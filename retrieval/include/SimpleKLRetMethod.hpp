@@ -176,10 +176,10 @@ protected:
   //@{
   /// Mixture model feedback method
   void computeMixtureFBModel(SimpleKLQueryModel &origRep, DocIDSet & relDocs);
-  /// Divergence minimization feedback method, not implemented
-  void computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) {}
-  /// Markov chain feedback method, not implemented
-  void computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) {}
+  /// Divergence minimization feedback method
+  void computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs);
+  /// Markov chain feedback method
+  void computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) 
   //@}
 
   SimpleKLParameter::DocSmoothParam docParam;

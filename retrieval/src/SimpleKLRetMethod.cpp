@@ -155,9 +155,9 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName
     throw Exception("SimpleKLRetMethod", "Markov chain support file can't be opened");
   }
 
-  mcNorm = new double[ind->termCountUnique()+1];
+  mcNorm = new double[ind.termCountUnique()+1];
   
-  for (i=1; i<= ind->termCountUnique(); i++) {
+  for (i=1; i<= ind.termCountUnique(); i++) {
     int id;
     double norm;
     ifs >> id >> norm;
