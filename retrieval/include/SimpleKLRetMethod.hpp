@@ -27,11 +27,11 @@
 class SimpleKLQueryModel : public ArrayQueryRep {
 public:
   /// construct a query model based on query text
-  SimpleKLQueryModel(TextQuery &qry, Index &dbIndex) : ArrayQueryRep(dbIndex.termCountUnique()+1, qry, dbIndex), qm(NULL), ind(dbIndex) {
+  SimpleKLQueryModel(TextQuery &qry, Index &dbIndex) : ArrayQueryRep(dbIndex.termCountUnique()+1, qry, dbIndex), qm(NULL), ind(dbIndex), colKLComputed(false) {
   }
 
   /// construct an empty query model
-  SimpleKLQueryModel(Index &dbIndex) : ArrayQueryRep(dbIndex.termCountUnique()+1), qm(NULL), ind(dbIndex) {
+  SimpleKLQueryModel(Index &dbIndex) : ArrayQueryRep(dbIndex.termCountUnique()+1), qm(NULL), ind(dbIndex), colKLComputed(false) {
     startIteration();
     while (hasMore()) {
       QueryTerm *qt = nextTerm();
@@ -64,7 +64,52 @@ have to sum to 1. The assumption is that if a word has an extrememly small proba
   /// save a query model/rep to output stream os
   virtual void save(ostream &os);
 
-private:
+
+
+
+  /// get and compute if necessary query-collection KL-div (useful for recovering the true divergence value from a score)
+  double colDivergence() {
+    if (colKLComputed) {
+      return colKL;
+    } else {
+      colKLComputed = true;
+      double d=0;
+      startIteration();
+      while (hasMore()) {
+	QueryTerm *qt=nextTerm();
+	double pr = qt->weight()/(double)totalCount();
+	double colPr = (ind.termCount(qt->id())+1)/(double)(ind.termCount()+ind.termCountUnique()); // Laplace smoothing, same as in SimpleKLRetMethod
+	d += pr*log(pr/colPr);
+	delete qt;
+	
+      }
+      colKL=d;
+      return d;
+    }
+  }
+
+
+
+  /// compute the KL-div of the query model and any unigram LM, i.e.,D(Mq|Mref)
+  double KLDivergence(UnigramLM &refMod) {
+    double d=0;
+    startIteration();
+    while (hasMore()) {
+      QueryTerm *qt=nextTerm();
+      double pr = qt->weight()/(double)totalCount();
+      d += pr*log(pr/refMod.prob(qt->id()));
+      delete qt;
+    }
+    return d;
+  }
+
+
+
+protected:
+
+  double colKL;
+  bool colKLComputed;
+
   IndexedRealVector *qm;
   Index &ind;
 };
@@ -100,9 +145,29 @@ public:
     // dynamic_cast<SimpleKLQueryModel *>qRep;
     SimpleKLDocModel *dm = (SimpleKLDocModel *)dRep;
       // dynamic_cast<SimpleKLDocModel *>dRep;
-    return (origScore+log(dm->scoreConstant())*qm->scoreConstant());
+
+    /// The following are three different options for scoring
+
+    /// ==== Option 1: query likelihood ==============
+    // this is the original query likelihood scoring formula
+    //  return (origScore+log(dm->scoreConstant())*qm->scoreConstant());
+
+    /// ==== Option 2: cross-entropy (normalized query likelihood) ==== 
+    // This is the normalized query-likelihood, i.e., cross-entropy
+    // assert(qm->scoreConstant()!=0);
+    // return (origScore/qm->scoreConstant() + log(dm->scoreConstant()));
+
+    /// ==== Option 3: negative KL-divergence ==== 
+    // This is the exact (negative) KL-divergence value, i.e., -D(Mq||Md)
+    assert(qm->scoreConstant()!=0);
+    return (origScore/qm->scoreConstant() + log(dm->scoreConstant())
+	    - qm->colDivergence());
+
+
   }
 };
+
+
 
 
 /// KL Divergence retrieval model with simple document model smoothing
