@@ -29,7 +29,17 @@ void DocScoreVector::PushValue(const char* str, double value)
   DocScore entry;
   entry.id = strdup(str);
   entry.val = value;
+  // the vector will make a shallow copy
   push_back(entry);
+}
+
+DocScoreVector::~DocScoreVector() {
+  //free memory from our strdup in PushValue
+  // parent destructor should take care of rest
+  for (int i=0;i<size();i++) {
+    if ((*this)[i].id) 
+      free((*this)[i].id);
+  }
 }
 
 

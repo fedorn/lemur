@@ -26,8 +26,8 @@
 #include <algorithm>
 
 struct DocScore {
-  const char* id;
   double val;
+  char* id;
 };
 
 
@@ -36,7 +36,7 @@ public:
   
   DocScoreVector() : vector<DocScore>() {}
   DocScoreVector(int size) : vector<DocScore>(size) {}
-  virtual ~DocScoreVector() {}
+  virtual ~DocScoreVector();
 
   /// push a value 
   virtual void PushValue(const char* docid, double value);
