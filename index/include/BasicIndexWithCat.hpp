@@ -162,7 +162,7 @@ inline const char *BasicIndexWithCat::category (int catID)
 inline int BasicIndexWithCat::catCount()
 {
   if (catAsTerm) {
-    return (catIndex->termCount());
+    return (catIndex->termCountUnique()-1); // -1 because of [OOV]
   } else {
     // docid as term, so cat as doc
     return (catIndex->docCount());
