@@ -143,7 +143,7 @@ int param_init(){
    param_init_buffers();
    if (ddinf_inited) return TRUE;
 
-   ddinfName = (char *) malloc(80);
+   //   ddinfName = (char *) malloc(80); // leaks. immediately overwritten.
    ddinfName = getenv("PARAM");
    ddinf_inited = TRUE;
 
@@ -182,7 +182,7 @@ void parse_stream(FILE *instream, char *inname){
       END_OF_LINE, COMMAND, QUOTE, DQUOTE, OTHER, FIXIT
      } class;
    
-   ddinf = push_ddinf_stream(instream, inname);
+   ddinf = push_ddinf_stream(instream, inname); // never freed, leaks.
 
    while (ddinf != NULL) {
       while ((c=getc(ddinf->stream)) != EOF) {
