@@ -261,7 +261,7 @@ COUNT_T InvIndex::docLengthCounted(DOCID_T docID) const{
   if ( !(look->gcount() == sizeof(COUNT_T)) ) 
     return 0;
   
-  return dl;
+  return dl/2;
 }
 
 DocInfoList* InvIndex::docInfoList(TERMID_T termID) const{
