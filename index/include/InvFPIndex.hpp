@@ -30,16 +30,16 @@ public:
   /// @name Index entry access
   //@{
   /// doc entries in a term index, @see DocList @see InvFPDocList
-  DocInfoList* docInfoList(int termID) const;
+  DocInfoList* docInfoList(TERMID_T termID) const;
 
   /// word entries in a document index (bag of words), @see TermList
-  TermInfoList* termInfoList(int docID) const;
+  TermInfoList* termInfoList(DOCID_T docID) const;
 
   /// word entries in a document index (sequence of words), @see TermList
-  TermInfoList* termInfoListSeq(int docID) const;
+  TermInfoList* termInfoListSeq(DOCID_T docID) const;
 
   /// Total count of terms in given document, not including stop words
-  int docLengthCounted(int docID) const;
+  int docLengthCounted(DOCID_T docID) const;
 
   //@}
 private:

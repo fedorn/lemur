@@ -34,7 +34,7 @@ class File;
 class InvFPTermList : public TermInfoList {
 public:
   InvFPTermList();
-  InvFPTermList(int did, int len, vector<LocatedTerm> &tls);
+  InvFPTermList(DOCID_T did, int len, vector<LocatedTerm> &tls);
   ~InvFPTermList();
 
   /// prepare iteration
@@ -53,7 +53,7 @@ public:
   int termCount()  const{ return listlen; }
 
   /// Get the docid this list is for
-  int docID()  const{ return uid; }
+  DOCID_T docID()  const{ return uid; }
 
   /// Read in a TermInfoList object from a file
   /// Assumes the following format: DOCID DOCLENGTH UNIQUE_TERM_COUNT [TERM LOC]..[]

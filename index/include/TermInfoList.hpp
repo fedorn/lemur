@@ -13,7 +13,7 @@
 #ifndef _TERMINFOLIST_HPP
 #define _TERMINFOLIST_HPP
 
-#include "InvFPTypes.hpp"
+#include "IndexTypes.hpp"
 #include "Exception.hpp"
 
 //!  Abstract Representation of Term Information Entry
@@ -29,15 +29,15 @@ includes  the term ID and the frequency of the term.
 class TermInfo {
 public:
   TermInfo() {}
-  TermInfo( int termID, int termCount) :
+  TermInfo( TERMID_T termID, int termCount) :
     tid(termID), tcount(termCount) {}
   virtual ~TermInfo() {}
 
   /// Term id
-  virtual int termID() const {return tid;}
+  virtual TERMID_T termID() const {return tid;}
 
   /// Set term id
-  virtual void termID(int id) {tid = id;}
+  virtual void termID(TERMID_T id) {tid = id;}
 
   /// Term count in the doc
   virtual int count() const {return tcount;}

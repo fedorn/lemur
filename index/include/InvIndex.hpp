@@ -61,18 +61,18 @@ public:
   //@{
 
   /// Convert a term spelling to a termID
-  int term(const string &word) const;
+  TERMID_T term(const TERM_T &word) const;
 
   /// Convert a termID to its spelling
-  const string term(int termID) const;
+  const TERM_T term(TERMID_T termID) const;
 
   /// Convert a spelling to docID
-  int document(const string &docIDStr) const;
+  DOCID_T document(const EXDOCID_T &docIDStr) const;
 
   /// Convert a docID to its spelling
-  const string document(int docID) const; 
+  const EXDOCID_T document(DOCID_T docID) const; 
 
-  const DocumentManager* docManager(int docID) const;
+  const DocumentManager* docManager(DOCID_T docID) const;
 
   //@}
 
@@ -86,7 +86,7 @@ public:
   int termCountUnique() const { return counts[UNIQUE_TERMS]; };
 
   /// Total counts of a term in collection
-  int termCount(int termID) const;
+  int termCount(TERMID_T termID) const;
 
   /// Total counts of all terms in collection
   int termCount() const { return counts[TOTAL_TERMS]; };
@@ -95,23 +95,23 @@ public:
   float docLengthAvg() const;
 
   /// Total counts of doc with a given term
-  int docCount(int termID) const;
+  int docCount(TERMID_T termID) const;
 
   /// Total counts of terms in a document, including stop words
   int docLength(DOCID_T docID) const;
 
   /// Total count of terms in given document, not including stop words
-  virtual int docLengthCounted(int docID) const;
+  virtual int docLengthCounted(DOCID_T docID) const;
 
   //@}
 
   /// @name Index entry access
   //@{
   /// doc entries in a term index, @see DocList @see InvFPDocList
-  DocInfoList* docInfoList(int termID) const;
+  DocInfoList* docInfoList(TERMID_T termID) const;
 
   /// word entries in a document index (bag of words), @see TermList
-  TermInfoList* termInfoList(int docID) const;
+  TermInfoList* termInfoList(DOCID_T docID) const;
 
   //@}
 

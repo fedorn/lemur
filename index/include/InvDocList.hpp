@@ -37,12 +37,12 @@ public:
 
   /// constructor for this list using malloc for its own memory
   /// usage of InvDocList without MemCache has not been tested
-  InvDocList(int id, int len);
+  InvDocList(TERMID_T id, int len);
   /// constructors for this list getting memory from a MemCache
-  InvDocList(MemCache* mc, int id, int len);  
-  InvDocList(MemCache* mc, int id, int len, int docid, int location);
+  InvDocList(MemCache* mc, TERMID_T id, int len);  
+  InvDocList(MemCache* mc, TERMID_T id, int len, DOCID_T docid, int location);
   /// constructor for a list not needing to get any memory
-  InvDocList(int id, int listlen, int* list, int fr, int* ldocid, int len);
+  InvDocList(TERMID_T id, int listlen, int* list, int fr, int* ldocid, int len);
   ~InvDocList();
 
   /// this is meant for use with the empty constructor
@@ -50,12 +50,12 @@ public:
   /// the outsider will be able to set everything properly.  thus, when this method
   /// is used, the object becomes READ_ONLY such that methods which attempt to append
   /// the contents of the list will not be able to @see setListSafe
-  void setList(int id, int listlen, int* list, int fr, int* ldocid=NULL, int len=0);
+  void setList(TERMID_T id, int listlen, int* list, int fr, int* ldocid=NULL, int len=0);
 
   /// same as the setList above.
   /// however the READ_ONLY flag will not get set.  this method should be used only
   /// if you really know what you're doing
-  void setListSafe(int id, int listlen, int* list, int fr, int* ldocid, int len);
+  void setListSafe(TERMID_T id, int listlen, int* list, int fr, int* ldocid, int len);
 
   /// reset the list such that it points to nothing. doesn't free the memory
   /// be careful when using this to avoid memory leaks.  if you are not managing
@@ -70,7 +70,7 @@ public:
   bool hasNoMem();
 
   /// increase count for this docid, we don't care about location
-  virtual bool addTerm(int docid);
+  virtual bool addTerm(DOCID_T docid);
 
   /// append the given list to the end of this list.  watch for overlap of lastdocid of this list and first docid of given list.
   virtual bool append(InvDocList* tail);
@@ -83,7 +83,7 @@ public:
   DOCID_T curDocID() const{ if (lastid == NULL) return -1; return *lastid; };
   int docFreq() const{ return df; };
   int length() const{ return end-begin; };
-  int termID() const{ return uid; };
+  TERMID_T termID() const{ return uid; };
   int termLen() const{ return strlength; };
   virtual int termCTF() const;
   int curDocIDdiff() const{ return lastid-begin; };

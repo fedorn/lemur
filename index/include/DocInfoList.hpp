@@ -13,7 +13,7 @@
 #ifndef _DOCINFOLIST_HPP
 #define _DOCINFOLIST_HPP
 
-#include "InvFPTypes.hpp"
+#include "IndexTypes.hpp"
 #include <iterator>
 
 
@@ -36,10 +36,10 @@ public:
   virtual ~DocInfo() {}
 
   /// Doc id
-  virtual int docID() const {return did;}
+  virtual DOCID_T docID() const {return did;}
 
   /// Set doc id
-  virtual void docID(int id) {did = id;}
+  virtual void docID(DOCID_T id) {did = id;}
 
   /// Term count in the doc
   virtual int termCount() const {return tcount;}

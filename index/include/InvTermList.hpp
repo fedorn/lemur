@@ -45,7 +45,7 @@ public:
   int termCount() const{ return listlen/2; }
 
   /// Get the docid this list is for
-  int docID() const{ return uid; }
+  DOCID_T docID() const{ return uid; }
 
   /// Read in a TermInfoList object from a file
   /// Assumes the following format: DOCID DOCLENGTH TID TERM_COUNT ..

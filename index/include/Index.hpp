@@ -74,21 +74,20 @@ public:
   //@{
 
   /// Convert a term spelling to a termID, returns 0 if out of vocabulary. Valid index starts at 1.
-  virtual int term (const string &word) const=0;
+  virtual TERMID_T term (const TERM_T &word) const=0;
 
   /// Convert a valid termID to its spelling
-  virtual const string term (int termID) const=0;
+  virtual const TERM_T term (TERMID_T termID) const=0;
 
   /// Convert a spelling to docID, returns 0 if out of vocabulary. Valid index starts at 1.
-  virtual int document (const string &docIDStr) const=0;
+  virtual DOCID_T document (const EXDOCID_T &docIDStr) const=0;
 
   /// Convert a valid docID to its spelling
-  virtual const string document (int docID) const=0;
-
+  virtual const EXDOCID_T document (DOCID_T docID) const=0;
   /// A String identifier for the document manager to get at the source
   /// of the document with this document id
   //  virtual const char* docManager(int docID) { return NULL;}
-  virtual const DocumentManager* docManager(int docID) const {return NULL;}
+  virtual const DocumentManager* docManager(DOCID_T docID) const {return NULL;}
 
 
   /// Return a string ID for the term lexicon (usually the file name of the lexicon)
@@ -109,7 +108,7 @@ public:
   virtual int termCountUnique () const=0;
 
   /// Total counts of a term in collection
-  virtual int termCount (int termID) const=0;
+  virtual int termCount (TERMID_T termID) const=0;
 
   /// Total counts of all terms in collection
   virtual int termCount () const=0;
@@ -118,26 +117,26 @@ public:
   virtual float docLengthAvg() const=0;
 
   /// Total counts of doc with a given term
-  virtual int docCount(int termID) const=0;
+  virtual int docCount(TERMID_T termID) const=0;
 
   /// Total counts of terms in a document  
-  virtual int docLength (int docID) const=0;
+  virtual int docLength (DOCID_T docID) const=0;
 
   //@}
 
   /// @name Index entry access
   //@{
   /// returns a new instance of DocInfoList which represents the doc entries in a term index, you must delete the instance later. @see DocInfoList
-  virtual DocInfoList *docInfoList(int termID) const=0;
+  virtual DocInfoList *docInfoList(TERMID_T termID) const=0;
 
   /// returns a new instance of TermInfoList which represents the word entries in a document index, you must delete the instance later. @see TermInfoList
-  virtual TermInfoList *termInfoList(int docID) const=0;
+  virtual TermInfoList *termInfoList(DOCID_T docID) const=0;
 
   //@}
 
   // returns TermInfoList is sequential representation (not bag of words)
   // return NULL list when sequence is not available.
-  virtual TermInfoList *termInfoListSeq(int docID) const { return NULL; }
+  virtual TermInfoList *termInfoListSeq(DOCID_T docID) const { return NULL; }
 
 };
 
