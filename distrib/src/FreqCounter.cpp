@@ -18,7 +18,7 @@
 
 // need time to seed the random number generator
 #ifdef _WIN32
-#include <afx.h>
+#include <time.h>
 #else
 #include <sys/time.h>
 #endif
