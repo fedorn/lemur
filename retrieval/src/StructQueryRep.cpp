@@ -50,98 +50,6 @@ QnList * StructQueryRep::getChildren(StructQuery &qry, getFunc getFn,
   return chlist;
 }
 
-#if 0  
-QnList * StructQueryRep::getChildren(StructQuery &qry) {
-  TokenTerm *tok;
-  QueryNode *qn;
-  QueryNode *qParent = qStack[topqStack-1];
-  QnList *chlist = new QnList();
-  int cnt = 0;
-  while(qry.hasMore()) {
-    tok = qry.nextTerm();
-    if(!strcmp(tok->spelling(), "RPAREN")) {
-      if(qParent == qStack[--topqStack]) {
-	qParent->setEntries(cnt);
-	return chlist;
-      } else {
-	cerr << "StructQueryRep::getChildren: Unmatched Parentheses" << endl;
-	exit(1);
-      }
-    }
-    else {
-      qn = getQryNode(qry, tok, 1.0);
-      if (qn) { // OOV returns null node
-	chlist->push_back(qn);
-	cnt++;
-      }
-    }
-  }
-  qParent->setEntries(cnt);
-  return chlist;
-}
-
-QnList * StructQueryRep::getWeightedChildren(StructQuery &qry) {
-  TokenTerm *tok;
-  QueryNode *qn;
-  QueryNode *qParent = qStack[topqStack-1];
-  QnList *chlist = new QnList();
-  double wt;
-  int cnt = 0;
-  while(qry.hasMore()) {
-    tok = qry.nextTerm();
-    if(!strcmp(tok->spelling(), "RPAREN")) {
-      if(qParent == qStack[--topqStack]) {
-	qParent->setEntries(cnt);
-	return chlist;
-      } else {
-	cerr << "StructQueryRep::getWeightedChildren: Unmatched Parentheses" << endl;
-	exit(1);
-      }
-    }
-    // each child has to have a weight and a qnode
-    wt = (double)atof(tok->spelling());
-    tok = qry.nextTerm();
-    qn = getQryNode(qry, tok, wt);
-    if (qn) { // OOV returns null node
-      chlist->push_back(qn);
-      cnt++;
-    }
-  }
-  qParent->setEntries(cnt);
-  return chlist;
-}
-
-QnList * StructQueryRep::getProxChildren(StructQuery &qry) {
-  TokenTerm *tok;
-  QueryNode *qn;
-  QueryNode *qParent = qStack[topqStack-1];
-  QnList *chlist = new QnList();
-  int cnt = 0;
-  while(qry.hasMore()) {
-    tok = qry.nextTerm();
-    if(!strcmp(tok->spelling(), "RPAREN")) {
-      if(qParent == qStack[--topqStack]) {
-	qParent->setEntries(cnt);
-	return chlist;
-      } else {
-	cerr << "StructQueryRep::getProxChildren: Unmatched Parentheses" << endl;
-	exit(1);
-      }
-    }
-    else {
-      // rewrite these to take a fn pointer...
-      // only difference from getChildren
-      qn = getProxQryNode(qry, tok);
-      // OOV returns empty prox node.
-      chlist->push_back(qn);
-      cnt++;
-    }
-  }
-  qParent->setEntries(cnt);
-  return chlist;
-}
-
-#endif
 QueryNode * StructQueryRep::getProxQryNode(StructQuery &qry, TokenTerm *tok, 
 					   double w) {
   // using a separate function for parsing proximity ops
@@ -192,6 +100,16 @@ QueryNode * StructQueryRep::getProxQryNode(StructQuery &qry, TokenTerm *tok,
     qn->updateDocList(numDocs);
     return qn;
   }
+  // PROP
+  else if(!strcmp(tok->spelling(),"#PROP")) {
+    // skip the next token which must be LPAREN
+    tok = qry.nextTerm();
+    qn = new PropQNode(w, dw);
+    qStack[topqStack++] = qn;
+    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
+    qn->updateDocList(numDocs);
+    return qn;
+  }
   else {
     // found an OOV term
     qn = new TermQnode(0, 1.0);
@@ -229,7 +147,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));//    qn->setChildren(getChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -238,7 +156,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));//    qn->setChildren(getChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -247,7 +165,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));//    qn->setChildren(getChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
     // #NOT has to eval every document individually
     int i, dc = numDocs + 1;
     bool *didList = new bool[dc];
@@ -264,7 +182,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));    //    qn->setChildren(getChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -273,7 +191,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));//    qn->setChildren(getChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -282,7 +200,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));    //    qn->setChildren(getChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -291,7 +209,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));//    qn->setChildren(getChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -300,7 +218,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));    //    qn->setChildren(getChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -309,7 +227,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     tok = qry.nextTerm();
     qn = new WsumQnode(w);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode, true));    //    qn->setChildren(getWeightedChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode, true));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -321,7 +239,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     tok = qry.nextTerm();
     qn = new OdnQNode(size, w, dw);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));//    qn->setChildren(getProxChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -333,7 +251,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     tok = qry.nextTerm();
     qn = new UwnQNode(size, w, dw);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));//    qn->setChildren(getProxChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -346,7 +264,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     qn = new PassageQNode(size, w);
     qStack[topqStack++] = qn;
     // passage op allows any kind of children qnodes
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));//    qn->setChildren(getChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -356,7 +274,17 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
     tok = qry.nextTerm();
     qn = new SynQNode(w, dw);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));//    qn->setChildren(getProxChildren(qry));
+    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
+    qn->updateDocList(numDocs);
+    return qn;
+  }
+  // PROP
+  else if(!strcmp(tok->spelling(),"#PROP")) {
+    // skip the next token which must be LPAREN
+    tok = qry.nextTerm();
+    qn = new PropQNode(w, dw);
+    qStack[topqStack++] = qn;
+    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }

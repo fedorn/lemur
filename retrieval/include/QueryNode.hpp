@@ -594,4 +594,12 @@ private:
   void synonymProxList();
 };
 
+/// Implements the PROP operator. This implementation uses #0 to model
+/// #prop(field proxnode). Implementation and inheritance may change.
+class PropQNode : public OdnQNode {
+public:
+  PropQNode(double w, double d) : OdnQNode(0, w, d){}
+  virtual ~PropQNode() {}
+};
+
 #endif
