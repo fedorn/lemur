@@ -108,7 +108,6 @@ int AppMain(int argc, char *argv[]) {
       // cout << i << "\t" <<  ind->termCount(info->id()) << "\t" << ind->term(info->id()) << endl;
 
       size++;
-      delete info;
     }
     prSum = prSum / (double)(ind->termCount()+ind->termCountUnique());
     ofs << i << " " << size << " "<< prSum << endl;
