@@ -23,6 +23,14 @@ Parser* TextHandlerManager::createParser(string type, string acros) {
     type = ParamGetString("docFormat");
   }
 
+  // if it's still empty, return nothing
+  if (type.empty())
+    return NULL;
+
+  // make it all lowercase
+  for (int i=0;i<type.length();i++)
+    type[i] = tolower(type[i]);
+
   if (type.compare( "web") == 0) {
     parser = new WebParser();
   } else if (type.compare("reuters") == 0) {
@@ -56,6 +64,14 @@ Stemmer* TextHandlerManager::createStemmer(string type, string datadir, string f
     // didn't pass in type, try to get it from the paramstack
     type = ParamGetString("stemmer");
   }  
+
+  // if it's still empty, return nothing
+  if (type.empty())
+    return NULL;
+
+  // make it all lowercase
+  for (int i=0;i<type.length();i++)
+    type[i] = tolower(type[i]);
 
   if (type.compare("krovetz") == 0) {
     stemmer = new KStemmer();
