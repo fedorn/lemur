@@ -15,6 +15,9 @@
 /*
  * NAME DATE - COMMENTS
  * tnt 04/2002 - created
+ * dmf 10/22/2002 -- Change to open all of the inverted list files 
+ * (dtfiles, invfiles) once at initialization and store the open streams 
+ * in the arrays dtfstreams and invfstreams.
  *
  *========================================================================*/
 
@@ -22,7 +25,9 @@ InvIndex::InvIndex() {
   lookup = NULL;  
   dtlookup = NULL;
   dtfiles = NULL;
+  dtfstreams = NULL;
   invfiles = NULL;
+  invfstreams = NULL;
   docnames = NULL;
   terms = NULL;
   aveDocLen = 0;
@@ -32,7 +37,9 @@ InvIndex::InvIndex(const char* indexName) {
   lookup = NULL;  
   dtlookup = NULL;
   dtfiles = NULL;
+  dtfstreams = NULL;
   invfiles = NULL;
+  invfstreams = NULL;
   docnames = NULL;
   terms = NULL;
   aveDocLen = 0;
@@ -65,12 +72,24 @@ InvIndex::~InvIndex() {
     }
     delete[](dtfiles);
   }
+  if (dtfstreams != NULL) {
+    for (i=0;i<counts[DT_FILES];i++) {
+      dtfstreams[i].close();
+    }
+    delete[](dtfstreams);
+  }
 
   if (invfiles != NULL) {
     for (i=0;i<counts[INV_FILES];i++) {
       delete[](invfiles[i]);
     }
     delete[](invfiles);
+  }
+  if (invfstreams != NULL) {
+    for (i=0;i<counts[INV_FILES];i++) {
+      invfstreams[i].close();
+    }
+    delete[](invfstreams);
   }
 
   for (i = 0; i < docmgrs.size(); i++)
@@ -262,18 +281,16 @@ int InvIndex::docLengthCounted(int docID) {
 
   int dl;
   DOCID_T id;
-  ifstream look;
-  look.open(dtfiles[dtlookup[docID].fileid], ios::in | ios::binary);
+  ifstream *look = &(dtfstreams[dtlookup[docID].fileid]);
   if (!look) {
     *msgstream << "Could not open term indexfile for reading." << endl;
     return 0;
   }
-  look.seekg(dtlookup[docID].offset, ios::beg);
-  look.read((char*)&id, sizeof(DOCID_T));
-  look.read((char*)&dl, sizeof(int));
-  look.read((char*)&dl, sizeof(int));
-  look.close();
-  if ( !(look.gcount() == sizeof(int)) ) 
+  look->seekg(dtlookup[docID].offset, ios::beg);
+  look->read((char*)&id, sizeof(DOCID_T));
+  look->read((char*)&dl, sizeof(int));
+  look->read((char*)&dl, sizeof(int));
+  if ( !(look->gcount() == sizeof(int)) ) 
     return 0;
   
   return dl;
@@ -287,26 +304,21 @@ DocInfoList* InvIndex::docInfoList(int termID){
 
   if (termID == 0)
     return NULL;
-
-  ifstream indexin;
-
-  indexin.open(invfiles[lookup[termID].fileid], ios::in | ios::binary);
-  indexin.seekg(lookup[termID].offset, ios::beg);
+  ifstream *indexin = &(invfstreams[lookup[termID].fileid]);
+  indexin->seekg(lookup[termID].offset, ios::beg);
   DocInfoList* doclist;
   InvDocList* dlist = new InvDocList();
   bool success;
 
   if (strcmp(names[VERSION_NUM], "")) {
     // version 1.9 is compressed and must be decompressed
-    success = dlist->binReadC(indexin);
+    success = dlist->binReadC(*indexin);
   } else {
-    success = dlist->binRead(indexin);
+    success = dlist->binRead(*indexin);
   }
   if (!success) {
-    indexin.close();
     return NULL;
   } else {
-    indexin.close();
     doclist = dlist;
     return doclist;
   }
@@ -325,18 +337,13 @@ TermInfoList* InvIndex::termInfoList(int docID){
     *msgstream << "DT index must be loaded to obtain termInfoList" << endl;
     return NULL;
   }
-
-  ifstream indexin;
-  indexin.open(dtfiles[dtlookup[docID].fileid], ios::in | ios::binary);
-  indexin.seekg(dtlookup[docID].offset, ios::beg);
+  ifstream *indexin = &(dtfstreams[dtlookup[docID].fileid]);
+  indexin->seekg(dtlookup[docID].offset, ios::beg);
   TermInfoList* termlist;
   InvTermList* tlist = new InvTermList();
-  if (!tlist->binRead(indexin)) {
-    indexin.close();
+  if (!tlist->binRead(*indexin)) {
     return NULL;
   } 
-
-  indexin.close();
   termlist = tlist;
   return termlist;
 }
@@ -388,6 +395,7 @@ bool InvIndex::fullToc(const char * fileName) {
 
   aveDocLen = counts[TOTAL_TERMS] / (float) counts[DOCS];
 
+  fclose(in);
   return true;
 }
 
@@ -480,7 +488,7 @@ bool InvIndex::dtFileIDs() {
 
 
   dtfiles = new char*[counts[DT_FILES]];
-
+  dtfstreams = new ifstream[counts[DT_FILES]];
   int index;
   int len;
   char* str;
@@ -496,6 +504,9 @@ bool InvIndex::dtFileIDs() {
     }
     str[len] = '\0';
     dtfiles[index] = str;
+    dtfstreams[index].open(dtfiles[index], ios::in | ios::binary);
+    if (dtfstreams[index] == NULL)
+      cerr << "error opening: " << dtfiles[index] << endl;
   }
 
   fclose(in);
@@ -538,7 +549,7 @@ bool InvIndex::invFileIDs() {
   }
 
   invfiles = new char*[counts[INV_FILES]];
-
+  invfstreams = new ifstream[counts[INV_FILES]];
   int index;
   int len;
   char* str;
@@ -554,6 +565,7 @@ bool InvIndex::invFileIDs() {
     }
     str[len] = '\0';
     invfiles[index] = str;
+    invfstreams[index].open(invfiles[index], ios::in | ios::binary);
   }
 
   fclose(in);
