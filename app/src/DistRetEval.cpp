@@ -12,10 +12,13 @@
 
 /** author: tnt, lsi */
 
-/** This is a sample application that does distributed retrieval, using
-    a collection selection index and individual indexes.  Database ranking
-    is done using the CORIRetMethod (the only db ranking implemented thus
-    far).  Merging can be done using any available DistMergeMethod.
+/** 
+    This is a sample application that does distributed retrieval, using a
+    resource selection index and individual indexes. resource selection is done
+    using the CORI_CS  (the only resource selection implemented thus far).
+    results merging uses either CORIMergeMethod (The retrieval method of each
+    individual databases should be CORI_DOC) or SingleRegrMergeMethod (The
+    retrieval method of each individual databases should be CORI_DOC).
 
     Parameters should be set as follows:
     index = the collection selection database
@@ -30,7 +33,29 @@
 	    retModel = the retrieval model to use
 	    mergeMethod = the merging method to use
 	    "modelvals" - whatever parameters are required for that retModel
+    CSTF_factor  The TFfactor parameter in the CORI_CS resource
+    selection method.
+
+    CSTF_baseline The TFbaseline parameter in the CORI_CS resource
+    selection method.
+
+    mergeMethod  resource merging method (0 for CORI results merging
+    method, 1 for single regression results merging method)
+
+    Merginge Method-specific parameters:
+
+         For CORI mergine Method: None
     
+	 For  Single regression merging method:
+    
+	 1. csDbDataBaseIndex the centralized sampling database index
+
+         2. DOCTF_factor  The TFfactor parameter in the CORI_DOC retrieval
+	 method for the centralized sampling database.
+	 
+         3. DOCTF_baseline The TFbaseline parameter in the CORI_DOC
+retrieval method for the centralized sampling database.
+
 **/
 
 #include "CORIRetMethod.hpp"
