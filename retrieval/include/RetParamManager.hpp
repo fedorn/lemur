@@ -123,9 +123,13 @@ namespace SimpleKLParameter {
     qryPrm.emIterations = ParamGetInt("emIterations",defaultEMIterations);
 					      
   }
-}
+};
 
-
-
+namespace CORIParameter {
+  static String collectionCounts;
+  static void get() {
+    collectionCounts = ParamGetString("collCounts");
+  }
+};
 
 #endif
