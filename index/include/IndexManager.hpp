@@ -14,6 +14,8 @@
 #ifndef _INDEXMANAGER_HPP
 #define _INDEXMANAGER_HPP
 #include "Index.hpp"
+// force parsing includes to get dependencies.
+#include "indri/Repository.hpp"
 /// A group of index management functions
 class IndexManager {
 public:
