@@ -16,21 +16,75 @@
 #include "InvFPTermList.hpp"
 #include "InvFPIndex.hpp"
 #include "Counter.hpp"
+#include <cstring>
 
 /// Document term frequency counter that supports both whole documents and
 /// and passages of documents. Requires the use of an InvFPIndex.
+class DocTermsCounter {
+public:
+  DocTermsCounter(int docID, InvFPIndex &indx)  : 
+    ind(indx)
+  { 
+    int size = indx.termCountUnique()+1;
+    ct = new int [size];
+    //    for (int i=0; i<size; i++) ct[i]=0;
+    memset(ct, '\0', size * sizeof(int));
+    // Make it faster by skipping the countTerms step.
+    TermInfoList *tList = indx.termInfoListSeq(docID);
+    TermInfo *info;
+    tList->startIteration();
+    while (tList->hasMore()) {
+      info = tList->nextEntry();
+      ct[info->id()]++;
+    }
+    delete tList;
+  }
+
+  /// construct a counter for a passage from the document.
+  DocTermsCounter(int docID, InvFPIndex &indx, int start, int end) : 
+    ind(indx)
+  { 
+    int size = indx.termCountUnique()+1;
+    ct = new int [size];
+    //    for (int i=0; i<size; i++) ct[i]=0;
+    memset(ct, '\0', size * sizeof(int));
+    TermInfoList *dTerms=indx.termInfoListSeq(docID);
+    InvFPTerm *term;
+    dTerms->startIteration();
+    while (dTerms->hasMore()) {
+      term = (InvFPTerm *) dTerms->nextEntry();
+      if(term->position()>start) {
+	if(term->position() > end)
+	  break;
+	ct[term->id()]++;
+      }
+    }
+    delete dTerms;
+  }
+
+  virtual ~DocTermsCounter() { delete[] (ct);}
+  /// return the count of an event
+  virtual double count(int eventIndex) {
+    return ct[eventIndex];
+  }
+
+protected:
+  int *ct;
+  InvFPIndex &ind;
+};
+#if 0
 class DocTermsCounter : public ArrayCounter <int> {
 public:
   /// construct a counter for a doc
   DocTermsCounter(int docID, InvFPIndex &indx) : 
     ind(indx), ArrayCounter<int>(indx.termCountUnique()+1)
   { 
-    TermInfoList *tList = indx.termInfoList(docID);
+    TermInfoList *tList = indx.termInfoListSeq(docID);
     TermInfo *info;
     tList->startIteration();
     while (tList->hasMore()) {
       info = tList->nextEntry();
-      incCount(info->id(), info->count());
+      incCount(info->id(), 1);
     }
     delete tList;
   }
@@ -57,7 +111,7 @@ public:
 protected:
   InvFPIndex &ind;
 };
-
+#endif
 /// Representation of a doc (as a weighted vector) in the StructQry method.
 /// Provides support for passage level operations on a document.
 class StructQryDocRep : public DocumentRep {
