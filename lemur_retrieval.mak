@@ -1,6 +1,6 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on lemur_retrieval.dsp
 !IF "$(CFG)" == ""
-CFG=lemur_retrieval - Win32 Release
+CFG=lemur_retrieval - Win32 Release 
 !MESSAGE No configuration specified. Defaulting to lemur_retrieval - Win32 Release.
 !ENDIF 
 
@@ -37,8 +37,12 @@ ALL : ".\lemur_retrieval.lib"
 
 
 CLEAN :
+	-@erase "$(INTDIR)\FreqVector.obj"
+	-@erase "$(INTDIR)\IndexedReal.obj"
 	-@erase "$(INTDIR)\OkapiRetMethod.obj"
+	-@erase "$(INTDIR)\ResultFile.obj"
 	-@erase "$(INTDIR)\RetrievalMethod.obj"
+	-@erase "$(INTDIR)\ScoreAccumulator.obj"
 	-@erase "$(INTDIR)\SimpleKLRetMethod.obj"
 	-@erase "$(INTDIR)\TextQueryRep.obj"
 	-@erase "$(INTDIR)\TextQueryRetMethod.obj"
@@ -62,7 +66,11 @@ LIB32_OBJS= \
 	"$(INTDIR)\SimpleKLRetMethod.obj" \
 	"$(INTDIR)\TextQueryRep.obj" \
 	"$(INTDIR)\TextQueryRetMethod.obj" \
-	"$(INTDIR)\TFIDFRetMethod.obj"
+	"$(INTDIR)\TFIDFRetMethod.obj" \
+	"$(INTDIR)\FreqVector.obj" \
+	"$(INTDIR)\IndexedReal.obj" \
+	"$(INTDIR)\ResultFile.obj" \
+	"$(INTDIR)\ScoreAccumulator.obj"
 
 ".\lemur_retrieval.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -78,8 +86,12 @@ ALL : ".\lemur_retrieval.lib"
 
 
 CLEAN :
+	-@erase "$(INTDIR)\FreqVector.obj"
+	-@erase "$(INTDIR)\IndexedReal.obj"
 	-@erase "$(INTDIR)\OkapiRetMethod.obj"
+	-@erase "$(INTDIR)\ResultFile.obj"
 	-@erase "$(INTDIR)\RetrievalMethod.obj"
+	-@erase "$(INTDIR)\ScoreAccumulator.obj"
 	-@erase "$(INTDIR)\SimpleKLRetMethod.obj"
 	-@erase "$(INTDIR)\TextQueryRep.obj"
 	-@erase "$(INTDIR)\TextQueryRetMethod.obj"
@@ -104,7 +116,11 @@ LIB32_OBJS= \
 	"$(INTDIR)\SimpleKLRetMethod.obj" \
 	"$(INTDIR)\TextQueryRep.obj" \
 	"$(INTDIR)\TextQueryRetMethod.obj" \
-	"$(INTDIR)\TFIDFRetMethod.obj"
+	"$(INTDIR)\TFIDFRetMethod.obj" \
+	"$(INTDIR)\FreqVector.obj" \
+	"$(INTDIR)\IndexedReal.obj" \
+	"$(INTDIR)\ResultFile.obj" \
+	"$(INTDIR)\ScoreAccumulator.obj"
 
 ".\lemur_retrieval.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -154,15 +170,39 @@ LIB32_OBJS= \
 
 
 !IF "$(CFG)" == "lemur_retrieval - Win32 Release" || "$(CFG)" == "lemur_retrieval - Win32 Debug"
+SOURCE=.\retrieval\src\FreqVector.cpp
+
+"$(INTDIR)\FreqVector.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\retrieval\src\IndexedReal.cpp
+
+"$(INTDIR)\IndexedReal.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\retrieval\src\OkapiRetMethod.cpp
 
 "$(INTDIR)\OkapiRetMethod.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=.\retrieval\src\ResultFile.cpp
+
+"$(INTDIR)\ResultFile.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\retrieval\src\RetrievalMethod.cpp
 
 "$(INTDIR)\RetrievalMethod.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\retrieval\src\ScoreAccumulator.cpp
+
+"$(INTDIR)\ScoreAccumulator.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
