@@ -203,6 +203,9 @@
 			<File
 				RelativePath=".\src\Repository.cpp">
 			</File>
+			<File
+				RelativePath=".\src\TopdocsIndex.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -393,6 +396,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\TermListBuilder.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\TopdocsIndex.hpp">
 			</File>
 		</Filter>
 		<Filter

@@ -216,6 +216,9 @@
 				RelativePath=".\src\Packer.cpp">
 			</File>
 			<File
+				RelativePath=".\src\PonteExpander.cpp">
+			</File>
+			<File
 				RelativePath=".\src\PriorFactory.cpp">
 			</File>
 			<File
@@ -485,6 +488,9 @@
 				RelativePath=".\include\PassageRep.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\PonteExpander.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\PriorFactory.hpp">
 			</File>
 			<File
@@ -618,9 +624,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\TwoStageTermScoreFunction.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\UnknownRemoverCopier.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\UnnecessaryNodeRemoverCopier.hpp">
