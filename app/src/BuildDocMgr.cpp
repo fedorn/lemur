@@ -170,9 +170,9 @@ int AppMain(int argc, char * argv[]) {
   docmgr->buildMgr();
   
   // free memory
+  delete(indexer);
   delete(stopper);
   delete(stemmer);
-  delete(indexer);
   delete(ind);
   delete(docmgr);
   return 0;
