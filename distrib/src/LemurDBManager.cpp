@@ -22,20 +22,34 @@ LemurDBManager::open(char * dbname) {
   // Load the parameter file 
   String dbparam(dbname);
   ParamPushFile(dbparam);
-  LemurParameter::get();
+
+  //This is unnecessary, RetrievalParamter::get() is sufficient.
+  //  LemurParameter::get(); 
+  // dmf 01/16/2004
+  RetrievalParameter::get();
 
   // Create the index
-  index = IndexManager::openIndex(LemurParameter::dbname);
+  //  index = IndexManager::openIndex(LemurParameter::dbname);
+  // dmf 01/16/2004
+  index = IndexManager::openIndex(RetrievalParameter::databaseIndex);
   // Create the parser
   parser = new LemurMemParser(index);
   // Create the results list
   accumulator = new ArrayAccumulator(index->docCount());
   results = new IndexedRealVector(index->docCount());
   
-  model = RetMethodManager::createModel(index, (ArrayAccumulator*)accumulator, LemurParameter::mod);
+  //  model = RetMethodManager::createModel(index, (ArrayAccumulator*)accumulator, LemurParameter::mod);
+  // dmf 01/16/2004
+  model = RetMethodManager::createModel(index, (ArrayAccumulator*)accumulator,
+					RetrievalParameter::retModel);
 
   // Why did I comment this out?
-  //  ParamPopFile();
+  
+  // dmf 01/16/2004 -- perhaps because if it gets called with only a single
+  // previous file pushed, ParamPopFile aborts due to using String(NULL). 
+  // Issue addressed in 2.2
+  
+  ParamPopFile();
 
   outfile = NULL;
 }

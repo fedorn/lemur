@@ -22,6 +22,9 @@
 #include "LemurMemParser.hpp"
 #include "RetMethodManager.hpp"
 
+// All of these are available from RetrievalParameter directly
+// No need for an additional namespace. --dmf 01/16/2004
+#if 0
 /// Parameters needed for querying Lemur databases
 namespace LemurParameter {
   static RetMethodManager::RetModel mod;
@@ -37,6 +40,7 @@ namespace LemurParameter {
   }
 };
 
+#endif
 /*! Provides a simple wrapper to lemur databases for 
  * use with the query-based sampling code.
  */
