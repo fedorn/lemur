@@ -27,10 +27,6 @@ public:
    InvFPIndex(const char* indexName);
   ~InvFPIndex(); 
 
-  /// Open previously created Index using names in given param file, return true if opened successfully
-  bool openName(char* filename);
-
-
   /// @name Index entry access
   //@{
   /// doc entries in a term index, @see DocList @see InvFPDocList

@@ -28,67 +28,6 @@ InvFPIndex::~InvFPIndex() {
   // base class will take care of everything
 }
 
-bool InvFPIndex::openName(char* indexName){
-  counts = new int[5];
-  names = new char*[6];  
-  int nameLen = strlen(indexName)+1;
-
-  char * tocName = new char[nameLen + strlen(INVFPTOC) + 1];
-  strncpy(tocName, indexName, nameLen);
-  strcpy(tocName + nameLen, INVFPTOC);
-
-  if (!mainToc(tocName)) {
-    delete[](tocName);
-    return false;
-  }
-  delete[](tocName);
-
-  names[DOC_INDEX] = new char[nameLen + strlen(INVFPINDEX)];
-  strncpy(names[DOC_INDEX], indexName, nameLen);
-  strcpy(names[DOC_INDEX] + nameLen, INVFPINDEX);
-
-  names[DOC_LOOKUP] = new char[nameLen + strlen(INVLOOKUP)];
-  strncpy(names[DOC_LOOKUP], indexName, nameLen);
-  strcpy(names[DOC_LOOKUP] + nameLen, INVLOOKUP);
-
-  names[TERM_INDEX] = new char[nameLen + strlen(DTINDEX)];
-  strncpy(names[TERM_INDEX], indexName, nameLen);
-  strcpy(names[TERM_INDEX] + nameLen, DTINDEX);
-
-  names[TERM_LOOKUP] = new char[nameLen + strlen(DTLOOKUP)];
-  strncpy(names[TERM_LOOKUP], indexName, nameLen);
-  strcpy(names[TERM_LOOKUP] + nameLen, DTLOOKUP);
-
-  names[TERM_IDS] = new char[nameLen + strlen(TERMIDMAP)];
-  strncpy(names[TERM_IDS], indexName, nameLen);
-  strcpy(names[TERM_IDS] + nameLen, TERMIDMAP);
-
-  names[DOC_IDS] = new char[nameLen + strlen(DOCIDMAP)];
-  strncpy(names[DOC_IDS], indexName, nameLen);
-  strcpy(names[DOC_IDS] + nameLen, DOCIDMAP);
-
-  if (!indexLookup())
-    return false;
-
-  if (!dtLookup())
-    return false;
-
-  if (!dtFileIDs())
-    return false;
-
-  if (!invFileIDs())
-    return false;
-
-  if (!termIDs())
-    return false;
-
-  if (!docIDs())
-    return false;
-
-  *lemurstream << "Load index complete." << endl;
-  return true;
-}
-
 DocInfoList* InvFPIndex::docInfoList(int termID){
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS])) {
     *lemurstream << "Error:  Trying to get docInfoList for invalid termID" << endl;    
@@ -116,7 +55,7 @@ DocInfoList* InvFPIndex::docInfoList(int termID){
 
 TermInfoList* InvFPIndex::termInfoList(int docID){
   if ((docID < 0) || (docID > counts[DOCS])) {
-    fprintf(stderr, "Error trying to get termInfoList for invalid docID.\n");
+    *lemurstream <<  "Error trying to get termInfoList for invalid docID.\n" << endl;
     return NULL;
   }
     
@@ -143,7 +82,7 @@ TermInfoList* InvFPIndex::termInfoList(int docID){
 
 TermInfoList* InvFPIndex::termInfoListSeq(int docID){
   if ((docID < 0) || (docID > counts[DOCS])) {
-    fprintf(stderr, "Error trying to get termInfoList for invalid docID.\n");
+    *lemurstream << "Error trying to get termInfoList for invalid docID.\n"<< endl;
     return NULL;
   }
     
