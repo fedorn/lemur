@@ -31,7 +31,7 @@ public:
   /// Returns the property with a given name.  Returns
   /// NULL if there is no property in the list with that name.
   /// Do not deallocate the returned pointer.
-  virtual const Property * getProperty(const char * name) const= 0;
+  virtual const Property * getProperty(const string name) const= 0;
 
   /// Starts iteration over properties.
   virtual void startIteration() const= 0;
@@ -52,7 +52,7 @@ public:
   /// Removes a property from the list with the
   /// passed in name.  If no property in the list has
   /// the name, the function fails silently.
-  virtual void removeProperty(const char * name) = 0;
+  virtual void removeProperty(const string name) = 0;
 
   /// Clears all properties from the list
   virtual void clear() = 0;

@@ -12,8 +12,7 @@
 #include "common_headers.hpp"
 
 Property::Property() {
-  nameSize = INITNAMESIZE;
-  name = new char[nameSize];
+  name = "";
   nullName = true;
 
   buffer = new char[INITBUFFSIZE];
@@ -23,14 +22,8 @@ Property::Property() {
   destructor = 0;
 }
 
-Property::Property(const char * initName) {
-  nameSize = INITNAMESIZE;
-  int length = strlen(initName) + 1;
-  if (length > nameSize) {
-    nameSize = length;
-  }
-  name = new char[nameSize];
-  strcpy(name, initName);
+Property::Property(const string initName) {
+  name = initName;
   nullName = false;
 
   buffer = new char[INITBUFFSIZE];
@@ -46,19 +39,12 @@ Property::~Property() {
     destructor = 0;
   }
 
-  delete [] name;
   delete [] buffer;
 }
 
-void Property::setName(const char * newName) {
-  if (newName != (char *) NULL) {
-    int length = strlen(newName) + 1;
-    if (length > nameSize) {
-      nameSize = length;
-      delete [] name;
-      name = new char[nameSize];
-    }
-    strcpy(name, newName); 
+void Property::setName(const string newName) {
+  if (! newName.empty() ) {
+    name = newName;
     nullName = false;
   } else {
     nullName = true;
@@ -78,7 +64,7 @@ void Property::copyValue(const Property * property) {
   }
 }
 
-const char * Property::getName() const{
+const string Property::getName() const{
   return (nullName ? NULL : name);
 }
 

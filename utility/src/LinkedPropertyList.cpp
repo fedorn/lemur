@@ -29,7 +29,7 @@ LinkedPropertyList::~LinkedPropertyList() {
 /// NULL if there is no property in the list with that name.
 /// Do not deallocate the returned pointer.
 const Property * 
-LinkedPropertyList::getProperty(const char * name) const{
+LinkedPropertyList::getProperty(const string name) const{
   Property * prop = getPropertyInternal(name);
   if (prop != NULL) {
     returnProp.setName(prop->getName());
@@ -78,7 +78,7 @@ LinkedPropertyList::hasMore() const{
 /// will not affect the property in the list.
 void 
 LinkedPropertyList::setProperty(const Property * property) {
-  if (property != NULL && property->getName() != NULL) {
+  if ((property != NULL) && (!property->getName().empty())) {
     Property * prop = getPropertyInternal(property->getName());
     if (prop == NULL) {
       prop = getAProperty();
@@ -93,7 +93,7 @@ LinkedPropertyList::setProperty(const Property * property) {
 /// passed in name.  If no property in the list has
 /// the name, the function fails silently.
 void 
-LinkedPropertyList::removeProperty(const char * name) {
+LinkedPropertyList::removeProperty(const string name) {
   Property * prop = getPropertyInternal(name);
   // if the property is there, move it to the cache
   if (prop != NULL) {
@@ -128,12 +128,12 @@ LinkedPropertyList::getAProperty() {
 }
 
 Property * 
-LinkedPropertyList::getPropertyInternal(const char * name) const{
+LinkedPropertyList::getPropertyInternal(const string name) const{
   Property * prop = NULL;
-  if (name != NULL) {
+  if (!name.empty()) {
     plist::iterator iter = properties.begin();
     while (iter != properties.end()) {
-      if (!strcmp((*iter)->getName(), name)) {
+      if ((*iter)->getName() == name) {
 	prop = *iter;
 	break;
       }

@@ -26,20 +26,20 @@
     Caller should not free memory returned by getValue
  */
 
-#include <cstring>
+#include "common_headers.hpp"
 
 class Property {
 public:
-  enum DataType {EMPTY = 0, INT = 1, STRING = 2, DOUBLE = 3, UNKNOWN = 4};
+  enum DataType {EMPTY = 0, INT = 1, STRING = 2, DOUBLE = 3, UNKNOWN = 4, STDSTRING = 5};
 
   Property();
-  Property(const char * name);
+  Property(const string initName);
   ~Property();
 
-  void setName(const char * name);
+  void setName(const string newName);
   void copyValue(const Property * property);
   /// get this property's name
-  const char * getName() const;
+  const string getName() const;
   /// get the value of this property. do not free memory.
   const void * getValue() const;
   /// enumerated datatype for this property
@@ -95,6 +95,12 @@ public:
   }
 
   /// set string value to object  
+  void setValue( const string value) {
+    setObjectValue(value);
+    setType(STDSTRING);
+  }
+
+  /// set string value to object  
   void setValue( char* value ) {
     setArrayValue( value, STRING, strlen(value)+1 );
   }
@@ -126,8 +132,7 @@ protected:
   int dataSize;
   char * buffer;
 
-  int nameSize;
-  char * name;
+  string name;
   bool nullName;
 };
 

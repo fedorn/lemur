@@ -34,12 +34,12 @@ class LinkedPropertyList : public PropertyList {
 
 public:
   LinkedPropertyList();
-  ~LinkedPropertyList();
+  virtual ~LinkedPropertyList();
 
   /// Returns the property with a given name.  Returns
   /// NULL if there is no property in the list with that name.
   /// Do not deallocate the returned pointer.
-  virtual const Property * getProperty(const char * name) const; 
+  virtual const Property * getProperty(const string name) const; 
 
   /// Starts iteration over properties.
   virtual void startIteration() const;
@@ -60,7 +60,7 @@ public:
   /// Removes a property from the list with the
   /// passed in name.  If no property in the list has
   /// the name, the function fails silently.
-  virtual void removeProperty(const char * name);
+  virtual void removeProperty(const string name);
   /// Clears all properties from the list
   virtual void clear();
 
@@ -71,7 +71,7 @@ protected:
   // property
   virtual Property * getAProperty();
   // finds the property with the given name
-  virtual Property * getPropertyInternal(const char * name) const;
+  virtual Property * getPropertyInternal(const string name) const;
 
   // need this mutable for iteration
   mutable plist::iterator iterator;
