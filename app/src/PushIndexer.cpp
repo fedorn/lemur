@@ -13,6 +13,7 @@
 #include "PorterStemmer.hpp"
 #include "WebParser.hpp"
 #include "TrecParser.hpp"
+#include "ReutersParser.hpp"
 #include "InvFPTextHandler.hpp"
 #include "Param.hpp"
 
@@ -81,7 +82,8 @@ void usage(int argc, char ** argv) {
        << "\t           (eg USA U.S.A. USAs USA's U.S.A.) are left " << endl
        << "\t           uppercase if in the acronym list." << endl
        << "\tdocFormat - \"trec\" for standard TREC formatted documents "<< endl
-       << "\t            web for web TREC formatted documents (def = trec)" << endl
+       << "\t            web for web TREC formatted documents " << endl
+       << "\t            reuters for Reuters XML documents (def = trec) " << endl
        << "\tstemmer - \"porter\" to use Porter's stemmer. " << endl
        << "\t          (def = no stemmer)" << endl
        << "\tcountStopWords - \"true\" to count stopwords in doc length. " << endl
@@ -104,6 +106,8 @@ int AppMain(int argc, char * argv[]) {
   Parser * parser;
   if (!strcmp(LocalParameter::docFormat, "web")) {
     parser = new WebParser;
+  } else if (!strcmp (LocalParameter::docFormat, "reuters")) {
+    parser = new ReutersParser;
   } else {
     parser = new TrecParser;
   }
