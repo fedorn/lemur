@@ -51,7 +51,7 @@ void ResultFile::load(istream &is, Index &index)
   }
 }
 
-bool ResultFile::findResult(const char *queryID, IndexedRealVector *&res)
+bool ResultFile::findResult(const string& queryID, IndexedRealVector *&res)
 {
   static ResultEntry entry;
   entry.key = queryID;
@@ -66,10 +66,11 @@ bool ResultFile::findResult(const char *queryID, IndexedRealVector *&res)
   }
 }
 
-void ResultFile::getResult(const char *expectedQID, IndexedRealVector &res)
+void ResultFile::getResult(const string& expectedQID, IndexedRealVector &res)
 {
   res.clear();
-  if (eof || strcmp(curQID, expectedQID)) {
+  //  if (eof || strcmp(curQID, expectedQID)) {
+  if (eof || curQID != expectedQID) {
     if (!eof) {
       cerr << "expected query ID: "<< expectedQID << " actual ID: "<<curQID <<endl;
     } else {
@@ -92,10 +93,11 @@ void ResultFile::getResult(const char *expectedQID, IndexedRealVector &res)
       eof = true;
       break;
     }
-  } while (!strcmp(curQID, expectedQID));
+    //  } while (!strcmp(curQID, expectedQID));
+  } while (curQID == expectedQID);
 }
 
-void ResultFile::writeResults(const char *queryID, IndexedRealVector *results, int maxCountOfResult)
+void ResultFile::writeResults(const string& queryID, IndexedRealVector *results, int maxCountOfResult)
 {
   IndexedRealVector::iterator j;
   int count=0;

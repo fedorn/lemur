@@ -45,10 +45,10 @@ public:
   void load(istream &is, Index &index);
 
   /// Read the results for a given query from the associated input stream into memory (stored in res), sequential reading, so appropriate order must be maintained and attempting to get the results for a query that has no results will fail.
-  void getResult(const char *expectedQID, IndexedRealVector &res);
+  void getResult(const string& expectedQID, IndexedRealVector &res);
 
   /// Find the results for the given query id, the output variable res gets a pointer to the results, returns true iff found.
-  bool findResult(const char *queryID, IndexedRealVector *&res);
+  bool findResult(const string& queryID, IndexedRealVector *&res);
   
   /// Associate an output stream for writing results
   void openForWrite( ostream &os, Index &index) {
@@ -59,7 +59,7 @@ public:
 
   /// writing the results (stored in <tt> results</tt>) into the associated output stream, up to a maximum count.
 
-  void writeResults(const char *queryID, IndexedRealVector *results, int maxCountOfResult);
+  void writeResults(const string& queryID, IndexedRealVector *results, int maxCountOfResult);
   
 private:
 
@@ -67,7 +67,8 @@ private:
 
   bool trecFmt;
 
-  char curQID[300];
+  //  char curQID[300];
+  string curQID;
   char curDID[300];
   double curSC;
   Index *ind;
