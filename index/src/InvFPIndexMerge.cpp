@@ -108,6 +108,18 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
   vector<IndexReader*> readers;
   char* bufptr = readbuffer;
 
+  int namelen = strlen(name)+1;
+  char* indexname = (char*)malloc(namelen+3);
+
+  sprintf(indexname, "%s%d.%d", name, level, intmed->size());
+  intmed->push_back(indexname);
+
+  // if we're only merging one file, no merging is necessary
+  if (files->size() == 1) {
+    rename((*files)[0], indexname);
+    return 1;
+  }
+    
   for (int i=0;i<files->size();i++) {
 
     readers.push_back(new IndexReader);
@@ -126,12 +138,6 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
     if (!readers[i]->list->binRead(*(readers[i]->reader))) 
       fprintf(stderr, "Error reading from file\n");
   }
-
-  int namelen = strlen(name)+1;
-  char* indexname = (char*)malloc(namelen+3);
-
-  sprintf(indexname, "%s%d.%d", name, level, intmed->size());
-  intmed->push_back(indexname);
 
   ofstream indexfile;
   indexfile.open(indexname, ios::binary | ios::out);
@@ -409,12 +415,31 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
   } // if still a file
 
   indexfile.close();
+
+  //remove files already merged
+  for (int f=0;f<files->size();f++) {
+    remove((*files)[f]);
+  }
+
   return intmed->size();
 }
 
 int InvFPIndexMerge::finalMerge(vector<char*>* files) {
   fprintf(stderr, "%s: Final Merge of files\n", name);
   int i=0;
+  int namelen = strlen(name)+1;
+
+  namelen += strlen(INVINDEX);
+  char* indexname = (char*)malloc(namelen+1);
+  sprintf(indexname, "%s%s%d", name, INVINDEX, 0);
+  invfiles.push_back(indexname);
+
+  // if we're only merging one file, no merging is necessary
+  if (files->size() == 1) {
+    rename((*files)[0], indexname);
+    return 1;
+  }
+
   vector<IndexReader*> readers;
   char* bufptr = readbuffer;
 
@@ -433,18 +458,11 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     readers[i]->list->binRead(*(readers[i]->reader));
   }
 
-
-  int namelen = strlen(name)+1;
-
   vector<int> working;  // list of least words
   map<DOCID_T, int> tfs; // combined tf's for overlapping docids
   map<DOCID_T, int>::iterator finder;
   char* lookup = (char*)malloc(namelen+strlen(INVLOOKUP));
-  namelen += strlen(INVINDEX);
-  char* indexname = (char*)malloc(namelen+1);
-  sprintf(indexname, "%s%s%d", name, INVINDEX, 0);
   sprintf(lookup, "%s%s", name, INVLOOKUP);
-  invfiles.push_back(indexname);
 
 //  FILE* indexfile = fopen(indexname, "wb");
   ofstream indexfile;
@@ -789,6 +807,11 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
   free(indexname);
   free(lookup);
 //  delete(info);
+
+  //remove files already merged
+  for (int f=0;f<files->size();f++) {
+    remove((*files)[f]);
+  }
 
   return invfiles.size();
 }
