@@ -23,6 +23,7 @@
 #include "InvDocList.hpp"
 #include "InvTermList.hpp"
 #include "InvFPTypes.hpp"
+#include "BasicCollectionProps.hpp"
 #include "Param.hpp"
 #include "DocMgrManager.hpp"
 
@@ -115,6 +116,10 @@ public:
 
   //@}
 
+  /// return whatever collection properties might have been passed in 
+  /// indexing with call to PushIndex::endCollection(CollectionProps)
+  virtual const CollectionProps* collectionProps() const { return &colprops; }
+
   /// set the mesg stream
  void setMesgStream(ostream * lemStream);
 
@@ -156,6 +161,8 @@ protected:
   mutable map<TERM_T, TERMID_T, less<TERM_T> > termtable; // table of terms to termid
   mutable map<EXDOCID_T, DOCID_T, less<EXDOCID_T> > doctable; // table of exdocids to docid
   ostream* msgstream; // Lemur code messages stream		
+  // hold collectionprops saved into TOC file during indexing
+  BasicCollectionProps colprops;
 };
 
 #endif

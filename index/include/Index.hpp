@@ -57,6 +57,7 @@ delete docList;
 #include "TermInfoList.hpp"
 #include "DocInfoList.hpp"
 #include "DocumentManager.hpp"
+#include "CollectionProps.hpp"
 #include "lemur-platform.h"
 #include "lemur-compat.hpp"
 
@@ -140,6 +141,9 @@ public:
   // return NULL list when sequence is not available.
   virtual TermInfoList *termInfoListSeq(DOCID_T docID) const { return NULL; }
 
+  /// return whatever collection properties might have been passed in 
+  /// indexing with call to PushIndex::endCollection(CollectionProps)
+  virtual const CollectionProps* collectionProps() const { return NULL; }
 };
 
 
