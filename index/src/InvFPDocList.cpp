@@ -30,7 +30,7 @@ InvFPDocList::InvFPDocList() {
 
 //  This hasn't been tested
 InvFPDocList::InvFPDocList(int id, int len){
-  size = (int) pow(2,DEFAULT);
+  size = (int) pow(2.0,DEFAULT);
   begin = (int*) malloc(size);
   lastid = begin;
   *lastid = -1;
@@ -60,7 +60,7 @@ InvFPDocList::InvFPDocList(int id, int listlen, int* list, int fr, int* ldocid, 
 
 InvFPDocList::InvFPDocList(MemCache* mc, int id, int len){
   READ_ONLY = false;
-  size = (int) pow(2,DEFAULT);
+  size = (int) pow(2.0,DEFAULT);
   cache = mc;
   begin = cache->getMem(DEFAULT);
   if (!begin)
@@ -78,7 +78,7 @@ InvFPDocList::InvFPDocList(MemCache* mc, int id, int len){
 
 InvFPDocList::InvFPDocList(MemCache* mc, int id, int len, int docid, int location) {
   READ_ONLY = false;
-  size = (int) pow(2,DEFAULT);
+  size = (int) pow(2.0,DEFAULT);
   cache = mc;
   begin = cache->getMem(DEFAULT);
   lastid = begin;
@@ -178,7 +178,7 @@ bool InvFPDocList::allocMem() {
   if (READ_ONLY)
     return false;
 
-  size = (int) pow(2,DEFAULT);
+  size = (int) pow(2.0,DEFAULT);
 
   if (hascache) {
     begin = cache->getMem(DEFAULT);
