@@ -28,7 +28,7 @@ for estimating such models.
 class OneStepMarkovChain {
 public:
   /// construct a MC restricted to a subset of docs
-  OneStepMarkovChain(WeightedIDSet &docSet, Index &homeIndex, double stopProbAlpha);
+  OneStepMarkovChain(WeightedIDSet &docSet, Index &homeIndex, double *wdNorm, double stopProbAlpha);
   ~OneStepMarkovChain();
   
   /// @name Iteration support

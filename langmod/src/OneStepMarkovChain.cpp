@@ -15,11 +15,11 @@
 
 #include "OneStepMarkovChain.hpp"
 
-OneStepMarkovChain::OneStepMarkovChain(WeightedIDSet &docSet, Index &homeIndex, double stopProb):
-  ind(homeIndex), alpha(stopProb),curToWord(0)
+OneStepMarkovChain::OneStepMarkovChain(WeightedIDSet &docSet, Index &homeIndex, double *wdNorm, double stopProb):
+  ind(homeIndex), alpha(stopProb),curToWord(0), norm(wdNorm)
 {
   dSet = new int[ind.docCount()+1];
-  norm = new double[ind.termCountUnique()+1];
+  //  norm = new double[ind.termCountUnique()+1];
   fromWordPr = new double[ind.termCountUnique()+1];
 
   int i;
@@ -27,13 +27,15 @@ OneStepMarkovChain::OneStepMarkovChain(WeightedIDSet &docSet, Index &homeIndex, 
     dSet[i] = 0;
   }
 
+  /*
   for (i=1; i<=ind.termCountUnique(); i++) {
     norm[i] = 0;
   }
+  */
 
   // compute normalizer for each word, not an efficient way.
   // In the future, they should be pre-computed, e.g., in GenerateSmoothSupport.
-
+  /*
   for (i=1; i<= ind.docCount(); i++) {
     TermInfoList *tList = ind.termInfoList(i);
     tList->startIteration();
@@ -43,7 +45,7 @@ OneStepMarkovChain::OneStepMarkovChain(WeightedIDSet &docSet, Index &homeIndex, 
     }
     delete tList;
   }
-
+  */
   docSet.startIteration();
   while (docSet.hasMore()) {
     int id;
@@ -56,7 +58,7 @@ OneStepMarkovChain::OneStepMarkovChain(WeightedIDSet &docSet, Index &homeIndex, 
 OneStepMarkovChain::~OneStepMarkovChain()
 {
   delete [] fromWordPr;
-  delete [] norm;
+  //  delete [] norm;
   delete [] dSet;
 }
 
@@ -99,7 +101,7 @@ void OneStepMarkovChain::computeFromWordProb(int toWord)
     }
     if (toWord == i) {
       fromWordPr[i] += alpha;
-      // cout << "diag: "<< fromWordPr[i] << endl;
+      //cout << "diag: "<< fromWordPr[i] << endl;
     }
   }
 
