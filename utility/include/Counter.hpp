@@ -29,14 +29,14 @@ public:
   // access functions
   
   /// return the count of a word
-  virtual double count(int eventIndex) = 0;
+  virtual double count(int eventIndex) const= 0;
   /// return the sum of all counts
-  virtual double sum() = 0;
+  virtual double sum() const= 0;
   
   /// iteration over non-zero counts
-  virtual void startIteration() = 0;
-  virtual bool hasMore() = 0;
-  virtual void nextCount(int &eventIndex, double &count) = 0;
+  virtual void startIteration() const= 0;
+  virtual bool hasMore() const= 0;
+  virtual void nextCount(int &eventIndex, double &count) const= 0;
 };
 
 /// Modifiable counter, supports modification of counts
@@ -60,12 +60,12 @@ public:
   virtual ~ArrayCounter() { delete [] ct;}
 
   /// return the count of an event
-  virtual double count(int eventIndex) {
+  virtual double count(int eventIndex) const{
     return ct[eventIndex];
   }
 
   /// return the sum of all counts
-  virtual double sum() {
+  virtual double sum() const{
     return total;
   }
 
@@ -80,17 +80,17 @@ public:
   }
 
 
-  virtual void startIteration() {
+  virtual void startIteration() const{
     pos=0;
   }
 
-  virtual bool hasMore() {
+  virtual bool hasMore() const{
     while ((pos < sz) && (ct[pos] == 0))
       pos++;
     return (pos<sz); 
   }
 
-  virtual void nextCount(int &eventIndex, double &count) {
+  virtual void nextCount(int &eventIndex, double &count) const{
     eventIndex = pos;
     count = ct[pos];
     pos++;
@@ -100,7 +100,7 @@ protected:
   T *ct;
   int sz;
   T total;
-  int pos;
+  mutable int pos;
 };
 
 #endif /* _COUNTER_HPP */

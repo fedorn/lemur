@@ -23,9 +23,9 @@ namespace ArabicStemmerParameter {
   static String stemDir;
   //@}
   /// default location of stemmer data files "/usr/local/lemur/arabic_stem_data"
-  static char *defaultStemDir = "/usr/local/lemur/arabic_stem_data";
+  static String defaultStemDir("/usr/local/lemur/arabic_stem_data");
   /// default stem function to use "arabic_light10_stop"
-  static char *defaultStemFunc = "arabic_light10_stop";  
+  static String defaultStemFunc("arabic_light10_stop");
   /// get the parameters
   static void get()
   {
@@ -39,8 +39,8 @@ namespace ArabicStemmerParameter {
 ///  inheritance, the TextHandler interface.
 class ArabicStemmer : public Stemmer {
 public:
-  ArabicStemmer(const char *stemDir=ArabicStemmerParameter::defaultStemDir, 
-		const char *stemmer=ArabicStemmerParameter::defaultStemFunc);
+  ArabicStemmer(const string &stemDir=ArabicStemmerParameter::defaultStemDir, 
+		const string &stemmer=ArabicStemmerParameter::defaultStemFunc);
   ~ArabicStemmer();
   /// Stem a word using an Arabic stemmer.
   char * stemWord(char * word);

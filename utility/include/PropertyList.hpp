@@ -31,15 +31,15 @@ public:
   /// Returns the property with a given name.  Returns
   /// NULL if there is no property in the list with that name.
   /// Do not deallocate the returned pointer.
-  virtual Property * getProperty(char * name) = 0;
+  virtual const Property * getProperty(const char * name) const= 0;
 
   /// Starts iteration over properties.
-  virtual void startIteration() = 0;
+  virtual void startIteration() const= 0;
   /// Returns the next Property in the iteration.  Do not
   /// deallocate the returned pointer.
-  virtual Property * nextEntry() = 0;
+  virtual const Property * nextEntry() const= 0;
   /// Tests to see whether there are more properties in the iteration.
-  virtual bool hasMore() = 0;
+  virtual bool hasMore() const= 0;
 
   
   /// Adds/changes a property into the list.  Overwrites
@@ -47,12 +47,12 @@ public:
   /// stored is a copy of the property passed in.  Changes
   /// after calling this function to the property passed in
   /// will not affect the property in the list.
-  virtual void setProperty(Property * property) = 0;
+  virtual void setProperty(const Property * property) = 0;
 
   /// Removes a property from the list with the
   /// passed in name.  If no property in the list has
   /// the name, the function fails silently.
-  virtual void removeProperty(char * name) = 0;
+  virtual void removeProperty(const char * name) = 0;
 
   /// Clears all properties from the list
   virtual void clear() = 0;

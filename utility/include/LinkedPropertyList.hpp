@@ -39,15 +39,15 @@ public:
   /// Returns the property with a given name.  Returns
   /// NULL if there is no property in the list with that name.
   /// Do not deallocate the returned pointer.
-  virtual Property * getProperty(char * name); 
+  virtual const Property * getProperty(const char * name) const; 
 
   /// Starts iteration over properties.
-  virtual void startIteration();
+  virtual void startIteration() const;
   /// Returns the next Property in the iteration.  Do not
   /// deallocate the returned pointer.
-  virtual Property * nextEntry();
+  virtual const Property * nextEntry() const;
   /// Tests to see whether there are more properties in the iteration.
-  virtual bool hasMore();
+  virtual bool hasMore() const;
 
   
   /// Adds/changes a property into the list.  Overwrites
@@ -55,12 +55,12 @@ public:
   /// stored is a copy of the property passed in.  Changes
   /// after calling this function to the property passed in
   /// will not affect the property in the list.
-  virtual void setProperty(Property * property);
+  virtual void setProperty(const Property * property);
 
   /// Removes a property from the list with the
   /// passed in name.  If no property in the list has
   /// the name, the function fails silently.
-  virtual void removeProperty(char * name);
+  virtual void removeProperty(const char * name);
   /// Clears all properties from the list
   virtual void clear();
 
@@ -71,17 +71,18 @@ protected:
   // property
   virtual Property * getAProperty();
   // finds the property with the given name
-  virtual Property * getPropertyInternal(char * name);
+  virtual Property * getPropertyInternal(const char * name) const;
 
-  plist::iterator iterator;
-  plist properties;
+  // need this mutable for iteration
+  mutable plist::iterator iterator;
+  mutable plist properties;
 
   plist cache;
 
   // We copy values into this property when returning
   // property objects.  This allows control to
   // the linked property list only.
-  Property returnProp;
+  mutable Property returnProp;
 
   
 

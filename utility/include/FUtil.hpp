@@ -11,7 +11,8 @@
 
 #ifndef _FUTIL_HPP_
 #define _FUTIL_HPP_
-
-bool fileExist(char *name);
+#include <string>
+using namespace std;
+bool fileExist(const string &name);
 
 #endif

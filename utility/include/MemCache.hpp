@@ -77,8 +77,8 @@ public:
    */
   void flushMem();
 
-  int* getBegin();
-  int* getEnd();
+  const int* getBegin();
+  const int* getEnd();
 
 private:
   /** returns pointer to memory holes if available

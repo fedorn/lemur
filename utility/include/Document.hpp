@@ -22,7 +22,7 @@ class TokenTerm : public Term {
 public:
 
   /// return the spelling of the term (read-only)
-  virtual const char *spelling() = 0;
+  virtual const char *spelling() const=0;
 };
 
 
@@ -39,20 +39,20 @@ public:
   virtual ~Document() {};
   
   /// returns the external string ID
-  virtual char *getID() const =0;
+  virtual const char *getID() const =0;
 
 
   /// start term iteration
-  virtual void startTermIteration()=0;
+  virtual void startTermIteration() const=0;
 
   /// returns true iff there's at least one term for iteration
-  virtual bool hasMore() = 0;
+  virtual bool hasMore() const= 0;
 
   /// returns a pointer to next term (static memory, do not delete the returned instance). caller should check hasMore() before calling it
-  virtual TokenTerm *nextTerm()=0;
+  virtual const TokenTerm *nextTerm() const=0;
 
   /// "fast forward" to the end of the document
-  virtual void skipToEnd()=0;
+  virtual void skipToEnd() const=0;
 
   /// return the DocumentProps handle
   virtual DocumentProps *property() {
@@ -61,7 +61,6 @@ public:
 private:
   DocumentProps *props;
 };
-
 
 #endif
 

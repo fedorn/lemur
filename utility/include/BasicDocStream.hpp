@@ -68,7 +68,7 @@ class BasicTokenTerm : public TokenTerm {
  public:
   BasicTokenTerm() {}
   virtual ~BasicTokenTerm() {}
-  virtual const char *spelling() { return str;}
+  virtual const char *spelling() const { return str;}
   friend class BasicTokenDoc;
  private:
   char *str;
@@ -83,26 +83,26 @@ class BasicTokenDoc : public Document {
   }
   BasicTokenDoc(ifstream *stream): docStr(stream) {
   }
-   void startTermIteration(); 
+   void startTermIteration() const;  
   
-  char *getID() const { return (char *)id;}
+  const char *getID() const { return id;}
 
-  bool hasMore() { return (strcmp(curWord, "</DOC>") != 0);}
+  bool hasMore() const{ return (strcmp(curWord, "</DOC>") != 0);}
     
-  TokenTerm * nextTerm();
+  const TokenTerm * nextTerm() const;
 
-  void skipToEnd();
+  void skipToEnd() const;
   friend class BasicDocStream;
  private:
   void readID(); 
-  char *curWord;
-  char buf1[20000];
-  char buf2[20000];
+  mutable char *curWord;
+  mutable char buf1[20000];
+  mutable char buf2[20000];
   char id[2000];
   ifstream *docStr;
   streampos startPos; // starting position of the terms in the file
   //replace  static BasicTokenTerm t; with attribute
-  BasicTokenTerm t;
+  mutable BasicTokenTerm t;
 };
 
 
@@ -111,7 +111,7 @@ class BasicDocStream : public DocStream
 {
 public:
   BasicDocStream() {}
-  BasicDocStream (const char * inputFile);
+  BasicDocStream (const string &inputFile);
 
   virtual ~BasicDocStream() {  delete ifs;}
 

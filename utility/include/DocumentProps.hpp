@@ -34,17 +34,17 @@ public:
   void length(int dl) { len=dl; };
 
   /// get document length
-  int length() { return len; };
+  int length() const { return len; };
 
   /// set docID, we're not making a copy
-  void stringID(char* did) { sid = did; };
+  void stringID(const char* did) { sid = did; };
 
   /// get docID
-  char* stringID() { return sid; };
+  const char* stringID() const { return sid; };
 
 private:
   int len;
-  char* sid;
+  const char* sid;
 };
 
 #endif

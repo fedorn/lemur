@@ -77,7 +77,7 @@ public:
 
   virtual void foundToken(TokenType type, 
 			  char * token = NULL, 
-			  char * orig = NULL,
+			  const char * orig = NULL,
 			  PropertyList * properties = NULL) {
     char * t = NULL;
 
@@ -115,37 +115,37 @@ public:
 
   /// Handle a doc begin - default implementation calls
   /// handleDoc for backwords compat
-  virtual char * handleBeginDoc(char * docno, char * original,
+  virtual char * handleBeginDoc(char * docno, const char * original,
 				PropertyList * list) {
     return handleDoc(docno);
   }
   /// Handle a doc end - default implementation calls
   /// old handleEndDoc for backwords compat
-  virtual char * handleEndDoc(char * token, char * original,
+  virtual char * handleEndDoc(char * token, const char * original,
 			      PropertyList * list) {
     handleEndDoc();
     return token;
   }
   /// Handle a word - default implementation calls
   /// old handleWord for backwords compat
-  virtual char * handleWord(char * word, char * original,
+  virtual char * handleWord(char * word, const char * original,
 			    PropertyList * list) {
     return handleWord(word);
   }
   /// Handle a begin tag
-  virtual char * handleBeginTag(char * tag, char * original,
+  virtual char * handleBeginTag(char * tag, const char * original,
 				PropertyList * list) {
     return tag;
   }
   /// Handle an end tag 
-  virtual char * handleEndTag(char * tag, char * original,
+  virtual char * handleEndTag(char * tag, const char * original,
 			      PropertyList * list) {
     return tag;
   }
 
   /// Handle a symbol - default implementation calls
   /// old handleSymbol for backwords compat
-  virtual char * handleSymbol(char * symbol, char * original,
+  virtual char * handleSymbol(char * symbol, const char * original,
 			      PropertyList * list) {
     return handleSymbol(symbol);
   }
@@ -157,14 +157,14 @@ public:
   virtual void foundDoc(char * docno) {
     foundToken(BEGINDOC, docno, docno);
   }
-  virtual void foundDoc(char * docno, char * original) {
+  virtual void foundDoc(char * docno, const char * original) {
     foundToken(BEGINDOC, docno, original);
   }
   /// Found a word
   virtual void foundWord(char * word) {
     foundToken(WORDTOK, word, word);
   }
-  virtual void foundWord(char * word, char * original) {
+  virtual void foundWord(char * word, const char * original) {
     foundToken(WORDTOK, word, original);
   }
   /// Found end of doc

@@ -33,19 +33,19 @@ public:
   enum DataType {EMPTY = 0, INT = 1, STRING = 2, DOUBLE = 3, UNKNOWN = 4};
 
   Property();
-  Property(char * name);
+  Property(const char * name);
   ~Property();
 
-  void setName(char * name);
-  void copyValue(Property * property);
+  void setName(const char * name);
+  void copyValue(const Property * property);
   /// get this property's name
-  char * getName();
+  const char * getName() const;
   /// get the value of this property. do not free memory.
-  void * getValue();
+  const void * getValue() const;
   /// enumerated datatype for this property
-  DataType getType();
-  int getSize();
-  int getLength();
+  DataType getType() const;
+  int getSize() const;
+  int getLength() const;
 
   /// set the value for this Property to be given object. proper destructor will
   /// get called. ** Don't use this for primary data types. For that, 

@@ -17,10 +17,10 @@
 class WeightedIDSet {
 public:
   virtual ~WeightedIDSet() {}
-  virtual void startIteration() = 0;
-  virtual bool hasMore() = 0;
+  virtual void startIteration() const= 0;
+  virtual bool hasMore() const= 0;
   /// returns an ID and its weight
-  virtual void nextIDInfo(int &id, double &weight) = 0;
+  virtual void nextIDInfo(int &id, double &weight) const= 0;
 };
 
 #endif /* _WEIGHTEDIDSET_HPP */

@@ -38,7 +38,7 @@ public:
 
   ///  split the token, send the word as is
   ///  along the pipeline with the POS added as a Property
-  char *  handleWord(char* word, char* original, PropertyList* list);
+  char *  handleWord(char* word, const char* original, PropertyList* list);
 
 protected:
   char splitter;

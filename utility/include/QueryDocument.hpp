@@ -28,7 +28,7 @@ class QueryToken: public TokenTerm {
 public:
   QueryToken() {}
   virtual ~QueryToken(){}
-  virtual const char *spelling() { return str; }
+  virtual const char *spelling() const { return str; }
   friend class QueryDocument;
   friend class StrStructQuery;
 private:
@@ -39,24 +39,24 @@ class QueryDocument: public Document, public TextHandler {
 public:
   QueryDocument();
   ~QueryDocument();
-  void startTermIteration() {iter = 0;}
-  bool hasMore() { return iter < tokens.size();}
-  void skipToEnd() {iter = tokens.size();}
+  void startTermIteration() const{iter = 0;}
+  bool hasMore() const{ return iter < tokens.size();}
+  void skipToEnd() const{iter = tokens.size();}
 
   /// get the next term. do not delete TT returned
-  TokenTerm* nextTerm();
+  const TokenTerm* nextTerm() const;
   void addTerm(const char* token);
   char* handleWord(char *word);
   char* handleSymbol(char *sym);
 
-  char *getID() const {return id;}
+  const char *getID() const {return id;}
   void setID(const char* idstr) {id = strdup(idstr);}
 
 private:
   char* id;
   vector<char*> tokens;
-  int iter;
-  QueryToken tt;
+  mutable int iter;
+  mutable QueryToken tt;
 };
 
 #endif

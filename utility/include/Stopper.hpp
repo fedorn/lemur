@@ -25,10 +25,10 @@ public:
   Stopper();
   /// Create the stopword list, loading it from file.
   /// One word per line.
-  Stopper(char * filename);
+  Stopper(const string &filename);
 
   /// Checks to see if a word is a stopword.
-  bool stopWord(char * word);
+  bool stopWord(const char * word) const;
 
 
   /// Will replace stopwords with a NULL pointer.

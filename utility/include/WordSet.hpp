@@ -45,15 +45,15 @@ class WordSet {
 public:
   WordSet();
   /// Create object, and load set from file.
-  WordSet(char * filename);
+  WordSet(const string &filename);
   ~WordSet();
 
   /// Load a set from file.  Does not clear the set first.
-  void load(char * filename);
+  void load(const string &filename);
   /// Add a word (char *) to the set.
-  void add(char * word);
+  void add(const char * word);
   /// Check for the existence of a word in the set.
-  bool contains(char * word);
+  bool contains(const char * word) const;
 
   /// Empty the set and free memory.
   void clear();
@@ -62,6 +62,7 @@ public:
 protected:
   
   /// The set used to store words.
+  /// once a word is stored, we do not change it
   set<char *, lt_str> words;
 
 
