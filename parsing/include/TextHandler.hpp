@@ -20,7 +20,7 @@
 #define _TEXTHANDLER_HPP
 
 #include "PropertyList.hpp"
-
+#include "Exception.hpp"
 
 #define MAXWORDSIZE 1024
 
@@ -64,19 +64,32 @@ public:
 
   TextHandler() {
     textHandler = NULL;
+    prevHandler = NULL;
     buffer[MAXWORDSIZE-1] = '\0';
     cat = category;
     iden = identifier;
   }
-  virtual ~TextHandler() {}
+  virtual ~TextHandler() {
+    if (textHandler)
+      textHandler->destroyPrevHandler();
+    if (prevHandler)
+      prevHandler->destroyTextHandler();
+  }
   
   /// Set the TextHandler that this TextHandler will pass information on to.
   virtual void setTextHandler(TextHandler * th) {
     textHandler = th;
+    textHandler->setPrevHandler(this);
   }
-  /// Set the TextHandler that this TextHandler will pass information on to.
+
+  /// Get the TextHandler that this TextHandler will pass information on to.
   virtual TextHandler * getTextHandler() {
     return textHandler;
+  }
+
+  /// Get the TextHandler that this TextHandler gets info from
+  virtual TextHandler * getPrevHandler() {
+    return prevHandler;
   }
 
   virtual void foundToken(TokenType type, 
@@ -190,12 +203,42 @@ public:
   virtual char * handleSymbol(char * sym) { return sym; }
 
   /// Return the category TextHandler this is
-  virtual string getCategory() { return cat; }
+  virtual string getCategory() const { return cat; }
   /// Return a unique identifier for this TextHandler object
-  virtual string getIdentifier() { return iden; }
+  virtual string getIdentifier() const { return iden; }
+  /// Write out the properties associated with this TextHandler into the given list
+  virtual void writePropertyList(PropertyList* list) const{
+    if (!list) {
+      LEMUR_THROW(LEMUR_INTERNAL_ERROR, cat + " unable to save properties list");
+      return;
+    }
+    Property prop(cat);
+    prop.setValue(iden);
+    list->setProperty(&prop);
+  }
+
 protected:
+  /// Set the TextHandler that this TextHandler gets info from
+  virtual void setPrevHandler(TextHandler * th) {
+    prevHandler = th;
+  }
+
+  /// the PrevHandler is being destroyed. try to fix the chain
+  virtual void destroyPrevHandler() {
+    if (prevHandler)
+      prevHandler = prevHandler->getPrevHandler();
+  }
+
+  /// the PrevHandler is being destroyed. try to fix the chain
+  virtual void destroyTextHandler() {
+    if (textHandler)
+      textHandler = textHandler->getTextHandler();
+  }
+
   /// The next textHandler in the chain
   TextHandler * textHandler;
+  /// The previous textHandler in the chain
+  TextHandler * prevHandler;
   string cat;
   string iden;
 
