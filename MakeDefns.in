@@ -74,9 +74,9 @@ CPPFLAGS    = -D_CXXVER=$(CXXVER) $(INCPATH) @CPPFLAGS@
 
 CPPLDFLAGS  =   $(LIBPATH) $(LIBFLAGS) -lm
 
-CCVER = $(shell $(CC) --version | sed 's/\.//g')
+CCVER = $(shell $(CC) -dumpversion | sed 's/\.//g')
 
-CXXVER = $(shell $(CXX) --version |sed 's/\.//g')
+CXXVER = $(shell $(CXX) -dumpversion |sed 's/\.//g')
 
 
   
