@@ -1,3 +1,5 @@
 index = pindex;
+indexType = inv;
+position = 1;
 docFormat = web;
 memory = 256000000;
