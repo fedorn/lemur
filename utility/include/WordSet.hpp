@@ -16,6 +16,9 @@
 
 #ifndef _LT_STR_
 #define _LT_STR_
+
+#include "common_headers.hpp"
+
 /* for the set */
 struct lt_str
 {
@@ -28,6 +31,7 @@ struct lt_str
 
 #ifndef _WORDSET_H_
 #define _WORDSET_H_
+
 
 ///
 /// A generic class that provides a neat and easy to use wrapper

@@ -12,7 +12,7 @@
 #include "TextHandler.hpp"
 
 #include <fstream>
-
+#include "common_headers.hpp"
 
 #ifndef _WRITERTEXTHANDLER_HPP
 #define _WRITERTEXTHANDLER_HPP
