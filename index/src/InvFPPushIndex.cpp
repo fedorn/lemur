@@ -79,7 +79,7 @@ bool InvFPPushIndex::addTerm(Term& t){
   term = static_cast< InvFPTerm* >(&t);
 
   //search to see if this is a new term 
-  placehold = wordtable.find(term->spelling());
+  placehold = wordtable.find((char*)term->spelling());
   if (placehold != wordtable.end()) {
     //* OLD WORD *//
     curlist = placehold->second;
