@@ -37,6 +37,7 @@ DocFreqIndexer::~DocFreqIndexer() {
 
 char *
 DocFreqIndexer::handleDoc(char * docno) {
+  handleEndDoc();
   numDocs++;
   return docno;
 }
