@@ -125,7 +125,6 @@ QryBasedSampler::probe(const char * initQuery) {
 	  }
 	  //	  free (doc->id);
 	  delete doc;
-	  delete parser;
 	  done++;	
 
 	} catch (Exception &ex) {

@@ -25,8 +25,8 @@ LemurDBManager::open(const string &dbname) {
 
   // Create the index
   index = IndexManager::openIndex(RetrievalParameter::databaseIndex);
-  // Create the parser
-  //  parser = new LemurMemParser(index);
+  // Create the parser -- DON'T CHANGE THIS 
+  parser = new LemurMemParser(index);
   // Create the results list
   accumulator = new ArrayAccumulator(index->docCount());
   results = new IndexedRealVector(index->docCount());
@@ -36,10 +36,10 @@ LemurDBManager::open(const string &dbname) {
   outfile = NULL;
 }
 
-// Return the parser.
+// Return the parser. -- DON'T CHANGE THIS
 MemParser *
 LemurDBManager::getParser() const {
-  return (new LemurMemParser(index));
+  return parser;
 }
 
 
