@@ -26,8 +26,7 @@
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
 
-#include <cstdio>
-//#include <unistd.h>
+#include <stdio.h>
 
 
 /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
@@ -1348,6 +1347,7 @@ register char *yy_bp;
 #endif	/* ifndef YY_NO_UNPUT */
 
 
+#ifndef YY_NO_INPUT
 #ifdef __cplusplus
 static int yyinput()
 #else
@@ -1419,7 +1419,7 @@ static int input()
 
 	return c;
 	}
-
+#endif /* YY_NO_INPUT */
 
 #ifdef YY_USE_PROTOS
 void yyrestart( FILE *input_file )
@@ -1867,11 +1867,12 @@ TrecParser::TrecParser() {
 }
 
 
-long TrecParser::fileTell() {
+long TrecParser::fileTell() const {
   return trecpos;
 }
 
 void TrecParser::parseFile(const string &filename) {  
+  parsefile = filename;
   trecpos = 0;
   trecin = fopen(filename.c_str(), "rb");
   doParse();

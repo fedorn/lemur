@@ -81,12 +81,13 @@ ReutersParser::ReutersParser() {
 
 
 
-long ReutersParser::fileTell() {
+long ReutersParser::fileTell() const {
   return reuterspos;
 }
 
 void 
 ReutersParser::parseFile(const string &filename) {
+  parsefile = filename;
   reuterspos = 0;
   reutersin = fopen(filename.c_str(), "rb");
   doParse();

@@ -97,11 +97,12 @@ ChineseParser::ChineseParser() {
   iden = identifier;
 }
 
-long ChineseParser::fileTell() {
+long ChineseParser::fileTell() const {
   return chinesepos;
 }
 
 void ChineseParser::parseFile(const string &filename) {  
+  parsefile = filename;
   chinesepos = 0;
   Chinesein = fopen(filename.c_str(), "rb");
   doParse();

@@ -110,11 +110,12 @@ TrecParser::TrecParser() {
 }
 
 
-long TrecParser::fileTell() {
+long TrecParser::fileTell() const {
   return trecpos;
 }
 
 void TrecParser::parseFile(const string &filename) {  
+  parsefile = filename;
   trecpos = 0;
   trecin = fopen(filename.c_str(), "rb");
   doParse();

@@ -94,11 +94,12 @@ ArabicParser::ArabicParser() {
   iden = identifier;
 }
 
-long ArabicParser::fileTell() {
+long ArabicParser::fileTell() const{
   return arabicpos;
 }
 
 void ArabicParser::parseFile(const string &filename) {  
+  parsefile = filename;
   arabicpos = 0;
   Arabicin = fopen(filename.c_str(), "rb");
   doParse();

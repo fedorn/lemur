@@ -33,9 +33,10 @@ public:
 
   /// Parse a file.  
   /// use parseFile.  this method will be deprecated in future
-  virtual void parse(const string &filename) { parseFile(filename); } ;
+  virtual void parse(const string &filename) { parsefile=filename; parseFile(parsefile); } ;
   
   /// Parse a file.
+  /// implementing subclasses should set parsefile string
   virtual void parseFile(const string &filename) = 0;
 
   /// Parse a buffer.  
@@ -50,10 +51,13 @@ public:
   virtual void setAcroList(string filename);
 
   /// return the current byte position of the file being parsed
-  virtual long fileTell() = 0;
+  virtual long fileTell() const = 0;
 
   /// return the byte position at the beginning of the current document
-  virtual long getDocBytePos() { return docpos; }
+  virtual long getDocBytePos() const { return docpos; }
+
+  /// return the name of the file being parsed
+  virtual const string getParseFile() const { return parsefile; }
 
 protected: 
   /// Checks to see if the word is in the acronym list.
@@ -64,6 +68,7 @@ protected:
 
   long docpos; 
 
+  string parsefile;
 private:
   /// The acronym list.
   WordSet * myacros;

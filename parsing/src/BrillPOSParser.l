@@ -95,12 +95,13 @@ BrillPOSParser::BrillPOSParser() {
   iden = identifier;
 }
 
-long BrillPOSParser::fileTell() {
+long BrillPOSParser::fileTell() const {
   return bposloc;
 }
 
 void 
 BrillPOSParser::parseFile(const string &filename) {
+  parsefile = filename;
   bposloc = 0;
   bposin = fopen(filename.c_str(), "rb");
   doParse();

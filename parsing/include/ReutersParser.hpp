@@ -39,7 +39,7 @@ public:
   /// Parse a file.
   void parseFile (const string &filename);
   void parseBuffer (char * buf, int len);
-  long fileTell();
+  long fileTell()const;
  
 private:
   /// Actual parsing action flow

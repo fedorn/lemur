@@ -37,7 +37,7 @@ public:
 
   /// Gives current byte position offset into file being parsed.
   /// Don't use with parseBuffer
-  long fileTell();
+  long fileTell()const;
 
  
 private:

@@ -113,12 +113,13 @@ WebParser::WebParser() {
   iden=identifier;
 }
 
-long WebParser::fileTell() {
+long WebParser::fileTell() const {
   return webloc;
 }
 
 void 
 WebParser::parseFile(const string &filename) {
+  parsefile = filename;
   webloc = 0;
   webin = fopen(filename.c_str(), "rb");
   doParse();

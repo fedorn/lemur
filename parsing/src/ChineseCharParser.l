@@ -128,11 +128,12 @@ ChineseCharParser::ChineseCharParser() {
   iden = identifier;
 }
 
-long ChineseCharParser::fileTell() {
+long ChineseCharParser::fileTell() const {
   return CCpos;
 }
 
 void ChineseCharParser::parseFile(const string &filename) {  
+  parsefile = filename;
   CCpos = 0;
   ChineseCharin = fopen(filename.c_str(), "rb");
   doParse();

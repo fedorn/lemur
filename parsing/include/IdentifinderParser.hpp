@@ -53,7 +53,7 @@ public:
   
   void parseBuffer(char * buf, int len);
  
-  long fileTell();
+  long fileTell() const;
 
 private:
   /// Actual parsing action flow

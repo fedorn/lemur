@@ -588,7 +588,7 @@ void InqArabicParser::parseQryNode(int tok) {
     }
 }
 
-long InqArabicParser::fileTell() {
+long InqArabicParser::fileTell() const{
   int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
   if (InqArabicin) {
     long begin = ftell(InqArabicin)-YY_CURRENT_BUFFER->yy_n_chars;
@@ -604,7 +604,7 @@ void InqArabicParser::parseBuffer(char* buf, int len) {
 }
 
 void InqArabicParser::parseFile(const string &filename) {
-  
+  parsefile = filename;
   InqArabicin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(InqArabicin);

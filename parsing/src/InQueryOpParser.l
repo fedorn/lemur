@@ -590,7 +590,7 @@ void InQueryOpParser::parseQryNode(int tok) {
     }
 }
 
-long InQueryOpParser::fileTell() {
+long InQueryOpParser::fileTell() const {
   int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
   if (InQueryin) {
     long begin = ftell(InQueryin)-YY_CURRENT_BUFFER->yy_n_chars;
@@ -606,7 +606,7 @@ void InQueryOpParser::parseBuffer(char* buf, int len) {
 }
 
 void InQueryOpParser::parseFile(const string &filename) {
-  
+  parsefile=filename;
   InQueryin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(InQueryin);

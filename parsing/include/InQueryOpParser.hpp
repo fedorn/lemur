@@ -32,7 +32,7 @@ public:
 
   /// Gives current byte position offset into file being parsed.
   /// Don't use with parseBuffer
-  long fileTell();
+  long fileTell() const;
   /// The workhorse.
   void doParse();
   /// parse nested query nodes until the next enclosing RIGHT_PAREN

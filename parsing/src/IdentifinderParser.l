@@ -108,12 +108,13 @@ IdentifinderParser::IdentifinderParser() {
   iden = identifier;
 }
 
-long IdentifinderParser::fileTell() {
+long IdentifinderParser::fileTell() const {
   return idenloc;
 }
 
 void 
 IdentifinderParser::parseFile(const string &filename) {
+  parsefile = filename;
   idenloc = 0;
   idenin = fopen(filename.c_str(), "rb");
   doParse();
