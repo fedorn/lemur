@@ -11,7 +11,7 @@
 
 #include "FreqVector.hpp"
 
-HashFreqVector::HashFreqVector(const Index &index, int docID) 
+HashFreqVector::HashFreqVector(const Index &index, DOCID_T docID) 
   : CSet<FreqCount, int>(300)
 {
   TermInfoList *tList = index.termInfoList(docID);
@@ -27,7 +27,7 @@ HashFreqVector::HashFreqVector(const Index &index, int docID)
 }
 
 
-bool HashFreqVector::find(int ind, int &freq) const 
+bool HashFreqVector::find(TERMID_T ind, int &freq) const 
 {
   static FreqCount c;
   c.key = ind;
@@ -37,7 +37,7 @@ bool HashFreqVector::find(int ind, int &freq) const
 }
 
 
-void HashFreqVector::nextFreq(int &id, int &freq) const 
+void HashFreqVector::nextFreq(TERMID_T &id, int &freq) const 
 {
   // get the i-th element
   static FreqCount c;

@@ -57,13 +57,13 @@ public:
   /// overriding abstract class method
   virtual QueryRep *computeQueryRep(const Query &qry); 
   /// score the query against the given document id.
-  virtual double scoreDoc(const QueryRep &qry, int docID);
+  virtual double scoreDoc(const QueryRep &qry, DOCID_T docID);
   /// score the query against the collection.
   virtual void scoreCollection(const QueryRep &qry, IndexedRealVector &results);
 
   /// compute the doc representation (caller responsible for deleting 
   /// the memory of the generated new instance)
-  virtual DocumentRep *computeDocRep(int docID) = 0;
+  virtual DocumentRep *computeDocRep(DOCID_T docID) = 0;
   /// return the scoring function pointer
   virtual ScoreFunction *scoreFunc() = 0;
   /// update the query

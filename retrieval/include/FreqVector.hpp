@@ -20,8 +20,8 @@
 /// Record with frequency information to be stored in a hash table
 class FreqCount {
 public:
-  int key;
-  unsigned int Hash() const { return ByteHash((char *)(&key),sizeof(int),0); }
+  TERMID_T key;
+  unsigned int Hash() const { return ByteHash((char *)(&key),sizeof(TERMID_T),0); }
   unsigned int hash() const { return Hash(); }
   bool operator==(const FreqCount count) { return count.key == this->key;} 
 };
@@ -33,11 +33,11 @@ class FreqVector {
 public:
 
   /// Find the frequency of a word identified by the index "ind"
-  virtual bool find(int ind, int &freq) const=0;
+  virtual bool find(TERMID_T ind, int &freq) const=0;
   virtual void startIteration()const=0;
   virtual bool hasMore()const=0;
   /// Fetch the next frequency entry
-  virtual void nextFreq(int &id, int &freq)const=0;
+  virtual void nextFreq(TERMID_T &id, int &freq)const=0;
   virtual int size()const=0;
 };
 
@@ -47,16 +47,16 @@ class HashFreqVector : public FreqVector, public CSet<FreqCount, int> {
 public:
   HashFreqVector() : CSet<FreqCount, int>(300) {}
   /// Construct a document frequency vector based on the counts stored in an index
-  HashFreqVector(const Index &index, int docID);
+  HashFreqVector(const Index &index, DOCID_T docID);
 
   virtual ~HashFreqVector() {};
 
   
-  virtual bool find(int ind, int &freq)const ;
+  virtual bool find(DOCID_T ind, int &freq)const ;
 
   virtual void startIteration() const {  i=0; }
   virtual bool hasMore() const {  return (i < size()); }
-  virtual void nextFreq(int &id, int &freq)const ;
+  virtual void nextFreq(DOCID_T &id, int &freq)const ;
 
   /// return the total number of non-zero elements in the vector
   virtual int size() const {    return (ISet<FreqCount>::size()); }

@@ -23,11 +23,11 @@
 
 class DocumentRep {
 public:
-  DocumentRep(int docID, int dl = 1) : id(docID), docLength(dl) {}
+  DocumentRep(DOCID_T docID, int dl = 1) : id(docID), docLength(dl) {}
   virtual ~DocumentRep() {}
 
   /// term weighting function @see TextQueryRetMethod
-  virtual double termWeight(int termID, const DocInfo *info) const = 0;
+  virtual double termWeight(TERMID_T termID, const DocInfo *info) const = 0;
 
   /// doc-specific constant term in the scoring formula @see TextQueryRetMethod 
   virtual double scoreConstant() const = 0 ;
@@ -40,10 +40,10 @@ public:
   int getDocLength() const { return docLength;}
   /// get the document id. Used by PassageRep.
   /// @return the id.
-  int getID() const { return id;}
+  DOCID_T getID() const { return id;}
   
 protected:  
-  int id;
+  DOCID_T id;
   int docLength;
 };
 #endif /* _DOCUMENTREP_HPP */

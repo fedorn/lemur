@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 
-CORIDocRep::CORIDocRep(int docID, const Index & dbIndex, double * cwRatio, 
+CORIDocRep::CORIDocRep(DOCID_T docID, const Index & dbIndex, double * cwRatio, 
 		       double TFfact, double TFbase, 
 		       const SimpleKLDocModel * smoother,
 		       const UnigramLM * collectLM) : 
@@ -31,7 +31,7 @@ CORIDocRep::CORIDocRep(int docID, const Index & dbIndex, double * cwRatio,
 }
 
 double 
-CORIDocRep::termWeight(int termID, const DocInfo * info) const { 
+CORIDocRep::termWeight(TERMID_T termID, const DocInfo * info) const { 
   
   double cf = ind.docCount(termID);
   double df = info->termCount(); 
@@ -87,7 +87,7 @@ void CORIRetMethod::scoreCollection(const QueryRep &qry,
   rmax = 0;
   double qw = 0;
   while (textQry->hasMore()) {
-    int qtid = textQry->nextTerm()->id();
+    TERMID_T qtid = textQry->nextTerm()->id();
     rmax += (1-MINBELIEF)*(log(c05 / ind.docCount(qtid)) / idiv);
   }
 
@@ -121,7 +121,7 @@ CORIRetMethod::CORIRetMethod(const Index & dbIndex, ScoreAccumulator &accumulato
   }
 
   //cout<<tffactor<<"  "<<tfbaseline<<endl;
-  int dc = ind.docCount();
+  COUNT_T dc = ind.docCount();
 
   cwRatio = new double[dc];
 

@@ -25,12 +25,12 @@ InQueryRetMethod::InQueryRetMethod(const Index &dbIndex, double belief,
   docLengthAverage = dbIndex.docLengthAvg();
     // pre-compute IDF values
   if (cacheIDF) {
-    int termCount = dbIndex.termCountUnique();
+    COUNT_T termCount = dbIndex.termCountUnique();
     double denom = log(docCount + 1.0);
     double numer = docCount + 0.5;
     idfV = new double[termCount + 1];
     idfV[0] = 0; // make sure an entry for OOV terms.
-    for (int i = 1; i <= termCount; i++) {
+    for (TERMID_T i = 1; i <= termCount; i++) {
       idfV[i] = log(numer/(double)dbIndex.docCount(i))/denom;
     }
   } else {
@@ -43,14 +43,14 @@ void InQueryRetMethod::updateStructQuery(StructQueryRep &qryRep,
 					 const DocIDSet &relDocs) {
   // build a top query node of wsum, choose new terms as is done by
   // TFIDF
-  int totalTerm = ind.termCountUnique();  
+  COUNT_T totalTerm = ind.termCountUnique();  
   float * expandTerms = new float[totalTerm + 1]; // one extra for OOV
-  int i;
+  TERMID_T i;
   for (i = 1; i <= totalTerm; i++) {
     expandTerms[i] = 0;
   }
   relDocs.startIteration();
-  int docCount = ind.docCount();
+  COUNT_T docCount = ind.docCount();
   double denom = log(docCount + 1.0);
   double numer = docCount + 0.5;
   while (relDocs.hasMore()) {
@@ -62,7 +62,7 @@ void InQueryRetMethod::updateStructQuery(StructQueryRep &qryRep,
     tList->startIteration();
     while (tList->hasMore()) {
       TermInfo *info = tList->nextEntry();
-      int tid = info->termID();
+      TERMID_T tid = info->termID();
       double dtf = (double)info->count();
       if (idfV != NULL)
 	expandTerms[tid] += fbCoeff * (dr->beliefScore(dtf, idfV[tid]));
@@ -93,17 +93,17 @@ void InQueryRetMethod::updateStructQuery(StructQueryRep &qryRep,
   chlist->push_back(qn);
   
   IndexedRealVector::iterator j;
-  int termCount = 0;
+  COUNT_T termCount = 0;
   for (j = expTerms.begin(); 
        termCount < fbTermCount && j != expTerms.end(); 
        j++, termCount++) {
     // adding the expanded terms to the query
-    int tid = (*j).ind;
+    TERMID_T tid = (*j).ind;
     double belief = (*j).val;
     QueryNode *expQTerm = new TermQnode(tid, belief);
     DocInfoList *dl = ind.docInfoList(tid);
-    int listlen = ind.docCount(tid);
-    int tf = ind.termCount(tid);
+    COUNT_T listlen = ind.docCount(tid);
+    COUNT_T tf = ind.termCount(tid);
     expQTerm->copyDocList(listlen, tf, dl, docCount);
     chlist->push_back(expQTerm);
   }

@@ -113,13 +113,13 @@ have to sum to 1. The assumption is that if a word has an extrememly small proba
   double colQueryLikelihood() const {
     if (colQLikelihood == 0) {
       //Sum w in Q qtf * log(qtcf/termcount);
-      int tc = ind.termCount();
+      COUNT_T tc = ind.termCount();
       startIteration();
       while (hasMore()) {
 	QueryTerm *qt = nextTerm();
-	int id = qt->id();
+	TERMID_T id = qt->id();
 	double qtf = qt->weight();
-	int qtcf = ind.termCount(id);
+	COUNT_T qtcf = ind.termCount(id);
 	double s = qtf * log((double)qtcf/(double)tc);
 	colQLikelihood += s;
 	delete qt;
@@ -247,7 +247,7 @@ public:
     return (new SimpleKLQueryModel(qry, ind));
   }
   
-  virtual DocumentRep *computeDocRep(int docID);
+  virtual DocumentRep *computeDocRep(DOCID_T docID);
   
 
   virtual ScoreFunction *scoreFunc() {
@@ -268,7 +268,7 @@ protected:
 /// needed for fast alpha computing
   double *docProbMass; 
 /// needed for supporting fast absolute discounting
-  int *uniqueTermCount; 
+  COUNT_T *uniqueTermCount; 
 /// a little faster if pre-computed
   UnigramLM *collectLM; 
   /// support the construction of collectLM

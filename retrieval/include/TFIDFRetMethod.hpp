@@ -54,12 +54,12 @@ protected:
 /// Representation of a doc (as a weighted vector) in the TFIDF method
 class TFIDFDocRep : public DocumentRep {
 public:
-  TFIDFDocRep(int docID, const Index &dbIndex, double *idfValue,
+  TFIDFDocRep(DOCID_T docID, const Index &dbIndex, double *idfValue,
 	      TFIDFParameter::WeightParam &param) : 
     DocumentRep(docID), ind(dbIndex), prm(param), idf(idfValue) {
   }
   virtual ~TFIDFDocRep() { }
-  virtual double termWeight(int termID, const DocInfo *info) const{ 
+  virtual double termWeight(TERMID_T termID, const DocInfo *info) const{ 
     return (idf[termID]*docTFWeight(info->termCount())); 
   }
   virtual double scoreConstant() const { return 0;}
@@ -85,7 +85,7 @@ public:
     return (new TFIDFQueryRep(qry, ind, idfV, qryTFParam));
   }
 
-  virtual DocumentRep *computeDocRep(int docID) { 
+  virtual DocumentRep *computeDocRep(DOCID_T docID) { 
     return (new TFIDFDocRep(docID, ind, idfV, docTFParam));
   }
   virtual ScoreFunction *scoreFunc() {

@@ -114,7 +114,7 @@ public:
   bool nextProxItem() const {return proxList && proxList->nextDoc();}
   /// advance to element with id did, or to next element beyond if
   /// did is not found. Return true if found, false if not.
-  bool nextProxItem(int did) const{
+  bool nextProxItem(DOCID_T did) const{
     return proxList && proxList->nextDoc(did);
   }
 
@@ -123,7 +123,7 @@ public:
   /// array of bool matched docs indexed by docid
   bool *dList;
   /// the next document this node matched.
-  mutable int nextDoc;
+  mutable DOCID_T nextDoc;
   /// This node's ProxInfo list
   ProxInfo * proxList;
 
@@ -370,7 +370,7 @@ public:
     const QueryNode *qn;
     double wt;
     StructQryDocRep * myRep = (StructQryDocRep *)dRep;
-    int did = myRep->did;
+    DOCID_T did = myRep->did;
     ch->startIteration();
     while(ch->hasMore()) {
       qn = ch->nextNode();
@@ -487,7 +487,7 @@ public:
   /// Score as the termWeight of this term in the document.
   virtual double eval(const DocumentRep *dRep) const{ 
     StructQryDocRep * myRep = (StructQryDocRep *)dRep;
-    int did = myRep->did;
+    DOCID_T did = myRep->did;
     double freq = 0.0;
     if (nextDoc == did) {
       freq = (double)proxList->count();

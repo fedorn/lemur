@@ -41,14 +41,14 @@ CosSimQueryRep::CosSimQueryRep(const TermQuery &qry, const Index &dbIndex,
 }
 
 /// Construct a query rep from an existing document (given document id).
-CosSimQueryRep::CosSimQueryRep(int docId, const Index &dbIndex, 
+CosSimQueryRep::CosSimQueryRep(DOCID_T docId, const Index &dbIndex, 
 			       double *idfValue): 
   ArrayQueryRep (dbIndex.termCountUnique() + 1), 
   ind(dbIndex), idf(idfValue) {
   double qNorm = 0;
   double tmpval;
-  int cnt;
-  int id;
+  COUNT_T cnt;
+  TERMID_T id;
   TermInfoList *tList = dbIndex.termInfoList(docId);
   TermInfo *info;
   tList->startIteration();
@@ -78,7 +78,7 @@ CosSimRetMethod::CosSimRetMethod(const Index &dbIndex,
   fbParam.posCoeff = CosSimParameter::defaultPosCoeff;
   // pre-compute IDF values
   idfV = new double[dbIndex.termCountUnique()+1];
-  for (int i=1; i<=dbIndex.termCountUnique(); i++) {
+  for (TERMID_T i=1; i<=dbIndex.termCountUnique(); i++) {
     idfV[i] = log((dbIndex.docCount()+1)/(0.5+dbIndex.docCount(i)));
   }
   loadDocNorms();  
@@ -93,7 +93,7 @@ CosSimRetMethod::CosSimRetMethod(const Index &dbIndex, const string &L2file,
 
   // pre-compute IDF values
   idfV = new double[dbIndex.termCountUnique()+1];
-  for (int i=1; i<=dbIndex.termCountUnique(); i++) {
+  for (TERMID_T i=1; i<=dbIndex.termCountUnique(); i++) {
     idfV[i] = log((dbIndex.docCount()+1)/(0.5+dbIndex.docCount(i)));
   }
   loadDocNorms();  
@@ -101,9 +101,9 @@ CosSimRetMethod::CosSimRetMethod(const Index &dbIndex, const string &L2file,
 }
 
 void CosSimRetMethod::loadDocNorms() {
-  int  numDocs = ind.docCount();
+  COUNT_T  numDocs = ind.docCount();
   docNorms = new double[numDocs + 1];
-  for (int j = 0; j <= numDocs; j++) {
+  for (COUNT_T j = 0; j <= numDocs; j++) {
     docNorms[j] = 0;
   }
   ifstream ifs;
@@ -112,8 +112,8 @@ void CosSimRetMethod::loadDocNorms() {
     cerr << "open file, wrong name:" << L2FileName << endl; 
     return;
   }
-  for (int i = 1; i <= numDocs; i++) {
-    int id;
+  for (COUNT_T i = 1; i <= numDocs; i++) {
+    DOCID_T id;
     double norm;
     ifs >> id >> norm;
     if (id != i) {
@@ -132,13 +132,14 @@ CosSimRetMethod::~CosSimRetMethod() {
   delete(scFunc);
 }
 
-double CosSimRetMethod::docNorm(int docID) {
+double CosSimRetMethod::docNorm(DOCID_T docID) {
   // cache norms for docs already seen once.
   if (docNorms[docID] == 0) {
     TermInfoList *qList = ind.termInfoList(docID);
     TermInfo *qInfo;
     qList->startIteration();
-    int idx, dtf;
+    TERMID_T idx;
+    COUNT_T dtf;
     double norm = 0, tmp;
     while (qList->hasMore()) {
       qInfo = qList->nextEntry();
@@ -159,10 +160,10 @@ double CosSimRetMethod::docNorm(int docID) {
 void CosSimRetMethod::updateTextQuery(TextQueryRep &qryRep, 
 				      const DocIDSet &relDocs)
 {
-  int totalTerm=ind.termCountUnique();  
+  COUNT_T totalTerm=ind.termCountUnique();  
   float * centroidVector = new float[totalTerm+1]; // one extra for OOV
 
-  int i;
+  COUNT_T i;
   for (i=1;i<=totalTerm;i++) {
     centroidVector[i]=0;
   }
@@ -203,7 +204,7 @@ void CosSimRetMethod::updateTextQuery(TextQueryRep &qryRep,
   }
   centVector.Sort();
   IndexedRealVector::iterator j;
-  int termCount=0;
+  COUNT_T termCount=0;
   for (j= centVector.begin();j!=centVector.end();j++) {
     if (termCount++ >= fbParam.howManyTerms) {
       break;

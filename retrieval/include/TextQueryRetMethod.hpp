@@ -90,22 +90,22 @@ public:
 
   /// compute the query representation for a text query (caller responsible for deleting the memory of the generated new instance)
   virtual TextQueryRep *computeTextQueryRep(const TermQuery &qry)=0;
-  /// compute a query rep for an existing doc (DOCID_T needed).
-  virtual TextQueryRep *computeTextQueryRep(int docid){
+  /// compute a query rep for an existing doc
+  virtual TextQueryRep *computeTextQueryRep(DOCID_T docid){
     return NULL; 
   } // need to implement for other ret methods.
   /// overriding abstract class method
   virtual QueryRep *computeQueryRep(const Query &qry); 
 
   /// ooverriding abstract class method
-  virtual double scoreDoc(const QueryRep &qry, int docID);
+  virtual double scoreDoc(const QueryRep &qry, DOCID_T docID);
   /// overriding abstract class method with a general efficient inverted index scoring procedure
   virtual void scoreCollection(const QueryRep &qry, IndexedRealVector &results);
   /// add support for scoring an existing document against the collection
-  virtual void scoreCollection(int docid, IndexedRealVector &results);
+  virtual void scoreCollection(DOCID_T docid, IndexedRealVector &results);
   
   /// compute the doc representation (caller responsible for deleting the memory of the generated new instance)
-  virtual DocumentRep *computeDocRep(int docID) =0;
+  virtual DocumentRep *computeDocRep(DOCID_T docID) =0;
   /// return the scoring function pointer
   virtual ScoreFunction *scoreFunc() = 0;
   /// update the query
@@ -125,7 +125,7 @@ public:
 				  IndexedRealVector &scores, 
 				  bool scoreAll=false);
 
-  virtual double scoreDocVector(const TextQueryRep &qry, int docID, 
+  virtual double scoreDocVector(const TextQueryRep &qry, DOCID_T docID, 
 				FreqVector &docVector);
   /// \brief Score a query for each passage of a document. 
   /// @param qRep the TextQuery to score.
@@ -134,7 +134,7 @@ public:
   /// @param psgSize the number of tokens for sliding window. 
   /// @param overlap the number of tokens to overlap in each passage. 
   /// @return the maximum score over the passages.
-  virtual double scoreDocPassages(const TermQuery &qRep, int docID, 
+  virtual double scoreDocPassages(const TermQuery &qRep, DOCID_T docID, 
 				  PassageScoreVector &scores, 
 				  int psgSize, int overlap);
   

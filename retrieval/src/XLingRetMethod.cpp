@@ -9,7 +9,6 @@
 */
 
 
-
 #include "XLingRetMethod.hpp"
 #include "DocInfoList.hpp"
 #include "SimpleKLRetMethod.hpp"
@@ -32,24 +31,24 @@ XLingRetMethod::XLingRetMethod(const Index &dbIndex,
   docBasedTargetSmooth = (tBM == "doc");
   numSource = 0;
   if (docBasedSourceSmooth) {
-    for (int i = 1; i < source.termCountUnique(); i++) 
+    for (TERMID_T i = 1; i < source.termCountUnique(); i++) 
       numSource += source.docCount(i);
   } else {
     numSource = source.termCount(); 
   }
   numTarget = 0;
   if (docBasedTargetSmooth) {
-    for (int i = 1; i < ind.termCountUnique(); i++) 
+    for (TERMID_T i = 1; i < ind.termCountUnique(); i++) 
       numTarget += ind.docCount(i);
   } else {
     numTarget = ind.termCount(); 
   }
 
   if (cacheDocReps) {
-    int dc = ind.docCount();
+    COUNT_T dc = ind.docCount();
     docRepsSize = dc + 1;
     docReps = new DocumentRep *[docRepsSize];
-    for (int i = 0; i <= dc; i++) docReps[i] = NULL;
+    for (DOCID_T i = 0; i <= dc; i++) docReps[i] = NULL;
   }
   termScores = new ArrayAccumulator(ind.docCount());
 }
@@ -67,7 +66,7 @@ QueryRep *XLingRetMethod::computeTargetKLRep(const QueryRep *qry) {
     if (xlates != NULL) {
       for (DictEntryVector::iterator it = xlates->begin(); 
 	   it != xlates->end(); it++) {
-	int tid = ind.term((*it).target);
+	TERMID_T tid = ind.term((*it).target);
 	if (tid > 0) {
 	  double prob = (*it).prob;
 	  qr->incCount(tid, prob * sourceWeight);
@@ -84,13 +83,13 @@ QueryRep *XLingRetMethod::computeTargetKLRep(const QueryRep *qry) {
 
 XLingRetMethod::~XLingRetMethod() {
   if (cacheDocReps) {
-    for (int i = 0; i < docRepsSize; i++) delete(docReps[i]);
+    for (DOCID_T i = 0; i < docRepsSize; i++) delete(docReps[i]);
     delete[](docReps);
   }
   delete(termScores);
 }
 
-DocumentRep *XLingRetMethod::computeDocRep(int docID) {
+DocumentRep *XLingRetMethod::computeDocRep(DOCID_T docID) {
   return( new XLingDocModel(docID, &ind, beta, numTarget, 
 			    docBasedTargetSmooth));
 }
@@ -104,7 +103,7 @@ void XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep,
   //      for each D_a
   //         compute lambda P(a|D)P(e|a)
   int i;
-  int dc = ind.docCount();
+  COUNT_T dc = ind.docCount();
   double s;  
   termScores->reset();
   scAcc.reset();
@@ -120,7 +119,7 @@ void XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep,
     if (xlates != NULL) {
       for (DictEntryVector::iterator it = xlates->begin(); 
 	   it != xlates->end(); it++) {
-	int tid = ind.term((*it).target);
+	TERMID_T tid = ind.term((*it).target);
 	if (tid > 0) {
 	  // P(e|a)
 	  double prob = (*it).prob;
@@ -129,7 +128,7 @@ void XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep,
 	  dList->startIteration();
 	  while (dList->hasMore()) {
 	    const DocInfo *info = dList->nextEntry();
-	    int id = info->docID();
+	    DOCID_T id = info->docID();
 	    if (cacheDocReps) {
 	      if (docReps[id] == NULL)
 		docReps[id] = computeDocRep(id);      
@@ -184,12 +183,12 @@ void XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep,
   }
 }
 
-double XLingRetMethod::scoreDoc(const QueryRep &qry, int docID) {
+double XLingRetMethod::scoreDoc(const QueryRep &qry, DOCID_T docID) {
   HashFreqVector docVector(ind,docID);
   return (scoreDocVector(*((const XLingQueryModel *)(&qry)),docID,docVector));
 }
 
-double XLingRetMethod::scoreDocVector(const XLingQueryModel &qRep, int docID, 
+double XLingRetMethod::scoreDocVector(const XLingQueryModel &qRep, DOCID_T docID, 
 				      FreqVector &docVector) {
   double score = 0, termScore;
   qRep.startIteration();
@@ -205,7 +204,7 @@ double XLingRetMethod::scoreDocVector(const XLingQueryModel &qRep, int docID,
       termScore = 0;
       for (DictEntryVector::iterator it = xlates->begin(); 
 	   it != xlates->end(); it++) {
-	int tid = ind.term((*it).target);
+	TERMID_T tid = ind.term((*it).target);
 	if (tid > 0) {
 	  double prob = (*it).prob;
 	  int fq;

@@ -46,7 +46,7 @@ public:
     return (new InQueryRep(qry, ind, defaultBelief));
   }
 
-  virtual DocumentRep *computeDocRep(int docID) { 
+  virtual DocumentRep *computeDocRep(DOCID_T docID) { 
     return (new StructQryDocRep(docID, idfV, ind.docLength(docID),
 				docCount, docLengthAverage, 
 				defaultBelief));

@@ -16,6 +16,7 @@
 #include <cmath>
 #include <vector>
 #include <algorithm>
+#include "IndexTypes.hpp"
 #include "FreqVector.hpp"
 #include "UnigramLM.hpp"
 #include "ScoreFunction.hpp"
@@ -29,7 +30,7 @@
 
 class XLQueryTerm : public QueryTerm {
 public:
-  XLQueryTerm(int tid, double  wt, const char *term, double pge,
+  XLQueryTerm(TERMID_T tid, double  wt, const char *term, double pge,
 	      PDict &dic, Stemmer *stm = NULL) :
     QueryTerm(tid, wt), source(term), p_s_ge(pge), dict(dic),
     stemmer(stm) {
@@ -141,7 +142,7 @@ public:
 	  (*iter).incWeight(1);
 	} else {
 	  // new term
-	  int ti = source.term(t->spelling());
+	  TERMID_T ti = source.term(t->spelling());
 	  if (ti>0) {
 	    // pge
 	    if (dbS) {
@@ -226,7 +227,7 @@ public:
   /// \brief Create a document representation
   /// @param docID the internal document id to create the representation for
   /// @return An instance of XLingDocRep
-  virtual DocumentRep *computeDocRep(int docID);
+  virtual DocumentRep *computeDocRep(DOCID_T docID);
 
   /// \brief Score a given term for a given document
   /// @param id the term id
@@ -234,7 +235,7 @@ public:
   /// @param info the DocInfo for this document
   /// @param dRep the DocumentRep for this document
   /// @return P(t|D) * P(s|t)
-  virtual double matchedTermWeight(int id, double weight,
+  virtual double matchedTermWeight(TERMID_T id, double weight,
 				   const DocInfo *info, 
 				   const DocumentRep *dRep) const { 
     double d = dRep->termWeight(id,info); //P(a|D)
@@ -269,13 +270,13 @@ public:
   virtual QueryRep *computeTargetKLRep(const QueryRep *qry);
 
   /// Score a document identified by the id w.r.t. a query rep
-  virtual double scoreDoc(const QueryRep &qry, int docID);
+  virtual double scoreDoc(const QueryRep &qry, DOCID_T docID);
 
   /// update the query -- noop
   virtual void updateQuery(QueryRep &qryRep, const DocIDSet &relDocs) {}
 
 protected:
-  virtual double scoreDocVector(const XLingQueryModel &qRep, int docID, 
+  virtual double scoreDocVector(const XLingQueryModel &qRep, DOCID_T docID, 
 				FreqVector &docVector);
 
   double lambda;

@@ -18,7 +18,7 @@ ArrayQueryRep::ArrayQueryRep(int size, const TermQuery &qry, const Index &dbInde
   qry.startTermIteration();
   while (qry.hasMore()) {
     const Term *t = qry.nextTerm();
-    int ti = dbIndex.term(t->spelling());
+    TERMID_T ti = dbIndex.term(t->spelling());
     if (ti>0) {
       incCount(ti, 1);
     } else {
@@ -32,7 +32,8 @@ ArrayQueryRep::ArrayQueryRep(int size, const FreqVector &qryVec):
 {
   qryVec.startIteration();
   while (qryVec.hasMore()) {
-    int ti, fq;
+    TERMID_T ti;
+    int fq;
     qryVec.nextFreq(ti, fq);
     incCount(ti, fq);
   }

@@ -62,11 +62,11 @@ OkapiRetMethod::OkapiRetMethod(const Index &dbIndex, ScoreAccumulator &accumulat
 void OkapiRetMethod::updateTextQuery(TextQueryRep &origRep, const DocIDSet &relDocs)
 {
   
-  int totalTerm=ind.termCountUnique();  
+  COUNT_T totalTerm=ind.termCountUnique();  
   int * relCounts = new int[totalTerm+1];
 
 
-  int i;
+  TERMID_T i;
   for (i=1;i<=totalTerm;i++) {
     relCounts[i]=0;
   }
@@ -107,7 +107,7 @@ void OkapiRetMethod::updateTextQuery(TextQueryRep &origRep, const DocIDSet &relD
   qr->setPNormCount(actualDocs);
   weightedTerms.Sort();
   IndexedRealVector::iterator j;
-  int termCount=0;
+  COUNT_T termCount=0;
   for (j= weightedTerms.begin();j!=weightedTerms.end();j++) {
     if (termCount++ >= fbParam.howManyTerms) {
       break;

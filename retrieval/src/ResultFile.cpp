@@ -42,7 +42,7 @@ void ResultFile::load(istream &is, Index &index)
       qi = resTable->add(entry);
     }
     entry = (*resTable)[qi];
-    int did = ind->document(curDID);
+    DOCID_T did = ind->document(curDID);
     if (did>0) {
       entry.res->PushValue(did, curSC); 
     } else {
@@ -82,7 +82,7 @@ void ResultFile::getResult(const string& expectedQID, IndexedRealVector &res)
   }
   do {
 
-    int did = ind->document(curDID);
+    DOCID_T did = ind->document(curDID);
     if (did>0) {
       res.PushValue(did, curSC); 
     } else {

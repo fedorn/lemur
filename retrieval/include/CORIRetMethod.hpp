@@ -38,12 +38,12 @@ protected:
 
 class CORIDocRep : public DocumentRep {
 public:
-  CORIDocRep(int docID, const Index & dbIndex, double * cwRatio, 
+  CORIDocRep(DOCID_T docID, const Index & dbIndex, double * cwRatio, 
 	     double TFfact = 150, double TFbase = 50, 
 	     const SimpleKLDocModel * smoother = NULL,
 	     const UnigramLM * collectLM = NULL);
   virtual ~CORIDocRep() { }
-  virtual double termWeight(int termID, const DocInfo * info) const ;
+  virtual double termWeight(TERMID_T termID, const DocInfo * info) const ;
 
   virtual double scoreConstant() const { return 0; }
 
@@ -75,7 +75,7 @@ public:
   virtual TextQueryRep * computeTextQueryRep(const TermQuery & qry) {
     return new CORIQueryRep(qry, ind);
   }
-  virtual DocumentRep * computeDocRep(int docID) { 
+  virtual DocumentRep * computeDocRep(DOCID_T docID) { 
     if (dfSmooth != NULL) {
       return new CORIDocRep(docID, ind, cwRatio, tffactor, tfbaseline, dfSmooth[docID], collLM);
     }
@@ -125,7 +125,7 @@ public:
       rmax = 0;
       double qw = 0;
       while (qRep->hasMore()) {
-	int qtid = qRep->nextTerm()->id();
+	TERMID_T qtid = qRep->nextTerm()->id();
 	rmax += (1-MINBELIEF)*(log(c05 / ind.docCount(qtid)) / idiv);
       }
     }

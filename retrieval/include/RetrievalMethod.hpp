@@ -75,7 +75,7 @@ public:
   virtual QueryRep *computeQueryRep(const Query &qry)=0;
 
   /// Score a document identified by the id w.r.t. a query rep
-  virtual double scoreDoc(const QueryRep &qry, int docID)=0;
+  virtual double scoreDoc(const QueryRep &qry, DOCID_T docID)=0;
 
   /// Score a set of documents w.r.t. a query rep (e.g. for re-ranking)
   /*! 

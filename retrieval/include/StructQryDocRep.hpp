@@ -19,7 +19,7 @@
 class StructQryDocRep : public DocumentRep {
 public:
   /// New StructQryDocRep
-  StructQryDocRep(int docID, double *idfValue, int docLength, int docCount,
+  StructQryDocRep(DOCID_T docID, double *idfValue, int docLength, int docCount,
 		  double docLengthAverage, double db) : 
     DocumentRep(docID), did(docID), idf(idfValue), end(docLength),
     docEnd(docLength), size(docLength), start(0),
@@ -31,9 +31,9 @@ public:
   /// no clean up
   virtual ~StructQryDocRep() {}
   /// needed for DocRep interface.
-  virtual double termWeight(int termID, const DocInfo *info) const { return 0;}
+  virtual double termWeight(TERMID_T termID, const DocInfo *info) const { return 0;}
   /// Belief score for this term with this dtf.
-  virtual double termWeight(int termID, double dtf, int df) const{
+  virtual double termWeight(TERMID_T termID, double dtf, int df) const{
     if (idf)
       return beliefScore(dtf, idf[termID]);
     else
@@ -77,7 +77,7 @@ public:
   }
 
   /// the document id.
-  int did;
+  DOCID_T did;
   /// start position of a passage
   mutable int start; 
   /// end position of a passage

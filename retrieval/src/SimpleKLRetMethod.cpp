@@ -32,7 +32,7 @@ void SimpleKLQueryModel::interpolateWith(const UnigramLM &qModel,
   qModel.startIteration();
   while (qModel.hasMore()) {
     IndexedReal entry;
-    qModel.nextWordProb(entry.ind,entry.val);
+    qModel.nextWordProb((TERMID_T &)entry.ind,entry.val);
     qm->push_back(entry);
 
   }
@@ -84,7 +84,7 @@ void SimpleKLQueryModel::load(istream &is)
   double pr;
   while (count-- >0) {
     is >> wd >> pr;
-    int id = ind.term(wd);
+    TERMID_T id = ind.term(wd);
     setCount(id, pr);
   }
   colQueryLikelihood();
@@ -226,11 +226,12 @@ void SimpleKLRetMethod::loadSupportFile() {
       throw  Exception("SimpleKLRetMethod::loadSupportFile", 
 		       "smoothing support file open failure");
     }
-    int numDocs = ind.docCount();
+    COUNT_T numDocs = ind.docCount();
     docProbMass = new double[numDocs+1];
-    uniqueTermCount = new int[numDocs+1];
+    uniqueTermCount = new COUNT_T[numDocs+1];
     for (i = 1; i <= numDocs; i++) {
-      int id, uniqCount;
+      DOCID_T id;
+      int uniqCount;
       double prMass;
       ifs >> id >> uniqCount >> prMass;
       if (id != i) {
@@ -259,7 +260,7 @@ void SimpleKLRetMethod::loadSupportFile() {
     mcNorm = new double[ind.termCountUnique()+1];
   
     for (i = 1; i <= ind.termCountUnique(); i++) {
-      int id;
+      TERMID_T id;
       double norm;
       ifs >> id >> norm;
       if (id != i) {
@@ -271,7 +272,7 @@ void SimpleKLRetMethod::loadSupportFile() {
   }
 }
 
-DocumentRep *SimpleKLRetMethod::computeDocRep(int docID)
+DocumentRep *SimpleKLRetMethod::computeDocRep(DOCID_T docID)
 {
   switch (docParam.smthMethod) {
   case SimpleKLParameter::JELINEKMERCER:
@@ -347,7 +348,7 @@ void SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep,
 void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, 
 					      const DocIDSet &relDocs)
 {
-  int numTerms = ind.termCountUnique();
+  COUNT_T numTerms = ind.termCountUnique();
 
   DocUnigramCounter *dCounter = new DocUnigramCounter(relDocs, ind);
 
@@ -384,7 +385,7 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep,
     // compute likelihood
     dCounter->startIteration();
     while (dCounter->hasMore()) {
-      int wd;
+      int wd; //dmf FIXME
       double wdCt;
       dCounter->nextCount(wd, wdCt);
       ll += wdCt * log (noisePr*collectLM->prob(wd)  // Pc(w)
@@ -401,7 +402,7 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep,
 
     dCounter->startIteration();
     while (dCounter->hasMore()) {
-      int wd;
+      int wd; // dmf FIXME
       double wdCt;
       dCounter->nextCount(wd, wdCt);
       
@@ -431,14 +432,14 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep,
 void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, 
 					     const DocIDSet &relDocs)
 {
-  int numTerms = ind.termCountUnique();
+  COUNT_T numTerms = ind.termCountUnique();
 
   double * ct = new double[numTerms+1];
 
-  int i;
+  TERMID_T i;
   for (i=1; i<=numTerms; i++) ct[i]=0;
 
-  int actualDocCount=0;
+  COUNT_T actualDocCount=0;
   relDocs.startIteration();
   while (relDocs.hasMore()) {
     actualDocCount++;
@@ -499,7 +500,7 @@ void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, c
     summ =0;
     mc->startFromWordIteration(qt->id());
     // cout << " +++++++++ "<< ind.term(qt->id()) <<endl;
-    int fromWd;
+    TERMID_T fromWd;
     double fromWdPr;
     
     while (mc->hasMoreFromWord()) {
@@ -542,7 +543,7 @@ void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, c
 void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep, 
 					  const DocIDSet &relDocs)
 {  
-  int numTerms = ind.termCountUnique();
+  COUNT_T numTerms = ind.termCountUnique();
 
   // RelDocUnigramCounter computes SUM(D){P(w|D)*P(D|Q)} for each w
   RelDocUnigramCounter *dCounter = new RelDocUnigramCounter(relDocs, ind);
@@ -550,14 +551,14 @@ void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep,
   static double *distQuery = new double[numTerms+1];
   double expWeight = qryParam.fbCoeff;
 
-  int i;
+  TERMID_T i;
   for (i=1; i<=numTerms;i++)
     distQuery[i] = 0.0;
 
   double pSum=0.0;
   dCounter->startIteration();
   while (dCounter->hasMore()) {
-    int wd;
+    int wd; // dmf FIXME
     double wdPr;
     dCounter->nextCount(wd, wdPr);
     distQuery[wd]=wdPr;
@@ -589,14 +590,14 @@ void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep,
 // P(w) = SUM_d P(w|d) p(d)
 // Promote this to some include somewhere...
 struct termProb  {
-  int id; // TERM_ID
+  TERMID_T id; // TERM_ID
   double prob; // a*tf(w,d)/|d| +(1-a)*tf(w,C)/|C|
 };
 
 void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep, 
 					  const DocIDSet &relDocs) {  
-  int numTerms = ind.termCountUnique();
-  int termCount = ind.termCount();
+  COUNT_T numTerms = ind.termCountUnique();
+  COUNT_T termCount = ind.termCount();
   double expWeight = qryParam.fbCoeff;
 
   // RelDocUnigramCounter computes P(w)=SUM(D){P(w|D)*P(D|Q)} for each w
@@ -604,7 +605,7 @@ void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep,
   RelDocUnigramCounter *dCounter = new RelDocUnigramCounter(relDocs, ind);
 
   static double *distQuery = new double[numTerms+1];
-  int numDocs = ind.docCount();
+  COUNT_T numDocs = ind.docCount();
   vector<termProb> **tProbs = new vector<termProb> *[numDocs + 1];
 
   int i;
@@ -615,17 +616,17 @@ void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep,
   }
   
   // Put these in a faster structure.
-  vector <int> qTerms; // TERM_ID
+  vector <TERMID_T> qTerms; // TERM_ID
   origRep.startIteration();
   while (origRep.hasMore()) {
     QueryTerm *qt = origRep.nextTerm();
     qTerms.push_back(qt->id());
     delete(qt);
   }
-  int numQTerms = qTerms.size();
+  COUNT_T numQTerms = qTerms.size();
   dCounter->startIteration();
   while (dCounter->hasMore()) {
-    int wd;
+    int wd; // dmf fixme
     double P_w;
     double P_qw=0;
     double P_Q_w = 1.0;
@@ -633,7 +634,7 @@ void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep,
     dCounter->nextCount(wd, P_w);
     for (int j = 0; j < numQTerms; j++) {
       P_Q_w=1.0;
-      int qtID = qTerms[j]; // TERM_ID
+      TERMID_T qtID = qTerms[j]; // TERM_ID
       relDocs.startIteration();
       while (relDocs.hasMore()) {
 	int docID;

@@ -46,7 +46,7 @@ namespace OkapiParameter {
 
 class OkapiQueryTerm : public QueryTerm {
 public:
-  OkapiQueryTerm(int termID, double count, int pEstCount, double paramK3) : QueryTerm(termID, count), pEst(pEstCount), k3(paramK3) {
+  OkapiQueryTerm(TERMID_T termID, double count, int pEstCount, double paramK3) : QueryTerm(termID, count), pEst(pEstCount), k3(paramK3) {
   }
   /// return the number of rel docs with the term
   virtual int pEstCount() const { return pEst;}
@@ -85,7 +85,7 @@ public:
   /// increase the count of relevant/feedback doc in which a term occurs
   void incPEst(int wdIndex, int val) { pEst[wdIndex]+=val;}
 protected:
-  virtual QueryTerm *makeQueryTerm(int wdIndex, double wdCount) const{
+  virtual QueryTerm *makeQueryTerm(TERMID_T wdIndex, double wdCount) const{
     return (new OkapiQueryTerm(wdIndex, wdCount, pEst[wdIndex], k3));
   }
   double k3;
@@ -97,11 +97,11 @@ protected:
 
 class OkapiDocRep : public DocumentRep {
 public:
-  OkapiDocRep(int docID, const Index &dbIndex, OkapiParameter::TFParam &param) : DocumentRep(docID, dbIndex.docLength(docID)), ind(dbIndex),
+  OkapiDocRep(DOCID_T docID, const Index &dbIndex, OkapiParameter::TFParam &param) : DocumentRep(docID, dbIndex.docLength(docID)), ind(dbIndex),
   prm(param) {
   }
   virtual ~OkapiDocRep() { }
-  virtual double termWeight(int termID, const DocInfo *info) const;
+  virtual double termWeight(TERMID_T termID, const DocInfo *info) const;
   double BM25TF(double rawTF, double docLength) const;
   virtual double scoreConstant() const { return 0;}
 protected:
@@ -123,7 +123,7 @@ public:
     return (new OkapiQueryRep(qry, ind, tfParam.k3));
   }
 
-  virtual DocumentRep *computeDocRep(int docID) {
+  virtual DocumentRep *computeDocRep(DOCID_T docID) {
     return (new OkapiDocRep(docID, ind, tfParam));
   }
 
@@ -169,7 +169,7 @@ inline double OkapiDocRep::BM25TF(double rawTF, double docLength) const
 }
 
 
-inline double OkapiDocRep::termWeight(int termID, const DocInfo *info) const
+inline double OkapiDocRep::termWeight(TERMID_T termID, const DocInfo *info) const
 {
   return BM25TF(info->termCount(), ind.docLength(info->docID()));
 } 

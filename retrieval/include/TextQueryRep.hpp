@@ -29,13 +29,13 @@
 
 class QueryTerm {
 public:
-  QueryTerm(int termID, double weight) : ti(termID), w(weight) {
+  QueryTerm(TERMID_T termID, double weight) : ti(termID), w(weight) {
   } 
   virtual ~QueryTerm() {}
-  virtual int id() const { return ti;}
+  virtual TERMID_T id() const { return ti;}
   virtual double weight() const { return w;}
 protected:
-  int ti;
+  TERMID_T ti;
   double w;
 };
 
@@ -86,11 +86,11 @@ public:
   virtual QueryTerm *nextTerm() const;
 
 
-  virtual void incCount(int wdIndex, double count) {
+  virtual void incCount(TERMID_T wdIndex, double count) {
     ct->incCount(wdIndex,count);
   }
 
-  virtual void setCount(int wdIndex, double count) {
+  virtual void setCount(TERMID_T wdIndex, double count) {
     ct->setCount(wdIndex,count);
   }
 
@@ -102,7 +102,7 @@ public:
 
 
 protected:
-  virtual QueryTerm *makeQueryTerm(int wdIndex, double wdCount) const {
+  virtual QueryTerm *makeQueryTerm(TERMID_T wdIndex, double wdCount) const {
     return (new QueryTerm(wdIndex, wdCount));
   }
   double scConst;

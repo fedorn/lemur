@@ -17,7 +17,7 @@
 void RetrievalMethod::scoreCollection(const QueryRep &qry, IndexedRealVector &results)
 {
   results.clear();
-  for (int id=1; id<=ind.docCount();id++) {
+  for (DOCID_T id=1; id<=ind.docCount();id++) {
     results.PushValue(id, scoreDoc(qry, id));
   }
 }

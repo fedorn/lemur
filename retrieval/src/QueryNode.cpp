@@ -59,7 +59,7 @@ void QueryNode::transformPassageOps() {
   /// all belief operators have already been removed/flattened.
  double PassageQNode::passageScore(const StructQryDocRep *dRep) const{
     const QueryNode *child;
-    int did = dRep->did;
+    DOCID_T did = dRep->did;
     double score = 0;
     int tf;
     double totalWeight = 0, weight, idf;
@@ -76,7 +76,7 @@ void QueryNode::transformPassageOps() {
 	// compute proximity score for a passage
 	int numPos = child->proxList->count();
 	for(int k = 0; k < numPos; k++) {
-	  int pos = child->proxList->position(k);
+	  LOC_T pos = child->proxList->position(k);
 	  if (pos >= dRep->start && pos < dRep->end)
 	    tf++;
 	}
@@ -95,11 +95,11 @@ void QueryNode::transformPassageOps() {
 
 void TermQnode::copyDocList(int listlen, int tf,
 			    const DocInfoList *dl, int numDocs) {
-  int dc = numDocs + 1;
-  int nd = dc;
+  COUNT_T dc = numDocs + 1;
+  COUNT_T nd = dc;
   int cnt = 0;
   bool *didList= new bool[dc];
-  for(int i = 0; i < dc; i++) didList[i] = false;
+  for(COUNT_T i = 0; i < dc; i++) didList[i] = false;
   if (listlen == 0) {
     dList = didList;
     nextDoc = nd;
@@ -126,15 +126,15 @@ void TermQnode::copyDocList(int listlen, int tf,
 
 void QueryNode::unionDocList(int numDocs) {
   // Consume the children's dLists
-  int dc = numDocs + 1;
-  int nd = dc;
+  COUNT_T dc = numDocs + 1;
+  COUNT_T nd = dc;
   int cnt = 0;
   ch->startIteration();
   // If all children are empty (such as all terms that are OOV)
   // initialize an empty doc list.
   if (! ch->hasMore()) {
     dList = new bool[dc];
-    for(int i = 0; i < dc; i++) dList[i] = false;
+    for(COUNT_T i = 0; i < dc; i++) dList[i] = false;
     nextDoc = nd; /// first elt
     dCnt = cnt;
     proxList = NULL;
@@ -186,15 +186,15 @@ void QueryNode::intersectDocList(int numDocs) {
   // rewrite this to be cleaner/neater/quicker...
   // should not have to do the allocs.
   int all = entries;
-  int dc = numDocs + 1;
-  int nd = dc;
+  COUNT_T dc = numDocs + 1;
+  COUNT_T nd = dc;
   int cnt = 0;
   bool *didList = new bool[dc];
-  int *counts = new int[dc];
-  for(int i=0; i<dc; i++) {didList[i]=false; counts[i]=0; };
+  COUNT_T *counts = new COUNT_T[dc];
+  for(COUNT_T i=0; i<dc; i++) {didList[i]=false; counts[i]=0; };
   ch->startIteration();
   while (ch->hasMore()) {
-    int i;
+    COUNT_T i;
     const QueryNode *child = ch->nextNode();
     child->startProxIteration();
     /// this should iterate over the sets of prox lists
@@ -252,10 +252,10 @@ void SynQNode::synonymProxList() {
     totalTF += child->proxList->posSize();    // count position entries
   }
   totalPos += totalTF;
-  int *newProx = new int[totalPos];
-  int *tmpDF = new int[numChildren]; /// collect freqs
-  const int** tmpPos = new const int *[numChildren]; /// collect pos vectors to merge.
-  int *posIDX = new int[numChildren]; /// pos buffer idx
+  LOC_T *newProx = new LOC_T[totalPos];
+  COUNT_T *tmpDF = new COUNT_T[numChildren]; /// collect freqs
+  const LOC_T** tmpPos = new const LOC_T *[numChildren]; /// collect pos vectors to merge.
+  LOC_T *posIDX = new LOC_T[numChildren]; /// pos buffer idx
   int newProxIDX = 0;
   for(j = 0, i = nextDoc; j < dCnt; i++) {
 
@@ -319,8 +319,7 @@ bool OdnQNode::foundOrderedProx(int currPos, int wsize,
     childPos = nextChild->proxList->position(nextChild->proxList->nextPos);
     if (childPos < currPos) {
       while (nextChild->proxList->nextPos < nextChild->proxList->count() &&
-	     ((childPos = nextChild->proxList->position(nextChild->proxList->nextPos)) <
-currPos) ) {
+	     ((childPos = nextChild->proxList->position(nextChild->proxList->nextPos)) < currPos)) {
 	nextChild->proxList->nextPos++;
       }
       if(nextChild->proxList->nextPos >= nextChild->proxList->count())
@@ -341,7 +340,7 @@ void OdnQNode::orderedProxList(int numDocs) {
   static int intsize = sizeof(int);
   const QueryNode *child;
   int i, j, cnt, df = 0;
-  int nd = numDocs + 1;
+  COUNT_T nd = numDocs + 1;
 
   // Choose min num doc positions for allocation.
   int totalPos = INT_MAX;
@@ -353,8 +352,8 @@ void OdnQNode::orderedProxList(int numDocs) {
     }
   }
   totalPos += dCnt * 2;
-  int *tmpPos = NULL;
-  int *newProx = new int[totalPos];
+  LOC_T *tmpPos = NULL;
+  LOC_T *newProx = new LOC_T[totalPos];
   int newProxIDX = 0;
   int totalTF = 0;
   
@@ -374,14 +373,14 @@ void OdnQNode::orderedProxList(int numDocs) {
       // start with the first child
       child = ch->getNode(0);
       int numPos = child->proxList->count();
-      const int *positions = child->proxList->positions();
+      const LOC_T *positions = child->proxList->positions();
       for(int k = 0; k < numPos; k++) {
 	// find the matched window from the rest of children
 	if(foundOrderedProx(positions[k], winSize, ch, 1)) {
 	  if (cnt == 0) { // first one.
 	    delete[](tmpPos);
 	    /// maximum number of matches.
-	    tmpPos = new int[numPos];
+	    tmpPos = new LOC_T[numPos];
 	  }
 	  tmpPos[cnt++]= positions[k];
 	  // Advance each child to the next occurring position
@@ -397,7 +396,7 @@ void OdnQNode::orderedProxList(int numDocs) {
 	newProx[newProxIDX++] = i; // docid
 	newProx[newProxIDX++] = cnt; // (total number of matched positions)
 	memcpy((void *)(newProx + newProxIDX), (void *) tmpPos, 
-	       cnt * intsize);
+	       cnt * sizeof(LOC_T));
 	totalTF += cnt;
 	newProxIDX += cnt;
 	df++;
@@ -444,7 +443,7 @@ void UwnQNode::unorderedProxList(int numDocs) {
   static int intsize = sizeof(int);
   QueryNode *child; 
   int i, j, cnt, df = 0;
-  int nd = numDocs + 1;
+  COUNT_T nd = numDocs + 1;
   //  int winSize = ((UwnQNode *)qn)->winSize;
 
   // Choose min num doc positions for allocation.
@@ -457,8 +456,8 @@ void UwnQNode::unorderedProxList(int numDocs) {
   }
 
   totalPos += 2 * dCnt;
-  int *newProx = new int[totalPos];
-  int *tmpPos = NULL;
+  LOC_T *newProx = new LOC_T[totalPos];
+  LOC_T *tmpPos = NULL;
   int newProxIDX = 0;
   int totalTF = 0;
   for (j = 0, i = nextDoc; j < dCnt; i++) {
@@ -482,7 +481,7 @@ void UwnQNode::unorderedProxList(int numDocs) {
 	ch->startIteration();
 	while (ch->hasMore()) {
 	  child = ch->nextNode();
-	  int pos = child->proxList->position(child->proxList->nextPos);
+	  LOC_T pos = child->proxList->position(child->proxList->nextPos);
 	  if(pos < startPos) {
 	    startPos = pos;
 	    startChild = child;
@@ -493,7 +492,7 @@ void UwnQNode::unorderedProxList(int numDocs) {
 	  if (cnt == 0) { // first one.
 	    delete[](tmpPos);
 	    /// maximum number of matches.
-	    tmpPos = new int[startChild->proxList->count()];
+	    tmpPos = new LOC_T[startChild->proxList->count()];
 	  }
 	  tmpPos[cnt++]= startPos;
 	  // consume the used position entries
@@ -521,7 +520,7 @@ void UwnQNode::unorderedProxList(int numDocs) {
 	newProx[newProxIDX++] = i; // docid
 	newProx[newProxIDX++] = cnt; // (total number of matched positions)
 	memcpy((void *)(newProx + newProxIDX), (void *) tmpPos, 
-	       cnt * intsize);
+	       cnt * sizeof(LOC_T));
 	totalTF += cnt;
 	newProxIDX += cnt;
 	df++;

@@ -35,7 +35,7 @@ public:
   CosSimQueryRep(const TermQuery &qry, const Index &dbIndex, 
 		 double *idfValue);
   /// Create a query representation for the given document id.
-  CosSimQueryRep(int docId, const Index &dbIndex, double *idfValue);
+  CosSimQueryRep(DOCID_T docId, const Index &dbIndex, double *idfValue);
   virtual ~CosSimQueryRep() {}
 protected:
   double *idf;
@@ -45,12 +45,12 @@ protected:
 /// Representation of a doc (as a weighted vector) in the CosSim method.
 class CosSimDocRep : public DocumentRep {
 public:
-  CosSimDocRep(int docID, double *idfValue, double norm, int dl) : 
+  CosSimDocRep(DOCID_T docID, double *idfValue, double norm, int dl) : 
     DocumentRep(docID, dl), idf(idfValue), dNorm(norm) {
   }
   virtual ~CosSimDocRep() { }
   /// return dtf*idf.
-  virtual double termWeight(int termID, const DocInfo *info) const { 
+  virtual double termWeight(TERMID_T termID, const DocInfo *info) const { 
     return (idf[termID]*info->termCount()); 
   }
   /// return the L2 norm for this document.
@@ -94,11 +94,11 @@ public:
     return (new CosSimQueryRep(qry, ind, idfV));
   }
 
-  virtual TextQueryRep *computeTextQueryRep(int docid) {
+  virtual TextQueryRep *computeTextQueryRep(DOCID_T docid) {
     return (new CosSimQueryRep(docid, ind, idfV));
   }
 
-  virtual DocumentRep *computeDocRep(int docID) { 
+  virtual DocumentRep *computeDocRep(DOCID_T docID) { 
     return (new CosSimDocRep(docID, idfV, docNorm(docID), 
 			     ind.docLength(docID)));
   }
@@ -123,7 +123,7 @@ protected:
   //@}
 
   /// compute the L2 norm for a given docID.
-  double docNorm(int docID);
+  double docNorm(DOCID_T docID);
   /// load the precomputed L2 norms support file.
   void loadDocNorms();
 };

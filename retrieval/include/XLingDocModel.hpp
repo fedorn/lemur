@@ -27,7 +27,7 @@ public:
   /// @param l lambda value to use for smoothing term weights.
   /// @param nt |V| (sM false) or docCount(t)/Sum_w_in_V(docCount(w)) (sM true)
   /// @param sM whether to use term frequency (tf/|V|) or term doc frequency (docCount(t)/Sum_w_in_V(docCount(w))) for the background model. Default is term frequency.
-  XLingDocModel(int docID, const Index *ind, double l, double nt, 
+  XLingDocModel(DOCID_T docID, const Index *ind, double l, double nt, 
 		bool sM = false) :
     DocumentRep(docID, ind->docLength(docID)), refIndex(ind), lambda(l), 
 				 numTerms(nt),  docBasedSmooth(sM) {
@@ -38,7 +38,7 @@ public:
   /// @param termID the term
   /// @param info the DocInfo for this document
   /// @return the smoothed term weight for the term using lambda*(dtf/|D|) + (1-lambda)*P(t|C) where P(t|C) is either term frequency (tf/|V|) or term doc frequency (docCount(t)/Sum_w_in_V(docCount(w))).
-  virtual double termWeight(int termID, const DocInfo *info) const {
+  virtual double termWeight(TERMID_T termID, const DocInfo *info) const {
     //    double p_doc = info->termCount()/(double)refIndex->docLength(id);
     double p_doc = info->termCount()/(double)docLength;
     double p_gen; 

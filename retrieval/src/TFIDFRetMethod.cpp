@@ -75,7 +75,7 @@ TFIDFRetMethod::TFIDFRetMethod(const Index &dbIndex, ScoreAccumulator &accumulat
 
   // pre-compute IDF values
   idfV = new double[dbIndex.termCountUnique()+1];
-  for (int i=1; i<=dbIndex.termCountUnique(); i++) {
+  for (COUNT_T i=1; i<=dbIndex.termCountUnique(); i++) {
     idfV[i] = log((dbIndex.docCount()+1)/(0.5+dbIndex.docCount(i)));
   }
   scFunc = new ScoreFunction();
@@ -86,10 +86,10 @@ TFIDFRetMethod::TFIDFRetMethod(const Index &dbIndex, ScoreAccumulator &accumulat
 
 void TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, const DocIDSet &relDocs)
 {
-  int totalTerm=ind.termCountUnique();  
+  COUNT_T totalTerm=ind.termCountUnique();  
   static float * centroidVector = new float[totalTerm+1]; // one extra for OOV
 
-  int i;
+  COUNT_T i;
   for (i=1;i<=totalTerm;i++) {
     centroidVector[i]=0;
   }

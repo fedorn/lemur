@@ -22,14 +22,14 @@ TextQueryRetMethod::TextQueryRetMethod(const Index &ind,
   cacheDocReps = RetrievalParameter::cacheDocReps;
   
   if (cacheDocReps) {
-    int dc = ind.docCount();
+    COUNT_T dc = ind.docCount();
     docRepsSize = dc + 1;
     docReps = new DocumentRep *[docRepsSize];
-    for (int i = 0; i <= dc; i++) docReps[i] = NULL;
+    for (COUNT_T i = 0; i <= dc; i++) docReps[i] = NULL;
   }
 }
 
-void TextQueryRetMethod::scoreCollection(int docID, 
+void TextQueryRetMethod::scoreCollection(DOCID_T docID, 
 					 IndexedRealVector &results){
   QueryRep *rep = computeTextQueryRep(docID);
   scoreCollection(*rep, results);
@@ -57,7 +57,7 @@ void TextQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep,
     dList->startIteration();
     while (dList->hasMore()) {
       DocInfo *info = dList->nextEntry();
-      int id = info->docID();
+      DOCID_T id = info->docID();
       if (cacheDocReps) {
 	if (docReps[id] == NULL)
 	  docReps[id] = computeDocRep(id);      
@@ -102,12 +102,12 @@ void TextQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep,
   }
 }
 
-double TextQueryRetMethod::scoreDoc(const QueryRep &qry, int docID) {
+double TextQueryRetMethod::scoreDoc(const QueryRep &qry, DOCID_T docID) {
   HashFreqVector docVector(ind,docID);
   return (scoreDocVector(*((TextQueryRep *)(&qry)),docID,docVector));
 }
 
-double TextQueryRetMethod::scoreDocVector(const TextQueryRep &qRep, int docID, 
+double TextQueryRetMethod::scoreDocVector(const TextQueryRep &qRep, DOCID_T docID, 
 					  FreqVector &docVector) {
 
   qRep.startIteration();
@@ -135,7 +135,7 @@ double TextQueryRetMethod::scoreDocVector(const TextQueryRep &qRep, int docID,
 }
 
 #include <float.h> // for -DBL_MAX
-double TextQueryRetMethod::scoreDocPassages(const TermQuery &qry, int docID, 
+double TextQueryRetMethod::scoreDocPassages(const TermQuery &qry, DOCID_T docID, 
 					    PassageScoreVector &scores, 
 					    int psgSize, int overlap) {
   double score = 0, maxScore = -DBL_MAX;
@@ -160,7 +160,7 @@ double TextQueryRetMethod::scoreDocPassages(const TermQuery &qry, int docID,
     qRep->startIteration();
     while (qRep->hasMore()) {
       QueryTerm *qTerm = qRep->nextTerm();
-      int fq = pRep->passageTF(qTerm->id(), matches);
+      COUNT_T fq = pRep->passageTF(qTerm->id(), matches);
       dInfo = new DocInfo(docID, fq); //passage freq here
       score += scoreFunc()->matchedTermWeight(qTerm, qRep, dInfo, pRep);
       delete dInfo;

@@ -25,8 +25,8 @@ void StructQueryRetMethod::scoreCollection(const QueryRep &qry,
 void StructQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
 					      IndexedRealVector &scores, 
 					      bool scoreAll) {
-  int numDocs = ind.docCount();
-  int i;
+  COUNT_T numDocs = ind.docCount();
+  COUNT_T i;
   QueryNode *queryRoot = ((StructQueryRep *)(&qRep))->topnode();
   scores.clear();  
   // eval the query
@@ -42,7 +42,7 @@ void StructQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep,
   }
 }
 
-double StructQueryRetMethod::scoreDoc(const QueryRep &qry, int docID) {
+double StructQueryRetMethod::scoreDoc(const QueryRep &qry, DOCID_T docID) {
   double score = 0;
   QueryNode *structQR = ((StructQueryRep &)qry).topnode();
   DocumentRep *dRep = computeDocRep(docID);

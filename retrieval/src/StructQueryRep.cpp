@@ -54,13 +54,13 @@ QueryNode * StructQueryRep::getProxQryNode(const TermQuery &qry, const Term *tok
   // using a separate function for parsing proximity ops
   // because they allow only proximity children
   QueryNode *qn;
-  int ti = ind.term(tok->spelling());
+  TERMID_T ti = ind.term(tok->spelling());
   if (ti > 0) {
     // found a indexed term
     qn = new TermQnode(ti, 1.0);
     DocInfoList *dl = ind.docInfoList(ti);
-    int listlen = ind.docCount(ti);
-    int tf = ind.termCount(ti);
+    COUNT_T listlen = ind.docCount(ti);
+    COUNT_T tf = ind.termCount(ti);
     qn->copyDocList(listlen, tf, dl, numDocs);
     return qn;
   }
@@ -122,13 +122,13 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
 				       double w) {
 
   QueryNode *qn;
-  int ti = ind.term(tok->spelling());
+  TERMID_T ti = ind.term(tok->spelling());
   if (ti > 0) {
     // found a indexed term
     qn = new TermQnode(ti, w);
     DocInfoList *dl = ind.docInfoList(ti);
-    int listlen = ind.docCount(ti);
-    int tf = ind.termCount(ti);
+    COUNT_T listlen = ind.docCount(ti);
+    COUNT_T tf = ind.termCount(ti);
     qn->copyDocList(listlen, tf, dl, numDocs);
     return qn;
   }
@@ -166,7 +166,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     qStack[topqStack++] = qn;
     qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
     // #NOT has to eval every document individually
-    int i, dc = numDocs + 1;
+    DOCID_T i, dc = numDocs + 1;
     bool *didList = new bool[dc];
     for(i = 1; i <= dc; i++)
       didList[i] = true;

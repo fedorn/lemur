@@ -188,7 +188,7 @@ public:
   /// the document. This list is used for efficiency, as it is shorter
   /// than the whole TermInfoList for the document.
   /// @return the frequency of a term within the current passage.
-  int passageTF(int tid, MatchInfo *matches) const {
+  int passageTF(TERMID_T tid, MatchInfo *matches) const {
     int tf = 0;
     int pos = 0;
     MatchInfo::iterator m = matches->begin();
@@ -212,7 +212,7 @@ public:
   int getEnd () const {return pEnd;}
 
   /// Delegate call to termWeight of the encapsulated DocumentRep
-  virtual double termWeight(int termID, const DocInfo *info) const {
+  virtual double termWeight(TERMID_T termID, const DocInfo *info) const {
     return docRep.termWeight(termID, info);
   }
   

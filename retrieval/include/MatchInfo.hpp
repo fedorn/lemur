@@ -22,10 +22,10 @@
 /// Term match entry
 class TMatch {
 public:
-  TMatch(int t, int s, int e, int p): tid(t), start(s), end(e), 
+  TMatch(TERMID_T t, int s, int e, int p): tid(t), start(s), end(e), 
 				      position(p) { }
   /// internal term id
-  int tid;
+  TERMID_T tid;
   /// byte offset of first letter of term in raw document
   int start;
   /// byte offset of last letter of term in raw document
@@ -59,14 +59,14 @@ public:
   /// Query would be better replaced by the QueryDocument class
   /// or some list of internal term ids derived from the input
   /// query.
-  static MatchInfo *getMatches(const Index &ind, const Query &qry, int docID);
+  static MatchInfo *getMatches(const Index &ind, const Query &qry, DOCID_T docID);
 
 private:
   /// Make an empty one.
   MatchInfo() {}
 
   /// add an entry
-  void add(int tid, int position, int start=-1, int end=-1) {
+  void add(TERMID_T tid, int position, int start=-1, int end=-1) {
     TMatch t(tid, start, end, position);
     //matchList.push_back(t);
     push_back(t);
