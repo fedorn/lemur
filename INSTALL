@@ -10,8 +10,8 @@
 		  the distributed retrieval components. Default is disabled.
 		- <tt>--enable-summarization</tt> compiles and installs the
 		  summarization components. Default is disabled.
-		- <tt>--prefix=<install-directory></tt> Specifes the 
-		  directory for the installed the toolkit. 
+		- <tt>--prefix=<install-directory></tt> Specifies the 
+		  directory for the installed toolkit. 
 		  Default is /usr/local.
 
   - To make the lemur toolkit library and applications
