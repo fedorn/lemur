@@ -39,8 +39,13 @@
 
 class QueryEnvironment {
 private:
+  // first is entry in _servers, second is entry _streams
+  // derive idx to erase from those.
+  std::map<std::string, std::pair<QueryServer *, NetworkStream *> > _serverNameMap;
   std::vector<QueryServer*> _servers;
-
+  // first is entry _servers, second is entry in _repositories.
+  // derive idx to erase from those.
+  std::map<std::string, std::pair<QueryServer *, Repository *> > _repositoryNameMap;
   std::vector<Repository*> _repositories;
   std::vector<NetworkStream*> _streams;
   std::vector<NetworkMessageStream*> _messageStreams;
@@ -85,6 +90,13 @@ public:
   void addIndex( const std::string& pathname );
   /// Close the QueryEnvironment.
   void close();
+  /// \brief Remove a remote server
+  /// @param hostname the host the server is running on
+  void removeServer( const std::string& hostname );
+  /// \brief Remove a local repository
+  /// @param pathname the path to the repository.
+  void removeIndex( const std::string& pathname );
+
   /// \brief Run an Indri query language query. @see ScoredExtentResult
   /// @param query the query to run
   /// @param resultsRequested maximum number of results to return

@@ -191,8 +191,8 @@ std::vector<QueryServerResponse*> QueryEnvironment::_runServerQuery( std::vector
   
   // this ships out the requests to each server (doesn't necessarily block until they're done)
   for( unsigned int i=0; i<_servers.size(); i++ ) {
-    QueryServerResponse* response = _servers[i]->runQuery( roots, resultsRequested, true );
-    responses.push_back( response );
+      QueryServerResponse* response = _servers[i]->runQuery( roots, resultsRequested, true );
+      responses.push_back( response );
   }
 
   // this just goes through all the results, blocking on each one,
@@ -309,7 +309,38 @@ void QueryEnvironment::addIndex( const std::string& pathname ) {
   repository->openRead( pathname, &_parameters );
 
   _repositories.push_back( repository );
-  _servers.push_back( new LocalQueryServer( *repository ) );
+  LocalQueryServer *server = new LocalQueryServer( *repository ) ;
+  _servers.push_back( server );
+  _repositoryNameMap[pathname] = std::make_pair(server,	repository);
+  
+}
+
+void QueryEnvironment::removeIndex( const std::string& pathname ) {
+  // close, delete, and remove opened Repository from _repositories
+  // close, delete, and remove opened LocalQueryServer from _servers
+  // renumber map entries after removal
+  std::map<std::string, std::pair<QueryServer *, Repository *> >::iterator iter;
+  iter = _repositoryNameMap.find(pathname);
+  if (iter != _repositoryNameMap.end()) {
+    QueryServer * s = iter->second.first;
+    Repository * r = iter->second.second;
+    for (int i = 0; i < _servers.size(); i++) {
+      if (_servers[i] == s) {
+	delete(_servers[i]);
+	_servers.erase(_servers.begin() + i);
+	break;
+      }
+    }
+    
+    for (int i = 0; i < _repositories.size(); i++) {
+      if (_repositories[i] == r) {
+	delete(_repositories[i]);
+	_repositories.erase(_repositories.begin() + i);
+	break;
+      }
+    }
+    _repositoryNameMap.erase(iter);
+  }
 }
 
 void QueryEnvironment::addServer( const std::string& hostname ) {
@@ -334,6 +365,39 @@ void QueryEnvironment::addServer( const std::string& hostname ) {
 
   _messageStreams.push_back( messageStream );
   _servers.push_back( proxy );
+  _serverNameMap[hostname] = std::make_pair(proxy, stream);
+
+}
+
+void QueryEnvironment::removeServer( const std::string& hostname ) {
+  // close, delete, and remove opened NetworkStream from _streams
+  // close, delete, and remove opened NetworkMessageStream from _messageStreams
+  // close, delete and remove opened NetworkServerProxy from _servers
+  // renumber map entries after removal as needed.
+  std::map<std::string, std::pair<QueryServer *, NetworkStream *> >::iterator iter;
+  iter = _serverNameMap.find(hostname);
+  if (iter != _serverNameMap.end()) {
+    QueryServer * s = iter->second.first;
+    NetworkStream * n = iter->second.second;
+    for (int i = 0; i < _servers.size(); i++) {
+      if (_servers[i] == s) {
+	delete(_servers[i]);
+	_servers.erase(_servers.begin() + i);
+	break;
+      }
+    }
+    
+    for (int i = 0; i < _streams.size(); i++) {
+      if (_streams[i] == n) {
+	delete(_streams[i]);
+	_streams.erase(_streams.begin() + i);
+	delete(_messageStreams[i]);
+	_messageStreams.erase(_messageStreams.begin() + i);
+	break;
+      }
+    }
+    _serverNameMap.erase(iter);
+  }
 }
 
 void QueryEnvironment::close() {
@@ -567,7 +631,8 @@ std::vector<ScoredExtentResult> QueryEnvironment::_runQuery( InferenceNetwork::M
   try {
     rootNode = parser.query();
   } catch( antlr::ANTLRException exc ) {
-    LEMUR_THROW( LEMUR_PARSE_ERROR, "Couldn't understand this query: " + exc.toString() );
+    //    LEMUR_THROW( LEMUR_PARSE_ERROR, "Couldn't understand this query: " + exc.toString() );
+    LEMUR_THROW( LEMUR_PARSE_ERROR, "Couldn't understand this query: " + exc.getMessage() );
   }
   
   PRINT_TIMER( "Parsing complete" );
