@@ -1,10 +1,9 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2001, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
@@ -25,7 +24,7 @@ class PorterStemmer : public Stemmer {
 public:
   
   /// Stem a word using the Porter Stemmer.
-  void stemWord(char * word);
+  char * stemWord(char * word);
 
 };
 

@@ -1,10 +1,10 @@
+
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2001, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
@@ -58,6 +58,14 @@ public:
     if (textHandler != NULL)
       textHandler->foundWord(word);
   }
+
+  /// Found a word
+  virtual void foundSymbol(char * sym) {
+    sym = handleSymbol(sym);
+    if (textHandler != NULL)
+      textHandler->foundSymbol(sym);
+  }
+
   /// Set the TextHandler that this TextHandler will pass information on to.
   virtual void setTextHandler(TextHandler * th) {
     textHandler = th;
@@ -67,6 +75,8 @@ public:
   virtual char * handleDoc(char * docno) { return docno; }
   /// Handle a word, possibly transforming it
   virtual char * handleWord(char * word) { return word; }
+  /// Handle a word, possibly transforming it
+  virtual char * handleSymbol(char * sym) { return sym; }
 
 protected:
   /// The next textHandler in the chain

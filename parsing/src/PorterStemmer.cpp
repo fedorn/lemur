@@ -1,13 +1,19 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2001, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
+
+/*
+ * NAME DATE - COMMENTS
+ * pto 2001 - created
+ * dmf 9/2002 - modified stemWord to return char*
+ *
+ *========================================================================*/
 
 #include "PorterStemmer.hpp"
 
@@ -18,8 +24,7 @@
 extern int porter_stem(char * p, int i, int j);
 
 
-void 
-PorterStemmer::stemWord(char * word) {
+char * PorterStemmer::stemWord(char * word) {
   // only stem words that begin with a lowercase letter 
   // (don't stem acronyms or names)
   if (islower(*word)) {
@@ -27,4 +32,5 @@ PorterStemmer::stemWord(char * word) {
     len = porter_stem(word, 0, len - 1) + 1;
     word[len] = '\0';
   }
+  return word;
 }
