@@ -1,8 +1,24 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * 
+ * The Lemur toolkit for language modeling and information retrieval.
+ * Copyright (c) 2001 Carnegie Mellon University.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted for research or educational purposes,
+ * provided that this copyright notice is maintained and note is made
+ * of any changes to the source code.
+ * 
+ * This is a research system.  The code is distributed on an "as is" basis,
+ * without any warranty, express or implied. 
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "InvFPPushIndex.hpp"
+
 /*
  * NAME DATE - COMMENTS
  * tnt 03/2001 - created
+ * tnt 07/2001 - adding [OOV] term and docid
  *
  *========================================================================*/
 
@@ -76,13 +92,13 @@ bool InvFPPushIndex::addTerm(Term& t){
     }
     // try to add position information for this current doc to term's doclist
     // we can't depend on our own count for position info because stopwords aren't added
-    if (!curlist->addLocation( docIDs.size()-1, term->position() )) {
+    if (!curlist->addLocation( docIDs.size(), term->position() )) {
       // flush the cache
       writeCache();
       cache->flushMem();
       // we still need to add this term
       curlist->allocMem();
-      curlist->addLocation(docIDs.size()-1, term->position());
+      curlist->addLocation(docIDs.size(), term->position());
     }
 
   } else {
@@ -91,7 +107,9 @@ bool InvFPPushIndex::addTerm(Term& t){
     tidcount++;
     //store new word in list of ids
     char* spell = strdup(term->spelling());
-    curlist = new InvFPDocList(cache, termIDs.size(), term->strLength(), docIDs.size()-1, term->position() );
+    termIDs.push_back(spell);
+
+    curlist = new InvFPDocList(cache, termIDs.size(), term->strLength(), docIDs.size(), term->position() );
 
     if (curlist->hasNoMem()) {
       //we didn't allocate memory in the constructor!
@@ -100,9 +118,8 @@ bool InvFPPushIndex::addTerm(Term& t){
       cache->flushMem();
       // we still need to add this term
       curlist->allocMem();
-      curlist->addLocation(docIDs.size()-1, term->position());
+      curlist->addLocation(docIDs.size(), term->position());
     }
-    termIDs.push_back(spell);
     wordtable[spell] = curlist;
   }
 
@@ -117,9 +134,8 @@ bool InvFPPushIndex::addTerm(Term& t){
 
 void InvFPPushIndex::endDoc(DocumentProps* dp){
   //flush list and write to lookup table
-  //index of last item in docIDs is current internal docid
   if (dp != NULL) {
-    int docid = docIDs.size()-1;
+    int docid = docIDs.size();
     int len = dp->length();
     int tls = termlist.size();
     
@@ -208,8 +224,10 @@ void InvFPPushIndex::writeDocIDs() {
    char* dname = new char[namelen+strlen(DOCIDMAP)];
    sprintf(dname, "%s%s", name, DOCIDMAP);
    FILE* docid = fopen(dname, "wb");
+   // first write out the string value for an unknown docid
+   fprintf(docid, "%d %d %s ", 0, strlen(INVALID_STR), INVALID_STR);
    for (int i=0;i<docIDs.size();i++) {
-     fprintf(docid, "%d %d %s ", i, strlen(docIDs[i]), docIDs[i]);
+     fprintf(docid, "%d %d %s ", i+1, strlen(docIDs[i]), docIDs[i]);
    }
    fclose(docid);
    delete[](dname);
@@ -247,7 +265,7 @@ void InvFPPushIndex::writeCache() {
   TABLE_T::iterator finder;
   InvFPDocList* list;
 //  InvFPDocInfo* info;
-  DOCID_T docid = docIDs.size()-1;
+//  DOCID_T docid = docIDs.size();
 //  LOC_T* locs;
 
   // write the file out in termid order
@@ -290,11 +308,11 @@ void InvFPPushIndex::lastWriteCache() {
   char* tidname = new char[namelen+strlen(TERMIDMAP)];
   sprintf(tidname, "%s%s", name, TERMIDMAP);
   FILE* tid = fopen(tidname, "wb");
-
+  fprintf(tid, "%d %d %s ", 0, strlen(INVALID_STR), INVALID_STR);
   char* term;
   TABLE_T::iterator finder;
   InvFPDocList* list;
-  DOCID_T docid = docIDs.size()-1;
+  //  DOCID_T docid = docIDs.size();
 
   // write the file out in termid order
   for (int i=0;i<termIDs.size();i++) {
@@ -309,7 +327,7 @@ void InvFPPushIndex::lastWriteCache() {
       list = finder->second;
     }
     //write out word to term id table
-    fprintf(tid, "%d %d %s ", i, list->termLen(), term);
+    fprintf(tid, "%d %d %s ", i+1, list->termLen(), term);
 
     // check to see that there is a list that requires flushing
     if (!list->hasNoMem()) {
