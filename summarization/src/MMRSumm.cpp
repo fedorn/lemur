@@ -35,9 +35,32 @@ void MMRSumm::markPassages(int optLen, char* qInfo) {
 }
   
 void MMRSumm::addPassage(Passage &psg) {
-  MMRPassage* mPsg = dynamic_cast<MMRPassage*>(&psg);
+  MMRPassage* mPsg = (MMRPassage*)(&psg);
   doc.push_back(*mPsg);
 }  
+
+void MMRSumm::addDocument(const char* docID) {
+
+  int eos = 0;
+
+  MMRPassage* tempPsg;
+
+  TermInfoList* tList = idx->termInfoListSeq(idx->document(docID));
+  eos = hasEOS(idx, tList);
+  if (eos) {
+    cout << "EOS located in document" << endl;
+  } else {
+    cout << "EOS not present; using default passage length " << summLen << endl;
+  }
+  tList->startIteration();
+  while (tList->hasMore()) {
+    tempPsg = new MMRPassage(docID);
+    findNextPassage(*tempPsg, idx, tList, eos);
+    addPassage(*tempPsg);
+  }
+  delete tList;
+
+}
 
   
 int MMRSumm::fetchPassages(Passage psgs[], int optLen) {
