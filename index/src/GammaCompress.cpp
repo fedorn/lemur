@@ -39,12 +39,13 @@ int GammaCompress::gamma_size(int x) {
 int GammaCompress::gamma_encode(int x, int offset, BitArray * ba) {
   int o=offset;
   int l = floorlog2(x);
-  for (int i=0; i<l; ++i) {
+  int i;
+  for (i=0; i<l; ++i) {
     ba->Sett(o++);
   }
   ba->Clear(o++);
   int z = x - (1 << l);
-  for (int i=l-1; i>=0; --i) {
+  for (i=l-1; i>=0; --i) {
     if (bitmask[i]&z) 
       ba->Sett(o++);
     else 
@@ -72,12 +73,13 @@ GammaCompress::GammaCompress() : ba(NULL) { initBitMasks(); }
 
 void GammaCompress::compress(ostream &os, int n, int * a) {
   int size=0;
-  for (int i=0; i<n; ++i) {
+  int i;
+  for (i=0; i<n; ++i) {
     size += gamma_size(a[i]);
   }
   BitArray * ba = new BitArray(size);
   int offset=0;
-  for (int i=0; i<n; ++i) {
+  for (i=0; i<n; ++i) {
     offset += gamma_encode(a[i], offset, ba);
   }
   int s=ba->Size();

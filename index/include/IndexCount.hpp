@@ -27,8 +27,7 @@
 //---------------------------------------------------------------
 
 
-#include <fstream.h>
-#include <cstdio>
+#include "common_headers.hpp"
 #include <cstdlib>
 #include "MemList.hpp"
 

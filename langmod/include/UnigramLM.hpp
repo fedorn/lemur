@@ -52,7 +52,7 @@ public:
   }
 
   virtual bool hasMore() {
-    ct.hasMore();
+    return ct.hasMore();
   }
 
   virtual void nextWordProb(int &wordIndex, double &prob) {

@@ -29,8 +29,8 @@
 
 // CLASSES: IndexedReal, IndexedRealVector (C. Zhai, 12/1/2000)
 
-#include <vector.h>
-#include <algo.h>
+#include "common_headers.hpp"
+#include <algorithm>
 
 struct IndexedReal {
   int ind;

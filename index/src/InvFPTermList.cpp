@@ -37,15 +37,15 @@ bool InvFPTermList::hasMore(){
 }
 
 TermInfo* InvFPTermList::nextEntry(){
-  TermInfo* tinfo;
-  InvFPTerm* info = new InvFPTerm();
-  info->loc = list[index].loc;
-  info->tid = list[index].term;
+//  TermInfo* tinfo;
+  static InvFPTerm info;
+  info.loc = list[index].loc;
+  info.tid = list[index].term;
   if (counts)
-    info->freq = counts[index];
+    info.freq = counts[index];
   index++;
-  tinfo = info;
-  return tinfo;
+//  tinfo = info;
+  return &info;
 }
 
 bool InvFPTermList::binRead(ifstream& infile){

@@ -31,12 +31,10 @@
 #ifndef _PSETH_
 #define _PSETH_
 
-#include <iostream.h>
-#include <cstdlib>
+#include "common_headers.hpp"
 #include <cmath>
 #include <memory.h>
 #include <cassert>
-#include <iostream.h>
 
 static const float SPARSENESS = 1.5;
 static const float GROW_FACTOR = 2.0;

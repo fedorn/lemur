@@ -21,9 +21,8 @@
 //        bits[32] -> position 63 (end of second word)
 //
 
-#include <iostream.h>
+#include "common_headers.hpp"
 #include <cassert>
-#include <cstdlib>
 #include <memory.h>		// for memset
 #include "ByteHash.hpp"
 #include "MemList.hpp"

@@ -17,8 +17,7 @@
 
 #include <LL.hpp>
 #include <Null.hpp>
-#include <cstdlib>
-#include <iostream.h>
+#include "common_headers.hpp"
 #include <cassert>
 
 #define LIST_NOTFOUND (-1)

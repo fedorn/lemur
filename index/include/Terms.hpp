@@ -23,9 +23,7 @@
 #ifndef _TERMSH_
 #define _TERMSH_
 
-#include <iostream.h>
-#include <fstream.h>
-
+#include "common_headers.hpp"
 #include "String.hpp"
 #include "ISet.hpp"
 #include "Array.hpp"

@@ -33,7 +33,7 @@ public:
   ~BasicIndexWithCat() { delete [] base2cat; delete [] cat2base ;};
 
   /// to be implemented later
-  bool open(const char *) {} 
+  bool open(const char *) {return false;} 
 
   /// @name Spelling and index conversion
   //@{

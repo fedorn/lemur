@@ -152,17 +152,17 @@ bool InvFPDocList::hasMore() {
 }
 
 DocInfo* InvFPDocList::nextEntry() {
-  DocInfo* dinfo;
-  InvFPDocInfo* info = new InvFPDocInfo();
+  //DocInfo* dinfo;
+  static InvFPDocInfo info;
   // info is stored in int* as docid freq pos1 pos2 .. 
-  info->id = *iter;
+  info.id = *iter;
   iter++;
-  info->count = *iter;
+  info.count = *iter;
   iter++;
-  info->pos = iter;
-  iter+=info->count;
-  dinfo = info;
-  return dinfo;
+  info.pos = iter;
+  iter+=info.count;
+//  dinfo = info;
+  return &info;
 }
 
 void InvFPDocList::nextEntry(InvFPDocInfo* info) {

@@ -36,8 +36,7 @@
 //
 //---------------------------------------------------------------
 
-#include <cstdlib>
-#include <iostream.h>
+#include "common_headers.hpp"
 #include "BitArray.hpp"
 
 class Compress {

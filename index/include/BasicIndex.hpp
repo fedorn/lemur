@@ -27,11 +27,9 @@ two indices (term->doc and doc->term) as well as a term lexicon and document id 
 //-----------------------------------------------------------------
 
 
-#include <fstream.h>
 #include <cstdio>
-#include <cstdlib>
 #include <ctime>
-
+#include "common_headers.hpp"
 #include "Compress.hpp"
 #include "DocStream.hpp"
 #include "FastList.hpp"

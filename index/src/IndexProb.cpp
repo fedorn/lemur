@@ -20,8 +20,8 @@ MemList *FastList<IndexProb>::pMemList = NULL;
 MemList *FLL<IndexProb>::pMemList = NULL;
 MemList *IndexProb::pMemList = NULL;
 
-template class FastList<IndexProb >;
-template class FLL<IndexProb >;
+//template class FastList<IndexProb >;
+//template class FLL<IndexProb >;
 
 void IndexProb::UseMemory(MemList &memList)
 {

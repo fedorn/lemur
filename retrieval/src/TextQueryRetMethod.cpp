@@ -26,7 +26,7 @@ void TextQueryRetMethod::scoreCollection(QueryRep &qry, IndexedRealVector &resul
 
 
 
-void TextQueryRetMethod::scoreInvertedIndex(QueryRep &qRep, IndexedRealVector &scores, bool scoreAll=false)
+void TextQueryRetMethod::scoreInvertedIndex(QueryRep &qRep, IndexedRealVector &scores, bool scoreAll)
 {
 
   scAcc.reset();

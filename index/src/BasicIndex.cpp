@@ -9,17 +9,13 @@
  *==========================================================================
 */
 
-
-#include <fstream.h>
 #include <cassert>
-#include <cstdlib>
-#include <cstdio>
-#include <ctime>
-
+extern "C" { 
+#include "util.h"
+}
 #include "BasicIndex.hpp"
 #include "Array.hpp"
 #include "BitArray.hpp"
-#include "CUtil.hpp"
 #include "BasicDocStream.hpp"
 #include "FastList.hpp"
 #include "GammaCompress.hpp"
@@ -257,8 +253,8 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
 
   int numWordsRead=0;
   int numDocs=0;
-
-  for (int i=0; i<maxVocSize; ++i) {
+  int i;
+  for (i=0; i<maxVocSize; ++i) {
     ti[i].index = i;
     ti[i].count = 0;
   }
@@ -320,9 +316,8 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
   ofstream ofs(wordVocabulary);
   assert(ofs);
   cerr << "Pruning vocabulary with minimum count " << minCount << endl;
-
   ofs << Terms::getOOVSpelling() << endl;
-  for (int i=n-1; i>=0; --i) {
+  for (i=n-1; i>=0; --i) {
     String &s = voc[ti[i].index];
     if (s.length() == 0) continue;
     if (ti[i].count < minCount) break;
@@ -335,7 +330,7 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
   assert(ofs2);
   cerr << "Number of document ids: " << doc.size() << endl;
   ofs2 << Terms::getOOVSpelling() << endl;
-  for (int i=0; i<doc.size(); ++i) {
+  for (i=0; i<doc.size(); ++i) {
     ofs2 << doc[i] << endl;
   }
 
@@ -402,7 +397,7 @@ int BasicIndex::indexCollection()
   int numIndices=0;
   char cmd[1024];
   int did;
-
+  int i;
   char name[1024];
   sprintf(name, "%s.%s", (const char *) prefix, documentIndexSuffix);
   documentIndexFile = name;
@@ -413,7 +408,7 @@ int BasicIndex::indexCollection()
   //  pDocStream->open(textFile);
   // DocStream &dfs = *pDocStream;
 
-  for (int i=0; i<terms.size(); ++i) {
+  for (i=0; i<terms.size(); ++i) {
     wordCount[i] = 0;
   }
 
@@ -463,7 +458,7 @@ int BasicIndex::indexCollection()
     // Write an entry in the document index
     n = 2*docSet.size();
     totalCount = 0;
-    for (int i=0; i<docSet.size(); ++i) {
+    for (i=0; i<docSet.size(); ++i) {
       int k = docSet[i];
       docEntry[i] = k;
       docEntry[docSet.size()+i] = wordCount[k];
@@ -476,7 +471,7 @@ int BasicIndex::indexCollection()
     pCompressor->compress(ofs, n, docEntry);
     
     // Now add to the lists for the word index
-    for (int i=0; i<docSet.size(); ++i) {
+    for (i=0; i<docSet.size(); ++i) {
       int k = docSet[i];
       FastList<IndexCount> &docList = docListOfWord[k];
       IndexCount * dc = new IndexCount(numDocs+1, wordCount[k]);
@@ -487,7 +482,7 @@ int BasicIndex::indexCollection()
       cerr << endl;
       timer.Elapsed();
       writeWordIndex(numIndices++, docListOfWord);
-      for (int i=0; i<terms.size(); ++i) {
+      for (i=0; i<terms.size(); ++i) {
 	FastList<IndexCount> &docList = docListOfWord[i];
 	docList.Clear();
       }
@@ -579,7 +574,7 @@ int BasicIndex::headDocIndex()
 
 int BasicIndex::mergePair(const char * fn1, const char * fn2, const char * fn3) 
 {
-  int n1, n2, n3, w1, w2, c1, c2, c3;
+  int n1, n2, n3, w1, w2, c1, c2, c3, i;
   static int inited=0;
   static int * dc1, * dc2, * dc3;
 
@@ -631,7 +626,7 @@ int BasicIndex::mergePair(const char * fn1, const char * fn2, const char * fn3)
       int m1 = n1/2;
       int m2 = n2/2;
       int currDoc = 0;
-      for (int i=0; i<m1; ++i) {
+      for (i=0; i<m1; ++i) {
 	dc3[i] = dc1[i];
 	currDoc += dc1[i];
       }
@@ -640,13 +635,14 @@ int BasicIndex::mergePair(const char * fn1, const char * fn2, const char * fn3)
       // Handle the "boundary" between records, 
       // which are delta-encoded
       dc3[m1+0] = dc2[0]-currDoc;
-      for (int i=1; i<m2; ++i) {
+	  
+      for (i=1; i<m2; ++i) {
 	dc3[m1+i] = dc2[i];
       }
-      for (int i=0; i<m1; ++i) {
+      for (i=0; i<m1; ++i) {
 	dc3[m1+m2+i] = dc1[m1+i];
       }
-      for (int i=0; i<m2; ++i) {
+      for (i=0; i<m2; ++i) {
 	dc3[m1+m2+m1+i] = dc2[m2+i];
       }
       ofs.write((char *)&w1, sizeof(int));
@@ -692,15 +688,15 @@ void BasicIndex::mergeIndexFiles()
 
     // We're finished when only indexPrefix.0 is present;
     sprintf(tmpnam1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, 0);
-    assert(CUQFileF(tmpnam1));
+    assert(qfilef(tmpnam1));
     sprintf(tmpnam1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, 1);
-    if (!CUQFileF(tmpnam1)) break;
+    if (!qfilef(tmpnam1)) break;
 
     for (int i=0; ; i+=2) {
       sprintf(fname1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, i);
       sprintf(fname2, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, i+1);
-      if (!(CUQFileF(fname1))) break;
-      else if (!CUQFileF(fname2)) {
+      if (!(qfilef(fname1))) break;
+      else if (!qfilef(fname2)) {
 	sprintf(tmpnam1, "%s.%s.%d", 
 		(const char *) prefix, wordIndexSuffix, i/2);
 	sprintf(cmd, "/bin/mv %s %s", fname1, tmpnam1);

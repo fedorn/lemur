@@ -12,8 +12,7 @@
 
 #include "SimpleKLRetMethod.hpp"
 #include "Param.hpp"
-#include <iostream.h>
-#include <fstream.h>
+#include "common_headers.hpp"
 #include <cmath>
 #include "DocUnigramCounter.hpp"
 #include "OneStepMarkovChain.hpp"
@@ -245,9 +244,8 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocID
 
   double noisePr;
 
-  int j;
   int i;
-  double bestLL ;
+
   double convergeLL;
   double distQueryNorm=0;
 

@@ -21,11 +21,11 @@
 #endif
 
 #include <cstdio>
-#include <iostream.h>
-#include <fstream.h>
 #include <cassert>
-#include <cstdlib>
-#include <unistd.h>
+#include "common_headers.hpp"
+#ifndef _WIN32
+	#include <unistd.h>
+#endif
 #include <sys/types.h>
 #include <sys/wait.h>
 //#include <sys/access.h>

@@ -13,7 +13,7 @@
 #ifndef _DOCUNIGRAMCOUNTER_HPP
 #define _DOCUNIGRAMCOUNTER_HPP
 
-#include <vector.h>
+#include "common_headers.hpp"
 #include "WeightedIDSet.hpp"
 #include "Counter.hpp"
 #include "Index.hpp"

@@ -17,6 +17,64 @@
 #include "Index.hpp"
 #include "UnigramLM.hpp"
 
+
+
+namespace SimpleKLParameter {
+  enum SmoothMethod  {JELINEKMERCER=0, DIRICHLETPRIOR=1, ABSOLUTEDISCOUNT=2};
+  
+  enum SmoothStrategy  {INTERPOLATE=0, BACKOFF=1}; 
+
+  enum QueryUpdateMethod {MIXTURE = 0, DIVMIN=1, MARKOVCHAIN=2};
+
+  struct DocSmoothParam {
+    /// smoothing method
+    enum SmoothMethod smthMethod;
+    /// smoothing strategy
+    enum SmoothStrategy smthStrategy;
+    /// discount constant (delta) in absolute discounting
+    double ADDelta;
+    /// collection model coefficient (lambda) in Jelinek-Mercer
+    double JMLambda;
+    /// prior (mu) in Dirichlet prior
+    double DirPrior;
+  };
+
+  static enum SmoothMethod defaultSmoothMethod = DIRICHLETPRIOR;
+  static enum SmoothStrategy defaultSmoothStrategy = INTERPOLATE;
+  static double defaultADDelta = 0.7;
+  static double defaultJMLambda = 0.5;
+  static double defaultDirPrior = 1000;
+
+  struct QueryModelParam {
+    /// query model re-estimation/updating method
+    enum QueryUpdateMethod fbMethod;
+    /// Q_new = (1-fbCoeff)*Q_old + fbCoeff*FBModel
+    double fbCoeff;
+    /// how many terms to use for the re-estimated query model
+    int fbTermCount;
+    /// feedback query model term probability threshold (only terms with a higher prob. will be used
+    double fbPrTh;
+    /// feedback query model prob. sum threshold (taking terms up to the point, where the accumulated prob. mass exceeds the threshold
+    double fbPrSumTh;
+    /// collection influence coefficient (e.g., in mixture model and divergence minimization methods)
+    double fbMixtureNoise;
+    //// max iterations for EM algorithm (will stop earlier if the likelihood converges with an error smaller than 0.5)
+    int emIterations;
+  };
+
+  static enum QueryUpdateMethod defaultFBMethod = MIXTURE;
+  static double defaultFBCoeff = 0.5;
+  static int defaultFBTermCount =50;
+  static double defaultFBPrTh = 0.001;
+  static double defaultFBPrSumTh = 1;
+  static double defaultFBMixNoise = 0.5;
+  static int defaultEMIterations = 50;
+
+};
+
+
+
+
 /// Doc representation for simple KL divergence retrieval model
 
 /*!
@@ -72,23 +130,23 @@ public:
 			UnigramLM &collectLM,
 			double *docProbMass,
 			double collectLMWeight, 
-			bool backoffVersion=false): 
+			SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
     SimpleKLDocModel(docID, collectLM),
     refIndex(referenceIndex),
     docPrMass(docProbMass),
     lambda(collectLMWeight), 
-    backoff(backoffVersion) {
+    strategy(smthStrategy) {
   };
 
   virtual ~JelinekMercerDocModel() {};
   
   virtual double unseenCoeff() {
-    return (backoff? 
+	  return (strategy!=SimpleKLParameter::INTERPOLATE? 
 	    lambda/(1-docPrMass[id]):
 	    lambda);
   }
   virtual double seenProb(double termFreq, int termID) {
-    if (backoff) {
+    if (strategy != SimpleKLParameter::INTERPOLATE) {
       return ((1-lambda)*termFreq/(double)refIndex->docLength(id));
     } else {
       return ((1-lambda)*termFreq/(double)refIndex->docLength(id)+
@@ -99,7 +157,7 @@ private:
   Index *refIndex;
   double *docPrMass;
   double lambda;
-  bool backoff;
+  SimpleKLParameter::SmoothStrategy strategy;
 };
 
 /// Bayesian smoothing with Dirichlet prior
@@ -115,18 +173,18 @@ public:
 		   UnigramLM &collectLM,
 		   double *docProbMass,
 		   double priorWordCount, 
-		   bool backoffVersion=false): 
+	    	SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
     SimpleKLDocModel(docID, collectLM),
     refIndex(referenceIndex),
     docPrMass(docProbMass),
     mu(priorWordCount),
-    backoff(backoffVersion) {
+	    strategy(smthStrategy) {
   };
 
   virtual ~BayesianDocModel() {};
 
   virtual double unseenCoeff() {
-    if (backoff) {
+    if (strategy != SimpleKLParameter::INTERPOLATE) {
       return (mu/((mu+refIndex->docLength(id))*
 		      (1-docPrMass[id])));
     } else {
@@ -135,7 +193,7 @@ public:
   }
 
   virtual double seenProb(double termFreq, int termID) {
-    if (backoff) {
+    if (strategy != SimpleKLParameter::INTERPOLATE) {
       return (termFreq/
 	      (double)(refIndex->docLength(id)+mu));
     } else {      
@@ -148,7 +206,7 @@ private:
   Index *refIndex;
   double *docPrMass;
   double mu;
-  bool backoff;
+  SimpleKLParameter::SmoothStrategy strategy;
 };
 
 /// Absolute discout smoothing
@@ -167,19 +225,19 @@ public:
 			   double *docProbMass,
 			   int *uniqueTermCount,
 			   double discount,
-			   bool backoffVersion=false): 
+		SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
     SimpleKLDocModel(docID, collectLM),
     refIndex(referenceIndex),
     docPrMass(docProbMass),
     uniqDocLen(uniqueTermCount),
     delta(discount),
-    backoff(backoffVersion) {
+      strategy(smthStrategy) {
   };
 
   virtual ~AbsoluteDiscountDocModel() {};
   
   virtual double unseenCoeff() {
-    if (backoff) {
+    if (strategy != SimpleKLParameter::INTERPOLATE) {
       return (delta*uniqDocLen[id]/
 	      (refIndex->docLength(id)*(1-docPrMass[id])));
     } else {
@@ -187,7 +245,7 @@ public:
     } 
   }
   virtual double seenProb(double termFreq, int termID) {
-    if (backoff) {
+	  if (strategy != SimpleKLParameter::INTERPOLATE) {
       return ((termFreq-delta)/(double)refIndex->docLength(id));
     } else {
       return ((termFreq-delta)/(double)refIndex->docLength(id)+
@@ -201,7 +259,7 @@ private:
   double *docPrMass;
   int *uniqDocLen;
   double delta;
-  bool backoff;
+  SimpleKLParameter::SmoothStrategy strategy;
 };
 
 

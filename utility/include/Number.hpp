@@ -20,8 +20,7 @@
 
 #pragma interface
 
-#include <iostream.h>
-#include <fstream.h>
+#include "common_headers.hpp"
 
 template <class U>
 class Number

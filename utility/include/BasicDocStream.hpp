@@ -52,14 +52,13 @@
  </PRE>
 */
 
-
+#include "common_headers.hpp"
 #include <cassert>
-#include <fstream.h>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include "DocStream.hpp"
 #include "Exception.hpp"
+
 
 #define MAXLINE 65536
 
@@ -89,7 +88,7 @@ class BasicTokenDoc : public Document {
   
   char *getID() const { return (char *)id;}
 
-  bool hasMore() { return (strcmp(curWord, "</DOC>"));}
+  bool hasMore() { return (strcmp(curWord, "</DOC>") != 0);}
     
   TokenTerm * nextTerm() {
     static BasicTokenTerm t;
@@ -141,7 +140,7 @@ public:
   virtual ~BasicDocStream() {  delete ifs;}
 
 public:
-
+	
   bool hasMore() {
     streampos pos = ifs->tellg();
     bool moreData= (*ifs >> buf);
@@ -149,7 +148,6 @@ public:
     return moreData; }
   
   void startDocIteration() {
-
     ifs->seekg(0);
     ifs->clear();
   }

@@ -20,8 +20,8 @@ MemList *FastList<IndexCount>::pMemList = NULL;
 MemList *FLL<IndexCount>::pMemList = NULL;
 MemList *IndexCount::pMemList = NULL;
 
-template class FastList<IndexCount >;
-template class FLL<IndexCount >;
+//template class FastList<IndexCount >;
+//template class FLL<IndexCount >;
 
 void IndexCount::UseMemory(MemList &memList)
 {

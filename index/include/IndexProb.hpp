@@ -29,10 +29,10 @@
 //---------------------------------------------------------------
 
 
-#include <fstream.h>
+
 #include <cstdio>
-#include <cstdlib>
 #include "MemList.hpp"
+#include "common_headers.hpp"
 
 class IndexProb
 {

@@ -81,8 +81,7 @@ The following is an example of supporting an index with position information:
 
 */
 
-#include <cstdlib>
-#include <iostream.h>
+#include "common_headers.hpp"
 
 
 class DocStream {

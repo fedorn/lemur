@@ -18,7 +18,9 @@
 // 
 
 // #define ARRAY_BOUNDARY_CHECK
-#include <unistd.h>
+#ifndef _WIN32
+	#include <unistd.h>
+#endif
 #include <cassert>
 
 // basic array class, fixed size, not automatically growable

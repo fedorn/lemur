@@ -67,6 +67,7 @@ public:
     c.key = ind;
     freq = count(c);
     if (freq==0) return false;
+	return true;
   }
 
   virtual void startIteration() {

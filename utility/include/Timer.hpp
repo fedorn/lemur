@@ -14,7 +14,7 @@
 #define _TIMERH_
 
 #include <ctime>
-#include <iostream.h>
+#include "common_headers.hpp"
 #include "String.hpp"
 
 class Timer {

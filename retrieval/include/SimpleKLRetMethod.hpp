@@ -22,59 +22,6 @@
 #include "Counter.hpp"
 #include "DocUnigramCounter.hpp"
 
-namespace SimpleKLParameter {
-  enum SmoothMethod  {JELINEKMERCER=0, DIRICHLETPRIOR=1, ABSOLUTEDISCOUNT=2};
-  
-  enum SmoothStrategy  {INTERPOLATE=0, BACKOFF=1}; 
-
-  enum QueryUpdateMethod {MIXTURE = 0, DIVMIN=1, MARKOVCHAIN=2};
-
-  struct DocSmoothParam {
-    /// smoothing method
-    enum SmoothMethod smthMethod;
-    /// smoothing strategy
-    enum SmoothStrategy smthStrategy;
-    /// discount constant (delta) in absolute discounting
-    double ADDelta;
-    /// collection model coefficient (lambda) in Jelinek-Mercer
-    double JMLambda;
-    /// prior (mu) in Dirichlet prior
-    double DirPrior;
-  };
-
-  static enum SmoothMethod defaultSmoothMethod = DIRICHLETPRIOR;
-  static enum SmoothStrategy defaultSmoothStrategy = INTERPOLATE;
-  static double defaultADDelta = 0.7;
-  static double defaultJMLambda = 0.5;
-  static double defaultDirPrior = 1000;
-
-  struct QueryModelParam {
-    /// query model re-estimation/updating method
-    enum QueryUpdateMethod fbMethod;
-    /// Q_new = (1-fbCoeff)*Q_old + fbCoeff*FBModel
-    double fbCoeff;
-    /// how many terms to use for the re-estimated query model
-    int fbTermCount;
-    /// feedback query model term probability threshold (only terms with a higher prob. will be used
-    double fbPrTh;
-    /// feedback query model prob. sum threshold (taking terms up to the point, where the accumulated prob. mass exceeds the threshold
-    double fbPrSumTh;
-    /// collection influence coefficient (e.g., in mixture model and divergence minimization methods)
-    double fbMixtureNoise;
-    //// max iterations for EM algorithm (will stop earlier if the likelihood converges with an error smaller than 0.5)
-    int emIterations;
-  };
-
-  static enum QueryUpdateMethod defaultFBMethod = MIXTURE;
-  static double defaultFBCoeff = 0.5;
-  static int defaultFBTermCount =50;
-  static double defaultFBPrTh = 0.001;
-  static double defaultFBPrSumTh = 1;
-  static double defaultFBMixNoise = 0.5;
-  static int defaultEMIterations = 50;
-
-};
-
 /// Query model representation for the simple KL divergence model
 
 class SimpleKLQueryModel : public ArrayQueryRep {

@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "string-set.h"
+#include <string.h>
 
 /* Suppose you have a program that generates strings and keeps pointers to them. 
    The program never needs to change these strings once they're generated.

@@ -17,7 +17,6 @@
 #pragma implementation
 
 #include <MemList.hpp>
-#include <iostream.h>
 
 #ifndef NULL
 #define NULL (void *)0
@@ -55,7 +54,7 @@ void MemList::Reset()
   if (next)
     {
       delete next;
-      next = NULL;
+      next = (MemList*)NULL;
     }
   curp = p;
 }
