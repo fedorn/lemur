@@ -42,7 +42,12 @@ void ResultFile::load(istream &is, Index &index)
       qi = resTable->add(entry);
     }
     entry = (*resTable)[qi];
-    entry.res->PushValue(ind->document(curDID), curSC);  
+    int did = ind->document(curDID);
+    if (did>0) {
+      entry.res->PushValue(did, curSC); 
+    } else {
+      cerr << "Warning: doc id "<< curDID << " not found in database\n";
+    }
   }
 }
 
@@ -75,7 +80,13 @@ void ResultFile::getResult(char *expectedQID, IndexedRealVector &res)
     throw Exception("ResultFile", "query id mismatch between the original query and the result file");
   }
   do {
-    res.PushValue(ind->document(curDID), curSC);
+
+    int did = ind->document(curDID);
+    if (did>0) {
+      res.PushValue(did, curSC); 
+    } else {
+      cerr << "Warning: doc id "<< curDID << " not found in database\n";
+    }
     if (! readLine()) {
       // end of file
       eof = true;
