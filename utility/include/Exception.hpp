@@ -12,8 +12,6 @@
 
 #ifndef _EXCEPTION_HPP
 #define _EXCEPTION_HPP
-#include <iostream>
-using namespace std;
 
 /// Default Exception class
 /*!
@@ -24,27 +22,35 @@ inherit from.
   
   (1) Define your main function as "int AppMain(int argc, char *argv[])"
      rather than the normal "main" function. 
-  (2) When throwing an exception from a class (e.g., MyClass), do
-
-        " throw Exception("MyClass", "description of exception");"
-  (3) If you want to process the exception, do
+  (2) Use the LEMUR_THROW and LEMUR_RETHROW macros to throw the exception, and
+      to pass it along to the next level's handler, respectively.
+      To use LEMUR_THROW, include the appropriate Lemur error code, and whatever
+      string description you want.   File and line information are automatically
+      included.
+      The error code can be from the standard Lemur list (see below).
+ (3)  Here's an example of how you might use LEMUR_THROW to generate an exception,
+      and LEMUR_RETHROW to pass it along to the next handler.
 
      <PRE> 
              try { 
 	     ... ... 
-	        throw Exception("MyClass", "an exception");
+                // within the index open routine, this exception might be thrown:
+                LEMUR_THROW(LEMUR_IO_ERROR, "The index file does not exist");
               }
 	      catch  (Exception &ex) {
-	         process exception...
+                 LEMUR_RETHROW(ex, "Could not start retrieval program.");
              }
 
     </PRE>
+    In general, consistent use of LEMUR_THROW and LEMUR_RETHROW will result in a 
+    nested series of exception messages, showing successively lower
+    levels of exception information, allowing easy tracing of the failure path.
 
   (4) If the exception is not caught in the application, it will be
    caught be the main function in the lemur toolkit. The default exception handler prints the following
    message on stderr and terminates the program. 
    <PRE>
-     Exception [ by MyClass]: an exception
+     Exception FileName.cpp(#linenum): The index file does not exist
      Program aborted due to exception
  </PRE>
 
@@ -54,20 +60,68 @@ inherit from.
 
 */
 
+#include "common_headers.hpp"
+
+typedef unsigned long LemurErrorType;
+
 class Exception {
 public:
-  Exception(char *throwerString=" unknown thrower", char *whatString="unknown exception"):
-    thrower(throwerString), what(whatString) {}
+  Exception(char *throwerString=" unknown thrower", char *whatString="unknown exception") {
+    _what = throwerString;
+    _what += ": ";
+    _what += whatString;
+  }
+
+  Exception( const std::string& whoString, const std::string& whereLine, 
+             const std::string& whatString, LemurErrorType code ) :
+    _what( whoString + "(" + whereLine + ")" + ": " + whatString ),
+    _code( code )
+  {
+  }
+
+  Exception( const std::string& whoString, const std::string& whereLine,
+             const std::string& whatString, const Exception& inner ) :
+    _what( whoString + "(" + whereLine + ")" + ": " + whatString + "\n\t" + inner.what() ),
+    _code(inner._code)
+  {
+  }
+
   ~Exception() {}
-  void writeMessage(ostream &os = cerr);
+
+  inline void writeMessage(ostream &os = cerr)
+  {
+    os << "Exception [" << _what << "], code = " << _code << endl;
+  }
+
+  const std::string& what() const {
+    return _what;
+  }
+
+  LemurErrorType code() const {
+    return _code;
+  }
+
 private:
-  char *thrower;
-  char *what;
+  std::string _what;
+  LemurErrorType _code;
 };
 
+#define LEMUR_MAKESTR(x) # x
 
-inline void Exception::writeMessage(ostream &os)
-{
-  os << "Exception [by "<< thrower << "]:"<< what << endl;
-}
+#define LEMUR_ABORT( e )                  { std::cerr << e.what() << std::endl; exit(-1); }
+#define LEMUR_THROW_LINE( code, text, file, line )  throw Exception( file, LEMUR_MAKESTR(line), \
+                                                    std::string() + text, (code) )
+#define LEMUR_THROW(code, text)  LEMUR_THROW_LINE(code, text, __FILE__, __LINE__)
+#define LEMUR_RETHROW_LINE( e, text, file, line )   throw Exception( file, LEMUR_MAKESTR(line), \
+                                                   (text), (e) )
+#define LEMUR_RETHROW( e, text)  LEMUR_RETHROW_LINE(e, text, __FILE__, __LINE__)
+
+#define LEMUR_GENERIC_ERROR               ((LemurErrorType)0xFFFFFFFF)
+#define LEMUR_MISSING_PARAMETER_ERROR     ((LemurErrorType)0xFFFFFFFE)
+#define LEMUR_PARSE_ERROR                 ((LemurErrorType)0xFFFFFFFD)
+#define LEMUR_KEYFILE_IO_ERROR            ((LemurErrorType)0xFFFFFFFC)
+#define LEMUR_IO_ERROR                    ((LemurErrorType)0xFFFFFFFB)
+#define LEMUR_RUNTIME_ERROR               ((LemurErrorType)0xFFFFFFFA)
+#define LEMUR_NETWORK_ERROR               ((LemurErrorType)0xFFFFFFF9)
+
 #endif
