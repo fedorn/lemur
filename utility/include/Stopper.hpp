@@ -11,7 +11,7 @@
 #include "TextHandler.hpp"
 #include "WordSet.hpp"
 
-#include <hash_set>
+#include <set>
 
 
 #ifndef _EQSTR_
