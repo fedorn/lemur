@@ -98,7 +98,6 @@ void TermQnode::copyDocList(int listlen, int tf,
   int dc = numDocs + 1;
   int nd = dc;
   int cnt = 0;
-  int *positions;
   bool *didList= new bool[dc];
   for(int i = 0; i < dc; i++) didList[i] = false;
   if (listlen == 0) {
@@ -243,7 +242,7 @@ void SynQNode::synonymProxList() {
   QueryNode *child;
   int numChildren = entries;  
   int nextPos, minIDX, minVal;
-  int i, j, k, cnt,  df = 0;
+  int i, j, k,  df = 0;
   /// we know how many entries are coming.
   /// total requirement is sum of the sizes of each child list + 2*dCnt
   int totalPos = 2 * dCnt, totalTF = 0;
