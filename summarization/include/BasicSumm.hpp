@@ -19,7 +19,7 @@
 
 using std::vector;
 
-#ifndef min
+#if (defined(WIN32) && !defined(min))
 #define min(x,y) __min(x,y)
 #endif
 
