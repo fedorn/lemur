@@ -1,15 +1,15 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2000, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
 
 #include "IndexedReal.hpp"
+#include <cmath>
 
 IndexedRealVector::IndexedRealAscending IndexedRealVector::ascendOrder;
 IndexedRealVector::IndexedRealDescending IndexedRealVector::descendOrder;
@@ -20,6 +20,53 @@ void IndexedRealVector::Sort(bool descending)
     sort(this->begin(), this->end(), descendOrder);
   } else {
     sort(this->begin(), this->end(), ascendOrder);
+  }
+}
+
+void IndexedRealVector::NormalizeValues()
+{
+  iterator it = begin();
+  static double sum=0;
+  while (it != end()) {
+    sum+=(*it).val;
+    it++;
+  }
+  it = begin();
+  while (it != end()) {
+    (*it).val/=sum;
+    it++;
+  }
+}
+
+void IndexedRealVector::LogToPosterior()
+{
+// In:  log(x1) log(x2) ... log(xN) 
+// Out: x1/sum, x2/sum, ... xN/sum
+// 
+// Extra care is taken to make sure we don't overflow 
+// machine precision when taking exp (log x)
+// This is done by adding a constant K which cancels out
+// Right now K is set to maximally preserve the highest value
+// but could be altered to a min or average, or whatever...
+
+  iterator it = begin();
+  static double sum=0;
+  static double K=(*it).val; 
+  while (it != end()) { // find the max value;
+    if((*it).val>K)
+      K=(*it).val;
+    it++;
+  }
+  K=-K;
+  it = begin();
+  while (it != end()) {
+    sum+=(*it).val=exp(K+(*it).val);
+    it++;
+  }
+  it = begin();
+  while (it != end()) {
+    (*it).val/=sum;
+    it++;
   }
 }
 

@@ -1,10 +1,9 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ * Original source copyright (c) 2000, Carnegie Mellon University.  
+ * See copyright.cmu for details.
+ * Modifications copyright (c) 2002, University of Massachusetts.
+ * See copyright.umass for details.
  *
  *==========================================================================
 */
@@ -28,6 +27,7 @@
 */
 
 // CLASSES: IndexedReal, IndexedRealVector (C. Zhai, 12/1/2000)
+// Normalize and LogToPosterior (added dmf, 09/2002)
 
 #include "common_headers.hpp"
 #include <algorithm>
@@ -55,6 +55,15 @@ public:
 
   /// sort all the values, default is descending order
   virtual void Sort(bool descending = true);
+
+  /// normalize values in a range (0:1), and sum to 1
+  virtual void NormalizeValues();
+
+  /// consider input values as log(x), mapping to exp(log(x)), and
+  /// normalize x values in a range (0:1), and sum to 1
+  virtual void LogToPosterior();
+
+
 private:
 
   /// Function object types, 
