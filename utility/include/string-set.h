@@ -13,6 +13,10 @@
 #ifndef _STRINGSETH_
 #define _STRINGSETH_
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #include <stdio.h>
 
 typedef struct {
@@ -26,5 +30,9 @@ char *       string_set_add(const char * source_string, String_set * ss);
 char *       string_set_lookup(const char * source_string, String_set * ss);
 void         string_set_delete(String_set *ss);
 void         string_set_display(FILE * fp, String_set *ss);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif
