@@ -67,7 +67,7 @@
 
 # Then evaluate it with Dirichlet smoothing
 ../app/obj/QueryModelEval mixfb_model_eval_param
-../app/src/ireval.pl -j qrel -trec < qrel res.mixfb_kl > pr.mixfb_kl
+../app/src/ireval.pl -j qrel -trec < res.mixfb_kl > pr.mixfb_kl
 
 
 ######################################################################
