@@ -75,9 +75,12 @@ to customize its behavior.
        "<new-module-dir>/include".
       -# Put all implementation files in the subdirectory named 
        "<new-module-dir>/src".
-      -# Add the module directory name to the Makefile variable LIBDIRS 
+      -# Add the module directory name to the Makefile variable LIBDIRS
+  and to the MakeDefns variables MODULES and ALLMODULES. New modules
+  should be placed at the front of the lists.
        <b>Note:</b> If you rerun configure, you will have to make this 
-       change again. Advanced users should edit configure.ac and add 
+       change again. Advanced users should edit MakeDefns.in to add the
+  module directory name to ALLMODULES and edit configure.ac to add 
        an AC_ARG_ENABLE for the new module (see the distrib entry in 
        configure.ac) and then use autoconf to generate a new configure 
        script. 
@@ -88,10 +91,12 @@ to customize its behavior.
       \section runapp  To run lemur applications
 
   - Create a parameter file with value definitions for all the
-  input variables of an application. Terminate each line with a semicolon.
+  input variables of an application.
   For example, 
   <PRE>
-    index = /usr0/mydata/index.ifp;
+    &lt;parameters&gt;
+      &lt;index&gt;/usr0/mydata/index.ifp&lt;/index&gt;
+    &lt;/parameters&gt;
   </PRE>
    Most applications will display a list of required input variables, 
 if you run it with the "--help" option. 
