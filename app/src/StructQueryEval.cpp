@@ -93,12 +93,16 @@ int AppMain(int argc, char *argv[]) {
     InvFPDocList *dList;
     DocInfoList *dl;
     // use last term in vocab to make this a small read (hopefully).
-    int lastTerm = ind->termCountUnique();
+    COUNT_T lastTerm = ind->termCountUnique();
     dl = ind->docInfoList(lastTerm);
     dList = dynamic_cast<InvFPDocList *>(dl);
     if (dList == NULL) {
-      throw Exception("StructQueryEval", 
-		      "InvFPDocList required from index->docInfoList()");
+      //  throw Exception("StructQueryEval", 
+      //      "InvFPDocList required from index->docInfoList()");
+      cerr << "WARNING: StructQueryEval: InvFPDocList required "
+	   << "from index for\nproximity operators. " 
+	   << "Setting all positions to 0." << endl;
+
     }
     delete(dl);
   } catch (Exception &ex) {
