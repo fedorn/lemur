@@ -1,7 +1,5 @@
+#include <linux/limits.h>
 #include "InvFPIndexMerge.hpp"
-
-#define OPEN_MAX 255
-// To get it to compile -- JDL
 
 InvFPIndexMerge::InvFPIndexMerge(char* buffer, long size, long maxfilesize) {
   maxfile = maxfilesize;
