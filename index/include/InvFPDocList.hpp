@@ -51,6 +51,7 @@ public:
 
   virtual DocInfo* nextEntry();
   virtual void nextEntry(InvFPDocInfo* info);
+  virtual int termCTF();
 
 protected:
   /// delta encode docids and positions from begin through end

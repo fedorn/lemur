@@ -85,7 +85,7 @@ public:
   int length() { return end-begin; };
   int termID() { return uid; };
   int termLen() { return strlength; };
-  int termCTF();
+  virtual int termCTF();
   int curDocIDdiff() { return lastid-begin; };
   int curDocIDtf() { return *(lastid+1); };
   
