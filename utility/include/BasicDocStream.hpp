@@ -132,6 +132,7 @@ class BasicDocStream : public DocStream
 public:
   BasicDocStream() {}
   BasicDocStream (const char * inputFile) {
+    strcpy(file, inputFile);
     ifs = new ifstream(inputFile, ios::in);
     if (ifs->fail() ) {
       throw Exception("BasicDocStream", "can't open BasicDocStream source file");
@@ -146,10 +147,13 @@ public:
     bool moreData= (*ifs >> buf);
     ifs->seekg(pos);
     return moreData; }
-  
+ 
+
   void startDocIteration() {
-    ifs->seekg(0);
-    ifs->clear();
+    ifs->close();
+    ifs->open(file);
+     ifs->seekg(0);
+     ifs->clear(); 
   }
 
   Document *nextDoc() {
@@ -159,7 +163,7 @@ public:
   }
 
  private:
-  char *file;
+  char file[1024];
   ifstream *ifs;
   char buf[2000];
 };
