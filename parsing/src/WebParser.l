@@ -45,7 +45,8 @@
 #define UNKNOWN 16
 #define B_STYLE 19
 #define E_STYLE 20
-
+#define B_TITLE 21
+#define E_TITLE 22
 
 extern FILE * webin;
 extern char * webtext;
@@ -67,6 +68,8 @@ long webloc;
 "</"[sS][tT][yY][lL][eE]">"             {webloc += webleng; return E_STYLE; } 
 "<"[sS][cC][rR][iI][pP][tT][^>]*">"     {webloc += webleng; return B_SCRIPT; }
 "</"[sS][cC][rR][iI][pP][tT]">"         {webloc += webleng; return E_SCRIPT; } 
+"<"[tT][iI][tT][lL][eE][^>]*">"         {webloc += webleng; return B_TITLE; }
+"</"[tT][iI][tT][lL][eE]">"             {webloc += webleng; return E_TITLE; }
 "<!--"                                  {webloc += webleng; return B_COMMENT; }
 "-->"                                   {webloc += webleng; return E_COMMENT; }
 "<"[/]?[a-zA-Z][^>]*">"                 {webloc += webleng; /* zap tags */ }
@@ -95,6 +98,13 @@ long webloc;
 
 WebParser::WebParser() {
   state = OUTER;
+// tags for signaling the beginning and ending of an element
+// for ElemDocMgr, actual tag values don't matter as long as 
+// begin and end tags send same value. Retrieve later using same string
+  begelem.setName("B_ELEM");
+  endelem.setName("E_ELEM");
+  begelem.setValue("\0");
+  endelem.setValue("\0");
 }
 
 long WebParser::fileTell() {
@@ -211,7 +221,27 @@ void WebParser::doParse() {
       if (state == STYLE)
         state = DOC;
       break;
-         
+
+    case B_TITLE:
+      // title words should be indexed
+      state = DOC;
+      
+      begelem.setValue("TITLE");
+      proplist.clear();
+      proplist.setProperty(&begelem);
+      if (textHandler)
+        textHandler->foundToken(BEGINTAG, webtext, webtext, &proplist);
+      break;
+
+    case E_TITLE:
+      state = DOC;
+      endelem.setValue("TITLE");
+      proplist.clear();
+      proplist.setProperty(&endelem);
+      if (textHandler)
+        textHandler->foundToken(ENDTAG, webtext, webtext, &proplist);
+      break;
+     
     case WORD:
       if (state == DOC) {
         // put the word in lowercase and pass it on
