@@ -1,6 +1,6 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on lemur_index.dsp
 !IF "$(CFG)" == ""
-CFG=lemur_index - Release
+CFG=lemur_index - Win32 Release
 !MESSAGE No configuration specified. Defaulting to lemur_index - Win32 Release.
 !ENDIF 
 
