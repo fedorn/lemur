@@ -46,14 +46,16 @@ InvDocList::InvDocList(int id, int len){
 
 
 InvDocList::InvDocList(int id, int listlen, int* list, int fr, int* ldocid, int len){
-  READ_ONLY = false;
+  //we don't own the memory.. 
+  READ_ONLY = true;
+
   intsize = sizeof(int);
   size = listlen * intsize;
   begin = list;
   end = begin + listlen;
   uid = id;
   strlength = len;
-	df = fr;
+  df = fr;
   hascache = false;
   lastid = ldocid;
   freq = lastid+1;
@@ -82,7 +84,7 @@ InvDocList::~InvDocList() {
     int pow = logb2(size);
       cache->freeMem(begin, pow);      
   } */
-  if ((begin != NULL) && (!hascache))
+  if ((begin != NULL) && (!hascache) && (!READ_ONLY))
     free(begin);
 }
 
@@ -198,6 +200,48 @@ bool InvDocList::addTerm(int docid) {
   return true;
 }
 
+bool InvDocList::append(InvDocList* tail) {
+  if (READ_ONLY)
+    return false;
+
+  // we only want to append the actual content
+  int* ptr = tail->begin;
+  int len = tail->length();
+
+  // check for memory
+  while ((end-begin+len)*intsize > size) {
+    if (!getMoreMem())
+      return false;
+  }
+
+  // update doc frequency
+  df += tail->docFreq();
+  
+  // check for overlap (by 1 docid)
+  // this method will mainly be used for merging lists from indexing
+  // in that case, overlap of docids would only occur by 1
+  if (*ptr == *lastid) {
+    // add tfs together
+    *freq += *(ptr+1);
+    // advance pointer to next doc
+    ptr += 2;
+    len -= 2;
+    // doc frequency is actually one less
+    df--;
+  }
+
+  // copy list over
+  if (len > 0) {
+    memcpy(end, ptr, len*intsize);
+
+    end += len;
+    lastid = end-2;
+    freq = end-1;
+  }
+
+  return true;
+}
+
 bool InvDocList::hasNoMem() {
   if (begin == NULL)
     return true;
@@ -281,20 +325,120 @@ bool InvDocList::binRead(ifstream& inf) {
   return true;
 }
 
+void InvDocList::binWriteC(ofstream& of) {
+  int len= end-begin;
+  int diff = lastid-begin;
+  of.write((const char*) &uid, sizeof(TERMID_T));
+  of.write((const char*) &df, intsize);
+  of.write((const char*) &diff, intsize);
+
+  deltaEncode();
+
+  // compress it
+  // it's ok to make comp the same size.  the compressed will be smaller
+  unsigned char* comp = (unsigned char*) malloc(len*intsize);
+  int compbyte = RVLCompress::compress_ints(begin, comp, len);
+  
+  // write out the compressed bits
+  of.write((const char*) &compbyte, intsize);
+  of.write((const char*) comp, compbyte);
+
+  //  of.write((const char*) &len, intsize);
+  //of.write((const char*) begin, sizeof(LOC_T)*len);
+  free(comp);
+}
+
+bool InvDocList::binReadC(ifstream& inf) {
+  if (inf.eof())
+    return false;
+  int diff;
+
+  inf.read((char*) &uid, sizeof(TERMID_T));
+  if (!(inf.gcount() == sizeof(TERMID_T)))
+    return false;
+
+  inf.read((char*) &df, intsize);
+  if (!inf.gcount() == intsize)
+    return false;
+
+  inf.read((char*) &diff, intsize);
+  if (!inf.gcount() == intsize)
+    return false;
+
+  inf.read((char*) &size, intsize);
+  if (!inf.gcount() == intsize)
+    return false;
+
+  unsigned char* buffer = (unsigned char*) malloc(size);
+  inf.read((char*) buffer, size);
+  if (!inf.gcount() == size) {
+    resetFree();
+    return false;
+  }
+
+  // this should be big enough
+  begin = (LOC_T*) malloc(size*4);
+  
+  // decompress it
+  int len = RVLCompress::decompress_ints(buffer, begin, size);
+
+  size = size*4;
+
+  if (len * intsize > size)
+    cerr << "RVLDecompress in DocList buffer overrun!" << endl;
+
+  lastid = begin + diff;
+  end = begin + len;
+  freq = lastid+1;
+
+  deltaDecode();
+
+  READ_ONLY = false;
+  free(buffer);
+  return true;
+}
+
 /** THE PRIVATE STUFF **/
 /** double our current mem size 
   *
   */
+void InvDocList::deltaEncode() {
+  // we will encode in place
+  // go backwards starting at the last docid
+  // we're counting on two always being bigger than one
+  int* two = lastid;
+  int* one = lastid-2;
+
+  while (two != begin) {
+    *two = *two-*one;
+    two = one;
+    one -= 2;
+  }
+}
+
+void InvDocList::deltaDecode() {
+  // we will decode in place
+  // start at the begining
+  int* one = begin;
+  int* two = begin+2;
+  
+  while (one != lastid) {
+    *two = *two + *one;
+    one = two;
+    two += 2;
+  }
+}
+
 bool InvDocList::getMoreMem() {
   int ldiff = lastid-begin;
   int enddiff = end-begin;
   int bigger = size*2;
 
-  int pow = logb2(bigger);
-  if (pow > 22)
-    return false;
-
   if (hascache) {
+    int pow = logb2(bigger);
+    if (pow > 22)
+      return false;
+
     int* loc = cache->getMoreMem(pow, begin, pow-1);
     if (loc == NULL)
       return false;
