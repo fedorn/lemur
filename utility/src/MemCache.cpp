@@ -26,7 +26,7 @@ MemCache::~MemCache() {
 }
 
 int* MemCache::getMem(int chunksize) {
-  int bytesize = pow(2,chunksize);
+  int bytesize = (int) pow(2,chunksize);
   int s = bytesize/intsize;
   int *retval = NULL;
 
@@ -63,7 +63,7 @@ int* MemCache::getMoreMem(int newsize, int* location, int oldsize) {
     return NULL;
 
   //do the copy
-  memcpy(retval, location, pow(2,oldsize));
+  memcpy(retval, location, (int) pow(2,oldsize));
 	
   //store this free spot
 //  *location = oldsize;
