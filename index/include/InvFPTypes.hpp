@@ -25,6 +25,7 @@ typedef TERMID_T DOCID_T;
 typedef float SCORE_T;
 typedef string TERM_T;
 typedef string EXDOCID_T;
+typedef void* POS_T;  // Used by DocLists and TermLists
 
 // suffixes for filenames
 #define INVINDEX  ".invf"
