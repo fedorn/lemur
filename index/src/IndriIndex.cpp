@@ -47,8 +47,8 @@
 #include "indri/RVLDecompressStream.hpp"
 
 #include "indri/ParsedDocument.hpp"
-#include "indri/Path.hpp"
 #include <math.h>
+#include "indri/Path.hpp"
 
 // suffixes for filenames
 #define TERMDATA ".termdata"
@@ -275,14 +275,8 @@ bool IndriIndex::open(const std::string& indexName){
   _batchBuild = false;
   _readOnly = false;
 
-  std::string indexNameString(indexName);
-  std::string ext = Path::extension(indexNameString);
-  std::string prefix = indexNameString.substr( 0, indexNameString.rfind('.') );
-  if (ext.size() > 0) {
-    setName(prefix); 
-  } else {
-    setName(indexNameString); 
-  }
+  std::string prefix = Path::basename( indexName );
+  setName(prefix);
 
   std::string parametersName = _baseName + EXTENSION;
   if( ! _readParameters( parametersName ) )
@@ -305,14 +299,8 @@ bool IndriIndex::openRead(const std::string& indexName) {
   _batchBuild = false;
   _readOnly = true;
 
-  std::string indexNameString(indexName);
-  std::string ext = Path::extension(indexNameString);
-  std::string prefix = indexNameString.substr( 0, indexNameString.rfind('.') );
-  if (ext.size() > 0) {
-    setName(prefix); 
-  } else {
-    setName(indexNameString); 
-  }
+  std::string prefix = Path::basename( indexName );
+  setName(prefix);
 
   std::string parametersName = _baseName + EXTENSION;
   if( ! _readParameters( parametersName ) )
