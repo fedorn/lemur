@@ -158,7 +158,7 @@ In addition, the collection mixture model also recognizes the parameter
 #include "ResultFile.hpp"
 
 namespace LocalParameter {
-  enum RetModel {TFIDF=0, OKAPI=1, KL=2, CORI=3};
+  enum RetModel {TFIDF=0, OKAPI=1, KL=2, CORIDOC=3};
   /// retrieval model 
   static enum RetModel mod;
   static bool TRECResultFormat;
@@ -248,11 +248,11 @@ int AppMain(int argc, char *argv[]) {
     ((SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
     ((SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
     break;
-  case LocalParameter::CORI:
+  case LocalParameter::CORIDOC:
     CORIParameter::get();
     model = new CORIRetMethod(*ind, accumulator, CORIParameter::collectionCounts);
-    ((CORIRetMethod*)model)->setTFFactor(CORIParameter::tffactor);
-    ((CORIRetMethod*)model)->setTFBaseline(CORIParameter::tfbaseline);    
+    ((CORIRetMethod*)model)->setTFFactor(CORIParameter::doctffactor);
+    ((CORIRetMethod*)model)->setTFBaseline(CORIParameter::doctfbaseline);    
     break;
   default:
     throw Exception("RetEval", "unknown retModel parameter");
