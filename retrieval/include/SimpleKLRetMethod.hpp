@@ -19,7 +19,7 @@ public:
   }
 
   /// construct an empty query model
-  SimpleKLQueryModel(int size, Index &dbIndex) : ArrayQueryRep(size), qm(NULL), ind(dbIndex) {
+  SimpleKLQueryModel(Index &dbIndex) : ArrayQueryRep(dbIndex.termCountUnique()+1), qm(NULL), ind(dbIndex) {
     startIteration();
     while (hasMore()) {
       QueryTerm *qt = nextTerm();
@@ -29,15 +29,19 @@ public:
   }
 
 
-  ~SimpleKLQueryModel(){ if (qm) delete qm;}
+  virtual ~SimpleKLQueryModel(){ if (qm) delete qm;}
 
 
   /// interpolate the model with any (truncated) unigram LM, default parameter  to control the truncation is the number of words
-  void interpolateWith(UnigramLM &qModel, double origModCoeff, int howManyWord, double prSumThresh=1, double prThresh=0);
+  virtual void interpolateWith(UnigramLM &qModel, double origModCoeff, int howManyWord, double prSumThresh=1, double prThresh=0);
   virtual double scoreConstant() {
     return totalCount();
   }
   
+  virtual void load(istream &is);
+
+  virtual void save(ostream &os);
+
 private:
   IndexedRealVector *qm;
   Index &ind;
@@ -74,7 +78,7 @@ public:
   
   enum SmoothStrategy  {INTERPOLATE=0, BACKOFF=1}; 
 
-  enum QueryUpdateMethod {MAXLIKE = 0, MIXTURE = 1, DIVMIN=2, MARKOVCHAIN=3};
+  enum QueryUpdateMethod {MIXTURE = 0, DIVMIN=1, MARKOVCHAIN=2};
 
   struct Parameter {
     int smthMethod;
