@@ -1,10 +1,10 @@
 This is the Lemur Toolkit for Language Modeling and Information
 Retrieval. For more information, including full documentation for the
-toolkit, please visit the web site http://www.cs.cmu.edu/~lemur.
+toolkit, please visit the web site http://www.lemurproject.org
 
 See the file INSTALL in this same directory for instructions on how to
 configure, build, and install the toolkit library.
 
 See the file LICENSE in this same directory for the terms of
 redistribution and use. If you have any questions, please send email
-to lemur-project@cs.cmu.edu.
+to license@lemurproject.org.
