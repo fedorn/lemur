@@ -1,13 +1,13 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2001, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
+
 
 
 #include "SimpleKLRetMethod.hpp"
@@ -15,6 +15,7 @@
 #include "common_headers.hpp"
 #include <cmath>
 #include "DocUnigramCounter.hpp"
+#include "RelDocUnigramCounter.hpp"
 #include "OneStepMarkovChain.hpp"
 
 void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff, int howManyWord, double prSumThresh, double prThresh) 
@@ -98,6 +99,50 @@ void SimpleKLQueryModel::save(ostream &os)
   }
 }
 
+void SimpleKLQueryModel::clarity(ostream &os)
+{
+  int count = 0;
+  double sum=0, ln_Pr=0;
+  startIteration();
+  QueryTerm *qt;
+  while (hasMore()) {
+    qt = nextTerm();
+    count++;
+    sum += qt->weight();
+    // query-clarity = SUM_w{P(w|Q)*log(P(w|Q)/P(w))}
+    // P(w)=cf(w)/|C|
+    // P(w|Q) is a prob computed by any model, e.g. relevance models
+    ln_Pr += (qt->weight())*log(qt->weight()/((double)ind.termCount(qt->id())/(double)ind.termCount()));
+    delete qt;
+  }
+  os << "=" << count << " " << ln_Pr/(sum ? sum : 1.0) << endl;
+  startIteration();
+  while (hasMore()) {
+    qt = nextTerm();
+    // print clarity for each query term
+    os << ind.term(qt->id()) << " "<< qt->weight()*log(qt->weight()/((double)ind.termCount(qt->id())/(double)ind.termCount())) << endl;
+    delete qt;
+  }
+}
+
+double SimpleKLQueryModel::clarity()
+{
+  int count = 0;
+  double sum=0, ln_Pr=0;
+  startIteration();
+  QueryTerm *qt;
+  while (hasMore()) {
+    qt = nextTerm();
+    count++;
+    sum += qt->weight();
+    // query-clarity = SUM_w{P(w|Q)*log(P(w|Q)/P(w))}
+    // P(w)=cf(w)/|C|
+    // P(w|Q) is a prob computed by any model, e.g. relevance models
+    ln_Pr += (qt->weight())*log(qt->weight()/((double)ind.termCount(qt->id())/(double)ind.termCount()));
+    delete qt;
+  }
+  return (ln_Pr/(sum ? sum : 1.0));
+}
 
 SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName, ScoreAccumulator &accumulator) : 
   TextQueryRetMethod(dbIndex, accumulator)
@@ -439,5 +484,161 @@ void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, D
   delete fbLM;
   delete counter;
 }
+
+void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs)
+{  
+  int numTerms = ind.termCountUnique();
+
+  // RelDocUnigramCounter computes SUM(D){P(w|D)*P(D|Q)} for each w
+  RelDocUnigramCounter *dCounter = new RelDocUnigramCounter(relDocs, ind);
+
+  static double *distQuery = new double[numTerms+1];
+  double expWeight = qryParam.fbCoeff;
+
+  int i;
+  for (i=1; i<=numTerms;i++)
+    distQuery[i] = 0.0;
+
+  double pSum=0.0;
+  dCounter->startIteration();
+  while (dCounter->hasMore()) {
+    int wd;
+    double wdPr;
+    dCounter->nextCount(wd, wdPr);
+    distQuery[wd]=wdPr;
+    pSum += wdPr;
+  }
+
+  for (i=1; i<=numTerms;i++) {
+    distQuery[i] = expWeight*distQuery[i]/pSum+(1-expWeight)*ind.termCount(i)/ind.termCount();
+  }
+
+  ArrayCounter<double> lmCounter(numTerms+1);
+  for (i=1; i<=numTerms; i++) {
+    if (distQuery[i] > 0) {
+      lmCounter.incCount(i, distQuery[i]);
+    }
+  }
+  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind.termLexiconID());
+  origRep.interpolateWith(*fblm, 0.0, qryParam.fbTermCount,
+			  qryParam.fbPrSumTh, 0.0);
+  delete fblm;
+  delete dCounter;
+}
+
+// out: w.weight = P(w|Q)
+// P(w|Q) = k P(w) P(Q|w)
+// P(Q|w) = PROD_q P(q|w)
+// P(q|w) = SUM_d P(q|d) P(w|d) p(d) / p(w)
+// P(w) = SUM_d P(w|d) p(d)
+// Promote this to some include somewhere...
+struct termProb  {
+  int id; // TERM_ID
+  double prob; // a*tf(w,d)/|d| +(1-a)*tf(w,C)/|C|
+};
+
+void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep, 
+					  DocIDSet &relDocs) {  
+  int numTerms = ind.termCountUnique();
+  int termCount = ind.termCount();
+  double expWeight = qryParam.fbCoeff;
+
+  // RelDocUnigramCounter computes P(w)=SUM(D){P(w|D)*P(D|Q)} for each w
+  // P(w) = SUM_d P(w|d) p(d)
+  RelDocUnigramCounter *dCounter = new RelDocUnigramCounter(relDocs, ind);
+
+  static double *distQuery = new double[numTerms+1];
+  int numDocs = ind.docCount();
+  vector<termProb> **tProbs = new vector<termProb> *[numDocs + 1];
+
+  int i;
+  for (i=1; i<=numTerms;i++) 
+    distQuery[i] = 0.0;
+  for (i = 1; i <= numDocs; i++) {
+    tProbs[i] = NULL;
+  }
+  
+  // Put these in a faster structure.
+  vector <int> qTerms; // TERM_ID
+  origRep.startIteration();
+  while (origRep.hasMore()) {
+    QueryTerm *qt = origRep.nextTerm();
+    qTerms.push_back(qt->id());
+    delete(qt);
+  }
+  int numQTerms = qTerms.size();
+  dCounter->startIteration();
+  while (dCounter->hasMore()) {
+    int wd;
+    double P_w;
+    double P_qw=0;
+    double P_Q_w;
+    // P(q|w) = SUM_d P(q|d) P(w|d) p(d)
+    dCounter->nextCount(wd, P_w);
+    for (int j = 0; j < numQTerms; j++) {
+      P_Q_w=1.0;
+      int qtID = qTerms[j]; // TERM_ID
+      relDocs.startIteration();
+      while (relDocs.hasMore()) {
+	int docID;
+	double P_d, P_w_d, P_q_d;
+	double dlength;
+	relDocs.nextIDInfo(docID, P_d);
+	dlength  = (double)ind.docLength(docID);
+	if (tProbs[docID] == NULL) {
+	  vector<termProb> * pList = new vector<termProb>;
+	  TermInfoList *tList = ind.termInfoList(docID);
+	  TermInfo *t;
+	  tList->startIteration();
+	  while (tList->hasMore()) {
+	  t = tList->nextEntry();
+	  termProb prob;
+	  prob.id = t->id();
+	  prob.prob = expWeight*t->count()/dlength+
+	    (1-expWeight)*ind.termCount(t->id())/termCount;
+	  pList->push_back(prob);
+	  }
+	  delete(tList);
+	  tProbs[docID] = pList;
+	}
+	vector<termProb> * pList = tProbs[docID];	
+	P_w_d=0;
+	P_q_d=0;
+	for (int i = 0; i < pList->size(); i++) {	  
+	  // p(q|d)= a*tf(q,d)/|d|+(1-a)*tf(q,C)/|C|
+	  if((*pList)[i].id == qtID)
+	    P_q_d = (*pList)[i].prob;	  
+	  // p(w|d)= a*tf(w,d)/|d|+(1-a)*tf(w,C)/|C|
+	  if((*pList)[i].id == wd)
+	    P_w_d = (*pList)[i].prob;
+	  if(P_q_d && P_w_d)
+	    break;
+	}
+	P_qw += P_d*P_w_d*P_q_d;
+      }
+      // P(Q|w) = PROD_q P(q|w) / p(w)
+      P_Q_w *= P_qw/P_w;
+    }
+    // P(w|Q) = k P(w) P(Q|w), k=1
+    distQuery[wd] =P_w*P_Q_w;
+  }
+
+  ArrayCounter<double> lmCounter(numTerms+1);
+  for (i=1; i<=numTerms; i++) {
+    if (distQuery[i] > 0) {
+      lmCounter.incCount(i, distQuery[i]);
+    }
+  }
+  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind.termLexiconID());
+  origRep.interpolateWith(*fblm, 0.0, qryParam.fbTermCount,
+			  qryParam.fbPrSumTh, 0.0);
+  delete fblm;
+  delete dCounter;
+  for (i = 1; i <= numDocs; i++) {
+    delete(tProbs[i]);
+  }
+  delete[](tProbs);
+}
+
 
 
