@@ -256,9 +256,8 @@ bool KeyfileIncIndex::open(const string &indexName){
 }
 int KeyfileIncIndex::term(const string &inWord) const{
   const char* word = inWord.c_str();
-  int len = strlen(word);
 
-  if (len > (MAX_TERM_LENGTH - 1)) {
+  if (inWord.length() > (MAX_TERM_LENGTH - 1)) {
     //term is too big to be a key, so it is OOV.
     return 0;
   }
@@ -292,7 +291,7 @@ int KeyfileIncIndex::document(const string &docID) const{
 
   const char *did = docID.c_str();
 
-  int len = strlen(did);
+  int len = docID.length();
   if (len > (MAX_DOCID_LENGTH - 1)) {
     cerr << "document: document id " << did << " is too long ("
 	 << len << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
@@ -672,7 +671,7 @@ bool KeyfileIncIndex::tryOpen() {
   // open an existing index and load up all of the data structures.
   std::string fname;
   fname = name + ".key"; // fix this.
-  return open(fname.c_str());
+  return open(fname);
 }
 
 void KeyfileIncIndex::writeTOC() {
