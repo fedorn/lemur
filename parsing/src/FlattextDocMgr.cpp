@@ -10,6 +10,7 @@
 
 /** tnt 07/2002 - created
  *  dmf 09/2002 - added parser support
+ *  dmf 03/2005 - fix spurious entries in fpos file output at end of input.
  */
 
 #include "FlattextDocMgr.hpp"
@@ -40,10 +41,6 @@ FlattextDocMgr::~FlattextDocMgr() {
     delete myparser;
   if (entries)
     delete[]entries;
-  // free docids
-  //  map<char*, lookup_e*, abc>::iterator finder;
-  //  for (finder=table.begin();finder != table.end();finder++) 
-  //    free(finder->first);
 }
 
 bool FlattextDocMgr::open(const string &manname) {
@@ -51,40 +48,22 @@ bool FlattextDocMgr::open(const string &manname) {
   IDnameext = manname;
   // strip extension, but this doesn't really get used
   IDname = IDnameext.substr(0, IDnameext.length() - 5);
-
   return loadTOC(manname);
 }
 
 void FlattextDocMgr::buildMgr() {
   myparser->setTextHandler(this);
-  // dangerous but I KNOW that my parser is also a texthandler
-  //  TextHandler *th = (TextHandler*)myparser;
-  // th->setTextHandler(this);
   string n = IDname+FT_LOOKUP;
   writefpos.open(n.c_str());
   n = IDname+FT_FID;
   ofstream fid(n.c_str());
 
-  long one = 1;
-//  lastid = -1;
   cerr << "Building " << IDname << endl;
   for (int i=0;i<sources.size();i++) {
     fileid = i;
     cerr << "  *Parsing " << sources[i] << endl;
     myparser->parse(sources[i]);
     fid << i << " " << sources[i] << endl;
-
-    /* we need to get position at end of last doc.  can't really do it 
-    /  using parser. also want to avoid doing system specific calls for 
-    /  platform compatibilirty issues.
-    /  we hope there's no junk from end of last doc to end of file
-    /  even if there is running through the parser should ignore it
-    */
-    ifstream check(sources[i].c_str());
-    check.seekg(0, ios::end);
-    long p = check.tellg();
-    writefpos << p - prevpos-one << endl;
-    check.close();
   }
 
   writefpos.close();
@@ -98,8 +77,6 @@ char* FlattextDocMgr::handleDoc(char* docno) {
 
   writefpos << docno << " " << fileid << " " << pos << " ";
   prevpos = pos;
-//  lastid = fileid;
-
   return docno;
 }
 
@@ -123,7 +100,6 @@ char* FlattextDocMgr::getDoc(const string &docID) const{
   }
 
   lookup_e* e = finder->second;
-//  char* doc = (char*) malloc((*e).bytes * sizeof(char)+1);
   char* doc = new char[(*e).bytes +1];
   ifstream read(sources[(*e).fid].c_str(), ios::binary);
   if (!read.is_open()) {
@@ -215,14 +191,12 @@ bool FlattextDocMgr::loadFTLookup(const string &fn) {
   lookup_e* e;
   int index=0;
   while (lup >> docid >> fid >> pos >> bytes) {
-    //    char* id = strdup(docid.c_str());
     e = &entries[index];
     index++;
     e->fid = fid;
     e->offset = pos;
     e->bytes = bytes;
     // map does shallow copy
-    //    table[id] = e;
     table[docid] = e;
   }
 
@@ -239,16 +213,12 @@ bool FlattextDocMgr::loadFTFiles(const string &fn, int num) {
 
   string f;
   int id;
-  //  string* arr = new string[num];
   sources.resize(num);
   while (fns >> id >> f) {
     //  arr[id] = f;
     sources[id]=f;
   }
 
-  //  for (int i=0; i<num; i++) 
-  //  sources.push_back(arr[i]);
-  //delete[] arr;
   fns.close();
   return true;
 }
