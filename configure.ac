@@ -1,0 +1,68 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(Lemur, 2.2, lemur-project@cs.cmu.edu)
+AC_CONFIG_SRCDIR(app/src/RetEval.cpp)
+AC_CONFIG_FILES(MakeDefns Makefile Makefile.app)
+dnl To use a header file instead of command line -D defs, use
+dnl AC_CONFIG_HEADERS(config.h)
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_LEX
+AC_PROG_INSTALL
+AC_CHECK_PROGS(AR, ar gar)
+
+dnl Checks for libraries.
+dnl If/when we add client server
+dnl AC_CHECK_LIB(nsl, gethostbyname)
+dnl AC_CHECK_LIB(socket, socket)
+
+dnl Checks for header files.
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+
+AC_SYS_LARGEFILE
+
+dnl Checks for library functions.
+
+dnl Finish up and output.
+AC_SUBST(MODULES)
+AC_SUBST(WITH_SUMMARIZATION)
+AC_SUBST(WITH_DISTRIB)
+dnl Base lemur modules
+MODULES="retrieval langmod index utility"
+
+AC_ARG_ENABLE(distrib,
+	    AC_HELP_STRING([--enable-distrib],
+	                   [Enable distributed retrieval package]))
+if test "$enable_distrib" = "yes" ; then
+  MODULES="distrib $MODULES"
+  WITH_DISTRIB=1
+  AC_DEFINE(WITH_DISTRIB, 1, [Enable distributed retrieval package])
+else
+  WITH_DISTRIB=0
+  AC_DEFINE(WITH_DISTRIB, 0, [Enable distributed retrieval package])
+fi
+
+AC_ARG_ENABLE(summarization,
+	    AC_HELP_STRING([--enable-summarization],
+	                   [Enable summarization package]))
+
+if test "$enable_summarization" = "yes" ; then
+  MODULES="summarization $MODULES"
+  WITH_SUMMARIZATION=1
+  AC_DEFINE(WITH_SUMMARIZATION, 1, [Enable summarization package])
+else
+  WITH_SUMMARIZATION=0
+  AC_DEFINE(WITH_SUMMARIZATION, 0, [Enable summarization package])
+fi
+
+AC_ARG_ENABLE(assert,
+	    AC_HELP_STRING([--enable-assert],
+	                   [Enable assert statements in code]),
+			   [if test "${enable_assert}" = "no" ; then
+			    AC_DEFINE(NDEBUG, 1, [Turn off assert statements])
+			   fi],
+			   AC_DEFINE(NDEBUG, 1, [Turn off assert statements]))
+
+AC_OUTPUT
