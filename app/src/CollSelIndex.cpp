@@ -1,13 +1,4 @@
-#include "Stopper.hpp"
-#include "PorterStemmer.hpp"
-#include "KStemmer.hpp"
-#include "ArabicStemmer.hpp"
-#include "WebParser.hpp"
-#include "TrecParser.hpp"
-#include "ReutersParser.hpp"
-#include "ChineseParser.hpp"
-#include "ChineseCharParser.hpp"
-#include "ArabicParser.hpp"
+#include "TextHandlerManager.hpp"
 #include "DocFreqIndexer.hpp"
 #include "CtfIndexer.hpp"
 #include "Param.hpp"
@@ -22,9 +13,6 @@ namespace LocalParameter {
   char * dfDocs;
   char * dfCounts;
   char * stemmer;
-  char* d;	
-  // path name to data files used by kstemmer
-  char *kstemmer_dir;
 
   bool countStopWds;
 
@@ -35,29 +23,10 @@ namespace LocalParameter {
     stopwords = strdup(ParamGetString("stopwords"));
     acronyms = strdup(ParamGetString("acronyms"));
     docFormat = strdup(ParamGetString("docFormat"));
-    for (d = docFormat; *d != '\0'; d++) *d = tolower(*d);
     dfCounts = strdup(ParamGetString("dfCounts", "collSel_df.cw"));
     dfDocs = strdup(ParamGetString("dfDocs", "collSel_df.cd"));
 
     stemmer = strdup(ParamGetString("stemmer"));
-    // convert stemmer to lowercase
-    for (d = stemmer; *d != '\0'; d++) *d = tolower(*d);
-    if(!strcmp(stemmer, "krovetz")) {
-      // Using kstemmer needs a path to data files
-      if(strlen(ParamGetString("KstemmerDir"))>0) {
-	// if KstemmerDir is declared then resets STEM_DIR otherwise uses the default
-	kstemmer_dir = new char[MAX_FILENAME_LENGTH];
-	kstemmer_dir[0]='\0';
-	strcat(kstemmer_dir, "STEM_DIR=");
-	strcat(kstemmer_dir,ParamGetString("KstemmerDir"));
-	if(putenv(kstemmer_dir))
-	  cerr << "putenv can not set STEM_DIR" << endl;
-      }
-    } else if (!strcmp(stemmer, "arabic")){
-      ArabicStemmerParameter::get();
-    }
-    
-    
     countStopWds = (ParamGetString("countStopWords", "false") == "true" 
 		    ? true : false);
 
@@ -71,7 +40,6 @@ namespace LocalParameter {
     free(dfCounts);
     free(dfDocs);
     free(stemmer);
-    delete[](kstemmer_dir);
   }
 };
 
@@ -92,47 +60,22 @@ int AppMain(int argc, char * argv[]) {
     usage(argc, argv);
     return -1;
   }
-  Parser * parser;
 
-  if (!strcmp(LocalParameter::docFormat, "web")) {
-    parser = new WebParser();
-  } else if (!strcmp (LocalParameter::docFormat, "reuters")) {
-    parser = new ReutersParser();
-  } else if (!strcmp (LocalParameter::docFormat, "trec")) {
+  // Create the appropriate parser and acronyms list if needed
+  Parser * parser = NULL;
+  parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
+					    LocalParameter::acronyms);
+  // if failed to create parser, create a default
+  if (!parser)
     parser = new TrecParser();
-  } else if (!strcmp(LocalParameter::docFormat, "chinese")) {
-    parser = new ChineseParser();
-  } else if (!strcmp(LocalParameter::docFormat, "chinesechar")) {
-    parser = new ChineseCharParser();
-  } else if (!strcmp(LocalParameter::docFormat, "arabic")) {
-    parser = new ArabicParser();
-  } else if (strcmp (LocalParameter::docFormat, "")) {
-    throw Exception("PushIndexer", "Unknown docFormat specified");
-  } else {
-    cerr << "Using default trec parser" << endl;
-    parser = new TrecParser();
-  }
-
+  
+  // Create the stopper if needed.
   Stopper * stopper = NULL;
-   if (strcmp(LocalParameter::stopwords, "")) {
-    stopper = new Stopper(LocalParameter::stopwords);
-  }
+  stopper = TextHandlerManager::createStopper(LocalParameter::stopwords);
 
-  WordSet * acros = NULL;
-  if (strcmp(LocalParameter::acronyms, "")) {
-    acros = new WordSet(LocalParameter::acronyms);
-    parser->setAcroList(acros);
-  }
-
+  // Create the stemmer if needed.
   Stemmer * stemmer = NULL;
-  if (!strcmp(LocalParameter::stemmer, "porter")) {
-    stemmer = new PorterStemmer();
-  } else if (!strcmp(LocalParameter::stemmer, "krovetz")) {
-    stemmer = new KStemmer();
-  } else if (!strcmp(LocalParameter::stemmer, "arabic")) {
-    stemmer = new ArabicStemmer(ArabicStemmerParameter::stemDir, 
-				ArabicStemmerParameter::stemFunc);
-  }
+  stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
 
   DocFreqIndexer dfIndexer(LocalParameter::df,
 			   LocalParameter::dfCounts,
@@ -148,7 +91,7 @@ int AppMain(int argc, char * argv[]) {
 
   TextHandler * th = parser;
 
-  parser->setTextHandler(stopper);
+  //  parser->setTextHandler(stopper);
 
   if (stopper != NULL) {
     th->setTextHandler(stopper);
@@ -188,7 +131,6 @@ int AppMain(int argc, char * argv[]) {
 
   }
 
-  if (acros != NULL) delete acros;
   if (stopper != NULL) delete stopper;
   delete parser;
   LocalParameter::freeMem();
