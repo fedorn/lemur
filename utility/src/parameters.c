@@ -773,7 +773,7 @@ void param_fwritec(FILE *fp, char *var_name, char *val) {
 
 
 /*******************************************************/
-void param_set(const char *parameter_name, char *new_value) {
+void param_set(const char *parameter_name, const char *new_value) {
    param_init_par();
    insert(parameter_name, new_value);
 }
