@@ -14,6 +14,7 @@
  */
 
 #include "InvFPTermList.hpp"
+#include "File.hpp"
 
 InvFPTermList::InvFPTermList() {
   length = 0;
@@ -53,10 +54,6 @@ bool InvFPTermList::hasMore(){
 }
 
 TermInfo* InvFPTermList::nextEntry(){
-//  TermInfo* tinfo;
-//  static InvFPTerm info;
-//  static vector<int> loclist;
-  
   if (counts) {
     entry.freq = counts[index];
     entry.loclist = &(listcounted[index].loc);    
@@ -65,7 +62,6 @@ TermInfo* InvFPTermList::nextEntry(){
    
   } else {
     entry.freq = 1;
-    //    info.loclist = new vector<int>;
     ///empty it!
     loclist.clear();
     entry.loclist = &loclist;
@@ -75,7 +71,6 @@ TermInfo* InvFPTermList::nextEntry(){
   }
 
   index++;
-//  tinfo = info;
   return &entry;
 }
 
@@ -107,6 +102,63 @@ bool InvFPTermList::binRead(ifstream& infile){
   }
   return true;
 }
+
+//
+// File-based functions
+//
+
+void InvFPTermList::binWriteC( File& of ) {
+  of.write((const char*) &uid, sizeof(DOCID_T));
+  of.write((const char*) &length, sizeof(int));
+  //  if (length == 0) {
+  if (listlen == 0) {
+    int zero = 0;
+    of.write((const char*) &zero, sizeof(int));
+    return;
+  }
+  
+  deltaEncode();
+  // compress it
+  // it's ok to make comp the same size.  the compressed will be smaller
+  unsigned char* comp = new unsigned char[listlen * sizeof(LocatedTerm)];
+  int compbyte = RVLCompress::compress_ints((int *)list, comp, 
+					    listlen * 2);
+  of.write((const char*) &compbyte, sizeof(int));
+  // write out the compressed bits
+  of.write((const char*) comp, compbyte);
+  delete[](comp);
+}
+
+bool InvFPTermList::binReadC( File& infile ){
+  int size = 0;
+  
+  infile.read((char*) &uid, sizeof(DOCID_T));
+  infile.read((char*) &length, sizeof(int));
+  infile.read((char*) &size, sizeof(int));
+
+  if (size == 0) {
+    list = new LocatedTerm[0];
+    listlen = 0;
+    return true;
+  }
+  
+  unsigned char *buffer = new unsigned char[size];
+  infile.read((char *)buffer, size);
+
+  if (!(list == NULL))
+    delete[](list);
+
+  list = new LocatedTerm[size * 4];
+  // decompress it
+  listlen = RVLCompress::decompress_ints(buffer, (int *)list, size)/2;
+  deltaDecode();
+  delete[](buffer);
+  return true;
+}
+
+//
+// Stream-based functions
+// 
 
 void InvFPTermList::binWriteC(ofstream& of) {
   of.write((const char*) &uid, sizeof(DOCID_T));
@@ -170,6 +222,7 @@ bool InvFPTermList::binReadC(ifstream& infile){
   return true;
 }
 
+
 void InvFPTermList::deltaEncode() {
   // we will encode in place
   // go backwards starting at the last docid
@@ -197,51 +250,9 @@ void InvFPTermList::deltaDecode() {
   }
 }
 
-#if 0
-void InvFPTermList::countTerms(){
-  // this is probably not the best way of doing this, but..
-  // this is what happens when you adapt one implementation of something to match
-  // something else that originally had other data structures.
-
-  //already been counted then we don't want to count again.
-  if (counts)
-    return;
-
-  map<int, LLTerm> table;
-  map<int, LLTerm>::iterator place;
-  for (int i=0;i<listlen;i++) {
-    place = table.find(list[i].term);
-    if (place != table.end()) {
-      (place->second).term++; // term is keeping a count of the terms
-      (place->second).loc.push_back(list[i].loc);
-    } else {
-      //store to table
-      LLTerm lt;
-      lt.term = 1;
-      lt.loc.push_back(list[i].loc);
-      table[list[i].term]=lt;
-    }
-  }
-
-  listlen = table.size();
-  listcounted = new LLTerm[listlen];
-  counts = (int*) malloc(sizeof(int) * listlen);
-  int ind = 0;
-  for (place = table.begin(); place != table.end(); place++) {
-    listcounted[ind].term = place->first;
-    listcounted[ind].loc = (place->second).loc;
-    counts[ind] = (place->second).term;
-    ind++;
-  }
-}
-#endif
-
 void InvFPTermList::countTerms(){
   //already been counted then we don't want to count again.
-  if (counts)
-    return;
-  // if listlen is 0, nothing to count
-  if (listlen == 0)
+  if (counts || listlen == 0) // pathological case of 0 length list.
     return;
   map<int, int> table;
   map<int, int>::iterator place;
