@@ -1,7 +1,7 @@
 #ifndef INC_QueryLexer_hpp_
 #define INC_QueryLexer_hpp_
 
-#line 55 "indrilang.g"
+#line 18 "indrilang.g"
 
   #include "indri/QuerySpec.hpp"
   #include "indri/DateParse.hpp"
@@ -21,7 +21,7 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API QueryLexer : public ANTLR_USE_NAMESPACE(antlr)CharScanner, public QueryLexerTokenTypes
 {
-#line 109 "indrilang.g"
+#line 73 "indrilang.g"
 
 private:
   bool _numbers;

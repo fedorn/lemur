@@ -34,6 +34,7 @@ options {
   k=2;
   charVocabulary = '\u0001'..'\u00ff'; // UTF-8 format
   testLiterals = false;
+  defaultErrorHandler = false;
 }
 
 tokens {
@@ -143,6 +144,9 @@ JUNK:      ( TAB | CR | LF | SPACE )
            { $setType(antlr::Token::SKIP); };
      
 class QueryParser extends Parser;
+options {
+  defaultErrorHandler = false;
+}
 
 {
 private:
