@@ -19,6 +19,14 @@
 #include "indri/OrderedWindowNode.hpp"
 #include "indri/Annotator.hpp"
 
+OrderedWindowNode::OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children ) :
+  _children(children),
+  _windowSize(-1), // unlimited window size
+  _name(name)
+{
+  _pointers.resize(children.size());
+}
+
 OrderedWindowNode::OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children, int windowSize ) :
   _children(children),
   _windowSize(windowSize),
@@ -80,7 +88,7 @@ void OrderedWindowNode::prepare( int documentID ) {
       // now check the distance.  It's a match if there are fewer
       // than _windowSize-1 positions between the end of the last term
       // and the beginning of this one
-      if( _pointers[i].iter->begin - _pointers[i-1].iter->end + 1 > _windowSize ) {
+      if( (_pointers[i].iter->begin - _pointers[i-1].iter->end + 1 > _windowSize) && (_windowSize >= 0) ) {
         // word <i> appears too far from the last word
         match = false;
         break;
