@@ -185,9 +185,16 @@ int AppMain(int argc, char *argv[]) {
   ResultFile resFile(LocalParameter::TRECResultFormat);
   resFile.openForWrite(result, *ind);
 
-  ifstream workSetStr(LocalParameter::workSetFile);
-  ResultFile docPool(false); // working set is always simple format
-  docPool.openForRead(workSetStr, *ind);
+  ifstream *workSetStr;
+  ResultFile *docPool;
+  if (LocalParameter::useWorkingSet) {
+    workSetStr = new ifstream(LocalParameter::workSetFile, ios::in);
+    if (workSetStr->fail()) {
+      throw Exception("RetEval", "can't open working set file");
+    }
+    docPool = new ResultFile(false); // working set is always simple format
+    docPool->openForRead(*workSetStr, *ind);
+  }
 
   ArrayAccumulator accumulator(ind->docCount());
 
@@ -236,7 +243,7 @@ int AppMain(int argc, char *argv[]) {
     PseudoFBDocs *workSet;
 
     if (LocalParameter::useWorkingSet) {
-      docPool.getResult(q->id(), workSetRes);
+      docPool->getResult(q->id(), workSetRes);
       workSet = new PseudoFBDocs(workSetRes, -1); // -1 means using all docs
       model->scoreDocSet(*qr,*workSet,results);
     } else {
@@ -265,6 +272,10 @@ int AppMain(int argc, char *argv[]) {
     delete q;
   }
 
+  if (LocalParameter::useWorkingSet) {
+    delete docPool;
+    delete workSetStr;
+  }
   delete model;
   result.close();
   delete qryStream;
