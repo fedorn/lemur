@@ -179,7 +179,7 @@ protected:
   /// Divergence minimization feedback method
   void computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs);
   /// Markov chain feedback method
-  void computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) 
+  void computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) ;
   //@}
 
   SimpleKLParameter::DocSmoothParam docParam;

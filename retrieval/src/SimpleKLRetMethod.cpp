@@ -213,7 +213,7 @@ DocumentRep *SimpleKLRetMethod::computeDocRep(int docID)
 }
 
 
-void SimpleKLRetMethod::updateQuery(TextQueryRep &origRep, DocIDSet &relDocs)
+void SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs)
 {
   SimpleKLQueryModel *qr = dynamic_cast<SimpleKLQueryModel *> (&origRep);
   
@@ -377,7 +377,7 @@ void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, D
 
   ArrayCounter<double> *counter = new ArrayCounter<double>(ind.termCountUnique()+1);
 
-  OneStepMarkovChain * mc = new OneStepMarkovChain(relDocs, *ind, mcNorm,
+  OneStepMarkovChain * mc = new OneStepMarkovChain(relDocs, ind, mcNorm,
 						   1-qryParam.fbMixtureNoise);
   origRep.startIteration();
   double summ;
