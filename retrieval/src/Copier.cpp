@@ -36,6 +36,8 @@ namespace indri {
     Node* Copier::after( class FieldGreaterNode* oldNode, class FieldGreaterNode* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class FieldBetweenNode* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class FieldBetweenNode* oldNode, class FieldBetweenNode* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class FieldEqualsNode* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class FieldEqualsNode* oldNode, class FieldEqualsNode* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class RawScorerNode* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class RawScorerNode* oldNode, class RawScorerNode* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class TermFrequencyScorerNode* oldNode ) { defaultBefore( oldNode ); }

@@ -1,14 +1,3 @@
-/*==========================================================================
- * Copyright (c) 2004 University of Massachusetts.  All Rights Reserved.
- *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.lemurproject.org/license.html
- *
- *==========================================================================
-*/
-
 #ifndef INC_QueryLexerTokenTypes_hpp_
 #define INC_QueryLexerTokenTypes_hpp_
 
@@ -45,37 +34,38 @@ struct CUSTOM_API QueryLexerTokenTypes {
 		LESS = 21,
 		GREATER = 22,
 		BETWEEN = 23,
-		NUMBER = 24,
-		FLOAT = 25,
-		STAR = 26,
-		O_PAREN = 27,
-		C_PAREN = 28,
-		O_ANGLE = 29,
-		C_ANGLE = 30,
-		O_SQUARE = 31,
-		C_SQUARE = 32,
-		DBL_QUOTE = 33,
-		QUOTE = 34,
-		DOT = 35,
-		COMMA = 36,
-		DASH = 37,
-		COLON = 38,
-		TAB = 39,
-		CR = 40,
-		LF = 41,
-		SPACE = 42,
-		HIGH_CHAR = 43,
-		ASCII_LETTER = 44,
-		ASCII_LETTER_NO_B = 45,
-		SAFE_CHAR = 46,
-		BASESIXFOUR_CHAR = 47,
-		TEXT_TERM = 48,
-		TERM = 49,
-		ENCODED_QUOTED_TERM = 50,
-		ENCODED_TERM = 51,
-		OPERATOR = 52,
-		JUNK = 53,
-		SLASH = 54,
+		EQUALS = 24,
+		NUMBER = 25,
+		FLOAT = 26,
+		STAR = 27,
+		O_PAREN = 28,
+		C_PAREN = 29,
+		O_ANGLE = 30,
+		C_ANGLE = 31,
+		O_SQUARE = 32,
+		C_SQUARE = 33,
+		DBL_QUOTE = 34,
+		QUOTE = 35,
+		DOT = 36,
+		COMMA = 37,
+		DASH = 38,
+		COLON = 39,
+		TAB = 40,
+		CR = 41,
+		LF = 42,
+		SPACE = 43,
+		HIGH_CHAR = 44,
+		ASCII_LETTER = 45,
+		ASCII_LETTER_NO_B = 46,
+		SAFE_CHAR = 47,
+		BASESIXFOUR_CHAR = 48,
+		TEXT_TERM = 49,
+		TERM = 50,
+		ENCODED_QUOTED_TERM = 51,
+		ENCODED_TERM = 52,
+		OPERATOR = 53,
+		JUNK = 54,
+		SLASH = 55,
 		NULL_TREE_LOOKAHEAD = 3
 	};
 #ifdef __cplusplus

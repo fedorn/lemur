@@ -37,6 +37,8 @@ namespace indri {
       virtual class Node* after( class FieldGreaterNode* oldNode, class FieldGreaterNode* newNode );
       virtual void before( class FieldBetweenNode* oldNode );
       virtual class Node* after( class FieldBetweenNode* oldNode, class FieldBetweenNode* newNode );
+      virtual void before( class FieldEqualsNode* oldNode );
+      virtual class Node* after( class FieldEqualsNode* oldNode, class FieldEqualsNode* newNode );
       virtual void before( class RawScorerNode* oldNode );
       virtual class Node* after( class RawScorerNode* oldNode, class RawScorerNode* newNode );
       virtual void before( class TermFrequencyScorerNode* oldNode );

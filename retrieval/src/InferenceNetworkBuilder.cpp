@@ -37,6 +37,7 @@
 #include "indri/FilterRejectNode.hpp"
 #include "indri/FilterRequireNode.hpp"
 #include "indri/FieldBetweenNode.hpp"
+#include "indri/FieldEqualsNode.hpp"
 #include "indri/FieldLessNode.hpp"
 #include "indri/FieldGreaterNode.hpp"
 #include "indri/MaxNode.hpp"
@@ -499,6 +500,22 @@ void InferenceNetworkBuilder::after( indri::lang::FieldBetweenNode* fbNode ) {
   }
 }
 
+void InferenceNetworkBuilder::after( indri::lang::FieldEqualsNode* feNode ) {
+  if( _nodeMap.find( feNode ) == _nodeMap.end() ) {
+    InferenceNetworkNode* untypedFieldNode = _nodeMap[ feNode->getField() ];
+    FieldEqualsNode* fieldEqualsNode = 0;
+      
+    if( untypedFieldNode ) {
+      fieldEqualsNode = new FieldEqualsNode( feNode->nodeName(),
+                                             dynamic_cast<FieldIteratorNode*>( untypedFieldNode ),
+                                             feNode->getConstant() );
+      _network->addListNode( fieldEqualsNode );
+    }
+
+    _nodeMap[feNode] = fieldEqualsNode;
+  }
+}
+
 void InferenceNetworkBuilder::after( indri::lang::ContextCounterNode* contextCounterNode ) {
   if( _nodeMap.find( contextCounterNode ) == _nodeMap.end() ) {
     InferenceNetworkNode* untypedRawExtent = _nodeMap[ contextCounterNode->getRawExtent() ];
@@ -792,7 +809,7 @@ void InferenceNetworkBuilder::after( indri::lang::OrNode* orSpecNode ) {
 
 void InferenceNetworkBuilder::after( indri::lang::NotNode* notSpecNode ) {
   if( _nodeMap.find( notSpecNode ) == _nodeMap.end() ) {
-    BeliefNode* child = dynamic_cast<BeliefNode*>( notSpecNode->getChild() );
+    BeliefNode* child = dynamic_cast<BeliefNode*>( _nodeMap[notSpecNode->getChild()] );
     NotNode* notNode = new NotNode( notSpecNode->nodeName(), child );
 
     _network->addBeliefNode( notNode );

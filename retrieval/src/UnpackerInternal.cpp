@@ -35,6 +35,8 @@ indri::lang::Node* indri::lang::Unpacker::_unpack( XMLNode* child ) {
     result = new FieldGreaterNode(*this);
   } else if( type == "FieldBetweenNode" ) {
     result = new FieldBetweenNode(*this);
+  } else if( type == "FieldEqualsNode" ) {
+    result = new FieldEqualsNode(*this);
   } else if( type == "RawScorerNode" ) {
     result = new RawScorerNode(*this);
   } else if( type == "TermFrequencyScorerNode" ) {

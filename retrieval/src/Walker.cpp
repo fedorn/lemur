@@ -36,6 +36,8 @@ namespace indri {
    void Walker::after( class FieldGreaterNode* n ) { defaultAfter( n ); }
    void Walker::before( class FieldBetweenNode* n ) { defaultBefore( n ); }
    void Walker::after( class FieldBetweenNode* n ) { defaultAfter( n ); }
+   void Walker::before( class FieldEqualsNode* n ) { defaultBefore( n ); }
+   void Walker::after( class FieldEqualsNode* n ) { defaultAfter( n ); }
    void Walker::before( class RawScorerNode* n ) { defaultBefore( n ); }
    void Walker::after( class RawScorerNode* n ) { defaultAfter( n ); }
    void Walker::before( class TermFrequencyScorerNode* n ) { defaultBefore( n ); }

@@ -842,7 +842,7 @@ namespace indri {
 
       std::string queryText() const {
         std::stringstream qtext;
-        qtext << "#field:less(" << _field->queryText() << " " << _constant << ")";
+        qtext << "#less(" << _field->queryText() << " " << _constant << ")";
         return qtext.str();
       }
 
@@ -905,7 +905,7 @@ namespace indri {
 
       std::string queryText() const {
         std::stringstream qtext;
-        qtext << "#field:greater(" << _field->queryText() << " " << _constant << ")";
+        qtext << "#greater(" << _field->queryText() << " " << _constant << ")";
         return qtext.str();
       }
 
@@ -971,7 +971,7 @@ namespace indri {
 
       std::string queryText() const {
         std::stringstream qtext;
-        qtext << "#field:between(" << _field->queryText() << " " << _low << " " << _high << ")";
+        qtext << "#between(" << _field->queryText() << " " << _low << " " << _high << ")";
         return qtext.str();
       }
 
@@ -1014,6 +1014,69 @@ namespace indri {
         packer.put("field", _field);
         packer.put("low", _low);
         packer.put("high", _high);
+        packer.after(this);
+      }
+    };
+
+    class FieldEqualsNode : public RawExtentNode {
+    private:
+      RawExtentNode* _field;
+      UINT64 _constant;
+
+    public:
+      FieldEqualsNode( RawExtentNode* field, UINT64 constant ) :
+        _field(field),
+        _constant(constant) {
+      }
+      
+      FieldEqualsNode( Unpacker& unpacker ) {
+        _field = unpacker.getRawExtentNode("field");
+        _constant = unpacker.getInteger("constant");
+      }
+
+      std::string typeName() const {
+        return "FieldEqualsNode";
+      }
+
+      std::string queryText() const {
+        std::stringstream qtext;
+        qtext << "#equals(" << _field->queryText() << " " << _constant << ")";
+        return qtext.str();
+      }
+
+      UINT64 getConstant() const {
+        return _constant;
+      }
+
+      RawExtentNode* getField() {
+        return _field;
+      }
+
+      bool operator== ( Node& node ) {
+        FieldEqualsNode* other = dynamic_cast<FieldEqualsNode*>(&node);
+
+        return other &&
+               other->getConstant() == _constant &&
+               *other->getField() == *_field;
+      }
+
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+        RawExtentNode* fieldDuplicate = dynamic_cast<RawExtentNode*>(_field->copy(copier));
+        FieldEqualsNode* duplicate = new FieldEqualsNode( fieldDuplicate, _constant );
+        return copier.after(this, duplicate);
+      }
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+        _field->walk(walker);
+        walker.after(this);
+      }
+
+      void pack( Packer& packer ) {
+        packer.before(this);
+        packer.put("field", _field);
+        packer.put("constant", _constant);
         packer.after(this);
       }
     };

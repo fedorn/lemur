@@ -97,6 +97,7 @@ tokens {
   LESS = "#less";
   GREATER = "#greater";
   BETWEEN = "#between";
+  EQUALS = "#equals";
   
   // pseudo-tokens
   NUMBER;
@@ -281,6 +282,18 @@ weightedList[ indri::lang::WeightedCombinationNode* wn ] returns [ indri::lang::
   C_PAREN
   ;
 
+sumList[ indri::lang::WSumNode* wn ] returns [ indri::lang::ScoredExtentNode* sr ] 
+  {
+    double w = 0;
+    ScoredExtentNode* n = 0;
+    sr = wn;
+  } :
+  ( sr=extentRestriction[wn] )?
+  O_PAREN 
+    ( options { greedy=true; } : n=scoredExtentNode { wn->addChild( 1.0, n ); } )+
+  C_PAREN
+  ;
+
 unweightedList[ indri::lang::UnweightedCombinationNode* cn ] returns [ indri::lang::ScoredExtentNode* sr ]
   {
     ScoredExtentNode* n = 0;
@@ -305,6 +318,13 @@ combineNode returns [ indri::lang::ScoredExtentNode* r ]
     _nodes.push_back(cn);
   } :
   COMBINE r=unweightedList[cn];
+
+sumNode returns [ indri::lang::ScoredExtentNode* r ]
+  {
+    indri::lang::WSumNode* wn = new indri::lang::WSumNode;
+    _nodes.push_back(wn);
+  } :
+  SUM r=sumList[wn];
 
 wsumNode returns [ indri::lang::ScoredExtentNode* r ] 
   {
@@ -341,7 +361,7 @@ notNode returns [ indri::lang::ScoredExtentNode* r ]
     _nodes.push_back(n);
     r = n;
   } :
-  NOT (r=extentRestriction[r])? c=scoredExtentNode
+  NOT (r=extentRestriction[r])? O_PAREN c=scoredExtentNode C_PAREN
   {
     n->setChild(c);
   };
@@ -471,6 +491,7 @@ unqualifiedTerm returns [ RawExtentNode* re ] :
   | ( LESS ) => re=lessNode
   | ( GREATER ) => re=greaterNode
   | ( BETWEEN ) => re=betweenNode
+  | ( EQUALS ) => re=equalsNode
   | re=rawText;
           
 extentRestriction [ indri::lang::ScoredExtentNode* sn ] returns [ indri::lang::ExtentRestriction* er ] {
@@ -709,5 +730,17 @@ betweenNode returns [ FieldBetweenNode* bn ] {
     bn = new FieldBetweenNode( compareField, low, high );
     _nodes.push_back( compareField );
     _nodes.push_back( bn );
+  };
+
+equalsNode returns [ FieldEqualsNode* en ] {
+    en = 0;
+    Field* compareField = 0;
+    INT64 eq = 0;
+  } :
+  EQUALS O_PAREN field:TERM eq=number C_PAREN {
+    compareField = new Field(field->getText());
+    en = new FieldEqualsNode( compareField, eq );
+    _nodes.push_back( compareField );
+    _nodes.push_back( en );
   };
 

@@ -69,6 +69,7 @@ public:
   // documents
   virtual int documentLength( int documentID ) = 0;
   virtual INT64 documentCount() = 0;
+  virtual INT64 documentCount( const std::string& term ) = 0;
   
   // document vector
   virtual QueryServerVectorsResponse* documentVectors( const std::vector<int>& documentIDs ) = 0;

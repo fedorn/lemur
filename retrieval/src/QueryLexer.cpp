@@ -33,6 +33,7 @@ QueryLexer::QueryLexer(const ANTLR_USE_NAMESPACE(antlr)LexerSharedInputState& st
 void QueryLexer::initLiterals()
 {
 	literals["#any"] = 16;
+	literals["#equals"] = 24;
 	literals["#not"] = 9;
 	literals["#between"] = 23;
 	literals["#prior"] = 17;
@@ -932,9 +933,9 @@ void QueryLexer::mTERM(bool _createToken) {
 	if ( synPredMatched46 ) {
 		mFLOAT(false);
 		if ( inputState->guessing==0 ) {
-#line 158 "indrilang.g"
+#line 159 "indrilang.g"
 			_ttype = FLOAT;
-#line 936 "QueryLexer.cpp"
+#line 937 "QueryLexer.cpp"
 		}
 	}
 	else {
@@ -1005,9 +1006,9 @@ void QueryLexer::mTERM(bool _createToken) {
 			if ( synPredMatched48 ) {
 				mNUMBER(false);
 				if ( inputState->guessing==0 ) {
-#line 159 "indrilang.g"
+#line 160 "indrilang.g"
 					_ttype = NUMBER;
-#line 1009 "QueryLexer.cpp"
+#line 1010 "QueryLexer.cpp"
 				}
 			}
 			else if ((_tokenSet_0.member(LA(1))) && (true)) {
@@ -1221,9 +1222,9 @@ void QueryLexer::mOPERATOR(bool _createToken) {
 	if ( synPredMatched65 ) {
 		mENCODED_QUOTED_TERM(false);
 		if ( inputState->guessing==0 ) {
-#line 167 "indrilang.g"
+#line 168 "indrilang.g"
 			_ttype = ENCODED_QUOTED_TERM;
-#line 1225 "QueryLexer.cpp"
+#line 1226 "QueryLexer.cpp"
 		}
 	}
 	else {
@@ -1246,9 +1247,9 @@ void QueryLexer::mOPERATOR(bool _createToken) {
 		if ( synPredMatched67 ) {
 			mENCODED_TERM(false);
 			if ( inputState->guessing==0 ) {
-#line 168 "indrilang.g"
+#line 169 "indrilang.g"
 				_ttype = ENCODED_TERM;
-#line 1250 "QueryLexer.cpp"
+#line 1251 "QueryLexer.cpp"
 			}
 		}
 		else if ((LA(1) == 0x23 /* '#' */ ) && (true)) {
@@ -1313,9 +1314,9 @@ void QueryLexer::mJUNK(bool _createToken) {
 	}
 	}
 	if ( inputState->guessing==0 ) {
-#line 172 "indrilang.g"
+#line 173 "indrilang.g"
 		_ttype = antlr::Token::SKIP;
-#line 1317 "QueryLexer.cpp"
+#line 1318 "QueryLexer.cpp"
 	}
 	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
 	   _token = makeToken(_ttype);
@@ -1327,18 +1328,18 @@ void QueryLexer::mJUNK(bool _createToken) {
 
 
 const unsigned long QueryLexer::_tokenSet_0_data_[] = { 0UL, 67043328UL, 134217726UL, 134217726UL, 4294967295UL, 4294967295UL, 4294967295UL, 4294967295UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
-// 0 1 2 3 4 5 6 
+// 0 1 2 3 4 5 6 7 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryLexer::_tokenSet_0(_tokenSet_0_data_,24);
 const unsigned long QueryLexer::_tokenSet_1_data_[] = { 0UL, 67043328UL, 134217726UL, 134217726UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
-// 0 1 2 3 4 5 6 
+// 0 1 2 3 4 5 6 7 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryLexer::_tokenSet_1(_tokenSet_1_data_,10);
 const unsigned long QueryLexer::_tokenSet_2_data_[] = { 0UL, 67059712UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
-// . 0 1 2 3 4 5 6 
+// . 0 1 2 3 4 5 6 7 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryLexer::_tokenSet_2(_tokenSet_2_data_,10);
 const unsigned long QueryLexer::_tokenSet_3_data_[] = { 0UL, 0UL, 134217726UL, 134217726UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryLexer::_tokenSet_3(_tokenSet_3_data_,10);
 const unsigned long QueryLexer::_tokenSet_4_data_[] = { 0UL, 67078144UL, 134217726UL, 134217726UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
-// + / 0 1 2 3 4 5 6 
+// + / 0 1 2 3 4 5 6 7 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryLexer::_tokenSet_4(_tokenSet_4_data_,10);
 
 ANTLR_END_NAMESPACE

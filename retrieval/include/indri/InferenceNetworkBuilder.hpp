@@ -81,6 +81,7 @@ public:
   void after( indri::lang::FieldLessNode* flNode );
   void after( indri::lang::FieldGreaterNode* fgNode );
   void after( indri::lang::FieldBetweenNode* fbNode );
+  void after( indri::lang::FieldEqualsNode* fbNode );
   void after( indri::lang::FilterNode* filterNode );
 };
 
