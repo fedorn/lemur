@@ -223,7 +223,10 @@ void CompressedCollection::_readPositions( ParsedDocument* document, const void*
 }
 
 CompressedCollection::CompressedCollection() {
-  _output = new WriteBuffer( _storage, 1024*1024 );
+  // _storage may be seeked. Should probably move creation
+  // into open/openRead/create and only set _exclusiveAccess
+  // to false on open. 
+  _output = new WriteBuffer( _storage, 1024*1024, false );
 
   _stream = new z_stream_s;
   _stream->zalloc = zlib_alloc;

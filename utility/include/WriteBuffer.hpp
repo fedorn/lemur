@@ -28,11 +28,14 @@ private:
   File& _file;
   size_t _position;
   File::offset_type _filePos;
+  bool _exclusiveAccess;
 
 public:
-  WriteBuffer( File& file, size_t bufferSize );
+  // <exclusiveAccess> = true if the WriteBuffer is 
+  // the only user of the underlying file, false otherwise.
+  WriteBuffer( File& file, size_t bufferSize, bool exclusiveAccess = true  );
   ~WriteBuffer();
-  
+
   // gives a memory pointer to the next <length>
   // bytes in the file.
   char* write( size_t length );
@@ -57,7 +60,7 @@ public:
 
   // returns the current write pointer
   // position
-  File::offset_type tellp() const;
+  File::offset_type tellp() ;
 };
 
 #endif // LEMUR_WRITEBUFFER_HPP

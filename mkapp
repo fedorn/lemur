@@ -1,5 +1,5 @@
 #!/bin/sh
 
 gmake lib
-cd app/obj; make -s -f ../src/Makefile $1
+cd app/obj; gmake -s -f ../src/Makefile $1
 
