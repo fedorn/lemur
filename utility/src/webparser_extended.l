@@ -99,12 +99,29 @@ WebParser::WebParser() {
   state = OUTER;
 }
 
+long WebParser::fileTell() {
+  int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
+  if (webin) {
+    long begin = ftell(webin)-YY_CURRENT_BUFFER->yy_n_chars;
+    return begin+offset;
+  }
+  return offset;
+}
 
 void 
-WebParser::parse(char * filename) {
+WebParser::parseFile(char * filename) {
   
-
   webin = fopen(filename, "r");
+  doParse();
+  fclose(webin);
+}
+
+void WebParser::parseBuffer (char* buf, int len) {
+  yy_scan_bytes(buf, len);
+  doParse();
+}
+
+void WebParser::doParse() {
 
   int tok;
 
@@ -120,6 +137,7 @@ WebParser::parse(char * filename) {
       break;
     
     case B_DOC:
+      docpos = fileTell() - webleng;
       state = DOC;
       break;
 
@@ -180,43 +198,14 @@ WebParser::parse(char * filename) {
       if (state == SCRIPT)
         state = DOC;
       break;
-
-    case B_TITLE:
-      if (state == DOC)
-        state = TITLE;
-      break;
-
-    case E_TITLE:
-      if (state == TITLE)
-        state = DOC;
-      break;
-
+         
     case WORD:
       if (state == DOC) {
         // put the word in lowercase and pass it on
 	for (char * c = webtext; *c != '\0'; *(c++) = tolower(*c));
 	if (textHandler != NULL) textHandler->foundWord(webtext);
       }
-
-      if (state == TITLE) {
-        if (textHandler != NULL) textHandler->foundWord("*title");
-	for (char * c = webtext; *c != '\0'; *(c++) = tolower(*c));
-	if (textHandler != NULL) textHandler->foundWord(webtext); 
-      }       
-    break;
-
-    case EOS:
-    if (state == DOC) {
-      // hand in the EOS marker
-        if (textHandler != NULL) textHandler->foundWord("*eos");
-      }
-    break;
-
-    case PRONOUN:
-      if (state == DOC) {
-        if (textHandler != NULL) textHandler->foundWord("*pronoun");
-      }
-    break;
+      break;
 
     case CONTRACTION:
       if (state == DOC) {
@@ -271,7 +260,8 @@ WebParser::parse(char * filename) {
     }
 
   }
-  fclose(webin);
-
 }
+
+
+
 
