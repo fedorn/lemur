@@ -31,6 +31,8 @@ namespace LocalParameter {
   char * docFormat;
   // whether or not to stem
   char * stemmer;
+  // file with source files
+  char * sourceFiles;
 
   bool countStopWords;
 
@@ -43,6 +45,8 @@ namespace LocalParameter {
     stopwords = strdup(ParamGetString("stopwords"));
     acronyms = strdup(ParamGetString("acronyms"));
     docFormat = strdup(ParamGetString("docFormat"));
+    sourceFiles = strdup(ParamGetString("sourceFiles"));
+
     // convert docFormat to lowercase
     for (char * d = docFormat; *d != '\0'; d++) *d = tolower(*d);
 
@@ -61,13 +65,14 @@ namespace LocalParameter {
     free(acronyms);
     free(docFormat);
     free(stemmer);
+    free(sourceFiles);
   }
 };
 
 // put more usage info in here
 void usage(int argc, char ** argv) {
   cerr << "Usage:" << endl
-       << argv[0] << " paramfile datfile1 datfile2 ... " << endl
+       << argv[0] << " paramfile [datfile1] [datfile2] ... " << endl
        << endl
        << "PushIndexer builds a database using either the TrecParser or " << endl
        << "WebParser class and InvFPPushIndex.  Summary of parameters:" << endl << endl
@@ -87,7 +92,10 @@ void usage(int argc, char ** argv) {
        << "\tstemmer - \"porter\" to use Porter's stemmer. " << endl
        << "\t          (def = no stemmer)" << endl
        << "\tcountStopWords - \"true\" to count stopwords in doc length. " << endl
-       << "\t                 (def = false)" << endl;
+       << "\t                 (def = false)" << endl
+       << "\tsourceFiles - name of file containing list of datafiles. " << endl
+       << "\t              (one line per datafile name) " << endl
+       << "\t              if not specified, enter datafiles on command line. "<< endl;
 }
 
 // get application parameters
@@ -97,7 +105,7 @@ void GetAppParam() {
 
 
 int AppMain(int argc, char * argv[]) {
-  if (argc < 3) {
+  if ((argc < 3) && (!strcmp(LocalParameter::sourceFiles, ""))) {
     usage(argc, argv);
     return -1;
   }
@@ -156,9 +164,22 @@ int AppMain(int argc, char * argv[]) {
   th->setTextHandler(&indexer);
 
   // parse the data files
-  for (int i = 2; i < argc; i++) {
-    cerr << "Parsing " << argv[i] << endl;
-    parser->parse(argv[i]);
+  if (strcmp(LocalParameter::sourceFiles, "")) {
+    ifstream source(LocalParameter::sourceFiles);
+    if (!source.is_open()) {
+      cerr << "Error opening sourceFiles list " << LocalParameter::sourceFiles << endl;
+    } else {
+      string filename;
+      while (getline(source, filename)) {
+	cerr << "Parsing " << filename <<endl;
+	parser->parse((char*)filename.c_str());
+      }
+    }
+  } else {
+    for (int i = 2; i < argc; i++) {
+      cerr << "Parsing " << argv[i] << endl;
+      parser->parse(argv[i]);
+    }
   }
 
   // free memory
