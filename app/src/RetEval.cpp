@@ -39,7 +39,7 @@ It currently supports five different models:
 </ol>
 <p>
 The parameter to select the model is <tt>retModel</tt> (with value 0 for
-TFIDF, 1 for Okapi, 2 for KL, 3 for CORI (inquery)), 4 for Rel KL (Lavrenko), and 5 for cosine similarity. It is suspected that there is a bugin the implementation of the feedback for Okapi BM25 retrieval function, because the performance is not as expected. 
+TFIDF, 1 for Okapi, 2 for KL, 3 for CORI (inquery)), and 5 for cosine similarity. It is suspected that there is a bugin the implementation of the feedback for Okapi BM25 retrieval function, because the performance is not as expected. 
 <p>
 Other common parameters (for all retrieval methods)  are:
 <p>
@@ -166,7 +166,7 @@ In addition, the collection mixture model also recognizes the parameter
 #include "ResultFile.hpp"
 
 namespace LocalParameter {
-  enum RetModel {TFIDF=0, OKAPI=1, KL=2, CORIDOC=3, COS=4};
+  enum RetModel {TFIDF=0, OKAPI=1, KL=2, CORIDOC=3, COS=5};
   enum FBMethod {MIX=0, DIV=1, MAR=2, RM1=3, RM2=4};
   /// retrieval model 
   static enum RetModel mod;
