@@ -10,6 +10,7 @@
 */
 
 #include "RetMethodManager.hpp"
+#include "BasicCollectionProps.hpp"
 
 RetrievalMethod* RetMethodManager::createModel (const Index* ind, 
 						ArrayAccumulator* accum, 
@@ -117,6 +118,19 @@ IndexedRealVector* RetMethodManager::runQuery(const string& query, const Index* 
   if (!model)
     LEMUR_THROW(LEMUR_MISSING_PARAMETER_ERROR, "could not create retrieval model from given type");
   
+  if (stopfile.empty() || stemtype.empty()) {
+    const BasicCollectionProps* props = dynamic_cast<const BasicCollectionProps*> (index->collectionProps());
+    if (props) {
+      const Property* p = NULL;
+      props->startIteration();
+      while (props->hasMore()) {
+	p = props->nextEntry();
+	if (p->getType() == Property::STRING) 
+	  ParamSet(p->getName(),(char*)p->getValue());
+      }
+    }
+  }
+  
   if (TextQueryRetMethod* textmethod = dynamic_cast<TextQueryRetMethod*>(model)) {    
     results = runTextQuery(query, textmethod, stopfile, stemtype, datadir, func);
   } else if (StructQueryRetMethod* structmethod = dynamic_cast<StructQueryRetMethod*>(model)) {
@@ -194,6 +208,7 @@ IndexedRealVector* RetMethodManager::runStructQuery(const string& query,
 						    const string& func) {
   Stopper* stopper = TextHandlerManager::createStopper(stopfile);
   Stemmer* stemmer = TextHandlerManager::createStemmer(stemtype, datadir, func);
+
   // make bogus query number for parser
   string structquery = "#q1=" + query;
   InQueryOpParser* parser = new InQueryOpParser();
@@ -228,3 +243,4 @@ IndexedRealVector* RetMethodManager::runStructQuery(const string& query,
 
   return results;
 }
+
