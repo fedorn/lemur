@@ -20,8 +20,8 @@ Index *IndexManager::openIndex(const char *indexTOCFile)
 
   Index *ind;
   const char *extension = &(indexTOCFile[len-3]);
-  if ( (!strcmp(extension, "TOC")) || 
-       (!strcmp(extension, "toc"))) {
+  if ( (!strcmp(extension, "IFP")) || 
+       (!strcmp(extension, "ifp"))) {
     // InvFP
     ind = new InvFPIndex();
   } else if ((!strcmp(extension, "BSC")) ||
