@@ -218,7 +218,7 @@ namespace SimpleKLParameter {
       qryPrm.fbMethod = SimpleKLParameter::RM1;
     else if (tmpString == "relevancemodel2" || tmpString == "rm2" || 
 	     tmpString == "4")
-      qryPrm.fbMethod = SimpleKLParameter::RM1;
+      qryPrm.fbMethod = SimpleKLParameter::RM2;
     else {
       cerr << "Unknown queryUpdateMethod " << tmpString 
 	   << ". Using MIXTURE" 
