@@ -1,8 +1,24 @@
 #!/bin/sh
 
 
+
+
 #######################################################################
-# The following command builds an index of the CACM database          #
+# The following command converts the CACM database from a simple      #
+# SGML format to the basic lemur format  (output file: source)        #
+#######################################################################
+
+../app/obj/ParseToFile parse_doc_param database.sgml
+
+#######################################################################
+# The following command converts the queries from a simple            #
+# SGML format to the basic lemur format  (output file: query)         #
+#######################################################################
+
+../app/obj/ParseToFile parse_query_param query.sgml
+
+#######################################################################
+# The following command builds an index of the CACM database (source) #
 #######################################################################
 
 ../app/obj/BuildBasicIndex buildparam
@@ -10,6 +26,7 @@
 #######################################################################
 # The following command computes the necessary support information    # 
 # to be used for document language model smoothing                    #
+# (output file:  index.supp )                                         #
 #######################################################################
 
 ../app/obj/GenerateSmoothSupport suppparam
