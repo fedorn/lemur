@@ -4,15 +4,20 @@
 #include "lex_parser.hpp"
 
 int main(int argc, char* argv[]) {
+  if (argc < 4) {
+    fprintf(stderr, "Usage: indexname cachemem_bytes file1 [... fileN]\n");
+    return 0;
+  }
+
   FILE* readin = NULL;
-  InvFPPushIndex* index = new InvFPPushIndex("ThiTestIndex", atoi(argv[1]));
+  InvFPPushIndex* index = new InvFPPushIndex(argv[1], atoi(argv[2]));
   DocumentProps* dp = new DocumentProps();
   InvFPTerm* term = new InvFPTerm();
 
   int tcount = 0; // count of total terms (not unique)
   int dtcount = 0;  // count of total terms in document
   int token;
-  for (int i=2;i<argc;i++) {    
+  for (int i=3;i<argc;i++) {    
     // if there was one, close the previous file pointer
     if (readin != NULL)
       fclose(readin);
