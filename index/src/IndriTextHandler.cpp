@@ -40,7 +40,8 @@ char* IndriTextHandler::handleDoc(char * docno) {
     free(curdocno);
     curdocno = strdup(docno);
     docid.value = curdocno;
-    docid.valueLength = strlen(docno);
+    // include the trailing '\0'
+    docid.valueLength = strlen(docno) + 1;
     document.metadata.push_back(docid);
   } 
   return docno;
