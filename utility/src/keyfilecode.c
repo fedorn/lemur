@@ -2436,6 +2436,7 @@ int *mid_lc_out, int *mid_prefix_lc_out, int *rt_lc_out, int *rt_prefix_lc_out)
         lc,mid_lc,mid_change,rt_lc,rt_change);
     }
     if ( rt_lc+rt_change>keyspace_lc ) done = true;
+    else if ( rt_cnt>=(mid->keys_in_block+insert-1) ) done = true; /* leave at least one key in mid */
     else {
       mid_prefix_lc = new_mid_prefix_lc;
       rt_prefix_lc = new_rt_prefix_lc;
@@ -2444,7 +2445,6 @@ int *mid_lc_out, int *mid_prefix_lc_out, int *rt_lc_out, int *rt_prefix_lc_out)
       rt_cnt++;
       if ( rt_lc>=target) done = true;
     }
-    if ( rt_cnt>=(mid->keys_in_block+insert) ) done = true; /* everything will move to rt */
   }
   if ( f->trace ) printf(" should move %d keys to rt, mid_lc=%d, rt_lc=%d, mid_prefix_lc=%d, rt_prefix_lc=%d\n",
     rt_cnt,mid_lc,rt_lc,mid_prefix_lc,rt_prefix_lc);
@@ -2473,10 +2473,10 @@ int *mid_lc_out, int *mid_prefix_lc_out, int *rt_lc_out, int *rt_prefix_lc_out)
 /*  ***the move won't actually be done                                  */
 
 static int choose_left_move_cnt(struct fcb *f, struct ix_block *lt, struct ix_block *mid,
-struct key *k, levelx_pntr *new_p, int ix, boolean insert, int target, int mid_keys_in_block,
-int *mid_lc_in_out, int *mid_prefix_lc_in_out, int *lt_lc_out, int *lt_prefix_lc_out)
+  struct key *k, levelx_pntr *new_p, int ix, boolean insert, int mid_keys_in_block,
+  int *mid_lc_in_out, int *mid_prefix_lc_in_out, int *lt_lc_out, int *lt_prefix_lc_out)
 {int lt_cnt=0,lc,lt_prefix_lc,mid_prefix_lc,prefix_difference,lt_lc,mid_lc,
- lt_change,mid_change,new_lt_prefix_lc,new_mid_prefix_lc;
+ lt_change,mid_change,new_lt_prefix_lc,new_mid_prefix_lc,target;
  boolean done=false;
  struct key min_key,rt_mid_key,move_key,mid_min_key;
 
@@ -2490,6 +2490,7 @@ int *mid_lc_in_out, int *mid_prefix_lc_in_out, int *lt_lc_out, int *lt_prefix_lc
   lt_prefix_lc = lt->prefix_lc;
   mid_lc = *mid_lc_in_out;
   mid_prefix_lc = *mid_prefix_lc_in_out;
+  target = (lt_lc + mid_lc) / 2;
 
   if ( block_prefix_lc(lt)!=lt->prefix_lc && show_errors )
     printf("**lt prefix length has changed, expected=%d, actual=%d, index=%d\n",block_prefix_lc(lt),lt->prefix_lc,lt->index_type);
@@ -2523,6 +2524,7 @@ int *mid_lc_in_out, int *mid_prefix_lc_in_out, int *lt_lc_out, int *lt_prefix_lc
         lc,mid_lc,mid_change,lt_lc,lt_change);
     }
     if ( lt_lc+lt_change>keyspace_lc ) done = true;
+    else if ( lt_cnt>=(mid_keys_in_block+insert-1) ) done = true; /* leave at least one key in mid */
     else {
       lt_prefix_lc = new_lt_prefix_lc;
       mid_prefix_lc = new_mid_prefix_lc;
@@ -2532,7 +2534,6 @@ int *mid_lc_in_out, int *mid_prefix_lc_in_out, int *lt_lc_out, int *lt_prefix_lc
       lt_cnt++;
       if ( lt_lc+lt_change>=target) done = true;
     }
-    if ( lt_cnt>=(mid_keys_in_block+insert) ) done = true; /* everything will move to lt */
   }
   if ( f->trace ) {
     printf(" should move %d keys to lt, ",lt_cnt);
@@ -2578,7 +2579,7 @@ struct ix_block *rt, struct key *k, levelx_pntr *new_p, int ix, boolean insert)
 
   rt_cnt = choose_right_move_cnt(f,mid,rt,k,new_p,ix,insert,target,&mid_lc,&mid_prefix_lc,&rt_lc,&rt_prefix_lc);
   choose_key(mid,k,new_p,ix,mid->keys_in_block-rt_cnt,&rt_mid_key,true);
-  lt_cnt = choose_left_move_cnt(f,lt,mid,k,new_p,ix,insert,target,mid->keys_in_block-rt_cnt,&mid_lc,&mid_prefix_lc,&lt_lc,&lt_prefix_lc);
+  lt_cnt = choose_left_move_cnt(f,lt,mid,k,new_p,ix,insert,mid->keys_in_block-rt_cnt,&mid_lc,&mid_prefix_lc,&lt_lc,&lt_prefix_lc);
 
   if ( f->trace ) {
     printf(" should move %d keys to lt, %d to rt ",lt_cnt,rt_cnt);
@@ -2699,6 +2700,7 @@ static void create_new_primary(struct fcb *f, int index, struct leveln_pntr b, s
   }
 }
 
+
 /* split_block splits the block in buffer[bufix]. On entry key k    */
 /*   belongs in entry ix and must be <= the */
 /*   max_key in the parent block that points to this block.  It     */
@@ -2763,7 +2765,7 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, 
     old_block->prev = newb;
     old_block_lc = ix_pool_lc(old_block);
     old_block_prefix_lc = old_block->prefix_lc;
-    cnt = choose_left_move_cnt(f,new_block,old_block,k,&p,ix,insert,target,
+    cnt = choose_left_move_cnt(f,new_block,old_block,k,&p,ix,insert,
       old_block->keys_in_block,&old_block_lc,&old_block_prefix_lc,&new_block_lc,&new_block_prefix_lc);
     get_nth_key(old_block,&temp,0);
     set_empty_block_prefix(new_block,&temp,new_block_prefix_lc);
@@ -2856,6 +2858,7 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, 
     }
   }
 }
+
 /* update_index inserts key k and pointer p into index block b. */
 
 static void update_index(struct fcb *f, struct key *k, struct leveln_pntr b, levelx_pntr p)
