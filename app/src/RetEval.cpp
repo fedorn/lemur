@@ -149,7 +149,7 @@ In addition, the collection mixture model also recognizes the parameter
 #include "TFIDFRetMethod.hpp"
 #include "SimpleKLRetMethod.hpp"
 #include "OkapiRetMethod.hpp"
-#include "ParamManager.hpp"
+#include "RetParamManager.hpp"
 #include "ResultFile.hpp"
 
 namespace LocalParameter {

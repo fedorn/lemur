@@ -55,7 +55,7 @@ The following are document model smoothing parameters:
 #include "BasicDocStream.hpp"
 #include <iostream.h>
 #include "SimpleKLRetMethod.hpp"
-#include "ParamManager.hpp"
+#include "RetParamManager.hpp"
 #include "ResultFile.hpp"
 namespace LocalParameter {
   String queryModel;
