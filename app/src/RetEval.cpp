@@ -145,7 +145,7 @@ In addition, the collection mixture model also recognizes the parameter
 #include "Param.hpp"
 #include "IndexManager.hpp"
 #include "BasicDocStream.hpp"
-#include <iostream.h>
+#include "common_headers.hpp"
 #include "TFIDFRetMethod.hpp"
 #include "SimpleKLRetMethod.hpp"
 #include "OkapiRetMethod.hpp"
@@ -283,5 +283,3 @@ int AppMain(int argc, char *argv[]) {
   return 0;
 
 }
-
-
