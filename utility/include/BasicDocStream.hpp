@@ -109,8 +109,8 @@ class BasicTokenDoc : public Document {
   }
 
   char *curWord;
-  char buf1[2000];
-  char buf2[2000];
+  char buf1[20000];
+  char buf2[20000];
   char id[2000];
   ifstream *docStr;
 };
