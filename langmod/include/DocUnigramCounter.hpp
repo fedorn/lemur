@@ -23,7 +23,7 @@ public:
   DocUnigramCounter(Index &collectionIndex);
 
   virtual ~DocUnigramCounter() {}
-  char *lexiconID() { return (ind.termLexiconID());}
+  const char *lexiconID() { return (ind.termLexiconID());}
 
 protected:
 
