@@ -1,10 +1,9 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2001, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
@@ -20,7 +19,7 @@
 #include "ScoreFunction.hpp"
 #include "ScoreAccumulator.hpp"
 #include "FreqVector.hpp"
-
+#include "Param.hpp"
 //----------------------------------------------------------------------
 //      Abstract Interface for A Retrieval Method/Model for Text Query
 //----------------------------------------------------------------------
@@ -74,12 +73,32 @@ specific <tt>TextQueryRep</tt> and <tt>DocumentRep</tt> that are appropriate for
 
 class TextQueryRetMethod : public RetrievalMethod {
 public:
+  /// Create the retrieval method. If cacheDocReps is true,
+  /// allocate DocumentRep cache array.
   TextQueryRetMethod(Index &ind, ScoreAccumulator & accumulator) : 
-    RetrievalMethod(ind), scAcc(accumulator) {}
-  virtual ~TextQueryRetMethod() {}
+    RetrievalMethod(ind), scAcc(accumulator) {
+    cacheDocReps = (ParamGetInt("cacheDocReps", 1) == 1);
+    if (cacheDocReps) {
+      docRepsSize = ind.docCount() + 1;
+      docReps = new DocumentRep *[docRepsSize];
+      for (int i = 0; i <= ind.docCount(); i++) docReps[i] = NULL;
+    }
+  }
+  /// Destroy the object. If cacheDocReps is true, delete the
+  /// DocumentRep cache array
+  virtual ~TextQueryRetMethod() {
+    if (cacheDocReps) {
+      for (int i = 0; i < docRepsSize; i++) delete(docReps[i]);
+      delete[](docReps);
+    }
+  }
+
   /// compute the query representation for a text query (caller responsible for deleting the memory of the generated new instance)
   virtual TextQueryRep *computeTextQueryRep(TextQuery &qry)=0;
-
+  /// compute a query rep for an existing doc (DOCID_T needed).
+  virtual TextQueryRep *computeTextQueryRep(int docid){
+    return NULL; 
+  } // need to implement for other ret methods.
   /// overriding abstract class method
   virtual QueryRep *computeQueryRep(Query &qry); 
 
@@ -87,7 +106,9 @@ public:
   virtual double scoreDoc(QueryRep &qry, int docID);
   /// ooverriding abstract class method with a general efficient inverted index scoring procedure
   virtual void scoreCollection(QueryRep &qry, IndexedRealVector &results);
-
+  /// add support for scoring an existing document against the collection
+  virtual void scoreCollection(int docid, IndexedRealVector &results);
+  
   /// compute the doc representation (caller responsible for deleting the memory of the generated new instance)
   virtual DocumentRep *computeDocRep(int docID) =0;
   /// return the scoring function pointer
@@ -110,6 +131,12 @@ public:
 
 protected:
   ScoreAccumulator &scAcc;
+  /// cache document reps.
+  DocumentRep **docReps;
+  /// whether or not to cache document representations
+  bool cacheDocReps;
+  /// number of documents plus 1, the size of the docReps array.
+  int docRepsSize;
 };
 
 
