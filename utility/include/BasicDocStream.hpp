@@ -63,18 +63,6 @@
 #define MAXLINE 65536
 
 
-/// term representation for the BasicDocStream
-class BasicTokenTerm : public TokenTerm {
- public:
-  BasicTokenTerm() {}
-  virtual ~BasicTokenTerm() {}
-  virtual const char *spelling() const { return str;}
-  friend class BasicTokenDoc;
- private:
-  char *str;
-};
-
-
 /// doc representation for BasicDocStream
 
 class BasicTokenDoc : public Document {
@@ -89,7 +77,7 @@ class BasicTokenDoc : public Document {
 
   bool hasMore() const{ return (strcmp(curWord, "</DOC>") != 0);}
     
-  const TokenTerm * nextTerm() const;
+  const Term * nextTerm() const;
 
   void skipToEnd() const;
   friend class BasicDocStream;
@@ -102,7 +90,7 @@ class BasicTokenDoc : public Document {
   ifstream *docStr;
   streampos startPos; // starting position of the terms in the file
   //replace  static BasicTokenTerm t; with attribute
-  mutable BasicTokenTerm t;
+  mutable Term t;
 };
 
 
