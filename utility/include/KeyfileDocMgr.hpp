@@ -27,7 +27,6 @@
 // source files.
 #define BT_FID ".bfi"
 
-#define MAX_DOCID_LENGTH 256 /* must track with keydef.h max_key_lc */
 
 /*!
   Document manager using Keyfile for data storage. In addition to providing
@@ -44,7 +43,7 @@ public:
 
   /// constructor (for open)
   ///             name = toc file for this manager (same as getMyID) 
-  KeyfileDocMgr(const char *name);
+  KeyfileDocMgr(const string &name);
 
   /// constructor (for build) 
   ///             name = what to name this manager
@@ -55,7 +54,7 @@ public:
   virtual ~KeyfileDocMgr();
 
   /// return the document associated with this ID
-  char* getDoc(const char* docID);
+  char* getDoc(const string &docID) const;
   /// add entry for new doc
   virtual char* handleDoc(char * docno);
   /// finish entry for current doc
@@ -77,23 +76,27 @@ public:
     myparser = p;
   }
 
+  virtual Parser* getParser() const {
+    return (TextHandlerManager::createParser(pm));
+  }
+
   /// Build the document manager tables from the files previously provided
   /// in the constructor.
   virtual void buildMgr();
   /// return name of this document manager, with the file extension (.bdm).
-  virtual const char *getMyID() {
-    return IDnameext.c_str();
+  virtual const string &getMyID() const{
+    return IDnameext;
   }
 
   /// get the array of Match entries for the tokens in the document
   /// named docID. The entries are indexed by token position (as is
   /// recorded in a TermInfoList object.
-  vector<Match> getOffsets(char *docID);
+  vector<Match> getOffsets(const string &docID) const;
 
   /// Open and load the toc file manname.
-  virtual bool open(const char* manname) {
-    string tmp(manname);
-    IDname = tmp.substr(0, tmp.length() - 4);
+  virtual bool open(const string &manname) {
+    IDnameext = manname;
+    IDname = manname.substr(0, manname.length() - 4);
     return loadTOC();
   }
 
@@ -104,15 +107,17 @@ protected:
     long bytes;
   };
 
+  Parser *myparser;
   virtual void writeTOC();
   virtual bool loadTOC();
-  bool loadFTFiles(const char* fn, int num);
-  vector <Match> offsets;
+  bool loadFTFiles(const string &fn, int num);
+  // the return object
+  mutable vector <Match> offsets;
   int numdocs;              // how many docs we have
   string pm;  // parse mode
 
-  Keyfile poslookup; // btree for lookup to positions list.
-  Keyfile doclookup; // btree for lookup to doc start.
+  mutable Keyfile poslookup; // btree for lookup to positions list.
+  mutable Keyfile doclookup; // btree for lookup to doc start.
   int dbcache;
   
   btl docEntry;

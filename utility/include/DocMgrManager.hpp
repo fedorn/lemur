@@ -33,7 +33,8 @@ public:
   /// Recognized extensions are : .flat -- FlattextDocMgr; or 
   /// .bdm -- KeyfileDocMgr.
   /// elem -- ElemDocMgr.
-  static DocumentManager* openDocMgr(string name);
+  /// caller deletes
+  static DocumentManager* openDocMgr(const string name);
 };
 
 #endif

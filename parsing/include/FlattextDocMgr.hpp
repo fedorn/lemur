@@ -43,33 +43,40 @@ public:
 
   /// constructor (for open)
   ///             name = toc file for this manager (same as getMyID) 
-  FlattextDocMgr(const char* name);
+  FlattextDocMgr(const string &name);
 
   virtual ~FlattextDocMgr();
 
   /// open previously created manager
-  virtual bool open(const char*manname);
+  virtual bool open(const string &manname);
 
+  virtual Parser* getParser() const {
+    return TextHandlerManager::createParser(parseMode);
+  }
   /// get the ID string to use for opening this later
-  virtual const char* getMyID();
+  virtual const string &getMyID() const;
   
   /// return the document associated with this ID
-  virtual char* getDoc(const char* docID);
+  virtual char* getDoc(const string &docID) const;
 
   virtual void buildMgr();
 
   char* handleDoc(char * docno);
   void  handleEndDoc();
+
+protected:
+  Parser* myparser;
+
 private:
   /// open the file with all the sources and save internally
-  bool readinSources(const char* fn);
+  bool readinSources(const string &fn);
 
   /// save info we'll need to open this Manager
   void writeTOC();
 
-  bool loadTOC(const char* fn);
-  bool loadFTLookup(const char* fn);
-  bool loadFTFiles(const char* fn, int num);
+  bool loadTOC(const string &fn);
+  bool loadFTLookup(const string &fn);
+  bool loadFTFiles(const string &fn, int num);
 
   int numdocs;              // how many docs we have
   string parseMode;           // what type of parser we have
@@ -79,7 +86,7 @@ private:
   vector<string> sources;   // list of all source files
   int fileid;			    // fileid of current file being processed
   ofstream writefpos;       // stream for writing out file positions
-  map<char*, lookup_e*, abc> table; 
+  mutable map<string, lookup_e*, less<string> > table; 
   lookup_e* entries;        // array of lookup entries
 };
 

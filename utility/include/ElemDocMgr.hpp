@@ -49,7 +49,7 @@ public:
 
   /// constructor (for open)
   ///             name = toc file for this manager (same as getMyID) 
-  ElemDocMgr(const char *name);
+  ElemDocMgr(const string &name);
 
   /// constructor (for build) 
   ///             name = what to name this manager
@@ -71,9 +71,9 @@ public:
   virtual char* getElement(const char* docid, const char* element);
 
   /// Open and load the toc file manname.
-  virtual bool open(const char* manname) {
-    string tmp(manname);
-    IDname = tmp.substr(0, tmp.length() - 5);
+  virtual bool open(const string &manname) {
+    IDnameext = manname;
+    IDname = manname.substr(0, manname.length() - 5);
     return loadTOC();
   }
 
