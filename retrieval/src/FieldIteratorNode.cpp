@@ -50,7 +50,7 @@ const greedy_vector<Extent>& FieldIteratorNode::extents() {
   return _extents;
 }
 
-const greedy_vector<UINT64>& FieldIteratorNode::numbers() {
+const greedy_vector<INT64>& FieldIteratorNode::numbers() {
   return _numbers;
 }
 

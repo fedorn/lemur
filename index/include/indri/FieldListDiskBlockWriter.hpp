@@ -87,7 +87,7 @@ namespace indri {
         return _lastDocument;
       }
 
-      bool addExtent( unsigned int documentID, unsigned int begin, unsigned int end, UINT64 number = 0 ) {
+      bool addExtent( unsigned int documentID, unsigned int begin, unsigned int end, INT64 number = 0 ) {
         if( _beginMetadata() - _data < INDRI_EXTENT_REQUIRED_SPACE )
           return false;
 
@@ -106,6 +106,12 @@ namespace indri {
         _data = RVLCompress::compress_int( _data, end - begin );
 
         if( _numeric ) {
+          // fold negative numbers into positive ones, use low bit as negative sign
+          if( number < 0 )
+            number = (2 * -number) - 1;
+          else
+            number = 2 * number;
+
           _data = RVLCompress::compress_longlong( _data, number );
         }
 

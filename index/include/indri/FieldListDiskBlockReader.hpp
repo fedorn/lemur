@@ -75,6 +75,14 @@ public:
 
     if( _numeric ) {
       _current = RVLCompress::decompress_longlong( _current, _number );
+
+      if( _number & 1 ) {
+        // number is negative
+        _number = -((_number + 1) / 2);
+      } else {
+        // number is positive
+        _number = _number / 2;
+      }
     }
 
     assert( _current < _block + INDRI_FIELDLIST_BLOCKSIZE );

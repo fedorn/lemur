@@ -33,10 +33,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ScoredExtentNode*  QueryParser::query() {
-#line 193 "indrilang.g"
+#line 198 "indrilang.g"
 	 indri::lang::ScoredExtentNode* q ;
 #line 37 "QueryParser.cpp"
-#line 193 "indrilang.g"
+#line 198 "indrilang.g"
 	
 	indri::lang::CombineNode* c = 0;
 	indri::lang::ScoredExtentNode* s = 0;
@@ -79,7 +79,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		{
 			s=scoredExtentNode();
 			if ( inputState->guessing==0 ) {
-#line 200 "indrilang.g"
+#line 205 "indrilang.g"
 				
 				c = new CombineNode;
 				c->addChild(q);
@@ -94,7 +94,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				if ((_tokenSet_0.member(LA(1)))) {
 					s=scoredExtentNode();
 					if ( inputState->guessing==0 ) {
-#line 208 "indrilang.g"
+#line 213 "indrilang.g"
 						
 						c->addChild(s);
 						
@@ -102,11 +102,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 					}
 				}
 				else {
-					goto _loop75;
+					goto _loop82;
 				}
 				
 			}
-			_loop75:;
+			_loop82:;
 			} // ( ... )*
 			break;
 		}
@@ -135,7 +135,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ScoredExtentNode*  QueryParser::scoredExtentNode() {
-#line 214 "indrilang.g"
+#line 219 "indrilang.g"
 	 indri::lang::ScoredExtentNode* s ;
 #line 139 "QueryParser.cpp"
 	
@@ -224,10 +224,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ScoredExtentNode*  QueryParser::weightNode() {
-#line 308 "indrilang.g"
+#line 313 "indrilang.g"
 	 indri::lang::ScoredExtentNode* r ;
 #line 228 "QueryParser.cpp"
-#line 308 "indrilang.g"
+#line 313 "indrilang.g"
 	
 	indri::lang::WeightNode* wn = new indri::lang::WeightNode;
 	_nodes.push_back(wn);
@@ -251,10 +251,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ScoredExtentNode*  QueryParser::combineNode() {
-#line 315 "indrilang.g"
+#line 320 "indrilang.g"
 	 indri::lang::ScoredExtentNode* r ;
 #line 255 "QueryParser.cpp"
-#line 315 "indrilang.g"
+#line 320 "indrilang.g"
 	
 	indri::lang::CombineNode* cn = new indri::lang::CombineNode;
 	_nodes.push_back(cn);
@@ -278,10 +278,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ScoredExtentNode*  QueryParser::orNode() {
-#line 343 "indrilang.g"
+#line 348 "indrilang.g"
 	 indri::lang::ScoredExtentNode* r ;
 #line 282 "QueryParser.cpp"
-#line 343 "indrilang.g"
+#line 348 "indrilang.g"
 	
 	indri::lang::OrNode* on = new indri::lang::OrNode;
 	_nodes.push_back(on);
@@ -305,10 +305,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ScoredExtentNode*  QueryParser::notNode() {
-#line 357 "indrilang.g"
+#line 362 "indrilang.g"
 	 indri::lang::ScoredExtentNode* r ;
 #line 309 "QueryParser.cpp"
-#line 357 "indrilang.g"
+#line 362 "indrilang.g"
 	
 	indri::lang::NotNode* n = new indri::lang::NotNode;
 	indri::lang::ScoredExtentNode* c = 0;
@@ -340,7 +340,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		c=scoredExtentNode();
 		match(C_PAREN);
 		if ( inputState->guessing==0 ) {
-#line 365 "indrilang.g"
+#line 370 "indrilang.g"
 			
 			n->setChild(c);
 			
@@ -360,10 +360,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ScoredExtentNode*  QueryParser::wandNode() {
-#line 336 "indrilang.g"
+#line 341 "indrilang.g"
 	 indri::lang::ScoredExtentNode* r ;
 #line 364 "QueryParser.cpp"
-#line 336 "indrilang.g"
+#line 341 "indrilang.g"
 	
 	indri::lang::WAndNode* wn = new indri::lang::WAndNode;
 	_nodes.push_back(wn);
@@ -387,10 +387,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ScoredExtentNode*  QueryParser::wsumNode() {
-#line 329 "indrilang.g"
+#line 334 "indrilang.g"
 	 indri::lang::ScoredExtentNode* r ;
 #line 391 "QueryParser.cpp"
-#line 329 "indrilang.g"
+#line 334 "indrilang.g"
 	
 	indri::lang::WSumNode* wn = new indri::lang::WSumNode;
 	_nodes.push_back(wn);
@@ -414,10 +414,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ScoredExtentNode*  QueryParser::maxNode() {
-#line 350 "indrilang.g"
+#line 355 "indrilang.g"
 	 indri::lang::ScoredExtentNode* r ;
 #line 418 "QueryParser.cpp"
-#line 350 "indrilang.g"
+#line 355 "indrilang.g"
 	
 	indri::lang::MaxNode* mn = new indri::lang::MaxNode;
 	_nodes.push_back(mn);
@@ -441,11 +441,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::PriorNode*  QueryParser::priorNode() {
-#line 369 "indrilang.g"
+#line 374 "indrilang.g"
 	 indri::lang::PriorNode* p ;
 #line 445 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  name = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 369 "indrilang.g"
+#line 374 "indrilang.g"
 	
 	indri::lang::Field* field = 0;
 	p = 0;
@@ -459,7 +459,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		match(TERM);
 		match(C_PAREN);
 		if ( inputState->guessing==0 ) {
-#line 374 "indrilang.g"
+#line 379 "indrilang.g"
 			
 			p = _priorFactory->create( name->getText() );
 			
@@ -487,10 +487,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  ScoredExtentNode*  QueryParser::scoredRaw() {
-#line 231 "indrilang.g"
+#line 236 "indrilang.g"
 	 ScoredExtentNode* sn ;
 #line 491 "QueryParser.cpp"
-#line 231 "indrilang.g"
+#line 236 "indrilang.g"
 	
 	RawExtentNode* raw = 0;
 	RawExtentNode* contexts = 0;
@@ -499,10 +499,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 #line 498 "QueryParser.cpp"
 	
 	try {      // for error handling
-		bool synPredMatched95 = false;
+		bool synPredMatched102 = false;
 		if (((_tokenSet_3.member(LA(1))))) {
-			int _m95 = mark();
-			synPredMatched95 = true;
+			int _m102 = mark();
+			synPredMatched102 = true;
 			inputState->guessing++;
 			try {
 				{
@@ -511,16 +511,16 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				}
 			}
 			catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-				synPredMatched95 = false;
+				synPredMatched102 = false;
 			}
-			rewind(_m95);
+			rewind(_m102);
 			inputState->guessing--;
 		}
-		if ( synPredMatched95 ) {
+		if ( synPredMatched102 ) {
 			raw=qualifiedTerm();
 			contexts=context_list();
 			if ( inputState->guessing==0 ) {
-#line 238 "indrilang.g"
+#line 243 "indrilang.g"
 				
 				sn = new indri::lang::RawScorerNode( raw, contexts );
 				_nodes.push_back(sn);
@@ -529,10 +529,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			bool synPredMatched97 = false;
+			bool synPredMatched104 = false;
 			if (((_tokenSet_3.member(LA(1))))) {
-				int _m97 = mark();
-				synPredMatched97 = true;
+				int _m104 = mark();
+				synPredMatched104 = true;
 				inputState->guessing++;
 				try {
 					{
@@ -540,15 +540,15 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 					}
 				}
 				catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-					synPredMatched97 = false;
+					synPredMatched104 = false;
 				}
-				rewind(_m97);
+				rewind(_m104);
 				inputState->guessing--;
 			}
-			if ( synPredMatched97 ) {
+			if ( synPredMatched104 ) {
 				raw=qualifiedTerm();
 				if ( inputState->guessing==0 ) {
-#line 243 "indrilang.g"
+#line 248 "indrilang.g"
 					
 					sn = new indri::lang::RawScorerNode( raw, contexts );
 					_nodes.push_back(sn);
@@ -557,10 +557,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				}
 			}
 			else {
-				bool synPredMatched99 = false;
+				bool synPredMatched106 = false;
 				if (((_tokenSet_3.member(LA(1))))) {
-					int _m99 = mark();
-					synPredMatched99 = true;
+					int _m106 = mark();
+					synPredMatched106 = true;
 					inputState->guessing++;
 					try {
 						{
@@ -569,17 +569,17 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 						}
 					}
 					catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-						synPredMatched99 = false;
+						synPredMatched106 = false;
 					}
-					rewind(_m99);
+					rewind(_m106);
 					inputState->guessing--;
 				}
-				if ( synPredMatched99 ) {
+				if ( synPredMatched106 ) {
 					raw=unqualifiedTerm();
 					match(DOT);
 					contexts=context_list();
 					if ( inputState->guessing==0 ) {
-#line 248 "indrilang.g"
+#line 253 "indrilang.g"
 						
 						sn = new indri::lang::RawScorerNode( raw, contexts );
 						_nodes.push_back(sn);
@@ -590,7 +590,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				else if ((_tokenSet_3.member(LA(1)))) {
 					raw=unqualifiedTerm();
 					if ( inputState->guessing==0 ) {
-#line 253 "indrilang.g"
+#line 258 "indrilang.g"
 						
 						sn = new indri::lang::RawScorerNode( raw, contexts );
 						_nodes.push_back(sn);
@@ -616,10 +616,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  RawExtentNode*  QueryParser::qualifiedTerm() {
-#line 471 "indrilang.g"
+#line 476 "indrilang.g"
 	 RawExtentNode* t ;
 #line 620 "QueryParser.cpp"
-#line 471 "indrilang.g"
+#line 476 "indrilang.g"
 	
 	RawExtentNode* synonyms = 0;
 	RawExtentNode* fields = 0;
@@ -632,7 +632,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		match(DOT);
 		fields=field_list();
 		if ( inputState->guessing==0 ) {
-#line 478 "indrilang.g"
+#line 483 "indrilang.g"
 			
 			if( fields ) {
 			t = new indri::lang::ExtentInside( synonyms, fields );
@@ -657,12 +657,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  ExtentOr*  QueryParser::context_list() {
-#line 544 "indrilang.g"
+#line 549 "indrilang.g"
 	 ExtentOr* contexts ;
 #line 661 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  first = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  additional = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 544 "indrilang.g"
+#line 549 "indrilang.g"
 	
 	contexts = new ExtentOr;
 	_nodes.push_back( contexts );
@@ -674,7 +674,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		first = LT(1);
 		match(TERM);
 		if ( inputState->guessing==0 ) {
-#line 550 "indrilang.g"
+#line 555 "indrilang.g"
 			
 			Field* firstField = new indri::lang::Field( first->getText() );
 			_nodes.push_back( firstField );
@@ -689,7 +689,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				additional = LT(1);
 				match(TERM);
 				if ( inputState->guessing==0 ) {
-#line 557 "indrilang.g"
+#line 562 "indrilang.g"
 					
 					Field* additionalField = new Field(additional->getText());
 					_nodes.push_back( additionalField );
@@ -699,11 +699,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				}
 			}
 			else {
-				goto _loop184;
+				goto _loop191;
 			}
 			
 		}
-		_loop184:;
+		_loop191:;
 		} // ( ... )*
 		match(C_PAREN);
 	}
@@ -720,7 +720,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  RawExtentNode*  QueryParser::unqualifiedTerm() {
-#line 487 "indrilang.g"
+#line 492 "indrilang.g"
 	 RawExtentNode* re ;
 #line 724 "QueryParser.cpp"
 	
@@ -823,10 +823,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
  indri::lang::ScoredExtentNode*  QueryParser::weightedList(
 	 indri::lang::WeightedCombinationNode* wn 
 ) {
-#line 269 "indrilang.g"
+#line 274 "indrilang.g"
 	 indri::lang::ScoredExtentNode* sr ;
 #line 827 "QueryParser.cpp"
-#line 269 "indrilang.g"
+#line 274 "indrilang.g"
 	
 	double w = 0;
 	ScoredExtentNode* n = 0;
@@ -854,24 +854,24 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		}
 		match(O_PAREN);
 		{ // ( ... )+
-		int _cnt103=0;
+		int _cnt110=0;
 		for (;;) {
 			if ((LA(1) == NUMBER || LA(1) == FLOAT)) {
 				w=floating();
 				n=scoredExtentNode();
 				if ( inputState->guessing==0 ) {
-#line 280 "indrilang.g"
+#line 285 "indrilang.g"
 					wn->addChild( w, n );
 #line 864 "QueryParser.cpp"
 				}
 			}
 			else {
-				if ( _cnt103>=1 ) { goto _loop103; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+				if ( _cnt110>=1 ) { goto _loop110; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 			}
 			
-			_cnt103++;
+			_cnt110++;
 		}
-		_loop103:;
+		_loop110:;
 		}  // ( ... )+
 		match(C_PAREN);
 	}
@@ -890,11 +890,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
  indri::lang::ExtentRestriction*  QueryParser::extentRestriction(
 	 indri::lang::ScoredExtentNode* sn 
 ) {
-#line 503 "indrilang.g"
+#line 508 "indrilang.g"
 	 indri::lang::ExtentRestriction* er ;
 #line 894 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  field = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 503 "indrilang.g"
+#line 508 "indrilang.g"
 	
 	indri::lang::Field* f = 0;
 	er = 0;
@@ -907,7 +907,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		match(TERM);
 		match(C_SQUARE);
 		if ( inputState->guessing==0 ) {
-#line 508 "indrilang.g"
+#line 513 "indrilang.g"
 			
 			f = new indri::lang::Field(field->getText());
 			_nodes.push_back(f);
@@ -930,12 +930,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  double  QueryParser::floating() {
-#line 687 "indrilang.g"
+#line 699 "indrilang.g"
 	 double d ;
 #line 934 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  f = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  n = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 687 "indrilang.g"
+#line 699 "indrilang.g"
 	
 	d = 0;
 	
@@ -948,7 +948,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			f = LT(1);
 			match(FLOAT);
 			if ( inputState->guessing==0 ) {
-#line 690 "indrilang.g"
+#line 702 "indrilang.g"
 				
 				d = atof(f->getText().c_str());
 				
@@ -961,7 +961,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			n = LT(1);
 			match(NUMBER);
 			if ( inputState->guessing==0 ) {
-#line 693 "indrilang.g"
+#line 705 "indrilang.g"
 				
 				d = atof(n->getText().c_str());
 				
@@ -990,10 +990,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
  indri::lang::ScoredExtentNode*  QueryParser::sumList(
 	 indri::lang::WSumNode* wn 
 ) {
-#line 285 "indrilang.g"
+#line 290 "indrilang.g"
 	 indri::lang::ScoredExtentNode* sr ;
 #line 994 "QueryParser.cpp"
-#line 285 "indrilang.g"
+#line 290 "indrilang.g"
 	
 	double w = 0;
 	ScoredExtentNode* n = 0;
@@ -1021,23 +1021,23 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		}
 		match(O_PAREN);
 		{ // ( ... )+
-		int _cnt107=0;
+		int _cnt114=0;
 		for (;;) {
 			if ((_tokenSet_0.member(LA(1)))) {
 				n=scoredExtentNode();
 				if ( inputState->guessing==0 ) {
-#line 293 "indrilang.g"
+#line 298 "indrilang.g"
 					wn->addChild( 1.0, n );
 #line 1030 "QueryParser.cpp"
 				}
 			}
 			else {
-				if ( _cnt107>=1 ) { goto _loop107; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+				if ( _cnt114>=1 ) { goto _loop114; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 			}
 			
-			_cnt107++;
+			_cnt114++;
 		}
-		_loop107:;
+		_loop114:;
 		}  // ( ... )+
 		match(C_PAREN);
 	}
@@ -1056,10 +1056,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
  indri::lang::ScoredExtentNode*  QueryParser::unweightedList(
 	 indri::lang::UnweightedCombinationNode* cn 
 ) {
-#line 297 "indrilang.g"
+#line 302 "indrilang.g"
 	 indri::lang::ScoredExtentNode* sr ;
 #line 1060 "QueryParser.cpp"
-#line 297 "indrilang.g"
+#line 302 "indrilang.g"
 	
 	ScoredExtentNode* n = 0;
 	sr = cn;
@@ -1086,23 +1086,23 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		}
 		match(O_PAREN);
 		{ // ( ... )+
-		int _cnt111=0;
+		int _cnt118=0;
 		for (;;) {
 			if ((_tokenSet_0.member(LA(1)))) {
 				n=scoredExtentNode();
 				if ( inputState->guessing==0 ) {
-#line 304 "indrilang.g"
+#line 309 "indrilang.g"
 					cn->addChild( n );
 #line 1095 "QueryParser.cpp"
 				}
 			}
 			else {
-				if ( _cnt111>=1 ) { goto _loop111; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+				if ( _cnt118>=1 ) { goto _loop118; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 			}
 			
-			_cnt111++;
+			_cnt118++;
 		}
-		_loop111:;
+		_loop118:;
 		}  // ( ... )+
 		match(C_PAREN);
 	}
@@ -1119,10 +1119,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ScoredExtentNode*  QueryParser::sumNode() {
-#line 322 "indrilang.g"
+#line 327 "indrilang.g"
 	 indri::lang::ScoredExtentNode* r ;
 #line 1123 "QueryParser.cpp"
-#line 322 "indrilang.g"
+#line 327 "indrilang.g"
 	
 	indri::lang::WSumNode* wn = new indri::lang::WSumNode;
 	_nodes.push_back(wn);
@@ -1146,12 +1146,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ODNode*  QueryParser::odNode() {
-#line 395 "indrilang.g"
+#line 400 "indrilang.g"
 	 indri::lang::ODNode* od ;
 #line 1150 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  n1 = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  n2 = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 395 "indrilang.g"
+#line 400 "indrilang.g"
 	
 	RawExtentNode* rn = 0;
 	od = new indri::lang::ODNode;
@@ -1161,40 +1161,40 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	
 	try {      // for error handling
 		{
-		bool synPredMatched125 = false;
+		bool synPredMatched132 = false;
 		if (((LA(1) == OD))) {
-			int _m125 = mark();
-			synPredMatched125 = true;
+			int _m132 = mark();
+			synPredMatched132 = true;
 			inputState->guessing++;
 			try {
-		{
+				{
 				match(OD);
 				match(NUMBER);
 				}
 			}
 			catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-				synPredMatched125 = false;
+				synPredMatched132 = false;
 			}
-			rewind(_m125);
+			rewind(_m132);
 			inputState->guessing--;
 		}
-		if ( synPredMatched125 ) {
+		if ( synPredMatched132 ) {
 			{
 			match(OD);
 			n1 = LT(1);
 			match(NUMBER);
 			if ( inputState->guessing==0 ) {
-#line 404 "indrilang.g"
+#line 409 "indrilang.g"
 				od->setWindowSize( n1->getText() );
 #line 1188 "QueryParser.cpp"
 			}
 			}
 		}
 		else {
-			bool synPredMatched128 = false;
+			bool synPredMatched135 = false;
 			if (((LA(1) == OD))) {
-				int _m128 = mark();
-				synPredMatched128 = true;
+				int _m135 = mark();
+				synPredMatched135 = true;
 				inputState->guessing++;
 				try {
 					{
@@ -1202,28 +1202,28 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 					}
 				}
 				catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-					synPredMatched128 = false;
+					synPredMatched135 = false;
 				}
-				rewind(_m128);
+				rewind(_m135);
 				inputState->guessing--;
 			}
-			if ( synPredMatched128 ) {
-		{
+			if ( synPredMatched135 ) {
+				{
 				match(OD);
 				}
 			}
 			else if ((LA(1) == OPERATOR)) {
-			{
-			match(OPERATOR);
-			n2 = LT(1);
-			match(NUMBER);
-			if ( inputState->guessing==0 ) {
-#line 408 "indrilang.g"
-				od->setWindowSize( n2->getText() );
+				{
+				match(OPERATOR);
+				n2 = LT(1);
+				match(NUMBER);
+				if ( inputState->guessing==0 ) {
+#line 413 "indrilang.g"
+					od->setWindowSize( n2->getText() );
 #line 1222 "QueryParser.cpp"
+				}
+				}
 			}
-			}
-		}
 		else {
 			throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());
 		}
@@ -1231,23 +1231,23 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		}
 		match(O_PAREN);
 		{ // ( ... )+
-		int _cnt132=0;
+		int _cnt139=0;
 		for (;;) {
 			if ((_tokenSet_3.member(LA(1)))) {
 				rn=unscoredTerm();
 				if ( inputState->guessing==0 ) {
-#line 412 "indrilang.g"
+#line 417 "indrilang.g"
 					od->addChild( rn );
 #line 1240 "QueryParser.cpp"
 				}
 			}
 			else {
-				if ( _cnt132>=1 ) { goto _loop132; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+				if ( _cnt139>=1 ) { goto _loop139; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 			}
 			
-			_cnt132++;
+			_cnt139++;
 		}
-		_loop132:;
+		_loop139:;
 		}  // ( ... )+
 		match(C_PAREN);
 	}
@@ -1264,20 +1264,20 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  RawExtentNode*  QueryParser::unscoredTerm() {
-#line 464 "indrilang.g"
+#line 469 "indrilang.g"
 	 RawExtentNode* t ;
 #line 1268 "QueryParser.cpp"
-#line 464 "indrilang.g"
+#line 469 "indrilang.g"
 	
 	t = 0;
 	
 #line 1273 "QueryParser.cpp"
 	
 	try {      // for error handling
-		bool synPredMatched146 = false;
+		bool synPredMatched153 = false;
 		if (((_tokenSet_3.member(LA(1))))) {
-			int _m146 = mark();
-			synPredMatched146 = true;
+			int _m153 = mark();
+			synPredMatched153 = true;
 			inputState->guessing++;
 			try {
 				{
@@ -1285,12 +1285,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				}
 			}
 			catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-				synPredMatched146 = false;
+				synPredMatched153 = false;
 			}
-			rewind(_m146);
+			rewind(_m153);
 			inputState->guessing--;
 		}
-		if ( synPredMatched146 ) {
+		if ( synPredMatched153 ) {
 			t=qualifiedTerm();
 		}
 		else if ((_tokenSet_3.member(LA(1)))) {
@@ -1314,11 +1314,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::UWNode*  QueryParser::uwNode() {
-#line 416 "indrilang.g"
+#line 421 "indrilang.g"
 	 indri::lang::UWNode* uw ;
 #line 1318 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  n = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 416 "indrilang.g"
+#line 421 "indrilang.g"
 	
 	uw = new indri::lang::UWNode;
 	RawExtentNode* rn = 0;
@@ -1328,10 +1328,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	
 	try {      // for error handling
 		{
-		bool synPredMatched136 = false;
+		bool synPredMatched143 = false;
 		if (((LA(1) == UW))) {
-			int _m136 = mark();
-			synPredMatched136 = true;
+			int _m143 = mark();
+			synPredMatched143 = true;
 			inputState->guessing++;
 			try {
 				{
@@ -1340,19 +1340,19 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				}
 			}
 			catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-				synPredMatched136 = false;
+				synPredMatched143 = false;
 			}
-			rewind(_m136);
+			rewind(_m143);
 			inputState->guessing--;
 		}
-		if ( synPredMatched136 ) {
+		if ( synPredMatched143 ) {
 			{
-		match(UW);
-		n = LT(1);
-		match(NUMBER);
-		if ( inputState->guessing==0 ) {
-#line 424 "indrilang.g"
-			uw->setWindowSize( n->getText() );
+			match(UW);
+			n = LT(1);
+			match(NUMBER);
+			if ( inputState->guessing==0 ) {
+#line 429 "indrilang.g"
+				uw->setWindowSize( n->getText() );
 #line 1355 "QueryParser.cpp"
 			}
 			}
@@ -1369,23 +1369,23 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		}
 		match(O_PAREN);
 		{ // ( ... )+
-		int _cnt140=0;
+		int _cnt147=0;
 		for (;;) {
 			if ((_tokenSet_3.member(LA(1)))) {
 				rn=unscoredTerm();
 				if ( inputState->guessing==0 ) {
-#line 430 "indrilang.g"
+#line 435 "indrilang.g"
 					uw->addChild( rn );
 #line 1378 "QueryParser.cpp"
 				}
 			}
 			else {
-				if ( _cnt140>=1 ) { goto _loop140; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+				if ( _cnt147>=1 ) { goto _loop147; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 			}
 			
-			_cnt140++;
+			_cnt147++;
 		}
-		_loop140:;
+		_loop147:;
 		}  // ( ... )+
 		match(C_PAREN);
 	}
@@ -1402,10 +1402,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::FilRejNode*  QueryParser::filrejNode() {
-#line 433 "indrilang.g"
+#line 438 "indrilang.g"
 	 indri::lang::FilRejNode* fj ;
 #line 1406 "QueryParser.cpp"
-#line 433 "indrilang.g"
+#line 438 "indrilang.g"
 	
 	RawExtentNode* filtered = 0;
 	RawExtentNode* disallowed = 0;
@@ -1419,7 +1419,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		disallowed=unscoredTerm();
 		match(C_PAREN);
 		if ( inputState->guessing==0 ) {
-#line 439 "indrilang.g"
+#line 444 "indrilang.g"
 			
 			fj = new FilRejNode( filtered, disallowed );
 			_nodes.push_back(fj);
@@ -1440,10 +1440,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::FilReqNode*  QueryParser::filreqNode() {
-#line 444 "indrilang.g"
+#line 449 "indrilang.g"
 	 indri::lang::FilReqNode* fq ;
 #line 1444 "QueryParser.cpp"
-#line 444 "indrilang.g"
+#line 449 "indrilang.g"
 	
 	RawExtentNode* filtered = 0;
 	RawExtentNode* required = 0;
@@ -1457,7 +1457,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		required=unscoredTerm();
 		match(C_PAREN);
 		if ( inputState->guessing==0 ) {
-#line 450 "indrilang.g"
+#line 455 "indrilang.g"
 			
 			fq = new FilReqNode( filtered, required );
 			_nodes.push_back(fq);
@@ -1478,11 +1478,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::Field*  QueryParser::anyField() {
-#line 455 "indrilang.g"
+#line 460 "indrilang.g"
 	 indri::lang::Field* f ;
 #line 1482 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  t = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 455 "indrilang.g"
+#line 460 "indrilang.g"
 	
 	f = 0;
 	
@@ -1494,7 +1494,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		t = LT(1);
 		match(TERM);
 		if ( inputState->guessing==0 ) {
-#line 459 "indrilang.g"
+#line 464 "indrilang.g"
 			
 			f = new Field(t->getText());
 			_nodes.push_back(f);
@@ -1515,12 +1515,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  ExtentAnd*  QueryParser::field_list() {
-#line 524 "indrilang.g"
+#line 529 "indrilang.g"
 	 ExtentAnd* fields ;
 #line 1519 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  first = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  additional = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 524 "indrilang.g"
+#line 529 "indrilang.g"
 	
 	fields = new ExtentAnd;
 	_nodes.push_back( fields );
@@ -1531,7 +1531,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		first = LT(1);
 		match(TERM);
 		if ( inputState->guessing==0 ) {
-#line 530 "indrilang.g"
+#line 535 "indrilang.g"
 			
 			Field* firstField = new indri::lang::Field( first->getText() );
 			_nodes.push_back( firstField );
@@ -1546,7 +1546,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				additional = LT(1);
 				match(TERM);
 				if ( inputState->guessing==0 ) {
-#line 537 "indrilang.g"
+#line 542 "indrilang.g"
 					
 					Field* additionalField = new Field(additional->getText());
 					_nodes.push_back( additionalField );
@@ -1556,11 +1556,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				}
 			}
 			else {
-				goto _loop181;
+				goto _loop188;
 			}
 			
 		}
-		_loop181:;
+		_loop188:;
 		} // ( ... )*
 	}
 	catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& ex) {
@@ -1576,10 +1576,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  FieldLessNode*  QueryParser::dateBefore() {
-#line 573 "indrilang.g"
+#line 578 "indrilang.g"
 	 FieldLessNode* extent ;
 #line 1580 "QueryParser.cpp"
-#line 573 "indrilang.g"
+#line 578 "indrilang.g"
 	
 	UINT64 d = 0;
 	Field* dateField = 0;
@@ -1593,7 +1593,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		d=date();
 		match(C_PAREN);
 		if ( inputState->guessing==0 ) {
-#line 578 "indrilang.g"
+#line 583 "indrilang.g"
 			
 			dateField = new Field("date");
 			extent = new FieldLessNode( dateField, d );
@@ -1616,10 +1616,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  FieldGreaterNode*  QueryParser::dateAfter() {
-#line 585 "indrilang.g"
+#line 590 "indrilang.g"
 	 FieldGreaterNode* extent ;
 #line 1620 "QueryParser.cpp"
-#line 585 "indrilang.g"
+#line 590 "indrilang.g"
 	
 	UINT64 d = 0;
 	Field* dateField = 0;
@@ -1633,7 +1633,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		d=date();
 		match(C_PAREN);
 		if ( inputState->guessing==0 ) {
-#line 590 "indrilang.g"
+#line 595 "indrilang.g"
 			
 			dateField = new Field("date");
 			extent = new FieldGreaterNode( dateField, d );
@@ -1656,10 +1656,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  FieldBetweenNode*  QueryParser::dateBetween() {
-#line 597 "indrilang.g"
+#line 602 "indrilang.g"
 	 FieldBetweenNode* extent ;
 #line 1660 "QueryParser.cpp"
-#line 597 "indrilang.g"
+#line 602 "indrilang.g"
 	
 	UINT64 low = 0;
 	UINT64 high = 0;
@@ -1676,7 +1676,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		high=date();
 		match(C_PAREN);
 		if ( inputState->guessing==0 ) {
-#line 603 "indrilang.g"
+#line 608 "indrilang.g"
 			
 			dateField = new Field("date");
 			extent = new FieldBetweenNode( dateField, low, high );
@@ -1699,10 +1699,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  indri::lang::ExtentOr*  QueryParser::synonym_list() {
-#line 515 "indrilang.g"
+#line 520 "indrilang.g"
 	 indri::lang::ExtentOr* s ;
 #line 1703 "QueryParser.cpp"
-#line 515 "indrilang.g"
+#line 520 "indrilang.g"
 	
 	indri::lang::RawExtentNode* term = 0;
 	s = new indri::lang::ExtentOr;
@@ -1713,23 +1713,23 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	try {      // for error handling
 		match(O_ANGLE);
 		{ // ( ... )+
-		int _cnt178=0;
+		int _cnt185=0;
 		for (;;) {
 			if ((_tokenSet_3.member(LA(1)))) {
 				term=unscoredTerm();
 				if ( inputState->guessing==0 ) {
-#line 521 "indrilang.g"
+#line 526 "indrilang.g"
 					s->addChild(term);
 #line 1722 "QueryParser.cpp"
 				}
 			}
 			else {
-				if ( _cnt178>=1 ) { goto _loop178; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+				if ( _cnt185>=1 ) { goto _loop185; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 			}
 			
-			_cnt178++;
+			_cnt185++;
 		}
-		_loop178:;
+		_loop185:;
 		}  // ( ... )+
 		match(C_ANGLE);
 	}
@@ -1746,11 +1746,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  FieldLessNode*  QueryParser::lessNode() {
-#line 716 "indrilang.g"
+#line 731 "indrilang.g"
 	 FieldLessNode* ln ;
 #line 1750 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  field = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 716 "indrilang.g"
+#line 731 "indrilang.g"
 	
 	ln = 0;
 	Field* compareField = 0;
@@ -1766,7 +1766,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		high=number();
 		match(C_PAREN);
 		if ( inputState->guessing==0 ) {
-#line 721 "indrilang.g"
+#line 736 "indrilang.g"
 			
 			compareField = new Field(field->getText());
 			ln = new FieldLessNode( compareField, high );
@@ -1789,11 +1789,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  FieldGreaterNode*  QueryParser::greaterNode() {
-#line 704 "indrilang.g"
+#line 719 "indrilang.g"
 	 FieldGreaterNode* gn ;
 #line 1793 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  field = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 704 "indrilang.g"
+#line 719 "indrilang.g"
 	
 	gn = 0;
 	Field* compareField = 0;
@@ -1809,7 +1809,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		low=number();
 		match(C_PAREN);
 		if ( inputState->guessing==0 ) {
-#line 709 "indrilang.g"
+#line 724 "indrilang.g"
 			
 			compareField = new Field(field->getText());
 			gn = new FieldGreaterNode( compareField, low );
@@ -1832,11 +1832,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  FieldBetweenNode*  QueryParser::betweenNode() {
-#line 728 "indrilang.g"
+#line 743 "indrilang.g"
 	 FieldBetweenNode* bn ;
 #line 1836 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  field = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 728 "indrilang.g"
+#line 743 "indrilang.g"
 	
 	bn = 0;
 	Field* compareField = 0;
@@ -1854,7 +1854,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		high=number();
 		match(C_PAREN);
 		if ( inputState->guessing==0 ) {
-#line 734 "indrilang.g"
+#line 749 "indrilang.g"
 			
 			compareField = new Field(field->getText());
 			bn = new FieldBetweenNode( compareField, low, high );
@@ -1877,11 +1877,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  FieldEqualsNode*  QueryParser::equalsNode() {
-#line 741 "indrilang.g"
+#line 756 "indrilang.g"
 	 FieldEqualsNode* en ;
 #line 1881 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  field = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 741 "indrilang.g"
+#line 756 "indrilang.g"
 	
 	en = 0;
 	Field* compareField = 0;
@@ -1897,7 +1897,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		eq=number();
 		match(C_PAREN);
 		if ( inputState->guessing==0 ) {
-#line 746 "indrilang.g"
+#line 761 "indrilang.g"
 			
 			compareField = new Field(field->getText());
 			en = new FieldEqualsNode( compareField, eq );
@@ -1920,7 +1920,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  IndexTerm*  QueryParser::rawText() {
-#line 652 "indrilang.g"
+#line 664 "indrilang.g"
 	 IndexTerm* t ;
 #line 1924 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  id = ANTLR_USE_NAMESPACE(antlr)nullToken;
@@ -1928,7 +1928,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	ANTLR_USE_NAMESPACE(antlr)RefToken  f = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  et = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  qet = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 652 "indrilang.g"
+#line 664 "indrilang.g"
 	
 	t = 0;
 	
@@ -1941,7 +1941,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			id = LT(1);
 			match(TERM);
 			if ( inputState->guessing==0 ) {
-#line 655 "indrilang.g"
+#line 667 "indrilang.g"
 				
 				t = new indri::lang::IndexTerm(id->getText());
 				_nodes.push_back(t);
@@ -1955,7 +1955,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			n = LT(1);
 			match(NUMBER);
 			if ( inputState->guessing==0 ) {
-#line 659 "indrilang.g"
+#line 671 "indrilang.g"
 				
 				t = new indri::lang::IndexTerm(n->getText());
 				_nodes.push_back(t);
@@ -1969,7 +1969,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			f = LT(1);
 			match(FLOAT);
 			if ( inputState->guessing==0 ) {
-#line 663 "indrilang.g"
+#line 675 "indrilang.g"
 				
 				t = new indri::lang::IndexTerm(f->getText());
 				_nodes.push_back(t);
@@ -1984,7 +1984,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			t=rawText();
 			match(DBL_QUOTE);
 			if ( inputState->guessing==0 ) {
-#line 667 "indrilang.g"
+#line 679 "indrilang.g"
 				
 				// if a text term appears in quotes, consider it stemmed
 				t->setStemmed(true);
@@ -1998,7 +1998,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			et = LT(1);
 			match(ENCODED_TERM);
 			if ( inputState->guessing==0 ) {
-#line 671 "indrilang.g"
+#line 683 "indrilang.g"
 				
 				std::string decodedString; 
 				base64_decode_string(decodedString, et->getText());
@@ -2014,7 +2014,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			qet = LT(1);
 			match(ENCODED_QUOTED_TERM);
 			if ( inputState->guessing==0 ) {
-#line 677 "indrilang.g"
+#line 689 "indrilang.g"
 				
 				std::string decodedString; 
 				base64_decode_string(decodedString, et->getText());
@@ -2045,7 +2045,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  Field*  QueryParser::field_restriction() {
-#line 565 "indrilang.g"
+#line 570 "indrilang.g"
 	 Field* extent ;
 #line 2049 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  fieldName = ANTLR_USE_NAMESPACE(antlr)nullToken;
@@ -2055,7 +2055,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		fieldName = LT(1);
 		match(TERM);
 		if ( inputState->guessing==0 ) {
-#line 567 "indrilang.g"
+#line 572 "indrilang.g"
 			
 			extent = new Field( fieldName->getText() );
 			_nodes.push_back( extent );
@@ -2077,54 +2077,53 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  UINT64  QueryParser::date() {
-#line 625 "indrilang.g"
+#line 630 "indrilang.g"
 	 UINT64 d ;
 #line 2081 "QueryParser.cpp"
 	
 	try {      // for error handling
-		bool synPredMatched191 = false;
+		bool synPredMatched198 = false;
 		if (((LA(1) == NUMBER))) {
-			int _m191 = mark();
-			synPredMatched191 = true;
+			int _m198 = mark();
+			synPredMatched198 = true;
 			inputState->guessing++;
 			try {
 				{
 				match(NUMBER);
-				match(DASH);
+				match(SLASH);
 				}
 			}
 			catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-				synPredMatched191 = false;
+				synPredMatched198 = false;
 			}
-			rewind(_m191);
+			rewind(_m198);
 			inputState->guessing--;
 		}
-		if ( synPredMatched191 ) {
-			d=dashDate();
+		if ( synPredMatched198 ) {
+			d=slashDate();
 		}
 		else {
-			bool synPredMatched193 = false;
+			bool synPredMatched200 = false;
 			if (((LA(1) == NUMBER))) {
-				int _m193 = mark();
-				synPredMatched193 = true;
+				int _m200 = mark();
+				synPredMatched200 = true;
 				inputState->guessing++;
 				try {
 					{
 					match(NUMBER);
-					match(SLASH);
 					}
 				}
 				catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-					synPredMatched193 = false;
+					synPredMatched200 = false;
 				}
-				rewind(_m193);
+				rewind(_m200);
 				inputState->guessing--;
 			}
-			if ( synPredMatched193 ) {
-				d=slashDate();
-			}
-			else if ((LA(1) == NUMBER)) {
+			if ( synPredMatched200 ) {
 				d=spaceDate();
+			}
+			else if ((LA(1) == TERM)) {
+				d=dashDate();
 			}
 		else {
 			throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());
@@ -2143,60 +2142,18 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	return d ;
 }
 
- UINT64  QueryParser::dashDate() {
-#line 630 "indrilang.g"
-	 UINT64 d ;
-#line 2148 "QueryParser.cpp"
-	ANTLR_USE_NAMESPACE(antlr)RefToken  day = ANTLR_USE_NAMESPACE(antlr)nullToken;
-	ANTLR_USE_NAMESPACE(antlr)RefToken  month = ANTLR_USE_NAMESPACE(antlr)nullToken;
-	ANTLR_USE_NAMESPACE(antlr)RefToken  year = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 630 "indrilang.g"
-	
-	d = 0;
-	
-#line 2156 "QueryParser.cpp"
-	
-	try {      // for error handling
-		day = LT(1);
-		match(NUMBER);
-		match(DASH);
-		month = LT(1);
-		match(TERM);
-		match(DASH);
-		year = LT(1);
-		match(NUMBER);
-		if ( inputState->guessing==0 ) {
-#line 633 "indrilang.g"
-			
-			d = DateParse::convertDate( year->getText(), month->getText(), day->getText() ); 
-			
-#line 2172 "QueryParser.cpp"
-		}
-	}
-	catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& ex) {
-		if( inputState->guessing == 0 ) {
-			reportError(ex);
-			consume();
-			consumeUntil(_tokenSet_8);
-		} else {
-			throw;
-		}
-	}
-	return d ;
-}
-
  UINT64  QueryParser::slashDate() {
-#line 637 "indrilang.g"
+#line 649 "indrilang.g"
 	 UINT64 d ;
-#line 2190 "QueryParser.cpp"
+#line 2147 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  month = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  day = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  year = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 637 "indrilang.g"
+#line 649 "indrilang.g"
 	
 	d = 0;
 	
-#line 2198 "QueryParser.cpp"
+#line 2155 "QueryParser.cpp"
 	
 	try {      // for error handling
 		month = LT(1);
@@ -2208,11 +2165,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		year = LT(1);
 		match(NUMBER);
 		if ( inputState->guessing==0 ) {
-#line 640 "indrilang.g"
+#line 652 "indrilang.g"
 			
 			d = DateParse::convertDate( year->getText(), month->getText(), day->getText() ); 
 			
-#line 2214 "QueryParser.cpp"
+#line 2171 "QueryParser.cpp"
 		}
 	}
 	catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& ex) {
@@ -2228,17 +2185,17 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  UINT64  QueryParser::spaceDate() {
-#line 644 "indrilang.g"
+#line 656 "indrilang.g"
 	 UINT64 d ;
-#line 2232 "QueryParser.cpp"
+#line 2189 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  day = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  month = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  year = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 644 "indrilang.g"
+#line 656 "indrilang.g"
 	
 	d = 0;
 	
-#line 2240 "QueryParser.cpp"
+#line 2197 "QueryParser.cpp"
 	
 	try {      // for error handling
 		day = LT(1);
@@ -2248,11 +2205,52 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		year = LT(1);
 		match(NUMBER);
 		if ( inputState->guessing==0 ) {
-#line 647 "indrilang.g"
+#line 659 "indrilang.g"
 			
 			d = DateParse::convertDate( year->getText(), month->getText(), day->getText() );
 			
-#line 2254 "QueryParser.cpp"
+#line 2211 "QueryParser.cpp"
+		}
+	}
+	catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& ex) {
+		if( inputState->guessing == 0 ) {
+			reportError(ex);
+			consume();
+			consumeUntil(_tokenSet_8);
+		} else {
+			throw;
+		}
+	}
+	return d ;
+}
+
+ UINT64  QueryParser::dashDate() {
+#line 635 "indrilang.g"
+	 UINT64 d ;
+#line 2229 "QueryParser.cpp"
+	ANTLR_USE_NAMESPACE(antlr)RefToken  dmy = ANTLR_USE_NAMESPACE(antlr)nullToken;
+#line 635 "indrilang.g"
+	
+	d = 0;
+	
+#line 2235 "QueryParser.cpp"
+	
+	try {      // for error handling
+		dmy = LT(1);
+		match(TERM);
+		if ( inputState->guessing==0 ) {
+#line 638 "indrilang.g"
+			
+			const std::string& text = dmy->getText();
+			int firstDash = text.find('-');
+			int secondDash = text.find('-', firstDash+1);
+			std::string day = text.substr( 0, firstDash ); 
+			std::string month = text.substr( firstDash+1, secondDash-firstDash-1 );
+			std::string year = text.substr( secondDash );
+			
+			d = DateParse::convertDate( year, month, day ); 
+			
+#line 2252 "QueryParser.cpp"
 		}
 	}
 	catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& ex) {
@@ -2268,25 +2266,49 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 }
 
  INT64  QueryParser::number() {
-#line 697 "indrilang.g"
+#line 709 "indrilang.g"
 	 INT64 v ;
-#line 2272 "QueryParser.cpp"
+#line 2270 "QueryParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  n = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 697 "indrilang.g"
+	ANTLR_USE_NAMESPACE(antlr)RefToken  nn = ANTLR_USE_NAMESPACE(antlr)nullToken;
+#line 709 "indrilang.g"
 	
 	v = 0;
 	
-#line 2278 "QueryParser.cpp"
+#line 2277 "QueryParser.cpp"
 	
 	try {      // for error handling
-		n = LT(1);
-		match(NUMBER);
-		if ( inputState->guessing==0 ) {
-#line 700 "indrilang.g"
-			
-			v = string_to_i64(n->getText());
-			
-#line 2288 "QueryParser.cpp"
+		switch ( LA(1)) {
+		case NUMBER:
+		{
+			n = LT(1);
+			match(NUMBER);
+			if ( inputState->guessing==0 ) {
+#line 712 "indrilang.g"
+				
+				v = string_to_i64(n->getText());
+				
+#line 2290 "QueryParser.cpp"
+			}
+			break;
+		}
+		case NEGATIVE_NUMBER:
+		{
+			nn = LT(1);
+			match(NEGATIVE_NUMBER);
+			if ( inputState->guessing==0 ) {
+#line 715 "indrilang.g"
+				
+				v = string_to_i64(nn->getText());
+				
+#line 2303 "QueryParser.cpp"
+			}
+			break;
+		}
+		default:
+		{
+			throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());
+		}
 		}
 	}
 	catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& ex) {
@@ -2331,6 +2353,7 @@ const char* QueryParser::tokenNames[] = {
 	"\"#between\"",
 	"\"#equals\"",
 	"NUMBER",
+	"NEGATIVE_NUMBER",
 	"FLOAT",
 	"STAR",
 	"O_PAREN",
@@ -2350,8 +2373,10 @@ const char* QueryParser::tokenNames[] = {
 	"LF",
 	"SPACE",
 	"HIGH_CHAR",
+	"DIGIT",
 	"ASCII_LETTER",
 	"ASCII_LETTER_NO_B",
+	"SAFE_LETTER",
 	"SAFE_CHAR",
 	"BASESIXFOUR_CHAR",
 	"TEXT_TERM",
@@ -2364,7 +2389,7 @@ const char* QueryParser::tokenNames[] = {
 	0
 };
 
-const unsigned long QueryParser::_tokenSet_0_data_[] = { 1207959520UL, 3932164UL, 0UL, 0UL };
+const unsigned long QueryParser::_tokenSet_0_data_[] = { 2348810208UL, 31457288UL, 0UL, 0UL };
 // "#wsum" "#wand" "#od" "#or" "#not" "#uw" "#combine" "#weight" "#max" 
 // "#filreq" "#filrej" "#any" "#prior" "#date:after" "#date:before" "#date:between" 
 // "#less" "#greater" "#between" "#equals" NUMBER FLOAT O_ANGLE DBL_QUOTE 
@@ -2373,43 +2398,43 @@ const ANTLR_USE_NAMESPACE(antlr)BitSet QueryParser::_tokenSet_0(_tokenSet_0_data
 const unsigned long QueryParser::_tokenSet_1_data_[] = { 2UL, 0UL, 0UL, 0UL };
 // EOF 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryParser::_tokenSet_1(_tokenSet_1_data_,4);
-const unsigned long QueryParser::_tokenSet_2_data_[] = { 1744830434UL, 3932164UL, 0UL, 0UL };
+const unsigned long QueryParser::_tokenSet_2_data_[] = { 3422552034UL, 31457288UL, 0UL, 0UL };
 // EOF "#wsum" "#wand" "#od" "#or" "#not" "#uw" "#combine" "#weight" "#max" 
 // "#filreq" "#filrej" "#any" "#prior" "#date:after" "#date:before" "#date:between" 
 // "#less" "#greater" "#between" "#equals" NUMBER FLOAT C_PAREN O_ANGLE 
 // DBL_QUOTE TERM ENCODED_QUOTED_TERM ENCODED_TERM OPERATOR 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryParser::_tokenSet_2(_tokenSet_2_data_,4);
-const unsigned long QueryParser::_tokenSet_3_data_[] = { 1207813248UL, 3932164UL, 0UL, 0UL };
+const unsigned long QueryParser::_tokenSet_3_data_[] = { 2348663936UL, 31457288UL, 0UL, 0UL };
 // "#od" "#uw" "#filreq" "#filrej" "#any" "#date:after" "#date:before" 
 // "#date:between" "#less" "#greater" "#between" "#equals" NUMBER FLOAT 
 // O_ANGLE DBL_QUOTE TERM ENCODED_QUOTED_TERM ENCODED_TERM OPERATOR 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryParser::_tokenSet_3(_tokenSet_3_data_,4);
-const unsigned long QueryParser::_tokenSet_4_data_[] = { 4160749538UL, 3932164UL, 0UL, 0UL };
+const unsigned long QueryParser::_tokenSet_4_data_[] = { 3959422946UL, 31457289UL, 0UL, 0UL };
 // EOF "#wsum" "#wand" "#od" "#or" "#not" "#uw" "#combine" "#weight" "#max" 
 // "#filreq" "#filrej" "#any" "#prior" "#date:after" "#date:before" "#date:between" 
 // "#less" "#greater" "#between" "#equals" NUMBER FLOAT O_PAREN C_PAREN 
 // O_ANGLE C_ANGLE DBL_QUOTE TERM ENCODED_QUOTED_TERM ENCODED_TERM OPERATOR 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryParser::_tokenSet_4(_tokenSet_4_data_,4);
-const unsigned long QueryParser::_tokenSet_5_data_[] = { 3892314082UL, 3932180UL, 0UL, 0UL };
+const unsigned long QueryParser::_tokenSet_5_data_[] = { 3422552034UL, 31457321UL, 0UL, 0UL };
 // EOF "#wsum" "#wand" "#od" "#or" "#not" "#uw" "#combine" "#weight" "#max" 
 // "#filreq" "#filrej" "#any" "#prior" "#date:after" "#date:before" "#date:between" 
 // "#less" "#greater" "#between" "#equals" NUMBER FLOAT C_PAREN O_ANGLE 
 // C_ANGLE DBL_QUOTE DOT TERM ENCODED_QUOTED_TERM ENCODED_TERM OPERATOR 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryParser::_tokenSet_5(_tokenSet_5_data_,4);
-const unsigned long QueryParser::_tokenSet_6_data_[] = { 268435456UL, 0UL, 0UL, 0UL };
+const unsigned long QueryParser::_tokenSet_6_data_[] = { 536870912UL, 0UL, 0UL, 0UL };
 // O_PAREN 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryParser::_tokenSet_6(_tokenSet_6_data_,4);
-const unsigned long QueryParser::_tokenSet_7_data_[] = { 3892167808UL, 3932164UL, 0UL, 0UL };
+const unsigned long QueryParser::_tokenSet_7_data_[] = { 3422405760UL, 31457289UL, 0UL, 0UL };
 // "#od" "#uw" "#filreq" "#filrej" "#any" "#date:after" "#date:before" 
 // "#date:between" "#less" "#greater" "#between" "#equals" NUMBER FLOAT 
 // C_PAREN O_ANGLE C_ANGLE DBL_QUOTE TERM ENCODED_QUOTED_TERM ENCODED_TERM 
 // OPERATOR 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryParser::_tokenSet_7(_tokenSet_7_data_,4);
-const unsigned long QueryParser::_tokenSet_8_data_[] = { 536870912UL, 32UL, 0UL, 0UL };
+const unsigned long QueryParser::_tokenSet_8_data_[] = { 1073741824UL, 64UL, 0UL, 0UL };
 // C_PAREN COMMA 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryParser::_tokenSet_8(_tokenSet_8_data_,4);
-const unsigned long QueryParser::_tokenSet_9_data_[] = { 570425344UL, 0UL, 0UL, 0UL };
-// NUMBER C_PAREN 
+const unsigned long QueryParser::_tokenSet_9_data_[] = { 1174405120UL, 0UL, 0UL, 0UL };
+// NUMBER NEGATIVE_NUMBER C_PAREN 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryParser::_tokenSet_9(_tokenSet_9_data_,4);
 
 

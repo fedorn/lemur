@@ -130,12 +130,6 @@ ANTLR_USE_NAMESPACE(antlr)RefToken QueryLexer::nextToken()
 				theRetToken=_returnToken;
 				break;
 			}
-			case 0x2d /* '-' */ :
-			{
-				mDASH(true);
-				theRetToken=_returnToken;
-				break;
-			}
 			case 0x3a /* ':' */ :
 			{
 				mCOLON(true);
@@ -443,6 +437,22 @@ void QueryLexer::mHIGH_CHAR(bool _createToken) {
 	_saveIndex=0;
 }
 
+void QueryLexer::mDIGIT(bool _createToken) {
+	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
+	_ttype = DIGIT;
+	int _saveIndex;
+	
+	{
+	matchRange('0','9');
+	}
+	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
+	   _token = makeToken(_ttype);
+	   _token->setText(text.substr(_begin, text.length()-_begin));
+	}
+	_returnToken = _token;
+	_saveIndex=0;
+}
+
 void QueryLexer::mASCII_LETTER(bool _createToken) {
 	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
 	_ttype = ASCII_LETTER;
@@ -611,6 +621,97 @@ void QueryLexer::mASCII_LETTER_NO_B(bool _createToken) {
 	_saveIndex=0;
 }
 
+void QueryLexer::mSAFE_LETTER(bool _createToken) {
+	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
+	_ttype = SAFE_LETTER;
+	int _saveIndex;
+	
+	{
+	switch ( LA(1)) {
+	case 0x61 /* 'a' */ :
+	case 0x62 /* 'b' */ :
+	case 0x63 /* 'c' */ :
+	case 0x64 /* 'd' */ :
+	case 0x65 /* 'e' */ :
+	case 0x66 /* 'f' */ :
+	case 0x67 /* 'g' */ :
+	case 0x68 /* 'h' */ :
+	case 0x69 /* 'i' */ :
+	case 0x6a /* 'j' */ :
+	case 0x6b /* 'k' */ :
+	case 0x6c /* 'l' */ :
+	case 0x6d /* 'm' */ :
+	case 0x6e /* 'n' */ :
+	case 0x6f /* 'o' */ :
+	case 0x70 /* 'p' */ :
+	case 0x71 /* 'q' */ :
+	case 0x72 /* 'r' */ :
+	case 0x73 /* 's' */ :
+	case 0x74 /* 't' */ :
+	case 0x75 /* 'u' */ :
+	case 0x76 /* 'v' */ :
+	case 0x77 /* 'w' */ :
+	case 0x78 /* 'x' */ :
+	case 0x79 /* 'y' */ :
+	case 0x7a /* 'z' */ :
+	{
+		matchRange('a','z');
+		break;
+	}
+	case 0x41 /* 'A' */ :
+	case 0x42 /* 'B' */ :
+	case 0x43 /* 'C' */ :
+	case 0x44 /* 'D' */ :
+	case 0x45 /* 'E' */ :
+	case 0x46 /* 'F' */ :
+	case 0x47 /* 'G' */ :
+	case 0x48 /* 'H' */ :
+	case 0x49 /* 'I' */ :
+	case 0x4a /* 'J' */ :
+	case 0x4b /* 'K' */ :
+	case 0x4c /* 'L' */ :
+	case 0x4d /* 'M' */ :
+	case 0x4e /* 'N' */ :
+	case 0x4f /* 'O' */ :
+	case 0x50 /* 'P' */ :
+	case 0x51 /* 'Q' */ :
+	case 0x52 /* 'R' */ :
+	case 0x53 /* 'S' */ :
+	case 0x54 /* 'T' */ :
+	case 0x55 /* 'U' */ :
+	case 0x56 /* 'V' */ :
+	case 0x57 /* 'W' */ :
+	case 0x58 /* 'X' */ :
+	case 0x59 /* 'Y' */ :
+	case 0x5a /* 'Z' */ :
+	{
+		matchRange('A','Z');
+		break;
+	}
+	case 0x2d /* '-' */ :
+	{
+		match('-');
+		break;
+	}
+	case 0x5f /* '_' */ :
+	{
+		match('_');
+		break;
+	}
+	default:
+	{
+		throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+	}
+	}
+	}
+	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
+	   _token = makeToken(_ttype);
+	   _token->setText(text.substr(_begin, text.length()-_begin));
+	}
+	_returnToken = _token;
+	_saveIndex=0;
+}
+
 void QueryLexer::mSAFE_CHAR(bool _createToken) {
 	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
 	_ttype = SAFE_CHAR;
@@ -690,6 +791,16 @@ void QueryLexer::mSAFE_CHAR(bool _createToken) {
 	case 0x39 /* '9' */ :
 	{
 		matchRange('0','9');
+		break;
+	}
+	case 0x2d /* '-' */ :
+	{
+		match('-');
+		break;
+	}
+	case 0x5f /* '_' */ :
+	{
+		match('_');
 		break;
 	}
 	default:
@@ -817,7 +928,7 @@ void QueryLexer::mTEXT_TERM(bool _createToken) {
 	int _saveIndex;
 	
 	{ // ( ... )+
-	int _cnt29=0;
+	int _cnt33=0;
 	for (;;) {
 		if (((LA(1) >= 0x80 && LA(1) <= 0xff))) {
 			mHIGH_CHAR(false);
@@ -826,12 +937,12 @@ void QueryLexer::mTEXT_TERM(bool _createToken) {
 			mSAFE_CHAR(false);
 		}
 		else {
-			if ( _cnt29>=1 ) { goto _loop29; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+			if ( _cnt33>=1 ) { goto _loop33; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
 		}
 		
-		_cnt29++;
+		_cnt33++;
 	}
-	_loop29:;
+	_loop33:;
 	}  // ( ... )+
 	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
 	   _token = makeToken(_ttype);
@@ -847,18 +958,46 @@ void QueryLexer::mNUMBER(bool _createToken) {
 	int _saveIndex;
 	
 	{ // ( ... )+
-	int _cnt32=0;
+	int _cnt36=0;
 	for (;;) {
 		if (((LA(1) >= 0x30 /* '0' */  && LA(1) <= 0x39 /* '9' */ ))) {
 			matchRange('0','9');
 		}
 		else {
-			if ( _cnt32>=1 ) { goto _loop32; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+			if ( _cnt36>=1 ) { goto _loop36; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
 		}
 		
-		_cnt32++;
+		_cnt36++;
 	}
-	_loop32:;
+	_loop36:;
+	}  // ( ... )+
+	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
+	   _token = makeToken(_ttype);
+	   _token->setText(text.substr(_begin, text.length()-_begin));
+	}
+	_returnToken = _token;
+	_saveIndex=0;
+}
+
+void QueryLexer::mNEGATIVE_NUMBER(bool _createToken) {
+	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
+	_ttype = NEGATIVE_NUMBER;
+	int _saveIndex;
+	
+	mDASH(false);
+	{ // ( ... )+
+	int _cnt39=0;
+	for (;;) {
+		if (((LA(1) >= 0x30 /* '0' */  && LA(1) <= 0x39 /* '9' */ ))) {
+			matchRange('0','9');
+		}
+		else {
+			if ( _cnt39>=1 ) { goto _loop39; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+		}
+		
+		_cnt39++;
+	}
+	_loop39:;
 	}  // ( ... )+
 	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
 	   _token = makeToken(_ttype);
@@ -874,18 +1013,18 @@ void QueryLexer::mFLOAT(bool _createToken) {
 	int _saveIndex;
 	
 	{ // ( ... )+
-	int _cnt35=0;
+	int _cnt42=0;
 	for (;;) {
 		if (((LA(1) >= 0x30 /* '0' */  && LA(1) <= 0x39 /* '9' */ ))) {
 			matchRange('0','9');
 		}
 		else {
-			if ( _cnt35>=1 ) { goto _loop35; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+			if ( _cnt42>=1 ) { goto _loop42; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
 		}
 		
-		_cnt35++;
+		_cnt42++;
 	}
-	_loop35:;
+	_loop42:;
 	}  // ( ... )+
 	mDOT(false);
 	{ // ( ... )*
@@ -894,11 +1033,11 @@ void QueryLexer::mFLOAT(bool _createToken) {
 			matchRange('0','9');
 		}
 		else {
-			goto _loop37;
+			goto _loop44;
 		}
 		
 	}
-	_loop37:;
+	_loop44:;
 	} // ( ... )*
 	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
 	   _token = makeToken(_ttype);
@@ -913,10 +1052,10 @@ void QueryLexer::mTERM(bool _createToken) {
 	_ttype = TERM;
 	int _saveIndex;
 	
-	bool synPredMatched46 = false;
+	bool synPredMatched51 = false;
 	if ((((LA(1) >= 0x30 /* '0' */  && LA(1) <= 0x39 /* '9' */ )) && (_tokenSet_2.member(LA(2))))) {
-		int _m46 = mark();
-		synPredMatched46 = true;
+		int _m51 = mark();
+		synPredMatched51 = true;
 		inputState->guessing++;
 		try {
 			{
@@ -925,99 +1064,112 @@ void QueryLexer::mTERM(bool _createToken) {
 			}
 		}
 		catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-			synPredMatched46 = false;
+			synPredMatched51 = false;
 		}
-		rewind(_m46);
+		rewind(_m51);
 		inputState->guessing--;
 	}
-	if ( synPredMatched46 ) {
+	if ( synPredMatched51 ) {
 		mFLOAT(false);
 		if ( inputState->guessing==0 ) {
-#line 159 "indrilang.g"
+#line 163 "indrilang.g"
 			_ttype = FLOAT;
-#line 937 "QueryLexer.cpp"
+#line 1076 "QueryLexer.cpp"
 		}
 	}
 	else {
-		bool synPredMatched44 = false;
-		if (((_tokenSet_0.member(LA(1))) && (true))) {
-			int _m44 = mark();
-			synPredMatched44 = true;
+		bool synPredMatched53 = false;
+		if (((LA(1) == 0x2d /* '-' */ ) && ((LA(2) >= 0x30 /* '0' */  && LA(2) <= 0x39 /* '9' */ )))) {
+			int _m53 = mark();
+			synPredMatched53 = true;
 			inputState->guessing++;
 			try {
 				{
-				{ // ( ... )*
-				for (;;) {
-					if (((LA(1) >= 0x30 /* '0' */  && LA(1) <= 0x39 /* '9' */ ))) {
-						matchRange('0','9');
-					}
-					else {
-						goto _loop41;
-					}
-					
-				}
-				_loop41:;
-				} // ( ... )*
-				{ // ( ... )+
-				int _cnt43=0;
-				for (;;) {
-					if ((_tokenSet_3.member(LA(1)))) {
-						mASCII_LETTER(false);
-					}
-					else if (((LA(1) >= 0x80 && LA(1) <= 0xff))) {
-						mHIGH_CHAR(false);
-					}
-					else {
-						if ( _cnt43>=1 ) { goto _loop43; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
-					}
-					
-					_cnt43++;
-				}
-				_loop43:;
-				}  // ( ... )+
+				mDASH(false);
+				mNUMBER(false);
+				mDOT(false);
 				}
 			}
 			catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-				synPredMatched44 = false;
+				synPredMatched53 = false;
 			}
-			rewind(_m44);
+			rewind(_m53);
 			inputState->guessing--;
 		}
-		if ( synPredMatched44 ) {
-			mTEXT_TERM(false);
+		if ( synPredMatched53 ) {
+			mNEGATIVE_NUMBER(false);
+			if ( inputState->guessing==0 ) {
+#line 164 "indrilang.g"
+				_ttype = NEGATIVE_NUMBER;
+#line 1103 "QueryLexer.cpp"
+			}
 		}
 		else {
-			bool synPredMatched48 = false;
-			if ((((LA(1) >= 0x30 /* '0' */  && LA(1) <= 0x39 /* '9' */ )) && (true))) {
-				int _m48 = mark();
-				synPredMatched48 = true;
+			bool synPredMatched49 = false;
+			if (((_tokenSet_0.member(LA(1))) && (true))) {
+				int _m49 = mark();
+				synPredMatched49 = true;
 				inputState->guessing++;
 				try {
 					{
-					mNUMBER(false);
+					{ // ( ... )+
+					int _cnt48=0;
+					for (;;) {
+						if (((LA(1) >= 0x30 /* '0' */  && LA(1) <= 0x39 /* '9' */ ))) {
+							mDIGIT(false);
+						}
+						else {
+							if ( _cnt48>=1 ) { goto _loop48; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+						}
+						
+						_cnt48++;
+					}
+					_loop48:;
+					}  // ( ... )+
+					mSAFE_LETTER(false);
 					}
 				}
 				catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-					synPredMatched48 = false;
+					synPredMatched49 = false;
 				}
-				rewind(_m48);
+				rewind(_m49);
 				inputState->guessing--;
 			}
-			if ( synPredMatched48 ) {
-				mNUMBER(false);
-				if ( inputState->guessing==0 ) {
-#line 160 "indrilang.g"
-					_ttype = NUMBER;
-#line 1010 "QueryLexer.cpp"
-				}
-			}
-			else if ((_tokenSet_0.member(LA(1))) && (true)) {
+			if ( synPredMatched49 ) {
 				mTEXT_TERM(false);
 			}
+			else {
+				bool synPredMatched55 = false;
+				if ((((LA(1) >= 0x30 /* '0' */  && LA(1) <= 0x39 /* '9' */ )) && (true))) {
+					int _m55 = mark();
+					synPredMatched55 = true;
+					inputState->guessing++;
+					try {
+						{
+						mNUMBER(false);
+						}
+					}
+					catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
+						synPredMatched55 = false;
+					}
+					rewind(_m55);
+					inputState->guessing--;
+				}
+				if ( synPredMatched55 ) {
+					mNUMBER(false);
+					if ( inputState->guessing==0 ) {
+#line 165 "indrilang.g"
+						_ttype = NUMBER;
+#line 1162 "QueryLexer.cpp"
+					}
+				}
+				else if ((_tokenSet_0.member(LA(1))) && (true)) {
+					mTEXT_TERM(false);
+				}
 	else {
 		throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
 	}
-	}}
+	}}}
 	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
 	   _token = makeToken(_ttype);
 	   _token->setText(text.substr(_begin, text.length()-_begin));
@@ -1056,92 +1208,6 @@ void QueryLexer::mENCODED_QUOTED_TERM(bool _createToken) {
 		}
 		default:
 		{
-			goto _loop51;
-		}
-		}
-	}
-	_loop51:;
-	} // ( ... )*
-	{ // ( ... )+
-	int _cnt53=0;
-	for (;;) {
-		if ((_tokenSet_4.member(LA(1)))) {
-			mBASESIXFOUR_CHAR(false);
-		}
-		else {
-			if ( _cnt53>=1 ) { goto _loop53; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
-		}
-		
-		_cnt53++;
-	}
-	_loop53:;
-	}  // ( ... )+
-	{ // ( ... )*
-	for (;;) {
-		switch ( LA(1)) {
-		case 0x9 /* '\t' */ :
-		{
-			_saveIndex = text.length();
-			mTAB(false);
-			text.erase(_saveIndex);
-			break;
-		}
-		case 0x20 /* ' ' */ :
-		{
-			_saveIndex = text.length();
-			mSPACE(false);
-			text.erase(_saveIndex);
-			break;
-		}
-		default:
-		{
-			goto _loop55;
-		}
-		}
-	}
-	_loop55:;
-	} // ( ... )*
-	_saveIndex = text.length();
-	mC_PAREN(false);
-	text.erase(_saveIndex);
-	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
-	   _token = makeToken(_ttype);
-	   _token->setText(text.substr(_begin, text.length()-_begin));
-	}
-	_returnToken = _token;
-	_saveIndex=0;
-}
-
-void QueryLexer::mENCODED_TERM(bool _createToken) {
-	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
-	_ttype = ENCODED_TERM;
-	int _saveIndex;
-	
-	_saveIndex = text.length();
-	match("#base64");
-	text.erase(_saveIndex);
-	_saveIndex = text.length();
-	mO_PAREN(false);
-	text.erase(_saveIndex);
-	{ // ( ... )*
-	for (;;) {
-		switch ( LA(1)) {
-		case 0x9 /* '\t' */ :
-		{
-			_saveIndex = text.length();
-			mTAB(false);
-			text.erase(_saveIndex);
-			break;
-		}
-		case 0x20 /* ' ' */ :
-		{
-			_saveIndex = text.length();
-			mSPACE(false);
-			text.erase(_saveIndex);
-			break;
-		}
-		default:
-		{
 			goto _loop58;
 		}
 		}
@@ -1151,7 +1217,7 @@ void QueryLexer::mENCODED_TERM(bool _createToken) {
 	{ // ( ... )+
 	int _cnt60=0;
 	for (;;) {
-		if ((_tokenSet_4.member(LA(1)))) {
+		if ((_tokenSet_3.member(LA(1)))) {
 			mBASESIXFOUR_CHAR(false);
 		}
 		else {
@@ -1198,15 +1264,101 @@ void QueryLexer::mENCODED_TERM(bool _createToken) {
 	_saveIndex=0;
 }
 
+void QueryLexer::mENCODED_TERM(bool _createToken) {
+	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
+	_ttype = ENCODED_TERM;
+	int _saveIndex;
+	
+	_saveIndex = text.length();
+	match("#base64");
+	text.erase(_saveIndex);
+	_saveIndex = text.length();
+	mO_PAREN(false);
+	text.erase(_saveIndex);
+	{ // ( ... )*
+	for (;;) {
+		switch ( LA(1)) {
+		case 0x9 /* '\t' */ :
+		{
+			_saveIndex = text.length();
+			mTAB(false);
+			text.erase(_saveIndex);
+			break;
+		}
+		case 0x20 /* ' ' */ :
+		{
+			_saveIndex = text.length();
+			mSPACE(false);
+			text.erase(_saveIndex);
+			break;
+		}
+		default:
+		{
+			goto _loop65;
+		}
+		}
+	}
+	_loop65:;
+	} // ( ... )*
+	{ // ( ... )+
+	int _cnt67=0;
+	for (;;) {
+		if ((_tokenSet_3.member(LA(1)))) {
+			mBASESIXFOUR_CHAR(false);
+		}
+		else {
+			if ( _cnt67>=1 ) { goto _loop67; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+		}
+		
+		_cnt67++;
+	}
+	_loop67:;
+	}  // ( ... )+
+	{ // ( ... )*
+	for (;;) {
+		switch ( LA(1)) {
+		case 0x9 /* '\t' */ :
+		{
+			_saveIndex = text.length();
+			mTAB(false);
+			text.erase(_saveIndex);
+			break;
+		}
+		case 0x20 /* ' ' */ :
+		{
+			_saveIndex = text.length();
+			mSPACE(false);
+			text.erase(_saveIndex);
+			break;
+		}
+		default:
+		{
+			goto _loop69;
+		}
+		}
+	}
+	_loop69:;
+	} // ( ... )*
+	_saveIndex = text.length();
+	mC_PAREN(false);
+	text.erase(_saveIndex);
+	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
+	   _token = makeToken(_ttype);
+	   _token->setText(text.substr(_begin, text.length()-_begin));
+	}
+	_returnToken = _token;
+	_saveIndex=0;
+}
+
 void QueryLexer::mOPERATOR(bool _createToken) {
 	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
 	_ttype = OPERATOR;
 	int _saveIndex;
 	
-	bool synPredMatched65 = false;
+	bool synPredMatched72 = false;
 	if (((LA(1) == 0x23 /* '#' */ ) && (LA(2) == 0x62 /* 'b' */ ))) {
-		int _m65 = mark();
-		synPredMatched65 = true;
+		int _m72 = mark();
+		synPredMatched72 = true;
 		inputState->guessing++;
 		try {
 			{
@@ -1214,24 +1366,24 @@ void QueryLexer::mOPERATOR(bool _createToken) {
 			}
 		}
 		catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-			synPredMatched65 = false;
+			synPredMatched72 = false;
 		}
-		rewind(_m65);
+		rewind(_m72);
 		inputState->guessing--;
 	}
-	if ( synPredMatched65 ) {
+	if ( synPredMatched72 ) {
 		mENCODED_QUOTED_TERM(false);
 		if ( inputState->guessing==0 ) {
-#line 168 "indrilang.g"
+#line 173 "indrilang.g"
 			_ttype = ENCODED_QUOTED_TERM;
-#line 1226 "QueryLexer.cpp"
+#line 1378 "QueryLexer.cpp"
 		}
 	}
 	else {
-		bool synPredMatched67 = false;
+		bool synPredMatched74 = false;
 		if (((LA(1) == 0x23 /* '#' */ ) && (LA(2) == 0x62 /* 'b' */ ))) {
-			int _m67 = mark();
-			synPredMatched67 = true;
+			int _m74 = mark();
+			synPredMatched74 = true;
 			inputState->guessing++;
 			try {
 				{
@@ -1239,32 +1391,32 @@ void QueryLexer::mOPERATOR(bool _createToken) {
 				}
 			}
 			catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-				synPredMatched67 = false;
+				synPredMatched74 = false;
 			}
-			rewind(_m67);
+			rewind(_m74);
 			inputState->guessing--;
 		}
-		if ( synPredMatched67 ) {
+		if ( synPredMatched74 ) {
 			mENCODED_TERM(false);
 			if ( inputState->guessing==0 ) {
-#line 169 "indrilang.g"
+#line 174 "indrilang.g"
 				_ttype = ENCODED_TERM;
-#line 1251 "QueryLexer.cpp"
+#line 1403 "QueryLexer.cpp"
 			}
 		}
 		else if ((LA(1) == 0x23 /* '#' */ ) && (true)) {
 			match('#');
 			{ // ( ... )*
 			for (;;) {
-				if ((_tokenSet_3.member(LA(1)))) {
+				if ((_tokenSet_4.member(LA(1)))) {
 					mASCII_LETTER(false);
 				}
 				else {
-					goto _loop69;
+					goto _loop76;
 				}
 				
 			}
-			_loop69:;
+			_loop76:;
 			} // ( ... )*
 		}
 	else {
@@ -1314,9 +1466,9 @@ void QueryLexer::mJUNK(bool _createToken) {
 	}
 	}
 	if ( inputState->guessing==0 ) {
-#line 173 "indrilang.g"
+#line 178 "indrilang.g"
 		_ttype = antlr::Token::SKIP;
-#line 1318 "QueryLexer.cpp"
+#line 1470 "QueryLexer.cpp"
 	}
 	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
 	   _token = makeToken(_ttype);
@@ -1327,19 +1479,19 @@ void QueryLexer::mJUNK(bool _createToken) {
 }
 
 
-const unsigned long QueryLexer::_tokenSet_0_data_[] = { 0UL, 67043328UL, 134217726UL, 134217726UL, 4294967295UL, 4294967295UL, 4294967295UL, 4294967295UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
-// 0 1 2 3 4 5 6 7 
+const unsigned long QueryLexer::_tokenSet_0_data_[] = { 0UL, 67051520UL, 2281701374UL, 134217726UL, 4294967295UL, 4294967295UL, 4294967295UL, 4294967295UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
+// - 0 1 2 3 4 5 6 7 8 9 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryLexer::_tokenSet_0(_tokenSet_0_data_,24);
-const unsigned long QueryLexer::_tokenSet_1_data_[] = { 0UL, 67043328UL, 134217726UL, 134217726UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
-// 0 1 2 3 4 5 6 7 
+const unsigned long QueryLexer::_tokenSet_1_data_[] = { 0UL, 67051520UL, 2281701374UL, 134217726UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
+// - 0 1 2 3 4 5 6 7 8 9 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryLexer::_tokenSet_1(_tokenSet_1_data_,10);
 const unsigned long QueryLexer::_tokenSet_2_data_[] = { 0UL, 67059712UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
-// . 0 1 2 3 4 5 6 7 
+// . 0 1 2 3 4 5 6 7 8 9 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryLexer::_tokenSet_2(_tokenSet_2_data_,10);
-const unsigned long QueryLexer::_tokenSet_3_data_[] = { 0UL, 0UL, 134217726UL, 134217726UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
+const unsigned long QueryLexer::_tokenSet_3_data_[] = { 0UL, 67078144UL, 134217726UL, 134217726UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
+// + / 0 1 2 3 4 5 6 7 8 9 
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryLexer::_tokenSet_3(_tokenSet_3_data_,10);
-const unsigned long QueryLexer::_tokenSet_4_data_[] = { 0UL, 67078144UL, 134217726UL, 134217726UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
-// + / 0 1 2 3 4 5 6 7 
+const unsigned long QueryLexer::_tokenSet_4_data_[] = { 0UL, 0UL, 134217726UL, 134217726UL, 0UL, 0UL, 0UL, 0UL, 0UL, 0UL };
 const ANTLR_USE_NAMESPACE(antlr)BitSet QueryLexer::_tokenSet_4(_tokenSet_4_data_,10);
 
 ANTLR_END_NAMESPACE

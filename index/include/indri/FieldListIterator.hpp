@@ -32,7 +32,7 @@ namespace indri {
     struct FieldExtentInfo {
       int documentID;
       greedy_vector<Extent> extents;
-      greedy_vector<UINT64> numbers;
+      greedy_vector<INT64> numbers;
     };
 
     class FieldListIterator {

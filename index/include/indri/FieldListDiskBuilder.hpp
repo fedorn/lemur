@@ -35,7 +35,7 @@ namespace indri {
       {
       }
 
-      void addExtent( unsigned int documentID, unsigned int begin, unsigned int end, UINT64 number ) {
+      void addExtent( unsigned int documentID, unsigned int begin, unsigned int end, INT64 number ) {
         if( _block.addExtent( documentID, begin, end, number ) )
           return;
 

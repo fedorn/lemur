@@ -101,6 +101,7 @@ tokens {
   
   // pseudo-tokens
   NUMBER;
+  NEGATIVE_NUMBER;
   FLOAT;
 }
 
@@ -130,7 +131,7 @@ QUOTE:     '\'';
 DOT:       '.';
 COMMA:     ',';
 
-DASH:      '-';
+protected DASH:      '-';
 COLON:     ':';
 
 protected TAB:       '\t';
@@ -139,10 +140,12 @@ protected LF:        '\r';
 protected SPACE:     ' ';
 
 protected HIGH_CHAR:         '\u0080'..'\u00ff';
+protected DIGIT:             ('0'..'9');
 protected ASCII_LETTER:      ('a'..'z' | 'A'..'Z');
 protected ASCII_LETTER_NO_B: ('a' | 'c'..'z' | 'A' | 'C'..'Z');
-protected SAFE_CHAR:         ('a'..'z' | 'A'..'Z' | '0'..'9');
-protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/' );
+protected SAFE_LETTER:       ('a'..'z' | 'A'..'Z' | '-' | '_');
+protected SAFE_CHAR:         ('a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_');
+protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/');
 
 //
 // Within the ASCII range, we only accept a restricted
@@ -151,12 +154,14 @@ protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/' );
 // chars) so that we can support UTF-8 input.
 //
 
-protected TEXT_TERM:      ( HIGH_CHAR | SAFE_CHAR )+;
-protected NUMBER:         ( '0'..'9' )+;
-protected FLOAT:          ( '0'..'9' )+ DOT ( '0'..'9' )*;
+protected TEXT_TERM:        ( HIGH_CHAR | SAFE_CHAR )+;
+protected NUMBER:           ( '0'..'9' )+;
+protected NEGATIVE_NUMBER:  DASH ( '0'..'9' )+;
+protected FLOAT:            ( '0'..'9' )+ DOT ( '0'..'9' )*;
 
-TERM:     ( ('0'..'9')* ( ASCII_LETTER | HIGH_CHAR )+ ) => TEXT_TERM |
+TERM:     ( (DIGIT)+ SAFE_LETTER ) => TEXT_TERM |
           ( NUMBER DOT ) => FLOAT { $setType(FLOAT); } |
+          ( DASH NUMBER DOT ) => NEGATIVE_NUMBER { $setType(NEGATIVE_NUMBER); } |
           ( NUMBER ) => NUMBER { $setType(NUMBER); } |
           TEXT_TERM;
           
@@ -420,7 +425,7 @@ uwNode returns [ indri::lang::UWNode* uw ]
     _nodes.push_back(uw);
   } :
   (
-  // operator (#uw2)
+      // operator (#uw2)
       (UW NUMBER) => (UW n:NUMBER { uw->setWindowSize( n->getText() ); } )
       // operator #uw( term )
     | (UW)
@@ -623,15 +628,22 @@ dateBetween returns [ FieldBetweenNode* extent ] {
 //
 
 date returns [ UINT64 d ] :
-  ( NUMBER DASH ) => d=dashDate |
   ( NUMBER SLASH ) => d=slashDate |
-  d=spaceDate;
+  ( NUMBER ) => d=spaceDate |
+  d=dashDate;
   
 dashDate returns [ UINT64 d ] {
     d = 0;
   } :
-  day:NUMBER DASH month:TERM DASH year:NUMBER {
-    d = DateParse::convertDate( year->getText(), month->getText(), day->getText() ); 
+  dmy:TERM {
+    const std::string& text = dmy->getText();
+    int firstDash = text.find('-');
+    int secondDash = text.find('-', firstDash+1);
+    std::string day = text.substr( 0, firstDash ); 
+    std::string month = text.substr( firstDash+1, secondDash-firstDash-1 );
+    std::string year = text.substr( secondDash );
+
+    d = DateParse::convertDate( year, month, day ); 
   };
   
 slashDate returns [ UINT64 d ] {
@@ -699,6 +711,9 @@ number returns [ INT64 v ] {
   } :
   n:NUMBER {
     v = string_to_i64(n->getText());
+  } |
+  nn:NEGATIVE_NUMBER {
+    v = string_to_i64(nn->getText());
   };
 
 greaterNode returns [ FieldGreaterNode* gn ] {

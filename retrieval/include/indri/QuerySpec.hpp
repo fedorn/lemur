@@ -498,7 +498,7 @@ namespace indri {
         std::stringstream qtext;
         
         if( _windowSize >= 0 )
-        qtext << "#uw" << _windowSize << "( ";
+          qtext << "#uw" << _windowSize << "( ";
         else
           qtext << "#uw( ";
           
@@ -604,7 +604,7 @@ namespace indri {
       std::string queryText() const {
         std::stringstream qtext;
         if( _windowSize >= 0 )
-        qtext << "#" << _windowSize << "( ";
+          qtext << "#" << _windowSize << "( ";
         else
           qtext << "#od( ";
 
@@ -830,10 +830,10 @@ namespace indri {
     class FieldLessNode : public RawExtentNode {
     private:
       RawExtentNode* _field;
-      UINT64 _constant;
+      INT64 _constant;
 
     public:
-      FieldLessNode( RawExtentNode* field, UINT64 constant ) :
+      FieldLessNode( RawExtentNode* field, INT64 constant ) :
         _field(field),
         _constant(constant) {
       }
@@ -853,7 +853,7 @@ namespace indri {
         return qtext.str();
       }
 
-      UINT64 getConstant() const {
+      INT64 getConstant() const {
         return _constant;
       }
 
@@ -893,10 +893,10 @@ namespace indri {
     class FieldGreaterNode : public RawExtentNode {
     private:
       RawExtentNode* _field;
-      UINT64 _constant;
+      INT64 _constant;
 
     public:
-      FieldGreaterNode( RawExtentNode* field, UINT64 constant ) :
+      FieldGreaterNode( RawExtentNode* field, INT64 constant ) :
         _field(field),
         _constant(constant) {
       }
@@ -916,7 +916,7 @@ namespace indri {
         return qtext.str();
       }
 
-      UINT64 getConstant() const {
+      INT64 getConstant() const {
         return _constant;
       }
 
@@ -956,11 +956,11 @@ namespace indri {
     class FieldBetweenNode : public RawExtentNode {
     private:
       RawExtentNode* _field;
-      UINT64 _low;
-      UINT64 _high;
+      INT64 _low;
+      INT64 _high;
 
     public:
-      FieldBetweenNode( RawExtentNode* field, UINT64 low, UINT64 high ) :
+      FieldBetweenNode( RawExtentNode* field, INT64 low, INT64 high ) :
         _field(field),
         _low(low),
         _high(high) {
@@ -982,11 +982,11 @@ namespace indri {
         return qtext.str();
       }
 
-      UINT64 getLow() const {
+      INT64 getLow() const {
         return _low;
       }
 
-      UINT64 getHigh() const {
+      INT64 getHigh() const {
         return _high;
       }
 
@@ -1028,10 +1028,10 @@ namespace indri {
     class FieldEqualsNode : public RawExtentNode {
     private:
       RawExtentNode* _field;
-      UINT64 _constant;
+      INT64 _constant;
 
     public:
-      FieldEqualsNode( RawExtentNode* field, UINT64 constant ) :
+      FieldEqualsNode( RawExtentNode* field, INT64 constant ) :
         _field(field),
         _constant(constant) {
       }
@@ -1051,7 +1051,7 @@ namespace indri {
         return qtext.str();
       }
 
-      UINT64 getConstant() const {
+      INT64 getConstant() const {
         return _constant;
       }
 

@@ -21,7 +21,7 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API QueryLexer : public ANTLR_USE_NAMESPACE(antlr)CharScanner, public QueryLexerTokenTypes
 {
-#line 107 "indrilang.g"
+#line 108 "indrilang.g"
 
 private:
   bool _numbers;
@@ -58,19 +58,22 @@ public:
 	public: void mQUOTE(bool _createToken);
 	public: void mDOT(bool _createToken);
 	public: void mCOMMA(bool _createToken);
-	public: void mDASH(bool _createToken);
+	protected: void mDASH(bool _createToken);
 	public: void mCOLON(bool _createToken);
 	protected: void mTAB(bool _createToken);
 	protected: void mCR(bool _createToken);
 	protected: void mLF(bool _createToken);
 	protected: void mSPACE(bool _createToken);
 	protected: void mHIGH_CHAR(bool _createToken);
+	protected: void mDIGIT(bool _createToken);
 	protected: void mASCII_LETTER(bool _createToken);
 	protected: void mASCII_LETTER_NO_B(bool _createToken);
+	protected: void mSAFE_LETTER(bool _createToken);
 	protected: void mSAFE_CHAR(bool _createToken);
 	protected: void mBASESIXFOUR_CHAR(bool _createToken);
 	protected: void mTEXT_TERM(bool _createToken);
 	protected: void mNUMBER(bool _createToken);
+	protected: void mNEGATIVE_NUMBER(bool _createToken);
 	protected: void mFLOAT(bool _createToken);
 	public: void mTERM(bool _createToken);
 	protected: void mENCODED_QUOTED_TERM(bool _createToken);

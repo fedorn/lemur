@@ -25,11 +25,11 @@ namespace indri {
   namespace index {
     struct FieldExtent {
       FieldExtent() {};
-      FieldExtent( int _id, int _begin, int _end, UINT64 _number ) : id(_id), begin(_begin), end(_end), number(_number) {}
+      FieldExtent( int _id, int _begin, int _end, INT64 _number ) : id(_id), begin(_begin), end(_end), number(_number) {}
       unsigned int id;
       unsigned int begin;
       unsigned int end;
-      UINT64 number;
+      INT64 number;
     };
   }
 }

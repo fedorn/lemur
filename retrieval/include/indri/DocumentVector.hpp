@@ -31,7 +31,7 @@ public:
     std::string name;
     int begin;
     int end;
-    UINT64 number;
+    INT64 number;
   };
 
 private:

@@ -105,6 +105,10 @@ namespace indri {
     }
 
     void Packer::put( const char* name, UINT64 value ) {
+      put( name, INT64(value) );
+    }
+
+    void Packer::put( const char* name, INT64 value ) {
       assert( _stack.size() );
       node_element* element = _stack.top();
 

@@ -28,11 +28,11 @@ class FieldLessNode : public ListIteratorNode {
 private:
   class FieldIteratorNode* _field;
   greedy_vector<Extent> _extents;
-  UINT64 _constant;
+  INT64 _constant;
   std::string _name;
 
 public:
-  FieldLessNode( const std::string& name, class FieldIteratorNode* iterator, UINT64 constant );
+  FieldLessNode( const std::string& name, class FieldIteratorNode* iterator, INT64 constant );
 
   void prepare( int documentID );
   greedy_vector<Extent>& extents();

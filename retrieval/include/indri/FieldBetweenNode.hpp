@@ -27,12 +27,12 @@ class FieldBetweenNode : public ListIteratorNode {
 private:
   class FieldIteratorNode* _field;
   greedy_vector<Extent> _extents;
-  UINT64 _low;
-  UINT64 _high;
+  INT64 _low;
+  INT64 _high;
   std::string _name;
 
 public:
-  FieldBetweenNode( const std::string& name, class FieldIteratorNode* iterator, UINT64 low, UINT64 high );
+  FieldBetweenNode( const std::string& name, class FieldIteratorNode* iterator, INT64 low, INT64 high );
 
   void prepare( int documentID );
   greedy_vector<Extent>& extents();

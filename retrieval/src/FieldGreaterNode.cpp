@@ -20,7 +20,7 @@
 #include "indri/Annotator.hpp"
 #include "indri/FieldIteratorNode.hpp"
 
-FieldGreaterNode::FieldGreaterNode( const std::string& name, FieldIteratorNode* iterator, UINT64 constant ) {
+FieldGreaterNode::FieldGreaterNode( const std::string& name, FieldIteratorNode* iterator, INT64 constant ) {
   _name = name;
   _field = iterator;
   _constant = constant;
@@ -32,7 +32,7 @@ void FieldGreaterNode::prepare( int documentID ) {
   if( !_field )
     return;
 
-  const greedy_vector<UINT64>& numbers = _field->numbers();
+  const greedy_vector<INT64>& numbers = _field->numbers();
   const greedy_vector<Extent>& extents = _field->extents();
 
   for( unsigned int i=0; i<numbers.size(); i++ ) {

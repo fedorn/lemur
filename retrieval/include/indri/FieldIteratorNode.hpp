@@ -26,7 +26,7 @@ class FieldIteratorNode : public ListIteratorNode {
 private:
   class indri::index::FieldListIterator* _field;
   greedy_vector<Extent> _extents;
-  greedy_vector<UINT64> _numbers;
+  greedy_vector<INT64> _numbers;
   std::string _name;
 
 public:
@@ -34,7 +34,7 @@ public:
   void prepare( int documentID );
   /// returns a list of intervals describing positions of children
   const greedy_vector<Extent>& extents(); 
-  const greedy_vector<UINT64>& numbers();
+  const greedy_vector<INT64>& numbers();
   int nextCandidateDocument();
   const std::string& getName() const;
   void annotate( class Annotator& annotator, int documentID, int begin, int end );

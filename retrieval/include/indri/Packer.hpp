@@ -64,6 +64,7 @@ namespace indri {
       void put( const char* name, int value );
       void put( const char* name, unsigned int value );
       void put( const char* name, UINT64 value );
+      void put( const char* name, INT64 value );
       void put( const char* name, double value );
       void put( const char* name, const std::string& value );
       void put( const char* name, const std::vector<int>& value );

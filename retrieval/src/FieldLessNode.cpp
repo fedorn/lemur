@@ -20,7 +20,7 @@
 #include "indri/FieldIteratorNode.hpp"
 #include "indri/Annotator.hpp"
 
-FieldLessNode::FieldLessNode( const std::string& name, FieldIteratorNode* iterator, UINT64 constant ) {
+FieldLessNode::FieldLessNode( const std::string& name, FieldIteratorNode* iterator, INT64 constant ) {
   _field = iterator;
   _constant = constant;
   _name = name;
@@ -32,7 +32,7 @@ void FieldLessNode::prepare( int documentID ) {
   if( !_field )
     return;
 
-  const greedy_vector<UINT64>& numbers = _field->numbers();
+  const greedy_vector<INT64>& numbers = _field->numbers();
   const greedy_vector<Extent>& extents = _field->extents();
 
   for( unsigned int i=0; i<numbers.size(); i++ ) {

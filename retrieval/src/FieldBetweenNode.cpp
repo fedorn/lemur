@@ -20,7 +20,7 @@
 #include "indri/Annotator.hpp"
 #include "indri/FieldIteratorNode.hpp"
 
-FieldBetweenNode::FieldBetweenNode( const std::string& name, FieldIteratorNode* iterator, UINT64 low, UINT64 high ) {
+FieldBetweenNode::FieldBetweenNode( const std::string& name, FieldIteratorNode* iterator, INT64 low, INT64 high ) {
   _name = name;
   _field = iterator;
   _low = low;
@@ -33,7 +33,7 @@ void FieldBetweenNode::prepare( int documentID ) {
   if( !_field )
     return;
 
-  const greedy_vector<UINT64>& numbers = _field->numbers();
+  const greedy_vector<INT64>& numbers = _field->numbers();
   const greedy_vector<Extent>& extents = _field->extents();
 
   for( unsigned int i=0; i<numbers.size(); i++ ) {

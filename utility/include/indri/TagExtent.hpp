@@ -23,7 +23,7 @@ struct TagExtent {
   const char* name;
   unsigned int begin;
   unsigned int end;
-  UINT64 number;
+  INT64 number;
 };
 
 #endif // INDRI_TAGEXTENT_HPP
