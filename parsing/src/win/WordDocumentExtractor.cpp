@@ -275,6 +275,11 @@ void WordDocumentExtractor::open( const std::string& filename ) {
 
   _unparsedDocument.metadata.clear();
 
+  pair.key = "docno";
+  pair.value = _documentPath.c_str();
+  pair.valueLength = _documentPath.length()+1;
+  _unparsedDocument.metadata.push_back( pair );
+
   pair.key = "path";
   pair.value = _documentPath.c_str();
   pair.valueLength = _documentPath.length()+1;
@@ -308,10 +313,11 @@ void WordDocumentExtractor::open( const std::string& filename ) {
 }
 
 UnparsedDocument* WordDocumentExtractor::nextDocument() {
-  if( _documentWaiting )
+  if( _documentWaiting ) {
+    _documentWaiting = false;
     return &_unparsedDocument;
+  }
 
-  _documentWaiting = false;
   return 0;
 }
 

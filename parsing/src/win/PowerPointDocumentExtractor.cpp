@@ -61,8 +61,8 @@
 
 #include "indri/PowerPointDocumentExtractor.hpp"
 #include "indri/Buffer.hpp"
-#include "lemur-compat.hpp"
-#include "Exception.hpp"
+#include "lemur/lemur-compat.hpp"
+#include "lemur/Exception.hpp"
 
 //
 // PowerPoint.Application:
@@ -400,9 +400,10 @@ void PowerPointDocumentExtractor::open( const std::string& filename ) {
 }
 
 UnparsedDocument* PowerPointDocumentExtractor::nextDocument() {
-  if( _documentWaiting )
+  if( _documentWaiting ) {
+    _documentWaiting = false;
     return &_unparsedDocument;
-  _documentWaiting = false;
+  }
   return 0;
 }
 
