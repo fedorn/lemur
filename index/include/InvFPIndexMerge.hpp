@@ -44,7 +44,7 @@ public:
 private:
   void writeInvFIDs();
   /// figure out which readers point to the lowest termids
-  void least(vector<InvFPIndexReader*>* r, vector<int>* ret);
+  void least(vector<InvFPIndexReader*>* r, vector<TERMID_T>* ret);
 };
 
 #endif

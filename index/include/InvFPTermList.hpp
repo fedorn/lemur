@@ -47,10 +47,10 @@ public:
   TermInfo *nextEntry() const;
 
   /// Get the length of this document
-  int docLength() const{ return length; }
+  COUNT_T docLength() const{ return length; }
 
   /// Get the number of terms in this document
-  int termCount()  const{ return listlen; }
+  COUNT_T termCount()  const{ return listlen; }
 
   /// Get the docid this list is for
   DOCID_T docID()  const{ return uid; }
@@ -94,14 +94,14 @@ protected:
   virtual POS_T nextPosition(POS_T position) const;
 
   DOCID_T uid; // this doc's id
-  int length;  // length of this document (terms + stopwords)
+  COUNT_T length;  // length of this document (terms + stopwords)
   LocatedTerm* list; // list of terms and locations
   LLTerm* listcounted; // list of terms and location lists
-  int listlen; // number of items we have in list  (same as number of terms)
+  COUNT_T listlen; // number of items we have in list  (same as number of terms)
   mutable int index;   // index for iterator
-  int* counts; // keep track of counts of terms for bag of word
+  LOC_T* counts; // keep track of counts of terms for bag of word
   mutable InvFPTerm entry;
-  mutable vector<int> loclist; //list of locations to return
+  mutable vector<LOC_T> loclist; //list of locations to return
 
 };
 

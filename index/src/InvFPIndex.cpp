@@ -29,7 +29,7 @@ InvFPIndex::~InvFPIndex() {
   // base class will take care of everything
 }
 
-DocInfoList* InvFPIndex::docInfoList(int termID) const{
+DocInfoList* InvFPIndex::docInfoList(TERMID_T termID) const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS])) {
     *msgstream << "Error:  Trying to get docInfoList for invalid termID" << endl;    
     return NULL;
@@ -58,7 +58,7 @@ DocInfoList* InvFPIndex::docInfoList(int termID) const{
   }
 }
 
-TermInfoList* InvFPIndex::termInfoList(int docID) const{
+TermInfoList* InvFPIndex::termInfoList(DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream <<  "Error trying to get termInfoList for invalid docID.\n" << endl;
     return NULL;
@@ -87,7 +87,7 @@ TermInfoList* InvFPIndex::termInfoList(int docID) const{
   return termlist;
 }
 
-TermInfoList* InvFPIndex::termInfoListSeq(int docID) const{
+TermInfoList* InvFPIndex::termInfoListSeq(DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get termInfoList for invalid docID.\n"<< endl;
     return NULL;
@@ -113,7 +113,7 @@ TermInfoList* InvFPIndex::termInfoListSeq(int docID) const{
   return termlist;
 }
 
-int InvFPIndex::docLengthCounted(int docID)  const{
+COUNT_T InvFPIndex::docLengthCounted(DOCID_T docID)  const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get docLengthCounted for invalid docID."<< endl;
     return 0;
@@ -127,7 +127,7 @@ int InvFPIndex::docLengthCounted(int docID)  const{
   if (!tl)
     return 0;
 
-  int count = tl->termCount();
+  COUNT_T count = tl->termCount();
   delete tl;
   return count;
 }

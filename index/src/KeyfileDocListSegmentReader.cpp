@@ -66,7 +66,8 @@ InvFPDocList* KeyfileDocListSegmentReader::next() {
     int *listData = new int[4 + (dataLength/sizeof(int)) + 1];
     _file->read((char *)listData, (sizeof(int)*4) + dataLength );
     // make a list from the data we read
-    InvFPDocList* list = new InvFPDocList( const_cast<int*>( (const int*) listData ) );
+    // dmf FIXME
+    InvFPDocList* list = new InvFPDocList( const_cast<LOC_T*>( (const LOC_T*) listData ) );
     //clean up alignment data.
     delete[](listData);
     return list;

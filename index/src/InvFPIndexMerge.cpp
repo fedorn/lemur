@@ -64,11 +64,11 @@ int InvFPIndexMerge::mergeFiles(vector<string>* files,
   ofstream indexfile;
   indexfile.open(indexname.c_str(), ios::binary | ios::out);
 
-  vector<int> working;  // list of least words
+  vector<TERMID_T> working;  // list of least words
   int offset;
   long filelen;
   InvFPDocList* list, *first;
-  vector<int>::iterator iter;
+  vector<TERMID_T>::iterator iter;
 
   while (readers.size() > 1) {
     offset=0;
@@ -85,7 +85,7 @@ int InvFPIndexMerge::mergeFiles(vector<string>* files,
     // figure out if we need a new index file or if there's still room
     indexfile.flush();
     filelen = (long)indexfile.tellp();
-    if (filelen + ((first->length()+4) *sizeof(int)) > maxfile) {
+    if (filelen + ((first->length()+4) *sizeof(LOC_T)) > maxfile) {
       indexfile.close();
       std::stringstream nameStr;
       nameStr << name << level << "." << intmed->size();
@@ -123,7 +123,7 @@ int InvFPIndexMerge::mergeFiles(vector<string>* files,
     // check for file size
     indexfile.flush();
     filelen = (long)indexfile.tellp();
-    if (filelen + ((myreader->list->length()+4) *sizeof(int)) > maxfile) {
+    if (filelen + ((myreader->list->length()+4) *sizeof(LOC_T)) > maxfile) {
       indexfile.close();
       std::stringstream nameStr;
       nameStr << name << level << "." << intmed->size();
@@ -141,7 +141,7 @@ int InvFPIndexMerge::mergeFiles(vector<string>* files,
     while (myreader->list->binReadC(*(myreader->reader))) {
       indexfile.flush();
       filelen = (long)indexfile.tellp();
-      if (filelen + ((myreader->list->length()+4) *sizeof(int)) > maxfile) {
+      if (filelen + ((myreader->list->length()+4) *sizeof(LOC_T)) > maxfile) {
         indexfile.close();
 	std::stringstream nameStr;
 	nameStr << name << level << "." << intmed->size();
@@ -193,7 +193,7 @@ int InvFPIndexMerge::finalMerge(vector<string>* files) {
     readers[i]->list->binReadC(*(readers[i]->reader));
   }
 
-  vector<int> working;  // list of least words
+  vector<TERMID_T> working;  // list of least words
 
   std::stringstream nameStr;
   nameStr << name << INVFPINDEX << 0;
@@ -208,7 +208,7 @@ int InvFPIndexMerge::finalMerge(vector<string>* files) {
   int fid;
   int offset, ll, df;
   long filelen;
-  vector<int>::iterator iter;
+  vector<TERMID_T>::iterator iter;
   InvFPDocList* list, *first;
 
   while (readers.size() > 1) {
@@ -235,7 +235,7 @@ int InvFPIndexMerge::finalMerge(vector<string>* files) {
     // the length of what we write out is the length of the inverted list
     // plus the tid, df, diff, len
     filelen = (long)indexfile.tellp();
-    if ((filelen + (ll+4) *sizeof(int)) > maxfile) {
+    if ((filelen + (ll+4) *sizeof(LOC_T)) > maxfile) {
       indexfile.close();
       std::stringstream nameStr;
       nameStr << name << INVFPINDEX << invfiles.size();
@@ -280,7 +280,7 @@ int InvFPIndexMerge::finalMerge(vector<string>* files) {
 
     indexfile.flush();
     filelen = (long)indexfile.tellp();
-    if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
+    if (filelen + ((ll+4) *sizeof(LOC_T)) > maxfile) {
       indexfile.close();
       std::stringstream nameStr;
       nameStr << name << INVFPINDEX << invfiles.size();
@@ -355,10 +355,10 @@ void InvFPIndexMerge::writeInvFIDs() {
   fclose(write);
 }
 
-void InvFPIndexMerge::least(vector<InvFPIndexReader*>* r, vector<int>*ret) {
+void InvFPIndexMerge::least(vector<InvFPIndexReader*>* r, vector<TERMID_T>*ret) {
   InvFPDocList* list;
 
-  int lid, id;
+  TERMID_T lid, id;
   list = (*r)[0]->list;
   lid = list->termID();
   ret->push_back(0);

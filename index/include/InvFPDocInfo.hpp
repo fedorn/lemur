@@ -36,11 +36,11 @@ public:
   InvFPDocInfo() {pos=NULL;}
   ~InvFPDocInfo() {} 
   
-  const int* positions() const {return pos; }
-  void positions(const int* p) {pos = p;}
+  const LOC_T* positions() const {return pos; }
+  void positions(const LOC_T* p) {pos = p;}
 
 private:
-  const int* pos;  // list of positions in this doc (size is count)
+  const LOC_T* pos;  // list of positions in this doc (size is count)
 };
 
 #endif

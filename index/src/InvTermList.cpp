@@ -46,8 +46,8 @@ TermInfo* InvTermList::nextEntry() const{
 
 /// set element from position, returns pointer to the element
 TermInfo* InvTermList::getElement(TermInfo* elem, POS_T position) const {
-  // info is stored in int* as docid freq .. ..
-  int* ip = (int*) position;
+  // info is stored in LOC_T* as docid freq .. ..
+  LOC_T* ip = (LOC_T*) position;
   elem->termID(*ip);
   ip++;
   elem->count(*ip);
@@ -55,8 +55,8 @@ TermInfo* InvTermList::getElement(TermInfo* elem, POS_T position) const {
 }
 /// advance position
 POS_T InvTermList::nextPosition(POS_T position) const {
-  // info is stored in int* as docid freq .. ..
-  return (POS_T) (((int*) position) + 2);
+  // info is stored in LOC_T* as docid freq .. ..
+  return (POS_T) (((LOC_T*) position) + 2);
 }
 
 bool InvTermList::binRead(ifstream& infile){
@@ -67,12 +67,12 @@ bool InvTermList::binRead(ifstream& infile){
   if (!(infile.gcount() == sizeof(DOCID_T)))
     return false;
 
-  infile.read((char*) &length, sizeof(int));
-  if (!(infile.gcount() == sizeof(int)))
+  infile.read((char*) &length, sizeof(COUNT_T));
+  if (!(infile.gcount() == sizeof(COUNT_T)))
     return false;
 
-  infile.read((char*) &listlen, sizeof(int));
-  if (!(infile.gcount() == sizeof(int)))
+  infile.read((char*) &listlen, sizeof(COUNT_T));
+  if (!(infile.gcount() == sizeof(COUNT_T)))
     return false;
 
   //  if (list)
@@ -80,9 +80,9 @@ bool InvTermList::binRead(ifstream& infile){
   delete[](list);
   //  list = (int*) malloc(sizeof(int)*listlen);
   // use new/delete[] so an exception will be thrown if out of memory.
-  list = new int[listlen];
-  infile.read((char*) list, sizeof(int) * listlen);
-  if (!(infile.gcount() == (sizeof(int) * listlen))) {
+  list = new LOC_T[listlen];
+  infile.read((char*) list, sizeof(LOC_T) * listlen);
+  if (!(infile.gcount() == (sizeof(LOC_T) * listlen))) {
     //    free(list);
     delete[](list);
     list = NULL;

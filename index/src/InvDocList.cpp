@@ -24,22 +24,22 @@ InvDocList::InvDocList() {
   uid = -1;
   df = 0;
   strlength = 0;
-  intsize = sizeof(int);
+  LOC_Tsize = sizeof(LOC_T);
   hascache = false;
 }
 
 //  This hasn't been tested
-InvDocList::InvDocList(int id, int len){
+InvDocList::InvDocList(TERMID_T id, int len){
   READ_ONLY = false;
   size = (int) pow(2.0,DEFAULT);
   //  begin = (int*) malloc(size);
   // use new/delete[] so an exception will be thrown if out of memory.
-  begin = new int[size/sizeof(int)];
+  begin = new LOC_T[size/sizeof(LOC_T)];
   lastid = begin;
   *lastid = -1;
   end = begin;
   freq = begin;
-  intsize = sizeof(int);
+  LOC_Tsize = sizeof(LOC_T);
   uid = id;
   strlength = len;
   df = 0;
@@ -47,11 +47,11 @@ InvDocList::InvDocList(int id, int len){
 }
 
 
-InvDocList::InvDocList(int id, int listlen, int* list, int fr, int* ldocid, int len){
+InvDocList::InvDocList(TERMID_T id, int listlen, LOC_T* list, int fr, DOCID_T* ldocid, int len){
   //we don't own the memory.. 
   READ_ONLY = true;
-  intsize = sizeof(int);
-  size = listlen * intsize;
+  LOC_Tsize = sizeof(LOC_T);
+  size = listlen * LOC_Tsize;
   begin = list;
   end = begin + listlen;
   uid = id;
@@ -62,18 +62,18 @@ InvDocList::InvDocList(int id, int listlen, int* list, int fr, int* ldocid, int 
   freq = lastid+1;
 }
 
-InvDocList::InvDocList(MemCache* mc, int id, int len){
+InvDocList::InvDocList(MemCache* mc, TERMID_T id, int len){
   READ_ONLY = false;
   size = (int) pow(2.0,DEFAULT);
   cache = mc;
-  begin = cache->getMem(DEFAULT);
+  begin = (LOC_T*)cache->getMem(DEFAULT);
   if (!begin)
     size = 0;
   lastid = begin;
   if (lastid != NULL) *lastid = -1;
   end = begin;
   freq = begin;
-  intsize = sizeof(int);
+  LOC_Tsize = sizeof(LOC_T);
   hascache = true;
   uid = id;
   strlength = len;
@@ -94,7 +94,7 @@ InvDocList::~InvDocList() {
 
 }
 
-void InvDocList::setList(int id, int listlen, int* list, int fr, int* ldocid, int len){
+void InvDocList::setList(TERMID_T id, int listlen, LOC_T* list, int fr, DOCID_T* ldocid, int len){
   READ_ONLY = true;
 /*
   if (hascache) {
@@ -104,7 +104,7 @@ void InvDocList::setList(int id, int listlen, int* list, int fr, int* ldocid, in
     free(begin);
   }
   */
-  size = listlen * intsize;
+  size = listlen * LOC_Tsize;
   begin = list;
   end = begin + listlen;
   uid = id;
@@ -115,13 +115,13 @@ void InvDocList::setList(int id, int listlen, int* list, int fr, int* ldocid, in
   freq = lastid+1;
 }
 
-void InvDocList::setListSafe(int id, int listlen, int* list, int fr, int* ldocid, int len){
+void InvDocList::setListSafe(TERMID_T id, int listlen, LOC_T* list, int fr, DOCID_T* ldocid, int len){
   if (hascache) {
 /*    int pow = logb2(size);
       cache->freeMem(begin, pow);
     */
   }
-  size = listlen * intsize;
+  size = listlen * LOC_Tsize;
   begin = list;
   end = begin + listlen;
   uid = id;
@@ -143,7 +143,7 @@ bool InvDocList::hasMore() const{
 DocInfo* InvDocList::nextEntry() const{
   // use the attribute entry.
   //  static InvDocInfo info;
-  // info is stored in int* as docid freq .. ..
+  // info is stored in LOC_T* as docid freq .. ..
   entry.docID(*iter);
   iter++;
   entry.termCount(*iter);
@@ -160,8 +160,8 @@ void InvDocList::nextEntry(DocInfo* info) const{
 
 /// set element from position, returns pointer to the element
 DocInfo* InvDocList::getElement(DocInfo* elem, POS_T position) const {
-  // info is stored in int* as docid freq .. ..
-  int* ip = (int*) position;
+  // info is stored in LOC_T* as docid freq .. ..
+  LOC_T* ip = (LOC_T*) position;
   elem->docID(*ip);
   ip++;
   elem->termCount(*ip);
@@ -169,8 +169,8 @@ DocInfo* InvDocList::getElement(DocInfo* elem, POS_T position) const {
 }
 /// advance position
 POS_T InvDocList::nextPosition(POS_T position) const {
-  // info is stored in int* as docid freq .. ..
-  return (POS_T) (((int*) position) + 2);
+  // info is stored in LOC_T* as docid freq .. ..
+  return (POS_T) (((LOC_T*) position) + 2);
 }
 
 bool InvDocList::allocMem() {
@@ -180,11 +180,11 @@ bool InvDocList::allocMem() {
   size = (int) pow(2.0,DEFAULT);
 
   if (hascache) {
-    begin = cache->getMem(DEFAULT);
+    begin = (LOC_T *)cache->getMem(DEFAULT);
   } else {
     //    begin = (TERMID_T*) malloc(size);
     // use new/delete[] so an exception will be thrown if out of memory.
-    begin = new int[size/sizeof(int)];
+    begin = new LOC_T[size/sizeof(LOC_T)];
   }
   lastid = begin;
   if (lastid != NULL) *lastid = -1;
@@ -197,7 +197,7 @@ bool InvDocList::allocMem() {
   return true;
 }
 
-bool InvDocList::addTerm(int docid) {
+bool InvDocList::addTerm(DOCID_T docid) {
   if (READ_ONLY)
     return false;
     // check that we can add at all
@@ -209,7 +209,7 @@ bool InvDocList::addTerm(int docid) {
     (*freq)++;
   } else {
     //get more mem if needed
-    if ((end-begin+2)*intsize > size) {
+    if ((end-begin+2)*LOC_Tsize > size) {
       if (!getMoreMem())
         return false;
     }
@@ -229,11 +229,11 @@ bool InvDocList::append(InvDocList* tail) {
     return false;
 
   // we only want to append the actual content
-  int* ptr = tail->begin;
+  LOC_T *ptr = tail->begin;
   int len = tail->length();
 
   // check for memory
-  while ((end-begin+len)*intsize > size) {
+  while ((end-begin+len)*LOC_Tsize > size) {
     if (!getMoreMem())
       return false;
   }
@@ -256,7 +256,7 @@ bool InvDocList::append(InvDocList* tail) {
 
   // copy list over
   if (len > 0) {
-    memcpy(end, ptr, len*intsize);
+    memcpy(end, ptr, len*LOC_Tsize);
 
     end += len;
     lastid = end-2;
@@ -266,9 +266,9 @@ bool InvDocList::append(InvDocList* tail) {
   return true;
 }
 
-int InvDocList::termCTF() const{
-  int ctf = 0;
-  int *start = begin;
+COUNT_T InvDocList::termCTF() const{
+  COUNT_T ctf = 0;
+  LOC_T *start = begin;
   while (start != lastid){
     start++;
     ctf += *start;
@@ -304,7 +304,7 @@ void InvDocList::resetFree() {
   // free the memory
   if (hascache) {
     int pow = logb2(size);
-    cache->freeMem(begin, pow);   
+    cache->freeMem((int *)begin, pow);   
   } else if (begin != NULL) {
     //    free(begin);
     delete[](begin);
@@ -317,13 +317,13 @@ void InvDocList::resetFree() {
 }
 
 void InvDocList::binWrite(ofstream& of) {
-  int len= end-begin;
-  int diff = lastid-begin;
-  of.write((const char*) &uid, sizeof(TERMID_T));
-  of.write((const char*) &df, intsize);
-  of.write((const char*) &diff, intsize);
-  of.write((const char*) &len, intsize);
-  of.write((const char*) begin, sizeof(LOC_T)*len);
+  COUNT_T len= end-begin;
+  COUNT_T diff = lastid-begin;
+  of.write((const char*) &uid, LOC_Tsize);
+  of.write((const char*) &df, LOC_Tsize);
+  of.write((const char*) &diff, LOC_Tsize);
+  of.write((const char*) &len, LOC_Tsize);
+  of.write((const char*) begin, LOC_Tsize*len);
 }
 
 bool InvDocList::binRead(ifstream& inf) {
@@ -335,22 +335,22 @@ bool InvDocList::binRead(ifstream& inf) {
   if (!(inf.gcount() == sizeof(TERMID_T)))
     return false;
 
-  inf.read((char*) &df, intsize);
-  if (!inf.gcount() == intsize)
+  inf.read((char*) &df, LOC_Tsize);
+  if (!inf.gcount() == LOC_Tsize)
     return false;
 
-  inf.read((char*) &diff, intsize);
-  if (!inf.gcount() == intsize)
+  inf.read((char*) &diff, LOC_Tsize);
+  if (!inf.gcount() == LOC_Tsize)
     return false;
 
-  inf.read((char*) &size, intsize);
-  if (!inf.gcount() == intsize)
+  inf.read((char*) &size, LOC_Tsize);
+  if (!inf.gcount() == LOC_Tsize)
     return false;
 
   int s = sizeof(LOC_T)*size;
   //  begin = (LOC_T*) malloc(s);
   // use new/delete[] so an exception will be thrown if out of memory.
-  begin = new int[s/sizeof(int)];
+  begin = new LOC_T[s/sizeof(LOC_T)];
 
   inf.read((char*) begin, s);
   if (!inf.gcount() == s) {
@@ -366,26 +366,26 @@ bool InvDocList::binRead(ifstream& inf) {
 }
 
 void InvDocList::binWriteC(ofstream& of) {
-  int len= end-begin;
-  int diff = lastid-begin;
+  COUNT_T len= end-begin;
+  COUNT_T diff = lastid-begin;
   of.write((const char*) &uid, sizeof(TERMID_T));
-  of.write((const char*) &df, intsize);
-  of.write((const char*) &diff, intsize);
+  of.write((const char*) &df, LOC_Tsize);
+  of.write((const char*) &diff, LOC_Tsize);
 
   deltaEncode();
 
   // compress it
   // it's ok to make comp the same size.  the compressed will be smaller
-  //  unsigned char* comp = (unsigned char*) malloc(len*intsize);
+  //  unsigned char* comp = (unsigned char*) malloc(len*LOC_Tsize);
   // use new/delete so an exception will be thrown if out of memory
-  unsigned char* comp = new unsigned char[len*intsize];
-  int compbyte = RVLCompress::compress_ints(begin, comp, len);
+  unsigned char* comp = new unsigned char[len*LOC_Tsize];
+  int compbyte = RVLCompress::compress_ints((int *)begin, comp, len);
   
   // write out the compressed bits
-  of.write((const char*) &compbyte, intsize);
+  of.write((const char*) &compbyte, LOC_Tsize);
   of.write((const char*) comp, compbyte);
 
-  //  of.write((const char*) &len, intsize);
+  //  of.write((const char*) &len, LOC_Tsize);
   //of.write((const char*) begin, sizeof(LOC_T)*len);
   //  free(comp);
   delete[](comp);
@@ -400,16 +400,16 @@ bool InvDocList::binReadC(ifstream& inf) {
   if (!(inf.gcount() == sizeof(TERMID_T)))
     return false;
 
-  inf.read((char*) &df, intsize);
-  if (!inf.gcount() == intsize)
+  inf.read((char*) &df, LOC_Tsize);
+  if (!inf.gcount() == LOC_Tsize)
     return false;
 
-  inf.read((char*) &diff, intsize);
-  if (!inf.gcount() == intsize)
+  inf.read((char*) &diff, LOC_Tsize);
+  if (!inf.gcount() == LOC_Tsize)
     return false;
 
-  inf.read((char*) &size, intsize);
-  if (!inf.gcount() == intsize)
+  inf.read((char*) &size, LOC_Tsize);
+  if (!inf.gcount() == LOC_Tsize)
     return false;
 
   //  unsigned char* buffer = (unsigned char*) malloc(size);
@@ -424,14 +424,14 @@ bool InvDocList::binReadC(ifstream& inf) {
   // this should be big enough
   //  begin = (LOC_T*) malloc(size*4);  
   // use new/delete[] so an exception will be thrown if out of memory.
-  begin = new int[(size*4)/sizeof(int)];  
+  begin = new LOC_T[(size*4)/sizeof(LOC_T)];  
 
   // decompress it
-  int len = RVLCompress::decompress_ints(buffer, begin, size);
+  int len = RVLCompress::decompress_ints(buffer, (int *)begin, size);
 
   size = size*4;
 
-  if (len * intsize > size)
+  if (len * LOC_Tsize > size)
     cerr << "RVLDecompress in DocList buffer overrun!" << endl;
 
   lastid = begin + diff;
@@ -454,8 +454,8 @@ void InvDocList::deltaEncode() {
   // we will encode in place
   // go backwards starting at the last docid
   // we're counting on two always being bigger than one
-  int* two = lastid;
-  int* one = lastid-2;
+  LOC_T* two = lastid;
+  LOC_T* one = lastid-2;
 
   while (two != begin) {
     *two = *two-*one;
@@ -467,8 +467,8 @@ void InvDocList::deltaEncode() {
 void InvDocList::deltaDecode() {
   // we will decode in place
   // start at the begining
-  int* one = begin;
-  int* two = begin+2;
+  LOC_T* one = begin;
+  LOC_T* two = begin+2;
 
   while (one != lastid) {
     *two = *two + *one;
@@ -488,15 +488,15 @@ bool InvDocList::getMoreMem() {
     if (pow > 22)
       return false;
 
-    int* loc = cache->getMoreMem(pow, begin, pow-1);
+    LOC_T* loc = (LOC_T *)cache->getMoreMem(pow, (int *)begin, pow-1);
     if (loc == NULL)
       return false;
     begin = loc;
   } else {
-    int* old = begin;
+    LOC_T* old = begin;
     //    begin = (int*) malloc(bigger);
     // use new/delete[] so an exception will be thrown if out of memory
-    begin = new int[bigger/sizeof(int)];
+    begin = new LOC_T[bigger/sizeof(LOC_T)];
     memcpy(begin, old, size);
     //free(old);
     delete[](old);

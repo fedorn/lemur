@@ -39,11 +39,11 @@ public:
   ~InvDocInfo() {}; 
   
   DOCID_T docID() const{ return id; };
-  int termCount() const{ return count; };
+  COUNT_T termCount() const{ return count; };
  
 protected:
   DOCID_T id;    // id of this doc
-  int count; // count of this term in this doc
+  COUNT_T count; // count of this term in this doc
 };
 
 #endif

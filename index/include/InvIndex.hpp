@@ -80,28 +80,28 @@ public:
   //@{
 
   /// Total count (i.e., number) of documents in collection
-  int docCount() const { return counts[DOCS]; };
+  COUNT_T docCount() const { return counts[DOCS]; };
 
   /// Total count of unique terms in collection
-  int termCountUnique() const { return counts[UNIQUE_TERMS]; };
+  COUNT_T termCountUnique() const { return counts[UNIQUE_TERMS]; };
 
   /// Total counts of a term in collection
-  int termCount(TERMID_T termID) const;
+  COUNT_T termCount(TERMID_T termID) const;
 
   /// Total counts of all terms in collection
-  int termCount() const { return counts[TOTAL_TERMS]; };
+  COUNT_T termCount() const { return counts[TOTAL_TERMS]; };
 
   /// Average document length 
   float docLengthAvg() const;
 
   /// Total counts of doc with a given term
-  int docCount(TERMID_T termID) const;
+  COUNT_T docCount(TERMID_T termID) const;
 
   /// Total counts of terms in a document, including stop words
-  int docLength(DOCID_T docID) const;
+  COUNT_T docLength(DOCID_T docID) const;
 
   /// Total count of terms in given document, not including stop words
-  virtual int docLengthCounted(DOCID_T docID) const;
+  virtual COUNT_T docLengthCounted(DOCID_T docID) const;
 
   //@}
 
@@ -139,7 +139,7 @@ protected:
   bool docIDs();
 
 
-  int* counts;    // array to hold all the overall count stats of this db
+  LOC_T* counts;    // array to hold all the overall count stats of this db
   string *names;  // array to hold all the names for files we need for this db
   float aveDocLen; // the average document length in this index
   inv_entry* lookup;  // the array holding entries (index is termid)

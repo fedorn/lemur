@@ -30,7 +30,7 @@ includes the doc ID and the frequency of a term in the document.
 class DocInfo {
 public:
   DocInfo() {}
-  DocInfo(int docID, int termCount) :
+  DocInfo(DOCID_T docID, COUNT_T termCount) :
     did(docID), tcount(termCount) {}
 
   virtual ~DocInfo() {}
@@ -42,23 +42,23 @@ public:
   virtual void docID(DOCID_T id) {did = id;}
 
   /// Term count in the doc
-  virtual int termCount() const {return tcount;}
+  virtual COUNT_T termCount() const {return tcount;}
 
   /// Set term count
-  virtual void termCount(int c) {tcount = c;}
+  virtual void termCount(COUNT_T c) {tcount = c;}
 
   /// Return list of positions this term occurs in this document
   /// Default implementation to return NULL if no position information available for this DocInfo
-  virtual const int* positions() const { return NULL; }
+  virtual const LOC_T* positions() const { return NULL; }
 
   /// Set the list of positions
   /// Default implementation does nothing
-  virtual void positions(const int* pos) {}
+  virtual void positions(const LOC_T* pos) {}
   // Maybe throw an exception here since this shouldn't ever be called
 
 protected:
-  int did;    // document id
-  int tcount; // term count
+  DOCID_T did;    // document id
+  COUNT_T tcount; // term count
 };
 
 

@@ -40,9 +40,9 @@ public:
   InvDocList(TERMID_T id, int len);
   /// constructors for this list getting memory from a MemCache
   InvDocList(MemCache* mc, TERMID_T id, int len);  
-  InvDocList(MemCache* mc, TERMID_T id, int len, DOCID_T docid, int location);
+  InvDocList(MemCache* mc, TERMID_T id, int len, DOCID_T docid, LOC_T location);
   /// constructor for a list not needing to get any memory
-  InvDocList(TERMID_T id, int listlen, int* list, int fr, int* ldocid, int len);
+  InvDocList(TERMID_T id, int listlen, LOC_T* list, int fr, DOCID_T* ldocid, int len);
   ~InvDocList();
 
   /// this is meant for use with the empty constructor
@@ -50,12 +50,12 @@ public:
   /// the outsider will be able to set everything properly.  thus, when this method
   /// is used, the object becomes READ_ONLY such that methods which attempt to append
   /// the contents of the list will not be able to @see setListSafe
-  void setList(TERMID_T id, int listlen, int* list, int fr, int* ldocid=NULL, int len=0);
+  void setList(TERMID_T id, int listlen, LOC_T* list, int fr, DOCID_T* ldocid=NULL, int len=0);
 
   /// same as the setList above.
   /// however the READ_ONLY flag will not get set.  this method should be used only
   /// if you really know what you're doing
-  void setListSafe(TERMID_T id, int listlen, int* list, int fr, int* ldocid, int len);
+  void setListSafe(TERMID_T id, int listlen, LOC_T* list, int fr, DOCID_T* ldocid, int len);
 
   /// reset the list such that it points to nothing. doesn't free the memory
   /// be careful when using this to avoid memory leaks.  if you are not managing
@@ -81,11 +81,11 @@ public:
   virtual void nextEntry(DocInfo* info) const;
 
   DOCID_T curDocID() const{ if (lastid == NULL) return -1; return *lastid; };
-  int docFreq() const{ return df; };
+  COUNT_T docFreq() const{ return df; };
   int length() const{ return end-begin; };
   TERMID_T termID() const{ return uid; };
   int termLen() const{ return strlength; };
-  virtual int termCTF() const;
+  virtual COUNT_T termCTF() const;
   int curDocIDdiff() const{ return lastid-begin; };
   int curDocIDtf() const{ return *(lastid+1); };
   int memorySize() const{ return size; };
@@ -127,16 +127,17 @@ protected:
   /// call after read
   virtual void deltaDecode();
 
-  int* begin;		// pointer to the beginning of this list
-  int* lastid;	// pointer to the most recent DocID added
-  int* freq;		// pointer to the frequency of the last DocID
-  int* end;		  // pointer to the next free memory
-  mutable int* iter;    // pointer tells us where we are in iteration
+  // Use LOC_T* for TERMID/DOCID/COUNT/LOC.
+  LOC_T* begin;		// pointer to the beginning of this list
+  LOC_T* lastid;	// pointer to the most recent DocID added
+  LOC_T* freq;		// pointer to the frequency of the last DocID
+  LOC_T * end;		  // pointer to the next free memory
+  mutable LOC_T* iter;    // pointer tells us where we are in iteration
   int  size;		// how big are we, increment in powers of 2, start at 16K
-  int  intsize;	// sizeof(int) value
+  int  LOC_Tsize;	// sizeof(LOC_T) value
   int  strlength;       // the character length of our corresponding string
   TERMID_T  uid;		          // a unique ID for our string
-  int  df;		          // the document frequency for current term
+  COUNT_T  df;		          // the document frequency for current term
   MemCache* cache;      // the cache to get memory from
   bool hascache;        // remember if we have our own cache
 

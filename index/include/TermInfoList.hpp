@@ -29,7 +29,7 @@ includes  the term ID and the frequency of the term.
 class TermInfo {
 public:
   TermInfo() {}
-  TermInfo( TERMID_T termID, int termCount) :
+  TermInfo( TERMID_T termID, COUNT_T termCount) :
     tid(termID), tcount(termCount) {}
   virtual ~TermInfo() {}
 
@@ -40,28 +40,28 @@ public:
   virtual void termID(TERMID_T id) {tid = id;}
 
   /// Term count in the doc
-  virtual int count() const {return tcount;}
+  virtual COUNT_T count() const {return tcount;}
 
   /// Set term count
-  virtual void count(int c) {tcount = c;}
+  virtual void count(COUNT_T c) {tcount = c;}
 
   // Return list of positions this term occurs in this document
   // (can be a list of 1 item)
   // Default implementation to return NULL if no position information available for this TermInfo
   // List of positions is better used for bag of words support
-  virtual const int* positions() const{ return NULL; }
+  virtual const LOC_T* positions() const{ return NULL; }
 
   // Return position this term occurs in this document
   // Better for sequence of words support
   // When list of positions can be obtained, this returns the first item in the list
   // Default implementation to return -1 if no position information available for this TermInfo
-  virtual int position() const { return -1; }
+  virtual LOC_T position() const { return -1; }
 
-  virtual void position(int pos) {}
+  virtual void position(LOC_T pos) {}
 
 protected:
-  int tid;
-  int tcount;
+  TERMID_T tid;
+  COUNT_T tcount;
 };
 
 

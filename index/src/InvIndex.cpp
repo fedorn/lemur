@@ -78,7 +78,7 @@ InvIndex::~InvIndex() {
 }
 
 bool InvIndex::open(const string &indexName){
-  counts = new int[5];
+  counts = new COUNT_T[5];
   names = new string[NAMES_SIZE];  
   names[VERSION_NUM] = "";
   names[DOCMGR_IDS] = "";
@@ -133,7 +133,7 @@ bool InvIndex::open(const string &indexName){
   return true;
 }
 
-int InvIndex::term(const string &word) const{
+TERMID_T InvIndex::term(const TERM_T &word) const{
   map<TERM_T, TERMID_T, less<TERM_T> >::iterator point = termtable.find(word);
   if (point != termtable.end()) 
     return point->second;
@@ -141,13 +141,13 @@ int InvIndex::term(const string &word) const{
   return 0;
 }
 
-const string InvIndex::term(int termID) const {
+const TERM_T InvIndex::term(TERMID_T termID) const {
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS]))
     return "";
   return terms[termID];
 }
 
-int InvIndex::document(const string &docIDStr) const{
+DOCID_T InvIndex::document(const EXDOCID_T &docIDStr) const{
   map<EXDOCID_T, DOCID_T, less<EXDOCID_T> >::iterator point = doctable.find(docIDStr);
   if (point != doctable.end()) 
     return point->second;
@@ -155,14 +155,14 @@ int InvIndex::document(const string &docIDStr) const{
   return 0;
 }
 
-const string InvIndex::document(int docID) const { 
+const EXDOCID_T InvIndex::document(DOCID_T docID) const { 
   if ((docID < 0) || (docID > counts[DOCS]))
     return "";
   return docnames[docID]; 
 }
 
 //const char* InvIndex::docManager(int docID) {
-const DocumentManager* InvIndex::docManager(int docID) const{
+const DocumentManager* InvIndex::docManager(DOCID_T docID) const{
   // no such thing previous to version 1.9
   if (names[VERSION_NUM].empty()) 
     return NULL;
@@ -183,7 +183,7 @@ const DocumentManager* InvIndex::docManager(int docID) const{
   return docmgrs[dtlookup[docID].docmgr]; 
 }
 
-int InvIndex::termCount(int termID) const{
+COUNT_T InvIndex::termCount(TERMID_T termID) const{
   // the termCount is equal to the position counts
   // this is calculated by the length of the inverted list -(df*2) for each doc, 
   // there is the docid and the tf
@@ -203,7 +203,7 @@ float InvIndex::docLengthAvg() const{
   return aveDocLen;
 }
 
-int InvIndex::docCount(int termID)  const{
+COUNT_T InvIndex::docCount(TERMID_T termID)  const{
   if ((termID <0) || (termID > counts[UNIQUE_TERMS])) {
     *msgstream << "Error:  Trying to get docCount for invalid termID" << endl;
     return 0;
@@ -216,7 +216,7 @@ int InvIndex::docCount(int termID)  const{
   return lookup[termID].df;
 }
 
-int InvIndex::docLength(int docID) const{
+COUNT_T InvIndex::docLength(DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get docLength for invalid docID." << endl;
     return 0;
@@ -233,7 +233,7 @@ int InvIndex::docLength(int docID) const{
   return dtlookup[docID].length;
 }
 
-int InvIndex::docLengthCounted(int docID) const{
+COUNT_T InvIndex::docLengthCounted(DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get docLengthCounted for invalid docID." << endl;
     return 0;
@@ -247,7 +247,7 @@ int InvIndex::docLengthCounted(int docID) const{
     return 0;
   }
 
-  int dl;
+  COUNT_T dl;
   DOCID_T id;
   ifstream *look = &(dtfstreams[dtlookup[docID].fileid]);
   if (!look) {
@@ -256,15 +256,15 @@ int InvIndex::docLengthCounted(int docID) const{
   }
   look->seekg(dtlookup[docID].offset, ios::beg);
   look->read((char*)&id, sizeof(DOCID_T));
-  look->read((char*)&dl, sizeof(int));
-  look->read((char*)&dl, sizeof(int));
-  if ( !(look->gcount() == sizeof(int)) ) 
+  look->read((char*)&dl, sizeof(COUNT_T));
+  look->read((char*)&dl, sizeof(COUNT_T));
+  if ( !(look->gcount() == sizeof(COUNT_T)) ) 
     return 0;
   
   return dl;
 }
 
-DocInfoList* InvIndex::docInfoList(int termID) const{
+DocInfoList* InvIndex::docInfoList(TERMID_T termID) const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS])) {
     *msgstream << "Error:  Trying to get docInfoList for invalid termID" << endl;
     return NULL;
@@ -292,7 +292,7 @@ DocInfoList* InvIndex::docInfoList(int termID) const{
   }
 }
 
-TermInfoList* InvIndex::termInfoList(int docID) const{
+TermInfoList* InvIndex::termInfoList(DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get termInfoList for invalid docID." << endl;
     return NULL;
@@ -378,10 +378,11 @@ bool InvIndex::indexLookup() {
   lookup = new inv_entry[counts[UNIQUE_TERMS]+1];
   inv_entry* e;
   TERMID_T tid =0;
-  int fid =0;
+  FILEID_T fid =0;
   long off =0;
-  int ctf = 0;
-  int df = 0;
+  COUNT_T ctf = 0;
+  COUNT_T df = 0;
+  // if COUNT_T changes, this needs to be changed...
   while (fscanf(in, "%d %d %d %d %d", &tid, &fid, &off, &ctf, &df) == 5) {
     e = &lookup[tid];
     e->fileid = fid;
@@ -406,7 +407,7 @@ bool InvIndex::dtLookup_ver1() {
   dtlookup = new dt_entry[counts[DOCS]+1];
   dt_entry* e;
   TERMID_T tid =0;
-  int fid =0;
+  FILEID_T fid =0;
   long off =0;
   int len =0;
   while (fscanf(in, "%d %d %d %d", &tid, &fid, &off, &len) == 4) {
@@ -432,7 +433,7 @@ bool InvIndex::dtLookup() {
   dtlookup = new dt_entry[counts[DOCS]+1];
   dt_entry* e;
   TERMID_T tid =0;
-  int fid =0;
+  FILEID_T fid =0;
   long off =0;
   int len =0;
   int mgr =0;

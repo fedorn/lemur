@@ -77,8 +77,8 @@ protected:
 
   long maxfile; /// the biggest our file size can be
   MemCache* cache; /// the main memory handler for building
-  vector<string> docIDs; /// list of external docids in internal docid order
-  vector<string> termIDs; /// list of terms in termid order
+  vector<EXDOCID_T> docIDs; /// list of external docids in internal docid order
+  vector<TERM_T> termIDs; /// list of terms in termid order
   vector<string> tempfiles; /// list of tempfiles we've written to flush cache
   vector<string> dtfiles; /// list of dt index files
   vector<string> docmgrs;  // the list of doc managers we have (index = id)
@@ -86,12 +86,12 @@ protected:
   FILE* writetlookup; /// filestream for writing the lookup table to the docterm db
   ofstream writetlist; /// filestream for writing the list of located terms for each document
 
-  int tcount;    /// count of total terms
-  int tidcount ; /// count of unique terms
-  int dtidcount; /// count of unique terms in a current doc
+  COUNT_T tcount;    /// count of total terms
+  COUNT_T tidcount ; /// count of unique terms
+  COUNT_T dtidcount; /// count of unique terms in a current doc
   string name;    /// the prefix name
   TABLE_T wordtable; /// table of all terms and their doclists
-  map<int, int> termlist; /// maps of terms and freqs
+  map<TERMID_T, COUNT_T> termlist; /// maps of terms and freqs
   int* membuf; /// memory to use for cache and buffers
   int membufsize;  // how much memory we have
   int curdocmgr; // the current docmanager to use

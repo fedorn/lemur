@@ -195,7 +195,7 @@ void InvPushIndex::writeDocIDs() {
   FILE* docid = fopen(dname.c_str(), "wb");
   // first write out the string value for an unknown docid
   fprintf(docid, "%d %d %s ", 0, strlen(INVALID_STR), INVALID_STR);
-  for (int i=0;i<docIDs.size();i++) {
+  for (DOCID_T i=0;i<docIDs.size();i++) {
     fprintf(docid, "%d %d %s ", i+1, docIDs[i].size(), docIDs[i].c_str());
   }
   fclose(docid);
@@ -238,8 +238,8 @@ void InvPushIndex::writeCache() {
   TABLE_T::iterator finder;
   InvDocList* list;
   // write the file out in termid order
-  for (int i=0;i<termIDs.size();i++) {
-    string &term = termIDs[i];
+  for (TERMID_T i=0;i<termIDs.size();i++) {
+    TERM_T &term = termIDs[i];
     finder = wordtable.find(term);
     if (finder == wordtable.end() ) {
       // this really shouldn't happen. means can't find term in table
@@ -289,8 +289,8 @@ void InvPushIndex::lastWriteCache() {
   InvDocList* list;
 
   // write the file out in termid order
-  for (int i=0;i<termIDs.size();i++) {
-    string &term = termIDs[i];
+  for (TERMID_T i=0;i<termIDs.size();i++) {
+    TERM_T &term = termIDs[i];
 
     finder = wordtable.find(term);
     if (finder == wordtable.end() ) {
@@ -338,15 +338,15 @@ int InvPushIndex::docMgrID(const string &mgrString) {
 void InvPushIndex::doendDoc(const DocumentProps* dp, int mgrid){
   //flush list and write to lookup table
   if (dp != NULL) {
-    int docid = docIDs.size();
-    int len = dp->length();
-    int tls = termlist.size() *2; // for each item we will write 2 ints
+    DOCID_T docid = docIDs.size();
+    COUNT_T len = dp->length();
+    COUNT_T tls = termlist.size() *2; // for each item we will write 2 ints
 
     // make sure the ftell is correct
     writetlist.flush();
     long offset = (long)writetlist.tellp();
 
-    if (offset+(3*sizeof(int))+(tls*sizeof(int)) > maxfile) {
+    if (offset+(3*sizeof(LOC_T))+(tls*sizeof(LOC_T)) > maxfile) {
       writetlist.close();
       std::stringstream nameStr;
       nameStr << name << DTINDEX << dtfiles.size();
@@ -359,13 +359,13 @@ void InvPushIndex::doendDoc(const DocumentProps* dp, int mgrid){
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset, len, mgrid);
 
     writetlist.write((const char*)&docid, sizeof(DOCID_T));
-    writetlist.write((const char*)&len, sizeof(int));
-    writetlist.write((const char*)&tls, sizeof(int));
+    writetlist.write((const char*)&len, sizeof(COUNT_T));
+    writetlist.write((const char*)&tls, sizeof(COUNT_T));
 
     // write our termlist out.. buffering taken care of by os
-    for (map<int, int>::iterator look=termlist.begin();look!=termlist.end();look++) {
-      writetlist.write((const char*)&(look->first), sizeof(int));
-      writetlist.write((const char*)&(look->second), sizeof(int));
+    for (map<TERMID_T, COUNT_T>::iterator look=termlist.begin();look!=termlist.end();look++) {
+      writetlist.write((const char*)&(look->first), sizeof(TERMID_T));
+      writetlist.write((const char*)&(look->second), sizeof(COUNT_T));
     }
 
     tcount += len;

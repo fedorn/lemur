@@ -851,7 +851,7 @@ void BasicIndex::createKeys()
   wordKeyFile = outputName;
 }
 
-DocInfoList * BasicIndex::docInfoList(int termID) const
+DocInfoList * BasicIndex::docInfoList(TERMID_T termID) const
 {
   wordIndexStream.seekg(woffset[termID]);
   int w;
@@ -864,7 +864,7 @@ DocInfoList * BasicIndex::docInfoList(int termID) const
 }
 
 
-TermInfoList *BasicIndex::termInfoList(int docID) const
+TermInfoList *BasicIndex::termInfoList(DOCID_T docID) const
 {
   documentIndexStream.seekg(doffset[docID]);
   int d, count;
@@ -875,7 +875,7 @@ TermInfoList *BasicIndex::termInfoList(int docID) const
   
 }
 
-int BasicIndex::docCount(int t) const
+COUNT_T BasicIndex::docCount(TERMID_T t) const
 {
   int w;
   int count;

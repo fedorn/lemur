@@ -28,7 +28,7 @@ public:
   int strLength() const { return strlen; }
   void strLength(int len) { strlen = len; }
   LOC_T position() const { return loc; }
-  const int* positions() const {vector<LOC_T>::const_iterator it(loclist->begin()); return &(*it); }
+  const LOC_T* positions() const {vector<LOC_T>::const_iterator it(loclist->begin()); return &(*it); }
   void position(LOC_T pos) { loc = pos; }
   void positions(vector<LOC_T>* list) { loclist = list; }
 protected:

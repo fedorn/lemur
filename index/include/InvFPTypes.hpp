@@ -74,8 +74,8 @@ struct dt_entry {   // an entry in the lookup table for docterm lists index
 struct inv_entry {   // an entry in the lookup table for docterm lists index
   FILEID_T fileid;  // which file the word is in
   long offset;        // what the offset into the file is
-  int ctf;            // collection term freq
-  int df;             // doc freq
+  COUNT_T ctf;            // collection term freq
+  COUNT_T df;             // doc freq
 };
 
 struct ltstr

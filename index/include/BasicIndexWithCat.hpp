@@ -39,16 +39,16 @@ public:
   //@{
 
   /// Convert a term spelling to a termID
-  virtual int term (const string &word) const { return baseIndex->term(word);}
+  virtual TERMID_T term (const string &word) const { return baseIndex->term(word);}
 
   /// Convert a termID to its spelling
-  virtual const string term (int termID) const { return baseIndex->term(termID);}
+  virtual const string term (TERMID_T termID) const { return baseIndex->term(termID);}
 
   /// Convert a spelling to docID
-  virtual int document (const string &docIDStr) const { return baseIndex->document(docIDStr);}
+  virtual DOCID_T document (const string &docIDStr) const { return baseIndex->document(docIDStr);}
 
   /// Convert a docID to its spelling
-  virtual const string document (int docID) const { return baseIndex->document(docID);}
+  virtual const string document (DOCID_T docID) const { return baseIndex->document(docID);}
 
   /// Convert a spelling to catID
   virtual int category (const string &catIDStr) const;
@@ -62,25 +62,25 @@ public:
   //@{
 
   /// Total count (i.e., number) of documents in collection
-  virtual int docCount () const { return baseIndex->docCount();}
+  virtual COUNT_T docCount () const { return baseIndex->docCount();}
 
   /// Total count of unique terms in collection
-  virtual int termCountUnique () const { return baseIndex->termCountUnique();}
+  virtual COUNT_T termCountUnique () const { return baseIndex->termCountUnique();}
 
   /// Total counts of a term in collection
-  virtual int termCount (int termID) const { return baseIndex->termCount(termID); }
+  virtual COUNT_T termCount (TERMID_T termID) const { return baseIndex->termCount(termID); }
 
   /// Total counts of all terms in collection
-  virtual int termCount () const { return baseIndex->termCount(); }
+  virtual COUNT_T termCount () const { return baseIndex->termCount(); }
 
   /// Average document length 
   virtual float docLengthAvg() const { return baseIndex->docLengthAvg(); }
 
   /// Total counts of doc with a given term
-  virtual int docCount(int termID) const { return baseIndex->docCount(termID);}
+  virtual COUNT_T docCount(TERMID_T termID) const { return baseIndex->docCount(termID);}
 
   /// Total counts of terms in a document  
-  virtual int docLength (int docID) const {return baseIndex->docLength(docID); }
+  virtual COUNT_T docLength (DOCID_T docID) const {return baseIndex->docLength(docID); }
 
   /// Total counts of categories
   virtual int catCount() const;
@@ -93,10 +93,10 @@ public:
   /// @name Base Index entry access (Term X Doc)
   //@{
   /// doc entries in a term index, @see DocList
-  virtual DocInfoList *docInfoList(int termID) const { return baseIndex->docInfoList(termID); }
+  virtual DocInfoList *docInfoList(TERMID_T termID) const { return baseIndex->docInfoList(termID); }
 
   /// word entries in a document index, @see TermList
-  virtual TermInfoList *termInfoList(int docID) const { return baseIndex->termInfoList(docID); }
+  virtual TermInfoList *termInfoList(DOCID_T docID) const { return baseIndex->termInfoList(docID); }
 
   //@}
 

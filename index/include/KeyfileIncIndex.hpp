@@ -89,9 +89,9 @@ public:
   /// individual term data
   struct TermData {
     /// total number of times this term occurs in the corpus
-    unsigned int totalCount;
+    COUNT_T totalCount;
     /// total number of documents this term occurs in
-    unsigned int documentCount;
+    COUNT_T documentCount;
     /// segments containing the data associated with the the term
     SegmentOffset segments[ KEYFILE_MAX_SEGMENTS ];
   };
@@ -181,31 +181,31 @@ public:
   //@{
 
   /// Total count (i.e., number) of documents in collection
-  int docCount() const { return counts[DOCS]; };
+  COUNT_T docCount() const { return counts[DOCS]; };
 
   /// Total count of unique terms in collection
-  int termCountUnique() const { return counts[UNIQUE_TERMS]; };
+  COUNT_T termCountUnique() const { return counts[UNIQUE_TERMS]; };
 
   /// Total counts of a term in collection
-  int termCount(TERMID_T termID) const;
+  COUNT_T termCount(TERMID_T termID) const;
 
   /// Total counts of all terms in collection
-  int termCount() const { return counts[TOTAL_TERMS]; };
+  COUNT_T termCount() const { return counts[TOTAL_TERMS]; };
 
   /// Average document length 
   float docLengthAvg() const;
 
   /// Total counts of doc with a given term
-  int docCount(TERMID_T termID) const;
+  COUNT_T docCount(TERMID_T termID) const;
 
   /// Total counts of terms in a document, including stop words maybe
-  int docLength(DOCID_T docID) const; // should use DOCID_T everywhere...
+  COUNT_T docLength(DOCID_T docID) const;
 
   /// Total counts of terms in a document including stopwords for sure.
-  virtual int totaldocLength (DOCID_T docID) const;
+  virtual COUNT_T totaldocLength (DOCID_T docID) const;
 
   /// Total count of terms in given document, not including stop words
-  int docLengthCounted(DOCID_T docID) const;
+  COUNT_T docLengthCounted(DOCID_T docID) const;
 
   //@}
 
@@ -224,11 +224,11 @@ public:
   /// set the mesg stream
   void setMesgStream(ostream * lemStream);
   /// update data for an already seen term
-  void addKnownTerm( TERMID_T termID, int position );
+  void addKnownTerm( TERMID_T termID, LOC_T position );
   /// initialize data for a previously unseen term.
-  int addUnknownTerm( const InvFPTerm* term );
+  TERMID_T addUnknownTerm( const InvFPTerm* term );
   /// update data for a term that is not cached in the term cache.
-  int addUncachedTerm( const InvFPTerm* term );
+  TERMID_T addUncachedTerm( const InvFPTerm* term );
 
 protected:
   /// open the database files
@@ -250,11 +250,11 @@ protected:
   void addTermLookup( TERMID_T termKey, const char* termSpelling );
   /// store a record
   void addGeneralLookup( Keyfile& numberNameIndex, Keyfile& nameNumberIndex, 
-			 int number, const char* name );
+			 TERMID_T number, const char* name );
   /// retrieve and construct the DocInfoList for a term.
   InvFPDocList* internalDocInfoList(TERMID_T termID) const;
   /// add a position to a DocInfoList
-  void _updateTermlist( InvFPDocList* curlist, int position );
+  void _updateTermlist( InvFPDocList* curlist, LOC_T position );
   /// total memory used by cache
   int _cacheSize();
   /// cache size limits based on cachesize parameter to constructor
@@ -262,7 +262,7 @@ protected:
   /// Approximate how many updates to collect before flushing the cache.
   void _resetEstimatePoint();
   /// array to hold all the overall count stats of this db
-  int* counts;    
+  COUNT_T* counts;    
   /// array to hold all the names for files we need for this db
   std::vector<std::string> names;
   /// the average document length in this index
@@ -318,7 +318,7 @@ protected:
   /// out-of-tree segments for data
   std::vector<File*> _segments;
   /// highest term id flushed to disk.
-  int _largestFlushedTermID;
+  TERMID_T _largestFlushedTermID;
   /// invertlists point where we should next check on the cache size
   int _estimatePoint; 
   /// are we in a bad document state?

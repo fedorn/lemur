@@ -35,26 +35,26 @@ class InvFPDocList: public InvDocList {
 public:
   InvFPDocList();
   /// copy from byteVector
-  InvFPDocList(int *vec);
+  InvFPDocList(LOC_T *vec);
 
   /// constructor for this list using malloc for its own memory
   /// usage of InvFPDocList without MemCache has not been tested
-  InvFPDocList(int id, int len);
+  InvFPDocList(TERMID_T id, int len);
   /// constructors for this list getting memory from a MemCache
-  InvFPDocList(MemCache* mc, int id, int len);
-  InvFPDocList(MemCache* mc, int id, int len, int docid, int location);
+  InvFPDocList(MemCache* mc, TERMID_T id, int len);
+  InvFPDocList(MemCache* mc, TERMID_T id, int len, DOCID_T docid, LOC_T location);
   /// constructor for a list not needing to get any memory
-  InvFPDocList(int id, int listlen, int* list, int fr, int* ldocid, int len);
+  InvFPDocList(TERMID_T id, int listlen, LOC_T* list, int fr, DOCID_T* ldocid, int len);
   ~InvFPDocList();
 
-  bool addTerm(int docid);
-  bool addLocation(int docid, LOC_T location);
+  bool addTerm(DOCID_T docid);
+  bool addLocation(DOCID_T docid, LOC_T location);
   bool append(InvDocList* tail);
 
   virtual DocInfo* nextEntry() const;
   virtual void nextEntry(InvFPDocInfo* info) const;
-  virtual int termCTF() const;
-  int *byteVec(int &len);
+  virtual COUNT_T termCTF() const;
+  LOC_T *byteVec(COUNT_T &len);
 
 protected:
   // Helper functions for iterator, subclasses should override

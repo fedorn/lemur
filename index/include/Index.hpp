@@ -57,6 +57,8 @@ delete docList;
 #include "TermInfoList.hpp"
 #include "DocInfoList.hpp"
 #include "DocumentManager.hpp"
+#include "lemur-platform.h"
+#include "lemur-compat.hpp"
 
 class Index {
 public:
@@ -102,25 +104,25 @@ public:
   //@{
 
   /// Total count (i.e., number) of documents in collection
-  virtual int docCount () const=0;
+  virtual COUNT_T docCount () const=0;
 
   /// Total count of unique terms in collection, i.e., the term vocabulary size
-  virtual int termCountUnique () const=0;
+  virtual COUNT_T termCountUnique () const=0;
 
   /// Total counts of a term in collection
-  virtual int termCount (TERMID_T termID) const=0;
+  virtual COUNT_T termCount (TERMID_T termID) const=0;
 
   /// Total counts of all terms in collection
-  virtual int termCount () const=0;
+  virtual COUNT_T termCount () const=0;
 
   /// Average document length 
   virtual float docLengthAvg() const=0;
 
   /// Total counts of doc with a given term
-  virtual int docCount(TERMID_T termID) const=0;
+  virtual COUNT_T docCount(TERMID_T termID) const=0;
 
   /// Total counts of terms in a document  
-  virtual int docLength (DOCID_T docID) const=0;
+  virtual COUNT_T docLength (DOCID_T docID) const=0;
 
   //@}
 

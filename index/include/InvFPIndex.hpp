@@ -39,7 +39,7 @@ public:
   TermInfoList* termInfoListSeq(DOCID_T docID) const;
 
   /// Total count of terms in given document, not including stop words
-  int docLengthCounted(DOCID_T docID) const;
+  COUNT_T docLengthCounted(DOCID_T docID) const;
 
   //@}
 private:

@@ -72,7 +72,7 @@ bool InvFPPushIndex::addTerm(const Term& t){
     // update unique word counter
     tidcount++;
     //store new word in list of ids
-    string spell = term->spelling();
+    TERM_T spell = term->spelling();
     termIDs.push_back(spell);
 
     curlist = new InvFPDocList(cache, termIDs.size(), term->strLength(), docIDs.size(), term->position() );
@@ -157,15 +157,15 @@ void InvFPPushIndex::writeTOC(int numinv) {
 void InvFPPushIndex::doendDoc(const DocumentProps* dp, int mgrid){
   //flush list and write to lookup table
   if (dp != NULL) {
-    int docid = docIDs.size();
-    int len = dp->length();
-    int tls = termlist.size();
+    DOCID_T docid = docIDs.size();
+    COUNT_T len = dp->length();
+    COUNT_T tls = termlist.size();
     
     // make sure the ftell is correct
     writetlist.flush();
     long offset = (long)writetlist.tellp();
 
-    if (offset+(3*sizeof(int))+(tls*sizeof(LocatedTerm)) > maxfile) {
+    if (offset+(3*sizeof(LOC_T))+(tls*sizeof(LocatedTerm)) > maxfile) {
       writetlist.close();
       std::stringstream nameStr;
       nameStr << name << DTINDEX << dtfiles.size();

@@ -118,14 +118,14 @@ bool InvPassagePushIndex::addTerm(const Term& t){
   termlist.push_back(lt);
   if (termlist.size() == passageSize) {
     // flush a passage.
-    int docid = docIDs.size();
-    int tls = termlist.size();
+    DOCID_T docid = docIDs.size();
+    COUNT_T tls = termlist.size();
     // stop words will not be counted
-    int len = tls;
+    COUNT_T len = tls;
     // make sure the ftell is correct
     writetlist.flush();
     long offset = (long)writetlist.tellp();
-    if (offset+(3*sizeof(int))+(tls*sizeof(LocatedTerm)) > maxfile) {
+    if (offset+(3*sizeof(LOC_T))+(tls*sizeof(LocatedTerm)) > maxfile) {
       writetlist.close();
       std::stringstream nameStr;
       nameStr << name << DTINDEX << dtfiles.size();
@@ -172,15 +172,15 @@ bool InvPassagePushIndex::addTerm(const Term& t){
 void InvPassagePushIndex::doendDoc(const DocumentProps* dp, int mgrid) {
   //flush list and write to lookup table
   if (dp != NULL) {
-    int docid = docIDs.size();
+    DOCID_T docid = docIDs.size();
     //    int len = dp->length(); // stop words will not be counted
-    int tls = termlist.size();
-    int len = tls;
+    COUNT_T tls = termlist.size();
+    COUNT_T len = tls;
     // make sure the ftell is correct
     writetlist.flush();
     long offset = (long)writetlist.tellp();
 
-    if (offset+(3*sizeof(int))+(tls*sizeof(LocatedTerm)) > maxfile) {
+    if (offset+(3*sizeof(LOC_T))+(tls*sizeof(LocatedTerm)) > maxfile) {
       writetlist.close();
       std::stringstream nameStr;
       nameStr << name << DTINDEX << dtfiles.size();

@@ -39,10 +39,10 @@ public:
   TermInfo *nextEntry() const;
 
   /// Get the length of this document
-  int docLength() const { return length; }
+  COUNT_T docLength() const { return length; }
 
   /// Get the number of terms in this document
-  int termCount() const{ return listlen/2; }
+  COUNT_T termCount() const{ return listlen/2; }
 
   /// Get the docid this list is for
   DOCID_T docID() const{ return uid; }
@@ -66,10 +66,11 @@ private:
 
   DOCID_T uid; // this doc's id
   int length;  // length of this document (terms + stopwords)
-  int* list; // beginning of list of terms and counts
-  int* end; // end of list
+  // LOC_T==TERMID_T==COUNT_T==DOCID_T
+  LOC_T* list; // beginning of list of terms and counts
+  LOC_T* end; // end of list
   int listlen; // number of terms in list
-  mutable int* iter;   // index for iterator
+  mutable LOC_T* iter;   // index for iterator
   mutable TermInfo entry;
 };
 

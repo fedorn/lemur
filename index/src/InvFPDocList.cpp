@@ -21,38 +21,38 @@ InvFPDocList::InvFPDocList() : InvDocList() {
 }
 
 //  This hasn't been tested
-InvFPDocList::InvFPDocList(int id, int len) : InvDocList(id, len) {
+InvFPDocList::InvFPDocList(TERMID_T id, int len) : InvDocList(id, len) {
 }
 
 
-InvFPDocList::InvFPDocList(int id, int listlen, int* list, int fr, int* ldocid, int len) : InvDocList(id, listlen, list, fr, ldocid, len) {
+InvFPDocList::InvFPDocList(TERMID_T id, int listlen, LOC_T* list, int fr, DOCID_T* ldocid, int len) : InvDocList(id, listlen, list, fr, ldocid, len) {
 }
 
-InvFPDocList::InvFPDocList(MemCache* mc, int id, int len) : InvDocList(mc, id, len) {
+InvFPDocList::InvFPDocList(MemCache* mc, TERMID_T id, int len) : InvDocList(mc, id, len) {
 }
 
-InvFPDocList::InvFPDocList(MemCache* mc, int id, int len, int docid, int location) : InvDocList(mc, id, len) {
+InvFPDocList::InvFPDocList(MemCache* mc, TERMID_T id, int len, DOCID_T docid, LOC_T location) : InvDocList(mc, id, len) {
   if (begin)
     addLocation(docid, location);	
 }
 
-InvFPDocList::InvFPDocList(int *vec) {
+InvFPDocList::InvFPDocList(LOC_T *vec) {
   READ_ONLY = false;
   hascache = false;
-  intsize = sizeof(int);
+  LOC_Tsize = sizeof(LOC_T);
   uid = vec[0];
   df = vec[1];
-  int diff = vec[2];
-  int vecLength = vec[3];
+  COUNT_T diff = vec[2];
+  COUNT_T vecLength = vec[3];
   size = vecLength * 4;
   unsigned char* buffer = (unsigned char *) (vec + 4);
   // this should be big enough
   //  begin = (LOC_T*) malloc(s);
   // use new/delete[] so an exception will be thrown if out of memory.
-  begin = new int[size/sizeof(int)];
+  begin = new LOC_T[size/sizeof(LOC_T)];
 
   // decompress it
-  int len = RVLCompress::decompress_ints(buffer, begin, vecLength);
+  int len = RVLCompress::decompress_ints(buffer, (int *)begin, vecLength);
   
   lastid = begin + diff;
   end = begin + len;
@@ -65,7 +65,7 @@ InvFPDocList::~InvFPDocList() {
 }
 
 DocInfo* InvFPDocList::nextEntry() const{
-  // info is stored in int* as docid freq pos1 pos2 ..
+  // info is stored in LOC_T* as docid freq pos1 pos2 ..
   entry.docID(*iter);
   iter++;
   entry.termCount(*iter);
@@ -87,7 +87,7 @@ void InvFPDocList::nextEntry(InvFPDocInfo* info) const{
 /// set element from position, returns pointer to the element
 DocInfo* InvFPDocList::getElement(DocInfo* elem, POS_T position) const {
   //  InvFPDocInfo* e = dynamic_cast<InvFPDocInfo*>(elem);
-  int* ip = (int*) position;
+  LOC_T* ip = (LOC_T*) position;
   elem->docID(*ip);
   ip++;
   elem->termCount(*ip);
@@ -97,11 +97,11 @@ DocInfo* InvFPDocList::getElement(DocInfo* elem, POS_T position) const {
 }
 /// advance position
 POS_T InvFPDocList::nextPosition(POS_T position) const {
-  int* ip = (int*) position;
+  LOC_T* ip = (LOC_T*) position;
   return (POS_T) (ip + *(ip+1) + 2);  // ip + termcount + 2
 }
 
-bool InvFPDocList::addTerm(int docid) {
+bool InvFPDocList::addTerm(DOCID_T docid) {
   cerr << "InvFPDocList add term must have location.  Use addLocation(int, int)" << endl;
   return false;
 }
@@ -113,12 +113,12 @@ bool InvFPDocList::append(InvDocList* par_tail) {
   InvFPDocList* tail = (InvFPDocList*) par_tail;
   
   // we only want to append the actual content
-  int* ptr = tail->begin;
-  int len = tail->length();
-  int diff = tail->end - tail->lastid;
+  LOC_T* ptr = tail->begin;
+  COUNT_T len = tail->length();
+  COUNT_T diff = tail->end - tail->lastid;
 
   // check for memory
-  while ((end-begin+len)*intsize > size) {
+  while ((end-begin+len)*LOC_Tsize > size) {
     if (!getMoreMem())
       return false;
   }
@@ -130,12 +130,12 @@ bool InvFPDocList::append(InvDocList* par_tail) {
   // this method will mainly be used for merging lists from indexing
   // in that case, overlap of docids would only occur by 1
   if (*ptr == *lastid) {
-    int tailtf = *(ptr+1);
+    COUNT_T tailtf = *(ptr+1);
     // add tfs together
     *freq += tailtf;
     // advance pointer to pos list
     ptr += 2;
-    memcpy(end, ptr, tailtf*intsize);
+    memcpy(end, ptr, tailtf*LOC_Tsize);
 
     // doc frequency is actually one less
     df--;
@@ -148,7 +148,7 @@ bool InvFPDocList::append(InvDocList* par_tail) {
 
   // copy list over
   if (len > 0) {
-    memcpy(end, ptr, len*intsize);
+    memcpy(end, ptr, len*LOC_Tsize);
 
     end += len;
     lastid = end-diff;
@@ -158,7 +158,7 @@ bool InvFPDocList::append(InvDocList* par_tail) {
   return true;
 }
 
-bool InvFPDocList::addLocation(int docid, int location) {
+bool InvFPDocList::addLocation(DOCID_T docid, LOC_T location) {
   if (READ_ONLY)
     return false;
     // check that we can add at all
@@ -168,7 +168,7 @@ bool InvFPDocList::addLocation(int docid, int location) {
   // check to see if it's a new document
   if (docid == *lastid) {
     //get more mem if needed
-    if ((end-begin+1)*intsize > size) {
+    if ((end-begin+1)*LOC_Tsize > size) {
       if (!getMoreMem())
         return false;
     }
@@ -178,7 +178,7 @@ bool InvFPDocList::addLocation(int docid, int location) {
     end++;
   } else {
     //get more mem if needed
-    if ((end-begin+3)*intsize > size) {
+    if ((end-begin+3)*LOC_Tsize > size) {
       if (!getMoreMem())
         return false;
     }
@@ -194,9 +194,9 @@ bool InvFPDocList::addLocation(int docid, int location) {
   return true;
 }
 
-int InvFPDocList::termCTF() const {
-  int ctf = 0;
-  int *ptr = begin;
+COUNT_T InvFPDocList::termCTF() const {
+  COUNT_T ctf = 0;
+  LOC_T *ptr = begin;
   while (ptr != lastid) {
     ptr++;
     ctf += (*ptr);
@@ -210,17 +210,17 @@ void InvFPDocList::deltaEncode() {
   // we will encode in place
   // go backwards starting at the last docid
   // we're counting on two always being bigger than one
-  int* two = lastid;
+  LOC_T* two = lastid;
   // to keep track of encoding positions
-  int* posbeg = freq+1;
-  int* posone = end-2;
-  int* postwo = end-1;
+  LOC_T* posbeg = freq+1;
+  LOC_T* posone = end-2;
+  LOC_T* postwo = end-1;
   
   // our stack of ones so we can backtrack
-  vector<int*> onestack;
-  int* k = begin;
+  vector<LOC_T*> onestack;
+  LOC_T* k = begin;
   while (k!=lastid) {
-    int* j = k;
+    LOC_T* j = k;
     onestack.push_back(j);
     //advance to freq
     k++; 
@@ -228,7 +228,7 @@ void InvFPDocList::deltaEncode() {
     k += *k+1;
   }
   
-  int* one;
+  LOC_T* one;
   while (two != begin) {
     one = onestack.back();
     onestack.pop_back();
@@ -257,11 +257,11 @@ void InvFPDocList::deltaEncode() {
 void InvFPDocList::deltaDecode() {
   // we will decode in place
   // start at the begining
-  int* one = begin;
-  int* two = one +*(begin+1)+2;
+  LOC_T* one = begin;
+  LOC_T* two = one +*(begin+1)+2;
   
-  int* posone = begin+2;
-  int* postwo = begin+3;
+  LOC_T* posone = begin+2;
+  LOC_T* postwo = begin+3;
 
   while (one != lastid) {
     // do the positions
@@ -284,20 +284,20 @@ void InvFPDocList::deltaDecode() {
   }
 }
 
-int *InvFPDocList::byteVec(int &vecLength){
-  int len= end-begin;
-  int diff = lastid-begin;
+LOC_T *InvFPDocList::byteVec(COUNT_T &vecLength){
+  COUNT_T len= end-begin;
+  COUNT_T diff = lastid-begin;
   deltaEncode();
 
-  unsigned char* comp = new unsigned char[(len+4)*intsize];
-  vecLength = RVLCompress::compress_ints(begin, comp + (4 * intsize), len);
+  unsigned char* comp = new unsigned char[(len+4)*LOC_Tsize];
+  vecLength = RVLCompress::compress_ints((int *)begin, comp + (4 * LOC_Tsize), len);
 
-  int *tmp = ((int *) comp);
+  LOC_T *tmp = ((LOC_T *) comp);
   tmp[0] = uid;
   tmp[1] = df;
   tmp[2] = diff;
   tmp[3] = vecLength;
-  vecLength += (4 * intsize);
+  vecLength += (4 * LOC_Tsize);
   return(tmp);
 }
 

@@ -57,16 +57,16 @@ public:
   //@{
 
   /// Convert a term spelling to a termID
-  virtual int term (const string &word) const { return terms[word];}
+  virtual TERMID_T term (const string &word) const { return terms[word];}
 
   /// Convert a termID to its spelling
-  virtual const string term (int termID) const { return terms[termID];} 
+  virtual const string term (TERMID_T termID) const { return terms[termID];} 
 
   /// Convert a spelling to docID
-  virtual int document (const string &docIDStr) const {return docids[docIDStr];}
+  virtual TERMID_T document (const string &docIDStr) const {return docids[docIDStr];}
 
   /// Convert a docID to its spelling
-  virtual const string document (int docID) const {return docids[docID];}
+  virtual const string document (TERMID_T docID) const {return docids[docID];}
 
   /// return the term lexicon ID
   virtual const string termLexiconID() const { return wordVocabulary;} 
@@ -76,37 +76,37 @@ public:
   //@{
 
   /// Total count (i.e., number) of documents in collection
-  virtual int docCount () const  { return docids.size()-1;}
+  virtual COUNT_T docCount () const  { return docids.size()-1;}
 
   /// Total count of unique terms in collection
-  virtual int termCountUnique () const { return terms.size()-1;}
+  virtual COUNT_T termCountUnique () const { return terms.size()-1;}
 
   /// Total counts of a term in collection
-  virtual int termCount (int termID) const { return countOfTerm[termID] ;}
+  virtual COUNT_T termCount (TERMID_T termID) const { return countOfTerm[termID] ;}
 
   /// Total counts of all terms in collection
-  //  virtual int termCount () const {return (int)avgDocumentLength*(docids.size()-1) ;}
-  virtual int termCount () const {return numWords ;}
+  //  virtual COUNT_T termCount () const {return (int)avgDocumentLength*(docids.size()-1) ;}
+  virtual COUNT_T termCount () const {return numWords ;}
   // XXX Better to have an exact count!
 
   /// Average document length 
   virtual float docLengthAvg() const { return avgDocumentLength;}
 
   /// Total counts of doc with a given term
-  virtual int docCount(int termID) const;
+  virtual COUNT_T docCount(TERMID_T termID) const;
 
   /// Total counts of terms in a document  
-  virtual int docLength (int docID) const { return countOfDoc[docID];}  ;
+  virtual COUNT_T docLength (DOCID_T docID) const { return countOfDoc[docID];}  ;
 
   //@}
 
   /// @name Index entry access
   //@{
   /// doc entries in a term index, caller should release the memory @see DocList
-  virtual DocInfoList *docInfoList(int termID) const ;
+  virtual DocInfoList *docInfoList(TERMID_T termID) const ;
 
   /// word entries in a document index, caller should release the memory @see TermList
-  virtual TermInfoList *termInfoList(int docID) const ;
+  virtual TermInfoList *termInfoList(DOCID_T docID) const ;
 
   //@}
 
