@@ -55,7 +55,7 @@ public:
   ArrayCounter(int size) : sz(size), ct(new T[size]), total(0) {
     for (int i=0; i<size; i++) ct[i]=0;
   }
-  ~ArrayCounter() { delete [] ct;}
+  virtual ~ArrayCounter() { delete [] ct;}
 
   /// return the count of an event
   virtual double count(int eventIndex) {
