@@ -155,6 +155,8 @@ public:
       } else {
         result = defaultAfter( oldNode, newNode );
       }
+    } else {
+      result = defaultAfter( oldNode, newNode );
     }
 
     _disqualifiedTree = false;
