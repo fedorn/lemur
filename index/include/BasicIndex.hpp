@@ -52,7 +52,6 @@ public:
   
   /// Open previously created Index, return true if opened successfully
   virtual bool open(const char * indexName);
-  //@}
 
   /// @name Spelling and index conversion
   //@{
