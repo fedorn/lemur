@@ -309,7 +309,7 @@ DocumentManager * KeyfileIncIndex::docManager(int docID) {
     return NULL;
   record r = fetchDocumentRecord( docID );
   int docManagerID = r.num;
-  cerr << "DOCManagerID " << docManagerID << endl;
+  //  cerr << "DOCManagerID " << docManagerID << endl;
   // if it never had one registered.
   if (docManagerID == -1) 
     return NULL;
