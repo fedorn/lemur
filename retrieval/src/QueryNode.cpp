@@ -131,7 +131,16 @@ void QueryNode::unionDocList(int numDocs) {
   int nd = dc;
   int cnt = 0;
   ch->startIteration();
-  // can't be empty...
+  // If all children are empty (such as all terms that are OOV)
+  // initialize an empty doc list.
+  if (! ch->hasMore()) {
+    dList = new bool[dc];
+    for(int i = 0; i < dc; i++) dList[i] = false;
+    nextDoc = nd; /// first elt
+    dCnt = cnt;
+    proxList = NULL;
+    return;
+  }
   QueryNode *child = ch->nextNode();
   bool *didList = child->dList;
   nd = child->nextDoc; /// first elt
@@ -250,6 +259,7 @@ void SynQNode::synonymProxList() {
   int *posIDX = new int[numChildren]; /// pos buffer idx
   int newProxIDX = 0;
   for(j = 0, i = nextDoc; j < dCnt; i++) {
+
     if(dList[i]) {
       /// initialize
       // get prox info for all children

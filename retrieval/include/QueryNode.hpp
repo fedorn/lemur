@@ -366,9 +366,14 @@ public:
     double prod = 1.0;
     QueryNode *qn;
     double wt;
+    StructQryDocRep * myRep = (StructQryDocRep *)dRep;
+    int did = myRep->did;
     ch->startIteration();
     while(ch->hasMore()) {
       qn = ch->nextNode();
+      // advance child prox entry to this document
+      if (qn->hasMoreProx() && qn->nextProxItem(did))
+	qn->nextDoc = did; // update nextDoc for term node eval
       wt = qn->eval(dRep);
       if(wt > dw) 
 	prod *= wt;
@@ -548,29 +553,21 @@ public:
   /// by window size. The StructQueryDocRep provides passage iteration
   /// over the overlapping windows. The score for an individual passage
   /// is the sum of the scores of the children nodes.
-  /// evaluate proximity operator against a document or passage.
-  /// Prunes proxList to remove any entries that are no longer
-  /// relevant to scoring this operator.
   virtual double eval(DocumentRep *dR) {
     StructQryDocRep *dRep = (StructQryDocRep *)dR;
     double maxScore = 0;
-    if(dRep->did < nextDoc) {
-      return maxScore; // This should be a 0
-    }
-    // Skip to next doc id that we can score (> or == to current).
-    if (proxList->nextDoc(dRep->did)) {
-      double score;      
-      dRep->startPassageIteration(winSize);
-      while(dRep->hasMorePassage()) {
-	score = passageScore(dRep);
-	if(score > maxScore) {
-	  maxScore = score;
-	}
-	dRep->nextPassage();
+    double score;      
+    dRep->startPassageIteration(winSize);
+    while(dRep->hasMorePassage()) {
+      score = passageScore(dRep);
+      if(score > maxScore) {
+	maxScore = score;
       }
+      dRep->nextPassage();
     }
     return maxScore;
   }
+
   virtual void updateDocList(int numDocs) {
     unionDocList(numDocs); // different from superclass.
     transformPassageOps();
