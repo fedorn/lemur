@@ -36,8 +36,6 @@ It will print out the estimated parameter value to the standard output.
 #include <cstdio>
 
 #include "IndexManager.hpp"
-#include "BasicIndex.hpp"
-#include "IndexCount.hpp"
 #include "Param.hpp"
 #include "String.hpp"
 

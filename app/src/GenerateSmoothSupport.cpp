@@ -43,8 +43,6 @@ This application is also a good example of using the doc index (i.e., doc->term 
 #include "common_headers.hpp"
 
 #include "IndexManager.hpp"
-#include "BasicIndex.hpp"
-#include "IndexCount.hpp"
 #include "Param.hpp"
 #include "String.hpp"
 
