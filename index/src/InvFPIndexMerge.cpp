@@ -554,7 +554,7 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     fid = invfiles.size()-1;
 
     // write out the lookup first
-    fprintf(listing, "%d %d %d ", termid, fid, filelen);    
+    fprintf(listing, "%d %d %d %d %d ", termid, fid, filelen, ll-(df*2), df);
     indexfile.write((const char*) &termid, sizeof(TERMID_T));
 
 //    fprintf(indexfile, "%d ", ll);
@@ -704,7 +704,7 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     fid = invfiles.size()-1;
 
 //    fprintf(listing, "%d %d %d %d\n", myreader->list->termID(), fid, ftell(indexfile), myreader->list->length()+1);
-    fprintf(listing, "%d %d %d ", myreader->list->termID(), fid, filelen);
+    fprintf(listing, "%d %d %d %d %d ", termid, fid, filelen, ll-(df*2), df);
     
     indexfile.write((const char*)&termid, sizeof(TERMID_T));
 //    fprintf(indexfile, "%d ", myreader->list->docFreq());   
@@ -754,7 +754,8 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       fid = invfiles.size()-1;
 
   //    fprintf(listing, "%d %d %d %d\n", myreader->list->termID(), fid, ftell(indexfile), myreader->list->length()+1);
-      fprintf(listing, "%d %d %d ", myreader->list->termID(), fid, filelen);
+      fprintf(listing, "%d %d %d %d %d ", termid, fid, filelen, ll-(df*2), df);
+
 
       indexfile.write((const char*)&termid, sizeof(TERMID_T));
 //    fprintf(indexfile, "%d ", myreader->list->docFreq());     
