@@ -37,7 +37,8 @@
 
 class InvFPPushIndex : public InvPushIndex {
 public:
-  InvFPPushIndex(char* prefix="DefaultIndex", int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=1);
+  InvFPPushIndex(){ };
+  InvFPPushIndex(char* prefix, int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=1);
   ~InvFPPushIndex();
 
   /// adding a term to the current document, returns true if term was added successfully.  

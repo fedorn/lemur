@@ -38,7 +38,8 @@ typedef map<char*, InvDocList*, ltstr> TABLE_T;
 
 class InvPushIndex : public PushIndex {
 public:
-  InvPushIndex(char* prefix="DefaultIndex", int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=1);
+  InvPushIndex(){ };
+  InvPushIndex(char* prefix, int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=1);
   ~InvPushIndex();
 
   /// sets the name for this index. the name will be the prefix for all files related to this index
