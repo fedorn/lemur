@@ -81,7 +81,7 @@ int BasicIndexWithCat::nextCatID() const
 {
   if (catAsTerm) {
     tmInfo = tmInfoBuffer->nextEntry();
-    return (tmInfo->id());
+    return (tmInfo->termID());
   } else {
     docInfo = docInfoBuffer->nextEntry();
     return (docInfo->docID());
@@ -117,7 +117,7 @@ int BasicIndexWithCat::nextDocID() const
 {
   if (!catAsTerm) {
     tmInfo = tmInfoBuffer->nextEntry();
-    return (cat2base[tmInfo->id()]);
+    return (cat2base[tmInfo->termID()]);
   } else {
     docInfo = docInfoBuffer->nextEntry();
     return (cat2base[docInfo->docID()]);
