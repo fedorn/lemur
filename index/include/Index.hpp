@@ -157,6 +157,11 @@ public:
   /// Convert a docID to its spelling
   virtual const char * document (int docID)=0;
 
+  /// Return a string ID for the term lexicon (usually the file name of the lexicon)
+  /*! This function should be pure virtual; the default implementation
+     is just for convenience. Appropriate implementation to be done in the future. 
+  */
+  virtual char *termLexiconID() { return NULL;} 
   //@}
 
   /// @name Summary counts
