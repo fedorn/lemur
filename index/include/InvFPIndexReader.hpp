@@ -27,6 +27,7 @@ public:
 private:
 	FILE* reader;
   InvFPDocList* current; // the list we've most recently read in
+  LOC_T* list;
 };
 
 #endif
