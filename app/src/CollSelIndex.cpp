@@ -170,7 +170,9 @@ int AppMain(int argc, char * argv[]) {
     char * name = n + strlen(n);
     char * t = name;
     while (name > n && *name != '/') name--;
-    name++;
+    if (*name == '/') {
+      name++;
+    }
     while (t > name && *t != '.') t--;
     if (t > name) *t = '\0';
 
