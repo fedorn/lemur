@@ -54,7 +54,6 @@ private:
   void write_bits(ostream & os, vector<int> &bv);
 
 private:
-  vector<int> bv;
   static char bits[8];
 };
 

@@ -156,7 +156,7 @@ int GammaCompress::read(istream &is) {
   is.read((char *)&n, sizeof(int));
   is.read((char *)&size, sizeof(int));
   if (is.peek() == EOF) return 0;
-  bv.reserve(size);
+  vector<int> bv;
   return read_bits(is, bv, size);
 }
 
