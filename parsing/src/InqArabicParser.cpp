@@ -39,7 +39,7 @@
 
 #ifdef __cplusplus
 
-#include <cstdlib>
+#include <stdlib.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
