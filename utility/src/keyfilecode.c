@@ -1197,7 +1197,7 @@ static int vacate_oldest_buffer(struct fcb *f)
 
       /*    i = write_page_and_flush(f,f->buffer[oldest].contents,&(f->buffer[oldest].b));*/
       if ( trace_io ) {
-        printf("  wrote block %d/%d ",f->buffer[oldest].contents.segment,f->buffer[oldest].contents.block);
+        printf("  wrote block %d/%lu ",f->buffer[oldest].contents.segment,f->buffer[oldest].contents.block);
         print_buffer_caption(stdout,f,oldest);
         printf(" from buffer %d, %d others in window\n",oldest,i);
       }
@@ -1258,7 +1258,7 @@ static int get_index(struct fcb *f, struct leveln_pntr b)
   if ( not_found ) {
     read_page(f,b,&(f->buffer[bufix].b));
     if ( trace_io ) {
-      printf("  read block %d/%d ",b.segment,b.block);
+      printf("  read block %d/%lu ",b.segment,b.block);
       print_buffer_caption(stdout,f,bufix);
       printf(" into buffer %d\n",bufix);
     }
@@ -2039,8 +2039,8 @@ static boolean will_fit(struct key *k, levelx_pntr *p, struct ix_block *b, int i
 /*   split) can only occur if all keys have the new prefix length.         */
 
 static int compress_ix_block(struct ix_block *b, int prefix_lc, boolean trace)
-{int i,lc,prefix_difference,expected_pool_lc,original_prefix_lc,original_pool_lc,pool_sc,pntr_lc,
-old_key_sc,old_key_lc,old_pntr_sc,chars_in_use;
+{int i,prefix_difference,expected_pool_lc,pool_sc,pntr_lc,
+old_key_sc,old_pntr_sc,chars_in_use;
 struct ix_block copy; struct key prefix; char expansion[max_prefix_lc];
 
   if ( b->prefix_lc==prefix_lc ) { /* do nothing */ }
@@ -2380,7 +2380,7 @@ static int choose_key(struct ix_block *mid, struct key *new_key, levelx_pntr *ne
 
 static int choose_right_move_cnt(struct fcb *f, struct ix_block *mid, struct ix_block *rt,
 struct key *k, levelx_pntr *new_p, int ix, boolean insert, int target,
-int *mid_lc_in_out, int *mid_prefix_lc_out, int *rt_lc_out, int *rt_prefix_lc_out)
+int *mid_lc_in_out, int *mid_prefix_lc_in_out, int *rt_lc_out, int *rt_prefix_lc_out)
 {int rt_cnt=0,lc,mid_prefix_lc,rt_prefix_lc,prefix_difference,mid_lc,rt_lc,
  mid_change,rt_change,new_mid_prefix_lc,new_rt_prefix_lc,move_ix;
  boolean done=false;
@@ -2388,17 +2388,15 @@ int *mid_lc_in_out, int *mid_prefix_lc_out, int *rt_lc_out, int *rt_prefix_lc_ou
 
  /*  if ( insert ) mid_lc = ix_pool_lc_after_insert(mid,k,new_p,ix,&mid_prefix_lc,false);
      else  mid_lc = ix_pool_lc_after_replace(mid,k,new_p,ix,&mid_prefix_lc,false);*/
-
-  mid_prefix_lc = *mid_prefix_lc_out; /* computed before call in ix_pool_after_change */
-  mid_lc = *mid_lc_in_out; /* computed before call in ix_pool_after_change */
+  mid_lc = *mid_lc_in_out;
+  mid_prefix_lc = *mid_prefix_lc_in_out;
   rt_lc = ix_pool_lc(rt);
   rt_prefix_lc = rt->prefix_lc;
 
   if ( f->trace ) {
     print_key(mid->index_type,k,"finding right_mov_cnt, insert key=");
     printf(", lc=%d, pntr_lc=%d, ix=%d, level=%d",k->lc,pntr_lc(new_p,mid->level),ix,mid->level);
-    printf(" target=%d, mid_lc=%d, rt_lc=%d,",target,mid_lc,rt_lc);
-    printf(" mid_prefix_lc=%d, rt_prefix_lc=%d\n",mid_prefix_lc,rt_prefix_lc);
+    printf(" target=%d, mid_lc=%d, rt_lc=%d\n",target,mid_lc,rt_lc);
   }
 
   choose_key(mid,k,new_p,ix,0,&min_key,insert);
@@ -2444,7 +2442,7 @@ int *mid_lc_in_out, int *mid_prefix_lc_out, int *rt_lc_out, int *rt_prefix_lc_ou
     rt_cnt,mid_lc,rt_lc,mid_prefix_lc,rt_prefix_lc);
 
   *mid_lc_in_out = mid_lc;
-  *mid_prefix_lc_out = mid_prefix_lc;
+  *mid_prefix_lc_in_out = mid_prefix_lc;
   *rt_lc_out = rt_lc;
   *rt_prefix_lc_out = rt_prefix_lc;
   return(rt_cnt);
@@ -2521,9 +2519,7 @@ static int choose_left_move_cnt(struct fcb *f, struct ix_block *lt, struct ix_bl
       mid_lc = mid_lc + mid_change;
       /*      if ( lt_cnt==0 && lt->keys_in_block==0 ) min_key = move_key;*/
       lt_cnt++;
-      /*      if ( lt_lc+lt_change>=target) done = true; */
-      /* change was already added in. cf choose_right_move_count*/
-      if ( lt_lc >= target ) done = true;
+      if ( lt_lc+lt_change>=target) done = true;
     }
   }
   if ( f->trace ) {
@@ -2563,7 +2559,7 @@ struct ix_block *rt, struct key *k, levelx_pntr *new_p, int ix, boolean insert)
   lt_prefix_lc = lt->prefix_lc;
   /*  if ( insert ) mid_lc = ix_pool_lc_after_insert(mid,k,new_p,ix,&mid_prefix_lc,false);
       else mid_lc = ix_pool_lc_after_replace(mid,k,new_p,ix,&mid_prefix_lc,false);*/
-  mid_lc = ix_pool_lc_after_change(mid,k,new_p,ix,&mid_prefix_lc,insert,f->trace);
+  mid_lc = ix_pool_lc_after_change(mid,k,new_p,ix,&mid_prefix_lc,insert,false);
   rt_lc = ix_pool_lc(rt);
   target = ( lt_lc + mid_lc + rt_lc) / 3;
   if ( lt_lc>target ) target = (mid_lc + rt_lc) / 2;
@@ -3500,7 +3496,7 @@ int close_key(struct fcb *f)
       if (f->buffer[i].modified){
         write_page(f,f->buffer[i].contents,&(f->buffer[i].b) );
         if ( trace_io ) {
-          printf("  wrote block %d/%d ",f->buffer[i].contents.segment,f->buffer[i].contents.block);
+          printf("  wrote block %d/%lu ",f->buffer[i].contents.segment,f->buffer[i].contents.block);
           print_buffer_caption(stdout,f,i);
           printf(" from buffer %d\n",i);
         }
@@ -3666,9 +3662,4 @@ int get_subrec(
 void kf_test(struct fcb *f)
 {
 
-}
-
-void trace(struct fcb *f) 
-{
-  f->trace = true;
 }
