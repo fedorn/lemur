@@ -38,6 +38,9 @@ public:
   /// word entries in a document index (sequence of words), @see TermList
   TermInfoList* termInfoListSeq(int docID);
 
+  /// Total count of terms in given document, not including stop words
+  int docLengthCounted(int docID);
+
   //@}
 private:
 

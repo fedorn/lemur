@@ -113,5 +113,22 @@ TermInfoList* InvFPIndex::termInfoListSeq(int docID){
   return termlist;
 }
 
+int InvFPIndex::docLengthCounted(int docID) {
+  if ((docID < 0) || (docID > counts[DOCS])) {
+    *msgstream << "Error trying to get docLengthCounted for invalid docID."<< endl;
+    return 0;
+  }
+  // this is OOV
+  if (docID == 0)
+    return 0;
 
+  InvFPTermList* tl = (InvFPTermList*) this->termInfoListSeq(docID);
+  // if this fails for whatever reason
+  if (!tl)
+    return 0;
+
+  int count = tl->termCount();
+  delete tl;
+  return count;
+}
 
