@@ -18,7 +18,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <malloc.h>
+//#include <malloc.h>
 
 void arabic_remove_diacritics (char *, char *);
 //removes diacritics from word
