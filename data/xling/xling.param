@@ -1,0 +1,23 @@
+sourceIndex = indt1.key; /* source language index */
+targetIndex = indt2.key; /* target language index */
+dictionary = t1.dict; /* translation dictionary */
+textQuery = test.qry; /* query text stream */
+XLlambda = 0.7; /* lambda for first pass cross lingual retrieval */
+XLbeta = 0.5; /* beta for smoothing P(t|D) */
+/* term for count(t)/|V|, doc for docCount(t)/sum_w_in_V docCount(w) */
+sourceBackgroundModel = doc; 
+targetBackgroundModel = doc; 
+resultFile = res.xling; /* result file */
+resultCount = 1000; /* how many docs to return as the result */
+resultFormat = trec; /* 0 = simple-format; 1 = TREC-format */
+
+smoothSupportFile = indt2.supp; /* target language smooth support */
+smoothStrategy = interpolate;
+smoothMethod = dirichletprior;
+DirichletPrior = 1000; 
+
+/* Pseudo feedback parameters */
+adjustedScoreMethod = ce;
+queryUpdateMethod = rm1;
+feedbackDocCount = 0; /* if greater than 0, do cross lingual rm retrieval */
+feedbackTermCount = 50;

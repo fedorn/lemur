@@ -1,0 +1,104 @@
+	Cross-lingual Retrieval and Probabilistic Dictionaries
+
+The application XlingRetEval provides translation dictionary based
+retrieval, scoring queries in the source language against documents in
+the target language using:
+
+P(Q_s|D_t) =  Prod_w_in_Q_s(lambda(Sum_t_in_D_t P(t|D_t)P(w|t)) +
+                            (1-lambda)P(w|G_s)
+where G_s is the background model for the source language. It
+additionally provides the option of using cross-lingual relevance models
+for retrieval. See:
+
+Xu et. al. "Evaluating a probabilistic model for cross-lingual
+information retrieval" in Proceedings of the 24th annual international
+ACM SIGIR conference on Research and development in information
+retrieval. New Orleans, Louisiana, United States. 2001. ACM Press.
+
+and
+
+Larkey, L. and Connell, M. Structured Queries, Language Modeling,
+and Relevance Modeling in Cross-Language Information Retrieval. in IP&M
+journal. 2003
+
+The parameters are:
+
+sourceIndex: The complete name of the lemur index for the source 
+language collection. This provides the background model for the source 
+language.
+
+targetIndex: The complete name of the lemur index for the target
+language collection. This is the collection that is searched.
+
+textQuery: the query text stream, in the source language
+
+XLlambda: The smoothing parameter for mixing P(t|D) and P(s|GS).
+
+XLbeta: The Jelinik-Mercer lambda for estimating P(t|D).
+
+sourceBackgroundModel: One of "term" or "doc". If term, background
+model for the source language is estimated as tf(s)/|V|. If doc, the
+background model for the source language is estimated as
+df(t)/sum_w_in_V df(w). Default is term.
+
+targetBackgroundModel: One of "term" or "doc". If term, background
+model for the target language is estimated as tf(s)/|V|. If doc, the
+background model for the target language is estimated as
+df(t)/sum_w_in_V df(w). Default is term.
+
+ resultFile: the result file
+
+resultFormat: whether the result format should be of the 
+TREC format (i.e., six-column) or just a simple three-column format 
+<queryID, docID, score>. String value, either trec
+for TREC format or 3col for three column format. Default: TREC 
+format.
+
+resultCount: the number of documents to return for each query 
+
+feedbackDocCount: the number of docs to use for
+pseudo-feedback (0 means no-feedback) 
+
+feedbackTermCount: the number of terms to add to a query
+when doing feedback. 
+
+For cross-lingual relevance models. First pass xling, second pass
+simple-kl with rm1 (or rm2).
+
+Simple KL parameters as documented in RetEval < link >: with explanation
+of rm1, rm2 use of feedbackCoefficient.
+
+queryUpdateMethod: feedback method, one of:
+
+relevancemodel1 or rm1 for relevance model 1.
+relevancemodel2 or rm2 for relevance model 2.
+
+feedbackCoefficient: the coefficient for mixing the relevance model
+feedback documents'model with the background model. The value is in
+[0,1], with 0 meaning use only the background model and 1 meaning using
+only the feedback documents' model.
+
+The shell script test_xling.sh demonstrates using XlingRetEval
+application with the incremental indexer and with PDictManager.  The
+source language vocabulary for the example is {aa, abandon} and the
+target language vocabulary is {fred, wilma, barney}. The expected output
+is in the file res.xling.expected, which can be compared to res.xling
+after running the script.
+
+	    Probabilistic Dictionary
+
+The PDict class provides support for translation dictionaries with
+probabilities. Entries consist of four elements
+
+source	       type    target  prob/freq
+
+where source is the source language term, type is an arbitrary symbol
+(such as part of speech), target is the target language term, and
+prob/freq is either a count or a translation probability. PDict objects
+can be created from plain text files that are formatted in four columns
+with a single character delimiter (such as ';'), eg:
+
+aa;U;fred;0.005084;
+
+The order of the columns is as above. The file t1.in provides an example
+of this format.

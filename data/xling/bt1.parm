@@ -1,0 +1,3 @@
+index = indt1;
+docFormat = trec;
+memory = 256000000;
