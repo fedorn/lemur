@@ -2,18 +2,21 @@
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 %: %.o
-	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -o $@ $< $(CPPLDFLAGS)
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 INC = @includedir@
+#antlr is already set up properly for include path
+
 LIBPATH = @libdir@
 LIB = @PACKAGE_TARNAME@
-LDFLAGS = -L$(LIBPATH) -l$(LIB) -lm
 CXX = @CXX@
-CFLAGS = @DEFS@ @CFLAGS@ 
+CFLAGS = @DEFS@ @CFLAGS@  -I$(INC)
 CXXFLAGS  = @DEFS@ @CXXFLAGS@ -I$(INC)
 
+
+CPPLDFLAGS  = @LDFLAGS@ -L$(LIBPATH) -l$(LIB) @LIBS@ -lm
 ## specify your object files here
 OBJS =
 ## specify your program here
@@ -22,7 +25,7 @@ PROG =
 all: $(PROG)
 
 $(PROG): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(CPPLDFLAGS)
 
 clean:
 	rm $(PROG) $(OBJS)
