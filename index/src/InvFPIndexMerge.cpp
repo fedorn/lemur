@@ -1,5 +1,8 @@
 #include "InvFPIndexMerge.hpp"
 
+#define OPEN_MAX 255
+// To get it to compile -- JDL
+
 InvFPIndexMerge::InvFPIndexMerge(char* buffer, long size, long maxfilesize) {
   maxfile = maxfilesize;
   readbuffer = NULL;
@@ -832,3 +835,4 @@ void InvFPIndexMerge::least(vector<IndexReader*>* r, vector<int>* ret) {
     } // if not NULL
   } // for each list
 }	
+
