@@ -73,9 +73,9 @@ int param_push_file (const char *fn);
 char *param_pop_file (void);
   /* Pop current bindings */
 
-void param_initialize(int argc, char * argv[]);
-  /* handle command-line parameters.  "--help" to display bindings and exit */
-
+void param_display();
+/* display parameter bindings */ 
+   
 #endif
 
 

@@ -41,6 +41,7 @@ void   ParamPushPrefix (const String &s);
 void   ParamPopPrefix (void);
 int    ParamPushFile (const String &s);
 String ParamPopFile (void);
-void   ParamInitialize(int argc, char * argv[]);
+/// Display parameter bindings
+void  ParamDisplay();
 
 #endif

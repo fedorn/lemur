@@ -1014,10 +1014,6 @@ char * param_pop_file (void) {
 }
 
 /*******************************************************/
-void param_initialize(int argc, char * argv[]) {
-    if ((argc == 2) && (strcmp(argv[1], "--help")==0)) {
-	fprintf(stderr, "Parameters for %s:\n", argv[0]);
-	string_set_display(stderr, string_set);
-	exit(0);
-    }
+void param_display() {
+  string_set_display(stderr, string_set);
 }

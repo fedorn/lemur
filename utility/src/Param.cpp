@@ -233,6 +233,12 @@ String ParamPopFile (void)
      return fn;
   }
 
-void ParamInitialize(int argc, char * argv[]) {
-  param_initialize(argc, argv);
+void ParamDisplay() {
+  param_display();
 }
+
+
+
+
+
+
