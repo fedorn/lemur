@@ -19,12 +19,14 @@
 #include "InvFPIndex.hpp"
 #include <algorithm>
 #include <vector>
-
+#include <string>
+using std::string;
 using std::vector;
 
-#define EOS      "*eos"
-#define TITLE    "*title"
-#define PRONOUN  "*pronoun"
+static const string EOS("*eos");
+static const string TITLE("*title");
+static const string PRONOUN("*pronoun");
+
 #define PSG_LEN  15
 
 /*!
@@ -36,10 +38,10 @@ class MMRSumm : public Summarizer {
 
 private:
   double lambda;
-  InvFPIndex* idx;
+  const InvFPIndex* idx;
   int summLen;
   vector<MMRPassage> doc;
-  int iterCount;
+  mutable int iterCount;
   double maxSims;
   MMRPassage* queryPassage;
 
@@ -82,7 +84,7 @@ private:
     return 1;
   }
 
-  int setMMRQuery(char* qInfo) {
+  int setMMRQuery(const string &qInfo) {
     if (qInfo != "") {
       termCount* storage;
       storage = new termCount;
@@ -97,7 +99,7 @@ private:
 
 public:
 
-  MMRSumm(InvFPIndex* inIdx, int inSummLen = 5) {
+  MMRSumm(const InvFPIndex* inIdx, int inSummLen = 5) {
     idx = inIdx;
     summLen = inSummLen;
     iterCount = 1;
@@ -106,38 +108,38 @@ public:
     lambda = 1.0;
   };
   
-  virtual void markPassages(int optLen, char* qInfo);
+  virtual void markPassages(int optLen, const string &qInfo);
 
   virtual void addPassage(Passage &psg);
 
-  void addDocument(const char* docID);
+  void addDocument(const string &docID);
 
-  virtual int fetchPassages(Passage* psgs, int optLen);
+  virtual int fetchPassages(Passage* psgs, int optLen) const;
   
-  virtual void summDocument(const char* docID, const int optLen, const char* qInfo);
+  virtual void summDocument(const string &docID, const int optLen, const string &qInfo);
 
-  virtual void scorePassages(const char* qInfo);
+  virtual void scorePassages(const string &qInfo);
 
   virtual void clear(void);
 
-  virtual int nextPassage(Passage* psg);
+  virtual int nextPassage(Passage* psg) const;
 
-  virtual void iterClear(void);
+  virtual void iterClear(void) const;
 
-  virtual void outputSumm(void);
+  virtual void outputSumm(void) const;
 
-  void findNextPassage(MMRPassage &psg, InvFPIndex* idx, 
-		       TermInfoList* tList, int eos);
+  void findNextPassage(MMRPassage &psg, const InvFPIndex* idx, 
+		       const TermInfoList* tList, int eos);
 
-  void showPassage(passageVec* psg, InvFPIndex* idx);
+  void showPassage(const passageVec* psg, const InvFPIndex* idx) const;
   
-  void showMarkedPassages();
+  void showMarkedPassages() const ;
 
-  int isEOS(const char* check) {
-    return !strcmp(check, EOS);
+  int isEOS(const string &check) {
+    return (check == EOS);
   }
   
-  int hasEOS(InvFPIndex* idx, TermInfoList* tList) {
+  int hasEOS(const InvFPIndex* idx, const TermInfoList* tList) {
     tList->startIteration();
     TermInfo* tEntry;
     while (tList->hasMore()) {
@@ -147,11 +149,12 @@ public:
     return false;
   }
   
-  int isTITLE(const char* check) {
-    return !strcmp(check, TITLE);
+  int isTITLE(const string & check) {
+    //    return !strcmp(check, TITLE);
+    return (check == TITLE);
   }
   
-  int hasTITLE(InvFPIndex* idx, TermInfoList* tList) {
+  int hasTITLE(const InvFPIndex* idx, const TermInfoList* tList) {
     tList->startIteration();
     TermInfo* tEntry;
     while (tList->hasMore()) {
@@ -161,8 +164,8 @@ public:
     return false;
   }
   
-  int isPRONOUN(const char* check) {
-    return !strcmp(check, PRONOUN);
+  int isPRONOUN(const string &check) {
+    return (check == PRONOUN);
   }
   
   struct compareSW {

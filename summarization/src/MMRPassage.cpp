@@ -16,8 +16,8 @@ void MMRPassage::clear() {
   psg->erase(psg->begin(), psg->end());
 }  
 
-int MMRPassage::operator<(Passage &b) {
-  MMRPassage* mPsg = dynamic_cast<MMRPassage*>(&b);
+int MMRPassage::operator<(const Passage &b) const{
+  const MMRPassage* mPsg = dynamic_cast<const MMRPassage*>(&b);
   return (score < mPsg->score);
 }
 
@@ -26,14 +26,14 @@ void MMRPassage::addTerm(termCount term) {
   psg->push_back(term);
 }
 
-void MMRPassage::addTerms(passageVec pv) {
+void MMRPassage::addTerms(const passageVec pv) {
   // :TODO: set counts right
   for (int i=0; i<pv.size(); i++) {
     psg->push_back(pv[i]);
   }
 }
 
-passageVec* MMRPassage::getAsVector(void) {
+const passageVec* MMRPassage::getAsVector(void) const {
   return psg;
 }
 

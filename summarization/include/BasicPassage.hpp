@@ -9,14 +9,16 @@
  *==========================================================================
 */
 
-#include <iomanip>
-#include "Passage.hpp"
-#include <vector>
-
-using std::vector;
-
 #ifndef _BASICPASSAGE_HPP
 #define _BASICPASSAGE_HPP
+
+#include <iomanip>
+#include <vector>
+#include <string>
+#include "Passage.hpp"
+using std::vector;
+using std::string;
+
 
 /*!
   A simple implementation of the abstract class <code>Passage</code> meant to work in conjunction with the simple sentence selection summarizer <code>BasicSumm</code>
@@ -26,9 +28,9 @@ using std::vector;
 class BasicPassage : public Passage {
 
 public:
-  BasicPassage(const char* id) {
+  BasicPassage(const string &id) {
     psg = new passageVec;
-    docID = (char *)id;
+    docID = id;
     score = -1;
     marked = 0;
   } 
@@ -37,11 +39,11 @@ public:
 
   virtual void addTerm(termCount term) ;
 
-  virtual void addTerms(passageVec pv) ;
+  virtual void addTerms(const passageVec pv) ;
 
-  virtual passageVec* getAsVector(void) ;
+  virtual const passageVec* getAsVector(void) const ;
 
-  virtual int operator<(Passage &b) ;
+  virtual int operator<(const Passage &b) const ;
 
 };
 

@@ -26,7 +26,9 @@ using std::vector;
 #ifndef _BASICSUMM_HPP
 #define _BASICSUMM_HPP
 
-#define EOS      "*eos"
+//#define EOS      "*eos"
+static const string EOS("*eos");
+
 #define PSG_LEN  15
 
 /*!
@@ -36,44 +38,45 @@ using std::vector;
 class BasicSumm : public Summarizer {
 
 private:
-  InvFPIndex* idx;
+  const InvFPIndex* idx;
   int summLen;
   vector<BasicPassage> doc;
-  int iterCount;
+  mutable int iterCount;
 
 public:
   /// Constructor takes index information and an option default summary length
-  BasicSumm(InvFPIndex* inIdx, int inSummLen = 5) {
+  BasicSumm(const InvFPIndex* inIdx, int inSummLen = 5) {
     idx = inIdx;
     summLen = inSummLen;
     iterCount = 1;
   };
 
-  virtual void summDocument(const char* docID, const int optLen, const char* qInfo);
+  virtual void summDocument(const string &docID, const int optLen, const string &qInfo);
 
-  virtual void scorePassages(const char* qInfo);
+  virtual void scorePassages(const string &qInfo);
 
-  virtual void markPassages(int optLen, char* qInfo);
+  virtual void markPassages(int optLen, const string &qInfo);
 
   virtual void addPassage(Passage &psg);
 
   virtual void clear(void);
 
-  virtual int fetchPassages(Passage* psgs, int optLen);
+  virtual int fetchPassages(Passage* psgs, int optLen) const;
 
-  virtual int nextPassage(Passage* psg);
+  virtual int nextPassage(Passage* psg) const;
 
-  virtual void iterClear(void);
+  virtual void iterClear(void) const ;
 
-  virtual void outputSumm(void);
+  virtual void outputSumm(void) const ;
 
   /// Checks for EOS marker
-  int isEOS(const char* check) {
-    return !strcmp(check, EOS);
+  int isEOS(const string &check) {
+    //    return !strcmp(check, EOS);
+    return (check  == EOS);
   }
 
   /// Determines if any EOS markers are present
-  int hasEOS(InvFPIndex* idx, TermInfoList* tList) {
+  int hasEOS(const InvFPIndex* idx, const TermInfoList* tList) {
     tList->startIteration();
     TermInfo* tEntry;
     while (tList->hasMore()) {
@@ -84,8 +87,8 @@ public:
   }
 
   /// Scores an individual passage
-  double scorePassage(BasicPassage &psg, char* qInfo) {
-    char* docID = psg.docID;
+  double scorePassage(BasicPassage &psg, const string &qInfo) {
+    const string &docID = psg.docID;
     passageVec psgV= *psg.getAsVector();
     double psgLen = psgV.size();
     double P = 1;  // no markup yet, all get same weight
@@ -106,8 +109,8 @@ public:
   }
 
   /// Locate the next passage in a document by searching for the next EOS or using a max length
-  void findNextPassage(BasicPassage &psg, InvFPIndex* idx, 
-		       TermInfoList* tList, int eos) {
+  void findNextPassage(BasicPassage &psg, const InvFPIndex* idx, 
+		       const TermInfoList* tList, int eos) {
     TermInfo* tEntry;
     psg.clear();
     termCount* storage;
@@ -137,14 +140,14 @@ public:
   }
  
   /// <code>BasicSumm</code>'s method to output a summary (to screen)
-  void showPassage(passageVec* psg, InvFPIndex* idx) {
+  void showPassage(const passageVec* psg, const InvFPIndex* idx) const {
     for (int i=0; i < psg->size(); i++) {
       cout << idx->term((*psg)[i].termID) << " ";
     }
   }
 
   /// Only display passages flagged as 'marked' as part of the output
-  void showMarkedPassages() {
+  void showMarkedPassages() const {
     
     for (int i=0; i<doc.size(); i++) {
       if (doc[i].marked > 0) {

@@ -12,8 +12,8 @@
 #include "BasicSumm.hpp"
 
 
-void BasicSumm::markPassages(int optLen, char* qInfo) {
-  int oldLen;
+void BasicSumm::markPassages(int optLen, const string &qInfo) {
+  int oldLen = -1;
   if (optLen != -1) {
     oldLen = summLen;
     summLen = optLen;
@@ -41,7 +41,7 @@ void BasicSumm::addPassage(Passage &psg) {
   doc.push_back(*bPsg);
 }  
 
-int BasicSumm::fetchPassages(Passage* psgs, int optLen = -1) {
+int BasicSumm::fetchPassages(Passage* psgs, int optLen = -1) const {
   int l, count=0;
   if (optLen >0) {
     l = optLen;
@@ -58,8 +58,8 @@ int BasicSumm::fetchPassages(Passage* psgs, int optLen = -1) {
   return count;
 }
   
-void BasicSumm::summDocument(const char* docID, const int optLen, const char* qInfo) {
-  int oldLen;
+void BasicSumm::summDocument(const string &docID, const int optLen, const string &qInfo) {
+  int oldLen = -1;
   if (optLen != -1) {
     oldLen = summLen;
     summLen = optLen;
@@ -92,9 +92,9 @@ void BasicSumm::summDocument(const char* docID, const int optLen, const char* qI
   
 } 
 
-void BasicSumm::scorePassages(const char* qInfo) {
+void BasicSumm::scorePassages(const string &qInfo) {
   for (int i=0; i < doc.size(); i++) {
-    scorePassage(doc[i], (char*)qInfo);
+    scorePassage(doc[i], qInfo);
   }    
 }
 
@@ -103,7 +103,7 @@ void BasicSumm::clear(void) {
   iterCount = 1;
 }
 
-int BasicSumm::nextPassage(Passage* psg) {
+int BasicSumm::nextPassage(Passage* psg) const {
   for (int i=0; i<doc.size(); i++) {
     if (doc[i].marked  == iterCount) {
       *psg = doc[i];
@@ -114,11 +114,11 @@ int BasicSumm::nextPassage(Passage* psg) {
   return 0;
 }
 
-void BasicSumm::iterClear(void) {
+void BasicSumm::iterClear(void) const {
   iterCount = 1;
 }
 
-void BasicSumm::outputSumm(void) {
+void BasicSumm::outputSumm(void) const {
   showMarkedPassages();
 }
 

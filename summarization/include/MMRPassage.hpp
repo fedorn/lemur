@@ -31,9 +31,9 @@ public:
   double qSim;
   double maxSim;
 
-  MMRPassage(const char* id) {
+  MMRPassage(const string &id) {
     psg = new passageVec;
-    docID = (char*) id;
+    docID = id;
     score = -1;
     marked = 0;
     wt = 1.0;
@@ -46,11 +46,11 @@ public:
 
   virtual void addTerm(termCount term);
 
-  virtual void addTerms(passageVec pv);
+  virtual void addTerms(const passageVec pv);
 
-  virtual passageVec* getAsVector(void);
+  virtual const passageVec* getAsVector(void) const;
 
-  virtual int operator<(Passage &b);
+  virtual int operator<(const Passage &b) const;
 
   virtual double computeMMR(double lambda) const;
 

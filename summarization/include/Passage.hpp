@@ -9,12 +9,15 @@
  *==========================================================================
 */
 
-#include <vector>
 
-using std::vector;
 
 #ifndef _PASSAGE_HPP
 #define _PASSAGE_HPP
+
+#include <string>
+#include <vector>
+using std::vector;
+using std::string;
 
 class termCount {
 public:
@@ -35,7 +38,7 @@ class Passage {
 public:
   double score;
   int marked;
-  char* docID;
+  string docID;
   passageVec* psg;
 
   virtual ~Passage();
@@ -47,13 +50,13 @@ public:
   virtual void addTerm(termCount term) = 0;
 
   /// Take a vector of term/scores and make it a passage
-  virtual void addTerms(passageVec pv) = 0;
+  virtual void addTerms(const passageVec pv) = 0;
 
   /// Return the passage terms in vector form for easy access
-  virtual passageVec* getAsVector(void) = 0;
+  virtual const passageVec* getAsVector(void) const = 0;
 
   /// For comparison with other passages for sorting by score
-  virtual int operator<(Passage &b) = 0;
+  virtual int operator<(const Passage &b) const = 0;
 
 };
 

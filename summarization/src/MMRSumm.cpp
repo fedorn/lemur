@@ -11,8 +11,8 @@
 
 #include "MMRSumm.hpp"
 
-void MMRSumm::markPassages(int optLen, char* qInfo) {
-  int oldLen;
+void MMRSumm::markPassages(int optLen, const string &qInfo) {
+  int oldLen = -1;
   if (optLen != -1) {
     oldLen = summLen;
     summLen = optLen;
@@ -39,7 +39,7 @@ void MMRSumm::addPassage(Passage &psg) {
   doc.push_back(*mPsg);
 }  
 
-void MMRSumm::addDocument(const char* docID) {
+void MMRSumm::addDocument(const string &docID) {
 
   int eos = 0;
 
@@ -63,7 +63,7 @@ void MMRSumm::addDocument(const char* docID) {
 }
 
   
-int MMRSumm::fetchPassages(Passage* psgs, int optLen) {
+int MMRSumm::fetchPassages(Passage* psgs, int optLen) const {
   int l, count=0;
   if (optLen >0) {
     l = optLen;
@@ -80,8 +80,8 @@ int MMRSumm::fetchPassages(Passage* psgs, int optLen) {
   return count;
 }
   
-void MMRSumm::findNextPassage(MMRPassage &psg, InvFPIndex* idx, 
-			      TermInfoList* tList, int eos) {
+void MMRSumm::findNextPassage(MMRPassage &psg, const InvFPIndex* idx, 
+			      const TermInfoList* tList, int eos) {
   TermInfo* tEntry;
   psg.clear();
   termCount* storage;
@@ -112,13 +112,13 @@ void MMRSumm::findNextPassage(MMRPassage &psg, InvFPIndex* idx,
   return;
 }
   
-void MMRSumm::showPassage(passageVec* psg, InvFPIndex* idx) {
+void MMRSumm::showPassage(const passageVec* psg, const InvFPIndex* idx) const {
   for (int i=0; i < psg->size(); i++) {
     cout << idx->term((*psg)[i].termID) << " ";
   }
 }
 
-void MMRSumm::showMarkedPassages() {
+void MMRSumm::showMarkedPassages() const {
   for (int i=0; i<doc.size(); i++) {
     if (doc[i].marked > 0) {
       showPassage(doc[i].getAsVector(), idx);
@@ -127,8 +127,8 @@ void MMRSumm::showMarkedPassages() {
   }
 }
 
-void MMRSumm::summDocument(const char* docID, const int optLen, const char* qInfo) {
-  int oldLen;
+void MMRSumm::summDocument(const string &docID, const int optLen, const string &qInfo) {
+  int oldLen = -1;
   queryPassage = new MMRPassage(docID);
   if (optLen != -1) {
     oldLen = summLen;
@@ -136,10 +136,10 @@ void MMRSumm::summDocument(const char* docID, const int optLen, const char* qInf
   }
   int eos = 0;
   
-  if (!qInfo) {
+  if (qInfo.empty()) {
     autoMMRQuery();
   } else {
-    setMMRQuery((char*)qInfo);
+    setMMRQuery(qInfo);
   }
   
   MMRPassage* tempPsg;
@@ -168,7 +168,7 @@ void MMRSumm::summDocument(const char* docID, const int optLen, const char* qInf
   
 }  
 
-void MMRSumm::scorePassages(const char* qInfo) {
+void MMRSumm::scorePassages(const string &qInfo) {
   // query similarities
   int saveScore = doc.size();
   vector<MMRPassage> docCopy(doc);
@@ -212,7 +212,7 @@ void MMRSumm::clear(void) {
   iterCount = 1;
 }
 
-int MMRSumm::nextPassage(Passage* psg) {
+int MMRSumm::nextPassage(Passage* psg) const {
   for (int i=0; i<doc.size(); i++) {
     if (doc[i].marked  == iterCount) {
       *psg = doc[i];
@@ -223,11 +223,11 @@ int MMRSumm::nextPassage(Passage* psg) {
   return 0;
 }
 
-void MMRSumm::iterClear(void) {
+void MMRSumm::iterClear(void) const {
   iterCount = 1;
 }
 
-void MMRSumm::outputSumm(void) {
+void MMRSumm::outputSumm(void) const {
   showMarkedPassages();
 }
 

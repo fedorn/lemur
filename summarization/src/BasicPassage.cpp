@@ -16,7 +16,7 @@ void BasicPassage::clear() {
   psg->erase(psg->begin(), psg->end());
 }  
 
-void BasicPassage::addTerms(passageVec pv) {
+void BasicPassage::addTerms(const passageVec pv) {
   for (int i=0; i<pv.size(); i++) {
     psg->push_back(pv[i]);
   }
@@ -26,11 +26,11 @@ void BasicPassage::addTerm(termCount term) {
   psg->push_back(term);
 }
   
-passageVec* BasicPassage::getAsVector(void) {
+const passageVec* BasicPassage::getAsVector(void) const {
   return psg;
 }
   
-int BasicPassage::operator<(Passage &b) {
-  BasicPassage* bPsg = dynamic_cast<BasicPassage*>(&b);
+int BasicPassage::operator<(const Passage &b) const {
+  const BasicPassage* bPsg = dynamic_cast<const BasicPassage*>(&b);
   return (score < bPsg->score);
 }
