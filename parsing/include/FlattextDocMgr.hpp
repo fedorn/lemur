@@ -1,14 +1,12 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2001, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
-
 
 #ifndef _FLATTEXTDOCMGR_HPP
 #define _FLATTEXTDOCMGR_HPP
@@ -17,6 +15,9 @@
 #include "TrecParser.hpp"
 #include "WebParser.hpp"
 #include "ReutersParser.hpp"
+#include "ChineseParser.hpp"
+#include "ChineseCharParser.hpp"
+#include "ArabicParser.hpp"
 #include "Exception.hpp"
 #include "DocumentManager.hpp"
 
@@ -26,7 +27,7 @@
 
 class FlattextDocMgr : public DocumentManager, public TextHandler {
 public:
-  enum ParseModes {TREC=0, WEB=1};
+  enum ParseModes {TREC=0, WEB=1, CHINESE=2, CHINESECHAR=3, ARABIC=4};
 
   struct lookup_e {
     int fid;

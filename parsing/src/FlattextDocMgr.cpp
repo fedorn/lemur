@@ -1,13 +1,16 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2001, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
+
+/** tnt 07/2002 - created
+ *  dmf 09/2002 - added parser support
+ */
 
 #include "FlattextDocMgr.hpp"
 
@@ -124,6 +127,15 @@ Parser* FlattextDocMgr::createParser (ParseModes mode) {
   case WEB:
     p = new WebParser();
     break;
+  case CHINESE:
+    p = new ChineseParser();
+    break;
+  case CHINESECHAR:
+    p = new ChineseCharParser();
+    break;
+  case ARABIC:
+    p = new ArabicParser();
+    break;
   default:
     throw Exception("FlattextDocMgr", "Parser Mode unregcognized.");
     break;
@@ -185,6 +197,13 @@ bool FlattextDocMgr::loadTOC(char* fn) {
 	  pm =TREC;
 	else if (val.compare("1") == 0)
 	  pm = WEB;
+	else if (val.compare("2") == 0)
+	  pm = CHINESE;
+	else if (val.compare("3") == 0)
+	  pm = CHINESECHAR;
+	else if (val.compare("4") == 0)
+	  pm = ARABIC;
+
       }
   }
   if (!loadFTFiles(files, num))
