@@ -47,15 +47,15 @@ int AppMain(int argc, char *argv[]) {
   int i;
 
   double prSum=0;
-  for (i=0; i< lemur.docCount(); i++) {
+  for (i=1; i<= lemur.docCount(); i++) {
     prSum =  0;
     TermInfoList *tList = lemur.termInfoList(i);
     tList->startIteration();
     int size=0;
     while (tList->hasMore()) {
       TermInfo *info = tList->nextEntry();
-      prSum += lemur.termCount(info->id())/
-      (double)(lemur.termCount());
+      prSum += (lemur.termCount(info->id())+1)/
+      (double)(lemur.termCount()+lemur.termCountUnique());
       size++;
     }
     ofs << i << " " << size << " "<< prSum << endl;
