@@ -54,29 +54,29 @@ bool InvFPTermList::hasMore(){
 
 TermInfo* InvFPTermList::nextEntry(){
 //  TermInfo* tinfo;
-  static InvFPTerm info;
-  static vector<int> loclist;
+//  static InvFPTerm info;
+//  static vector<int> loclist;
   
   if (counts) {
-    info.freq = counts[index];
-    info.loclist = &(listcounted[index].loc);    
-    info.tid = listcounted[index].term;
-    info.loc = listcounted[index].loc[0];
+    entry.freq = counts[index];
+    entry.loclist = &(listcounted[index].loc);    
+    entry.tid = listcounted[index].term;
+    entry.loc = listcounted[index].loc[0];
    
   } else {
-    info.freq = 1;
+    entry.freq = 1;
     //    info.loclist = new vector<int>;
     ///empty it!
     loclist.clear();
-    info.loclist = &loclist;
-    info.loclist->push_back(list[index].loc);
-    info.tid = list[index].term;
-    info.loc = list[index].loc;
+    entry.loclist = &loclist;
+    entry.loclist->push_back(list[index].loc);
+    entry.tid = list[index].term;
+    entry.loc = list[index].loc;
   }
 
   index++;
 //  tinfo = info;
-  return &info;
+  return &entry;
 }
 
 bool InvFPTermList::binRead(ifstream& infile){

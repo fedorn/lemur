@@ -35,14 +35,14 @@ bool InvTermList::hasMore(){
 }
 
 TermInfo* InvTermList::nextEntry(){
-  static InvFPTerm info;
+  //  static InvFPTerm info;
 
-  info.tid = *iter;
+  entry.tid = *iter;
   iter++;
-  info.freq = *iter;
+  entry.freq = *iter;
   iter++;
 
-  return &info;
+  return &entry;
 }
 
 bool InvTermList::binRead(ifstream& infile){
