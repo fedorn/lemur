@@ -192,7 +192,7 @@ void BasicIndex::writeIndexFile()
   fprintf(fp, "%-20s =  %s;\n", "createdTime", (const char *) buildTime);
   fprintf(fp, "%-20s =  %s;\n", "textFile", (const char *) textFile);
   fprintf(fp, "%-20s =  %d;\n", "numDocuments", numDocuments);
-  fprintf(fp, "%-20s =  %d;\n", "numTerms", terms.size());
+  fprintf(fp, "%-20s =  %d;\n", "numTerms", terms.size()-1);
   fprintf(fp, "%-20s =  %d;\n", "numWords", numWords);
   fprintf(fp, "%-20s =  %d;\n", "numBytes", numBytes);
   fprintf(fp, "%-20s =  %d;\n", "maxDocLength", maxDocumentLength);
