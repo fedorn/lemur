@@ -783,26 +783,6 @@ void BasicIndex::mergeIndexFiles()
 		(const char *) prefix, wordIndexSuffix, i/2);
 	sprintf(cmd, "/bin/mv %s %s", fname1, tmpnam1);
 	system(cmd);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       }
       else {
 	sprintf(tmpnam1, "%s.%s.tmp.%d.%d", 
