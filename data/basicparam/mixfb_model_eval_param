@@ -5,13 +5,13 @@ queryModel = query_mixfb_kl;
 
 /* Basic retrieval parameters */
 
-index = index.bsc; /* database index */
+index = bindex.bsc; /* database index */
 textQuery = query; /* query text stream */
 resultFile = res.mixfb_kl; /* result file */
 resultCount = 1000; /* how many docs to return as the result */
 resultFormat = 1; /* 0 = simple-format; 1 = TREC-format */
 
-smoothSupportFile = index.supp; /* this is not needed by Okapi or TFIDF, but by SimpleKL */
+smoothSupportFile = bindex.supp; /* this is not needed by Okapi or TFIDF, but by SimpleKL */
 
 smoothStrategy =0;  /* interpolation rather than backoff, 0=interpolate, 1=backoff */
 

@@ -1,0 +1,3 @@
+index = pindex;
+docFormat = web;
+memory = 256000000;

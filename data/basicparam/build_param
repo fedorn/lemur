@@ -1,4 +1,4 @@
 inputFile    = source;
-outputPrefix    = index;
+outputPrefix    = bindex;
 maxDocuments = 100000;
 maxMemory    = 0x4000000;

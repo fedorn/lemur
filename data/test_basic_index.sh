@@ -1,7 +1,16 @@
 #!/bin/sh
 
 
+#######################################################################
+# THIS IS THE TEST SCRIPT FOR THE BASIC INDEXER                       #
+#   (For the position indexer, use test_pos_index.sh                  #
+#######################################################################
 
+# First erasing any existing files 
+./clean.sh
+
+# Then prepare parameters
+cp basicparam/*_param .
 
 #######################################################################
 # The following command converts the CACM database from a simple      #
@@ -21,7 +30,7 @@
 # The following command builds an index of the CACM database (source) #
 #######################################################################
 
-../app/obj/BuildBasicIndex buildparam
+../app/obj/BuildBasicIndex build_param
 
 #######################################################################
 # The following command computes the necessary support information    # 
@@ -29,7 +38,7 @@
 # (output file:  index.supp )                                         #
 #######################################################################
 
-../app/obj/GenerateSmoothSupport suppparam
+../app/obj/GenerateSmoothSupport supp_param
 
 
 #######################################################################

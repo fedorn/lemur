@@ -5,7 +5,7 @@ retModel = 0; /*  0 = TFIDF; 1 = Okapi; 2 = KL-divergence */
 
 /* Basic retrieval parameters */
 
-index = index.bsc; /* database index */
+index = bindex.bsc; /* database index */
 textQuery = query; /* query text stream */
 resultFile = res.fb_tfidf; /* result file */
 resultCount = 1000; /* how many docs to return as the result */
