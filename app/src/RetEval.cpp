@@ -129,7 +129,6 @@ The collection mixture method also recognizes the following two additional param
 #include "TFIDFRetMethod.hpp"
 #include "SimpleKLRetMethod.hpp"
 #include "OkapiRetMethod.hpp"
-
 #include "ParamManager.hpp"
 #include "ResultFile.hpp"
 
@@ -138,9 +137,13 @@ namespace LocalParameter {
   /// retrieval model 
   static enum RetModel mod;
   static bool TRECResultFormat;
+  bool useWorkingSet;
+  String workSetFile;
   void get() {
     mod = (RetModel) ParamGetInt("retModel",KL); // default is KL divergence model
     TRECResultFormat = ParamGetInt("resultFormat",1); // default is TREC format
+    useWorkingSet = ParamGetInt("useWorkingSet", 0); //default is to score the whole collection; otherwise, score a subset
+    workSetFile = ParamGetString("workingSetFile",""); // working set file name
   }
 };
 
@@ -157,13 +160,16 @@ int AppMain(int argc, char *argv[]) {
   
   Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
   DocStream *qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+
   ofstream result(RetrievalParameter::resultFile);
+  ResultFile resFile(LocalParameter::TRECResultFormat);
+  resFile.openForWrite(result, *ind);
+
+  ifstream workSetStr(LocalParameter::workSetFile);
+  ResultFile docPool(false); // working set is always simple format
+  docPool.openForRead(workSetStr, *ind);
 
   ArrayAccumulator accumulator(ind->docCount());
-
-  ResultFile resFile(LocalParameter::TRECResultFormat);
-
-  resFile.openForWrite(result, *ind);
 
   IndexedRealVector results(ind->docCount());
 
@@ -200,17 +206,34 @@ int AppMain(int argc, char *argv[]) {
   qryStream->startDocIteration();
   TextQuery *q;
   
+  IndexedRealVector workSetRes;
+  
   while (qryStream->hasMore()) {
     Document *d = qryStream->nextDoc();
     q = new TextQuery(*d);
     cout << "query : "<< q->id() << endl;
     QueryRep * qr = model->computeQueryRep(*q);
-    model->scoreCollection(*qr, results);
+    PseudoFBDocs *workSet;
+
+    if (LocalParameter::useWorkingSet) {
+      docPool.getResult(q->id(), workSetRes);
+      workSet = new PseudoFBDocs(workSetRes, -1); // -1 means using all docs
+      model->scoreDocSet(*qr,*workSet,results);
+    } else {
+      model->scoreCollection(*qr, results);
+    }
+
     results.Sort();
     if (RetrievalParameter::fbDocCount>0) {
       PseudoFBDocs *topDoc = new PseudoFBDocs(results, RetrievalParameter::fbDocCount);
       model->updateQuery(*qr, *topDoc);
-      model->scoreCollection(*qr, results);
+     
+      if (LocalParameter::useWorkingSet) {
+	model->scoreDocSet(*qr,*workSet,results);
+	delete workSet;
+      } else {
+	model->scoreCollection(*qr, results);
+      } 
       results.Sort();
       delete topDoc;
     }
