@@ -166,8 +166,6 @@ void ReutersParser::doParse() {
 	  // put in lowercase if the word is not in the acronym list
 	  for (c = reuterstext; *c != '\0'; c++)
 	    *(c) = tolower(*c);
-	} else {
-	  for (c = reuterstext; *c != '\0'; c++);
 	}	
 	if (textHandler != NULL) textHandler->foundWord(reuterstext);	
 
@@ -197,14 +195,14 @@ void ReutersParser::doParse() {
     case ACRONYM2:
       if (state == TEXT) {
         char * c;
+	// strip suffix
+	for (c = reuterstext; *c != '\'' && *c != '\0' && *c != 's'; c++);
+        *c = '\0';
 	if (!isAcronym(reuterstext)) {
 	  // put in lowercase if not in the acronym list
 	  for (c = reuterstext; *c != '\0'; c++)
 	    *(c) = tolower(*c);	 
 	}
-	// strip suffix
-	for (c = reuterstext; *c != '\'' && *c != '\0' && *c != 's'; c++);
-        *c = '\0';
 	if (textHandler != NULL && c != reuterstext) 
 	  textHandler->foundWord(reuterstext);	
 	 

@@ -63,6 +63,8 @@ long trecpos;
 "</TTL>"                            { trecpos += trecleng; return E_TEXT; }
 "<LP>"                              { trecpos += trecleng; return B_TEXT; }
 "</LP>"                             { trecpos += trecleng; return E_TEXT; }
+"<LEADPARA>"                        { trecpos += trecleng; return B_TEXT; }
+"</LEADPARA>"                       { trecpos += trecleng; return E_TEXT; }
 "<"[/]?[a-zA-Z][^>]*">"             { trecpos += trecleng; /* zap tags */ }
 "<!"[^-][^>]*">"                    { trecpos += trecleng; /* zap other tags*/}
 [&][a-zA-Z]+[;]                     { trecpos += trecleng; /* zap symbols */ }
@@ -194,14 +196,14 @@ void TrecParser::doParse() {
     case ACRONYM2:
       if (state == TEXT) {
         char * c;
+	// strip suffix
+	for (c = trectext; *c != '\'' && *c != '\0' && *c != 's'; c++);
+        *c = '\0';
 	if (!isAcronym(trectext)) {
 	  // put in lowercase if not in the acronym list
 	  for (c = trectext; *c != '\0'; c++)
 	    *(c) = tolower(*c);	 
 	}
-	// strip suffix
-	for (c = trectext; *c != '\'' && *c != '\0' && *c != 's'; c++);
-        *c = '\0';
 	if (textHandler != NULL) textHandler->foundWord(trectext);	
       }      
       break;

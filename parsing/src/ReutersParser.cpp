@@ -650,7 +650,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp = NULL, *yy_bp = NULL;
+	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
 #line 49 "../src/ReutersParser.l"
@@ -1403,6 +1403,11 @@ YY_BUFFER_STATE b;
 	}
 
 
+#ifndef YY_ALWAYS_INTERACTIVE
+#ifndef YY_NEVER_INTERACTIVE
+extern int isatty YY_PROTO(( int ));
+#endif
+#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -1819,8 +1824,6 @@ void ReutersParser::doParse() {
 	  // put in lowercase if the word is not in the acronym list
 	  for (c = reuterstext; *c != '\0'; c++)
 	    *(c) = tolower(*c);
-	} else {
-	  for (c = reuterstext; *c != '\0'; c++);
 	}	
 	if (textHandler != NULL) textHandler->foundWord(reuterstext);	
 
@@ -1850,14 +1853,14 @@ void ReutersParser::doParse() {
     case ACRONYM2:
       if (state == TEXT) {
         char * c;
+	// strip suffix
+	for (c = reuterstext; *c != '\'' && *c != '\0' && *c != 's'; c++);
+        *c = '\0';
 	if (!isAcronym(reuterstext)) {
 	  // put in lowercase if not in the acronym list
 	  for (c = reuterstext; *c != '\0'; c++)
 	    *(c) = tolower(*c);	 
 	}
-	// strip suffix
-	for (c = reuterstext; *c != '\'' && *c != '\0' && *c != 's'; c++);
-        *c = '\0';
 	if (textHandler != NULL && c != reuterstext) 
 	  textHandler->foundWord(reuterstext);	
 	 
