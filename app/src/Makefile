@@ -1,9 +1,49 @@
+include ../../MakeDefns
+MYSRC = $(patsubst %, %.cpp, $(ALLBIN))
 
-# define dependent modules
-# Assuming dependence on all library modules. In the future
-# each application should have its own dependent list (to be fixed later)
+.PHONY: all clean install
+all: $(ALLBIN)
 
-DEPENDMODS = distrib retrieval langmod index utility summarization
+clean:
+	rm -f *.o; rm -f ../depend/*.d; rm -f $(ALLBIN)
 
+ifneq (clean, $(MAKECMDGOALS))
+ifneq (install, $(MAKECMDGOALS))
+ifneq ($(strip $(MYSRC)),)
+-include $(patsubst %, ../depend/%, $(MYSRC:.cpp=.d))
+endif
+## there are no C apps, but this needs to be addressed.
+ifneq ($(strip $(CSRC)),)
+-include $(patsubst %, ../depend/%, $(CSRC:.c=.d))
+endif
+endif
+endif
 
-include ../../MakeApp
+## override default dependency rule to add individual library dependencies.
+## use -MM to omit system header files.
+# how to generate .d  file from a .C file
+../depend/%.d: ../src/%.cpp
+	@echo "Generating $@ for $<"
+	@set -e; $(CXX) -MM $(CXXFLAGS) $(ALLINCPATH) $< | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
+	@DEPS="" ; for mod in $(ALLMODULES) ; do if `grep "../../$$mod/include" $@ >/dev/null` ; then echo "$*: ../../$$mod/obj/lib$$mod.a" >> $@;  DEPS="$$DEPS $$mod" ; fi ; done ; echo "$*.o_INCPATH = -I../include $$""(patsubst %, -I../../%/include, $$DEPS)" >> $@; echo "$*_LIBPATH = $$""(patsubst %, -L../../%/obj, $$DEPS)" >> $@; echo "$*_LIBFLAGS = $$""(patsubst %, -l%, $$DEPS)" >> $@;
+
+# how to generate .d file from a .c file
+../depend/%.d: ../src/%.c
+	@echo "Generating $@ for $<"
+	@set -e; $(CC) -MM $(CFLAGS) $(ALLINCPATH) $< | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
+	@DEPS="" ; for mod in $(ALLMODULES) ; do if `grep "../../$$mod/include" $@ >/dev/null` ; then echo "$*: ../../$$mod/obj/lib$$mod.a" >> $@;  DEPS="$$DEPS $$mod" ; fi ; done ; echo "$*.o_INCPATH = -I../include $$""(patsubst %, -I../../%/include, $$DEPS)" >> $@; echo "$*_LIBPATH = $$""(patsubst %, -L../../%/obj, $$DEPS)" >> $@; echo "$*_LIBFLAGS = $$""(patsubst %, -l%, $$DEPS)" >> $@;
+
+# how to make an application
+# compiling C++ code
+%.o: ../src/%.cpp
+	$(CXX) $(CXXFLAGS) $($@_INCPATH) -o $@ -c $<
+
+# compiling C code
+%.o: ../src/%.c
+	$(CC) $(CFLAGS) $($@_INCPATH) -o $@ -c $<
+
+%: %.o
+	$(CXX) -o $@ $< $($@_LIBPATH) $($@_LIBFLAGS) $(CPPLDFLAGS)
+
+install:
+	$(INSTALL_PROGRAM) $(ALLBIN)  $(bindir)
