@@ -12,7 +12,7 @@
 
 #include "OneStepMarkovChain.hpp"
 
-OneStepMarkovChain::OneStepMarkovChain(WeightedIDSet &docSet, Index &homeIndex, double *wdNorm, double stopProb):
+OneStepMarkovChain::OneStepMarkovChain(const WeightedIDSet &docSet, const Index &homeIndex, double *wdNorm, double stopProb):
   ind(homeIndex), alpha(stopProb),curToWord(0), norm(wdNorm)
 {
   dSet = new int[ind.docCount()+1];
@@ -59,7 +59,7 @@ OneStepMarkovChain::~OneStepMarkovChain()
   delete [] dSet;
 }
 
-void OneStepMarkovChain::computeFromWordProb(int toWord)
+void OneStepMarkovChain::computeFromWordProb(int toWord) const 
 {
   int i;
   for (i=1; i<=ind.termCountUnique(); i++) {
@@ -69,7 +69,7 @@ void OneStepMarkovChain::computeFromWordProb(int toWord)
   DocInfoList *dList = ind.docInfoList(toWord);
   dList->startIteration();
   while (dList->hasMore()) {
-    DocInfo *dinfo = dList->nextEntry();
+    const DocInfo *dinfo = dList->nextEntry();
     if (dSet[dinfo->docID()]==0) {
       continue;
     }
@@ -78,7 +78,7 @@ void OneStepMarkovChain::computeFromWordProb(int toWord)
     double p_qi_given_d = dinfo->termCount()/dLength;
    
     TermInfoList *tList = ind.termInfoList(dinfo->docID());
-    TermInfo *tinfo;
+    const TermInfo *tinfo;
     tList->startIteration();
     while (tList->hasMore()) {
       tinfo = tList->nextEntry();
@@ -106,7 +106,7 @@ void OneStepMarkovChain::computeFromWordProb(int toWord)
 
 }
 
-void OneStepMarkovChain::startFromWordIteration(int toWord)
+void OneStepMarkovChain::startFromWordIteration(int toWord) const
 {
   if (toWord != curToWord) 
     computeFromWordProb(toWord);
@@ -114,7 +114,7 @@ void OneStepMarkovChain::startFromWordIteration(int toWord)
   itPos = 1;
 }
 
-void OneStepMarkovChain::nextFromWordProb(int &fromWord, double &prob) 
+void OneStepMarkovChain::nextFromWordProb(int &fromWord, double &prob) const
 {
   fromWord = itPos;
   prob = fromWordPr[itPos];

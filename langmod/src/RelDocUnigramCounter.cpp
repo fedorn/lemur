@@ -14,13 +14,13 @@
 #include "RelDocUnigramCounter.hpp"
 
 
-RelDocUnigramCounter::RelDocUnigramCounter(int docID, Index &homeIndex)
+RelDocUnigramCounter::RelDocUnigramCounter(int docID, const Index &homeIndex)
   : ind(homeIndex), ArrayCounter<double>(homeIndex.termCountUnique()+1) 
 {
   countRelDocUnigram(docID);
 }
 
-RelDocUnigramCounter::RelDocUnigramCounter(WeightedIDSet &docSet, Index &homeIndex) 
+RelDocUnigramCounter::RelDocUnigramCounter(const WeightedIDSet &docSet, const Index &homeIndex) 
   : ind(homeIndex), ArrayCounter<double>(homeIndex.termCountUnique()+1) 
 {
   docSet.startIteration();

@@ -13,23 +13,26 @@
 #include "DocUnigramCounter.hpp"
 
 
-DocUnigramCounter::DocUnigramCounter(int docID, Index &homeIndex)
+DocUnigramCounter::DocUnigramCounter(int docID, const Index &homeIndex)
   : ind(homeIndex), ArrayCounter<int>(homeIndex.termCountUnique()+1) 
 {
   countDocUnigram(docID);
 }
 
-DocUnigramCounter::DocUnigramCounter(vector<int> &docSet, Index &homeIndex) 
+DocUnigramCounter::DocUnigramCounter(const vector<int> &docSet, const Index &homeIndex) 
   : ind(homeIndex), ArrayCounter<int>(homeIndex.termCountUnique()+1) 
-{
+{/*
   vector<int>::iterator it;
   for (it=docSet.begin(); it!= docSet.end(); it++) {
     countDocUnigram(*it);
+    }*/
+  for (int it=0;it<docSet.size();it++) {
+    countDocUnigram(docSet[it]);
   }
 }
 
 
-DocUnigramCounter::DocUnigramCounter(WeightedIDSet &docSet, Index &homeIndex) 
+DocUnigramCounter::DocUnigramCounter(const WeightedIDSet &docSet, const Index &homeIndex) 
   : ind(homeIndex), ArrayCounter<int>(homeIndex.termCountUnique()+1) 
 {
   docSet.startIteration();
@@ -42,7 +45,7 @@ DocUnigramCounter::DocUnigramCounter(WeightedIDSet &docSet, Index &homeIndex)
 }
 
 
-DocUnigramCounter::DocUnigramCounter(Index &collectionIndex)
+DocUnigramCounter::DocUnigramCounter(const Index &collectionIndex)
   : ind(collectionIndex), ArrayCounter<int>(collectionIndex.termCountUnique()+1) 
 {
   int numTerms = ind.termCountUnique();
@@ -54,7 +57,7 @@ DocUnigramCounter::DocUnigramCounter(Index &collectionIndex)
 void DocUnigramCounter::countDocUnigram(int docID, double weight)
 {
   TermInfoList *tList = ind.termInfoList(docID);
-  TermInfo *info;
+  const TermInfo *info;
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
