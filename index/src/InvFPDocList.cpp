@@ -155,6 +155,17 @@ bool InvFPDocList::addLocation(int docid, int location) {
   return true;
 }
 
+int InvFPDocList::termCTF() {
+  int ctf = 0;
+  int *ptr = begin;
+  while (ptr != lastid) {
+    ptr++;
+    ctf += (*ptr);
+    ptr += (*ptr)+ 1;
+  }
+  ctf += (*freq);
+  return ctf;
+}
 
 void InvFPDocList::deltaEncode() {
   // we will encode in place
