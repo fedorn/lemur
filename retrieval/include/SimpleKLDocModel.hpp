@@ -18,11 +18,15 @@
 
 /// Simple KL divergence retrieval model parameters
 namespace SimpleKLParameter {
-  enum SmoothMethod  {JELINEKMERCER=0, DIRICHLETPRIOR=1, ABSOLUTEDISCOUNT=2, TWOSTAGE=3};
+  enum SmoothMethod  {JELINEKMERCER=0, DIRICHLETPRIOR=1, ABSOLUTEDISCOUNT=2, 
+		      TWOSTAGE=3};
  
   enum SmoothStrategy  {INTERPOLATE=0, BACKOFF=1};
 
   enum QueryUpdateMethod {MIXTURE = 0, DIVMIN=1, MARKOVCHAIN=2, RM1=3, RM2=4};
+
+  enum adjustedScoreMethods {QUERYLIKELIHOOD = 1, CROSSENTROPY = 2, 
+			       NEGATIVEKLD = 3};
 
   struct DocSmoothParam {
     /// smoothing method
@@ -44,6 +48,7 @@ namespace SimpleKLParameter {
   static double defaultDirPrior = 1000;
 
   struct QueryModelParam {
+    enum adjustedScoreMethods adjScoreMethod;
     /// query noise coefficient
     double qryNoise;
 
@@ -95,7 +100,15 @@ public:
 
   /// term weighting function, weight(w) = p_seen(w)/p_unseen(w)
   virtual double termWeight(int termID, DocInfo *info) {
-    return (seenProb(info->termCount(), termID)/(unseenCoeff()* refLM.prob(termID)));
+    double sp = seenProb(info->termCount(), termID);
+    double usp = unseenCoeff();
+    double ref = refLM.prob(termID);
+    double score = sp/(usp*ref);
+    /*
+    cerr << "TW:" << termID << " sp:" << sp << " usp:" << usp << " ref:" << ref << " s:" << score << endl;
+    */
+    //    return (seenProb(info->termCount(), termID)/(unseenCoeff()* refLM.prob(termID)));
+    return score;
   }
 
   /// doc-specific constant term in the scoring formula
