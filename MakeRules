@@ -33,10 +33,15 @@ endif
 	echo "$(CC) $(CFLAGS) -o $@ -c $<"
 	$(CC) $(CFLAGS) -o $@ -c $<
 
+# generating C++ with flex
+../src/%.cpp: ../src/%.l
+	echo "$(LEX) -8 -o$@ $<"
+	$(LEX) -8 -o$@ $<
+
 # how to make a library from object files
 $(OBJLIB): $(OBJ)
-	echo "rm -f $@; ar -rs $@ $(OBJ)"
-	rm -f $@; ar -rs $@ $(OBJ)
+	echo "rm -f $@; $(AR) -rs $@ $(OBJ)"
+	rm -f $@; $(AR) -rs $@ $(OBJ)
 
 # how to clean a library module directory
 cleanlib:

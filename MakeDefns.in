@@ -2,9 +2,9 @@
 
 # these are common definitions that the Makefile in
 # each subdirectory includes
-
+AR = ar
 SHELL = /bin/sh
-
+LEX = flex
 # C++ source files
 CPPSRC = $(shell cd ../src; ls *.cpp 2> /dev/null)
 
@@ -77,16 +77,3 @@ CPPLDFLAGS  =   $(LIBPATH) $(LIBFLAGS) -lm
 CCVER = $(shell $(CC) -dumpversion | sed 's/\.//g')
 
 CXXVER = $(shell $(CXX) -dumpversion |sed 's/\.//g')
-
-
-  
-
-
-
-
-
-
-
-
-
-
