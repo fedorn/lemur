@@ -157,6 +157,13 @@ void WordDocumentExtractor::initialize() {
                                       
   v_internal->_documentsDispatch = result.pdispVal;
 
+  LPOLESTR closeMethodName = L"Close";
+
+  hr = v_internal->_documentsDispatch->GetIDsOfNames( IID_NULL,
+                                          &closeMethodName,
+                                          1,
+                                          LOCALE_SYSTEM_DEFAULT,
+                                          &v_internal->_closeDispatchID );
   LPOLESTR openMethodName = L"Open";
 
   hr = v_internal->_documentsDispatch->GetIDsOfNames( IID_NULL,
