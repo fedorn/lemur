@@ -51,16 +51,16 @@ bool InvIndex::open(const char* indexName){
   counts = new int[5];
   names = new char*[6];  
 
-  if (!fullToc(indexName)) {
-    *lemurstream << "Couldn't not properly parse param file. Index was not loaded." << endl;
-    return false;
-  }
-
   String streamSelect = ParamGetString("stream", "cerr");
   if (streamSelect == "cout") {
     setLemurStream(&cout);
   } else {
     setLemurStream(&cerr);
+  }
+
+  if (!fullToc(indexName)) {
+    *lemurstream << "Couldn't not properly parse param file. Index was not loaded." << endl;
+    return false;
   }
   
   if (!indexLookup())
@@ -209,7 +209,7 @@ int InvIndex::docCount(int termID) {
 
 int InvIndex::docLength(int docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
-    fprintf(stderr, "Error trying to get docLength for invalid docID.\n");
+    *lemurstream << "Error trying to get docLength for invalid docID." << endl;
     return 0;
   }
     
@@ -224,7 +224,7 @@ int InvIndex::docLength(int docID) const{
 
 int InvIndex::docLengthCounted(int docID) {
   if ((docID < 0) || (docID > counts[DOCS])) {
-    fprintf(stderr, "Error trying to get docLengthCounted for invalid docID.\n");
+    *lemurstream << "Error trying to get docLengthCounted for invalid docID." << endl;
     return 0;
   }
   if (!dtloaded) {
@@ -240,7 +240,7 @@ int InvIndex::docLengthCounted(int docID) {
   ifstream look;
   look.open(dtfiles[dtlookup[docID].fileid], ios::in | ios::binary);
   if (!look) {
-    fprintf(stderr, "Could not open term indexfile for reading.\n");
+    *lemurstream << "Could not open term indexfile for reading." << endl;
     return 0;
   }
   look.seekg(dtlookup[docID].offset, ios::beg);
@@ -281,7 +281,7 @@ DocInfoList* InvIndex::docInfoList(int termID){
 
 TermInfoList* InvIndex::termInfoList(int docID){
   if ((docID < 0) || (docID > counts[DOCS])) {
-    fprintf(stderr, "Error trying to get termInfoList for invalid docID.\n");
+    *lemurstream << "Error trying to get termInfoList for invalid docID." << endl;
     return NULL;
   }
   if (!dtloaded) {
@@ -388,7 +388,7 @@ bool InvIndex::indexLookup() {
   FILE* in = fopen(names[DOC_LOOKUP], "rb");
   *lemurstream << "Trying to open invlist lookup: " << names[DOC_LOOKUP] << endl;
   if (in == NULL) {
-    fprintf(stderr, "Couldn't open invlist lookup table for reading\n");
+    *lemurstream << "Couldn't open invlist lookup table for reading" << endl;
     return false;
   }
 
@@ -420,7 +420,7 @@ bool InvIndex::dtLookup() {
   }
   *lemurstream << "Trying to open dtlist lookup: " << names[TERM_LOOKUP] << endl;
   if (in == NULL) {
-    fprintf(stderr, "Couldn't open dt lookup table for reading\n");
+    *lemurstream << "Couldn't open dt lookup table for reading" << endl;
     return false;
   }
 
@@ -444,7 +444,7 @@ bool InvIndex::dtFileIDs() {
   FILE* in = fopen(names[TERM_INDEX], "rb");
   *lemurstream << "Trying to open term index filenames: " << names[TERM_INDEX] << endl;
   if (in == NULL) {
-    fprintf(stderr, "Error opening term index filenames file\n");
+    *lemurstream << "Error opening term index filenames file" << endl;
     return false;
   }
 
@@ -475,7 +475,7 @@ bool InvIndex::invFileIDs() {
   FILE* in = fopen(names[DOC_INDEX], "rb");
   *lemurstream << "Trying to open inverted index filenames: " << names[DOC_INDEX] << endl;
   if (in == NULL) {
-    fprintf(stderr, "Error opening inverted index filenames file\n");
+    *lemurstream << "Error opening inverted index filenames file" << endl;
     return false;
   }
 
@@ -506,7 +506,7 @@ bool InvIndex::termIDs() {
   FILE* in = fopen(names[TERM_IDS], "rb");
   *lemurstream << "Trying to open term ids file: " << names[TERM_IDS] << endl;
   if (in == NULL) {
-    fprintf(stderr, "Error opening termfile\n");
+    *lemurstream << "Error opening termfile" << endl;
     return false;
   }
   terms = new TERM_T[counts[UNIQUE_TERMS]+1];
@@ -542,7 +542,7 @@ bool InvIndex::docIDs() {
   FILE* in = fopen(names[DOC_IDS], "rb");
   *lemurstream << "Trying to open doc ids file: " << names[DOC_IDS] << endl;
   if (in == NULL) {
-    fprintf(stderr, "Error opening docfile\n");
+    *lemurstream << "Error opening docfile" << endl;
     return false;
   }
   docnames = new EXDOCID_T[counts[DOCS]+1];
