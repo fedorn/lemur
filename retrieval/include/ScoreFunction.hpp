@@ -18,10 +18,18 @@
 #include "DocumentRep.hpp"
 
 //------------------------------------------------------------
-//      Abstract Interface for Retrieval Function 
+//      Abstract Interface for Inverted index based Retrieval Function 
 //------------------------------------------------------------
 
 /// Abstract interface for retrieval function with a default implementation (dot product)
+
+/*!
+  This is an abstract interface for a retrieval function that can be written
+ as involving a sum over all the matched terms between a query and a document.
+Many retrieval functions can be rewritten in this form. Please see the
+API documentation on the  Lemur web site
+ for more information about the generic scoring function form. 
+*/
 
 class ScoreFunction {
 public:

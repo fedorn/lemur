@@ -71,9 +71,19 @@ public:
   virtual double scoreDoc(QueryRep &qry, int docID)=0;
 
   /// Score a set of documents w.r.t. a query rep (e.g. for re-ranking)
+  /*! 
+     The default implementation provided by this class is to call function scoreDoc
+  */
   virtual void scoreDocSet(QueryRep &qry, DocIDSet &docSet, IndexedRealVector &results);
   
-  /// Score all documents in the collection 
+  /// Score all documents in the collection
+  /*! 
+    The default implementation provided by this class is to call 
+    function scoreDoc, thus to score documents one by one. 
+    This is inefficient, so usually a subclass should override this method
+    if a more efficient scoring, e.g., based on inverted index, is possible.
+  */
+
   virtual void scoreCollection(QueryRep &qry, IndexedRealVector &results);
 
   /// update the query, feedback support

@@ -83,8 +83,10 @@ public:
 
 class ArrayQueryRep : public TextQueryRep {
 public:
+  /// The size passed in must be large enough to hold all the terms
   ArrayQueryRep(int size) : ct(new ArrayCounter<double>(size)), scConst(0) {
   }
+  /// The size passed in must be large enough to hold all the terms, typically dbIndex.termCountUnique()+1.
   ArrayQueryRep(int size, TextQuery &qry, Index &dbIndex);
   /// build a query rep with a frequency vector
   ArrayQueryRep(int size, FreqVector &qryVec);

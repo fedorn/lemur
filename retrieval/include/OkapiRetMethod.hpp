@@ -128,13 +128,15 @@ public:
   }
 
   virtual ScoreFunction *scoreFunc();
-  
+
+  /// It's suspected that there is a bug in the implementation of feedback; the performance is not as expected.   
   virtual void updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs);
 
   void setTFParam(OkapiParameter::TFParam &tfWeightParam);
 
   void setFeedbackParam(OkapiParameter::FeedbackParam &feedbackParam);
 
+  /// Compute the Robertson Spark Jones Weight 
   static double RSJWeight(double r, double R, 
 
 			  double n, double N) {
