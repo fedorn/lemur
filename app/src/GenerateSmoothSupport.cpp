@@ -16,8 +16,16 @@
 
  
 
-This application (GenerateSmoothSupport.cpp) generates a supporting file needed by 
-retrieval using smoothed unigram language model based on BasicIndex.
+This application (GenerateSmoothSupport.cpp) generates two support files
+for retrieval using the language modeling approach. Both files contain
+some pre-computed quantities that are needed to speed up the retrieval process.
+One file has the suffix ".supp" and is needed by 
+retrieval using smoothed unigram language model based on BasicIndex. 
+Each entry in this support file corresponds to one document and records
+two pieces of information: (a) the count of unique terms in the document;
+(b) the sum of collection language model probabilities for the words in the document.
+The other
+file has the suffix ".supp.mc" and is needed by feedback based on the Markov chain query model. Each line in this file contains a term and a sum of the probability of the word given all documents in the collection. (i.e., a sum of p(w|d) over all possible d's.) 
 
 To run the application, follow the general steps of running a lemur
 application and set the following variables in the parameter file:
@@ -28,9 +36,7 @@ BuildBasicIndex, e.g., /usr0/mydata/index.bsc)
 (2) smoothSupportFile: file path for the support file
 (e.g., /usr0/mydata/index.supp)
 
-Each entry in the support file corresponds to one document and records
-two pieces of information: (a) the count of unique terms in the document;
-(b) the sum of collection language model probabilities for the words in the document.
+
 
 This application is also a good example of using the doc index (i.e., doc->term index).
 

@@ -38,7 +38,7 @@ a simple three-column format <queryID, docID, score>. Integer value, zero for no
 
 7) "feedbackDocCount": the number of docs to use for pseudo-feedback (0 means no-feedback)
 
-8) "queryUpdateMethod": feedback method (0, 1, 2 for mixture model, divergence minimization, and Markov chain respectively, but currently only mixture model is implemented).
+8) "queryUpdateMethod": feedback method (0, 1, 2 for mixture model, divergence minimization, and Markov chain respectively).
 
 9) Method-specific parameters:
 
@@ -56,11 +56,19 @@ parameters apply:
 
 Parameters 9.2), 9.3) and 9.4) work conjunctively to control the truncation, i.e., the truncated model must satisfy all the three constraints. 
 
-The collection mixture method also recognizes the following two additional parameters:
 
-9.5) "feedbackMixtureNoise": This is the collection model selection probability in the mixture model. That is, with this probability, a word is picked according to the collection language model, when a feedback document is "generated". Default: 0.5.
+All the three feedback methods also recognize the parameter "feedbackMixtureNoise" (default value :0.5), but with <font color=red> <em> different</em> interpretations</font>.  
+<ul>
+<li> For the collection mixture model method, "feedbackMixtureNoise" is the collection model selection probability in the mixture model. That is, with this probability, a word is picked according to the collection language model, when a feedback document is "generated".
+<li> For the divergence minimization method, "feedbackMixtureNoise" means
+the weight of the divergence from the collection language model. (The higher it is, the farther the estimated model is from the collection model.)
+<li> For the Markov chain method, "feedbackMixtureNoise" is the probability
+of <em>not</em> stopping, i.e., 1- alpha, where alpha is the stopping probability while walking through the chain. 
+</ul>
 
-9.6) "emIterations": The maximum number of iterations the EM algorithm will run. Default: 50. The algorithm will also stop if the log-likelihood increase is no more than 0.5. 
+In addition, the collection mixture model also recognizes the parameter 
+"emIterations", which is the maximum number of iterations the EM algorithm will run. Default: 50. (The EM algorithm can terminate earlier if the log-likelihood converges quickly, where convergence is measured by some hard-coded criterion. See the source code in SimpleKLRetMethod.cpp for details. )
+
 
  */
 
