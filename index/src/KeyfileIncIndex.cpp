@@ -869,7 +869,13 @@ void KeyfileIncIndex::mergeCacheSegments() {
       new KeyfileDocListSegmentReader(fileToOpen, nameToOpen, i, 
 				      KEYFILE_DOCLISTREADER_SIZE );
     reader->pop(); // read the first list into memory
-    readers.push( reader );
+    if( reader->top() ) {
+      readers.push(reader);
+    } else {
+      reader->file()->unlink();
+      delete reader->file();
+      delete reader;
+    }
   }
 
   while( readers.size() ) {
