@@ -69,6 +69,9 @@ public:
 
   /// Score a document identified by the id w.r.t. a query rep
   virtual double scoreDoc(QueryRep &qry, int docID)=0;
+
+  /// Score a set of documents w.r.t. a query rep (e.g. for re-ranking)
+  virtual void scoreDocSet(QueryRep &qry, DocIDSet &docSet, IndexedRealVector &results);
   
   /// Score all documents in the collection 
   virtual void scoreCollection(QueryRep &qry, IndexedRealVector &results);

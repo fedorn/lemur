@@ -21,4 +21,16 @@ void RetrievalMethod::scoreCollection(QueryRep &qry, IndexedRealVector &results)
   }
 }
 
+/// Score a set of documents w.r.t. a query rep (e.g. for re-ranking)
+void RetrievalMethod::scoreDocSet(QueryRep &qry, DocIDSet &docSet, IndexedRealVector &results)
+{
+  results.clear();
+  docSet.startIteration();
+  while (docSet.hasMore()) {
+    int docID;
+    double prevScore;
+    docSet.nextIDInfo(docID, prevScore);
+    results.PushValue(docID, scoreDoc(qry, docID));
+  }
+}
 
