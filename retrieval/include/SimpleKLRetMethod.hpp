@@ -26,27 +26,15 @@
 class SimpleKLQueryModel : public ArrayQueryRep {
 public:
   /// construct a query model based on query text
-  SimpleKLQueryModel(TextQuery &qry, Index &dbIndex) : 
+  SimpleKLQueryModel(const TextQuery &qry, const Index &dbIndex) : 
     ArrayQueryRep(dbIndex.termCountUnique()+1, qry, dbIndex), qm(NULL), 
     ind(dbIndex), colKLComputed(false) {
-    startIteration();
     colQLikelihood = 0;
-    //Sum w in Q qtf * log(qtcf/termcount);
-    int tc = ind.termCount();
-    while (hasMore()) {
-      QueryTerm *qt = nextTerm();
-      int id = qt->id();
-      double qtf = qt->weight();
-      int qtcf = ind.termCount(id);
-      double s = qtf * log((double)qtcf/(double)tc);
-      colQLikelihood += s;
-      delete qt;
-    }
-
+    colQueryLikelihood();    
   }
 
   /// construct an empty query model
-  SimpleKLQueryModel(Index &dbIndex) : 
+  SimpleKLQueryModel(const Index &dbIndex) : 
     ArrayQueryRep(dbIndex.termCountUnique()+1), qm(NULL), ind(dbIndex), 
     colKLComputed(false) {
     colQLikelihood = 0;
@@ -70,10 +58,10 @@ So, the sum of all word probabilities according to the truncated model does not
 have to sum to 1. The assumption is that if a word has an extrememly small probability, adding it to the query model will not affect scoring that much. <p> The truncation procedure is as follows:  First, we sort the probabilities in <tt> qModel</tt> passed in, and then iterate over all the entries. For each entry, we check the stopping condition and add the entry to the existing query model if none of the following stopping conditions is satisfied. If, however, any of the conditions is satisfied, the process will terminate. The three stopping conditions are: (1) We already added <tt>howManyWord</tt> words. (2) The total sum of probabilities added exceeds the threshold <tt>prSumThresh</tt>. (3) The probability of the current word is below <tt>prThresh</tt>.
    */
 
-  virtual void interpolateWith(UnigramLM &qModel, double origModCoeff, 
+  virtual void interpolateWith(const UnigramLM &qModel, double origModCoeff, 
 			       int howManyWord, double prSumThresh=1, 
 			       double prThresh=0);
-  virtual double scoreConstant() {
+  virtual double scoreConstant() const {
     return totalCount();
   }
   
@@ -86,11 +74,10 @@ have to sum to 1. The assumption is that if a word has an extrememly small proba
   /// save a query clarity to output stream os
   virtual void clarity(ostream &os);
   /// compute query clarity score
-  virtual double clarity();
+  virtual double clarity() const;
 
-#if 0
   /// get and compute if necessary query-collection KL-div (useful for recovering the true divergence value from a score)
-  double colDivergence() {
+  double colDivergence() const {
     if (colKLComputed) {
       return colKL;
     } else {
@@ -100,41 +87,18 @@ have to sum to 1. The assumption is that if a word has an extrememly small proba
       while (hasMore()) {
 	QueryTerm *qt=nextTerm();
 	double pr = qt->weight()/(double)totalCount();
-	double colPr = (ind.termCount(qt->id())+1)/(double)(ind.termCount()+ind.termCountUnique()); // Laplace smoothing, same as in SimpleKLRetMethod
+	double colPr = ((double)ind.termCount(qt->id()) /
+			(double)(ind.termCount())); // ML smoothing
 	d += pr*log(pr/colPr);
 	delete qt;
-	
-      }
-      colKL=d;
-      return d;
-    }
-  }
-#endif
-  /// get and compute if necessary query-collection KL-div (useful for recovering the true divergence value from a score)
-  double colDivergence() {
-    if (colKLComputed) {
-      return colKL;
-    } else {
-      colKLComputed = true;
-      double d=0;
-      startIteration();
-      while (hasMore()) {
-	QueryTerm *qt=nextTerm();
-	double pr = qt->weight()/(double)totalCount();
-	//	double colPr = (ind.termCount(qt->id())+1)/(double)(ind.termCount()+ind.termCountUnique()); // Laplace smoothing, same as in SimpleKLRetMethod
-	double colPr = ((double)ind.termCount(qt->id())/(double)(ind.termCount())); // ML smoothing, same as in SimpleKLRetMethod
-	d += pr*log(pr/colPr);
-	delete qt;
-	
       }
       colKL=d;
       return d;
     }
   }
 
-
-  /// compute the KL-div of the query model and any unigram LM, i.e.,D(Mq|Mref)
-  double KLDivergence(UnigramLM &refMod) {
+  ///compute the KL-div of the query model and any unigram LM, i.e.,D(Mq|Mref)
+  double KLDivergence(const UnigramLM &refMod) {
     double d=0;
     startIteration();
     while (hasMore()) {
@@ -146,20 +110,33 @@ have to sum to 1. The assumption is that if a word has an extrememly small proba
     return d;
   }
 
-  double colQueryLikelihood() {
+  double colQueryLikelihood() const {
+    if (colQLikelihood == 0) {
+      //Sum w in Q qtf * log(qtcf/termcount);
+      int tc = ind.termCount();
+      startIteration();
+      while (hasMore()) {
+	QueryTerm *qt = nextTerm();
+	int id = qt->id();
+	double qtf = qt->weight();
+	int qtcf = ind.termCount(id);
+	double s = qtf * log((double)qtcf/(double)tc);
+	colQLikelihood += s;
+	delete qt;
+      }
+    }
     return colQLikelihood;
   }
   
 
 protected:
   // For Query likelihood adjusted score
-  double colQLikelihood;
-  
-  double colKL;
-  bool colKLComputed;
+  mutable double colQLikelihood;
+  mutable double colKL;
+  mutable bool colKLComputed;
 
   IndexedRealVector *qm;
-  Index &ind;
+  const Index &ind;
 };
 
 
@@ -186,7 +163,10 @@ public:
   void setScoreMethod(enum SimpleKLParameter::adjustedScoreMethods adj) {
     adjScoreMethod = adj;
   }  
-  virtual double matchedTermWeight(QueryTerm *qTerm, TextQueryRep *qRep, DocInfo *info, DocumentRep *dRep) { 
+  virtual double matchedTermWeight(const QueryTerm *qTerm, 
+				   const TextQueryRep *qRep, 
+				   const DocInfo *info,
+				   const DocumentRep *dRep) const { 
     double w = qTerm->weight();
     double d = dRep->termWeight(qTerm->id(),info);
     double l = log(d);
@@ -199,29 +179,32 @@ public:
     //    return (qTerm->weight()*log(dRep->termWeight(qTerm->id(),info)));
   }
   /// score adjustment (e.g., appropriate length normalization)
-  virtual double adjustedScore(double origScore, TextQueryRep *qRep, 
-			       DocumentRep *dRep) {
-    SimpleKLQueryModel *qm = (SimpleKLQueryModel *)qRep;
-    // dynamic_cast<SimpleKLQueryModel *>qRep;
-    SimpleKLDocModel *dm = (SimpleKLDocModel *)dRep;
+  virtual double adjustedScore(double origScore, 
+			       const TextQueryRep *qRep, 
+			       const DocumentRep *dRep) const {
+    const SimpleKLQueryModel *qm = dynamic_cast<const SimpleKLQueryModel *>(qRep);
+    // this cast is unnecessary
+    //    SimpleKLDocModel *dm = (SimpleKLDocModel *)dRep;
       // dynamic_cast<SimpleKLDocModel *>dRep;
 
     double qsc = qm->scoreConstant();
-    double dsc = log(dm->scoreConstant());
+    double dsc = log(dRep->scoreConstant());
     double cql = qm->colQueryLikelihood();
     // real query likelihood
     double s = dsc * qsc + origScore + cql;
     double qsNorm = origScore/qsc;
     double qmD = qm->colDivergence();
+    /*
+      cerr << "A:"<< origScore << " dsc:" << dsc  << " qsc:" << qsc  
+	   << " cql:" << cql << " s:"  << s << endl;
+    */
     /// The following are three different options for scoring    
     switch (adjScoreMethod) {
     case SimpleKLParameter::QUERYLIKELIHOOD:
       /// ==== Option 1: query likelihood ==============
       // this is the original query likelihood scoring formula
-      /*
-      cerr << "A:"<< origScore << " dsc:" << dsc  << " qsc:" << qsc  
-	   << " cql:" << cql << " s:"  << s << endl;
-      */
+
+
       return s;
       //      return (origScore+log(dm->scoreConstant())*qm->scoreConstant());
     case SimpleKLParameter::CROSSENTROPY:
@@ -243,53 +226,24 @@ public:
       return s;
       //      return (origScore/qm->scoreConstant() + log(dm->scoreConstant())
       //	      - qm->colDivergence());
+    default:
+      cerr << "unknown adjusted score method" << endl;
+      return origScore;
     }
   }
   
-#if 0
-  /// score adjustment (e.g., appropriate length normalization)
-  virtual double adjustedScore(double origScore, TextQueryRep *qRep, DocumentRep *dRep) {
-    SimpleKLQueryModel *qm = (SimpleKLQueryModel *)qRep;
-    // dynamic_cast<SimpleKLQueryModel *>qRep;
-    SimpleKLDocModel *dm = (SimpleKLDocModel *)dRep;
-      // dynamic_cast<SimpleKLDocModel *>dRep;
-
-    /// The following are three different options for scoring
-
-    /// ==== Option 1: query likelihood ==============
-    // this is the original query likelihood scoring formula
-    //  return (origScore+log(dm->scoreConstant())*qm->scoreConstant());
-
-    /// ==== Option 2: cross-entropy (normalized query likelihood) ==== 
-    // This is the normalized query-likelihood, i.e., cross-entropy
-    // assert(qm->scoreConstant()!=0);
-    // return (origScore/qm->scoreConstant() + log(dm->scoreConstant()));
-
-    /// ==== Option 3: negative KL-divergence ==== 
-    // This is the exact (negative) KL-divergence value, i.e., -D(Mq||Md)
-    assert(qm->scoreConstant()!=0);
-    return (origScore/qm->scoreConstant() + log(dm->scoreConstant())
-	    - qm->colDivergence());
-
-
-  }
-#endif
 };
 
-
-
-
 /// KL Divergence retrieval model with simple document model smoothing
-
-
 class SimpleKLRetMethod : public TextQueryRetMethod {
 public:
 
   /// Construction of SimpleKLRetMethod requires a smoothing support file, which can be generated by the application GenerateSmoothSupport. The use of this smoothing support file is to store some pre-computed quantities so that the scoring procedure can be speeded up.
-  SimpleKLRetMethod(Index &dbIndex, const char *supportFileName, ScoreAccumulator &accumulator);
+  SimpleKLRetMethod(const Index &dbIndex, const string &supportFileName, 
+		    ScoreAccumulator &accumulator);
   virtual ~SimpleKLRetMethod();
   
-  virtual TextQueryRep *computeTextQueryRep(TextQuery &qry) {
+  virtual TextQueryRep *computeTextQueryRep(const TextQuery &qry) {
     return (new SimpleKLQueryModel(qry, ind));
   }
   
@@ -299,9 +253,9 @@ public:
   virtual ScoreFunction *scoreFunc() {
     return (scFunc);
   }
-  
 
-  virtual void updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs);
+  virtual void updateTextQuery(TextQueryRep &origRep, 
+			       const DocIDSet &relDocs);
 
   void setDocSmoothParam(SimpleKLParameter::DocSmoothParam &docSmthParam);
   void setQueryModelParam(SimpleKLParameter::QueryModelParam &queryModParam);
@@ -325,26 +279,35 @@ protected:
   /// @name query model updating methods (i.e., feedback methods)
   //@{
   /// Mixture model feedback method
-  void computeMixtureFBModel(SimpleKLQueryModel &origRep, DocIDSet & relDocs);
+  void computeMixtureFBModel(SimpleKLQueryModel &origRep, 
+			     const DocIDSet & relDocs);
   /// Divergence minimization feedback method
-  void computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs);
+  void computeDivMinFBModel(SimpleKLQueryModel &origRep, 
+			    const DocIDSet &relDocs);
   /// Markov chain feedback method
-  void computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) ;
+  void computeMarkovChainFBModel(SimpleKLQueryModel &origRep, 
+				 const DocIDSet &relDocs) ;
   /// Relevance model1 feedback method
-  void computeRM1FBModel(SimpleKLQueryModel &origRep, DocIDSet & relDocs);
+  void computeRM1FBModel(SimpleKLQueryModel &origRep, 
+			 const DocIDSet & relDocs);
   /// Relevance model1 feedback method
-  void computeRM2FBModel(SimpleKLQueryModel &origRep, DocIDSet & relDocs);
+  void computeRM2FBModel(SimpleKLQueryModel &origRep, 
+			 const DocIDSet & relDocs);
   //@}
 
   SimpleKLParameter::DocSmoothParam docParam;
   SimpleKLParameter::QueryModelParam qryParam;
 
+  /// Load support file support
+  void loadSupportFile();
+  const string supportFile;
 };
 
 
 inline  void SimpleKLRetMethod::setDocSmoothParam(SimpleKLParameter::DocSmoothParam &docSmthParam)
 {
   docParam = docSmthParam;
+  loadSupportFile();
 }
 
 inline  void SimpleKLRetMethod::setQueryModelParam(SimpleKLParameter::QueryModelParam &queryModParam)
@@ -353,14 +316,7 @@ inline  void SimpleKLRetMethod::setQueryModelParam(SimpleKLParameter::QueryModel
   // add a parameter to the score function.
   // isn't available in the constructor.
   scFunc->setScoreMethod(qryParam.adjScoreMethod);
+  loadSupportFile();
 }
 
 #endif /* _SIMPLEKLRETMETHOD_HPP */
-
-
-
-
-
-
-
-

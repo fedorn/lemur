@@ -18,7 +18,7 @@
 #include "RelDocUnigramCounter.hpp"
 #include "OneStepMarkovChain.hpp"
 
-void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, 
+void SimpleKLQueryModel::interpolateWith(const UnigramLM &qModel, 
 					 double origModCoeff, 
 					 int howManyWord, 
 					 double prSumThresh, 
@@ -63,17 +63,7 @@ void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel,
 
   //Sum w in Q qtf * log(qtcf/termcount);
   colQLikelihood = 0;
-  int tc = ind.termCount();
-  startIteration();
-  while (hasMore()) {
-    QueryTerm *qt = nextTerm();
-    int id = qt->id();
-    double qtf = qt->weight();
-    int qtcf = ind.termCount(id);
-    double s = qtf * log((double)qtcf/(double)tc);
-    colQLikelihood += s;
-    delete qt;
-  }
+  colQueryLikelihood();
   colKLComputed = false;
 }
 
@@ -87,21 +77,17 @@ void SimpleKLQueryModel::load(istream &is)
     setCount(qt->id(),0);
   }
   colQLikelihood = 0;
-  //Sum w in Q qtf * log(qtcf/termcount);
 
   int count;
   is >> count;
   char wd[500];
   double pr;
-  int tc = ind.termCount();
   while (count-- >0) {
     is >> wd >> pr;
     int id = ind.term(wd);
     setCount(id, pr);
-    int qtcf = ind.termCount(ind.term(wd));
-    double s = pr * log((double)qtcf/(double)tc);
-    colQLikelihood += s;
   }
+  colQueryLikelihood();
   colKLComputed = false;
 }
 
@@ -157,7 +143,7 @@ void SimpleKLQueryModel::clarity(ostream &os)
   }
 }
 
-double SimpleKLQueryModel::clarity()
+double SimpleKLQueryModel::clarity() const
 {
   int count = 0;
   double sum=0, ln_Pr=0;
@@ -181,10 +167,10 @@ double SimpleKLQueryModel::clarity()
   return (ln_Pr/log(2.0));
 }
 
-SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, 
-				     const char *supportFileName, 
+SimpleKLRetMethod::SimpleKLRetMethod(const Index &dbIndex, 
+				     const string &supportFileName, 
 				     ScoreAccumulator &accumulator) : 
-  TextQueryRetMethod(dbIndex, accumulator) {
+  TextQueryRetMethod(dbIndex, accumulator), supportFile(supportFileName) {
 
   docParam.smthMethod = SimpleKLParameter::defaultSmoothMethod;
   docParam.smthStrategy= SimpleKLParameter::defaultSmoothStrategy;
@@ -201,66 +187,14 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex,
   qryParam.fbMixtureNoise = SimpleKLParameter::defaultFBMixNoise;
   qryParam.emIterations = SimpleKLParameter::defaultEMIterations;
 
-  ifstream ifs;
-  ifs.open(supportFileName);
-  if (ifs.fail()) {
-    throw  Exception("SimpleKLRetMethod", 
-		     "smoothing support file open failure");
-  }
-  int numDocs = ind.docCount();
-  docProbMass = new double[numDocs+1];
-  uniqueTermCount = new int[numDocs+1];
-  
-  int i;
-  
-  for (i=1; i<= numDocs; i++) {
-    int id, uniqCount;
-    double prMass;
-    ifs >> id >> uniqCount >> prMass;
-    if (id != i) {
-      cerr << "alignment error in smoothing support file, wrong id:" 
-	   << id << endl; 
-      exit(1);
-    }
-    docProbMass[i]=prMass;
-    uniqueTermCount[i]=uniqCount;
-  }
-  
-  ifs.close();
+  docProbMass = NULL;
+  uniqueTermCount = NULL;
+  mcNorm = NULL;
 
   collectLMCounter = new DocUnigramCounter(ind);
   collectLM = new MLUnigramLM(*collectLMCounter, ind.termLexiconID()); 
-  /// dmf 12/18/2003 -- Why was the laplace estimator used here?
-  /*
-  collectLM = new LaplaceUnigramLM(*collectLMCounter, ind.termLexiconID(), 
-				   ind.termCountUnique()); 
-  */
-
-  char mcSuppFN[500];
-  strcpy(mcSuppFN, supportFileName);
-  strcat(mcSuppFN, ".mc");
-  ifs.open(mcSuppFN);
-  if (ifs.fail()) {
-    throw Exception("SimpleKLRetMethod", 
-		    "Markov chain support file can't be opened");
-  }
-
-  mcNorm = new double[ind.termCountUnique()+1];
-  
-  for (i=1; i<= ind.termCountUnique(); i++) {
-    int id;
-    double norm;
-    ifs >> id >> norm;
-    if (id != i) {
-      cerr << "alignment error in Markov chain support file, wrong id:" 
-	   << id << endl; 
-      exit(1);
-    }
-    mcNorm[i] = norm;
-  }
 
   scFunc = new SimpleKLScoreFunc();
-  scFunc->setScoreMethod(qryParam.adjScoreMethod);
 }
 
 SimpleKLRetMethod::~SimpleKLRetMethod() 
@@ -273,26 +207,90 @@ SimpleKLRetMethod::~SimpleKLRetMethod()
   delete scFunc;
 }
 
+void SimpleKLRetMethod::loadSupportFile() {
+  ifstream ifs;
+  int i;
+
+  // Only need to load this file if smooth strategy is back off
+  // or the smooth method is absolute discount. Don't reload if
+  // docProbMass is not NULL.
+
+  if (docProbMass == NULL &&
+      (docParam.smthMethod == SimpleKLParameter::ABSOLUTEDISCOUNT ||
+       docParam.smthStrategy == SimpleKLParameter::BACKOFF)) {
+    cerr << "SimpleKLRetMethod::loadSupportFile loading "
+	 << supportFile << endl;
+      
+    ifs.open(supportFile.c_str());
+    if (ifs.fail()) {
+      throw  Exception("SimpleKLRetMethod::loadSupportFile", 
+		       "smoothing support file open failure");
+    }
+    int numDocs = ind.docCount();
+    docProbMass = new double[numDocs+1];
+    uniqueTermCount = new int[numDocs+1];
+    for (i = 1; i <= numDocs; i++) {
+      int id, uniqCount;
+      double prMass;
+      ifs >> id >> uniqCount >> prMass;
+      if (id != i) {
+      throw  Exception("SimpleKLRetMethod::loadSupportFile", 
+		       "alignment error in smooth support file, wrong id:");
+      }
+      docProbMass[i] = prMass;
+      uniqueTermCount[i] = uniqCount;
+    }
+    ifs.close();
+  }
+    
+  // only need to load this file if the feedback method is
+  // markov chain. Don't reload if called a second time.
+
+  if (mcNorm == NULL && qryParam.fbMethod == SimpleKLParameter::MARKOVCHAIN) {
+    string mcSuppFN = supportFile + ".mc";
+    cerr << "SimpleKLRetMethod::loadSupportFile loading " << mcSuppFN << endl;
+
+    ifs.open(mcSuppFN.c_str());
+    if (ifs.fail()) {
+      throw Exception("SimpleKLRetMethod::loadSupportFile", 
+		      "Markov chain support file can't be opened");
+    }
+
+    mcNorm = new double[ind.termCountUnique()+1];
+  
+    for (i = 1; i <= ind.termCountUnique(); i++) {
+      int id;
+      double norm;
+      ifs >> id >> norm;
+      if (id != i) {
+      throw Exception("SimpleKLRetMethod::loadSupportFile", 
+		      "alignment error in Markov chain support file, wrong id:");
+      }
+      mcNorm[i] = norm;
+    }
+  }
+}
+
 DocumentRep *SimpleKLRetMethod::computeDocRep(int docID)
 {
   switch (docParam.smthMethod) {
   case SimpleKLParameter::JELINEKMERCER:
     return( new JelinekMercerDocModel(docID,
-				      &ind, 
+				      ind.docLength(docID),
 				      *collectLM,
 				      docProbMass,
 				      docParam.JMLambda,
 				      docParam.smthStrategy));
   case SimpleKLParameter::DIRICHLETPRIOR:
     return (new DirichletPriorDocModel(docID,
-				 &ind, 
-				 *collectLM,
-				 docProbMass,  
-				 docParam.DirPrior,
-				 docParam.smthStrategy));
+				       ind.docLength(docID),
+				       *collectLM,
+				       docProbMass,  
+				       docParam.DirPrior,
+				       docParam.smthStrategy));
   case SimpleKLParameter::ABSOLUTEDISCOUNT:
     return (new AbsoluteDiscountDocModel(docID,
-					 &ind, 
+					 ind.docLength(docID),
 					 *collectLM,
 					 docProbMass,
 					 uniqueTermCount,
@@ -300,7 +298,7 @@ DocumentRep *SimpleKLRetMethod::computeDocRep(int docID)
 					 docParam.smthStrategy));
   case SimpleKLParameter::TWOSTAGE:
     return (new TwoStageDocModel(docID,
-				 &ind, 
+				 ind.docLength(docID),
 				 *collectLM,
 				 docProbMass,
 				 docParam.DirPrior, // 1st stage mu
@@ -309,15 +307,15 @@ DocumentRep *SimpleKLRetMethod::computeDocRep(int docID)
     
     
   default:
+    // this should throw, not exit.
     cerr << "Unknown document language model smoothing method\n";
     exit(1);
   }
-
 }
 
 
 void SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep, 
-					DocIDSet &relDocs)
+					const DocIDSet &relDocs)
 {
   SimpleKLQueryModel *qr;
 
@@ -347,7 +345,7 @@ void SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep,
 
 
 void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, 
-					      DocIDSet &relDocs)
+					      const DocIDSet &relDocs)
 {
   int numTerms = ind.termCountUnique();
 
@@ -431,7 +429,7 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep,
 
 
 void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, 
-					     DocIDSet &relDocs)
+					     const DocIDSet &relDocs)
 {
   int numTerms = ind.termCountUnique();
 
@@ -485,7 +483,7 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep,
   delete fblm;
 }
 
-void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs)
+void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, const DocIDSet &relDocs)
 {
   int stopWordCutoff =50;
 
@@ -542,7 +540,7 @@ void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, D
 }
 
 void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep, 
-					  DocIDSet &relDocs)
+					  const DocIDSet &relDocs)
 {  
   int numTerms = ind.termCountUnique();
 
@@ -596,7 +594,7 @@ struct termProb  {
 };
 
 void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep, 
-					  DocIDSet &relDocs) {  
+					  const DocIDSet &relDocs) {  
   int numTerms = ind.termCountUnique();
   int termCount = ind.termCount();
   double expWeight = qryParam.fbCoeff;
@@ -630,7 +628,7 @@ void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep,
     int wd;
     double P_w;
     double P_qw=0;
-    double P_Q_w;
+    double P_Q_w = 1.0;
     // P(q|w) = SUM_d P(q|d) P(w|d) p(d)
     dCounter->nextCount(wd, P_w);
     for (int j = 0; j < numQTerms; j++) {
