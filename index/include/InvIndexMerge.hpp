@@ -57,9 +57,9 @@ public:
 
 protected:
   /// write file ids for indexes created
-  void writeInvFIDs();
+  virtual void writeInvFIDs();
   /// figure out which readers point to the lowest termids
-  void least(vector<IndexReader*>* r, vector<int>* ret);
+  virtual void least(vector<IndexReader*>* r, vector<int>* ret);
   /// setbuffer for ifstream.  trying to keep ugly os specific code out of main code
   void setbuf(ifstream* fs, char* bp, int bytes);
 
