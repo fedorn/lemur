@@ -130,7 +130,7 @@ void GetAppParam()
 }
 
 
-void updateQueryModel(QueryRep *qr, char *qid, ResultFile &resFile, RetrievalMethod *model, ofstream &os)
+void updateQueryModel(QueryRep *qr, const char *qid, ResultFile &resFile, RetrievalMethod *model, ofstream &os)
 
 {
   bool	ignoreWeights = true;  
@@ -139,6 +139,7 @@ void updateQueryModel(QueryRep *qr, char *qid, ResultFile &resFile, RetrievalMet
   SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
   if (resFile.findResult(qid, res)) {
     res->Sort();
+    
     if (SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM1 || 
 	SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM2) {
       // need a parameter here
@@ -146,6 +147,11 @@ void updateQueryModel(QueryRep *qr, char *qid, ResultFile &resFile, RetrievalMet
       // res->NormalizeValues();
       // KL should use querylikelihood score method
       // and
+      // prune to number of feedback docs.
+      if (res->size() > RetrievalParameter::fbDocCount)
+	res->erase(res->begin() + RetrievalParameter::fbDocCount,
+		      res->end());
+
       res->LogToPosterior();
       ignoreWeights = false;  
     }

@@ -11,7 +11,7 @@
 
 /// Structured Query Parser
 
-/*! \page Structured Query ParseInQuery Application
+/*! \page StructQuery ParseInQueryOp 
 
  
 
@@ -254,7 +254,7 @@ int AppMain(int argc, char * argv[]) {
   Stemmer * stemmer = NULL;
   stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
 
-  WriterInQueryHandler writer((char *)LocalParameter::qryOutFile.c_str());
+  WriterInQueryHandler writer(LocalParameter::qryOutFile);
 
   // chain the parser/queryHandler/stopper/stemmer/writer
 
@@ -275,10 +275,11 @@ int AppMain(int argc, char * argv[]) {
   // parse the data files
   for (int i = 2; i < argc; i++) {
     cerr << "Parsing " << argv[i] << endl;
-    if (!fileExist(argv[i])) {
+    string filename(argv[i]);
+    if (!fileExist(filename)) {
       throw Exception("ParseInQuery", "datfile specified does not exist");
     }
-    parser->parse(argv[i]);
+    parser->parse(filename);
   }
 
   // free memory

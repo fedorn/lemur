@@ -5,42 +5,32 @@
 #include "TrecParser.hpp"
 
 namespace LocalParameter {
-  char * df;
-  char * ctf;
+  string df;
+  string ctf;
   int memory;
-  char * stopwords;
-  char * acronyms;
-  char * docFormat;
-  char * dfDocs;
-  char * dfCounts;
-  char * stemmer;
+  string stopwords;
+  string acronyms;
+  string docFormat;
+  string dfDocs;
+  string dfCounts;
+  string stemmer;
 
   bool countStopWds;
 
   void get() {
-    df = strdup(ParamGetString("dfIndex", "collSel_df"));
-    ctf = strdup(ParamGetString("ctfIndex", "collSel_ctf"));
+    df = ParamGetString("dfIndex", "collSel_df");
+    ctf = ParamGetString("ctfIndex", "collSel_ctf");
     memory = ParamGetInt("memory", 64000000);
-    stopwords = strdup(ParamGetString("stopwords"));
-    acronyms = strdup(ParamGetString("acronyms"));
-    docFormat = strdup(ParamGetString("docFormat"));
-    dfCounts = strdup(ParamGetString("dfCounts", "collSel_df.cw"));
-    dfDocs = strdup(ParamGetString("dfDocs", "collSel_df.cd"));
+    stopwords = ParamGetString("stopwords");
+    acronyms = ParamGetString("acronyms");
+    docFormat = ParamGetString("docFormat");
+    dfCounts = ParamGetString("dfCounts", "collSel_df.cw");
+    dfDocs = ParamGetString("dfDocs", "collSel_df.cd");
 
-    stemmer = strdup(ParamGetString("stemmer"));
+    stemmer = ParamGetString("stemmer");
     countStopWds = (ParamGetString("countStopWords", "false") == "true" 
 		    ? true : false);
 
-  }
-  void freeMem() {
-    free(df);
-    free(ctf);
-    free(stopwords);
-    free(acronyms);
-    free(docFormat);
-    free(dfCounts);
-    free(dfDocs);
-    free(stemmer);
   }
 };
 
@@ -122,11 +112,11 @@ int AppMain(int argc, char * argv[]) {
 
     cerr << "indexing: " << argv[i] << endl;
     cerr << "collection: " << name << endl;
-
-
+    
     dfIndexer.newDb(name);
     ctfIndexer.newDb(name);
-    parser->parse(argv[i]);
+    string filename(argv[i]);
+    parser->parse(filename);
 
     free (n);
 
@@ -134,7 +124,6 @@ int AppMain(int argc, char * argv[]) {
 
   if (stopper != NULL) delete stopper;
   delete parser;
-  LocalParameter::freeMem();
   return 0;
 }
 

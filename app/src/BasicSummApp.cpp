@@ -12,7 +12,7 @@
 
 
 /// A simple summarizer
-/*! \page BasicSummApp Application
+/*! \page BasicSummApp Basic Summarization Application
 
 
 

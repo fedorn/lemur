@@ -176,7 +176,7 @@ int AppMain(int argc, char * argv[]) {
   }
 
   InvPassageTextHandler* indexer;
-  indexer = new InvPassageTextHandler((char *)LocalParameter::index.c_str(),
+  indexer = new InvPassageTextHandler(LocalParameter::index,
 				      LocalParameter::psgSize,
 				      LocalParameter::memory);
 
@@ -198,27 +198,28 @@ int AppMain(int argc, char * argv[]) {
 
   // parse the data files
   if (!LocalParameter::dataFiles.empty()) {
-    if (!fileExist((char *)LocalParameter::dataFiles.c_str())) {
+    if (!fileExist(LocalParameter::dataFiles.c_str())) {
       throw Exception("PassageIndexer", "dataFiles specified does not exist");
     }
 
-    ifstream source((char *)LocalParameter::dataFiles.c_str());
+    ifstream source(LocalParameter::dataFiles.c_str());
     if (!source.is_open()) {
       throw Exception("PassageIndexer","could not open dataFiles specified");
     } else {
       string filename;
       while (getline(source, filename)) {
 	cerr << "Parsing " << filename <<endl;
-	parser->parse((char*)filename.c_str());
+	parser->parse(filename);
       }
     }
   } else {
     for (int i = 2; i < argc; i++) {
       cerr << "Parsing " << argv[i] << endl;
-    if (!fileExist(argv[i])) {
+      string filename(argv[i]);
+    if (!fileExist(filename)) {
       throw Exception("PassageIndexer", "datfile specified does not exist");
     }
-      parser->parse(argv[i]);
+      parser->parse(filename);
     }
   }
   // free memory

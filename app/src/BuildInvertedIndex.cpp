@@ -173,7 +173,7 @@ int AppMain(int argc, char * argv[]) {
   // TextHandler class, so that it is compatible with my parser
   // architecture.  See the TextHandler and InvFPTextHandler classes
   // for more info.)
-  InvFPTextHandler indexer((char *)LocalParameter::index.c_str(), 
+  InvFPTextHandler indexer(LocalParameter::index, 
 			   LocalParameter::memory, 
 			   LocalParameter::countStopWords, 
 			   LocalParameter::position);
@@ -195,23 +195,24 @@ int AppMain(int argc, char * argv[]) {
 
   // parse the data files
   if (!LocalParameter::dataFiles.empty()) {
-    if (!fileExist((char *)LocalParameter::dataFiles.c_str())) {
+    if (!fileExist(LocalParameter::dataFiles)) {
       throw Exception("PushIndexer", "dataFiles specified does not exist");
     }
-    ifstream source((char *)LocalParameter::dataFiles.c_str());
+    ifstream source(LocalParameter::dataFiles.c_str());
     if (!source.is_open()) {
       throw Exception("PushIndexer","could not open dataFiles specified");
     } else {
       string filename;
       while (getline(source, filename)) {
 	cerr << "Parsing file: " << filename <<endl;
-	parser->parse((char*)filename.c_str());
+	parser->parse(filename);
       }
     }
   } else {
     for (int i = 2; i < argc; i++) {
       cerr << "Parsing file: " << argv[i] << endl;
-      parser->parse(argv[i]);
+      string filename(argv[i]);
+      parser->parse(filename);
     }
   }
   // free memory

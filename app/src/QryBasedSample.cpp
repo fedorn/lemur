@@ -188,15 +188,15 @@ int AppMain (int argc, char * argv []) {
   dbp.setFreqCounter(&freqCounter);
 
   // Initial query terms are selected from this model.
-  FreqCounter initQueryModel((char *)LocalParameter::initModel.c_str());
+  FreqCounter initQueryModel(LocalParameter::initModel);
   initQueryModel.setRandomMode(QBSParameter::qryMode);
   
   // Main processing loop - perform sampling on all databases.
-  ifstream inl((char *)LocalParameter::listFile.c_str());
+  ifstream inl(LocalParameter::listFile.c_str());
   while (! inl.eof()) {
-    char dbn[5000];
-    char opre[5000];
-    char dbid[100];
+    string dbn;
+    string opre;
+    string dbid;
     // Read in database.
     inl >> dbn;
     if (! inl.eof()) {
@@ -213,7 +213,7 @@ int AppMain (int argc, char * argv []) {
       dbp.setOutputPrefix(opre);      
 
       // Open the new database.
-      dbm->open((char *) dbn);
+      dbm->open(dbn);
       // Get a parser for the database.
       MemParser * dp = dbm->getParser();
       // Tell the parser to pass info on to the model builder.

@@ -178,7 +178,7 @@ int AppMain(int argc, char * argv[]) {
     throw Exception("IncIndexer", "index must be specified");
   }
   IncFPTextHandler* indexer = 
-    new IncFPTextHandler((char *)LocalParameter::index.c_str(), 
+    new IncFPTextHandler(LocalParameter::index, 
 			 LocalParameter::memory,
 			 LocalParameter::countStopWords);
 
@@ -200,24 +200,25 @@ int AppMain(int argc, char * argv[]) {
 
   // parse the data files
   if (!LocalParameter::dataFiles.empty()) {
-    if (!fileExist((char *)LocalParameter::dataFiles.c_str())) {
+    if (!fileExist(LocalParameter::dataFiles)) {
       throw Exception("IncIndexer", "dataFiles specified does not exist");
     }
 
-    ifstream source((char *)LocalParameter::dataFiles.c_str());
+    ifstream source(LocalParameter::dataFiles.c_str());
     if (!source.is_open()) {
       throw Exception("IncIndexer","could not open dataFiles specified");
     } else {
       string filename;
       while (getline(source, filename)) {
 	cerr << "Parsing " << filename <<endl;
-	parser->parse((char*)filename.c_str());
+	parser->parse(filename);
       }
     }
   } else {
     for (int i = 2; i < argc; i++) {
       cerr << "Parsing " << argv[i] << endl;
-    if (!fileExist(argv[i])) {
+      string s(argv[i]);
+    if (!fileExist(s)) {
       throw Exception("IncIndexer", "datfile specified does not exist");
     }
       parser->parse(argv[i]);

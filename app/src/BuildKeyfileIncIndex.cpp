@@ -10,7 +10,7 @@
 */
 
 /// An Incremental Indexer
-/*! \page KeyfileIncIndexer Keyfile positional incremental Indexer
+/*! \page KeyfileIncIndexer Keyfile Positional Incremental Indexer
 <P>
  This application builds a Keyfile positional index for a collection of 
 documents.
@@ -21,7 +21,7 @@ The parameters are:
 <p>
 <ol>
 <li> <tt>index</tt>: name of the index table-of-content file without the
-.ifp extension.
+.key extension.
 <li> <tt>memory</tt>: memory (in bytes) for index cache (def = 96000000).
 <li> <tt>stopwords</tt>: name of file containing the stopword list.
 <li> <tt>acronyms</tt>: name of file containing the acronym list.
@@ -162,7 +162,7 @@ int AppMain(int argc, char * argv[]) {
   Stemmer *stemmer = NULL;
   stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
 
-  KeyfileIncIndex *index = new KeyfileIncIndex((char *)LocalParameter::index.c_str(), 
+  KeyfileIncIndex *index = new KeyfileIncIndex(LocalParameter::index, 
 					       LocalParameter::memory);
 
   KeyfileTextHandler *indexer = new KeyfileTextHandler(index,
@@ -185,7 +185,7 @@ int AppMain(int argc, char * argv[]) {
 
   // parse the data files
   if (!LocalParameter::dataFiles.empty()) {
-    if (!fileExist((char *)LocalParameter::dataFiles.c_str())) {
+    if (!fileExist(LocalParameter::dataFiles)) {
       throw Exception("KeyfileIncIndexer", 
 		      "dataFiles specified does not exist");
     }
@@ -198,7 +198,7 @@ int AppMain(int argc, char * argv[]) {
       while (getline(source, filename)) {
         cerr << "Parsing " << filename <<endl;
         try {
-          parser->parse((char*)filename.c_str());
+          parser->parse(filename);
         } catch ( Exception ex ) {
           ex.writeMessage( cerr );
 	}
@@ -207,7 +207,8 @@ int AppMain(int argc, char * argv[]) {
   } else {
     for (int i = 2; i < argc; i++) {
       cerr << "Parsing " << argv[i] << endl;
-      parser->parse(argv[i]);
+      string filename(argv[i]);
+      parser->parse(filename);
     }
   }
   delete(parser);

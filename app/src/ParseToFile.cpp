@@ -107,7 +107,7 @@ int AppMain(int argc, char * argv[]) {
   if (LocalParameter::outFile.empty()) {
     throw Exception("ParseToFile", "outputFile must be specified");
   }
-  WriterTextHandler writer((char *)LocalParameter::outFile.c_str());
+  WriterTextHandler writer(LocalParameter::outFile);
 
   // chain the parser/stopper/stemmer/indexer
 
@@ -128,10 +128,11 @@ int AppMain(int argc, char * argv[]) {
   // parse the data files
   for (int i = 2; i < argc; i++) {
     cerr << "Parsing " << argv[i] << endl;
-    if (!fileExist(argv[i])) {
+    string filename(argv[i]);
+    if (!fileExist(filename)) {
       throw Exception("ParseToFile", "datfile specified does not exist");
     }
-    parser->parse(argv[i]);
+    parser->parse(filename);
   }
 
   // free memory

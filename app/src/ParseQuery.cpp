@@ -116,7 +116,7 @@ int AppMain(int argc, char * argv[]) {
   QueryTextHandler queryHandler;
   queryHandler.setIndex(ind);
   
-  WriterTextHandler writer((char *)LocalParameter::qryOutFile.c_str());
+  WriterTextHandler writer(LocalParameter::qryOutFile);
 
   // chain the parser/queryHandler/stopper/stemmer/writer
 
@@ -140,10 +140,11 @@ int AppMain(int argc, char * argv[]) {
   // parse the data files
   for (int i = 2; i < argc; i++) {
     cerr << "Parsing " << argv[i] << endl;
-    if (!fileExist(argv[i])) {
+    string filename(argv[i]);
+    if (!fileExist(filename)) {
       throw Exception("ParseQuery", "datfile specified does not exist");
     }
-    parser->parse(argv[i]);
+    parser->parse(filename);
   }
 
   // free memory

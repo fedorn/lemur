@@ -10,7 +10,7 @@
 */
 /// A Structured Query Retrieval Evaluation Program
 
-/*! \page StructuredQueryEvaluation Structured Query Evaluation Application
+/*! \page StructuredQueryEvaluation Structured Query Evaluation
 <p>
 This application (StructQueryEval.cpp) runs retrieval experiments to 
 evaluate the performance of the structured query model using the inquery 

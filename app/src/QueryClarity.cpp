@@ -9,9 +9,7 @@
  *==========================================================================
 */
 
-/// A query model generation program for the KL-divergence retrieval model
-
-/*! \page QueryClarity Query Clarity Application 
+/*! \page QueryClarity Query Clarity
 
 <p>
 This application (QueryClarity.cpp) computes clarity scores for a query 
@@ -132,7 +130,7 @@ void GetAppParam()
   SimpleKLParameter::get();
 }
 
-void QueryClarity(QueryRep *qr, char *qid, ResultFile &resFile, 
+void QueryClarity(QueryRep *qr, const char *qid, ResultFile &resFile, 
 		  RetrievalMethod *model, ofstream &os)
 
 {
@@ -140,29 +138,24 @@ void QueryClarity(QueryRep *qr, char *qid, ResultFile &resFile,
   bool ignoreWeights = true;
   cout << "query : "<< qid << endl;
   SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
-  if (RetrievalParameter::fbDocCount > 0) {
-    if (resFile.findResult(qid, res)) {
-      res->Sort();
-      if (SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM1 || 
-	  SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM2) {
-	res->LogToPosterior();
-	ignoreWeights = false;
-      }
 
-      PseudoFBDocs *topDoc = new PseudoFBDocs(*res, 
-					      RetrievalParameter::fbDocCount,
-					      ignoreWeights);
-      model->updateQuery(*qr, *topDoc);
-      delete topDoc;
-      os << qid;
-      qm->clarity(os);
-    } else {
-      cerr << "Warning: no feedback documents found for query: "
-	   << qid << endl;
+  if (resFile.findResult(qid, res)) {
+    res->Sort();
+    if (SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM1 || 
+	SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM2) {
+      res->LogToPosterior();
+      ignoreWeights = false;
     }
-  } else {
+    PseudoFBDocs *topDoc = new PseudoFBDocs(*res, 
+					    RetrievalParameter::fbDocCount,
+					    ignoreWeights);
+    model->updateQuery(*qr, *topDoc);
+    delete topDoc;
     os << qid;
     qm->clarity(os);
+  } else {
+    cerr << "Warning: no feedback documents found for query: "
+	 << qid << endl;
   }
 }
 
@@ -194,6 +187,13 @@ int AppMain(int argc, char *argv[]) {
       throw Exception("AppMain", "can't open the feedback doc file, check parameter value for feedbackDocuments");
     }
     resFile.load(fbdoc, *ind);
+  } else {
+    cerr << "Warning: no feedback documents specified: "
+	 << "check feedbackDocCount parameter." << endl;
+    os.close();
+    delete model;
+    delete ind;
+    return -1;
   }
   // Use either the original query text or the initial query model stored in 
   // LocalParameter::origQuery.
@@ -236,6 +236,7 @@ int AppMain(int argc, char *argv[]) {
       QueryClarity(qm, qid,  resFile, model, os);      
     }
   }
+
   os.close();
   delete model;
   if (useOrigQuery) {

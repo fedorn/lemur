@@ -130,7 +130,7 @@ int AppMain(int argc, char * argv[]) {
     // Create the right type of indexer (DocMgrManager should handle this).
     // Need an abstract class to hang the setDocManager call on here...
     if (LocalParameter::indexType == "inv") {
-      indexer = new InvFPTextHandler((char*)LocalParameter::index.c_str(), 
+      indexer = new InvFPTextHandler(LocalParameter::index, 
 				     LocalParameter::memory, 
 				     LocalParameter::countStopWords, 
 				     LocalParameter::position);
@@ -138,8 +138,8 @@ int AppMain(int argc, char * argv[]) {
       ((InvFPTextHandler *)indexer)->setDocManager(docmgr->getMyID());
 
     } else if (LocalParameter::indexType == "key"){
-      ind = new KeyfileIncIndex((char*)LocalParameter::index.c_str(),
-				       LocalParameter::memory);
+      ind = new KeyfileIncIndex(LocalParameter::index,
+				LocalParameter::memory);
       indexer = new KeyfileTextHandler((KeyfileIncIndex *)ind,
 				       LocalParameter::countStopWords);
       // register document manager with PushIndex

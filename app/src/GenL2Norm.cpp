@@ -10,7 +10,7 @@
 */
 /// L2 norm support file generator
 
-/*! \page L2 Norm GenL2Norm Application
+/*! \page L2Norm GenL2Norm
 
  
 
