@@ -34,6 +34,8 @@ extern "C" {
 class InvFPDocList: public InvDocList {
 public:
   InvFPDocList();
+  /// copy from byteVector
+  InvFPDocList(int *vec);
 
   /// constructor for this list using malloc for its own memory
   /// usage of InvFPDocList without MemCache has not been tested
@@ -52,6 +54,7 @@ public:
   virtual DocInfo* nextEntry();
   virtual void nextEntry(InvFPDocInfo* info);
   virtual int termCTF();
+  int *byteVec(int &len);
 
 protected:
   /// delta encode docids and positions from begin through end
