@@ -25,6 +25,10 @@ private:
   std::vector<indri::lang::ContextCounterNode*> _contextCounters;
 
 public:
+  ~ContextCountGraphCopier() {
+    delete_vector_contents<indri::lang::Node*>( _newNodes );
+  }
+
   indri::lang::Node* defaultAfter( indri::lang::Node* oldNode, indri::lang::Node* newNode ) {
     _newNodes.push_back( newNode );
     return newNode;

@@ -43,6 +43,10 @@ public:
     return newNode;
   }
 
+  ~FrequencyListCopier() {
+    delete_vector_contents<indri::lang::Node*>( _nodes );
+  }
+
   void before( indri::lang::ExtentAnd* exAnd ) {
     _disqualifiers.push(exAnd);
   }
