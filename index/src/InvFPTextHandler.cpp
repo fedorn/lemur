@@ -67,9 +67,10 @@ InvFPTextHandler::handleDoc(char * docno) {
 char * 
 InvFPTextHandler::handleWord(char * word) {
   if (word != NULL) {
-    // ignore words longer than 20 characters
+    // ignore words longer than 50 characters
+    // this ignores junk in some web pages
     int len = strlen(word);
-    if (len <= 20) {
+    if (len <= 50) {
       // index the word
       term->strLength(len);
       term->spelling(word);
