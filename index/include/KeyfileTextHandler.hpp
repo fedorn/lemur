@@ -27,7 +27,7 @@
 class KeyfileTextHandler : public TextHandler {
 public:
   /// Instantiate with index to push terms into.
-  KeyfileTextHandler( class KeyfileIncIndex* index );
+  KeyfileTextHandler( class KeyfileIncIndex* index, bool countStops=false);
   ~KeyfileTextHandler();
   /// add a new document
   char * handleDoc(char * docno);

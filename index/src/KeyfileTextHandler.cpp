@@ -22,16 +22,16 @@
 #include "InvFPTerm.hpp"
 #include "DocumentProps.hpp"
 #include "KeyfileIncIndex.hpp"
-#include <string.h>
+#include <string>
 
-KeyfileTextHandler::KeyfileTextHandler( KeyfileIncIndex* index ) :
-  _index( index )
+KeyfileTextHandler::KeyfileTextHandler( KeyfileIncIndex* index, 
+					bool countStops) :
+  _index( index ), countStopWds(countStops)
 {
   dp = NULL;
   docLength = 0;
   pos = 0;
   first = true;
-  countStopWds = false;
 }
 
 KeyfileTextHandler::~KeyfileTextHandler() {
