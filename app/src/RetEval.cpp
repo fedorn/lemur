@@ -135,6 +135,8 @@ of <em>not</em> stopping, i.e., <tt>1- alpha</tt>, where alpha is the stopping p
 In addition, the collection mixture model also recognizes the parameter 
 <tt>emIterations</tt>, which is the maximum number of iterations the EM algorithm will run. Default: 50. (The EM algorithm can terminate earlier if the log-likelihood converges quickly, where convergence is measured by some hard-coded criterion. See the source code in <tt>SimpleKLRetMethod.cpp</tt> for details. )
 
+</ol>
+</ul>
 
  */
 
