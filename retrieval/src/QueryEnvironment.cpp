@@ -36,7 +36,6 @@
 #include "indri/QueryLexer.hpp"
 #include "indri/QueryParser.hpp"
 
-#include "indri/UnknownRemoverCopier.hpp"
 #include "indri/DagCopier.hpp"
 #include "indri/InferenceNetworkBuilder.hpp"
 #include "indri/RawScorerNodeExtractor.hpp"
