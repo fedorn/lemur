@@ -106,9 +106,9 @@ namespace TFIDFParameter {
   static void get()
   {
     string tfmethod = RetrievalParameter::getLower("doc.tfMethod", "bm25");
-    if (tfmethod == "rawtf") docTFPrm.tf = RAWTF;
-    else if (tfmethod == "logf") docTFPrm.tf = LOGTF;    
-    else if (tfmethod == "bm25") docTFPrm.tf = BM25;
+    if ((tfmethod == "rawtf") || (tfmethod == "0")) docTFPrm.tf = RAWTF;
+    else if ((tfmethod == "logf") || (tfmethod == "1")) docTFPrm.tf = LOGTF;    
+    else if ((tfmethod == "bm25") || (tfmethod == "2")) docTFPrm.tf = BM25;
 
     docTFPrm.bm25K1 = ParamGetDouble("doc.bm25K1",defaultDocK1);
     docTFPrm.bm25B = ParamGetDouble("doc.bm25B",defaultDocB);
