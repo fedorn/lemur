@@ -225,13 +225,16 @@ public:
   /// by the number of children.
   virtual double eval(DocumentRep *dRep) {
     double sum = 0;
+    int count = 0;
     QueryNode *qn;
     ch->startIteration();
     while(ch->hasMore()) {
       qn = ch->nextNode();
       sum += qn->eval(dRep);
+      count++;
     }
-    return sum/entries;
+    //    return sum/entries;
+    return sum/count;
   }
 };
 

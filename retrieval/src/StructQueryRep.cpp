@@ -14,7 +14,6 @@
 
 #include "StructQueryRep.hpp"
 
-
 QnList * StructQueryRep::getChildren(StructQuery &qry, getFunc getFn, 
 					bool weigh) {
   TokenTerm *tok;
@@ -42,8 +41,9 @@ QnList * StructQueryRep::getChildren(StructQuery &qry, getFunc getFn,
       qn = (this->*getFn)(qry, tok, wt);
       if (qn) { // OOV returns null node
 	chlist->push_back(qn);
-	cnt++;
+	//	cnt++; // need to count even if it is oov for #band
       }
+      cnt++; // need to count even if it is oov for #band
     }
   }
   qParent->setEntries(cnt);
