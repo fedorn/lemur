@@ -1,3 +1,6 @@
-index = indt2;
-docFormat = web;
-memory = 256000000;
+<parameters>
+<index>indt2</index>
+<indexType>key</indexType>
+<docFormat>web</docFormat>
+<memory>256000000</memory>
+</parameters>

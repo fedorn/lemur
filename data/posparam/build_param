@@ -1,6 +1,7 @@
-index = pindex;
-indexType = inv;
-position = 1;
-docFormat = web;
-memory = 256000000;
-
+<parameters>
+<index>pindex</index>
+<indexType>inv</indexType>
+<position>1</position>
+<docFormat>web</docFormat>
+<memory>256000000</memory>
+</parameters>

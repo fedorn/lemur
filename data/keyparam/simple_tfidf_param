@@ -1,28 +1,32 @@
-
-/* Retrieval model selection */
-
-retModel = 0; /*  0 = TFIDF; 1 = Okapi; 2 = KL-divergence */
-
-/* Basic retrieval parameters */
-
-index = kindex.key; /* database index */
-textQuery = query; /* query text stream */
-resultFile = res.simple_tfidf; /* result file */
-resultCount = 1000; /* how many docs to return as the result */
-resultFormat = 1; /* 0 = simple-format; 1 = TREC-format */
-
-/* TFIDF weighting parameters */
-
-doc.tfMethod = 2;   /* 0 = RawTF; 1 = log-TF; 2 = BM25TF */
-doc.bm25K1 = 1;
-doc.bm25B = 0.3;
-
-query.tfMethod = 2; /* 0 = RawTF; 1 = log-TF; 2 = BM25TF */
-query.bm25K1 = 1000;
-query.bm25B = 0;
-
-/* Pseudo feedback parameters */
-
-feedbackDocCount = 0; /* i.e., no pseudo feedback */
-feedbackTermCount = 20; /* only relevant when feedbackDocCount >0 */
-feedbackPosCoeff = 0.5; /* only relevant when feedbackDocCount >0 */
+<parameters>
+<!--  Retrieval model selection  -->
+<!--   0   TFIDF  1   Okapi  2   KL-divergence  -->
+<retModel>0</retModel>
+<!--  Basic retrieval parameters  -->
+<!--  database index  -->
+<index>kindex.key</index>
+<!--  query text stream  -->
+<textQuery>query</textQuery>
+<!--  result file  -->
+<resultFile>res.simple_tfidf</resultFile>
+<!--  how many docs to return as the result  -->
+<resultCount>1000</resultCount>
+<!--  0   simple-format  1   TREC-format  -->
+<resultFormat>1</resultFormat>
+<!--  TFIDF weighting parameters  -->
+<!--  0   RawTF  1   log-TF  2   BM25TF  -->
+<doc.tfMethod>2</doc.tfMethod>
+<doc.bm25K1>1</doc.bm25K1>
+<doc.bm25B>0.3</doc.bm25B>
+<!--  0   RawTF  1   log-TF  2   BM25TF  -->
+<query.tfMethod>2</query.tfMethod>
+<query.bm25K1>1000</query.bm25K1>
+<query.bm25B>0</query.bm25B>
+<!--  Pseudo feedback parameters  -->
+<!--  i.e., no pseudo feedback  -->
+<feedbackDocCount>0</feedbackDocCount>
+<!--  only relevant when feedbackDocCount >0  -->
+<feedbackTermCount>20</feedbackTermCount>
+<!--  only relevant when feedbackDocCount >0  -->
+<feedbackPosCoeff>0.5</feedbackPosCoeff>
+</parameters>

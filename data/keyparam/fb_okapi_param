@@ -1,29 +1,25 @@
-
-/* Retrieval model selection */
-
-retModel = 1; /*  0 = TFIDF; 1 = Okapi; 2 = KL-divergence */
-
-/* Basic retrieval parameters */
-
-index = kindex.key; /* database index */
-textQuery = query; /* query text stream */
-resultFile = res.fb_okapi; /* result file */
-resultCount = 1000; /* how many docs to return as the result */
-resultFormat = 1; /* 0 = simple-format; 1 = TREC-format */
-
-/*  weighting parameters */
-
-
-BM25K1 = 1.2;
-
-BM25B = 0.75;
-
-
-BM25K3   = 7;
-
-BM25QTF = 0.5;
-
-/* Pseudo feedback parameters */
-
-feedbackDocCount = 5; 
-feedbackTermCount = 20; /* only relevant when feedbackDocCount >0 */
+<parameters>
+<!--  Retrieval model selection  -->
+<!--   0   TFIDF  1   Okapi  2   KL-divergence  -->
+<retModel>1</retModel>
+<!--  Basic retrieval parameters  -->
+<!--  database index  -->
+<index>kindex.key</index>
+<!--  query text stream  -->
+<textQuery>query</textQuery>
+<!--  result file  -->
+<resultFile>res.fb_okapi</resultFile>
+<!--  how many docs to return as the result  -->
+<resultCount>1000</resultCount>
+<!--  0   simple-format  1   TREC-format  -->
+<resultFormat>1</resultFormat>
+<!--   weighting parameters  -->
+<BM25K1>1.2</BM25K1>
+<BM25B>0.75</BM25B>
+<BM25K3>7</BM25K3>
+<BM25QTF>0.5</BM25QTF>
+<!--  Pseudo feedback parameters  -->
+<feedbackDocCount>5</feedbackDocCount>
+<!--  only relevant when feedbackDocCount >0  -->
+<feedbackTermCount>20</feedbackTermCount>
+</parameters>

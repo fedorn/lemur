@@ -1,3 +1,4 @@
-
-index = pindex.ifp;
-smoothSupportFile = pindex.supp;
+<parameters>
+<index>pindex.ifp</index>
+<smoothSupportFile>pindex.supp</smoothSupportFile>
+</parameters>

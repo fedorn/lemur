@@ -5,7 +5,7 @@
 BIN=../../app/obj
 RET=$BIN/XlingRetEval
 DICT=$BIN/PDictManager
-INDEX=$BIN/BuildKeyfileIncIndex
+INDEX=$BIN/BuildIndex
 rm -f indt* res.xling t1.dict*
 # index source language collection
 $INDEX bt1.parm t1.sgml

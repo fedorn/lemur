@@ -1,3 +1,6 @@
-index = indt1;
-docFormat = trec;
-memory = 256000000;
+<parameters>
+<index>indt1</index>
+<indexType>key</indexType>
+<docFormat>trec</docFormat>
+<memory>256000000</memory>
+</parameters>

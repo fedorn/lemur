@@ -1,2 +1,4 @@
-index=kindex.key;
-initValue=1;
+<parameters>
+<index>kindex.key</index>
+<initValue>1</initValue>
+</parameters>

@@ -1,39 +1,37 @@
-
-/* Parameter file to be used with GenerateQueryModel  */
-/* Iterative relevance feedback, expanding an pre-saved initial query */
-
-expandedQuery = query_mixrelfb_it;
-initQuery = query_mixfb_kl; /* when initQuery is set, it provides the initial query */
-
-/* Basic retrieval parameters */
-
-index = pindex.ifp; /* database index */
-textQuery = query; /* query text stream */
-
-feedbackDocuments = qrel3column; /* judgments file */
-resultFormat = 0; /* 0 = simple-format; 1 = TREC-format, judgments always simple format */
-
-smoothSupportFile = pindex.supp; /* this is not needed by Okapi or TFIDF, but by SimpleKL */
-
-smoothStrategy =0;  /* interpolation rather than backoff, 0=interpolate, 1=backoff */
-
-smoothMethod = 1; /* Jelinek-Mercer = 0; Bayesian/Dirichlet prior =1; Abs. Discount =2; */
-
-discountDelta = 0.5; /* not used since smoothMethod is Dirichlet prior */
-
-JelinekMercerLambda = 0.5;  /* not used since smoothMethod is Dirichlet prior */
-
-DirichletPrior = 2000; 
-
-
-/* feedback parameters */
-
-feedbackDocCount = 5; 
-feedbackTermCount = 100; 
-queryUpdateMethod = 0; /* 0=mixture; 1=div-min; 2=markov chain? */
-feedbackCoefficient = 0.5;
-feedbackProbThresh= 0.001;
-feedbackProbSumThresh = 1;
-feedbackMixtureNoise = 0.5;
-emIterations = 50;
-
+<parameters>
+<!--  Parameter file to be used with GenerateQueryModel   -->
+<!--  Iterative relevance feedback, expanding an pre-saved initial query  -->
+<expandedQuery>query_mixrelfb_it</expandedQuery>
+<!--  when initQuery is set, it provides the initial query  -->
+<initQuery>query_mixfb_kl</initQuery>
+<!--  Basic retrieval parameters  -->
+<!--  database index  -->
+<index>pindex.ifp</index>
+<!--  query text stream  -->
+<textQuery>query</textQuery>
+<!--  judgments file  -->
+<feedbackDocuments>qrel3column</feedbackDocuments>
+<!--  0   simple-format  1   TREC-format, judgments always simple format  -->
+<resultFormat>0</resultFormat>
+<!--  this is not needed by Okapi or TFIDF, but by SimpleKL  -->
+<smoothSupportFile>pindex.supp</smoothSupportFile>
+<!--  interpolation rather than backoff, 0 interpolate, 1 backoff  -->
+<smoothStrategy>0</smoothStrategy>
+<!--  Jelinek-Mercer   0  Bayesian/Dirichlet prior  1  Abs. Discount  2   -->
+<smoothMethod>1</smoothMethod>
+<!--  not used since smoothMethod is Dirichlet prior  -->
+<discountDelta>0.5</discountDelta>
+<!--  not used since smoothMethod is Dirichlet prior  -->
+<JelinekMercerLambda>0.5</JelinekMercerLambda>
+<DirichletPrior>2000</DirichletPrior>
+<!--  feedback parameters  -->
+<feedbackDocCount>5</feedbackDocCount>
+<feedbackTermCount>100</feedbackTermCount>
+<!--  0 mixture  1 div-min  2 markov chain?  -->
+<queryUpdateMethod>0</queryUpdateMethod>
+<feedbackCoefficient>0.5</feedbackCoefficient>
+<feedbackProbThresh>0.001</feedbackProbThresh>
+<feedbackProbSumThresh>1</feedbackProbSumThresh>
+<feedbackMixtureNoise>0.5</feedbackMixtureNoise>
+<emIterations>50</emIterations>
+</parameters>
