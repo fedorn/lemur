@@ -19,7 +19,47 @@ void ResultFile::openForRead(istream &is, Index &index)
   eof = !readLine();
 }
 
+void ResultFile::load(istream &is, Index &index)
+{
+  int i;
+  static ResultEntry entry;
 
+  // delete any old data
+  for (i=0; i<resTable->size(); i++) {
+    entry = (*resTable)[i];
+    delete entry.res;
+  }
+
+  resTable->clear();
+ 
+  inStr=&is;
+  ind = &index;
+  while (readLine()) {
+    entry.key = curQID;
+    int qi = (*resTable)[entry];
+    if (qi<0) {
+      entry.res = new IndexedRealVector();
+      qi = resTable->add(entry);
+    }
+    entry = (*resTable)[qi];
+    entry.res->PushValue(ind->document(curDID), curSC);  
+  }
+}
+
+bool ResultFile::findResult(char *queryID, IndexedRealVector *&res)
+{
+  static ResultEntry entry;
+  entry.key = queryID;
+  int qi = (*resTable)[entry];
+  if (qi>=0) {
+    entry = (*resTable)[qi];
+    res = entry.res;
+    return true;
+  } else {
+    res = NULL;
+    return false;
+  }
+}
 
 void ResultFile::getResult(char *expectedQID, IndexedRealVector &res)
 {

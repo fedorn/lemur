@@ -16,21 +16,39 @@
 #include "common_headers.hpp"
 #include "Index.hpp"
 #include "IndexedReal.hpp"
+#include "ISet.hpp"
+#include "String.hpp"
+
+/// Hash table entry for storing results
+struct ResultEntry {
+public:
+  String key;
+  unsigned int Hash() const { return key.Hash();}
+  unsigned int hash() const { return Hash();} 
+  bool operator==(const ResultEntry entry) { return (entry.key ==  this->key);}  IndexedRealVector *res;
+};
 
 /// representation of result file 
 
 class ResultFile {
 public:
-  ResultFile(bool TRECFormat = true) : trecFmt (TRECFormat) {
+  ResultFile(bool TRECFormat = true) : trecFmt (TRECFormat), resTable(NULL) {
+    resTable = new ISet<ResultEntry>(50);
   }
   
-  ~ResultFile() {}
+  ~ResultFile() { delete resTable;}
 
   /// Open and associate an input stream for reading, e.g., with getResult function
   void openForRead(istream &is, Index &index);
   
-  /// Read the results for a given query from the associated input stream into memory (stored in res) 
+  /// Load all the results into an internal hash table, so as to allow random access to any of the results.
+  void load(istream &is, Index &index);
+
+  /// Read the results for a given query from the associated input stream into memory (stored in res), sequential reading, so appropriate order must be maintained and attempting to get the results for a query that has no results will fail.
   void getResult(char *expectedQID, IndexedRealVector &res);
+
+  /// Find the results for the given query id, the output variable res gets a pointer to the results, returns true iff found.
+  bool findResult(char *queryID, IndexedRealVector *&res);
   
   /// Associate an output stream for writing results
   void openForWrite( ostream &os, Index &index) {
@@ -56,6 +74,8 @@ private:
   istream *inStr;
   ostream *outStr;
   bool eof;
+
+  ISet<ResultEntry> * resTable;
 
 };
 
