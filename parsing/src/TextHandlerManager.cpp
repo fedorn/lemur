@@ -14,6 +14,17 @@
 */
 
 #include "TextHandlerManager.hpp"
+#include "WebParser.hpp"
+#include "TrecParser.hpp"
+#include "ChineseParser.hpp"
+#include "ChineseCharParser.hpp"
+#include "ReutersParser.hpp"
+#include "ArabicParser.hpp"
+#include "IdentifinderParser.hpp"
+#include "BrillPOSParser.hpp"
+#include "PorterStemmer.hpp"
+#include "KStemmer.hpp"
+#include "ArabicStemmer.hpp"
 
 Parser* TextHandlerManager::createParser(string type, string acros) {  
   // Create the appropriate parser.

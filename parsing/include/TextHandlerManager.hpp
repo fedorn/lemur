@@ -9,20 +9,9 @@
 #ifndef _TEXTHANDLERMGR_HPP
 #define _TEXTHANDLERMGR_HPP
 
-#include "TextHandler.hpp"
-#include "WebParser.hpp"
-#include "TrecParser.hpp"
-#include "ChineseParser.hpp"
-#include "ChineseCharParser.hpp"
-#include "ReutersParser.hpp"
-#include "ArabicParser.hpp"
-#include "IdentifinderParser.hpp"
-#include "BrillPOSParser.hpp"
+#include "Parser.hpp"
 #include "Stopper.hpp"
-#include "PorterStemmer.hpp"
-#include "KStemmer.hpp"
-#include "ArabicStemmer.hpp"
-#include "Exception.hpp"
+#include "Stemmer.hpp"
 
 /** This TextHandlerManager offers static methods for creating known 
     TextHandler objects. Object types will be created from the specified 
