@@ -30,6 +30,9 @@ public:
    */
   MemCache(int cachesize);
 
+  /// use the given memory
+  MemCache(int* cache, int cachesize);
+
   /** default constructor that doesn't do much */
   MemCache();
 
@@ -81,6 +84,7 @@ private:
   int  intsize;	        /// sizeof(int) value
   //vector<int*> freelist;	/// a list of free memory holes
   vector<int*> freelist[NLISTS]; /// array of lists of free memory 
+  bool ourmem; /// whether we initialized mem and should free it
 };
 
 #endif
