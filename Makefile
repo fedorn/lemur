@@ -1,14 +1,19 @@
 SHELL = /bin/sh
 
-# this line specifies all the subdirectories
+# The following two lines specify all the subdirectories
 # and should be the only line you want to change
 # add the directory name here when you add a new module  or application directory to lemur
 # IMPORTANT: Make sure the order reflects the dependency!
 #            It is usually safe to add your module directory at the end of all
-#            other module directories but before any application directory,
-#            and add your application directory at the end of the whole list
-DIRS = utility index langmod retrieval app
+#            other module directories
 
+# module ("library") directories
+LIBDIRS = utility index langmod retrieval
+
+# application directories
+APPDIRS = app
+
+DIRS = $(LIBDIRS) $(APPDIRS)
 
 # IN GENERAL, DO NOT CHANGE THE FOLLOWING LINES
 
@@ -27,6 +32,9 @@ DEPENDDIRS = $(DIRS:%=%/depend)
 
 # "make all" means ensuring obj and depend subdirs to exist and making each directory
 all All ALL: $(DIRS) 
+
+# "make lib" means to ensure that obj and depend subdirs to exist and make each module/library directory
+lib Lib LIB: $(LIBDIRS)
 
 # Create OBJDIRS and DEPENDDIRS if necessary
 $(OBJDIRS) $(DEPENDDIRS):
