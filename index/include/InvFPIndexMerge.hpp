@@ -3,7 +3,13 @@
 
 #include "vector.hpp"
 #include "map.hpp"
-#include "InvFPIndexReader.hpp"
+#include "InvFPDocList.hpp"
+#include "InvFPTypes.hpp"
+
+struct IndexReader {
+  InvFPDocList* list;
+  ifstream* reader;
+};
 
 // this class could actually be static
 class InvFPIndexMerge {
@@ -18,7 +24,7 @@ public:
 private:
   void least(vector<int>* ret);
 
-  vector<InvFPIndexReader*> readers;  // a list of indexreaders for each file that is being merged
+  vector<IndexReader*> readers;  // a list of indexreaders for each file that is being merged
 };
 
 #endif
