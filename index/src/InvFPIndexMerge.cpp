@@ -116,6 +116,8 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
 
   // if we're only merging one file, no merging is necessary
   if (files->size() == 1) {
+    // have to do the remove because rename wont' work if file exists
+    remove(indexname);
     rename((*files)[0], indexname);
     return 1;
   }
@@ -436,6 +438,8 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
 
   // if we're only merging one file, no merging is necessary
   if (files->size() == 1) {
+    // have to do the remove because rename wont' work if file exists
+    remove(indexname);
     rename((*files)[0], indexname);
     return 1;
   }
