@@ -151,7 +151,7 @@ std::vector<ScoredExtentResult> runQuery( const std::string& query, const std::v
   /// \brief Return total number of documents in the collection.
   /// @return total number of documents in the aggregated collection
   INT64 documentCount();
-
+  INT64 documentCount( const std::string& term );
   /// \brief Fetch a document vector for a list of documents. 
   /// Caller responsible for deleting the Vector.
   /// @param documentIDs the vector of document ids.

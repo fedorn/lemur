@@ -190,7 +190,7 @@ INT64 LocalQueryServer::termFieldCount( const std::string& term, const std::stri
 
 INT64 LocalQueryServer::stemFieldCount( const std::string& stem, const std::string& field ) {
   IndriIndex* index = _repository.index();
-  int termid = this->termID( stem );
+  int termid = index->term( stem.c_str() );
   return termFieldCount( termid, field );
 }
 
@@ -229,6 +229,12 @@ int LocalQueryServer::documentLength( int documentID ) {
 INT64 LocalQueryServer::documentCount() {
   IndriIndex* index = _repository.index();
   return index->docCount();
+}
+
+INT64 LocalQueryServer::documentCount( const std::string& term ) {
+  IndriIndex* index = _repository.index();
+  int termid = this->termID( term );
+  return index->docCount( termid );
 }
 
 QueryServerResponse* LocalQueryServer::runQuery( std::vector<indri::lang::Node*>& roots, int resultsRequested, bool optimize ) {

@@ -46,6 +46,7 @@ private:
   void _handleTermFieldCount( XMLNode* request );
   void _handleStemFieldCount( XMLNode* request );
   void _handleDocumentCount( XMLNode* request );
+  void _handleDocumentTermCount( XMLNode* request );
   void _handleDocumentLength( XMLNode* request );
   void _handleFieldList( XMLNode* request );
 

@@ -755,6 +755,16 @@ INT64 QueryEnvironment::documentCount() {
   return totalDocumentCount;
 }
 
+INT64 QueryEnvironment::documentCount( const std::string& term ) {
+  INT64 totalDocumentCount = 0;
+
+  for( unsigned int i=0; i<_servers.size(); i++ ) {
+    totalDocumentCount += _servers[i]->documentCount( term );
+  }
+
+  return totalDocumentCount;
+}
+
 std::vector<DocumentVector*> QueryEnvironment::documentVectors( const std::vector<DOCID_T>& documentIDs ) {
   std::vector< std::vector<DOCID_T> > docIDLists;
   docIDLists.resize( _servers.size() );

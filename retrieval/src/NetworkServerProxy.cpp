@@ -472,6 +472,18 @@ INT64 NetworkServerProxy::documentCount() {
   return string_to_int(reply->getValue());
 }
 
+INT64 NetworkServerProxy::documentCount( const std::string& term ) {
+  XMLNode* request = new XMLNode( "document-term-count" );
+  _stream->request( request );
+  delete request;
+
+  XMLReplyReceiver r;
+  r.wait( _stream );
+
+  XMLNode* reply = r.getReply();
+  return string_to_int(reply->getValue());
+}
+
 QueryServerVectorsResponse* NetworkServerProxy::documentVectors( const std::vector<int>& documentIDs ) {
   XMLNode* request = new XMLNode( "document-vectors" );
 

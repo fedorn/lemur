@@ -55,6 +55,7 @@ public:
   // documents
   int documentLength( int documentID );
   INT64 documentCount();
+  INT64 documentCount( const std::string& term );
 
   // document vector
   QueryServerVectorsResponse* documentVectors( const std::vector<int>& documentIDs );

@@ -337,6 +337,17 @@ void NetworkServerStub::_handleDocumentCount( XMLNode* request ) {
   delete response;
 }
 
+void NetworkServerStub::_handleDocumentTermCount( XMLNode* request ) {
+  const std::string& term = request->getValue();
+
+  INT64 count = _server->documentCount( term );
+  XMLNode* response = new XMLNode( "document-term-count", i64_to_string( count ) );
+
+  _stream->reply( response );
+  _stream->replyDone();
+  delete response;
+}
+
 void NetworkServerStub::request( XMLNode* input ) {
   try {
     const std::string& type = input->getName();
@@ -371,6 +382,8 @@ void NetworkServerStub::request( XMLNode* input ) {
       _handleDocumentLength( input );
     } else if( type == "document-count" ) {
       _handleDocumentCount( input );
+    } else if( type == "document-term-count" ) {
+      _handleDocumentTermCount( input );
     } else {
       _stream->error( std::string() + "Unknown XML message type: " + input->getName() );
     }
