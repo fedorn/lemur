@@ -1,0 +1,55 @@
+
+# these are the common rules to be included in
+# the Makefile of each subdirectory
+
+# Each source file has a corresponding ".d" file
+# that specifies its dependents. 
+ifneq ($(strip $(CPPSRC)),)
+include $(CPPSRC:.cpp=.d)
+endif
+
+ifneq ($(strip $(CSRC)),)
+include $(CSRC:.c=.d)
+endif
+
+# how to generate .d  file from a .C file
+%.d: %.cpp
+	set -e; $(CPP) -M $(CPPFLAGS) $< \
+     | sed 's/:/ $@ :/g' > $@; [ -s $@ ] || rm -f $@
+
+# how to generate .d file from a .c file
+%.d: %.c
+	set -e; $(CC) -M $(CPPFLAGS) $< \
+     | sed 's/:/ $@ :/g' > $@; [ -s $@ ] || rm -f $@
+
+# compiling C++ code
+%.o: %.cpp
+	$(CXX) $(CPPFLAGS) -o $@ -c $<
+
+# compiling C code
+%.o: %.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+# how to make a library from object files
+$(OBJLIB): $(OBJ)
+	rm -f $@; ar -rs $@ $(OBJ)
+
+# how to clean a library module directory
+cleanlib:
+	rm -f *.o; rm -f *.d; rm -f *.a
+
+# how to clean an application directory
+cleanapp:
+	rm -f *.o; rm -f *.d; rm -f $(CPPAPPBIN) $(CAPPBIN)
+
+
+
+
+
+
+
+
+
+
+
+  

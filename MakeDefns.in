@@ -1,0 +1,63 @@
+
+# these are common definitions that the Makefile in
+# each subdirectory includes
+
+# C++ source files
+CPPSRC = $(shell ls *.cpp) 
+
+# C source files
+CSRC = $(shell ls *.c)
+
+# Include path
+INCPATH = -I../include $(patsubst %, -I../../%/include, $(DEPENDMODS))
+
+# Library path
+LIBPATH = $(patsubst %, -L../../%/src, $(DEPENDMODS))
+
+# library linking options
+LIBFLAGS = $(patsubst %, -l%, $(DEPENDMODS))
+
+# module library name
+OBJLIBS = $(foreach dir, $(DEPENDMODS), ../../$(dir)/src/lib$(dir).a)
+
+# C++ objects
+CPPOBJ = $(CPPSRC:.cpp=.o)
+
+# C objects
+COBJ = $(CSRC:.c=.o)
+
+# all objects
+OBJ = $(CPPOBJ) $(COBJ)
+
+# library name for a module 
+# "MODULE" defined in the Makefile of a subdirectory
+OBJLIB = lib$(MODULE).a
+
+# C compiler and compiling options
+#
+# configure script will replace @CC@ with the right value
+CC = @CC@
+
+# CFLAGS = $(INCPATH) -g -c -O -Wall
+
+# configure script will replace @CFLAGS@ and @CPPFLAGS@ with the right values
+
+CFLAGS = $(INCPATH) @CFLAGS@ @CPPFLAGS@
+
+# C++ compiler and compiling/linking options
+# configure script will replace @CXX@ with the right value
+
+CXX = @CXX@
+
+# CPPFLAGS    = $(INCPATH) -fnonnull-objects -fguiding-decls -c -g -Wall
+
+# configure script will replace @CXXFLAGS@ and @CPPFLAGS@ with the right values
+
+CPPFLAGS    = $(INCPATH) @CXXFLAGS@ @CPPFLAGS@
+
+CPPLDFLAGS  =   $(LIBPATH) $(LIBFLAGS) -lm
+
+
+
+
+  
