@@ -135,7 +135,7 @@ namespace CORIParameter {
   static double doctffactor;
   static double doctfbaseline;
   static void get() {
-    collectionCounts = ParamGetString("collCounts");
+    collectionCounts = ParamGetString("collCounts", "USE_INDEX_COUNTS");
     cstffactor = ParamGetDouble("CSCTF_factor", 150);
     cstfbaseline = ParamGetDouble("CSCTF_baseline", 50);
     doctffactor = ParamGetDouble("DOCCTF_factor", 1.5);
