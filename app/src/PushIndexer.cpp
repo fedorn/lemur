@@ -115,16 +115,16 @@ int AppMain(int argc, char * argv[]) {
   // Create the appropriate parser.
   Parser * parser;
   if (!strcmp(LocalParameter::docFormat, "web")) {
-    parser = new WebParser;
+    parser = new WebParser();
   } else if (!strcmp (LocalParameter::docFormat, "reuters")) {
-    parser = new ReutersParser;
+    parser = new ReutersParser();
   } else if (!strcmp (LocalParameter::docFormat, "trec")) {
-    parser = new TrecParser;
+    parser = new TrecParser();
   } else if (strcmp (LocalParameter::docFormat, "")) {
     throw Exception("PushIndexer", "Unknown docFormat specified");
   } else {
     cerr << "Using default trec parser" << endl;
-    parser = new TrecParser;
+    parser = new TrecParser();
   }
 
   // Create the stopper if needed.
@@ -163,7 +163,7 @@ int AppMain(int argc, char * argv[]) {
   if (!strcmp(LocalParameter::index, "")) {
     throw Exception("PushIndexer", "index must be specified");
   }
-  InvFPTextHandler indexer(LocalParameter::index, LocalParameter::memory, LocalParameter::countStopWords);
+  InvFPTextHandler* indexer = new InvFPTextHandler(LocalParameter::index, LocalParameter::memory, LocalParameter::countStopWords);
 
   // chain the parser/stopper/stemmer/indexer
 
@@ -179,21 +179,17 @@ int AppMain(int argc, char * argv[]) {
     th = stemmer;
   } 
 
-  th->setTextHandler(&indexer);
+  th->setTextHandler(indexer);
 
   // parse the data files
   if (strcmp(LocalParameter::dataFiles, "")) {
     if (!fileExist(LocalParameter::dataFiles)) {
-      cerr << "Exception [by PushIndexer]:dataFiles specified does not exist : " << LocalParameter::dataFiles << endl;
-      cerr << "Program aborted due to exception" << endl;
-      exit(0);
+      throw Exception("PushIndexer", "dataFiles specified does not exist");
     }
 
     ifstream source(LocalParameter::dataFiles);
     if (!source.is_open()) {
-      cerr << "Exception [by PushIndexer]:could not open dataFiles specified : " << LocalParameter::dataFiles << endl;
-      cerr << "Program aborted due to exception" << endl;
-      exit(0);
+      throw Exception("PushIndexer","could not open dataFiles specified");
     } else {
       string filename;
       while (getline(source, filename)) {
@@ -212,6 +208,7 @@ int AppMain(int argc, char * argv[]) {
   if (acros != NULL) delete acros;
   if (stopper != NULL) delete stopper;
   delete parser;
+  delete indexer;
   LocalParameter::freeMem();
   return 0;
 }
