@@ -117,7 +117,9 @@ int AppMain(int argc, char *argv[]) {
 
       size++;
     }
-    prSum = prSum / (double)(ind->termCount()+ind->termCountUnique());
+    // should be ML here
+    //    prSum = prSum / (double)(ind->termCount()+ind->termCountUnique());
+    prSum = prSum/(double)ind->termCount();
     ofs << i << " " << size << " "<< prSum << endl;
     delete tList;
   }
