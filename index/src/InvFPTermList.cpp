@@ -111,7 +111,8 @@ bool InvFPTermList::binRead(ifstream& infile){
 void InvFPTermList::binWriteC(ofstream& of) {
   of.write((const char*) &uid, sizeof(DOCID_T));
   of.write((const char*) &length, sizeof(int));
-  if (length == 0) {
+  //  if (length == 0) {
+  if (listlen == 0) {
     int zero = 0;
     of.write((const char*) &zero, sizeof(int));
     return;
@@ -148,6 +149,7 @@ bool InvFPTermList::binReadC(ifstream& infile){
     return false;
   if (size == 0) {
     list = new LocatedTerm[0];
+    listlen = 0;
     return true;
   }
   
