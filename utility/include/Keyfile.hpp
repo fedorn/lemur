@@ -12,7 +12,7 @@
 
 #ifndef _LEMUR_KEYFILE_H
 #define _LEMUR_KEYFILE_H
-
+#include <string>
 /// Provides C++ interface to the keyfile b-tree package. Arbitrary data can
 /// be stored using either int or char * keys. 
 class Keyfile {
