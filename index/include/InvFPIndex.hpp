@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <string>
 #include "Index.hpp"
 #include "InvFPDocList.hpp"
 #include "InvFPTermList.hpp"
@@ -15,6 +16,8 @@
 #define UNIQUE_TERMS 0
 #define TOTAL_TERMS  1
 #define DOCS         2
+#define DT_FILES     3
+#define INV_FILES    4
 
 // for names array
 #define DOC_INDEX    0
@@ -27,7 +30,7 @@
 class InvFPIndex : public Index {
 public:
    InvFPIndex();
-   InvFPIndex(char* indexName);
+   InvFPIndex(const char* indexName);
   ~InvFPIndex(); 
 
   /// @name Open index 
@@ -47,13 +50,13 @@ public:
   int term(const char* word);
 
   /// Convert a termID to its spelling
-  char* term(int termID);
+  const char* term(int termID);
 
   /// Convert a spelling to docID
   int document(const char* docIDStr);
 
   /// Convert a docID to its spelling
-  char* document(int docID); 
+  const char* document(int docID); 
 
   //@}
 
@@ -96,10 +99,14 @@ public:
 
   //@}
 private:
+  /// readin main stats
+  bool mainToc(char* fileName);
   /// readin index lookup table
   bool indexLookup();
   /// read in dt index lookup table
   bool dtLookup();
+  /// read in dt index filenames map
+  bool dtFileIDs();
   /// read in termIDs to term spelling map
   bool termIDs();
   /// read in docIDs to doc spelling map
@@ -107,11 +114,12 @@ private:
 
   int* counts;    // array to hold all the overall count stats of this db
   char** names;   // array to hold all the names for files we need for this db
-
+  float aveDocLen; // the average document length in this index
   entry* lookup;  // the array holding entries (index is termid)
   entry* dtlookup; // the array holding entries to dt index (index of array is docid)
   TERM_T* terms;   // array of the term spellings (index is termid)
   EXDOCID_T* docnames; // array of the external docids (index is docid)
+  char** dtfiles; // array of dt index filenames
   map<TERM_T, TERMID_T, ltstr> termtable; // table of terms to termid
   map<EXDOCID_T, DOCID_T, ltstr> doctable; // table of exdocids to docid
 };
