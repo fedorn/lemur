@@ -185,7 +185,7 @@ INT64 LocalQueryServer::termFieldCount( int term, const std::string& field ) {
   IndriIndex* index = _repository.index();
   int fieldid = index->field( field.c_str() );
 
-  return index->fieldTermCount( term, fieldid );
+  return index->fieldTermCount( fieldid, term );
 }
 
 INT64 LocalQueryServer::termFieldCount( const std::string& term, const std::string& field ) {
