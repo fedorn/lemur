@@ -21,23 +21,28 @@
 InvIndex::InvIndex() {
   lookup = NULL;  
   dtlookup = NULL;
+  dtfiles = NULL;
+  invfiles = NULL;
   aveDocLen = 0;
 }
 
 InvIndex::InvIndex(const char* indexName) {
   lookup = NULL;  
   dtlookup = NULL;
+  dtfiles = NULL;
+  invfiles = NULL;
   aveDocLen = 0;
   open(indexName);
 }
 
 InvIndex::~InvIndex() {
+  int i;
   if (lookup != NULL)
     delete[](lookup);
   if (dtlookup  != NULL)
     delete[](dtlookup);
   if (names != NULL) {
-    for (int i = 0; i < 6; i++) {
+    for (i = 0; i < NAMES_SIZE; i++) {
       if (names[i] != NULL) {
         delete[](names[i]);
         names[i] = NULL;
@@ -45,31 +50,61 @@ InvIndex::~InvIndex() {
     }
     delete[](names);
   }
+  
+  if (dtfiles != NULL) {
+    for (i=0;i<counts[DT_FILES];i++) {
+      delete[](dtfiles[i]);
+    }
+  }
+
+  if (invfiles != NULL) {
+    for (i=0;i<counts[INV_FILES];i++) {
+      delete[](invfiles[i]);
+    }
+  }
 }
 
 bool InvIndex::open(const char* indexName){
   counts = new int[5];
-  names = new char*[6];  
+  names = new char*[NAMES_SIZE];  
+  names[VERSION_NUM] = "";
+  names[DOCMGR_IDS] = NULL;
 
   String streamSelect = ParamGetString("stream", "cerr");
   if (streamSelect == "cout") {
-    setLemurStream(&cout);
+    setMesgStream(&cout);
   } else {
-    setLemurStream(&cerr);
+    setMesgStream(&cerr);
   }
 
   if (!fullToc(indexName)) {
-    *lemurstream << "Couldn't not properly parse param file. Index was not loaded." << endl;
+    cerr << "Couldn't not properly parse param file. Index was not loaded." << endl;
     return false;
   }
-  
+
+  dtloaded = ParamGetInt("loadDT", 1);
+
+  if (!dtloaded) {
+    *msgstream << "Parameter set to dtlist lookup not being loaded" << endl;
+  } else {
+
+    // older versions didn't specify version name and will be blank
+    // if it's new we call new load functions
+    if (strcmp(names[VERSION_NUM], "")) {
+      if (!dtLookup())
+	return false;
+    if (!docMgrIDs())
+      return false;
+    } else {
+      if (!dtLookup_ver1())
+	return false;
+    }
+
+    if (!dtFileIDs())
+      return false;
+  }
+
   if (!indexLookup())
-    return false;
-
-  if (!dtLookup())
-    return false;
-
-  if (!dtFileIDs())
     return false;
 
   if (!invFileIDs())
@@ -81,68 +116,7 @@ bool InvIndex::open(const char* indexName){
   if (!docIDs())
     return false;
 
-  *lemurstream << "Load index complete." << endl;
-  return true;
-}
-
-bool InvIndex::openName(char* indexName){
-  counts = new int[5];
-  names = new char*[6];  
-  int nameLen = strlen(indexName)+1;
-
-  char * tocName = new char[nameLen + strlen(MAINTOC) + 1];
-  strncpy(tocName, indexName, nameLen);
-  strcpy(tocName + nameLen, MAINTOC);
-
-  if (!mainToc(tocName)) {
-    delete[](tocName);
-    return false;
-  }
-  delete[](tocName);
-
-  names[DOC_INDEX] = new char[nameLen + strlen(INVINDEX)];
-  strncpy(names[DOC_INDEX], indexName, nameLen);
-  strcpy(names[DOC_INDEX] + nameLen, INVINDEX);
-
-  names[DOC_LOOKUP] = new char[nameLen + strlen(INVLOOKUP)];
-  strncpy(names[DOC_LOOKUP], indexName, nameLen);
-  strcpy(names[DOC_LOOKUP] + nameLen, INVLOOKUP);
-
-  names[TERM_INDEX] = new char[nameLen + strlen(DTINDEX)];
-  strncpy(names[TERM_INDEX], indexName, nameLen);
-  strcpy(names[TERM_INDEX] + nameLen, DTINDEX);
-
-  names[TERM_LOOKUP] = new char[nameLen + strlen(DTLOOKUP)];
-  strncpy(names[TERM_LOOKUP], indexName, nameLen);
-  strcpy(names[TERM_LOOKUP] + nameLen, DTLOOKUP);
-
-  names[TERM_IDS] = new char[nameLen + strlen(TERMIDMAP)];
-  strncpy(names[TERM_IDS], indexName, nameLen);
-  strcpy(names[TERM_IDS] + nameLen, TERMIDMAP);
-
-  names[DOC_IDS] = new char[nameLen + strlen(DOCIDMAP)];
-  strncpy(names[DOC_IDS], indexName, nameLen);
-  strcpy(names[DOC_IDS] + nameLen, DOCIDMAP);
-
-  if (!indexLookup())
-    return false;
-
-  if (!dtLookup())
-    return false;
-
-  if (!dtFileIDs())
-    return false;
-
-  if (!invFileIDs())
-    return false;
-
-  if (!termIDs())
-    return false;
-
-  if (!docIDs())
-    return false;
-
-  *lemurstream << "Load index complete." << endl;
+  *msgstream << "Load index complete." << endl;
   return true;
 }
 
@@ -174,12 +148,33 @@ const char* InvIndex::document(int docID) {
   return docnames[docID]; 
 }
 
+const char* InvIndex::docManager(int docID) {
+  // no such thing previous to version 1.9
+  if (!strcmp(names[VERSION_NUM], "")) 
+    return NULL;
+
+  if ((docID < 0) || (docID > counts[DOCS])) {
+    fprintf(stderr, "Error trying to get docManager for invalid docID.\n");
+    return NULL;
+  }
+
+  // there is no such document
+  if (docID == 0)
+    return NULL;
+
+  // if it never had one registered.
+  if (dtlookup[docID].docmgr == -1)
+    return NULL;
+
+  return docmgrs[dtlookup[docID].docmgr]; 
+}
+
 int InvIndex::termCount(int termID) const{
   // the termCount is equal to the position counts
   // this is calculated by the length of the inverted list -(df*2) for each doc, 
   // there is the docid and the tf
   if ((termID <0) || (termID > counts[UNIQUE_TERMS])) {
-    *lemurstream << "Error:  Trying to get termCount for invalid termID" << endl;
+    *msgstream << "Error:  Trying to get termCount for invalid termID" << endl;
     return 0;
   }
 
@@ -196,7 +191,7 @@ float InvIndex::docLengthAvg(){
 
 int InvIndex::docCount(int termID) {
   if ((termID <0) || (termID > counts[UNIQUE_TERMS])) {
-    *lemurstream << "Error:  Trying to get docCount for invalid termID" << endl;
+    *msgstream << "Error:  Trying to get docCount for invalid termID" << endl;
     return 0;
   }
 
@@ -209,38 +204,41 @@ int InvIndex::docCount(int termID) {
 
 int InvIndex::docLength(int docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
-    *lemurstream << "Error trying to get docLength for invalid docID." << endl;
+    *msgstream << "Error trying to get docLength for invalid docID." << endl;
     return 0;
   }
     
   if (docID == 0)
     return 0;
+
   if (!dtloaded) {
-    *lemurstream << "DT index must be loaded to obtain docLength" << endl;
+    *msgstream << "DT index must be loaded to obtain docLength" << endl;
     return 0;
   }
+
   return dtlookup[docID].length;
 }
 
 int InvIndex::docLengthCounted(int docID) {
   if ((docID < 0) || (docID > counts[DOCS])) {
-    *lemurstream << "Error trying to get docLengthCounted for invalid docID." << endl;
-    return 0;
-  }
-  if (!dtloaded) {
-    *lemurstream << "DT index must be loaded to obtain docLength" << endl;
+    *msgstream << "Error trying to get docLengthCounted for invalid docID." << endl;
     return 0;
   }
     
   if (docID == 0)
     return 0;
+
+  if (!dtloaded) {
+    *msgstream << "DT index must be loaded to obtain docLength" << endl;
+    return 0;
+  }
 
   int dl;
   DOCID_T id;
   ifstream look;
   look.open(dtfiles[dtlookup[docID].fileid], ios::in | ios::binary);
   if (!look) {
-    *lemurstream << "Could not open term indexfile for reading." << endl;
+    *msgstream << "Could not open term indexfile for reading." << endl;
     return 0;
   }
   look.seekg(dtlookup[docID].offset, ios::beg);
@@ -256,7 +254,7 @@ int InvIndex::docLengthCounted(int docID) {
 
 DocInfoList* InvIndex::docInfoList(int termID){
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS])) {
-    *lemurstream << "Error:  Trying to get docInfoList for invalid termID" << endl;    
+    *msgstream << "Error:  Trying to get docInfoList for invalid termID" << endl;
     return NULL;
   }
 
@@ -269,7 +267,15 @@ DocInfoList* InvIndex::docInfoList(int termID){
   indexin.seekg(lookup[termID].offset, ios::beg);
   DocInfoList* doclist;
   InvDocList* dlist = new InvDocList();
-  if (!dlist->binRead(indexin)) {
+  bool success;
+
+  if (strcmp(names[VERSION_NUM], "")) {
+    // version 1.9 is compressed and must be decompressed
+    success = dlist->binReadC(indexin);
+  } else {
+    success = dlist->binRead(indexin);
+  }
+  if (!success) {
     indexin.close();
     return NULL;
   } else {
@@ -281,16 +287,17 @@ DocInfoList* InvIndex::docInfoList(int termID){
 
 TermInfoList* InvIndex::termInfoList(int docID){
   if ((docID < 0) || (docID > counts[DOCS])) {
-    *lemurstream << "Error trying to get termInfoList for invalid docID." << endl;
+    *msgstream << "Error trying to get termInfoList for invalid docID." << endl;
     return NULL;
   }
-  if (!dtloaded) {
-    *lemurstream << "DT index must be loaded to obtain termInfoList" << endl;
-    return 0;
-  }
-    
+
   if (docID == 0)
     return NULL;
+
+  if (!dtloaded) {
+    *msgstream << "DT index must be loaded to obtain termInfoList" << endl;
+    return NULL;
+  }
 
   ifstream indexin;
   indexin.open(dtfiles[dtlookup[docID].fileid], ios::in | ios::binary);
@@ -312,9 +319,9 @@ TermInfoList* InvIndex::termInfoList(int docID){
  =======================================================================*/
 bool InvIndex::fullToc(const char * fileName) {
   FILE* in = fopen(fileName, "rb");
-  *lemurstream << "Trying to open toc: " << fileName << endl;
+  *msgstream << "Trying to open toc: " << fileName << endl;
   if (in == NULL) {
-    *lemurstream << "Couldn't open toc file for reading" << endl;
+     *msgstream << "Couldn't open toc file for reading" << endl;
     return false;
   }
 
@@ -322,7 +329,7 @@ bool InvIndex::fullToc(const char * fileName) {
   char val[128];
   while (!feof(in)) {
     fscanf(in, "%s %s", key, val);
-    *lemurstream << key << ":" << val << endl;
+    cerr << key << ":" << val << endl;
     if (strcmp(key, NUMDOCS_PAR) == 0) {
       counts[DOCS] = atoi(val);
     } else if (strcmp(key, NUMTERMS_PAR) == 0) {
@@ -345,6 +352,10 @@ bool InvIndex::fullToc(const char * fileName) {
       names[TERM_IDS] = strdup(val);
     } else if (strcmp(key, DOCIDMAP_PAR) == 0) {
       names[DOC_IDS] = strdup(val);
+    } else if (strcmp(key, DOCMGR_PAR) == 0) {
+      names[DOCMGR_IDS] = strdup(val);
+    } else if (strcmp(key, VERSION_PAR) == 0) {
+      names[VERSION_NUM] = strdup(val);
     }
   }    
 
@@ -353,42 +364,11 @@ bool InvIndex::fullToc(const char * fileName) {
   return true;
 }
 
-bool InvIndex::mainToc(char * fileName) {
-  FILE* in = fopen(fileName, "r");
-  *lemurstream << "Trying to open toc: " << fileName << endl;
-  if (in == NULL) {
-    *lemurstream << "Couldn't open toc file for reading" << endl;
-    return false;
-  }
-
-  char key[128];
-  char val[128];
-  while (!feof(in)) {
-    fscanf(in, "%s %s", key, val);
-    if (strcmp(key, NUMDOCS_PAR) == 0) {
-      counts[DOCS] = atoi(val);
-    } else if (strcmp(key, NUMTERMS_PAR) == 0) {
-      counts[TOTAL_TERMS] = atoi(val);
-    } else if (strcmp(key, NUMUTERMS_PAR) == 0) {
-      counts[UNIQUE_TERMS] = atoi(val);
-    } else if (strcmp(key, NUMDT_PAR) == 0) {
-      counts[DT_FILES] = atoi(val);
-    } else if (strcmp(key, NUMINV_PAR) == 0) {
-      counts[INV_FILES] = atoi(val);
-    }
-
-  }
-
-  aveDocLen = counts[TOTAL_TERMS] / (float) counts[DOCS];
-
-  return true;
-}
-
 bool InvIndex::indexLookup() {
   FILE* in = fopen(names[DOC_LOOKUP], "rb");
-  *lemurstream << "Trying to open invlist lookup: " << names[DOC_LOOKUP] << endl;
+  *msgstream << "Trying to open invlist lookup: " << names[DOC_LOOKUP] << endl;
   if (in == NULL) {
-    *lemurstream << "Couldn't open invlist lookup table for reading" << endl;
+    *msgstream << "Couldn't open invlist lookup table for reading" << endl;
     return false;
   }
 
@@ -411,16 +391,11 @@ bool InvIndex::indexLookup() {
   return true;
 }
 
-bool InvIndex::dtLookup() {
+bool InvIndex::dtLookup_ver1() {
   FILE* in = fopen(names[TERM_LOOKUP], "rb");
-  dtloaded = ParamGetInt("loadDT", 1);
-  if (!dtloaded) {
-    *lemurstream << "Skipping dtlist at user request" << endl;
-    return true;
-  }
-  *lemurstream << "Trying to open dtlist lookup: " << names[TERM_LOOKUP] << endl;
+  *msgstream << "Trying to open dtlist lookup: " << names[TERM_LOOKUP] << endl;
   if (in == NULL) {
-    *lemurstream << "Couldn't open dt lookup table for reading" << endl;
+    *msgstream <<  "Couldn't open dt lookup table for reading" << endl;
     return false;
   }
 
@@ -440,13 +415,42 @@ bool InvIndex::dtLookup() {
   return true;
 }
 
-bool InvIndex::dtFileIDs() {
-  FILE* in = fopen(names[TERM_INDEX], "rb");
-  *lemurstream << "Trying to open term index filenames: " << names[TERM_INDEX] << endl;
+bool InvIndex::dtLookup() {
+  *msgstream << "Trying to open dtlist lookup: " << names[TERM_LOOKUP] << endl;
+
+  FILE* in = fopen(names[TERM_LOOKUP], "rb");
+
   if (in == NULL) {
-    *lemurstream << "Error opening term index filenames file" << endl;
+    *msgstream << "Couldn't open dt lookup table for reading" << endl;
     return false;
   }
+
+  dtlookup = new dt_entry[counts[DOCS]+1];
+  dt_entry* e;
+  TERMID_T tid =0;
+  int fid =0;
+  long off =0;
+  int len =0;
+  int mgr =0;
+  while (fscanf(in, "%d %d %d %d %d", &tid, &fid, &off, &len, &mgr) == 5) {
+    e = &dtlookup[tid];
+    e->fileid = fid;
+    e->offset = off;
+    e->length = len;
+    e->docmgr = mgr;
+  }
+  fclose(in);
+  return true;
+}
+
+bool InvIndex::dtFileIDs() {
+  FILE* in = fopen(names[TERM_INDEX], "rb");
+  *msgstream << "Trying to open term index filenames: " << names[TERM_INDEX] << endl;
+  if (in == NULL) {
+    *msgstream << "Error opening term index filenames file" << endl;
+    return false;
+  }
+
 
   dtfiles = new char*[counts[DT_FILES]];
 
@@ -471,11 +475,37 @@ bool InvIndex::dtFileIDs() {
   return true;
 }
 
+bool InvIndex::docMgrIDs() {
+  FILE* in = fopen(names[DOCMGR_IDS], "r");
+  *msgstream << "Trying to open doc manager ids file: " << names[DOCMGR_IDS] << endl;
+  if (in == NULL) {
+    fprintf(stderr, "Error opening doc manager ids \n");
+    return false;
+  }
+
+  int ind, len;
+  char* str;
+
+  while (!feof(in)) {
+    if (fscanf(in, "%d %d", &ind, &len) != 2)
+      continue;
+    str = (char*) malloc(sizeof(char) * (len+1));
+    if (fscanf(in, "%s", str) != 1) {
+      free(str);
+      continue;
+    }
+
+    docmgrs.push_back(str);
+  }
+  fclose(in);
+  return true;
+}
+
 bool InvIndex::invFileIDs() {
   FILE* in = fopen(names[DOC_INDEX], "rb");
-  *lemurstream << "Trying to open inverted index filenames: " << names[DOC_INDEX] << endl;
+  *msgstream << "Trying to open inverted index filenames: " << names[DOC_INDEX] << endl;
   if (in == NULL) {
-    *lemurstream << "Error opening inverted index filenames file" << endl;
+    *msgstream <<  "Error opening inverted index filenames file"<< endl;
     return false;
   }
 
@@ -504,9 +534,9 @@ bool InvIndex::invFileIDs() {
 
 bool InvIndex::termIDs() {
   FILE* in = fopen(names[TERM_IDS], "rb");
-  *lemurstream << "Trying to open term ids file: " << names[TERM_IDS] << endl;
+  *msgstream << "Trying to open term ids file: " << names[TERM_IDS] << endl;
   if (in == NULL) {
-    *lemurstream << "Error opening termfile" << endl;
+    *msgstream <<  "Error opening termfile" << endl;
     return false;
   }
   terms = new TERM_T[counts[UNIQUE_TERMS]+1];
@@ -531,8 +561,8 @@ bool InvIndex::termIDs() {
 
   fclose(in);
   if (termtable.size() != counts[UNIQUE_TERMS]+1) {
-    *lemurstream << "Didn't read in as many terms as we were expecting" << endl;
-    return false;
+    *msgstream << "Warning:Didn't read in as many terms as we were expecting." << endl;
+    *msgstream << "could be corrupted file or duplicate terms in file" << endl;
   }
 
   return true;
@@ -540,9 +570,9 @@ bool InvIndex::termIDs() {
 
 bool InvIndex::docIDs() {
   FILE* in = fopen(names[DOC_IDS], "rb");
-  *lemurstream << "Trying to open doc ids file: " << names[DOC_IDS] << endl;
+   *msgstream<< "Trying to open doc ids file: " << names[DOC_IDS] << endl;
   if (in == NULL) {
-    *lemurstream << "Error opening docfile" << endl;
+    *msgstream << "Error opening docfile" << endl;
     return false;
   }
   docnames = new EXDOCID_T[counts[DOCS]+1];
@@ -567,13 +597,12 @@ bool InvIndex::docIDs() {
   fclose(in);
 
   if (doctable.size() != counts[DOCS]+1) {
-    *lemurstream << "Didn't read in as many docids as we were expecting" << endl;
-    return false;
+    *msgstream << "Warning:Didn't read in as many docids as we were expecting" << endl;
+    *msgstream << "could be corrupted file or duplicate docids in file" << endl;
   }
-
   return true;
 }
 
-void InvIndex::setLemurStream(ostream * lemStream) {
-  lemurstream = lemStream;
+void InvIndex::setMesgStream(ostream * lemStream) {
+  msgstream = lemStream;
 }
