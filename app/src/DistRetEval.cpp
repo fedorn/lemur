@@ -10,12 +10,7 @@
 */
 
 
-/*
- * NAME DATE - COMMENTS
- * tnt 06/2002 - created
- * lsi 09/2002 - modified to support other merge methods
- *
- *========================================================================*/
+/** author: tnt, lsi */
 
 /** This is a sample application that does distributed retrieval, using
     a collection selection index and individual indexes.  Database ranking
@@ -72,7 +67,6 @@ int AppMain(int argc, char *argv[]) {
   Index *csindex;
   // the centralized sample database
   Index *csdbindex;
-  int csdoccount                      ;
   ArrayAccumulator *accumCsDb;
   IndexedRealVector *rankingsCsDb;
   CORIRetMethod *modelCsDb;
@@ -144,7 +138,6 @@ int AppMain(int argc, char *argv[]) {
 
   qryStream->startDocIteration();
   TextQuery *q;
-  TextQuery *qCsDb;
   DistMergeMethodParameter::get();
 
   while (qryStream->hasMore() ) {
