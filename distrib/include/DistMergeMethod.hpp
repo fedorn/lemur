@@ -20,6 +20,24 @@
 
  **/
 
+#include "Param.hpp"
+
+#define  CORI_MERGE 0
+#define  SINGLETYPEREGR_MERGE 1
+
+namespace DistMergeMethodParameter {
+
+  //@{ 
+  /// the result merging method
+  static int mergeMethod;
+  //@}
+
+  static void get() {
+    mergeMethod=ParamGetInt("mergeMethod",0);
+  }
+};
+
+
 #include "common_headers.hpp"
 #include "IndexedReal.hpp"
 #include "DocScore.hpp"

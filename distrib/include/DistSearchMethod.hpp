@@ -25,9 +25,12 @@
 
 class DistSearchMethod {
 public:
-  DistSearchMethod() {csindex = NULL; defrt = RetMethodManager::OKAPI; } 
-  DistSearchMethod(Index* index, RetMethodManager::RetModel defmodel=RetMethodManager::OKAPI) {csindex = index; defrt = defmodel;} 
+  DistSearchMethod() {csindex = NULL; defrt = RetMethodManager::CORI_DOC; returnCount=1000;} 
+  DistSearchMethod(Index* index, RetMethodManager::RetModel defmodel=RetMethodManager::CORI_DOC) {csindex = index; defrt = defmodel;} 
   ~DistSearchMethod() {}
+
+  /// set the return documents number;
+  void setReturnCount(int retCount){returnCount=retCount;};
 
   /// use the given collection selection index 
   void setIndex(Index* index){csindex = index;} ;
@@ -59,4 +62,5 @@ protected:
   Query* query; // the query we're currently working on
   DocScoreVector** allres; // where to store all results
   int reslen; // length of allres
+  int returnCount;//the number of result should be returned
 };
