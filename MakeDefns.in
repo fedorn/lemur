@@ -52,25 +52,25 @@ OBJLIB = lib$(MODULE).a
 
 # C compiler and compiling options
 #
-# configure script will replace @CC@ with the right value
+# Let configure script set CC to an appropriate value
 CC = @CC@
 
 # CFLAGS = $(INCPATH) -g -c -O -Wall
 
-# configure script will replace @CFLAGS@ and @CPPFLAGS@ with the right values
+# Let configure script set CFLAGS to an appropriate value
 
-CFLAGS = -D_CCVER=$(CCVER) $(INCPATH) @CFLAGS@ @CPPFLAGS@
+CFLAGS = -D_CCVER=$(CCVER) $(INCPATH) @CFLAGS@ 
 
 # C++ compiler and compiling/linking options
-# configure script will replace @CXX@ with the right value
+# Let configure script set CXX to an appropriate value
 
 CXX = @CXX@
 
 # CPPFLAGS    = $(INCPATH) -fnonnull-objects -fguiding-decls -c -g -Wall
 
-# configure script will replace @CXXFLAGS@ and @CPPFLAGS@ with the right values
+# Let configure script set CPPFLAGS to an appropriate value
 
-CPPFLAGS    = -D_CXXVER=$(CXXVER) $(INCPATH) @CXXFLAGS@ @CPPFLAGS@
+CPPFLAGS    = -D_CXXVER=$(CXXVER) $(INCPATH) @CPPFLAGS@
 
 CPPLDFLAGS  =   $(LIBPATH) $(LIBFLAGS) -lm
 
