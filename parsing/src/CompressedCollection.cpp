@@ -43,6 +43,10 @@ static void zlib_free( void* opaque, void* address ) {
 }
 
 static void zlib_deflate( z_stream_s& stream, WriteBuffer* outfile ) {
+  if( stream.avail_in == 0 ) {
+    // nothing to do...
+    return;
+  }
   if( stream.avail_out == 0 ) {
     stream.next_out = (Bytef*) outfile->write( OUTPUT_BUFFER_SIZE );
     stream.avail_out = OUTPUT_BUFFER_SIZE;
