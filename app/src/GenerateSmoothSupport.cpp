@@ -76,7 +76,20 @@ int AppMain(int argc, char *argv[]) {
 
   ofs.open(LocalParameter::smoothSupportFile);
 
+
+  char mcSuppFileName[500];
+  strcpy(mcSuppFileName, LocalParameter::smoothSupportFile);
+  strcat(mcSuppFileName, ".mc");
+
+  ofstream mcOFS;
+  mcOFS.open(mcSuppFileName);
+
   int i;
+
+
+  double *wdPr = new double[lemur.termCountUnique()+1];
+  for (i=1; i<=lemur.termCountUnique();i++)
+    wdPr[i]=0;
 
   double prSum=0;
   for (i=1; i<= lemur.docCount(); i++) {
@@ -86,12 +99,21 @@ int AppMain(int argc, char *argv[]) {
     int size=0;
     while (tList->hasMore()) {
       TermInfo *info = tList->nextEntry();
+
+      wdPr[info->id()] += info->count()/(double)lemur.docLength(i);
+      // compute Markov chain support
+
       prSum += (lemur.termCount(info->id())+1)/
       (double)(lemur.termCount()+lemur.termCountUnique());
       size++;
     }
     ofs << i << " " << size << " "<< prSum << endl;
   }
+
+  for (i=1;i<=lemur.termCountUnique();i++) 
+    mcOFS << i << " " << wdPr[i] << endl;
+  mcOFS.close();
+
   ofs.close();
   return 0;
 
