@@ -217,9 +217,12 @@ void InvFPIndexMerge::merge(char* name) {
     }
 
     //update this file reader or erase it from available readers
+    InvFPIndexReader* reader;
     for (iter=working.begin(); iter!=working.end(); iter++) {
-      if (!readers[*iter-offset]->readNextList()) {
-	      readers.erase(readers.begin()+(*iter-offset));
+      reader = readers[*iter-offset];
+      if (!reader->readNextList()) {
+        readers.erase(readers.begin()+(*iter-offset));
+        delete(reader);
 	      //update the other indices
 	      offset++;
       }
@@ -270,9 +273,13 @@ void InvFPIndexMerge::merge(char* name) {
       }
       list = myreader->readNextList();
     } //while that file
+    delete(myreader);
+    readers.clear();
   } // if still a file
   fclose(indexfile);
   fclose(listing);
+  free(indexname);
+  free(lookup);
 //  delete(info);
 }
 

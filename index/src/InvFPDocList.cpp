@@ -5,6 +5,17 @@
  *========================================================================*/
 #include "InvFPDocList.hpp"
 
+InvFPDocList::InvFPDocList() {
+  size = 0;
+  begin = end = lastid = freq = NULL;
+  uid = -1;
+  df = 0;
+  strlength = 0;
+  intsize = sizeof(int);
+  hascache = false;
+}
+
+/*
 InvFPDocList::InvFPDocList(int id, int len){
   size = pow(2,DEFAULT);
   begin = (int*) malloc(size);
@@ -18,6 +29,7 @@ InvFPDocList::InvFPDocList(int id, int len){
 	df = 0;
   hascache = false;
 }
+*/
 
 InvFPDocList::InvFPDocList(int id, int listlen, int* list, int fr, int* ldocid, int len){
   intsize = sizeof(int);
@@ -69,12 +81,18 @@ InvFPDocList::InvFPDocList(MemCache* mc, int id, int len, int docid, int locatio
 }
 
 InvFPDocList::~InvFPDocList() {
-  if (!hascache) {
-    free(begin);
-  }
+/*  if (hascache) {
+    int pow = logb2(size);
+      cache->freeMem(begin, pow);      
+  } */
 }
 
 void InvFPDocList::setList(int id, int listlen, int* list, int fr, int* ldocid, int len){
+  if (hascache) {
+/*    int pow = logb2(size);
+      cache->freeMem(begin, pow);   
+    */
+  } 
   size = listlen * intsize;
   begin = list;
   end = begin + listlen;

@@ -2,26 +2,31 @@
 
 InvFPIndexReader::InvFPIndexReader() {
   reader = NULL;
-  current = new InvFPDocList(-1,0);
+  list = NULL;
+  current = new InvFPDocList();
 }
 
 InvFPIndexReader::InvFPIndexReader(string fname) {
 	//	fprintf(stderr, "opening %s to read", fname.c_str());
   //fprintf(stderr, "string\n");
 	reader = fopen(fname.c_str(), "rb");
-  current = new InvFPDocList(-1,0);
+  current = new InvFPDocList();
+  list = NULL;
 }
 
 InvFPIndexReader::InvFPIndexReader(char* fname) {
 	//	fprintf(stderr, "opening %s to read", fname.c_str());
   //fprintf(stderr, "char*\n");
 	reader = fopen(fname, "rb");
-  current = new InvFPDocList(-1,0);
+  current = new InvFPDocList();
+  list = NULL;
 }
 
 InvFPIndexReader::~InvFPIndexReader() {
   delete(current);
   fclose(reader);
+  if (list != NULL)
+    free(list);
 }
 
 void InvFPIndexReader::setFStream(FILE* fstream) {
@@ -44,11 +49,13 @@ bool InvFPIndexReader::EOIndex() {
 InvFPDocList* InvFPIndexReader::readNextList() {
   //	fprintf(stderr, "reading word\n");
   //	free(word);
-  //if (list != NULL)
-  //  free(list);
-  //llength = 0;
+  if (list != NULL) {
+    free(list);
+    list = NULL;
+  }
 
-	DOCID_T* list;
+  //llength = 0;
+	
 	int llength;
   TERMID_T termid;
 

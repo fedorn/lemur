@@ -15,13 +15,14 @@ InvFPPushIndex::InvFPPushIndex(char* prefix, int cachesize, DOCID_T startdocid) 
   sprintf(docfname, "%s.dtlist", name);
   fprintf(stderr, "file name is %s\n.", docfname);
   writetlist = fopen(docfname, "wb");
-  //  delete[namelen+7](docfname);
+  delete[](docfname);
   tcount = tidcount = 0;
 }
 
 InvFPPushIndex::~InvFPPushIndex() {
   fclose(writetlist);
   delete(cache);
+  free(name);
 }
 
 void InvFPPushIndex::setName(char* prefix) {
@@ -35,6 +36,7 @@ void InvFPPushIndex::setName(char* prefix) {
 bool InvFPPushIndex::beginDoc(DocumentProps* dp){
   if (dp == NULL)
     return false;
+
   //strdup here necessary?
   char* id = strdup(dp->stringID());
   docIDs.push_back(id);
@@ -127,6 +129,7 @@ void InvFPPushIndex::endCollection(CollectionProps* cp){
   // merge them
   InvFPIndexMerge* merger = new InvFPIndexMerge(&tempfiles);
   merger->merge(name);
+  delete(merger);
 }
 
 void InvFPPushIndex::writeDocIDs() {
