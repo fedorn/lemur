@@ -15,8 +15,10 @@
 
 class InvFPDocList: public DocInfoList {
 public:
-  /// constructor for this list using malloc for its own memory
-  InvFPDocList(int id, int len);
+  InvFPDocList();
+
+  // constructor for this list using malloc for its own memory
+  //InvFPDocList(int id, int len);
   /// constructors for this list getting memory from a MemCache
   InvFPDocList(MemCache* mc, int id, int len);  
   InvFPDocList(MemCache* mc, int id, int len, int docid, int location);
