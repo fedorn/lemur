@@ -15,7 +15,6 @@
 #include "StringQuery.hpp"
 
 #include "Param.hpp"
-#include "RetParamManager.hpp"
 
 // Open the database.
 void
@@ -33,40 +32,7 @@ LemurDBManager::open(char * dbname) {
   accumulator = new ArrayAccumulator(index->docCount());
   results = new IndexedRealVector(index->docCount());
   
-  // Create the retrieval method
-  switch (LemurParameter::mod) {
-
-  case LemurParameter::TFIDF: 
-    model = new TFIDFRetMethod(*index, *accumulator);
-    TFIDFParameter::get();
-    ((TFIDFRetMethod *)model)->setDocTFParam(TFIDFParameter::docTFPrm);
-    ((TFIDFRetMethod *)model)->setQueryTFParam(TFIDFParameter::qryTFPrm);
-    ((TFIDFRetMethod *)model)->setFeedbackParam(TFIDFParameter::fbPrm);
-    break;
-  case LemurParameter::OKAPI:
-    model = new OkapiRetMethod(*index, *accumulator);
-    OkapiParameter::get();
-    ((OkapiRetMethod *)model)->setTFParam(OkapiParameter::tfPrm);
-    ((OkapiRetMethod *)model)->setFeedbackParam(OkapiParameter::fbPrm);
-    break;
-  case LemurParameter::KL:
-    SimpleKLParameter::get();
-    model = new SimpleKLRetMethod(*index, 
-				  ParamGetString("smoothSupportFile"), 
-				  *accumulator);
-    ((SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
-    ((SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
-    break;
-//    case LemurParameter::CORI:
-//      CORIParameter::get();
-//      model = new CORIRetMethod(*index, *accumulator,
-//                                CORIParameter::collectionCounts);
-//      break;
-  default:
-    throw Exception("RetrievalExp", "unknown retModel parameter");
-    break;
-    
-  }
+  model = RetMethodManager::createModel(index, (ArrayAccumulator*)accumulator, LemurParameter::mod);
 
   // Why did I comment this out?
   //  ParamPopFile();
