@@ -71,9 +71,11 @@ input variables:
 #include "Param.hpp"
 #include "String.hpp"
 #include "BasicDocStream.hpp"
+#include "InvFPIndex.hpp"
 
 #define MIN(a,b) (a<=b) ? a : b
-String inputLemur = ParamGetString("lemur");
+String inputIndexTOC = ParamGetString("indexTOC");
+String inputIndexer = ParamGetString("indexer", "Basic");
 String inputQuerySet = ParamGetString("querySet");
 String inputResultFile = ParamGetString("resultFile");
 int inputResultCount = ParamGetInt("resultCount",1000);
@@ -93,7 +95,7 @@ double inputQueryBM25B = ParamGetDouble("query.bm25B",0.5);
 double inputQueryBM25AvgLen = ParamGetDouble("query.bm25AvgLen",20);
 
 
-BasicIndex lemur;
+Index *lemur;
 
 void PrintResults(ofstream &res, char *queryID, IndexedRealVector *sortedScores)
 {
@@ -104,7 +106,7 @@ void PrintResults(ofstream &res, char *queryID, IndexedRealVector *sortedScores)
       break;
     } else {
       res << queryID << " "  
-	  << lemur.document((*j).ind) << " " 
+	  << lemur->document((*j).ind) << " " 
 	  <<  (*j).val << endl;
       count++;
 
@@ -115,12 +117,26 @@ void PrintResults(ofstream &res, char *queryID, IndexedRealVector *sortedScores)
 
 
 int AppMain(int argc, char *argv[]) {
+  
+  char indexTOC[300];
 
-  lemur.open(inputLemur);
+  strcpy(indexTOC, inputIndexTOC);
+
+  if (!strcmp("InvFP", inputIndexer)) {
+    lemur = new InvFPIndex();
+    //    strcat(indexTOC,".toc");
+    cerr << "Indexer is InvFP\n";
+  } else { // default is BasicIndex
+    cerr << "Assuming Basic Indexer ...\n";
+    lemur = new BasicIndex();
+    strcat(indexTOC,".lemur");
+  }
+
+  lemur->open(indexTOC);
 
   // set the right average doc length
   if (!inputDocBM25AvgLen) {
-    inputDocBM25AvgLen = (int)lemur.docLengthAvg();
+    inputDocBM25AvgLen = (int)lemur->docLengthAvg();
   }
 
 
@@ -130,7 +146,7 @@ int AppMain(int argc, char *argv[]) {
   ofstream result (inputResultFile);
   BasicDocStream queryStream(inputQuerySet);
 
-  int numTerms = lemur.termCountUnique();
+  int numTerms = lemur->termCountUnique();
   static double *queryVec  = new double[numTerms];
   IndexedRealVector scores(0);
 
@@ -156,26 +172,30 @@ int AppMain(int argc, char *argv[]) {
     doc->startTermIteration();
     while (doc->hasMore()) {
       TokenTerm *t = doc->nextTerm();
-      queryVec[lemur.term(t->spelling())]++;
-      querySum ++;
+      if (lemur->term(t->spelling())>0) {
+	queryVec[lemur->term(t->spelling())]++;
+	querySum ++;
+      } else {
+	cerr << "Out of vocabulary:" << t->spelling() << "  [ignored]\n";
+      }
     }
 
 
 
 
     TFIDFModel::retrieve(queryVec, querySum, 
-			 lemur, scores, queryWeighting, docWeighting);  
+			 *lemur, scores, queryWeighting, docWeighting);  
     
     scores.Sort();
     if (inputFeedbackDocCount>0) {
       cerr << "doing feedback...\n";
       TFIDFModel::computeFeedbackQuery(queryVec, &scores,
-				       lemur, docWeighting, 
+				       *lemur, docWeighting, 
 				       inputFeedbackDocCount, 
 				       inputFeedbackTermCount, 
 				       inputFeedbackPosCoeff);      
       TFIDFModel::retrieve(queryVec, querySum, 
-			   lemur, scores, queryWeighting, docWeighting, true);  
+			   *lemur, scores, queryWeighting, docWeighting, true);  
       scores.Sort();
 
     }
