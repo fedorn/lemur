@@ -32,6 +32,8 @@ public:
   }
 
   bool listen( unsigned int port ) {
+    int result;
+ 
     lemur_compat::initializeNetwork();
     _socket = ::socket( AF_INET, SOCK_STREAM, 0 );
 
@@ -41,12 +43,17 @@ public:
     sa.sin_family = AF_INET;
     memset( &sa.sin_zero, 0, sizeof sa.sin_zero );
 
-    ::bind( _socket, (const sockaddr*) &sa, sizeof sa );
-    int result = ::listen( _socket, 8 );
+    result = ::bind( _socket, (const sockaddr*) &sa, sizeof sa );
+    if( result ) {
+      close();
+      LEMUR_THROW( LEMUR_IO_ERROR, "Wasn't able to bind port " + i64_to_string(port) );
+    }
+  
+    result = ::listen( _socket, 8 );
 
     if( result ) {
       close();
-      return false;
+      LEMUR_THROW( LEMUR_IO_ERROR, "Wasn't able to listen on port " + i64_to_string(port) );
     }
 
     return true;
