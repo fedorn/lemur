@@ -1,6 +1,6 @@
 
-#define min_fcb_lc 19176
-#define buffer_lc 2072
+#define min_fcb_lc 44620
+#define buffer_lc 4120
 
 int keyrec_lc (void *pointer);
 int set_bof   (char *fcb);
@@ -18,6 +18,6 @@ int next_rec  (char *fcb, char *key, int *key_lc, int max_key_lc,
 int prev_rec  (char *fcb, char *key, int *key_lc, int max_key_lc,
                           void *rec, int *rec_lc, int max_rec_lc);
 int copy_rec  (char *fcb, void *pointer, void *rec, int *lc, int max_lc);
-int open_key  (char *fcb, char *id, int fcb_lc);
+int open_key  (char *fcb, char *id, int fcb_lc, int read_only);
 int create_key(char *fcb, char *id, int fcb_lc);
 int close_key (char *fcb);

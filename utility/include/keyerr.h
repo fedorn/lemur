@@ -30,3 +30,5 @@
 #define move_rec_err 29
 #define bad_close_err 30
 #define ix_struct_err 31
+#define read_only_err 32
+#define repl_max_key_err 33

@@ -8,24 +8,24 @@
 #define current_version  5           /* version of keyed file software */
 #define maxkey_lc 512                /* maximum key length */
 #define max_prefix_lc 255
-#define key_ptrs_per_block 506       /* number of key_ptrs in index block */
-#define random_split_lc 880          /* chars to be freed on random split */
+#define key_ptrs_per_block 1018 /*506*/       /* number of key_ptrs in index block */
 #define level_zero 0                 /* level of index leaves */
 #define level_one 1                  /* level immediately above leaves */
 #define long_lc   sizeof(long)       /* lc of a long int */
-#define min_buffer_cnt 4             /* default number of buffers allocated */
+#define min_buffer_cnt 8             /* default number of buffers allocated */
 #define max_buffer_cnt 1024          /* max buffers allowed */
 #define buf_hash_load_factor 3       /* hash table is>=this times buffers alloc,*/
 #define max_level 32                 /* number of index block levels */
-/* fib_lc is set to size of fcb minus buffers and segment_ix table */
-/*   it's still longer than it needs to be */
-#define fib_lc min_fcb_lc-(min_buffer_cnt*buffer_lc)-(max_segments*sizeof(int))
+#define fib_lc 6432                  /* length of fixed portion of fib ****hand computed *****/
+#define fib_blocks ((fib_lc-1)/block_lc+1)
+/*#define max_segment_lc 4194304 */      /* 1024 blocks of 4096 each */
 #define max_segment_lc max_long      /* max length of a file segment */
 #define max_segments 1024            /* max number of file segments */
 #define max_files 10                 /* max number of open files */
 #define max_filename_lc 128          /* max length of a file name */
 #define max_extension_lc 40          /* max length of file name extension */
 #define rec_allocation_unit 8        /* user rec allocation unit */
+#define block_allocation_unit 16     /* # blocks to allocate at a time */
 #define user_ix 0
 #define free_rec_ix 1
 #define free_lc_ix 2
@@ -71,9 +71,10 @@ struct ix_block {                  /* block is the disk resident image of */
     chars_in_use;               /* chars in key/pointer pool, does not */
                                 /*   include length of key_ptr_t entries */
   unsigned char
-    index_type,
-    prefix_lc,
-    level;
+    index_type,                 /* user, free_lc, or free_rec */
+    prefix_lc,                  /* lc of prefix removed from all keys in block */
+    free_block_cnt,             /* number of free blocks if on free_block_chain */
+    level;                      /* level of block */
   struct leveln_pntr
     next,prev;
   struct key_ptr_t              /* key_ptrs are inserted from 0, keys and */
@@ -101,6 +102,16 @@ typedef union level0orn_pntr {
   struct leveln_pntr     pn;
 } levelx_pntr;
 
+/*typedef union int_or_byte {
+  int           as_int;
+  unsigned char as_byte[sizeof(int)];
+} int_alias;
+
+typedef union short_or_byte {
+  short         as_short;
+  unsigned char as_byte[sizeof(short)];
+} short_alias;
+*/
 
 /* Buffer handling.  Buffers contain the disk image of an index or    */
 /*   freespace block */
@@ -115,7 +126,7 @@ typedef union level0orn_pntr {
 struct buffer_type {            /* buffer is the memory resident image of */
                                 /* a disk block */
   unsigned char
-    locked,
+    lock_cnt,
     modified,
     notused;
   int
@@ -155,6 +166,7 @@ struct fcb {
   boolean
     file_ok;
   struct leveln_pntr
+    first_free_block[max_level][max_index],/* points to start of empty block chain */
     first_at_level[max_level][max_index],  /* block containing lowest key at level */
     last_pntr[max_level][max_index];       /* last pointer at each level */
   long
@@ -166,14 +178,17 @@ struct fcb {
     file_name[max_filename_lc],
     file_extension[max_extension_lc];
   unsigned char
+    byte_swapping_required,     /* true means swap bytes on I/O */
     trace,                      /* true means trace execution */
-    trace_freespace;
+    trace_freespace,            /* true means trace space management */
+    read_only;                  /* true means file is read only */
   int
     open_file_cnt,              /* number of files actually open */
     open_segment[max_files],    /* segment to which each file is open */
     file_age[max_files],        /* age of each open file  */
     oldest_buffer,              /* first buffer in LRU buffer list */
-    youngest_buffer;            /* last buffer in LRU buffer list */
+    youngest_buffer,            /* last buffer in LRU buffer list */
+    block_shift;                /* log2(block_lc) */
   FILE
     *open_file[max_files];      /* pointers to open files */
 
