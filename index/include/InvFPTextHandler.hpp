@@ -26,7 +26,7 @@ class InvFPTextHandler : public TextHandler {
 public:
   /// Create a InvFPTextHandler with index name filename 
   /// (minus the .ifp extension) and specified buffer size.
-  InvFPTextHandler(char * filename, int bufferSize);
+  InvFPTextHandler(char * filename, int bufferSize, bool countStopWds = false);
   ~InvFPTextHandler();
 
   /// Pushes the doc into the InvFPPushIndex.
@@ -48,6 +48,11 @@ private:
   InvFPTerm * term;
   /// Keeps track of document length.
   int docLength;
+  /// Keeps track of term positions.
+  int pos;
+  /// Indicates whether or not to count stop words in doc length
+  bool countStopWds;
+
   /// Indicates whether object is before first doc
   /// true = yes, false = foundDoc has been called once.
   bool first;

@@ -13,13 +13,15 @@
 
 
 
-InvFPTextHandler::InvFPTextHandler(char * filename, int bufferSize) {
+InvFPTextHandler::InvFPTextHandler(char * filename, int bufferSize,
+				   bool countStopWords) {
   // create index and helper objects  
   index = new InvFPPushIndex(filename, bufferSize);
   dp = new DocumentProps();
   term = new InvFPTerm();
 
   docLength = 0;
+  pos = 0;
   // set state that is on first doc
   bool first = true;
 }
@@ -52,6 +54,7 @@ InvFPTextHandler::handleDoc(char * docno) {
   // begin the new document
   dp->length(0);  
   docLength = 0;
+  pos = 0;
   dp->stringID(docno);
   index->beginDoc(dp);
   return docno;
@@ -66,10 +69,16 @@ InvFPTextHandler::handleWord(char * word) {
       // index the word
       term->strLength(len);
       term->spelling(word);
-      term->position(docLength);
+      term->position(pos);
       index->addTerm(*term);
       docLength++;
-    }    
+      pos++;
+    }
+  } else {
+    if (countStopWds) docLength++;
+    pos++;
   }
   return word;
 }
+
+
