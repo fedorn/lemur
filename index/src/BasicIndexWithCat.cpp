@@ -3,6 +3,7 @@
 const char BasicIndexWithCat::OOVSTRING[]="[OOV]";
  
 #include "Exception.hpp"
+#include <iostream>
 
 BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &categoryIndex, bool catIsTerm):
     baseIndex(&wordIndex), catIndex(&categoryIndex), catAsTerm(catIsTerm) 
@@ -40,9 +41,11 @@ BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &categoryIndex, boo
 void BasicIndexWithCat::startCatIDIteration(int docID)
 {
   if (catAsTerm) {
+    if(base2cat[docID]==catIndex->term(OOVSTRING)){ tmInfoBuffer=NULL; return; }
     tmInfoBuffer = catIndex->termInfoList(base2cat[docID]);
     tmInfoBuffer->startIteration();
-  } else {
+  } else { 
+    if(base2cat[docID]==catIndex->document(OOVSTRING)){ docInfoBuffer=NULL; return; }
     docInfoBuffer = catIndex->docInfoList(base2cat[docID]);
     docInfoBuffer->startIteration();
   }
@@ -50,10 +53,12 @@ void BasicIndexWithCat::startCatIDIteration(int docID)
 }
 
 bool BasicIndexWithCat::hasMoreCatID()
-{
+{ 
   if (catAsTerm) {
+    if(!tmInfoBuffer) return false;
     return (tmInfoBuffer->hasMore());
   } else {
+    if(!docInfoBuffer) return false;
     return (docInfoBuffer->hasMore());
   }
 }
