@@ -222,7 +222,16 @@ void process(QueryRep *qr, char *qid, ResultFile *judgments, RetrievalMethod *me
 /// A retrieval evaluation program
 int AppMain(int argc, char *argv[]) {
   
-  Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
+
+  Index  *ind;
+
+  try {
+    ind  = IndexManager::openIndex(RetrievalParameter::databaseIndex);
+  } 
+  catch (Exception &ex) {
+    ex.writeMessage();
+    throw Exception("RelFBEval", "Can't open index, check parameter index");
+  }
 
 
   ofstream result(RetrievalParameter::resultFile);
@@ -234,7 +243,7 @@ int AppMain(int argc, char *argv[]) {
   if (LocalParameter::useWorkingSet) {
     workSetStr = new ifstream(LocalParameter::workSetFile, ios::in);
     if (workSetStr->fail()) {
-      throw Exception("RetEval", "can't open working set file");
+      throw Exception("RelFBEval", "can't open working set file");
     }
     docPool = new ResultFile(false); // working set is always simple format
     docPool->openForRead(*workSetStr, *ind);
@@ -281,15 +290,22 @@ int AppMain(int argc, char *argv[]) {
     ((SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
     break;
   default:
-    throw Exception("RetrievalExp", "unknown retModel parameter");
+    throw Exception("RelFBEval", "unknown retModel parameter");
     break;
     
   }
 
 
   DocStream *qryStream;
+  try {
+    qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+  } 
+  catch (Exception &ex) {
+    ex.writeMessage(cerr);
+    throw Exception("RelFBEval", "Can't open query file, check parameter textQuery");
+  }
 
-  qryStream= new BasicDocStream(RetrievalParameter::textQuerySet);
+
 
   char qid[1024];
 

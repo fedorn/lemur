@@ -138,9 +138,18 @@ void updateQueryModel(QueryRep *qr, char *qid, ResultFile &resFile, RetrievalMet
 /// A query model estimation program
 
 int AppMain(int argc, char *argv[]) {
-  
-  Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
 
+
+  Index  *ind;
+
+  try {
+    ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
+  } 
+  catch (Exception &ex) {
+    ex.writeMessage();
+    throw Exception("GenerateQueryModel", "Can't open index, check parameter index");
+  }
+ 
 
   ArrayAccumulator accumulator(ind->docCount());
 
@@ -167,7 +176,12 @@ int AppMain(int argc, char *argv[]) {
   
   if (useOrigQuery) {
     cerr << "### Expanding the original text query ...\n";
-    qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+    try {
+      qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+    } catch (Exception &ex) {
+       ex.writeMessage(cerr);
+       throw Exception("GenerateQueryModel", "Can't open query file, check parameter textQuery");
+    }
   } else {
     cerr << "### Expanding the saved initial query ...\n";
     initQIFS = new ifstream(LocalParameter::initQuery);

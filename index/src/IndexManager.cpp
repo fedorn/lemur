@@ -18,8 +18,7 @@ Index *IndexManager::openIndex(const char *indexTOCFile)
   int len = strlen(indexTOCFile);
   if (!(len>4 && indexTOCFile[len-4]=='.')) {
     ; // it must have format .xxx 
-    cerr << "Index file must have format .xxx" << endl;
-    exit(0);
+    throw Exception ("IndexManager","Index file must have format .xxx");
   }
 
   Index *ind;

@@ -80,13 +80,24 @@ void GetAppParam()
 /// A query model estimation program
 int AppMain(int argc, char *argv[]) {
   
-  Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
+
+  Index  *ind;
+
+  try {
+    ind =  IndexManager::openIndex(RetrievalParameter::databaseIndex);
+  } 
+  catch (Exception &ex) {
+    ex.writeMessage();
+    throw Exception("QueryModelEval", "Can't open index, check parameter index");
+  }
+
+
   ifstream qmodel(LocalParameter::queryModel, ios::in);
 
   ArrayAccumulator accumulator(ind->docCount());
 
   if (qmodel.fail()) {
-    throw Exception("AppMain", "can't open the query model file, check the value for parameter queryModel");
+    throw Exception("QueryModelEval", "can't open the query model file, check the value for parameter queryModel");
   }
   
   ofstream result(RetrievalParameter::resultFile);

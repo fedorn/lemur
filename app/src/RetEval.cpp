@@ -178,8 +178,27 @@ void GetAppParam()
 /// A retrieval evaluation program
 int AppMain(int argc, char *argv[]) {
   
-  Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
-  DocStream *qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+  Index  *ind;
+
+  try {
+    ind  = IndexManager::openIndex(RetrievalParameter::databaseIndex);
+  } 
+  catch (Exception &ex) {
+    ex.writeMessage();
+    throw Exception("RelEval", "Can't open index, check parameter index");
+  }
+
+  
+  DocStream *qryStream;
+  try {
+    qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+  } 
+  catch (Exception &ex) {
+    ex.writeMessage(cerr);
+    throw Exception("RetEval", "Can't open query file, check parameter textQuery");
+  }
+
+
 
   ofstream result(RetrievalParameter::resultFile);
   ResultFile resFile(LocalParameter::TRECResultFormat);
@@ -225,7 +244,7 @@ int AppMain(int argc, char *argv[]) {
     ((SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
     break;
   default:
-    throw Exception("RetrievalExp", "unknown retModel parameter");
+    throw Exception("RetEval", "unknown retModel parameter");
     break;
     
   }

@@ -88,8 +88,18 @@ void GetAppParam()
 int AppMain(int argc, char * argv[]) {
   
   BasicIndex lemur(new GammaCompress());
-  BasicDocStream dstream(LocalParameter::inputFile);
-  lemur.build(&dstream, LocalParameter::inputFile, LocalParameter::outputPrefix, LocalParameter::maxDocuments, LocalParameter::maxMemory);
+
+  BasicDocStream *dstream;
+  try {
+    dstream = new BasicDocStream(LocalParameter::inputFile);
+  } 
+  catch (Exception &ex) {
+    ex.writeMessage();
+    throw Exception("BuildBasicIndex", "Can't open document source file, check parameter inputFile");
+  }
+
+
+  lemur.build(dstream, LocalParameter::inputFile, LocalParameter::outputPrefix, LocalParameter::maxDocuments, LocalParameter::maxMemory);
 
   return 0;
 }

@@ -70,8 +70,16 @@ int AppMain(int argc, char *argv[]) {
 
   ofstream ofs;
 
-  Index * ind = IndexManager::openIndex(LocalParameter::index);
 
+  Index * ind;
+
+  try {
+    ind = IndexManager::openIndex(LocalParameter::index);
+  } 
+  catch (Exception &ex) {
+    ex.writeMessage();
+    throw Exception("GenerateSmoothSupport", "Can't open index, check parameter index");
+  }
 
   ofs.open(LocalParameter::smoothSupportFile);
 
