@@ -153,8 +153,6 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
     offset=0;
     working.clear();
     least(&readers, &working);
-    list = readers[working.front()]->list;
-    termid = list->termID();
 
    // make sure the ftell is accurate
     indexfile.flush();
@@ -166,8 +164,9 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
     prev = readers[*iter]->list;
     ll = prev->length();
     df = prev->docFreq();
+    termid = prev->termID();
 
-    for (iter=iter+1; iter!=working.end(); iter++) {
+    for (iter++; iter!=working.end(); iter++) {
       list = readers[*iter]->list;
       ll += list->length();
       df += list->docFreq();
@@ -253,7 +252,7 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
 
     }  // while prev hasMore
 
-    for (iter=iter++; iter!=working.end(); iter++) {
+    for (iter++; iter!=working.end(); iter++) {
       list = readers[*iter]->list;
       list->startIteration();
 
@@ -424,8 +423,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
 
   for (i=0;i<files->size();i++) {
     readers.push_back(new IndexReader);
-    //    readers.push_back(new InvFPIndexReader(*p) );
-    //    readers[i++]->readNextList();
     readers[i]->reader = new ifstream();
     setbuf(readers[i]->reader, bufptr, READBUFSIZE);
     bufptr += READBUFSIZE;
@@ -450,7 +447,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
   char* lookup = (char*)malloc(namelen+strlen(INVLOOKUP));
   sprintf(lookup, "%s%s", name, INVLOOKUP);
 
-//  FILE* indexfile = fopen(indexname, "wb");
   ofstream indexfile;
   indexfile.open(indexname, ios::binary | ios::out);
   FILE* listing = fopen(lookup, "wb");
@@ -470,12 +466,8 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     offset=0;
     working.clear();
     least(&readers, &working);
-    list = readers[working.front()]->list;
-//    fprintf(indexfile, "%d ", list->termID());
-    termid = list->termID();
 
    // make sure the ftell is accurate
-//    fflush(indexfile);
     indexfile.flush();
 
     // first, add up the list lengths and df.  
@@ -485,8 +477,9 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     prev = readers[*iter]->list;
     ll = prev->length();
     df = prev->docFreq();
+    termid = prev->termID();
 
-    for (iter=iter+1; iter!=working.end(); iter++) {
+    for (iter++; iter!=working.end(); iter++) {
       list = readers[*iter]->list;
       ll += list->length();
       df += list->docFreq();
@@ -566,7 +559,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       if (!prev->hasMore()) {
         finder = tfs.find(info->docID());
         if (finder != tfs.end()) {
-//          fprintf(indexfile, "%d %d ", info->docID(), info->termCount()+finder->second);
           tf += finder->second;
         }
       }
@@ -574,16 +566,9 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       indexfile.write((const char*) &docid, sizeof(DOCID_T));
       indexfile.write((const char*) &tf, sizeof(int));
       indexfile.write((const char*) locs, sizeof(LOC_T) * info->termCount());
-
-      /*
-      for (k=0;k<info->termCount();k++) {
-        fprintf(indexfile, "%d ", locs[k]);
-      }
-      */
-      
     }  // while prev hasMore
 
-    for (iter=iter++; iter!=working.end(); iter++) {
+    for (iter++; iter!=working.end(); iter++) {
       list = readers[*iter]->list;
       list->startIteration();
 
@@ -597,7 +582,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
         if (!list->hasMore()) {
           finder = tfs.find(info->docID());
           if (finder != tfs.end()) {
-//          fprintf(indexfile, "%d %d ", info->docID(), info->termCount()+finder->second);
             tf += finder->second;
           }
         }
@@ -606,12 +590,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       }
       locs = info->positions();
       indexfile.write((const char*) locs, sizeof(LOC_T) * info->termCount());
-
-        /*
-        for (k=0;k<info->termCount();k++) {
-        fprintf(indexfile, "%d ", locs[k]);
-      }
-      */
 
     while (list->hasMore()) {
 //    info = static_cast< InvFPDocInfo* > (list->nextEntry());
@@ -633,11 +611,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       indexfile.write((const char*) &tf, sizeof(int));
       indexfile.write((const char*) locs, sizeof(LOC_T) * info->termCount());
 
-      /*
-      for (k=0;k<info->termCount();k++) {
-        fprintf(indexfile, "%d ", locs[k]);
-      }
-      */
       } 
       prev = list;
     }
@@ -662,15 +635,12 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
   if (readers.size() != 0) {
     IndexReader* myreader = readers.front();
     // dump it out
-    // write the current list
-//    fprintf(indexfile, "%d %d ", myreader->list->termID(), myreader->list->length()+1);
 
     termid = myreader->list->termID();
     ll = myreader->list->length();
     df = myreader->list->docFreq();
     diff = myreader->list->curDocIDdiff();
 
-    //fflush(indexfile);
     indexfile.flush();
     filelen = (long)indexfile.tellp();
     if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
@@ -683,11 +653,9 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     }
     fid = invfiles.size()-1;
 
-//    fprintf(listing, "%d %d %d %d\n", myreader->list->termID(), fid, ftell(indexfile), myreader->list->length()+1);
     fprintf(listing, "%d %d %d %d %d ", termid, fid, filelen, ll-(df*2), df);
     
     indexfile.write((const char*)&termid, sizeof(TERMID_T));
-//    fprintf(indexfile, "%d ", myreader->list->docFreq());   
     indexfile.write((const char*)&df, sizeof(int));     
     indexfile.write((const char*)&diff, sizeof(int));
     indexfile.write((const char*)&ll, sizeof(int));
@@ -696,15 +664,10 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     while (myreader->list->hasMore()) {
 //    info = static_cast< InvFPDocInfo* > (myreader->list->nextEntry());
       myreader->list->nextEntry(info);
-//      fprintf(indexfile, "%d %d ", info->docID(), info->termCount());
       docid = info->docID();
       tf = info->termCount();
       locs = info->positions();
-    /*
-      for (k=0;k<info->termCount();k++) {
-        fprintf(indexfile, "%d ", locs[k]);
-      }
-      */
+
       indexfile.write((const char*)&docid, sizeof(DOCID_T));
       indexfile.write((const char*)&tf, sizeof(int));
       indexfile.write((const char*)locs, sizeof(LOC_T) * tf);
@@ -713,7 +676,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
 
     //write the rest 
     while (myreader->list->binRead(*(myreader->reader)) ){
-//    fprintf(indexfile, "%d %d ", myreader->list->termID(), myreader->list->length()+1);
       termid = myreader->list->termID();
       ll = myreader->list->length();
       df = myreader->list->docFreq();
@@ -732,33 +694,23 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       }
       fid = invfiles.size()-1;
 
-  //    fprintf(listing, "%d %d %d %d\n", myreader->list->termID(), fid, ftell(indexfile), myreader->list->length()+1);
       fprintf(listing, "%d %d %d %d %d ", termid, fid, filelen, ll-(df*2), df);
 
 
       indexfile.write((const char*)&termid, sizeof(TERMID_T));
-//    fprintf(indexfile, "%d ", myreader->list->docFreq());     
       indexfile.write((const char*)&df, sizeof(int));     
       indexfile.write((const char*)&diff, sizeof(int));
       indexfile.write((const char*)&ll, sizeof(int));
 
       // write the listing
-      //fflush(indexfile);
-  //    fprintf(indexfile, "%d ", myreader->list->docFreq());
-
       myreader->list->startIteration();
       while (myreader->list->hasMore()) {
   //    info = static_cast< InvFPDocInfo* > (myreader->list->nextEntry());
         myreader->list->nextEntry(info);
-  //      fprintf(indexfile, "%d %d ", info->docID(), info->termCount());
         docid = info->docID();
         tf = info->termCount();
         locs = info->positions();
-      /*
-        for (k=0;k<info->termCount();k++) {
-          fprintf(indexfile, "%d ", locs[k]);
-        }
-        */
+
         indexfile.write((const char*)&docid, sizeof(DOCID_T));
         indexfile.write((const char*)&tf, sizeof(int));
         indexfile.write((const char*)locs, sizeof(LOC_T) * tf);
@@ -773,7 +725,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     readers.clear();
   
   } // if still a file
-//  fclose(indexfile);
   indexfile.close();
   fclose(listing);
 
