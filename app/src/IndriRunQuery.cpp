@@ -163,6 +163,7 @@ as <tt>-fbOrigWeight=number</tt> on the command line.</dd>
 
 #include "indri/QueryExpander.hpp"
 #include "indri/RMExpander.hpp"
+#include "indri/PonteExpander.hpp"
 
 #ifndef WIN32
 #include <sys/time.h>
@@ -216,10 +217,12 @@ int main(int argc, char * argv[]) {
 
     std::string queryString = param["query"];
     int resultsRequested = param.get( "count", 1000 );
+    int initialRequested = param.get( "fbDocs", resultsRequested );
     int fbDocs = param.get( "fbDocs", 0 );
     string runID = param.get( "runID", "indri" );
     int queryOffset = param.get( "queryOffset" , 0 );
     int trecFormat = param.get( "trecFormat" , 0 );
+    bool printQuery = param.get( "printQuery", true );
 
     Parameters queries = param[ "query" ];
 
@@ -238,9 +241,9 @@ int main(int argc, char * argv[]) {
 
     QueryExpander * qe = NULL;
 
-    if( fbDocs )
+    if( fbDocs ) {
       qe = new RMExpander( &env, param );
-
+    }
     // actually perform the query (in parallel for servers, in series for
     // the local databases)
     std::vector<ScoredExtentResult> results;
@@ -251,14 +254,21 @@ int main(int argc, char * argv[]) {
 
     for( int query = 0; query < queries.size(); query++ ) {
       std::string queryString = std::string( queries[ query ] );
+      std::string expandedQuery;
 
-      if( qe )
-        results = qe->runExpandedQuery( queryString , resultsRequested );
-      else
-        results = env.runQuery( queryString, resultsRequested );
+      if( printQuery ) std::cout << "# query: " << queryString << std::endl;
+
+      results = env.runQuery( queryString, initialRequested );
+
+      if( qe ) {
+        expandedQuery = qe->expand( queryString, results );
+        if( printQuery ) std::cout << "# expanded: " << expandedQuery << std::endl;
+        results = env.runQuery( expandedQuery, resultsRequested );
+      }
 
       if( param.get( "printDocuments", 0 ) || param.get( "printPassages", 0 ) ) {
         documents = env.documents( results );
+        documentNames.clear();
 
         for( unsigned int i=0; i<results.size(); i++ ) {
           ParsedDocument* doc = documents[i];
