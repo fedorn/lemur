@@ -1,7 +1,7 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on lemur_retrieval.dsp
 !IF "$(CFG)" == ""
-CFG=lemur_retrieval - Win32 Release
-!MESSAGE No configuration specified. Defaulting to lemur_retrieval - Win32 Release.
+CFG=lemur_retrieval - Win32 Debug
+!MESSAGE No configuration specified. Defaulting to lemur_retrieval - Win32 Debug.
 !ENDIF 
 
 !IF "$(CFG)" != "lemur_retrieval - Win32 Release" && "$(CFG)" != "lemur_retrieval - Win32 Debug"
@@ -43,6 +43,8 @@ CLEAN :
 	-@erase "$(INTDIR)\IndexedReal.obj"
 	-@erase "$(INTDIR)\InQueryRetMethod.obj"
 	-@erase "$(INTDIR)\OkapiRetMethod.obj"
+	-@erase "$(INTDIR)\ProxInfo.obj"
+	-@erase "$(INTDIR)\QueryNode.obj"
 	-@erase "$(INTDIR)\ResultFile.obj"
 	-@erase "$(INTDIR)\RetMethodManager.obj"
 	-@erase "$(INTDIR)\RetrievalMethod.obj"
@@ -59,7 +61,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "retrieval\include" /I "langmod\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "langmod\include" /I "retrieval\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_retrieval.bsc" 
 BSC32_SBRS= \
@@ -73,6 +75,8 @@ LIB32_OBJS= \
 	"$(INTDIR)\IndexedReal.obj" \
 	"$(INTDIR)\InQueryRetMethod.obj" \
 	"$(INTDIR)\OkapiRetMethod.obj" \
+	"$(INTDIR)\ProxInfo.obj" \
+	"$(INTDIR)\QueryNode.obj" \
 	"$(INTDIR)\ResultFile.obj" \
 	"$(INTDIR)\RetMethodManager.obj" \
 	"$(INTDIR)\RetrievalMethod.obj" \
@@ -104,6 +108,8 @@ CLEAN :
 	-@erase "$(INTDIR)\IndexedReal.obj"
 	-@erase "$(INTDIR)\InQueryRetMethod.obj"
 	-@erase "$(INTDIR)\OkapiRetMethod.obj"
+	-@erase "$(INTDIR)\ProxInfo.obj"
+	-@erase "$(INTDIR)\QueryNode.obj"
 	-@erase "$(INTDIR)\ResultFile.obj"
 	-@erase "$(INTDIR)\RetMethodManager.obj"
 	-@erase "$(INTDIR)\RetrievalMethod.obj"
@@ -121,7 +127,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /I "retrieval\include" /I "langmod\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
+CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /I "langmod\include" /I "retrieval\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_retrieval.bsc" 
 BSC32_SBRS= \
@@ -135,6 +141,8 @@ LIB32_OBJS= \
 	"$(INTDIR)\IndexedReal.obj" \
 	"$(INTDIR)\InQueryRetMethod.obj" \
 	"$(INTDIR)\OkapiRetMethod.obj" \
+	"$(INTDIR)\ProxInfo.obj" \
+	"$(INTDIR)\QueryNode.obj" \
 	"$(INTDIR)\ResultFile.obj" \
 	"$(INTDIR)\RetMethodManager.obj" \
 	"$(INTDIR)\RetrievalMethod.obj" \
@@ -227,6 +235,18 @@ SOURCE=.\retrieval\src\InQueryRetMethod.cpp
 SOURCE=.\retrieval\src\OkapiRetMethod.cpp
 
 "$(INTDIR)\OkapiRetMethod.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\retrieval\src\ProxInfo.cpp
+
+"$(INTDIR)\ProxInfo.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\retrieval\src\QueryNode.cpp
+
+"$(INTDIR)\QueryNode.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
