@@ -185,8 +185,7 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
         else 
           tfs[info->docID()] = info->termCount();
       }
-
-      delete(info);
+      
       prev = list;        
     }
 
@@ -253,7 +252,6 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
       indexfile.write((const char*) &tf, sizeof(int));
       indexfile.write((const char*) locs, sizeof(LOC_T) * info->termCount());
 
-      delete(info);
     }  // while prev hasMore
 
     for (iter=iter++; iter!=working.end(); iter++) {
@@ -279,8 +277,6 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
       locs = info->positions();
       indexfile.write((const char*) locs, sizeof(LOC_T) * info->termCount());
 
-      delete(info);
-
     while (list->hasMore()) {
       info = static_cast< InvFPDocInfo* > (list->nextEntry());
       docid = info->docID();
@@ -299,7 +295,6 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
       indexfile.write((const char*) &tf, sizeof(int));
       indexfile.write((const char*) locs, sizeof(LOC_T) * info->termCount());
 
-      delete(info);
       } 
       prev = list;
     }
@@ -359,7 +354,6 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
       indexfile.write((const char*)&docid, sizeof(DOCID_T));
       indexfile.write((const char*)&tf, sizeof(int));
       indexfile.write((const char*)locs, sizeof(LOC_T) * tf);
-      delete(info);
     }
     myreader->list->resetFree();
 
@@ -397,7 +391,6 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
         indexfile.write((const char*)&docid, sizeof(DOCID_T));
         indexfile.write((const char*)&tf, sizeof(int));
         indexfile.write((const char*)locs, sizeof(LOC_T) * tf);
-        delete(info);
       }
       myreader->list->resetFree();
     } //while that file
@@ -507,7 +500,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
           tfs[info->docID()] = info->termCount();
       }
 
-      delete(info);
       prev = list;        
     }
 
@@ -590,7 +582,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       }
       */
       
-      delete(info);
     }  // while prev hasMore
 
     for (iter=iter++; iter!=working.end(); iter++) {
@@ -623,8 +614,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       }
       */
 
-      delete(info);
-
     while (list->hasMore()) {
       info = static_cast< InvFPDocInfo* > (list->nextEntry());
 //        list->nextEntry(info);
@@ -650,8 +639,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
         fprintf(indexfile, "%d ", locs[k]);
       }
       */
-
-      delete(info);
       } 
       prev = list;
     }
@@ -722,7 +709,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       indexfile.write((const char*)&docid, sizeof(DOCID_T));
       indexfile.write((const char*)&tf, sizeof(int));
       indexfile.write((const char*)locs, sizeof(LOC_T) * tf);
-      delete(info);
     }
     myreader->list->resetFree();
 
@@ -777,7 +763,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
         indexfile.write((const char*)&docid, sizeof(DOCID_T));
         indexfile.write((const char*)&tf, sizeof(int));
         indexfile.write((const char*)locs, sizeof(LOC_T) * tf);
-        delete(info);
       }
       myreader->list->resetFree();
     } //while that file
