@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
   catch (Exception &ex) {
     ex.writeMessage();
     cerr << "Program aborted due to exception" << endl;;
+    exit(1);
   } 
   return result;
 }
