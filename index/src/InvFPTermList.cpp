@@ -1,10 +1,9 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2001, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
@@ -25,7 +24,8 @@ InvFPTermList::~InvFPTermList() {
   if (list != NULL)
     delete[](list);
   if (counts != NULL) {
-    free(counts);
+    //    free(counts);
+    delete[](counts);
     delete[](listcounted);
   }
 }
@@ -41,7 +41,8 @@ bool InvFPTermList::hasMore(){
 TermInfo* InvFPTermList::nextEntry(){
 //  TermInfo* tinfo;
   static InvFPTerm info;
-
+  static vector<int> loclist;
+  
   if (counts) {
     info.freq = counts[index];
     info.loclist = &(listcounted[index].loc);    
@@ -50,7 +51,10 @@ TermInfo* InvFPTermList::nextEntry(){
    
   } else {
     info.freq = 1;
-    info.loclist = new vector<int>;
+    //    info.loclist = new vector<int>;
+    ///empty it!
+    loclist.clear();
+    info.loclist = &loclist;
     info.loclist->push_back(list[index].loc);
     info.tid = list[index].term;
     info.loc = list[index].loc;
@@ -90,7 +94,7 @@ bool InvFPTermList::binRead(ifstream& infile){
 
   return true;
 }
-
+#if 0
 void InvFPTermList::countTerms(){
   // this is probably not the best way of doing this, but..
   // this is what happens when you adapt one implementation of something to match
@@ -127,4 +131,33 @@ void InvFPTermList::countTerms(){
     ind++;
   }
 }
+#endif
 
+void InvFPTermList::countTerms(){
+  //already been counted then we don't want to count again.
+  if (counts)
+    return;
+  map<int, int> table;
+  map<int, int>::iterator place;
+  int idx = 0;
+  listcounted = new LLTerm[listlen];
+  //  counts = (int*) malloc(sizeof(int) * listlen);
+  counts = new int[listlen];
+  // Reduce computations at the cost of wasting the end
+  // of the two arrays, listcounted and counts
+  int i;
+  for (i = 0; i < listlen; i++) {
+    place = table.find(list[i].term);
+    if (place != table.end()) {
+      counts[(place->second)]++;
+      listcounted[(place->second)].loc.push_back(list[i].loc);
+    } else {
+      listcounted[idx].term = list[i].term;
+      listcounted[idx].loc.push_back(list[i].loc);
+      counts[idx] = 1;
+      table[list[i].term]=idx;
+      idx++;
+    }
+  }  
+  listlen = idx;
+}
