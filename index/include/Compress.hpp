@@ -37,7 +37,6 @@
 //---------------------------------------------------------------
 
 #include "common_headers.hpp"
-#include "BitArray.hpp"
 
 class Compress {
 public:
@@ -45,7 +44,7 @@ public:
   virtual int decompress (istream &is, int * arr)=0;
   
   // Read into bit array, do not decompress
-  virtual int read(istream &is, BitArray * ba)=0;
+  virtual int read(istream &is)=0;
   virtual const char * type ()=0;
 };
 
