@@ -70,7 +70,7 @@ void MMRSumm::findNextPassage(MMRPassage &psg, InvFPIndex* idx,
       storage = new termCount;
       storage->termID = tEntry->id();
       storage->tf = tEntry->count();
-      storage->val = tEntry->count(); // fix
+      storage->val = tEntry->count();
       psg.addTerm(*storage);
     }
   } else {
@@ -80,7 +80,7 @@ void MMRSumm::findNextPassage(MMRPassage &psg, InvFPIndex* idx,
 	storage = new termCount;
 	storage->termID = tEntry->id();
 	storage->tf = tEntry->count();
-	storage->val = tEntry->count(); // fix
+	storage->val = tEntry->count();
 	psg.addTerm(*storage);
       } else {
 	return;
@@ -178,7 +178,6 @@ void MMRSumm::scorePassages(const char* qInfo = NULL) {
     saveScore--;
     sort(++i, j, compareSW(lambda));
   }
-  // :TODO: undo this for ordering
   doc = docCopy;
   
 }
