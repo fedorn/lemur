@@ -14,8 +14,9 @@
 
 #include <stdio.h>
 
-CORIDocRep::CORIDocRep(int docID, Index & dbIndex, 
-		       double * cwRatio, SimpleKLDocModel * smoother,
+CORIDocRep::CORIDocRep(int docID, Index & dbIndex, double * cwRatio, 
+		       double TFfact, double TFbase, 
+		       SimpleKLDocModel * smoother,
 		       UnigramLM * collectLM) : 
   DocumentRep(docID), ind(dbIndex) {
    
@@ -27,8 +28,7 @@ CORIDocRep::CORIDocRep(int docID, Index & dbIndex,
   dfSmooth = smoother;
   collLM = collectLM;
 
-  tnorm = 50 + 150 * cwRatio[docID-1] * c;
-
+  tnorm = TFbase + TFfact * cwRatio[docID-1];
 }
 
 double 
@@ -80,32 +80,44 @@ CORIRetMethod::CORIRetMethod(Index & dbIndex, ScoreAccumulator &accumulator,
   scFunc = new CORIScoreFunc(dbIndex);
   dfSmooth = smoothers;
   collLM = collectLM;
-  
+  //set defaults
+  tffactor = 150;
+  tfbaseline = 50;
+
   int dc = ind.docCount();
 
   cwRatio = new double[dc];
-  int * cwCount = new int[dc];
 
+  if (cwName.compare("USE_INDEX_COUNTS") == 0) {
+    float ave = ind.docLengthAvg();
+    for (int i=0;i<dc;i++) {
+      cwRatio[i] = ind.docLength(i+1)/ave;
+    }
+  } else {
+    int * cwCount = new int[dc];
 
-  FILE * fp = fopen(cwName.c_str(), "rb");
+    FILE * fp = fopen(cwName.c_str(), "rb");
 
-  int * cw = cwCount; int d = 0;
-  while (d < dc) {
-    int dd = fread(cw, sizeof(int), dc - d, fp);
-    d += dd;
-    cw += dd;
-  }
+    int * cw = cwCount; int d = 0;
+    while (d < dc) {
+      int dd = fread(cw, sizeof(int), dc - d, fp);
+      d += dd;
+      cw += dd;
+    }
   
-  fclose(fp);
-    
-  double cwTot;
-  for (int i = 0; i < dc; i++) {
-    cwTot += cwCount[i];
-  }
-  for (int i = 0; i < dc; i++) {
-    cwRatio[i] = cwCount[i] / cwTot;
-  }
+    fclose(fp);
+  
 
-  delete [] cwCount;
+    double cwTot;
+    for (int i = 0; i < dc; i++) {
+      cwTot += cwCount[i];
+    }
+    double cwAve = cwTot / dc;
+    for (int i = 0; i < dc; i++) {
+      cwRatio[i] = cwCount[i] / cwAve;
+    }
+
+    delete [] cwCount;
+  }
 }
 

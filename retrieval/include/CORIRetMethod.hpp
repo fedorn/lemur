@@ -33,7 +33,8 @@ protected:
 
 class CORIDocRep : public DocumentRep {
 public:
-  CORIDocRep(int docID, Index & dbIndex, double * cwRatio,
+  CORIDocRep(int docID, Index & dbIndex, double * cwRatio, 
+	     double TFfact = 150, double TFbase = 50, 
 	     SimpleKLDocModel * smoother = NULL,
 	     UnigramLM * collectLM = NULL);
   virtual ~CORIDocRep() { }
@@ -71,9 +72,9 @@ public:
   }
   virtual DocumentRep * computeDocRep(int docID) { 
     if (dfSmooth != NULL) {
-      return new CORIDocRep(docID, ind, cwRatio, dfSmooth[docID], collLM);
+      return new CORIDocRep(docID, ind, cwRatio, tffactor, tfbaseline, dfSmooth[docID], collLM);
     }
-    return new CORIDocRep(docID, ind, cwRatio);
+    return new CORIDocRep(docID, ind, cwRatio, tffactor, tfbaseline);
   }
   virtual ScoreFunction * scoreFunc() {
     return scFunc;
@@ -82,7 +83,9 @@ public:
   virtual void scoreCollection(QueryRep &qry, IndexedRealVector &results);
 
   virtual void updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs) { }
-
+  
+  void setTFFactor(double tf) { tffactor = tf; }
+  void setTFBaseline(double tf) { tfbaseline = tf; }
 
 protected:
 
@@ -91,6 +94,8 @@ protected:
   UnigramLM * collLM;
 
   double * cwRatio;
+  double tffactor;
+  double tfbaseline;
   
 };
 
