@@ -26,23 +26,23 @@ public:
 
   /// Retrieve the value in the b-tree for the given key. 
   /// Returns false if key does not exist in the b-tree.
-  bool get( const char* key, void* value, int& actualSize, int maxSize ) const;
+  bool get( const char* key, void* value, int& actualSize, int maxSize );
   /// Retrieve the value in the b-tree for the given key. 
   /// Returns false if key does not exist in the b-tree.
-  bool get( const char* key, char** value, int& actualSize ) const;
+  bool get( const char* key, char** value, int& actualSize );
   /// Retrieve the value in the b-tree for the given key. 
   /// Returns false if key does not exist in the b-tree.
-  bool get( int key, void* value, int& actualSize, int maxSize ) const;
+  bool get( int key, void* value, int& actualSize, int maxSize );
   /// Retrieve the value in the b-tree for the given key. 
   /// Returns false if key does not exist in the b-tree.
-  bool get( int key, char** value, int& actualSize ) const;
+  bool get( int key, char** value, int& actualSize );
 
   /// Return the size of the data in the b-tree for the given key. 
   /// Returns -1 if key does not exist in the b-tree.
-  int getSize( const char* key ) const;
+  int getSize( const char* key );
   /// Return the size of the data in the b-tree for the given key. 
   /// Returns -1 if key does not exist in the b-tree.
-  int getSize( int key ) const;
+  int getSize( int key );
 
   /// Remove the entry in the b-tree for the given key.
   void remove( const char* key );
@@ -62,21 +62,23 @@ public:
   /// Initialize keyfile to first key for iteration
   void setFirst();
   ///get the next key and value pair from the keyfile.
-  bool getNext( int& key, void* value, int& actualSize, int maxSize ) const;
+  bool getNext( int& key, void* value, int& actualSize, int maxSize );
   ///get the next key and value pair from the keyfile.
   bool getNext( char* key, int maxKeySize, void* value, 
-		int& actualSize, int maxSize ) const;
+		int& actualSize, int maxSize );
   ///initialize to empty
-  Keyfile() : _handleSize(0), _handle(std::auto_ptr<char>(NULL)) {
+  //  Keyfile() : _handleSize(0), _handle(std::auto_ptr<char>(NULL)) {
+  Keyfile() : _handleSize(0), _handle(NULL) {
   }
   
 private:
-  std::auto_ptr<char> _handle; // file control block of the keyfile
+  //  std::auto_ptr<char> _handle; // file control block of the keyfile
+  char* _handle; // file control block of the keyfile
   int _handleSize; // sizeof _handle buffer
 
   void _buildHandle( int cacheSize );
-  void _createKey( char* keyBuf, int number ) const;
-  int _decodeKey( char* keyBuf ) const;
+  void _createKey( char* keyBuf, int number );
+  int _decodeKey( char* keyBuf );
 };
 
 #endif // _LEMUR_KEYFILE_H
