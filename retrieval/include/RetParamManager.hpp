@@ -9,6 +9,8 @@
  *==========================================================================
 */
 
+#ifndef _RETRIEVALPARAMETER_HPP
+#define _RETRIEVALPARAMETER_HPP
 
 /// A package of retrieval parameter definitions and loading procedures
 #include "Param.hpp"
@@ -35,7 +37,7 @@ namespace RetrievalParameter {
   static int resultCount;
   //@}
 
-  void get() {
+  static void get() {
     databaseIndex = ParamGetString("index","");
     textQuerySet = ParamGetString("textQuery","");
     resultFile = ParamGetString("resultFile","");
@@ -126,8 +128,4 @@ namespace SimpleKLParameter {
 
 
 
-
-																								  
-
-
-
+#endif
