@@ -1,3 +1,18 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * 
+ * The Lemur toolkit for language modeling and information retrieval.
+ * Copyright (c) 2001 Carnegie Mellon University.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted for research or educational purposes,
+ * provided that this copyright notice is maintained and note is made
+ * of any changes to the source code.
+ * 
+ * This is a research system.  The code is distributed on an "as is" basis,
+ * without any warranty, express or implied. 
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #include "InvFPPushIndex.hpp"
 #include "DocumentProps.hpp"
 #include "InvFPTerm.hpp"
@@ -24,6 +39,11 @@ int main(int argc, char* argv[]) {
 
     fprintf (stderr, "begin indexing: %s\n", argv[i]);
     readin = fopen(argv[i], "r");
+    if (!readin) {
+      fprintf(stderr, "Error: could not open source file %s\n", argv[i]);
+      continue;
+    }
+
     yyin = readin;
           
     while ((token = yylex()) != 0) {
