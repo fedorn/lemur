@@ -20,7 +20,7 @@
 #include <iostream>
 
 #include <fstream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 #include "Index.hpp"
 #include "InvFPDocList.hpp"
@@ -110,8 +110,11 @@ public:
   /// doc entries in a term index, @see DocList @see InvFPDocList
   DocInfoList* docInfoList(int termID);
 
-  /// word entries in a document index, @see TermList
+  /// word entries in a document index (bag of words), @see TermList
   TermInfoList* termInfoList(int docID);
+
+  /// word entries in a document index (sequence of words), @see TermList
+  TermInfoList* termInfoListSeq(int docID);
 
   //@}
 private:
