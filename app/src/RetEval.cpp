@@ -72,7 +72,7 @@ Other common parameters (for all retrieval methods)  are:
 <li> <tt>index</tt>: The complete name of the index table-of-content
 file for the database index.
 
-<li> <tt>textQuerySet</tt>: the query text stream 
+<li> <tt>textQuery</tt>: the query text stream 
 
 <li> <tt>resultFile</tt>: the result file
 
