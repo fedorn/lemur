@@ -164,7 +164,7 @@ inline int strncasecmp( const char* one, const char* two, int length ) {
 }
 #endif
 
-#ifdef BIG_ENDIAN
+#if defined(BIG_ENDIAN) && (BYTE_ORDER == BIG_ENDIAN)
 inline double htond( double native ) {
   return native;
 }
@@ -182,7 +182,7 @@ inline double ntohd( double native ) {
 }
 #endif 
 
-#ifdef BIG_ENDIAN
+#if defined(BIG_ENDIAN) && (BYTE_ORDER == BIG_ENDIAN)
 inline UINT64 htonll( UINT64 native ) {
   return native;
 }

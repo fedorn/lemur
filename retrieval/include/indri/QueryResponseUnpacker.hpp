@@ -59,12 +59,24 @@ public:
     listName = name.substr( name.find(':')+1 );
     
     ScoredExtentResult aligned;
-    int count = length / sizeof(ScoredExtentResult);
+    int count = length / (sizeof(INT32)*3 + sizeof(double));
     std::vector<ScoredExtentResult>& resultVector = _results[nodeName][listName];
+    
+    const char* p = (const char*) buffer;
 
     for( int i=0; i<count; i++ ) {
       // copy for alignment
-      memcpy( &aligned, (const char*)buffer + i*sizeof(ScoredExtentResult), sizeof(ScoredExtentResult) );
+      memcpy( &aligned.score, p, sizeof(double) );
+      p += sizeof(double);
+
+      memcpy( &aligned.document, p, sizeof(INT32) );
+      p += sizeof(INT32);
+
+      memcpy( &aligned.begin, p, sizeof(INT32) );
+      p += sizeof(INT32);
+
+      memcpy( &aligned.end, p, sizeof(INT32) );
+      p += sizeof(INT32);
 
       aligned.begin = ntohl(aligned.begin);
       aligned.end = ntohl(aligned.end);

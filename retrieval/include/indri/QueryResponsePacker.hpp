@@ -45,20 +45,29 @@ public:
         const std::vector<ScoredExtentResult>& resultList = nodeIter->second;
 
         // send each chunk of 100 results in a separate chunk
-        ScoredExtentResult networkResults[100];
+        const char resultSize = 20;
+        char networkResults[resultSize * 100];
         size_t resultsSent = 0;
 
         while( resultList.size() > resultsSent ) {
           size_t sendChunk = lemur_compat::min<size_t>( resultList.size() - resultsSent, 100 );
 
           for( size_t i=0; i<sendChunk; i++ ) {
-            networkResults[i].begin = htonl(resultList[i + resultsSent].begin);
-            networkResults[i].end = htonl(resultList[i + resultsSent].end);
-            networkResults[i].score = lemur_compat::htond( resultList[i + resultsSent].score );
-            networkResults[i].document = htonl( resultList[i + resultsSent].document );
+            ScoredExtentResult byteSwapped;
+            const ScoredExtentResult& unswapped = resultList[i + resultsSent];
+
+            byteSwapped.begin = htonl(unswapped.begin);
+            byteSwapped.end = htonl(unswapped.end);
+            byteSwapped.document = htonl(unswapped.document );
+            byteSwapped.score = lemur_compat::htond(unswapped.score);
+
+            memcpy( networkResults + i*resultSize, &byteSwapped.score, sizeof(double) );
+            memcpy( networkResults + i*resultSize + 8, &byteSwapped.document, sizeof(INT32) );
+            memcpy( networkResults + i*resultSize + 12, &byteSwapped.begin, sizeof(INT32) );
+            memcpy( networkResults + i*resultSize + 16, &byteSwapped.end, sizeof(INT32) );
           }
 
-          stream->reply( resultName, &networkResults, int(sendChunk * sizeof(ScoredExtentResult)) );
+          stream->reply( resultName, networkResults, int(sendChunk * resultSize) );
           resultsSent += sendChunk;
         }
       }
