@@ -148,7 +148,7 @@ bool FlattextDocMgr::readinSources(const string &fn){
     return false;
   }
 
-  while (files >> file) {
+  while (getline(files, file)) {
     sources.push_back(file);
   }
 

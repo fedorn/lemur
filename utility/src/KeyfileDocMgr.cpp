@@ -62,7 +62,7 @@ KeyfileDocMgr::KeyfileDocMgr(string name, string mode, string source) {
   ifstream files(source.c_str());
   string file;
   if (files.is_open()) {
-    while (files >> file) {
+      while (getline(files, file)) {
       sources.push_back(file);
     }
     files.close();
