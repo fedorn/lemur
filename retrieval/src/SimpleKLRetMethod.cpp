@@ -56,6 +56,7 @@ void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff,
     prSum += (*it).val;
     wdCount++;
   }
+  colKLComputed = false;
 }
 
 void SimpleKLQueryModel::load(istream &is)
@@ -75,6 +76,7 @@ void SimpleKLQueryModel::load(istream &is)
     is >> wd >> pr;
     setCount(ind.term(wd), pr);
   }
+  colKLComputed = false;
 }
 
 void SimpleKLQueryModel::save(ostream &os)
