@@ -103,15 +103,18 @@ void ResultFile::writeResults(char *queryID, IndexedRealVector *results, int max
     if (count >= maxCountOfResult) {
       break;
     } else {
-      *outStr << queryID 
-	      << (trecFmt ? " Q0 ":" ")  
-	      << ind->document((*j).ind) << " " 
-	      << (trecFmt? " 0 ":" ")  
-	      <<  (*j).val 
-	      << (trecFmt? " Exp ":" ")  
-	      << endl;
       count++;
-      
+      *outStr << queryID;
+      if (trecFmt)
+	*outStr << " Q0";
+      *outStr << " "  << ind->document((*j).ind) << " " ;
+      if (trecFmt)
+	*outStr << count << " ";
+      *outStr << (*j).val;
+      if (trecFmt)
+	*outStr << " Exp";
+      //      *outStr << endl; //flushes buffer each call.
+      *outStr << "\n";
     }
   }  
   outStr->flush();
