@@ -67,9 +67,6 @@ int InvFPIndexMerge::hierMerge(vector<char*>* files, int level) {
   fprintf(stderr, "%s: Begin hierchical merge level %d\n", name, level);
   int numfh = bufsize/READBUFSIZE;
 
-  // I admit, this is a temporary hack until I can figure out how to find out
-  // how many file handles are available.  7 is arbitrary number. 
-  // hasn't been tested on windows
   if (numfh > NUM_FH_OPEN) {
     numfh = NUM_FH_OPEN;
   }
@@ -147,7 +144,7 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
   long filelen;
   vector<int>::iterator iter;
   InvFPDocList* list, *prev;
-  InvFPDocInfo* info;
+  InvFPDocInfo* info = new InvFPDocInfo();
   int overlap;    // the number of times this term got flushed mid docid
   LOC_T* locs;
   TERMID_T termid;
@@ -176,7 +173,8 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
       df += list->docFreq();
       // count how many times we flushed in the middle of the doc
       list->startIteration();
-      info = static_cast< InvFPDocInfo* > (list->nextEntry());
+//      info = static_cast< InvFPDocInfo* > (list->nextEntry());
+      list->nextEntry(info);
       if (info->docID() == prev->curDocID()) {
         overlap++;
         finder = tfs.find(info->docID());
@@ -235,7 +233,8 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
     prev->startIteration();
 
     while (prev->hasMore()) {
-      info = static_cast< InvFPDocInfo* > (prev->nextEntry());
+//      info = static_cast< InvFPDocInfo* > (prev->nextEntry());
+      prev->nextEntry(info);		
       docid = info->docID();
       tf = info->termCount();
       locs = info->positions();
@@ -259,8 +258,8 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
       list->startIteration();
 
       //overlap would occur only for the first one
-      info = static_cast< InvFPDocInfo* > (list->nextEntry());
-
+//      info = static_cast< InvFPDocInfo* > (list->nextEntry());
+      list->nextEntry(info);
       // write out docid and termcount only if it hasn't been written already
       if (info->docID() != prev->curDocID()) {
         docid = info->docID();
@@ -278,7 +277,8 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
       indexfile.write((const char*) locs, sizeof(LOC_T) * info->termCount());
 
     while (list->hasMore()) {
-      info = static_cast< InvFPDocInfo* > (list->nextEntry());
+//      info = static_cast< InvFPDocInfo* > (list->nextEntry());
+      list->nextEntry(info);
       docid = info->docID();
       tf = info->termCount();
       locs = info->positions();
@@ -346,7 +346,8 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
 
     myreader->list->startIteration();
     while (myreader->list->hasMore()) {
-      info = static_cast< InvFPDocInfo* > (myreader->list->nextEntry());
+//      info = static_cast< InvFPDocInfo* > (myreader->list->nextEntry());
+      myreader->list->nextEntry(info);
       docid = info->docID();
       tf = info->termCount();
       locs = info->positions();
@@ -383,7 +384,8 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
 
       myreader->list->startIteration();
       while (myreader->list->hasMore()) {
-        info = static_cast< InvFPDocInfo* > (myreader->list->nextEntry());
+//        info = static_cast< InvFPDocInfo* > (myreader->list->nextEntry());
+	    myreader->list->nextEntry(info);
         docid = info->docID();
         tf = info->termCount();
         locs = info->positions();
@@ -399,12 +401,13 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
     delete(myreader->list);
     delete(myreader->reader);
     delete(myreader);
+	
     readers.clear();
   
   } // if still a file
 
   indexfile.close();
-
+  delete(info);	
   //remove files already merged
   for (int f=0;f<files->size();f++) {
     remove((*files)[f]);
@@ -457,8 +460,8 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
   long filelen;
   vector<int>::iterator iter;
   InvFPDocList* list, *prev;
-//  InvFPDocInfo* info = new InvFPDocInfo();
-  InvFPDocInfo* info;
+  InvFPDocInfo* info = new InvFPDocInfo();
+//InvFPDocInfo* info;
   int overlap;    // the number of times this term got flushed mid docid
   LOC_T* locs;
   TERMID_T termid;
@@ -489,8 +492,8 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       df += list->docFreq();
       // count how many times we flushed in the middle of the doc
       list->startIteration();
-      info = static_cast< InvFPDocInfo* > (list->nextEntry());
-//      list->nextEntry(info);
+//      info = static_cast< InvFPDocInfo* > (list->nextEntry());
+      list->nextEntry(info);
       if (info->docID() == prev->curDocID()) {
         overlap++;
         finder = tfs.find(info->docID());
@@ -543,10 +546,6 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     fprintf(listing, "%d %d %d %d %d ", termid, fid, filelen, ll-(df*2), df);
     indexfile.write((const char*) &termid, sizeof(TERMID_T));
 
-//    fprintf(indexfile, "%d ", ll);
-//    fprintf(listing, "%d %d %d %d\n", list->termID(), fid, ftell(indexfile), ll);
-//    fprintf(listing, "%d %d %d %d\n", list->termID(), fid, indexfile.tellp(), ll);
-//    fprintf(indexfile, "%d ", df);
     indexfile.write( (const char*) &df, sizeof(int));
     indexfile.write( (const char*) &diff, sizeof(int));
     indexfile.write( (const char*) &ll, sizeof(int));
@@ -556,8 +555,8 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     prev->startIteration();
 
     while (prev->hasMore()) {
-      info = static_cast< InvFPDocInfo* > (prev->nextEntry());
-//      prev->nextEntry(info);
+//      info = static_cast< InvFPDocInfo* > (prev->nextEntry());
+      prev->nextEntry(info);
      
       docid = info->docID();
       tf = info->termCount();
@@ -589,8 +588,8 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       list->startIteration();
 
       //overlap would occur only for the first one
-      info = static_cast< InvFPDocInfo* > (list->nextEntry());
-//      list->nextEntry(info);
+//      info = static_cast< InvFPDocInfo* > (list->nextEntry());
+      list->nextEntry(info);
       // write out docid and termcount only if it hasn't been written already
       if (info->docID() != prev->curDocID()) {
         docid = info->docID();
@@ -615,8 +614,8 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       */
 
     while (list->hasMore()) {
-      info = static_cast< InvFPDocInfo* > (list->nextEntry());
-//        list->nextEntry(info);
+//    info = static_cast< InvFPDocInfo* > (list->nextEntry());
+      list->nextEntry(info);
       docid = info->docID();
       tf = info->termCount();
       locs = info->positions();
@@ -695,8 +694,8 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
 
     myreader->list->startIteration();
     while (myreader->list->hasMore()) {
-      info = static_cast< InvFPDocInfo* > (myreader->list->nextEntry());
-//        list->nextEntry(info);
+//    info = static_cast< InvFPDocInfo* > (myreader->list->nextEntry());
+      myreader->list->nextEntry(info);
 //      fprintf(indexfile, "%d %d ", info->docID(), info->termCount());
       docid = info->docID();
       tf = info->termCount();
@@ -749,8 +748,8 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
 
       myreader->list->startIteration();
       while (myreader->list->hasMore()) {
-        info = static_cast< InvFPDocInfo* > (myreader->list->nextEntry());
-  //        list->nextEntry(info);
+  //    info = static_cast< InvFPDocInfo* > (myreader->list->nextEntry());
+        myreader->list->nextEntry(info);
   //      fprintf(indexfile, "%d %d ", info->docID(), info->termCount());
         docid = info->docID();
         tf = info->termCount();
@@ -782,7 +781,7 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
 
   free(indexname);
   free(lookup);
-//  delete(info);
+  delete(info);
 
   //remove files already merged
   for (int f=0;f<files->size();f++) {
