@@ -84,7 +84,7 @@ protected:
   virtual TermInfo* getElement(TermInfo* elem, POS_T position) const;
   /// copy values from one Element (of type InvFPTerm) to another
   virtual void assignElement(TermInfo* to, TermInfo* from) const {
-    *dynamic_cast<InvFPTerm*>(to) = *dynamic_cast<InvFPTerm*>(from);
+    *static_cast<InvFPTerm*>(to) = *static_cast<InvFPTerm*>(from);
   }
   /// position at beginning of list
   virtual POS_T beginPosition() const { return (POS_T) 0; }

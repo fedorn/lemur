@@ -33,8 +33,6 @@ public:
 
 protected:
   // Helper functions for iterator, subclasses should override
-  /// create new element of this list type for the iterator
-  virtual DocInfo* newElement() const { return new DocInfo(); }
   /// set element from position, returns pointer to the element
   virtual DocInfo* getElement(DocInfo* elem, POS_T position) const;
   /// position at beginning of list
