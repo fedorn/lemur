@@ -178,35 +178,25 @@ contain a semicolon, as that will prematurely terminate the query.
 namespace LocalParameter {
 
   // name of file containing stopwords
-  char * stopwords;
+  string stopwords;
   // name of file containing acronyms
-  char * acronyms;
+  string acronyms;
   // format of documents (trec or web)
-  char * docFormat;
+  string docFormat;
   // stemmer to use
-  char * stemmer;
+  string stemmer;
   // query output file
-  char * qryOutFile;
+  string qryOutFile;
 
   void get() {
-    // my code uses char *'s while the param utils use
-    // strings.  maybe I should convert to strings...
-    docFormat = strdup(ParamGetString("docFormat"));
+    docFormat = ParamGetString("docFormat");
     // convert docFormat to lowercase
-    for (char * d = docFormat; *d != '\0'; d++) *d = tolower(*d);
-    stopwords = strdup(ParamGetString("stopwords"));
-    acronyms = strdup(ParamGetString("acronyms"));
-    stemmer = strdup(ParamGetString("stemmer"));
-    qryOutFile = strdup(ParamGetString("outputFile"));
-  }
-
-  // free the memory allocated in get()
-  void freeMem() {
-    free(docFormat);
-    free(stopwords);
-    free(acronyms);
-    free(stemmer);
-    free(qryOutFile);
+    for (int i = 0; i < docFormat.length(); i++)
+      docFormat[i] = tolower(docFormat[i]);
+    stopwords = ParamGetString("stopwords");
+    acronyms = ParamGetString("acronyms");
+    stemmer = ParamGetString("stemmer");
+    qryOutFile = ParamGetString("outputFile");
   }
 };
 
@@ -247,36 +237,24 @@ int AppMain(int argc, char * argv[]) {
 
   // Create the appropriate parser.
   Parser * parser;
-  if (!strcmp(LocalParameter::docFormat, "arabic"))
+  if (LocalParameter::docFormat == "arabic")
     parser = new InqArabicParser();
   else
     parser = new InQueryOpParser();
 
-  // Create the stopper if needed.
-  Stopper * stopper = NULL;
-  if (strcmp(LocalParameter::stopwords, "")) {
-    if (!fileExist(LocalParameter::stopwords)) {
-      throw Exception("ParseInQuery", 
-		      "stopwords file specified does not exist");
-    }
-    stopper = new Stopper(LocalParameter::stopwords);
+  if (!LocalParameter::acronyms.empty()) {
+    parser->setAcroList(LocalParameter::acronyms);
   }
 
-  // Create the acronym list and tell parser if needed.
-  WordSet * acros = NULL;
-  if (strcmp(LocalParameter::acronyms, "")) {
-   if (!fileExist(LocalParameter::acronyms)) {
-      throw Exception("ParseInQuery", "acronyms file specified does not exist");
-    }
-    acros = new WordSet(LocalParameter::acronyms);
-    parser->setAcroList(acros);
-  }
-  
+  // Create the stopper if needed.
+  Stopper * stopper = NULL;
+  stopper = TextHandlerManager::createStopper(LocalParameter::stopwords);
+
   // Create the stemmer if needed.
   Stemmer * stemmer = NULL;
   stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
 
-  WriterInQueryHandler writer(LocalParameter::qryOutFile);
+  WriterInQueryHandler writer((char *)LocalParameter::qryOutFile.c_str());
 
   // chain the parser/queryHandler/stopper/stemmer/writer
 
@@ -304,10 +282,9 @@ int AppMain(int argc, char * argv[]) {
   }
 
   // free memory
-  if (stopper != NULL) delete stopper;
-  delete parser;
-  //delete ind;
-  LocalParameter::freeMem();
+  delete(stopper);
+  delete(stemmer);
+  delete(parser);
   return 0;
 }
 

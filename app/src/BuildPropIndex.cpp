@@ -55,6 +55,7 @@ The parameters are:
  */
 #include "TextHandlerManager.hpp"
 #include "BrillPOSTokenizer.hpp"
+#include "BrillPOSParser.hpp"
 #include "PropIndexTH.hpp"
 #include "Param.hpp"
 #include "FUtil.hpp"
@@ -64,7 +65,7 @@ namespace LocalParameter {
   int memory;
 
   // name (minus extension) of the database
-  char* index;
+  string index;
   // name of file containing stopwords
   string stopwords;
   // name of file containing acronyms
@@ -72,7 +73,7 @@ namespace LocalParameter {
   // whether or not to stem
   string stemmer;
   // file with source files
-  char* dataFiles;
+  string dataFiles;
   string docFormat;
   bool countStopWords;
 
@@ -80,20 +81,13 @@ namespace LocalParameter {
     // my code uses char *'s while the param utils use
     // strings.  maybe I should convert to strings...
     docFormat = ParamGetString("docFormat");
-    index = strdup(ParamGetString("index"));
+    index = ParamGetString("index");
     memory = ParamGetInt("memory", 96000000);
     stopwords = ParamGetString("stopwords");
     acronyms = ParamGetString("acronyms");
-    dataFiles = strdup(ParamGetString("dataFiles"));
+    dataFiles = ParamGetString("dataFiles");
     stemmer = ParamGetString("stemmer");
     countStopWords = (ParamGetString("countStopWords", "false") == "true");
-  }
-
-  // free the memory allocated in get()
-  void freeMem() {
-    // these strings were created using strdup
-    free(dataFiles);
-    free(index);
   }
 };
 
@@ -138,7 +132,7 @@ void GetAppParam() {
 
 
 int AppMain(int argc, char * argv[]) {
-  if ((argc < 3) && (!strcmp(LocalParameter::dataFiles, ""))) {
+  if ((argc < 3) && LocalParameter::dataFiles.empty()) {
     usage(argc, argv);
     return -1;
   }
@@ -147,7 +141,8 @@ int AppMain(int argc, char * argv[]) {
   Parser* parser = NULL;
   TextHandler* th;
   BrillPOSTokenizer* tok = NULL;
-  parser = TextHandlerManager::createParser(LocalParameter::docFormat, LocalParameter::acronyms);
+  parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
+					    LocalParameter::acronyms);
 
   if (!parser) {
     parser = new BrillPOSParser();
@@ -177,7 +172,9 @@ int AppMain(int argc, char * argv[]) {
   // TextHandler class, so that it is compatible with my parser
   // architecture.  See the TextHandler and InvFPTextHandler classes
   // for more info.)
-  PropIndexTH indexer(LocalParameter::index, LocalParameter::memory, LocalParameter::countStopWords);
+  PropIndexTH indexer((char *)LocalParameter::index.c_str(), 
+		      LocalParameter::memory, 
+		      LocalParameter::countStopWords);
 
   // chain the parser/stopper/stemmer/indexer
   if (stopper) {
@@ -193,11 +190,11 @@ int AppMain(int argc, char * argv[]) {
   th->setTextHandler(&indexer);
 
   // parse the data files
-  if (strcmp(LocalParameter::dataFiles, "")) {
-    if (!fileExist(LocalParameter::dataFiles)) {
+  if (!LocalParameter::dataFiles.empty()) {
+    if (!fileExist((char *)LocalParameter::dataFiles.c_str())) {
       throw Exception("PushIndexer", "dataFiles specified does not exist");
     }
-    ifstream source(LocalParameter::dataFiles);
+    ifstream source((char *)LocalParameter::dataFiles.c_str());
     if (!source.is_open()) {
       throw Exception("PushIndexer","could not open dataFiles specified");
     } else {
@@ -214,12 +211,11 @@ int AppMain(int argc, char * argv[]) {
     }
   }
   // free memory
-  if (stopper) delete stopper;
-  if (stemmer) delete stemmer;
-  if (tok) delete tok;
+  delete(stopper);
+  delete(stemmer);
+  delete(tok);
   //  delete tagger;
-  delete parser;
-  LocalParameter::freeMem();
+  delete(parser);
   return 0;
 }
 

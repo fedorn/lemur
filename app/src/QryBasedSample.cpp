@@ -136,37 +136,20 @@ namespace LocalParameter {
   /// database manager
   String dbManager;
   /// Filename for a list of databases to sample
-  char * listFile;
+  string listFile;
   /// Initial query selection model
-  char * initModel;
-
-  // Name of Collection Term Frequency index to build
-  // char * ctfIndex;
-  // Name of Document Frequency index to build
-  // char * dfIndex;
-
+  string initModel;
 
   /// Get the application specific parameters
   void get() {
     dbManager = ParamGetString("dbManager", "lemur");
-    listFile = strdup(ParamGetString("listFile", ""));    
-    initModel = strdup(ParamGetString("initModel", ""));
-//      dfIndex = strdup(ParamGetString("docFreqIndex", ""));    
-//      ctfIndex = strdup(ParamGetString("ctfIndex", ""));
-
+    listFile = ParamGetString("listFile", "");    
+    initModel = ParamGetString("initModel", "");
     // Enforce that both the listFile and initModel be specified
-    if (strcmp(listFile, "") == 0 || strcmp(initModel, "") == 0) {
+    if (listFile.empty() ||initModel.empty()) {
       usage();
       exit(-1);
     }
-  }
-
-  /// Free memory created by the get function
-  void freeMem() {
-    free(listFile);
-    free(initModel);
-//      free(ctfIndex);
-//      free(dfIndex);
   }
 };
 
@@ -204,50 +187,12 @@ int AppMain (int argc, char * argv []) {
   dbp.setDBManager(dbm);
   dbp.setFreqCounter(&freqCounter);
 
-  /*
-  // Create and chain the document frequency indexer.
-  DocFreqIndexer * dfIndexer = NULL;
-  if (strcmp(LocalParameter::dfIndex, "") != 0) {
-    char * csdbCw = new char[strlen(LocalParameter::dfIndex) + 4];
-    strcpy(csdbCw, LocalParameter::dfIndex);
-    strcat(csdbCw, ".cw");
-    char * csdbSs = new char[strlen(LocalParameter::dfIndex) + 4];
-    strcpy(csdbSs, LocalParameter::dfIndex);
-    strcat(csdbSs, ".ss");
-    dfIndexer = new DocFreqIndexer(LocalParameter::dfIndex, 
-				   csdbCw, csdbSs, 24*1024*1024);      
-    freqCounter.setTextHandler(dfIndexer);
-    delete [] csdbCw;
-    delete [] csdbSs;
-  }
- 
-  // Create and chain the collection term frequency indexer.
-  CtfIndexer * ctfIndexer = NULL;
-  if (strcmp(LocalParameter::ctfIndex, "")  != 0) {
-    char * csdbCw = new char[strlen(LocalParameter::ctfIndex) + 4];
-    strcpy(csdbCw, LocalParameter::ctfIndex);
-    strcat(csdbCw, ".cw");
-    char * csdbSs = new char[strlen(LocalParameter::ctfIndex) + 4];
-    strcpy(csdbSs, LocalParameter::ctfIndex);
-    strcat(csdbSs, ".ss");
-    ctfIndexer = new CtfIndexer(LocalParameter::ctfIndex, 
-				csdbCw, csdbSs, 24*1024*1024);
-    if (dfIndexer != NULL) {
-      dfIndexer->setTextHandler(ctfIndexer);
-    } else {
-      freqCounter.setTextHandler(ctfIndexer);
-    }
-    delete [] csdbCw;
-    delete [] csdbSs;
-  }
-  */
-
   // Initial query terms are selected from this model.
-  FreqCounter initQueryModel(LocalParameter::initModel);
+  FreqCounter initQueryModel((char *)LocalParameter::initModel.c_str());
   initQueryModel.setRandomMode(QBSParameter::qryMode);
   
   // Main processing loop - perform sampling on all databases.
-  ifstream inl(LocalParameter::listFile);
+  ifstream inl((char *)LocalParameter::listFile.c_str());
   while (! inl.eof()) {
     char dbn[5000];
     char opre[5000];
@@ -261,17 +206,6 @@ int AppMain (int argc, char * argv []) {
       // Read in database label.
       inl >> dbid;
 
-      /*
-      // If building a collection selection database,
-      // tell them about the new database.
-      if (dfIndexer != NULL) {
-	dfIndexer->newDb(dbid);
-      }
-      if (ctfIndexer != NULL) {
-	ctfIndexer->newDb(dbid);
-      }
-      */
-      
       // Output which database we're about to sample.
       cout << "Database: " << dbn << endl;
 	
@@ -300,21 +234,9 @@ int AppMain (int argc, char * argv []) {
       dbm->close();
       
     }
+    delete(dbm);
     
   }
-  /*
-  // Delete indexers.
-  if (dfIndexer != NULL) {
-    delete dfIndexer;
-  }
-  if (ctfIndexer != NULL) {
-    delete ctfIndexer;
-  }
-  */
-
-  // Free parameter memory.
-  LocalParameter::freeMem();
-
   return 0;
 }
 
