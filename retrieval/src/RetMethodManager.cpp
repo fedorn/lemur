@@ -62,6 +62,15 @@ RetrievalMethod* RetMethodManager::createModel (const Index* ind,
 				 InQueryParameter::fbTermCount,
 				 InQueryParameter::fbCoeff,
 				 InQueryParameter::cacheIDF);
+    break;
+  case INDRI:
+    IndriParameter::get();
+    model = new IndriRetMethod(*ind);
+    IndriRetMethod * indri = dynamic_cast<IndriRetMethod *>(model);
+    // set up the parameters
+    indri->setParams(&IndriParameter::params);
+    // then add the stopwords.
+    indri->setStopwords(IndriParameter::stopwords);
   }  
   return model;
 }
@@ -92,6 +101,8 @@ RetrievalMethod* RetMethodManager::createModel (const Index* ind,
     mod = createModel(ind, accum, COS);
   if (type == "inq_struct")
     mod = createModel(ind, accum, INQ_STRUCT);
+  if (type == "indri")
+    mod = createModel(ind, accum, INDRI);
 
   return mod;
 }
@@ -110,6 +121,12 @@ IndexedRealVector* RetMethodManager::runQuery(const string& query, const Index* 
     results = runTextQuery(query, textmethod, stopfile, stemtype, datadir, func);
   } else if (StructQueryRetMethod* structmethod = dynamic_cast<StructQueryRetMethod*>(model)) {
     results = runStructQuery(query, structmethod, stopfile, stemtype, datadir, func);
+  } else if (IndriRetMethod* indrimethod = dynamic_cast<IndriRetMethod*>(model)) {
+    results = new IndexedRealVector();
+    // add the stopwords.
+    indrimethod->setStopwords(stopfile);
+    indrimethod->scoreCollection(query, *results);
+    results->Sort();
   } else {
     delete(model);
     LEMUR_THROW(LEMUR_GENERIC_ERROR, "could not handle retrieval model");
