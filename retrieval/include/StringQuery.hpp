@@ -17,16 +17,6 @@
 #include "Document.hpp"
 #include "RetrievalMethod.hpp"
 
-/// A term in a StringQuery
-class StringTokenTerm : public TokenTerm {
-public:
-  StringTokenTerm(const char * tokterm) { term = strdup(tokterm); }
-  ~StringTokenTerm() { free(term); }
-  virtual const char * spelling() const { return term; }
-private:
-  char * term;
-};
-
 /// A string query takes a char * and splits it by spaces
 class StringQuery : public Query {
 public:
@@ -56,11 +46,12 @@ public:
     }
     return true;
   }
-  virtual TokenTerm * nextTerm() const { 
+  virtual Term * nextTerm() const { 
     if (!hasMore()) {
       return NULL;
     }
-    TokenTerm * term = new StringTokenTerm(current);
+    Term * term = new Term();
+    term->copyspelling(current);
     current = strtok(NULL, " ");
     return term;
   }
