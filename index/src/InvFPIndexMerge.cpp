@@ -8,9 +8,6 @@
  *
  *==========================================================================
 */
-
-
-#include <limits.h>
 #include "InvFPIndexMerge.hpp"
 
 InvFPIndexMerge::InvFPIndexMerge(char* buffer, long size, long maxfilesize) {
@@ -73,8 +70,8 @@ int InvFPIndexMerge::hierMerge(vector<char*>* files, int level) {
   // I admit, this is a temporary hack until I can figure out how to find out
   // how many file handles are available.  7 is arbitrary number. 
   // hasn't been tested on windows
-  if (numfh > (OPEN_MAX-7)) {
-    numfh = OPEN_MAX-7;
+  if (numfh > NUM_FH_OPEN) {
+    numfh = NUM_FH_OPEN;
   }
 
   if (files->size() > numfh) {
@@ -124,7 +121,7 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
     readers.push_back(new IndexReader);
 
     readers[i]->reader = new ifstream();
-    readers[i]->reader->setbuf(bufptr, READBUFSIZE);
+    setbuf(readers[i]->reader, bufptr, READBUFSIZE);
     bufptr += READBUFSIZE;
 
     fprintf(stderr, "Opening %s\n", (*files)[i]);
@@ -434,7 +431,7 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     //    readers.push_back(new InvFPIndexReader(*p) );
     //    readers[i++]->readNextList();
     readers[i]->reader = new ifstream();
-    readers[i]->reader->setbuf(bufptr, READBUFSIZE);
+    setbuf(readers[i]->reader, bufptr, READBUFSIZE);
     bufptr += READBUFSIZE;
     fprintf(stderr, "Opening file %s\n", (*files)[i]);
     readers[i]->reader->open((*files)[i], ios::in | ios::binary);
@@ -866,3 +863,11 @@ void InvFPIndexMerge::least(vector<IndexReader*>* r, vector<int>* ret) {
   } // for each list
 }	
 
+
+void InvFPIndexMerge::setbuf(ifstream* fs, char* bp, int bytes){
+  #ifdef _WIN32
+  fs->rdbuf()->pubsetbuf(bp, bytes);
+  #else
+  fs->setbuf(bp, bytes);
+  #endif
+}
