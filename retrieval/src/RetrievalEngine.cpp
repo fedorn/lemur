@@ -31,6 +31,7 @@ void RetrievalEngine::retrievePseudoFeedback(TextQuery &qry, int howManyDoc, Ind
   method.updateQuery(*qryRep,*topDoc);
   scoreInvertedIndex(*qryRep, *res);
   results = res;
+  delete topDoc;
   delete qryRep;
 }
 
