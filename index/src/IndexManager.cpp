@@ -11,7 +11,6 @@
 
 #include "IndexManager.hpp"
 
-#include "BasicIndex.hpp"
 #include "InvFPIndex.hpp"
 #include "InvIndex.hpp"
 #include "KeyfileIncIndex.hpp"
@@ -33,10 +32,6 @@ Index *IndexManager::openIndex(const string &tocFile)
        (!strcmp(extension, "ifp"))) {
     // InvFP
     ind = new InvFPIndex();
-  } else if ((!strcmp(extension, "BSC")) ||
-	     (!strcmp(extension, "bsc"))) {
-    
-    ind = new BasicIndex();
   } else if ((!strcmp(extension, "INV")) ||
 	     (!strcmp(extension, "inv"))) {
     ind = new InvIndex();
