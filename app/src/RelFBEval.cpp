@@ -250,7 +250,7 @@ void GetAppParam()
 
 
 
-void process(QueryRep *qr, const char *qid, ResultFile *judgments, 
+void process(QueryRep *qr, const string& qid, ResultFile *judgments, 
 	     RetrievalMethod *method, ResultFile *docPool, 
 	     IndexedRealVector &results, ResultFile &resFile)
 {

@@ -130,7 +130,7 @@ void GetAppParam()
 }
 
 
-void updateQueryModel(QueryRep *qr, const char *qid, ResultFile &resFile, RetrievalMethod *model, ofstream &os)
+void updateQueryModel(QueryRep *qr, const string& qid, ResultFile &resFile, RetrievalMethod *model, ofstream &os)
 
 {
   bool	ignoreWeights = true;  
@@ -234,7 +234,7 @@ int AppMain(int argc, char *argv[]) {
       delete q;
     }
   } else {
-    char qid[1024];
+    string qid;
     while ( *initQIFS >> qid) {
       SimpleKLQueryModel *qm = new SimpleKLQueryModel(*ind);
       qm->load(*initQIFS);

@@ -129,7 +129,7 @@ void GetAppParam()
     SimpleKLParameter::QUERYLIKELIHOOD;
 }
 
-void QueryClarity(QueryRep *qr, const char *qid, IndexedRealVector *res, 
+void QueryClarity(QueryRep *qr, const string& qid, IndexedRealVector *res, 
 		  RetrievalMethod *model, ofstream &os)
 
 {

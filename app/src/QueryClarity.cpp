@@ -130,7 +130,7 @@ void GetAppParam()
   SimpleKLParameter::get();
 }
 
-void QueryClarity(QueryRep *qr, const char *qid, ResultFile &resFile, 
+void QueryClarity(QueryRep *qr, const string& qid, ResultFile &resFile, 
 		  RetrievalMethod *model, ofstream &os)
 
 {
