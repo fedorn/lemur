@@ -1,3 +1,18 @@
+ /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  
+ * 
+ * The Lemur toolkit for language modeling and information retrieval.
+ * Copyright (c) 2001 Carnegie Mellon University.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted for research or educational purposes,
+ * provided that this copyright notice is maintained and note is made
+ * of any changes to the source code.
+ * 
+ * This is a research system.  The code is distributed on an "as is" basis,
+ * without any warranty, express or implied. 
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #ifndef _INVFPPUSHINDEX_HPP
 #define _INVFPPUSHINDEX_HPP
 
@@ -28,7 +43,7 @@ typedef map<char*, InvFPDocList*, ltstr> TABLE_T;
 
 class InvFPPushIndex : public PushIndex {
 public:
-  InvFPPushIndex(char* prefix="DefaultIndex", int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=0);
+  InvFPPushIndex(char* prefix="DefaultIndex", int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=1);
   ~InvFPPushIndex();
 
   /// sets the name for this index. the name will be the prefix for all files related to this index
