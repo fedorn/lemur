@@ -4,7 +4,7 @@
 # add the directory name here when you add a new
 # directory to lemur
 
-DIRS = eval utility index retrieval app test
+DIRS = eval cl_utility utility cl_index index classify retrieval cl_app app test
 
 
 # IN GENERAL, DO NOT CHANGE THE FOLLOWING LINES
