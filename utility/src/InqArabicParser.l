@@ -597,8 +597,8 @@ void InqArabicParser::doParse() {
       state = 1;
       while(*qid && !isdigit(*qid))
 	qid++;
-      while(!isdigit(qid[ql-1]))
-	qid[--ql]='\0';
+      while(ql>0 && !isdigit(tofree[ql-1]))
+	tofree[--ql]='\0';
       ara_parenstack_top=0;
       if (textHandler != NULL) textHandler->foundDoc(qid);
       free(tofree);

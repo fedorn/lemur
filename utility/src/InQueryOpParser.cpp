@@ -1555,7 +1555,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
+	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
 #line 116 "../src/InQueryOpParser.l"
@@ -2493,11 +2493,6 @@ YY_BUFFER_STATE b;
 	}
 
 
-#ifndef YY_ALWAYS_INTERACTIVE
-#ifndef YY_NEVER_INTERACTIVE
-extern int isatty YY_PROTO(( int ));
-#endif
-#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -3146,8 +3141,8 @@ void InQueryOpParser::doParse() {
       state = 1;
       while(*qid && !isdigit(*qid))
 	qid++;
-      while(!isdigit(qid[ql-1]))
-	qid[--ql]='\0';
+      while((ql>0) && (!isdigit(tofree[ql-1])))
+	tofree[--ql]='\0';
       paren_stack_top=0;
       if (textHandler != NULL) textHandler->foundDoc(qid);
       free(tofree);
