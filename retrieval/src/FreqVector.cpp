@@ -16,6 +16,7 @@ HashFreqVector::HashFreqVector(Index &index, int docID)
 {
   TermInfoList *tList = index.termInfoList(docID);
   TermInfo *info;
+  tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
     static FreqCount ct;
