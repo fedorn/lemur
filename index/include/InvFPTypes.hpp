@@ -14,7 +14,7 @@
 #ifndef _INVFPTYPES_H
 #define _INVFPTYPES_H
 
-#define IND_VERSION "2.1"
+#define IND_VERSION "2.2"
 
 #include "common_headers.hpp"
 
@@ -33,7 +33,9 @@ typedef char* EXDOCID_T;
 #define DTINDEX  ".dt"
 #define DTLOOKUP  ".dtlookup"
 #define TERMIDMAP  ".tid"
+#define TERMIDSTRMAP ".tidstr"
 #define DOCIDMAP  ".did"
+#define DOCIDSTRMAP ".didstr"
 #define MAINTOC  ".inv"
 #define INVFPTOC ".ifp"
 #define DOCMGRMAP ".dm"
@@ -52,7 +54,9 @@ typedef char* EXDOCID_T;
 #define DTINDEX_PAR  "DT_INDEX"
 #define DTLOOKUP_PAR  "DT_LOOKUP"
 #define TERMIDMAP_PAR  "TERMIDS"
+#define TERMIDSTRMAP_PAR "TERMIDSTRS"
 #define DOCIDMAP_PAR  "DOCIDS"
+#define DOCIDSTRMAP_PAR "DOCIDSTRS"
 #define NUMDT_PAR  "NUM_DTFILES"
 #define NUMINV_PAR  "NUM_INVFILES"
 #define DOCMGR_PAR  "DOCMGR_IDS"
