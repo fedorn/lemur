@@ -57,7 +57,7 @@ public:
 
   virtual void incCount(int eventIndex, double count) {
     ct[eventIndex] += (T)count;
-    total += count;
+    total += (T)count;
   }
 
   virtual void setCount(int eventIndex, double count) {
