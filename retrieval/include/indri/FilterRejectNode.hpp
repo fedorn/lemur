@@ -21,20 +21,24 @@
 
 #include "indri/greedy_vector"
 #include "indri/Extent.hpp"
+#include "indri/BeliefNode.hpp"
 #include "indri/ListIteratorNode.hpp"
 
-class FilterRejectNode : public ListIteratorNode {
+class FilterRejectNode : public BeliefNode {
 private:
-  greedy_vector<Extent> _extents;
-  ListIteratorNode* _filtered;
-  ListIteratorNode* _disallowed;
+  greedy_vector<ScoredExtentResult> _extents;
+  ListIteratorNode* _filter;
+  BeliefNode* _disallowed;
   std::string _name;
 
 public:
-  FilterRejectNode( const std::string& name, ListIteratorNode* filtered, ListIteratorNode* disallowed );
+  FilterRejectNode( const std::string& name, ListIteratorNode* filter, 
+		    BeliefNode* disallowed );
 
-  void prepare( int documentID );
-  const greedy_vector<Extent>& extents();
+  double maximumBackgroundScore();
+  double maximumScore();
+  bool hasMatch( int documentID );
+  const greedy_vector<ScoredExtentResult>& score( int documentID, int start, int end, int documentLength );
   int nextCandidateDocument();
   const std::string& getName() const;
   void annotate( class Annotator& annotator, int documentID, int begin, int end );

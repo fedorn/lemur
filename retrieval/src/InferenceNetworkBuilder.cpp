@@ -415,20 +415,20 @@ void InferenceNetworkBuilder::after( indri::lang::BAndNode* bandNode ) {
 
 void InferenceNetworkBuilder::after( indri::lang::FilRejNode* filRejNode ) {
   if( _nodeMap.find( filRejNode ) == _nodeMap.end() ) {
-    InferenceNetworkNode* untypedFilter = _nodeMap[ filRejNode->getFiltered() ];
+    InferenceNetworkNode* untypedFilter = _nodeMap[ filRejNode->getFilter() ];
     InferenceNetworkNode* untypedDisallowed = _nodeMap[ filRejNode->getDisallowed() ];
-    ListIteratorNode* filterRejectNode = 0;
+    BeliefNode* filterRejectNode = 0;
     
     if( untypedFilter ) {
       // normal case
       filterRejectNode = new FilterRejectNode( filRejNode->nodeName(),
                                               dynamic_cast<ListIteratorNode*>(untypedFilter),
-                                              dynamic_cast<ListIteratorNode*>(untypedDisallowed) );
-      _network->addListNode( filterRejectNode );
+                                              dynamic_cast<BeliefNode*>(untypedDisallowed) );
+      _network->addBeliefNode( filterRejectNode );
     } else {
       // the filter term doesn't exist in the collection, so therefore, it never matches
       // therefore, we can promote the disallowed node up the chain
-      filterRejectNode = dynamic_cast<ListIteratorNode*>(untypedDisallowed);
+      filterRejectNode = dynamic_cast<BeliefNode*>(untypedDisallowed);
     }
 
     _nodeMap[filRejNode] = filterRejectNode;
@@ -437,15 +437,15 @@ void InferenceNetworkBuilder::after( indri::lang::FilRejNode* filRejNode ) {
 
 void InferenceNetworkBuilder::after( indri::lang::FilReqNode* filReqNode ) {
   if( _nodeMap.find( filReqNode ) == _nodeMap.end() ) {
-    InferenceNetworkNode* untypedFilter = _nodeMap[ filReqNode->getFiltered() ];
+    InferenceNetworkNode* untypedFilter = _nodeMap[ filReqNode->getFilter() ];
     InferenceNetworkNode* untypedRequired = _nodeMap[ filReqNode->getRequired() ];
     FilterRequireNode* filterRequireNode = 0;
     
     if( untypedFilter && untypedRequired ) {
       filterRequireNode = new FilterRequireNode( filReqNode->nodeName(),
                                                  dynamic_cast<ListIteratorNode*>(untypedFilter),
-                                                 dynamic_cast<ListIteratorNode*>(untypedRequired) );
-      _network->addListNode( filterRequireNode );
+                                                 dynamic_cast<BeliefNode*>(untypedRequired) );
+      _network->addBeliefNode( filterRequireNode );
     }
 
     _nodeMap[filReqNode] = filterRequireNode;

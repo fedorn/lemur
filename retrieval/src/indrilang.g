@@ -89,7 +89,7 @@ tokens {
   FILREJ = "#filrej";
   ANY = "#any";
   BAND = "#band";
-
+  SYN = "#syn";
   // numerics
   PRIOR = "#prior";
   DATEAFTER = "#date:after";
@@ -225,6 +225,8 @@ scoredExtentNode returns [ indri::lang::ScoredExtentNode* s ] :
   | ( WSUM ) => s=wsumNode
   | ( MAX ) => s=maxNode
   | ( PRIOR ) => s=priorNode
+  | ( FILREJ ) => s=filrejNode
+  | ( FILREQ ) => s=filreqNode
   | s=scoredRaw
   ;
 
@@ -449,23 +451,23 @@ bandNode returns [ indri::lang::BAndNode* b ]
   
 filrejNode returns [ indri::lang::FilRejNode* fj ]
   {
-    RawExtentNode* filtered = 0;
-    RawExtentNode* disallowed = 0;
+    RawExtentNode* filter = 0;
+    ScoredExtentNode* disallowed = 0;
   } :
   FILREJ
-  O_PAREN filtered=unscoredTerm disallowed=unscoredTerm C_PAREN {
-    fj = new FilRejNode( filtered, disallowed );
+  O_PAREN filter=unscoredTerm disallowed=scoredExtentNode C_PAREN {
+    fj = new FilRejNode( filter, disallowed );
     _nodes.push_back(fj);
   }; 
   
 filreqNode returns [ indri::lang::FilReqNode* fq ]
   {
-    RawExtentNode* filtered = 0;
-    RawExtentNode* required = 0;
+    RawExtentNode* filter = 0;
+    ScoredExtentNode* required = 0;
   } :
   FILREQ
-  O_PAREN filtered=unscoredTerm required=unscoredTerm C_PAREN {
-    fq = new FilReqNode( filtered, required );
+  O_PAREN filter=unscoredTerm required=scoredExtentNode C_PAREN {
+    fq = new FilReqNode( filter, required );
     _nodes.push_back(fq);
   }; 
  
@@ -508,9 +510,8 @@ unqualifiedTerm returns [ RawExtentNode* re ] :
   | ( DATEBEFORE ) => re=dateBefore
   | ( DATEAFTER ) => re=dateAfter
   | ( DATEBETWEEN ) => re=dateBetween
-  | ( FILREJ ) => re=filrejNode
-  | ( FILREQ ) => re=filreqNode
   | ( O_ANGLE ) => re=synonym_list
+  | ( SYN ) => re=synonym_list_alt
   | ( ANY ) => re=anyField
   | ( LESS ) => re=lessNode
   | ( GREATER ) => re=greaterNode
@@ -538,6 +539,16 @@ synonym_list returns [ indri::lang::ExtentOr* s ] {
   O_ANGLE
     ( options { greedy=true; }: term=unscoredTerm { s->addChild(term); } )+
   C_ANGLE;
+
+synonym_list_alt returns [ indri::lang::ExtentOr* s ] {
+    indri::lang::RawExtentNode* term = 0;
+    s = new indri::lang::ExtentOr;
+    _nodes.push_back(s);
+  } :
+  SYN
+  O_PAREN
+    ( options { greedy=true; }: term=unscoredTerm { s->addChild(term); } )+
+  C_PAREN;
 
 field_list returns [ ExtentAnd* fields ]
   { 

@@ -21,41 +21,52 @@
 #include "indri/Extent.hpp"
 #include "indri/Annotator.hpp"
 
-FilterRequireNode::FilterRequireNode( const std::string& name, ListIteratorNode* filtered, ListIteratorNode* required ) {
+FilterRequireNode::FilterRequireNode( const std::string& name, 
+				      ListIteratorNode* filter, 
+				      BeliefNode* required ) {
   _name = name;
-  _filtered = filtered;
+  _filter = filter;
   _required = required;
-}
-
-void FilterRequireNode::prepare( int documentID ) {
-  _extents.clear();
-
-  // if the required term matches, take the filtered term's extents;
-  // otherwise don't match
-  if( _required->extents().size() != 0 ) {
-    _extents = _filtered->extents();
-  }
-}
-
-const greedy_vector<Extent>& FilterRequireNode::extents() {
-  return _extents;
 }
 
 int FilterRequireNode::nextCandidateDocument() {
   // both terms have to appear before this matches, so we take the max
-  return lemur_compat::max( _filtered->nextCandidateDocument(),
+  return lemur_compat::max( _filter->nextCandidateDocument(),
                             _required->nextCandidateDocument() );
+}
+
+double FilterRequireNode::maximumBackgroundScore() {
+  // delegate to the query as if the filter were true
+  return _required->maximumBackgroundScore();
+}
+
+double FilterRequireNode::maximumScore() {
+  return _required->maximumScore();
+}
+
+bool FilterRequireNode::hasMatch( int documentID ) {
+  // delegate to the children.
+  return (_filter->extents().size() && _required->hasMatch( documentID ));
 }
 
 const std::string& FilterRequireNode::getName() const {
   return _name;
 }
 
-void FilterRequireNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
-  annotator.addMatches( _extents, this, documentID, begin, end );
-  _required->annotate( annotator, documentID, begin, end );
+const greedy_vector<ScoredExtentResult>& FilterRequireNode::score( int documentID, int begin, int end, int documentLength ) {
+  _extents.clear();
+  // if the filter applies, return the child score.
+  if (_filter->extents().size() )
+    return _required->score( documentID, begin, end, documentLength );
+  else
+    return _extents;
+}
 
-  if( _required->extents().size() ) {
-    _filtered->annotate( annotator, documentID, begin, end );
+void FilterRequireNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+  // mark up the filter
+  _filter->annotate( annotator, documentID, begin, end );
+  // if the filter applied, mark up the matches.
+  if( _filter->extents().size() ) {
+    _required->annotate( annotator, documentID, begin, end );
   }
 }

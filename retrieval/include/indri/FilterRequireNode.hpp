@@ -19,21 +19,25 @@
 #ifndef INDRI_FILTERREQUIRENODE_HPP
 #define INDRI_FILTERREQUIRENODE_HPP
 
+#include "indri/BeliefNode.hpp"
 #include "indri/ListIteratorNode.hpp"
 #include "indri/Extent.hpp"
 
-class FilterRequireNode : public ListIteratorNode {
+class FilterRequireNode : public BeliefNode {
 private:
-  ListIteratorNode* _filtered;
-  ListIteratorNode* _required;
-  greedy_vector<Extent> _extents;
+  ListIteratorNode* _filter;
+  BeliefNode* _required;
+  greedy_vector<ScoredExtentResult> _extents;
   std::string _name;
 
 public:
-  FilterRequireNode( const std::string& name, ListIteratorNode* filtered, ListIteratorNode* required );
+  FilterRequireNode( const std::string& name, ListIteratorNode* filter, 
+		     BeliefNode* required );
 
-  void prepare( int documentID );
-  const greedy_vector<Extent>& extents();
+  double maximumBackgroundScore();
+  double maximumScore();
+  const greedy_vector<ScoredExtentResult>& score( int documentID, int start, int end, int documentLength );
+  bool hasMatch( int documentID );
   int nextCandidateDocument();
   const std::string& getName() const;
   void annotate( class Annotator& annotator, int documentID, int begin, int end );

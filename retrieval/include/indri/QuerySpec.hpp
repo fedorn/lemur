@@ -744,20 +744,20 @@ namespace indri {
       }
     };
 
-    class FilReqNode : public RawExtentNode {
+    class FilReqNode : public ScoredExtentNode {
     private:
-      RawExtentNode* _filtered;
-      RawExtentNode* _required;
+      RawExtentNode* _filter;
+      ScoredExtentNode* _required;
 
     public:
-      FilReqNode( RawExtentNode* filtered, RawExtentNode* required ) {
-        _filtered = filtered;
+      FilReqNode( RawExtentNode* filter, ScoredExtentNode* required ) {
+        _filter = filter;
         _required = required;
       }
 
       FilReqNode( Unpacker& unpacker ) {
-        _filtered = unpacker.getRawExtentNode( "filtered" );
-        _required = unpacker.getRawExtentNode( "required" );
+        _filter = unpacker.getRawExtentNode( "filter" );
+        _required = unpacker.getScoredExtentNode( "required" );
       }
 
       std::string typeName() const {
@@ -768,18 +768,18 @@ namespace indri {
         std::stringstream qtext;
 
         qtext << "#filreq("
-              << _filtered->queryText()
+              << _filter->queryText()
               << " "
               << _required->queryText()
               << ")";
         return qtext.str();
       }
 
-      RawExtentNode* getFiltered() {
-        return _filtered;
+      RawExtentNode* getFilter() {
+        return _filter;
       }
 
-      RawExtentNode* getRequired() {
+      ScoredExtentNode* getRequired() {
         return _required;
       }
 
@@ -789,47 +789,47 @@ namespace indri {
         if( !other )
           return false;
 
-        return (*_filtered) == (*other->getFiltered()) &&
+        return (*_filter) == (*other->getFilter()) &&
                (*_required) == (*other->getRequired());
       }
 
       void pack( Packer& packer ) {
         packer.before(this);
-        packer.put("filtered", _filtered);
+        packer.put("filter", _filter);
         packer.put("required", _required);
         packer.after(this);
       }
 
       void walk( Walker& walker ) {
         walker.before(this);
-        _filtered->walk(walker);
+        _filter->walk(walker);
         _required->walk(walker);
         walker.after(this);
       }
 
       Node* copy( Copier& copier ) {
         copier.before(this);
-        RawExtentNode* filteredDuplicate = dynamic_cast<RawExtentNode*>(_filtered->copy(copier));
-        RawExtentNode* requiredDuplicate = dynamic_cast<RawExtentNode*>(_required->copy(copier));
-        FilReqNode* duplicate = new FilReqNode( filteredDuplicate, requiredDuplicate );
+        RawExtentNode* filterDuplicate = dynamic_cast<RawExtentNode*>(_filter->copy(copier));
+        ScoredExtentNode* requiredDuplicate = dynamic_cast<ScoredExtentNode*>(_required->copy(copier));
+        FilReqNode* duplicate = new FilReqNode( filterDuplicate, requiredDuplicate );
         return copier.after(this, duplicate);
       }
     };
 
-    class FilRejNode : public RawExtentNode {
+    class FilRejNode : public ScoredExtentNode {
     private:
-      RawExtentNode* _filtered;
-      RawExtentNode* _disallowed;
+      RawExtentNode* _filter;
+      ScoredExtentNode* _disallowed;
 
     public:
-      FilRejNode( RawExtentNode* filtered, RawExtentNode* disallowed ) {
-        _filtered = filtered;
+      FilRejNode( RawExtentNode* filter, ScoredExtentNode* disallowed ) {
+        _filter = filter;
         _disallowed = disallowed;
       }
 
       FilRejNode( Unpacker& unpacker ) {
-        _filtered = unpacker.getRawExtentNode( "filtered" );
-        _disallowed = unpacker.getRawExtentNode( "disallowed" );
+        _filter = unpacker.getRawExtentNode( "filter" );
+        _disallowed = unpacker.getScoredExtentNode( "disallowed" );
       }
 
       std::string typeName() const {
@@ -840,7 +840,7 @@ namespace indri {
         std::stringstream qtext;
 
         qtext << "#filrej("
-              << _filtered->queryText()
+              << _filter->queryText()
               << " "
               << _disallowed->queryText()
               << ")";
@@ -848,11 +848,11 @@ namespace indri {
         return qtext.str();
       }
 
-      RawExtentNode* getFiltered() {
-        return _filtered;
+      RawExtentNode* getFilter() {
+        return _filter;
       }
 
-      RawExtentNode* getDisallowed() {
+      ScoredExtentNode* getDisallowed() {
         return _disallowed;
       }
 
@@ -862,29 +862,29 @@ namespace indri {
         if( !other )
           return false;
 
-        return (*_filtered) == (*other->getFiltered()) &&
+        return (*_filter) == (*other->getFilter()) &&
                (*_disallowed) == (*other->getDisallowed());
       }
 
       void pack( Packer& packer ) {
         packer.before(this);
-        packer.put("filtered", _filtered);
+        packer.put("filter", _filter);
         packer.put("disallowed", _disallowed);
         packer.after(this);
       }
 
       void walk( Walker& walker ) {
         walker.before(this);
-        _filtered->walk(walker);
+        _filter->walk(walker);
         _disallowed->walk(walker);
         walker.after(this);
       }
 
       Node* copy( Copier& copier ) {
         copier.before(this);
-        RawExtentNode* filteredDuplicate = dynamic_cast<RawExtentNode*>(_filtered->copy(copier));
-        RawExtentNode* disallowedDuplicate = dynamic_cast<RawExtentNode*>(_disallowed->copy(copier));
-        FilRejNode* duplicate = new FilRejNode( filteredDuplicate, disallowedDuplicate );
+        RawExtentNode* filterDuplicate = dynamic_cast<RawExtentNode*>(_filter->copy(copier));
+        ScoredExtentNode* disallowedDuplicate = dynamic_cast<ScoredExtentNode*>(_disallowed->copy(copier));
+        FilRejNode* duplicate = new FilRejNode( filterDuplicate, disallowedDuplicate );
         return copier.after(this, duplicate);
       }
     };
