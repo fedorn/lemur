@@ -95,6 +95,7 @@ private:
     segment->stream.open( name.c_str(), std::ios::out | std::ios::binary | std::ios::in );
     _segments.push_back( segment );
   }
+  
 
   offset_type _absolutePosition( offset_type relativePosition,
     offset_type currentPosition,
@@ -113,18 +114,20 @@ private:
       case std::fstream::end:
         newPosition = size() + relativePosition;
         break;
+    default:
+      break;
     }
     // seeking off the end of a file is not currently implemented
-    //    assert( newPosition <= size() );
+        assert( newPosition <= size() );
 
     return newPosition;
   }
 
   FileSegment* _segmentForPosition( offset_type absolutePosition, 
 				    FileSegment* guess ) {
-    //    assert( absolutePosition <= size() );
-    //    assert( absolutePosition >= 0 );
-    //    assert( _segments.size() );
+    assert( absolutePosition <= size() );
+        assert( absolutePosition >= 0 );
+	assert( _segments.size() );
 
     // see if the guess was good
     if( guess->contains( absolutePosition ) ) {
@@ -141,7 +144,7 @@ private:
       return *high;
     }
 
-    //    assert( _segments.size() > 1 );
+    assert( _segments.size() > 1 );
 
     while( high - low > 1 ) {
       middle = low+((high-low)/2);
@@ -168,9 +171,9 @@ private:
       _writePointerValid = false;
     }
 
-    //    assert( _readPosition <= _readSegment->end );
-    //    assert( _readPosition >= _readSegment->start );
-    //    assert( _readPosition == ( library_offset_type(_readSegment->stream.tellg()) + _readSegment->start) );
+        assert( _readPosition <= _readSegment->end );
+        assert( _readPosition >= _readSegment->start );
+        assert( _readPosition == ( library_offset_type(_readSegment->stream.tellg()) + _readSegment->start) );
   }
 
   void _validateWritePointer() {
@@ -182,9 +185,9 @@ private:
       _readPointerValid = false;
     }
 
-    //    assert( _writePosition <= _writeSegment->end );
-    //    assert( _writePosition >= _writeSegment->start );    
-    //    assert( _writePosition == ( library_offset_type(_writeSegment->stream.tellp()) + _writeSegment->start) );
+        assert( _writePosition <= _writeSegment->end );
+        assert( _writePosition >= _writeSegment->start );    
+        assert( _writePosition == ( library_offset_type(_writeSegment->stream.tellp()) + _writeSegment->start) );
   }
 
 public:
@@ -231,30 +234,25 @@ public:
         break;
       } else if ( mode & std::fstream::trunc ) {
         // segment opened properly, but we're doing a trunc, so 
-		// this segment must go away
+	// this segment must go away
         segment->stream.close();
         delete segment;
-		// g++ doesn't like this -- dmf
-		//        ::unlink( name.c_str() );
-    	//std::remove( name.c_str() );
-		_UNLINK(name.c_str());
+	_UNLINK(name.c_str());
       } else {
         // segment opened properly and we'd like to keep it
-        
         // if we want write access, we need to close and reopen the file
         if( mode & std::fstream::out ) {
           segment->stream.close();
           segment->stream.open( name.c_str(), 
-		  // g++ doesn't like this -- dmf
-		  // need to move this ifdef out of here
-		  #ifdef WIN32 
-			mode & (std::fstream::binary | 
-			std::fstream::in | std::fstream::out) );
-		  #else 
-			std::_Ios_Openmode(mode) & 
-			(std::fstream::binary | std::fstream::in | 
-			 std::fstream::out) );
-		  #endif
+				// need to move this ifdef out of here
+#ifdef WIN32 
+				mode & (std::fstream::binary | 
+					std::fstream::in | std::fstream::out) );
+#else 
+	  std::_Ios_Openmode(mode) & 
+	    (std::fstream::binary | std::fstream::in | 
+	     std::fstream::out) );
+#endif
           if( segment->stream.rdstate() & std::fstream::failbit ) {
             delete segment;
             break;
@@ -264,8 +262,6 @@ public:
         // set up segment statistics and add to the segment vector
         offset_type length;
 
-	//        segment->stream.seekp( 0, std::fstream::end );
-        //length = segment->stream.tellp();
         segment->stream.seekg( 0, std::fstream::end );
         length = segment->stream.tellg();
 
@@ -318,7 +314,6 @@ public:
   /// Read count bytes into buffer from File.
   void read( void* buffer, offset_type count ) {
     _validateReadPointer();
-
     offset_type readAmount;
     _readCount = 0;
 
@@ -340,7 +335,7 @@ public:
       _readCount += readAmount;
     }
 
-    //    assert((int)_readSegment->stream.tellg() != -1 || size() == _readPosition );
+        assert((int)_readSegment->stream.tellg() != -1 || size() == _readPosition );
   }
   ///Write count bytes from buffer into File.
   void write( const void* buffer, offset_type count ) {
@@ -373,7 +368,7 @@ public:
       _writeSegment->end = _writePosition;
     }
 
-    //    assert( (int)_writeSegment->stream.tellp() != -1 );
+       assert( (int)_writeSegment->stream.tellp() != -1 );
   }
   /// Move the get pointer. 
   void seekg( offset_type relativePosition, std::fstream::seekdir direction ) {
@@ -424,9 +419,7 @@ public:
   static void unlink( const std::string& fileName ) {
     for( int i=0; ; i++ ) {
       std::string segment = segmentName( fileName, i );
-	  if (_UNLINK( segment.c_str() ) != 0 ) {
-      //if( ::unlink( segment.c_str() ) != 0 ) {
-      //if( std::remove( segment.c_str() ) != 0 ) {
+      if (_UNLINK( segment.c_str() ) != 0 ) {
         break;
       }
     }
