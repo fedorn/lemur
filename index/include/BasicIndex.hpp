@@ -40,8 +40,6 @@ public:
 
   virtual ~BasicIndex(){};
   
-
-
   /// Open previously created Index, return true if opened successfully
   virtual bool open(const char * indexName);
   //@}
@@ -53,13 +51,13 @@ public:
   virtual int term (const char * word) { return terms[word];}
 
   /// Convert a termID to its spelling
-  virtual const char * term (int termID) { return terms[termID];} ;
+  virtual const char * term (int termID) { return terms[termID];} 
 
   /// Convert a spelling to docID
-  virtual int document (const char * docIDStr) {return docids[docIDStr];};
+  virtual int document (const char * docIDStr) {return docids[docIDStr];}
 
   /// Convert a docID to its spelling
-  virtual const char * document (int docID) {return docids[docID];};
+  virtual const char * document (int docID) {return docids[docID];}
 
   //@}
 
