@@ -19,9 +19,9 @@
  *
  *========================================================================*/
 #include <cmath>
+#include "InvFPTypes.hpp"
 #include "common_headers.hpp"
 #include "DocInfoList.hpp"
-#include "InvDocInfo.hpp"
 #include "MemCache.hpp"
 #include "RVLCompress.hpp"
 
@@ -78,7 +78,7 @@ public:
   virtual void startIteration() const;
   virtual bool hasMore() const;
   virtual DocInfo* nextEntry() const;
-  virtual void nextEntry(InvDocInfo* info) const;
+  virtual void nextEntry(DocInfo* info) const;
 
   DOCID_T curDocID() const{ if (lastid == NULL) return -1; return *lastid; };
   int docFreq() const{ return df; };
@@ -132,7 +132,7 @@ protected:
 
   bool READ_ONLY;    // flag for whether this list can be added
 private:
-  mutable InvDocInfo entry;
+  mutable DocInfo entry;
 };
 
 #endif

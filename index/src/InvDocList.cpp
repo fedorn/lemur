@@ -144,17 +144,17 @@ DocInfo* InvDocList::nextEntry() const{
   // use the attribute entry.
   //  static InvDocInfo info;
   // info is stored in int* as docid freq .. .. 
-  entry.id = *iter;
+  entry.docID(*iter);
   iter++;
-  entry.count = *iter;
+  entry.termCount(*iter);
   iter++;
   return &entry;
 }
 
-void InvDocList::nextEntry(InvDocInfo* info) const{
-  info->id = *iter;
+void InvDocList::nextEntry(DocInfo* info) const{
+  info->docID(*iter);
   iter++;
-  info->count = *iter;
+  info->termCount(*iter);
   iter++;
 }
 
