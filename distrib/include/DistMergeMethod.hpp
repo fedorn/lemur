@@ -24,7 +24,7 @@
 
 #define  CORI_MERGE 0
 #define  SINGLETYPEREGR_MERGE 1
-#define  MULTITYPEREGR_MREGE 2
+#define  MULTITYPEREGR_MERGE 2
 
 namespace DistMergeMethodParameter {
 
