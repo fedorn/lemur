@@ -71,7 +71,11 @@ static void writeResults(char *queryID, IndexedRealVector *results, Index *ind, 
 int AppMain(int argc, char *argv[]) {
   
   Index  *ind = IndexManager::openIndex(inputIndex);
-  ifstream qmodel(inputQueryModelFile);
+  ifstream qmodel(inputQueryModelFile, ios::in);
+  if (qmodel.fail()) {
+    throw Exception("AppMain", "can't open the query model file, check the value for parameter queryModelFile");
+  }
+
   ofstream os(inputResultFile);
 
 

@@ -81,7 +81,11 @@ int AppMain(int argc, char *argv[]) {
   
   Index  *ind = IndexManager::openIndex(inputIndex);
   DocStream *qryStream = new BasicDocStream(inputQuerySet);
-  ifstream result(inputResultFile);
+  ifstream result(inputResultFile, ios::in);
+  if (result.fail()) {
+    throw Exception("AppMain", "can't open the result file, check parameter value for resultFile");
+  }
+
   ofstream os(inputExpandedQueryFile);
   
   ResultFile resFile(result, *ind);
