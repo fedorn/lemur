@@ -537,6 +537,7 @@ bool InvIndex::docMgrIDs() {
     str[len] = '\0';
     DocumentManager* dm = DocMgrManager::openDocMgr(str);
     docmgrs.push_back(dm);
+    delete[]str;
     //docmgrs.push_back(str);
   }
   fclose(in);
