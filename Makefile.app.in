@@ -1,0 +1,28 @@
+# compiling C++ code
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+%: %.o
+	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+INC = @includedir@
+LIBPATH = @libdir@
+LIB = @PACKAGE_TARNAME@
+LDFLAGS = -L$(LIBPATH) -l$(LIB) -lm
+CXX = @CXX@
+CFLAGS = @DEFS@ @CFLAGS@ 
+CXXFLAGS  = @DEFS@ @CXXFLAGS@ -I$(INC)
+
+## specify your object files here
+OBJS =
+## specify your program here
+PROG =
+
+all: $(PROG)
+
+$(PROG): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+clean:
+	rm $(PROG) $(OBJS)
