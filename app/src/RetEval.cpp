@@ -37,9 +37,7 @@ It currently supports three different models:
 </ol>
 <p>
 The parameter to select the model is <tt>retModel</tt> (with value 0 for
-TFIDF, 1 for Okapi, and 2 for KL). It is suspected that there is a bug
-in the implementation of the feedback for Okapi BM25 retrieval function,
-because the performance is not as expected. 
+TFIDF, 1 for Okapi, 2 for KL, and 3 for CORI (inquery)). It is suspected that there is a bugin the implementation of the feedback for Okapi BM25 retrieval function, because the performance is not as expected. 
 <p>
 Other common parameters (for all retrieval methods)  are:
 <p>
@@ -86,6 +84,12 @@ about the Okapi system is not clear about how this is set, so
 it's implemented as a parameter.)
 </ol>
 
+<li>For CORI:
+<ol>
+<li><tt>TF_factor</tt>
+<li><tt>TF_baseline</tt>
+<li> <tt>collCounts</tt> - Use value "USE_INDEX_COUNTS" to use counts from the index if no separate collection counts file is available.  For collection selection indexes built from collSell application, that file is auto generated.
+</ol>
 <li>For KL-divergence:
 <ol>
 
