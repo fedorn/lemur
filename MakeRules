@@ -25,27 +25,28 @@ endif
 
 # compiling C++ code
 %.o: ../src/%.cpp
+	echo "$(CXX) $(CPPFLAGS) -o $@ -c $<"
 	$(CXX) $(CPPFLAGS) -o $@ -c $<
 
 # compiling C code
 %.o: ../src/%.c
+	echo "$(CC) $(CFLAGS) -o $@ -c $<"
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 # how to make a library from object files
 $(OBJLIB): $(OBJ)
+	echo "rm -f $@; ar -rs $@ $(OBJ)"
 	rm -f $@; ar -rs $@ $(OBJ)
 
 # how to clean a library module directory
 cleanlib:
+	echo "rm -f *.o; rm -f ../depend/*.d; rm -f *.a"
 	rm -f *.o; rm -f ../depend/*.d; rm -f *.a
 
 # how to clean an application directory
 cleanapp:
+	echo "rm -f *.o; rm -f ../depend/*.d; rm -f $(CPPAPPBIN) $(CAPPBIN)"
 	rm -f *.o; rm -f ../depend/*.d; rm -f $(CPPAPPBIN) $(CAPPBIN)
-
-
-
-
 
 
 
