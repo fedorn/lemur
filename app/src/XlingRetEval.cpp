@@ -36,7 +36,7 @@ language collection. This is the collection that is searched.
 <li> <tt>resultFile</tt>: the result file
 <li> <tt>resultFormat</tt>: whether the result format should be of the 
 TREC format (i.e., six-column) or just a simple three-column format 
-<tt>&lt;queryID, docID, score><tt>. String value, either <tt>trec</tt>
+<tt>&lt;queryID, docID, score&gt;<tt>. String value, either <tt>trec</tt>
 for TREC format or <tt>3col</tt> for three column format. Default: TREC 
 format.
 <li> <tt>resultCount</tt>: the number of documents to return for each query 
