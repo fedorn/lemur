@@ -138,8 +138,8 @@ private:
   int* counts;    // array to hold all the overall count stats of this db
   char** names;   // array to hold all the names for files we need for this db
   float aveDocLen; // the average document length in this index
-  entry* lookup;  // the array holding entries (index is termid)
-  entry* dtlookup; // the array holding entries to dt index (index of array is docid)
+  inv_entry* lookup;  // the array holding entries (index is termid)
+  dt_entry* dtlookup; // the array holding entries to dt index (index of array is docid)
   TERM_T* terms;   // array of the term spellings (index is termid)
   EXDOCID_T* docnames; // array of the external docids (index is docid)
   char** dtfiles; // array of dt index filenames
