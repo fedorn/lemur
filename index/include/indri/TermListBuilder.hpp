@@ -86,6 +86,8 @@ namespace indri {
                 >> extent.begin
                 >> extent.end
                 >> extent.number;
+
+          _fields.push_back( extent );
         }
       }
 
