@@ -48,6 +48,12 @@ const char * wordKeySuffix       = "wkey";
 const char * documentKeySuffix   = "dkey";
 const char * indexFileSuffix     = "bsc";
 
+static void my_assert(int exp, char * msg) {
+  if (exp == 0) {
+    cerr << "Assertion failed: " << msg << endl;
+    exit(0);
+  }
+}
 
 static bool fileExist(char *name)
 {
@@ -114,9 +120,6 @@ BasicIndex::~BasicIndex()
   }
 }
 
-
-
-
 void BasicIndex::build(DocStream *collectionStream, 
 		       const char *file, const char * outputPrefix, 
 		  int totalDocs, int maxMemory, 
@@ -169,7 +172,7 @@ void BasicIndex::writeIndexFile()
   char fn[1024];
   sprintf(fn, "%s.%s", (const char *) prefix, indexFileSuffix);
   FILE * fp = fopen(fn, "w");
-  assert(fp);
+  my_assert((fp != (FILE *)NULL), "Opening index file.");
   time_t t;
   time(&t);
   String date = ctime(&t);
@@ -248,14 +251,15 @@ bool BasicIndex::open(const char * fn)
   docids.open(documentVocabulary);
 
   // Open up indices
-  // textStream.open(textFile); assert(textStream);
   wordIndexStream.open(wordIndexFile, ios::binary | ios::in); 
-  assert(wordIndexStream);
+  my_assert(wordIndexStream.good(), "Opening word index");
   documentIndexStream.open(documentIndexFile, ios::binary | ios::in); 
-  assert(documentIndexStream);
+  my_assert(documentIndexStream.good(), "Opening document index");
+  ifstream wordKeyStream(wordKeyFile); 
+  my_assert(wordKeyStream.good(), "Opening word key stream");
+  ifstream documentKeyStream(documentKeyFile); 
+  my_assert(documentKeyStream.good(), "Opening document key stream");
 
-  ifstream wordKeyStream(wordKeyFile); assert(wordKeyStream);
-  ifstream documentKeyStream(documentKeyFile); assert(documentKeyStream);
   cout << "Input streams successfully opened." << endl;
 
   // Set up compression scheme 
@@ -265,7 +269,7 @@ bool BasicIndex::open(const char * fn)
   }
   else {
     // no other compression currently supported!
-    assert(0);
+    my_assert(0, "Invalid compression scheme");
   }
 
   // Read in key information, etc.
@@ -280,7 +284,7 @@ bool BasicIndex::open(const char * fn)
     wordKeyStream.getline(rec, MAXLINE, '\n');
     p = strtok(rec, " ");
     int k = terms[p];
-    assert (k != -1);
+    my_assert (k != -1, "Invalid term");
     p = strtok(NULL, " ");
     int c = atoi(p);
     countOfTerm[k] = c;
@@ -300,7 +304,7 @@ bool BasicIndex::open(const char * fn)
     documentKeyStream.getline(rec, MAXLINE, '\n');
     p = strtok(rec, " ");
     int k = docids[p];
-    assert (k != -1);
+    my_assert (k != -1, "Invalid docid");
     p = strtok(NULL, " ");
     int c = atoi(p);
     countOfDoc[k] = c;
@@ -311,7 +315,7 @@ bool BasicIndex::open(const char * fn)
     totalDocCount += c;
   }
   documentKeyStream.close();
-  assert(totalDocCount == totalWordCount);
+  my_assert(totalDocCount == totalWordCount, "DocCount != WordCount");
 
   tmpdarr = new int[2*docids.size()];
   tmpwarr = new int[2*terms.size()];
@@ -349,7 +353,7 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
 
     Document *thisDoc = pDocStream->nextDoc();
     // make sure docid is not duplicated
-    assert (doc[thisDoc->getID()]==-1);  
+    my_assert ((doc[thisDoc->getID()]==-1), "Invalid docId");  
     doc += thisDoc->getID();
     //    cerr << "id: "<< thisDoc->getID() << endl;
     thisDoc->startTermIteration();
@@ -390,7 +394,7 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
   sprintf(name, "%s.%s", (const char *) prefix, wordVocSuffix);
   wordVocabulary = name;
   ofstream ofs(wordVocabulary);
-  assert(ofs);
+  my_assert(ofs.good(), "Invalid word vocabulary");
   cerr << "Pruning vocabulary with minimum count " << minCount << endl;
   ofs << Terms::getOOVSpelling() << endl;
   for (i=n-1; i>=0; --i) {
@@ -403,7 +407,7 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
   sprintf(name, "%s.%s", (const char *) prefix, documentVocSuffix);
   documentVocabulary = name;
   ofstream ofs2(documentVocabulary);
-  assert(ofs2);
+  my_assert(ofs2.good(), "Invalid document vocabulary");
   cerr << "Number of document ids: " << doc.size() << endl;
   ofs2 << Terms::getOOVSpelling() << endl;
   for (i=0; i<doc.size(); ++i) {
@@ -423,7 +427,7 @@ void BasicIndex::writeWordIndex(int indexNum, FastList<IndexCount> * dlw)
 	  (const char *) prefix, wordIndexSuffix, indexNum);
   wordIndexFile = outputName;
   ofstream ofs(outputName, ios::binary | ios::out);
-  assert(ofs);
+  my_assert(ofs.good(), "Opening word index");
   int termsWritten=0;
 
   cerr << "\nWriting index to " << outputName << endl;
@@ -432,7 +436,7 @@ void BasicIndex::writeWordIndex(int indexNum, FastList<IndexCount> * dlw)
     if (docList.HeadLL() == NULL) continue;
     int numEntries = docList.ComputeLength();
     int totalCount = 0;
-    assert(numEntries > 0);
+    my_assert((numEntries > 0), "Zero entries");
     int prevDoc=0;
     int index=0;
     const FLL<IndexCount> *dll;
@@ -444,9 +448,9 @@ void BasicIndex::writeWordIndex(int indexNum, FastList<IndexCount> * dlw)
       a[numEntries+index] = c;
       totalCount += c;
       index++;
-      assert(c > 0);
+      my_assert((c > 0), "Zero count");
     }
-    assert(index == numEntries);
+    my_assert((index == numEntries), "Invalid num entries");
     ofs.write((char *)&i, sizeof(int));
     ofs.write((char *)&totalCount, sizeof(int));
     pCompressor->compress(ofs, 2*numEntries, a);
@@ -478,7 +482,7 @@ int BasicIndex::indexCollection()
   sprintf(name, "%s.%s", (const char *) prefix, documentIndexSuffix);
   documentIndexFile = name;
   ofstream ofs(name, ios::binary | ios::out);
-  assert(ofs);
+  my_assert(ofs.good(), "Opening document index file");
 
   pDocStream->startDocIteration();
   //  pDocStream->open(textFile);
@@ -514,7 +518,7 @@ int BasicIndex::indexCollection()
     Document *thisDoc = pDocStream->nextDoc();
 
     did = docids[thisDoc->getID()];
-    assert(did > 0);
+    my_assert((did > 0), "Bad document id");
     thisDoc->startTermIteration();
     while (thisDoc->hasMore()) {
 
@@ -600,7 +604,7 @@ int BasicIndex::headWordIndex()
   char fn[1024];
   sprintf(fn, "%s.%s", (const char *) prefix, wordIndexSuffix);
   ifstream ifs(fn, ios::binary | ios::in);
-  assert(ifs);
+  my_assert(ifs.good(), "Opening word index");
 
   while (ifs.peek() != EOF) {
     ifs.read((char *)&w, sizeof(int));
@@ -632,7 +636,7 @@ int BasicIndex::headDocIndex()
   char fn[1024];
   sprintf(fn, "%s.%s", (const char *) prefix, documentIndexSuffix);
   ifstream ifs(fn, ios::binary | ios::in);
-  assert(ifs);
+  my_assert(ifs.good(), "Opening doc index");
 
   while (ifs.peek() != EOF) {
     ifs.read((char *)&d, sizeof(int));
@@ -670,11 +674,11 @@ int BasicIndex::mergePair(const char * fn1, const char * fn2, const char * fn3)
   cerr << "Merging: \n " << fn1 << "\n " << fn2 << endl;
 
   ifstream ifs1(fn1, ios::binary | ios::in);
-  assert(ifs1);
+  my_assert(ifs1.good(), "opening index file1");
   ifstream ifs2(fn2, ios::binary | ios::in);
-  assert(ifs2);
+  my_assert(ifs2.good(), "opening index file2");
   ofstream ofs(fn3, ios::binary | ios::out);
-  assert(ofs);
+  my_assert(ofs.good(), "opening output index file");
 
   ifs1.read((char *)&w1, sizeof(int));
   ifs1.read((char *)&c1, sizeof(int));
@@ -712,7 +716,7 @@ int BasicIndex::mergePair(const char * fn1, const char * fn2, const char * fn3)
 	dc3[i] = dc1[i];
 	currDoc += dc1[i];
       }
-      assert(dc2[0] > currDoc);
+      my_assert((dc2[0] > currDoc), "unaligned file");
 
       // Handle the "boundary" between records, 
       // which are delta-encoded
@@ -774,9 +778,7 @@ void BasicIndex::mergeIndexFiles()
     // We're finished when only indexPrefix.0 is present;
     sprintf(tmpnam1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, 0);
 
-    //  assert(qfilef(tmpnam1));
-    
-    assert(fileExist(tmpnam1));
+    my_assert(fileExist(tmpnam1), "Tmp file does not exist");
 
     sprintf(tmpnam1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, 1);
     //if (!qfilef(tmpnam1)) break;
@@ -792,7 +794,7 @@ void BasicIndex::mergeIndexFiles()
 	sprintf(tmpnam1, "%s.%s.%d", 
 		(const char *) prefix, wordIndexSuffix, i/2);
 	remove(tmpnam1);
-	assert(rename(fname1, tmpnam1) == 0);
+	my_assert((rename(fname1, tmpnam1) == 0), "Unable to rename");
       }
       else {
 	sprintf(tmpnam1, "%s.%s.tmp.%d.%d", 
@@ -800,10 +802,10 @@ void BasicIndex::mergeIndexFiles()
 	sprintf(tmpnam2, "%s.%s.%d", 
 		(const char *) prefix, wordIndexSuffix, i/2);
 	mergePair(fname1, fname2, tmpnam1);
-	assert(remove(fname1)==0);
-	assert(remove(fname2)==0);
+	my_assert((remove(fname1)==0), "Could not remove file1");
+	my_assert((remove(fname2)==0), "Could not remove file2");
 	remove(tmpnam2);
-	assert (rename(tmpnam1, tmpnam2) == 0);
+	my_assert((rename(tmpnam1, tmpnam2) == 0), "Could not rename");
       }
     }
   }
@@ -811,7 +813,7 @@ void BasicIndex::mergeIndexFiles()
   sprintf(fname1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, 0);
   sprintf(tmpnam1, "%s.%s", (const char *) prefix, wordIndexSuffix);
   remove(tmpnam1);
-  assert(rename(fname1, tmpnam1)==0);
+  my_assert((rename(fname1, tmpnam1)==0), "Renaming file1");
   wordIndexFile = tmpnam1;
 
   headWordIndex();
@@ -820,9 +822,9 @@ void BasicIndex::mergeIndexFiles()
 void BasicIndex::createKey(const char * inName, const char * outName, 
 		      Terms & voc, int * byteOffset) {
   ofstream ofs(outName);
-  assert(ofs);
+  my_assert(ofs.good(), "opening key file");
   ifstream ifs(inName, ios::binary | ios::in);
-  assert(ifs);
+  my_assert(ifs.good(), "Opening input key file");
 
   int d, c;
   cerr << "Creating key file " << outName << endl;

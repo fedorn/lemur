@@ -15,6 +15,13 @@
 Terms* Terms::setOfSets = NULL;
 int    Terms::nSetsOpen = 0;
   
+static void my_assert(int exp, char * msg) {
+  if (exp == 0) {
+    cerr << msg << endl;
+    exit(0);
+  }
+}
+
 Terms *Terms::construct(const char *path_) {
   // access only through here 
   int n = NSetsOpen();
@@ -31,7 +38,7 @@ int Terms::tokenize(const char *buff, Array<unsigned short> &tokenized) const {
   tokenized.Grow(tokenizedInt.Size());
   for (int i=0; i<(int) tokenizedInt.Size(); i++) {
     tokenized[i] = (unsigned short) tokenizedInt[i];
-    assert(tokenizedInt[i]<65536); // overflow error? 
+    my_assert((tokenizedInt[i]<65536), "overflow error?");
   }
   return tokenized.Size();
 }

@@ -16,7 +16,11 @@
 Index *IndexManager::openIndex(const char *indexTOCFile)
 {
   int len = strlen(indexTOCFile);
-  assert (len>4 && indexTOCFile[len-4]=='.'); // it must have format .xxx 
+  if (!(len>4 && indexTOCFile[len-4]=='.')) {
+    ; // it must have format .xxx 
+    cerr << "Index file must have format .xxx" << endl;
+    exit(0);
+  }
 
   Index *ind;
   const char *extension = &(indexTOCFile[len-3]);

@@ -9,8 +9,9 @@
  *==========================================================================
 */
 
+#include <iostream>
+#include <stdlib.h>
 #include "ScoreAccumulator.hpp"
-#include <cassert>
 
 void ArrayAccumulator::reset()
 {
@@ -32,7 +33,10 @@ bool ArrayAccumulator::findScore(int id, double &score)
 }
 
 bool ArrayAccumulator::hasMore() {
-  assert (p>=0 && p<=sz);
+  if (!(p>=0 && p<=sz)) {
+    cerr << "Illegal score" << endl;
+    exit(0);
+  }
   while (p<sz && status[p]==0) p++;
   return (p<sz);
 }
