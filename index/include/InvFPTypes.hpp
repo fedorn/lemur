@@ -17,15 +17,7 @@
 #define IND_VERSION "3.0"
 
 #include "common_headers.hpp"
-
-typedef int   FILEID_T;
-typedef int   TERMID_T;
-typedef TERMID_T LOC_T;  // for simplifying implementation of memory management, it's helpful for termid and location to be of the same type.
-typedef TERMID_T DOCID_T;
-typedef float SCORE_T;
-typedef string TERM_T;
-typedef string EXDOCID_T;
-typedef void* POS_T;  // Used by DocLists and TermLists
+#include "IndexTypes.hpp"
 
 // suffixes for filenames
 #define INVINDEX  ".invf"
