@@ -45,6 +45,7 @@ InvFPPushIndex::InvFPPushIndex(char* prefix, int cachesize, long maxfilesize, DO
 InvFPPushIndex::~InvFPPushIndex() {
 //  fclose(writetlist);
   writetlist.close();
+  fclose(writetlookup);
   if (cache)
     delete(cache);
   free(name);
@@ -234,6 +235,7 @@ void InvFPPushIndex::writeDocIDs() {
    fprintf(docid, "%d %d %s ", 0, strlen(INVALID_STR), INVALID_STR);
    for (int i=0;i<docIDs.size();i++) {
      fprintf(docid, "%d %d %s ", i+1, strlen(docIDs[i]), docIDs[i]);
+     free(docIDs[i]);
    }
    fclose(docid);
    delete[](dname);
