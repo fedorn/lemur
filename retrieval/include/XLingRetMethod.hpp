@@ -119,7 +119,7 @@ public:
   /// @param dict the translation dictionary to use.
   /// @param stp optional Stopper for source language terms.
   /// @param stm optional Stemmer for source language terms.
-  XLingQueryModel(const TextQuery &qry, const Index &source, 
+  XLingQueryModel(const TermQuery &qry, const Index &source, 
 		  bool dbS, double numSource,
 		  PDict &dict, const Stopper *stp = NULL, 
 		  Stemmer *stm = NULL) {
@@ -260,9 +260,10 @@ public:
 				  bool scoreAll = false);
 
   virtual QueryRep *computeQueryRep(const Query &qry) {
-    const TextQuery *q = static_cast<const TextQuery *>(&qry);
-    return (new XLingQueryModel(*q, source, docBasedSourceSmooth, numSource,
-				dictionary, stopper, stemmer));
+    if (const TermQuery *q = dynamic_cast<const TermQuery *>(&qry))
+      return (new XLingQueryModel(*q, source, docBasedSourceSmooth, numSource,
+				  dictionary, stopper, stemmer));
+    else LEMUR_THROW(LEMUR_RUNTIME_ERROR, "XLingRetMethod expects query of type TermQuery");
   } 
 
   virtual QueryRep *computeTargetKLRep(const QueryRep *qry);

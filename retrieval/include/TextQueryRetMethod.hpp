@@ -14,6 +14,7 @@
 
 
 #include "RetrievalMethod.hpp"
+#include "TermQuery.hpp"
 #include "TextQueryRep.hpp"
 #include "DocumentRep.hpp"
 #include "PassageRep.hpp"
@@ -88,7 +89,7 @@ public:
   }
 
   /// compute the query representation for a text query (caller responsible for deleting the memory of the generated new instance)
-  virtual TextQueryRep *computeTextQueryRep(const TextQuery &qry)=0;
+  virtual TextQueryRep *computeTextQueryRep(const TermQuery &qry)=0;
   /// compute a query rep for an existing doc (DOCID_T needed).
   virtual TextQueryRep *computeTextQueryRep(int docid){
     return NULL; 
@@ -133,7 +134,7 @@ public:
   /// @param psgSize the number of tokens for sliding window. 
   /// @param overlap the number of tokens to overlap in each passage. 
   /// @return the maximum score over the passages.
-  virtual double scoreDocPassages(const TextQuery &qRep, int docID, 
+  virtual double scoreDocPassages(const TermQuery &qRep, int docID, 
 				  PassageScoreVector &scores, 
 				  int psgSize, int overlap);
   
@@ -151,8 +152,10 @@ protected:
 //=============== inlines ========================================
 
 inline QueryRep *TextQueryRetMethod::computeQueryRep(const Query &qry) { 
-  const TextQuery *q = static_cast<const TextQuery *>(&qry);
-  return (computeTextQueryRep(*q));
+  if (const TermQuery *q = dynamic_cast<const TermQuery *>(&qry))
+    return (computeTextQueryRep(*q));
+  else 
+    LEMUR_THROW(LEMUR_RUNTIME_ERROR, "TextQueryRetMethod expects a TermQuery object");
 }
 
 #endif /* _TEXTQUERYRETMETHOD_HPP */
