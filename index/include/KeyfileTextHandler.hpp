@@ -38,6 +38,7 @@ public:
 
 private:
   void endDoc();
+  void endCollection();
 
   int docLength;
   DocumentProps* dp;

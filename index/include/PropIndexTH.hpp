@@ -51,6 +51,7 @@ public:
 protected:
   /// Ends a document in the collection
   void endDoc();
+  void endCollection();
 
   /// The indexer.
   PushIndex * index;

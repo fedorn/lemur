@@ -26,6 +26,7 @@
 #include "InvFPDocList.hpp"
 #include "InvFPTermList.hpp"
 #include "InvFPTypes.hpp"
+#include "BasicCollectionProps.hpp"
 #include "Param.hpp"
 #include "PushIndex.hpp"
 #include "MemCache.hpp"
@@ -129,7 +130,7 @@ protected:
   /// try to open an existing index
   bool tryOpen();
   /// write out the table of contents file.
-  void writeTOC();
+  void writeTOC(const CollectionProps* cp);
   /// write out the cache
   void writeCache( bool lastRun = false );
   /// final run write out of cache
@@ -175,6 +176,7 @@ public:
   /// The document manager for this document
   const DocumentManager *docManager(DOCID_T docID) const;
 
+  const CollectionProps *collectionProps() const;
   //@}
 
   /// @name Summary counts
@@ -314,6 +316,8 @@ protected:
   vector<DocumentManager*> docMgrs; 
   /// cache of term entries
   TermCache _cache;
+  /// list of collection properties
+  mutable BasicCollectionProps* cprops;
 
   /// out-of-tree segments for data
   std::vector<File*> _segments;

@@ -11,7 +11,7 @@
 #include "TextHandler.hpp"
 #include "InvPushIndex.hpp"
 #include "InvFPPushIndex.hpp"
-
+#include "BasicCollectionProps.hpp"
 
 #ifndef _INVFPTEXTHANDLER_HPP
 #define _INVFPTEXTHANDLER_HPP
@@ -44,7 +44,7 @@ public:
 protected:
   /// Ends a document in the collection
   void endDoc();
-
+  void endCollection();
 
   /// The indexer.
   PushIndex * index;
@@ -62,6 +62,7 @@ protected:
   /// Indicates whether object is before first doc
   /// true = yes, false = foundDoc has been called once.
   bool first;
+
 };
 
 #endif
