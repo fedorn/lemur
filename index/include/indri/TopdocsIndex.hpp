@@ -1,3 +1,13 @@
+/*==========================================================================
+ * Copyright (c) 2004 University of Massachusetts.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software, and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 
 //
 // TopdocsIndex
@@ -57,6 +67,7 @@ private:
   std::string _pathname;
   Keyfile _lists;
   UINT64 _documents;
+  bool _readOnly;
   
   void _getListEntries( std::vector<Entry>& output, Entry& smallest, IndriIndex& index, int term, UINT64 total, UINT64 keep );
   void _writeList( const std::vector<Entry>& input, const Entry& smallest, int term );
