@@ -52,11 +52,12 @@ void IndriRetMethod::setStopwords(const string &stopfile) {
     return;
   }
   params->set("stopper","");
+  Parameters myParams = params->get("stopper");
   string word;
   while (ifs >> word) {
     // put in param object too so RM expander will see them if need be.
     stopwords.push_back(word);
-    params->append("word").set(word);
+    myParams.append("word").set(word);
   }
   env->setStopwords(stopwords);
 }
