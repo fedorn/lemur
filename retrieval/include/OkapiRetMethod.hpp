@@ -13,6 +13,7 @@ namespace OkapiParameter {
     double k1;
     double b;
     double k3;
+    /// The (pseudo) count of a new term added to the query (It's unclear how this is set from the Okapi paper, so it's implemented as a parameter.)
     double expQTF; // expanded query term TF
   }; 
 };
@@ -32,6 +33,7 @@ private:
   double k3;
 };
 
+/// The Okapi scoring function
 
 class OkapiScoreFunc : public ScoreFunction {
 public:
@@ -77,6 +79,7 @@ protected:
   OkapiParameter::TFParam &prm;
 };
 
+/// The Okapi BM25 retrieval function, as described in their TREC-3 paper
 
 class OkapiRetMethod : public RetrievalMethod  {
 public:

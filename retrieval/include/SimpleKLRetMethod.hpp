@@ -123,13 +123,16 @@ protected:
   DocUnigramCounter *collectLMCounter; // support collectLM
   SimpleKLScoreFunc *scFunc; // keep a copy to be used at any time
 private:
+  /// Markov chain feedback method
   MLUnigramLM *computeMCQueryModel(ArrayCounter<double> &counter,
 				   SimpleKLQueryModel &origRep,
 				   DocIDSet &relDocs,
 				   Index &ind, 
 				   int stopWordCutoff, 
 				   double alpha);
+  /// Mixture model feedback method
   void computeMixtureFBModel(SimpleKLQueryModel &origRep, DocIDSet & relDocs);
+  /// Divergence minimization feedback method
   void computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs);
 };
 

@@ -108,6 +108,7 @@ protected:
   ArrayCounter<double> *ct;
 };
 
+/// Representation of a subset of feedback documents
 
 class PseudoFBDocs : public DocIDSet {
 public:

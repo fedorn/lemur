@@ -3,6 +3,7 @@
 
 #include "RetrievalMethod.hpp"
 
+/// Parameters used in the TFIDF retrieval method
 namespace TFIDFParameter {
 
   enum TFMethod  {RAWTF=0, LOGTF=1, BM25=2};
@@ -13,6 +14,7 @@ namespace TFIDFParameter {
   };
 };
 
+/// Representation of a query (as a weighted vector) in the TFIDF method
 class TFIDFQueryRep : public ArrayQueryRep {
 public:
   TFIDFQueryRep(TextQuery &qry, Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param);
@@ -26,6 +28,7 @@ protected:
   Index &ind;
 };
 
+/// Representation of a doc (as a weighted vector) in the TFIDF method
 class TFIDFDocRep : public DocumentRep {
 public:
   TFIDFDocRep(int docID, Index &dbIndex, double *idfValue,
@@ -47,7 +50,7 @@ private:
 };
 
 
-
+/// The TFIDF retrieval method with a few TF formula options
 
 class TFIDFRetMethod : public RetrievalMethod {
 public:
@@ -95,5 +98,10 @@ inline double TFIDFRetMethod ::BM25TF(const double rawTF, const double k1, const
 
 
 #endif /* _TFIDFRETMETHOD_HPP */
+
+
+
+
+
 
 

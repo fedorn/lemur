@@ -3,6 +3,8 @@
 
 #include "RetrievalMethod.hpp"
 
+/// A generic retrieval engine
+
 class RetrievalEngine {
 public:
   RetrievalEngine(RetrievalMethod &retMethod);
@@ -14,10 +16,11 @@ public:
   /// Performs pseudo-feedback retrieval and returns a ranked list of documents with scores
   virtual void retrievePseudoFeedback(TextQuery &qry, int howManyDoc, IndexedRealVector *&results);
 
-protected:
-
   /// a general scoring procedure shared by many different models
   virtual void scoreInvertedIndex(QueryRep &qryRep, IndexedRealVector &sortedScores);
+
+protected:
+
 
   Index *ind; // handle of index
   double *scAcc; // score accumulators
