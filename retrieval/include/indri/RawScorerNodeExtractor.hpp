@@ -26,9 +26,11 @@ class RawScorerNodeExtractor : public indri::lang::Walker {
 private:
   std::vector<indri::lang::RawScorerNode*> _scorerNodes;
   std::vector<indri::lang::Node*> _reachableNodes;
-  int _insideCount;
+  int _insideCount; // used unitialized
 
 public:
+  RawScorerNodeExtractor() : _insideCount(0) { }
+  
   void defaultBefore( indri::lang::Node* n ) {
     if( _insideCount ) {
       _reachableNodes.push_back(n);
