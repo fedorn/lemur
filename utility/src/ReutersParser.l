@@ -43,30 +43,30 @@
 extern FILE * reutersin;
 extern char * reuterstext;
 
-
+long reuterspos; 
 
 %}
 %%
 
-"</newsitem>"                       { return E_DOC; }
-"<newsitem "[^>]*">"                { return F_DOCNO; }
-"<text>"                            { return B_TEXT; }
-"</text>"                           { return E_TEXT; }
-"<headline>"                        { return B_TEXT; }
-"</headline>"                       { return E_TEXT; }
-"<title>"                           { return B_TEXT; }
-"</title>"                          { return E_TEXT; }
-"<"[/]?[a-zA-Z][^>]*">"             { /* zap tags */ }
-"<!"[^-][^>]*">"                    { /* zap other tags*/}
-[&][a-zA-Z]+[;]                     { /* zap symbols */ }
-[&][#][0-9]*[;]                     { /* zap symbols */ } 
-[A-Z][A-Z]+                         { return UPWORD; }
-[a-zA-Z0-9]+                        { return WORD; }
-[A-Z][A-Z]+((\')?[s])?              { return ACRONYM2; }
-[a-zA-Z0-9]+\'[a-zA-Z]+             { return CONTRACTION;}
-[A-Z]\.([A-Z]\.)+                   { return ACRONYM; }
-[\n]                                { /* zap newline */ }
-.                                   { return UNKNOWN; }
+"</newsitem>"                       { reuterspos += reutersleng; return E_DOC; }
+"<newsitem "[^>]*">"                { reuterspos += reutersleng; return F_DOCNO; }
+"<text>"                            { reuterspos += reutersleng; return B_TEXT; }
+"</text>"                           { reuterspos += reutersleng; return E_TEXT; }
+"<headline>"                        { reuterspos += reutersleng; return B_TEXT; }
+"</headline>"                       { reuterspos += reutersleng; return E_TEXT; }
+"<title>"                           { reuterspos += reutersleng; return B_TEXT; }
+"</title>"                          { reuterspos += reutersleng; return E_TEXT; }
+"<"[/]?[a-zA-Z][^>]*">"             { reuterspos += reutersleng; /* zap tags */ }
+"<!"[^-][^>]*">"                    { reuterspos += reutersleng; /* zap other tags*/}
+[&][a-zA-Z]+[;]                     { reuterspos += reutersleng; /* zap symbols */ }
+[&][#][0-9]*[;]                     { reuterspos += reutersleng; /* zap symbols */ } 
+[A-Z][A-Z]+                         { reuterspos += reutersleng; return UPWORD; }
+[a-zA-Z0-9]+                        { reuterspos += reutersleng; return WORD; }
+[A-Z][A-Z]+((\')?[s])?              { reuterspos += reutersleng; return ACRONYM2; }
+[a-zA-Z0-9]+\'[a-zA-Z]+             { reuterspos += reutersleng; return CONTRACTION;}
+[A-Z]\.([A-Z]\.)+                   { reuterspos += reutersleng; return ACRONYM; }
+[\n]                                { reuterspos += reutersleng; /* zap newline */ }
+.                                   { reuterspos += reutersleng; return UNKNOWN; }
 
 %%
 
@@ -81,17 +81,12 @@ ReutersParser::ReutersParser() {
 
 
 long ReutersParser::fileTell() {
-  int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
-  if (reutersin) {
-    long begin = ftell(reutersin)-YY_CURRENT_BUFFER->yy_n_chars;
-    return begin+offset;
-  }
-  return offset;
+  return reuterspos;
 }
 
 void 
 ReutersParser::parseFile(char * filename) {
-
+  reuterspos = 0;
   reutersin = fopen(filename, "r");
   doParse();
   fclose(reutersin);
@@ -126,7 +121,7 @@ void ReutersParser::doParse() {
         char * ide = strstr(id, "\"");
 	*ide = '\0';
         if (textHandler != NULL) textHandler->foundDoc(id);
-	docpos = fileTell();
+	docpos = reuterspos;
 	state = DOC;
 	break;
       }

@@ -39,7 +39,7 @@
 
 #ifdef __cplusplus
 
-#include <cstdlib>
+#include <stdlib.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -504,7 +504,7 @@ char *yytext;
 extern FILE * trecin;
 extern char * trectext;
 
-
+long trecpos;
 
 #line 511 "../src/TrecParser.cpp"
 
@@ -654,7 +654,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
+	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
 #line 49 "../src/TrecParser.l"
@@ -746,132 +746,132 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 51 "../src/TrecParser.l"
-{ return B_DOC; }
+{ trecpos += trecleng; return B_DOC; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 52 "../src/TrecParser.l"
-{ return E_DOC; }
+{ trecpos += trecleng; return E_DOC; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 53 "../src/TrecParser.l"
-{ return F_DOCNO; }
+{ trecpos += trecleng; return F_DOCNO; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 54 "../src/TrecParser.l"
-{ return B_TEXT; }
+{ trecpos += trecleng; return B_TEXT; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 55 "../src/TrecParser.l"
-{ return E_TEXT; }
+{ trecpos += trecleng; return E_TEXT; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 56 "../src/TrecParser.l"
-{ return B_TEXT; }
+{ trecpos += trecleng; return B_TEXT; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 57 "../src/TrecParser.l"
-{ return E_TEXT; }
+{ trecpos += trecleng; return E_TEXT; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 58 "../src/TrecParser.l"
-{ return B_TEXT; }
+{ trecpos += trecleng; return B_TEXT; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 59 "../src/TrecParser.l"
-{ return E_TEXT; }
+{ trecpos += trecleng; return E_TEXT; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 60 "../src/TrecParser.l"
-{ return B_TEXT; }
+{ trecpos += trecleng; return B_TEXT; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 61 "../src/TrecParser.l"
-{ return E_TEXT; }
+{ trecpos += trecleng; return E_TEXT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 62 "../src/TrecParser.l"
-{ return B_TEXT; }
+{ trecpos += trecleng; return B_TEXT; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 63 "../src/TrecParser.l"
-{ return E_TEXT; }
+{ trecpos += trecleng; return E_TEXT; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 64 "../src/TrecParser.l"
-{ return B_TEXT; }
+{ trecpos += trecleng; return B_TEXT; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 65 "../src/TrecParser.l"
-{ return E_TEXT; }
+{ trecpos += trecleng; return E_TEXT; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 66 "../src/TrecParser.l"
-{ /* zap tags */ }
+{ trecpos += trecleng; /* zap tags */ }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 67 "../src/TrecParser.l"
-{ /* zap other tags*/}
+{ trecpos += trecleng; /* zap other tags*/}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 68 "../src/TrecParser.l"
-{ /* zap symbols */ }
+{ trecpos += trecleng; /* zap symbols */ }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 69 "../src/TrecParser.l"
-{ /* zap symbols */ } 
+{ trecpos += trecleng; /* zap symbols */ } 
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 70 "../src/TrecParser.l"
-{ return UPWORD; }
+{ trecpos += trecleng; return UPWORD; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 71 "../src/TrecParser.l"
-{ return WORD; }
+{ trecpos += trecleng; return WORD; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 72 "../src/TrecParser.l"
-{ return ACRONYM2; }
+{ trecpos += trecleng; return ACRONYM2; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 73 "../src/TrecParser.l"
-{ return CONTRACTION;}
+{ trecpos += trecleng; return CONTRACTION;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 74 "../src/TrecParser.l"
-{ return ACRONYM; }
+{ trecpos += trecleng; return ACRONYM; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 75 "../src/TrecParser.l"
-{ /* zap newline */ }
+{ trecpos += trecleng; /* zap newline */ }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 76 "../src/TrecParser.l"
-{ return UNKNOWN; }
+{ trecpos += trecleng; return UNKNOWN; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
@@ -1442,11 +1442,6 @@ YY_BUFFER_STATE b;
 	}
 
 
-#ifndef YY_ALWAYS_INTERACTIVE
-#ifndef YY_NEVER_INTERACTIVE
-extern int isatty YY_PROTO(( int ));
-#endif
-#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -1777,15 +1772,11 @@ TrecParser::TrecParser() {
 
 
 long TrecParser::fileTell() {
-  int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
-  if (trecin) {
-    long begin = ftell(trecin)-YY_CURRENT_BUFFER->yy_n_chars;
-    return begin+offset;
-  } 
-  return offset;
+  return trecpos;
 }
 
 void TrecParser::parseFile(char * filename) {  
+  trecpos = 0;
   trecin = fopen(filename, "r");
   doParse();
   fclose(trecin);
@@ -1811,7 +1802,7 @@ void TrecParser::doParse() {
     
     case B_DOC:
       state = DOC;
-      docpos = fileTell() - trecleng;
+      docpos = trecpos - trecleng;
       break;
 
     case F_DOCNO:

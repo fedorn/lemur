@@ -39,7 +39,7 @@
 
 #ifdef __cplusplus
 
-#include <cstdlib>
+#include <stdlib.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -518,9 +518,10 @@ char *yytext;
 extern FILE * webin;
 extern char * webtext;
 
+long webloc;
 
 
-#line 525 "../src/WebParser.cpp"
+#line 526 "../src/WebParser.cpp"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -668,13 +669,13 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
+	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
-#line 54 "../src/WebParser.l"
+#line 55 "../src/WebParser.l"
 
 
-#line 679 "../src/WebParser.cpp"
+#line 680 "../src/WebParser.cpp"
 
 	if ( yy_init )
 		{
@@ -759,120 +760,120 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 56 "../src/WebParser.l"
-{ return B_DOC; }
+#line 57 "../src/WebParser.l"
+{webloc += webleng; return B_DOC; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 57 "../src/WebParser.l"
-{ return E_DOC; }
+#line 58 "../src/WebParser.l"
+{webloc += webleng; return E_DOC; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 58 "../src/WebParser.l"
-{ return B_DOCHDR; }
+#line 59 "../src/WebParser.l"
+{webloc += webleng; return B_DOCHDR; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 59 "../src/WebParser.l"
-{ return E_DOCHDR; }
+#line 60 "../src/WebParser.l"
+{webloc += webleng; return E_DOCHDR; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 60 "../src/WebParser.l"
-{ return F_DOCNO; }
+#line 61 "../src/WebParser.l"
+{webloc += webleng; return F_DOCNO; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 61 "../src/WebParser.l"
-{ return B_DOCOLDNO; }
+#line 62 "../src/WebParser.l"
+{webloc += webleng; return B_DOCOLDNO; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 62 "../src/WebParser.l"
-{ return E_DOCOLDNO; }
+#line 63 "../src/WebParser.l"
+{webloc += webleng; return E_DOCOLDNO; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 63 "../src/WebParser.l"
-{ return B_SCRIPT; }
+#line 64 "../src/WebParser.l"
+{webloc += webleng; return B_SCRIPT; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 64 "../src/WebParser.l"
-{ return E_SCRIPT; } 
+#line 65 "../src/WebParser.l"
+{webloc += webleng; return E_SCRIPT; } 
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 65 "../src/WebParser.l"
-{ return B_COMMENT; }
+#line 66 "../src/WebParser.l"
+{webloc += webleng; return B_COMMENT; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 66 "../src/WebParser.l"
-{ return E_COMMENT; }
+#line 67 "../src/WebParser.l"
+{webloc += webleng; return E_COMMENT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 67 "../src/WebParser.l"
-{ /* zap tags */ }
+#line 68 "../src/WebParser.l"
+{webloc += webleng; /* zap tags */ }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 68 "../src/WebParser.l"
-{ /* zap other tags*/}
+#line 69 "../src/WebParser.l"
+{webloc += webleng; /* zap other tags*/}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 69 "../src/WebParser.l"
-{ /* zap symbols */ }
+#line 70 "../src/WebParser.l"
+{webloc += webleng; /* zap symbols */ }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 70 "../src/WebParser.l"
-{ /* zap symbols */ } 
+#line 71 "../src/WebParser.l"
+{webloc += webleng; /* zap symbols */ } 
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 71 "../src/WebParser.l"
-{ return UPWORD; }
+#line 72 "../src/WebParser.l"
+{webloc += webleng; return UPWORD; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 72 "../src/WebParser.l"
-{ return WORD; }
+#line 73 "../src/WebParser.l"
+{webloc += webleng; return WORD; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 73 "../src/WebParser.l"
-{ return ACRONYM2; }
+#line 74 "../src/WebParser.l"
+{webloc += webleng; return ACRONYM2; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 74 "../src/WebParser.l"
-{ return CONTRACTION;}
+#line 75 "../src/WebParser.l"
+{webloc += webleng; return CONTRACTION;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 75 "../src/WebParser.l"
-{ return ACRONYM; }
+#line 76 "../src/WebParser.l"
+{webloc += webleng; return ACRONYM; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 76 "../src/WebParser.l"
-{ /* zap newline */ }
+#line 77 "../src/WebParser.l"
+{webloc += webleng; /* zap newline */ }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 77 "../src/WebParser.l"
-{ return UNKNOWN; }
+#line 78 "../src/WebParser.l"
+{webloc += webleng; return UNKNOWN; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 79 "../src/WebParser.l"
+#line 80 "../src/WebParser.l"
 ECHO;
 	YY_BREAK
-#line 877 "../src/WebParser.cpp"
+#line 878 "../src/WebParser.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1436,11 +1437,6 @@ YY_BUFFER_STATE b;
 	}
 
 
-#ifndef YY_ALWAYS_INTERACTIVE
-#ifndef YY_NEVER_INTERACTIVE
-extern int isatty YY_PROTO(( int ));
-#endif
-#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -1758,7 +1754,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 79 "../src/WebParser.l"
+#line 80 "../src/WebParser.l"
 
 
 #define OUTER 0
@@ -1775,17 +1771,12 @@ WebParser::WebParser() {
 }
 
 long WebParser::fileTell() {
-  int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
-  if (webin) {
-    long begin = ftell(webin)-YY_CURRENT_BUFFER->yy_n_chars;
-    return begin+offset;
-  }
-  return offset;
+  return webloc;
 }
 
 void 
 WebParser::parseFile(char * filename) {
-  
+  webloc = 0;
   webin = fopen(filename, "r");
   doParse();
   fclose(webin);
@@ -1812,7 +1803,7 @@ void WebParser::doParse() {
       break;
     
     case B_DOC:
-      docpos = fileTell() - webleng;
+      docpos = webloc - webleng;
       state = DOC;
       break;
 

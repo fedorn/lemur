@@ -45,6 +45,7 @@ extern FILE * Chinesein;
 extern char * Chinesetext;
 
 
+long chinesepos;
 
 %}
 %s SKIP
@@ -56,34 +57,34 @@ gb_skip {gb_punct}|{gb_space}|{gb_skip_punct}|{gb_decpt}
 
 %%
 
-"<DOC>"                             { return B_DOC; /*1*/}
-"</DOC>"                            { return E_DOC; /*2*/}
-"<DOCNO>"[^<]*"</DOCNO>"            { return F_DOCNO; /*3*/}
-"<TEXT>"                            { return B_TEXT; /*4*/}
-"</TEXT>"                           { return E_TEXT; /*5*/}
-"<HL>"                              { return B_TEXT;/*6*/ }
-"</HL>"                             { return E_TEXT;/*7*/ }
-"<HEAD>"                            { return B_TEXT;/*8*/ }
-"</HEAD>"                           { return E_TEXT;/*9*/ }
-"<HEADLINE>"                        { return B_TEXT;/*10*/ }
-"</HEADLINE>"                       { return E_TEXT; /*11*/}
-"<TTL>"                             { return B_TEXT;/*12*/ }
-"</TTL>"                            { return E_TEXT;/*13*/ }
-"<LP>"                              { return B_TEXT; /*14*/}
-"</LP>"                             { return E_TEXT; /*15*/}
-"<"[/]?[a-zA-Z][^>]*">"             { /* zap tags */ }
-"<!"[^-][^>]*">"                    { /* zap other tags*/}
-[&][a-zA-Z]+[;]                     { /* zap symbols */ }
-[&][#][0-9]*[;]                     { /* zap symbols */ }
-{gb_skip}[^\r\t\n ]*                { yyless(2); /* zap one chinese punctutions */ } 
-[A-Z][A-Z]+                         { return UPWORD; }
-[a-zA-Z0-9]+                        { return WORD; }
-[A-Z][A-Z]+((\')?[s])?              { return ACRONYM2; }
-[a-zA-Z0-9]+\'[a-zA-Z]+             { return CONTRACTION;}
-[A-Z]\.([A-Z]\.)+                   { return ACRONYM; }
-[^\r\t\n ]+                         { return WORD;/*16*/ }
-[\n]                                { /* zap newline */ }
-.                                   { return UNKNOWN; }
+"<DOC>"                             { chinesepos += Chineseleng; return B_DOC; /*1*/}
+"</DOC>"                            { chinesepos += Chineseleng;return E_DOC; /*2*/}
+"<DOCNO>"[^<]*"</DOCNO>"            { chinesepos += Chineseleng;return F_DOCNO; /*3*/}
+"<TEXT>"                            { chinesepos += Chineseleng;return B_TEXT; /*4*/}
+"</TEXT>"                           { chinesepos += Chineseleng;return E_TEXT; /*5*/}
+"<HL>"                              { chinesepos += Chineseleng;return B_TEXT;/*6*/ }
+"</HL>"                             { chinesepos += Chineseleng;return E_TEXT;/*7*/ }
+"<HEAD>"                            { chinesepos += Chineseleng;return B_TEXT;/*8*/ }
+"</HEAD>"                           { chinesepos += Chineseleng;return E_TEXT;/*9*/ }
+"<HEADLINE>"                        { chinesepos += Chineseleng;return B_TEXT;/*10*/ }
+"</HEADLINE>"                       { chinesepos += Chineseleng;return E_TEXT; /*11*/}
+"<TTL>"                             { chinesepos += Chineseleng;return B_TEXT;/*12*/ }
+"</TTL>"                            { chinesepos += Chineseleng;return E_TEXT;/*13*/ }
+"<LP>"                              { chinesepos += Chineseleng;return B_TEXT; /*14*/}
+"</LP>"                             { chinesepos += Chineseleng;return E_TEXT; /*15*/}
+"<"[/]?[a-zA-Z][^>]*">"             { chinesepos += Chineseleng;/* zap tags */ }
+"<!"[^-][^>]*">"                    { chinesepos += Chineseleng;/* zap other tags*/}
+[&][a-zA-Z]+[;]                     { chinesepos += Chineseleng;/* zap symbols */ }
+[&][#][0-9]*[;]                     { chinesepos += Chineseleng;/* zap symbols */ }
+{gb_skip}[^\r\t\n ]*                { chinesepos += Chineseleng; yyless(2); /* zap one chinese punctutions */ } 
+[A-Z][A-Z]+                         { chinesepos += Chineseleng;return UPWORD; }
+[a-zA-Z0-9]+                        { chinesepos += Chineseleng;return WORD; }
+[A-Z][A-Z]+((\')?[s])?              { chinesepos += Chineseleng;return ACRONYM2; }
+[a-zA-Z0-9]+\'[a-zA-Z]+             { chinesepos += Chineseleng;return CONTRACTION;}
+[A-Z]\.([A-Z]\.)+                   { chinesepos += Chineseleng;return ACRONYM; }
+[^\r\t\n ]+                         { chinesepos += Chineseleng;return WORD;/*16*/ }
+[\n]                                { chinesepos += Chineseleng;/* zap newline */ }
+.                                   { chinesepos += Chineseleng;return UNKNOWN; }
 
 %%
 
@@ -96,15 +97,11 @@ ChineseParser::ChineseParser() {
 }
 
 long ChineseParser::fileTell() {
-  int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
-  if (Chinesein) {
-    long begin = ftell(Chinesein)-YY_CURRENT_BUFFER->yy_n_chars;
-    return begin+offset;
-  } 
-  return offset;
+  return chinesepos;
 }
 
 void ChineseParser::parseFile(char * filename) {  
+  chinesepos = 0;
   Chinesein = fopen(filename, "r");
   doParse();
   fclose(Chinesein);
@@ -131,7 +128,7 @@ void ChineseParser::doParse() {
     
     case B_DOC:
       state = DOC;
-      docpos = fileTell() - Chineseleng;
+      docpos = chinesepos - Chineseleng;
       break;
 
     case F_DOCNO:

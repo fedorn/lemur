@@ -43,37 +43,37 @@
 extern FILE * trecin;
 extern char * trectext;
 
-
+long trecpos;
 
 %}
 %%
 
-"<DOC>"                             { return B_DOC; }
-"</DOC>"                            { return E_DOC; }
-"<DOCNO>"[^<]*"</DOCNO>"            { return F_DOCNO; }
-"<TEXT>"                            { return B_TEXT; }
-"</TEXT>"                           { return E_TEXT; }
-"<HL>"                              { return B_TEXT; }
-"</HL>"                             { return E_TEXT; }
-"<HEAD>"                            { return B_TEXT; }
-"</HEAD>"                           { return E_TEXT; }
-"<HEADLINE>"                        { return B_TEXT; }
-"</HEADLINE>"                       { return E_TEXT; }
-"<TTL>"                             { return B_TEXT; }
-"</TTL>"                            { return E_TEXT; }
-"<LP>"                              { return B_TEXT; }
-"</LP>"                             { return E_TEXT; }
-"<"[/]?[a-zA-Z][^>]*">"             { /* zap tags */ }
-"<!"[^-][^>]*">"                    { /* zap other tags*/}
-[&][a-zA-Z]+[;]                     { /* zap symbols */ }
-[&][#][0-9]*[;]                     { /* zap symbols */ } 
-[A-Z][A-Z]+                         { return UPWORD; }
-[a-zA-Z0-9]+                        { return WORD; }
-[A-Z][A-Z]+((\')?[s])?              { return ACRONYM2; }
-[a-zA-Z0-9]+\'[a-zA-Z]+             { return CONTRACTION;}
-[A-Z]\.([A-Z]\.)+                   { return ACRONYM; }
-[\n]                                { /* zap newline */ }
-.                                   { return UNKNOWN; }
+"<DOC>"                             { trecpos += trecleng; return B_DOC; }
+"</DOC>"                            { trecpos += trecleng; return E_DOC; }
+"<DOCNO>"[^<]*"</DOCNO>"            { trecpos += trecleng; return F_DOCNO; }
+"<TEXT>"                            { trecpos += trecleng; return B_TEXT; }
+"</TEXT>"                           { trecpos += trecleng; return E_TEXT; }
+"<HL>"                              { trecpos += trecleng; return B_TEXT; }
+"</HL>"                             { trecpos += trecleng; return E_TEXT; }
+"<HEAD>"                            { trecpos += trecleng; return B_TEXT; }
+"</HEAD>"                           { trecpos += trecleng; return E_TEXT; }
+"<HEADLINE>"                        { trecpos += trecleng; return B_TEXT; }
+"</HEADLINE>"                       { trecpos += trecleng; return E_TEXT; }
+"<TTL>"                             { trecpos += trecleng; return B_TEXT; }
+"</TTL>"                            { trecpos += trecleng; return E_TEXT; }
+"<LP>"                              { trecpos += trecleng; return B_TEXT; }
+"</LP>"                             { trecpos += trecleng; return E_TEXT; }
+"<"[/]?[a-zA-Z][^>]*">"             { trecpos += trecleng; /* zap tags */ }
+"<!"[^-][^>]*">"                    { trecpos += trecleng; /* zap other tags*/}
+[&][a-zA-Z]+[;]                     { trecpos += trecleng; /* zap symbols */ }
+[&][#][0-9]*[;]                     { trecpos += trecleng; /* zap symbols */ } 
+[A-Z][A-Z]+                         { trecpos += trecleng; return UPWORD; }
+[a-zA-Z0-9]+                        { trecpos += trecleng; return WORD; }
+[A-Z][A-Z]+((\')?[s])?              { trecpos += trecleng; return ACRONYM2; }
+[a-zA-Z0-9]+\'[a-zA-Z]+             { trecpos += trecleng; return CONTRACTION;}
+[A-Z]\.([A-Z]\.)+                   { trecpos += trecleng; return ACRONYM; }
+[\n]                                { trecpos += trecleng; /* zap newline */ }
+.                                   { trecpos += trecleng; return UNKNOWN; }
 
 %%
 
@@ -87,15 +87,11 @@ TrecParser::TrecParser() {
 
 
 long TrecParser::fileTell() {
-  int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
-  if (trecin) {
-    long begin = ftell(trecin)-YY_CURRENT_BUFFER->yy_n_chars;
-    return begin+offset;
-  } 
-  return offset;
+  return trecpos;
 }
 
 void TrecParser::parseFile(char * filename) {  
+  trecpos = 0;
   trecin = fopen(filename, "r");
   doParse();
   fclose(trecin);
@@ -121,7 +117,7 @@ void TrecParser::doParse() {
     
     case B_DOC:
       state = DOC;
-      docpos = fileTell() - trecleng;
+      docpos = trecpos - trecleng;
       break;
 
     case F_DOCNO:

@@ -48,33 +48,34 @@
 extern FILE * webin;
 extern char * webtext;
 
+long webloc;
 
 
 %}
 %%
 
-"<DOC>"                                 { return B_DOC; }
-"</DOC>"                                { return E_DOC; }
-"<DOCHDR>"                              { return B_DOCHDR; }
-"</DOCHDR>"                             { return E_DOCHDR; }
-"<DOCNO>"[[:space:]]*[A-Za-z0-9\-]+[[:space:]]*"</DOCNO>" { return F_DOCNO; }
-"<DOCOLDNO>"                            { return B_DOCOLDNO; }
-"</DOCOLDNO>"                           { return E_DOCOLDNO; }
-"<"[sS][cC][rR][iI][pP][tT][^>]*">"     { return B_SCRIPT; }
-"</"[sS][cC][rR][iI][pP][tT]">"         { return E_SCRIPT; } 
-"<!--"                                  { return B_COMMENT; }
-"-->"                                   { return E_COMMENT; }
-"<"[/]?[a-zA-Z][^>]*">"                 { /* zap tags */ }
-"<!"[^-][^>]*">"                        { /* zap other tags*/}
-[&][a-zA-Z]+[;]                         { /* zap symbols */ }
-[&][#][0-9]*[;]                         { /* zap symbols */ } 
-[A-Z][A-Z]+                             { return UPWORD; }
-[a-zA-Z0-9]+                            { return WORD; }
-[A-Z][A-Z]+((\')?[s])?                  { return ACRONYM2; }
-[a-zA-Z0-9]+\'[a-zA-Z]+                 { return CONTRACTION;}
-[A-Z]\.([A-Z]\.)+                       { return ACRONYM; }
-[\n]                                    { /* zap newline */ }
-.                                       { return UNKNOWN; }
+"<DOC>"                                 {webloc += webleng; return B_DOC; }
+"</DOC>"                                {webloc += webleng; return E_DOC; }
+"<DOCHDR>"                              {webloc += webleng; return B_DOCHDR; }
+"</DOCHDR>"                             {webloc += webleng; return E_DOCHDR; }
+"<DOCNO>"[[:space:]]*[A-Za-z0-9\-]+[[:space:]]*"</DOCNO>" {webloc += webleng; return F_DOCNO; }
+"<DOCOLDNO>"                            {webloc += webleng; return B_DOCOLDNO; }
+"</DOCOLDNO>"                           {webloc += webleng; return E_DOCOLDNO; }
+"<"[sS][cC][rR][iI][pP][tT][^>]*">"     {webloc += webleng; return B_SCRIPT; }
+"</"[sS][cC][rR][iI][pP][tT]">"         {webloc += webleng; return E_SCRIPT; } 
+"<!--"                                  {webloc += webleng; return B_COMMENT; }
+"-->"                                   {webloc += webleng; return E_COMMENT; }
+"<"[/]?[a-zA-Z][^>]*">"                 {webloc += webleng; /* zap tags */ }
+"<!"[^-][^>]*">"                        {webloc += webleng; /* zap other tags*/}
+[&][a-zA-Z]+[;]                         {webloc += webleng; /* zap symbols */ }
+[&][#][0-9]*[;]                         {webloc += webleng; /* zap symbols */ } 
+[A-Z][A-Z]+                             {webloc += webleng; return UPWORD; }
+[a-zA-Z0-9]+                            {webloc += webleng; return WORD; }
+[A-Z][A-Z]+((\')?[s])?                  {webloc += webleng; return ACRONYM2; }
+[a-zA-Z0-9]+\'[a-zA-Z]+                 {webloc += webleng; return CONTRACTION;}
+[A-Z]\.([A-Z]\.)+                       {webloc += webleng; return ACRONYM; }
+[\n]                                    {webloc += webleng; /* zap newline */ }
+.                                       {webloc += webleng; return UNKNOWN; }
 
 %%
 
@@ -92,17 +93,12 @@ WebParser::WebParser() {
 }
 
 long WebParser::fileTell() {
-  int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
-  if (webin) {
-    long begin = ftell(webin)-YY_CURRENT_BUFFER->yy_n_chars;
-    return begin+offset;
-  }
-  return offset;
+  return webloc;
 }
 
 void 
 WebParser::parseFile(char * filename) {
-  
+  webloc = 0;
   webin = fopen(filename, "r");
   doParse();
   fclose(webin);
@@ -129,7 +125,7 @@ void WebParser::doParse() {
       break;
     
     case B_DOC:
-      docpos = fileTell() - webleng;
+      docpos = webloc - webleng;
       state = DOC;
       break;
 

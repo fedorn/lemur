@@ -42,44 +42,46 @@
 
 extern FILE * Arabicin;
 extern char * Arabictext;
+
+long arabicpos;
 %}
 
 arabic_skip [~`!@#$%^&*()_\-+=[\]{}|\\:;"'<>,.?/¡÷×º¿]
 not_arabic_skip [^\r\t\n ~`!@#$%^&*()_\-+=[\]{}|\\:;"'<>,.?/¡÷×º¿]
 %%
 
-"<DOC>"                             { return B_DOC; /*1*/}
-"</DOC>"                            { return E_DOC; /*2*/}
-"<DOCNO>"[^<]*"</DOCNO>"            { return F_DOCNO; /*3*/}
-"<TEXT>"                            { return B_TEXT; /*4*/}
-"</TEXT>"                           { return E_TEXT; /*5*/}
-"<HL>"                              { return B_TEXT;/*6*/ }
-"</HL>"                             { return E_TEXT;/*7*/ }
-"<HEAD"(ER)?">"                     { return B_TEXT;/*8*/ }
-"</HEAD"(ER)?">"                    { return E_TEXT;/*9*/ }
-"<HEADLINE>"                        { return B_TEXT;/*10*/ }
-"</HEADLINE>"                       { return E_TEXT; /*11*/}
-"<TTL>"                             { return B_TEXT;/*12*/ }
-"</TTL>"                            { return E_TEXT;/*13*/ }
-"<LP>"                              { return B_TEXT; /*14*/}
-"</LP>"                             { return E_TEXT; /*15*/}
-"<FOOTER>"                          { return B_TEXT; /*???? vl indexes*/}
-"</FOOTER>"                         { return E_TEXT; /*???? vl indexes*/}
-"<TRAILER>"                         { return B_TEXT; /*???? vl indexes*/}
-"</TRAILER>"                        { return E_TEXT; /*???? vl indexes*/}
-"<"[/]?[a-zA-Z][^>]*">"             { /* zap tags */ }
-"<!"[^-][^>]*">"                    { /* zap other tags*/}
-[&][a-zA-Z]+[;]                     { /* zap symbols */ }
-[&][#][0-9]*[;]                     { /* zap symbols */ }
-{arabic_skip}                       { /* zap Arabic punctution */ } 
-[A-Z][A-Z]+                         { return UPWORD; }
-[a-zA-Z0-9]+                        { return WORD; }
-[A-Z][A-Z]+((\')?[s])?              { return ACRONYM2; }
-[a-zA-Z0-9]+\'[a-zA-Z]+             { return CONTRACTION;}
-[A-Z]\.([A-Z]\.)+                   { return ACRONYM; }
-{not_arabic_skip}+                  { return WORD;/*16*/ }
-[\n]                                { /* zap newline */ }
-.                                   { return UNKNOWN; }
+"<DOC>"                             { arabicpos += Arabicleng; return B_DOC; /*1*/}
+"</DOC>"                            { arabicpos += Arabicleng; return E_DOC; /*2*/}
+"<DOCNO>"[^<]*"</DOCNO>"            { arabicpos += Arabicleng; return F_DOCNO; /*3*/}
+"<TEXT>"                            { arabicpos += Arabicleng; return B_TEXT; /*4*/}
+"</TEXT>"                           { arabicpos += Arabicleng; return E_TEXT; /*5*/}
+"<HL>"                              { arabicpos += Arabicleng; return B_TEXT;/*6*/ }
+"</HL>"                             { arabicpos += Arabicleng; return E_TEXT;/*7*/ }
+"<HEAD"(ER)?">"                     { arabicpos += Arabicleng; return B_TEXT;/*8*/ }
+"</HEAD"(ER)?">"                    { arabicpos += Arabicleng; return E_TEXT;/*9*/ }
+"<HEADLINE>"                        { arabicpos += Arabicleng; return B_TEXT;/*10*/ }
+"</HEADLINE>"                       { arabicpos += Arabicleng; return E_TEXT; /*11*/}
+"<TTL>"                             { arabicpos += Arabicleng; return B_TEXT;/*12*/ }
+"</TTL>"                            { arabicpos += Arabicleng; return E_TEXT;/*13*/ }
+"<LP>"                              { arabicpos += Arabicleng; return B_TEXT; /*14*/}
+"</LP>"                             { arabicpos += Arabicleng; return E_TEXT; /*15*/}
+"<FOOTER>"                          { arabicpos += Arabicleng; return B_TEXT; /*???? vl indexes*/}
+"</FOOTER>"                         { arabicpos += Arabicleng; return E_TEXT; /*???? vl indexes*/}
+"<TRAILER>"                         { arabicpos += Arabicleng; return B_TEXT; /*???? vl indexes*/}
+"</TRAILER>"                        { arabicpos += Arabicleng; return E_TEXT; /*???? vl indexes*/}
+"<"[/]?[a-zA-Z][^>]*">"             { arabicpos += Arabicleng; /* zap tags */ }
+"<!"[^-][^>]*">"                    { arabicpos += Arabicleng; /* zap other tags*/}
+[&][a-zA-Z]+[;]                     { arabicpos += Arabicleng; /* zap symbols */ }
+[&][#][0-9]*[;]                     { arabicpos += Arabicleng; /* zap symbols */ }
+{arabic_skip}                       { arabicpos += Arabicleng; /* zap Arabic punctution */ } 
+[A-Z][A-Z]+                         { arabicpos += Arabicleng; return UPWORD; }
+[a-zA-Z0-9]+                        { arabicpos += Arabicleng; return WORD; }
+[A-Z][A-Z]+((\')?[s])?              { arabicpos += Arabicleng; return ACRONYM2; }
+[a-zA-Z0-9]+\'[a-zA-Z]+             { arabicpos += Arabicleng; return CONTRACTION;}
+[A-Z]\.([A-Z]\.)+                   { arabicpos += Arabicleng; return ACRONYM; }
+{not_arabic_skip}+                  { arabicpos += Arabicleng;return WORD;/*16*/ }
+[\n]                                { arabicpos += Arabicleng;/* zap newline */ }
+.                                   { arabicpos += Arabicleng;return UNKNOWN; }
 
 %%
 
@@ -92,15 +94,11 @@ ArabicParser::ArabicParser() {
 }
 
 long ArabicParser::fileTell() {
-  int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
-  if (Arabicin) {
-    long begin = ftell(Arabicin)-YY_CURRENT_BUFFER->yy_n_chars;
-    return begin+offset;
-  } 
-  return offset;
+  return arabicpos;
 }
 
 void ArabicParser::parseFile(char * filename) {  
+  arabicpos = 0;
   Arabicin = fopen(filename, "r");
   doParse();
   fclose(Arabicin);
@@ -124,7 +122,7 @@ void ArabicParser::doParse() {
       break;
     case B_DOC:
       state = DOC;
-      docpos = fileTell() - Arabicleng;
+      docpos = arabicpos - Arabicleng;
       break;
     case F_DOCNO:
       {
