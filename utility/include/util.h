@@ -1,14 +1,17 @@
-/*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
+ /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * 
+ * The Lemur toolkit for language modeling and information retrieval.
+ * Copyright (c) 2001 Carnegie Mellon University.  All rights reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
- *
- *==========================================================================
-*/
-
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted for research or educational purposes,
+ * provided that this copyright notice is maintained and note is made
+ * of any changes to the source code.
+ * 
+ * This is a research system.  The code is distributed on an "as is" basis,
+ * without any warranty, express or implied. 
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
 #ifndef _UTIL_INCLUDED
@@ -25,14 +28,11 @@
 extern const char*  quote (const char *s);
 extern char*  dequote (char *s);
 extern void   quote_no_matter_what (const char *s, char *t);
-extern void   sleepx (int secs);
 extern int    verify (char *s, char *t);
 extern char*  strip (char *s);
 extern char*  upper (char *s);
 extern char*  lower (char *s);
 extern int    qfilef (const char *fname); /* TRUE if file exists */
-extern void   erasef (char *fname); /* forks to erase file and waits */
-extern void   mv (char *s, char *t); /* forks to mv file and waits */
 extern int    free_storage (char *fn); /* returns free storage in file system of fn */
 extern char*  util_strdup(char *string);
 extern void*  util_malloc (int size);
