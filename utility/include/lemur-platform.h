@@ -22,7 +22,6 @@
   #include <unistd.h>
   #include <sys/socket.h>
   #include <netdb.h>
-  #include <tcpd.h>
   #include <arpa/inet.h>
 
   typedef long long INT64;
