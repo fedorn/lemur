@@ -54,7 +54,8 @@ Other common parameters (for all retrieval methods)  are:
 
 <li><tt>judgmentFile </tt>: the file of relevance judgments
 
-<li> <tt>feedbackDocCount</tt>: the number of docs to use for feedback (negative value means using all judged documents for feedback)
+<li> <tt>feedbackDocCount</tt>: the number of docs to use for feedback (negative value means using all judged documents for feedback). The documents in 
+the <tt> judgmentFile</tt> are sorted in decreasing order according to the numerical value in the third column, and then the top documents are used for feedback. 
 
 <li> <tt>feedbackTermCount</tt>: the number of terms to add to a query when doing feedback. Note that
     in the KL-div. approach, the actual number of terms is also affected by two other parameters.(See below.)

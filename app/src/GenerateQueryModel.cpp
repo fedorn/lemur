@@ -19,7 +19,10 @@
 
 <p>
 This application (GenerateQueryModel.cpp) computes an expanded query model based on feedback documents and the original query model for the KL-divergence retrieval method. It can be regarded as performing a feedback in the
-language modeling approach to retrieval.
+language modeling approach to retrieval. The original query model can be computed based on the original query text (when the parameter "initQuery" is not set,
+or set to a null string), or based on a previously saved query model (the model
+is given by the parameter "initQuery"). Expanding a saved query model makes
+it possible to do iterative feedback. 
 <p>
 Parameters:
 <ol>
@@ -29,10 +32,18 @@ Parameters:
 
 <li> <tt>textQuerySet</tt>: the original query text stream 
 
-<li> <tt>resultFile</tt>: the result file to be used for feedback
+<li> <tt>initQuery</tt>: the file with a saved initial query model. When this
+parameter is set to a non-empty string, the model stored in this file will be
+used for expansion; otherwise, the original query text is used the initial
+query model for expansion.
 
-<li> <tt>TRECResultFormat</tt>: whether the result format is of the TREC format (i.e., six-column) or just
-a simple three-column format <queryID, docID, score>. Integer value, zero for non-TREC format, and non-zero for TREC format. Default: 1 (i.e., TREC format)
+<li> <tt>feedbackDocuments</tt>: the file of feedback documents to be used for feedback. In the case of pseudo feedback, this can be a result file generated from an initial retrieval process. In the case of relevance feedback, this is usually a 3-column relevance judgment file. 
+
+<li> <tt>TRECResultFormat</tt>: whether the feedback document file (given
+by <tt>feedbackDocuments</tt>  is of the TREC format (i.e., six-column) or just
+a simple three-column format <queryID, docID, score>. Integer value, zero for non-TREC format, and non-zero for TREC format. Default: 1 (i.e., TREC format).
+<em> VERY IMPORTANT: For relevance feedback, <tt>TRECResultFormat</tt> should
+always be set to 0, since the judgment file is always a simple format</em>.
 
 <li> <tt>expandedQuery</tt>: the file to store the expanded query model
 
