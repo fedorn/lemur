@@ -29,5 +29,10 @@ KStemmer::~KStemmer() {
 }
 
 char * KStemmer::stemWord(char * word) {
-  return kstem_stemmer(word);
+  // only stem words that begin with a lowercase letter 
+  // (don't stem acronyms or names)
+  if (islower(*word)) {
+    return kstem_stemmer(word);
+  }
+  return word;
 }
