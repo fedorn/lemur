@@ -3,6 +3,7 @@
 // Keyfile.cpp
 //
 // 18 September 2003 - tds
+// 30 March 2004 - dmf -- update to new 8 bit clean keyfile api.
 //
 
 extern "C" {
@@ -26,41 +27,38 @@ void Keyfile::_buildHandle( int cacheSize ) {
   _handle = std::auto_ptr<char>(new char[ _handleSize ]);
 }
 
-void Keyfile::open( const char* filename, Keyfile::access_mode accessMode, 
-		    int cacheSize ) {
+void Keyfile::open( const char* filename, int cacheSize ) {
   _buildHandle( cacheSize );
   
   int error = open_key( _handle.get(), const_cast<char*>(filename), 
-			_handleSize, accessMode );
+			_handleSize);
 
   if( error )
     throw Exception( "Keyfile::open", "Error opening keyfile" );
 }
 
-void Keyfile::open( const std::string& filename, 
-		    Keyfile::access_mode accessMode, int cacheSize ) {
-  open( filename.c_str(), accessMode, cacheSize );
+void Keyfile::open( const std::string& filename, int cacheSize ) {
+  open( filename.c_str(), cacheSize );
 }
 
-void Keyfile::create( const char* filename, Keyfile::access_mode accessMode, 
-		      int cacheSize ) {
+void Keyfile::create( const char* filename, int cacheSize ) {
   _buildHandle( cacheSize );
   
   int error = create_key( _handle.get(), const_cast<char*>(filename), 
-			  _handleSize, accessMode );
+			  _handleSize );
 
   if( error )
     throw Exception( "Keyfile::create", "Error creating keyfile" );
 }
 
-void Keyfile::create( const std::string& filename, 
-		      Keyfile::access_mode accessMode, int cacheSize ) {
-  create( filename.c_str(), accessMode, cacheSize );
+void Keyfile::create( const std::string& filename, int cacheSize ) {
+  create( filename.c_str(), cacheSize );
 }
 
 void Keyfile::close() {
   //  assert( _handle.get() );
-  close_key( _handle.get() );
+  // don't close an unopened key.
+  if (_handle.get() != NULL) close_key( _handle.get() );
 //  _handle.reset();
   _handle = std::auto_ptr<char>(NULL);
 }
@@ -96,9 +94,10 @@ bool Keyfile::get( const char* key, void* value, int& actualSize,
   //  assert( value && "value cannot be null" );
   //  assert( _handle.get() && "call open() or create() first" );
   //  assert( maxSize > 0 && "maxSize must be positive" );
-
-  int error = get_rec( _handle.get(), const_cast<char*>(key), (char*)value,
-		       &actualSize, maxSize );
+  int len = strlen(key); // fix for UTF-8
+  
+  int error = get_rec( _handle.get(), const_cast<char*>(key), len,
+		       (char*)value, &actualSize, maxSize );
 
   if( error && error != getnokey_err )
     throw Exception( "Keyfile::get", "Internal error getting record" );
@@ -109,9 +108,9 @@ bool Keyfile::get( const char* key, void* value, int& actualSize,
 void Keyfile::put( const char* key, const void* value, int valueSize ) {
   //  assert( key && "key cannot be null" );
   //  assert( value && "value cannot be null" );
-
+  int len = strlen(key); // fix for UTF-8
   int error = put_rec( _handle.get(),
-                       const_cast<char*>(key),
+                       const_cast<char*>(key), len,
                        static_cast<char*>(const_cast<void*>(value)),
                        valueSize );
 
@@ -128,8 +127,8 @@ void Keyfile::put( const char* key, const void* value, int valueSize ) {
 void Keyfile::remove( const char* key ) {
   //  assert( key && "key cannot be null" );
   //  assert( _handle.get() && "call open() or create() first" );
-
-  int error = delete_rec( _handle.get(), const_cast<char*>(key) );
+  int len = strlen(key); // fix for UTF-8
+  int error = delete_rec( _handle.get(), const_cast<char*>(key), len );
 
   if( error )
     throw Exception( "Keyfile::remove", "Internal error deleting record" );
@@ -140,8 +139,8 @@ int Keyfile::getSize( const char* key ) {
   //  assert( _handle.get() && "call open() or create() first" );
   char pointer[buffer_lc];
   int size;
-
-  int error = get_ptr( _handle.get(), const_cast<char*>(key), pointer );
+  int len = strlen(key); // fix for UTF-8
+  int error = get_ptr( _handle.get(), const_cast<char*>(key), len, pointer );
 
   if( error ) {
     if( error == getnokey_err ) {
@@ -189,6 +188,7 @@ inline int Keyfile::_decodeKey( char* keyBuf ) {
 }
 
 void Keyfile::put( int key, const void* value, int valueLength ) {
+  // have to handle the 0 key. Bleah.
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   _createKey( keyBuf, key );
   put( keyBuf, value, valueLength );
@@ -217,4 +217,28 @@ int Keyfile::getSize( int key ) {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   _createKey( keyBuf, key );
   return getSize( keyBuf );
+}
+
+void Keyfile::setFirst() {
+  set_bof(_handle.get());
+}
+
+bool Keyfile::getNext( char* key, int maxKeySize, void* value, 
+		       int& actualSize, int maxValueSize ) {
+  int len; // for key length
+  int result = next_rec( _handle.get(), key, &len, maxKeySize,
+			 value, &actualSize, maxValueSize );
+  return !result;
+}
+
+bool Keyfile::getNext( int& key, void* value, int& actualSize, 
+		       int maxValueSize ) {
+  char keyBuf[KEYFILE_KEYBUF_SIZE];
+  bool result = getNext( keyBuf, KEYFILE_KEYBUF_SIZE, 
+			 value, actualSize, maxValueSize );
+  
+  if( result )
+    key = _decodeKey( keyBuf );
+
+  return result;
 }

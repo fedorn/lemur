@@ -17,9 +17,6 @@
 /// be stored using either int or char * keys. 
 class Keyfile {
 public:
-  /// Random or sequential access b-tree.
-  enum access_mode{ random, sequential };
-
   /// Insert value into b-tree for the given key. Throws an Exception if
   /// the operation fails.
   void put( const char* key, const void* value, int valueSize );
@@ -52,24 +49,26 @@ public:
   /// Remove the entry in the b-tree for the given key.
   void remove( int key );
 
-  /// Open a keyfile with the given filename, with access_mode of 
-  /// random or sequential, and cacheSize (default 1MB).
-  void open( const std::string& filename, access_mode mode, 
-	     int cacheSize = 1024 * 1024 );
-  /// Open a keyfile with the given filename, with access_mode of 
-  /// random or sequential, and cacheSize (default 1MB).
-  void open( const char* filename, access_mode mode, 
-	     int cacheSize = 1024 * 1024 );
-  /// Createa keyfile with the given filename, with access_mode of 
-  /// random or sequential, and cacheSize (default 1MB).
-  void create( const std::string& filename, access_mode mode,
-	       int cacheSize = 1024 * 1024 );
-  /// Create a keyfile with the given filename, with access_mode of 
-  /// random or sequential, and cacheSize (default 1MB).
-  void create( const char* filename, access_mode mode, 
-	       int cacheSize = 1024 * 1024 );
+  /// Open a keyfile with the given filename, with cacheSize (default 1MB).
+  void open( const std::string& filename, int cacheSize = 1024 * 1024 );
+  /// Open a keyfile with the given filename, with cacheSize (default 1MB).
+  void open( const char* filename, int cacheSize = 1024 * 1024 );
+  /// Createa keyfile with the given filename, with cacheSize (default 1MB).
+  void create( const std::string& filename, int cacheSize = 1024 * 1024 );
+  /// Create a keyfile with the given filename, with cacheSize (default 1MB).
+  void create( const char* filename, int cacheSize = 1024 * 1024 );
   /// Close a keyfile.
   void close();
+  /// Initialize keyfile to first key for iteration
+  void setFirst();
+  ///get the next key and value pair from the keyfile.
+  bool getNext( int& key, void* value, int& actualSize, int maxSize );
+  ///get the next key and value pair from the keyfile.
+  bool getNext( char* key, int maxKeySize, void* value, 
+		int& actualSize, int maxSize );
+  ///initialize to empty
+  Keyfile() : _handleSize(0), _handle(std::auto_ptr<char>(NULL)) {
+  }
   
 private:
   std::auto_ptr<char> _handle; // file control block of the keyfile
