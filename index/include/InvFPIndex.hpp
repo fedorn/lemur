@@ -14,16 +14,12 @@
 #define _INVFPINDEX_HPP
 
 ///  Class for retrieving indexed document collection based on the abstract class Index.hpp
-#include <iostream>
-
-#include <fstream>
-#include <cstdlib>
-#include <string>
+#include "common_headers.hpp"
 #include "Index.hpp"
 #include "InvFPDocList.hpp"
 #include "InvFPTermList.hpp"
 #include "InvFPTypes.hpp"
-#include "map.hpp"
+
 
 // for counts array
 #define UNIQUE_TERMS 0
