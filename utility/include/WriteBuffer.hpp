@@ -20,32 +20,43 @@
 #define LEMUR_WRITEBUFFER_HPP
 
 #include "File.hpp"
-///Provide a write buffer for a File object, enabling explicit 
-/// buffer management..
+
 class WriteBuffer {
 private:
   char* _buffer;
-  int _bufferSize;
+  size_t _bufferSize;
   File& _file;
-  int _position;
+  size_t _position;
   File::offset_type _filePos;
 
 public:
-  WriteBuffer( File& file, int bufferSize );
+  WriteBuffer( File& file, size_t bufferSize );
   ~WriteBuffer();
   
-  /// standard write semantics; will
-  /// perform an unbuffered write if
-  /// <length> is long enough to warrant it
-  void write( const char* data, int length );
+  // gives a memory pointer to the next <length>
+  // bytes in the file.
+  char* write( size_t length );
+
+  // tells the WriteBuffer that <length> bytes
+  // of the last write(size_t) call were not used
+  // and should be returned as a part of the
+  // next write(size_t) call.  This function cannot
+  // be used in conjunction with the write(char*, size_t)
+  // call.
+  void unwrite( size_t length );
   
-  /// flushes the internal buffer out to 
-  /// the ofstream. does not explicitly
-  /// flush the ofstream.
+  // standard write semantics; will
+  // perform an unbuffered write if
+  // <length> is long enough to warrant it
+  void write( const char* data, size_t length );
+
+  // flushes the internal buffer out to 
+  // the ofstream. does not explicitly
+  // flush the ofstream.
   void flush();
 
-  /// returns the current write pointer
-  /// position
+  // returns the current write pointer
+  // position
   File::offset_type tellp() const;
 };
 

@@ -18,18 +18,53 @@
 
 #include "WriteBuffer.hpp"
 
-WriteBuffer::WriteBuffer( File& file, int bufferSize ) : _file( file ) {
+size_t nearest_megabyte( size_t length ) {
+  const int ONE_MEGABYTE = 1024*1024;
+  return ( length + ONE_MEGABYTE - 1 ) & ~(ONE_MEGABYTE-1);
+}
+
+WriteBuffer::WriteBuffer( File& file, size_t bufferSize ) : _file( file ) {
   _position = 0;
   _filePos = 0;
   _bufferSize = bufferSize;
-  _buffer = new char[bufferSize];
+  _buffer = (char*) malloc( bufferSize );
 }
 
 WriteBuffer::~WriteBuffer() {
-  delete[](_buffer);
+  free( _buffer );
 }
 
-void WriteBuffer::write( const char* data, int length ) {
+char* WriteBuffer::write( size_t length ) {
+  char* region = 0;
+
+  // grow buffer if necessary
+  if( (length + _position) <= _bufferSize ) {
+    // buffer size is fine; don't need to do anything
+  } else if( length < _bufferSize ) {
+    // the buffer is large enough to hold this data, as
+    // long as we flush the buffer first
+    flush();
+  } else {
+    // the buffer is too small to hold this data, have to grow it
+    flush();
+    size_t newBufferSize = nearest_megabyte( length );
+    char* newBuffer = (char*) malloc( newBufferSize );
+    free( _buffer );
+    _buffer = newBuffer;
+    _bufferSize = newBufferSize;
+  }
+
+  region = _buffer + _position;
+  _position += length;
+  return region;
+}
+
+void WriteBuffer::unwrite( size_t length ) {
+  assert( _position > length );
+  _position -= length;
+}
+
+void WriteBuffer::write( const char* data, size_t length ) {
   if( (length + _position) < _bufferSize ) {
     memcpy( _buffer + _position, data, length );
     _position += length;
