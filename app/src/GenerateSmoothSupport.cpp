@@ -31,13 +31,23 @@ application and set the following variables in the parameter file:
 
 #define MIN(a,b) (a<=b) ? a : b
 
-String inputLemur = ParamGetString("lemur");
-String inputSmoothSupportFile = ParamGetString("smoothSupportFile");
+String inputLemur;
+String inputSmoothSupportFile;
 BasicIndex lemur;
 ofstream ofs;
 
+
+
+void GetAppParam()
+{
+
+ inputLemur = ParamGetString("lemur");
+ inputSmoothSupportFile = ParamGetString("smoothSupportFile");
+}
+
+
 int AppMain(int argc, char *argv[]) {
-  ParamInitialize(argc, argv);
+
 
   lemur.open(inputLemur);
 

@@ -101,16 +101,21 @@ two-stage smoothing  (1 means no collection model mixed, so essentially the quer
 #include "OkapiRetMethod.hpp"
 #include "RetrievalEngine.hpp"
 
-String inputIndex = ParamGetString("index");
-String inputQuerySet = ParamGetString("querySet", "query");
-String inputResultFile = ParamGetString("resultFile", "result");
+String inputIndex;
+String inputQuerySet;
+String inputResultFile;
 
 
 
 enum RetModel {TFIDF=0, OKAPI=1, KL=2};
 
 
-
+void GetAppParam()
+{
+ inputIndex = ParamGetString("index");
+ inputQuerySet = ParamGetString("querySet", "query");
+ inputResultFile = ParamGetString("resultFile", "result");
+}
 
 static void writeResults(char *queryID, IndexedRealVector *results, Index *ind, int maxCountOfResult, ostream *resStream)
 {

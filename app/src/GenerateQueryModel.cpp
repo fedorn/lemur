@@ -37,12 +37,23 @@ Parameters:
 #include <iostream.h>
 #include "SimpleKLRetMethod.hpp"
 
-String inputIndex = ParamGetString("index");
-String inputQuerySet = ParamGetString("querySet", "query");
-String inputResultFile = ParamGetString("resultFile");
-String inputExpandedQueryFile = ParamGetString("expandedQuery", "expQuery");
+String inputIndex;
+String inputQuerySet;
+String inputResultFile;
+String inputExpandedQueryFile ;
 
 
+
+void GetAppParam()
+{
+
+ inputIndex = ParamGetString("index");
+ inputQuerySet = ParamGetString("querySet", "query");
+ inputResultFile = ParamGetString("resultFile");
+ inputExpandedQueryFile = ParamGetString("expandedQuery", "expQuery");
+
+
+}
 class ResultFile {
 public:
   ResultFile(istream &is, Index &index) : s(is), ind(index), eof(false) {

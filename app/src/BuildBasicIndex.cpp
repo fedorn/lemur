@@ -42,13 +42,21 @@ The following is an example of use:
 #include "Param.hpp"
 #include "String.hpp"
 
-String inputFile    = ParamGetString("inputFile");
-String outputPrefix = ParamGetString("outputPrefix");
-int maxDocuments    = ParamGetInt("maxDocuments", 1000000);
-int maxMemory       = ParamGetInt("maxMemory", 0x8000000);
+String inputFile;   
+String outputPrefix;
+int maxDocuments;   
+int maxMemory;      
+
+void GetAppParam() 
+{
+ inputFile    = ParamGetString("inputFile");
+ outputPrefix = ParamGetString("outputPrefix");
+ maxDocuments   = ParamGetInt("maxDocuments", 1000000);
+ maxMemory      = ParamGetInt("maxMemory", 0x8000000);
+}
 
 int AppMain(int argc, char * argv[]) {
-  ParamInitialize(argc, argv);
+  
   BasicIndex lemur(new GammaCompress());
   BasicDocStream dstream(inputFile);
   lemur.build(&dstream, inputFile, outputPrefix, maxDocuments, maxMemory);
