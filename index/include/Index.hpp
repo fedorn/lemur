@@ -3,11 +3,9 @@
 
 /*! \mainpage Lemur Toolkit Documentation
 
-  \section Introduction
-
 
   
-  \section Installation 
+  \section install Installation 
 
  
   - After checking out the toolkit
@@ -25,7 +23,7 @@
       -# go to directory lemur
       -# type in "make clean"
 
-  \section Change the toolkit
+  \section change  Change the toolkit
 
 
   - To modify an existing file or add a file to an existing directory:
@@ -51,7 +49,7 @@
       -# Copy a Makefile from an existing application directory (e.g, app/src/Makefile) to <new-application-dir>/src, and change the line that defines the dependent modules.
 
 
-      \section To run lemur applications
+      \section runapp  To run lemur applications
 
   - Create a parameter file with value definitions for all the  input variables of an application. Terminate each line with a semicolon. 	For example, 
   <PRE>
@@ -68,7 +66,7 @@
   -  Run the application program without any argument.
 
 
-  \section To try the sample data
+  \section sampledata To try the sample data
 
   - Go to the data directory
 
