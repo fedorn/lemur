@@ -63,7 +63,7 @@ protected:
   /// The set used to store words.
   /// once a word is stored, we do not change it
   set<char *, lt_str> words;
-
+  string lastfile;
 
 };
 

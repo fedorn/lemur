@@ -25,6 +25,7 @@ WordSet::WordSet() {
 
 WordSet::WordSet(const string &filename) {
   load(filename);
+  lastfile = filename;
 }
 
 WordSet::~WordSet() {
@@ -35,6 +36,7 @@ WordSet::~WordSet() {
 
 void
 WordSet::load(const string &filename) {
+  lastfile = filename;
   ifstream ifstr(filename.c_str());
   // return if the file can't be opened
   if (ifstr == NULL) {
