@@ -22,6 +22,9 @@
 class Stopper : public WordSet, public TextHandler {
 
 public:
+  static const string category;
+  static const string identifier;
+
   Stopper();
   /// Create the stopword list, loading it from file.
   /// One word per line.

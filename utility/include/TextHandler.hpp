@@ -59,10 +59,14 @@ class TextHandler {
 public:
   enum TokenType {BEGINDOC = 1, ENDDOC = 2, WORDTOK = 3, 
 		  BEGINTAG = 4, ENDTAG = 5, SYMBOLTOK = 6};
+  static const string category;
+  static const string identifier;
 
   TextHandler() {
     textHandler = NULL;
     buffer[MAXWORDSIZE-1] = '\0';
+    cat = category;
+    iden = identifier;
   }
   virtual ~TextHandler() {}
   
@@ -185,12 +189,19 @@ public:
   /// Handle a word, possibly transforming it
   virtual char * handleSymbol(char * sym) { return sym; }
 
+  /// Return the category TextHandler this is
+  virtual string getCategory() { return cat; }
+  /// Return a unique identifier for this TextHandler object
+  virtual string getIdentifier() { return iden; }
 protected:
   /// The next textHandler in the chain
   TextHandler * textHandler;
+  string cat;
+  string iden;
 
   char buffer[MAXWORDSIZE];
 };
+
 
 #endif
 

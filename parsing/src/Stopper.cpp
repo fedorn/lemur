@@ -7,9 +7,11 @@
 #define MAXLINE 500
 
 Stopper::Stopper() {
+  cat = category;
+  iden = identifier;
 }
 
-Stopper::Stopper(const string &filename) {
+Stopper::Stopper(const string &filename) : Stopper() {
   load(filename);
 }
 

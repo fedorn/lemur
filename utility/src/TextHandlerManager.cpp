@@ -20,11 +20,43 @@
 #include "ChineseCharParser.hpp"
 #include "ReutersParser.hpp"
 #include "ArabicParser.hpp"
+#include "InqArabicParser.hpp"
+#include "InQueryOpParser.hpp"
 #include "IdentifinderParser.hpp"
 #include "BrillPOSParser.hpp"
 #include "PorterStemmer.hpp"
 #include "KStemmer.hpp"
 #include "ArabicStemmer.hpp"
+
+// define each TextHandler's identifier
+// this is the way to do static const string in C++
+const string TextHandler::category = "TextHandler";
+const string TextHandler::identifier = "TextHandler";
+
+// these in Parser category
+const string Parser::category = "Parser";
+const string Parser::identifier = "parser";
+const string TrecParser::identifier = "trec";
+const string WebParser::identifier = "web";
+const string ReutersParser::identifier = "reuters";
+const string ChineseParser::identifier = "chinese";
+const string ChineseCharParser::identifier = "chinesechar";
+const string ArabicParser::identifier = "arabic";
+const string InqArabicParser::identifier = "inqarabic";
+const string BrillPOSParser::identifier = "brill";
+const string IdentifinderParser::identifier = "identifinder";
+const string InQueryOpParser::identifier = "inqueryop";
+
+
+// these in Stemmer category
+const string Stemmer::category = "Stemmer";
+const string Stemmer::identifier = "stemmer";
+const string PorterStemmer::identifier = "porter";
+const string KStemmer::identifier = "krovetz";
+const string ArabicStemmer::identifier = "arabic";
+
+const string Stopper::category = "Stopper";
+const string Stopper::identifier = "Stopper";
 
 Parser* TextHandlerManager::createParser(string type, string acros) {  
   // Create the appropriate parser.
@@ -41,22 +73,24 @@ Parser* TextHandlerManager::createParser(string type, string acros) {
   // make it all lowercase
   for (int i=0;i<type.length();i++)
     type[i] = tolower(type[i]);
-
-  if (type.compare( "web") == 0) {
+  
+  if (type == WebParser::identifier) {
     parser = new WebParser();
-  } else if (type.compare("reuters") == 0) {
+  } else if (type == ReutersParser::identifier) {
     parser = new ReutersParser();
-  } else if (type.compare("trec") == 0) {
+  } else if (type == TrecParser::identifier) {
     parser = new TrecParser();
-  } else if (type.compare("chinese") == 0) {
+  } else if (type == ChineseParser::identifier) {
     parser = new ChineseParser();
-  } else if (type.compare("chinesechar") == 0) {
+  } else if (type ==ChineseCharParser::identifier) {
     parser = new ChineseCharParser();
-  } else if (type.compare("arabic") == 0) {
+  } else if (type == ArabicParser::identifier) {
     parser = new ArabicParser();
-  } else if (type == "brill") {
+  } else if (type == InqArabicParser::identifier) {
+    parser = new InqArabicParser();
+  } else if (type == BrillPOSParser::identifier) {
     parser = new BrillPOSParser();
-  } else if (type == "identifinder") {
+  } else if (type == IdentifinderParser::identifier) {
     parser = new IdentifinderParser();
   }
   
@@ -88,12 +122,12 @@ Stemmer* TextHandlerManager::createStemmer(string type, string datadir, string f
   for (int i=0;i<type.length();i++)
     type[i] = tolower(type[i]);
 
-  if (type.compare("krovetz") == 0) {
+  if (type == KStemmer::identifier) {
     if (datadir.compare("") == 0) {
       datadir = ParamGetString("KstemmerDir");
     }
     stemmer = new KStemmer(datadir);
-  } else if (type.compare("arabic") == 0){
+  } else if (type == ArabicStemmer::identifier){
     if ((datadir.empty()) || (func.empty())) {
       ArabicStemmerParameter::get();
       // param get has defaults so it'll always get back values
@@ -102,7 +136,7 @@ Stemmer* TextHandlerManager::createStemmer(string type, string datadir, string f
     } else {
       stemmer = new ArabicStemmer((char*)datadir.c_str(),(char*)func.c_str());    
     }
-  } else if (type.compare("porter") == 0) {
+  } else if (type == PorterStemmer::identifier) {
     stemmer = new PorterStemmer();
   }
   
