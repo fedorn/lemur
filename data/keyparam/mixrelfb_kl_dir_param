@@ -1,0 +1,38 @@
+
+/* Retrieval model selection */
+
+retModel = 2; /*  0 = TFIDF; 1 = Okapi; 2 = KL-divergence */
+
+/* Basic retrieval parameters */
+
+index = kindex.key; /* database index */
+textQuery = query; /* query text stream */
+resultFile = res.mixrelfb_kl_dir; /* result file */
+resultCount = 1000; /* how many docs to return as the result */
+resultFormat = 1; /* 0 = simple-format; 1 = TREC-format */
+
+smoothSupportFile = kindex.supp; /* this is not needed by Okapi or TFIDF, but by SimpleKL */
+
+smoothStrategy =0;  /* interpolation rather than backoff, 0=interpolate, 1=backoff */
+
+smoothMethod = 1; /* Jelinek-Mercer = 0; Bayesian/Dirichlet prior =1; Abs. Discount =2; */
+
+discountDelta = 0.5; /* not used since smoothMethod is Dirichlet prior */
+
+JelinekMercerLambda = 0.5;  /* not used since smoothMethod is Dirichlet prior */
+
+DirichletPrior = 2000; 
+
+
+/* Pseudo feedback parameters */
+
+feedbackDocCount = 5; 
+feedbackTermCount = 20; 
+queryUpdateMethod = 0; /* 0=mixture; 1=div-min; 2=markov chain? */
+feedbackCoefficient = 0.5;
+feedbackProbThresh= 0.001;
+feedbackProbSumThresh = 1;
+feedbackMixtureNoise = 0.5;
+emIterations = 50;
+
+feedbackDocuments = qrel3column;
