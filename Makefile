@@ -70,5 +70,5 @@ $(INSTALLDIRS):
 	cd $(patsubst install%,%,$@)/obj && $(MAKE) -s -f ../src/Makefile install
 
 DATAINSTALL:
-	cp kstem_data/*.txt $(LEMUR_INSTALL_PATH)/lemur/kstem_data 
-	cp arabic_stem_data/*.txt $(LEMUR_INSTALL_PATH)/lemur/arabic_stem_data
+	cp data/kstem_data/*.txt $(LEMUR_INSTALL_PATH)/lemur/kstem_data 
+	cp data/arabic_stem_data/*.txt $(LEMUR_INSTALL_PATH)/lemur/arabic_stem_data
