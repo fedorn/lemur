@@ -45,7 +45,7 @@
 // avoid conflicts with other index include files.
 // do something about these defines. Ought to be enums.
 
-#define NAMES_SIZE   10
+#define NAMES_SIZE   11
 // for names array
 #define DOC_INDEX    0
 #define DOC_LOOKUP   1
@@ -57,13 +57,17 @@
 #define VERSION_NUM  7
 #define TERM_IDSTRS  8
 #define DOC_IDSTRS   9
+#define PROPS_FILE   10 
 
 #define IVLINDEX  ".ivl"
+#define COLPROPS ".cps"
+#define COLPROPS_PAR "COLLECTION_PROPS"
 
 KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesize, 
 				 DOCID_T startdocid) {
   ignoreDoc = false;
   listlengths = 0;
+  cprops = NULL;
   setName(prefix);
 
   _computeMemoryBounds( cachesize );
@@ -71,7 +75,7 @@ KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesize,
   if (!tryOpen()) {
     // brand new empty index
 	*msgstream << "Creating new index" << endl;    
-    names.resize( NAMES_SIZE );
+   names.resize( NAMES_SIZE );
 
     counts[TOTAL_TERMS] = counts[UNIQUE_TERMS] = 0;
     counts[DOCS] = 0;
@@ -95,7 +99,7 @@ KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesize,
     // create term dictionary trees
     names[TERM_IDS] = name + TERMIDMAP;
     names[TERM_IDSTRS] = name + TERMIDSTRMAP;
-    
+
     createDBs();
 
     // add reserved OOV term
@@ -119,6 +123,7 @@ KeyfileIncIndex::KeyfileIncIndex() {
   _computeMemoryBounds( 128 * 1024 * 1024 );
   _largestFlushedTermID = 0;
   aveDocLen = 0;
+  cprops = NULL;
 }
 
 KeyfileIncIndex::~KeyfileIncIndex() {
@@ -140,6 +145,7 @@ KeyfileIncIndex::~KeyfileIncIndex() {
     delete(docMgrs[i]); // objects
 
   delete dtlookupReadBuffer;
+  delete cprops;
   delete[](counts);
 }
 
@@ -332,6 +338,27 @@ const DocumentManager * KeyfileIncIndex::docManager(DOCID_T docID) const{
   return docMgrs[docManagerID]; 
 }
 
+const CollectionProps *KeyfileIncIndex::collectionProps() const {
+  // if already loaded, return list
+  if (cprops)
+    return cprops;
+
+  // if not loaded, try to load
+  Property p;
+  string key, val;
+  ifstream rf(names[PROPS_FILE].c_str());
+  if (!rf.is_open()) 
+    return NULL;
+
+  cprops = new BasicCollectionProps();
+  while (rf >> key >> val) {
+    p.setName(key);
+    p.setValue(val.c_str());
+    cprops->setProperty(&p);
+  }
+  return cprops;
+}
+
 COUNT_T KeyfileIncIndex::termCount(TERMID_T termID) const {
   if ((termID <= 0) || (termID > counts[UNIQUE_TERMS]))
     return 0;
@@ -510,6 +537,7 @@ void KeyfileIncIndex::fullToc() {
   names[VERSION_NUM] = ParamGetString(VERSION_PAR);
   names[TERM_IDSTRS] = ParamGetString(TERMIDSTRMAP_PAR);
   names[DOC_IDSTRS] = ParamGetString(DOCIDSTRMAP_PAR);
+  names[PROPS_FILE] = ParamGetString(COLPROPS_PAR);
   aveDocLen = counts[TOTAL_TERMS] / (float) counts[DOCS];
 }
 
@@ -674,7 +702,7 @@ void KeyfileIncIndex::endCollection(const CollectionProps* cp){
   // write list of document managers
   writeDocMgrIDs();
   //write out the main toc file
-  writeTOC();
+  writeTOC(cp);
 }
 
 void KeyfileIncIndex::setDocManager (const string &mgrID) {
@@ -691,7 +719,7 @@ bool KeyfileIncIndex::tryOpen() {
   return open(fname);
 }
 
-void KeyfileIncIndex::writeTOC() {
+void KeyfileIncIndex::writeTOC(const CollectionProps* cp) {
   std::string fname = name + ".key";
   *msgstream << "Writing out main stats table" << std::endl;
 
@@ -715,7 +743,35 @@ void KeyfileIncIndex::writeTOC() {
   toc << TERMIDMAP_PAR << " = " << name << TERMIDMAP << ";\n";
   toc << TERMIDSTRMAP_PAR << " = " << name << TERMIDSTRMAP << ";\n";
   toc << DOCMGR_PAR << " = " << name << DOCMGRMAP << ";\n";
+  toc << COLPROPS_PAR << " = " << name << COLPROPS << ";\n";
+
+  const BasicCollectionProps* props = dynamic_cast<const BasicCollectionProps*>(cp);
+
   toc.close();
+
+  if (props) {
+    fname = name + COLPROPS;
+    ofstream pf(fname.c_str());
+    
+    if (! pf.is_open()) {
+      fprintf(stderr, "Could not save collection properties information\n");
+      return;
+    }
+    
+    const Property* p = NULL;
+    string value;
+    props->startIteration();
+    while (props->hasMore()) {
+      p = props->nextEntry();
+      if (p->getType() == Property::STDSTRING)
+	pf << p->getName() << "  " << *(string*)p->getValue() << endl;
+      else if (p->getType() == Property::STRING)
+	pf << p->getName() << "  " << (char*)p->getValue() << endl;
+    }
+    
+    pf.close();
+  }
+  
 }
 
 void KeyfileIncIndex::writeDocMgrIDs() {
