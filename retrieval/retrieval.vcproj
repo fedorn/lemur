@@ -288,7 +288,7 @@
 				RelativePath=".\src\TFIDFTermScoreFunction.cpp">
 			</File>
 			<File
-				RelativePath=".\src\UnoderedWindowNode.cpp">
+				RelativePath=".\src\UnorderedWindowNode.cpp">
 			</File>
 			<File
 				RelativePath=".\src\Unpacker.cpp">

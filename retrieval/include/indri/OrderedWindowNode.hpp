@@ -53,6 +53,7 @@ private:
   std::string _name;
 
 public:
+  OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children );
   OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children, int windowSize );
   int nextCandidateDocument();
   void prepare( int documentID );

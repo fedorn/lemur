@@ -25,16 +25,24 @@
 
 class UnorderedWindowNode : public ListIteratorNode {
 private:
-  struct positions_pointer {
-    greedy_vector<Extent>::const_iterator iter;
-    greedy_vector<Extent>::const_iterator end;
+  struct term_position {
+    bool operator< ( const term_position& other ) const {
+      return begin < other.begin;
+    }
+
+    int type;
+    int begin;
+    int end;
+    int last; // index of previous entry of this type
   };
+
   int _windowSize;
   std::vector<ListIteratorNode*> _children;
   greedy_vector<Extent> _extents;
   std::string _name;
 
 public:
+  UnorderedWindowNode( const std::string& name, std::vector<ListIteratorNode*>& children );
   UnorderedWindowNode( const std::string& name, std::vector<ListIteratorNode*>& children, int windowSize );
   int nextCandidateDocument();
   void prepare( int documentID );

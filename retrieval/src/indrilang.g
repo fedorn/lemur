@@ -401,7 +401,9 @@ odNode returns [ indri::lang::ODNode* od ]
   // operator
   (
     // #od5 syntax
-      (OD n1:NUMBER  { od->setWindowSize( n1->getText() ); } )
+      (OD NUMBER) => (OD n1:NUMBER  { od->setWindowSize( n1->getText() ); } )
+    // #od( term ) syntax
+    | (OD) => (OD)
     // #5 syntax
     | (OPERATOR n2:NUMBER { od->setWindowSize( n2->getText() ); } )
   )
@@ -417,8 +419,12 @@ uwNode returns [ indri::lang::UWNode* uw ]
     RawExtentNode* rn = 0;
     _nodes.push_back(uw);
   } :
+  (
   // operator (#uw2)
-  UW n:NUMBER { uw->setWindowSize( n->getText() ); }
+      (UW NUMBER) => (UW n:NUMBER { uw->setWindowSize( n->getText() ); } )
+      // operator #uw( term )
+    | (UW)
+  )
   // contents
   O_PAREN
     ( options { greedy=true; } : rn=unscoredTerm { uw->addChild( rn ); } )+

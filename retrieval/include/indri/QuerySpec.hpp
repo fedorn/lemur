@@ -475,7 +475,7 @@ namespace indri {
 
     public:
       UWNode() :
-        _windowSize(0)
+        _windowSize(-1) // default is unlimited window size
       {
       }
 
@@ -497,7 +497,11 @@ namespace indri {
       std::string queryText() const {
         std::stringstream qtext;
         
+        if( _windowSize >= 0 )
         qtext << "#uw" << _windowSize << "( ";
+        else
+          qtext << "#uw( ";
+          
         for( unsigned int i=0; i<_children.size(); i++ ) {
           qtext << _children[i]->queryText() << " ";
         }
@@ -584,7 +588,7 @@ namespace indri {
       }
 
       ODNode() :
-        _windowSize(0)
+        _windowSize(-1) // default is unlimited window size
       {
       }
 
@@ -599,7 +603,10 @@ namespace indri {
 
       std::string queryText() const {
         std::stringstream qtext;
+        if( _windowSize >= 0 )
         qtext << "#" << _windowSize << "( ";
+        else
+          qtext << "#od( ";
 
         for( unsigned int i=0; i<_children.size(); i++ ) {
           qtext << _children[i]->queryText() << " ";
