@@ -23,10 +23,10 @@
 class DocUnigramCounter : public ArrayCounter <int> {
 public:
   /// construct a counter for a doc
-  DocUnigramCounter(int docID, const Index &homeIndex);
+  DocUnigramCounter(DOCID_T docID, const Index &homeIndex);
 
   /// construct a counter for a subset of docs in a collection
-  DocUnigramCounter(const vector<int> &docSet, const Index &homeIndex);
+  DocUnigramCounter(const vector<DOCID_T> &docSet, const Index &homeIndex);
 
   /// construct a counter for a subset of weighted docs in a collection
   DocUnigramCounter(const WeightedIDSet &docSet, const Index &homeIndex);
@@ -39,7 +39,7 @@ public:
 
 protected:
 
-  void countDocUnigram(int docID, double weight=1);
+  void countDocUnigram(DOCID_T docID, double weight=1);
 
   const Index &ind;
 };

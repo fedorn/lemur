@@ -14,7 +14,7 @@
 #include "RelDocUnigramCounter.hpp"
 
 
-RelDocUnigramCounter::RelDocUnigramCounter(int docID, const Index &homeIndex)
+RelDocUnigramCounter::RelDocUnigramCounter(DOCID_T docID, const Index &homeIndex)
   : ind(homeIndex), ArrayCounter<double>(homeIndex.termCountUnique()+1) 
 {
   countRelDocUnigram(docID);
@@ -32,7 +32,7 @@ RelDocUnigramCounter::RelDocUnigramCounter(const WeightedIDSet &docSet, const In
   }
 }
 
-void RelDocUnigramCounter::countRelDocUnigram(int docID, double weight)
+void RelDocUnigramCounter::countRelDocUnigram(DOCID_T docID, double weight)
 {
   double dlength = (double)ind.docLength(docID);
   TermInfoList *tList = ind.termInfoList(docID);

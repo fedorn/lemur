@@ -15,6 +15,7 @@
 
 #include "Counter.hpp"
 #include "Exception.hpp"
+#include "IndexTypes.hpp"
 #include <cstring>
 /// Abstract Unigram Language Model class
 /*!
@@ -25,14 +26,14 @@
 class UnigramLM {
 public:
   /// return p(w) 
-  virtual double prob(int wordIndex) const = 0;
+  virtual double prob(TERMID_T wordIndex) const = 0;
   /// return a string ID of the lexicon on which the word index should be interpreted
   virtual const string lexiconID() const= 0;
 
   /// iteration over non-zero probability entries
   virtual void startIteration() const = 0;
   virtual bool hasMore() const = 0;
-  virtual void nextWordProb(int &wordIndex, double &prob) const = 0;
+  virtual void nextWordProb(TERMID_T &wordIndex, double &prob) const = 0;
 };
 
 
@@ -43,7 +44,7 @@ public:
   SmoothedMLEstimator(const Counter &counter, const string &lexiconID) : ct(counter), lexID(lexiconID) {}
   virtual ~SmoothedMLEstimator() {}
 
-  virtual double prob(int wordIndex) const {
+  virtual double prob(TERMID_T wordIndex) const {
     return (probEstimate(wordIndex, ct.count(wordIndex),ct.sum()));
   }
 
@@ -55,16 +56,17 @@ public:
     return ct.hasMore();
   }
 
-  virtual void nextWordProb(int &wordIndex, double &prob) const{
+  virtual void nextWordProb(TERMID_T &wordIndex, double &prob) const{
     double count;
-    ct.nextCount(wordIndex, count);
+    //dmf FIXME
+    ct.nextCount((int&)wordIndex, count);
     prob = probEstimate(wordIndex, count, ct.sum());
   }
   
   virtual const string lexiconID() const { return lexID;}
 
   /// individual model differs in its implementation of probEstimate() method
-  virtual double probEstimate(int wordIndex, double wdCount, double sumCount) const=0;
+  virtual double probEstimate(TERMID_T wordIndex, double wdCount, double sumCount) const=0;
 
 protected:
   const Counter &ct;
@@ -78,7 +80,7 @@ public:
   MLUnigramLM(const Counter & counter, const string &lexiconID) : SmoothedMLEstimator(counter, lexiconID) {};
   virtual ~MLUnigramLM() {}
   
-  virtual double probEstimate(int wordIndex, double count, double sum) const{
+  virtual double probEstimate(TERMID_T wordIndex, double count, double sum) const{
     return (count/sum);
   }
 };
@@ -89,7 +91,7 @@ public:
   LaplaceUnigramLM(const Counter & counter, const string &lexiconID, double vocabSize) : SmoothedMLEstimator(counter, lexiconID), vocSz(vocabSize) {};
   virtual ~LaplaceUnigramLM() {}
   
-  virtual double probEstimate(int wordIndex, double count, double sum) const {
+  virtual double probEstimate(TERMID_T wordIndex, double count, double sum) const {
     return ((count+1)/(sum+vocSz));
   }
 private:
@@ -108,7 +110,7 @@ public:
 
   virtual ~DirichletUnigramLM() {}
   
-  virtual double probEstimate(int wordIndex, double count, double sum) const {
+  virtual double probEstimate(TERMID_T wordIndex, double count, double sum) const {
     return ((count+s*ref->prob(wordIndex))/(sum+s));
   }
 
@@ -134,7 +136,7 @@ public:
 
   virtual ~InterpUnigramLM() {}
   
-  virtual double probEstimate(int wordIndex, double count, double sum) const {
+  virtual double probEstimate(TERMID_T wordIndex, double count, double sum) const {
     return ((1-refC)*count/sum + refC*ref->prob(wordIndex));
   }
 

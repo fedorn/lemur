@@ -59,9 +59,9 @@ OneStepMarkovChain::~OneStepMarkovChain()
   delete [] dSet;
 }
 
-void OneStepMarkovChain::computeFromWordProb(int toWord) const 
+void OneStepMarkovChain::computeFromWordProb(TERMID_T toWord) const 
 {
-  int i;
+  COUNT_T i;
   for (i=1; i<=ind.termCountUnique(); i++) {
     fromWordPr[i] = 0;
   }  
@@ -106,7 +106,7 @@ void OneStepMarkovChain::computeFromWordProb(int toWord) const
 
 }
 
-void OneStepMarkovChain::startFromWordIteration(int toWord) const
+void OneStepMarkovChain::startFromWordIteration(TERMID_T toWord) const
 {
   if (toWord != curToWord) 
     computeFromWordProb(toWord);
@@ -114,7 +114,7 @@ void OneStepMarkovChain::startFromWordIteration(int toWord) const
   itPos = 1;
 }
 
-void OneStepMarkovChain::nextFromWordProb(int &fromWord, double &prob) const
+void OneStepMarkovChain::nextFromWordProb(TERMID_T &fromWord, double &prob) const
 {
   fromWord = itPos;
   prob = fromWordPr[itPos];

@@ -27,7 +27,7 @@
 class RelDocUnigramCounter : public ArrayCounter <double> {
 public:
   /// construct a counter for a doc
-  RelDocUnigramCounter(int docID, const Index &homeIndex);
+  RelDocUnigramCounter(DOCID_T docID, const Index &homeIndex);
 
   /// construct a counter for a subset of weighted docs in a collection
   RelDocUnigramCounter(const WeightedIDSet &docSet, const Index &homeIndex);
@@ -38,7 +38,7 @@ public:
 protected:
   /// Fill in the counter values with the probability of each term in
   /// in the document (count/length).
-  void countRelDocUnigram(int docID, double weight=1);
+  void countRelDocUnigram(DOCID_T docID, double weight=1);
 
   const Index &ind;
 };

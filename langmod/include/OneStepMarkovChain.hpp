@@ -36,25 +36,25 @@ public:
    */
   //@{
   /// Start iteration over w's for t(toWord |w)
-  void startFromWordIteration(int toWord) const;
+  void startFromWordIteration(TERMID_T toWord) const;
   bool hasMoreFromWord() const { 
     while (itPos <= ind.termCountUnique() && fromWordPr[itPos]==0) 
       itPos++;
     return (itPos<= ind.termCountUnique());
   }
   /// Fetch the next word and the prob of "translating" it to the toWord
-  void nextFromWordProb(int &fromWord, double &prob) const ;
+  void nextFromWordProb(TERMID_T &fromWord, double &prob) const ;
   //@}
 
 private:
-  void computeFromWordProb(int toWord) const;
+  void computeFromWordProb(TERMID_T toWord) const;
   const Index &ind;
   double alpha;
   int *dSet;
   double *norm;
   mutable double *fromWordPr;
-  mutable int itPos;
-  mutable int curToWord;
+  mutable TERMID_T itPos;
+  mutable TERMID_T curToWord;
 };
 
 
