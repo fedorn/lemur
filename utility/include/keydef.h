@@ -1,6 +1,8 @@
+#if !defined(KEYDEF_H)
+#define KEYDEF_H
 
 /*                                                               */
-/* Copyright 1984,1985,1986,1988,1989,1990,2003,2004 by Howard Turtle      */
+/* Copyright 1984,1985,1986,1988,1989,1990,2003,2004,2005 by Howard Turtle      */
 /*                                                               */
 
 #define max_long 2147483647
@@ -12,12 +14,11 @@
 #define level_zero 0                 /* level of index leaves */
 #define level_one 1                  /* level immediately above leaves */
 #define long_lc   sizeof(long)       /* lc of a long int */
+#define min_disk_rec_lc 5            /* records this lc or longer are on disk */
 #define min_buffer_cnt 8             /* default number of buffers allocated */
-#define max_buffer_cnt 1024          /* max buffers allowed */
+#define max_buffer_cnt 16384         /* max buffers allowed */
 #define buf_hash_load_factor 3       /* hash table is>=this times buffers alloc,*/
 #define max_level 32                 /* number of index block levels */
-#define fib_lc 6432                  /* length of fixed portion of fib ****hand computed *****/
-#define fib_blocks ((fib_lc-1)/block_lc+1)
 /*#define max_segment_lc 4194304 */      /* 1024 blocks of 4096 each */
 #define max_segment_lc max_long      /* max length of a file segment */
 #define max_segments 1024            /* max number of file segments */
@@ -56,6 +57,8 @@ struct level0_pntr {
     lc;
 };
 #define level0_lc sizeof(struct level0_pntr)
+
+typedef struct level0_pntr keyfile_pointer; /* external name for Chiliad use */
 
 struct key_ptr_t {
   short
@@ -207,3 +210,9 @@ struct fcb {
     buffer[min_buffer_cnt];     /* should be at end of fcb so we can extend */
 };
 #define min_fcb_lc sizeof(struct fcb)
+
+#define fib_lc ((int) &((struct fcb *) 0)->file_name)
+#define fib_blocks ((fib_lc-1)/block_lc+1)
+
+
+#endif
