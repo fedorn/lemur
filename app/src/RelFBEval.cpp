@@ -326,9 +326,8 @@ int AppMain(int argc, char *argv[]) {
 
 
 
-  char qid[1024];
 
-  QueryRep *qr;
+
 
   qryStream->startDocIteration();
   TextQuery *q;
