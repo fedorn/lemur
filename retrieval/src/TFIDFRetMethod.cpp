@@ -22,6 +22,7 @@ TFIDFQueryRep::TFIDFQueryRep(TextQuery &qry, Index &dbIndex, double *idfValue, T
     QueryTerm *qt = nextTerm();
     setCount(qt->id(), queryTFWeight(qt->weight())*idf[qt->id()]);
     // cout << "term : "<< dbIndex.term(qt->id()) << " idf="<< idf[qt->id()] <<    " total "<< dbIndex.docCount() << " with term "<< dbIndex.docCount(qt->id()) << endl;
+    delete qt;
   }
 }
 double TFIDFQueryRep::queryTFWeight(const double rawTF)
@@ -109,6 +110,7 @@ void TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs)
       centroidVector[info->id()] += dr->docTFWeight(info->count());
       delete dr;
     }
+    delete tList;
   }
 
   // adjust term weight to obtain true Rocchio weight

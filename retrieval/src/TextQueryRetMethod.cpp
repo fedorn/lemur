@@ -57,13 +57,13 @@ void TextQueryRetMethod::scoreInvertedIndex(QueryRep &qRep, IndexedRealVector &s
   double s;
   DocumentRep *dr;
   for (i=1; i<=ind.docCount(); i++) {
+    dr = computeDocRep(i);
     if (scAcc.findScore(i,s)) {
-      dr = computeDocRep(i);
       scores.PushValue(i, scoreFunc()->adjustedScore(s, textQR, dr));
     } else if (scoreAll) {
-      dr = computeDocRep(i);
       scores.PushValue(i, scoreFunc()->adjustedScore(0, textQR, dr));
     }
+    delete dr;
   }
 }
 

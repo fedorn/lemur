@@ -137,7 +137,7 @@ int AppMain(int argc, char *argv[]) {
   }
 
   os.close();
-
+  delete model;
   delete qryStream;
   delete ind;
   return 0;

@@ -41,6 +41,7 @@ void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff,
   while (hasMore()) {
     QueryTerm *qt = nextTerm();
     setCount(qt->id(), qt->weight()*origModCoeff/countSum);
+    delete qt;
   }
   
   // now adding the new model

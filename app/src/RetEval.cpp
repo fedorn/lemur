@@ -230,7 +230,6 @@ int AppMain(int argc, char *argv[]) {
      
       if (LocalParameter::useWorkingSet) {
 	model->scoreDocSet(*qr,*workSet,results);
-	delete workSet;
       } else {
 	model->scoreCollection(*qr, results);
       } 
@@ -238,10 +237,15 @@ int AppMain(int argc, char *argv[]) {
       delete topDoc;
     }
     resFile.writeResults(q->id(), &results, RetrievalParameter::resultCount);
+    
+    if (LocalParameter::useWorkingSet) {
+      delete workSet;
+    }
     delete qr;
     delete q;
   }
 
+  delete model;
   result.close();
   delete qryStream;
   delete ind;
