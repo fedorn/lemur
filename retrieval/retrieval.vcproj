@@ -141,6 +141,9 @@
 				RelativePath=".\src\FieldBetweenNode.cpp">
 			</File>
 			<File
+				RelativePath=".\src\FieldEqualsNode.cpp">
+			</File>
+			<File
 				RelativePath=".\src\FieldGreaterNode.cpp">
 			</File>
 			<File
@@ -378,6 +381,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\FieldBetweenNode.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\FieldEqualsNode.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\FieldGreaterNode.hpp">
