@@ -24,16 +24,25 @@
 class DocumentManager {
 public:
 
-  virtual ~DocumentManager() {};
-
   /// open previously created document manager, return true if opened successfully.  index name should be the full name of the table-of-content file for the manager.  E.g. "manager.flat" for FlattextDocMgr.
-  virtual bool open(const char* manname)=0;
+  virtual bool open(const char* manname) = 0;
 
   /// returns the document with the given docID (usually in raw format)
-  virtual char* getDoc(const char* docID)=0;
+  virtual char* getDoc(const char* docID) = 0;
 
   /// returns a handle to a Parser object that can handle parsing the raw format of these documents
   virtual Parser* getParser() { return myparser; } ;
+
+  /// returns self cast to TextHandler (FIX INHERITANCE HERE!)
+  virtual TextHandler* getTextHandler() { return NULL; } ;  
+
+  /// Construct the data tables for the previously given input files. 
+  virtual void buildMgr() = 0;
+  /// get the ID string to use for opening this later
+  virtual const char* getMyID() = 0;
+
+  virtual ~DocumentManager() {};
+
 
 protected:
   Parser* myparser;
