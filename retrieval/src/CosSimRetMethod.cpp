@@ -51,6 +51,7 @@ CosSimQueryRep::CosSimQueryRep(int docId, Index &dbIndex,
   int id;
   TermInfoList *tList = dbIndex.termInfoList(docId);
   TermInfo *info;
+  tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
     id = info->id();
