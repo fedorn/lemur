@@ -242,6 +242,7 @@ int AppMain(int argc, char *argv[]) {
     delete accumCsDb;
     delete rankingsCsDb;
     delete modelCsDb;
+    delete csdbindex;
   }
 
   return 0;
