@@ -140,10 +140,13 @@ char * lower(char *s) {
 int qfilef(const char *fname) {
    FILE * fp;
    if (fname == FALSE) return FALSE;
-   fp = fopen(fname, "r");
-   fclose(fp);
-   if (fp != NULL) return TRUE;
-   else return FALSE;
+   fp = fopen(fname, "r");   
+   if (fp != NULL) { 
+     fclose(fp); 
+     return TRUE;
+   } else {
+     return FALSE;
+   }
 }
 
 
