@@ -11,6 +11,10 @@
 #include "InvFPDocInfo.hpp"
 #include "MemCache.hpp"
 
+extern "C" {
+#include <stdio.h>
+}
+
 #define DEFAULT 9
 
 class InvFPDocList: public DocInfoList {
