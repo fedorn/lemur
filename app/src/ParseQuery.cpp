@@ -11,49 +11,36 @@
 
 #include "TextHandlerManager.hpp"
 #include "IndexManager.hpp"
-#include "Index.hpp"
 #include "QueryTextHandler.hpp"
 #include "WriterTextHandler.hpp"
 #include "FUtil.hpp"
-
 #include "Param.hpp"
+#include "TrecParser.hpp"
+
 
 // Local parameters used by the indexer 
 namespace LocalParameter {
 
   // name of the database
-  char * index;
+  string index;
   // name of file containing stopwords
-  char * stopwords;
+  string stopwords;
   // name of file containing acronyms
-  char * acronyms;
+  string acronyms;
   // format of documents (trec or web)
-  char * docFormat;
+  string docFormat;
   // stemmer to use
-  char * stemmer;
+  string stemmer;
   // query output file
-  char * qryOutFile;
+  string qryOutFile;
 
   void get() {
-    // my code uses char *'s while the param utils use
-    // strings.  maybe I should convert to strings...
-
-    index = strdup(ParamGetString("index"));
-    stopwords = strdup(ParamGetString("stopwords"));
-    acronyms = strdup(ParamGetString("acronyms"));
-    docFormat = strdup(ParamGetString("docFormat"));
-    stemmer = strdup(ParamGetString("stemmer"));
-    qryOutFile = strdup(ParamGetString("qryOutFile"));
-  }
-
-  // free the memory allocated in get()
-  void freeMem() {
-    free(index);
-    free(stopwords);
-    free(acronyms);
-    free(docFormat);
-    free(stemmer);
-    free(qryOutFile);
+    index = ParamGetString("index");
+    stopwords = ParamGetString("stopwords");
+    acronyms = ParamGetString("acronyms");
+    docFormat = ParamGetString("docFormat");
+    stemmer = ParamGetString("stemmer");
+    qryOutFile = ParamGetString("qryOutFile");
   }
 };
 
@@ -107,6 +94,9 @@ int AppMain(int argc, char * argv[]) {
   parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
 					    LocalParameter::acronyms);
   // if failed to create parser, create a default
+  // Should not do this, if no parser is created, app should say
+  // so and exit... dmf 01/2004. #include "TrecParser.hpp" can
+  // be removed if this is.
   if (!parser)
     parser = new TrecParser();
   
@@ -118,15 +108,15 @@ int AppMain(int argc, char * argv[]) {
   Stemmer * stemmer = NULL;
   stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
 
-  if (!strcmp(LocalParameter::index, "")) {
+  if (LocalParameter::index.empty()) {
     throw Exception("ParseQuery", "index must be specified");
   }
-  Index * ind = IndexManager::openIndex(LocalParameter::index);
+  Index * ind = IndexManager::openIndex(LocalParameter::index.c_str());
 
   QueryTextHandler queryHandler;
   queryHandler.setIndex(ind);
   
-  WriterTextHandler writer(LocalParameter::qryOutFile);
+  WriterTextHandler writer((char *)LocalParameter::qryOutFile.c_str());
 
   // chain the parser/queryHandler/stopper/stemmer/writer
 
@@ -157,10 +147,10 @@ int AppMain(int argc, char * argv[]) {
   }
 
   // free memory
-  if (stopper != NULL) delete stopper;
-  delete parser;
-  delete ind;
-  LocalParameter::freeMem();
+  delete(stopper);
+  delete(stemmer);
+  delete(parser);
+  delete(ind);
   return 0;
 }
 

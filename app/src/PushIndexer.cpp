@@ -62,12 +62,14 @@ The parameters are:
 #include "InvFPTextHandler.hpp"
 #include "Param.hpp"
 #include "FUtil.hpp"
+#include "TrecParser.hpp"
+
 // Local parameters used by the indexer 
 namespace LocalParameter {
   int memory;
 
   // name (minus extension) of the database
-  char* index;
+  string index;
   // name of file containing stopwords
   string stopwords;
   // name of file containing acronyms
@@ -79,30 +81,20 @@ namespace LocalParameter {
   //whether to keep positions and dtindex
   int position;
   // file with source files
-  char * dataFiles;
+  string dataFiles;
 
   bool countStopWords;
 
   void get() {
-    // my code uses char *'s while the param utils use
-    // strings.  maybe I should convert to strings...
-    
-    index = strdup(ParamGetString("index"));
+    index = ParamGetString("index");
     memory = ParamGetInt("memory", 96000000);
     stopwords = ParamGetString("stopwords");
     acronyms = ParamGetString("acronyms");
     docFormat = ParamGetString("docFormat");
-    dataFiles = strdup(ParamGetString("dataFiles"));
+    dataFiles = ParamGetString("dataFiles");
     position = ParamGetInt("position", 1);
     stemmer = ParamGetString("stemmer");
     countStopWords = (ParamGetString("countStopWords", "false") == "true");
-  }
-  
-  // free the memory allocated in get()
-  void freeMem() {
-    // these strings were created using strdup
-    free(index);
-    free(dataFiles);
   }
 };
 
@@ -152,15 +144,19 @@ void GetAppParam() {
 
 
 int AppMain(int argc, char * argv[]) {
-  if ((argc < 3) && (!strcmp(LocalParameter::dataFiles, ""))) {
+  if ((argc < 3) && LocalParameter::dataFiles.empty()) {
     usage(argc, argv);
     return -1;
   }
   
   // Create the appropriate parser and acronyms list if needed
   Parser * parser = NULL;
-  parser = TextHandlerManager::createParser(LocalParameter::docFormat, LocalParameter::acronyms);
+  parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
+					    LocalParameter::acronyms);
   // if failed to create parser, create a default
+  // Should not do this, if no parser is created, app should say
+  // so and exit... dmf 01/2004. #include "TrecParser.hpp" can
+  // be removed if this is.
   if (!parser)
     parser = new TrecParser();
   
@@ -177,7 +173,10 @@ int AppMain(int argc, char * argv[]) {
   // TextHandler class, so that it is compatible with my parser
   // architecture.  See the TextHandler and InvFPTextHandler classes
   // for more info.)
-  InvFPTextHandler indexer(LocalParameter::index, LocalParameter::memory, LocalParameter::countStopWords, LocalParameter::position);
+  InvFPTextHandler indexer((char *)LocalParameter::index.c_str(), 
+			   LocalParameter::memory, 
+			   LocalParameter::countStopWords, 
+			   LocalParameter::position);
 
   // chain the parser/stopper/stemmer/indexer
   TextHandler * th = parser;
@@ -195,11 +194,11 @@ int AppMain(int argc, char * argv[]) {
   th->setTextHandler(&indexer);
 
   // parse the data files
-  if (strcmp(LocalParameter::dataFiles, "")) {
-    if (!fileExist(LocalParameter::dataFiles)) {
+  if (!LocalParameter::dataFiles.empty()) {
+    if (!fileExist((char *)LocalParameter::dataFiles.c_str())) {
       throw Exception("PushIndexer", "dataFiles specified does not exist");
     }
-    ifstream source(LocalParameter::dataFiles);
+    ifstream source((char *)LocalParameter::dataFiles.c_str());
     if (!source.is_open()) {
       throw Exception("PushIndexer","could not open dataFiles specified");
     } else {
@@ -216,10 +215,9 @@ int AppMain(int argc, char * argv[]) {
     }
   }
   // free memory
-  if (stopper) delete stopper;
-  if (stemmer) delete stemmer;
+  delete(stopper);
+  delete(stemmer);
   delete parser;
-  LocalParameter::freeMem();
   return 0;
 }
 

@@ -2,6 +2,7 @@
 #include "DocFreqIndexer.hpp"
 #include "CtfIndexer.hpp"
 #include "Param.hpp"
+#include "TrecParser.hpp"
 
 namespace LocalParameter {
   char * df;

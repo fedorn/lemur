@@ -68,47 +68,35 @@ The parameters are:
 #include "IncPassageTextHandler.hpp"
 #include "Param.hpp"
 #include "FUtil.hpp"
+#include "TrecParser.hpp"
 
 // Local parameters used by the indexer 
 namespace LocalParameter {
   // name (minus extension) of the database
-  char * index;
+  string index;
   // name of file containing stopwords
-  char * stopwords;
+  string stopwords;
   // name of file containing acronyms
-  char * acronyms;
+  string acronyms;
   // format of documents (trec or web)
-  char * docFormat;
+  string docFormat;
   // whether or not to stem
-  char * stemmer;
+  string stemmer;
   // file with source files
-  char * dataFiles;
+  string dataFiles;
 
   int memory;
   int psgSize;
 
   void get() {
-    // my code uses char *'s while the param utils use
-    // strings.  maybe I should convert to strings...
-
-    index = strdup(ParamGetString("index"));
-    stopwords = strdup(ParamGetString("stopwords"));
-    acronyms = strdup(ParamGetString("acronyms"));
-    docFormat = strdup(ParamGetString("docFormat"));
-    dataFiles = strdup(ParamGetString("dataFiles"));
+    index = ParamGetString("index");
+    stopwords = ParamGetString("stopwords");
+    acronyms = ParamGetString("acronyms");
+    docFormat = ParamGetString("docFormat");
+    dataFiles = ParamGetString("dataFiles");
     memory = ParamGetInt("memory", 256000000);
     psgSize = ParamGetInt("passageSize", 50);
-    stemmer = strdup(ParamGetString("stemmer"));
-  }
-
-  // free the memory allocated in get()
-  void freeMem() {
-    free(index);
-    free(stopwords);
-    free(acronyms);
-    free(docFormat);
-    free(stemmer);
-    free(dataFiles);
+    stemmer = ParamGetString("stemmer");
   }
 };
 
@@ -155,7 +143,7 @@ void GetAppParam() {
 
 
 int AppMain(int argc, char * argv[]) {
-  if ((argc < 3) && (!strcmp(LocalParameter::dataFiles, ""))) {
+  if ((argc < 3) && LocalParameter::dataFiles.empty()) {
     usage(argc, argv);
     return -1;
   }
@@ -165,6 +153,9 @@ int AppMain(int argc, char * argv[]) {
   parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
 					    LocalParameter::acronyms);
   // if failed to create parser, create a default
+  // Should not do this, if no parser is created, app should say
+  // so and exit... dmf 01/2004. #include "TrecParser.hpp" can
+  // be removed if this is.
   if (!parser)
     parser = new TrecParser();
   
@@ -182,11 +173,11 @@ int AppMain(int argc, char * argv[]) {
   // architecture.  See the TextHandler and InvFPTextHandler classes
   // for more info.)
   
-  if (!strcmp(LocalParameter::index, "")) {
-    throw Exception("IncIndexer", "index must be specified");
+  if (LocalParameter::index.empty()) {
+    throw Exception("IncPassageIndexer", "index must be specified");
   }
   IncPassageTextHandler* indexer;
-  indexer = new IncPassageTextHandler(LocalParameter::index,
+  indexer = new IncPassageTextHandler((char *)LocalParameter::index.c_str(),
 				      LocalParameter::psgSize,
 				      LocalParameter::memory);
 
@@ -207,14 +198,16 @@ int AppMain(int argc, char * argv[]) {
   th->setTextHandler(indexer);
 
   // parse the data files
-  if (strcmp(LocalParameter::dataFiles, "")) {
-    if (!fileExist(LocalParameter::dataFiles)) {
-      throw Exception("IncIndexer", "dataFiles specified does not exist");
+  if (!LocalParameter::dataFiles.empty()) {
+    if (!fileExist((char *)LocalParameter::dataFiles.c_str())) {
+      throw Exception("IncPassageIndexer", 
+		      "dataFiles specified does not exist");
     }
 
-    ifstream source(LocalParameter::dataFiles);
+    ifstream source((char *)LocalParameter::dataFiles.c_str());
     if (!source.is_open()) {
-      throw Exception("IncIndexer","could not open dataFiles specified");
+      throw Exception("IncPassageIndexer",
+		      "could not open dataFiles specified");
     } else {
       string filename;
       while (getline(source, filename)) {
@@ -231,12 +224,10 @@ int AppMain(int argc, char * argv[]) {
       parser->parse(argv[i]);
     }
   }
-
   // free memory
-  if (stopper != NULL) delete stopper;
-  delete parser;
-  delete indexer;
-  LocalParameter::freeMem();
+  delete(stopper);
+  delete(parser);
+  delete(indexer);
   return 0;
 }
 

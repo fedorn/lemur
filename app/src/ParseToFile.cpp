@@ -13,39 +13,28 @@
 #include "Param.hpp"
 #include "FUtil.hpp"
 #include "Exception.hpp"
+#include "TrecParser.hpp"
 
 // Local parameters used by the indexer 
 namespace LocalParameter {
 
   // name of file containing stopwords
-  char * stopwords;
+  string stopwords;
   // name of file containing acronyms
-  char * acronyms;
+  string acronyms;
   // format of documents (trec or web)
-  char * docFormat;
+  string docFormat;
   // which stemmer to use
-  char * stemmer;
+  string stemmer;
   // output file
-  char * outFile;
+  string outFile;
 
   void get() {
-    // my code uses char *'s while the param utils use
-    // strings.  maybe I should convert to strings...
-
-    outFile = strdup(ParamGetString("outputFile"));
-    stopwords = strdup(ParamGetString("stopwords"));
-    acronyms = strdup(ParamGetString("acronyms"));
-    docFormat = strdup(ParamGetString("docFormat"));
-    stemmer = strdup(ParamGetString("stemmer"));
-  }
-
-  // free the memory allocated in get()
-  void freeMem() {
-    free(stopwords);
-    free(acronyms);
-    free(docFormat);
-    free(stemmer);
-    free(outFile);
+    outFile = ParamGetString("outputFile");
+    stopwords = ParamGetString("stopwords");
+    acronyms = ParamGetString("acronyms");
+    docFormat = ParamGetString("docFormat");
+    stemmer = ParamGetString("stemmer");
   }
 };
 
@@ -97,8 +86,12 @@ int AppMain(int argc, char * argv[]) {
 
   // Create the appropriate parser and acronyms list if needed
   Parser * parser = NULL;
-  parser = TextHandlerManager::createParser(LocalParameter::docFormat, LocalParameter::acronyms);
+  parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
+					    LocalParameter::acronyms);
   // if failed to create parser, create a default
+  // Should not do this, if no parser is created, app should say
+  // so and exit... dmf 01/2004. #include "TrecParser.hpp" can
+  // be removed if this is.
   if (!parser)
     parser = new TrecParser();
   
@@ -111,11 +104,10 @@ int AppMain(int argc, char * argv[]) {
   stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
 
   // Create the document writer.
-  if (!strcmp(LocalParameter::outFile, "")) {
+  if (LocalParameter::outFile.empty()) {
     throw Exception("ParseToFile", "outputFile must be specified");
   }
-  WriterTextHandler writer(LocalParameter::outFile);
-
+  WriterTextHandler writer((char *)LocalParameter::outFile.c_str());
 
   // chain the parser/stopper/stemmer/indexer
 
@@ -143,9 +135,9 @@ int AppMain(int argc, char * argv[]) {
   }
 
   // free memory
-  if (stopper != NULL) delete stopper;
-  delete parser;
-  LocalParameter::freeMem();
+  delete(stopper);
+  delete(stemmer);
+  delete(parser);
   return 0;
 }
 
