@@ -19,6 +19,7 @@
 #include "ReadBuffer.hpp"
 #include "WriteBuffer.hpp"
 #include "DocMgrManager.hpp"
+#include "minmax.hpp"
 
 #include <assert.h>
 #include <functional>
@@ -67,7 +68,7 @@ KeyfileIncIndex::KeyfileIncIndex(char* prefix, int cachesize,
 
   if (!tryOpen()) {
     // brand new empty index
-    
+	*msgstream << "Creating new index" << endl;    
     names.resize( NAMES_SIZE );
 
     counts[TOTAL_TERMS] = counts[UNIQUE_TERMS] = 0;
@@ -308,6 +309,7 @@ DocumentManager * KeyfileIncIndex::docManager(int docID) {
     return NULL;
   record r = fetchDocumentRecord( docID );
   int docManagerID = r.num;
+  cerr << "DOCManagerID " << docManagerID << endl;
   // if it never had one registered.
   if (docManagerID == -1) 
     return NULL;
@@ -756,7 +758,7 @@ void KeyfileIncIndex::writeCacheSegment() {
       termData.totalCount += list->termCTF();
 
       // we need to add the location of the new inverted list
-      int missingSegments = std::min<unsigned>( (sizeof(TermData) - actual) / 
+      int missingSegments = _MINIM<unsigned>( (sizeof(TermData) - actual) / 
 						sizeof(SegmentOffset), 
 						KEYFILE_MAX_SEGMENTS);
       int termSegments = KEYFILE_MAX_SEGMENTS - missingSegments;
@@ -805,8 +807,12 @@ void KeyfileIncIndex::mergeCacheSegments() {
   if( firstMergeSegment == 0 ) {
     invlookup.close();
     // g++ doesn't like this
-    //    ::unlink( names[DOC_LOOKUP].c_str() );
+	// need to move this ifdef out of here
+#ifdef WIN32
+    ::unlink( names[DOC_LOOKUP].c_str() );
+#else
     std::remove( names[DOC_LOOKUP].c_str() );
+#endif
     invlookup.create( names[DOC_LOOKUP].c_str(), Keyfile::sequential );
   }
 
@@ -892,7 +898,7 @@ void KeyfileIncIndex::mergeCacheSegments() {
     }
 
     // we need to add the location of the new inverted list
-    int missingSegments = std::min<unsigned>( (sizeof(TermData) - actual) / sizeof(SegmentOffset), KEYFILE_MAX_SEGMENTS);
+    int missingSegments = _MINIM<unsigned>( (sizeof(TermData) - actual) / sizeof(SegmentOffset), KEYFILE_MAX_SEGMENTS);
     int termSegments = KEYFILE_MAX_SEGMENTS - missingSegments;
 
     // find the first segment offset that was merged in this pass
