@@ -1,0 +1,38 @@
+#ifndef _INVFPTERM_HPP
+#define _INVFPTERM_HPP
+
+/// term class for InvFPIndex
+/*! 
+*/
+
+class InvFPTerm: public Term {
+public:
+  InvFPTerm() { freq=-1;};
+  ~InvFPTerm() {};
+
+  char* spelling() { return word; };
+  void spelling(char* term) { word = term; };
+  int strLength() { return strlen; };
+  void strLength(int len) { strlen = len; };
+  int count() {return freq; };
+  TERMID_T id() { return tid; };
+  LOC_T position() { return loc; };
+  LOC_T* positions() { return loclist; };
+  void position(LOC_T pos) { loc = pos; };
+
+private:
+  LOC_T loc;  // where this term (currently) occurs in the document
+  LOC_T* loclist; // list of all places term occurs in the document
+  TERMID_T tid;
+  int strlen;
+  char* word; 
+  int freq; // number of times this term occurs in this document
+};
+
+#endif
+
+
+
+  
+
+
