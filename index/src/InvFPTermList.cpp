@@ -47,7 +47,7 @@ bool InvFPTermList::binRead(ifstream& infile){
   if (!(infile.gcount() == sizeof(int)))
     return false;
 
-  if (!list == NULL)
+  if (!(list == NULL))
     delete[](list);
 
   list = new LocatedTerm[listlen];
@@ -60,3 +60,5 @@ bool InvFPTermList::binRead(ifstream& infile){
 
   return true;
 }
+
+
