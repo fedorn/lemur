@@ -10,13 +10,10 @@
 */
 
 
+
 #ifndef _INDEXMANAGER_HPP
 #define _INDEXMANAGER_HPP
-
-#include "BasicIndex.hpp"
-#include "InvFPIndex.hpp"
-#include "InvIndex.hpp"
-
+#include "Index.hpp"
 /// A group of index management functions
 class IndexManager {
 public:
