@@ -60,9 +60,6 @@ public:
 
   char* handleDoc(char * docno);
   void  handleEndDoc();
-  /// returns self cast to TextHandler (FIX INHERITANCE HERE!)
-  virtual TextHandler* getTextHandler() { return this; }
-
 private:
   /// open the file with all the sources and save internally
   bool readinSources(const char* fn);
