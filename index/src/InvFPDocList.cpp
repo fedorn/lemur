@@ -6,6 +6,7 @@
 #include "InvFPDocList.hpp"
 
 InvFPDocList::InvFPDocList() {
+  READ_ONLY = true;
   size = 0;
   begin = end = lastid = freq = NULL;
   uid = -1;
@@ -15,7 +16,7 @@ InvFPDocList::InvFPDocList() {
   hascache = false;
 }
 
-/*
+//  This hasn't been tested
 InvFPDocList::InvFPDocList(int id, int len){
   size = pow(2,DEFAULT);
   begin = (int*) malloc(size);
@@ -29,9 +30,10 @@ InvFPDocList::InvFPDocList(int id, int len){
 	df = 0;
   hascache = false;
 }
-*/
+
 
 InvFPDocList::InvFPDocList(int id, int listlen, int* list, int fr, int* ldocid, int len){
+  READ_ONLY = false;
   intsize = sizeof(int);
   size = listlen * intsize;
   begin = list;
@@ -45,6 +47,7 @@ InvFPDocList::InvFPDocList(int id, int listlen, int* list, int fr, int* ldocid, 
 }
 
 InvFPDocList::InvFPDocList(MemCache* mc, int id, int len){
+  READ_ONLY = false;
   size = pow(2,DEFAULT);
   cache = mc;
   begin = cache->getMem(DEFAULT);
@@ -62,6 +65,7 @@ InvFPDocList::InvFPDocList(MemCache* mc, int id, int len){
 }
 
 InvFPDocList::InvFPDocList(MemCache* mc, int id, int len, int docid, int location) {
+  READ_ONLY = false;
   size = pow(2,DEFAULT);
   cache = mc;
   begin = cache->getMem(DEFAULT);
@@ -85,9 +89,32 @@ InvFPDocList::~InvFPDocList() {
     int pow = logb2(size);
       cache->freeMem(begin, pow);      
   } */
+  if ((begin != NULL) && (!hascache))
+    free(begin);
 }
 
 void InvFPDocList::setList(int id, int listlen, int* list, int fr, int* ldocid, int len){
+  READ_ONLY = true;
+/*
+  if (hascache) {
+    int pow = logb2(size);
+    cache->freeMem(begin, pow);     
+  } else if (begin != NULL) {
+    free(begin);
+  }
+  */
+  size = listlen * intsize;
+  begin = list;
+  end = begin + listlen;
+  uid = id;
+  strlength = len;
+	df = fr;
+  hascache = false;
+  lastid = ldocid;
+  freq = lastid+1;
+}
+
+void InvFPDocList::setListSafe(int id, int listlen, int* list, int fr, int* ldocid, int len){
   if (hascache) {
 /*    int pow = logb2(size);
       cache->freeMem(begin, pow);   
@@ -103,7 +130,7 @@ void InvFPDocList::setList(int id, int listlen, int* list, int fr, int* ldocid, 
   lastid = ldocid;
   freq = lastid+1;
 }
-  
+ 
 void InvFPDocList::startIteration() {
   iter = begin;
 }
@@ -136,12 +163,15 @@ void InvFPDocList::nextEntry(InvFPDocInfo* info) {
 }
 
 bool InvFPDocList::allocMem() {
+  if (READ_ONLY)
+    return false;
+
   size = pow(2,DEFAULT);
 
   if (hascache) {
     begin = cache->getMem(DEFAULT);
   } else {
-    begin = (int*) malloc(size);
+    begin = (TERMID_T*) malloc(size);
   }
   lastid = begin;
   if (lastid != NULL) *lastid = -1;
@@ -155,6 +185,8 @@ bool InvFPDocList::allocMem() {
 }
 
 bool InvFPDocList::addLocation(int docid, int location) {
+  if (READ_ONLY)
+    return false;
     // check that we can add at all
   if (size == 0)
     return false;
@@ -195,16 +227,11 @@ bool InvFPDocList::hasNoMem() {
 }
 
 void InvFPDocList::reset() {
-  // this is logically the right thing to do here, but we know we are going to reset
-  // the cache
-
-  if (!hascache)
-    free(begin);
   /*
   if (hascache) {
     int pow = logb2(size);
     cache->freeMem(begin, pow);   
-  } else {
+  } else if (begin != NULL) {
     free(begin);
   } */
   begin = NULL;
@@ -213,6 +240,67 @@ void InvFPDocList::reset() {
   freq = begin;
   size = 0;
   df = 0;
+}
+
+void InvFPDocList::resetFree() {
+  // free the memory
+  if (hascache) {
+    int pow = logb2(size);
+    cache->freeMem(begin, pow);   
+  } else if (begin != NULL) {
+    free(begin);
+  } 
+
+  begin = end = lastid = freq = NULL;
+  size = 0;
+  df = 0;
+  uid = -1;
+}
+
+void InvFPDocList::binWrite(ofstream& of) {
+  int len= end-begin;
+  int diff = lastid-begin;
+  of.write((const char*) &uid, sizeof(TERMID_T));
+  of.write((const char*) &df, intsize);
+  of.write((const char*) &diff, intsize);
+  of.write((const char*) &len, intsize);
+  of.write((const char*) begin, sizeof(LOC_T)*len);
+}
+
+bool InvFPDocList::binRead(ifstream& inf) {
+  if (inf.eof())
+    return false;
+  int diff;
+
+  inf.read((char*) &uid, sizeof(TERMID_T));
+  if (!(inf.gcount() == sizeof(TERMID_T)))
+    return false;
+
+  inf.read((char*) &df, intsize);
+  if (!inf.gcount() == intsize)
+    return false;
+
+  inf.read((char*) &diff, intsize);
+  if (!inf.gcount() == intsize)
+    return false;
+
+  inf.read((char*) &size, intsize);
+  if (!inf.gcount() == intsize)
+    return false;
+
+  int s = sizeof(LOC_T)*size;
+  begin = (LOC_T*) malloc(s);
+  inf.read((char*) begin, s);
+  if (!inf.gcount() == s) {
+    resetFree();
+    return false;
+  }
+
+  lastid = begin + diff;
+  end = begin + size;
+  freq = lastid+1;
+  READ_ONLY = false;
+  return true;
 }
 
 /** THE PRIVATE STUFF **/
