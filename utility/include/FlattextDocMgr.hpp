@@ -25,8 +25,8 @@ public:
 
   struct lookup_e {
     int fid;
-    int offset;
-    int bytes;
+    long offset;
+    long bytes;
   };
 
   struct abc {
