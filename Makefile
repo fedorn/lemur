@@ -18,14 +18,23 @@ CLEANDIRS = $(DIRS:%=clean%)
 # derived targets for installing directories
 INSTALLDIRS = $(DIRS:%=install%)
 
-.PHONY: $(DIRS) $(CLEANDIRS) $(INSTALLDIRS) CLEANDEST
 
-# "make all" means making each directory
-all All ALL: $(DIRS)
+# derived targets for sub directories
+OBJDIRS = $(DIRS:%=%/obj)
+DEPENDDIRS = $(DIRS:%=%/depend)
+
+.PHONY: $(DIRS) $(CLEANDIRS) $(INSTALLDIRS) CLEANDEST 
+
+# "make all" means ensuring obj and depend subdirs to exist and making each directory
+all All ALL: $(DIRS) 
+
+# Create OBJDIRS and DEPENDDIRS if necessary
+$(OBJDIRS) $(DEPENDDIRS):
+	mkdir $@
 
 # how to make each directory
 # for more verbose output, remove the "-s" below
-$(DIRS): 
+$(DIRS): $(OBJDIRS) $(DEPENDDIRS)
 	cd $@/obj && $(MAKE) -s -f ../src/Makefile all
 
 # "make clean" means cleaning each directory
