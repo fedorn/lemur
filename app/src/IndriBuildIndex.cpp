@@ -18,25 +18,38 @@
 //
 
 /*! \page IndriParameters Indri Parameter Files
-<P>The indri applications, BuildIndriIndex, IndriDaemon, and IndriRunQuery accept parameters from either the command line or from 
-a file. The parameter file uses an XML format. The command line uses dotted 
-path notation. The top level element in the parameters file is named <em>parameters</em>. 
+<P>The indri applications, IndriBuildIndex, IndriDaemon, and IndriRunQuery accept
+parameters from either the command line or from a file. The parameter
+file uses an XML format. The command line uses dotted path notation. The
+top level element in the parameters file is named <em>parameters</em>.
+
 <H3> Repository construction parameters</h3>
 <dl>
 <dt>memory</dt>
-<dd> an integer value specifying the number of bytes to use for the indexing process. The value can include a scaling factor by adding a suffix. Valid values are (case insensitive) K = 1000, M = 1000000, G = 1000000000. So 100M would be equivalent to 100000000. The value should contain only decimal digits and the optional suffix. Specified as &lt;memory&gt;100M&lt;/memory&gt; in the parameter file and as <tt>-memory=100M</tt> on the command line. </dd>
-<dt>index</dt>
-<dd> path to where to place the Indri Repository. Specified as
-&lt;index&gt;/path/to/repository&lt;/index&gt; in the parameter file and
-as <tt>-index=/path/to/repository</tt> on the command line.
-
+<dd> an integer value specifying the number of bytes to use for the
+indexing process. The value can include a scaling factor by adding a
+suffix. Valid values are (case insensitive) K = 1000, M = 1000000, G =
+1000000000. So 100M would be equivalent to 100000000. The value should
+contain only decimal digits and the optional suffix. Specified as
+&lt;memory&gt;100M&lt;/memory&gt; in the parameter file and as
+<tt>-memory=100M</tt> on the command line. </dd> 
 <dt>corpus</dt>
-<dd>a complex element containing parameters related to a corpus. This element can be specified multiple times. The parameters are
+<dd>a complex element containing parameters related to a corpus. This
+element can be specified multiple times. The parameters are 
 <dl>
 <dt>path</dt>
-<dd>The pathname of the file or directory containing documents to index. Specified as &lt;corpus&gt;&lt;path&gt;/path/to/file_or_directory&lt;/path&gt;&lt;/corpus&gt; in the parameter file and as <tt>-corpus.path=/path/to/file_or_directory</tt> on the command line.</dd>
+<dd>The pathname of the file or directory containing documents to
+index. Specified as
+&lt;corpus&gt;&lt;path&gt;/path/to/file_or_directory&lt;/path&gt;&lt;/corpus&gt;
+in the parameter file and as
+<tt>-corpus.path=/path/to/file_or_directory</tt> on the command
+line.</dd> 
 <dt>class</dt>
-<dd>The FileClassEnviroment of the file or directory containing documents to index. Specified as &lt;corpus&gt;&lt;class&gt;trecweb&lt;/class&gt;&lt;/corpus&gt; in the parameter file and as <tt>-corpus.class=trecweb</tt> on the command line. The known classes are:
+<dd>The FileClassEnviroment of the file or directory containing
+documents to index. Specified as
+&lt;corpus&gt;&lt;class&gt;trecweb&lt;/class&gt;&lt;/corpus&gt; in the
+parameter file and as <tt>-corpus.class=trecweb</tt> on the command
+line. The known classes are: 
 <ul>
 <li>html -- web page data.
 <li>trecweb -- TREC web format, eg terabyte track.
@@ -62,13 +75,17 @@ specifying the metadata fields to index, eg DOCNO. Specified as
 the parameter file and as <tt>metadata.field=fieldname</tt> on the
 command line.</dd> 
 <dt>field</dt>
-<dd>a complex element specifying the fields to index as data, eg TITLE. This parameter can appear multiple times. The subelements are:
+<dd>a complex element specifying the fields to index as data, eg
+TITLE. This parameter can appear multiple times in a parameter file. 
+<b>If provided on the command line, only the first field specified will 
+be indexed</b>. The subelements are:  
 <dl>
 <dt>name</dt><dd>the field name, specified as
 &lt;field&gt;&lt;name&gt;fieldname&lt;/name&gt;&lt;/field&gt; in the
-parameter file and as <tt>-field.name=fieldname</tt> on the command line.</dd>
-<dt>numeric</dt><dd>the symbol <tt>true</tt> if the field contains numeric
-data, otherwise the symbol <tt>false</tt>, specified as
+parameter file and as <tt>-field.name=fieldname</tt> on the command
+line.</dd> 
+<dt>numeric</dt><dd>the symbol <tt>true</tt> if the field contains
+numeric data, otherwise the symbol <tt>false</tt>, specified as
 &lt;field&gt;&lt;numeric&gt;true&lt;/numeric&gt;&lt;/field&gt; in the
 parameter file and as <tt>-field.numeric=true</tt> on the command
 line. This is an optional parameter, defaulting to false. Note that <tt>0</tt>
@@ -279,7 +296,10 @@ specifying the metadata fields to index, eg DOCNO. Specified as
 the parameter file and as <tt>metadata.field=fieldname</tt> on the
 command line.</dd> 
 <dt>field</dt>
-<dd>a complex element specifying the fields to index as data, eg TITLE. This parameter can appear multiple times. The subelements are:
+<dd>a complex element specifying the fields to index as data, eg TITLE.
+This parameter can appear multiple times in a parameter file. 
+<b>If provided on the command line, only the first field specified will 
+be indexed</b>. The subelements are:
 <dl>
 <dt>name</dt><dd>the field name, specified as
 &lt;field&gt;&lt;name&gt;fieldname&lt;/name&gt;&lt;/field&gt; in the
