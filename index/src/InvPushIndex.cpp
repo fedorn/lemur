@@ -15,6 +15,7 @@
 /*
  * NAME DATE - COMMENTS
  * tnt 01/2002 - created
+ * tnt 06/2002 - added docmgr
  *
  *========================================================================*/
 
@@ -28,6 +29,7 @@ InvPushIndex::InvPushIndex(char* prefix, int cachesize, long maxfilesize, DOCID_
   cache = new MemCache(membuf, membufsize);
   tcount = tidcount = 0;
   maxfile = maxfilesize;
+  curdocmgr = -1;
 
   // docterm index stuff
   char* docfname = new char[namelen+strlen(DTINDEX)+1];
@@ -134,41 +136,12 @@ bool InvPushIndex::addTerm(Term& t){
   return true;
 }
 
-void InvPushIndex::endDoc(DocumentProps* dp){
-  //flush list and write to lookup table
-  if (dp != NULL) {
-    int docid = docIDs.size();
-    int len = dp->length();
-    int tls = termlist.size() *2; // for each item we will write 2 ints
+void InvPushIndex::endDoc(DocumentProps* dp) {
+  doendDoc(dp, curdocmgr);
+}
 
-    // make sure the ftell is correct
-    writetlist.flush();
-    long offset = (long)writetlist.tellp();
-
-    if (offset+(3*sizeof(int))+(tls*sizeof(int)) > maxfile) {
-      writetlist.close();
-      char* docfname = new char[namelen+strlen(DTINDEX)+2];
-      sprintf(docfname, "%s%s%d", name, DTINDEX, dtfiles.size());
-      dtfiles.push_back(docfname);
-      writetlist.open(docfname, ios::binary | ios::out);
-      offset = 0;
-    }
-
-    fprintf(writetlookup, "%d %d %d %d ", docid, dtfiles.size()-1, offset, len);
-
-    writetlist.write((const char*)&docid, sizeof(DOCID_T));
-    writetlist.write((const char*)&len, sizeof(int));
-    writetlist.write((const char*)&tls, sizeof(int));
-
-    // write our termlist out.. buffering taken care of by os
-    for (map<int, int>::iterator look=termlist.begin();look!=termlist.end();look++) {
-      writetlist.write((const char*)&(look->first), sizeof(int));
-      writetlist.write((const char*)&(look->second), sizeof(int));
-    }
-
-    tcount += len;
-  }
-  termlist.clear();
+void InvPushIndex::endDoc(DocumentProps* dp, const char* mgr){
+  doendDoc(dp, docMgrID(mgr));
 }
 
 void InvPushIndex::endCollection(CollectionProps* cp){
@@ -184,6 +157,9 @@ void InvPushIndex::endCollection(CollectionProps* cp){
   writeDocIDs();
   // write our list of dt index files in internal fid order
   writeDTIDs();
+  // write list of document managers
+  writeDocMgrIDs();
+
   // merge them
   InvIndexMerge* merger = new InvIndexMerge((char*)membuf, membufsize,maxfile);
   int numinv = merger->merge(&tempfiles, name);
@@ -192,6 +168,10 @@ void InvPushIndex::endCollection(CollectionProps* cp){
   //write out the main toc file
   writeTOC(numinv);
 
+}
+
+void InvPushIndex::setDocManager (const char* mgrID) {
+  curdocmgr = docMgrID(mgrID);
 }
 
 /*==========================================================================
@@ -208,7 +188,7 @@ void InvPushIndex::writeTOC(int numinv) {
      delete[](fname);
      return;
    }
-   fprintf(toc, "%s %s\n", VERSION_PAR, VERSION);
+   fprintf(toc, "%s %s\n", VERSION_PAR, IND_VERSION);
    fprintf(toc, "%s  %d\n", NUMDOCS_PAR, docIDs.size());
    fprintf(toc, "%s  %d\n", NUMTERMS_PAR, tcount);
    fprintf(toc, "%s  %d\n", NUMUTERMS_PAR, tidcount);
@@ -221,6 +201,7 @@ void InvPushIndex::writeTOC(int numinv) {
    fprintf(toc, "%s  %s%s\n", DTLOOKUP_PAR, name, DTLOOKUP);
    fprintf(toc, "%s  %s%s\n", DOCIDMAP_PAR, name, DOCIDMAP);
    fprintf(toc, "%s  %s%s\n", TERMIDMAP_PAR, name, TERMIDMAP);
+   fprintf(toc, "%s  %s%s\n", DOCMGR_PAR, name, DOCMGRMAP);
 
    fclose(toc);
    delete[](fname);
@@ -250,6 +231,17 @@ void InvPushIndex::writeDTIDs() {
   }
   fclose(dtid);
   delete[](dname);
+}
+
+void InvPushIndex::writeDocMgrIDs() {
+  char* dmname = new char[namelen+strlen(DOCMGRMAP)];
+  sprintf(dmname, "%s%s", name, DOCMGRMAP);
+  FILE* dmid = fopen(dmname, "wb");
+  for (int i=0;i<docmgrs.size();i++) {
+    fprintf(dmid, "%d %d %s ", i, strlen(docmgrs[i]), docmgrs[i]);
+  }
+  fclose(dmid);
+  delete[]dmname;
 }
 
 void InvPushIndex::writeCache() {
@@ -286,7 +278,7 @@ void InvPushIndex::writeCache() {
     // check to see that there is a list that requires flushing
     if (!list->hasNoMem()) {
       // write the list out
-      list->binWrite(fout);
+      list->binWriteC(fout);
       list->reset();
     } // if needs flushing
   } // for each term
@@ -321,7 +313,10 @@ void InvPushIndex::lastWriteCache() {
     finder = wordtable.find(term);
     if (finder == wordtable.end() ) {
       // this really shouldn't happen. means can't find term in table
-      fprintf (stderr, "Weird things are happening.\n");
+	  // this does happen... stl table might be managing it in a way i don't fully understand.
+	  // despite the code entering here, it all works fine.
+      // tends to enter here with a large data set and a small cache size   
+//      fprintf (stderr, "Weird things are happening.\n");
       continue;
     } else {
       list = finder->second;
@@ -331,7 +326,7 @@ void InvPushIndex::lastWriteCache() {
 
     // check to see that there is a list that requires flushing
     if (!list->hasNoMem()) {
-      list->binWrite(fout);
+      list->binWriteC(fout);
       list->reset();
     } // if needs flushing   
   } // for each term
@@ -342,4 +337,52 @@ void InvPushIndex::lastWriteCache() {
   delete[](tidname);
 }
 
+
+int InvPushIndex::docMgrID(const char* mgr) {
+  for (int i=0;i<docmgrs.size();i++) {
+    if (!strcmp(mgr, docmgrs[i])) {
+      return i;
+    }
+  }
+  docmgrs.push_back(strdup(mgr));
+ 
+  return docmgrs.size()-1;
+}
+
+void InvPushIndex::doendDoc(DocumentProps* dp, int mgrid){
+  //flush list and write to lookup table
+  if (dp != NULL) {
+    int docid = docIDs.size();
+    int len = dp->length();
+    int tls = termlist.size() *2; // for each item we will write 2 ints
+
+    // make sure the ftell is correct
+    writetlist.flush();
+    long offset = (long)writetlist.tellp();
+
+    if (offset+(3*sizeof(int))+(tls*sizeof(int)) > maxfile) {
+      writetlist.close();
+      char* docfname = new char[namelen+strlen(DTINDEX)+2];
+      sprintf(docfname, "%s%s%d", name, DTINDEX, dtfiles.size());
+      dtfiles.push_back(docfname);
+      writetlist.open(docfname, ios::binary | ios::out);
+      offset = 0;
+    }
+
+    fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset, len, mgrid);
+
+    writetlist.write((const char*)&docid, sizeof(DOCID_T));
+    writetlist.write((const char*)&len, sizeof(int));
+    writetlist.write((const char*)&tls, sizeof(int));
+
+    // write our termlist out.. buffering taken care of by os
+    for (map<int, int>::iterator look=termlist.begin();look!=termlist.end();look++) {
+      writetlist.write((const char*)&(look->first), sizeof(int));
+      writetlist.write((const char*)&(look->second), sizeof(int));
+    }
+
+    tcount += len;
+  }
+  termlist.clear();
+}
 

@@ -86,3 +86,6 @@ InvFPTextHandler::handleWord(char * word) {
 }
 
 
+void InvFPTextHandler::setDocManager(const char* mgrID) {
+  index->setDocManager(mgrID);
+}
