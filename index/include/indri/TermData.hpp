@@ -121,7 +121,7 @@ inline int termdata_compress( char* buffer, int size, int fieldCount, indri::ind
 
   // count up the number of segments used here
   for( size_t i=0; i<INDRI_MAX_SEGMENTS; i++ ) {
-    if( termData->segmentOffsets[i] != MAX_INT64 )
+    if( termData->segmentOffsets[i] != (INT64) (-1) )
       numSegments++;
   }
 
@@ -129,9 +129,9 @@ inline int termdata_compress( char* buffer, int size, int fieldCount, indri::ind
 
   // stream out only the segment offsets that are used
   for( unsigned int i=0; i<INDRI_MAX_SEGMENTS; i++ ) {
-    if( termData->segmentOffsets[i] != MAX_INT64 ) {
+    if( termData->segmentOffsets[i] != (INT64) (-1) ) {
       stream << i
-            << termData->segmentOffsets[i];
+             << termData->segmentOffsets[i];
     }
   }
 
@@ -149,12 +149,12 @@ inline void termdata_decompress( const char* buffer, int size, int fieldCount, i
   
   // corpus statistics
   stream >> termData->corpus.totalCount
-        >> termData->corpus.documentCount;
+         >> termData->corpus.documentCount;
 
   // max-score statistics
   stream >> termData->maxDocumentFrequency
-        >> termData->minDocumentLength
-        >> termData->maxDocumentFraction;
+         >> termData->minDocumentLength
+         >> termData->maxDocumentFraction;
 
   // segment information
   int numSegments = 0;
@@ -165,7 +165,7 @@ inline void termdata_decompress( const char* buffer, int size, int fieldCount, i
     File::offset_type offset;
 
     stream >> segment
-          >> offset;
+           >> offset;
 
     termData->segmentOffsets[segment] = offset;
   }
@@ -173,7 +173,7 @@ inline void termdata_decompress( const char* buffer, int size, int fieldCount, i
   // field statistics
   for( int i=0; i<fieldCount; i++ ) {
     stream >> termData->fields[i].totalCount
-          >> termData->fields[i].documentCount;
+           >> termData->fields[i].documentCount;
   }
 }
 
