@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2000-2002 Carnegie Mellon University.  All rights reserved.
+ * Copyright (c) 2000-2004 The Lemur Project.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -13,17 +13,17 @@
  *    the documentation and/or other materials provided with the
  *    distribution.
  *
- * 3. The names "Lemur" and "Carnegie Mellon" must not be used to
- *    endorse or promote products derived from this software without
- *    prior written permission. To obtain permission, contact 
- *    lemur-toolkit@cs.cmu.edu.
+ * 3. The names "Lemur", "Indri", "University of Massachusetts" and 
+ *    "Carnegie Mellon" must not be used to endorse or promote products 
+ *    derived from this software without prior written permission. To 
+ *    obtain permission, contact license@lemurproject.org.
  *
- * 4. Products derived from this software may not be called "Lemur"
- *    nor may "Lemur" appear in their names without prior written
- *    permission of Carnegie Mellon University. To obtain permission,
- *    contact lemur-toolkit@cs.cmu.edu.
+ * 4. Products derived from this software may not be called "Lemur" or "Indri"
+ *    nor may "Lemur" or "Indri" appear in their names without prior written
+ *    permission of The Lemur Project. To obtain permission,
+ *    contact license@lemurproject.org.
  * 
- * THIS SOFTWARE IS PROVIDED BY CARNEGIE MELLON UNIVERSITY AND OTHER
+ * THIS SOFTWARE IS PROVIDED BY THE LEMUR PROJECT AND OTHER
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
  * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
