@@ -18,7 +18,7 @@
 #include "TFIDFRetMethod.hpp"
 #include "OkapiRetMethod.hpp"
 #include "SimpleKLRetMethod.hpp"
-
+#include "CORIRetMethod.hpp"
 
 /// General retrieval-related parameters
 namespace RetrievalParameter {
@@ -127,8 +127,12 @@ namespace SimpleKLParameter {
 
 namespace CORIParameter {
   static String collectionCounts;
+  static double tffactor;
+  static double tfbaseline;
   static void get() {
     collectionCounts = ParamGetString("collCounts");
+    tffactor = ParamGetDouble("TF_factor", 150);
+    tfbaseline = ParamGetDouble("TF_baseline", 50);
   }
 };
 
