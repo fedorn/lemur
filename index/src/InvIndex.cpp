@@ -143,7 +143,7 @@ int InvIndex::term(const string &word) const{
 
 const string InvIndex::term(int termID) const {
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS]))
-    return NULL;
+    return "";
   return terms[termID];
 }
 
@@ -157,7 +157,7 @@ int InvIndex::document(const string &docIDStr) const{
 
 const string InvIndex::document(int docID) const { 
   if ((docID < 0) || (docID > counts[DOCS]))
-    return NULL;
+    return "";
   return docnames[docID]; 
 }
 
