@@ -1761,7 +1761,7 @@ long BrillPOSParser::fileTell() {
 void 
 BrillPOSParser::parseFile(char * filename) {
   bposloc = 0;
-  bposin = fopen(filename, "r");
+  bposin = fopen(filename, "rb");
   doParse();
   fclose(bposin);
 }
@@ -1848,8 +1848,6 @@ void BrillPOSParser::doParse() {
         proplist.clear();
 	proplist.setProperty(&wordpos);
 	if (textHandler != NULL) 
-	  // 3 is TextHandler::WORD for some reason the compiler is not happy with
-	  // the enumerated type. 	
 	  textHandler->foundToken(WORDTOK, bpostext, bpostext, &proplist);
 	poscount++;
       }

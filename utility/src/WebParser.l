@@ -104,7 +104,7 @@ long WebParser::fileTell() {
 void 
 WebParser::parseFile(char * filename) {
   webloc = 0;
-  webin = fopen(filename, "r");
+  webin = fopen(filename, "rb");
   doParse();
   fclose(webin);
 }

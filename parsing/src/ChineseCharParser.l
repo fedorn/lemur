@@ -133,7 +133,7 @@ long ChineseCharParser::fileTell() {
 
 void ChineseCharParser::parseFile(char * filename) {  
   CCpos = 0;
-  ChineseCharin = fopen(filename, "r");
+  ChineseCharin = fopen(filename, "rb");
   doParse();
   fclose(ChineseCharin);
 }

@@ -101,7 +101,7 @@ long BrillPOSParser::fileTell() {
 void 
 BrillPOSParser::parseFile(char * filename) {
   bposloc = 0;
-  bposin = fopen(filename, "r");
+  bposin = fopen(filename, "rb");
   doParse();
   fclose(bposin);
 }

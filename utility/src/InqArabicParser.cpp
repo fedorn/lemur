@@ -27,6 +27,7 @@
 #define YY_FLEX_MINOR_VERSION 5
 
 #include <stdio.h>
+//#include <unistd.h>
 
 
 /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
@@ -40,7 +41,6 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
-//#include <unistd.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -1075,7 +1075,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
+	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
 #line 118 "../src/InqArabicParser.l"
@@ -1847,6 +1847,7 @@ register char *yy_bp;
 #endif	/* ifndef YY_NO_UNPUT */
 
 
+#ifndef YY_NO_INPUT
 #ifdef __cplusplus
 static int yyinput()
 #else
@@ -1918,7 +1919,7 @@ static int input()
 
 	return c;
 	}
-
+#endif /* YY_NO_INPUT */
 
 #ifdef YY_USE_PROTOS
 void yyrestart( FILE *input_file )
@@ -2029,11 +2030,6 @@ YY_BUFFER_STATE b;
 	}
 
 
-#ifndef YY_ALWAYS_INTERACTIVE
-#ifndef YY_NEVER_INTERACTIVE
-extern int isatty YY_PROTO(( int ));
-#endif
-#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -2677,7 +2673,7 @@ void InqArabicParser::parseBuffer(char* buf, int len) {
 
 void InqArabicParser::parseFile(char * filename) {
   
-  InqArabicin = fopen(filename, "r");
+  InqArabicin = fopen(filename, "rb");
   doParse();
   fclose(InqArabicin);
 }

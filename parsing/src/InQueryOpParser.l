@@ -606,7 +606,7 @@ void InQueryOpParser::parseBuffer(char* buf, int len) {
 
 void InQueryOpParser::parseFile(char * filename) {
   
-  InQueryin = fopen(filename, "r");
+  InQueryin = fopen(filename, "rb");
   doParse();
   fclose(InQueryin);
 }

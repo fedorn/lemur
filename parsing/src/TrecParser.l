@@ -97,7 +97,7 @@ long TrecParser::fileTell() {
 
 void TrecParser::parseFile(char * filename) {  
   trecpos = 0;
-  trecin = fopen(filename, "r");
+  trecin = fopen(filename, "rb");
   doParse();
   fclose(trecin);
 }

@@ -604,7 +604,7 @@ void InqArabicParser::parseBuffer(char* buf, int len) {
 
 void InqArabicParser::parseFile(char * filename) {
   
-  InqArabicin = fopen(filename, "r");
+  InqArabicin = fopen(filename, "rb");
   doParse();
   fclose(InqArabicin);
 }

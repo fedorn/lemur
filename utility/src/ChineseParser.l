@@ -102,7 +102,7 @@ long ChineseParser::fileTell() {
 
 void ChineseParser::parseFile(char * filename) {  
   chinesepos = 0;
-  Chinesein = fopen(filename, "r");
+  Chinesein = fopen(filename, "rb");
   doParse();
   fclose(Chinesein);
 }

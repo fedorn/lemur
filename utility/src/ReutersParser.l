@@ -87,7 +87,7 @@ long ReutersParser::fileTell() {
 void 
 ReutersParser::parseFile(char * filename) {
   reuterspos = 0;
-  reutersin = fopen(filename, "r");
+  reutersin = fopen(filename, "rb");
   doParse();
   fclose(reutersin);
 

@@ -1830,7 +1830,7 @@ long IdentifinderParser::fileTell() {
 void 
 IdentifinderParser::parseFile(char * filename) {
   idenloc = 0;
-  idenin = fopen(filename, "r");
+  idenin = fopen(filename, "rb");
   doParse();
   fclose(idenin);
 }
@@ -1910,8 +1910,6 @@ void IdentifinderParser::doParse() {
 	proplist.setProperty(&tag);
 	proplist.setProperty(&btag);
 	if (textHandler != NULL) 
-	  // 3 is TextHandler::WORD for some reason the compiler is not happy with
-	  // the enumerated type. Might be Flex
 	  textHandler->foundToken(WORDTOK, identext, identext, &proplist);
 	poscount++;
 	// reset begin tag

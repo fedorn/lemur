@@ -114,7 +114,7 @@ long IdentifinderParser::fileTell() {
 void 
 IdentifinderParser::parseFile(char * filename) {
   idenloc = 0;
-  idenin = fopen(filename, "r");
+  idenin = fopen(filename, "rb");
   doParse();
   fclose(idenin);
 }
