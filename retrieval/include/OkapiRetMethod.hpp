@@ -49,10 +49,10 @@ public:
   OkapiQueryTerm(int termID, double count, int pEstCount, double paramK3) : QueryTerm(termID, count), pEst(pEstCount), k3(paramK3) {
   }
   /// return the number of rel docs with the term
-  int pEstCount() { return pEst;}
+  virtual int pEstCount() { return pEst;}
 
   /// return query term TF weight
-  double weight() { 
+  virtual double weight() { 
     return ((k3+1)*w/(k3+w));
   } 
 private:
