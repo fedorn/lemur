@@ -106,12 +106,11 @@ while (<stdin>) {
 	$rel++;
     }
     $thisPr = $rel/$rankCount;
-    $thisRec = $rel/$totalRels{$q};
     if ($judge) {
 	$avgPr += $thisPr;
 	
 	for ($i=0; $i<=$#recLevel; $i++) {
-	    if ($thisRec>=$recLevel[$i] && $thisPr >$precRec[$i]) {
+	    if ($rel >= $recLevel[$i]*$totalRels{$q} && $thisPr >$precRec[$i]) {
 		$precRec[$i] = $thisPr;
 	    }
 	}
