@@ -17,7 +17,6 @@
 #include "InvFPTextHandler.hpp"
 #include "Param.hpp"
 #include "FUtil.hpp"
-#include "main.hpp"
 
 // Local parameters used by the indexer 
 namespace LocalParameter {
@@ -200,6 +199,9 @@ int AppMain(int argc, char * argv[]) {
   } else {
     for (int i = 2; i < argc; i++) {
       cerr << "Parsing " << argv[i] << endl;
+    if (!fileExist(argv[i])) {
+      throw Exception("PushIndexer", "datfile specified does not exist");
+    }
       parser->parse(argv[i]);
     }
   }
