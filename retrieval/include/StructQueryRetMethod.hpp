@@ -52,7 +52,7 @@ public:
   virtual ~StructQueryRetMethod() {}
   /// compute the query representation for a text query 
   //(caller responsible for deleting the memory of the generated new instance)
-  virtual StructQueryRep *computeStructQueryRep(const StructQuery &qry) = 0;
+  virtual StructQueryRep *computeStructQueryRep(const TermQuery &qry) = 0;
 
   /// overriding abstract class method
   virtual QueryRep *computeQueryRep(const Query &qry); 
@@ -98,8 +98,9 @@ public:
 //=============== inlines ========================================
 
 inline QueryRep *StructQueryRetMethod::computeQueryRep(const Query &qry) { 
-  const StructQuery *q = static_cast<const StructQuery *>(&qry);
-  return (computeStructQueryRep(*q));
+  if (const TermQuery *q = dynamic_cast<const TermQuery *>(&qry))
+    return (computeStructQueryRep(*q));
+  else LEMUR_THROW(LEMUR_RUNTIME_ERROR,"StructQueryRetMethod expects query of type TermQuery");
 }
 
 #endif /* _STRUCTQUERYRETMETHOD_HPP */
