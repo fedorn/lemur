@@ -11,10 +11,10 @@
 
 
 #include <stdio.h>
-#include <stdarg.h>
 #include <errno.h>
 #include <assert.h>
 #include "error.h"
+#include <stdlib.h>
 
 char   buf[1024];
 #define CRLF  printf("\n")
