@@ -66,8 +66,8 @@ MindDBManager::open(char * dbname) {
   //    }
 
   if (soap_call_mindcall__retrieveURL(soap, registry, NULL, interfaceName,
-				      "", &interface) == SOAP_OK) {
-    printf("Interface %s: %s\n", interfaceName, interface);
+				      "", &intrface) == SOAP_OK) {
+    printf("Interface %s: %s\n", interfaceName, intrface);
   } else {
     soap_print_fault(soap, stderr);
     exit(-1);
@@ -87,7 +87,7 @@ MindDBManager::open(char * dbname) {
   changeNamespace("mindcall", interfaceName, "urn:*");
   
   mindcall__getSchemaResponse getSchemaResponse;
-  if (soap_call_mindcall__getSchema(soap, interface, NULL,
+  if (soap_call_mindcall__getSchema(soap, intrface, NULL,
 				    &getSchemaResponse) == SOAP_OK) {
 
     schema = getSchemaResponse.mindtype__return;
@@ -162,7 +162,8 @@ MindDBManager::query(char * query, int numDocs) {
   
   // clear set up schema mediatype
   qry.schema = new mindtype__Schema(*schema);
-  for (int i = 0; i < qry.schema->attributes->__size; i++) {
+  int i;
+  for (i = 0; i < qry.schema->attributes->__size; i++) {
     qry.schema->attributes->schemaAttribute[i]->mediatype = strdup(empty);
   }
 
@@ -183,7 +184,7 @@ MindDBManager::query(char * query, int numDocs) {
   // run the query
   changeNamespace("mindcall", interfaceName, "urn:*");  
   mindcall__queryResponse response;
-  if (soap_call_mindcall__query(soap, (const char *) interface,
+  if (soap_call_mindcall__query(soap, (const char *) intrface,
                                 NULL, qry, numDocs,
                                 &response) == SOAP_OK) {
 
@@ -202,7 +203,7 @@ MindDBManager::query(char * query, int numDocs) {
   results = new results_t;
   results->numDocs = numReturned;
   results->ids = new docid_t[numReturned];
-  for (int i = 0; i < numReturned; i++) {
+  for (i = 0; i < numReturned; i++) {
     results->ids[i] = 
       strdup(mindResult->propDocuments.__ptr[i].documentID.internalID);    
   }
@@ -441,7 +442,7 @@ MindDBManager::close() {
 
 
   free(registry);
-  free(interface);
+  free(intrface);
   free(construction);
   free(schemaName);
   free(sampleAttribute);

@@ -79,7 +79,7 @@ private:
   struct soap * soap;
 
   char * registry;
-  char * interface;
+  char * intrface;
   char * interfaceName;
   char * construction;
   char * constructionName;
