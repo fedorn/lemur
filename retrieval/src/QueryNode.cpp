@@ -313,18 +313,24 @@ bool OdnQNode::foundOrderedProx(int currPos, int wsize,
   // recursively find the matched window in children order
   if(ith < cl->size()) {
     QueryNode *nextChild = cl->getNode(ith);
-    int *posList = nextChild->proxList->positions();
-    int count = nextChild->proxList->count();
-    for(int k = 0; k < count; k++) {
-      if(posList[k] < currPos)
-	continue;
-      if((posList[k] - currPos - 1) < wsize)
-	// matching the next child
-	return foundOrderedProx(posList[k], wsize, cl, ith + 1);
-      else
-	return false;
+    if(nextChild->proxList->nextPos >= nextChild->proxList->count())
+      return false; // no more positions for this child
+    int childPos;
+    childPos = nextChild->proxList->position(nextChild->proxList->nextPos);
+    if (childPos < currPos) {
+      while (nextChild->proxList->nextPos < nextChild->proxList->count() &&
+	     (childPos = nextChild->proxList->position(nextChild->proxList->nextPos) <
+currPos)) {
+	nextChild->proxList->nextPos++;
+      }
+      if(nextChild->proxList->nextPos >= nextChild->proxList->count())
+	return false; // no more positions for this child
     }
-    return false;
+    if((childPos - currPos - 1) < wsize)
+      // matching the next child
+      return foundOrderedProx(childPos, wsize, cl, ith + 1);
+    else
+      return false;
   } else {
     // matched all children recursively
     return true;
@@ -337,8 +343,7 @@ void OdnQNode::orderedProxList(int numDocs) {
   int i, j, cnt, df = 0;
   int nd = numDocs + 1;
   bool no_more = false;
-  //  int winSize = ((OdnQNode *)qn)->winSize;
-  
+
   // Choose min num doc positions for allocation.
   int totalPos = INT_MAX;
   ch->startIteration();
@@ -363,6 +368,8 @@ void OdnQNode::orderedProxList(int numDocs) {
       while (ch->hasMore()) {
 	child = ch->nextNode();
 	child->nextProxItem(i);
+	// initialize the prox with the first occurring position 
+	child->proxList->nextPos = 0;
       }
       cnt = 0;
       // compute the prox info for current doc
@@ -379,6 +386,13 @@ void OdnQNode::orderedProxList(int numDocs) {
 	    tmpPos = new int[numPos];
 	  }
 	  tmpPos[cnt++]= positions[k];
+	  // Advance each child to the next occurring position
+	  // consume the used position entries
+	  ch->startIteration();
+	  while (ch->hasMore()) {
+	    child = ch->nextNode();
+	    child->proxList->nextPos++;
+	  }
 	}
       }
       if(cnt > 0) {
