@@ -25,16 +25,14 @@
  * NAME DATE - COMMENTS
  * tnt 03/01 - created
  ======================================================================*/
-#include <iostream>
-#include <fstream>
+#include "common_headers.hpp"
 #include "PushIndex.hpp"
 #include "MemCache.hpp"
 #include "InvFPTypes.hpp"
 #include "InvFPDocList.hpp"
 #include "InvFPTerm.hpp"
 #include "InvFPIndexMerge.hpp"
-#include "map.hpp"
-#include "vector.hpp"
+
 
 typedef map<char*, InvFPDocList*, ltstr> TABLE_T;
 

@@ -26,9 +26,8 @@ hand out memory in chunk sizes of powers of 2 from 2^10 through 2^22.
  * tnt 03/2001 - mudge to lemur toolkit standards
  *
  * =====================================================================*/
-#include <stdlib.h>
-#include <math.h>
-#include "vector.hpp"
+#include <cmath>
+#include "common_headers.hpp"
 
 #define MINPOW 5
 #define MAXPOW 22

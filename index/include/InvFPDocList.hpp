@@ -18,9 +18,8 @@
  * tnt 03/2001 - created
  *
  *========================================================================*/
-#include <math.h>
-#include <iostream>
-#include <fstream>
+#include <cmath>
+#include "common_headers.hpp"
 #include "DocInfoList.hpp"
 #include "InvFPDocInfo.hpp"
 #include "MemCache.hpp"

@@ -12,11 +12,10 @@
 #ifndef _INVFPTERMLIST_HPP
 #define _INVFPTERMLIST_HPP
 
-#include <iostream>
-#include <fstream>
+#include "common_headers.hpp"
 #include "InvFPTerm.hpp"
 #include "InvFPTypes.hpp"
-#include "map.hpp"
+
 
 /*! 
 
