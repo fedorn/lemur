@@ -12,13 +12,12 @@
 #ifndef _MMRSUMM_HPP
 #define _MMRSUMM_HPP
 
-using namespace std;
-
 #include <iomanip>
 #include "Summarizer.hpp"
 #include "Passage.hpp"
 #include "MMRPassage.hpp"
 #include "InvFPIndex.hpp"
+#include <algorithm>
 #include <vector>
 
 using std::vector;
@@ -80,6 +79,8 @@ private:
     cout << "Autoquery: ";
     showPassage((*queryPassage).getAsVector(), idx);
     cout << endl;
+
+    return 1;
   }
 
   int setMMRQuery(char* qInfo) {
@@ -88,6 +89,7 @@ private:
   }
 
 public:
+
   MMRSumm(InvFPIndex* inIdx, int inSummLen = 5) {
     idx = inIdx;
     summLen = inSummLen;
@@ -98,15 +100,15 @@ public:
   };
   
   //:TODO: undo qInfo here
-  virtual void markPassages(int optLen = -1, char* qInfo = NULL);
+  virtual void markPassages(int optLen, char* qInfo);
 
   virtual void addPassage(Passage &psg);
 
-  virtual int fetchPassages(Passage psgs[], int optLen = -1);
+  virtual int fetchPassages(Passage psgs[], int optLen);
   
-  virtual void summDocument(const char* docID, int optLen = -1, const char* qInfo = NULL);
+  virtual void summDocument(const char* docID, const int optLen, const char* qInfo);
 
-  virtual void scorePassages(const char* qInfo = NULL);
+  virtual void scorePassages(const char* qInfo);
 
   virtual void clear(void);
 

@@ -11,7 +11,7 @@
 
 #include "MMRSumm.hpp"
 
-void MMRSumm::markPassages(int optLen = -1, char* qInfo = NULL) {
+void MMRSumm::markPassages(int optLen, char* qInfo) {
   int oldLen;
   if (optLen != -1) {
     oldLen = summLen;
@@ -26,8 +26,8 @@ void MMRSumm::markPassages(int optLen = -1, char* qInfo = NULL) {
     (*it).score = -1;
     (*it).marked = ctr++;
   }
-  for (int i=0; i< doc.size(); i++) {
-    doc[i].marked = copyPsgs[i].marked;
+  for (int j=0; j< doc.size(); j++) {
+    doc[j].marked = copyPsgs[j].marked;
   }
   
   if (oldLen != -1) {
@@ -41,7 +41,7 @@ void MMRSumm::addPassage(Passage &psg) {
 }  
 
   
-int MMRSumm::fetchPassages(Passage psgs[], int optLen = -1) {
+int MMRSumm::fetchPassages(Passage psgs[], int optLen) {
   int l, count=0;
   if (optLen >0) {
     l = optLen;
@@ -105,7 +105,7 @@ void MMRSumm::showMarkedPassages() {
   }
 }
 
-void MMRSumm::summDocument(const char* docID, int optLen = -1, const char* qInfo = NULL) {
+void MMRSumm::summDocument(const char* docID, const int optLen, const char* qInfo) {
   int oldLen;
   queryPassage = new MMRPassage(docID);
   if (optLen != -1) {
@@ -138,7 +138,7 @@ void MMRSumm::summDocument(const char* docID, int optLen = -1, const char* qInfo
   delete tList;
   
   scorePassages(qInfo);
-  markPassages();
+  markPassages(-1, NULL);
   
   if (oldLen != -1) {
     summLen = oldLen;
@@ -146,13 +146,13 @@ void MMRSumm::summDocument(const char* docID, int optLen = -1, const char* qInfo
   
 }  
 
-void MMRSumm::scorePassages(const char* qInfo = NULL) {
+void MMRSumm::scorePassages(const char* qInfo) {
   // query similarities
   int saveScore = doc.size();
   vector<MMRPassage> docCopy(doc);
-  for(int i=0; i<doc.size(); i++) {
-    docCopy[i].qSim = docCopy[i].dotProduct(*queryPassage);
-    docCopy[i].wtSim = docCopy[i].qSim * docCopy[i].wt;
+  for(int iT=0; iT<doc.size(); iT++) {
+    docCopy[iT].qSim = docCopy[iT].dotProduct(*queryPassage);
+    docCopy[iT].wtSim = docCopy[iT].qSim * docCopy[iT].wt;
   }
   
   sort(docCopy.begin(), docCopy.end(), compareSW(lambda));

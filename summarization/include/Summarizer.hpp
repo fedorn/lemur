@@ -8,7 +8,7 @@
  *
  *==========================================================================
 */
-
+#include <stdlib.h> 
 #include <vector>
 #include "Passage.hpp"
 
@@ -28,13 +28,13 @@ public:
   virtual ~Summarizer();
 
   /// General purpose function that does all summary computation as well as passage marking
-  virtual void summDocument(const char* docID, const int optLen = -1, const char* qInfo = NULL) = 0;
+  virtual void summDocument(const char* docID, const int optLen, const char* qInfo) = 0;
 
   /// Score ALL passages currently in this summarizer, optionally given query terms.
-  virtual void scorePassages(const char* qInfo = NULL) = 0;
+  virtual void scorePassages(const char* qInfo) = 0;
 
   /// Flag <code>optLen</code> passages for inclusion in summary
-  virtual void markPassages(int optLen = -1, char* qInfo = NULL) = 0;
+  virtual void markPassages(int optLen, char* qInfo) = 0;
 
   /// Append a new passage to the list the summarizer will use to generate summary
   virtual void addPassage(Passage &psg) = 0;
@@ -43,7 +43,7 @@ public:
   virtual void clear(void) = 0;
 
   /// Place marked passages into an array
-  virtual int fetchPassages(Passage psgs[], int optLen = -1) = 0;
+  virtual int fetchPassages(Passage psgs[], int optLen) = 0;
 
   /// Get the next passage in iterative manner
   virtual int nextPassage(Passage* psg) = 0;

@@ -14,6 +14,7 @@
 #include "Passage.hpp"
 #include "BasicPassage.hpp"
 #include "InvFPIndex.hpp"
+#include <algorithm>
 #include <vector>
 
 using std::vector;
@@ -44,17 +45,17 @@ public:
     iterCount = 1;
   };
 
-  virtual void summDocument(const char* docID, const int optLen = -1, const char* qInfo = NULL);
+  virtual void summDocument(const char* docID, const int optLen, const char* qInfo);
 
-  virtual void scorePassages(const char* qInfo = NULL);
+  virtual void scorePassages(const char* qInfo);
 
-  virtual void markPassages(int optLen = -1, char* qInfo = NULL);
+  virtual void markPassages(int optLen, char* qInfo);
 
   virtual void addPassage(Passage &psg);
 
   virtual void clear(void);
 
-  virtual int fetchPassages(Passage psgs[], int optLen = -1);
+  virtual int fetchPassages(Passage psgs[], int optLen);
 
   virtual int nextPassage(Passage* psg);
 
@@ -79,7 +80,7 @@ public:
   }
 
   /// Scores an individual passage
-  double scorePassage(BasicPassage &psg, char* qInfo = NULL) {
+  double scorePassage(BasicPassage &psg, char* qInfo) {
     char* docID = psg.docID;
     passageVec psgV= *psg.getAsVector();
     double psgLen = psgV.size();
@@ -93,7 +94,7 @@ public:
       tf = psgV[i].tf;
       Tf = tf / (tf + 0.5 + 1.5 * (docLen/avgDocLen) );
       //cout << "score1: " << log((double)idx->docCount()/(double)idx->docCount(psgV[i].termID)) << endl;
-      idf = min(M, log((double)idx->docCount()/(double)idx->docCount(psgV[i].termID))); 
+      idf = __min(M, log((double)idx->docCount()/(double)idx->docCount(psgV[i].termID))); 
       endScore += (Tf * idf * P);
     }
     endScore = endScore / 1+psgLen;

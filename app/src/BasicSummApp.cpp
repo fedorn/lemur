@@ -51,7 +51,7 @@ The following is an example of use:
 #include "String.hpp"
 #include "BasicSumm.hpp"
 #include "InvFPIndex.hpp"
-#include <iostream.h>
+#include <iostream>
 
 
 namespace LocalParameter{
@@ -71,7 +71,7 @@ void GetAppParam()
   LocalParameter::get();
 }
 
-int AppMain(int argc, char** argv) {
+int AppMain(int argc, char* argv[]) {
 
   InvFPIndex idx(LocalParameter::index);
 
@@ -79,9 +79,11 @@ int AppMain(int argc, char** argv) {
   BasicSumm* s = new BasicSumm(&idx);
   
   // Generate a summary
-  s->summDocument(LocalParameter::docID, LocalParameter::summLength);
+  s->summDocument(LocalParameter::docID, LocalParameter::summLength, NULL);
 
   // Print to stdout
   s->outputSumm();
+
+  return 0;
 
 }

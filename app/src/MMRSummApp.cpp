@@ -52,7 +52,7 @@ The following is an example of use:
 #include "String.hpp"
 #include "MMRSumm.hpp"
 #include "InvFPIndex.hpp"
-#include <iostream.h>
+#include <iostream>
 
 namespace LocalParameter{
   String index;   
@@ -74,7 +74,7 @@ void GetAppParam()
 }
 
 
-int AppMain(int argc, char** argv) {
+int AppMain(int argc, char* argv[]) {
 
   InvFPIndex idx(LocalParameter::index);
 
@@ -83,11 +83,12 @@ int AppMain(int argc, char** argv) {
 
   if ( 1 ) {    // :TODO: q-based/generic summ
     // generic summary
-    s->summDocument(LocalParameter::docID, LocalParameter::summLength);
+    s->summDocument(LocalParameter::docID, LocalParameter::summLength, NULL);
   } else {
     // query relevent summary
     s->summDocument(LocalParameter::docID, 15, LocalParameter::query);
   }
 
   s->outputSumm();
+  return 0;
 }
