@@ -94,17 +94,7 @@ namespace LocalParameter {
     docFormat = ParamGetString("docFormat");
     dataFiles = strdup(ParamGetString("dataFiles"));
     position = ParamGetInt("position", 1);
-    // convert docFormat to lowercase    
-    for (int d=0;d<docFormat.length();d++) {
-      docFormat[d] = tolower(docFormat[d]);
-    }      
-    
     stemmer = ParamGetString("stemmer");
-    // convert stemmer to lowercase
-    //    for (char * e = stemmer; *e != '\0'; e++) *e = tolower(*e);
-    for (int e=0;e<stemmer.length();e++) {
-      stemmer[e] = tolower(stemmer[e]);
-    }
     countStopWords = (ParamGetString("countStopWords", "false") == "true");
   }
   
