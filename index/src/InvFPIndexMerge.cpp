@@ -1,4 +1,4 @@
-#include <linux/limits.h>
+#include <limits.h>
 #include "InvFPIndexMerge.hpp"
 
 InvFPIndexMerge::InvFPIndexMerge(char* buffer, long size, long maxfilesize) {
