@@ -1,7 +1,7 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on lemur_utility.dsp
 !IF "$(CFG)" == ""
 CFG=lemur_utility - Win32 Release
-!MESSAGE No configuration specified. Defaulting to lemur_utility - Win32 Release.
+!MESSAGE No configuration specified. Defaulting to lemur_utility - Win32 Release
 !ENDIF 
 
 !IF "$(CFG)" != "lemur_utility - Win32 Release" && "$(CFG)" != "lemur_utility - Win32 Debug"
@@ -41,29 +41,37 @@ CLEAN :
 	-@erase "$(INTDIR)\ArabicParser.obj"
 	-@erase "$(INTDIR)\ArabicStemmer.obj"
 	-@erase "$(INTDIR)\BasicDocStream.obj"
+	-@erase "$(INTDIR)\BrillPOSParser.obj"
+	-@erase "$(INTDIR)\BrillPOSTokenizer.obj"
 	-@erase "$(INTDIR)\ByteHash.obj"
 	-@erase "$(INTDIR)\ChineseCharParser.obj"
 	-@erase "$(INTDIR)\ChineseParser.obj"
+	-@erase "$(INTDIR)\DocMgrManager.obj"
 	-@erase "$(INTDIR)\error.obj"
 	-@erase "$(INTDIR)\FlattextDocMgr.obj"
 	-@erase "$(INTDIR)\FUtil.obj"
+	-@erase "$(INTDIR)\IdentifinderParser.obj"
 	-@erase "$(INTDIR)\InqArabicParser.obj"
 	-@erase "$(INTDIR)\InQueryOpParser.obj"
 	-@erase "$(INTDIR)\kstem.obj"
 	-@erase "$(INTDIR)\KStemmer.obj"
 	-@erase "$(INTDIR)\lex_parser.obj"
+	-@erase "$(INTDIR)\LinkedPropertyList.obj"
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\MemCache.obj"
 	-@erase "$(INTDIR)\MemList.obj"
 	-@erase "$(INTDIR)\Param.obj"
 	-@erase "$(INTDIR)\parameters.obj"
+	-@erase "$(INTDIR)\Parser.obj"
 	-@erase "$(INTDIR)\porter_stemmer.obj"
 	-@erase "$(INTDIR)\PorterStemmer.obj"
+	-@erase "$(INTDIR)\Property.obj"
 	-@erase "$(INTDIR)\ReutersParser.obj"
 	-@erase "$(INTDIR)\RVLCompress.obj"
 	-@erase "$(INTDIR)\Stopper.obj"
 	-@erase "$(INTDIR)\string-set.obj"
 	-@erase "$(INTDIR)\String.obj"
+	-@erase "$(INTDIR)\TextHandlerManager.obj"
 	-@erase "$(INTDIR)\Timer.obj"
 	-@erase "$(INTDIR)\TrecParser.obj"
 	-@erase "$(INTDIR)\util.obj"
@@ -89,29 +97,37 @@ LIB32_OBJS= \
 	"$(INTDIR)\ArabicParser.obj" \
 	"$(INTDIR)\ArabicStemmer.obj" \
 	"$(INTDIR)\BasicDocStream.obj" \
+	"$(INTDIR)\BrillPOSParser.obj" \
+	"$(INTDIR)\BrillPOSTokenizer.obj" \
 	"$(INTDIR)\ByteHash.obj" \
 	"$(INTDIR)\ChineseCharParser.obj" \
 	"$(INTDIR)\ChineseParser.obj" \
+	"$(INTDIR)\DocMgrManager.obj" \
 	"$(INTDIR)\error.obj" \
 	"$(INTDIR)\FlattextDocMgr.obj" \
 	"$(INTDIR)\FUtil.obj" \
+	"$(INTDIR)\IdentifinderParser.obj" \
 	"$(INTDIR)\InqArabicParser.obj" \
 	"$(INTDIR)\InQueryOpParser.obj" \
 	"$(INTDIR)\kstem.obj" \
 	"$(INTDIR)\KStemmer.obj" \
 	"$(INTDIR)\lex_parser.obj" \
+	"$(INTDIR)\LinkedPropertyList.obj" \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\MemCache.obj" \
 	"$(INTDIR)\MemList.obj" \
 	"$(INTDIR)\Param.obj" \
 	"$(INTDIR)\parameters.obj" \
+	"$(INTDIR)\Parser.obj" \
 	"$(INTDIR)\porter_stemmer.obj" \
 	"$(INTDIR)\PorterStemmer.obj" \
+	"$(INTDIR)\Property.obj" \
 	"$(INTDIR)\ReutersParser.obj" \
 	"$(INTDIR)\RVLCompress.obj" \
 	"$(INTDIR)\Stopper.obj" \
 	"$(INTDIR)\String.obj" \
 	"$(INTDIR)\string-set.obj" \
+	"$(INTDIR)\TextHandlerManager.obj" \
 	"$(INTDIR)\Timer.obj" \
 	"$(INTDIR)\TrecParser.obj" \
 	"$(INTDIR)\util.obj" \
@@ -138,29 +154,37 @@ CLEAN :
 	-@erase "$(INTDIR)\ArabicParser.obj"
 	-@erase "$(INTDIR)\ArabicStemmer.obj"
 	-@erase "$(INTDIR)\BasicDocStream.obj"
+	-@erase "$(INTDIR)\BrillPOSParser.obj"
+	-@erase "$(INTDIR)\BrillPOSTokenizer.obj"
 	-@erase "$(INTDIR)\ByteHash.obj"
 	-@erase "$(INTDIR)\ChineseCharParser.obj"
 	-@erase "$(INTDIR)\ChineseParser.obj"
+	-@erase "$(INTDIR)\DocMgrManager.obj"
 	-@erase "$(INTDIR)\error.obj"
 	-@erase "$(INTDIR)\FlattextDocMgr.obj"
 	-@erase "$(INTDIR)\FUtil.obj"
+	-@erase "$(INTDIR)\IdentifinderParser.obj"
 	-@erase "$(INTDIR)\InqArabicParser.obj"
 	-@erase "$(INTDIR)\InQueryOpParser.obj"
 	-@erase "$(INTDIR)\kstem.obj"
 	-@erase "$(INTDIR)\KStemmer.obj"
 	-@erase "$(INTDIR)\lex_parser.obj"
+	-@erase "$(INTDIR)\LinkedPropertyList.obj"
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\MemCache.obj"
 	-@erase "$(INTDIR)\MemList.obj"
 	-@erase "$(INTDIR)\Param.obj"
 	-@erase "$(INTDIR)\parameters.obj"
+	-@erase "$(INTDIR)\Parser.obj"
 	-@erase "$(INTDIR)\porter_stemmer.obj"
 	-@erase "$(INTDIR)\PorterStemmer.obj"
+	-@erase "$(INTDIR)\Property.obj"
 	-@erase "$(INTDIR)\ReutersParser.obj"
 	-@erase "$(INTDIR)\RVLCompress.obj"
 	-@erase "$(INTDIR)\Stopper.obj"
 	-@erase "$(INTDIR)\string-set.obj"
 	-@erase "$(INTDIR)\String.obj"
+	-@erase "$(INTDIR)\TextHandlerManager.obj"
 	-@erase "$(INTDIR)\Timer.obj"
 	-@erase "$(INTDIR)\TrecParser.obj"
 	-@erase "$(INTDIR)\util.obj"
@@ -187,29 +211,37 @@ LIB32_OBJS= \
 	"$(INTDIR)\ArabicParser.obj" \
 	"$(INTDIR)\ArabicStemmer.obj" \
 	"$(INTDIR)\BasicDocStream.obj" \
+	"$(INTDIR)\BrillPOSParser.obj" \
+	"$(INTDIR)\BrillPOSTokenizer.obj" \
 	"$(INTDIR)\ByteHash.obj" \
 	"$(INTDIR)\ChineseCharParser.obj" \
 	"$(INTDIR)\ChineseParser.obj" \
+	"$(INTDIR)\DocMgrManager.obj" \
 	"$(INTDIR)\error.obj" \
 	"$(INTDIR)\FlattextDocMgr.obj" \
 	"$(INTDIR)\FUtil.obj" \
+	"$(INTDIR)\IdentifinderParser.obj" \
 	"$(INTDIR)\InqArabicParser.obj" \
 	"$(INTDIR)\InQueryOpParser.obj" \
 	"$(INTDIR)\kstem.obj" \
 	"$(INTDIR)\KStemmer.obj" \
 	"$(INTDIR)\lex_parser.obj" \
+	"$(INTDIR)\LinkedPropertyList.obj" \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\MemCache.obj" \
 	"$(INTDIR)\MemList.obj" \
 	"$(INTDIR)\Param.obj" \
 	"$(INTDIR)\parameters.obj" \
+	"$(INTDIR)\Parser.obj" \
 	"$(INTDIR)\porter_stemmer.obj" \
 	"$(INTDIR)\PorterStemmer.obj" \
+	"$(INTDIR)\Property.obj" \
 	"$(INTDIR)\ReutersParser.obj" \
 	"$(INTDIR)\RVLCompress.obj" \
 	"$(INTDIR)\Stopper.obj" \
 	"$(INTDIR)\String.obj" \
 	"$(INTDIR)\string-set.obj" \
+	"$(INTDIR)\TextHandlerManager.obj" \
 	"$(INTDIR)\Timer.obj" \
 	"$(INTDIR)\TrecParser.obj" \
 	"$(INTDIR)\util.obj" \
@@ -290,6 +322,18 @@ SOURCE=.\utility\src\BasicDocStream.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=.\utility\src\BrillPOSParser.cpp
+
+"$(INTDIR)\BrillPOSParser.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\BrillPOSTokenizer.cpp
+
+"$(INTDIR)\BrillPOSTokenizer.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\utility\src\ByteHash.cpp
 
 "$(INTDIR)\ByteHash.obj" : $(SOURCE) "$(INTDIR)"
@@ -308,6 +352,12 @@ SOURCE=.\utility\src\ChineseParser.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=.\utility\src\DocMgrManager.cpp
+
+"$(INTDIR)\DocMgrManager.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\utility\src\error.c
 
 "$(INTDIR)\error.obj" : $(SOURCE) "$(INTDIR)"
@@ -323,6 +373,12 @@ SOURCE=.\utility\src\FlattextDocMgr.cpp
 SOURCE=.\utility\src\FUtil.cpp
 
 "$(INTDIR)\FUtil.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\IdentifinderParser.cpp
+
+"$(INTDIR)\IdentifinderParser.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -356,6 +412,12 @@ SOURCE=.\utility\src\lex_parser.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=.\utility\src\LinkedPropertyList.cpp
+
+"$(INTDIR)\LinkedPropertyList.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\utility\src\main.cpp
 
 "$(INTDIR)\main.obj" : $(SOURCE) "$(INTDIR)"
@@ -386,6 +448,12 @@ SOURCE=.\utility\src\parameters.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=.\utility\src\Parser.cpp
+
+"$(INTDIR)\Parser.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\utility\src\porter_stemmer.cpp
 
 "$(INTDIR)\porter_stemmer.obj" : $(SOURCE) "$(INTDIR)"
@@ -395,6 +463,12 @@ SOURCE=.\utility\src\porter_stemmer.cpp
 SOURCE=.\utility\src\PorterStemmer.cpp
 
 "$(INTDIR)\PorterStemmer.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\Property.cpp
+
+"$(INTDIR)\Property.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -425,6 +499,12 @@ SOURCE=".\utility\src\string-set.c"
 SOURCE=.\utility\src\String.cpp
 
 "$(INTDIR)\String.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\TextHandlerManager.cpp
+
+"$(INTDIR)\TextHandlerManager.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
