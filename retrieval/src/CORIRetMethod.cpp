@@ -99,7 +99,7 @@ void CORIRetMethod::scoreCollection(QueryRep &qry,
 
 
 CORIRetMethod::CORIRetMethod(Index & dbIndex, ScoreAccumulator &accumulator, 
-				   String cwName, int isCSIndex=0,
+				   String cwName, int isCSIndex,
 			     SimpleKLDocModel ** smoothers,
 			     UnigramLM * collectLM) : 
   TextQueryRetMethod (dbIndex, accumulator) {
