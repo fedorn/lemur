@@ -215,7 +215,7 @@
 				RelativePath=".\src\parseargs.c">
 			</File>
 			<File
-				RelativePath=".\src\Parser.cc">
+				RelativePath=".\src\xpdfParser.cc">
 			</File>
 			<File
 				RelativePath=".\src\PDFDoc.cc">

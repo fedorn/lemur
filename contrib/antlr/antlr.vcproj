@@ -159,7 +159,7 @@
 				RelativePath=".\src\NoViableAltForCharException.cpp">
 			</File>
 			<File
-				RelativePath=".\src\Parser.cpp">
+				RelativePath=".\src\antlrParser.cpp">
 			</File>
 			<File
 				RelativePath=".\src\RecognitionException.cpp">
