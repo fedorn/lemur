@@ -13,6 +13,7 @@
 
 #ifndef _LEMURDBMANAGER_HPP
 #define _LEMURDBMANAGER_HPP
+#include "IndexManager.hpp"
 
 #include "DBManager.hpp"
 

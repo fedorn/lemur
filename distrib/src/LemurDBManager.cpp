@@ -11,7 +11,6 @@
 
 #include "LemurDBManager.hpp"
 
-#include "IndexManager.hpp"
 #include "StringQuery.hpp"
 
 #include "Param.hpp"
