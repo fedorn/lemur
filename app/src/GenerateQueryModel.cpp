@@ -57,10 +57,10 @@ query model for expansion.
 <li> <tt>feedbackDocuments</tt>: the file of feedback documents to be used for feedback. In the case of pseudo feedback, this can be a result file generated from an initial retrieval process. In the case of relevance feedback, this is usually a 3-column relevance judgment file. Note that this means you can <em>NOT</em> use a TREC-style judgment file
 directly; you must remove the second column to convert it to three-column.  
 
-<li> <tt>TRECResultFormat</tt>: whether the feedback document file (given
+<li> <tt>resultFormat</tt>: whether the feedback document file (given
 by <tt>feedbackDocuments</tt>  is of the TREC format (i.e., six-column) or just
 a simple three-column format <queryID, docID, score>. Integer value, zero for non-TREC format, and non-zero for TREC format. Default: 1 (i.e., TREC format).
-<em> VERY IMPORTANT: For relevance feedback, <tt>TRECResultFormat</tt> should
+<em> VERY IMPORTANT: For relevance feedback, <tt>resultFormat</tt> should
 always be set to 0, since the judgment file is always a simple format</em>.
 
 <li> <tt>expandedQuery</tt>: the file to store the expanded query model
