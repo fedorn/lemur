@@ -510,9 +510,10 @@ ddlink *lookup (const char *s) {
     int i;
     i = hash(s);
     if (ddpar == NULL) return NULL;
-    for (lp = ddpar->ddtable[hash(s)]; lp != NULL; lp = lp->next)
+    for (lp = ddpar->ddtable[hash(s)]; lp != NULL; lp = lp->next) {
         if (strcmp(s, lp->ddname) == 0)
            return lp;
+    }
     return NULL;
 }
 
@@ -520,9 +521,9 @@ ddlink *lookup (const char *s) {
 ddlink *prefixed_lookup (const char *s) {
     static char *prefixed_s=NULL;
     string_set_add(s, string_set);
+    if (prefix_stack == NULL) return lookup(s);
     if (prefixed_s == NULL) 
         prefixed_s = (char *) malloc (MAX_SYMBOL_LENGTH);
-    if (prefix_stack == NULL) return lookup(s);
     sprintf(prefixed_s, "%s%s", prefix_stack->name, s);
     return lookup(prefixed_s);
 }
@@ -996,14 +997,34 @@ int param_push_file (const char *fn) {
 
 /*******************************************************/
 char * param_pop_file (void) {
-    ddpar_link *d;
+  ddpar_link *dup, *d;
+  if (ddpar == NULL) 
+    return NULL; /* nothing to pop */
 
-    d = ddpar;
-    if ((d != NULL) && (d->next == NULL)) return NULL; /* Don't allow the stack to be */
-    else if (ddpar != NULL) ddpar = ddpar->next;       /* completely cleared          */
-
-    free (d->ddtable);
-    return d->file_name;
+  d = ddpar;
+  // see if the table is being used by another
+  for (dup = ddpar; dup != NULL; dup = dup->next)
+    if (!strcmp(dup->file_name, ddpar->file_name))
+      break;
+  if (! dup) {
+    /* free the table entries too*/
+    int i;
+    ddlink *lp, *tmp_lp;
+    for (i=0; i<DDTABLE_SIZE; ++i) {
+      for (lp = ddpar->ddtable[i]; lp != NULL; lp = tmp_lp) {
+	free(lp->ddname);
+	free(lp->ddvalue);
+	tmp_lp = lp->next;
+	free(lp);
+      }
+    }
+    free (d->ddtable); 
+  }
+  ddpar = ddpar->next;
+  // d->ddtable is shared with another structure, don't delete it.
+  free(d->file_name);
+  free(d);
+  return "";
 }
 
 /*******************************************************/
