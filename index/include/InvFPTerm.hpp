@@ -23,6 +23,7 @@ class InvFPTerm: public TermInfo {
 public:
   friend class InvTermList;
   friend class InvFPTermList;
+  friend class InvFPTermPropList;
 
   InvFPTerm() { freq=1;};
   ~InvFPTerm() {};
