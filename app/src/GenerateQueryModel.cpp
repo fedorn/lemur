@@ -77,7 +77,7 @@ In addition, the collection mixture model also recognizes the parameter
 #include "Param.hpp"
 #include "IndexManager.hpp"
 #include "BasicDocStream.hpp"
-#include <iostream.h>
+#include "common_headers.hpp" 
 #include "SimpleKLRetMethod.hpp"
 #include "RetParamManager.hpp"
 #include "ResultFile.hpp"
