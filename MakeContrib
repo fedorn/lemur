@@ -1,0 +1,70 @@
+# this is the common definitions and rules for making a module directory
+#include common definitions
+include ../../../MakeDefns
+# library name for a module 
+# "MODULE" defined in the Makefile of a subdirectory
+OBJLIB = lib$(MODULE).a
+CFLAGS += $(INCPATH)
+CXXFLAGS += $(INCPATH)
+
+.PHONY: all clean install
+
+all: $(OBJLIB)
+
+clean:
+	rm -f *.o; rm -f ../depend/*.d; rm -f *.a
+
+# Each source file has a corresponding ".d" file
+# that specifies its dependents. 
+ifneq (clean, $(MAKECMDGOALS))
+ifneq (install, $(MAKECMDGOALS))
+ifneq ($(strip $(CPPSRC)),)
+-include $(patsubst %, ../depend/%, $(CPPSRC:.cpp=.d))
+endif
+
+ifneq ($(strip $(CSRC)),)
+-include $(patsubst %, ../depend/%, $(CSRC:.c=.d))
+endif
+endif
+endif
+
+# how to generate .d  file from a .C file
+../depend/%.d: ../src/%.cpp
+	@echo "Generating $@ for $<"
+	@set -e; $(CXX) -MM $(CXXFLAGS) $< | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
+
+# how to generate .d  file from a .C file
+../depend/%.d: ../src/%.cc
+	@echo "Generating $@ for $<"
+	@set -e; $(CXX) -MM $(CXXFLAGS) $< | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
+
+# how to generate .d file from a .c file
+../depend/%.d: ../src/%.c
+	@echo "Generating $@ for $<"
+	@set -e; $(CC) -MM $(CFLAGS) $< | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
+
+# compiling C++ code
+%.o: ../src/%.cpp
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+%.o: ../src/%.cc
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+# compiling C code
+%.o: ../src/%.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+# generating C++ with flex
+../src/%.cpp: ../src/%.l
+	$(LEX) -8 -o$@ $<
+
+# how to make a library from object files
+$(OBJLIB): $(OBJ)
+	rm -f $@; $(AR) -rs $@ $(OBJ)
+
+#specify what it means by "make install"
+#install the header files and the library for the module
+
+install:
+	$(INSTALL_DATA) $(ALLHEADER) $(includedir)
+	$(AR) -rs $(libdir)/$(LEMURLIB) $(OBJ)
