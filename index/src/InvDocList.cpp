@@ -242,6 +242,18 @@ bool InvDocList::append(InvDocList* tail) {
   return true;
 }
 
+int InvDocList::termCTF() {
+  int ctf = 0;
+  int *start = begin;
+  while (start != lastid){
+    start++;
+    ctf += *start;
+    start++;
+  }
+  ctf += (*freq);
+  return ctf;  
+}
+
 bool InvDocList::hasNoMem() {
   if (begin == NULL)
     return true;

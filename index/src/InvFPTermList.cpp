@@ -109,10 +109,10 @@ void InvFPTermList::countTerms(){
       (place->second).loc.push_back(list[i].loc);
     } else {
       //store to table
-      LLTerm* lt = new LLTerm;
-      lt->term = 1;
-      lt->loc.push_back(list[i].loc);
-      table[list[i].term]=*lt;
+      LLTerm lt;
+      lt.term = 1;
+      lt.loc.push_back(list[i].loc);
+      table[list[i].term]=lt;
     }
   }
 

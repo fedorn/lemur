@@ -319,7 +319,7 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
 
     // write out the lookup first
     // tid, fid, file offset, ctf, df
-    fprintf(listing, "%d %d %d %d %d ", first->termID(), fid, filelen, ll-(df*2), df);
+    fprintf(listing, "%d %d %d %d %d ", first->termID(), fid, filelen, first->termCTF(), df);
 
     // write out the list
     first->binWriteC(indexfile);
@@ -361,7 +361,7 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
     }
     fid = invfiles.size()-1;
 
-    fprintf(listing, "%d %d %d %d %d ", myreader->list->termID(), fid, filelen, ll-(df*2), df);
+    fprintf(listing, "%d %d %d %d %d ", myreader->list->termID(), fid, filelen, myreader->list->termCTF(), df);
     
     // write out the list
     myreader->list->binWriteC(indexfile);
@@ -384,7 +384,7 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
       }
       fid = invfiles.size()-1;
 
-      fprintf(listing, "%d %d %d %d %d ", myreader->list->termID(), fid, filelen, ll-(df*2), df);
+      fprintf(listing, "%d %d %d %d %d ", myreader->list->termID(), fid, filelen, myreader->list->termCTF(), df);
 
       myreader->list->binWriteC(indexfile);
       myreader->list->resetFree();
