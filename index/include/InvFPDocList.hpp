@@ -51,6 +51,7 @@ public:
 
   virtual DocInfo* nextEntry();
   virtual void nextEntry(InvFPDocInfo* info);
+
 protected:
   /// delta encode docids and positions from begin through end
   /// call before write
@@ -59,6 +60,8 @@ protected:
   /// delta decode docids and positions from begin through end
   /// call after read
   virtual void deltaDecode();
+  private:
+  InvFPDocInfo entry;
 };
 
 #endif

@@ -130,6 +130,8 @@ protected:
   bool hascache;        // remember if we have our own cache
 
   bool READ_ONLY;    // flag for whether this list can be added
+private:
+  InvDocInfo entry;
 };
 
 #endif

@@ -48,7 +48,6 @@ InvDocList::InvDocList(int id, int len){
 InvDocList::InvDocList(int id, int listlen, int* list, int fr, int* ldocid, int len){
   //we don't own the memory.. 
   READ_ONLY = true;
-
   intsize = sizeof(int);
   size = listlen * intsize;
   begin = list;
@@ -135,13 +134,14 @@ bool InvDocList::hasMore() {
 }
 
 DocInfo* InvDocList::nextEntry() {
-  static InvDocInfo info;
+  // use the attribute entry.
+  //  static InvDocInfo info;
   // info is stored in int* as docid freq .. .. 
-  info.id = *iter;
+  entry.id = *iter;
   iter++;
-  info.count = *iter;
+  entry.count = *iter;
   iter++;
-  return &info;
+  return &entry;
 }
 
 void InvDocList::nextEntry(InvDocInfo* info) {

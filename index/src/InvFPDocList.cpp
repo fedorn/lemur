@@ -41,16 +41,16 @@ InvFPDocList::~InvFPDocList() {
 
 DocInfo* InvFPDocList::nextEntry() {
   //DocInfo* dinfo;
-  static InvFPDocInfo info;
+  //  static InvFPDocInfo info;
   // info is stored in int* as docid freq pos1 pos2 .. 
-  info.id = *iter;
+  entry.id = *iter;
   iter++;
-  info.count = *iter;
+  entry.count = *iter;
   iter++;
-  info.pos = iter;
-  iter+=info.count;
+  entry.pos = iter;
+  iter+=entry.count;
 //  dinfo = info;
-  return &info;
+  return &entry;
 }
 
 void InvFPDocList::nextEntry(InvFPDocInfo* info) {
