@@ -203,18 +203,18 @@ void InvFPPushIndex::writeTOC(int numinv) {
      delete[](fname);
      return;
    }
-   fprintf(toc, "%s: %d\n", NUMDOCS_PAR, docIDs.size());
-   fprintf(toc, "%s: %d\n", NUMTERMS_PAR, tcount);
-   fprintf(toc, "%s: %d\n", NUMUTERMS_PAR, tidcount);
-   fprintf(toc, "%s: %d\n", AVEDOCLEN_PAR, tcount/docIDs.size());
-   fprintf(toc, "%s: %s%s\n", INVINDEX_PAR, name, INVINDEX);
-   fprintf(toc, "%s: %d\n", NUMINV_PAR, numinv); 
-   fprintf(toc, "%s: %s%s\n", INVLOOKUP_PAR, name, INVLOOKUP);
-   fprintf(toc, "%s: %s%s\n", DTINDEX_PAR, name, DTINDEX);
-   fprintf(toc, "%s: %d\n", NUMDT_PAR, dtfiles.size());
-   fprintf(toc, "%s: %s%s\n", DTLOOKUP_PAR, name, DTLOOKUP);
-   fprintf(toc, "%s: %s%s\n", DOCIDMAP_PAR, name, DOCIDMAP);
-   fprintf(toc, "%s: %s%s\n", TERMIDMAP_PAR, name, TERMIDMAP);
+   fprintf(toc, "%s  %d\n", NUMDOCS_PAR, docIDs.size());
+   fprintf(toc, "%s  %d\n", NUMTERMS_PAR, tcount);
+   fprintf(toc, "%s  %d\n", NUMUTERMS_PAR, tidcount);
+   fprintf(toc, "%s  %d\n", AVEDOCLEN_PAR, tcount/docIDs.size());
+   fprintf(toc, "%s  %s%s\n", INVINDEX_PAR, name, INVINDEX);
+   fprintf(toc, "%s  %d\n", NUMINV_PAR, numinv); 
+   fprintf(toc, "%s  %s%s\n", INVLOOKUP_PAR, name, INVLOOKUP);
+   fprintf(toc, "%s  %s%s\n", DTINDEX_PAR, name, DTINDEX);
+   fprintf(toc, "%s  %d\n", NUMDT_PAR, dtfiles.size());
+   fprintf(toc, "%s  %s%s\n", DTLOOKUP_PAR, name, DTLOOKUP);
+   fprintf(toc, "%s  %s%s\n", DOCIDMAP_PAR, name, DOCIDMAP);
+   fprintf(toc, "%s  %s%s\n", TERMIDMAP_PAR, name, TERMIDMAP);
 
    fclose(toc);
    delete[](fname);
