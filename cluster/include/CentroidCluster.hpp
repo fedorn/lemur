@@ -32,7 +32,7 @@ public:
   /// add an element
   virtual void add(const ClusterElt &elt);
   /// add a list of document ids
-  virtual void add(const vector<int> docids);
+  virtual void add(const vector<DOCID_T> docids);
   /// remove the element from this cluster
   virtual void remove(const ClusterElt &elt);
   /// read a cluster in from the cluster db file.

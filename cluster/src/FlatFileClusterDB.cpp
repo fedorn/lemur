@@ -51,7 +51,7 @@ Cluster* FlatFileClusterDB::getCluster(int clusterId) const {
     return clusters[clusterId];
 }
 
-vector<Cluster*> FlatFileClusterDB::getDocCluster(int docId) const {
+vector<Cluster*> FlatFileClusterDB::getDocCluster(DOCID_T docId) const {
     vector<Cluster*> v;
     if(doc2cluster[docId] > 0 && clusters[doc2cluster[docId]])
       v.push_back(clusters[doc2cluster[docId]]);
@@ -68,20 +68,20 @@ Cluster* FlatFileClusterDB::newCluster() {
   return newCluster;
 }
 
-vector<int> FlatFileClusterDB::getDocClusterId(int docId) const {
+vector<int> FlatFileClusterDB::getDocClusterId(DOCID_T docId) const {
     vector<int> v;
     if(doc2cluster[docId] > 0) 
       v.push_back(doc2cluster[docId]);
     return v;
 }
 
-int FlatFileClusterDB::addToCluster(int docId, int clusterId, double score) {
+int FlatFileClusterDB::addToCluster(DOCID_T docId, int clusterId, double score) {
   Cluster *cluster = clusters[clusterId];
   addToCluster(docId, cluster, score);
   return clusterId;
 }
 
-int FlatFileClusterDB::addToCluster(int docId, Cluster *cluster, double score)
+int FlatFileClusterDB::addToCluster(DOCID_T docId, Cluster *cluster, double score)
 {
   doc2cluster[docId] = cluster->getId();
   ClusterElt fred;
@@ -92,7 +92,7 @@ int FlatFileClusterDB::addToCluster(int docId, Cluster *cluster, double score)
 }
 
 // remove doc from cluster
-int FlatFileClusterDB::removeFromCluster(int docId, int clusterId) {
+int FlatFileClusterDB::removeFromCluster(DOCID_T docId, int clusterId) {
   Cluster *cluster = clusters[clusterId];
   ClusterElt fred;
   fred.id = docId;
@@ -125,7 +125,7 @@ vector<int> FlatFileClusterDB::splitCluster(int clusterId, int numParts) {
     cluster->setId(newId);
     cluster->setName(myName);
     clusters[newId] = cluster;
-    vector <int> docs = cluster->getDocIds();
+    vector <DOCID_T> docs = cluster->getDocIds();
     for (int j = 0; j < docs.size(); j++) {
       doc2cluster[docs[j]] = newId;
     }
@@ -141,7 +141,7 @@ int FlatFileClusterDB::deleteCluster (Cluster *target) {
 }
 int FlatFileClusterDB::deleteCluster(int clusterID) {
   Cluster *cl2 = clusters[clusterID];
-  vector <int> docs = cl2->getDocIds();
+  vector <DOCID_T> docs = cl2->getDocIds();
   for (int i = 0; i < docs.size(); i++) {
     doc2cluster[docs[i]] = 0;
   }
@@ -156,7 +156,7 @@ int FlatFileClusterDB::mergeClusters(int c1, int c2) {
   Cluster *cl1 = clusters[c1];
   Cluster *cl2 = clusters[c2];
   cl1->merge(cl2);  
-  vector <int> docs = cl2->getDocIds();
+  vector <DOCID_T> docs = cl2->getDocIds();
   for (int i = 0; i < docs.size(); i++) {
     doc2cluster[docs[i]] = c1;
   }
@@ -190,7 +190,7 @@ void FlatFileClusterDB::readClusterDB()
     clusters[index] = cluster;
     clusterCount++;
     // update doc2cluster table.
-    vector <int> docs = cluster->getDocIds();
+    vector <DOCID_T> docs = cluster->getDocIds();
     for (int i = 0; i < docs.size(); i++) {
       doc2cluster[docs[i]] = index;
     }

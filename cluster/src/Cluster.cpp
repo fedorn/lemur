@@ -43,8 +43,8 @@ const string &Cluster::getName() const {
    
 const vector <ClusterElt> *Cluster::getIds() const { return &ids; }
 
-vector<int> Cluster::getDocIds() const {
-  vector<int> res;
+vector<DOCID_T> Cluster::getDocIds() const {
+  vector<DOCID_T> res;
   for (vector<ClusterElt>::const_iterator it = ids.begin();
        it != ids.end(); it++) 
     if ((*it).myType == DOC_ELT)
@@ -57,7 +57,7 @@ void Cluster::add(const ClusterElt &elt) {
   size++;
 }
 
-void Cluster::add(vector<int> docids) {
+void Cluster::add(vector<DOCID_T> docids) {
   ClusterElt fred;
   for (int i = 0; i < docids.size(); i++) {
     fred.id = docids[i];
@@ -150,7 +150,7 @@ void Cluster::print() const {
 
 string Cluster::getKeyWords(int maxTerms) const {
   double maxtf = 0, df = 0;
-  int numTerms = ind.termCountUnique(); 
+  COUNT_T numTerms = ind.termCountUnique(); 
   IndexedRealVector results(numTerms); 
   int *tf = new int[ numTerms + 1 ];
   int *posts = new int[ numTerms + 1 ];
@@ -163,14 +163,14 @@ string Cluster::getKeyWords(int maxTerms) const {
   for (vector<ClusterElt>::const_iterator it = ids.begin(); 
        it != ids.end(); it++) {
 	  if ((*it).myType == DOC_ELT) {
-		int docID = (*it).id;
+		DOCID_T docID = (*it).id;
 		TermInfoList *tlist = ind.termInfoList(docID);
 		TermInfo *info;
 		tlist->startIteration();
 		while (tlist->hasMore()) {
 			info = tlist->nextEntry();
-			int id = info->termID();
-			int freq = info->count();
+			TERMID_T id = info->termID();
+			COUNT_T freq = info->count();
 			tf[id] += freq;
 			if (tf[id] > maxtf)
 			maxtf = tf[id];

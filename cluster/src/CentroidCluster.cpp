@@ -52,7 +52,7 @@ void CentroidCluster::add(const ClusterElt &elt) {
   delete(rep);
 }
 
-void CentroidCluster::add(vector<int> docids) {  
+void CentroidCluster::add(vector<DOCID_T> docids) {  
   bool firstOne = (size == 0);
   // don't use add for efficiency's sake (single update of centroid).
   ClusterElt fred;
@@ -92,7 +92,7 @@ void CentroidCluster::remove(const ClusterElt &elt) {
 }
 
 FloatFreqVector *CentroidCluster::readCentroid() {
-  vector <int> dids = getDocIds();
+  vector <DOCID_T> dids = getDocIds();
   return new FloatFreqVector(ind, dids);
 }
 

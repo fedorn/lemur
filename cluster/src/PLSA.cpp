@@ -41,7 +41,7 @@ void PLSA::initR() {
     HashFreqVector *freqs = data[i];
     freqs->startIteration();
     while (freqs->hasMore()) { // TERM
-      int termId;
+      TERMID_T termId;
       int freq;
       freqs->nextFreq(termId, freq);
       R += freq;
@@ -201,7 +201,9 @@ PLSA::~PLSA() {
 
 // performs one EM iteration, returns log likelihood of training data
 double PLSA::interleavedIterationEM() {
-  int d, w, z, i, j;
+  int d, z, i, j;
+  TERMID_T w;
+  
   double* denominatorMaxStep = new double[sizeZ];
   double sum = 0.0, sum_pz = 0;
   for(z = 0; z < sizeZ; z++) { // CAT
@@ -351,7 +353,8 @@ void PLSA::setPrevToBest() {
 // Calculate the average likelihood of an event
 double PLSA::getAverageLikelihood() {
   double answer = 0.0;
-  int d, w;
+  int d;
+  TERMID_T w;
   int events = 0;
   for (d = 1; d < sizeD; d++) {
     HashFreqVector *freqs = testData[d];
@@ -370,7 +373,8 @@ double PLSA::getAverageLikelihood() {
 // Calculate the average likelihood of an event using prev parameter values
 double PLSA::getAverageLikelihoodPrev() {
   double answer = 0.0;
-  int d, w;
+  int d;
+  TERMID_T w;
   int events = 0;
   for (d = 1; d < sizeD; d++) {
     HashFreqVector *freqs = testData[d];
@@ -543,7 +547,8 @@ This technique of not using zero probability events in the log-likelihood is dan
 // joint estimate method.
 double PLSA::doLogLikelihood(jointfuncType jointFunc, 
 			     HashFreqVector **&myData) {
-  int d, w;  
+  int d;
+  TERMID_T w;  
   double sum = 0.0;
   double logJoint = 0.0;
   for (d = 1; d < sizeD; d++) {

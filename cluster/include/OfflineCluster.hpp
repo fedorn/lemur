@@ -35,7 +35,7 @@ public:
 
   /// Cluster a set of documents into numParts partitions (default 2).
   /// k-means caller responsible for deleting contents of return vector.
-  vector<Cluster*> *kMeans(vector<int> docIds, int numParts = 2, 
+  vector<Cluster*> *kMeans(vector<DOCID_T> docIds, int numParts = 2, 
 			   int maxIters = 100);
 
   /// k-means caller responsible for deleting contents of  return vector.
@@ -44,7 +44,7 @@ public:
 
   /// bisecting k-means caller responsible for deleting contents of
   /// return vector.
-  vector<Cluster*> *bisecting_kMeans(vector<int> docIds, int numParts = 2, 
+  vector<Cluster*> *bisecting_kMeans(vector<DOCID_T> docIds, int numParts = 2, 
 				     int numIters = 5, int maxIters = 100);
 
 private:
@@ -57,7 +57,7 @@ private:
   /// Are two sets of clusters equal?
   bool compareClusterSets(Cluster **, Cluster **, int n);
   /// Choose num seeds randomly from docIds.
-  vector <int> selectSeeds(vector<int> docIds, int num);
+  vector <DOCID_T> selectSeeds(vector<DOCID_T> docIds, int num);
   /// Choose largest cluster from working to split.
   Cluster *chooseSplit(vector<Cluster *> *working);  
   /// Score sum of within cluster similarity over a set of clusters

@@ -22,7 +22,7 @@ CosSim::CosSim(const Index &dbIndex) :ind(dbIndex) {
   numTerms = dbIndex.termCountUnique();
   numDocs = dbIndex.docCount();
   idfV = new double[numTerms + 1];
-  for (int i=1; i <= numTerms; i++) {
+  for (COUNT_T i=1; i <= numTerms; i++) {
     idfV[i] = log((numDocs + 1)/(0.5 + dbIndex.docCount(i)));
     }
   }

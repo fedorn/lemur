@@ -55,7 +55,7 @@ double OfflineCluster::scoreSet(vector<Cluster *> *working) {
   return retval;
 }
 
-vector<Cluster*> *OfflineCluster::bisecting_kMeans(vector<int> docIds, 
+vector<Cluster*> *OfflineCluster::bisecting_kMeans(vector<DOCID_T> docIds, 
 						  int numParts,
 						  int numIters,
 						  int maxIters) {
@@ -127,7 +127,7 @@ vector<Cluster*> *OfflineCluster::kMeans(Cluster *cluster, int numParts,
   return kMeans(cluster->getDocIds(), numParts, maxIters);
 }
  
-vector<Cluster*> *OfflineCluster::kMeans(vector<int> docIds, int numParts,
+vector<Cluster*> *OfflineCluster::kMeans(vector<DOCID_T> docIds, int numParts,
 					 int maxIters) {
   vector<Cluster*> *clusters = new vector<Cluster*>;
   // cluster elements
@@ -153,7 +153,7 @@ vector<Cluster*> *OfflineCluster::kMeans(vector<int> docIds, int numParts,
     delete(tList);
   }
   // Choose seeds
-  vector <int> seeds = selectSeeds(docIds, numParts);  
+  vector <DOCID_T> seeds = selectSeeds(docIds, numParts);  
   for (i = 0; i < numParts; i++){
     // init first pass and second pass arrays.
     firstPass[i] = factory->allocateCluster(i + 1);
@@ -225,12 +225,12 @@ bool OfflineCluster::compareClusterSets(Cluster **first, Cluster **second,
   return match;
 }
 
-vector <int> OfflineCluster::selectSeeds(vector<int> docIds, int num) {
+vector <DOCID_T> OfflineCluster::selectSeeds(vector<DOCID_T> docIds, int num) {
   // Chose num random elements without duplicates from docIds
   int max = docIds.size() - 1;
   if (max < num) return docIds; // all of them have to go back.
-  vector <int> results;
-  vector <int> tmp = docIds;
+  vector <DOCID_T> results;
+  vector <DOCID_T> tmp = docIds;
   while (results.size() < num) {
     int idx = rand()%max;
     results.push_back(tmp[idx]);

@@ -53,7 +53,7 @@ public:
   /// get vector of elements in this cluster.
   const vector <ClusterElt> *getIds() const;
   /// get vector of doc ids in this cluster.
-  vector <int> getDocIds() const;
+  vector <DOCID_T> getDocIds() const;
   /// \brief Get the ClusterRep for this Cluster for scoring. 
   /// The Rep will have been weighted by the SimilarityMethod. 
   /// Caller responsible for deleting.
@@ -63,7 +63,7 @@ public:
   /// add the element to this cluster
   virtual void add(const ClusterElt &elt);
   /// Add a list of documents to a cluster
-  virtual void add(const vector<int> docids);
+  virtual void add(const vector<DOCID_T> docids);
   /// remove the element from this cluster
   virtual void remove(const ClusterElt &elt);
   /// Split this cluster into subclusters.

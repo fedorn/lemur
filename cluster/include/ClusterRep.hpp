@@ -25,11 +25,11 @@ public:
     rep = new FloatFreqVector();
   }
   /// Rep for given document id.
-  ClusterRep(int did, const Index &ind);
+  ClusterRep(DOCID_T did, const Index &ind);
   /// Rep for given TermInfoList
   ClusterRep(TermInfoList *tList, const Index &ind);
   /// Rep for given vector of document ids
-  ClusterRep(vector<int> &dids, const Index &ind);
+  ClusterRep(vector<DOCID_T> &dids, const Index &ind);
   /// Rep for the given vector
   ClusterRep(FloatFreqVector *v, const Index &ind);
   /// Copy constructor.
@@ -54,7 +54,7 @@ public:
   void addVal(int id, double val) {rep->addVal(id, val);}  
   /// add 1 to each element in the vector specified in tids.
   /// Destructively modifies the vector
-  void addTerms(const vector<int> &tids) {
+  void addTerms(const vector<TERMID_T> &tids) {
     for (int i = 0; i < tids.size(); i++) {
       addVal(tids[i], 1);
     }

@@ -13,7 +13,7 @@
  */
 #include "ClusterRep.hpp"
 #include <cmath>
-ClusterRep::ClusterRep(int did, const Index &ind) : index(ind) {
+ClusterRep::ClusterRep(DOCID_T did, const Index &ind) : index(ind) {
   rep = new FloatFreqVector(ind, did);
 }
 
@@ -21,7 +21,7 @@ ClusterRep::ClusterRep(TermInfoList *tList, const Index &ind) : index(ind) {
   rep = new FloatFreqVector(ind, tList);
 }
 
-ClusterRep::ClusterRep(vector<int> &dids, const Index &ind) : index(ind) {
+ClusterRep::ClusterRep(vector<DOCID_T> &dids, const Index &ind) : index(ind) {
   rep = new FloatFreqVector(ind, dids);
 }
 

@@ -73,7 +73,7 @@ Cluster* KeyfileClusterDB::getCluster(int clusterId) const {
   Cluster *retVal = clusters[clusterId];
   // not already loaded.
   if (retVal == NULL) {
-    int buffer[MAX_IDS]; // size
+    DOCID_T buffer[MAX_IDS]; // size
     int actual;
     bool success = clustersKey.get(clusterId, buffer, actual, sizeof(buffer));
     if(success) {
@@ -81,8 +81,8 @@ Cluster* KeyfileClusterDB::getCluster(int clusterId) const {
       clusters[clusterId] = allocateCluster(clusterId);
       retVal = clusters[clusterId];
       // easier just to add each doc into a fresh empty cluster.
-      vector <int> dids;
-      for (int i = 0; i < actual/sizeof(int) ; i++) {
+      vector <DOCID_T> dids;
+      for (int i = 0; i < actual/sizeof(DOCID_T) ; i++) {
 	dids.push_back(buffer[i]);
       }
       retVal->add(dids);
@@ -91,7 +91,7 @@ Cluster* KeyfileClusterDB::getCluster(int clusterId) const {
   return retVal;
 }
 
-vector<Cluster*> KeyfileClusterDB::getDocCluster(int docId) const {
+vector<Cluster*> KeyfileClusterDB::getDocCluster(DOCID_T docId) const {
     vector<Cluster*> v;
     vector<int> d2c = getDocClusterId(docId);
     for (int i = 0; i < d2c.size(); i++)
@@ -116,7 +116,7 @@ Cluster* KeyfileClusterDB::newCluster() {
   return newCluster;
 }
 
-vector<int> KeyfileClusterDB::getDocClusterId(int docId) const {
+vector<int> KeyfileClusterDB::getDocClusterId(DOCID_T docId) const {
   vector<int> v;
   int buffer[MAX_IDS];
   int actual;
@@ -128,12 +128,12 @@ vector<int> KeyfileClusterDB::getDocClusterId(int docId) const {
   return v;
 }
 
-int KeyfileClusterDB::addToCluster(int docId, int clusterId, double score) {
+int KeyfileClusterDB::addToCluster(DOCID_T docId, int clusterId, double score) {
   Cluster *cluster = getCluster(clusterId);
   return addToCluster(docId, cluster, score);
 }
 
-int KeyfileClusterDB::addToCluster(int docId, Cluster *cluster, double score)
+int KeyfileClusterDB::addToCluster(DOCID_T docId, Cluster *cluster, double score)
 {
   int cid = cluster->getId();
 
@@ -143,19 +143,19 @@ int KeyfileClusterDB::addToCluster(int docId, Cluster *cluster, double score)
   fred.myType = DOC_ELT;
   cluster->add(fred);
 
-  int buffer[MAX_IDS]; // size element here?
+  DOCID_T buffer[MAX_IDS]; // size element here?
   int actual;
   bool success = clustersKey.get(cid, buffer, actual, sizeof(buffer));
   if (!success)
     actual = 0;
-  buffer[actual/sizeof(int)] = docId;
-  actual += sizeof(int);
+  buffer[actual/sizeof(DOCID_T)] = docId;
+  actual += sizeof(DOCID_T);
   clustersKey.put(cid, buffer, actual);
   return cid;
 }
 
 // remove doc from cluster
-int KeyfileClusterDB::removeFromCluster(int docId, int clusterId) {
+int KeyfileClusterDB::removeFromCluster(DOCID_T docId, int clusterId) {
   // doc2cluster.put, clustersKey.get, clustersKey.put
   Cluster *cluster = getCluster(clusterId);
   ClusterElt fred;
@@ -164,15 +164,15 @@ int KeyfileClusterDB::removeFromCluster(int docId, int clusterId) {
   cluster->remove(fred);
   doc2cluster.remove(docId);
 
-  int buffer[MAX_IDS]; // size element here?
+  DOCID_T buffer[MAX_IDS]; // size element here?
   int actual;
   // update clustersKey  
-  vector<int> docids = cluster->getDocIds();
+  vector<DOCID_T> docids = cluster->getDocIds();
   int j = 0;
   buffer[0] = docids.size();
-  for (vector<int>::iterator it = docids.begin(); it != docids.end(); it++)
+  for (vector<DOCID_T>::iterator it = docids.begin(); it != docids.end(); it++)
     buffer[j++] = *it;
-  actual = j * sizeof(int);
+  actual = j * sizeof(DOCID_T);
   clustersKey.put(clusterId, buffer, actual);
   return 0;
 }
@@ -199,9 +199,9 @@ vector<int> KeyfileClusterDB::splitCluster(int clusterId, int numParts) {
     cluster->setId(newId);
     cluster->setName(myName);
     clusters[newId] = cluster;
-    vector <int> docs = cluster->getDocIds();
+    vector <DOCID_T> docs = cluster->getDocIds();
     addC2D(newId, docs);
-    for (vector<int>::iterator it = docs.begin(); it != docs.end(); it++)
+    for (vector<DOCID_T>::iterator it = docs.begin(); it != docs.end(); it++)
       doc2cluster.put(*it, &newId, sizeof(int));
   }
   delete[](myName);
@@ -211,9 +211,9 @@ vector<int> KeyfileClusterDB::splitCluster(int clusterId, int numParts) {
 // delete a cluster
 int KeyfileClusterDB::deleteCluster (Cluster *target) {
   int clusterID = target->getId();
-  vector <int> docs = target->getDocIds();
-  for (vector<int>::iterator it = docs.begin(); it != docs.end(); it++) {
-    int docID = *it;
+  vector <DOCID_T> docs = target->getDocIds();
+  for (vector<DOCID_T>::iterator it = docs.begin(); it != docs.end(); it++) {
+    DOCID_T docID = *it;
     doc2cluster.remove(docID);
   }
   clusters[clusterID] = NULL;
@@ -234,29 +234,29 @@ int KeyfileClusterDB::mergeClusters(int c1, int c2) {
   //clusters.put
   Cluster *cl1 = getCluster(c1);
   Cluster *cl2 = getCluster(c2);
-  vector <int> docs = cl2->getDocIds();
+  vector <DOCID_T> docs = cl2->getDocIds();
   deleteCluster(cl2);
   cl1->add(docs);
   addC2D(c1, docs);
-  for (vector<int>::iterator it = docs.begin(); it != docs.end(); it++) {
-    int docID = *it;
+  for (vector<DOCID_T>::iterator it = docs.begin(); it != docs.end(); it++) {
+    DOCID_T docID = *it;
     doc2cluster.put(docID, &c1, sizeof(int));
   }
   return c1;
 }
 
-void KeyfileClusterDB::addC2D(int clusterId, const vector<int> &docids) {
+void KeyfileClusterDB::addC2D(int clusterId, const vector<DOCID_T> &docids) {
   // update clustersKey  
-  int buffer[MAX_IDS]; // size element here?
+  DOCID_T buffer[MAX_IDS]; // size element here?
   int actual;
   bool success = clustersKey.get(clusterId, buffer, actual, sizeof(buffer));
   int num = 0;
-  if (success) num = actual/sizeof(int);
+  if (success) num = actual/sizeof(DOCID_T);
   int j = num + 1;
-  for (vector<int>::const_iterator it = docids.begin(); 
+  for (vector<DOCID_T>::const_iterator it = docids.begin(); 
        it != docids.end(); 
        it++)
     buffer[j++] = *it;
-  actual = j * sizeof(int);
+  actual = j * sizeof(DOCID_T);
   clustersKey.put(clusterId, buffer, actual);
 }

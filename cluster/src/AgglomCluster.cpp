@@ -15,7 +15,7 @@
 #include "AgglomCluster.hpp"
 
 ClusterRep *AgglomCluster::getClusterRep() const {
-  vector <int> docids = getDocIds();
+  vector <DOCID_T> docids = getDocIds();
   ClusterRep *elt = new ClusterRep(docids, ind);
   elt->weigh(1.0/docids.size());
   similarity.weigh(elt);
@@ -32,7 +32,7 @@ double AgglomCluster::sum2() const {
 double AgglomCluster::score_max(const ClusterRep *rep) const {
   ClusterRep *elt = NULL;
   double max_score = 0, s = 0;
-  vector <int> docids = getDocIds();
+  vector <DOCID_T> docids = getDocIds();
   int sz = docids.size();
   for (int i = 0; i < sz; i++) {
     elt = new ClusterRep(docids[i], ind);
@@ -50,7 +50,7 @@ double AgglomCluster::score_min(const ClusterRep *rep) const {
   ClusterRep *elt = NULL;
   double min_score = 1.1, s = 0;
   if (size == 0) return s;
-  vector <int> docids = getDocIds();
+  vector <DOCID_T> docids = getDocIds();
   for (int i = 0; i < docids.size(); i++) {
     elt = new ClusterRep(docids[i], ind);
     similarity.weigh(elt);
@@ -75,7 +75,7 @@ double AgglomCluster::score_ave(const ClusterRep *rep) const {
   ClusterRep *elt = NULL;
   double score = 0;
   if (size == 0) return score;
-  vector <int> docids = getDocIds();
+  vector <DOCID_T> docids = getDocIds();
   for (int i = 0; i < docids.size(); i++) {
     elt = new ClusterRep(docids[i], ind);
     similarity.weigh(elt);

@@ -37,7 +37,7 @@ public:
   virtual ~FlatFileClusterDB();
 
   /// Get the Cluster for the given docId.
-  virtual vector<Cluster*> getDocCluster(int docId) const;
+  virtual vector<Cluster*> getDocCluster(DOCID_T docId) const;
 
   /// Count number of clusters
   virtual int countClusters() const {return clusterCount - 1;}
@@ -49,16 +49,16 @@ public:
   virtual Cluster *getCluster(int clusterId) const;
 
   /// Get the Cluster id for the given docId.
-  virtual vector<int> getDocClusterId(int docId) const;
+  virtual vector<int> getDocClusterId(DOCID_T docId) const;
 
   /// Add a document id to a cluster, given the cluster id.
-  virtual int addToCluster(int docId, int clusterId, double score);
+  virtual int addToCluster(DOCID_T docId, int clusterId, double score);
 
   /// Add a document id to a cluster, given the cluster.
-  virtual int addToCluster(int docId, Cluster *cluster, double score);
+  virtual int addToCluster(DOCID_T docId, Cluster *cluster, double score);
 
   /// Remove a document id from a cluster, given the cluster id.
-  virtual int removeFromCluster(int docId, int clusterID);
+  virtual int removeFromCluster(DOCID_T docId, int clusterID);
 
   /// Delete a cluster entirely
   virtual int deleteCluster(int clusterID);
