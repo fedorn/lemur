@@ -102,9 +102,9 @@ public:
       doc->startTermIteration();\n
       while (doc->nextTerm(term)) {\n
       ... process "term" ...\n
-      delete term;
+      // YOU MUST NOT DELETE term, as it is a pointer to a local static memory
       }\n
-      delete doc;\n
+      // YOU MUST NOT DELETE doc, as it is a pointer to a local static memory
     }\n
   */
 
@@ -116,9 +116,8 @@ public:
 
   virtual bool hasMore()=0;
 
-  /// next document, caller responsible for deleting doc and should call hasMore() before calling nextDoc()
+  /// return a pointer to next document (static memory, do not delete returned instance).  hasMore() should be called before calling nextDoc()
   virtual Document * nextDoc()=0;
-
 
   //@}
 

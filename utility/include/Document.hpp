@@ -48,7 +48,7 @@ public:
   /// returns true iff there's at least one term for iteration
   virtual bool hasMore() = 0;
 
-  /// fetch next term, caller should check hasMore() before calling it
+  /// returns a pointer to next term (static memory, do not delete the returned instance). caller should check hasMore() before calling it
   virtual TokenTerm *nextTerm()=0;
 
   /// return the DocumentProps handle

@@ -32,13 +32,14 @@ struct lt_str
 #ifndef _WORDSET_HPP
 #define _WORDSET_HPP
 
+/// A generic class that provides a neat and easy to use wrapper to a hash_set<char *>.
+/*! 
+ A generic class that provides a neat and easy to use wrapper
+ to a hash_set<char *>.  It can load items in the set from a file
+ (one item per line).  It also handles its own memory conveniently.
 
-///
-/// A generic class that provides a neat and easy to use wrapper
-/// to a hash_set<char *>.  It can load items in the set from a file
-/// (one item per line).  It also handles its own memory conveniently.
-///
-///
+*/
+
 class WordSet {
 
 public:
