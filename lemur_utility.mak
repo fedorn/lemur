@@ -40,6 +40,7 @@ CLEAN :
 	-@erase "$(INTDIR)\BasicDocStream.obj"
 	-@erase "$(INTDIR)\ByteHash.obj"
 	-@erase "$(INTDIR)\error.obj"
+	-@erase "$(INTDIR)\FUtil.obj"
 	-@erase "$(INTDIR)\lex_parser.obj"
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\MemCache.obj"
@@ -48,6 +49,7 @@ CLEAN :
 	-@erase "$(INTDIR)\parameters.obj"
 	-@erase "$(INTDIR)\porter_stemmer.obj"
 	-@erase "$(INTDIR)\PorterStemmer.obj"
+	-@erase "$(INTDIR)\ReutersParser.obj"
 	-@erase "$(INTDIR)\Stopper.obj"
 	-@erase "$(INTDIR)\string-set.obj"
 	-@erase "$(INTDIR)\String.obj"
@@ -74,6 +76,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\BasicDocStream.obj" \
 	"$(INTDIR)\ByteHash.obj" \
 	"$(INTDIR)\error.obj" \
+	"$(INTDIR)\FUtil.obj" \
 	"$(INTDIR)\lex_parser.obj" \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\MemCache.obj" \
@@ -82,6 +85,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\parameters.obj" \
 	"$(INTDIR)\porter_stemmer.obj" \
 	"$(INTDIR)\PorterStemmer.obj" \
+	"$(INTDIR)\ReutersParser.obj" \
 	"$(INTDIR)\Stopper.obj" \
 	"$(INTDIR)\string-set.obj" \
 	"$(INTDIR)\String.obj" \
@@ -109,6 +113,7 @@ CLEAN :
 	-@erase "$(INTDIR)\BasicDocStream.obj"
 	-@erase "$(INTDIR)\ByteHash.obj"
 	-@erase "$(INTDIR)\error.obj"
+	-@erase "$(INTDIR)\FUtil.obj" 
 	-@erase "$(INTDIR)\lex_parser.obj"
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\MemCache.obj"
@@ -117,6 +122,7 @@ CLEAN :
 	-@erase "$(INTDIR)\parameters.obj"
 	-@erase "$(INTDIR)\porter_stemmer.obj"
 	-@erase "$(INTDIR)\PorterStemmer.obj"
+	-@erase "$(INTDIR)\ReutersParser.obj
 	-@erase "$(INTDIR)\Stopper.obj"
 	-@erase "$(INTDIR)\string-set.obj"
 	-@erase "$(INTDIR)\String.obj"
@@ -144,6 +150,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\BasicDocStream.obj" \
 	"$(INTDIR)\ByteHash.obj" \
 	"$(INTDIR)\error.obj" \
+	"$(INTDIR)\FUtil.obj" \
 	"$(INTDIR)\lex_parser.obj" \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\MemCache.obj" \
@@ -152,6 +159,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\parameters.obj" \
 	"$(INTDIR)\porter_stemmer.obj" \
 	"$(INTDIR)\PorterStemmer.obj" \
+	"$(INTDIR)\ReutersParser.obj" \
 	"$(INTDIR)\Stopper.obj" \
 	"$(INTDIR)\string-set.obj" \
 	"$(INTDIR)\String.obj" \
@@ -227,6 +235,11 @@ SOURCE=.\utility\src\error.c
 "$(INTDIR)\error.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+SOURCE=.\utility\src\FUtil.cpp
+
+"$(INTDIR)\FUtil.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
 
 SOURCE=.\utility\src\lex_parser.cpp
 
@@ -271,6 +284,12 @@ SOURCE=.\utility\src\porter_stemmer.cpp
 SOURCE=.\utility\src\PorterStemmer.cpp
 
 "$(INTDIR)\PorterStemmer.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\ReutersParser.cpp
+
+"$(INTDIR)\ReutersParser.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
