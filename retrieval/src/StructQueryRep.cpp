@@ -28,8 +28,9 @@ void StructQueryRep::termOffsetList(QueryNode *qn, int did) {
 
   curr = new ProxInfo;
   curr->id = did;
-  // assume no more than  docLengthAvg same terms in a doc 
-  curr->posList = new int[(int)ind.docLengthAvg()];
+  // assume no more than  5*docLengthAvg same terms in a doc 
+  //  curr->posList = new int[(int)ind.docLengthAvg()*5];
+  curr->posList = new int[(int)ind.docLength(did)];
   TermInfoList *dTerms=ind.termInfoListSeq(did);
   InvFPTerm *thisTerm;
   dTerms->startIteration();
@@ -70,7 +71,8 @@ void StructQueryRep::synonymProxList(QueryNode *qn) {
 
   for(j=0, i = qn->nextDoc; j<qn->dCnt; i++) {
     if(qn->dList[i]) {
-      int dl=ind.docLength(i)+1;
+      // int dl=ind.docLength(i)+1; can't use docLength because doc maybe stopped
+      int dl=ind.docLength(i)*10; // large enough
       bool *posBuff = new bool[dl];
       for(k=0; k<dl; k++) posBuff[k]=false;
       cnt=0;
@@ -130,6 +132,9 @@ void StructQueryRep::synonymProxList(QueryNode *qn) {
 	  }
 	  df++;
 	  if(i < nd) nd=i;
+	}
+	else {
+	  qn->dList[i]=false;
 	}
       }
       delete []posBuff;
@@ -243,6 +248,9 @@ void StructQueryRep::orderedProxList(QueryNode *qn) {
 	df++;
 	if(i < nd) nd=i;
       }
+      else {
+	qn->dList[i]=false;
+      }
       // delete proxList for curr doc for all children
       cl->startIteration();
       while (cl->hasMore()) {
@@ -251,11 +259,12 @@ void StructQueryRep::orderedProxList(QueryNode *qn) {
 	  if(child->proxList->size>0 && !child->proxList->next) {
 	    // if child is a prox op (size>0) and no more docs, then done
 	    no_more=true;
-	    break;
 	  }
 	  childProx =child->proxList->next;
 	  delete child->proxList;
 	  child->proxList= childProx;
+	  if(no_more)
+	    break;
 	}
       }
     }
@@ -296,7 +305,7 @@ void StructQueryRep::unorderedProxList(QueryNode *qn) {
   qn->proxList=NULL;
   QnList *cl = qn->ch;
   QueryNode *child; 
-  int i, j, cnt, df=0;
+  int i, j, cnt, maxOcc=0, df=0;
   int nd = ind.docCount()+1;
   bool no_more=false;
   for(j=0, i = qn->nextDoc; j<qn->dCnt; i++) {
@@ -328,6 +337,7 @@ void StructQueryRep::unorderedProxList(QueryNode *qn) {
 	}
       }
       cnt=0;
+      maxOcc = 0;
       curr=NULL;
       // compute the prox info for current doc
       // initialize the prox with the first occurring position 
@@ -335,9 +345,14 @@ void StructQueryRep::unorderedProxList(QueryNode *qn) {
       while (cl->hasMore()) {
 	child = cl->nextNode();
 	child->proxList->nextPos=0;
+	if(child->proxList->count>maxOcc)
+	  maxOcc=child->proxList->count;
       }
       // start with the child having the minimum occurring position
-      int startPos=ind.docLength(i);
+      // can not use the doclength, which maybe less than
+      // a occurrence position if the database is stopped.
+      // int startPos=ind.docLength(i);
+      int startPos=INT_MAX;
       QueryNode *startChild=NULL;
       cnt =0;
       while (startPos > 0) {
@@ -359,15 +374,21 @@ void StructQueryRep::unorderedProxList(QueryNode *qn) {
 	    curr->size=((UwnQNode *)qn)->winSize;
 	    curr->id=i;
 	    // guarentee an enough room for matched positions
-	    curr->posList= new int[startChild->proxList->count];
+	    //	    curr->posList= new int[startChild->proxList->count+1];
+	    // May have multiple matches backward/forward,
+	    // so presume we need 10 * count of matched terms.
+	    curr->posList= new int[maxOcc * 10];
 	  }
+	  if (cnt >= (maxOcc * 10))
+	    cerr << "Too many posList entries: " << cnt << ":" 
+		 << (maxOcc * 10) << ":" << ind.document(i) << endl;
 	  curr->posList[cnt++]= startPos;
 	}
 	// move the startPos to the next occurring position
 	childProx=startChild->proxList;
 	childProx->nextPos++;
 	if(childProx->nextPos < childProx->count)
-	  startPos=ind.docLength(i);
+	  startPos=INT_MAX;
 	else
 	  startPos=0;  // equal to break here
       }
@@ -382,6 +403,8 @@ void StructQueryRep::unorderedProxList(QueryNode *qn) {
 	}
 	df++;
 	if(i < nd) nd=i;
+      } else {
+	qn->dList[i]=false;
       }
       // delete proxList for curr doc for all children
       cl->startIteration();
@@ -391,11 +414,12 @@ void StructQueryRep::unorderedProxList(QueryNode *qn) {
 	  if(child->proxList->size>0 && !child->proxList->next) {
 	    // if child is a prox op (size>0) and no more docs, then done
 	    no_more=true;
-	    break;
 	  }
 	  childProx =child->proxList->next;
 	  delete child->proxList;
 	  child->proxList= childProx;
+	  if(no_more)
+	    break;
 	}
       }
     }
