@@ -260,6 +260,7 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex,
   }
 
   scFunc = new SimpleKLScoreFunc();
+  scFunc->setScoreMethod(qryParam.adjScoreMethod);
 }
 
 SimpleKLRetMethod::~SimpleKLRetMethod() 
