@@ -7,7 +7,7 @@ expandedQuery = query_mixfb_kl;
 
 index = pindex.ifp; /* database index */
 textQuery = query; /* query text stream */
-resultFile = res.simple_kl_dir; /* result file */
+feedbackDocuments = res.simple_kl_dir; /* result file */
 resultCount = 1000; /* how many docs to return as the result, irrelevant */
 resultFormat = 1; /* 0 = simple-format; 1 = TREC-format */
 
