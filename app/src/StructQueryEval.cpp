@@ -135,11 +135,11 @@ int AppMain(int argc, char *argv[]) {
 			 InQueryParameter::fbCoeff,
 			 InQueryParameter::cacheIDF);
   qryStream->startDocIteration();
-  StructQuery *q;
+  TextQuery *q;
   IndexedRealVector workSetRes;
   while (qryStream->hasMore()) {
     Document *d = qryStream->nextDoc();
-    q = new StructQuery(*d);
+    q = new TextQuery(*d);
     cout << "query : "<< q->id() << endl;
     QueryRep *qr = model->computeQueryRep(*q);
     PseudoFBDocs *workSet;
