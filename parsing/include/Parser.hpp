@@ -33,7 +33,7 @@ public:
 
   /// Parse a file.  
   /// use parseFile.  this method will be deprecated in future
-  virtual void parse(const string &filename) { parsefile=filename; parseFile(parsefile); } ;
+  virtual void parse(const string &filename);
   
   /// Parse a file.
   /// implementing subclasses should set parsefile string
