@@ -25,15 +25,16 @@ endif
 ../depend/%.d: ../src/%.cpp
 	@echo "Generating $@ for $<"
 	@set -e; $(CXX) -MM $(CXXFLAGS) $(ALLINCPATH) $< | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
-	@DEPS="" ; for mod in $(ALLMODULES) ; do if `grep "../../$$mod/include" $@ >/dev/null` ; then echo "$*: ../../$$mod/obj/lib$$mod.a" >> $@;  DEPS="$$DEPS $$mod" ; fi ; done ; echo "$*.o_INCPATH = -I../include $$""(patsubst %, -I../../%/include, $$DEPS)" >> $@; echo "$*_LIBPATH = $$""(patsubst %, -L../../%/obj, $$DEPS)" >> $@; echo "$*_LIBFLAGS = $$""(patsubst %, -l%, $$DEPS)" >> $@;
+	@DEPS="" ; for mod in $(ALLMODULES) ; do if `grep "../../$$mod/include" $@ >/dev/null` ; then echo "$*: ../../$$mod/obj/lib$$mod.a" >> $@;  DEPS="$$DEPS $$mod" ; fi ; done ; if `grep "../../parsing/include" $@ >/dev/null` ; then echo "$*: ../../contrib/xpdf/obj/libxpdf.a" >> $@;  DEPS="$$DEPS xpdf" ; fi ; if `grep "../../retrieval/include" $@ >/dev/null` ; then echo "$*: ../../contrib/antlr/obj/libantlr.a" >> $@;  DEPS="$$DEPS antlr" ; fi ; DEPS="$$DEPS" ; echo "$*.o_INCPATH = -I../include $$""(patsubst %, -I../../%/include, $$DEPS)" >> $@; echo "$*_LIBPATH = $$""(patsubst %, -L../../%/obj, $$DEPS) -L../../contrib/antlr/obj -L../../contrib/xpdf/obj" >> $@; echo "$*_LIBFLAGS = $$""(patsubst %, -l%, $$DEPS)" >> $@;
 
 # how to generate .d file from a .c file
 ../depend/%.d: ../src/%.c
 	@echo "Generating $@ for $<"
 	@set -e; $(CC) -MM $(CFLAGS) $(ALLINCPATH) $< | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
-	@DEPS="" ; for mod in $(ALLMODULES) ; do if `grep "../../$$mod/include" $@ >/dev/null` ; then echo "$*: ../../$$mod/obj/lib$$mod.a" >> $@;  DEPS="$$DEPS $$mod" ; fi ; done ; echo "$*.o_INCPATH = -I../include $$""(patsubst %, -I../../%/include, $$DEPS)" >> $@; echo "$*_LIBPATH = $$""(patsubst %, -L../../%/obj, $$DEPS)" >> $@; echo "$*_LIBFLAGS = $$""(patsubst %, -l%, $$DEPS)" >> $@;
+	@DEPS="" ; for mod in $(ALLMODULES) ; do if `grep "../../$$mod/include" $@ >/dev/null` ; then echo "$*: ../../$$mod/obj/lib$$mod.a" >> $@;  DEPS="$$DEPS $$mod" ; fi ; done ; if `grep "../../parsing/include" $@ >/dev/null` ; then echo "$*: ../../contrib/xpdf/obj/libxpdf.a" >> $@;  DEPS="$$DEPS xpdf" ; fi ; if `grep "../../retrieval/include" $@ >/dev/null` ; then echo "$*: ../../contrib/antlr/obj/libantlr.a" >> $@;  DEPS="$$DEPS antlr" ; fi ; DEPS="$$DEPS" ; echo "$*.o_INCPATH = -I../include $$""(patsubst %, -I../../%/include, $$DEPS)" >> $@; echo "$*_LIBPATH = $$""(patsubst %, -L../../%/obj, $$DEPS) -L../../contrib/antlr/obj -L../../contrib/xpdf/obj" >> $@; echo "$*_LIBFLAGS = $$""(patsubst %, -l%, $$DEPS)" >> $@;
 
 # how to make an application
+
 # compiling C++ code
 %.o: ../src/%.cpp
 	$(CXX) $(CXXFLAGS) $($@_INCPATH) -o $@ -c $<
