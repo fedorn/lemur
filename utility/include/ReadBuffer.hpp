@@ -21,58 +21,60 @@
 
 #include "File.hpp"
 
-/// Provide a growable read buffer on a File object.
 class ReadBuffer {
 private:
   File::offset_type _filePosition;
   char* _buffer;
   File& _file;
-  int _bufferSize;
-  int _bufferPosition;
-  int _bufferDataLength;
+  size_t _bufferSize;
+  size_t _bufferPosition;
+  size_t _bufferDataLength;
   bool _gValid;
+  bool _exclusiveAccess;
 
 public:
-  /// wrap <file> in a ReadBuffer with initial
-  /// buffer size <bufferSize>.  The buffer
-  /// may grow if necessary to support large
-  /// peek() and read() requests.
-  ReadBuffer( File& file, int bufferSize );
+  // wrap <file> in a ReadBuffer with initial
+  // buffer size <bufferSize>.  The buffer
+  // may grow if necessary to support large
+  // peek() and read() requests.
+  // <exclusiveAccess> = true if the ReadBuffer is 
+  // the only user of the underlying file, false otherwise.
+  ReadBuffer( File& file, size_t bufferSize, bool exclusiveAccess = true );
   ~ReadBuffer();
 
-  /// standard read() semantics; will perform
-  /// an unbuffered read if the read size is
-  /// large enough
-  void read( char* data, int length );
+  // standard read() semantics; will perform
+  // an unbuffered read if the read size is
+  // large enough
+  void read( char* data, size_t length );
 
-  /// return a pointer to a buffer containing 
-  /// the next <length> bytes, but do not advance
-  /// the read pointer
-  const char* peek( int length );
+  // return a pointer to a buffer containing 
+  // the next <length> bytes, but do not advance
+  // the read pointer
+  const char* peek( size_t length );
 
-  /// return a pointer to a buffer containing 
-  /// the next <length> bytes, and advance
-  /// the read pointer
-  const char* read( int length );
+  // return a pointer to a buffer containing 
+  // the next <length> bytes, and advance
+  // the read pointer
+  const char* read( size_t length );
 
-  /// move the internal read pointer
-  /// to <position>, which may be relative to the
-  /// beginning, end or current position of the file
-  /// as specified by <direction>.
+  // move the internal read pointer
+  // to <position>, which may be relative to the
+  // beginning, end or current position of the file
+  // as specified by <direction>.
   void seekg( File::offset_type position, std::fstream::seekdir direction );
 
-  /// return the read pointer location with
-  /// reference to the beginning of the file
+  // return the read pointer location with
+  // reference to the beginning of the file
   File::offset_type tellg();
 
-  /// return the current read state bits,
-  /// eofbit, badbit, etc. (same
-  /// semantics as std::ifstream::rdstate())
+  // return the current read state bits,
+  // eofbit, badbit, etc. (same
+  // semantics as std::ifstream::rdstate())
   int rdstate();
 
-  /// marks the underlying stream pointer
-  /// as invalid--call this if you seek
-  /// the underlying file to a new location
+  // marks the underlying stream pointer
+  // as invalid--call this if you seek
+  // the underlying file to a new location
   void invalidateg();
 };
 
