@@ -1,10 +1,9 @@
 #ifndef _UNIGRAMLM_HPP
 #define _UNIGRAMLM_HPP
 
-#include <string.h>
 #include "Counter.hpp"
 #include "Exception.hpp"
-
+#include <string.h>
 /// Abstract Unigram Language Model class
 /*!
   The index range ([0,N]) is assumed to be defined by the lexicon.
@@ -16,7 +15,7 @@ public:
   /// return p(w) 
   virtual double prob(int wordIndex) = 0;
   /// return a string ID of the lexicon on which the word index should be interpreted
-  virtual char * lexiconID() = 0;
+  virtual const char * lexiconID() = 0;
 
   /// iteration over non-zero probability entries
   virtual void startIteration() = 0;
@@ -29,7 +28,7 @@ public:
 
 class SmoothedMLEstimator : public UnigramLM {
 public:
-  SmoothedMLEstimator(Counter &counter, char *lexiconID) : ct(counter), lexID(lexiconID) {}
+  SmoothedMLEstimator(Counter &counter, const char *lexiconID) : ct(counter), lexID(lexiconID) {}
   virtual ~SmoothedMLEstimator() {}
 
   virtual double prob(int wordIndex) {
@@ -50,21 +49,21 @@ public:
     prob = probEstimate(wordIndex, count, ct.sum());
   }
   
-  virtual char * lexiconID() { return lexID;}
+  virtual const char * lexiconID() { return lexID;}
 
   /// individual model differs in its implementation of probEstimate() method
   virtual double probEstimate(int wordIndex, double wdCount, double sumCount) =0;
 
 protected:
   Counter &ct;
-  char *lexID;
+  const char *lexID;
 };
   
 /// Maximum Likelihood Estimator
 
 class MLUnigramLM : public SmoothedMLEstimator { 
 public:
-  MLUnigramLM(Counter & counter, char *lexiconID) : SmoothedMLEstimator(counter, lexiconID) {};
+  MLUnigramLM(Counter & counter, const char *lexiconID) : SmoothedMLEstimator(counter, lexiconID) {};
   virtual ~MLUnigramLM() {}
   
   virtual double probEstimate(int wordIndex, double count, double sum) {
@@ -75,7 +74,7 @@ public:
 /// Laplace-smoothed unigram language model
 class LaplaceUnigramLM : public SmoothedMLEstimator { 
 public:
-  LaplaceUnigramLM(Counter & counter, char *lexiconID, double vocabSize) : SmoothedMLEstimator(counter, lexiconID), vocSz(vocabSize) {};
+  LaplaceUnigramLM(Counter & counter, const char *lexiconID, double vocabSize) : SmoothedMLEstimator(counter, lexiconID), vocSz(vocabSize) {};
   virtual ~LaplaceUnigramLM() {}
   
   virtual double probEstimate(int wordIndex, double count, double sum) {
@@ -90,7 +89,7 @@ private:
 
 class DirichletUnigramLM : public SmoothedMLEstimator { 
 public:
-  DirichletUnigramLM(Counter & counter, char *lexiconID, 
+  DirichletUnigramLM(Counter & counter, const char *lexiconID, 
 		     UnigramLM &refLM, double priorSampleSize) 
     : SmoothedMLEstimator(counter, lexiconID), ref(&refLM), 
     s(priorSampleSize) {}
@@ -126,7 +125,7 @@ public:
     return (c1*lm1.prob(wordIndex)+(1-c1)*lm2.prob(wordIndex));
   }
 
-  virtual char *lexiconID() {
+  virtual const char *lexiconID() {
     return lm1.lexiconID();
   }
 
