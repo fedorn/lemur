@@ -197,7 +197,7 @@ void WebParser::doParse() {
       // Can only transition to a STYLE state if in the DOC state,
       // handling style tags within comment tags appropriately.
       if (state == DOC)
-        state = SCRIPT;
+        state = STYLE;
       break;
 
     case E_STYLE:
@@ -256,14 +256,14 @@ void WebParser::doParse() {
     case ACRONYM2:
       if (state == DOC) {
         char * c;
+	// strip the suffix
+	for (c = webtext; *c != '\'' && *c != '\0' && *c != 's'; c++);
+        *c = '\0';
 	if (!isAcronym(webtext)) {
 	  // put in lowercase if the word is not in the acronym list
 	  for (c = webtext; *c != '\0'; c++)
 	    *(c) = tolower(*c);	 
 	}
-	// strip the suffix
-	for (c = webtext; *c != '\'' && *c != '\0' && *c != 's'; c++);
-        *c = '\0';
 	if (textHandler != NULL) textHandler->foundWord(webtext);	
       }      
       break;
