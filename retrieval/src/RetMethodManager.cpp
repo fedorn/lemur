@@ -36,11 +36,17 @@ RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* ac
     ((SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
     ((SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
     break;
-  case CORI:
+  case CORI_CS:
     CORIParameter::get();
-    model = new CORIRetMethod(*ind, *accum, CORIParameter::collectionCounts);
-    ((CORIRetMethod*)model)->setTFFactor(CORIParameter::tffactor);
-    ((CORIRetMethod*)model)->setTFBaseline(CORIParameter::tfbaseline);
+    model = new CORIRetMethod(*ind, *accum, CORIParameter::collectionCounts,1);
+    ((CORIRetMethod*)model)->setTFFactor(CORIParameter::cstffactor);
+    ((CORIRetMethod*)model)->setTFBaseline(CORIParameter::cstfbaseline);
+    break;
+  case CORI_DOC:
+    CORIParameter::get();
+    model = new CORIRetMethod(*ind, *accum, CORIParameter::collectionCounts,0);
+    ((CORIRetMethod*)model)->setTFFactor(CORIParameter::doctffactor);
+    ((CORIRetMethod*)model)->setTFBaseline(CORIParameter::doctfbaseline);
     break;
   default:
     throw Exception("RetrievalExp", "unknown retModel parameter");

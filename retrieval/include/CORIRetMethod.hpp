@@ -9,7 +9,6 @@
  *==========================================================================
 */
 
-
 #ifndef _CORIRETMETHOD_HPP
 #define _CORIRETMETHOD_HPP
 
@@ -19,8 +18,14 @@
 #include "TextQueryRetMethod.hpp"
 #include "Param.hpp"
 #include <math.h>
+#include <iostream>
 
-
+///The default tffactor tfbase values for the collection selection case and the document retrieval case
+#define CSTFBASELINE 50
+#define CSTFFACTOR 150
+#define DOCTFBASELINE 0.5
+#define DOCTFFACTOR 1.5
+#define MINBELIEF 0.4
 
 class CORIQueryRep : public ArrayQueryRep {
 public:
@@ -62,7 +67,7 @@ class CORIRetMethod : public TextQueryRetMethod {
 public:
 
   CORIRetMethod(Index & dbIndex, ScoreAccumulator &accumulator, 
-		String cwName, 
+		   String cwName, int isCSIndex=0,
 		SimpleKLDocModel ** smoothers = NULL, 
 		UnigramLM * collectLM = NULL);
   ~CORIRetMethod() { delete scFunc; delete [] cwRatio; }
@@ -102,14 +107,17 @@ protected:
 class CORIScoreFunc : public ScoreFunction {
 public:
   CORIScoreFunc(Index & index) : ind(index) {
+    rmax=0;
     double dc = ind.docCount();
     c05 = dc + 0.5;
-    idiv = log(dc + 1) / 0.6;
-   
+    idiv = log(dc + 1);
+    qr=NULL;
+    first=0;
   }
 
   virtual double adjustedScore(double origScore, TextQueryRep * qRep,
 			       DocumentRep * dRep) {
+
     if (qr != qRep) {
       qr = qRep;
       
@@ -118,19 +126,22 @@ public:
       double qw = 0;
       while (qRep->hasMore()) {
 	int qtid = qRep->nextTerm()->id();
-	
-	rmax += (log(c05 / ind.docCount(qtid)) / idiv);
+	rmax += (1-MINBELIEF)*(log(c05 / ind.docCount(qtid)) / idiv);
       }
     }
-    return (origScore / rmax);
+    if ((origScore/rmax)>=1){
+      cout<<"!!!!!!!!!"<<endl;
+      cout<<origScore<<" "<<rmax<<" "<<(origScore / rmax)<<endl;
+    }
+    //return (origScore / rmax);
+    return origScore;
   }
 
 private:
   Index & ind;
-
+  int first;
   TextQueryRep * qr;
   double rmax;
-
   double c05;
   double idiv;
 };

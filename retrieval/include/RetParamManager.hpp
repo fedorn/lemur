@@ -43,6 +43,7 @@ namespace RetrievalParameter {
     resultFile = ParamGetString("resultFile","");
     fbDocCount = ParamGetInt("feedbackDocCount",0); // default being no feedback
     resultCount = ParamGetInt("resultCount", 1000); 
+    
   }
 };
 
@@ -127,12 +128,16 @@ namespace SimpleKLParameter {
 
 namespace CORIParameter {
   static String collectionCounts;
-  static double tffactor;
-  static double tfbaseline;
+  static double cstffactor;
+  static double cstfbaseline;
+  static double doctffactor;
+  static double doctfbaseline;
   static void get() {
     collectionCounts = ParamGetString("collCounts");
-    tffactor = ParamGetDouble("TF_factor", 150);
-    tfbaseline = ParamGetDouble("TF_baseline", 50);
+    cstffactor = ParamGetDouble("CSCTF_factor", 150);
+    cstfbaseline = ParamGetDouble("CSCTF_baseline", 50);
+    doctffactor = ParamGetDouble("DOCCTF_factor", 1.5);
+    doctfbaseline = ParamGetDouble("DOCCTF_baseline", 0.5);
   }
 };
 

@@ -38,6 +38,7 @@ CORIDocRep::termWeight(int termID, DocInfo * info) {
   double df = info->termCount(); 
 
   if (dfSmooth != NULL) {
+    cout<<"smooth:"<<endl;
     if (df > 0) {
       df = dfSmooth->seenProb(df, termID) * ind.docLength(info->docID());
     } else {
@@ -48,10 +49,14 @@ CORIDocRep::termWeight(int termID, DocInfo * info) {
   
   double t = df / (df + tnorm);
   double i = log (c05/ cf) / idiv;
-  double p = 0.6 * t * i;
+  double p = (1-MINBELIEF) * t * i;
   
   //  cout << ind.term(termID) << " " << ind.document(info->docID())
   //       << " " << df << " " << cf << endl;
+  if (t>1){
+       cout << ind.term(termID) << " " << ind.document(info->docID())
+         << " " << df << " " << cf << endl;
+  }
   return p;
 }
 
@@ -67,11 +72,34 @@ CORIQueryRep::CORIQueryRep(TextQuery &qry, Index &dbIndex) :
 
 void CORIRetMethod::scoreCollection(QueryRep &qry, 
 				    IndexedRealVector &results) {
-  scoreInvertedIndex(qry, results, true);
+  scoreInvertedIndex(qry, results, false);
+  //adjust the score;
+
+  double c = ind.docCount();
+  double c05 = c + 0.5;
+  double idiv = log (c + 1);    
+  double rmax=0;
+  double rmin=0;
+
+  TextQueryRep *textQry = (TextQueryRep *)(&qry);
+  textQry->startIteration();
+  rmax = 0;
+  double qw = 0;
+  while (textQry->hasMore()) {
+    int qtid = textQry->nextTerm()->id();
+    rmax += (1-MINBELIEF)*(log(c05 / ind.docCount(qtid)) / idiv);
+  }
+
+  for (int i=0;i<results.size();i++) {
+    int dbOverlapNum=0; //the number of overlap documents for this specific database
+    results[i].val/=rmax;
+  }
 }
 
+
+
 CORIRetMethod::CORIRetMethod(Index & dbIndex, ScoreAccumulator &accumulator, 
-			     String cwName, 
+				   String cwName, int isCSIndex=0,
 			     SimpleKLDocModel ** smoothers,
 			     UnigramLM * collectLM) : 
   TextQueryRetMethod (dbIndex, accumulator) {
@@ -80,10 +108,18 @@ CORIRetMethod::CORIRetMethod(Index & dbIndex, ScoreAccumulator &accumulator,
   scFunc = new CORIScoreFunc(dbIndex);
   dfSmooth = smoothers;
   collLM = collectLM;
-  //set defaults
-  tffactor = 150;
-  tfbaseline = 50;
 
+  //set defaults according the whether this index is collection selection index
+  //or normal doc retrieval index
+  if (isCSIndex==1){
+    tffactor = CSTFFACTOR;
+    tfbaseline = CSTFBASELINE;
+  }else{
+    tffactor=DOCTFFACTOR;
+    tfbaseline=DOCTFBASELINE;
+  }
+
+  //cout<<tffactor<<"  "<<tfbaseline<<endl;
   int dc = ind.docCount();
 
   cwRatio = new double[dc];
@@ -97,7 +133,6 @@ CORIRetMethod::CORIRetMethod(Index & dbIndex, ScoreAccumulator &accumulator,
     int * cwCount = new int[dc];
 
     FILE * fp = fopen(cwName.c_str(), "rb");
-
     int * cw = cwCount; int d = 0;
     while (d < dc) {
       int dd = fread(cw, sizeof(int), dc - d, fp);
