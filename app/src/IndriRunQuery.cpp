@@ -222,7 +222,7 @@ int main(int argc, char * argv[]) {
     string runID = param.get( "runID", "indri" );
     int queryOffset = param.get( "queryOffset" , 0 );
     int trecFormat = param.get( "trecFormat" , 0 );
-    bool printQuery = param.get( "printQuery", true );
+    bool printQuery = param.get( "printQuery", false );
 
     Parameters queries = param[ "query" ];
 
