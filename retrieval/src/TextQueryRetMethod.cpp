@@ -12,9 +12,9 @@
 
 #include "TextQueryRetMethod.hpp"
 #include "RetParamManager.hpp"
-#include "BasicDocInfoList.hpp"
+#include "DocInfoList.hpp"
 
-TextQueryRetMethod::TextQueryRetMethod(Index &ind, 
+TextQueryRetMethod::TextQueryRetMethod(const Index &ind, 
 				       ScoreAccumulator & accumulator)  : 
   RetrievalMethod(ind), scAcc(accumulator) {
   // have to fix this to be passed in.
@@ -22,9 +22,10 @@ TextQueryRetMethod::TextQueryRetMethod(Index &ind,
   cacheDocReps = RetrievalParameter::cacheDocReps;
   
   if (cacheDocReps) {
-    docRepsSize = ind.docCount() + 1;
+    int dc = ind.docCount();
+    docRepsSize = dc + 1;
     docReps = new DocumentRep *[docRepsSize];
-    for (int i = 0; i <= ind.docCount(); i++) docReps[i] = NULL;
+    for (int i = 0; i <= dc; i++) docReps[i] = NULL;
   }
 }
 
@@ -35,12 +36,12 @@ void TextQueryRetMethod::scoreCollection(int docID,
   delete(rep);
 }
 //fix this to pass scoreAll down.
-void TextQueryRetMethod::scoreCollection(QueryRep &qry, 
+void TextQueryRetMethod::scoreCollection(const QueryRep &qry, 
 					 IndexedRealVector &results) {
   scoreInvertedIndex(qry, results);
 }
 
-void TextQueryRetMethod::scoreInvertedIndex(QueryRep &qRep, 
+void TextQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
 					    IndexedRealVector &scores, 
 					    bool scoreAll) {
 
@@ -101,12 +102,12 @@ void TextQueryRetMethod::scoreInvertedIndex(QueryRep &qRep,
   }
 }
 
-double TextQueryRetMethod::scoreDoc(QueryRep &qry, int docID) {
+double TextQueryRetMethod::scoreDoc(const QueryRep &qry, int docID) {
   HashFreqVector docVector(ind,docID);
   return (scoreDocVector(*((TextQueryRep *)(&qry)),docID,docVector));
 }
 
-double TextQueryRetMethod::scoreDocVector(TextQueryRep &qRep, int docID, 
+double TextQueryRetMethod::scoreDocVector(const TextQueryRep &qRep, int docID, 
 					  FreqVector &docVector) {
 
   qRep.startIteration();
@@ -115,13 +116,13 @@ double TextQueryRetMethod::scoreDocVector(TextQueryRep &qRep, int docID,
 
   DocumentRep *dRep = computeDocRep(docID);
 
-  BasicDocInfo *dInfo;
+  DocInfo *dInfo;
   while (qRep.hasMore()) {
     QueryTerm *qTerm = qRep.nextTerm();
     int fq;
     
     if (docVector.find(qTerm->id(),fq)) {
-      dInfo = new BasicDocInfo(docID, fq);
+      dInfo = new DocInfo(docID, fq);
       score += scoreFunc()
 	->matchedTermWeight(qTerm, &qRep, dInfo, dRep);
       delete dInfo;
@@ -133,6 +134,55 @@ double TextQueryRetMethod::scoreDocVector(TextQueryRep &qRep, int docID,
   return score;
 }
 
-
-
-
+#include <float.h> // for -DBL_MAX
+double TextQueryRetMethod::scoreDocPassages(const TextQuery &qry, int docID, 
+					    PassageScoreVector &scores, 
+					    int psgSize, int overlap) {
+  double score = 0, maxScore = -DBL_MAX;
+  MatchInfo *matches = MatchInfo::getMatches(ind, qry, docID);
+  TextQueryRep *qRep = (TextQueryRep *) computeQueryRep(qry);
+  DocumentRep *dRep = computeDocRep(docID);
+  PassageRep *pRep, *myRep;
+  // passage start + length needed for ret (alternate vector class).
+  int pNum = 1;
+  scores.clear();
+  myRep = new PassageRep(*dRep, ind.docLength(docID), psgSize, overlap);
+  
+  // passage info here
+  DocInfo *dInfo;
+  //  pRep->startPassageIteration();
+  //  while (pRep->hasMorePassage()) {
+  for (PassageRep::iterator iter = myRep->begin(), endIter = myRep->end();
+       iter != endIter;
+       iter++) {    
+    score = 0;
+    pRep = &(*iter);
+    qRep->startIteration();
+    while (qRep->hasMore()) {
+      QueryTerm *qTerm = qRep->nextTerm();
+      int fq = pRep->passageTF(qTerm->id(), matches);
+      dInfo = new DocInfo(docID, fq); //passage freq here
+      score += scoreFunc()->matchedTermWeight(qTerm, qRep, dInfo, pRep);
+      delete dInfo;
+      delete qTerm;
+    }
+    score = scoreFunc()->adjustedScore(score, qRep,  pRep);
+    PassageScore s;
+    s.id = pNum++;
+    s.start = pRep->getStart();
+    s.end = pRep->getEnd();
+    s.score = score;
+    
+    scores.push_back(s);
+    if (score > maxScore) {
+      maxScore = score;
+    }
+    //    pRep->nextPassage();
+  }
+  delete(matches);
+  delete(dRep);
+  //  delete(pRep);  
+  delete(myRep);
+  delete(qRep);
+  return maxScore;
+}

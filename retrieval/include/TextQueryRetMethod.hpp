@@ -16,6 +16,7 @@
 #include "RetrievalMethod.hpp"
 #include "TextQueryRep.hpp"
 #include "DocumentRep.hpp"
+#include "PassageRep.hpp"
 #include "ScoreFunction.hpp"
 #include "ScoreAccumulator.hpp"
 #include "FreqVector.hpp"
@@ -75,7 +76,8 @@ class TextQueryRetMethod : public RetrievalMethod {
 public:
   /// Create the retrieval method. If cacheDocReps is true,
   /// allocate DocumentRep cache array.
-  TextQueryRetMethod(Index &ind, ScoreAccumulator & accumulator);
+  TextQueryRetMethod(const Index &ind, ScoreAccumulator & accumulator);
+
   /// Destroy the object. If cacheDocReps is true, delete the
   /// DocumentRep cache array
   virtual ~TextQueryRetMethod() {
@@ -86,18 +88,18 @@ public:
   }
 
   /// compute the query representation for a text query (caller responsible for deleting the memory of the generated new instance)
-  virtual TextQueryRep *computeTextQueryRep(TextQuery &qry)=0;
+  virtual TextQueryRep *computeTextQueryRep(const TextQuery &qry)=0;
   /// compute a query rep for an existing doc (DOCID_T needed).
   virtual TextQueryRep *computeTextQueryRep(int docid){
     return NULL; 
   } // need to implement for other ret methods.
   /// overriding abstract class method
-  virtual QueryRep *computeQueryRep(Query &qry); 
+  virtual QueryRep *computeQueryRep(const Query &qry); 
 
   /// ooverriding abstract class method
-  virtual double scoreDoc(QueryRep &qry, int docID);
-  /// ooverriding abstract class method with a general efficient inverted index scoring procedure
-  virtual void scoreCollection(QueryRep &qry, IndexedRealVector &results);
+  virtual double scoreDoc(const QueryRep &qry, int docID);
+  /// overriding abstract class method with a general efficient inverted index scoring procedure
+  virtual void scoreCollection(const QueryRep &qry, IndexedRealVector &results);
   /// add support for scoring an existing document against the collection
   virtual void scoreCollection(int docid, IndexedRealVector &results);
   
@@ -106,21 +108,35 @@ public:
   /// return the scoring function pointer
   virtual ScoreFunction *scoreFunc() = 0;
   /// update the query
-  virtual void updateQuery(QueryRep &qryRep, DocIDSet &relDocs) {
+  virtual void updateQuery(QueryRep &qryRep, const DocIDSet &relDocs) {
     updateTextQuery(*((TextQueryRep *)(&qryRep)), relDocs);
   }
 
   /// Modify/update the query representation based on a set (presumably) relevant documents
-  virtual void updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs)=0;
+  virtual void updateTextQuery(TextQueryRep &qryRep, 
+			       const DocIDSet &relDocs)=0;
 
   /// Efficient scoring with the inverted index
-  /*! a general scoring procedure shared by many different models (assuming "sortedScores has memory allocated)
- 
+  /*! a general scoring procedure shared by many different models 
+    (assuming "sortedScores has memory allocated)
   */
-  virtual void scoreInvertedIndex(QueryRep &qryRep, IndexedRealVector &scores, bool scoreAll=false);
+  virtual void scoreInvertedIndex(const QueryRep &qryRep, 
+				  IndexedRealVector &scores, 
+				  bool scoreAll=false);
 
-  virtual double scoreDocVector(TextQueryRep &qry, int docID, FreqVector &docVector);
-
+  virtual double scoreDocVector(const TextQueryRep &qry, int docID, 
+				FreqVector &docVector);
+  /// \brief Score a query for each passage of a document. 
+  /// @param qRep the TextQuery to score.
+  /// @param docID the document to score.
+  /// @param scores accumulator for the passage scores, in passage order.
+  /// @param psgSize the number of tokens for sliding window. 
+  /// @param overlap the number of tokens to overlap in each passage. 
+  /// @return the maximum score over the passages.
+  virtual double scoreDocPassages(const TextQuery &qRep, int docID, 
+				  PassageScoreVector &scores, 
+				  int psgSize, int overlap);
+  
 protected:
   ScoreAccumulator &scAcc;
   /// cache document reps.
@@ -134,8 +150,8 @@ protected:
 
 //=============== inlines ========================================
 
-inline QueryRep *TextQueryRetMethod::computeQueryRep(Query &qry) { 
-  TextQuery *q = static_cast<TextQuery *>(&qry);
+inline QueryRep *TextQueryRetMethod::computeQueryRep(const Query &qry) { 
+  const TextQuery *q = static_cast<const TextQuery *>(&qry);
   return (computeTextQueryRep(*q));
 }
 
