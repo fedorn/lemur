@@ -13,10 +13,8 @@
 #include "PorterStemmer.hpp"
 #include "WebParser.hpp"
 #include "TrecParser.hpp"
-#include "ReutersParser.hpp"
 #include "InvFPTextHandler.hpp"
 #include "Param.hpp"
-#include "FUtil.hpp"
 
 // Local parameters used by the indexer 
 namespace LocalParameter {
@@ -32,8 +30,8 @@ namespace LocalParameter {
   char * docFormat;
   // whether or not to stem
   char * stemmer;
-  // file with source files
-  char * dataFiles;
+  //whether to keep positions and dtindex
+  int position;
 
   bool countStopWords;
 
@@ -46,8 +44,7 @@ namespace LocalParameter {
     stopwords = strdup(ParamGetString("stopwords"));
     acronyms = strdup(ParamGetString("acronyms"));
     docFormat = strdup(ParamGetString("docFormat"));
-    dataFiles = strdup(ParamGetString("dataFiles"));
-
+    position = ParamGetInt("position", 1);
     // convert docFormat to lowercase
     for (char * d = docFormat; *d != '\0'; d++) *d = tolower(*d);
 
@@ -66,14 +63,13 @@ namespace LocalParameter {
     free(acronyms);
     free(docFormat);
     free(stemmer);
-    free(dataFiles);
   }
 };
 
 // put more usage info in here
 void usage(int argc, char ** argv) {
   cerr << "Usage:" << endl
-       << argv[0] << " paramfile [datfile1] [datfile2] ... " << endl
+       << argv[0] << " paramfile datfile1 datfile2 ... " << endl
        << endl
        << "PushIndexer builds a database using either the TrecParser or " << endl
        << "WebParser class and InvFPPushIndex.  Summary of parameters:" << endl << endl
@@ -88,15 +84,11 @@ void usage(int argc, char ** argv) {
        << "\t           (eg USA U.S.A. USAs USA's U.S.A.) are left " << endl
        << "\t           uppercase if in the acronym list." << endl
        << "\tdocFormat - \"trec\" for standard TREC formatted documents "<< endl
-       << "\t            web for web TREC formatted documents " << endl
-       << "\t            reuters for Reuters XML documents (def = trec) " << endl
+       << "\t            web for web TREC formatted documents (def = trec)" << endl
        << "\tstemmer - \"porter\" to use Porter's stemmer. " << endl
        << "\t          (def = no stemmer)" << endl
        << "\tcountStopWords - \"true\" to count stopwords in doc length. " << endl
-       << "\t                 (def = false)" << endl
-       << "\tdataFiles - name of file containing list of datafiles. " << endl
-       << "\t              (one line per datafile name) " << endl
-       << "\t              if not specified, enter datafiles on command line. "<< endl;
+       << "\t                 (def = false)" << endl;
 }
 
 // get application parameters
@@ -106,7 +98,7 @@ void GetAppParam() {
 
 
 int AppMain(int argc, char * argv[]) {
-  if ((argc < 3) && (!strcmp(LocalParameter::dataFiles, ""))) {
+  if (argc < 3) {
     usage(argc, argv);
     return -1;
   }
@@ -114,33 +106,20 @@ int AppMain(int argc, char * argv[]) {
   // Create the appropriate parser.
   Parser * parser;
   if (!strcmp(LocalParameter::docFormat, "web")) {
-    parser = new WebParser();
-  } else if (!strcmp (LocalParameter::docFormat, "reuters")) {
-    parser = new ReutersParser();
-  } else if (!strcmp (LocalParameter::docFormat, "trec")) {
-    parser = new TrecParser();
-  } else if (strcmp (LocalParameter::docFormat, "")) {
-    throw Exception("PushIndexer", "Unknown docFormat specified");
+    parser = new WebParser;
   } else {
-    cerr << "Using default trec parser" << endl;
-    parser = new TrecParser();
+    parser = new TrecParser;
   }
 
   // Create the stopper if needed.
   Stopper * stopper = NULL;
   if (strcmp(LocalParameter::stopwords, "")) {
-    if (!fileExist(LocalParameter::stopwords)) {
-      throw Exception("PushIndexer", "stopwords file specified does not exist");
-    }
     stopper = new Stopper(LocalParameter::stopwords);
   }
 
   // Create the acronym list and tell parser if needed.
   WordSet * acros = NULL;
   if (strcmp(LocalParameter::acronyms, "")) {
-    if (!fileExist(LocalParameter::acronyms)) {
-      throw Exception("PushIndexer", "acronyms file specified does not exist");
-    }
     acros = new WordSet(LocalParameter::acronyms);
     parser->setAcroList(acros);
   }
@@ -149,8 +128,6 @@ int AppMain(int argc, char * argv[]) {
   Stemmer * stemmer = NULL;
   if (!strcmp(LocalParameter::stemmer, "porter")) {
     stemmer = new PorterStemmer();
-  } else if (strcmp(LocalParameter::stemmer, "")) {
-    throw Exception("PushIndexer", "Unknown stemmer specified");
   }
 
   // Create the indexer. (Note: this has an InvFPPushIndex that 
@@ -158,11 +135,7 @@ int AppMain(int argc, char * argv[]) {
   // TextHandler class, so that it is compatible with my parser
   // architecture.  See the TextHandler and InvFPTextHandler classes
   // for more info.)
-  
-  if (!strcmp(LocalParameter::index, "")) {
-    throw Exception("PushIndexer", "index must be specified");
-  }
-  InvFPTextHandler* indexer = new InvFPTextHandler(LocalParameter::index, LocalParameter::memory, LocalParameter::countStopWords);
+  InvFPTextHandler indexer(LocalParameter::index, LocalParameter::memory, LocalParameter::countStopWords, LocalParameter::position);
 
   // chain the parser/stopper/stemmer/indexer
 
@@ -178,41 +151,19 @@ int AppMain(int argc, char * argv[]) {
     th = stemmer;
   } 
 
-  th->setTextHandler(indexer);
+  th->setTextHandler(&indexer);
 
   // parse the data files
-  if (strcmp(LocalParameter::dataFiles, "")) {
-    if (!fileExist(LocalParameter::dataFiles)) {
-      throw Exception("PushIndexer", "dataFiles specified does not exist");
-    }
-
-    ifstream source(LocalParameter::dataFiles);
-    if (!source.is_open()) {
-      throw Exception("PushIndexer","could not open dataFiles specified");
-    } else {
-      string filename;
-      while (getline(source, filename)) {
-	cerr << "Parsing " << filename <<endl;
-	parser->parse((char*)filename.c_str());
-      }
-    }
-  } else {
-    for (int i = 2; i < argc; i++) {
-      cerr << "Parsing " << argv[i] << endl;
-    if (!fileExist(argv[i])) {
-      throw Exception("PushIndexer", "datfile specified does not exist");
-    }
-      parser->parse(argv[i]);
-    }
+  for (int i = 2; i < argc; i++) {
+    cerr << "Parsing " << argv[i] << endl;
+    parser->parse(argv[i]);
   }
 
   // free memory
   if (acros != NULL) delete acros;
   if (stopper != NULL) delete stopper;
   delete parser;
-  delete indexer;
   LocalParameter::freeMem();
   return 0;
 }
-
 
