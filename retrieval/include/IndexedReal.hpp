@@ -60,20 +60,22 @@ private:
   /// Function object types, 
   /// defines how to compare IndexedReal objects (for sorting/searching)
 
-  struct IndexedRealAscending {  
+  class IndexedRealAscending {
+  public:
     bool operator()(const IndexedReal & a, const IndexedReal & b) {
       return a.val < b.val;  // based on the real value
     }
   };
 
-  struct IndexedRealDescending {  
+  class IndexedRealDescending { 
+  public: 
     bool operator()(const IndexedReal & a, const IndexedReal & b) {
       return a.val > b.val;  // based on the real value
     }
   };
 
-  IndexedRealAscending ascendOrder;
-  IndexedRealDescending descendOrder;
+  static IndexedRealAscending ascendOrder;
+  static IndexedRealDescending descendOrder;
 
 };
 
