@@ -60,7 +60,10 @@ inherit from.
 
 */
 
-#include "common_headers.hpp"
+#include <iostream>
+#include <string>
+#include <sstream>
+using namespace std;
 
 typedef unsigned long LemurErrorType;
 
@@ -72,25 +75,31 @@ public:
     _what += whatString;
   }
 
-  Exception( const std::string& whoString, const std::string& whereLine, 
-             const std::string& whatString, LemurErrorType code ) :
-    _what( whoString + "(" + whereLine + ")" + ": " + whatString ),
-    _code( code )
+  Exception( const std::string& whoString, int whereLine, 
+             const std::string& whatString, LemurErrorType code )
   {
+    std::stringstream lineString;
+    lineString << whereLine;
+
+    _what = whoString + "(" + lineString.str() + ")" + ": " + whatString;
+    _code = code;
   }
 
-  Exception( const std::string& whoString, const std::string& whereLine,
-             const std::string& whatString, const Exception& inner ) :
-    _what( whoString + "(" + whereLine + ")" + ": " + whatString + "\n\t" + inner.what() ),
-    _code(inner._code)
+  Exception( const std::string& whoString, int whereLine,
+             const std::string& whatString, const Exception& inner )
   {
+    std::stringstream lineString;
+    lineString << whereLine;
+
+    _what = whoString + "(" + lineString.str() + ")" + ": " + whatString + "\n\t" + inner.what();
+    _code = inner.code();
   }
 
   ~Exception() {}
 
-  inline void writeMessage(ostream &os = cerr)
+  inline void writeMessage(std::ostream &os = std::cerr)
   {
-    os << "Exception [" << _what << "], code = " << _code << endl;
+    os << "Exception [" << _what << "], code = " << _code << std::endl;
   }
 
   const std::string& what() const {
@@ -106,14 +115,10 @@ private:
   LemurErrorType _code;
 };
 
-#define LEMUR_MAKESTR(x) # x
-
 #define LEMUR_ABORT( e )                  { std::cerr << e.what() << std::endl; exit(-1); }
-#define LEMUR_THROW_LINE( code, text, file, line )  throw Exception( file, LEMUR_MAKESTR(line), \
-                                                    std::string() + text, (code) )
+#define LEMUR_THROW_LINE( code, text, file, line )  throw Exception( file, line, std::string() + text, (code) )
 #define LEMUR_THROW(code, text)  LEMUR_THROW_LINE(code, text, __FILE__, __LINE__)
-#define LEMUR_RETHROW_LINE( e, text, file, line )   throw Exception( file, LEMUR_MAKESTR(line), \
-                                                   (text), (e) )
+#define LEMUR_RETHROW_LINE( e, text, file, line )   throw Exception( file, line, (std::string() + text), (e) )
 #define LEMUR_RETHROW( e, text)  LEMUR_RETHROW_LINE(e, text, __FILE__, __LINE__)
 
 #define LEMUR_GENERIC_ERROR               ((LemurErrorType)0xFFFFFFFF)
@@ -123,5 +128,6 @@ private:
 #define LEMUR_IO_ERROR                    ((LemurErrorType)0xFFFFFFFB)
 #define LEMUR_RUNTIME_ERROR               ((LemurErrorType)0xFFFFFFFA)
 #define LEMUR_NETWORK_ERROR               ((LemurErrorType)0xFFFFFFF9)
+#define LEMUR_INTERNAL_ERROR              ((LemurErrorType)0xFFFFFFF8)
 
 #endif
