@@ -26,7 +26,7 @@ public:
   InvFPTerm() { freq=1;};
   ~InvFPTerm() {};
 
-  TERM_T spelling() { return word; };
+  const char* spelling() { return word; };
   void spelling(TERM_T term) { word = term; };
   int strLength() { return strlen; };
   void strLength(int len) { strlen = len; };
