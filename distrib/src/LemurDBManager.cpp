@@ -105,7 +105,7 @@ LemurDBManager::getDoc(docid_t docid) const {
   while (til->hasMore()) {
     TermInfo * ti = til->nextEntry();
     for (int i = 0; i < ti->count(); i++) {
-      *loc = ti->id();
+      *loc = ti->termID();
       loc++;
       bytelen += sizeratio; 
     }
@@ -140,7 +140,7 @@ LemurDBManager::output(const docid_t docid) const {
     TermInfo * ti = til->nextEntry();
     for (int i = 0; i < ti->count(); i++) {
       if (c % 10 == 0) *outfile << "\n";
-      *outfile << index->term(ti->id()) << " ";
+      *outfile << index->term(ti->termID()) << " ";
       c++;
    }
   }
