@@ -35,12 +35,13 @@ double OkapiScoreFunc::matchedTermWeight(QueryTerm *qTerm,
 OkapiRetMethod::OkapiRetMethod(Index &dbIndex)
 {
   ind = &dbIndex;
-  param.k1 = ParamGetDouble("BM25K1",1.2);
-  param.b =  ParamGetDouble("BM25B",0.75);
-  param.k3 = ParamGetDouble("BM25K3", 7);
-  param.expQTF = ParamGetDouble("BM25QTF", 0.5);
-  expTermCount = ParamGetInt("feedbackTermCount",20);
   scFunc = new OkapiScoreFunc(dbIndex);
+
+  tfParam.k1 = OkapiParameter::defaultK1;
+  tfParam.b =  OkapiParameter::defaultB;
+  tfParam.k3 = OkapiParameter::defaultK3; 
+  fbParam.expQTF = OkapiParameter::defaultExpQTF; 
+  fbParam.howManyTerms = OkapiParameter::defaultHowManyTerms;
 }
 
 
@@ -93,12 +94,12 @@ void OkapiRetMethod::updateQuery(QueryRep &origRep, DocIDSet &relDocs)
   IndexedRealVector::iterator j;
   int termCount=0;
   for (j= weightedTerms.begin();j!=weightedTerms.end();j++) {
-    if (termCount++ >= expTermCount) {
+    if (termCount++ >= fbParam.howManyTerms) {
       break;
     } else {
       // add the term to the query representation
       qr->incPEst((*j).ind, relCounts[(*j).ind]);
-      qr->incCount((*j).ind, param.expQTF);
+      qr->incCount((*j).ind, fbParam.expQTF);
   
       
     } 

@@ -10,6 +10,59 @@
 #include "Counter.hpp"
 #include "DocUnigramCounter.hpp"
 
+namespace SimpleKLParameter {
+  enum SmoothMethod  {JELINEKMERCER=0, DIRICHLETPRIOR=1, ABSOLUTEDISCOUNT=2};
+  
+  enum SmoothStrategy  {INTERPOLATE=0, BACKOFF=1}; 
+
+  enum QueryUpdateMethod {MIXTURE = 0, DIVMIN=1, MARKOVCHAIN=2};
+
+  struct DocSmoothParam {
+    /// smoothing method
+    enum SmoothMethod smthMethod;
+    /// smoothing strategy
+    enum SmoothStrategy smthStrategy;
+    /// discount constant (delta) in absolute discounting
+    double ADDelta;
+    /// collection model coefficient (lambda) in Jelinek-Mercer
+    double JMLambda;
+    /// prior (mu) in Dirichlet prior
+    double DirPrior;
+  };
+
+  static enum SmoothMethod defaultSmoothMethod = DIRICHLETPRIOR;
+  static enum SmoothStrategy defaultSmoothStrategy = INTERPOLATE;
+  static double defaultADDelta = 0.7;
+  static double defaultJMLambda = 0.5;
+  static double defaultDirPrior = 1000;
+
+  struct QueryModelParam {
+    /// query model re-estimation/updating method
+    enum QueryUpdateMethod fbMethod;
+    /// Q_new = (1-fbCoeff)*Q_old + fbCoeff*FBModel
+    double fbCoeff;
+    /// how many terms to use for the re-estimated query model
+    int fbTermCount;
+    /// feedback query model term probability threshold (only terms with a higher prob. will be used
+    double fbPrTh;
+    /// feedback query model prob. sum threshold (taking terms up to the point, where the accumulated prob. mass exceeds the threshold
+    double fbPrSumTh;
+    /// collection influence coefficient (e.g., in mixture model and divergence minimization methods)
+    double fbMixtureNoise;
+    //// max iterations for EM algorithm (will stop earlier if the likelihood converges with an error smaller than 0.5)
+    int emIterations;
+  };
+
+  static enum QueryUpdateMethod defaultFBMethod = MIXTURE;
+  static double defaultFBCoeff = 0.5;
+  static int defaultFBTermCount =50;
+  static double defaultFBPrTh = 0.001;
+  static double defaultFBPrSumTh = 1;
+  static double defaultFBMixNoise = 0.5;
+  static int defaultEMIterations = 50;
+
+};
+
 /// Query model representation for the simple KL divergence model
 
 class SimpleKLQueryModel : public ArrayQueryRep {
@@ -38,8 +91,10 @@ public:
     return totalCount();
   }
   
+  /// load a query model/rep from input stream is
   virtual void load(istream &is);
 
+  /// save a query model/rep to output stream os
   virtual void save(ostream &os);
 
 private:
@@ -74,34 +129,8 @@ public:
 
 class SimpleKLRetMethod : public RetrievalMethod {
 public:
-  enum SmoothMethod  {JELINEKMERCER=0, BAYESIAN=1, ABSOLUTEDISCOUNT=2};
-  
-  enum SmoothStrategy  {INTERPOLATE=0, BACKOFF=1}; 
 
-  enum QueryUpdateMethod {MIXTURE = 0, DIVMIN=1, MARKOVCHAIN=2};
-
-  struct Parameter {
-    int smthMethod;
-    int smthStrategy;
-    int fbMethod;
-    /// Q_new = (1-fbCoeff)*Q_old + fbCoeff*FBModel
-    double fbCoeff;  
-    int fbTermCount;
-    double fbPrTh;
-    double fbPrSumTh;
-    double fbMixtureNoise;
-    /// p(w) = (1-fbMixtureCoeff)*p(w|feedbackModel)+fbMixtureCoeff*p(w|collect)
-    double fbMixtureCoeff; 
-    int emIterations;
-    double ADDelta;
-    double JMLambda;
-    double DirPrior;
-    double qFidelity;
-  };
-  Parameter param;
-
-  SimpleKLRetMethod(Index &dbIndex);
-  
+  SimpleKLRetMethod(Index &dbIndex, const char *supportFileName);
   virtual ~SimpleKLRetMethod();
   
   virtual QueryRep *computeQueryRep(TextQuery &qry) {
@@ -118,6 +147,8 @@ public:
 
   virtual void updateQuery(QueryRep &origRep, DocIDSet &relDocs);
 
+  void setDocSmoothParam(SimpleKLParameter::DocSmoothParam &docSmthParam);
+  void setQueryModelParam(SimpleKLParameter::QueryModelParam &queryModParam);
 
 protected:
   
@@ -126,19 +157,32 @@ protected:
   UnigramLM *collectLM; // a little faster if pre-computed
   DocUnigramCounter *collectLMCounter; // support collectLM
   SimpleKLScoreFunc *scFunc; // keep a copy to be used at any time
-private:
-  /// Markov chain feedback method
-  MLUnigramLM *computeMCQueryModel(ArrayCounter<double> &counter,
-				   SimpleKLQueryModel &origRep,
-				   DocIDSet &relDocs,
-				   Index &ind, 
-				   int stopWordCutoff, 
-				   double alpha);
+
+  /// @name query model updating methods (i.e., feedback methods)
+  //@{
   /// Mixture model feedback method
   void computeMixtureFBModel(SimpleKLQueryModel &origRep, DocIDSet & relDocs);
   /// Divergence minimization feedback method
   void computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs);
+  /// Markov chain feedback method
+  void computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs);
+  //@}
+
+  SimpleKLParameter::DocSmoothParam docParam;
+  SimpleKLParameter::QueryModelParam qryParam;
+
 };
+
+
+inline  void SimpleKLRetMethod::setDocSmoothParam(SimpleKLParameter::DocSmoothParam &docSmthParam)
+{
+  docParam = docSmthParam;
+}
+
+inline  void SimpleKLRetMethod::setQueryModelParam(SimpleKLParameter::QueryModelParam &queryModParam)
+{
+  qryParam = queryModParam;
+}
 
 #endif /* _SIMPLEKLRETMETHOD_HPP */
 

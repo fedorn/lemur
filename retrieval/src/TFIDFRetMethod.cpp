@@ -9,8 +9,7 @@ TFIDFQueryRep::TFIDFQueryRep(TextQuery &qry, Index &dbIndex, double *idfValue, T
   while (hasMore()) {
     QueryTerm *qt = nextTerm();
     setCount(qt->id(), queryTFWeight(qt->weight())*idf[qt->id()]);
-    cout << "term : "<< dbIndex.term(qt->id()) << " idf="<< idf[qt->id()] << 
-      " total "<< dbIndex.docCount() << " with term "<< dbIndex.docCount(qt->id()) << endl;
+    // cout << "term : "<< dbIndex.term(qt->id()) << " idf="<< idf[qt->id()] <<    " total "<< dbIndex.docCount() << " with term "<< dbIndex.docCount(qt->id()) << endl;
   }
 }
 double TFIDFQueryRep::queryTFWeight(const double rawTF)
@@ -50,16 +49,19 @@ double TFIDFDocRep::docTFWeight(const double rawTF)
 TFIDFRetMethod::TFIDFRetMethod(Index &dbIndex)
 {
   ind = &dbIndex;
-  docTFParam.tf = (TFIDFParameter::TFMethod)ParamGetInt("doc.tfMethod",TFIDFParameter::BM25);
-  docTFParam.bm25K1 = ParamGetDouble("doc.bm25K1",1);
-  docTFParam.bm25B = ParamGetDouble("doc.bm25B",0.5);
+
+  // set default parameter value
+  docTFParam.tf = TFIDFParameter::BM25;
+  docTFParam.bm25K1 = TFIDFParameter::defaultDocK1;
+  docTFParam.bm25B = TFIDFParameter::defaultDocB;
   
-  qryTFParam.tf = (TFIDFParameter::TFMethod)ParamGetInt("query.tfMethod",TFIDFParameter::BM25);
-  qryTFParam.bm25K1 = ParamGetDouble("query.bm25K1",1);
-  qryTFParam.bm25B = 0;
+  qryTFParam.tf = TFIDFParameter::BM25;
+  qryTFParam.bm25K1 = TFIDFParameter::defaultQryK1;
+  qryTFParam.bm25B = TFIDFParameter::defaultQryB;
  
-  howManyTerms = ParamGetInt("feedbackDocCount",0); // no feedback
-  posCoeff = ParamGetDouble("feedbackPosCoeff", 4); 
+  fbParam.howManyTerms = TFIDFParameter::defaultHowManyTerms;
+  fbParam.posCoeff = TFIDFParameter::defaultPosCoeff;
+
   // pre-compute IDF values
   idfV = new double[dbIndex.termCountUnique()+1];
   for (int i=1; i<=dbIndex.termCountUnique(); i++) {
@@ -120,11 +122,11 @@ void TFIDFRetMethod::updateQuery(QueryRep &qryRep, DocIDSet &relDocs)
   IndexedRealVector::iterator j;
   int termCount=0;
   for (j= centVector.begin();j!=centVector.end();j++) {
-    if (termCount++ >= howManyTerms) {
+    if (termCount++ >= fbParam.howManyTerms) {
       break;
     } else {
       // add the term to the query vector
-      (dynamic_cast<TFIDFQueryRep *>(&qryRep))->incCount((*j).ind, (*j).val*posCoeff);
+      (dynamic_cast<TFIDFQueryRep *>(&qryRep))->incCount((*j).ind, (*j).val*fbParam.posCoeff);
     }
   }
 

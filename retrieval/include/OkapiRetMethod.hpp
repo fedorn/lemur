@@ -13,9 +13,21 @@ namespace OkapiParameter {
     double k1;
     double b;
     double k3;
+  }; 
+
+  static double defaultK1 = 1.2;
+  static double defaultB = 0.75;
+  static double defaultK3 = 7;
+  
+  struct FeedbackParam {
     /// The (pseudo) count of a new term added to the query (It's unclear how this is set from the Okapi paper, so it's implemented as a parameter.)
     double expQTF; // expanded query term TF
-  }; 
+    /// The number of terms to add for feedback
+    int howManyTerms;
+  };
+
+  static double defaultExpQTF = 0.5;
+  static int defaultHowManyTerms = 50;
 };
 
 /// Represent of a query term in Okapi retrieval model, the term carries a count of the number of rel docs with the term
@@ -24,7 +36,10 @@ class OkapiQueryTerm : public QueryTerm {
 public:
   OkapiQueryTerm(int termID, double count, int pEstCount, double paramK3) : QueryTerm(termID, count), pEst(pEstCount), k3(paramK3) {
   }
+  /// return the number of rel docs with the term
   int pEstCount() { return pEst;}
+
+  /// return query term TF weight
   double weight() { 
     return ((k3+1)*w/(k3+w));
   } 
@@ -51,8 +66,11 @@ public:
   OkapiQueryRep(TextQuery &qry, Index &dbIndex, double paramK3);
 
   virtual ~OkapiQueryRep() { delete [] pEst; }
+  /// return total number of relevant/feedback documents
   int pNormCount() { return pNorm;}
+  /// set total number of relevant/feedback documents
   void setPNormCount(int count) { pNorm = count;}
+  /// increase the count of relevant/feedback doc in which a term occurs
   void incPEst(int wdIndex, int val) { pEst[wdIndex]+=val;}
 protected:
   virtual QueryTerm *makeQueryTerm(int wdIndex, double wdCount) {
@@ -83,24 +101,27 @@ protected:
 
 class OkapiRetMethod : public RetrievalMethod  {
 public:
-  OkapiParameter::TFParam param;
-  int expTermCount;
+
 
   OkapiRetMethod(Index &dbIndex);
 
   virtual ~OkapiRetMethod() { delete scFunc;}
 
   virtual QueryRep *computeQueryRep(TextQuery &qry) {
-    return (new OkapiQueryRep(qry, *ind, param.k3));
+    return (new OkapiQueryRep(qry, *ind, tfParam.k3));
   }
 
   virtual DocumentRep *computeDocRep(int docID) {
-    return (new OkapiDocRep(docID, *ind, param));
+    return (new OkapiDocRep(docID, *ind, tfParam));
   }
 
   virtual ScoreFunction *scoreFunc();
   
   virtual void updateQuery(QueryRep &origRep, DocIDSet &relDocs);
+
+  void setTFParam(OkapiParameter::TFParam &tfWeightParam);
+
+  void setFeedbackParam(OkapiParameter::FeedbackParam &feedbackParam);
 
   static double RSJWeight(double r, double R, 
 
@@ -108,12 +129,25 @@ public:
     return (log ((r+0.5)*(N-n-R+r+0.5)/((R-r+0.5)*(n-r+0.5))));
   }
 
-private:
+protected:
   OkapiScoreFunc *scFunc;
-  
+
+  OkapiParameter::TFParam tfParam;
+  OkapiParameter::FeedbackParam fbParam;
 
 
 };
+
+
+inline void OkapiRetMethod::setTFParam(OkapiParameter::TFParam &tfWeightParam)
+{
+  tfParam = tfWeightParam;
+}
+
+inline void OkapiRetMethod::setFeedbackParam(OkapiParameter::FeedbackParam &feedbackParam)
+{
+  fbParam = feedbackParam;
+}
 
 inline double OkapiDocRep::BM25TF(double rawTF, double docLength) 
 {

@@ -12,6 +12,16 @@ namespace TFIDFParameter {
     double bm25K1;
     double bm25B;
   };
+  struct FeedbackParam {
+    int howManyTerms;
+    double posCoeff;
+  };    
+  static double defaultDocK1=1;
+  static double defaultDocB = 0.5;
+  static double defaultQryK1 = 1;
+  static double defaultQryB = 0;
+  static int defaultHowManyTerms = 50;
+  static double defaultPosCoeff = 0.5;
 };
 
 /// Representation of a query (as a weighted vector) in the TFIDF method
@@ -55,10 +65,6 @@ private:
 class TFIDFRetMethod : public RetrievalMethod {
 public:
 
-  TFIDFParameter::WeightParam qryTFParam;
-  TFIDFParameter::WeightParam docTFParam;
-  int howManyTerms;
-  double posCoeff;
   TFIDFRetMethod(Index &dbIndex);
   ~TFIDFRetMethod() {delete [] idfV; delete scFunc;}
 
@@ -76,15 +82,48 @@ public:
 
   virtual void updateQuery(QueryRep &qryRep, DocIDSet &relDocs);
 
+  void setDocTFParam(TFIDFParameter::WeightParam &docTFWeightParam);
+
+  void setQueryTFParam(TFIDFParameter::WeightParam &queryTFWeightParam);
+
+  void setFeedbackParam(TFIDFParameter::FeedbackParam &feedbackParam);
+
   static double BM25TF(const double rawTF, const double k1, const double b, 
 		       const double docLen, const double avgDocLen);
 
 protected:
   double *idfV;
   ScoreFunction *scFunc;
+  
+  /// @name Parameters
+  //@{
+
+  TFIDFParameter::WeightParam qryTFParam;
+  TFIDFParameter::WeightParam docTFParam;
+  TFIDFParameter::FeedbackParam fbParam;
+
+  //@}
+
 };
 
 
+inline void TFIDFRetMethod::setDocTFParam(TFIDFParameter::WeightParam &docTFWeightParam)
+{
+  docTFParam = docTFWeightParam;
+}
+
+
+
+inline void TFIDFRetMethod::setQueryTFParam(TFIDFParameter::WeightParam &queryTFWeightParam)
+{
+  qryTFParam = queryTFWeightParam;
+}
+
+
+inline void TFIDFRetMethod::setFeedbackParam(TFIDFParameter::FeedbackParam &feedbackParam)
+{
+  fbParam = feedbackParam;
+}
 
 
 
