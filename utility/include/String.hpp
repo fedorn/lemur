@@ -13,7 +13,7 @@
 #ifndef _STRINGH_
 #define _STRINGH_
 
-#include <string>
+#include "common_headers.hpp"
 #include "ByteHash.hpp"
 
 class String : public string {
