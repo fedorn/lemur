@@ -14,7 +14,11 @@ Stopper::Stopper() {
 Stopper::Stopper(const string &filename) {
   cat = category;
   iden = identifier;
-  load(filename);
+  try {
+    load(filename);
+  } catch (Exception &ex) {
+    LEMUR_RETHROW(ex, "Stopwords file could not be loaded.");
+  }
 }
 
 

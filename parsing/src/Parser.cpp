@@ -7,6 +7,7 @@
 */
 
 #include "Parser.hpp"
+#include "FUtil.hpp"
 
 Parser::Parser() {
   borrowedacros = NULL;
@@ -16,6 +17,14 @@ Parser::Parser() {
 Parser::~Parser() {
   if (myacros)
     delete myacros;
+}
+
+void Parser::parse(const string &filename) {
+  parsefile = filename;
+  if (!fileExist(filename)) {
+    LEMUR_THROW(LEMUR_IO_ERROR, "Cannot find file "+filename+" for parsing.");
+  }
+  parseFile(parsefile);
 }
 
 void Parser::setAcroList(const WordSet* acronyms) {

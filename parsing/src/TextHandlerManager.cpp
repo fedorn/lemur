@@ -122,22 +122,26 @@ Stemmer* TextHandlerManager::createStemmer(string type, string datadir, string f
   for (int i=0;i<type.length();i++)
     type[i] = tolower(type[i]);
 
-  if (type == KStemmer::identifier) {
-    if (datadir.compare("") == 0) {
-      datadir = ParamGetString("KstemmerDir");
+  try {
+    if (type == KStemmer::identifier) {
+      if (datadir.compare("") == 0) {
+	datadir = ParamGetString("KstemmerDir");
+      }
+      stemmer = new KStemmer(datadir);
+    } else if (type == ArabicStemmer::identifier){
+      if ((datadir.empty()) || (func.empty())) {
+	ArabicStemmerParameter::get();
+	// param get has defaults so it'll always get back values
+	stemmer = new ArabicStemmer(ArabicStemmerParameter::stemDir, 
+				    ArabicStemmerParameter::stemFunc); 
+      } else {
+	stemmer = new ArabicStemmer((char*)datadir.c_str(),(char*)func.c_str());    
+      }
+    } else if (type == PorterStemmer::identifier) {
+      stemmer = new PorterStemmer();
     }
-    stemmer = new KStemmer(datadir);
-  } else if (type == ArabicStemmer::identifier){
-    if ((datadir.empty()) || (func.empty())) {
-      ArabicStemmerParameter::get();
-      // param get has defaults so it'll always get back values
-      stemmer = new ArabicStemmer(ArabicStemmerParameter::stemDir, 
-				  ArabicStemmerParameter::stemFunc); 
-    } else {
-      stemmer = new ArabicStemmer((char*)datadir.c_str(),(char*)func.c_str());    
-    }
-  } else if (type == PorterStemmer::identifier) {
-    stemmer = new PorterStemmer();
+  } catch (Exception &ex) {
+    LEMUR_RETHROW(ex, "Could not create Stemmer");
   }
   
   return stemmer;
@@ -148,8 +152,13 @@ Stopper* TextHandlerManager::createStopper(string filename) {
   if (filename.empty()) 
     filename = ParamGetString("stopwords");
   
-  if (!filename.empty()) 
-    stopper = new Stopper(filename);
+  if (!filename.empty()) {
+    try {
+      stopper = new Stopper(filename);
+    } catch (Exception &ex) {
+      LEMUR_RETHROW(ex, "Could not create Stopper using file name");
+    }
+  }
   
   return stopper;
 }
