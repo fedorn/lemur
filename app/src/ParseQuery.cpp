@@ -13,11 +13,13 @@
 #include "PorterStemmer.hpp"
 #include "WebParser.hpp"
 #include "TrecParser.hpp"
+#include "ReutersParser.hpp"
 
 #include "IndexManager.hpp"
 #include "Index.hpp"
 #include "QueryTextHandler.hpp"
 #include "WriterTextHandler.hpp"
+#include "FUtil.hpp"
 
 #include "Param.hpp"
 
@@ -103,20 +105,33 @@ int AppMain(int argc, char * argv[]) {
   // Create the appropriate parser.
   Parser * parser;
   if (!strcmp(LocalParameter::docFormat, "web")) {
-    parser = new WebParser;
+    parser = new WebParser();
+  } else if (!strcmp (LocalParameter::docFormat, "reuters")) {
+    parser = new ReutersParser();
+  } else if (!strcmp (LocalParameter::docFormat, "trec")) {
+    parser = new TrecParser();
+  } else if (strcmp (LocalParameter::docFormat, "")) {
+    throw Exception("ParseQuery", "Unknown docFormat specified");
   } else {
-    parser = new TrecParser;
+    cerr << "Using default trec parser" << endl;
+    parser = new TrecParser();
   }
 
   // Create the stopper if needed.
   Stopper * stopper = NULL;
   if (strcmp(LocalParameter::stopwords, "")) {
+    if (!fileExist(LocalParameter::stopwords)) {
+      throw Exception("ParseQuery", "stopwords file specified does not exist");
+    }
     stopper = new Stopper(LocalParameter::stopwords);
   }
 
   // Create the acronym list and tell parser if needed.
   WordSet * acros = NULL;
   if (strcmp(LocalParameter::acronyms, "")) {
+   if (!fileExist(LocalParameter::acronyms)) {
+      throw Exception("ParseQuery", "acronyms file specified does not exist");
+    }
     acros = new WordSet(LocalParameter::acronyms);
     parser->setAcroList(acros);
   }
@@ -125,8 +140,13 @@ int AppMain(int argc, char * argv[]) {
   Stemmer * stemmer = NULL;
   if (!strcmp(LocalParameter::stemmer, "porter")) {
     stemmer = new PorterStemmer();
+  } else if (strcmp(LocalParameter::stemmer, "")) {
+    throw Exception("ParseQuery", "Unknown stemmer specified");
   }
 
+  if (!strcmp(LocalParameter::index, "")) {
+    throw Exception("ParseQuery", "index must be specified");
+  }
   Index * ind = IndexManager::openIndex(LocalParameter::index);
 
   QueryTextHandler queryHandler;
@@ -156,6 +176,9 @@ int AppMain(int argc, char * argv[]) {
   // parse the data files
   for (int i = 2; i < argc; i++) {
     cerr << "Parsing " << argv[i] << endl;
+    if (!fileExist(argv[i])) {
+      throw Exception("ParseQuery", "datfile specified does not exist");
+    }
     parser->parse(argv[i]);
   }
 
@@ -163,6 +186,7 @@ int AppMain(int argc, char * argv[]) {
   if (acros != NULL) delete acros;
   if (stopper != NULL) delete stopper;
   delete parser;
+  delete ind;
   LocalParameter::freeMem();
   return 0;
 }
