@@ -56,14 +56,14 @@ double estimateQueryNoise(QueryRep *qrep, Index *ind)
   SimpleKLQueryModel *qr = (SimpleKLQueryModel *)qrep;
 
 
-  int dMax = ind->docCount();
+  COUNT_T dMax = ind->docCount();
   double *lambdaEst = new double[dMax+1];
   double *z = new double[dMax+1];
 
   double *pi = new double[dMax+1];
   double lambda;
 
-  int tMax = ind->termCountUnique();
+  COUNT_T tMax = ind->termCountUnique();
 
   double mu = SimpleKLParameter::docPrm.DirPrior;
 
@@ -73,7 +73,7 @@ double estimateQueryNoise(QueryRep *qrep, Index *ind)
   double curFit, meanFit;
   meanFit = 1e-40;
   
-  int d;
+  COUNT_T d;
   for (d=1; d<=dMax; d++) {
     pi[d] = 1.0/(double)dMax;
     
@@ -96,7 +96,7 @@ double estimateQueryNoise(QueryRep *qrep, Index *ind)
     double lnorm = 0;
     while (qr->hasMore()) {
       QueryTerm *qt = qr->nextTerm();
-      int tid = qt->id();
+      TERMID_T tid = qt->id();
       double qfq = qt->weight();
 
       double cpr = (1+ind->termCount(tid))/(double)(ind->termCount()+tMax); 
@@ -106,7 +106,7 @@ double estimateQueryNoise(QueryRep *qrep, Index *ind)
 
       // default value when not matching the term
       for (d=1; d<=dMax; d++) {
-	int docLen = ind->docLength(d);
+	COUNT_T docLen = ind->docLength(d);
 	z[d] += qfq*log(1+ (1-lambda)*mu/(lambda*(docLen+mu)));
 	lambdaEst[d] += qfq*(docLen+mu)*lambda/(lambda*docLen+mu);
       }
