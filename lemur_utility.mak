@@ -40,6 +40,7 @@ CLEAN :
 	-@erase "$(INTDIR)\BasicDocStream.obj"
 	-@erase "$(INTDIR)\ByteHash.obj"
 	-@erase "$(INTDIR)\error.obj"
+	-@erase "$(INTDIR)\FlattextDocMgr.obj"
 	-@erase "$(INTDIR)\FUtil.obj"
 	-@erase "$(INTDIR)\lex_parser.obj"
 	-@erase "$(INTDIR)\main.obj"
@@ -50,6 +51,7 @@ CLEAN :
 	-@erase "$(INTDIR)\porter_stemmer.obj"
 	-@erase "$(INTDIR)\PorterStemmer.obj"
 	-@erase "$(INTDIR)\ReutersParser.obj"
+	-@erase "$(INTDIR)\RVLCompress.obj"
 	-@erase "$(INTDIR)\Stopper.obj"
 	-@erase "$(INTDIR)\string-set.obj"
 	-@erase "$(INTDIR)\String.obj"
@@ -76,6 +78,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\BasicDocStream.obj" \
 	"$(INTDIR)\ByteHash.obj" \
 	"$(INTDIR)\error.obj" \
+	"$(INTDIR)\FlattextDocMgr.obj" \
 	"$(INTDIR)\FUtil.obj" \
 	"$(INTDIR)\lex_parser.obj" \
 	"$(INTDIR)\main.obj" \
@@ -86,9 +89,10 @@ LIB32_OBJS= \
 	"$(INTDIR)\porter_stemmer.obj" \
 	"$(INTDIR)\PorterStemmer.obj" \
 	"$(INTDIR)\ReutersParser.obj" \
+	"$(INTDIR)\RVLCompress.obj" \
 	"$(INTDIR)\Stopper.obj" \
-	"$(INTDIR)\string-set.obj" \
 	"$(INTDIR)\String.obj" \
+	"$(INTDIR)\string-set.obj" \
 	"$(INTDIR)\Timer.obj" \
 	"$(INTDIR)\TrecParser.obj" \
 	"$(INTDIR)\util.obj" \
@@ -113,7 +117,8 @@ CLEAN :
 	-@erase "$(INTDIR)\BasicDocStream.obj"
 	-@erase "$(INTDIR)\ByteHash.obj"
 	-@erase "$(INTDIR)\error.obj"
-	-@erase "$(INTDIR)\FUtil.obj" 
+	-@erase "$(INTDIR)\FlattextDocMgr.obj"
+	-@erase "$(INTDIR)\FUtil.obj"
 	-@erase "$(INTDIR)\lex_parser.obj"
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\MemCache.obj"
@@ -122,7 +127,8 @@ CLEAN :
 	-@erase "$(INTDIR)\parameters.obj"
 	-@erase "$(INTDIR)\porter_stemmer.obj"
 	-@erase "$(INTDIR)\PorterStemmer.obj"
-	-@erase "$(INTDIR)\ReutersParser.obj
+	-@erase "$(INTDIR)\ReutersParser.obj"
+	-@erase "$(INTDIR)\RVLCompress.obj"
 	-@erase "$(INTDIR)\Stopper.obj"
 	-@erase "$(INTDIR)\string-set.obj"
 	-@erase "$(INTDIR)\String.obj"
@@ -139,7 +145,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MLd /W3 /Gm /GX /ZI /Od /I "utility\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_utility.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
+CPP_PROJ=/nologo /MLd /W3 /Gm /GX /ZI /Od /I "utility\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_utility.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_utility.bsc" 
 BSC32_SBRS= \
@@ -150,6 +156,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\BasicDocStream.obj" \
 	"$(INTDIR)\ByteHash.obj" \
 	"$(INTDIR)\error.obj" \
+	"$(INTDIR)\FlattextDocMgr.obj" \
 	"$(INTDIR)\FUtil.obj" \
 	"$(INTDIR)\lex_parser.obj" \
 	"$(INTDIR)\main.obj" \
@@ -160,9 +167,10 @@ LIB32_OBJS= \
 	"$(INTDIR)\porter_stemmer.obj" \
 	"$(INTDIR)\PorterStemmer.obj" \
 	"$(INTDIR)\ReutersParser.obj" \
+	"$(INTDIR)\RVLCompress.obj" \
 	"$(INTDIR)\Stopper.obj" \
-	"$(INTDIR)\string-set.obj" \
 	"$(INTDIR)\String.obj" \
+	"$(INTDIR)\string-set.obj" \
 	"$(INTDIR)\Timer.obj" \
 	"$(INTDIR)\TrecParser.obj" \
 	"$(INTDIR)\util.obj" \
@@ -235,6 +243,13 @@ SOURCE=.\utility\src\error.c
 "$(INTDIR)\error.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+SOURCE=.\utility\src\FlattextDocMgr.cpp
+
+"$(INTDIR)\FlattextDocMgr.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\utility\src\FUtil.cpp
 
 "$(INTDIR)\FUtil.obj" : $(SOURCE) "$(INTDIR)"
@@ -258,10 +273,12 @@ SOURCE=.\utility\src\MemCache.cpp
 "$(INTDIR)\MemCache.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
 SOURCE=.\utility\src\MemList.cpp
 
 "$(INTDIR)\MemList.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
+
 
 SOURCE=.\utility\src\Param.cpp
 
@@ -290,6 +307,12 @@ SOURCE=.\utility\src\PorterStemmer.cpp
 SOURCE=.\utility\src\ReutersParser.cpp
 
 "$(INTDIR)\ReutersParser.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\RVLCompress.cpp
+
+"$(INTDIR)\RVLCompress.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

@@ -43,12 +43,17 @@ CLEAN :
 	-@erase "$(INTDIR)\IndexCount.obj"
 	-@erase "$(INTDIR)\IndexManager.obj"
 	-@erase "$(INTDIR)\IndexProb.obj"
+	-@erase "$(INTDIR)\InvDocList.obj"
 	-@erase "$(INTDIR)\InvFPDocList.obj"
 	-@erase "$(INTDIR)\InvFPIndex.obj"
 	-@erase "$(INTDIR)\InvFPIndexMerge.obj"
 	-@erase "$(INTDIR)\InvFPPushIndex.obj"
 	-@erase "$(INTDIR)\InvFPTermList.obj"
 	-@erase "$(INTDIR)\InvFPTextHandler.obj"
+	-@erase "$(INTDIR)\InvIndex.obj"
+	-@erase "$(INTDIR)\InvIndexMerge.obj"
+	-@erase "$(INTDIR)\InvPushIndex.obj"
+	-@erase "$(INTDIR)\InvTermList.obj"
 	-@erase "$(INTDIR)\QueryTextHandler.obj"
 	-@erase "$(INTDIR)\Terms.obj"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -71,12 +76,17 @@ LIB32_OBJS= \
 	"$(INTDIR)\IndexCount.obj" \
 	"$(INTDIR)\IndexManager.obj" \
 	"$(INTDIR)\IndexProb.obj" \
+	"$(INTDIR)\InvDocList.obj" \
 	"$(INTDIR)\InvFPDocList.obj" \
 	"$(INTDIR)\InvFPIndex.obj" \
 	"$(INTDIR)\InvFPIndexMerge.obj" \
 	"$(INTDIR)\InvFPPushIndex.obj" \
 	"$(INTDIR)\InvFPTermList.obj" \
 	"$(INTDIR)\InvFPTextHandler.obj" \
+	"$(INTDIR)\InvIndex.obj" \
+	"$(INTDIR)\InvIndexMerge.obj" \
+	"$(INTDIR)\InvPushIndex.obj" \
+	"$(INTDIR)\InvTermList.obj" \
 	"$(INTDIR)\QueryTextHandler.obj" \
 	"$(INTDIR)\Terms.obj"
 
@@ -100,12 +110,17 @@ CLEAN :
 	-@erase "$(INTDIR)\IndexCount.obj"
 	-@erase "$(INTDIR)\IndexManager.obj"
 	-@erase "$(INTDIR)\IndexProb.obj"
+	-@erase "$(INTDIR)\InvDocList.obj"
 	-@erase "$(INTDIR)\InvFPDocList.obj"
 	-@erase "$(INTDIR)\InvFPIndex.obj"
 	-@erase "$(INTDIR)\InvFPIndexMerge.obj"
 	-@erase "$(INTDIR)\InvFPPushIndex.obj"
 	-@erase "$(INTDIR)\InvFPTermList.obj"
 	-@erase "$(INTDIR)\InvFPTextHandler.obj"
+	-@erase "$(INTDIR)\InvIndex.obj"
+	-@erase "$(INTDIR)\InvIndexMerge.obj"
+	-@erase "$(INTDIR)\InvPushIndex.obj"
+	-@erase "$(INTDIR)\InvTermList.obj"
 	-@erase "$(INTDIR)\QueryTextHandler.obj"
 	-@erase "$(INTDIR)\Terms.obj"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -129,12 +144,17 @@ LIB32_OBJS= \
 	"$(INTDIR)\IndexCount.obj" \
 	"$(INTDIR)\IndexManager.obj" \
 	"$(INTDIR)\IndexProb.obj" \
+	"$(INTDIR)\InvDocList.obj" \
 	"$(INTDIR)\InvFPDocList.obj" \
 	"$(INTDIR)\InvFPIndex.obj" \
 	"$(INTDIR)\InvFPIndexMerge.obj" \
 	"$(INTDIR)\InvFPPushIndex.obj" \
 	"$(INTDIR)\InvFPTermList.obj" \
 	"$(INTDIR)\InvFPTextHandler.obj" \
+	"$(INTDIR)\InvIndex.obj" \
+	"$(INTDIR)\InvIndexMerge.obj" \
+	"$(INTDIR)\InvPushIndex.obj" \
+	"$(INTDIR)\InvTermList.obj" \
 	"$(INTDIR)\QueryTextHandler.obj" \
 	"$(INTDIR)\Terms.obj"
 
@@ -222,6 +242,12 @@ SOURCE=.\index\src\IndexProb.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=.\index\src\InvDocList.cpp
+
+"$(INTDIR)\InvDocList.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\index\src\InvFPDocList.cpp
 
 "$(INTDIR)\InvFPDocList.obj" : $(SOURCE) "$(INTDIR)"
@@ -255,6 +281,30 @@ SOURCE=.\index\src\InvFPTermList.cpp
 SOURCE=.\index\src\InvFPTextHandler.cpp
 
 "$(INTDIR)\InvFPTextHandler.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\InvIndex.cpp
+
+"$(INTDIR)\InvIndex.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\InvIndexMerge.cpp
+
+"$(INTDIR)\InvIndexMerge.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\InvPushIndex.cpp
+
+"$(INTDIR)\InvPushIndex.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\InvTermList.cpp
+
+"$(INTDIR)\InvTermList.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
