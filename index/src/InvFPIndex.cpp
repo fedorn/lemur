@@ -146,7 +146,7 @@ int InvFPIndex::termCount(int termID) const{
   look.read((char*)&t, sizeof(TERMID_T));
   // now read in what we really want
   int* stuff = new int[3];
-  look.read((char*)&stuff, sizeof(int)*3);
+  look.read((char*)stuff, sizeof(int)*3);
   look.close();
   if ( !(look.gcount() == sizeof(int)*3) ) {
     delete[](stuff);
