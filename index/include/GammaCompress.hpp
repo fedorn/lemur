@@ -31,7 +31,6 @@
 //---------------------------------------------------------------
 
 #include "BitVector.hpp"
-#include "BitArray.hpp"
 #include "Compress.hpp"
 
 class GammaCompress : public Compress 
@@ -43,7 +42,6 @@ public:
   void compress (ostream &os, int n, int * a);
   int decompress (istream &is, int * a);
   int read(istream &is);
-  int read(istream &is, BitArray *b) { assert(0); }
   const char * type() { return "gamma"; }
 
 private:
