@@ -22,8 +22,8 @@
 NullScorerNode::NullScorerNode( const std::string& name, TermScoreFunction& scoreFunction ) :
   _name(name),
   _scoreFunction(scoreFunction),
-  _maximumBackgroundScore(scoreFunction.scoreOccurrence(0,MAX_INT32)),
-  _maximumScore(scoreFunction.scoreOccurrence(0,1))
+  _maximumBackgroundScore(scoreFunction.scoreOccurrence(0,100)),
+  _maximumScore(scoreFunction.scoreOccurrence(0,100))
 {
 }
 
@@ -44,11 +44,8 @@ bool NullScorerNode::hasMatch( int documentID ) {
 }
 
 const greedy_vector<ScoredExtentResult>& NullScorerNode::score( int documentID, int begin, int end, int documentLength ) {
-  double score = _scoreFunction.scoreOccurrence( 0, end - begin );
-  
-  assert( score >= _maximumBackgroundScore && score <= _maximumScore );
   _scores.clear();
-  _scores.push_back( ScoredExtentResult( score, documentID, begin, end ) );
+  _scores.push_back( ScoredExtentResult( _maximumScore, documentID, begin, end ) );
 
   return _scores;
 }
