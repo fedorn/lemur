@@ -59,6 +59,8 @@ public:
   /// Convert a docID to its spelling
   virtual const char * document (int docID) {return docids[docID];}
 
+  /// return the term lexicon ID
+  virtual const char *termLexiconID() { return wordVocabulary;} 
   //@}
 
   /// @name Summary counts
@@ -68,7 +70,7 @@ public:
   virtual int docCount ()  { return docids.size()-1;}
 
   /// Total count of unique terms in collection
-  virtual int termCountUnique () { return terms.size();}
+  virtual int termCountUnique () { return terms.size()-1;}
 
   /// Total counts of a term in collection
   virtual int termCount (int termID) const { return countOfTerm[termID] ;}
