@@ -12,26 +12,6 @@
 
 #include "TermInfoList.hpp"
 
-/// BasicTermInfo
-
-class BasicTermInfo : public TermInfo {
-public:
-  BasicTermInfo() {}
-  BasicTermInfo( int termID, int termCount) : 
-    tid(termID), tcount(termCount) {}
-  virtual int count() const { return tcount;}
-
-  virtual int id() const { return tid;}
-  
-  /// pretend we have position
-  int position() const { return tid;}
-  friend class BasicTermInfoList;
-private:
-  int tid, tcount;
-};
-
-
-
 /// Basic TermInfoList
 
 class BasicTermInfoList : public TermInfoList {
@@ -62,9 +42,9 @@ inline BasicTermInfoList::BasicTermInfoList(int *tmpWordArray, int size):
 /// This function is implemented inline, because it gets called frequently
 inline TermInfo * BasicTermInfoList::nextEntry() const{
   // assert (hasMore());
-  static BasicTermInfo info;
-  info.tid =  tmpwarr[it];
-  info.tcount = tmpwarr[sz+it];
+  static TermInfo info;
+  info.termID(tmpwarr[it]);
+  info.count(tmpwarr[sz+it]);
   it++;
   return (&info);
 }
