@@ -109,7 +109,7 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
     
   for (int i=0;i<files->size();i++) {
 
-   readers.push_back(new IndexReader);
+    readers.push_back(new IndexReader);
 
     readers[i]->reader = new ifstream();
     setbuf(readers[i]->reader, bufptr, READBUFSIZE);
@@ -122,7 +122,7 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
       return 0;
     }
     readers[i]->list = new InvDocList();
-    if (!readers[i]->list->binRead(*(readers[i]->reader))) 
+    if (!readers[i]->list->binReadC(*(readers[i]->reader))) 
       fprintf(stderr, "Error reading from file\n");
   }
 
@@ -130,63 +130,27 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
   indexfile.open(indexname, ios::binary | ios::out);
 
   vector<int> working;  // list of least words
-  map<DOCID_T, int> tfs; // combined tf's for overlapping docids
-  map<DOCID_T, int>::iterator finder;
-
-  int offset, ll, df, tf, diff;
+  int offset;
   long filelen;
+  InvDocList* list, *first;
   vector<int>::iterator iter;
-  InvDocList* list, *prev;
-  InvDocInfo* info = new InvDocInfo();
-  int overlap;    // the number of times this term got flushed mid docid
-  //  LOC_T* locs;
-  TERMID_T termid;
-  DOCID_T docid;
+
   while (readers.size() > 1) {
     offset=0;
     working.clear();
     least(&readers, &working);
-    list = readers[working.front()]->list;
-    termid = list->termID();
 
-   // make sure the ftell is accurate
-    indexfile.flush();
-
-    // first, add up the list lengths and df.  
-    tfs.clear();
-    overlap = 0;
     iter=working.begin();
-    prev = readers[*iter]->list;
-    ll = prev->length();
-    df = prev->docFreq();
-
+    first = readers[*iter]->list;
     for (iter++; iter!=working.end(); iter++) {
       list = readers[*iter]->list;
-      ll += list->length();
-      df += list->docFreq();
-      // count how many times we flushed in the middle of the doc
-      list->startIteration();
-      list->nextEntry(info);
-      if (info->docID() == prev->curDocID()) {
-        overlap++;
-        finder = tfs.find(info->docID());
-        if (finder != tfs.end()) 
-          finder->second += info->termCount();
-        else 
-          tfs[info->docID()] = info->termCount();
-      }
-      
-      prev = list;        
+      first->append(list);
     }
 
-    // for each overlap we reduce the size by 2 more (docid and tf)
-    ll = ll - (overlap*2);
-    df = df - overlap;
-    diff = ((df-1)*2)+4;
-
     // figure out if we need a new index file or if there's still room
+    indexfile.flush();
     filelen = (long)indexfile.tellp();
-    if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
+    if (filelen + ((first->length()+4) *sizeof(int)) > maxfile) {
       indexfile.close();
       char* newindex = (char*)malloc(namelen+3);
       sprintf(newindex, "%s%d.%d", name, level, intmed->size());
@@ -199,81 +163,15 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
       filelen = 0;
     }
 
-    indexfile.write((const char*) &termid, sizeof(TERMID_T));
-    indexfile.write( (const char*) &df, sizeof(int));
-    indexfile.write( (const char*) &diff, sizeof(int));
-    indexfile.write( (const char*) &ll, sizeof(int));
-    // write out the list from the first file pointer
-    iter = working.begin();
-    prev = readers[*iter]->list;
-    prev->startIteration();
-
-    while (prev->hasMore()) {
-      prev->nextEntry(info);		
-      docid = info->docID();
-      tf = info->termCount();
-
-      // peek ahead to see if we're on the last one
-      if (!prev->hasMore()) {
-        finder = tfs.find(info->docID());
-        if (finder != tfs.end()) {
-          tf += finder->second;
-        }
-      }
-
-      indexfile.write((const char*) &docid, sizeof(DOCID_T));
-      indexfile.write((const char*) &tf, sizeof(int));
-
-    }  // while prev hasMore
-
-    for (iter++; iter!=working.end(); iter++) {
-      list = readers[*iter]->list;
-      list->startIteration();
-
-      //overlap would occur only for the first one
-      list->nextEntry(info);
-      // write out docid and termcount only if it hasn't been written already
-      if (info->docID() != prev->curDocID()) {
-        docid = info->docID();
-        tf = info->termCount();
-        if (!list->hasMore()) {
-          finder = tfs.find(info->docID());
-          if (finder != tfs.end()) {
-            tf += finder->second;
-          }
-        }
-        indexfile.write((const char*) &docid, sizeof(DOCID_T));
-        indexfile.write((const char*) &tf, sizeof(int));    
-      }
-
-    while (list->hasMore()) {
-      list->nextEntry(info);
-      docid = info->docID();
-      tf = info->termCount();
-      //      locs = info->positions();
-
-      // peek ahead to see if we're on the last one
-      if (!list->hasMore()) {
-        finder = tfs.find(info->docID());
-        if (finder != tfs.end()) {
-          tf += finder->second;
-        }
-      }
-
-      indexfile.write((const char*) &docid, sizeof(DOCID_T));
-      indexfile.write((const char*) &tf, sizeof(int));
-      //indexfile.write((const char*) locs, sizeof(LOC_T) * info->termCount());
-
-      } 
-      prev = list;
-    }
+    // write out the list
+    first->binWriteC(indexfile);
 
     //update this file reader or erase it from available readers
     IndexReader* ir;
     for (iter=working.begin(); iter!=working.end(); iter++) {
       ir = readers[*iter-offset];
       ir->list->resetFree();
-      if ( !ir->list->binRead(*(ir->reader)) ) {
+      if ( !ir->list->binReadC(*(ir->reader)) ) {
         delete(ir->list);
         delete(ir->reader);
         delete(ir);
@@ -289,16 +187,11 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
   if (readers.size() != 0) {
     IndexReader* myreader = readers.front();
     // dump it out
-    // write the current list
 
-    termid = myreader->list->termID();
-    ll = myreader->list->length();
-    df = myreader->list->docFreq();
-    diff = myreader->list->curDocIDdiff();
-
+    // check for file size
     indexfile.flush();
     filelen = (long)indexfile.tellp();
-    if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
+    if (filelen + ((myreader->list->length()+4) *sizeof(int)) > maxfile) {
       indexfile.close();
       char* newindex = (char*)malloc(namelen+3);
       sprintf(newindex, "%s%d.%d", name, level, intmed->size());
@@ -307,32 +200,15 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
       filelen =0;
     }
 
-    indexfile.write((const char*)&termid, sizeof(TERMID_T));
-    indexfile.write((const char*)&df, sizeof(int));     
-    indexfile.write((const char*)&diff, sizeof(int));
-    indexfile.write((const char*)&ll, sizeof(int));
-
-    myreader->list->startIteration();
-    while (myreader->list->hasMore()) {
-      myreader->list->nextEntry(info);
-      docid = info->docID();
-      tf = info->termCount();
-
-      indexfile.write((const char*)&docid, sizeof(DOCID_T));
-      indexfile.write((const char*)&tf, sizeof(int));
-    }
+    // write the current list
+    myreader->list->binWriteC(indexfile);
     myreader->list->resetFree();
 
     //write the rest 
-    while (myreader->list->binRead(*(myreader->reader)) ){
-      termid = myreader->list->termID();
-      ll = myreader->list->length();
-      df = myreader->list->docFreq();
-      diff = myreader->list->curDocIDdiff();
-
+    while (myreader->list->binReadC(*(myreader->reader))) {
       indexfile.flush();
       filelen = (long)indexfile.tellp();
-      if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
+      if (filelen + ((myreader->list->length()+4) *sizeof(int)) > maxfile) {
         indexfile.close();
         char* newindex = (char*)malloc(namelen+3);
         sprintf(newindex, "%s%d.%d", name, level, intmed->size());
@@ -340,21 +216,8 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
         indexfile.open(newindex, ios::binary | ios::out);
         filelen=0;
       }
-
-      indexfile.write((const char*)&termid, sizeof(TERMID_T));
-      indexfile.write((const char*)&df, sizeof(int));     
-      indexfile.write((const char*)&diff, sizeof(int));
-      indexfile.write((const char*)&ll, sizeof(int));
-
-      myreader->list->startIteration();
-      while (myreader->list->hasMore()) {
-	myreader->list->nextEntry(info);
-        docid = info->docID();
-        tf = info->termCount();
-
-        indexfile.write((const char*)&docid, sizeof(DOCID_T));
-        indexfile.write((const char*)&tf, sizeof(int));
-      }
+      
+      myreader->list->binWriteC(indexfile);
       myreader->list->resetFree();
     } //while that file
 
@@ -368,11 +231,11 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
   } // if still a file
 
   indexfile.close();
-  delete(info);	
+
   //remove files already merged
-  /*  for (int f=0;f<files->size();f++) {
+  for (int f=0;f<files->size();f++) {
     remove((*files)[f]);
-    }*/
+  }
 
   return intmed->size();
 }
@@ -393,13 +256,10 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
     if (!readers[i]->reader->is_open())
       fprintf(stderr, "Error: Could not open file\n");
     readers[i]->list = new InvDocList();
-    readers[i]->list->binRead(*(readers[i]->reader));
+    readers[i]->list->binReadC(*(readers[i]->reader));
   }
 
   vector<int> working;  // list of least words
-  map<DOCID_T, int> tfs; // combined tf's for overlapping docids
-  map<DOCID_T, int>::iterator finder;
-
   int namelen = strlen(name)+1;
 
   namelen += strlen(INVINDEX);
@@ -414,60 +274,36 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
   FILE* listing = fopen(lookup, "wb");
 
   int fid;
-  int offset, ll, df, tf, diff;
-  int ctf = 0;
+  int offset, ll, df;
   long filelen;
   vector<int>::iterator iter;
-  InvDocList* list, *prev;
-  InvDocInfo* info = new InvDocInfo();
-  int overlap;    // the number of times this term got flushed mid docid
-  TERMID_T termid;
-  DOCID_T docid;
+  InvDocList* list, *first;
+
   while (readers.size() > 1) {
     offset=0;
     working.clear();
     least(&readers, &working);
-    list = readers[working.front()]->list;
-    termid = list->termID();
 
-   // make sure the ftell is accurate
+    // make sure the ftell is accurate
     indexfile.flush();
 
-    // first, add up the list lengths and df.  
-    tfs.clear();
-    overlap = 0;
     iter=working.begin();
-    prev = readers[*iter]->list;
-    ll = prev->length();
-    df = prev->docFreq();
+    first = readers[*iter]->list;
 
+    // make all the lists into one
     for (iter++; iter!=working.end(); iter++) {
       list = readers[*iter]->list;
-      ll += list->length();
-      df += list->docFreq();
-      // count how many times we flushed in the middle of the doc
-      list->startIteration();
-      list->nextEntry(info);
-      if (info->docID() == prev->curDocID()) {
-        overlap++;
-        finder = tfs.find(info->docID());
-        if (finder != tfs.end()) 
-          finder->second += info->termCount();
-        else 
-          tfs[info->docID()] = info->termCount();
-      }
-
-      prev = list;        
+      first->append(list);
     }
-
-    // for each overlap we reduce the size by 2 more (docid and tf)
-    ll = ll - (overlap*2);
-    df = df - overlap;
-    diff = ((df-1)*2)+4;
-
+    
+    ll = first->length();
+    df = first->docFreq();
+    
     // figure out if we need a new index file or if there's still room
+    // the length of what we write out is the length of the inverted list
+    // plus the tid, df, diff, len
     filelen = (long)indexfile.tellp();
-    if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
+    if ((filelen + (ll+4) *sizeof(int)) > maxfile) {
       indexfile.close();
       char* newindex = (char*)malloc(namelen+1);
       sprintf(newindex, "%s%s%d", name, INVINDEX, invfiles.size());
@@ -481,83 +317,19 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
     }
     fid = invfiles.size()-1;
 
-    indexfile.write((const char*) &termid, sizeof(TERMID_T));
-    indexfile.write( (const char*) &df, sizeof(int));
-    indexfile.write( (const char*) &diff, sizeof(int));
-    indexfile.write( (const char*) &ll, sizeof(int));
-    // write out the list from the first file pointer
-    iter = working.begin();
-    prev = readers[*iter]->list;
-    prev->startIteration();
+    // write out the lookup first
+    // tid, fid, file offset, ctf, df
+    fprintf(listing, "%d %d %d %d %d ", first->termID(), fid, filelen, ll-(df*2), df);
 
-    ctf = 0;
-    while (prev->hasMore()) {
-      prev->nextEntry(info);
-      docid = info->docID();
-      tf = info->termCount();
-      //      locs = info->positions();
-
-      // peek ahead to see if we're on the last one
-      if (!prev->hasMore()) {
-        finder = tfs.find(info->docID());
-        if (finder != tfs.end()) {
-          tf += finder->second;
-        }
-      }
-      ctf += tf;
-      indexfile.write((const char*) &docid, sizeof(DOCID_T));
-      indexfile.write((const char*) &tf, sizeof(int));      
-    }  // while prev hasMore
-
-
-    for (iter++; iter!=working.end(); iter++) {
-      list = readers[*iter]->list;
-      list->startIteration();
-
-      //overlap would occur only for the first one
-      list->nextEntry(info);
-      // write out docid and termcount only if it hasn't been written already
-      if (info->docID() != prev->curDocID()) {
-        docid = info->docID();
-        tf = info->termCount();
-        if (!list->hasMore()) {
-          finder = tfs.find(info->docID());
-          if (finder != tfs.end()) {
-            tf += finder->second;
-          }
-        }
-	ctf += tf;
-        indexfile.write((const char*) &docid, sizeof(DOCID_T));
-        indexfile.write((const char*) &tf, sizeof(int));    
-      }
-
-      while (list->hasMore()) {
-	list->nextEntry(info);
-	docid = info->docID();
-	tf = info->termCount();
-
-	// peek ahead to see if we're on the last one
-	if (!list->hasMore()) {
-	  finder = tfs.find(info->docID());
-	  if (finder != tfs.end()) {
-	    tf += finder->second;
-	  }
-	}
-	ctf += tf;
-	indexfile.write((const char*) &docid, sizeof(DOCID_T));
-	indexfile.write((const char*) &tf, sizeof(int));
-      } 
-      prev = list;
-    }
-
-    fprintf(listing, "%d %d %d %d %d ", termid, fid, filelen, ctf, df);
+    // write out the list
+    first->binWriteC(indexfile);
 
     //update this file reader or erase it from available readers
     IndexReader* ir;
     for (iter=working.begin(); iter!=working.end(); iter++) {
       ir = readers[*iter-offset];
       ir->list->resetFree();
-      if ( !ir->list->binRead(*(ir->reader)) ) {
+      if ( !ir->list->binReadC(*(ir->reader)) ) {
         delete(ir->list);
         delete(ir->reader);
         delete(ir);
@@ -568,16 +340,14 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
     }
 
   }
+
   //grab the last file open if any
   if (readers.size() != 0) {
     IndexReader* myreader = readers.front();
     // dump it out
-    // write the current list
 
-    termid = myreader->list->termID();
     ll = myreader->list->length();
     df = myreader->list->docFreq();
-    diff = myreader->list->curDocIDdiff();
 
     indexfile.flush();
     filelen = (long)indexfile.tellp();
@@ -591,32 +361,17 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
     }
     fid = invfiles.size()-1;
 
-    indexfile.write((const char*)&termid, sizeof(TERMID_T));
-    indexfile.write((const char*)&df, sizeof(int));     
-    indexfile.write((const char*)&diff, sizeof(int));
-    indexfile.write((const char*)&ll, sizeof(int));
-
-    ctf = 0;
-    myreader->list->startIteration();
-    while (myreader->list->hasMore()) {
-      myreader->list->nextEntry(info);
-      docid = info->docID();
-      tf = info->termCount();
-      indexfile.write((const char*)&docid, sizeof(DOCID_T));
-      indexfile.write((const char*)&tf, sizeof(int));
-      ctf += tf;
-    }
-    myreader->list->resetFree();
-    fprintf(listing, "%d %d %d %d %d ", termid, fid, filelen, ctf, df);
+    fprintf(listing, "%d %d %d %d %d ", myreader->list->termID(), fid, filelen, ll-(df*2), df);
     
+    // write out the list
+    myreader->list->binWriteC(indexfile);
+    myreader->list->resetFree();
+
     //write the rest 
-    while (myreader->list->binRead(*(myreader->reader)) ){
-      termid = myreader->list->termID();
+    while (myreader->list->binReadC(*(myreader->reader)) ){
       ll = myreader->list->length();
       df = myreader->list->docFreq();
-      diff = myreader->list->curDocIDdiff();
 
-      //fflush(indexfile);
       indexfile.flush();
       filelen = (long)indexfile.tellp();
       if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
@@ -629,28 +384,10 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
       }
       fid = invfiles.size()-1;
 
-      indexfile.write((const char*)&termid, sizeof(TERMID_T));
-      indexfile.write((const char*)&df, sizeof(int));     
-      indexfile.write((const char*)&diff, sizeof(int));
-      indexfile.write((const char*)&ll, sizeof(int));
+      fprintf(listing, "%d %d %d %d %d ", myreader->list->termID(), fid, filelen, ll-(df*2), df);
 
-      // write the listing
-      //fflush(indexfile);
-  //    fprintf(indexfile, "%d ", myreader->list->docFreq());
-
-      ctf = 0;
-      myreader->list->startIteration();
-      while (myreader->list->hasMore()) {
-        myreader->list->nextEntry(info);
-        docid = info->docID();
-        tf = info->termCount();
-	ctf += tf;
-        indexfile.write((const char*)&docid, sizeof(DOCID_T));
-        indexfile.write((const char*)&tf, sizeof(int));
-      }
+      myreader->list->binWriteC(indexfile);
       myreader->list->resetFree();
-      fprintf(listing, "%d %d %d %d %d ", termid, fid, filelen, ctf, df);
-
     } //while that file
 
     myreader->reader->close();
@@ -667,12 +404,11 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
 
   free(indexname);
   free(lookup);
-  delete(info);
 
   //remove files already merged
-  /*  for (int f=0;f<files->size();f++) {
+  for (int f=0;f<files->size();f++) {
     remove((*files)[f]);
-    }*/
+  }
 
   return invfiles.size();
 }
