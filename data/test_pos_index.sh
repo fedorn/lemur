@@ -117,6 +117,14 @@ awk '{print $1, $3, $5;}'  < res.simple_tfidf > res_simple_tfidf
 ../app/obj/RetEval rerank_fb_tfidf_param
 ../app/src/ireval.pl -j qrel -trec  < res.rerank_fb_tfidf > pr.rerank_fb_tfidf
 
+######################################################################
+#								     #
+# The following examples show how one can do relevance feedback, as  #
+# opposed to pseudo feedback                                         #
+######################################################################
 
+# This performs relevance feedback using the mixture model approach
+../app/obj/RelFBEval mixrelfb_kl_dir_param
+../app/src/ireval.pl -j qrel -trec  < res.mixrelfb_kl_dir > pr.mixrelfb_kl_dir
 
 
