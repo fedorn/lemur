@@ -137,16 +137,17 @@ void freeWordSets() {
 
 void substring_copy (char dest[], const char *word, int start, int end) {
 	
-	char *p;
-	int len;
-	len = strlen (word);
-	if (start < len && end <= len && (end-start) > 0) {
-		p = (char *) ((int)word + (int)start);
-		strncpy (dest, p, end - start);
-		dest[end-start] = '\0';
-	} else {
-		strcpy (dest, "");
-	}
+  char *p;
+  int len;
+  len = strlen (word);
+  if (start < len && end <= len && (end-start) > 0) {
+    //		p = (char *) ((int)word + (int)start);
+    p = (char *)(word + start);
+    strncpy (dest, p, end - start);
+    dest[end-start] = '\0';
+  } else {
+    strcpy (dest, "");
+  }
 }
 
 char *substring (const char *word, int start, int end) {
