@@ -28,7 +28,7 @@ INSTALLDIRS = $(DIRS:%=install%)
 OBJDIRS = $(DIRS:%=%/obj)
 DEPENDDIRS = $(DIRS:%=%/depend)
 
-.PHONY: $(DIRS) $(CLEANDIRS) $(INSTALLDIRS) CLEANDEST 
+.PHONY: $(DIRS) $(CLEANDIRS) $(INSTALLDIRS) CLEANDEST DATAINSTALL
 
 # "make all" means ensuring obj and depend subdirs to exist and making each directory
 all All ALL: $(DIRS) 
@@ -53,10 +53,10 @@ $(CLEANDIRS):
 	cd $(patsubst clean%,%,$@)/obj && $(MAKE) -s -f ../src/Makefile clean
 
 # "make install" means creating destination directories and installing each module and application directory
-install Install INSTALL:  $(LEMUR_INSTALL_PATH)/lemur $(LEMUR_INSTALL_PATH)/lemur/include $(LEMUR_INSTALL_PATH)/lemur/lib  $(LEMUR_INSTALL_PATH)/lemur/bin  CLEANDEST $(INSTALLDIRS)
+install Install INSTALL:  $(LEMUR_INSTALL_PATH)/lemur $(LEMUR_INSTALL_PATH)/lemur/include $(LEMUR_INSTALL_PATH)/lemur/lib  $(LEMUR_INSTALL_PATH)/lemur/bin $(LEMUR_INSTALL_PATH)/lemur/kstem_data $(LEMUR_INSTALL_PATH)/lemur/arabic_stem_data  CLEANDEST $(INSTALLDIRS) DATAINSTALL
 
 # how to make the installation directory
-$(LEMUR_INSTALL_PATH)/lemur $(LEMUR_INSTALL_PATH)/lemur/include $(LEMUR_INSTALL_PATH)/lemur/lib $(LEMUR_INSTALL_PATH)/lemur/bin:
+$(LEMUR_INSTALL_PATH)/lemur $(LEMUR_INSTALL_PATH)/lemur/include $(LEMUR_INSTALL_PATH)/lemur/lib $(LEMUR_INSTALL_PATH)/lemur/bin $(LEMUR_INSTALL_PATH)/lemur/kstem_data $(LEMUR_INSTALL_PATH)/lemur/arabic_stem_data:
 	mkdir $@; echo $@ created
 
 #clean the destination directories
@@ -69,6 +69,6 @@ CLEANDEST:
 $(INSTALLDIRS):
 	cd $(patsubst install%,%,$@)/obj && $(MAKE) -s -f ../src/Makefile install
 
-
-
-
+DATAINSTALL:
+	cp kstem_data/*.txt $(LEMUR_INSTALL_PATH)/lemur/kstem_data 
+	cp arabic_stem_data/*.txt $(LEMUR_INSTALL_PATH)/lemur/arabic_stem_data
