@@ -19,7 +19,7 @@
 #include "ScoreFunction.hpp"
 #include "ScoreAccumulator.hpp"
 #include "FreqVector.hpp"
-#include "Param.hpp"
+
 //----------------------------------------------------------------------
 //      Abstract Interface for A Retrieval Method/Model for Text Query
 //----------------------------------------------------------------------
@@ -75,15 +75,7 @@ class TextQueryRetMethod : public RetrievalMethod {
 public:
   /// Create the retrieval method. If cacheDocReps is true,
   /// allocate DocumentRep cache array.
-  TextQueryRetMethod(Index &ind, ScoreAccumulator & accumulator) : 
-    RetrievalMethod(ind), scAcc(accumulator) {
-    cacheDocReps = (ParamGetInt("cacheDocReps", 1) == 1);
-    if (cacheDocReps) {
-      docRepsSize = ind.docCount() + 1;
-      docReps = new DocumentRep *[docRepsSize];
-      for (int i = 0; i <= ind.docCount(); i++) docReps[i] = NULL;
-    }
-  }
+  TextQueryRetMethod(Index &ind, ScoreAccumulator & accumulator);
   /// Destroy the object. If cacheDocReps is true, delete the
   /// DocumentRep cache array
   virtual ~TextQueryRetMethod() {
