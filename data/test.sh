@@ -64,16 +64,11 @@
 # previously retrieved result file "res.simple_kl_dir", store the expanded
 # query in query.mixfb_kl.
 ../app/obj/GenerateQueryModel mixfb_model_param
+
 # Then evaluate it with Dirichlet smoothing
 ../app/obj/QueryModelEval mixfb_model_eval_param
 ../app/obj/trec_eval -a qrel res.mixfb_kl > pr.mixfb_kl
 
 
-# Construct a query model using the divergence minimization method based on 
-# previously retrieved result file "res.simple_kl_dir", store the expanded
-# query in query.dmfb_kl.
-../app/obj/GenerateQueryModel dmfb_model_param
-# Then evaluate it with Dirichlet smoothing
-../app/obj/QueryModelEval dmfb_model_eval_param
-../app/obj/trec_eval -a qrel res.dmfb_kl > pr.dmfb_kl
+
 
