@@ -33,7 +33,9 @@ void error(char *fmt, ...) {
       }
    fflush(stderr);
    fflush(stdout);
-   assert(0); /* Always fail and print out this file name */
+   fprintf(stderr,"Program aborted due to a fatal error\n");
+   exit(1);
+   //   assert(0); /* Always fail and print out this file name */
 }
 
 void claim(int ex,char * s) { 
