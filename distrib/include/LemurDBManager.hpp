@@ -35,7 +35,8 @@ public:
   /// Query the database.
   results_t * query (const char * query, int numdocs) const;
 
-  /// Get a parser for the database.
+  /// Get the parser for the database. (This should always
+  /// return the same parser.)
   MemParser * getParser() const;
 
   /// Get a document given its document id.
@@ -55,7 +56,7 @@ private:
   RetrievalMethod * model;
   ScoreAccumulator * accumulator;
   IndexedRealVector * results;
-  //  LemurMemParser * parser;
+  LemurMemParser * parser;
   mutable ofstream * outfile;
 
 };
