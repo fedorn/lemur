@@ -11,24 +11,6 @@
 #include "TextHandler.hpp"
 #include "WordSet.hpp"
 
-#include <set>
-
-
-#ifndef _EQSTR_
-#define _EQSTR_
-/* for the hash set */
-struct eqstr
-{
-  bool operator()(const char* s1, const char* s2) const
-  {
-    return strcmp(s1, s2) == 0;
-  }
-};
-#endif
-
-#ifndef _STOPPER_HPP
-#define _STOPPER_HPP
-
 
 ///
 ///  Provides a stopword list that can be chained with a Parser using
