@@ -5,6 +5,15 @@ MemCache::MemCache(int cachesize) {
   begin = (int*) malloc(size);
   end = begin;
   intsize = sizeof(int);
+  ourmem = true;
+}
+
+MemCache::MemCache(int* cache, int cachesize) {
+  size = cachesize;
+  begin = cache;
+  end = begin;
+  intsize = sizeof(int);
+  ourmem = false;
 }
 
 MemCache::MemCache() {
@@ -12,7 +21,8 @@ MemCache::MemCache() {
 }
 
 MemCache::~MemCache() {
-  free(begin);
+  if (ourmem)
+    free(begin);
 }
 
 int* MemCache::getMem(int chunksize) {
