@@ -8,7 +8,11 @@
  *
  *==========================================================================
 */
-
+/*
+  10/22/2002 -- dmf Add arrays dtfstreams and invfstreams to hold open
+  ifstreams for the inverted list files so that each is opened and closed
+  only once.
+ */
 
 #ifndef _INVINDEX_HPP
 #define _INVINDEX_HPP
@@ -143,7 +147,9 @@ protected:
   TERM_T* terms;   // array of the term spellings (index is termid)
   EXDOCID_T* docnames; // array of the external docids (index is docid)
   char** dtfiles; // array of dt index filenames
+  ifstream *dtfstreams; // array of dt index input streams
   char** invfiles; // array of inv index filenames
+  ifstream *invfstreams; // array of inv index input streams
   vector<char*> docmgrs; // list of document managers
   map<TERM_T, TERMID_T, ltstr> termtable; // table of terms to termid
   map<EXDOCID_T, DOCID_T, ltstr> doctable; // table of exdocids to docid
