@@ -29,21 +29,62 @@ namespace RetrievalParameter {
   //@{ 
   /// database index
   static String databaseIndex;
+  /// Retrieval method
+  static String retModel;
   /// text query set
   static String textQuerySet;
   /// result file name
   static String resultFile;
+  /// result file format, one of true for trec, false for 3col.
+  static bool TRECresultFileFormat;
   /// number of docs for feedback (0=no feedback)
   static int fbDocCount;
   /// number of docs to return as results
   static int resultCount;
+  /// should DocReps be cached across calls to score
+  static bool cacheDocReps;
+  /// Use a working set? Default is to score the whole collection;
+  static bool useWorkingSet;
+  /// working set file name
+  static String workSetFile;
+
   //@}
+
+  static string getLower(char *parm, char *def) {
+    string tmpString = ParamGetString(parm, def);
+    // make it all lowercase
+    for (int i = 0; i < tmpString.length(); i++)
+      tmpString[i] = tolower(tmpString[i]);
+    return tmpString;
+  }
 
   static void get() {
     databaseIndex = ParamGetString("index","");
+    retModel = getLower("retModel","kl");
+    // backwards compatibility.
+    if (retModel == "0") retModel = "tfidf";
+    if (retModel == "1") retModel = "okapi";
+    if (retModel == "2") retModel = "kl";
+    if (retModel == "3") retModel = "cori";
+    if (retModel == "4") retModel = "cori_cs";
+    if (retModel == "5") retModel = "cos";
+
+    string tmp = getLower("cacheDocReps", "true");
+    cacheDocReps = (tmp == "true" || tmp == "1");
+
+    tmp = getLower("useWorkingSet", "false"); 
+    useWorkingSet = (tmp == "true" || tmp == "1");
+    // working set file name
+    workSetFile = ParamGetString("workingSetFile",""); 
+    
     textQuerySet = ParamGetString("textQuery","");
     resultFile = ParamGetString("resultFile","");
-    fbDocCount = ParamGetInt("feedbackDocCount",0); // default being no feedback
+
+    tmp = getLower("resultFileFormat","trec");
+    TRECresultFileFormat = (tmp == "trec" || tmp == "1");
+
+    // default being no feedback
+    fbDocCount = ParamGetInt("feedbackDocCount",0); 
     resultCount = ParamGetInt("resultCount", 1000); 
     
   }
@@ -61,20 +102,25 @@ namespace TFIDFParameter {
   
   static void get()
   {
-    
-    docTFPrm.tf = (TFMethod)ParamGetInt("doc.tfMethod",BM25);
+    string tfmethod = RetrievalParameter::getLower("doc.tfMethod", "bm25");
+    if (tfmethod == "rawtf") docTFPrm.tf = RAWTF;
+    else if (tfmethod == "logf") docTFPrm.tf = LOGTF;    
+    else if (tfmethod == "bm25") docTFPrm.tf = BM25;
+
     docTFPrm.bm25K1 = ParamGetDouble("doc.bm25K1",defaultDocK1);
     docTFPrm.bm25B = ParamGetDouble("doc.bm25B",defaultDocB);
-  
-    qryTFPrm.tf = (TFMethod)ParamGetInt("query.tfMethod",BM25);
+
+    tfmethod = RetrievalParameter::getLower("query.tfMethod", "bm25");
+    if (tfmethod == "rawtf") qryTFPrm.tf = RAWTF;
+    else if (tfmethod == "logf") qryTFPrm.tf = LOGTF;    
+    else if (tfmethod == "bm25") qryTFPrm.tf = BM25;
+
     qryTFPrm.bm25K1 = ParamGetDouble("query.bm25K1",defaultQryK1);
     qryTFPrm.bm25B = defaultQryB;
     
-    fbPrm.howManyTerms = ParamGetInt("feedbackTermCount",defaultHowManyTerms); 
+    fbPrm.howManyTerms = ParamGetInt("feedbackTermCount",defaultHowManyTerms);
     fbPrm.posCoeff = ParamGetDouble("feedbackPosCoeff", defaultPosCoeff); 
-    
   }
-
 };
 
 namespace OkapiParameter {
@@ -104,26 +150,91 @@ namespace SimpleKLParameter {
   static SimpleKLParameter::QueryModelParam qryPrm;
   static String smoothSupportFile;
   //@}
-  
-
+    
   static void get()
   {
+    smoothSupportFile = ParamGetString("smoothSupportFile", "");
+
+    string tmpString = RetrievalParameter::getLower("adjustedScoreMethod", 
+						    "negativekld");
+    if (tmpString == "querylikelihood" || tmpString == "ql") {
+      qryPrm.adjScoreMethod = SimpleKLParameter::QUERYLIKELIHOOD;
+    } else if (tmpString == "crossentropy" ||tmpString == "ce") {
+      qryPrm.adjScoreMethod = SimpleKLParameter::CROSSENTROPY;
+    } else if (tmpString == "negativekld" || tmpString == "-d") {
+      qryPrm.adjScoreMethod = SimpleKLParameter::NEGATIVEKLD;
+    } else {
+      cerr << "Unknown scoreMethod " << tmpString << ". Using NEGATIVEKLD" 
+	   << endl;
+      qryPrm.adjScoreMethod = SimpleKLParameter::NEGATIVEKLD;
+    }
+
+    tmpString = RetrievalParameter::getLower("smoothMethod", 
+					     "dirichletprior");
+    if (tmpString == "jelinikmercer" || tmpString == "jm" || tmpString == "0")
+      docPrm.smthMethod = SimpleKLParameter::JELINEKMERCER;
+    else if (tmpString == "dirichletprior" || tmpString == "dir" || 
+	     tmpString == "1")
+      docPrm.smthMethod = SimpleKLParameter::DIRICHLETPRIOR;
+    else if (tmpString == "absolutediscount" || tmpString == "ad" || 
+	     tmpString == "2")
+      docPrm.smthMethod = SimpleKLParameter::ABSOLUTEDISCOUNT;
+    else if (tmpString == "twostage" || tmpString == "2s" || tmpString == "3")
+      docPrm.smthMethod = SimpleKLParameter::TWOSTAGE;
+    else {
+      cerr << "Unknown smoothMethod " << tmpString << ". Using DIRICHLET" 
+	   << endl;
+      docPrm.smthMethod = SimpleKLParameter::defaultSmoothMethod;
+    }
     
-    smoothSupportFile = ParamGetString("smoothSupportFile");
+
+    tmpString = RetrievalParameter::getLower("smoothStrategy", "interpolate");
+    if (tmpString == "interpolate" || tmpString == "int" || tmpString == "0")
+      docPrm.smthStrategy= SimpleKLParameter::INTERPOLATE;
+    else if (tmpString == "backoff" || tmpString == "bo" || tmpString == "1")
+      docPrm.smthStrategy= SimpleKLParameter::BACKOFF;
+    else {
+      cerr << "Unknown smoothStrategy " << tmpString << ". Using INTERPOLATE" 
+	   << endl;
+      docPrm.smthStrategy= SimpleKLParameter::defaultSmoothStrategy;
+    }
     
-    docPrm.smthMethod = (SmoothMethod) ParamGetInt("smoothMethod", DIRICHLETPRIOR);
-    docPrm.smthStrategy= (SmoothStrategy) ParamGetInt("smoothStrategy", INTERPOLATE);
+
     docPrm.ADDelta = ParamGetDouble("discountDelta",defaultADDelta);
     docPrm.JMLambda = ParamGetDouble("JelinekMercerLambda",defaultJMLambda);
     docPrm.DirPrior = ParamGetDouble("DirichletPrior",defaultDirPrior);
     
-    qryPrm.fbMethod = (QueryUpdateMethod)ParamGetInt("queryUpdateMethod",MIXTURE);
-    qryPrm.fbCoeff = ParamGetDouble("feedbackCoefficient",defaultFBCoeff);
-    qryPrm.fbPrTh = ParamGetDouble("feedbackProbThresh",defaultFBPrTh);
-    qryPrm.fbPrSumTh = ParamGetDouble("feedbackProbSumThresh",defaultFBPrSumTh);
-    qryPrm.fbTermCount = ParamGetInt("feedbackTermCount",defaultFBTermCount);
-    qryPrm.fbMixtureNoise = ParamGetDouble("feedbackMixtureNoise",defaultFBMixNoise);
-    qryPrm.emIterations = ParamGetInt("emIterations",defaultEMIterations);
+    tmpString = RetrievalParameter::getLower("queryUpdateMethod", "mixture");
+
+    if (tmpString == "mixture" || tmpString == "mix" || tmpString == "0")
+      qryPrm.fbMethod = SimpleKLParameter::MIXTURE;
+    else if (tmpString == "divmin" || tmpString == "div" || tmpString == "1")
+      qryPrm.fbMethod = SimpleKLParameter::DIVMIN;
+    else if (tmpString == "markovchain" || tmpString == "mc" || 
+	     tmpString == "2")
+      qryPrm.fbMethod = SimpleKLParameter::MARKOVCHAIN;
+    else if (tmpString == "relevancemodel1" || tmpString == "rm1" || 
+	     tmpString == "3")
+      qryPrm.fbMethod = SimpleKLParameter::RM1;
+    else if (tmpString == "relevancemodel2" || tmpString == "rm2" || 
+	     tmpString == "4")
+      qryPrm.fbMethod = SimpleKLParameter::RM1;
+    else {
+      cerr << "Unknown queryUpdateMethod " << tmpString 
+	   << ". Using MIXTURE" 
+	   << endl;
+      qryPrm.fbMethod = SimpleKLParameter::MIXTURE;
+    }
+    
+
+    qryPrm.fbCoeff = ParamGetDouble("feedbackCoefficient", defaultFBCoeff);
+    qryPrm.fbPrTh = ParamGetDouble("feedbackProbThresh", defaultFBPrTh);
+    qryPrm.fbPrSumTh = ParamGetDouble("feedbackProbSumThresh",
+				      defaultFBPrSumTh);
+    qryPrm.fbTermCount = ParamGetInt("feedbackTermCount", defaultFBTermCount);
+    qryPrm.fbMixtureNoise = ParamGetDouble("feedbackMixtureNoise",
+					   defaultFBMixNoise);
+    qryPrm.emIterations = ParamGetInt("emIterations", defaultEMIterations);
 					      
   }
 };
@@ -174,7 +285,8 @@ namespace InQueryParameter {
     defaultBelief = ParamGetDouble("defaultBelief", defaultBelief);
     fbCoeff = ParamGetDouble("feedbackPosCoeff", fbCoeff);
     fbTermCount = ParamGetInt("feedbackTermCount", fbTermCount);
-    cacheIDF = (ParamGetInt("cacheIDF", cacheIDF) == 1);
+    string tmpString = RetrievalParameter::getLower("cacheIDF", "true");
+    cacheIDF = (tmpString == "true" || tmpString == "1");
   }
 };
 
