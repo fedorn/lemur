@@ -22,14 +22,16 @@ This application builds a BasicIndex.
 To use it, follow the general steps of running a lemur application
 and set the following variables in the parameter file:
 
-(1) inputFile: the path to the source file
+(1) inputFile: the path to the source file (e.g., /user/xxx/data/source)
 
-(2) outputPrefix: a prefix name for your index (e.g.,  "index")
+(2) outputPrefix: the path prefix name for your index (e.g.,  /user/xxx/data/index)
 
 (3) maxDocuments: maximum number of documents to index (default: 1000000)
 
 (4) maxMemory: maximum amount of memory to use for indexing (default:0x8000000, or 128MB)
 
+A "table-of-content" (TOC) file with a name of the format outputPrefix.bsc will be written
+in the directory where the index is stored. 
 
 The following is an example of use:
 <PRE> 
@@ -41,9 +43,9 @@ The following is an example of use:
  maxDocuments = 200000;
  maxMemory    = 0x10000000;
 
- % setenv PARAM buildparam
- % BuildBasicIndex
-
+ % BuildBasicIndex buildparam
+ 
+ The TOC file is /usr0/mydata/index.bsc.
  
  </PRE>
 

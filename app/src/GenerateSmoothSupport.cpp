@@ -25,7 +25,8 @@ retrieval using smoothed unigram language model based on BasicIndex.
 To run the application, follow the general steps of running a lemur
 application and set the following variables in the parameter file:
 
-(1) lemur: the lemur record file of the index (i.e., the .lemur file created by the indexer, e.g., /usr0/mydata/index.lemur)
+(1) index: the table-of-content (TOC) record file of the index (i.e., the .bsc file created by 
+BuildBasicIndex, e.g., /usr0/mydata/index.bsc)
 
 (2) smoothSupportFile: file path for the support file
 (e.g., /usr0/mydata/index.supp)
@@ -33,6 +34,8 @@ application and set the following variables in the parameter file:
 Each entry in the support file corresponds to one document and records
 two pieces of information: (a) the count of unique terms in the document;
 (b) the sum of collection language model probabilities for the words in the document.
+
+This application is also a good example of using the doc index (i.e., doc->term index).
 
 */
 
