@@ -182,7 +182,7 @@ void parse_stream(FILE *instream, char *inname){
       END_OF_LINE, COMMAND, QUOTE, DQUOTE, OTHER, FIXIT
      } class;
    
-   ddinf = push_ddinf_stream(instream, inname); // never freed, leaks.
+   ddinf = push_ddinf_stream(instream, inname);
 
    while (ddinf != NULL) {
       while ((c=getc(ddinf->stream)) != EOF) {
@@ -716,10 +716,13 @@ ddinf_link *push_ddinf (char *inname) {
 
 /*******************************************************/
 void pop_ddinf (void) {
-    if (ddinf == NULL) return;
-    free (ddinf->name);
-    fclose (ddinf->stream);
-    ddinf = ddinf->next;
+  ddinf_link *tmp;
+  if (ddinf == NULL) return;
+  tmp = ddinf;
+  free (ddinf->name);
+  fclose (ddinf->stream);
+  ddinf = ddinf->next;
+  free(tmp);
 }
 
 /*******************************************************/
