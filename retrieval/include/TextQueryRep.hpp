@@ -34,7 +34,7 @@ public:
   virtual const char *id() const { return d.getID();}
   virtual void startTermIteration() const { d.startTermIteration();}
   virtual bool hasMore() const { return d.hasMore();}
-  virtual const TokenTerm *nextTerm() const { return d.nextTerm();}
+  virtual const Term *nextTerm() const { return d.nextTerm();}
 protected:
   const Document &d;
 };

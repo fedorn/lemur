@@ -130,7 +130,7 @@ public:
     
     qry.startTermIteration();
     while (qry.hasMore()) {
-      const TokenTerm *t = qry.nextTerm();
+      const Term *t = qry.nextTerm();
       // if Stopper is not NULL, test for stopwords.
       if (stp == NULL || !(stp->stopWord(t->spelling()))) {
 	numTerms++;

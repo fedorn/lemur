@@ -33,7 +33,7 @@ public:
   virtual const char *id() const { return d.getID();}
   virtual void startTermIteration() const { d.startTermIteration();}
   virtual bool hasMore() const { return d.hasMore();}
-  virtual const TokenTerm *nextTerm() const { return d.nextTerm();}
+  virtual const Term *nextTerm() const { return d.nextTerm();}
 private:
   Document &d;
 };
@@ -61,15 +61,15 @@ public:
   
 private:
   /// pointer to member function for getting a node.
-  typedef QueryNode *(StructQueryRep::*getFunc)(const StructQuery &, const TokenTerm *,
+  typedef QueryNode *(StructQueryRep::*getFunc)(const StructQuery &, const Term *,
 						double);
   /// Parse the text representation of the children of a query node.
   QnList * getChildren(const StructQuery &qry, getFunc fn, 
 			       bool weigh = false);
   /// Parse the text representation of a weighted query node.  
-  QueryNode * getQryNode(const StructQuery &qry, const TokenTerm *tok, double w);
+  QueryNode * getQryNode(const StructQuery &qry, const Term *tok, double w);
   /// Parse the text representation of a proximity query node.  
-  QueryNode * getProxQryNode(const StructQuery &qry, const TokenTerm *tok,
+  QueryNode * getProxQryNode(const StructQuery &qry, const Term *tok,
 				     double w = 1.0);
   /// Top node of the query parse tree.
   QueryNode *topNode;
