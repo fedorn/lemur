@@ -2,7 +2,8 @@
 
 rm -f index.*
 rm -f query_*
-rm -f res.* res_*
+rm -f res.*
 rm -f pr.*
-rm -f source query
+rm -f source
 rm -f core
+rm -f res_*
