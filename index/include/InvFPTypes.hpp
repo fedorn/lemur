@@ -14,6 +14,8 @@
 #ifndef _INVFPTYPES_H
 #define _INVFPTYPES_H
 
+#include "common_headers.hpp"
+
 typedef int   FILEID_T;
 typedef int   TERMID_T;
 typedef TERMID_T LOC_T;  // for simplifying implementation of memory management, it's helpful for termid and location to be of the same type.

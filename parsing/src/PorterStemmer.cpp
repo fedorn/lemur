@@ -12,7 +12,7 @@
 #include "PorterStemmer.hpp"
 
 #include <cctype>
-
+#include "common_headers.hpp"
 
 // the Porter stemmer is in C
 extern int porter_stem(char * p, int i, int j);
