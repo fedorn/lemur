@@ -6,7 +6,7 @@
 #define max_long 2147483647
 #define keyf 32472                   /* marker for fcb */
 #define current_version  4           /* version of keyed file software */
-#define max_key_lc 82                /* maximum key length */
+#define max_key_lc 256                /* maximum key length */
 #define key_ptrs_per_block 506       /* number of key_ptrs in index block */
 #define random_split_lc 880          /* chars to be freed on random split */
 #define level_zero 0                 /* level of index leaves */

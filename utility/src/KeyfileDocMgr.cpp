@@ -103,22 +103,44 @@ char* KeyfileDocMgr::handleDoc(char* docno) {
   docEntry.fid = fileid;
   doclen = strlen(docno) + 1;
   delete[](myDoc);
+  if (doclen > (MAX_DOCID_LENGTH - 1)) {
+    doclen = MAX_DOCID_LENGTH;
+    cerr << "handleDoc: document id " << docno << " is too long ("
+	 << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
+    cerr << "truncating" << docno << endl;
+  }
   myDoc = new char[doclen];
-  strcpy(myDoc, docno);
+  strncpy(myDoc, docno, doclen - 1);
+  myDoc[doclen - 1] = '\0';
   return docno;
 }
 
 // caller delete[]s
 char *KeyfileDocMgr::getDoc(const char *docID) {
   int actual = 0;
-  btl documentLocation; 
-  doclookup.get( docID, &documentLocation, actual, sizeof(btl) );
+  btl documentLocation;
 
-  char *doc = new char[documentLocation.bytes + 1];  
+  char *docName = (char *)docID;
+  int doclen = strlen(docName) + 1;
+  if (doclen > (MAX_DOCID_LENGTH - 1)) {
+    doclen = MAX_DOCID_LENGTH;
+    cerr << "getDoc: document id " << docName << " is too long ("
+         << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
+    cerr << "truncating " << docName << endl;
+    docName = new char[doclen];
+    strncpy(docName, docID, doclen - 1);
+    docName[doclen - 1] = '\0';
+  }
+
+  doclookup.get( docName, &documentLocation, actual, sizeof(btl) );
+
+  if(docName != docID) delete[](docName);
+
+  char *doc = new char[documentLocation.bytes + 1];
   ifstream read(sources[documentLocation.fid].c_str(), ios::binary);
   if (!read.is_open()) {
-    cerr << "Could not open file " << sources[documentLocation.fid] 
-	       << " to get document" << endl;
+    cerr << "Could not open file " << sources[documentLocation.fid]
+               << " to get document" << endl;
     return NULL;
   }
   read.seekg(documentLocation.offset, ios::beg);
@@ -127,20 +149,32 @@ char *KeyfileDocMgr::getDoc(const char *docID) {
   doc[documentLocation.bytes] = '\0';
   return doc;
 }
-
 vector<Match> KeyfileDocMgr::getOffsets(char *docID) {
   // reset to empty
   offsets.clear();
   int size = 0;
   unsigned char* data = 0;
 
-  poslookup.get( docID, (char**) &data, size );
+  char *docName = (char *)docID;
+  int doclen = strlen(docName) + 1;
+  if (doclen > (MAX_DOCID_LENGTH - 1)) {
+    doclen = MAX_DOCID_LENGTH;
+    cerr << "getOffsets: document id " << docName << " is too long ("
+         << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
+    cerr << "truncating " << docName << endl;
+    docName = new char[doclen];
+    strncpy(docName, docID, doclen - 1);
+    docName[doclen - 1] = '\0';
+  }
+
+  poslookup.get( docName, (char**) &data, size );
+  if(docName != docID) delete[](docName);
+
   int *buffer = new int[(size * 4)];
 
   // decompress it
   // decompress it
-  int len = RVLCompress::decompress_ints(data, 
-					 buffer, size);
+  int len = RVLCompress::decompress_ints(data, buffer, size);
   offsets.resize(len/2);
   for (int i = 0, j = 0; i < len; i += 2, j++) {
     offsets[j].start = buffer[i];

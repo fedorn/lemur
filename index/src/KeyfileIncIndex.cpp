@@ -258,12 +258,16 @@ bool KeyfileIncIndex::open(const char* indexName){
   *msgstream << "Load index complete." << endl;
   return true;
 }
-
 int KeyfileIncIndex::term(const char* word){
-  int id;
+  int len = strlen(word);
 
-  id = _cache.find( word );
-  
+  if (len > (MAX_TERM_LENGTH - 1)) {
+    //term is too big to be a key, so it is OOV.
+    return 0;
+  }
+
+  int id = _cache.find( word );
+
   if( id <= 0 ) {
     int actual = 0;
     bool success = tIDs.get( word, &id, actual, sizeof id );
@@ -289,7 +293,19 @@ int KeyfileIncIndex::document(const char* docIDStr){
   int actual = 0;
   int documentID = 0;
 
-  dIDs.get( docIDStr, &documentID, actual, sizeof documentID );
+  const char *did = docIDStr;
+
+  int len = strlen(did);
+  if (len > (MAX_DOCID_LENGTH - 1)) {
+    cerr << "document: document id " << did << " is too long ("
+	 << len << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
+    strncpy(docKey, did, (MAX_DOCID_LENGTH - 1));
+    docKey[(MAX_DOCID_LENGTH - 1)] = '\0';
+    did = docKey;
+    cerr << "truncating to " << docKey << endl;
+  }
+
+  dIDs.get( did, &documentID, actual, sizeof documentID );
   //  assert( actual == sizeof documentID );
 
   return documentID;
@@ -538,11 +554,20 @@ void KeyfileIncIndex::setName(char* prefix) {
 bool KeyfileIncIndex::beginDoc(DocumentProps* dp){
   if (dp == NULL)
     return false;
+  char *did = dp->stringID();
 
+  int len = strlen(did);
+  if (len > (MAX_DOCID_LENGTH - 1)) {
+    cerr << "beginDoc: document id " << did << " is too long ("
+	 << len << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
+    strncpy(docKey, did, (MAX_DOCID_LENGTH - 1));
+    docKey[(MAX_DOCID_LENGTH - 1)] = '\0';
+    did = docKey;
+    cerr << "truncating to " << docKey << endl;
+  }
   counts[DOCS]++;
   int documentID = counts[DOCS];
-
-  addDocumentLookup( documentID, dp->stringID() );
+  addDocumentLookup( documentID, did);
   return true;
 }
 
@@ -595,11 +620,18 @@ int KeyfileIncIndex::addUncachedTerm( InvFPTerm* term ) {
 
   return tid;
 }
-
 bool KeyfileIncIndex::addTerm(Term& t){
   InvFPTerm* term = static_cast< InvFPTerm* >(&t);
   assert( term->strLength() > 0 );
   assert( term->spelling() != NULL );
+  int len = term->strLength();
+  if (len > (MAX_TERM_LENGTH - 1)) {
+    //term is too big to be a key.
+    cerr << "addTerm: ignoring " << term->spelling()
+	 << " which is too long ("
+	 << len << " > " << (MAX_TERM_LENGTH - 1) << ")" << endl;
+    return false;
+  }
 
   int id = _cache.find( term->spelling() );
 

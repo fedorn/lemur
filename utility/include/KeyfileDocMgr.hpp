@@ -27,6 +27,7 @@
 // source files.
 #define BT_FID ".bfi"
 
+#define MAX_DOCID_LENGTH 256 /* must track with keydef.h max_key_lc */
 
 /*!
   Document manager using Keyfile for data storage. In addition to providing

@@ -72,10 +72,10 @@ KeyfileTextHandler::handleDoc(char * docno) {
   return docno;
 }
 
-char * 
+char *
 KeyfileTextHandler::handleWord(char * word) {
   InvFPTerm term;
-
+  bool success = false;
   if (word != NULL) {
     // don't ignore words based on length
     int len = strlen(word);
@@ -83,13 +83,12 @@ KeyfileTextHandler::handleWord(char * word) {
     term.strLength(len);
     term.spelling(word);
     term.position(pos);
-    _index->addTerm(term);
-    docLength++;
-    pos++; // this should happen even if >20.
-  } else {
-    if (countStopWds) docLength++;
-    pos++;
+    // addTerm returns true if term is added.
+    success =  _index->addTerm(term);
   }
+  // term was added or we are counting stop words.
+  if (success || countStopWds) docLength++;
+  pos++;
   return word;
 }
 
