@@ -198,7 +198,7 @@ public:
 protected:
   mutable TermInfoList::iterator itbegin;  // iterator at head of list
   mutable TermInfoList::iterator itend;    // iterator at end of list
-
+  friend class iterator;
 };
 
 

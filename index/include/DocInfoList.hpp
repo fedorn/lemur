@@ -198,6 +198,7 @@ public:
 protected:
   mutable DocInfoList::iterator itbegin;  // iterator at head of list
   mutable DocInfoList::iterator itend;    // iterator at end of list
+  friend class iterator;
 };
 
 
