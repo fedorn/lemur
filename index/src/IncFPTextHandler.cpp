@@ -15,7 +15,8 @@ IncFPTextHandler::IncFPTextHandler(char * filename, int bufferSize,
 				   bool countStopWords, int ind) {
   index = new IncFPPushIndex(filename, bufferSize);
 
-  dp = new DocumentProps();
+  //  dp = new DocumentProps();
+  dp = NULL;  
   term = new InvFPTerm();
   countStopWds = countStopWords;
   docLength = 0;

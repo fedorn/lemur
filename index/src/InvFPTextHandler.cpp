@@ -19,11 +19,10 @@ InvFPTextHandler::InvFPTextHandler(char * filename, int bufferSize,
   if (ind == 0)
     index = new InvPushIndex(filename, bufferSize);
   else index = new InvFPPushIndex(filename, bufferSize);
-  dp = new DocumentProps();
+  //  dp = new DocumentProps();
+  dp = NULL;
   term = new InvFPTerm();
-
   countStopWds = countStopWords;
-
   docLength = 0;
   pos = 0;
   // set state that is on first doc
@@ -32,7 +31,7 @@ InvFPTextHandler::InvFPTextHandler(char * filename, int bufferSize,
 
 InvFPTextHandler::~InvFPTextHandler() {
   // end the doc and close the collection
-  endDoc();
+  if (!first) endDoc(); // if we haven't done any yet, don't bother.
   index->endCollection(NULL);
   delete dp;
   delete term;
@@ -52,6 +51,7 @@ InvFPTextHandler::handleDoc(char * docno) {
   if (!first) {
     endDoc();
   } else {
+    dp = new DocumentProps();
     first = false;
   }
 
