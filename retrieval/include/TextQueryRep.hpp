@@ -14,32 +14,12 @@
 #define _TEXTQUERYREP_HPP
 
 #include "RetrievalMethod.hpp"
-#include "Document.hpp"
+#include "TextQuery.hpp"
 #include "IndexedReal.hpp"
 #include "Index.hpp"
 #include "Counter.hpp"
 #include "WeightedIDSet.hpp"
 #include "FreqVector.hpp"
-
-//------------------------------------------------------------
-//      Abstract Interface for Text Query 
-//------------------------------------------------------------
-
-/// A text query is an adaptor of Document
-class TextQuery : public Query {
-public:
-  TextQuery(const Document &doc) : d(doc) {}
-  virtual ~TextQuery() {}
-
-  virtual const char *id() const { return d.getID();}
-  virtual void startTermIteration() const { d.startTermIteration();}
-  virtual bool hasMore() const { return d.hasMore();}
-  virtual const Term *nextTerm() const { return d.nextTerm();}
-protected:
-  const Document &d;
-};
-
-
 
 //------------------------------------------------------------
 //      Abstract Interface for Text Query Representation 
@@ -87,7 +67,7 @@ public:
   ArrayQueryRep(int size) : ct(new ArrayCounter<double>(size)), scConst(0) {
   }
   /// The size passed in must be large enough to hold all the terms, typically dbIndex.termCountUnique()+1.
-  ArrayQueryRep(int size, const TextQuery &qry, const Index &dbIndex);
+  ArrayQueryRep(int size, const TermQuery &qry, const Index &dbIndex);
   /// build a query rep with a frequency vector
   ArrayQueryRep(int size, const FreqVector &qryVec);
 
