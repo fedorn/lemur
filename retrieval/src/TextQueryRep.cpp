@@ -37,3 +37,30 @@ ArrayQueryRep::ArrayQueryRep(int size, FreqVector &qryVec):
     incCount(ti, fq);
   }
 }
+
+
+QueryTerm *ArrayQueryRep::nextTerm()
+{
+  int wdIndex;
+  double wdCount;
+  ct->nextCount(wdIndex, wdCount);
+  return (makeQueryTerm(wdIndex, wdCount));
+}
+
+
+
+bool PseudoFBDocs::hasMore() 
+{
+  if (howMany>=0 && i >= howMany) {
+    return false;
+  }
+  return (it != res->end());
+}
+
+void PseudoFBDocs::nextIDInfo(int &id, double &relProb) 
+{
+  id = (*it).ind;
+  relProb = (*it).val;
+  it++;
+  i++;
+}

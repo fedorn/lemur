@@ -60,6 +60,7 @@ inline BasicDocInfoList::BasicDocInfoList(int *tmpDocArray, int size):
 {
 }
 
+/// This function is implemented inline, because it gets called frequently
 inline DocInfo * BasicDocInfoList::nextEntry() {
   // assert (hasMore());
   static BasicDocInfo info;

@@ -47,48 +47,19 @@ class HashFreqVector : public FreqVector, public CSet<FreqCount, int> {
 public:
   HashFreqVector() : CSet<FreqCount, int>(300) {}
   /// Construct a document frequency vector based on the counts stored in an index
-  HashFreqVector(Index &index, int docID) : CSet<FreqCount, int>(300) {
-    TermInfoList *tList = index.termInfoList(docID);
-    TermInfo *info;
-    while (tList->hasMore()) {
-      info = tList->nextEntry();
-      static FreqCount ct;
-      ct.key = info->id();
-      add(ct, info->count());
-    }
-    delete tList;
+  HashFreqVector(Index &index, int docID);
 
-  }
   virtual ~HashFreqVector() {};
 
   
-  virtual bool find(int ind, int &freq) {
-    static FreqCount c;
-    c.key = ind;
-    freq = count(c);
-    if (freq==0) return false;
-	return true;
-  }
+  virtual bool find(int ind, int &freq);
 
-  virtual void startIteration() {
-    i=0;
-  }
-  virtual bool hasMore() { 
-    return (i < size());
-  }
-  virtual void nextFreq(int &id, int &freq) {
-    // get the i-th element
-    static FreqCount c;
-    id = (ISet<FreqCount>::operator[](i)).key;
-    c.key = id;
-    freq = count(c)    ;
-    i++;
-  }
+  virtual void startIteration() {  i=0; }
+  virtual bool hasMore() {  return (i < size()); }
+  virtual void nextFreq(int &id, int &freq);
 
   /// return the total number of non-zero elements in the vector
-  virtual int size() {
-    return (ISet<FreqCount>::size());
-  }
+  virtual int size() {    return (ISet<FreqCount>::size()); }
 protected:
   int i;
 };

@@ -103,12 +103,8 @@ public:
   }
 
 
-  virtual QueryTerm *nextTerm() {
-    int wdIndex;
-    double wdCount;
-    ct->nextCount(wdIndex, wdCount);
-    return (makeQueryTerm(wdIndex, wdCount));
-  }
+  virtual QueryTerm *nextTerm();
+
 
   virtual void incCount(int wdIndex, double count) {
     ct->incCount(wdIndex,count);
@@ -147,19 +143,9 @@ public:
     it = res->begin();
     i=0;
   }  
-  virtual bool hasMore() {
-    if (howMany>=0 && i >= howMany) {
-      return false;
-    }
-    return (it != res->end());
-  }
+  virtual bool hasMore() ;
 
-  virtual void nextIDInfo(int &id, double &relProb) {
-    id = (*it).ind;
-    relProb = (*it).val;
-    it++;
-    i++;
-  }
+  virtual void nextIDInfo(int &id, double &relProb);
 
 private:
   IndexedRealVector *res;

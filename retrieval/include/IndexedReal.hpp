@@ -80,50 +80,6 @@ private:
 };
 
 
-//==================== inline implementations ====================
-
-inline void IndexedRealVector::Sort(bool descending)
-{
-  if (descending) {
-    sort(this->begin(), this->end(), descendOrder);
-  } else {
-    sort(this->begin(), this->end(), ascendOrder);
-  }
-}
-
-
-inline IndexedRealVector::iterator IndexedRealVector::FindByIndex(int index)
-{
-  iterator it = begin();
-  while (it != end() && (*it).ind != index) {
-    it++;
-  }
-  return  it;
-}
-
-inline bool IndexedRealVector::IncreaseValueFor(int index, double value)
-{
-  iterator it = FindByIndex(index);
-  if (it == end()) {
-    IndexedReal entry;
-    entry.ind = index;
-    entry.val = value;
-    push_back(entry);
-    return false;
-  } else {
-    (*it).val += value;
-    return true;
-  }
-}
-
-
-inline void IndexedRealVector::PushValue(int index, double value)
-{
-  IndexedReal entry;
-  entry.ind = index;
-  entry.val = value;
-  push_back(entry);
-}
 
 #endif //_INDEXEDREAL_HPP
 

@@ -48,14 +48,9 @@ public:
   ArrayAccumulator(int maxID);
 
   virtual ~ArrayAccumulator() { delete [] acc; delete [] status;}
-  
-  virtual void reset(){
-    for (int i=0; i<sz; i++) {
-      acc[i]=0;
-      status[i]=0;
-    }
-    p=0;
-  }
+
+  /// Reset all entries to zero
+  virtual void reset();
   
   /// Find the score value for an id
   virtual bool findScore(int id, double &score);
@@ -94,27 +89,7 @@ inline ArrayAccumulator::ArrayAccumulator(int maxID) : sz(maxID)
   status = new short[maxID]; // using integer making the test faster
 }
 
-inline bool ArrayAccumulator::findScore(int id, double &score)
-{ 
-  if (status[id-1]>0) {
-    score = acc[id-1];
-    return true;
-  } else {
-    return false;
-  }
-}
 
-inline bool ArrayAccumulator::hasMore() {
-  assert (p>=0 && p<=sz);
-  while (p<sz && status[p]==0) p++;
-  return (p<sz);
-}
-
-inline  void ArrayAccumulator::nextScore(int &id, double &score) {
-  if (p<sz) id = p+1;
-  score = acc[p];
-  p++;
-}
 #endif /* _SCOREACCUMULATOR_HPP */
 
 

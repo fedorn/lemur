@@ -63,7 +63,7 @@
 #define MAXLINE 65536
 
 
-
+/// term representation for the BasicDocStream
 class BasicTokenTerm : public TokenTerm {
  public:
   BasicTokenTerm() {}
@@ -75,50 +75,23 @@ class BasicTokenTerm : public TokenTerm {
 };
 
 
+/// doc representation for BasicDocStream
+
 class BasicTokenDoc : public Document {
  public:
   BasicTokenDoc(ifstream *stream): docStr(stream) {
   }
-   void startTermIteration() {
-    curWord = buf1;
-    // peek one term
-    *docStr >> curWord;
-
-  }
+   void startTermIteration(); 
   
   char *getID() const { return (char *)id;}
 
   bool hasMore() { return (strcmp(curWord, "</DOC>") != 0);}
     
-  TokenTerm * nextTerm() {
-    static BasicTokenTerm t;
-    t.str = curWord;
-    if (curWord == buf1) {
-      curWord = buf2;
-    } else {
-      curWord = buf1;
-    }
-    *docStr >> curWord;
-    return &t;
-  }
+  TokenTerm * nextTerm();
 
   friend class BasicDocStream;
  private:
-  void readID() {
-    // get id
-    *docStr >> buf1;
-    if (strcmp(buf1, "<DOC")) {
-      cerr << " actual token seen: "<< buf1 << endl;
-      throw Exception("BasicTokenDoc", "begin doc marker expected");
-    }
-    *docStr >> id;
-    int len= strlen(id);
-    if (id[len-1]!='>') {
-      throw Exception("BasicTokenDoc","ill-formatted doc id, > expected");
-    }
-    id[len-1]='\0';
-  }
-
+  void readID(); 
   char *curWord;
   char buf1[20000];
   char buf2[20000];
@@ -127,42 +100,24 @@ class BasicTokenDoc : public Document {
 };
 
 
+/// A DocStream handler of a stream with the basic lemur format
 class BasicDocStream : public DocStream
 {
 public:
   BasicDocStream() {}
-  BasicDocStream (const char * inputFile) {
-    strcpy(file, inputFile);
-    ifs = new ifstream(inputFile, ios::in);
-    if (ifs->fail() ) {
-      throw Exception("BasicDocStream", "can't open BasicDocStream source file");
-    }
-  }
+  BasicDocStream (const char * inputFile);
+
   virtual ~BasicDocStream() {  delete ifs;}
 
 public:
 	
-  bool hasMore() {
-    streampos pos = ifs->tellg();
-    bool moreData= (*ifs >> buf);
-    ifs->seekg(pos);
-    return moreData; }
- 
+  bool hasMore(); 
 
-  void startDocIteration() {
-    ifs->close();
-    ifs->open(file);
-     ifs->seekg(0);
-     ifs->clear(); 
-  }
+  void startDocIteration();
 
-  Document *nextDoc() {
-    static BasicTokenDoc doc(ifs);
-    doc.readID();
-    return &doc;
-  }
+  Document *nextDoc();
 
- private:
+private:
   char file[1024];
   ifstream *ifs;
   char buf[2000];

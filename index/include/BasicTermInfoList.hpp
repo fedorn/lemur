@@ -58,6 +58,7 @@ inline BasicTermInfoList::BasicTermInfoList(int *tmpWordArray, int size):
 {
 }
 
+/// This function is implemented inline, because it gets called frequently
 inline TermInfo * BasicTermInfoList::nextEntry() {
   // assert (hasMore());
   static BasicTermInfo info;
