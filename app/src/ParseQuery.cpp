@@ -11,10 +11,14 @@
 
 #include "Stopper.hpp"
 #include "PorterStemmer.hpp"
+#include "KStemmer.hpp"
+#include "ArabicStemmer.hpp"
 #include "WebParser.hpp"
 #include "TrecParser.hpp"
 #include "ReutersParser.hpp"
-
+#include "ChineseParser.hpp"
+#include "ChineseCharParser.hpp"
+#include "ArabicParser.hpp"
 #include "IndexManager.hpp"
 #include "Index.hpp"
 #include "QueryTextHandler.hpp"
@@ -38,6 +42,8 @@ namespace LocalParameter {
   char * stemmer;
   // query output file
   char * qryOutFile;
+  // path name to data files used by kstemmer
+  char *kstemmer_dir;
 
   void get() {
     // my code uses char *'s while the param utils use
@@ -53,7 +59,21 @@ namespace LocalParameter {
     stemmer = strdup(ParamGetString("stemmer"));
     // convert stemmer to lowercase
     for (char * e = stemmer; *e != '\0'; e++) *e = tolower(*e);
-    
+    if(!strcmp(stemmer, "krovetz")) {
+      // Using kstemmer needs a path to data files
+      if(strlen(ParamGetString("KstemmerDir"))>0) {
+	// if KstemmerDir is declared then resets STEM_DIR otherwise uses the default
+	kstemmer_dir = new char[MAX_FILENAME_LENGTH];
+	kstemmer_dir[0]='\0';
+	strcat(kstemmer_dir, "STEM_DIR=");
+	strcat(kstemmer_dir,ParamGetString("KstemmerDir"));
+	if(putenv(kstemmer_dir))
+	  cerr << "putenv can not set STEM_DIR" << endl;
+      }
+    } else if (!strcmp(stemmer, "arabic")){
+      ArabicStemmerParameter::get();
+    }
+
     qryOutFile = strdup(ParamGetString("qryOutFile"));
   }
 
@@ -64,6 +84,7 @@ namespace LocalParameter {
     free(acronyms);
     free(docFormat);
     free(stemmer);
+    delete[](kstemmer_dir);
     free(qryOutFile);
   }
 };
@@ -73,9 +94,11 @@ void usage(int argc, char ** argv) {
   cerr << "Usage:" << endl
        << argv[0] << " paramfile datfile1 datfile2 ... " << endl
        << endl
-       << "ParseQuery parses queries using either the TrecParser or " << endl
-       << "WebParser class and an Index.  Summary of parameters:" << endl << endl
+       << "ParseQuery parses queries using either the TrecParser, " << endl
+       << "WebParser or Chinese(Char)Parser class and Index."
+       << endl << "Summary of parameters:" << endl << endl
        << "\tindex - name of the index" << endl
+       << "\tqryOutFile - name of output file" << endl
        << "\tstopwords - name of file containing stopword list" << endl
        << "\t            Words in this file should be one per line." << endl
        << "\t            If this parameter is not specified, all words " << endl
@@ -86,8 +109,17 @@ void usage(int argc, char ** argv) {
        << "\t           uppercase as USA if USA is in the acronym list." << endl
        << "\tdocFormat - \"trec\" for standard TREC formatted documents "<< endl
        << "\t            web for web TREC formatted documents (def = trec)" << endl
+       << "\t            \"reuters\" for Reuters XML documents " << endl
+       << "\t            \"arabic\" for Arabic (Windows CP1256). " << endl  
+       << "\t            \"chinese\" for for segmented Chinese (GB)." << endl  
+       << "\t            \"chinesechar\" for unsegmented Chinese (GB)." << endl
        << "\tstemmer - \"porter\" to use Porter's stemmer. " << endl
-       << "\t          (def = no stemmer)" << endl;
+       << "\t          \"krovetz\" to use Krovetz's stemmer (kstemmer). " << endl  
+       << "\t          \"arabic\" to use an Arabic stemmer. " << endl  
+       << "\t          (def = no stemmer)" << endl
+       << "\tKstemmerDir - pathname to data files used by kstemmer. " << endl
+       << "\tarabicStemDir - pathname to data files used by the Arabic stemmers. " << endl
+       << "\tarabicStemFunc - which Arabic stemmer algorithm. " << endl;
 }
 
 // get application parameters
@@ -110,6 +142,12 @@ int AppMain(int argc, char * argv[]) {
     parser = new ReutersParser();
   } else if (!strcmp (LocalParameter::docFormat, "trec")) {
     parser = new TrecParser();
+  } else if (!strcmp(LocalParameter::docFormat, "chinese")) {
+    parser = new ChineseParser();
+  } else if (!strcmp(LocalParameter::docFormat, "chinesechar")) {
+    parser = new ChineseCharParser();
+  } else if (!strcmp(LocalParameter::docFormat, "arabic")) {
+    parser = new ArabicParser();
   } else if (strcmp (LocalParameter::docFormat, "")) {
     throw Exception("ParseQuery", "Unknown docFormat specified");
   } else {
@@ -140,6 +178,11 @@ int AppMain(int argc, char * argv[]) {
   Stemmer * stemmer = NULL;
   if (!strcmp(LocalParameter::stemmer, "porter")) {
     stemmer = new PorterStemmer();
+  } else if (!strcmp(LocalParameter::stemmer, "krovetz")) {
+    stemmer = new KStemmer();
+  } else if (!strcmp(LocalParameter::stemmer, "arabic")) {
+    stemmer = new ArabicStemmer(ArabicStemmerParameter::stemDir, 
+				ArabicStemmerParameter::stemFunc);
   } else if (strcmp(LocalParameter::stemmer, "")) {
     throw Exception("ParseQuery", "Unknown stemmer specified");
   }

@@ -1,8 +1,13 @@
 #include "Stopper.hpp"
 #include "PorterStemmer.hpp"
+#include "KStemmer.hpp"
+#include "ArabicStemmer.hpp"
 #include "WebParser.hpp"
 #include "TrecParser.hpp"
 #include "ReutersParser.hpp"
+#include "ChineseParser.hpp"
+#include "ChineseCharParser.hpp"
+#include "ArabicParser.hpp"
 #include "DocFreqIndexer.hpp"
 #include "CtfIndexer.hpp"
 #include "Param.hpp"
@@ -18,6 +23,8 @@ namespace LocalParameter {
   char * dfCounts;
   char * stemmer;
   char* d;	
+  // path name to data files used by kstemmer
+  char *kstemmer_dir;
 
   bool countStopWds;
 
@@ -35,6 +42,21 @@ namespace LocalParameter {
     stemmer = strdup(ParamGetString("stemmer"));
     // convert stemmer to lowercase
     for (d = stemmer; *d != '\0'; d++) *d = tolower(*d);
+    if(!strcmp(stemmer, "krovetz")) {
+      // Using kstemmer needs a path to data files
+      if(strlen(ParamGetString("KstemmerDir"))>0) {
+	// if KstemmerDir is declared then resets STEM_DIR otherwise uses the default
+	kstemmer_dir = new char[MAX_FILENAME_LENGTH];
+	kstemmer_dir[0]='\0';
+	strcat(kstemmer_dir, "STEM_DIR=");
+	strcat(kstemmer_dir,ParamGetString("KstemmerDir"));
+	if(putenv(kstemmer_dir))
+	  cerr << "putenv can not set STEM_DIR" << endl;
+      }
+    } else if (!strcmp(stemmer, "arabic")){
+      ArabicStemmerParameter::get();
+    }
+    
     
     countStopWds = (ParamGetString("countStopWords", "false") == "true" 
 		    ? true : false);
@@ -49,6 +71,7 @@ namespace LocalParameter {
     free(dfCounts);
     free(dfDocs);
     free(stemmer);
+    delete[](kstemmer_dir);
   }
 };
 
@@ -77,6 +100,12 @@ int AppMain(int argc, char * argv[]) {
     parser = new ReutersParser();
   } else if (!strcmp (LocalParameter::docFormat, "trec")) {
     parser = new TrecParser();
+  } else if (!strcmp(LocalParameter::docFormat, "chinese")) {
+    parser = new ChineseParser();
+  } else if (!strcmp(LocalParameter::docFormat, "chinesechar")) {
+    parser = new ChineseCharParser();
+  } else if (!strcmp(LocalParameter::docFormat, "arabic")) {
+    parser = new ArabicParser();
   } else if (strcmp (LocalParameter::docFormat, "")) {
     throw Exception("PushIndexer", "Unknown docFormat specified");
   } else {
@@ -98,6 +127,11 @@ int AppMain(int argc, char * argv[]) {
   Stemmer * stemmer = NULL;
   if (!strcmp(LocalParameter::stemmer, "porter")) {
     stemmer = new PorterStemmer();
+  } else if (!strcmp(LocalParameter::stemmer, "krovetz")) {
+    stemmer = new KStemmer();
+  } else if (!strcmp(LocalParameter::stemmer, "arabic")) {
+    stemmer = new ArabicStemmer(ArabicStemmerParameter::stemDir, 
+				ArabicStemmerParameter::stemFunc);
   }
 
   DocFreqIndexer dfIndexer(LocalParameter::df,
