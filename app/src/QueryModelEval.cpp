@@ -140,6 +140,7 @@ int AppMain(int argc, char *argv[]) {
       docPool->getResult(qid, workSetRes);
       workSet = new PseudoFBDocs(workSetRes, -1); // -1 means using all docs
       model.scoreDocSet(*q,*workSet,res);
+      delete(workSet);
     } else {
       model.scoreCollection(*q, res);
     }
@@ -148,7 +149,10 @@ int AppMain(int argc, char *argv[]) {
     resFile.writeResults(qid, &res, RetrievalParameter::resultCount);
     delete q;
   }
-  
+  if (RetrievalParameter::useWorkingSet) {
+    delete docPool;
+    delete workSetStr;
+  }
   result.close();
   delete ind;
   return 0;
