@@ -21,7 +21,7 @@ discountDelta = 0.5; /* not used since smoothMethod is Dirichlet prior */
 
 JelinekMercerLambda = 0.5;  /* not used since smoothMethod is Dirichlet prior */
 
-BayesianPrior = 2000; 
+DirichletPrior = 1000; 
 
 
 /* Pseudo feedback parameters */
