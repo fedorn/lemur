@@ -15,23 +15,6 @@
 
 #include "DocInfoList.hpp"
 
-
-/// BasicDocInfo
-
-class BasicDocInfo : public DocInfo {
-public:
-  BasicDocInfo() {}
-  BasicDocInfo( int docID, int termCount) : 
-    id(docID), count(termCount) {}
-  virtual int termCount() const { return count;}
-
-  virtual int docID() const { return id;}
-  friend class BasicDocInfoList;
-private:
-  int id, count;
-};
-
-
 /// Implementation of DocInfoList for BasicIndex
 
 class BasicDocInfoList : public DocInfoList {
@@ -65,10 +48,10 @@ inline BasicDocInfoList::BasicDocInfoList(int *tmpDocArray, int size):
 /// This function is implemented inline, because it gets called frequently
 inline DocInfo * BasicDocInfoList::nextEntry() const{
   // assert (hasMore());
-  static BasicDocInfo info;
-  info.id =  tmpdarr[it]+prevDocID;
-  prevDocID = info.id;
-  info.count = tmpdarr[sz+it];
+  static DocInfo info;
+  info.docID(tmpdarr[it]+prevDocID);
+  prevDocID = info.docID();
+  info.termCount(tmpdarr[sz+it]);
   it++;
   return (&info);
 }
