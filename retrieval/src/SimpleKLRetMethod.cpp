@@ -287,6 +287,12 @@ void SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs
   case SimpleKLParameter::MARKOVCHAIN:
     computeMarkovChainFBModel(*qr, relDocs);
     break;
+  case SimpleKLParameter::RM1:
+   computeRM1FBModel(*qr, relDocs);
+   break;
+  case SimpleKLParameter::RM2:
+   computeRM2FBModel(*qr, relDocs);
+   break;   
   default:
     throw Exception("SimpleKLRetMethod", "unknown feedback method");
     break;
