@@ -31,11 +31,9 @@ application and set the following variables in the parameter file:
 It will print out the estimated parameter value to the standard output.
 */
 
-
-#include <fstream.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "common_headers.hpp"
+#include <cassert>
+#include <cstdio>
 
 #include "IndexManager.hpp"
 #include "BasicIndex.hpp"
