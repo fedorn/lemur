@@ -11,7 +11,9 @@ Stopper::Stopper() {
   iden = identifier;
 }
 
-Stopper::Stopper(const string &filename) : Stopper() {
+Stopper::Stopper(const string &filename) {
+  cat = category;
+  iden = identifier;
   load(filename);
 }
 
