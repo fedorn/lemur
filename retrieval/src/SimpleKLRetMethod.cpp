@@ -53,7 +53,7 @@ void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff,
   IndexedRealVector::iterator it;
   it = qm->begin();
   while (it != qm->end() && prSum < prSumThresh && wdCount < howManyWord && (*it).val >=prThresh) {
-    // cout << "==new-term== " << ind.term((*it).ind) << " "<< (*it).val << endl;
+    cout << "==new-term== " << ind.term((*it).ind) << " "<< (*it).val << endl;
     incCount((*it).ind, (*it).val*(1-origModCoeff));
     it++;
     prSum += (*it).val;
@@ -149,6 +149,28 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName
   collectLM = new LaplaceUnigramLM(*collectLMCounter, ind->termLexiconID(), 
 				   ind->termCountUnique()); 
 
+
+  char mcSuppFN[500];
+  strcpy(mcSuppFN, supportFileName);
+  strcat(mcSuppFN, ".mc");
+  ifs.open(mcSuppFN);
+  if (ifs.fail()) {
+    throw Exception("SimpleKLRetMethod", "Markov chain support file can't be opened");
+  }
+
+  mcNorm = new double[ind->termCountUnique()+1];
+  
+  for (i=1; i<= ind->termCountUnique(); i++) {
+    int id;
+    double norm;
+    ifs >> id >> norm;
+    if (id != i) {
+      cerr << "alignment error in Markov chain support file, wrong id:" << id << endl; 
+      exit(1);
+    }
+    mcNorm[i] = norm;
+  }
+
   scFunc = new SimpleKLScoreFunc();
 }
 
@@ -204,11 +226,9 @@ void SimpleKLRetMethod::updateQuery(QueryRep &origRep, DocIDSet &relDocs)
     break;
   case SimpleKLParameter::DIVMIN:
     computeDivMinFBModel(*qr, relDocs);
-    throw Exception("SimpleKLRetMethod", "Divergence minimization method not implemented");
     break;
   case SimpleKLParameter::MARKOVCHAIN:
     computeMarkovChainFBModel(*qr, relDocs);
-    throw Exception("SimpleKLRetMethod", "Markov chain method not implemented");
     break;
   default:
     throw Exception("SimpleKLRetMethod", "unknown feedback method");
@@ -302,8 +322,111 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocID
 }
 
 
+void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs)
+{
+  int numTerms = ind->termCountUnique();
 
+  double * ct = new double[numTerms+1];
 
+  int i;
+  for (i=1; i<=numTerms; i++) ct[i]=0;
 
+  int actualDocCount=0;
+  relDocs.startIteration();
+  while (relDocs.hasMore()) {
+    actualDocCount++;
+    int id;
+    double pr;
+    relDocs.nextIDInfo(id,pr);
+    SimpleKLDocModel *dm = dynamic_cast<SimpleKLDocModel *> (computeDocRep(id));
+    for (i=1; i<=numTerms; i++) { // pretend every word is unseen
+      ct[i] += log(dm->unseenCoeff()*collectLM->prob(i));
+    }
+
+    TermInfoList *tList = ind->termInfoList(id);
+    TermInfo *info;
+    tList->startIteration();
+    while (tList->hasMore()) {
+      info = tList->nextEntry();
+      ct[info->id()] += log(dm->seenProb(info->count(), info->id())/
+			    (dm->unseenCoeff()*collectLM->prob(info->id())));
+    }
+    delete tList;
+    delete dm;
+  }
+  if (actualDocCount==0) return;
+
+  ArrayCounter<double> lmCounter(numTerms+1);
+  
+  double norm = 1.0/(double)actualDocCount;
+  for (i=1; i<=numTerms; i++) { 
+    lmCounter.incCount(i, exp(( ct[i]*norm -
+				qryParam.fbMixtureNoise*log(collectLM->prob(i)))
+			      / (1.0-qryParam.fbMixtureNoise)));
+  }
+
+  delete [] ct;
+
+  
+  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind->termLexiconID());
+  origRep.interpolateWith(*fblm, (1-qryParam.fbCoeff), qryParam.fbTermCount,
+			qryParam.fbPrSumTh, qryParam.fbPrTh);
+  delete fblm;
+}
+
+void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs)
+{
+  int stopWordCutoff =50;
+
+  ArrayCounter<double> *counter = new ArrayCounter<double>(ind->termCountUnique()+1);
+
+  OneStepMarkovChain * mc = new OneStepMarkovChain(relDocs, *ind, mcNorm,
+						   1-qryParam.fbMixtureNoise);
+  origRep.startIteration();
+  double summ;
+  while (origRep.hasMore()) {
+    QueryTerm *qt;
+    qt = origRep.nextTerm();
+    summ =0;
+    mc->startFromWordIteration(qt->id());
+    // cout << " +++++++++ "<< ind.term(qt->id()) <<endl;
+    int fromWd;
+    double fromWdPr;
+    
+    while (mc->hasMoreFromWord()) {
+      mc->nextFromWordProb(fromWd, fromWdPr);
+      if (fromWd <= stopWordCutoff) { // a stop word
+	continue;
+      }
+      summ += qt->weight()*fromWdPr*collectLM->prob(fromWd);
+      // summ += qt->weight()*fromWdPr;
+    }
+    if (summ==0) {
+      // query term doesn't exist in the feedback documents, skip
+      continue;
+    }
+
+    mc->startFromWordIteration(qt->id());
+    while (mc->hasMoreFromWord()) {
+      mc->nextFromWordProb(fromWd, fromWdPr);
+      if (fromWd <= stopWordCutoff) { // a stop word
+	continue;
+      }
+
+      counter->incCount(fromWd, (qt->weight()*fromWdPr*collectLM->prob(fromWd)/summ));
+      // counter->incCount(fromWd, (qt->weight()*fromWdPr/summ));
+
+    }
+    delete qt;
+  }
+  delete mc;
+
+  UnigramLM *fbLM = new MLUnigramLM(*counter, ind->termLexiconID());
+
+  origRep.interpolateWith(*fbLM, 1-qryParam.fbCoeff, qryParam.fbTermCount,
+			  qryParam.fbPrSumTh, qryParam.fbPrTh);
+  delete fbLM;
+  delete counter;
+}
 
 

@@ -166,7 +166,9 @@ public:
   void setQueryModelParam(SimpleKLParameter::QueryModelParam &queryModParam);
 
 protected:
-  
+
+  double *mcNorm; // needed for fast one-step Markov chain   
+
   double *docProbMass; // needed for fast alpha computing
   int *uniqueTermCount; // needed for supporting fast absolute discounting
   UnigramLM *collectLM; // a little faster if pre-computed
@@ -178,9 +180,9 @@ protected:
   /// Mixture model feedback method
   void computeMixtureFBModel(SimpleKLQueryModel &origRep, DocIDSet & relDocs);
   /// Divergence minimization feedback method, not implemented
-  void computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) {}
+  void computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs);
   /// Markov chain feedback method, not implemented
-  void computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) {}
+  void computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) ;
   //@}
 
   SimpleKLParameter::DocSmoothParam docParam;
