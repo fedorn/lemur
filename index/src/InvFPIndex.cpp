@@ -342,6 +342,33 @@ TermInfoList* InvFPIndex::termInfoList(int docID){
   if (!tlist->binRead(indexin)) {
     indexin.close();
     return NULL;
+  } else {
+    //we have to count the terms to make it bag of words from sequence
+    tlist->countTerms();
+  }
+
+  indexin.close();
+  termlist = tlist;
+  return termlist;
+}
+
+TermInfoList* InvFPIndex::termInfoListSeq(int docID){
+  if ((docID < 0) || (docID > counts[DOCS])) {
+    fprintf(stderr, "Error trying to get termInfoList for invalid docID.\n");
+    return NULL;
+  }
+    
+  if (docID == 0)
+    return NULL;
+
+  ifstream indexin;
+  indexin.open(dtfiles[dtlookup[docID].fileid], ios::in | ios::binary);
+  indexin.seekg(dtlookup[docID].offset, ios::beg);
+  TermInfoList* termlist;
+  InvFPTermList* tlist = new InvFPTermList();
+  if (!tlist->binRead(indexin)) {
+    indexin.close();
+    return NULL;
   }
 
   indexin.close();
