@@ -1737,12 +1737,30 @@ ReutersParser::ReutersParser() {
   state = OUTER;
 }
 
-
+long ReutersParser::fileTell() {
+  int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
+  if (reutersin) {
+    long begin = ftell(reutersin)-YY_CURRENT_BUFFER->yy_n_chars;
+    return begin+offset;
+  }
+  return offset;
+}
 
 void 
-ReutersParser::parse(char * filename) {
+ReutersParser::parseFile(char * filename) {
 
   reutersin = fopen(filename, "r");
+  doParse();
+  fclose(reutersin);
+
+}
+
+void ReutersParser::parseBuffer(char* buf, int len) {
+  yy_scan_bytes(buf, len);
+  doParse();
+}
+
+void ReutersParser::doParse() {
   
   int tok;
   // The core loop of the parser.
@@ -1765,7 +1783,7 @@ ReutersParser::parse(char * filename) {
         char * ide = strstr(id, "\"");
 	*ide = '\0';
         if (textHandler != NULL) textHandler->foundDoc(id);
-
+	docpos = fileTell();
 	state = DOC;
 	break;
       }
@@ -1852,7 +1870,6 @@ ReutersParser::parse(char * filename) {
     }
 
   }
-  fclose(reutersin);
 
 }
 

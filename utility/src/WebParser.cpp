@@ -1775,12 +1775,29 @@ WebParser::WebParser() {
   state = OUTER;
 }
 
+long WebParser::fileTell() {
+  int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
+  if (webin) {
+    long begin = ftell(webin)-YY_CURRENT_BUFFER->yy_n_chars;
+    return begin+offset;
+  }
+  return offset;
+}
 
 void 
-WebParser::parse(char * filename) {
+WebParser::parseFile(char * filename) {
   
-
   webin = fopen(filename, "r");
+  doParse();
+  fclose(webin);
+}
+
+void WebParser::parseBuffer (char* buf, int len) {
+  yy_scan_bytes(buf, len);
+  doParse();
+}
+
+void WebParser::doParse() {
 
   int tok;
 
@@ -1796,6 +1813,7 @@ WebParser::parse(char * filename) {
       break;
     
     case B_DOC:
+      docpos = fileTell() - webleng;
       state = DOC;
       break;
 
@@ -1918,7 +1936,5 @@ WebParser::parse(char * filename) {
     }
 
   }
-  fclose(webin);
-
 }
 
