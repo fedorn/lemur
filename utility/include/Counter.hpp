@@ -34,7 +34,7 @@ public:
   virtual void setCount(int eventIndex, double count)  = 0;
 };
 
-/// Counts stored in an array
+/// Counts stored in an array ( when the element type is int, float/double typed counts will be converted to an integer)
 
 template<class T>
 class ArrayCounter : public ModifiableCounter {
