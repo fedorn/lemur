@@ -28,8 +28,6 @@ public:
     
   /// Stem a word using the Krovetz Stemmer.
   char * stemWord(char * word);
-private:
-  char *ddir;
 };
 
 #endif
