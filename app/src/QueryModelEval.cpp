@@ -20,7 +20,7 @@
 
 /*! \page QueryModelEval  Query Model Evaluation Application 
 
-This application loads an expanded query model (e.g., one computed by GenerateQueryModel), 
+This application (QueryModelEval.cpp) loads an expanded query model (e.g., one computed by GenerateQueryModel), 
 and evaluates it with the KL-divergence retrieval model.
 
 Parameters:

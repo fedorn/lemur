@@ -17,7 +17,7 @@
 /// A BasicIndex builder
 /*! \page BuildBasicIndex BuildBasicIndex Application
 
-This application builds a BasicIndex. 
+This application (BuildBasicIndex.cpp) builds a BasicIndex. 
 
 To use it, follow the general steps of running a lemur application
 and set the following variables in the parameter file:

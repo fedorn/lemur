@@ -20,7 +20,7 @@
 
 /*! \page RetrievalEvaluation Retrieval Evaluation Application
 
-This application runs retrieval experiments (with/without feedback) to
+This application (RetEval.cpp) runs retrieval experiments (with/without feedback) to
 evaluate different retrieval models as well as different parameter
 settings for those models. 
 

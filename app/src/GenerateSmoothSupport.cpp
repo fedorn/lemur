@@ -19,7 +19,7 @@
 
  
 
-This application  generates a supporting file needed by 
+This application (GenerateSmoothSupport.cpp) generates a supporting file needed by 
 retrieval using smoothed unigram language model based on BasicIndex.
 
 To run the application, follow the general steps of running a lemur

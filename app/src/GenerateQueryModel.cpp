@@ -21,7 +21,7 @@
 /*! \page GenerateQueryModel Query Model Generation Application 
 
 
-This application computes an expanded query model based on feedback documents and the original query model for the KL-divergence retrieval model. It can be regarded as performing a feedback in the
+This application (GenerateQueryModel.cpp) computes an expanded query model based on feedback documents and the original query model for the KL-divergence retrieval model. It can be regarded as performing a feedback in the
 language modeling approach to retrieval.
 
 Parameters:
