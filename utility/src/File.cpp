@@ -75,11 +75,6 @@ File::offset_type File::_absolutePosition( offset_type relativePosition,
       break;
   }
 
-  // TODO: debug code
-  File::offset_type s = size();
-  if( s < newPosition )
-    std::cout << "freak: " << s << " " << newPosition << " for " << PTR_TO_INT(this) << std::endl;
-
   // seeking off the end of a file is not currently implemented
   assert( newPosition <= size() );
 
