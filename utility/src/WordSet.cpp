@@ -38,6 +38,7 @@ WordSet::load(const string &filename) {
   ifstream ifstr(filename.c_str());
   // return if the file can't be opened
   if (ifstr == NULL) {
+    LEMUR_THROW(LEMUR_IO_ERROR, "Cannot open file");
     return;
   }
  
