@@ -66,6 +66,9 @@ BasicIndex::BasicIndex()
  doffset = NULL;
  tmpdarr = NULL;
  tmpwarr = NULL;
+ countOfDoc = NULL;
+ countOfTerm = NULL;
+ deleteCompressor = false;
 }
 
 BasicIndex::BasicIndex (Compress * pc) 
@@ -75,7 +78,9 @@ BasicIndex::BasicIndex (Compress * pc)
   doffset = NULL;
   tmpdarr = NULL;
   tmpwarr = NULL;
-
+  countOfDoc = NULL;
+  countOfTerm = NULL;
+  deleteCompressor = false;
 }
 
 BasicIndex::~BasicIndex()
@@ -96,6 +101,17 @@ BasicIndex::~BasicIndex()
     delete [] tmpwarr;
   }
 
+  if (countOfDoc) {
+    delete [] countOfDoc;
+  }
+
+  if (countOfTerm) {
+    delete [] countOfTerm;
+  }
+
+  if (deleteCompressor) {
+    delete pCompressor;
+  }
 }
 
 
@@ -242,6 +258,7 @@ bool BasicIndex::open(const char * fn)
   // Set up compression scheme 
   if (compressionType == "gamma") {
     pCompressor = new GammaCompress();
+    deleteCompressor = true;
   }
   else {
     // no other compression currently supported!
