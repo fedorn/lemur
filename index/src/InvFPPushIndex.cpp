@@ -33,6 +33,9 @@ bool InvFPPushIndex::addTerm(const Term& t){
   const InvFPTerm* term;
 
   term = dynamic_cast< const InvFPTerm* >(&t);
+  if (!term)
+    LEMUR_THROW(LEMUR_RUNTIME_ERROR,"InvFPPushIndex expects a Term of type InvFPTerm.");
+  
   if (term->strLength() < 1) {
     cerr << "Trying to add term with string length less than 1.  Term ignored." << endl;
     return false;
