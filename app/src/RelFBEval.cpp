@@ -67,6 +67,8 @@ Other common parameters (for all retrieval methods)  are:
 <li> <tt>textQuerySet</tt>: the query text stream 
 
 <li> <tt>resultFile</tt>: the result file
+<li> <tt>resultFormat</tt>: whether the result format should be of the TREC format 
+ (i.e., six-column) or just a simple three-column format <tt>&lt;queryID, docID, score><tt>. Integer value, zero for non-TREC format, and non-zero for TREC format. Default: 1 (i.e., TREC format)
 
 <li> <tt>resultCount</tt>: the number of documents to return as result for each query
 
