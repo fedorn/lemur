@@ -37,7 +37,7 @@
 
 //  Might make more sense as TextSource and TextDestination with
 //  functions in the middle of the chain inheriting from both.
-
+#include <cstdio>
 
 class TextHandler {
 
