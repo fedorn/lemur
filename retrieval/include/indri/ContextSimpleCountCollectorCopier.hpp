@@ -152,8 +152,10 @@ private:
       if( terms[i]->getStemmed() == false )
         processed = _repository.processTerm( terms[i]->getText() );
 
+      if( processed.length() != 0 ) {
       int termID = _index.term( processed.c_str() );
       occurrences += _index.fieldTermCount( fieldID, termID );
+    }
     }
 
     contextNode->setCounts( occurrences, size );
@@ -177,6 +179,7 @@ private:
       if( terms[i]->getStemmed() == false )
         processed = _repository.processTerm( terms[i]->getText() );
 
+      if( processed.length() != 0 ) {
       int termID = _index.term( processed.c_str() );
       occurrences += _index.termCount( termID );
 
@@ -185,6 +188,7 @@ private:
 
       maxDocumentFraction += _index.termMaxDocumentFraction( termID );
       maxDocumentFraction = lemur_compat::min<double>( 1.0, maxDocumentFraction );
+      }
     }
 
     maxContextSize = _index.maxDocumentLength();
