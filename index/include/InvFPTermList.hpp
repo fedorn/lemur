@@ -9,13 +9,18 @@
  *==========================================================================
 */
 
+/*
+  10/18/2002 -- dmf Add binReadC, binWriteC, deltaDecode, and deltEncode
+  for compression of TermInfoLists.
+ */
+
 #ifndef _INVFPTERMLIST_HPP
 #define _INVFPTERMLIST_HPP
 
 #include "common_headers.hpp"
 #include "InvFPTerm.hpp"
 #include "InvFPTypes.hpp"
-
+#include "RVLCompress.hpp"
 
 /*! 
 
@@ -27,6 +32,7 @@
 class InvFPTermList : public TermInfoList {
 public:
   InvFPTermList();
+  InvFPTermList(int did, int len, vector<LocatedTerm> &tls);
   ~InvFPTermList();
 
   /// prepare iteration
@@ -50,6 +56,17 @@ public:
   /// Read in a TermInfoList object from a file
   /// Assumes the following format: DOCID DOCLENGTH UNIQUE_TERM_COUNT [TERM LOC]..[]
   bool binRead(ifstream& infile);
+  /// Read in a compressed TermInfoList object from a file
+  bool binReadC(ifstream& infile);
+  /// Write a compressed TermInfoList object to a file
+  void binWriteC(ofstream& ofile);
+
+  /// delta decode termids and positions from begin through end
+  /// call after read
+  virtual void deltaDecode();
+  /// delta encode termids and positions from begin through end
+  /// call before write
+  virtual void deltaEncode();
 
   /// Change our default sequence of words representation to be bag of words
   void countTerms();
