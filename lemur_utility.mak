@@ -48,6 +48,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ChineseParser.obj"
 	-@erase "$(INTDIR)\DocMgrManager.obj"
 	-@erase "$(INTDIR)\error.obj"
+	-@erase "$(INTDIR)\ElemDocMgr.obj"
 	-@erase "$(INTDIR)\FlattextDocMgr.obj"
 	-@erase "$(INTDIR)\FUtil.obj"
 	-@erase "$(INTDIR)\IdentifinderParser.obj"
@@ -112,6 +113,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\ChineseParser.obj" \
 	"$(INTDIR)\DocMgrManager.obj" \
 	"$(INTDIR)\error.obj" \
+	"$(INTDIR)\ElemDocMgr.obj" \
 	"$(INTDIR)\FlattextDocMgr.obj" \
 	"$(INTDIR)\FUtil.obj" \
 	"$(INTDIR)\IdentifinderParser.obj" \
@@ -177,6 +179,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ChineseParser.obj"
 	-@erase "$(INTDIR)\DocMgrManager.obj"
 	-@erase "$(INTDIR)\error.obj"
+	-@erase "$(INTDIR)\ElemDocMgr.obj"
 	-@erase "$(INTDIR)\FlattextDocMgr.obj"
 	-@erase "$(INTDIR)\FUtil.obj"
 	-@erase "$(INTDIR)\IdentifinderParser.obj"
@@ -242,6 +245,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\ChineseParser.obj" \
 	"$(INTDIR)\DocMgrManager.obj" \
 	"$(INTDIR)\error.obj" \
+	"$(INTDIR)\ElemDocMgr.obj" \
 	"$(INTDIR)\FlattextDocMgr.obj" \
 	"$(INTDIR)\FUtil.obj" \
 	"$(INTDIR)\IdentifinderParser.obj" \
@@ -393,6 +397,12 @@ SOURCE=.\utility\src\DocMgrManager.cpp
 SOURCE=.\utility\src\error.c
 
 "$(INTDIR)\error.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\ElemDocMgr.cpp
+
+"$(INTDIR)\ElemDocMgr.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
