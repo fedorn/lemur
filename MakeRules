@@ -5,29 +5,30 @@
 # Each source file has a corresponding ".d" file
 # that specifies its dependents. 
 ifneq ($(strip $(CPPSRC)),)
-include $(CPPSRC:.cpp=.d)
+-include $(patsubst %, ../depend/%, $(CPPSRC:.cpp=.d))
 endif
 
 ifneq ($(strip $(CSRC)),)
-include $(CSRC:.c=.d)
+-include $(patsubst %, ../depend/%, $(CSRC:.c=.d))
 endif
 
+
 # how to generate .d  file from a .C file
-%.d: %.cpp
+../depend/%.d: ../src/%.cpp
 	set -e; $(CPP) -M $(CPPFLAGS) $< \
-     | sed 's/:/ $@ :/g' > $@; [ -s $@ ] || rm -f $@
+     | sed 's/:/ \.\.\/depend\/%.d :/g' > $@; [ -s $@ ] || rm -f $@
 
 # how to generate .d file from a .c file
-%.d: %.c
+../depend/%.d: ../src/%.c
 	set -e; $(CC) -M $(CPPFLAGS) $< \
-     | sed 's/:/ $@ :/g' > $@; [ -s $@ ] || rm -f $@
+     | sed 's/:/ \.\.\/depend\/%.d :/g' > $@; [ -s $@ ] || rm -f $@
 
 # compiling C++ code
-%.o: %.cpp
+%.o: ../src/%.cpp
 	$(CXX) $(CPPFLAGS) -o $@ -c $<
 
 # compiling C code
-%.o: %.c
+%.o: ../src/%.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 # how to make a library from object files
@@ -36,11 +37,11 @@ $(OBJLIB): $(OBJ)
 
 # how to clean a library module directory
 cleanlib:
-	rm -f *.o; rm -f *.d; rm -f *.a
+	rm -f *.o; rm -f ../depend/*.d; rm -f *.a
 
 # how to clean an application directory
 cleanapp:
-	rm -f *.o; rm -f *.d; rm -f $(CPPAPPBIN) $(CAPPBIN)
+	rm -f *.o; rm -f ../depend/*.d; rm -f $(CPPAPPBIN) $(CAPPBIN)
 
 
 

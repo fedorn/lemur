@@ -31,10 +31,13 @@ install Install INSTALL: $(INSTALLHEADER) INSTALLLIB
 
 # how to install header files
 $(INSTALLHEADER):
-	cp $(patsubst install%, %,$@) $(LEMUR_INSTALL_PATH)/lemur/include/
+	cp ../include/$(patsubst install%,%,$@) $(LEMUR_INSTALL_PATH)/lemur/include/
 
 
 # how to install a library for a module
 INSTALLLIB:
 	ar -rs $(LEMUR_INSTALL_PATH)/lemur/lib/liblemur.a $(OBJLIB)
+
+
+
 

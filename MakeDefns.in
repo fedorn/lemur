@@ -3,19 +3,19 @@
 # each subdirectory includes
 
 # C++ source files
-CPPSRC = $(shell ls *.cpp) 
+CPPSRC = $(shell find ../src -maxdepth 1 -name "*.cpp" -printf "%f ")
 
 # C source files
-CSRC = $(shell ls *.c)
+CSRC = $(shell find ../src -maxdepth 1 -name "*.c" -printf "%f ")
 
 
 # C++ header files
 
-CPPHEADER = $(shell ls ../include/*.hpp)
+CPPHEADER = $(shell find ../include -maxdepth 1 -name "*.hpp" -printf "%f ")
 
 # C header files
 
-CHEADER = $(shell ls ../include/*.h)
+CHEADER = $(shell find ../include -maxdepth 1 -name "*.h" -printf "%f ")
 
 # All header files
 
@@ -26,16 +26,16 @@ ALLHEADER = $(CPPHEADER) $(CHEADER)
 INCPATH = -I../include $(patsubst %, -I../../%/include, $(DEPENDMODS))
 
 # Library path
-LIBPATH = $(patsubst %, -L../../%/src, $(DEPENDMODS))
+LIBPATH = $(patsubst %, -L../../%/obj, $(DEPENDMODS))
 
 # library linking options
 LIBFLAGS = $(patsubst %, -l%, $(DEPENDMODS))
 
 # module library name
-OBJLIBS = $(foreach dir, $(DEPENDMODS), ../../$(dir)/src/lib$(dir).a)
+OBJLIBS = $(foreach dir, $(DEPENDMODS), ../../$(dir)/obj/lib$(dir).a)
 
 # C++ objects
-CPPOBJ = $(CPPSRC:.cpp=.o)
+CPPOBJ = $(CPPSRC:.cpp=.o) 
 
 # C objects
 COBJ = $(CSRC:.c=.o)

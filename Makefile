@@ -24,14 +24,14 @@ all All ALL: $(DIRS)
 
 # how to make each directory
 $(DIRS): 
-	cd $@/src && $(MAKE) all
+	cd $@/obj && $(MAKE) -f ../src/Makefile all
 
 # "make clean" means cleaning each directory
 clean Clean CLEAN: $(CLEANDIRS)
 
 # how to clean each directory
 $(CLEANDIRS):
-	cd $(patsubst clean%,%,$@)/src && $(MAKE) clean
+	cd $(patsubst clean%,%,$@)/obj && $(MAKE) -f ../src/Makefile clean
 
 # "make install" means creating destination directories and installing each module and application directory
 install Install INSTALL:  $(LEMUR_INSTALL_PATH)/lemur $(LEMUR_INSTALL_PATH)/lemur/include $(LEMUR_INSTALL_PATH)/lemur/lib  $(LEMUR_INSTALL_PATH)/lemur/bin  CLEANDEST $(INSTALLDIRS)
@@ -48,4 +48,8 @@ CLEANDEST:
 
 # how to install each directory
 $(INSTALLDIRS):
-	cd $(patsubst install%,%,$@)/src && $(MAKE) install
+	cd $(patsubst install%,%,$@)/obj && $(MAKE) -f ../src/Makefile install
+
+
+
+
