@@ -14,8 +14,7 @@
 #ifndef _INVFPTYPES_H
 #define _INVFPTYPES_H
 
-/// version is 1.9 but leave out the point
-#define IND_VERSION "1.9"
+#define IND_VERSION "2.0.1"
 
 #include "common_headers.hpp"
 
