@@ -28,17 +28,34 @@ includes  the doc ID and the frequency of a term in the document.
 
 class DocInfo {
 public:
+  DocInfo() {}
+  DocInfo(int docID, int termCount) :
+    did(docID), tcount(termCount) {}
+
   virtual ~DocInfo() {}
   
   /// doc id
-  virtual int docID() const=0;
+  virtual int docID() const {return did;}
   
   /// term count in the doc
-  virtual int termCount() const=0;
+  virtual int termCount() const {return tcount;}
+
+  /// set doc id
+  virtual void docID(int id) {did = id;}
+
+  /// set term count
+  virtual void termCount(int c) {tcount = c;}
 
   // return list of positions this term occurs in this document
   // default implementation to return NULL if no position information available for this DocInfo
   virtual const int* positions() const { return NULL; }  
+
+  /// set the list of positions
+  virtual void positions(const int* pos) {}
+
+protected:
+  int did;
+  int tcount;
 };
 
 
