@@ -512,6 +512,7 @@ void StructQueryRep::intersectDocList(QueryNode *qn) {
   int *counts = new int[dc];
   for(int i=1; i<dc; i++) {didList[i]=false; counts[i]=0; };
   cl->startIteration();
+  
   while (cl->hasMore()) {
     int i;
     ProxInfo *prx;
@@ -570,8 +571,9 @@ QnList * StructQueryRep::getChildren(StructQuery &qry) {
       qn=getQryNode(qry, tok, 1.0);
       if (qn != NULL) {
 	chlist->push_back(qn);
-	cnt++;
+	//	cnt++;
       }
+      cnt++; // count all children, even the empty ones.
     }
   }
   qParent->entries=cnt;
@@ -602,8 +604,9 @@ QnList * StructQueryRep::getWeightedChildren(StructQuery &qry) {
     qn=getQryNode(qry, tok, wt);
     if (qn != NULL) {
       chlist->push_back(qn);
-      cnt++;
+      //      cnt++;
     }
+    cnt++; // count all children, even the empty ones.
   }
   qParent->entries=cnt;
   return chlist;
@@ -631,8 +634,9 @@ QnList * StructQueryRep::getProxChildren(StructQuery &qry) {
       qn=getProxQryNode(qry, tok);
       if (qn != NULL) {
 	chlist->push_back(qn);
-	cnt++;
+	//	cnt++; 
       }
+      cnt++; // count all children, even the empty ones.
     }
   }
   qParent->entries=cnt;
