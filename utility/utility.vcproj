@@ -114,9 +114,6 @@
 				RelativePath=".\src\DirectoryIterator.cpp">
 			</File>
 			<File
-				RelativePath=".\src\error.c">
-			</File>
-			<File
 				RelativePath=".\src\File.cpp">
 			</File>
 			<File
@@ -151,9 +148,6 @@
 			</File>
 			<File
 				RelativePath=".\src\Param.cpp">
-			</File>
-			<File
-				RelativePath=".\src\parameters.c">
 			</File>
 			<File
 				RelativePath=".\src\Parameters.cpp">
@@ -196,9 +190,6 @@
 			</File>
 			<File
 				RelativePath=".\src\TermCache.cpp">
-			</File>
-			<File
-				RelativePath=".\src\util.c">
 			</File>
 			<File
 				RelativePath=".\src\WordSet.cpp">
