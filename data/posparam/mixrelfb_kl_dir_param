@@ -35,4 +35,4 @@ feedbackProbSumThresh = 1;
 feedbackMixtureNoise = 0.5;
 emIterations = 50;
 
-judgmentFile = qrel3column;
+feedbackDocuments = qrel3column;
