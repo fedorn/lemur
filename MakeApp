@@ -35,12 +35,14 @@ include ../../MakeRules
 # how to make an application
 
 %: %.o $(OBJLIBS)
+	echo 	"$(CXX) -o $@ $< $(INCPATH) $(CPPLDFLAGS)"
 	$(CXX) -o $@ $< $(INCPATH) $(CPPLDFLAGS)
 
 # how to install applications
 install Install INSTALL: $(INSTALLBIN)
 
 $(INSTALLBIN):
+	echo "cp $(patsubst install%, %,$@) $(LEMUR_INSTALL_PATH)/lemur/bin/"
 	cp $(patsubst install%, %,$@) $(LEMUR_INSTALL_PATH)/lemur/bin/
 
 
