@@ -55,19 +55,19 @@ bool InvFPTermList::hasMore() const{
 
 TermInfo* InvFPTermList::nextEntry() const{
   if (counts) {
-    entry.freq = counts[index];
-    entry.loclist = &(listcounted[index].loc);    
-    entry.tid = listcounted[index].term;
-    entry.loc = listcounted[index].loc[0];
+    entry.count(counts[index]);
+    entry.positions(&(listcounted[index].loc));    
+    entry.termID(listcounted[index].term);
+    entry.position(listcounted[index].loc[0]);
    
   } else {
-    entry.freq = 1;
+    entry.count(1);
     ///empty it!
     loclist.clear();
-    entry.loclist = &loclist;
-    entry.loclist->push_back(list[index].loc);
-    entry.tid = list[index].term;
-    entry.loc = list[index].loc;
+    loclist.push_back(list[index].loc);
+    entry.positions(&loclist);
+    entry.termID(list[index].term);
+    entry.position(list[index].loc);
   }
 
   index++;

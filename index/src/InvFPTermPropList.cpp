@@ -10,19 +10,19 @@ TermInfo* InvFPTermPropList::nextTerm()  const{
     return NULL;
 
   // advance pointer until we get something with a different position
-  while ((index < listlen) && (list[index].loc == entry.loc)) {
+  while ((index < listlen) && (list[index].loc == entry.position())) {
     index++;
   }
 
   if (index == listlen)
     return NULL;
 
-  entry.freq = 1;
+  entry.count(1);
   loclist.clear();
-  entry.loclist = &loclist;
-  entry.loclist->push_back(list[index].loc);
-  entry.tid = list[index].term;
-  entry.loc = list[index].loc;
+  loclist.push_back(list[index].loc);
+  entry.positions(&loclist);
+  entry.termID(list[index].term);
+  entry.position(list[index].loc);
   index++;
   return &entry;
 }
@@ -54,7 +54,7 @@ int InvFPTermPropList::nextTermPos()  const{
     return -1;
 
   int tracker = index;
-  while ((tracker < listlen) && (list[tracker].loc == entry.loc)) {
+  while ((tracker < listlen) && (list[tracker].loc == entry.position())) {
     tracker++;
   }
 

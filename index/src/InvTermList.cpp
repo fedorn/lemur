@@ -36,9 +36,9 @@ bool InvTermList::hasMore() const{
 TermInfo* InvTermList::nextEntry() const{
   //  static InvFPTerm info;
 
-  entry.tid = *iter;
+  entry.termID(*iter);
   iter++;
-  entry.freq = *iter;
+  entry.count(*iter);
   iter++;
 
   return &entry;
