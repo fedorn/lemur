@@ -113,24 +113,30 @@ In addition, the collection mixture model also recognizes the parameter
 
 
 namespace LocalParameter {
+  enum FBMethod {MIX=0, DIV=1, MAR=2, RM1=3, RM2=4};
+  /// retrieval model 
+  static enum FBMethod fbmethod;
+
   String expandedQuery;
   String initQuery;
   String feedbackDocuments;
   bool TRECResultFormat;
   void get() {
+    // default is MIX divergence model
+    fbmethod = (FBMethod) ParamGetInt("queryUpdateMethod",MIX);    
     expandedQuery = ParamGetString("expandedQuery");
     initQuery = ParamGetString("initQuery",""); 
     feedbackDocuments = ParamGetString("feedbackDocuments");
-    TRECResultFormat = ParamGetInt("resultFormat",1); // default is TREC format
+    // default is TREC format
+    TRECResultFormat = ParamGetInt("resultFormat",1); 
   }
 };
 
 void GetAppParam()
 {
   LocalParameter::get();
-  RetrievalParameter::get();
+  RetrievalParameter::get();  
   SimpleKLParameter::get();
-  
 }
 
 
@@ -142,11 +148,15 @@ void updateQueryModel(QueryRep *qr, char *qid, ResultFile &resFile, RetrievalMet
   SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
   if (resFile.findResult(qid, res)) {
     res->Sort();
-   PseudoFBDocs *topDoc = new PseudoFBDocs(*res, RetrievalParameter::fbDocCount);
-   model->updateQuery(*qr, *topDoc);
-   os << qid;
-   qm->save(os);
-   delete topDoc;
+    if(LocalParameter::fbmethod == LocalParameter::RM1 || 
+       LocalParameter::fbmethod == LocalParameter::RM2)
+      res->NormalizeValues();
+    PseudoFBDocs *topDoc = new PseudoFBDocs(*res, 
+					    RetrievalParameter::fbDocCount);
+    model->updateQuery(*qr, *topDoc);
+    os << qid;
+    qm->save(os);
+    delete topDoc;
   } else {
     cerr << "Warning: no feedback documents found for query: "<< qid << endl;
   }
@@ -182,7 +192,6 @@ int AppMain(int argc, char *argv[]) {
   SimpleKLRetMethod *model =  new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, accumulator);
   model->setDocSmoothParam(SimpleKLParameter::docPrm);
   model->setQueryModelParam(SimpleKLParameter::qryPrm);
-
 
   // Use either the original query text or the initial query model stored in 
   // LocalParameter::origQuery.
