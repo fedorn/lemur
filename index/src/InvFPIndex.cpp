@@ -15,6 +15,7 @@
 /*
  * NAME DATE - COMMENTS
  * tnt 04/2001 - created
+ * dmf 10/22/2002 -- Add reading of compressed TermInfoLists.
  *
  *========================================================================*/
 
@@ -36,27 +37,22 @@ DocInfoList* InvFPIndex::docInfoList(int termID){
 
   if (termID == 0)
     return NULL;
-
-  ifstream indexin;
-
-  indexin.open(invfiles[lookup[termID].fileid], ios::in | ios::binary);
-  indexin.seekg(lookup[termID].offset, ios::beg);
+  ifstream *indexin = &(invfstreams[lookup[termID].fileid]);
+  indexin->seekg(lookup[termID].offset, ios::beg);
   DocInfoList* doclist;
   InvFPDocList* dlist = new InvFPDocList();
   bool success;
 
   if (strcmp(names[VERSION_NUM], "")) {
     // version 1.9 is compressed and must be decompressed
-    success = dlist->binReadC(indexin);
+    success = dlist->binReadC(*indexin);
   } else {
-    success = dlist->binRead(indexin);
+    success = dlist->binRead(*indexin);
   }
 
   if (!success) {
-    indexin.close();
     return NULL;
   } else {
-    indexin.close();
     doclist = dlist;
     return doclist;
   }
@@ -70,21 +66,23 @@ TermInfoList* InvFPIndex::termInfoList(int docID){
     
   if (docID == 0)
     return NULL;
-
-  ifstream indexin;
-  indexin.open(dtfiles[dtlookup[docID].fileid], ios::in | ios::binary);
-  indexin.seekg(dtlookup[docID].offset, ios::beg);
+  bool success;
+  ifstream *indexin = &(dtfstreams[dtlookup[docID].fileid]);
+  indexin->seekg(dtlookup[docID].offset, ios::beg);
   TermInfoList* termlist;
   InvFPTermList* tlist = new InvFPTermList();
-  if (!tlist->binRead(indexin)) {
-    indexin.close();
+  if (strcmp(names[VERSION_NUM], "2.0.1") >= 0 )
+    // version 2.0 is compressed and must be decompressed
+    success = tlist->binReadC(*indexin);
+  else
+    success = tlist->binRead(*indexin);
+
+  if (!success) {
     return NULL;
   } else {
     //we have to count the terms to make it bag of words from sequence
     tlist->countTerms();
   }
-
-  indexin.close();
   termlist = tlist;
   return termlist;
 }
@@ -97,18 +95,20 @@ TermInfoList* InvFPIndex::termInfoListSeq(int docID){
     
   if (docID == 0)
     return NULL;
-
-  ifstream indexin;
-  indexin.open(dtfiles[dtlookup[docID].fileid], ios::in | ios::binary);
-  indexin.seekg(dtlookup[docID].offset, ios::beg);
+  bool success;
+  ifstream *indexin = &(dtfstreams[dtlookup[docID].fileid]);
+  indexin->seekg(dtlookup[docID].offset, ios::beg);
   TermInfoList* termlist;
   InvFPTermList* tlist = new InvFPTermList();
-  if (!tlist->binRead(indexin)) {
-    indexin.close();
+  if (strcmp(names[VERSION_NUM], "2.0.1") >= 0)
+    // version 2.0 is compressed and must be decompressed
+    success = tlist->binReadC(*indexin);
+  else
+    success = tlist->binRead(*indexin);
+
+  if (!success) {
     return NULL;
   }
-
-  indexin.close();
   termlist = tlist;
   return termlist;
 }
