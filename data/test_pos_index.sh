@@ -151,5 +151,23 @@ awk '{print $1, $3, $5;}'  < res.simple_tfidf > res_simple_tfidf
 
 
 
+######################################################################
+#								     #
+# The following examples show how one can do automatic estimation    #
+# of retrieval parameters using the two-stage smoothing method       #
+#                                                                    #
+######################################################################
+
+# We first estimate the 1st-stage Dirichlet prior parameter 
+# ("prior sample size"). This does not depend on the query
+../app/obj/EstimateDirPrior est_dirprior_param
+# After it is finishes, it will print out the estimated value
+
+# Then, we estimate the 2nd-stage query noise parameter
+# We have let the Dirichlet prior parameter set to the estimated
+# value in the parameter file "twostage_param"
+../app/obj/TwoStageRetEval twostage_param
+../app/src/ireval.pl -j qrel -trec < res.twostage > pr.twostage
+
 
 
