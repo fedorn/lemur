@@ -1,3 +1,18 @@
+ /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  
+ * 
+ * The Lemur toolkit for language modeling and information retrieval.
+ * Copyright (c) 2001 Carnegie Mellon University.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted for research or educational purposes,
+ * provided that this copyright notice is maintained and note is made
+ * of any changes to the source code.
+ * 
+ * This is a research system.  The code is distributed on an "as is" basis,
+ * without any warranty, express or implied. 
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #include "InvFPIndex.hpp"
 
 /*
@@ -5,6 +20,7 @@
  * tnt 04/2001 - created
  *
  *========================================================================*/
+
 InvFPIndex::InvFPIndex() {
   lookup = NULL;  
   dtlookup = NULL;
@@ -104,7 +120,7 @@ int InvFPIndex::term(const char* word){
   if (point != termtable.end()) 
     return point->second;
 
-  return -1;
+  return 0;
 }
 
 const char* InvFPIndex::term(int termID) {
@@ -118,7 +134,7 @@ int InvFPIndex::document(const char* docIDStr){
   if (point != doctable.end()) 
     return point->second;
 
-  return -1;
+  return 0;
 }
 
 const char* InvFPIndex::document(int docID) { 
@@ -133,15 +149,19 @@ int InvFPIndex::termCount(int termID) const{
   // there is the docid and the tf
   if ((termID <0) || (termID > counts[UNIQUE_TERMS])) {
     cerr << "Error:  Trying to get termCount for invalid termID" << endl;
-    return -1;
+    return 0;
   }
+
+  // this is OOV
+  if (termID == 0)
+    return 0;
 
   TERM_T t;
   ifstream look;
   look.open(invfiles[lookup[termID].fileid], ios::in | ios::binary);
   if (!look) {
     fprintf(stderr, "Error:  Could not open indexfile for reading.\n");
-    return -1;
+    return 0;
   }
 
   look.seekg(lookup[termID].offset, ios::beg);
@@ -153,7 +173,7 @@ int InvFPIndex::termCount(int termID) const{
   look.close();
   if ( !(look.gcount() == sizeof(int)*3) ) {
     delete[](stuff);
-    return -1;
+    return 0;
   }
   int length = stuff[2];
   int docf = stuff[0];
@@ -167,13 +187,22 @@ float InvFPIndex::docLengthAvg(){
 }
 
 int InvFPIndex::docCount(int termID) {
+  if ((termID <0) || (termID > counts[UNIQUE_TERMS])) {
+    cerr << "Error:  Trying to get docCount for invalid termID" << endl;
+    return 0;
+  }
+
+  // this is OOV
+  if (termID == 0)
+    return 0;
+
   int df;
   TERMID_T t;
   ifstream look;
   look.open(invfiles[lookup[termID].fileid], ios::in | ios::binary);
   if (!look) {
     fprintf(stderr, "Could not open indexfile for reading.\n");
-    return -1;
+    return 0;
   }
 
   look.seekg(lookup[termID].offset, ios::beg);
@@ -183,60 +212,55 @@ int InvFPIndex::docCount(int termID) {
   look.read((char*)&df, sizeof(int));
   look.close();
   if ( !(look.gcount() == sizeof(int)) ) 
-    return -1;
+    return 0;
   
   return df;
 
-/*
-  int df;
-  FILE* look = fopen(names[DOC_INDEX], "rb");
-  if (look == NULL) {
-    fprintf(stderr, "Could not open indexfile for reading.\n");
-    return NULL;
-  }
-  
-  if (fseek(look, lookup[termID].offset, SEEK_SET) == 0) {
-    // read in the df
-    if (fscanf(look, "%d", &df) != 1) {
-      fclose(look);
-      return 0;
-    }
-    fclose(look);
-    return df;
-  } else {
-    fclose(look);
-    return 0;
-  }
-  */
 }
 
 int InvFPIndex::docLength(int docID) const{
+  if ((docID < 0) || (docID > counts[DOCS])) {
+    fprintf(stderr, "Error trying to get docLength for invalid docID.\n");
+    return 0;
+  }
+    
+  if (docID == 0)
+    return 0;
+
   int dl;
   DOCID_T id;
   ifstream look;
   look.open(dtfiles[dtlookup[docID].fileid], ios::in | ios::binary);
   if (!look) {
     fprintf(stderr, "Could not open term indexfile for reading.\n");
-    return -1;
+    return 0;
   }
   look.seekg(dtlookup[docID].offset, ios::beg);
   look.read((char*)&id, sizeof(DOCID_T));
   look.read((char*)&dl, sizeof(int));
   look.close();
   if ( !(look.gcount() == sizeof(int)) ) 
-    return -1;
+    return 0;
   
   return dl;
 }
 
 int InvFPIndex::docLengthCounted(int docID) {
+  if ((docID < 0) || (docID > counts[DOCS])) {
+    fprintf(stderr, "Error trying to get docLengthCounted for invalid docID.\n");
+    return 0;
+  }
+    
+  if (docID == 0)
+    return 0;
+
   int dl;
   DOCID_T id;
   ifstream look;
   look.open(dtfiles[dtlookup[docID].fileid], ios::in | ios::binary);
   if (!look) {
     fprintf(stderr, "Could not open term indexfile for reading.\n");
-    return -1;
+    return 0;
   }
   look.seekg(dtlookup[docID].offset, ios::beg);
   look.read((char*)&id, sizeof(DOCID_T));
@@ -244,17 +268,18 @@ int InvFPIndex::docLengthCounted(int docID) {
   look.read((char*)&dl, sizeof(int));
   look.close();
   if ( !(look.gcount() == sizeof(int)) ) 
-    return -1;
+    return 0;
   
   return dl;
 }
 
 DocInfoList* InvFPIndex::docInfoList(int termID){
-//  fprintf(stderr, "looking for termid %d\n", termID);
-//  entry e = contents[wordid];
-//  char* filename = IDmanager.getFile(e.fileid);
-// for now our index is always one file
-  if ((termID < 0) || (termID >= counts[UNIQUE_TERMS]))
+  if ((termID < 0) || (termID > counts[UNIQUE_TERMS])) {
+    cerr << "Error:  Trying to get docInfoList for invalid termID" << endl;    
+    return NULL;
+  }
+
+  if (termID == 0)
     return NULL;
 
   ifstream indexin;
@@ -271,40 +296,15 @@ DocInfoList* InvFPIndex::docInfoList(int termID){
     doclist = dlist;
     return doclist;
   }
-
-/*
-  FILE* look = fopen(names[DOC_INDEX], "rb");
-  if (look == NULL) {
-    fprintf(stderr, "Could not open indexfile for reading.\n");
-    return NULL;
-  }
-//  lookup = new entry[counts[UNIQUE_TERMS]];  
-
-  
-  
-  int length = lookup[termID].length;
-  if (fseek(look, lookup[termID].offset, SEEK_SET) == 0) {
-    list = (TERMID_T*) malloc(sizeof(TERMID_T) * length);
-
-    // read in the list
-    for (int i=0;i<length;i++) {
-      fscanf(look, "%d", &list[i]);
-    }
-    fclose(look);
-    DocInfoList* doclist;
-    InvFPDocList* dlist = new InvFPDocList();
-    dlist->setList(termID, length-1, list+1, *list);
-    doclist = dlist;
-    return doclist;
-  } else {
-    fclose(look);
-    return NULL;
-  }*/
-
 }
 
 TermInfoList* InvFPIndex::termInfoList(int docID){
-  if ((docID < 0) || (docID >= counts[DOCS]))
+  if ((docID < 0) || (docID > counts[DOCS])) {
+    fprintf(stderr, "Error trying to get termInfoList for invalid docID.\n");
+    return NULL;
+  }
+    
+  if (docID == 0)
     return NULL;
 
   ifstream indexin;
@@ -337,15 +337,15 @@ bool InvFPIndex::mainToc(char * fileName) {
   char val[128];
   while (!feof(in)) {
     fscanf(in, "%s %s", key, val);
-    if (strcmp(key, "NUM_DOCS:") == 0) {
+    if (strcmp(key, NUMDOCS_PAR) == 0) {
       counts[DOCS] = atoi(val);
-    } else if (strcmp(key, "NUM_TERMS:") == 0) {
+    } else if (strcmp(key, NUMTERMS_PAR) == 0) {
       counts[TOTAL_TERMS] = atoi(val);
-    } else if (strcmp(key, "NUM_UNIQUE_TERMS:") == 0) {
+    } else if (strcmp(key, NUMUTERMS_PAR) == 0) {
       counts[UNIQUE_TERMS] = atoi(val);
-    } else if (strcmp(key, "NUM_DTFILES:") == 0) {
+    } else if (strcmp(key, NUMDT_PAR) == 0) {
       counts[DT_FILES] = atoi(val);
-    } else if (strcmp(key, "NUM_INVFILES:") == 0) {
+    } else if (strcmp(key, NUMINV_PAR) == 0) {
       counts[INV_FILES] = atoi(val);
     }
 
@@ -364,7 +364,7 @@ bool InvFPIndex::indexLookup() {
     return false;
   }
 
-  lookup = new entry[counts[UNIQUE_TERMS]];
+  lookup = new entry[counts[UNIQUE_TERMS]+1];
   entry* e;
   TERMID_T tid =0;
   int fid =0;
@@ -387,7 +387,7 @@ bool InvFPIndex::dtLookup() {
     return false;
   }
 
-  dtlookup = new entry[counts[DOCS]];
+  dtlookup = new entry[counts[DOCS]+1];
   entry* e;
   TERMID_T tid =0;
   int fid =0;
@@ -470,7 +470,7 @@ bool InvFPIndex::termIDs() {
     fprintf(stderr, "Error opening termfile\n");
     return false;
   }
-  terms = new TERM_T[counts[UNIQUE_TERMS]];
+  terms = new TERM_T[counts[UNIQUE_TERMS]+1];
 
   int index;
   int len;
@@ -491,7 +491,7 @@ bool InvFPIndex::termIDs() {
   }
 
   fclose(in);
-  if (termtable.size() != counts[UNIQUE_TERMS]) {
+  if (termtable.size() != counts[UNIQUE_TERMS]+1) {
     cerr << "Didn't read in as many terms as we were expecting" << endl;
     return false;
   }
@@ -506,7 +506,7 @@ bool InvFPIndex::docIDs() {
     fprintf(stderr, "Error opening docfile\n");
     return false;
   }
-  docnames = new EXDOCID_T[counts[DOCS]];
+  docnames = new EXDOCID_T[counts[DOCS]+1];
 
   int index;
   int len;
@@ -527,7 +527,7 @@ bool InvFPIndex::docIDs() {
   }
   fclose(in);
 
-  if (doctable.size() != counts[DOCS]) {
+  if (doctable.size() != counts[DOCS]+1) {
     cerr << "Didn't read in as many docids as we were expecting" << endl;
     return false;
   }
