@@ -12,12 +12,7 @@
 #define _FLATTEXTDOCMGR_HPP
 
 #include "common_headers.hpp"
-#include "TrecParser.hpp"
-#include "WebParser.hpp"
-#include "ReutersParser.hpp"
-#include "ChineseParser.hpp"
-#include "ChineseCharParser.hpp"
-#include "ArabicParser.hpp"
+#include "TextHandlerManager.hpp"
 #include "Exception.hpp"
 #include "DocumentManager.hpp"
 
@@ -46,7 +41,8 @@ public:
   ///             mode = type of parser to use 
   ///             source = file with list of files this will manage
   FlattextDocMgr(char* name, ParseModes mode, char* source);
-  
+  FlattextDocMgr(string name, string mode, string source);  
+
   /// constructor (for open)
   ///             name = toc file for this manager (same as getMyID) 
   FlattextDocMgr(const char* name);
@@ -71,12 +67,12 @@ public:
 
 private:
   /// open the file with all the sources and save internally
-  bool readinSources(char* fn);
+  bool readinSources(const char* fn);
 
   /// save info we'll need to open this Manager
   void writeTOC();
 
-  bool loadTOC(char* fn);
+  bool loadTOC(const char* fn);
   bool loadFTLookup(const char* fn);
   bool loadFTFiles(const char* fn, int num);
 
@@ -87,7 +83,8 @@ private:
   vector<string> sources;   // list of all source files
   int fileid, lastid;       // fileid of current/last file being processed
   ofstream writefpos;       // stream for writing out file positions
-  map<char*, lookup_e, abc> table; 
+  map<char*, lookup_e*, abc> table; 
+  lookup_e* entries;        // array of lookup entries
 };
 
 #endif

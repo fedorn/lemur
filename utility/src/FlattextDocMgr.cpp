@@ -15,10 +15,13 @@
 #include "FlattextDocMgr.hpp"
 
 FlattextDocMgr::FlattextDocMgr(const char* name) {
+  myparser = NULL;
+  entries = NULL;
   open(name);
 }
 
 FlattextDocMgr::FlattextDocMgr(char* name, ParseModes mode, char* source) {
+  entries = NULL;
   numdocs = 0;
   readinSources(source);
   pm = mode;
@@ -27,14 +30,45 @@ FlattextDocMgr::FlattextDocMgr(char* name, ParseModes mode, char* source) {
   prevpos = 0;
 }
 
+FlattextDocMgr::FlattextDocMgr(string name, string mode, string source) {
+  entries = NULL;
+  numdocs = 0;
+  readinSources(source.c_str());
+  // convert mode to lower
+  for (int i=0;i<mode.length();i++)
+    mode[i] = tolower(mode[i]);
+
+  if (mode == "trec")
+    pm = TREC;
+  else if (mode == "web")
+    pm = WEB;
+  else if (mode == "arabic")
+    pm = ARABIC;
+  else if (mode == "chinese")
+    pm = CHINESE;
+  else if (mode == "chinesechar")
+    pm = CHINESECHAR;
+
+  //  myparser = createParser(mode);
+  myparser = TextHandlerManager::createParser(mode);
+  IDname = name;
+  prevpos = 0;
+}
+
 FlattextDocMgr::~FlattextDocMgr() {
-  delete (myparser);
+  if (myparser)
+    delete myparser;
+  if (entries)
+    delete[]entries;
+  // free docids
+  map<char*, lookup_e*, abc>::iterator finder;
+  for (finder=table.begin();finder != table.end();finder++) 
+    free(finder->first);
 }
 
 bool FlattextDocMgr::open(const char* manname) {
-  char* temp = strdup(manname);
-  IDname = temp;
-  return loadTOC(temp);
+  IDname = manname;
+  return loadTOC(manname);
 }
 
 void FlattextDocMgr::buildMgr() {
@@ -98,25 +132,25 @@ const char* FlattextDocMgr::getMyID() {
 }
 
 char* FlattextDocMgr::getDoc(const char* docID) {
-  map<char*, lookup_e, abc>::iterator finder;
+  map<char*, lookup_e*, abc>::iterator finder;
   finder = table.find((char*)docID);
   if (finder == table.end()) {
     cerr << "This docid " << docID << " was not found." << endl;
     return "";
   }
 
-  lookup_e e = finder->second;
-  char* doc = (char*) malloc(e.bytes * sizeof(char)+1);
-  ifstream read(sources[e.fid].c_str());
+  lookup_e* e = finder->second;
+  char* doc = (char*) malloc((*e).bytes * sizeof(char)+1);
+  ifstream read(sources[(*e).fid].c_str());
   if (!read.is_open()) {
-    cerr << "Could not open file " << sources[e.fid] << " to get document" << endl;
+    cerr << "Could not open file " << sources[(*e).fid] << " to get document" << endl;
     return "";
   }
-  read.seekg(e.offset, ios::beg);
-  read.read(doc,e.bytes);
+  read.seekg((*e).offset, ios::beg);
+  read.read(doc,(*e).bytes);
   read.close();
   // null terminate the string
-  doc[e.bytes+1] = '\0';
+  doc[(*e).bytes] = '\0';
   return doc;
 }
 
@@ -146,7 +180,7 @@ Parser* FlattextDocMgr::createParser (ParseModes mode) {
 }
 
 /*=================  PRIVATE  ==========================*/
-bool FlattextDocMgr::readinSources(char* fn){
+bool FlattextDocMgr::readinSources(const char* fn){
   ifstream files(fn);
   string file;
 
@@ -175,7 +209,7 @@ void FlattextDocMgr::writeTOC() {
   toc.close();
 }
 
-bool FlattextDocMgr::loadTOC(char* fn) {
+bool FlattextDocMgr::loadTOC(const char* fn) {
   ifstream toc(fn);
   if (!toc.is_open()) {
     throw Exception ("FlattextDocMgr", "Cannot open TOC file for reading");
@@ -184,34 +218,32 @@ bool FlattextDocMgr::loadTOC(char* fn) {
   string key, val;
   int num;
   char* files;
+  char* lookup;
   while (toc >> key >> val) {
-    if (key.compare("FILE_LOOKUP") == 0) {
-      if (!loadFTLookup(val.c_str()))
-	return false;
-    }
+    if (key.compare("FILE_LOOKUP") == 0) 
+      lookup = strdup(val.c_str());
     else if (key.compare("FILE_IDS") == 0)
       files = strdup(val.c_str());
+    else if (key.compare("NUM_DOCS") == 0)
+      numdocs = atoi(val.c_str());
     else if (key.compare("NUM_FILES") == 0)
       num = atoi(val.c_str());
     else if (key.compare("PARSE_MODE") == 0) 
-      {
-	if (val.compare("0") == 0)
-	  pm =TREC;
-	else if (val.compare("1") == 0)
-	  pm = WEB;
-	else if (val.compare("2") == 0)
-	  pm = CHINESE;
-	else if (val.compare("3") == 0)
-	  pm = CHINESECHAR;
-	else if (val.compare("4") == 0)
-	  pm = ARABIC;
-
-      }
+      pm = (ParseModes) atoi(val.c_str());
   }
-  if (!loadFTFiles(files, num))
+  if (!loadFTLookup(lookup)) {
+    free(lookup);
+    free(files);
     return false;
+  }
+  if (!loadFTFiles(files, num)) {
+    free(lookup);
+    free(files);
+    return false;
+  }
   myparser = createParser(pm);
   free(files);
+  free(lookup);
   toc.close();
 
   return true;
@@ -226,13 +258,18 @@ bool FlattextDocMgr::loadFTLookup(const char* fn) {
   string docid;
   int fid;
   long pos, bytes;
+  entries = new lookup_e[numdocs];
+  lookup_e* e;
+  int index=0;
   while (lup >> docid >> fid >> pos >> bytes) {
     char* id = strdup(docid.c_str());
-    lookup_e* e = new lookup_e;
+    e = &entries[index];
+    index++;
     e->fid = fid;
     e->offset = pos;
     e->bytes = bytes;
-    table[id] = *e;
+    // map does shallow copy
+    table[id] = e;
   }
 
   lup.close();
