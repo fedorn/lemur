@@ -14,70 +14,67 @@
 
 
 #include "InQueryRetMethod.hpp"
-#include "Param.hpp"
+#include "StructQryDocRep.hpp"
 #include <cmath>
 
-double StructQryDocRep::termWeight(int termID, DocInfo *info) {
-  // docinfo is useless here, keep it for an identical termWeight api
-  double dtf=(double)docTermFrq->count(termID);
-  return beliefScore(dtf, idf[termID]);
-}
-
-double StructQryDocRep::computeIdfScore(double df) {
-  return log((double)(ind.docCount()+0.5)/(double)df)/(log((double)ind.docCount())+1);
-}
-
-double StructQryDocRep::beliefScore(double df, double idf) {
-  double a = InQueryParameter::defaultBelief;
-  return (a+(1-a)*(df/(df+0.5+1.5*(passageLength()/ind.docLengthAvg())))*idf);
-}
-
-InQueryRetMethod::InQueryRetMethod(InvFPIndex &dbIndex, ScoreAccumulator &accumulator) : 
-  StructQueryRetMethod(dbIndex, accumulator) {
-
-  docPrm.defaultBelief = InQueryParameter::defaultBelief;
-  qryPrm.fbCoeff = InQueryParameter::defaultFBCoeff;
-  qryPrm.fbTermCount = InQueryParameter::defaultFBTermCount;
-
+InQueryRetMethod::InQueryRetMethod(InvFPIndex &dbIndex, double belief,
+				   int fbTerms, double fbCoef, bool cacheIDF):
+  StructQueryRetMethod(dbIndex), fbCoeff(fbCoef), fbTermCount(fbTerms), 
+  defaultBelief(belief) {
+  docCount = dbIndex.docCount();
+  docLengthAverage = dbIndex.docLengthAvg();
     // pre-compute IDF values
-  idfV = new double[dbIndex.termCountUnique()+1];
-  for (int i=1; i<=dbIndex.termCountUnique(); i++) {
-    idfV[i] = log((double)(dbIndex.docCount()+0.5)/(double)dbIndex.docCount(i))/(log((double)(dbIndex.docCount())+1));
+  if (cacheIDF) {
+    int termCount = dbIndex.termCountUnique();
+    double denom = log(docCount + 1.0);
+    double numer = docCount + 0.5;
+    idfV = new double[termCount + 1];
+    idfV[0] = 0; // make sure an entry for OOV terms.
+    for (int i = 1; i <= termCount; i++) {
+      idfV[i] = log(numer/(double)dbIndex.docCount(i))/denom;
+    }
+  } else {
+    idfV = NULL;
   }
-
   scFunc = new StructQueryScoreFunc();
 }
 
-void InQueryRetMethod::updateStructQuery(StructQueryRep &qryRep, DocIDSet &relDocs)
-{
+void InQueryRetMethod::updateStructQuery(StructQueryRep &qryRep, 
+					 DocIDSet &relDocs) {
   // build a top query node of wsum, choose new terms as is done by
   // TFIDF
-  int totalTerm=index.termCountUnique();  
-  static float * expandTerms = new float[totalTerm+1]; // one extra for OOV
-
+  int totalTerm = ind.termCountUnique();  
+  float * expandTerms = new float[totalTerm + 1]; // one extra for OOV
   int i;
-  for (i=1;i<=totalTerm;i++) {
-    expandTerms[i]=0;
+  for (i = 1; i <= totalTerm; i++) {
+    expandTerms[i] = 0;
   }
-
   relDocs.startIteration();
+  int docCount = ind.docCount();
+  double denom = log(docCount + 1.0);
+  double numer = docCount + 0.5;
   while (relDocs.hasMore()) {
     double relPr;
     int docID;
     relDocs.nextIDInfo(docID, relPr);
-    StructQryDocRep *dr= new StructQryDocRep((int)docID, (InvFPIndex &)ind, &idfV[0]);
-    for (i=1;i<=totalTerm;i++) {
-      double dtf=(double)(dr->docTermFrq->count(i));
-      if(dtf>0)  // rel part of Rocchio weight, i.e. beta*X_rel 
-	expandTerms[i] +=qryPrm.fbCoeff * (dr->beliefScore(dtf, idfV[i]));
+    StructQryDocRep *dr = (StructQryDocRep *)computeDocRep(docID);
+    TermInfoList *tList = ind.termInfoList(docID);
+    tList->startIteration();
+    while (tList->hasMore()) {
+      TermInfo *info = tList->nextEntry();
+      int tid = info->id();
+      double dtf = (double)info->count();
+      if (idfV != NULL)
+	expandTerms[tid] += fbCoeff * (dr->beliefScore(dtf, idfV[tid]));
+      else      
+	expandTerms[tid] += fbCoeff * (dr->beliefScore(dtf, log(numer/(double)ind.docCount(tid))/denom));
     }
-    delete dr;
+    delete(dr);
+    delete(tList);
   }
-
-  IndexedRealVector expTerms(0);
- 
-  for (i=1; i<= totalTerm; i++) {
-    if (expandTerms[i]>0) {
+  IndexedRealVector expTerms;
+  for (i = 1; i <= totalTerm; i++) {
+    if (expandTerms[i] > 0) {
       IndexedReal entry;
       entry.ind = i;
       entry.val = expandTerms[i];
@@ -86,31 +83,32 @@ void InQueryRetMethod::updateStructQuery(StructQueryRep &qryRep, DocIDSet &relDo
   }
   expTerms.Sort();
   QueryNode *expandQry = new WsumQnode(1.0);
-  QnList *chlist= new QnList();
-  expandQry->ch=chlist;
-  
-  QueryNode *qn=qryRep.topnode();
+  QnList *chlist = new QnList();
+  //  expandQry->ch = chlist;
+  expandQry->setChildren(chlist);
+  QueryNode *qn = qryRep.topnode();
   // weight the original query
-  qn->setWeight(1-qryPrm.fbCoeff);
+  qn->setWeight(1 - fbCoeff);
   // add the original query as the first child of the new wsum
   chlist->push_back(qn);
   
   IndexedRealVector::iterator j;
-  int termCount=0;
-  for (j= expTerms.begin();j!=expTerms.end();j++) {
-    if (termCount++ >= qryPrm.fbTermCount) {
-      break;
-    } else {
-      // adding the expanded terms to the query
-      QueryNode *expQTerm = new TermQnode((*j).ind, (*j).val);
-      DocInfoList *dl = ind.docInfoList((*j).ind);
-      qryRep.copyDocList(dl, expQTerm);
-      delete dl;
-      chlist->push_back(expQTerm);
-    }
+  int termCount = 0;
+  for (j = expTerms.begin(); 
+       termCount < fbTermCount && j != expTerms.end(); 
+       j++, termCount++) {
+    // adding the expanded terms to the query
+    int tid = (*j).ind;
+    double belief = (*j).val;
+    QueryNode *expQTerm = new TermQnode(tid, belief);
+    DocInfoList *dl = ind.docInfoList(tid);
+    int listlen = ind.docCount(tid);
+    int tf = ind.termCount(tid);
+    expQTerm->copyDocList(listlen, tf, dl, docCount);
+    chlist->push_back(expQTerm);
   }
-  qryRep.unionDocList(expandQry);
-  expandQry->entries=termCount+1;
+  delete[](expandTerms);
+  expandQry->updateDocList(docCount);
+  expandQry->setEntries(termCount + 1);
   qryRep.setTopnode(expandQry);
 }
-

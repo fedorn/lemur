@@ -11,168 +11,90 @@
 
 #ifndef _STRUCTQRYDOCREP_HPP
 #define _STRUCTQRYDOCREP_HPP
-
 #include "DocumentRep.hpp"
-#include "InvFPTermList.hpp"
-#include "InvFPIndex.hpp"
-#include "Counter.hpp"
-#include <cstring>
-
-/// Document term frequency counter that supports both whole documents and
-/// and passages of documents. Requires the use of an InvFPIndex.
-class DocTermsCounter {
-public:
-  DocTermsCounter(int docID, InvFPIndex &indx)  : 
-    ind(indx)
-  { 
-    int size = indx.termCountUnique()+1;
-    ct = new int [size];
-    //    for (int i=0; i<size; i++) ct[i]=0;
-    memset(ct, '\0', size * sizeof(int));
-    // Make it faster by skipping the countTerms step.
-    TermInfoList *tList = indx.termInfoListSeq(docID);
-    TermInfo *info;
-    tList->startIteration();
-    while (tList->hasMore()) {
-      info = tList->nextEntry();
-      ct[info->id()]++;
-    }
-    delete tList;
-  }
-
-  /// construct a counter for a passage from the document.
-  DocTermsCounter(int docID, InvFPIndex &indx, int start, int end) : 
-    ind(indx)
-  { 
-    int size = indx.termCountUnique()+1;
-    ct = new int [size];
-    //    for (int i=0; i<size; i++) ct[i]=0;
-    memset(ct, '\0', size * sizeof(int));
-    TermInfoList *dTerms=indx.termInfoListSeq(docID);
-    InvFPTerm *term;
-    dTerms->startIteration();
-    while (dTerms->hasMore()) {
-      term = (InvFPTerm *) dTerms->nextEntry();
-      if(term->position()>start) {
-	if(term->position() > end)
-	  break;
-	ct[term->id()]++;
-      }
-    }
-    delete dTerms;
-  }
-
-  virtual ~DocTermsCounter() { delete[] (ct);}
-  /// return the count of an event
-  virtual double count(int eventIndex) {
-    return ct[eventIndex];
-  }
-
-protected:
-  int *ct;
-  InvFPIndex &ind;
-};
-#if 0
-class DocTermsCounter : public ArrayCounter <int> {
-public:
-  /// construct a counter for a doc
-  DocTermsCounter(int docID, InvFPIndex &indx) : 
-    ind(indx), ArrayCounter<int>(indx.termCountUnique()+1)
-  { 
-    TermInfoList *tList = indx.termInfoListSeq(docID);
-    TermInfo *info;
-    tList->startIteration();
-    while (tList->hasMore()) {
-      info = tList->nextEntry();
-      incCount(info->id(), 1);
-    }
-    delete tList;
-  }
-  /// construct a counter for a passage from the document.
-  DocTermsCounter(int docID, InvFPIndex &indx, int start, int end) : 
-    ind(indx), ArrayCounter<int>(indx.termCountUnique()+1)
-  { 
-    TermInfoList *dTerms=indx.termInfoListSeq(docID);
-    InvFPTerm *term;
-    dTerms->startIteration();
-    while (dTerms->hasMore()) {
-      term = (InvFPTerm *) dTerms->nextEntry();
-      if(term->position()>start) {
-	if(term->position() > end)
-	  break;
-	incCount(term->id(), 1);
-      }
-    }
-    delete dTerms;
-  }
-
-  virtual ~DocTermsCounter() {}
-
-protected:
-  InvFPIndex &ind;
-};
-#endif
-/// Representation of a doc (as a weighted vector) in the StructQry method.
+/// Representation of a document for structured query retrieval method.
 /// Provides support for passage level operations on a document.
 class StructQryDocRep : public DocumentRep {
 public:
-  /// New StructQryDocRep for an entire document.
-  StructQryDocRep(int docID, InvFPIndex &dbIndex, double *idfValue) :
-    DocumentRep(docID), did(docID), ind(dbIndex), idf(idfValue) {
-    start=0;
-    end=dbIndex.docLength(docID);
-    size=end;
-    docEnd=end;
-    docTermFrq = new DocTermsCounter(docID, dbIndex);
+  /// New StructQryDocRep
+  StructQryDocRep(int docID, double *idfValue, int docLength, int docCount,
+		  double docLengthAverage, double db) : 
+    DocumentRep(docID), did(docID), idf(idfValue), end(docLength),
+    docEnd(docLength), size(docLength), start(0),
+    dla(docLengthAverage), defaultBelief(db) {
+    oneMinusDB = 1 - defaultBelief;
+    denom = log(docCount + 1.0);
+    numer = docCount + 0.5;
   }
-
-  /// New StructQryDocRep for a passage from a document beginning at bg and
-  /// ending and nd.
-  StructQryDocRep(int docID, InvFPIndex &dbIndex, double *idfValue, int bg, int nd) :
-    DocumentRep(docID), did(docID), ind(dbIndex), idf(idfValue), start(bg), end(nd) {
-    size=nd-bg+1;
-    docEnd=dbIndex.docLength(docID);
-    maxScore=0;
-    offset=0;
-    docTermFrq = new DocTermsCounter(docID, dbIndex, bg, nd);
+  /// no clean up
+  virtual ~StructQryDocRep() {}
+  /// needed for DocRep interface.
+  virtual double termWeight(int termID, DocInfo *info) { return 0;}
+  /// Belief score for this term with this dtf.
+  virtual double termWeight(int termID, double dtf, int df) {
+    if (idf)
+      return beliefScore(dtf, idf[termID]);
+    else
+      return beliefScore(dtf, computeIdfScore(df));
   }
-
-  virtual ~StructQryDocRep() { delete docTermFrq; }
-  /// Belief score for this term in this document.
-  virtual double termWeight(int termID, DocInfo *info);
-  /// return 0.
+  /// needed for DocRep interface.
   virtual double scoreConstant() { return 0;}
 
-  virtual void startPassageIteration();
-  virtual bool hasMorePassage();
+  ///pass in passage size.
+  void startPassageIteration(int sz) {
+    size = sz;
+    increment = size/2;
+    start = 0;
+    end = size < docEnd ? size : docEnd;
+  }
+  /// any passages left?
+  bool hasMorePassage() {
+    // still some terms in the list.
+    return(start < docEnd);
+  }
+
   /// next block of psgSize termids, empty positions == OOV (0);
-  virtual void nextPassage();
+  void nextPassage() {
+    if(start + increment < docEnd)
+      start += increment;
+    else
+      start = docEnd;
+    end = (start + size) < docEnd ? (start + size) : docEnd;
+  }
+
   /// compute idf for the given document frequency as
   /// log((|C|+0.5)/df)/(log(|C|+1)
-  virtual double computeIdfScore(double df);
-  /// compute the belief score for a given term frequency.
-  virtual double beliefScore(double df, double idf);
-  /// The lenght of the current passage.
-  virtual double passageLength() {return end-start;};
+  double computeIdfScore(double df) {
+    return log(numer/df)/denom;
+  }
+
+  /// compute the belief score for a given tf/idf.
+  double beliefScore(double df, double idf) {
+    return (defaultBelief + oneMinusDB
+	    * (df / (df + 0.5 + 1.5* ((end - start)/dla))) * idf);
+  }
+
   /// the document id.
   int did;
-  InvFPIndex & ind;
-
-  double *idf;
   /// start position of a passage
   int start; 
   /// end position of a passage
   int end;
+
+private:
+  /// cached term idf values. May be NULL.
+  double *idf;
   /// size used by passages
   int size; 
   /// passage overlap value. default is size/2.
   int increment; 
   /// length of the document.
   int docEnd;  
-  /// record the offset of passage having the maxScore
-  int offset;      
-  /// record the max score of the passages
-  double maxScore; 
-  DocTermsCounter *docTermFrq;
+  /// average document length
+  double dla;
+  /// terms in idf formula
+  double numer, denom;
+  /// default belief and 1 - dB.
+  double defaultBelief, oneMinusDB;
 };
 #endif

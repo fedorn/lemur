@@ -17,37 +17,13 @@
 
 #include "StructQueryRetMethod.hpp"
 #include "StructQryDocRep.hpp"
-
-/// Parameters used in the InQuery retrieval method.
-namespace InQueryParameter {
-  struct docParam {
-    /// default belief value (score) for a node.
-    double defaultBelief;
-  };
-  struct qryParam {
-    /// Q_new = (1-fbCoeff)*Q_old + fbCoeff*FBModel
-    double fbCoeff;
-    /// how many terms to use for the re-estimated query model
-    int fbTermCount;
-  };
-
-  static double defaultFBCoeff = 0.5;
-  static int defaultFBTermCount = 50;
-  static double defaultBelief = 0.4;
-};
-
-/// Representation of a query (as a weighted vector) in the InQuery method
+/// Representation of a query in the InQuery method
 class InQueryRep : public StructQueryRep {
 public:
-  /// construct a query model based on query text
-  InQueryRep(StructQuery &qry, InvFPIndex &dbIndex) :  StructQueryRep(qry, dbIndex, InQueryParameter::defaultBelief), ind(dbIndex) {}
+  InQueryRep(StructQuery &qry, InvFPIndex &dbIndex, double db):
+    StructQueryRep(qry, dbIndex, db) {}
   virtual ~InQueryRep() {}
-
-protected:
-  double *idf;
-  InvFPIndex &ind;
 };
-
 
 /// The InQuery retrieval method for structured queries. Implements the
 /// InQuery formulation of idf weighting and default belief value. Behavior
@@ -58,48 +34,38 @@ protected:
 class InQueryRetMethod : public StructQueryRetMethod {
 public:
 
-  InQueryRetMethod(InvFPIndex &dbIndex, ScoreAccumulator &accumulator);
-  virtual ~InQueryRetMethod() {delete [] idfV; delete scFunc;}
+  //  InQueryRetMethod(InvFPIndex &dbIndex, ScoreAccumulator &accumulator);
+  InQueryRetMethod(InvFPIndex &dbIndex, double belief, int fbTerms, 
+		   double fbCoef, bool cacheIDF);
+  virtual ~InQueryRetMethod() {
+    delete[](idfV); 
+    delete(scFunc);
+  }
 
   virtual StructQueryRep *computeStructQueryRep(StructQuery &qry) {
-    return (new InQueryRep(qry, index));
+    return (new InQueryRep(qry, (InvFPIndex &)ind, defaultBelief));
   }
 
   virtual DocumentRep *computeDocRep(int docID) { 
-    return (new StructQryDocRep(docID, index, idfV));
+    return (new StructQryDocRep(docID, idfV, ind.docLength(docID),
+				docCount, docLengthAverage, 
+				defaultBelief));
   }
   virtual ScoreFunction *scoreFunc() {
     return (scFunc);
   }
   /// Create new structured query that is a weighted sum of the original
-  /// query and the terms selected by the simplified Rocchio of the
-  /// TFIDFRetMethod class.
+  /// query and the terms selected.
   virtual void updateStructQuery(StructQueryRep &qryRep, DocIDSet &relDocs);
-
-  void setDocINQParam(InQueryParameter::docParam &dParam);
-  void setQueryINQParam(InQueryParameter::qryParam &qParam);
-
-protected:
+private:
   double *idfV;
-  /// keep a copy to be used at any time
   ScoreFunction *scFunc; 
-  InQueryParameter::qryParam qryPrm;
-  InQueryParameter::docParam docPrm;
-
+  double fbCoeff;
+  int fbTermCount;
+  double defaultBelief;
+  int docCount;
+  double docLengthAverage;
 };
-
-inline void InQueryRetMethod::setDocINQParam(InQueryParameter::docParam &dParam)
-{
-  docPrm = dParam;
-}
-
-
-
-inline void InQueryRetMethod::setQueryINQParam(InQueryParameter::qryParam &qParam)
-{
-  qryPrm = qParam;
-}
-
 #endif /* _INQUERYRETMETHOD_HPP */
 
 

@@ -161,17 +161,20 @@ namespace CosSimParameter {
 
 namespace InQueryParameter {
   /// @name InQuery structured query parameters
-  //@{
-  static qryParam qryPrm;
-  static docParam docPrm;
-  //@}
-
-
+  /// default feedback coefficient (0.5).
+  static double fbCoeff = 0.5;
+  /// default number of feedback terms (50).
+  static int fbTermCount = 50;
+  /// default belief value (score) for a node (0.4).
+  static double defaultBelief = 0.4;
+  /// cache term idf values
+  static bool cacheIDF = false;
   static void get()
   {
-    docPrm.defaultBelief = ParamGetDouble("defaultBelief",defaultBelief);
-    qryPrm.fbCoeff = ParamGetDouble("feedbackPosCoeff",defaultFBCoeff);
-    qryPrm.fbTermCount = ParamGetInt("feedbackTermCount",defaultFBTermCount);
+    defaultBelief = ParamGetDouble("defaultBelief", defaultBelief);
+    fbCoeff = ParamGetDouble("feedbackPosCoeff", fbCoeff);
+    fbTermCount = ParamGetInt("feedbackTermCount", fbTermCount);
+    cacheIDF = (ParamGetInt("cacheIDF", cacheIDF) == 1);
   }
 };
 

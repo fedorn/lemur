@@ -159,7 +159,7 @@ double CosSimRetMethod::docNorm(int docID) {
 void CosSimRetMethod::updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs)
 {
   int totalTerm=ind.termCountUnique();  
-  static float * centroidVector = new float[totalTerm+1]; // one extra for OOV
+  float * centroidVector = new float[totalTerm+1]; // one extra for OOV
 
   int i;
   for (i=1;i<=totalTerm;i++) {
@@ -211,7 +211,7 @@ void CosSimRetMethod::updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs)
       (dynamic_cast<CosSimQueryRep *>(&qryRep))->incCount((*j).ind, (*j).val*fbParam.posCoeff);
     }
   }
-
+  delete[](centroidVector);
 }
 
 

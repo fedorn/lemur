@@ -48,23 +48,22 @@ function <tt>g</tt> of the scores of each child query node in
 
 class StructQueryRetMethod : public RetrievalMethod {
 public:
-  StructQueryRetMethod(InvFPIndex &ind,  ScoreAccumulator & accumulator) : 
-    RetrievalMethod(ind), scAcc(accumulator), index(ind){}
+  StructQueryRetMethod(InvFPIndex &ind) : RetrievalMethod(ind) {}
   virtual ~StructQueryRetMethod() {}
-  /// compute the query representation for a text query (caller responsible for deleting the memory of the generated new instance)
-  virtual StructQueryRep *computeStructQueryRep(StructQuery &qry)=0;
+  /// compute the query representation for a text query 
+  //(caller responsible for deleting the memory of the generated new instance)
+  virtual StructQueryRep *computeStructQueryRep(StructQuery &qry) = 0;
 
   /// overriding abstract class method
   virtual QueryRep *computeQueryRep(Query &qry); 
-  /// score the query against the given document vector.
-  virtual double scoreDocVector(StructQueryRep &qRep, int docID, FreqVector &docVector);
   /// score the query against the given document id.
   virtual double scoreDoc(QueryRep &qry, int docID);
   /// score the query against the collection.
   virtual void scoreCollection(QueryRep &qry, IndexedRealVector &results);
 
-  /// compute the doc representation (caller responsible for deleting the memory of the generated new instance)
-  virtual DocumentRep *computeDocRep(int docID) =0;
+  /// compute the doc representation (caller responsible for deleting 
+  /// the memory of the generated new instance)
+  virtual DocumentRep *computeDocRep(int docID) = 0;
   /// return the scoring function pointer
   virtual ScoreFunction *scoreFunc() = 0;
   /// update the query
@@ -72,15 +71,15 @@ public:
     updateStructQuery(*((StructQueryRep *)(&qryRep)), relDocs);
   }
 
-  /// Modify/update the query representation based on a set (presumably) relevant documents
-  virtual void updateStructQuery(StructQueryRep &qryRep, DocIDSet &relDocs)=0;
+  /// Modify/update the query representation based on a set (presumably)
+  /// relevant documents
+  virtual void updateStructQuery(StructQueryRep &qryRep, 
+				 DocIDSet &relDocs) = 0;
 
-  /// Efficient scoring with the inverted index
-  virtual void scoreInvertedIndex(QueryRep &qryRep, IndexedRealVector &scores, bool scoreAll=false);
-
-protected:
-  ScoreAccumulator &scAcc;
-  InvFPIndex &index;
+  /// Scoring with the inverted index
+  virtual void scoreInvertedIndex(QueryRep &qryRep, 
+				  IndexedRealVector &scores, 
+				  bool scoreAll=false);
 };
 
 /// ScoreFunction for structured querys. Provides evalQuery.
