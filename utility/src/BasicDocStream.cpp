@@ -96,10 +96,23 @@ void BasicDocStream::startDocIteration()
   nextTokenRead =false;
 }
 
-
+#if 0
 Document *BasicDocStream::nextDoc()
 {
   static BasicTokenDoc doc(ifs);
+  doc.readID();
+  nextTokenRead = false;
+  return &doc;
+}
+#endif
+
+Document *BasicDocStream::nextDoc()
+{
+  // fails to initialize properly, preventing reuse of a 
+  // BasicDocStream (or opening more than one).
+  // static BasicTokenDoc doc(ifs);
+  static BasicTokenDoc doc;
+  doc.docStr = ifs;
   doc.readID();
   nextTokenRead = false;
   return &doc;

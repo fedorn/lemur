@@ -79,6 +79,8 @@ class BasicTokenTerm : public TokenTerm {
 
 class BasicTokenDoc : public Document {
  public:
+  BasicTokenDoc() {
+  }
   BasicTokenDoc(ifstream *stream): docStr(stream) {
   }
    void startTermIteration(); 
