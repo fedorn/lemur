@@ -13,7 +13,6 @@
 #ifndef _BITVECTORH_
 #define _BITVECTORH_
 
-#include <stream.h>
 #include "common_headers.hpp"
 
 class BitVector : public vector<bool> {
