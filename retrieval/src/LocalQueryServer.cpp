@@ -167,7 +167,12 @@ INT64 LocalQueryServer::termCount( int term ) {
 
 INT64 LocalQueryServer::termCount( const std::string& term ) {
   std::string stem = _repository.processTerm( term );
-  return stemCount( stem );
+  // stopwords return a string of length 0, causing Keyfile to throw.
+  if( stem.length() != 0 ) {
+    return stemCount( stem );
+  } else {
+    return 0;
+  }
 }
 
 INT64 LocalQueryServer::stemCount( const std::string& stem ) {
@@ -185,7 +190,12 @@ INT64 LocalQueryServer::termFieldCount( int term, const std::string& field ) {
 
 INT64 LocalQueryServer::termFieldCount( const std::string& term, const std::string& field ) {
   std::string stem = _repository.processTerm( term );
-  return stemFieldCount( stem, field );
+  // stopwords return a string of length 0, causing Keyfile to throw.
+  if( stem.length() != 0 ) {
+    return stemFieldCount( stem, field );
+  } else {
+    return 0;
+  }
 }
 
 INT64 LocalQueryServer::stemFieldCount( const std::string& stem, const std::string& field ) {
@@ -202,7 +212,12 @@ std::string LocalQueryServer::termName( int term ) {
 int LocalQueryServer::termID( const std::string& term ) {
   IndriIndex* index = _repository.index();
   std::string processed = _repository.processTerm( term );
-  return index->term( processed.c_str() );
+  // stopwords return a string of length 0, causing Keyfile to throw.
+  if( processed.length() != 0 ) {
+    return index->term( processed.c_str() );
+  } else {
+    return 0;
+  }
 }
 
 std::vector<std::string> LocalQueryServer::fieldList() {
