@@ -25,6 +25,7 @@
  * NAME DATE - COMMENTS
  * tnt 03/01 - created
  * tnt 06/02 - subclass from InvPushIndex
+ * dmf 10/18/2002 -- Add include of InvFPTermList to access binWriteC.
  *
  ======================================================================*/
 #include "common_headers.hpp"
@@ -32,6 +33,7 @@
 #include "InvFPTypes.hpp"
 #include "InvFPDocList.hpp"
 #include "InvFPTerm.hpp"
+#include "InvFPTermList.hpp"
 #include "InvFPIndexMerge.hpp"
 #include "InvPushIndex.hpp"
 
