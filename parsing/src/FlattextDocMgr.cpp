@@ -49,8 +49,10 @@ void FlattextDocMgr::buildMgr() {
 
   long one = 1;
   lastid = -1;
+  cerr << "Building " << IDname << endl;
   for (int i=0;i<sources.size();i++) {
     fileid = i;
+    cerr << "  *Parsing " << sources[i] << endl;
     myparser->parse((char*)sources[i].c_str());
     fid << i << " " << sources[i] << endl;
 
