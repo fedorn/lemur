@@ -1,0 +1,106 @@
+/*! \mainpage Lemur Toolkit Documentation
+
+  \section install Installation 
+ 
+  - To configure the lemur toolkit
+      -# go to top level lemur directory.
+      -# run <tt>configure</tt> to generate MakeDefns, Makefile, 
+         and Makefile.app. <tt>configure</tt> accepts following arguments:
+		- <tt>--enable-distrib</tt> compiles and installs 
+		  the distributed retrieval components. Default is disabled.
+		- <tt>--enable-summarization</tt> compiles and installs the
+		  summarization components. Default is disabled.
+		- <tt>--prefix=<install-directory></tt> Specifes the 
+		  directory for the installed the toolkit. 
+		  Default is /usr/local.
+
+  - To make the lemur toolkit library and applications
+      -# go to top level lemur directory.
+      -# run <tt>make</tt> (or gmake)
+
+  - To clean the lemur toolkit (remove everything but the source)
+      -# go to top level lemur directory.
+      -# run <tt>make clean</tt> (or gmake clean)
+
+  - To install the lemur toolkit library and applications.
+      -# follow the instructions above for configuring and making the 
+         toolkit library and applications.
+      -# go to top level lemur directory.
+      -# run <tt>make install</tt> (or gmake install)
+
+The lemur include files will be installed in
+<install-directory>/include, the lemur library will be installed in
+<install-directory>/lib/liblemur.a, and the applications will be
+installed in <install-directory>/bin. If you only want the applications,
+you can use <tt>make install-bin</tt>. If you only want the library and 
+header files, you can use <tt>make install-lib</tt>. The stemmer data 
+files are installed in <install-directory>/kstem_data and
+<install-directory>/arabic_stem_data when either the applications or the
+library are installed.
+
+  \section program  Programming with the lemur toolkit
+
+To build an application using the toolkit library:
+
+      -# follow the instructions above for installing the 
+         toolkit library.
+      -# Copy Makefile.app from the top level lemur directory to the 
+         directory with your application's source code. Edit the file 
+	 and fill in values for
+        - OBJS -- list of each of the object files needed to build 
+	  your application.
+	- PROG -- name for your application.
+      -# use <tt>make -f Makefile.app</tt> to build your application.
+
+  \section change  Change the toolkit
+
+Modifying the toolkit is not recommended, but individual users may need 
+to customize its behavior.
+
+  - To modify an existing file or add a file to an existing directory:
+      -# Make the changes
+      -# follow the instructions above for making the 
+         toolkit library and applications.
+      -# follow the instructions above for installing the 
+         toolkit library.
+
+  - To add a new (library) module to the toolkit:
+      -# Add the module subdirectory to lemur, for example 
+       "<new-module-dir>".
+      -# Put all include files in the subdirectory named 
+       "<new-module-dir>/include".
+      -# Put all implementation files in the subdirectory named 
+       "<new-module-dir>/src".
+      -# Add the module directory name to the Makefile variable LIBDIRS 
+       <b>Note:</b> If you rerun configure, you will have to make this 
+       change again. Advanced users should edit configure.ac and add 
+       an AC_ARG_ENABLE for the new module (see the distrib entry in 
+       configure.ac) and then use autoconf to generate a new configure 
+       script. 
+      -# Copy a Makefile from an existing module directory 
+      (e.g, index/src/Makefile) to <new-module-dir>/src, and change 
+      the variable MODULE to the name of the new module (<new-module-dir>).
+
+      \section runapp  To run lemur applications
+
+  - Create a parameter file with value definitions for all the
+  input variables of an application. Terminate each line with a semicolon.
+  For example, 
+  <PRE>
+    index = /usr0/mydata/index.ifp;
+  </PRE>
+   Most applications will display a list of required input variables, 
+if you run it with the "--help" option. 
+
+  -  Run the application program without the parameter file as the 
+  only argument.
+
+
+  \section sampledata To try the sample data
+
+  - Go to the data directory, run "test_pos_index.sh" which is a 
+  self-explanatory shell script that will build an index, run 
+  several retrieval algorithms with some sample parameter files, 
+  and then evaluate the retrieval performance.
+
+ */

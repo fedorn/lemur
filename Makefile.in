@@ -1,0 +1,49 @@
+include MakeDefns
+# module ("library") directories
+LIBDIRS = @MODULES@
+
+# application directories
+APPDIRS = app
+
+DIRS = $(LIBDIRS) $(APPDIRS)
+
+# derived targets for sub directories
+OBJDIRS = $(DIRS:%=%/obj)
+DEPENDDIRS = $(DIRS:%=%/depend)
+
+DDIRS = $(prefix)/kstem_data $(prefix)/arabic_stem_data
+INSTALLDIRS = $(bindir) $(includedir) $(libdir) $(DDIRS)
+
+MF = ../src/Makefile
+
+.PHONY: all lib clean install install-bin install-lib install-data $(DIRS) $(INSTALLDIRS) $(DDIRS)
+
+all: $(DIRS) 
+
+lib: $(LIBDIRS)
+
+$(OBJDIRS) $(DEPENDDIRS) $(INSTALLDIRS):
+	$(INSTALL_DIR) $@
+
+$(DIRS): $(OBJDIRS) $(DEPENDDIRS)
+	$(MAKE) -C $@/obj -f $(MF) all
+
+clean:
+	for dir in $(DIRS) ; do $(MAKE) -C $$dir/obj -f $(MF) clean ; done
+
+install: install-lib install-bin
+	for dir in $(APPDIRS) ; do $(MAKE) -C $$dir/obj -f $(MF) install; done
+	$(INSTALL_DATA) data/kstem_data/*.txt $(prefix)/kstem_data 
+	$(INSTALL_DATA) data/arabic_stem_data/*.txt $(prefix)/arabic_stem_data
+
+#both bin and lib installs require that the data files be installed.
+install-data: $(INSTALLDIRS)
+	$(INSTALL_DATA) data/kstem_data/*.txt $(prefix)/kstem_data 
+	$(INSTALL_DATA) data/arabic_stem_data/*.txt $(prefix)/arabic_stem_data
+
+install-bin: $(INSTALLDIRS) install-data
+	for dir in $(APPDIRS) ; do $(MAKE) -C $$dir/obj -f $(MF) install; done
+
+install-lib: $(INSTALLDIRS) install-data
+	rm -f $(libdir)/$(LEMURLIB)
+	for dir in $(LIBDIRS) ; do $(MAKE) -C $$dir/obj -f $(MF) install; done
