@@ -100,7 +100,7 @@ public:
   int docLength(DOCID_T docID) const;
 
   /// Total count of terms in given document, not including stop words
-  int docLengthCounted(int docID);
+  virtual int docLengthCounted(int docID);
 
   //@}
 
