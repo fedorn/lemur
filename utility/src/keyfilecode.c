@@ -14,7 +14,7 @@
 
 #define size_t unsigned
 #define maxint 32767
-#define show_errors false
+#define show_errors true
 #define short_lc sizeof(short)
 
 #ifndef WIN32
@@ -111,7 +111,8 @@ static int uncompress_int(unsigned long *i, unsigned char p[])
 /*   i.e. the int is compressed from ptr to the left.             */
 
 
-static int compress_int(int i, unsigned char *ptr)
+/*static int compress_int(int i, unsigned char *ptr)*/
+static int compress_int(unsigned long i, unsigned char *ptr)
 {unsigned char *p;
 
   p = ptr;
@@ -124,7 +125,7 @@ static int compress_int(int i, unsigned char *ptr)
   return(ptr-p);
 }
 
-static int int_lc_if_compressed(int i)
+static int int_lc_if_compressed(unsigned long i)
 {
   if      ( i<128    )    return(1);
   else if ( i<16384  )    return(2);
@@ -1545,6 +1546,7 @@ static void init_key(struct fcb *f, char id[], int lc)
   if ( lc<min_fcb_lc ) { f->error_code = smallfcb_err; return; }
   set_block_shift(f);
   f->trace = false; f->trace_freespace = false;
+  /* f->trace = true; f->trace_freespace = false; */
   /*  f->trace = false; f->trace_freespace = true;*/
   f->open_file_cnt = 0;
   init_file_name(f,id);
