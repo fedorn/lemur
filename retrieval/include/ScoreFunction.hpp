@@ -34,12 +34,12 @@ API documentation on the  Lemur web site
 class ScoreFunction {
 public:
   /// compute the score contribution of a matched term
-  virtual double matchedTermWeight(QueryTerm *qTerm, TextQueryRep *qRep, DocInfo *info, DocumentRep *dRep) { 
+  virtual double matchedTermWeight(const QueryTerm *qTerm, const TextQueryRep *qRep, const DocInfo *info, const DocumentRep *dRep) const { 
     return (qTerm->weight()*dRep->termWeight(qTerm->id(),info));
   }
 	    
   /// score adjustment (e.g., appropriate length normalization)
-  virtual double adjustedScore(double origScore, TextQueryRep *qRep, DocumentRep *dRep) {
+  virtual double adjustedScore(double origScore, const TextQueryRep *qRep, const DocumentRep *dRep) const {
     return origScore; 
   }
 };

@@ -40,34 +40,34 @@ namespace TFIDFParameter {
 /// Representation of a query (as a weighted vector) in the TFIDF method
 class TFIDFQueryRep : public ArrayQueryRep {
 public:
-  TFIDFQueryRep(TextQuery &qry, Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param);
+  TFIDFQueryRep(const TextQuery &qry, const Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param);
 
   virtual ~TFIDFQueryRep() {}
 
-  double queryTFWeight(const double rawTF);
+  double queryTFWeight(const double rawTF) const;
 protected:
   TFIDFParameter::WeightParam &prm;
   double *idf;
-  Index &ind;
+  const Index &ind;
 };
 
 /// Representation of a doc (as a weighted vector) in the TFIDF method
 class TFIDFDocRep : public DocumentRep {
 public:
-  TFIDFDocRep(int docID, Index &dbIndex, double *idfValue,
+  TFIDFDocRep(int docID, const Index &dbIndex, double *idfValue,
 	      TFIDFParameter::WeightParam &param) : 
     DocumentRep(docID), ind(dbIndex), prm(param), idf(idfValue) {
   }
   virtual ~TFIDFDocRep() { }
-  virtual double termWeight(int termID, DocInfo *info) { 
+  virtual double termWeight(int termID, const DocInfo *info) const{ 
     return (idf[termID]*docTFWeight(info->termCount())); 
   }
-  virtual double scoreConstant() { return 0;}
+  virtual double scoreConstant() const { return 0;}
 
-  double docTFWeight(const double rawTF);
+  double docTFWeight(const double rawTF) const;
 private:
 
-  Index & ind;
+  const Index & ind;
   TFIDFParameter::WeightParam &prm;
   double *idf;
 };
@@ -78,10 +78,10 @@ private:
 class TFIDFRetMethod : public TextQueryRetMethod {
 public:
 
-  TFIDFRetMethod(Index &dbIndex, ScoreAccumulator &accumulator);
+  TFIDFRetMethod(const Index &dbIndex, ScoreAccumulator &accumulator);
   virtual ~TFIDFRetMethod() {delete [] idfV; delete scFunc;}
 
-  virtual TextQueryRep *computeTextQueryRep(TextQuery &qry) {
+  virtual TextQueryRep *computeTextQueryRep(const TextQuery &qry) {
     return (new TFIDFQueryRep(qry, ind, idfV, qryTFParam));
   }
 
@@ -93,7 +93,7 @@ public:
   }
 
 
-  virtual void updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs);
+  virtual void updateTextQuery(TextQueryRep &qryRep, const DocIDSet &relDocs);
 
   void setDocTFParam(TFIDFParameter::WeightParam &docTFWeightParam);
 

@@ -30,10 +30,10 @@ public:
   StructQuery(Document &doc) : d(doc) {}
   virtual ~StructQuery() {}
 
-  virtual char *id() { return d.getID();}
-  virtual void startTermIteration() { d.startTermIteration();}
-  virtual bool hasMore() { return d.hasMore();}
-  virtual TokenTerm *nextTerm() { return d.nextTerm();}
+  virtual const char *id() const { return d.getID();}
+  virtual void startTermIteration() const { d.startTermIteration();}
+  virtual bool hasMore() const { return d.hasMore();}
+  virtual const TokenTerm *nextTerm() const { return d.nextTerm();}
 private:
   Document &d;
 };
@@ -46,28 +46,30 @@ private:
 class StructQueryRep : public QueryRep {
 public:
   /// Parse the text representation into a structured query rep  
-  StructQueryRep(StructQuery &qry, Index &dbIndex, 
+  StructQueryRep(const StructQuery &qry, const Index &dbIndex, 
 		 double dbelief = 0);
 
   virtual ~StructQueryRep() {
     delete(topNode);
   }
   /// Get the topnode of the query parse tree.
-  virtual QueryNode * topnode() {return topNode;}
+  /// maybe this method should return a const object so it can't be deleted
+  /// but sometimes we want to allow caller to change node's weight.
+  virtual QueryNode * topnode() const {return topNode;}
   /// Set the topnode of the query parse tree.
   virtual void setTopnode(QueryNode *qn) {topNode = qn;}
   
 private:
   /// pointer to member function for getting a node.
-  typedef QueryNode *(StructQueryRep::*getFunc)(StructQuery &, TokenTerm *, 
+  typedef QueryNode *(StructQueryRep::*getFunc)(const StructQuery &, const TokenTerm *,
 						double);
   /// Parse the text representation of the children of a query node.
-  QnList * getChildren(StructQuery &qry, getFunc fn, 
+  QnList * getChildren(const StructQuery &qry, getFunc fn, 
 			       bool weigh = false);
   /// Parse the text representation of a weighted query node.  
-  QueryNode * getQryNode(StructQuery &qry, TokenTerm *tok, double w);
+  QueryNode * getQryNode(const StructQuery &qry, const TokenTerm *tok, double w);
   /// Parse the text representation of a proximity query node.  
-  QueryNode * getProxQryNode(StructQuery &qry, TokenTerm *tok,
+  QueryNode * getProxQryNode(const StructQuery &qry, const TokenTerm *tok,
 				     double w = 1.0);
   /// Top node of the query parse tree.
   QueryNode *topNode;
@@ -78,7 +80,7 @@ private:
   /// default weight.
   double dw;
   /// Our index.
-  Index &ind;
+  const Index &ind;
   /// number of docs in collection (reduce calls to docCount.
   int numDocs;
 };

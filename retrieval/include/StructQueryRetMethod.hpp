@@ -48,18 +48,18 @@ function <tt>g</tt> of the scores of each child query node in
 
 class StructQueryRetMethod : public RetrievalMethod {
 public:
-  StructQueryRetMethod(Index &ind) : RetrievalMethod(ind) {}
+  StructQueryRetMethod(const Index &ind) : RetrievalMethod(ind) {}
   virtual ~StructQueryRetMethod() {}
   /// compute the query representation for a text query 
   //(caller responsible for deleting the memory of the generated new instance)
-  virtual StructQueryRep *computeStructQueryRep(StructQuery &qry) = 0;
+  virtual StructQueryRep *computeStructQueryRep(const StructQuery &qry) = 0;
 
   /// overriding abstract class method
-  virtual QueryRep *computeQueryRep(Query &qry); 
+  virtual QueryRep *computeQueryRep(const Query &qry); 
   /// score the query against the given document id.
-  virtual double scoreDoc(QueryRep &qry, int docID);
+  virtual double scoreDoc(const QueryRep &qry, int docID);
   /// score the query against the collection.
-  virtual void scoreCollection(QueryRep &qry, IndexedRealVector &results);
+  virtual void scoreCollection(const QueryRep &qry, IndexedRealVector &results);
 
   /// compute the doc representation (caller responsible for deleting 
   /// the memory of the generated new instance)
@@ -67,17 +67,17 @@ public:
   /// return the scoring function pointer
   virtual ScoreFunction *scoreFunc() = 0;
   /// update the query
-  virtual void updateQuery(QueryRep &qryRep, DocIDSet &relDocs) {
+  virtual void updateQuery(QueryRep &qryRep, const DocIDSet &relDocs) {
     updateStructQuery(*((StructQueryRep *)(&qryRep)), relDocs);
   }
 
   /// Modify/update the query representation based on a set (presumably)
   /// relevant documents
   virtual void updateStructQuery(StructQueryRep &qryRep, 
-				 DocIDSet &relDocs) = 0;
+				 const DocIDSet &relDocs) = 0;
 
   /// Scoring with the inverted index
-  virtual void scoreInvertedIndex(QueryRep &qryRep, 
+  virtual void scoreInvertedIndex(const QueryRep &qryRep, 
 				  IndexedRealVector &scores, 
 				  bool scoreAll=false);
 };
@@ -86,19 +86,19 @@ public:
 class StructQueryScoreFunc : public ScoreFunction {
 public:
   /// Have the QueryNode eval itself on the DocumentRep. 
-  virtual double evalQuery(QueryNode *qn, DocumentRep *dRep) {
+  virtual double evalQuery(const QueryNode *qn, const DocumentRep *dRep) {
     return qn->eval(dRep);
   }
   /// No adjustment, return the original score.
-  virtual double adjustedScore(double w, QueryNode *qn) {
+  virtual double adjustedScore(double w, const QueryNode *qn) {
     return w;
   }  
 };
 
 //=============== inlines ========================================
 
-inline QueryRep *StructQueryRetMethod::computeQueryRep(Query &qry) { 
-  StructQuery *q = static_cast<StructQuery *>(&qry);
+inline QueryRep *StructQueryRetMethod::computeQueryRep(const Query &qry) { 
+  const StructQuery *q = static_cast<const StructQuery *>(&qry);
   return (computeStructQueryRep(*q));
 }
 

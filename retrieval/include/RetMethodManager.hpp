@@ -19,10 +19,10 @@ public:
   enum RetModel {UNKNOWN=-1, TFIDF=0, OKAPI=1, KL=2, INQUERY=3,CORI_CS=4,COS=5};
 
   /// use specified model or check in parameters
-  static RetrievalMethod* createModel(Index* ind, ArrayAccumulator* accum, RetModel type);
+  static RetrievalMethod* createModel(const Index* ind, ArrayAccumulator* accum, RetModel type);
 
   /// use specified model or check in parameters
-  static RetrievalMethod* createModel(Index* ind, ArrayAccumulator* accum, string type = "");
+  static RetrievalMethod* createModel(const Index* ind, ArrayAccumulator* accum, string type = "");
 };
 
 #endif

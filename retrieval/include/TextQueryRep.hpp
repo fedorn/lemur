@@ -28,15 +28,15 @@
 /// A text query is an adaptor of Document
 class TextQuery : public Query {
 public:
-  TextQuery(Document &doc) : d(doc) {}
+  TextQuery(const Document &doc) : d(doc) {}
   virtual ~TextQuery() {}
 
-  virtual char *id() { return d.getID();}
-  virtual void startTermIteration() { d.startTermIteration();}
-  virtual bool hasMore() { return d.hasMore();}
-  virtual TokenTerm *nextTerm() { return d.nextTerm();}
+  virtual const char *id() const { return d.getID();}
+  virtual void startTermIteration() const { d.startTermIteration();}
+  virtual bool hasMore() const { return d.hasMore();}
+  virtual const TokenTerm *nextTerm() const { return d.nextTerm();}
 protected:
-  Document &d;
+  const Document &d;
 };
 
 
@@ -51,9 +51,9 @@ class QueryTerm {
 public:
   QueryTerm(int termID, double weight) : ti(termID), w(weight) {
   } 
-  ~QueryTerm() {}
-  virtual int id() { return ti;}
-  virtual double weight() { return w;}
+  virtual ~QueryTerm() {}
+  virtual int id() const { return ti;}
+  virtual double weight() const { return w;}
 protected:
   int ti;
   double w;
@@ -65,14 +65,14 @@ class TextQueryRep : public QueryRep {
 public:
   virtual ~TextQueryRep() {}
   /// This, along with hasMore(), nextTerm(), supports iteration over terms
-  virtual void startIteration() = 0;
-  virtual bool hasMore() = 0;
+  virtual void startIteration() const = 0;
+  virtual bool hasMore() const = 0;
 
   /// Fetch the next term. A new instance is generated; the caller is responsible for deleting it!
-  virtual QueryTerm *nextTerm() = 0;
+  virtual QueryTerm *nextTerm() const = 0;
 
   /// Any query-specific constant term in the scoring formula
-  virtual double scoreConstant() = 0;
+  virtual double scoreConstant() const = 0;
 
 };
 
@@ -87,23 +87,23 @@ public:
   ArrayQueryRep(int size) : ct(new ArrayCounter<double>(size)), scConst(0) {
   }
   /// The size passed in must be large enough to hold all the terms, typically dbIndex.termCountUnique()+1.
-  ArrayQueryRep(int size, TextQuery &qry, Index &dbIndex);
+  ArrayQueryRep(int size, const TextQuery &qry, const Index &dbIndex);
   /// build a query rep with a frequency vector
-  ArrayQueryRep(int size, FreqVector &qryVec);
+  ArrayQueryRep(int size, const FreqVector &qryVec);
 
   virtual ~ArrayQueryRep() { delete ct; }
 
 
-  virtual void startIteration() {
+  virtual void startIteration() const {
     ct->startIteration();
   }
 
-  virtual bool hasMore() {
+  virtual bool hasMore() const{
     return (ct->hasMore());
   }
 
 
-  virtual QueryTerm *nextTerm();
+  virtual QueryTerm *nextTerm() const;
 
 
   virtual void incCount(int wdIndex, double count) {
@@ -114,15 +114,15 @@ public:
     ct->setCount(wdIndex,count);
   }
 
-  virtual double totalCount() { return ct->sum();}
+  virtual double totalCount() const { return ct->sum();}
 
-  virtual double scoreConstant() { return scConst;}
+  virtual double scoreConstant() const{ return scConst;}
 
   virtual void setScoreConstant(double scoreConst) { scConst = scoreConst;}
 
 
 protected:
-  virtual QueryTerm *makeQueryTerm(int wdIndex, double wdCount) {
+  virtual QueryTerm *makeQueryTerm(int wdIndex, double wdCount) const {
     return (new QueryTerm(wdIndex, wdCount));
   }
   double scConst;
@@ -139,20 +139,20 @@ public:
   }
   virtual ~PseudoFBDocs() {}
 
-  virtual void startIteration() {
+  virtual void startIteration() const{
     it = res->begin();
     i=0;
   }  
-  virtual bool hasMore() ;
+  virtual bool hasMore() const;
 
-  virtual void nextIDInfo(int &id, double &relProb);
+  virtual void nextIDInfo(int &id, double &relProb) const;
 
 private:
-  IndexedRealVector *res;
+  mutable IndexedRealVector *res;
   int howMany;
-  int i;
+  mutable int i;
   bool noWeight;
-  IndexedRealVector::iterator it;
+  mutable IndexedRealVector::iterator it;
 };
 
 

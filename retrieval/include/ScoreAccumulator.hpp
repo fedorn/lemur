@@ -24,16 +24,16 @@ public:
   /// clear, reset
   virtual void reset()=0;
   /// Find the score value for an id
-  virtual bool findScore(int id, double &score)=0;
+  virtual bool findScore(int id, double &score)const =0;
   /// Set the score value of an id, add the id if it doesn't exist
   virtual void setScore(int id, double score)=0;
   /// Increase the score value of an id, add the id if it doesn't exist
   virtual void incScore(int id, double score)=0;
   
   /// Iteration support
-  virtual void startIteration()=0;
-  virtual bool hasMore() = 0;
-  virtual void nextScore(int &id, double &score) =0;
+  virtual void startIteration()const =0;
+  virtual bool hasMore() const = 0;
+  virtual void nextScore(int &id, double &score) const =0;
 
 };
 
@@ -53,7 +53,7 @@ public:
   virtual void reset();
   
   /// Find the score value for an id
-  virtual bool findScore(int id, double &score);
+  virtual bool findScore(int id, double &score) const ;
 
   /// Set the score value of an id, add the id if it doesn't exist
   virtual void setScore(int id, double score) { 
@@ -68,13 +68,13 @@ public:
   }
   
   /// Iteration support
-  virtual void startIteration() { p = 0; }
-  bool hasMore();
+  virtual void startIteration() const { p = 0; }
+  bool hasMore()const ;
   
-  void nextScore(int &id, double &score); 
+  void nextScore(int &id, double &score)const ; 
 
 protected:
-  int p;
+  mutable int p;
   int sz;
   double *acc;
   short *status;

@@ -269,7 +269,7 @@ namespace CosSimParameter {
     L2NormFile = ParamGetString("L2File", defaultL2File);
   }
 };
-
+/// Parameters used in the InQuery structured query retrieval method
 namespace InQueryParameter {
   /// @name InQuery structured query parameters
   /// default feedback coefficient (0.5).

@@ -26,7 +26,7 @@
 /// Abstract query
 class Query {
 public:
-  virtual char *id() = 0;
+  virtual const char *id() const = 0;
 };
 
 /// Abstract query representation
@@ -63,20 +63,20 @@ typedef WeightedIDSet DocIDSet;
 
 class RetrievalMethod {
 public:
-  RetrievalMethod(Index &collectionIndex) : ind(collectionIndex) {}
+  RetrievalMethod(const Index &collectionIndex) : ind(collectionIndex) {}
   virtual ~RetrievalMethod() {}
 
   /// compute the representation for a query, semantics defined by subclass
-  virtual QueryRep *computeQueryRep(Query &qry)=0;
+  virtual QueryRep *computeQueryRep(const Query &qry)=0;
 
   /// Score a document identified by the id w.r.t. a query rep
-  virtual double scoreDoc(QueryRep &qry, int docID)=0;
+  virtual double scoreDoc(const QueryRep &qry, int docID)=0;
 
   /// Score a set of documents w.r.t. a query rep (e.g. for re-ranking)
   /*! 
      The default implementation provided by this class is to call function scoreDoc
   */
-  virtual void scoreDocSet(QueryRep &qry, DocIDSet &docSet, IndexedRealVector &results);
+  virtual void scoreDocSet(const QueryRep &qry, const DocIDSet &docSet, IndexedRealVector &results);
   
   /// Score all documents in the collection
   /*! 
@@ -86,13 +86,13 @@ public:
     if a more efficient scoring, e.g., based on inverted index, is possible.
   */
 
-  virtual void scoreCollection(QueryRep &qry, IndexedRealVector &results);
+  virtual void scoreCollection(const QueryRep &qry, IndexedRealVector &results);
 
   /// update the query, feedback support
-  virtual void updateQuery(QueryRep &qryRep, DocIDSet &relDocs) = 0;
+  virtual void updateQuery (QueryRep &qryRep, const DocIDSet &relDocs) = 0;
 
 protected:
-  Index &ind;
+  const Index &ind;
 };
 
 #endif /* _RETRIEVALMETHOD_HPP */
