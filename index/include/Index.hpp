@@ -58,8 +58,15 @@
    Most applications will display a list of required input variables, 
    if you run it with the "--help" option. 
 
-  - Do "setenv PARAM YOUR-PARAM-FILENAME" or 
-      "export PARAM=YOUR-PARAM-FILENAME", 
+  - Do 
+  <PRE>
+   "setenv PARAM YOUR-PARAM-FILENAME" 
+</PRE>
+or
+<PRE> 
+      "export PARAM=YOUR-PARAM-FILENAME"
+</PRE>
+
       depending on the shell you are running.
 
 
@@ -70,13 +77,13 @@
 
   - Go to the data directory
 
-  - First, try to build the index by running lemur/app/src/BuildIndex with buildparam as the parameter file.
-  - Second, built the support file (needed by the language model retrieval evaluation program) by running lemur/app/src/GenerateSmoothSupport with suppparam as the parameter file.
+  - First, try to build the index by running "lemur/app/src/BuildIndex" with "buildparam" as the parameter file.
+  - Second, built the support file (needed by the language model retrieval evaluation program) by running "lemur/app/src/GenerateSmoothSupport" with "suppparam" as the parameter file.
   - Now you can try any of the retrieval evaluation program with the appropriate parameter files. Each evaluation program will write the result to a file specified in the parameter file. 
-      -# tfidfparam (result in res.tfidf) or tfidffbparam (result in res.tfidffb) are for app/src/TFIDFEval
-      -# okapiparam (result in res.okapi) or okapifbparam (result in res.okapifb) are for app/src/OkapiEval
-      -# lmparam1 (result in res.lm1)  or lmparam2 (res.lm2) are for app/src/SimpleUnigEval
-  - Finally, you can compute the TREC style performance figures for any of the results by running "./eval result-file-name". For example, "./eval res.tfidf" would generate figures for res.tfidf. 
+      -# tfidfparam (result in res.tfidf) or tfidffbparam (result in res.tfidffb) are for \code app/src/TFIDFEval \endcode
+      -# okapiparam (result in res.okapi) or okapifbparam (result in res.okapifb) are for \code app/src/OkapiEval \endcode
+      -# lmparam1 (result in res.lm1)  or lmparam2 (res.lm2) are for \code app/src/SimpleUnigEval \endcode
+  - Finally, you can compute the TREC style performance figures for any of the results by running \code "./eval result-file-name" \endcode. For example, \code "./eval res.tfidf" \endcode would generate figures for res.tfidf. 
 
 
  */
