@@ -31,6 +31,8 @@ Index *IndexManager::openIndex(const char *indexTOCFile)
 	     (!strcmp(extension, "bsc"))) {
     
     ind = new BasicIndex();
+  } else {
+    throw Exception("IndexManager", "unknown index file extension");
   }
   ind->open(indexTOCFile);
   return (ind);
