@@ -16,6 +16,8 @@
 #include "ChineseCharParser.hpp"
 #include "ReutersParser.hpp"
 #include "ArabicParser.hpp"
+#include "IdentifinderParser.hpp"
+#include "BrillPOSParser.hpp"
 #include "Stopper.hpp"
 #include "PorterStemmer.hpp"
 #include "KStemmer.hpp"

@@ -43,6 +43,10 @@ Parser* TextHandlerManager::createParser(string type, string acros) {
     parser = new ChineseCharParser();
   } else if (type.compare("arabic") == 0) {
     parser = new ArabicParser();
+  } else if (type == "brill") {
+    parser = new BrillPOSParser();
+  } else if (type == "identifinder") {
+    parser = new IdentifinderParser();
   }
   
   if (parser) {
