@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="include"
+				AdditionalIncludeDirectories="include;../parsing/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -61,7 +61,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="include"
+				AdditionalIncludeDirectories="include;../parsing/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
@@ -102,40 +102,13 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\src\arabic_stem.cpp">
-			</File>
-			<File
-				RelativePath=".\src\ArabicParser.cpp">
-			</File>
-			<File
-				RelativePath=".\src\ArabicStemmer.cpp">
-			</File>
-			<File
 				RelativePath=".\src\BasicDocStream.cpp">
-			</File>
-			<File
-				RelativePath=".\src\BrillPOSParser.cpp">
-			</File>
-			<File
-				RelativePath=".\src\BrillPOSTokenizer.cpp">
 			</File>
 			<File
 				RelativePath=".\src\ByteHash.cpp">
 			</File>
 			<File
-				RelativePath=".\src\ChineseCharParser.cpp">
-			</File>
-			<File
-				RelativePath=".\src\ChineseParser.cpp">
-			</File>
-			<File
 				RelativePath=".\src\DirectoryIterator.cpp">
-			</File>
-			<File
-				RelativePath=".\src\DocMgrManager.cpp">
-			</File>
-			<File
-				RelativePath=".\src\ElemDocMgr.cpp">
 			</File>
 			<File
 				RelativePath=".\src\error.c">
@@ -147,22 +120,10 @@
 				RelativePath=".\src\FileTreeIterator.cpp">
 			</File>
 			<File
-				RelativePath=".\src\FlattextDocMgr.cpp">
-			</File>
-			<File
 				RelativePath=".\src\FUtil.cpp">
 			</File>
 			<File
-				RelativePath=".\src\IdentifinderParser.cpp">
-			</File>
-			<File
 				RelativePath=".\src\IndriTimer.cpp">
-			</File>
-			<File
-				RelativePath=".\src\InqArabicParser.cpp">
-			</File>
-			<File
-				RelativePath=".\src\InQueryOpParser.cpp">
 			</File>
 			<File
 				RelativePath=".\src\Keyfile.cpp">
@@ -171,22 +132,10 @@
 				RelativePath=".\src\keyfilecode.c">
 			</File>
 			<File
-				RelativePath=".\src\KeyfileDocMgr.cpp">
-			</File>
-			<File
 				RelativePath=".\src\keyprint.c">
 			</File>
 			<File
-				RelativePath=".\src\kstem.cpp">
-			</File>
-			<File
-				RelativePath=".\src\KStemmer.cpp">
-			</File>
-			<File
 				RelativePath=".\src\lemur-compat.cpp">
-			</File>
-			<File
-				RelativePath=".\src\lex_parser.cpp">
 			</File>
 			<File
 				RelativePath=".\src\LinkedPropertyList.cpp">
@@ -196,9 +145,6 @@
 			</File>
 			<File
 				RelativePath=".\src\MemCache.cpp">
-			</File>
-			<File
-				RelativePath=".\src\MemList.cpp">
 			</File>
 			<File
 				RelativePath=".\src\Param.cpp">
@@ -212,23 +158,20 @@
 					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+						ObjectFile="$(IntDir)/IndriParameters.obj"/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\src\Parser.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/IndriParameters.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\src\Path.cpp">
 			</File>
 			<File
 				RelativePath=".\src\PDict.cpp">
-			</File>
-			<File
-				RelativePath=".\src\porter_stemmer.cpp">
-			</File>
-			<File
-				RelativePath=".\src\PorterStemmer.cpp">
 			</File>
 			<File
 				RelativePath=".\src\Property.cpp">
@@ -240,13 +183,7 @@
 				RelativePath=".\src\ReadBuffer.cpp">
 			</File>
 			<File
-				RelativePath=".\src\ReutersParser.cpp">
-			</File>
-			<File
 				RelativePath=".\src\RVLCompress.cpp">
-			</File>
-			<File
-				RelativePath=".\src\Stopper.cpp">
 			</File>
 			<File
 				RelativePath=".\src\string-set.c">
@@ -258,31 +195,13 @@
 				RelativePath=".\src\TermCache.cpp">
 			</File>
 			<File
-				RelativePath=".\src\TextHandlerManager.cpp">
-			</File>
-			<File
-				RelativePath=".\src\Timer.cpp">
-			</File>
-			<File
-				RelativePath=".\src\TrecParser.cpp">
-			</File>
-			<File
 				RelativePath=".\src\util.c">
-			</File>
-			<File
-				RelativePath=".\src\WebParser.cpp">
 			</File>
 			<File
 				RelativePath=".\src\WordSet.cpp">
 			</File>
 			<File
 				RelativePath=".\src\WriteBuffer.cpp">
-			</File>
-			<File
-				RelativePath=".\src\WriterInQueryHandler.cpp">
-			</File>
-			<File
-				RelativePath=".\src\WriterTextHandler.cpp">
 			</File>
 			<File
 				RelativePath=".\src\XMLNode.cpp">
@@ -299,25 +218,7 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\include\arabic_stemmer.h">
-			</File>
-			<File
-				RelativePath=".\include\ArabicParser.hpp">
-			</File>
-			<File
-				RelativePath=".\include\ArabicStemmer.hpp">
-			</File>
-			<File
-				RelativePath=".\include\Array.hpp">
-			</File>
-			<File
 				RelativePath=".\include\BasicDocStream.hpp">
-			</File>
-			<File
-				RelativePath=".\include\BrillPOSParser.hpp">
-			</File>
-			<File
-				RelativePath=".\include\BrillPOSTokenizer.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\Buffer.hpp">
@@ -326,19 +227,10 @@
 				RelativePath=".\include\ByteHash.hpp">
 			</File>
 			<File
-				RelativePath=".\include\ChineseCharParser.hpp">
-			</File>
-			<File
-				RelativePath=".\include\ChineseParser.hpp">
-			</File>
-			<File
 				RelativePath=".\include\CollectionProps.hpp">
 			</File>
 			<File
 				RelativePath=".\include\common_headers.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\count_iterator">
 			</File>
 			<File
 				RelativePath=".\include\Counter.hpp">
@@ -356,9 +248,6 @@
 				RelativePath=".\include\indri\DirectoryIterator.hpp">
 			</File>
 			<File
-				RelativePath=".\include\DocMgrManager.hpp">
-			</File>
-			<File
 				RelativePath=".\include\DocOffsetParser.hpp">
 			</File>
 			<File
@@ -368,13 +257,7 @@
 				RelativePath=".\include\Document.hpp">
 			</File>
 			<File
-				RelativePath=".\include\DocumentManager.hpp">
-			</File>
-			<File
 				RelativePath=".\include\DocumentProps.hpp">
-			</File>
-			<File
-				RelativePath=".\include\ElemDocMgr.hpp">
 			</File>
 			<File
 				RelativePath=".\include\error.h">
@@ -386,34 +269,19 @@
 				RelativePath=".\include\indri\Extent.hpp">
 			</File>
 			<File
-				RelativePath=".\include\FastList.hpp">
-			</File>
-			<File
 				RelativePath=".\include\File.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\FileTreeIterator.hpp">
 			</File>
 			<File
-				RelativePath=".\include\FlattextDocMgr.hpp">
-			</File>
-			<File
-				RelativePath=".\include\FLL.hpp">
-			</File>
-			<File
 				RelativePath=".\include\FUtil.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\greedy_vector">
 			</File>
 			<File
 				RelativePath=".\include\indri\HashTable.hpp">
 			</File>
 			<File
 				RelativePath=".\include\ht.h">
-			</File>
-			<File
-				RelativePath=".\include\IdentifinderParser.hpp">
 			</File>
 			<File
 				RelativePath=".\include\IndexTypes.hpp">
@@ -423,15 +291,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\IndriTimer.hpp">
-			</File>
-			<File
-				RelativePath=".\include\InqArabicParser.hpp">
-			</File>
-			<File
-				RelativePath=".\include\InQueryOpParser.hpp">
-			</File>
-			<File
-				RelativePath=".\include\Int.hpp">
 			</File>
 			<File
 				RelativePath=".\include\ISet.hpp">
@@ -446,13 +305,7 @@
 				RelativePath=".\include\Keyfile.hpp">
 			</File>
 			<File
-				RelativePath=".\include\KeyfileDocMgr.hpp">
-			</File>
-			<File
 				RelativePath=".\include\keyref.h">
-			</File>
-			<File
-				RelativePath=".\include\KStemmer.hpp">
 			</File>
 			<File
 				RelativePath=".\include\lemur-compat.hpp">
@@ -461,16 +314,7 @@
 				RelativePath=".\include\lemur-platform.h">
 			</File>
 			<File
-				RelativePath=".\include\lex_parser.hpp">
-			</File>
-			<File
 				RelativePath=".\include\LinkedPropertyList.hpp">
-			</File>
-			<File
-				RelativePath=".\include\List.hpp">
-			</File>
-			<File
-				RelativePath=".\include\LL.hpp">
 			</File>
 			<File
 				RelativePath=".\include\main.hpp">
@@ -480,9 +324,6 @@
 			</File>
 			<File
 				RelativePath=".\include\MemCache.hpp">
-			</File>
-			<File
-				RelativePath=".\include\MemList.hpp">
 			</File>
 			<File
 				RelativePath=".\include\minmax.hpp">
@@ -497,12 +338,6 @@
 				RelativePath=".\include\indri\NormalDistribution.hpp">
 			</File>
 			<File
-				RelativePath=".\include\Null.hpp">
-			</File>
-			<File
-				RelativePath=".\include\Number.hpp">
-			</File>
-			<File
 				RelativePath=".\include\Param.hpp">
 			</File>
 			<File
@@ -512,16 +347,10 @@
 				RelativePath=".\include\indri\Parameters.hpp">
 			</File>
 			<File
-				RelativePath=".\include\Parser.hpp">
-			</File>
-			<File
 				RelativePath=".\include\indri\Path.hpp">
 			</File>
 			<File
 				RelativePath=".\include\PDict.hpp">
-			</File>
-			<File
-				RelativePath=".\include\PorterStemmer.hpp">
 			</File>
 			<File
 				RelativePath=".\include\Property.hpp">
@@ -542,9 +371,6 @@
 				RelativePath=".\include\ReadBuffer.hpp">
 			</File>
 			<File
-				RelativePath=".\include\ReutersParser.hpp">
-			</File>
-			<File
 				RelativePath=".\include\RVLCompress.hpp">
 			</File>
 			<File
@@ -552,12 +378,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\RVLDecompressStream.hpp">
-			</File>
-			<File
-				RelativePath=".\include\Stemmer.hpp">
-			</File>
-			<File
-				RelativePath=".\include\Stopper.hpp">
 			</File>
 			<File
 				RelativePath=".\include\string-set.h">
@@ -575,22 +395,7 @@
 				RelativePath=".\include\TermCache.hpp">
 			</File>
 			<File
-				RelativePath=".\include\TextHandler.hpp">
-			</File>
-			<File
-				RelativePath=".\include\TextHandlerManager.hpp">
-			</File>
-			<File
-				RelativePath=".\include\Timer.hpp">
-			</File>
-			<File
-				RelativePath=".\include\TrecParser.hpp">
-			</File>
-			<File
 				RelativePath=".\include\util.h">
-			</File>
-			<File
-				RelativePath=".\include\WebParser.hpp">
 			</File>
 			<File
 				RelativePath=".\include\WeightedIDSet.hpp">
@@ -600,12 +405,6 @@
 			</File>
 			<File
 				RelativePath=".\include\WriteBuffer.hpp">
-			</File>
-			<File
-				RelativePath=".\include\WriterInQueryHandler.hpp">
-			</File>
-			<File
-				RelativePath=".\include\WriterTextHandler.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\XMLNode.hpp">

@@ -24,7 +24,7 @@
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -64,7 +64,7 @@
 				AdditionalIncludeDirectories=".\include;..\utility\include;..\index\include;..\contrib\xpdf\include;..\contrib\zlib\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
@@ -101,25 +101,79 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\src\arabic_stem.cpp">
+			</File>
+			<File
+				RelativePath=".\src\ArabicParser.cpp">
+			</File>
+			<File
+				RelativePath=".\src\ArabicStemmer.cpp">
+			</File>
+			<File
+				RelativePath=".\src\BrillPOSParser.cpp">
+			</File>
+			<File
+				RelativePath=".\src\BrillPOSTokenizer.cpp">
+			</File>
+			<File
+				RelativePath=".\src\ChineseCharParser.cpp">
+			</File>
+			<File
+				RelativePath=".\src\ChineseParser.cpp">
+			</File>
+			<File
 				RelativePath=".\src\Combiner.cpp">
 			</File>
 			<File
 				RelativePath=".\src\CompressedCollection.cpp">
 			</File>
 			<File
+				RelativePath=".\src\DocMgrManager.cpp">
+			</File>
+			<File
 				RelativePath=".\src\DocumentIteratorFactory.cpp">
+			</File>
+			<File
+				RelativePath=".\src\ElemDocMgr.cpp">
 			</File>
 			<File
 				RelativePath=".\src\FileClassEnvironmentFactory.cpp">
 			</File>
 			<File
+				RelativePath=".\src\FlattextDocMgr.cpp">
+			</File>
+			<File
 				RelativePath=".\src\HTMLParser.cpp">
+			</File>
+			<File
+				RelativePath=".\src\IdentifinderParser.cpp">
+			</File>
+			<File
+				RelativePath=".\src\IndriDocMgr.cpp">
+			</File>
+			<File
+				RelativePath=".\src\InqArabicParser.cpp">
+			</File>
+			<File
+				RelativePath=".\src\InQueryOpParser.cpp">
+			</File>
+			<File
+				RelativePath=".\src\KeyfileDocMgr.cpp">
 			</File>
 			<File
 				RelativePath=".\src\KrovetzStemmerTransformation.cpp">
 			</File>
 			<File
+				RelativePath=".\src\kstem.cpp">
+			</File>
+			<File
+				RelativePath=".\src\KStemmer.cpp">
+			</File>
+			<File
 				RelativePath=".\src\NormalizationTransformation.cpp">
+			</File>
+			<File
+				RelativePath=".\src\Parser.cpp">
 			</File>
 			<File
 				RelativePath=".\src\ParserFactory.cpp">
@@ -128,13 +182,25 @@
 				RelativePath=".\src\PDFDocumentExtractor.cpp">
 			</File>
 			<File
+				RelativePath=".\src\porter_stemmer.cpp">
+			</File>
+			<File
+				RelativePath=".\src\PorterStemmer.cpp">
+			</File>
+			<File
 				RelativePath=".\src\PorterStemmerTransformation.cpp">
 			</File>
 			<File
 				RelativePath=".\src\win\PowerPointDocumentExtractor.cpp">
 			</File>
 			<File
+				RelativePath=".\src\ReutersParser.cpp">
+			</File>
+			<File
 				RelativePath=".\src\StemmerFactory.cpp">
+			</File>
+			<File
+				RelativePath=".\src\Stopper.cpp">
 			</File>
 			<File
 				RelativePath=".\src\StopperTransformation.cpp">
@@ -149,13 +215,25 @@
 				RelativePath=".\src\TextDocumentExtractor.cpp">
 			</File>
 			<File
-				RelativePath=".\include\TextDocumentExtractor.hpp">
+				RelativePath=".\src\TextHandlerManager.cpp">
 			</File>
 			<File
 				RelativePath=".\src\TextParser.cpp">
 			</File>
 			<File
+				RelativePath=".\src\TrecParser.cpp">
+			</File>
+			<File
+				RelativePath=".\src\WebParser.cpp">
+			</File>
+			<File
 				RelativePath=".\src\win\WordDocumentExtractor.cpp">
+			</File>
+			<File
+				RelativePath=".\src\WriterInQueryHandler.cpp">
+			</File>
+			<File
+				RelativePath=".\src\WriterTextHandler.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -169,6 +247,27 @@
 				RelativePath=".\include\indri\AnchorTextWriter.hpp">
 			</File>
 			<File
+				RelativePath=".\include\arabic_stemmer.h">
+			</File>
+			<File
+				RelativePath=".\include\ArabicParser.hpp">
+			</File>
+			<File
+				RelativePath=".\include\ArabicStemmer.hpp">
+			</File>
+			<File
+				RelativePath=".\include\BrillPOSParser.hpp">
+			</File>
+			<File
+				RelativePath=".\include\BrillPOSTokenizer.hpp">
+			</File>
+			<File
+				RelativePath=".\include\ChineseCharParser.hpp">
+			</File>
+			<File
+				RelativePath=".\include\ChineseParser.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\Collection.hpp">
 			</File>
 			<File
@@ -178,10 +277,19 @@
 				RelativePath=".\include\indri\CompressedCollection.hpp">
 			</File>
 			<File
+				RelativePath=".\include\DocMgrManager.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\DocumentIterator.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\DocumentIteratorFactory.hpp">
+			</File>
+			<File
+				RelativePath=".\include\DocumentManager.hpp">
+			</File>
+			<File
+				RelativePath=".\include\ElemDocMgr.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\FileClassEnvironment.hpp">
@@ -190,13 +298,34 @@
 				RelativePath=".\include\indri\FileClassEnvironmentFactory.hpp">
 			</File>
 			<File
+				RelativePath=".\include\FlattextDocMgr.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\HTMLParser.hpp">
+			</File>
+			<File
+				RelativePath=".\include\IdentifinderParser.hpp">
+			</File>
+			<File
+				RelativePath=".\include\IndriDocMgr.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\IndriParser.hpp">
 			</File>
 			<File
+				RelativePath=".\include\InqArabicParser.hpp">
+			</File>
+			<File
+				RelativePath=".\include\InQueryOpParser.hpp">
+			</File>
+			<File
+				RelativePath=".\include\KeyfileDocMgr.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\KrovetzStemmerTransformation.hpp">
+			</File>
+			<File
+				RelativePath=".\include\KStemmer.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\MetadataPair.hpp">
@@ -214,10 +343,16 @@
 				RelativePath=".\include\indri\ParsedDocument.hpp">
 			</File>
 			<File
+				RelativePath=".\include\Parser.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\ParserFactory.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\PDFDocumentExtractor.hpp">
+			</File>
+			<File
+				RelativePath=".\include\PorterStemmer.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\PorterStemmerTransformation.hpp">
@@ -226,7 +361,16 @@
 				RelativePath=".\include\indri\PowerPointDocumentExtractor.hpp">
 			</File>
 			<File
+				RelativePath=".\include\ReutersParser.hpp">
+			</File>
+			<File
+				RelativePath=".\include\Stemmer.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\StemmerFactory.hpp">
+			</File>
+			<File
+				RelativePath=".\include\Stopper.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\StopperTransformation.hpp">
@@ -253,16 +397,34 @@
 				RelativePath=".\include\indri\TextDocumentExtractor.hpp">
 			</File>
 			<File
+				RelativePath=".\include\TextHandler.hpp">
+			</File>
+			<File
+				RelativePath=".\include\TextHandlerManager.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\TextParser.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\Transformation.hpp">
 			</File>
 			<File
+				RelativePath=".\include\TrecParser.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\UnparsedDocument.hpp">
 			</File>
 			<File
+				RelativePath=".\include\WebParser.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\WordDocumentExtractor.hpp">
+			</File>
+			<File
+				RelativePath=".\include\WriterInQueryHandler.hpp">
+			</File>
+			<File
+				RelativePath=".\include\WriterTextHandler.hpp">
 			</File>
 		</Filter>
 		<Filter

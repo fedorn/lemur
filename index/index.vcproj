@@ -102,18 +102,6 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\src\BasicDocInfoList.cpp">
-			</File>
-			<File
-				RelativePath=".\src\BasicIndex.cpp">
-			</File>
-			<File
-				RelativePath=".\src\BasicIndexWithCat.cpp">
-			</File>
-			<File
-				RelativePath=".\src\BasicTermInfoList.cpp">
-			</File>
-			<File
 				RelativePath=".\src\DocListDiskBuilder.cpp">
 			</File>
 			<File
@@ -129,9 +117,6 @@
 				RelativePath=".\src\DocListMemoryBuilder.cpp">
 			</File>
 			<File
-				RelativePath=".\src\GammaCompress.cpp">
-			</File>
-			<File
 				RelativePath=".\src\IncFPPushIndex.cpp">
 			</File>
 			<File
@@ -141,19 +126,10 @@
 				RelativePath=".\src\IncPassagePushIndex.cpp">
 			</File>
 			<File
-				RelativePath=".\src\IndexCount.cpp">
-			</File>
-			<File
 				RelativePath=".\src\IndexEnvironment.cpp">
 			</File>
 			<File
 				RelativePath=".\src\IndexManager.cpp">
-			</File>
-			<File
-				RelativePath=".\src\IndexProb.cpp">
-			</File>
-			<File
-				RelativePath=".\src\IndriDocMgr.cpp">
 			</File>
 			<File
 				RelativePath=".\src\IndriIndex.cpp">
@@ -224,29 +200,11 @@
 			<File
 				RelativePath=".\src\Repository.cpp">
 			</File>
-			<File
-				RelativePath=".\src\Terms.cpp">
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
-				RelativePath=".\include\BasicDocInfoList.hpp">
-			</File>
-			<File
-				RelativePath=".\include\BasicIndex.hpp">
-			</File>
-			<File
-				RelativePath=".\include\BasicIndexWithCat.hpp">
-			</File>
-			<File
-				RelativePath=".\include\BasicTermInfoList.hpp">
-			</File>
-			<File
-				RelativePath=".\include\Compress.hpp">
-			</File>
 			<File
 				RelativePath=".\include\indri\CorpusStatistics.hpp">
 			</File>
@@ -308,9 +266,6 @@
 				RelativePath=".\include\indri\FieldStatistics.hpp">
 			</File>
 			<File
-				RelativePath=".\include\GammaCompress.hpp">
-			</File>
-			<File
 				RelativePath=".\include\IncFPPushIndex.hpp">
 			</File>
 			<File
@@ -326,22 +281,13 @@
 				RelativePath=".\include\Index.hpp">
 			</File>
 			<File
-				RelativePath=".\include\IndexCount.hpp">
-			</File>
-			<File
 				RelativePath=".\include\indri\IndexEnvironment.hpp">
 			</File>
 			<File
 				RelativePath=".\include\IndexManager.hpp">
 			</File>
 			<File
-				RelativePath=".\include\IndexProb.hpp">
-			</File>
-			<File
 				RelativePath=".\include\IndexWithCat.hpp">
-			</File>
-			<File
-				RelativePath=".\include\IndriDocMgr.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\IndriIndex.hpp">
@@ -441,9 +387,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\TermListBuilder.hpp">
-			</File>
-			<File
-				RelativePath=".\include\Terms.hpp">
 			</File>
 		</Filter>
 		<Filter
