@@ -36,6 +36,7 @@
 #include "lemur-platform.h"
 #include "lemur-compat.hpp"
 #include <stdlib.h>
+#include <stdexcept>
 #include <iostream>
 
 template<typename _Type, int _Count = 16>
