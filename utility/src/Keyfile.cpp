@@ -10,18 +10,20 @@ extern "C" {
   #include "keyerr.h"
 }
 
-#include <assert.h>
+#include <cassert>
 #include <memory>
 #include <string>
 
 #include "Keyfile.hpp"
 #include "Exception.hpp"
+#include "minmax.hpp"
 #include <sstream>
 
 void Keyfile::_buildHandle( int cacheSize ) {
-  int blocks = std::max( (cacheSize - min_fcb_lc) / buffer_lc, 0 );
+  int blocks = _MAXIM( (cacheSize - min_fcb_lc) / buffer_lc, 0 );
   _handleSize = min_fcb_lc + blocks * buffer_lc;
-  _handle.reset( new char[ _handleSize ] );
+//  _handle.reset( new char[ _handleSize ] );
+  _handle = std::auto_ptr<char>(new char[ _handleSize ]);
 }
 
 void Keyfile::open( const char* filename, Keyfile::access_mode accessMode, 
@@ -37,7 +39,7 @@ void Keyfile::open( const char* filename, Keyfile::access_mode accessMode,
 
 void Keyfile::open( const std::string& filename, 
 		    Keyfile::access_mode accessMode, int cacheSize ) {
-  return open( filename.c_str(), accessMode, cacheSize );
+  open( filename.c_str(), accessMode, cacheSize );
 }
 
 void Keyfile::create( const char* filename, Keyfile::access_mode accessMode, 
@@ -59,7 +61,8 @@ void Keyfile::create( const std::string& filename,
 void Keyfile::close() {
   //  assert( _handle.get() );
   close_key( _handle.get() );
-  _handle.reset();
+//  _handle.reset();
+  _handle = std::auto_ptr<char>(NULL);
 }
 
 bool Keyfile::get( const char* key, char** value, int& actualSize ) {
@@ -77,7 +80,8 @@ bool Keyfile::get( const char* key, char** value, int& actualSize ) {
 
   if( size > 0 ) {
     // make a buffer to handle the record
-    buffer.reset( new char[size] );
+    //buffer.reset( new char[size] );
+	buffer = std::auto_ptr<char>(new char[size]);
     get(key, buffer.get(), actualSize, size);
     // auto_ptr no longer needs control of the buffer
     *value = buffer.release(); 
@@ -193,7 +197,7 @@ void Keyfile::put( int key, const void* value, int valueLength ) {
 bool Keyfile::get( int key, void* value, int& actualSize, int maxSize ) {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   _createKey( keyBuf, key );
-  get( keyBuf, value, actualSize, maxSize );
+  return get( keyBuf, value, actualSize, maxSize );
 }
 
 
