@@ -25,6 +25,7 @@ be useful in a setting like EM.
 class Counter {
 public:
 
+  virtual ~Counter() {}
   // access functions
   
   /// return the count of a word
@@ -42,6 +43,7 @@ public:
 class ModifiableCounter : public Counter {
 public: 
   // manipulation functions
+  virtual ~ModifiableCounter() {}
   virtual void incCount(int eventIndex, double count) = 0;
   virtual void setCount(int eventIndex, double count)  = 0;
 };

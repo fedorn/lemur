@@ -141,7 +141,7 @@ public:
   PseudoFBDocs(IndexedRealVector &results, int howManyDoc):
     res(&results), howMany(howManyDoc) {
   }
-  ~PseudoFBDocs() {}
+  virtual ~PseudoFBDocs() {}
 
   virtual void startIteration() {
     it = res->begin();

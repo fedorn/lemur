@@ -16,6 +16,7 @@
 /// A set of ID's with weights
 class WeightedIDSet {
 public:
+  virtual ~WeightedIDSet() {}
   virtual void startIteration() = 0;
   virtual bool hasMore() = 0;
   /// returns an ID and its weight
