@@ -190,7 +190,7 @@ DocumentRep *SimpleKLRetMethod::computeDocRep(int docID)
 				      docParam.JMLambda,
 				      docParam.smthStrategy));
   case SimpleKLParameter::DIRICHLETPRIOR:
-    return (new BayesianDocModel(docID,
+    return (new DirichletPriorDocModel(docID,
 				 &ind, 
 				 *collectLM,
 				 docProbMass,  
