@@ -67,7 +67,7 @@ public:
   //@{
 
   /// Total count (i.e., number) of documents in collection
-  virtual int docCount ()  { return docids.size();}
+  virtual int docCount ()  { return docids.size()-1;}
 
   /// Total count of unique terms in collection
   virtual int termCountUnique () { return terms.size();}

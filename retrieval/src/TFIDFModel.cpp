@@ -94,15 +94,16 @@ void TFIDFModel::retrieve(double *query,
   int numDocs = dbIndex.docCount();
 
   int i;
-  static double *scAcc = new double[numDocs];  
+  static double *scAcc = new double[numDocs+1];  
   // ASSUMING max number of  score accumulators !!! 
+  // one more elements needed to accommodate OOV id
 
   static int *status = new int[numDocs]; 
   // status is needed to indicate which entry is a valid score
   // note that zero could be a valid score!
 
 
-  for (i=0; i<numDocs; i++) {
+  for (i=0; i<=numDocs; i++) {
     scAcc[i]=0;
     status[i]=0;
   }
@@ -126,8 +127,8 @@ void TFIDFModel::retrieve(double *query,
       while (dList->hasMore()) {
 	
 	DocInfo *info = dList->nextEntry();
-
-	scAcc[info->docID()] += query[i] *
+	
+       	scAcc[info->docID()] += query[i] *
 	  idfVal * DocTFWeight(info->termCount(),info->docID(), dbIndex, docparam);
 	status[info->docID()]=1;
       }
@@ -136,7 +137,7 @@ void TFIDFModel::retrieve(double *query,
 
   scores.clear();
   
-  for (i=0; i< numDocs; i++) {
+  for (i=0; i<= numDocs; i++) {
     if (status[i]) { // a valid entry
       // copy scores 
       IndexedReal entry;
