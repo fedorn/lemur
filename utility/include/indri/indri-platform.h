@@ -28,7 +28,7 @@
 #include "lemur-platform.h"
 
 #define INDRID_PORT ( 16743 )
-#define INDRI_DISTRIBUTION "Indri development release (Fri Oct 15 14:39:40 EDT 2004)"
+#define INDRI_DISTRIBUTION "Indri development release (Tue Oct 26 17:48:19 EDT 2004)"
 
 #endif /* INDRI_PLATFORM_H */
 
