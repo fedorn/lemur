@@ -30,6 +30,8 @@ typedef char* EXDOCID_T;
 #define DTLOOKUP_PAR  "DT_LOOKUP"
 #define TERMIDMAP_PAR  "TERMIDS"
 #define DOCIDMAP_PAR  "DOCIDS"
+#define NUMDT_PAR  "NUM_DTFILES"
+#define NUMINV_PAR  "NUM_INVFILES"
 
 struct LocatedTerm { // pair of term and its location
   TERMID_T term;
