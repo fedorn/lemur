@@ -81,16 +81,16 @@ void GammaCompress::compress(ostream &os, int n, int * a) {
     offset += gamma_encode(a[i], offset, ba);
   }
   int s=ba->Size();
-  os.write(&n, sizeof(int));
-  os.write(&s, sizeof(int));
+  os.write((char *)&n, sizeof(int));
+  os.write((char *)&s, sizeof(int));
   ba->Write(os);
   delete ba;
 }
 
 int GammaCompress::decompress(istream &is, int * a) {
   int n, size;
-  is.read(&n, sizeof(int));
-  is.read(&size, sizeof(int));
+  is.read((char *)&n, sizeof(int));
+  is.read((char *)&size, sizeof(int));
   if (is.peek() == EOF) return 0;
   BitArray * ca = new BitArray(size);
   ca->Read(is);
@@ -106,8 +106,8 @@ int GammaCompress::decompress(istream &is, int * a) {
 // Read into bit array, do not decompress
 int GammaCompress::read(istream &is, BitArray * ba) {
   int n, size;
-  is.read(&n, sizeof(int));
-  is.read(&size, sizeof(int));
+  is.read((char *)&n, sizeof(int));
+  is.read((char *)&size, sizeof(int));
   if (is.peek() == EOF) return 0;
   ba->Grow(size, 0);
   ba->Read(is);
