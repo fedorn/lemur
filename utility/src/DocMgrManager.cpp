@@ -10,6 +10,7 @@
 #include "Param.hpp"
 #include "FlattextDocMgr.hpp"
 #include "KeyfileDocMgr.hpp"
+#include "ElemDocMgr.hpp"
 
 DocumentManager* DocMgrManager::createDocMgr(string type, string name, 
 					     string parsetype, string sources) {
@@ -36,7 +37,11 @@ DocumentManager* DocMgrManager::createDocMgr(string type, string name,
     if ((!name.empty()) && (!parsetype.empty()) && (!sources.empty())) {
       dm = new KeyfileDocMgr(name, parsetype, sources);
     }
-  } // Add else if new types here...
+  } else if (type == "elem") {
+    if ((!name.empty()) && (!parsetype.empty()) && (!sources.empty())) {
+      dm = new ElemDocMgr(name, parsetype, sources);
+    }
+  }  // Add else if new types here...
   return dm;
 }
 
@@ -49,6 +54,8 @@ DocumentManager* DocMgrManager::openDocMgr(string name) {
     dm = new FlattextDocMgr(name.c_str());
   else if (len - name.rfind(".bdm") == 4)
     dm = new KeyfileDocMgr(name.c_str());
+  else if (len - name.rfind(".elem") == 5)
+    dm = new ElemDocMgr(name.c_str());
   // Add else if new types here...
   return dm;
 }
