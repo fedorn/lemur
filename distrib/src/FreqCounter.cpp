@@ -26,7 +26,7 @@
 
 
 
-FreqCounter::FreqCounter(Stopper * stopWords) {
+FreqCounter::FreqCounter(const Stopper * stopWords) {
   stopper = stopWords;
 
   // Set defaults
@@ -36,10 +36,10 @@ FreqCounter::FreqCounter(Stopper * stopWords) {
   dfTot = 0;
   nWords = 0;
   atfValid = false;
-  name = NULL;
+  name = "";
 }
 
-FreqCounter::FreqCounter(char * filename, Stopper * stopWords) {
+FreqCounter::FreqCounter(const string &filename, const Stopper * stopWords) {
   stopper = stopWords;
 
   // Set defaults
@@ -49,7 +49,7 @@ FreqCounter::FreqCounter(char * filename, Stopper * stopWords) {
   dfTot = 0;
   nWords = 0;
   atfValid = false;
-  name = NULL;
+  name = "";
 
   // Load statistics from file
   input(filename);
@@ -62,7 +62,6 @@ FreqCounter::~FreqCounter() {
     free (curr->first);
     curr++;
   }
-  free (name);
 }
 
 void
@@ -152,13 +151,13 @@ FreqCounter::endDoc() {
 
 
 void 
-FreqCounter::input(char * filename) {
+FreqCounter::input(const string &filename) {
   char word[5000];
   int ctfc;
   int dfc;
 
   // Load statistics from the file.
-  ifstream istr(filename);
+  ifstream istr(filename.c_str());
   while (! istr.eof()) {
     // Read in a line from the file.
     istr >> word;
@@ -195,13 +194,13 @@ FreqCounter::input(char * filename) {
 
 // Output counts to file.
 void
-FreqCounter::output(char * filename) {
-  ofstream outfile(filename);
+FreqCounter::output(const string &filename) const {
+  ofstream outfile(filename.c_str());
   // Iterate over terms in the freqInfo map
-  freqmap::iterator curr = freqInfo.begin();
+  freqmap::const_iterator curr = freqInfo.begin();
   while (curr != freqInfo.end()) {
-    char * word = curr->first;
-    freqinfo_t fi = curr->second;
+    //    char * word = curr->first;
+    const freqinfo_t fi = curr->second;
     // dumb error detection
     if (!(fi.df > fi.ctf || fi.ctf > ctfTot || fi.df > dfTot)) 
       // Output word, collection term frequency, and document frequency.
@@ -241,13 +240,13 @@ FreqCounter::randomWord() {
 }
 
 char *
-FreqCounter::randomCtf() {
+FreqCounter::randomCtf() const {
   // Random number from 1 to collection term frequencies total
   int n = (rand() % ctfTot) + 1;
   int i = 0;
   // Iterate over terms until i (= sum of ctf for words seen so far)
   // is at least n.
-  freqmap::iterator curr = freqInfo.begin();
+  freqmap::const_iterator curr = freqInfo.begin();
   i += curr->second.ctf;
   while (curr != freqInfo.end() && i < n) {
     curr++;
@@ -257,13 +256,13 @@ FreqCounter::randomCtf() {
 }
 
 char *
-FreqCounter::randomDf() {
+FreqCounter::randomDf() const {
   // Random number from 1 to document frequencies total
   int n = (rand() % dfTot) + 1;
   int i = 0;
   // Iterate over terms until i (= sum of df for words seen so far)
   // is at least n.
-  freqmap::iterator curr = freqInfo.begin();
+  freqmap::const_iterator curr = freqInfo.begin();
   i += curr->second.df;
   while (curr != freqInfo.end() && i < n) {
     curr++;
@@ -273,11 +272,11 @@ FreqCounter::randomDf() {
 }
 
 char *
-FreqCounter::randomAveTf() {
+FreqCounter::randomAveTf() const {
   if (atfValid == false) {
     // Recompute avetfTot
     avetfTot = 0;
-    freqmap::iterator curr = freqInfo.begin();
+    freqmap::const_iterator curr = freqInfo.begin();
     while (curr != freqInfo.end()) {
       avetfTot += curr->second.ctf/ (long double) curr->second.df;
       curr++;
@@ -291,7 +290,7 @@ FreqCounter::randomAveTf() {
   long double i = 0;
   // Iterate over terms until i (= sum of avetf/avetfTot for words seen so far)
   // is at least n.
-  freqmap::iterator curr = freqInfo.begin();
+  freqmap::const_iterator curr = freqInfo.begin();
   i += (curr->second.ctf / (long double) curr->second.df) / avetfTot;
   while (curr != freqInfo.end() && i < n) {
     curr++;
@@ -301,13 +300,13 @@ FreqCounter::randomAveTf() {
 }
 
 char *
-FreqCounter::randomUniform() {
+FreqCounter::randomUniform() const {
   // Random number between 1 and number of unique words
   int n = (rand() % nWords) + 1;
   int i = 0;
   // Iterate over terms until i (= number words seen so far)
   // is at least n.
-  freqmap::iterator curr = freqInfo.begin();
+  freqmap::const_iterator curr = freqInfo.begin();
   i++; 
   while (curr != freqInfo.end() && i < n) {
     curr++;
@@ -319,10 +318,10 @@ FreqCounter::randomUniform() {
 // Compute the collection term frequecy ratio of two LMs.
 // This model is the reference model.
 double
-FreqCounter::ctfRatio(FreqCounter & lm) {
+FreqCounter::ctfRatio(FreqCounter & lm) const {
   double ctfSum = 0.0;
   double ctfTot2 = 0.0;
-  freqmap::iterator curr = freqInfo.begin();
+  freqmap::const_iterator curr = freqInfo.begin();
   while (curr != freqInfo.end()) {
     if (lm.getCtf(curr->first) > 0) {
       ctfSum += curr->second.ctf;
@@ -387,18 +386,18 @@ FreqCounter::pruneBottomWords(int numTopWords) {
 //------ Get and set functions below. ------
  
 void
-FreqCounter::setName(char * freqCounterName) {
-  name = strdup(freqCounterName);
+FreqCounter::setName(const string &freqCounterName) {
+  name = freqCounterName;
 }
 
-char *
-FreqCounter::getName() {
+const string &
+FreqCounter::getName() const {
   return name;
 }
 
 
-freqmap *
-FreqCounter::getFreqInfo() {
+const freqmap *
+FreqCounter::getFreqInfo() const {
   return &freqInfo;
 }
 
@@ -411,23 +410,27 @@ FreqCounter::setRandomMode(int mode) {
 }
 
 int
-FreqCounter::getRandomMode() {
+FreqCounter::getRandomMode() const {
   return randomMode;
 }
 
 int 
-FreqCounter::getCtf(char * word) {
-  if (freqInfo.find(word) != freqInfo.end()) {
-    freqinfo_t fi = freqInfo[word];
+FreqCounter::getCtf(const char * word) const {
+  //we're not going to change w, but need it to work with map API
+  char* w = const_cast<char*>(word);
+  if (freqInfo.find(w) != freqInfo.end()) {
+    const freqinfo_t fi = freqInfo[w];
     return fi.ctf;
   }
   return 0;
 }
 
 int
-FreqCounter::getDf(char * word) {
-  if (freqInfo.find(word) != freqInfo.end()) {
-    freqinfo_t fi = freqInfo[word];
+FreqCounter::getDf(const char * word) const {
+  //we're not going to change w, but need it to work with map API
+  char* w = const_cast<char*>(word);
+  if (freqInfo.find(w) != freqInfo.end()) {
+    const freqinfo_t fi = freqInfo[w];
     return fi.df;
   }
   return 0;
@@ -435,9 +438,11 @@ FreqCounter::getDf(char * word) {
 
 // Return the average term frequency for a word
 double
-FreqCounter::getAveTf(char * word) {
-  if (freqInfo.find(word) != freqInfo.end()) {
-    freqinfo_t fi = freqInfo[word];
+FreqCounter::getAveTf(const char * word) const {
+  //we're not going to change w, but need it to work with map API
+  char* w = const_cast<char*>(word);
+  if (freqInfo.find(w) != freqInfo.end()) {
+    const freqinfo_t fi = freqInfo[w];
     return (fi.ctf / (double) fi.df);
   }
   return 0;
@@ -446,12 +451,12 @@ FreqCounter::getAveTf(char * word) {
 
 // Return number of unique words.
 int 
-FreqCounter::numWords() {
+FreqCounter::numWords() const {
   return nWords;
 }
 
 // Return total count of words.
 int 
-FreqCounter::totWords() {
+FreqCounter::totWords() const {
   return ctfTot;
 }

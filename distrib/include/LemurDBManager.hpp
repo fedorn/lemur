@@ -22,25 +22,6 @@
 #include "LemurMemParser.hpp"
 #include "RetMethodManager.hpp"
 
-// All of these are available from RetrievalParameter directly
-// No need for an additional namespace. --dmf 01/16/2004
-#if 0
-/// Parameters needed for querying Lemur databases
-namespace LemurParameter {
-  static RetMethodManager::RetModel mod;
-  /// Database name
-  static String dbname;
-
-  /// Get the parameters
-  static void get() {
-    // default is KL divergence model
-    mod = (RetMethodManager::RetModel) ParamGetInt("retModel", RetMethodManager::KL); 
-    dbname = ParamGetString("index");
-    RetrievalParameter::get();  
-  }
-};
-
-#endif
 /*! Provides a simple wrapper to lemur databases for 
  * use with the query-based sampling code.
  */
@@ -49,21 +30,21 @@ class LemurDBManager : public DBManager {
 public:
   /// Open a Lemur database - The dbname is a parameter file
   /// which specifies retrieval parameters as with RetEval.
-  void open(char * dbname);
+  void open(const string &dbname);
 
   /// Query the database.
-  results_t * query (char * query, int numdocs);
+  results_t * query (const char * query, int numdocs) const;
 
   /// Get a parser for the database.
-  MemParser * getParser();
+  MemParser * getParser() const;
 
   /// Get a document given its document id.
-  doc_t * getDoc(docid_t docid);
+  doc_t * getDoc(const docid_t docid) const;
 
   /// Write a document to file.
-  void output(docid_t docid);
+  void output(const docid_t docid) const;
   /// Set output file name
-  void setOutputFile(char * filename);
+  void setOutputFile(const string &filename) const;
 
   /// Close the database.
   void close();
@@ -74,8 +55,8 @@ private:
   RetrievalMethod * model;
   ScoreAccumulator * accumulator;
   IndexedRealVector * results;
-  LemurMemParser * parser;
-  ofstream * outfile;
+  //  LemurMemParser * parser;
+  mutable ofstream * outfile;
 
 };
 

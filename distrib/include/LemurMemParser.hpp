@@ -22,13 +22,13 @@
 class LemurMemParser : public MemParser {
  
 public:
-  LemurMemParser(Index * ind);
+  LemurMemParser(const Index * ind);
  
   /// Parses a document in memory.
   void parse (doc_t * doc);
   
 private:
-  Index * index;
+  const Index * index;
 
 };
 

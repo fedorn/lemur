@@ -3,7 +3,8 @@
 
 
  
-CtfIndexer::CtfIndexer(char * csName, int bufferSize, bool countStopWords) {
+CtfIndexer::CtfIndexer(const string &csName, int bufferSize, 
+		       bool countStopWords) {
   collsel = new InvPushIndex(csName, bufferSize);
 
   csdp = new DocumentProps();
@@ -52,7 +53,7 @@ CtfIndexer::handleWord(char * word) {
 
 
 void 
-CtfIndexer::newDb(char * name) {
+CtfIndexer::newDb(const string &name) {
   
   if (!first) {
     cout << "coll term freq: " << ctfCount << endl;
@@ -63,7 +64,7 @@ CtfIndexer::newDb(char * name) {
     first = false;
   }
 
-  csdp->stringID(name);
+  csdp->stringID((char *)name.c_str()); // fix this
   csdp->length(0);
   collsel->beginDoc(csdp);
 

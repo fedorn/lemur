@@ -35,7 +35,7 @@ QryBasedSampler::~QryBasedSampler() {
 }
 
 bool
-QryBasedSampler::probe(char * initQuery) {
+QryBasedSampler::probe(const char * initQuery) {
   // PRECONDITIONS:
   // language model manager has been set
   assert(freqCounter != NULL);
@@ -47,10 +47,8 @@ QryBasedSampler::probe(char * initQuery) {
   seenDocs.clear();
  
   // Document output file name
-  char * dfname = (char *) malloc((strlen(outputPrefix) + 5) * sizeof(char));
-  sprintf(dfname, "%sdocs", outputPrefix);
+  string dfname = outputPrefix + "docs";
   db->setOutputFile(dfname);
-  free (dfname);
 
   // the number of docs done so far
   int done = 0;
@@ -106,7 +104,8 @@ QryBasedSampler::probe(char * initQuery) {
       // check to make sure we haven't already gotten this doc
       docidset::iterator it = seenDocs.find(id);
       if (it == seenDocs.end()) {
-	seenDocs.insert(strdup(id));
+	//	seenDocs.insert(strdup(id));
+	seenDocs.insert(id);
 	
 	doc_t * doc;
 
@@ -124,9 +123,9 @@ QryBasedSampler::probe(char * initQuery) {
 	  if (doc->doc) {
 	    delete [] doc->doc;
 	  }
-	  free (doc->id);
+	  //	  free (doc->id);
 	  delete doc;
-
+	  delete parser;
 	  done++;	
 
 	} catch (Exception &ex) {
@@ -137,20 +136,20 @@ QryBasedSampler::probe(char * initQuery) {
 	    delete [] doc->doc;
 	  }
 	  if (doc) {
-	    free (doc->id);
+	    //	    free (doc->id);
 	    delete doc;
 	  }
 	}
 
       }
 
-      free (id);
+      //      free (id);
       
     }
 
     // Free memory
     for ( ; i < numResults; i++) {
-      free (results->ids[i]);
+      //      free (results->ids[i]);
     }
     delete [] results->ids;
     delete results;
@@ -160,10 +159,8 @@ QryBasedSampler::probe(char * initQuery) {
   freqCounter->endDoc();
 
   // output language model
-  char * fname = (char *) malloc((strlen(outputPrefix) + 6) * sizeof(char));
-  sprintf(fname, "%smodel", outputPrefix);
+  string fname = outputPrefix + "model";
   freqCounter->output(fname);
-  free (fname);
 
   return true;
 }
@@ -171,12 +168,12 @@ QryBasedSampler::probe(char * initQuery) {
 //------- Get and set functions below. -------
 
 void 
-QryBasedSampler::setDBManager(DBManager * database) {
+QryBasedSampler::setDBManager(const DBManager * database) {
   db = database;
 }
 
-DBManager * 
-QryBasedSampler::getDBManager() {
+const DBManager * 
+QryBasedSampler::getDBManager() const {
   return db;
 }   
 
@@ -186,18 +183,18 @@ QryBasedSampler::setFreqCounter(FreqCounter * counter) {
   freqCounter = counter;
 }
 
-FreqCounter * 
-QryBasedSampler::getFreqCounter() {
+const FreqCounter * 
+QryBasedSampler::getFreqCounter() const {
   return freqCounter;
 }
 
 void
-QryBasedSampler::setOutputPrefix(char * prefix) {
+QryBasedSampler::setOutputPrefix(const string &prefix) {
   outputPrefix = prefix;
 }
 
-char *
-QryBasedSampler::getOutputPrefix() {
+const string &
+QryBasedSampler::getOutputPrefix() const {
   return outputPrefix;
 }
 
@@ -207,7 +204,7 @@ QryBasedSampler::setNumDocs(int n) {
 }
 
 int
-QryBasedSampler::getNumDocs() {
+QryBasedSampler::getNumDocs() const {
   return numDocs;
 }
 
@@ -217,7 +214,7 @@ QryBasedSampler::setDocsPerQuery(int n) {
 }
 
 int
-QryBasedSampler::getDocsPerQuery() {
+QryBasedSampler::getDocsPerQuery() const {
   return docsPerQuery;
 }
 
@@ -227,7 +224,7 @@ QryBasedSampler::setNumWords(int n) {
 }
 
 int
-QryBasedSampler::getNumWords() {
+QryBasedSampler::getNumWords() const {
   return numWords;
 }
 
@@ -237,7 +234,7 @@ QryBasedSampler::setNumQueries(int n) {
 }
 
 int
-QryBasedSampler::getNumQueries() {
+QryBasedSampler::getNumQueries() const {
   return numQueries;
 }
 
@@ -248,6 +245,6 @@ QryBasedSampler::setTermMode(int m) {
 }
 
 int
-QryBasedSampler::getTermMode() {
+QryBasedSampler::getTermMode() const {
   return termMode;
 }

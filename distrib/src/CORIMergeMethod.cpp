@@ -19,7 +19,7 @@ CORIMergeMethod::CORIMergeMethod(double constA, double constB) {
 CORIMergeMethod::~CORIMergeMethod() {
 }
 
-double CORIMergeMethod::score(double dbscore, double docscore) {
+double CORIMergeMethod::score(double dbscore, double docscore) const {
   return ( docscore + A*dbscore*docscore )/B;  
 }
 

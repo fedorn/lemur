@@ -2,11 +2,12 @@
 
 
 
-DocFreqIndexer::DocFreqIndexer(char * csName, char * cwName, 
-			 char * ssName, int bufferSize, bool countStopWords) {
+DocFreqIndexer::DocFreqIndexer(const string &csName, const string &cwName, 
+			       const string &ssName, int bufferSize, 
+			       bool countStopWords) {
   collsel = new InvPushIndex(csName, bufferSize);
-  collWords = fopen(cwName, "wb");
-  serverSizes = fopen(ssName, "wb");
+  collWords = fopen(cwName.c_str(), "wb");
+  serverSizes = fopen(ssName.c_str(), "wb");
 
   csdp = new DocumentProps();
   term = new InvFPTerm();
@@ -73,7 +74,7 @@ DocFreqIndexer::handleWord(char * word) {
 
 
 void 
-DocFreqIndexer::newDb(char * name) {
+DocFreqIndexer::newDb(const string &name) {
   
   if (!first) {
     cout << "words in collection: " << cw << endl;
@@ -87,7 +88,7 @@ DocFreqIndexer::newDb(char * name) {
     first = false;
   }
 
-  csdp->stringID(name);
+  csdp->stringID((char *)name.c_str());
   csdp->length(0);
   collsel->beginDoc(csdp);
 

@@ -13,7 +13,7 @@
 
 
 // Create the Lemur memory "parser"
-LemurMemParser::LemurMemParser(Index * ind) {
+LemurMemParser::LemurMemParser(const Index * ind) {
   index = ind;
 }
 
@@ -25,14 +25,14 @@ LemurMemParser::parse(doc_t * doc) {
   int intlen = doc->len * sizeof(char) / sizeof(int);
 
   // Pass on document boundaries.
-  if (textHandler != NULL) textHandler->foundDoc(doc->id);
+  if (textHandler != NULL) textHandler->foundDoc((char *)(doc->id.c_str()));
 
   int * loc = intdoc;
   int * end = intdoc + intlen;
   while (loc < end) {
     // Look up the word for the term id and pass it on.
     if (textHandler != NULL) 
-      textHandler->foundWord((char *) index->term(*loc));
+      textHandler->foundWord((char *)(index->term(*loc).c_str()));
     loc++;
   }
   

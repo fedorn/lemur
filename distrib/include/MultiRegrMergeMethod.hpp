@@ -62,13 +62,17 @@ public:
   /// indexset are the database scores for selected databases
   /// centralsocres are the central documents scores retrieved by centralized sampling database
   /// scoresset are the distributed documents scores retrieved by individual databases
-  void mergeScoreSet(IndexedRealVector &indexset, DocScoreVector** scoreset, DocScoreVector &results);
-  void calcRegrParams(IndexedRealVector &indexset, DocScoreVector* centralscores, DocScoreVector** scoresset);
+  void mergeScoreSet(const IndexedRealVector &indexset, 
+		     const DocScoreVector* const* scoreset, 
+		     DocScoreVector &results);
+  void calcRegrParams(const IndexedRealVector &indexset, 
+		      const DocScoreVector* centralscores, 
+		      const DocScoreVector* const* scoresset);
 
 protected:
   /// create a score for the merge based on the index ranking score and the document score 
-  virtual double score(double dbscore, double docscore,int dbIndex);
-  virtual double score(double dbscore, double docscore);
+  virtual double score(double dbscore, double docscore,int dbIndex) const;
+  virtual double score(double dbscore, double docscore) const;
 
   /// The model parameters
   double *parama;

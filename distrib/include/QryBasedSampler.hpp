@@ -18,7 +18,8 @@
 #include "DBManager.hpp"
 
 /// Stores IDs of previously seen documents.
-typedef stringset docidset;
+//typedef stringset docidset;
+typedef set<docid_t, less<string> > docidset;
 
 /*! Terminate on number of unique documents seen. */
 #define T_NDOCS 1
@@ -36,13 +37,13 @@ public:
   ~QryBasedSampler();
 
   /*! Probe the database, using initQuery as the initial query. */
-  bool probe(char * initQuery);
+  bool probe(const char * initQuery);
   
   /// Set the dstabase manager.
-  void setDBManager(DBManager * database);
+  void setDBManager(const DBManager * database);
 
   /*! Get a reference to the database manager. */
-  DBManager * getDBManager();
+  const DBManager * getDBManager() const;
 
 
   /*! Set the frequency counter - this handles building the
@@ -50,36 +51,36 @@ public:
   void setFreqCounter(FreqCounter * counter);
 
   /*! Get a reference to the frequency counter. */
-  FreqCounter * getFreqCounter();
+  const FreqCounter * getFreqCounter() const;
 
 
   /*! Set the ouput prefix - this prepended to the file names
    * for documents and models.  Documents are stored in 
    * prefix.docs and the model for a db is stored in prefix.model. */
-  void setOutputPrefix(char * prefix);
+  void setOutputPrefix(const string &prefix);
   
   /*! Get the output prefix. */
-  char * getOutputPrefix();
+  const string &getOutputPrefix() const;
 
   /*! Set the number of unique documents to retrieve. */
   void setNumDocs(int n);
 
   /*! Get the number of unique documents to retrieve. */
-  int getNumDocs();
+  int getNumDocs() const;
 
 
   /*! Set the number of unique words to retrieve. */
   void setNumWords(int n);
 
   /*! Get the number of unique words to retrieve. */
-  int getNumWords();
+  int getNumWords() const;
 
 
   /*! Set the number of queries to run. */
   void setNumQueries(int n);
 
   /*! Get the number of queries to run. */
-  int getNumQueries();
+  int getNumQueries() const;
 
 
   /*! Set the termination mode.  To specify a disjunction of conditions,
@@ -91,20 +92,20 @@ public:
   void setTermMode(int m);
 
   /*! Get the termination mode. */
-  int getTermMode();
+  int getTermMode() const;
   
 
   /*! Set the number of documents per query to use. */
   void setDocsPerQuery(int n);
   
   /*! Get the number of documents per query used. */
-  int getDocsPerQuery();
+  int getDocsPerQuery() const;
 
 
 private:
 
   /* for querying a db */
-  DBManager * db;
+  const DBManager * db;
 
 
   /* for building a description of a db */
@@ -112,7 +113,7 @@ private:
 
 
   /* output prefix for filenames */
-  char * outputPrefix;
+  string outputPrefix;
 
 
   /* termination mode of the probe -

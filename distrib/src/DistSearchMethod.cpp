@@ -11,7 +11,9 @@
 
 #include "DistSearchMethod.hpp"
 
-void DistSearchMethod::scoreIndexSet(Query &qry, IndexedRealVector &indexset, DocScoreVector** results) {
+void DistSearchMethod::scoreIndexSet(const Query &qry, 
+				     const IndexedRealVector &indexset, 
+				     DocScoreVector** results) {
 
   query = &qry;
   allres = results;
@@ -27,7 +29,9 @@ void DistSearchMethod::scoreIndexSet(Query &qry, IndexedRealVector &indexset, Do
   }
 }
 
-void DistSearchMethod::scoreIndexSet(Query &qry, vector<string> &indexset, DocScoreVector** results) {
+void DistSearchMethod::scoreIndexSet(const Query &qry, 
+				     const vector<string> &indexset, 
+				     DocScoreVector** results) {
 
   query = &qry;
   allres = results;
@@ -44,9 +48,11 @@ void DistSearchMethod::scoreIndexSet(Query &qry, vector<string> &indexset, DocSc
 }
 
 
-void DistSearchMethod::indexToID(Index* ind, IndexedRealVector* ivec, DocScoreVector* dvec) {
+void DistSearchMethod::indexToID(const Index* ind, 
+				 const IndexedRealVector* ivec, 
+				 DocScoreVector* dvec) {
 
-  IndexedRealVector::iterator i;
+  IndexedRealVector::const_iterator i;
   for (i=ivec->begin();i!= ivec->end(); i++) {
     dvec->PushValue(ind->document((*i).ind), (*i).val);
   }

@@ -12,7 +12,8 @@
 #include "SingleRegrMergeMethod.hpp"
 #include <map>
 
-typedef map<char *, double, ltstr> docsidmap;
+//typedef map<char *, double, ltstr> docsidmap;
+typedef map<string, double, less<string> > docsidmap;
 
 
 SingleRegrMergeMethod::SingleRegrMergeMethod(double constA, double constB) {
@@ -24,7 +25,7 @@ SingleRegrMergeMethod::~SingleRegrMergeMethod() {
 }
 
 /// Calculate the final comparable document score
-double SingleRegrMergeMethod::score(double dbscore, double docscore) {
+double SingleRegrMergeMethod::score(double dbscore, double docscore) const {
   return parama * docscore + paramb * dbscore * docscore;
 }
 
@@ -32,9 +33,11 @@ double SingleRegrMergeMethod::score(double dbscore, double docscore) {
 /// indexset are the database scores for selected databases
 /// centralsocres are the central documents scores retrieved by centralized sampling database
 /// scoresset are the distributed documents scores retrieved by individual databases
-void SingleRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScoreVector* centralscores, DocScoreVector** scoresset) {
-  DocScoreVector* docscores;
-  DocScoreVector::iterator j;
+void SingleRegrMergeMethod::calcRegrParams(const IndexedRealVector &indexset, 
+					   const DocScoreVector* centralscores, 
+					   const DocScoreVector* const* scoresset) {
+  const DocScoreVector* docscores;
+  DocScoreVector::const_iterator j;
   docsidmap centerScoreHash;
   double indexscore;
   int maxArraySize=0;
@@ -63,7 +66,8 @@ void SingleRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScore
   for (j=centralscores->begin(); j!= centralscores->end();j++) {
     if ((*j).val!=0){
       //put all the centralized scores into a hash map
-      centerScoreHash[strdup((*j).id)]=(*j).val;
+      //      centerScoreHash[strdup((*j).id)]=(*j).val;
+      centerScoreHash[(*j).id]=(*j).val;
     }
   }
  
@@ -75,7 +79,7 @@ void SingleRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScore
     docscores = scoresset[i];
     indexscore = indexset[i].val;
     for (j=docscores->begin(); j!= docscores->end();j++) {
-      char* docId=(char *)(*j).id;
+      const string &docId = (*j).id;
       if  ((centerScoreHash[docId]!=0) && ((*j).val!=0) && (dbOverlapNum<GETTOPDOCSNUM)){
 	double y= centerScoreHash[docId];
 	double x1=(*j).val;

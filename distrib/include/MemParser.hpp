@@ -14,8 +14,8 @@
 
 #include "TextHandler.hpp"
 
-/// A document id is a null terminated character array.
-typedef char * docid_t;
+/// A document id is a string
+typedef string docid_t;
 
 /// A document is a character array storing the document contents,
 /// a length of the array, and a document id.

@@ -50,10 +50,10 @@ class FreqCounter : public TextHandler {
 public:
   /// Create a frequency counter with the specified stopword list.
   /// The stopWords parameter is optional.
-  FreqCounter(Stopper * stopWords = NULL);
+  FreqCounter(const Stopper * stopWords = NULL);
   /// Create a frequency counter (loading it from file) with the
   /// specified stopword list.  Thes stopWords parameter is optional.
-  FreqCounter(char * filename, Stopper * stopWords = NULL);
+  FreqCounter(const string &filename, const Stopper * stopWords = NULL);
   
   /// Delete the freqency counter.
   ~FreqCounter();
@@ -62,7 +62,7 @@ public:
   void clear();
 
   /// Output the frequency information to a file.
-  void output(char * filename);
+  void output(const string &filename) const;
 
   /*! Get a random word from the distribution specified by setRandomMode. 
    * The random word is unique since the last clear operation. */
@@ -75,39 +75,39 @@ public:
    */
   void setRandomMode(int mode);
   /*! Gets the current random word mode.  See setRandomMode(...) */
-  int getRandomMode();
+  int getRandomMode() const;
 
   /*! Select a word at random using collection term frequency. This
    * word is not guarenteed to be unique from other calls to this function. */
-  char * randomCtf();
+  char * randomCtf() const;
   /*! Select a word at random using document frequency. This word is not
    * guarenteed to be unique from other calls to this function. */
-  char * randomDf();
+  char * randomDf() const;
   /*! Select a word at random using average term frequency. This word is no
    * guarenteed to be unique from other calls to this function. */
-  char * randomAveTf();
+  char * randomAveTf() const;
   /*! Select a word at random with equal probability for each word. This
    * word is not guarenteed to be unique from other calls to this funtion. */
-  char * randomUniform();
+  char * randomUniform() const;
 
 
   /*! Return the number of unique words seen across all documents processed. */
-  int numWords();
+  int numWords() const;
   /*! Return the total words seen across all documents processed. */
-  int totWords();
+  int totWords() const;
 
   /*! Get a reference to the internal frequency count map. */
-  freqmap * getFreqInfo();
+  const freqmap * getFreqInfo() const;
 
   /*! Get the collection term frequency for a word. */
-  int getCtf(char * word);
+  int getCtf(const char * word) const;
   /*! Get the document frequency for a word. */
-  int getDf(char * word);
+  int getDf(const char * word) const;
   /*! Get the average term frequency for a word. */
-  double getAveTf(char * word);
+  double getAveTf(const char * word) const;
 
   /*! Compare lm1 to this language model, returning the ctf ratio. */
-  double ctfRatio(FreqCounter & lm1);
+  double ctfRatio(FreqCounter & lm1) const;
 
   /// Overridden from TextHandler
   char * handleDoc(char * docno);
@@ -118,9 +118,9 @@ public:
   void endDoc();
 
   /// Set the name of language model described by the frequency counter.
-  void setName(char * freqCounterName);
+  void setName(const string &freqCounterName);
   /// Get the counter's name.
-  char * getName();
+  const string & getName() const;
 
   /// Prune least frequent words, keeping only topWords most frequent words.
   void pruneBottomWords(int topWords);
@@ -128,10 +128,10 @@ public:
 
 protected:
   /* Loads a language model from file. */
-  void input(char * filename);
+  void input(const string &filename);
 
   /* Collection term frequencies. */
-  freqmap freqInfo;
+  mutable freqmap freqInfo;
 
   /* Words in a doc. */
   stringset doc;
@@ -139,10 +139,10 @@ protected:
   stringset randdone;
 
   /* The frequency counter's name. */
-  char * name;
+  string name;
 
   /* Stopword list */
-  Stopper * stopper;
+  const Stopper * stopper;
 
 
   /* used for calculating probabilities when
@@ -153,10 +153,10 @@ protected:
   /* Sum over words of df. */
   int dfTot;  
   /* Sum over words of average tf. */
-  long double avetfTot;
+  mutable long double avetfTot;
   /* Indicates whether avetfTot is valid (true)
    * or needs to be recalculated (false). */
-  bool atfValid;
+  mutable bool atfValid;
   /* Random selection mode. */
   int randomMode;
   /* Number of unique words. */

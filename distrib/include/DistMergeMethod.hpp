@@ -48,11 +48,13 @@ public:
   virtual ~DistMergeMethod() {};
 
   /// merge a set of scores that were obtained from retrieval on the individual databases in the indexset.  return the merged results into a DocScoreVector.  The scores in scoreset should correlate with the indexes in indexset.  
-  virtual void mergeScoreSet(IndexedRealVector &indexset, DocScoreVector** scoreset, DocScoreVector &results);
+  virtual void mergeScoreSet(const IndexedRealVector &indexset, 
+			     const DocScoreVector* const* scoreset, 
+			     DocScoreVector &results);
 
 protected:
   /// create a score for the merge based on the index ranking score and the document score 
-  virtual double score(double dbscore, double docscore)=0;
+  virtual double score(double dbscore, double docscore) const =0;
 };
 
 #endif

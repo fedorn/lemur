@@ -12,7 +12,8 @@
 #include "MultiRegrMergeMethod.hpp"
 #include <map>
 
-typedef map<char *, double, ltstr> docsidmap;
+//typedef map<char *, double, ltstr> docsidmap;
+typedef map<string, double, less<string> > docsidmap;
 
 
 MultiRegrMergeMethod::MultiRegrMergeMethod(double constA, double constB) {
@@ -20,10 +21,12 @@ MultiRegrMergeMethod::MultiRegrMergeMethod(double constA, double constB) {
   defParamB = constB;
 }
 
-void MultiRegrMergeMethod::mergeScoreSet(IndexedRealVector &indexset, DocScoreVector** scoreset, DocScoreVector &results) {
+void MultiRegrMergeMethod::mergeScoreSet(const IndexedRealVector &indexset, 
+					 const DocScoreVector* const* scoreset,
+					 DocScoreVector &results) {
 
-  DocScoreVector* docscores;
-  DocScoreVector::iterator j;
+  const DocScoreVector* docscores;
+  DocScoreVector::const_iterator j;
   double indexscore;
   
 
@@ -62,12 +65,13 @@ MultiRegrMergeMethod::~MultiRegrMergeMethod() {
 }
 
 /// Calculate the final comparable document score
-double MultiRegrMergeMethod::score(double dbscore, double docscore,int dbIndex) {
+double MultiRegrMergeMethod::score(double dbscore, 
+				   double docscore,int dbIndex) const {
   return parama[dbIndex]+ paramb[dbIndex]*docscore;
 }
 
 //only a dummy implementation of the virtual code
-double MultiRegrMergeMethod::score(double dbscore, double docscore) {
+double MultiRegrMergeMethod::score(double dbscore, double docscore) const {
     return ( defParamA*docscore + defParamB*dbscore*docscore);
 }
 
@@ -75,8 +79,10 @@ double MultiRegrMergeMethod::score(double dbscore, double docscore) {
 /// indexset are the database scores for selected databases
 /// centralsocres are the central documents scores retrieved by centralized sampling database
 /// scoresset are the distributed documents scores retrieved by individual databases
-void MultiRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScoreVector* centralscores, DocScoreVector** scoresset) {
-  DocScoreVector* docscores;
+void MultiRegrMergeMethod::calcRegrParams(const IndexedRealVector &indexset, 
+					  const DocScoreVector* centralscores,
+					  const DocScoreVector*const * scoresset) {
+  const DocScoreVector* docscores;
   docsidmap centerScoreHash;
   double indexscore;
   int i,maxArraySize=0;
@@ -94,10 +100,11 @@ void MultiRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScoreV
   }
 
   //put all the centralized scores into a hash map
-  DocScoreVector::iterator j;
+  DocScoreVector::const_iterator j;
   for (j=centralscores->begin(); j!= centralscores->end();j++) {
     if ((*j).val!=0){
-      centerScoreHash[(char *)(*j).id]=(*j).val;
+      //      centerScoreHash[(char *)(*j).id]=(*j).val;
+      centerScoreHash[(*j).id]=(*j).val;
     }
   }
 
@@ -117,7 +124,7 @@ void MultiRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScoreV
     int dbOverlapNum=0; //the number of overlap documents for this specific database
     docscores = scoresset[i];
     indexscore = indexset[i].val;
-    DocScoreVector::iterator j;
+    DocScoreVector::const_iterator j;
     double docMax=-1e10;//the max doc score of this database;
     double docMin=1e10;//the min doc score of this database;
 
@@ -129,7 +136,8 @@ void MultiRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScoreV
     }
 
     for (j=docscores->begin(); j!= docscores->end();j++) {
-      char* docId=(char *)(*j).id;
+      //      char* docId=(char *)(*j).id;
+      const string &docId=(*j).id;
       if  ((centerScoreHash[docId]!=0) && ((*j).val!=0) && (dbOverlapNum<MGETTOPDOCSNUM)){
 	double y= centerScoreHash[docId];
 	double x=(*j).val;

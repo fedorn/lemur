@@ -34,19 +34,19 @@ class DBManager {
 
 public:
 
-  virtual void open (char * info) = 0;
+  virtual void open (const string &info) = 0;
   virtual void close() = 0;
 
   /// Query a database.
-  virtual results_t * query (char * query, int numdocs) = 0;
+  virtual results_t * query (const char * query, int numdocs) const = 0;
   /// Get a parser that can parse this database's documents.
-  virtual MemParser * getParser() = 0;
+  virtual MemParser * getParser() const = 0;
   /// Get a document from the database.
-  virtual doc_t * getDoc(docid_t docid) = 0;
+  virtual doc_t * getDoc(const docid_t docid) const = 0;
   /// Append a document to file.
-  virtual void output(docid_t docid) = 0;
+  virtual void output(const docid_t docid) const = 0;
   /// Set output file name
-  virtual void setOutputFile(char * filename) = 0;
+  virtual void setOutputFile(const string &filename) const = 0;
 
 };
 

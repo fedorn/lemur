@@ -18,52 +18,34 @@
 
 // Open the database.
 void
-LemurDBManager::open(char * dbname) {
+LemurDBManager::open(const string &dbname) {
   // Load the parameter file 
-  String dbparam(dbname);
-  ParamPushFile(dbparam);
-
-  //This is unnecessary, RetrievalParamter::get() is sufficient.
-  //  LemurParameter::get(); 
-  // dmf 01/16/2004
+  ParamPushFile(dbname);
   RetrievalParameter::get();
 
   // Create the index
-  //  index = IndexManager::openIndex(LemurParameter::dbname);
-  // dmf 01/16/2004
   index = IndexManager::openIndex(RetrievalParameter::databaseIndex);
   // Create the parser
-  parser = new LemurMemParser(index);
+  //  parser = new LemurMemParser(index);
   // Create the results list
   accumulator = new ArrayAccumulator(index->docCount());
   results = new IndexedRealVector(index->docCount());
-  
-  //  model = RetMethodManager::createModel(index, (ArrayAccumulator*)accumulator, LemurParameter::mod);
-  // dmf 01/16/2004
   model = RetMethodManager::createModel(index, (ArrayAccumulator*)accumulator,
 					RetrievalParameter::retModel);
-
-  // Why did I comment this out?
-  
-  // dmf 01/16/2004 -- perhaps because if it gets called with only a single
-  // previous file pushed, ParamPopFile aborts due to using String(NULL). 
-  // Issue addressed in 2.2
-  
   ParamPopFile();
-
   outfile = NULL;
 }
 
 // Return the parser.
 MemParser *
-LemurDBManager::getParser() {
-  return parser;
+LemurDBManager::getParser() const {
+  return (new LemurMemParser(index));
 }
 
 
 // Query the database.
 results_t *
-LemurDBManager::query(char * query, int numdocs) {
+LemurDBManager::query(const char * query, int numdocs) const {
   // Create the return value container.
   results_t * res = new results_t;
   res->ids = new docid_t[numdocs];
@@ -85,7 +67,8 @@ LemurDBManager::query(char * query, int numdocs) {
   int i;
   for (i = 0; (i < numdocs) && (j != results->end()); i++) {
     // Place document id in the return value.
-    res->ids[i] = strdup(index->document(j->ind));    
+    //    res->ids[i] = strdup(index->document(j->ind));    
+    res->ids[i] = index->document(j->ind);    
     j++;
   }
   res->numDocs = i;
@@ -100,12 +83,13 @@ LemurDBManager::query(char * query, int numdocs) {
 // Return a document given its id.  The doc part of the return value
 // structure is really an array of integer term ids.
 doc_t *
-LemurDBManager::getDoc(docid_t docid) {
+LemurDBManager::getDoc(docid_t docid) const {
   int lemurID = index->document(docid);
 
   // Create the return value.
   doc_t * doc = new doc_t;
-  doc->id = strdup(docid);
+  //  doc->id = strdup(docid);
+  doc->id = docid;
  
   // Create thte doc contents part.
   int intlen = index->docLength(lemurID);
@@ -134,17 +118,17 @@ LemurDBManager::getDoc(docid_t docid) {
 }
 
 void
-LemurDBManager::setOutputFile(char * filename) {
+LemurDBManager::setOutputFile(const string &filename) const {
   if (outfile != NULL) {
     outfile->close();
     delete outfile;
   }
-  outfile = new ofstream(filename);
+  outfile = new ofstream(filename.c_str());
 }
 
 // Write a doc to the end of the file
 void
-LemurDBManager::output(docid_t docid) {
+LemurDBManager::output(const docid_t docid) const {
   int c = 0;
 
   int lemurID = index->document(docid);
@@ -174,7 +158,7 @@ LemurDBManager::close() {
   delete model;
   delete accumulator;
   delete results;
-  delete parser;
+  //  delete parser;
   outfile->close();
   delete outfile;
 }

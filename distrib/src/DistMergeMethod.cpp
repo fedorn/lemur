@@ -11,10 +11,12 @@
 
 #include "DistMergeMethod.hpp"
 
-void DistMergeMethod::mergeScoreSet(IndexedRealVector &indexset, DocScoreVector** scoreset, DocScoreVector &results) {
+void DistMergeMethod::mergeScoreSet(const IndexedRealVector &indexset, 
+				    const DocScoreVector* const* scoreset, 
+				    DocScoreVector &results) {
 
-  DocScoreVector* docscores;
-  DocScoreVector::iterator j;
+  const DocScoreVector* docscores;
+  DocScoreVector::const_iterator j;
   double indexscore;
   for (int i=0;i<indexset.size();i++) {
     docscores = scoreset[i];

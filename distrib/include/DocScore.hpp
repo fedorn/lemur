@@ -24,10 +24,10 @@
 
 #include "common_headers.hpp"
 #include <algorithm>
-
+#include <string>
 struct DocScore {
   double val;
-  char* id;
+  string id;
 };
 
 
@@ -39,7 +39,7 @@ public:
   virtual ~DocScoreVector();
 
   /// push a value 
-  virtual void PushValue(const char* docid, double value);
+  virtual void PushValue(const string &docid, double value);
 
   /// sort all the values, default is descending order
   virtual void Sort(bool descending = true);

@@ -26,14 +26,17 @@
 class DistSearchMethod {
 public:
   DistSearchMethod() {csindex = NULL; defrt = RetMethodManager::INQUERY; returnCount=1000;} 
-  DistSearchMethod(Index* index, RetMethodManager::RetModel defmodel=RetMethodManager::INQUERY) {csindex = index; defrt = defmodel;} 
+  DistSearchMethod(const Index* index, RetMethodManager::RetModel defmodel=RetMethodManager::INQUERY) {
+    csindex = index; 
+    defrt = defmodel;
+  } 
   ~DistSearchMethod() {}
 
   /// set the return documents number;
   void setReturnCount(int retCount){returnCount=retCount;};
 
   /// use the given collection selection index 
-  void setIndex(Index* index){csindex = index;} ;
+  void setIndex(const Index* index){csindex = index;} ;
   
   /// use the given retrieval method to do search if none is specified for an index
   void setDefaultRetMethod(RetMethodManager::RetModel rt) {defrt = rt;};
@@ -45,21 +48,24 @@ public:
     RetrievalMethod so would make writing code easier.  the indexes in 
     indexset should correspond to indexes in the collection selection index.
   */
-  void scoreIndexSet(Query &qry, IndexedRealVector &indexset, DocScoreVector** results);
+  void scoreIndexSet(const Query &qry, const IndexedRealVector &indexset, 
+		     DocScoreVector** results);
 
   /// score every document in each index in the indexset for the given query and return results in the results vector
-  void scoreIndexSet(Query &qry, vector<string> &indexset, DocScoreVector** results);
+  void scoreIndexSet(const Query &qry, const vector<string> &indexset, 
+		     DocScoreVector** results);
 
   /// convert the given IndexRealVector into a DocScoreVector.  
-  static void indexToID(Index* ind, IndexedRealVector* ivec, DocScoreVector* dvec);
+  static void indexToID(const Index* ind, const IndexedRealVector* ivec, 
+			DocScoreVector* dvec);
 
 protected:
   /// assuming all required parameters for index and retrieval method are on the top stack, do retrieval on this single index using the given query.  
   void doSingleRetr();
 
-  Index* csindex; // the collection selection index
+  const Index* csindex; // the collection selection index
   RetMethodManager::RetModel defrt; // default retrieval method to use if no param is avail
-  Query* query; // the query we're currently working on
+  const Query* query; // the query we're currently working on
   DocScoreVector** allres; // where to store all results
   int reslen; // length of allres
   int returnCount;//the number of result should be returned

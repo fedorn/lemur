@@ -13,15 +13,16 @@
 class DocFreqIndexer : public TextHandler {
 
 public:
-  DocFreqIndexer(char * csName, char * cwName, 
-		 char * ssName, int bufferSize, bool countStopWords = false);
+  DocFreqIndexer(const string &csName, const string &cwName, 
+		 const string &ssName, int bufferSize, 
+		 bool countStopWords = false);
   ~DocFreqIndexer();
 
   char * handleDoc(char * docno);
   char * handleWord(char * word);
   void handleEndDoc();
 
-  void newDb(char * name);
+  void newDb(const string &name);
 
 
 

@@ -30,7 +30,7 @@ public:
 
 protected:
   /// create a score for the merge based on the index ranking score and the document score 
-  double score(double dbscore, double docscore);
+  double score(double dbscore, double docscore) const;
 
 private:
   double A;    // a constant for the formula. default is 0.4

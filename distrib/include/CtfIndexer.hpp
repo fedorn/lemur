@@ -13,24 +13,20 @@
 class CtfIndexer : public TextHandler {
 
 public:
-  CtfIndexer(char * csName, int bufferSize, bool countStopWords = false);
+  CtfIndexer(const string &csName, int bufferSize, 
+	     bool countStopWords = false);
   ~CtfIndexer();
 
   char * handleWord(char * word);
 
-  void newDb(char * name);
+  void newDb(const string &name);
 
 private:
-  
   int ctfCount;
   bool first;
-
   InvPushIndex * collsel;
-
   DocumentProps * csdp;
   InvFPTerm * term;
-
- 
   bool countStopWds;
 };
 
