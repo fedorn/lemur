@@ -25,7 +25,7 @@ public:
   static const string category;
   static const string identifier;
 
-  Stemmer() { cat=category; iden=identifier;}
+  Stemmer() {}
 
   virtual char * handleWord(char * word) {
     if (word != NULL) {
