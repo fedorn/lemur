@@ -232,8 +232,9 @@ FreqCounter::randomWord() {
   if (it != randdone.end()) {
     // Word was not unique, select another.
     free (w);
-    w = randomWord();
+    w = randomWord(); // recurses indefinitely if all terms have been used -LMY
   }
+  randdone.insert(w);
 
   // Word was unique, return it.
   return w;
