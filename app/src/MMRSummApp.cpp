@@ -81,7 +81,7 @@ int AppMain(int argc, char* argv[]) {
   // Create an MMR summarizer
   MMRSumm* s = new MMRSumm(&idx);
 
-  if ( 1 ) {    // :TODO: q-based/generic summ
+  if ( !(LocalParameter::query) ) {
     // generic summary
     s->summDocument(LocalParameter::docID, LocalParameter::summLength, NULL);
   } else {
