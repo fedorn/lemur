@@ -11,12 +11,11 @@
 
 #include "RetMethodManager.hpp"
 
-RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* accum, RetModel type) 
-{
-  if (type == UNKNOWN)
-    type = (RetModel) ParamGetInt("retModel", UNKNOWN);
-  RetrievalMethod* model = NULL;
-  
+RetrievalMethod* RetMethodManager::createModel (Index* ind, 
+						ArrayAccumulator* accum, 
+						RetModel type) {
+  // type set externally as string.
+  RetrievalMethod *model = NULL;
   switch (type) {
   case TFIDF:
     model = new TFIDFRetMethod(*ind, *accum);
@@ -33,19 +32,22 @@ RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* ac
     break;
   case KL:
     SimpleKLParameter::get();
-    model = new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, *accum);
+    model = new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, 
+				  *accum);
     ((SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
     ((SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
     break;
   case CORI_CS:
     CORIParameter::get();
-    model = new CORIRetMethod(*ind, *accum, CORIParameter::collectionCounts,1);
+    model = new CORIRetMethod(*ind, *accum, CORIParameter::collectionCounts,
+			      1);
     ((CORIRetMethod*)model)->setTFFactor(CORIParameter::cstffactor);
     ((CORIRetMethod*)model)->setTFBaseline(CORIParameter::cstfbaseline);
     break;
   case INQUERY:
     CORIParameter::get();
-    model = new CORIRetMethod(*ind, *accum, CORIParameter::collectionCounts,0);
+    model = new CORIRetMethod(*ind, *accum, CORIParameter::collectionCounts,
+			      0);
     ((CORIRetMethod*)model)->setTFFactor(CORIParameter::doctffactor);
     ((CORIRetMethod*)model)->setTFBaseline(CORIParameter::doctfbaseline);
     break;
@@ -58,12 +60,12 @@ RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* ac
   return model;
 }
 
-RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* accum, string type) {
-  RetModel mod;
+RetrievalMethod* RetMethodManager::createModel (Index* ind, 
+						ArrayAccumulator* accum, 
+						string type) {
+  RetrievalMethod *mod = NULL;
   if (type.empty()) {
-    // eventually we want to change to string parameter, but now it's still int
-    mod = (RetModel) ParamGetInt("retModel", UNKNOWN);
-    return createModel(ind, accum, mod);
+    return mod; // nothing to make, give back NULL.
   }
 
   // make it all lowercase
@@ -71,17 +73,17 @@ RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* ac
     type[i] = tolower(type[i]);
 
   if (type == "tfidf")
-    return createModel(ind, accum, TFIDF);
+    mod = createModel(ind, accum, TFIDF);
   if (type == "okapi")
-    return createModel(ind, accum, OKAPI);
-  if (type == "inquery")
-    return createModel(ind, accum, INQUERY);
+    mod = createModel(ind, accum, OKAPI);
+  if (type == "cori")
+    mod = createModel(ind, accum, INQUERY);
   if (type == "kl")
-    return createModel(ind, accum, KL);
+    mod = createModel(ind, accum, KL);
   if (type == "cori_cs")
-    return createModel(ind, accum, CORI_CS);
+    mod = createModel(ind, accum, CORI_CS);
   if (type == "cos")
-    return createModel(ind, accum, COS);
+    mod = createModel(ind, accum, COS);
 
-  return NULL;
+  return mod;
 }
