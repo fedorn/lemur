@@ -15,8 +15,8 @@ have.  this class should be subclassed, adding access methods for the particular
  ==========================================================================*/
 class DocumentProps {
 public:
-  DocumentProps();
-  ~DocumentProps();
+  DocumentProps() { len=0; sid=NULL;};
+  ~DocumentProps() {};
   
   /// set document length
   void length(int dl) { len=dl; };
