@@ -78,21 +78,10 @@ Stemmer* TextHandlerManager::createStemmer(string type, string datadir, string f
     type[i] = tolower(type[i]);
 
   if (type.compare("krovetz") == 0) {
-    stemmer = new KStemmer();
-    // if KstemmerDir is declared then resets STEM_DIR environment variable
-    // this is how the krovetz stemmer was originally programmed. we should
-    // consider changing it to not get the directory from the environment if
-    // we're allowed to modify that code.    
     if (datadir.compare("") == 0) {
       datadir = ParamGetString("KstemmerDir");
     }
-    if (!datadir.empty()) {
-      datadir.insert(0,"STEM_DIR=");
-      if (putenv((char*)datadir.c_str()))
-	cerr << "putenv can not set STEM_DIR" << endl;  
-    } else {
-      cerr << "did not set STEM_DIR, must be in environment" << endl;
-    }
+    stemmer = new KStemmer(datadir);
   } else if (type.compare("arabic") == 0){
     if ((datadir.empty()) || (func.empty())) {
       ArabicStemmerParameter::get();
