@@ -346,7 +346,7 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
     //    cerr << "id: "<< thisDoc->getID() << endl;
     thisDoc->startTermIteration();
     while (thisDoc->hasMore()) {
-      const TokenTerm *term = thisDoc->nextTerm();
+      const Term *term = thisDoc->nextTerm();
       
       if (term->spelling()[0]  == '\0') {
 	continue;
@@ -512,7 +512,7 @@ int BasicIndex::indexCollection()
     thisDoc->startTermIteration();
     while (thisDoc->hasMore()) {
 
-      const TokenTerm *term = thisDoc->nextTerm();
+      const Term *term = thisDoc->nextTerm();
       //      cerr << "term: "<< term->spelling() << endl;
       if (term->spelling()[0]  == '\0') {
 	continue;
