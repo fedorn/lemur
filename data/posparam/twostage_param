@@ -4,20 +4,20 @@
 
 /* Basic retrieval parameters */
 
-index = bindex.bsc; /* database index */
+index = pindex.ifp; /* database index */
 textQuery = query; /* query text stream */
 resultFile = res.twostage; /* result file */
 resultCount = 1000; /* how many docs to return as the result */
 resultFormat = 1; /* 0 = simple-format; 1 = TREC-format */
 
 
-smoothSupportFile = bindex.supp; /* this is not needed by Okapi or TFIDF, but by SimpleKL */
+smoothSupportFile = pindex.supp; /* this is not needed by Okapi or TFIDF, but by SimpleKL */
 
 smoothStrategy =0;  /* interpolation rather than backoff, 0=interpolate, 1=backoff */
 
 /* smoothMethod is fixed to two-stage smoothing */
 
-DirichletPrior = 183.76;
+DirichletPrior = 183.517;
 /* This is the estimated value for DirichletPrior */
 
 /* Pseudo feedback parameters */
