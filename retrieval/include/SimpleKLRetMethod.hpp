@@ -36,6 +36,7 @@ public:
     while (hasMore()) {
       QueryTerm *qt = nextTerm();
       setCount(qt->id(), 0);
+      delete qt;
     }
 
   }
