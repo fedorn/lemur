@@ -101,6 +101,8 @@ class BasicTokenDoc : public Document {
   char id[2000];
   ifstream *docStr;
   streampos startPos; // starting position of the terms in the file
+  //replace  static BasicTokenTerm t; with attribute
+  BasicTokenTerm t;
 };
 
 
@@ -126,6 +128,8 @@ private:
   ifstream *ifs;
   char buf[2000];
   bool nextTokenRead;
+  // replace static BasicTokenDoc doc;  with attribute
+  BasicTokenDoc doc;
 };
 
 
