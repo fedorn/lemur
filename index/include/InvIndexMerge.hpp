@@ -16,7 +16,7 @@
 #include "common_headers.hpp"
 #include "InvDocList.hpp"
 #include "InvFPTypes.hpp"
-
+#include "Exception.hpp"
 
 #define READBUFSIZE 2000000
 #define NUM_FH_OPEN 32
