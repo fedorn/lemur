@@ -36,12 +36,32 @@ InvFPDocList::InvFPDocList(MemCache* mc, int id, int len, int docid, int locatio
     addLocation(docid, location);	
 }
 
+InvFPDocList::InvFPDocList(int *vec) {
+  READ_ONLY = false;
+  hascache = false;
+  intsize = sizeof(int);
+  uid = vec[0];
+  df = vec[1];
+  int diff = vec[2];
+  int vecLength = vec[3];
+  size = vecLength * 4;
+  unsigned char* buffer = (unsigned char *) (vec + 4);
+  // this should be big enough
+  begin = (LOC_T*) malloc(size);
+  // decompress it
+  int len = RVLCompress::decompress_ints(buffer, begin, vecLength);
+  
+  lastid = begin + diff;
+  end = begin + len;
+  freq = lastid+1;
+
+  deltaDecode();
+}
+
 InvFPDocList::~InvFPDocList() {
 }
 
 DocInfo* InvFPDocList::nextEntry() {
-  //DocInfo* dinfo;
-  //  static InvFPDocInfo info;
   // info is stored in int* as docid freq pos1 pos2 .. 
   entry.id = *iter;
   iter++;
@@ -49,7 +69,6 @@ DocInfo* InvFPDocList::nextEntry() {
   iter++;
   entry.pos = iter;
   iter+=entry.count;
-//  dinfo = info;
   return &entry;
 }
 
@@ -243,4 +262,21 @@ void InvFPDocList::deltaDecode() {
     posone = postwo;
     postwo++;
   }
+}
+
+int *InvFPDocList::byteVec(int &vecLength){
+  int len= end-begin;
+  int diff = lastid-begin;
+  deltaEncode();
+
+  unsigned char* comp = new unsigned char[(len+4)*intsize];
+  vecLength = RVLCompress::compress_ints(begin, comp + (4 * intsize), len);
+
+  int *tmp = ((int *) comp);
+  tmp[0] = uid;
+  tmp[1] = df;
+  tmp[2] = diff;
+  tmp[3] = vecLength;
+  vecLength += (4 * intsize);
+  return(tmp);
 }
