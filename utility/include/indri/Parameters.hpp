@@ -162,7 +162,15 @@ protected:
       case 'y':
       case 'T':
       case 't':
-        return true;
+      case '1':
+         return true;
+   
+      case 'F':
+      case 'f':
+      case 'N':
+      case 'n':
+      case '0':
+        return false;
     }
 
     return false;
