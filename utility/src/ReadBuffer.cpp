@@ -17,7 +17,8 @@
 //
 
 #include "ReadBuffer.hpp"
-#include <string.h>
+#include "minmax.hpp"
+#include <string>
 
 //#define READBUFFER_PAGE_SIZE (4096)
 #define READBUFFER_PAGE_SIZE (8192)
@@ -37,7 +38,8 @@ ReadBuffer::~ReadBuffer() {
 
 void ReadBuffer::read( char* data, int length ) {
   // read at least as much as we have left in the buffer, first
-  int bufferCopyLength = std::min(_bufferDataLength - _bufferPosition, length );
+//  int bufferCopyLength = std::min(_bufferDataLength - _bufferPosition, length );
+	int bufferCopyLength = _MINIM(_bufferDataLength - _bufferPosition, length );
   memcpy( data, _buffer + _bufferPosition, bufferCopyLength );
   _bufferPosition += bufferCopyLength;
 
@@ -69,7 +71,7 @@ void ReadBuffer::read( char* data, int length ) {
       _file.read( _buffer, _bufferSize );
       _bufferDataLength = int(_file.gcount());
 
-      int finalCopyLength = std::min( remainingLength, _bufferDataLength );
+      int finalCopyLength = _MINIM( remainingLength, _bufferDataLength );
       memcpy( data+bufferCopyLength, _buffer, finalCopyLength );
       _bufferPosition = finalCopyLength;
     }
