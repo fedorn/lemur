@@ -155,6 +155,7 @@ private:
   // int *       byteOffsetOfDoc;
   MemList *   pMemList;  
   Compress *  pCompressor;
+  bool deleteCompressor;
   DocStream * pDocStream;
 
 private:
