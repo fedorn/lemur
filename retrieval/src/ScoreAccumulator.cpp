@@ -11,7 +11,6 @@
 
 #include "ScoreAccumulator.hpp"
 #include <cassert>
-using namespace std;
 
 void ArrayAccumulator::reset()
 {
