@@ -736,16 +736,4 @@ void InvIndexMerge::least(vector<IndexReader*>* r, vector<int>* ret) {
 
 void InvIndexMerge::setbuf(ifstream* fs, char* bp, int bytes){
   fs->rdbuf()->pubsetbuf(bp, bytes);
-
-  /*  #ifdef _WIN32
-  fs->rdbuf()->pubsetbuf(bp, bytes);
-  #else
-
-  #if (_CXXVER == 301 || _CXXVER == 302 )
-  fs->rdbuf()->pubsetbuf(bp, bytes);
-  #else 
-  fs->setbuf(bp, bytes);
-  #endif
-  #endif
-  */
 }
