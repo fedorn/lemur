@@ -43,6 +43,7 @@ CLEAN :
 	-@erase "$(INTDIR)\lex_parser.obj"
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\MemCache.obj"
+	-@erase "$(INTDIR)\MemList.obj"
 	-@erase "$(INTDIR)\Param.obj"
 	-@erase "$(INTDIR)\parameters.obj"
 	-@erase "$(INTDIR)\porter_stemmer.obj"
@@ -76,6 +77,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\lex_parser.obj" \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\MemCache.obj" \
+	"$(INTDIR)\MemList.obj" \
 	"$(INTDIR)\Param.obj" \
 	"$(INTDIR)\parameters.obj" \
 	"$(INTDIR)\porter_stemmer.obj" \
@@ -110,6 +112,7 @@ CLEAN :
 	-@erase "$(INTDIR)\lex_parser.obj"
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\MemCache.obj"
+	-@erase "$(INTDIR)\MemList.obj"
 	-@erase "$(INTDIR)\Param.obj"
 	-@erase "$(INTDIR)\parameters.obj"
 	-@erase "$(INTDIR)\porter_stemmer.obj"
@@ -144,6 +147,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\lex_parser.obj" \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\MemCache.obj" \
+	"$(INTDIR)\MemList.obj" \
 	"$(INTDIR)\Param.obj" \
 	"$(INTDIR)\parameters.obj" \
 	"$(INTDIR)\porter_stemmer.obj" \
@@ -241,6 +245,10 @@ SOURCE=.\utility\src\MemCache.cpp
 "$(INTDIR)\MemCache.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+SOURCE=.\utility\src\MemList.cpp
+
+"$(INTDIR)\MemList.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 SOURCE=.\utility\src\Param.cpp
 
