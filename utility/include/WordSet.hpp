@@ -11,17 +11,17 @@
 
 #include "TextHandler.hpp"
 
-#include <hash_set>
+#include <set>
 
 
-#ifndef _EQSTR_
-#define _EQSTR_
-/* for the hash set */
-struct eqstr
+#ifndef _LT_STR_
+#define _LT_STR_
+/* for the set */
+struct lt_str
 {
   bool operator()(const char* s1, const char* s2) const
   {
-    return strcmp(s1, s2) == 0;
+    return strcmp(s1, s2) < 0;
   }
 };
 #endif
@@ -57,7 +57,7 @@ public:
 protected:
   
   /// The set used to store words.
-  hash_set<char *, hash<char *>, eqstr> words;
+  set<char *, lt_str> words;
 
 
 };

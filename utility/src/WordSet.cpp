@@ -64,7 +64,7 @@ WordSet::add(char * word) {
 bool 
 WordSet::contains(char * word) {
   // check to see if the word is in the set
-  hash_set<char *, hash<char *>, eqstr>::const_iterator it
+  set<char *, lt_str>::const_iterator it
     = words.find(word);
   return (it != words.end());
 }
@@ -72,7 +72,7 @@ WordSet::contains(char * word) {
 void 
 WordSet::clear() {
   // free memory and empty the set
-  hash_set<char *, hash<char *>, eqstr>::iterator curr = words.begin();
+  set<char *, lt_str>::iterator curr = words.begin();
   while (curr != words.end()) {
     free (*curr);
     curr++;
