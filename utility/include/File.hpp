@@ -87,11 +87,12 @@ private:
     FileSegment* segment = new FileSegment();
     int number = (int)_segments.size();
     std::string name = segmentName( _fileName, number );
-
     segment->start = size();
     segment->end = size();
     segment->stream.open( name.c_str(), std::ios::out | std::ios::binary );
-
+    
+    segment->stream.close();
+    segment->stream.open( name.c_str(), std::ios::out | std::ios::binary | std::ios::in );
     _segments.push_back( segment );
   }
 
