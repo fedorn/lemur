@@ -88,6 +88,7 @@ public:
   virtual int termCTF();
   int curDocIDdiff() { return lastid-begin; };
   int curDocIDtf() { return *(lastid+1); };
+  int memorySize() { return size; };
   
   /// write this object in binary to the given filestream.  the stream should support binary writing.
   void binWrite(ofstream& of);
