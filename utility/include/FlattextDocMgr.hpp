@@ -22,7 +22,6 @@
 
 class FlattextDocMgr : public DocumentManager, public TextHandler {
 public:
-  enum ParseModes {TREC=0, WEB=1, CHINESE=2, CHINESECHAR=3, ARABIC=4};
 
   struct lookup_e {
     int fid;
@@ -40,30 +39,29 @@ public:
   ///             name = what to name this manager
   ///             mode = type of parser to use 
   ///             source = file with list of files this will manage
-  FlattextDocMgr(char* name, ParseModes mode, char* source);
   FlattextDocMgr(string name, string mode, string source);  
 
   /// constructor (for open)
   ///             name = toc file for this manager (same as getMyID) 
   FlattextDocMgr(const char* name);
 
-  ~FlattextDocMgr();
+  virtual ~FlattextDocMgr();
 
   /// open previously created manager
-  bool open(const char*manname);
+  virtual bool open(const char*manname);
 
   /// get the ID string to use for opening this later
-  const char* getMyID();
-
+  virtual const char* getMyID();
+  
   /// return the document associated with this ID
-  char* getDoc(const char* docID);
+  virtual char* getDoc(const char* docID);
 
-  void buildMgr();
+  virtual void buildMgr();
 
   char* handleDoc(char * docno);
 
-  /// based on the given ParseMode, create and return a parser
-  static Parser* createParser(ParseModes mode);
+  /// returns self cast to TextHandler (FIX INHERITANCE HERE!)
+  virtual TextHandler* getTextHandler() { return this; }
 
 private:
   /// open the file with all the sources and save internally
@@ -77,7 +75,7 @@ private:
   bool loadFTFiles(const char* fn, int num);
 
   int numdocs;              // how many docs we have
-  ParseModes pm;           // what type of parser we have
+  string parseMode;           // what type of parser we have
   long prevpos;              // pos of previous doc beginning
   string IDname;            // my name
   vector<string> sources;   // list of all source files

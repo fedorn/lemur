@@ -20,16 +20,6 @@ FlattextDocMgr::FlattextDocMgr(const char* name) {
   open(name);
 }
 
-FlattextDocMgr::FlattextDocMgr(char* name, ParseModes mode, char* source) {
-  entries = NULL;
-  numdocs = 0;
-  readinSources(source);
-  pm = mode;
-  myparser = createParser(mode);
-  IDname = name;
-  prevpos = 0;
-}
-
 FlattextDocMgr::FlattextDocMgr(string name, string mode, string source) {
   entries = NULL;
   numdocs = 0;
@@ -37,19 +27,7 @@ FlattextDocMgr::FlattextDocMgr(string name, string mode, string source) {
   // convert mode to lower
   for (int i=0;i<mode.length();i++)
     mode[i] = tolower(mode[i]);
-
-  if (mode == "trec")
-    pm = TREC;
-  else if (mode == "web")
-    pm = WEB;
-  else if (mode == "arabic")
-    pm = ARABIC;
-  else if (mode == "chinese")
-    pm = CHINESE;
-  else if (mode == "chinesechar")
-    pm = CHINESECHAR;
-
-  //  myparser = createParser(mode);
+  parseMode = mode;
   myparser = TextHandlerManager::createParser(mode);
   IDname = name;
   prevpos = 0;
@@ -154,30 +132,6 @@ char* FlattextDocMgr::getDoc(const char* docID) {
   return doc;
 }
 
-Parser* FlattextDocMgr::createParser (ParseModes mode) {
-  Parser* p;
-  switch (mode) {
-  case TREC:
-    p = new TrecParser();
-    break;
-  case WEB:
-    p = new WebParser();
-    break;
-  case CHINESE:
-    p = new ChineseParser();
-    break;
-  case CHINESECHAR:
-    p = new ChineseCharParser();
-    break;
-  case ARABIC:
-    p = new ArabicParser();
-    break;
-  default:
-    throw Exception("FlattextDocMgr", "Parser Mode unregcognized.");
-    break;
-  }
-  return p;
-}
 
 /*=================  PRIVATE  ==========================*/
 bool FlattextDocMgr::readinSources(const char* fn){
@@ -205,7 +159,7 @@ void FlattextDocMgr::writeTOC() {
   toc << "FILE_IDS  " << IDname << FT_FID << endl;
   toc << "NUM_FILES " << sources.size() << endl;
   toc << "NUM_DOCS  " << numdocs << endl;
-  toc << "PARSE_MODE  " << pm << endl;
+  toc << "PARSE_MODE  " << parseMode << endl;
   toc.close();
 }
 
@@ -217,35 +171,28 @@ bool FlattextDocMgr::loadTOC(const char* fn) {
   }
   string key, val;
   int num;
-  char* files;
-  char* lookup;
+  string files;
+  string lookup;
   while (toc >> key >> val) {
     if (key.compare("FILE_LOOKUP") == 0) 
-      lookup = strdup(val.c_str());
+      lookup = val;
     else if (key.compare("FILE_IDS") == 0)
-      files = strdup(val.c_str());
+      files = val;
     else if (key.compare("NUM_DOCS") == 0)
       numdocs = atoi(val.c_str());
     else if (key.compare("NUM_FILES") == 0)
       num = atoi(val.c_str());
     else if (key.compare("PARSE_MODE") == 0) 
-      pm = (ParseModes) atoi(val.c_str());
+      parseMode = val;
   }
-  if (!loadFTLookup(lookup)) {
-    free(lookup);
-    free(files);
+  if (!loadFTLookup(lookup.c_str())) {
     return false;
   }
-  if (!loadFTFiles(files, num)) {
-    free(lookup);
-    free(files);
+  if (!loadFTFiles(files.c_str(), num)) {
     return false;
   }
-  myparser = createParser(pm);
-  free(files);
-  free(lookup);
+  myparser = TextHandlerManager::createParser(parseMode);
   toc.close();
-
   return true;
 }
 
