@@ -69,7 +69,7 @@ KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesize,
   listlengths = 0;
   cprops = NULL;
   setName(prefix);
-
+  _readOnly = false;
   _computeMemoryBounds( cachesize );
 
   if (!tryOpen()) {
@@ -745,7 +745,7 @@ void KeyfileIncIndex::writeTOC(const CollectionProps* cp) {
   toc << "<" << TERMIDMAP_PAR << ">" << name << TERMIDMAP << "</" << TERMIDMAP_PAR << ">\n";
   toc << "<" << TERMIDSTRMAP_PAR << ">" << name << TERMIDSTRMAP << "</" << TERMIDSTRMAP_PAR << ">\n";
   toc << "<" << DOCMGR_PAR << ">" << name << DOCMGRMAP << "</" << DOCMGR_PAR << ">\n";
-  toc << "<" << COLPROPS_PAR << ">" << name << COLPROPS << "</" << COLPROPS_PAR << ">" <<";\n";
+  toc << "<" << COLPROPS_PAR << ">" << name << COLPROPS << "</" << COLPROPS_PAR << ">" <<"\n";
   toc << "</parameters>\n";
   toc.close();
 
@@ -853,6 +853,7 @@ void KeyfileIncIndex::writeCacheSegment() {
 
       // update term statistics
       int actual = 0;
+      
       if( list->termID() <= _largestFlushedTermID ) {         
         invlookup.get( list->termID(), &termData, actual, sizeof termData);
       }
@@ -869,7 +870,6 @@ void KeyfileIncIndex::writeCacheSegment() {
       termData.segments[ termSegments ].segment = totalSegments;
       termData.segments[ termSegments ].offset = out.tellp();
       termData.segments[ termSegments ].length = vecLen;
-
       invlookup.put( list->termID(), &termData, 
 		     sizeof(TermData) - 
 		     sizeof(SegmentOffset)*(missingSegments-1) );
