@@ -56,10 +56,10 @@ bool InvFPTermList::hasMore() const{
 TermInfo* InvFPTermList::nextEntry() const{
   if (counts) {
     entry.count(counts[index]);
-    entry.positions(&(listcounted[index].loc));    
+    entry.positions(&(listcounted[index].loc));
     entry.termID(listcounted[index].term);
     entry.position(listcounted[index].loc[0]);
-   
+
   } else {
     entry.count(1);
     ///empty it!
@@ -72,6 +72,36 @@ TermInfo* InvFPTermList::nextEntry() const{
 
   index++;
   return &entry;
+}
+
+/// set element from position, returns pointer to the element
+TermInfo* InvFPTermList::getElement(TermInfo* elem, POS_T position) const {
+  InvFPTerm* e = dynamic_cast<InvFPTerm*>(elem);
+  if (!e)
+    LEMUR_THROW(LEMUR_RUNTIME_ERROR,"expected InvFPTerm");
+  
+  int index = (int) position;
+
+  if (counts) {
+    e->count(counts[index]);
+    e->positions(&(listcounted[index].loc));
+    e->termID(listcounted[index].term);
+    e->position(listcounted[index].loc[0]);
+
+  } else {
+    e->count(1);
+    ///empty it!
+    loclist.clear();
+    loclist.push_back(list[index].loc);
+    e->positions(&loclist);
+    e->termID(list[index].term);
+    e->position(list[index].loc);
+  }
+  return e;
+}
+/// advance position
+POS_T InvFPTermList::nextPosition(POS_T position) const {
+  return (POS_T) (((int) position) + 1);
 }
 
 bool InvFPTermList::binRead(ifstream& infile){

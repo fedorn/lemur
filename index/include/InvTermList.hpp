@@ -51,6 +51,17 @@ public:
   /// Assumes the following format: DOCID DOCLENGTH TID TERM_COUNT ..
   bool binRead(ifstream& infile);
 
+protected:
+  // Helper functions for iterator, subclasses should override
+  /// set element from position, returns pointer to the element
+  virtual TermInfo* getElement(TermInfo* elem, POS_T position) const;
+  /// position at beginning of list
+  virtual POS_T beginPosition() const { return (POS_T) list; }
+  /// position at end of list
+  virtual POS_T endPosition() const { return (POS_T) end; }
+  /// advance position
+  virtual POS_T nextPosition(POS_T position) const;
+
 private:
 
   DOCID_T uid; // this doc's id
@@ -59,7 +70,7 @@ private:
   int* end; // end of list
   int listlen; // number of terms in list
   mutable int* iter;   // index for iterator
-  mutable InvFPTerm entry;
+  mutable TermInfo entry;
 };
 
 

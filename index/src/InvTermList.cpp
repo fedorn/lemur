@@ -44,6 +44,21 @@ TermInfo* InvTermList::nextEntry() const{
   return &entry;
 }
 
+/// set element from position, returns pointer to the element
+TermInfo* InvTermList::getElement(TermInfo* elem, POS_T position) const {
+  // info is stored in int* as docid freq .. ..
+  int* ip = (int*) position;
+  elem->termID(*ip);
+  ip++;
+  elem->count(*ip);
+  return elem;
+}
+/// advance position
+POS_T InvTermList::nextPosition(POS_T position) const {
+  // info is stored in int* as docid freq .. ..
+  return (POS_T) (((int*) position) + 2);
+}
+
 bool InvTermList::binRead(ifstream& infile){
   if (infile.eof())
     return false;

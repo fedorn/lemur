@@ -89,7 +89,7 @@ public:
   int curDocIDdiff() const{ return lastid-begin; };
   int curDocIDtf() const{ return *(lastid+1); };
   int memorySize() const{ return size; };
-  
+
   /// write this object in binary to the given filestream.  the stream should support binary writing.
   void binWrite(ofstream& of);
 
@@ -99,10 +99,22 @@ public:
   /// write this object in binary to the given filestream.  the stream should support binary writing.  RVL compression is used before writing
   void binWriteC(ofstream& of);
 
-  /// read an object from the given stream into memory.  the stream should be pointing to the correct place, starting exactly where binWrite began writing.  this method should be used with the empty constructor, else watch out for mem leaks. returns whether the read was successful.  RVL decompression is done. 
+  /// read an object from the given stream into memory.  the stream should be pointing to the correct place, starting exactly where binWrite began writing.  this method should be used with the empty constructor, else watch out for mem leaks. returns whether the read was successful.  RVL decompression is done.
   bool binReadC(ifstream& inf);
 
 protected:
+  // Helper functions for iterator, subclasses should override
+  /// create new element of this list type for the iterator
+  virtual DocInfo* newElement() const { return new DocInfo(); }
+  /// set element from position, returns pointer to the element
+  virtual DocInfo* getElement(DocInfo* elem, POS_T position) const;
+  /// position at beginning of list
+  virtual POS_T beginPosition() const { return (POS_T) begin; }
+  /// position at end of list
+  virtual POS_T endPosition() const { return (POS_T) end; }
+  /// advance position
+  virtual POS_T nextPosition(POS_T position) const;
+
   /** internal method for allocating more memory to list as needed
    *  double what we had before
    */

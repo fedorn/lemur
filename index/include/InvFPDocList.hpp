@@ -41,7 +41,7 @@ public:
   /// usage of InvFPDocList without MemCache has not been tested
   InvFPDocList(int id, int len);
   /// constructors for this list getting memory from a MemCache
-  InvFPDocList(MemCache* mc, int id, int len);  
+  InvFPDocList(MemCache* mc, int id, int len);
   InvFPDocList(MemCache* mc, int id, int len, int docid, int location);
   /// constructor for a list not needing to get any memory
   InvFPDocList(int id, int listlen, int* list, int fr, int* ldocid, int len);
@@ -57,6 +57,18 @@ public:
   int *byteVec(int &len);
 
 protected:
+  // Helper functions for iterator, subclasses should override
+  /// create new element of this list type for the iterator
+  virtual DocInfo* newElement() const { return new InvFPDocInfo(); }
+  /// set element from position, returns pointer to the element
+  virtual DocInfo* getElement(DocInfo* elem, POS_T position) const;
+  /// copy values from one Element (of type InvFPDocInfo) to another
+  virtual void assignElement(DocInfo* to, DocInfo* from) const { 
+    *static_cast<InvFPDocInfo*>(to) = *static_cast<InvFPDocInfo*>(from); 
+  }
+  /// advance position
+  virtual POS_T nextPosition(POS_T position) const;
+
   /// delta encode docids and positions from begin through end
   /// call before write
   virtual void deltaEncode();
@@ -64,7 +76,8 @@ protected:
   /// delta decode docids and positions from begin through end
   /// call after read
   virtual void deltaDecode();
-  private:
+
+private:
   mutable InvFPDocInfo entry;
 };
 

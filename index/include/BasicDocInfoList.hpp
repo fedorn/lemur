@@ -31,6 +31,18 @@ public:
 
   virtual DocInfo * nextEntry() const;
 
+protected:
+  // Helper functions for iterator, subclasses should override
+  /// create new element of this list type for the iterator
+  virtual DocInfo* newElement() const { return new DocInfo(); }
+  /// set element from position, returns pointer to the element
+  virtual DocInfo* getElement(DocInfo* elem, POS_T position) const;
+  /// position at beginning of list
+  virtual POS_T beginPosition() const { return (POS_T) 0; }
+  /// position at end of list
+  virtual POS_T endPosition() const { return (POS_T) sz; }
+  /// advance position
+  virtual POS_T nextPosition(POS_T position) const;
 
 private:
   int sz;
@@ -39,23 +51,5 @@ private:
   int *tmpdarr;
 };
 
-
-inline BasicDocInfoList::BasicDocInfoList(int *tmpDocArray, int size):
-  tmpdarr(tmpDocArray), sz(size), it(0), prevDocID(0) 
-{
-}
-
-/// This function is implemented inline, because it gets called frequently
-inline DocInfo * BasicDocInfoList::nextEntry() const{
-  // assert (hasMore());
-  static DocInfo info;
-  info.docID(tmpdarr[it]+prevDocID);
-  prevDocID = info.docID();
-  info.termCount(tmpdarr[sz+it]);
-  it++;
-  return (&info);
-}
-
 #endif
-
 

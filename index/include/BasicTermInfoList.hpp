@@ -27,27 +27,20 @@ public:
 
   virtual TermInfo *nextEntry() const;
 
+protected:
+  // Helper functions for iterator, subclasses should override
+  /// set element from position, returns pointer to the element
+  virtual TermInfo* getElement(TermInfo* elem, POS_T position) const;
+  /// position at beginning of list
+  virtual POS_T beginPosition() const { return (POS_T) 0; }
+  /// position at end of list
+  virtual POS_T endPosition() const { return (POS_T) sz; }
+  /// advance position
+  virtual POS_T nextPosition(POS_T position) const;
+
 private:
   int sz;
   mutable int it;
   int *tmpwarr;
 };
-
-
-inline BasicTermInfoList::BasicTermInfoList(int *tmpWordArray, int size):
-  tmpwarr(tmpWordArray), sz(size), it(0) 
-{
-}
-
-/// This function is implemented inline, because it gets called frequently
-inline TermInfo * BasicTermInfoList::nextEntry() const{
-  // assert (hasMore());
-  static TermInfo info;
-  info.termID(tmpwarr[it]);
-  info.count(tmpwarr[sz+it]);
-  it++;
-  return (&info);
-}
-
-
 

@@ -42,7 +42,7 @@ InvDocList::InvDocList(int id, int len){
   intsize = sizeof(int);
   uid = id;
   strlength = len;
-	df = 0;
+  df = 0;
   hascache = false;
 }
 
@@ -77,7 +77,7 @@ InvDocList::InvDocList(MemCache* mc, int id, int len){
   hascache = true;
   uid = id;
   strlength = len;
-	df = 0;
+  df = 0;
 }
 
 InvDocList::~InvDocList() {
@@ -118,9 +118,9 @@ void InvDocList::setList(int id, int listlen, int* list, int fr, int* ldocid, in
 void InvDocList::setListSafe(int id, int listlen, int* list, int fr, int* ldocid, int len){
   if (hascache) {
 /*    int pow = logb2(size);
-      cache->freeMem(begin, pow);   
+      cache->freeMem(begin, pow);
     */
-  } 
+  }
   size = listlen * intsize;
   begin = list;
   end = begin + listlen;
@@ -131,7 +131,7 @@ void InvDocList::setListSafe(int id, int listlen, int* list, int fr, int* ldocid
   lastid = ldocid;
   freq = lastid+1;
 }
- 
+
 void InvDocList::startIteration() const{
   iter = begin;
 }
@@ -143,7 +143,7 @@ bool InvDocList::hasMore() const{
 DocInfo* InvDocList::nextEntry() const{
   // use the attribute entry.
   //  static InvDocInfo info;
-  // info is stored in int* as docid freq .. .. 
+  // info is stored in int* as docid freq .. ..
   entry.docID(*iter);
   iter++;
   entry.termCount(*iter);
@@ -156,6 +156,21 @@ void InvDocList::nextEntry(DocInfo* info) const{
   iter++;
   info->termCount(*iter);
   iter++;
+}
+
+/// set element from position, returns pointer to the element
+DocInfo* InvDocList::getElement(DocInfo* elem, POS_T position) const {
+  // info is stored in int* as docid freq .. ..
+  int* ip = (int*) position;
+  elem->docID(*ip);
+  ip++;
+  elem->termCount(*ip);
+  return elem;
+}
+/// advance position
+POS_T InvDocList::nextPosition(POS_T position) const {
+  // info is stored in int* as docid freq .. ..
+  return (POS_T) (((int*) position) + 2);
 }
 
 bool InvDocList::allocMem() {
@@ -273,7 +288,7 @@ void InvDocList::reset() {
   /*
   if (hascache) {
     int pow = logb2(size);
-    cache->freeMem(begin, pow);   
+    cache->freeMem(begin, pow);
   } else if (begin != NULL) {
     free(begin);
   } */
@@ -454,13 +469,14 @@ void InvDocList::deltaDecode() {
   // start at the begining
   int* one = begin;
   int* two = begin+2;
-  
+
   while (one != lastid) {
     *two = *two + *one;
     one = two;
     two += 2;
   }
 }
+
 
 bool InvDocList::getMoreMem() {
   int ldiff = lastid-begin;

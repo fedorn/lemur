@@ -77,6 +77,22 @@ public:
   void countTerms();
 
 protected:
+  // Helper functions for iterator, subclasses should override
+  /// create new element of this list type for the iterator
+  virtual TermInfo* newElement() const { return new InvFPTerm(); }
+  /// set element from position, returns pointer to the element
+  virtual TermInfo* getElement(TermInfo* elem, POS_T position) const;
+  /// copy values from one Element (of type InvFPTerm) to another
+  virtual void assignElement(TermInfo* to, TermInfo* from) const {
+    *dynamic_cast<InvFPTerm*>(to) = *dynamic_cast<InvFPTerm*>(from);
+  }
+  /// position at beginning of list
+  virtual POS_T beginPosition() const { return (POS_T) 0; }
+  /// position at end of list
+  virtual POS_T endPosition() const { return (POS_T) listlen; }
+  /// advance position
+  virtual POS_T nextPosition(POS_T position) const;
+
   DOCID_T uid; // this doc's id
   int length;  // length of this document (terms + stopwords)
   LocatedTerm* list; // list of terms and locations
@@ -85,7 +101,7 @@ protected:
   mutable int index;   // index for iterator
   int* counts; // keep track of counts of terms for bag of word
   mutable InvFPTerm entry;
-  mutable vector<int> loclist; //list of locations to return 
+  mutable vector<int> loclist; //list of locations to return
 
 };
 

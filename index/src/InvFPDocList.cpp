@@ -65,7 +65,7 @@ InvFPDocList::~InvFPDocList() {
 }
 
 DocInfo* InvFPDocList::nextEntry() const{
-  // info is stored in int* as docid freq pos1 pos2 .. 
+  // info is stored in int* as docid freq pos1 pos2 ..
   entry.docID(*iter);
   iter++;
   entry.termCount(*iter);
@@ -82,6 +82,23 @@ void InvFPDocList::nextEntry(InvFPDocInfo* info) const{
   iter++;
   info->positions(iter);
   iter+=info->termCount();
+}
+
+/// set element from position, returns pointer to the element
+DocInfo* InvFPDocList::getElement(DocInfo* elem, POS_T position) const {
+  //  InvFPDocInfo* e = dynamic_cast<InvFPDocInfo*>(elem);
+  int* ip = (int*) position;
+  elem->docID(*ip);
+  ip++;
+  elem->termCount(*ip);
+  ip++;
+  elem->positions(ip);
+  return elem;
+}
+/// advance position
+POS_T InvFPDocList::nextPosition(POS_T position) const {
+  int* ip = (int*) position;
+  return (POS_T) (ip + *(ip+1) + 2);  // ip + termcount + 2
 }
 
 bool InvFPDocList::addTerm(int docid) {
@@ -283,3 +300,4 @@ int *InvFPDocList::byteVec(int &vecLength){
   vecLength += (4 * intsize);
   return(tmp);
 }
+
