@@ -111,7 +111,7 @@ char* ElemDocMgr::handleEndTag(char* tag, char* orig, PropertyList* props){
 }
 
 // caller delete[]
-char* ElemDocMgr::getElement(const char* docid, const char* element) {
+char* ElemDocMgr::getElement(const char* docid, const char* element) const{
   int actual=0;
   btl elemloc;
   char* key = new char[strlen(docid)+strlen(element)+1];

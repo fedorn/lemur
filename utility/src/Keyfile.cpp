@@ -63,7 +63,7 @@ void Keyfile::close() {
   _handle = std::auto_ptr<char>(NULL);
 }
 
-bool Keyfile::get( const char* key, char** value, int& actualSize ) {
+bool Keyfile::get( const char* key, char** value, int& actualSize ) const {
   //  assert( key && "key cannot be null" );
   //  assert( value && "value cannot be null" );
   //  assert( _handle.get() && "call open() or create() first" );
@@ -89,7 +89,7 @@ bool Keyfile::get( const char* key, char** value, int& actualSize ) {
 }
 
 bool Keyfile::get( const char* key, void* value, int& actualSize, 
-		      int maxSize ) {
+		      int maxSize ) const {
   //  assert( key && "key cannot be null" );
   //  assert( value && "value cannot be null" );
   //  assert( _handle.get() && "call open() or create() first" );
@@ -134,7 +134,7 @@ void Keyfile::remove( const char* key ) {
     throw Exception( "Keyfile::remove", "Internal error deleting record" );
 }
 
-int Keyfile::getSize( const char* key ) {
+int Keyfile::getSize( const char* key ) const {
   //  assert( key && "key cannot be null" );
   //  assert( _handle.get() && "call open() or create() first" );
   char pointer[buffer_lc];
@@ -168,7 +168,7 @@ int Keyfile::getSize( const char* key ) {
 #define KEYFILE_BUFFER_SHIFT(num,dig) (num >> ((5-dig)*6))
 #define KEYFILE_BUFFER_DIGIT(num,dig)  ( (KEYFILE_BUFFER_SHIFT(num,dig) | 1<<6) & ~(1<<7) )
 
-inline void Keyfile::_createKey( char* keyBuf, int number ) {
+inline void Keyfile::_createKey( char* keyBuf, int number ) const {
    keyBuf[6] = 0;
    keyBuf[5] = KEYFILE_BUFFER_DIGIT( number, 5 );
    keyBuf[4] = KEYFILE_BUFFER_DIGIT( number, 4 );
@@ -178,7 +178,7 @@ inline void Keyfile::_createKey( char* keyBuf, int number ) {
    keyBuf[0] = KEYFILE_BUFFER_DIGIT( number, 0 );
 }
 
-inline int Keyfile::_decodeKey( char* keyBuf ) {
+inline int Keyfile::_decodeKey( char* keyBuf ) const {
   return ((keyBuf[5] & 0x3f) << 6*0) |
          ((keyBuf[4] & 0x3f) << 6*1) |
          ((keyBuf[3] & 0x3f) << 6*2) |
@@ -194,14 +194,14 @@ void Keyfile::put( int key, const void* value, int valueLength ) {
   put( keyBuf, value, valueLength );
 }
 
-bool Keyfile::get( int key, void* value, int& actualSize, int maxSize ) {
+bool Keyfile::get( int key, void* value, int& actualSize, int maxSize ) const {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   _createKey( keyBuf, key );
   return get( keyBuf, value, actualSize, maxSize );
 }
 
 
-bool Keyfile::get( int key, char** value, int& actualSize ) {
+bool Keyfile::get( int key, char** value, int& actualSize ) const {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   _createKey( keyBuf, key );
   return get( keyBuf, value, actualSize );
@@ -213,7 +213,7 @@ void Keyfile::remove( int key ) {
   remove( keyBuf );
 }
 
-int Keyfile::getSize( int key ) {
+int Keyfile::getSize( int key ) const {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   _createKey( keyBuf, key );
   return getSize( keyBuf );
@@ -224,7 +224,7 @@ void Keyfile::setFirst() {
 }
 
 bool Keyfile::getNext( char* key, int maxKeySize, void* value, 
-		       int& actualSize, int maxValueSize ) {
+		       int& actualSize, int maxValueSize ) const {
   int len; // for key length
   int result = next_rec( _handle.get(), key, &len, maxKeySize,
 			 value, &actualSize, maxValueSize );
@@ -232,7 +232,7 @@ bool Keyfile::getNext( char* key, int maxKeySize, void* value,
 }
 
 bool Keyfile::getNext( int& key, void* value, int& actualSize, 
-		       int maxValueSize ) {
+		       int maxValueSize ) const {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   bool result = getNext( keyBuf, KEYFILE_KEYBUF_SIZE, 
 			 value, actualSize, maxValueSize );

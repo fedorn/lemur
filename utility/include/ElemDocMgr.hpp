@@ -68,7 +68,7 @@ public:
   /// Get an element of a document with "element" name
   /// caller deletes memory with delete[]
   /// returns NULL if no such element exists for document
-  virtual char* getElement(const char* docid, const char* element);
+  virtual char* getElement(const char* docid, const char* element) const;
 
   /// Open and load the toc file manname.
   virtual bool open(const string &manname) {

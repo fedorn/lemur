@@ -27,7 +27,7 @@
 #define YY_FLEX_MINOR_VERSION 5
 
 #include <stdio.h>
-//#include <unistd.h>
+#include <unistd.h>
 
 
 /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
@@ -2232,7 +2232,6 @@ register char *yy_bp;
 #endif	/* ifndef YY_NO_UNPUT */
 
 
-#ifndef YY_NO_INPUT
 #ifdef __cplusplus
 static int yyinput()
 #else
@@ -2304,7 +2303,7 @@ static int input()
 
 	return c;
 	}
-#endif /* YY_NO_INPUT */
+
 
 #ifdef YY_USE_PROTOS
 void yyrestart( FILE *input_file )
@@ -3057,9 +3056,9 @@ void InQueryOpParser::parseBuffer(char* buf, int len) {
   doParse();
 }
 
-void InQueryOpParser::parseFile(char * filename) {
+void InQueryOpParser::parseFile(const string &filename) {
   
-  InQueryin = fopen(filename, "rb");
+  InQueryin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(InQueryin);
 }

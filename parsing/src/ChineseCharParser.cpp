@@ -27,7 +27,7 @@
 #define YY_FLEX_MINOR_VERSION 5
 
 #include <stdio.h>
-//#include <unistd.h>
+#include <unistd.h>
 
 
 /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
@@ -1920,7 +1920,6 @@ register char *yy_bp;
 #endif	/* ifndef YY_NO_UNPUT */
 
 
-#ifndef YY_NO_INPUT
 #ifdef __cplusplus
 static int yyinput()
 #else
@@ -1992,7 +1991,7 @@ static int input()
 
 	return c;
 	}
-#endif /* YY_NO_INPUT */
+
 
 #ifdef YY_USE_PROTOS
 void yyrestart( FILE *input_file )
@@ -2435,9 +2434,9 @@ long ChineseCharParser::fileTell() {
   return CCpos;
 }
 
-void ChineseCharParser::parseFile(char * filename) {  
+void ChineseCharParser::parseFile(const string &filename) {  
   CCpos = 0;
-  ChineseCharin = fopen(filename, "rb");
+  ChineseCharin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(ChineseCharin);
 }
