@@ -119,6 +119,7 @@ int AppMain(int argc, char *argv[]) {
   mcOFS.close();
 
   ofs.close();
+  delete [] wdPr;
   return 0;
 
 }
