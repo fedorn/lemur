@@ -5,7 +5,9 @@
  *
  *==========================================================================
 */
+
 #include "PropIndexTH.hpp"
+#include "KeyfileIncIndex.hpp"
 
 PropIndexTH::PropIndexTH(char * filename, int bufferSize,
 			 bool countStopWords, int ind) {

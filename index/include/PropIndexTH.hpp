@@ -6,18 +6,17 @@
  *==========================================================================
 */
 
-#include "TextHandler.hpp"
-#include "InvFPPushIndex.hpp"
-#include "KeyfileIncIndex.hpp"
-
 #ifndef _PROPINDEXTH_HPP
 #define _PROPINDEXTH_HPP
+
+#include "TextHandler.hpp"
+#include "InvFPPushIndex.hpp"
 
 #define MAX_WORD_LENGTH 25
 
 /**
-   PropIndexTH builds a positional indexer. At this time only InvFPIndex
-   is supported. This class is a destination TextHandler. It expects the 
+   PropIndexTH builds a positional indexer. 
+   This class is a destination TextHandler. It expects the 
    position of the token to be given (not counted) and will index
    certain properties if passed in the PropertyList. PropertyList *must*
    have one property called "position" with the token position. 
