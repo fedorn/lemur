@@ -66,13 +66,16 @@ long trecpos;
 "<LEADPARA>"                        { trecpos += trecleng; return B_TEXT; }
 "</LEADPARA>"                       { trecpos += trecleng; return E_TEXT; }
 "<"[/]?[a-zA-Z][^>]*">"             { trecpos += trecleng; /* zap tags */ }
-"<!"[^-][^>]*">"                    { trecpos += trecleng; /* zap other tags*/}
+"<!"[^-][^>]*">"                   { trecpos += trecleng; /* zap other tags*/}
+"<!--"[^>]*"-->"     { trecpos += trecleng; /* zap sgml/html comments*/}
+
+
 [&][a-zA-Z]+[;]                     { trecpos += trecleng; /* zap symbols */ }
-[&][#][0-9]*[;]                     { trecpos += trecleng; /* zap symbols */ } 
+[&][#][0-9]*[;]                    { trecpos += trecleng; /* zap symbols */ } 
 [A-Z][A-Z]+                         { trecpos += trecleng; return UPWORD; }
 [a-zA-Z0-9]+                        { trecpos += trecleng; return WORD; }
 [A-Z][A-Z]+((\')?[s])?              { trecpos += trecleng; return ACRONYM2; }
-[a-zA-Z0-9]+\'[a-zA-Z]+             { trecpos += trecleng; return CONTRACTION;}
+[a-zA-Z0-9]+\'[a-zA-Z]+            { trecpos += trecleng; return CONTRACTION;}
 [A-Z]\.([A-Z]\.)+                   { trecpos += trecleng; return ACRONYM; }
 [\n]                                { trecpos += trecleng; /* zap newline */ }
 .                                   { trecpos += trecleng; return UNKNOWN; }
@@ -100,8 +103,14 @@ void TrecParser::parseFile(char * filename) {
 }
 
 void TrecParser::parseBuffer(char* buf, int len) {
-  yy_scan_bytes(buf, len);
+  int tpos = trecpos;
+  trecpos = 0;
+  YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
+  YY_BUFFER_STATE myBuf = yy_scan_bytes(buf, len);
   doParse();
+  if (oldBuf) yy_switch_to_buffer(oldBuf);
+  yy_delete_buffer(myBuf);
+  trecpos = tpos;
 }
 
 void TrecParser::doParse() {
@@ -115,6 +124,7 @@ void TrecParser::doParse() {
 
     case E_DOC:
       state = OUTER;
+      if (textHandler != NULL) textHandler->foundEndDoc();
       break;
     
     case B_DOC:
@@ -157,10 +167,16 @@ void TrecParser::doParse() {
       if (state == TEXT) {
 	// strip suffix and convert to lowercase
 	char * c;
-	for (c = trectext; *c != '\''; c++)
+	int len = 0, diff;
+	for (c = trectext; *c != '\''; c++, len++)
 	  *(c) = tolower(*c);	
 	*c = '\0';
+	diff = trecleng - len;
+	trecpos -= diff; /* change endpoint for docMgr usage. */
 	if (textHandler != NULL) textHandler->foundWord(trectext);
+	trecpos += diff;
+	c++;
+	if (textHandler != NULL) textHandler->foundWord(c);
       }
       break;
 
@@ -179,10 +195,19 @@ void TrecParser::doParse() {
 
     case ACRONYM:
       if (state == TEXT) {
+	int len = 0, diff;
 	char * e = trectext;
 	for (char * c = trectext; *c != '\0'; c++) {
-	  if (*c != '.') *(e++) = *c;
+	  if (*c != '.') {
+	    *(e++) = *c;
+	  } else {
+	    len++;
+	  }
 	}
+	// this is broken, docMgr assumes tokens never shrink.
+	// Bleah.
+	diff = trecleng - len;
+	trecpos -= diff; /* change endpoint for docMgr usage. */
 	*e = '\0';
 	if (!isAcronym(trectext)) {
 	  // put in lowercase if not in the acronym list
@@ -190,21 +215,26 @@ void TrecParser::doParse() {
 	    *(c) = tolower(*c);	 
 	}
 	if (textHandler != NULL) textHandler->foundWord(trectext);
+	trecpos += diff;
       }
       break;
     
     case ACRONYM2:
       if (state == TEXT) {
         char * c;
+	int len = 0, diff;
 	// strip suffix
-	for (c = trectext; *c != '\'' && *c != '\0' && *c != 's'; c++);
+	for (c = trectext; *c != '\'' && *c != '\0' && *c != 's'; c++, len++);
         *c = '\0';
 	if (!isAcronym(trectext)) {
 	  // put in lowercase if not in the acronym list
 	  for (c = trectext; *c != '\0'; c++)
 	    *(c) = tolower(*c);	 
 	}
+	diff = trecleng - len;
+	trecpos -= diff; /* change endpoint for docMgr usage. */
 	if (textHandler != NULL) textHandler->foundWord(trectext);	
+	trecpos += diff;
       }      
       break;
 

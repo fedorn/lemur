@@ -110,8 +110,14 @@ WebParser::parseFile(char * filename) {
 }
 
 void WebParser::parseBuffer (char* buf, int len) {
-  yy_scan_bytes(buf, len);
+  int tpos = webloc;
+  webloc = 0;
+  YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
+  YY_BUFFER_STATE myBuf = yy_scan_bytes(buf, len);
   doParse();
+  if (oldBuf) yy_switch_to_buffer(oldBuf);
+  yy_delete_buffer(myBuf);
+  webloc = tpos;
 }
 
 void WebParser::doParse() {
@@ -127,6 +133,7 @@ void WebParser::doParse() {
 
     case E_DOC:
       state = OUTER;
+      if (textHandler != NULL) textHandler->foundEndDoc();
       break;
     
     case B_DOC:
@@ -218,10 +225,16 @@ void WebParser::doParse() {
       if (state == DOC) {
         // strip the suffx, put the word in lowercase, pass it on
 	char * c;
-	for (c = webtext; *c != '\''; c++)
+	int len = 0, diff;
+	for (c = webtext; *c != '\''; c++, len++)
 	  *(c) = tolower(*c);	
         *c = '\0';
+	diff = webleng - len;
+	webloc -= diff; /* change endpoint for docMgr usage. */
 	if (textHandler != NULL) textHandler->foundWord(webtext);
+	webloc += diff;
+	c++;
+	if (textHandler != NULL) textHandler->foundWord(c);
       }
       break;
 
@@ -256,15 +269,19 @@ void WebParser::doParse() {
     case ACRONYM2:
       if (state == DOC) {
         char * c;
+	int len = 0, diff;
 	// strip the suffix
-	for (c = webtext; *c != '\'' && *c != '\0' && *c != 's'; c++);
+	for (c = webtext; *c != '\'' && *c != '\0' && *c != 's'; c++, len++);
         *c = '\0';
 	if (!isAcronym(webtext)) {
 	  // put in lowercase if the word is not in the acronym list
 	  for (c = webtext; *c != '\0'; c++)
 	    *(c) = tolower(*c);	 
 	}
-	if (textHandler != NULL) textHandler->foundWord(webtext);	
+	diff = webleng - len;
+	webloc -= diff; /* change endpoint for docMgr usage. */
+	if (textHandler != NULL) textHandler->foundWord(webtext);
+	webloc += diff;
       }      
       break;
 

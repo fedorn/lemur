@@ -120,8 +120,14 @@ IdentifinderParser::parseFile(char * filename) {
 }
 
 void IdentifinderParser::parseBuffer (char* buf, int len) {
-  yy_scan_bytes(buf, len);
+  int tpos = idenloc;
+  idenloc = 0;
+  YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
+  YY_BUFFER_STATE myBuf = yy_scan_bytes(buf, len);
   doParse();
+  if (oldBuf) yy_switch_to_buffer(oldBuf);
+  yy_delete_buffer(myBuf);
+  idenloc = tpos;
 }
 
 void IdentifinderParser::doParse() {

@@ -108,8 +108,14 @@ void ChineseParser::parseFile(char * filename) {
 }
 
 void ChineseParser::parseBuffer(char* buf, int len) {
-  yy_scan_bytes(buf, len);
+  int tpos = chinesepos;
+  chinesepos = 0;
+  YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
+  YY_BUFFER_STATE myBuf = yy_scan_bytes(buf, len);
   doParse();
+  if (oldBuf) yy_switch_to_buffer(oldBuf);
+  yy_delete_buffer(myBuf);
+  chinesepos = tpos;
 }
 
 
@@ -124,6 +130,7 @@ void ChineseParser::doParse() {
     switch (tok) {	
     case E_DOC:
       state = OUTER;
+      if (textHandler != NULL) textHandler->foundEndDoc();
       break;
     
     case B_DOC:
@@ -185,10 +192,16 @@ void ChineseParser::doParse() {
     case ACRONYM2:
       if (state == TEXT) {
         char * c;
+        int len = 0, diff;
 	// strip suffix
-	for (c = Chinesetext; *c != '\'' && *c != '\0' && *c != 's'; c++);
+	for (c = Chinesetext; *c != '\'' && *c != '\0' && *c != 's'; c++, len++);
         *c = '\0';
+diff = Chineseleng - len;
+chinesepos -= diff;
+
 	if (textHandler != NULL) textHandler->foundWord(Chinesetext);	
+chinesepos += diff;
+
       }      
       break;
 

@@ -105,8 +105,14 @@ void ArabicParser::parseFile(char * filename) {
 }
 
 void ArabicParser::parseBuffer(char* buf, int len) {
-  yy_scan_bytes(buf, len);
+  int tpos = arabicpos;
+  arabicpos = 0;
+  YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
+  YY_BUFFER_STATE myBuf = yy_scan_bytes(buf, len);
   doParse();
+  if (oldBuf) yy_switch_to_buffer(oldBuf);
+  yy_delete_buffer(myBuf);
+  arabicpos = tpos;
 }
 
 void ArabicParser::doParse() {
@@ -119,6 +125,7 @@ void ArabicParser::doParse() {
     switch (tok) {	
     case E_DOC:
       state = OUTER;
+      if (textHandler != NULL) textHandler->foundEndDoc();
       break;
     case B_DOC:
       state = DOC;
@@ -154,10 +161,16 @@ void ArabicParser::doParse() {
       if (state == TEXT) {
 	// strip suffix and convert to lowercase
 	char * c;
-	for (c = Arabictext; *c != '\''; c++)
+	int len = 0, diff;      
+	for (c = Arabictext; *c != '\''; c++, len++)
 	  *(c) = tolower(*c);	
 	*c = '\0';
+	diff = Arabicleng - len;
+	arabicpos -= diff;
 	if (textHandler != NULL) textHandler->foundWord(Arabictext);
+	arabicpos += diff;
+	c++;
+	if (textHandler != NULL) textHandler->foundWord(c);
       }
       break;
     case UPWORD:
@@ -188,15 +201,19 @@ void ArabicParser::doParse() {
     case ACRONYM2:
       if (state == TEXT) {
         char * c;
+	int len = 0, diff;      
 	if (!isAcronym(Arabictext)) {
 	  // put in lowercase if not in the acronym list
 	   for (c = Arabictext; *c != '\0'; c++)
 	     *(c) = tolower(*c);	 
 	}
 	// strip suffix
-	for (c = Arabictext; *c != '\'' && *c != '\0' && *c != 's'; c++);
+	for (c = Arabictext; *c != '\'' && *c != '\0' && *c != 's'; c++, len++);
         *c = '\0';
-	if (textHandler != NULL) textHandler->foundWord(Arabictext);	
+	diff = Arabicleng - len;
+	arabicpos -= diff;
+	if (textHandler != NULL) textHandler->foundWord(Arabictext);
+	arabicpos += diff;
       }      
       break;
     }

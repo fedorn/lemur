@@ -94,8 +94,14 @@ ReutersParser::parseFile(char * filename) {
 }
 
 void ReutersParser::parseBuffer(char* buf, int len) {
-  yy_scan_bytes(buf, len);
+  int tpos = reuterspos;
+  reuterspos = 0;
+  YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
+  YY_BUFFER_STATE myBuf = yy_scan_bytes(buf, len);
   doParse();
+  if (oldBuf) yy_switch_to_buffer(oldBuf);
+  yy_delete_buffer(myBuf);
+  reuterspos = tpos;
 }
 
 void ReutersParser::doParse() {
@@ -110,6 +116,7 @@ void ReutersParser::doParse() {
 
     case E_DOC:
       state = OUTER;
+      if (textHandler != NULL) textHandler->foundEndDoc();
       break;
     
     case F_DOCNO:
@@ -150,12 +157,16 @@ void ReutersParser::doParse() {
       if (state == TEXT) {
 	// strip suffix and convert to lowercase
 	char * c;
-	for (c = reuterstext; *c != '\''; c++)
+	int len = 0, diff;
+	for (c = reuterstext; *c != '\''; c++, len++)
 	  *(c) = tolower(*c);	
 	*c = '\0';
-	if (textHandler != NULL && c != reuterstext) 
-          textHandler->foundWord(reuterstext);
-	 
+	diff = reutersleng - len;
+	reuterspos -= diff; /* change endpoint for docMgr usage. */
+	if (textHandler != NULL) textHandler->foundWord(reuterstext);
+	reuterspos += diff;
+	c++;
+	if (textHandler != NULL) textHandler->foundWord(c);
       }
       break;
 
@@ -195,17 +206,20 @@ void ReutersParser::doParse() {
     case ACRONYM2:
       if (state == TEXT) {
         char * c;
+	int len = 0, diff;
 	// strip suffix
-	for (c = reuterstext; *c != '\'' && *c != '\0' && *c != 's'; c++);
+	for (c = reuterstext; *c != '\'' && *c != '\0' && *c != 's'; c++, len++);
         *c = '\0';
 	if (!isAcronym(reuterstext)) {
 	  // put in lowercase if not in the acronym list
 	  for (c = reuterstext; *c != '\0'; c++)
 	    *(c) = tolower(*c);	 
 	}
+	diff = reutersleng - len;
+	reuterspos -= diff; /* change endpoint for docMgr usage. */
 	if (textHandler != NULL && c != reuterstext) 
 	  textHandler->foundWord(reuterstext);	
-	 
+	reuterspos += diff;
       }      
       break;
 
