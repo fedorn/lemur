@@ -27,15 +27,24 @@ includes  the term ID and the frequency of the term.
 
 */
 
-class TermInfo : public Term {
+class TermInfo {
 public:
+  TermInfo() {}
+  TermInfo( int termID, int termCount) : 
+    tid(termID), tcount(termCount) {}
   virtual ~TermInfo() {}
   
   /// term id
-  virtual int id() const=0;
+  virtual int termID() const {return tid;}
   
   /// term count in the doc
-  virtual int count() const=0;
+  virtual int count() const {return tcount;}
+
+  /// set term id
+  virtual void termID(int id) {tid = id;}
+
+  /// set term count
+  virtual void count(int c) {tcount = c;}
 
   // return list of positions this term occurs in this document
   // (can be a list of 1 item)
@@ -49,6 +58,11 @@ public:
   // default implementation to return -1 if no position information available for this TermInfo
   virtual int position() const { return -1; }
 
+  virtual void position(int pos) {}
+
+protected:
+  int tid;
+  int tcount;
 };
 
 
