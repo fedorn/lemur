@@ -19,10 +19,10 @@ extern char *arabic_stemdir;
 extern void *set_stemmer(char *);
 extern void freeWordSets();
 
-ArabicStemmer::ArabicStemmer(const char *stemDir, const char *stemmer) {
-  arabic_stemdir = new char[strlen(stemDir) + 1];
-  strcpy(arabic_stemdir, stemDir);
-  stem_fct = (void (*)(char *, char *)) set_stemmer((char *)stemmer);
+ArabicStemmer::ArabicStemmer(const string &stemDir, const string &stemmer) {
+  arabic_stemdir = new char[stemDir.length() + 1];
+  strcpy(arabic_stemdir, stemDir.c_str());
+  stem_fct = (void (*)(char *, char *)) set_stemmer((char *)stemmer.c_str());
 }
 
 ArabicStemmer::~ArabicStemmer() {
