@@ -37,12 +37,15 @@ public:
 private:
   class IndriIndex* _index;
   class CompressedCollection* _collection;
+  class TopdocsIndex* _topdocs;
   Parameters _parameters;
   std::vector<Transformation*> _transformations;
   std::vector<Field> _fields;
 
   std::string _path;
   bool _readOnly;
+
+  INT64 _memory;
 
   void _buildFields();
   void _buildChain();
@@ -75,6 +78,7 @@ public:
   class CompressedCollection* collection();
   /// @return the indri document index
   class IndriIndex* index();
+  class TopdocsIndex* topdocs();
   /// Create a new empty repository.
   /// @param path the directory to create the repository in
   /// @param options additional parameters

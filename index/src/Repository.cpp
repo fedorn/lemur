@@ -19,6 +19,7 @@
 #include "indri/Repository.hpp"
 #include "indri/IndriIndex.hpp"
 #include "indri/CompressedCollection.hpp"
+#include "indri/TopdocsIndex.hpp"
 #include "indri/Path.hpp"
 #include "indri/PorterStemmerTransformation.hpp"
 #include "indri/KrovetzStemmerTransformation.hpp"
@@ -119,19 +120,21 @@ void Repository::create( const std::string& path, Parameters* options ) {
       Path::create( path );
     }
     
-    int memory = 100*1000*1000;
+    _memory = 100*1000*1000;
     if( options )
-      memory = options->get( "memory", memory );
+      _memory = options->get( "memory", _memory );
 
     float queryProportion = 0.15f;
     if( options )
       queryProportion = static_cast<float>(options->get( "queryProportion", queryProportion ));
     
-    _index = new IndriIndex( memory, queryProportion );
+    _index = new IndriIndex( _memory, queryProportion );
     _collection = new CompressedCollection();
+    _topdocs = new TopdocsIndex();
 
     std::string indexPath = Path::combine( path, "index" );
     std::string collectionPath = Path::combine( path, "collection" );
+    std::string topdocsPath = Path::combine( path, "topdocs" );
 
     if( !Path::exists( indexPath ) )
       Path::create( indexPath );
@@ -161,6 +164,7 @@ void Repository::create( const std::string& path, Parameters* options ) {
     }
 
     _collection->create( collectionPath, collectionFields );
+    _topdocs->create( topdocsPath );
   } catch( Exception& e ) {
     LEMUR_RETHROW( e, "Couldn't create a repository at '" + path + "' because:" );
   } catch( ... ) {
@@ -172,23 +176,27 @@ void Repository::openRead( const std::string& path, Parameters* options ) {
   _path = path;
   _readOnly = true;
 
-  int memory = 100*1000*1000;
+  _memory = 100*1000*1000;
   if( options )
-    memory = options->get( "memory", memory );
+    _memory = options->get( "memory", _memory );
 
   float queryProportion = 1;
   if( options )
     queryProportion = static_cast<float>(options->get( "queryProportion", queryProportion ));
 
-  _index = new IndriIndex( memory, queryProportion );
+  _index = new IndriIndex( _memory, queryProportion );
   _collection = new CompressedCollection();
+  _topdocs = new TopdocsIndex();
 
   std::string indexPath = Path::combine( path, "index" );
   std::string collectionPath = Path::combine( path, "collection" );
+  std::string topdocsPath = Path::combine( path, "topdocs" );
+
   std::string indexName = Path::combine( indexPath, "index" );
 
   _index->openRead( indexName.c_str() );
   _collection->openRead( collectionPath );
+  _topdocs->openRead( topdocsPath );
 
   _parameters.loadFile( Path::combine( path, "manifest" ) );
 
@@ -203,23 +211,26 @@ void Repository::open( const std::string& path, Parameters* options ) {
   _path = path;
   _readOnly = false;
 
-  int memory = 100*1000*1000;
+  _memory = 100*1000*1000;
   if( options )
-    memory = options->get( "memory", memory );
+    _memory = options->get( "memory", _memory );
 
   float queryProportion = 0.75;
   if( options )
     queryProportion = static_cast<float>(options->get( "queryProportion", queryProportion ));
 
-  _index = new IndriIndex( memory, queryProportion );
+  _index = new IndriIndex( _memory, queryProportion );
   _collection = new CompressedCollection();
+  _topdocs = new TopdocsIndex();
 
   std::string indexPath = Path::combine( path, "index" );
   std::string collectionPath = Path::combine( path, "collection" );
   std::string indexName = Path::combine( indexPath, "index" );
+  std::string topdocsPath = Path::combine( path, "topdocs" );
 
   _index->open( indexName );
   _collection->open( collectionPath );
+  _topdocs->open( topdocsPath );
 
   _parameters.loadFile( Path::combine( path, "manifest" ) );
 
@@ -260,6 +271,10 @@ std::vector<std::string> Repository::tags() const {
 
 IndriIndex* Repository::index() {
   return _index;
+}
+
+TopdocsIndex* Repository::topdocs() {
+  return _topdocs;
 }
 
 std::string Repository::processTerm( const std::string& term ) {
@@ -303,6 +318,22 @@ void Repository::close() {
 
     delete _index;
     _index = 0;
+
+    if( ! _readOnly ) {
+      // build or update topdocs lists as necessary
+      std::string indexPath = Path::combine( _path, "index" );
+      indexPath = Path::combine( indexPath, "index" );
+      
+      _index = new IndriIndex( _memory, 1.0 );
+      _index->openRead( indexPath );
+      
+      _topdocs->update( *_index );
+      _topdocs->close();
+      delete _topdocs;
+      _topdocs = 0;
+
+      _index->close();
+    }
 
     delete _collection;
     _collection = 0;

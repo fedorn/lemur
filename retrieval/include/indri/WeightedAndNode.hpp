@@ -50,6 +50,9 @@ private:
   greedy_vector<ScoredExtentResult> _scores;
   std::string _name;
 
+  greedy_vector<int> _candidates;
+  int _candidatesIndex;
+
   double _threshold;
   double _recomputeThreshold;
   int _quorumIndex;
@@ -60,6 +63,7 @@ public:
   WeightedAndNode( const std::string& name ) : _name(name), _threshold(-DBL_MAX), _quorumIndex(0), _recomputeThreshold(-DBL_MAX) {}
 
   void addChild( double weight, BeliefNode* node );
+  void doneAddingChildren();
 
   // SkippingCapableNode
   void setThreshold( double threshold );

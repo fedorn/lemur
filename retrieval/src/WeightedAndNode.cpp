@@ -22,6 +22,7 @@
 #include "lemur-platform.h"
 #include <iostream>
 #include "indri/Annotator.hpp"
+#include "indri/TermFrequencyBeliefNode.hpp"
 
 double WeightedAndNode::_computeMaxScore( unsigned int start ) {
   // first, find the maximum score of the first few columns
@@ -73,6 +74,67 @@ void WeightedAndNode::addChild( double weight, BeliefNode* node ) {
   _computeQuorum();
 }
 
+struct double_greater {
+  bool operator() ( double one, double two ) const {
+    return one > two;
+  }
+};
+
+void WeightedAndNode::doneAddingChildren() {
+  _candidates.clear();
+  _candidatesIndex = 0;
+
+  greedy_vector< const TopdocsIndex::TopdocsList* > lists;
+
+  // get all the relevant topdocs lists
+  for( unsigned int i=0; i<_children.size(); i++ ) {
+    TermFrequencyBeliefNode* node = dynamic_cast<TermFrequencyBeliefNode*>(_children[i].node);
+    const TopdocsIndex::TopdocsList* topdocs = 0;
+
+    if( node ) {
+      topdocs = node->getTopdocsList();
+    }
+
+    if( topdocs ) {
+      assert( topdocs->entries.size() );
+      lists.push_back( topdocs );
+    }
+  }
+
+  // TODO: could compute an initial threshold here, but that may not be necessary
+  greedy_vector<int> indexes;
+  indexes.resize( lists.size(), 0 );
+
+  while( true ) {
+    // find the smallest document
+    int smallestDocument = MAX_INT32;
+
+    for( unsigned int i=0; i<lists.size(); i++ ) {
+      if( indexes[i] > 0 )
+        smallestDocument = lemur_compat::min( smallestDocument, lists[i]->entries[indexes[i]].documentID );
+    }
+
+    if( smallestDocument == MAX_INT32 )
+      break;
+
+    _candidates.push_back( smallestDocument );
+
+    // increment indexes
+    for( unsigned int i=0; i<lists.size(); i++ ) {
+      if( lists[i]->entries[indexes[i]].documentID == smallestDocument ) {
+        indexes[i]++;
+        
+        if( indexes[i] == lists[i]->entries.size() ) {
+          indexes[i] = -1;
+        }
+      }
+    }
+  }
+
+  // compute quorum
+  _computeQuorum();
+}
+
 void WeightedAndNode::setThreshold( double threshold ) {
   _threshold = threshold;
 
@@ -85,6 +147,10 @@ int WeightedAndNode::nextCandidateDocument() {
   std::vector<child_type>::iterator iter;
   int minDocument = MAX_INT32;
   int currentCandidate;
+
+  if( _candidatesIndex < _candidates.size() ) {
+    minDocument = _candidates[_candidatesIndex];
+  }
 
   for( iter = _children.begin() + _quorumIndex; iter != _children.end(); iter++ ) {
     currentCandidate = (*iter).node->nextCandidateDocument();
@@ -140,12 +206,15 @@ greedy_vector<ScoredExtentResult>& WeightedAndNode::score( int documentID, int b
       childScore += (*iter).weight * childResults[j].score;
     }
 
-    assert( childScore <= iter->maximumWeightedScore );
     score += childScore;
   }
 
   _scores.clear();
   _scores.push_back( ScoredExtentResult(score, documentID, begin, end) );
+
+  // advance candidates
+  while( _candidatesIndex < _candidates.size() && _candidates[_candidatesIndex] <= documentID )
+    _candidatesIndex++;
 
   return _scores;
 }

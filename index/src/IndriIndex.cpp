@@ -899,7 +899,7 @@ DOCID_T IndriIndex::addDocument( ParsedDocument* document ) {
 
   // find document name
   for( unsigned int i=0; i<document->metadata.size(); i++ ) {
-    if( !strcmp( "docno", document->metadata[i].key ) && strlen((const char*) document->metadata[i].value) < 30 ) {
+    if( !strcmp( "docno", document->metadata[i].key ) && strlen((const char*) document->metadata[i].value) < Keyfile::MAX_KEY_LENGTH-1 ) {
       documentName = (char*) document->metadata[i].value;
       break;
     }
@@ -939,7 +939,7 @@ DOCID_T IndriIndex::addDocument( const char* documentName, const greedy_vector<c
 
     int wordLength = strlen(word);
 
-    if( wordLength > 30 ) {
+    if( wordLength >= Keyfile::MAX_KEY_LENGTH-1 ) {
       _termList.addTerm(0);     
       continue;
     }
@@ -1237,6 +1237,13 @@ void IndriIndex::_incrementalWriteTermData( TERMID_T termID, indri::index::TermD
   int compressedSize = _compressTermData( compressedStructure, 16*1024, termData );
 
   _termDataStore.put( termID, compressedStructure, compressedSize );
+
+  // TODO: debug code
+  char retrievedStructure[ 16*1024 ];
+  int retrievedLength = 0;
+  _termDataStore.get( termID, retrievedStructure, retrievedLength, sizeof retrievedStructure );
+  assert( retrievedLength == compressedSize );
+  assert( !memcmp( retrievedStructure, compressedStructure, compressedSize ) );
 }
 
 //
@@ -1528,7 +1535,7 @@ void IndriIndex::_openMergeFiles( int startSegment,
     mappingBuffers.back()->write( (const char*) &zero, sizeof zero );
 
     // set up buffers
-    terms.push_back( new char[Keyfile::MAX_KEY_LENGTH + 1] );
+    terms.push_back( new char[Keyfile::MAX_KEY_LENGTH+1] );
     termDatas.push_back( termdata_create( _fieldData.size() ) );
 
     // read first entry

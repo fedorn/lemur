@@ -13,17 +13,28 @@
 
 TermFrequencyBeliefNode::TermFrequencyBeliefNode( const std::string& name,
                                                  indri::index::DocListFrequencyIterator& list,
+                                                 TopdocsIndex::TopdocsList* topdocs,
                                                  TermScoreFunction& scoreFunction,
                                                  double maximumBackgroundScore,
                                                  double maximumScore )
   :
   _name(name),
   _list(list),
+  _topdocs(topdocs),
   _function(scoreFunction),
   _maximumBackgroundScore(maximumBackgroundScore),
   _maximumScore(maximumScore)
 {
   _list.startIteration();
+}
+
+TermFrequencyBeliefNode::~TermFrequencyBeliefNode() {
+  // other lists are deleted by the inference network
+  delete _topdocs;
+}
+
+const TopdocsIndex::TopdocsList* TermFrequencyBeliefNode::getTopdocsList() const {
+  return _topdocs;
 }
 
 int TermFrequencyBeliefNode::nextCandidateDocument() {
@@ -47,7 +58,6 @@ const greedy_vector<ScoredExtentResult>& TermFrequencyBeliefNode::score( int doc
   int count = ( entry && entry->document == documentID ) ? entry->count : 0;
   double score = _function.scoreOccurrence( count, documentLength );
 
-  assert( score <= _maximumScore );
   _extents.push_back( ScoredExtentResult( score, documentID, begin, end ) );
   return _extents;
 }

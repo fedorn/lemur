@@ -48,6 +48,7 @@
 #include "indri/TermScoreFunctionFactory.hpp"
 #include "indri/TermFrequencyBeliefNode.hpp"
 #include "indri/CachedFrequencyBeliefNode.hpp"
+#include "indri/TopdocsIndex.hpp"
 
 #include <stdexcept>
 
@@ -648,11 +649,6 @@ void InferenceNetworkBuilder::after( indri::lang::TermFrequencyScorerNode* termS
                                         termScorerNode->getContextSize() );
 
     if( termScorerNode->getOccurrences() ) {
-      UINT64 maxOccurrences = UINT64( ceil( double(termScorerNode->getMaxContextLength()) * termScorerNode->getMaxContextFraction() ) );
-
-      double maximumScore = function->scoreOccurrence( maxOccurrences, termScorerNode->getMaxContextLength() );
-      double maximumBackgroundScore = function->scoreOccurrence( 0, termScorerNode->getMinContextLength() );
-      
       bool stopword = false;
       std::string processed = termScorerNode->getText();
       int termID = 0;
@@ -666,12 +662,34 @@ void InferenceNetworkBuilder::after( indri::lang::TermFrequencyScorerNode* termS
       // if it isn't a stopword, we can try to get it from the index
       if( !stopword ) {
         termID = _repository.index()->term( processed.c_str() );
-      
+
         if( termID != 0 ) {
           indri::index::DocListFrequencyIterator* frequencyList = _repository.index()->docFrequencyInfoList( termID );
-
           _network->addFrequencyIterator( frequencyList );
-          belief = new TermFrequencyBeliefNode( termScorerNode->nodeName(), *frequencyList, *function, maximumBackgroundScore, maximumScore );
+
+          UINT64 maxOccurrences;
+          double maximumScore;
+          double maximumBackgroundScore;
+          double maximumFraction;
+
+          TopdocsIndex::TopdocsList* topdocs = 0;
+
+          if( Parameters::instance().get( "topdocs", 1 ) )
+            topdocs = _repository.topdocs()->fetch( termID );
+
+          if( topdocs ) {
+            // this is the maximum fraction *not* in the topdocs list
+            maximumFraction = double(topdocs->smallest.count) / double(topdocs->smallest.length);
+          } else {
+            maximumFraction = termScorerNode->getMaxContextFraction();
+          }
+
+          maxOccurrences = UINT64( ceil( double(termScorerNode->getMaxContextLength()) * maximumFraction ) );
+
+          maximumScore = function->scoreOccurrence( maxOccurrences, termScorerNode->getMaxContextLength() );
+          maximumBackgroundScore = function->scoreOccurrence( 0, termScorerNode->getMinContextLength() );
+
+          belief = new TermFrequencyBeliefNode( termScorerNode->nodeName(), *frequencyList, topdocs, *function, maximumBackgroundScore, maximumScore );
         }
       }
     }
@@ -752,6 +770,8 @@ void InferenceNetworkBuilder::after( indri::lang::WeightNode* weightNode ) {
         dynamic_cast<BeliefNode*>( _nodeMap[children[i].second] ) );
     }
 
+    wandNode->doneAddingChildren();
+
     _network->addBeliefNode( wandNode );
     _nodeMap[weightNode] = wandNode;
   }
@@ -791,6 +811,8 @@ void InferenceNetworkBuilder::after( indri::lang::WAndNode* wandNode ) {
       weightedAndNode->addChild( children[i].first / totalWeights,
         dynamic_cast<BeliefNode*>( _nodeMap[children[i].second] ) );
     }
+
+    weightedAndNode->doneAddingChildren();
 
     _network->addBeliefNode( weightedAndNode );
     _nodeMap[wandNode] = weightedAndNode;
@@ -838,6 +860,8 @@ void InferenceNetworkBuilder::after( indri::lang::CombineNode* combineNode ) {
     for( unsigned int i=0; i<children.size(); i++ ) {
       wandNode->addChild( weight, translation[i] );
     }
+
+    wandNode->doneAddingChildren();
 
     _network->addBeliefNode( wandNode );
     _nodeMap[combineNode] = wandNode;
