@@ -14,9 +14,11 @@
 
 
 InvFPTextHandler::InvFPTextHandler(char * filename, int bufferSize,
-				   bool countStopWords) {
+				   bool countStopWords, int ind) {
   // create index and helper objects  
-  index = new InvFPPushIndex(filename, bufferSize);
+  if (ind == 0)
+    index = new InvPushIndex(filename, bufferSize);
+  else index = new InvFPPushIndex(filename, bufferSize);
   dp = new DocumentProps();
   term = new InvFPTerm();
 

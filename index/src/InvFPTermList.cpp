@@ -24,8 +24,10 @@ InvFPTermList::InvFPTermList() {
 InvFPTermList::~InvFPTermList() {
   if (list != NULL)
     delete[](list);
-  if (counts != NULL)
+  if (counts != NULL) {
     free(counts);
+    delete[](listcounted);
+  }
 }
 
 void InvFPTermList::startIteration(){
@@ -39,10 +41,21 @@ bool InvFPTermList::hasMore(){
 TermInfo* InvFPTermList::nextEntry(){
 //  TermInfo* tinfo;
   static InvFPTerm info;
-  info.loc = list[index].loc;
-  info.tid = list[index].term;
-  if (counts)
+
+  if (counts) {
     info.freq = counts[index];
+    info.loclist = &(listcounted[index].loc);    
+    info.tid = listcounted[index].term;
+    info.loc = listcounted[index].loc[0];
+   
+  } else {
+    info.freq = 1;
+    info.loclist = new vector<int>;
+    info.loclist->push_back(list[index].loc);
+    info.tid = list[index].term;
+    info.loc = list[index].loc;
+  }
+
   index++;
 //  tinfo = info;
   return &info;
@@ -82,29 +95,36 @@ void InvFPTermList::countTerms(){
   // this is probably not the best way of doing this, but..
   // this is what happens when you adapt one implementation of something to match
   // something else that originally had other data structures.
-  map<int, int> table;
-  map<int, int>::iterator place;
+
+  //already been counted then we don't want to count again.
+  if (counts)
+    return;
+
+  map<int, LLTerm> table;
+  map<int, LLTerm>::iterator place;
   for (int i=0;i<listlen;i++) {
     place = table.find(list[i].term);
     if (place != table.end()) {
-      (place->second)++;      
+      (place->second).term++; // term is keeping a count of the terms
+      (place->second).loc.push_back(list[i].loc);
     } else {
       //store to table
-      table[list[i].term]=1;
+      LLTerm* lt = new LLTerm;
+      lt->term = 1;
+      lt->loc.push_back(list[i].loc);
+      table[list[i].term]=*lt;
     }
   }
 
   listlen = table.size();
-  LocatedTerm* listcopy = new LocatedTerm[listlen];
+  listcounted = new LLTerm[listlen];
   counts = (int*) malloc(sizeof(int) * listlen);
   int ind = 0;
   for (place = table.begin(); place != table.end(); place++) {
-    listcopy[ind].term = place->first;
-    listcopy[ind].loc = -1;
-    counts[ind] = place->second;
+    listcounted[ind].term = place->first;
+    listcounted[ind].loc = (place->second).loc;
+    counts[ind] = (place->second).term;
     ind++;
   }
-  delete[](list);
-  list = listcopy;
 }
 
