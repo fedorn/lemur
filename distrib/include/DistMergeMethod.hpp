@@ -12,7 +12,7 @@
 #ifndef _DISTMERGEMETHOD_HPP
 #define _DISTMERGEMETHOD_HPP
 
-/** 
+/*! 
     Abstract interface for distributed retrieval merging of scores.  
     Merge scores from individual databases.
     See RetrievalMethod for database ranking algorithms (CORIRetMethod).
@@ -24,6 +24,7 @@
 
 #define  CORI_MERGE 0
 #define  SINGLETYPEREGR_MERGE 1
+#define  MULTITYPEREGR_MREGE 2
 
 namespace DistMergeMethodParameter {
 
