@@ -38,6 +38,8 @@
 
 class KeyfileDocMgr : public DocumentManager, public TextHandler {
 public:
+  /// default constructor 
+  KeyfileDocMgr() {  myDoc = NULL;  numdocs = 0; }
 
   /// constructor (for open)
   ///             name = toc file for this manager (same as getMyID) 
@@ -74,8 +76,6 @@ public:
     myparser = p;
   }
 
-  /// returns self cast to TextHandler (FIX INHERITANCE HERE!)
-  virtual TextHandler* getTextHandler() { return this; }
   /// Build the document manager tables from the files previously provided
   /// in the constructor.
   virtual void buildMgr();
@@ -96,15 +96,15 @@ public:
     return loadTOC();
   }
 
-private:
+protected:
   struct btl {
     int fid;
-    int offset;
-    int bytes;
+    long offset;
+    long bytes;
   };
 
-  void writeTOC();
-  bool loadTOC();
+  virtual void writeTOC();
+  virtual bool loadTOC();
   bool loadFTFiles(const char* fn, int num);
   vector <Match> offsets;
   int numdocs;              // how many docs we have
