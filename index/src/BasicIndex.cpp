@@ -32,7 +32,7 @@ extern "C" {
 #include "BasicTermInfoList.hpp"
 #include "BasicDocInfoList.hpp"
 #include "Exception.hpp"
-
+#include "FUtil.hpp"
 
 #define MAXLINE 65536
 #define MAXINDEX 1024
@@ -53,17 +53,6 @@ static void my_assert(int exp, char * msg) {
     cerr << "Assertion failed: " << msg << endl;
     exit(0);
   }
-}
-
-static bool fileExist(char *name)
-{
-  ifstream ifs;
-  ifs.open(name);
-  if (!ifs.fail()) {
-    ifs.close();
-    return true;
-  } 
-  return  false;
 }
 
 BasicIndex::BasicIndex()
