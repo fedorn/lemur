@@ -10,7 +10,7 @@
 
 #include "indri/ListIteratorNode.hpp"
 #include "indri/greedy_vector"
-#include "lemur/lemur-platform.h"
+#include "lemur-platform.h"
 #include <vector>
 #include <string>
 
