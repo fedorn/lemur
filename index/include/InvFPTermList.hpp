@@ -29,6 +29,8 @@
 
 */
 
+class File;
+
 class InvFPTermList : public TermInfoList {
 public:
   InvFPTermList();
@@ -60,6 +62,9 @@ public:
   bool binReadC(ifstream& infile);
   /// Write a compressed TermInfoList object to a file
   void binWriteC(ofstream& ofile);
+
+  bool binReadC( File& infile );
+  void binWriteC( File& outfile );
 
   /// delta decode termids and positions from begin through end
   /// call after read
