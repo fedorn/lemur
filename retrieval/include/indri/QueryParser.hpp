@@ -92,6 +92,7 @@ public:
 	public:  indri::lang::ODNode*  odNode();
 	public:  RawExtentNode*  unscoredTerm();
 	public:  indri::lang::UWNode*  uwNode();
+	public:  indri::lang::BAndNode*  bandNode();
 	public:  indri::lang::FilRejNode*  filrejNode();
 	public:  indri::lang::FilReqNode*  filreqNode();
 	public:  indri::lang::Field*  anyField();

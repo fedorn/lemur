@@ -401,6 +401,17 @@ void InferenceNetworkBuilder::after( indri::lang::UWNode* uwNode ) {
   }
 }
 
+void InferenceNetworkBuilder::after( indri::lang::BAndNode* bandNode ) {
+  if( _nodeMap.find( bandNode ) == _nodeMap.end() ) {
+    std::vector<ListIteratorNode*> translation = _translate<ListIteratorNode>( bandNode->getChildren() );
+    BooleanAndNode* booleanAndNode = new BooleanAndNode( bandNode->nodeName(),
+                                                         translation );
+
+    _network->addListNode( booleanAndNode );
+    _nodeMap[bandNode] = booleanAndNode;
+  }
+}
+
 void InferenceNetworkBuilder::after( indri::lang::FilRejNode* filRejNode ) {
   if( _nodeMap.find( filRejNode ) == _nodeMap.end() ) {
     InferenceNetworkNode* untypedFilter = _nodeMap[ filRejNode->getFiltered() ];

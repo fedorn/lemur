@@ -22,6 +22,8 @@ namespace indri {
     Node* Copier::after( class ExtentOr* oldNode, class ExtentOr* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class ExtentAnd* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class ExtentAnd* oldNode, class ExtentAnd* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class BAndNode* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class BAndNode* oldNode, class BAndNode* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class UWNode* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class UWNode* oldNode, class UWNode* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class ODNode* oldNode ) { defaultBefore( oldNode ); }

@@ -105,6 +105,9 @@
 				RelativePath=".\src\Annotator.cpp">
 			</File>
 			<File
+				RelativePath=".\src\BooleanAndNode.cpp">
+			</File>
+			<File
 				RelativePath=".\src\CachedFrequencyBeliefNode.cpp">
 			</File>
 			<File
@@ -324,6 +327,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\BeliefNode.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\BooleanAndNode.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\CachedFrequencyBeliefNode.hpp">

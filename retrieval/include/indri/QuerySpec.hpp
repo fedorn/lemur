@@ -468,6 +468,68 @@ namespace indri {
       }
     };
 
+    class BAndNode : public RawExtentNode {
+    private:
+      std::vector<RawExtentNode*> _children;
+
+    public:
+      BAndNode() {}
+
+      BAndNode( Unpacker& unpacker ) {
+        _children = unpacker.getRawExtentVector( "children" );
+      }
+
+      std::string typeName() const {
+        return "BAndNode";
+      }
+
+      std::string queryText() const {
+        std::stringstream qtext;
+        qtext << "#band(";
+        for( unsigned int i=0; i<_children.size(); i++ ) {
+          qtext << _children[i]->queryText() << " ";
+        }
+        qtext << ")";
+
+        return qtext.str();
+      } 
+
+      const std::vector<RawExtentNode*>& getChildren() const {
+        return _children;
+      }
+
+      void addChild( RawExtentNode* node ) {
+        _children.push_back( node );
+      }
+
+      void pack( Packer& packer ) {
+        packer.before(this);
+        packer.put( "children", _children );
+        packer.after(this);
+      }
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+        for( int i=0; i<_children.size(); i++ ) {
+          _children[i]->walk(walker);
+        }
+        walker.after(this);
+      }
+      
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+        BAndNode* duplicate = new BAndNode();
+
+        duplicate->setNodeName( nodeName() );
+        for(unsigned int i=0; i<_children.size(); i++) {
+          Node* child = _children[i]->copy(copier);
+          duplicate->addChild( dynamic_cast<RawExtentNode*>(child) );
+        }
+
+        return copier.after(this, duplicate);
+      }
+    };
+
     class UWNode : public RawExtentNode {
     private:
       std::vector<RawExtentNode*> _children;

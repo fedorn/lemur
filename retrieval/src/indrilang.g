@@ -88,6 +88,7 @@ tokens {
   FILREQ = "#filreq";
   FILREJ = "#filrej";
   ANY = "#any";
+  BAND = "#band";
 
   // numerics
   PRIOR = "#prior";
@@ -142,7 +143,6 @@ protected SPACE:     ' ';
 protected HIGH_CHAR:         '\u0080'..'\u00ff';
 protected DIGIT:             ('0'..'9');
 protected ASCII_LETTER:      ('a'..'z' | 'A'..'Z');
-protected ASCII_LETTER_NO_B: ('a' | 'c'..'z' | 'A' | 'C'..'Z');
 protected SAFE_LETTER:       ('a'..'z' | 'A'..'Z' | '-' | '_');
 protected SAFE_CHAR:         ('a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_');
 protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/');
@@ -351,7 +351,7 @@ orNode returns [ indri::lang::ScoredExtentNode* r ]
     _nodes.push_back(on);
   } :
   OR r=unweightedList[on];
-  
+
 maxNode returns [ indri::lang::ScoredExtentNode* r ]
   {
     indri::lang::MaxNode* mn = new indri::lang::MaxNode;
@@ -392,6 +392,7 @@ priorNode returns [ indri::lang::PriorNode* p ]
 // Extent operators start here:
 //    #odn = odNode
 //    #uwn = uwNode
+//    #band = bandNode
 //    #filrej = filrejNode
 //    #filreq = filreqNode
 //
@@ -433,6 +434,17 @@ uwNode returns [ indri::lang::UWNode* uw ]
   // contents
   O_PAREN
     ( options { greedy=true; } : rn=unscoredTerm { uw->addChild( rn ); } )+
+  C_PAREN;
+
+bandNode returns [ indri::lang::BAndNode* b ] 
+  {
+    b = new indri::lang::BAndNode;
+    RawExtentNode* rn = 0;
+    _nodes.push_back(b);
+  } :
+  BAND
+  O_PAREN
+    ( options { greedy=true; } : rn=unscoredTerm { b->addChild( rn ); } )+
   C_PAREN;
   
 filrejNode returns [ indri::lang::FilRejNode* fj ]
@@ -492,6 +504,7 @@ qualifiedTerm returns [ RawExtentNode* t ]
 unqualifiedTerm returns [ RawExtentNode* re ] :
     ( OD ) => re=odNode
   | ( UW ) => re=uwNode
+  | ( BAND ) => re=bandNode
   | ( DATEBEFORE ) => re=dateBefore
   | ( DATEAFTER ) => re=dateAfter
   | ( DATEBETWEEN ) => re=dateBetween

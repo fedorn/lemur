@@ -73,6 +73,10 @@ public:
     _disqualifiedTree = true;
   }
 
+  void before( indri::lang::BAndNode* bandNode ) {
+    _disqualifiedTree = true;
+  }
+
   indri::lang::Node* after( indri::lang::IndexTerm* oldNode, indri::lang::IndexTerm* newNode ) {
     _lastTerm = newNode;
     return defaultAfter( oldNode, newNode );

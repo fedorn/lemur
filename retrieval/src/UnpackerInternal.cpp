@@ -21,6 +21,8 @@ indri::lang::Node* indri::lang::Unpacker::_unpack( XMLNode* child ) {
     result = new ExtentOr(*this);
   } else if( type == "ExtentAnd" ) {
     result = new ExtentAnd(*this);
+  } else if( type == "BAndNode" ) {
+    result = new BAndNode(*this);
   } else if( type == "UWNode" ) {
     result = new UWNode(*this);
   } else if( type == "ODNode" ) {

@@ -22,6 +22,8 @@ namespace indri {
    void Walker::after( class ExtentOr* n ) { defaultAfter( n ); }
    void Walker::before( class ExtentAnd* n ) { defaultBefore( n ); }
    void Walker::after( class ExtentAnd* n ) { defaultAfter( n ); }
+   void Walker::before( class BAndNode* n ) { defaultBefore( n ); }
+   void Walker::after( class BAndNode* n ) { defaultAfter( n ); }
    void Walker::before( class UWNode* n ) { defaultBefore( n ); }
    void Walker::after( class UWNode* n ) { defaultAfter( n ); }
    void Walker::before( class ODNode* n ) { defaultBefore( n ); }

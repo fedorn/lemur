@@ -23,6 +23,8 @@ namespace indri {
       virtual void after( class ExtentOr* n );
       virtual void before( class ExtentAnd* n );
       virtual void after( class ExtentAnd* n );
+      virtual void before( class BAndNode* n );
+      virtual void after( class BAndNode* n );
       virtual void before( class UWNode* n );
       virtual void after( class UWNode* n );
       virtual void before( class ODNode* n );

@@ -59,6 +59,7 @@ public:
   void after( indri::lang::ExtentAnd* extentAnd );
   void after( indri::lang::ExtentOr* extentOr );
   void after( indri::lang::ExtentInside* extentInside );
+  void after( indri::lang::BAndNode* uwNode );
   void after( indri::lang::ODNode* odNode );
   void after( indri::lang::UWNode* uwNode );
   void after( indri::lang::FilRejNode* uwNode );
