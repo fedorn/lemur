@@ -41,11 +41,6 @@ TokenTerm * BasicTokenDoc::nextTerm()
 void BasicTokenDoc::readID()
 {
   // get id
-  *docStr >> buf1;
-  if (strcmp(buf1, "<DOC")) {
-    cerr << " actual token seen: "<< buf1 << endl;
-    throw Exception("BasicTokenDoc", "begin doc marker expected");
-  }
   *docStr >> id;
   int len= strlen(id);
   if (id[len-1]!='>') {
@@ -67,10 +62,17 @@ BasicDocStream::BasicDocStream (const char * inputFile)
 
 bool BasicDocStream::hasMore()
 {
-  streampos pos = ifs->tellg();
-  bool moreData= (*ifs >> buf);
-  ifs->seekg(pos);
-  return moreData; 
+  bool moreDoc;
+  if (!nextTokenRead) {
+    moreDoc = *ifs >> buf;
+    nextTokenRead = true;
+    if (moreDoc && strcmp(buf, "<DOC")) {
+      cerr << " actual token seen: "<< buf << endl;
+      throw Exception("BasicDocStream", "begin doc marker expected");
+    }
+  }
+
+  return moreDoc; 
 }
 
 
@@ -80,6 +82,7 @@ void BasicDocStream::startDocIteration()
   ifs->open(file);
   ifs->seekg(0);
   ifs->clear(); 
+  nextTokenRead =false;
 }
 
 
@@ -87,6 +90,7 @@ Document *BasicDocStream::nextDoc()
 {
   static BasicTokenDoc doc(ifs);
   doc.readID();
+  nextTokenRead = false;
   return &doc;
 }
 

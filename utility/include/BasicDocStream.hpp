@@ -121,6 +121,7 @@ private:
   char file[1024];
   ifstream *ifs;
   char buf[2000];
+  bool nextTokenRead;
 };
 
 
