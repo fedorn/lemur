@@ -85,9 +85,13 @@ In addition, the collection mixture model also recognizes the parameter
 
 namespace LocalParameter {
   String expandedQuery;
+  String initQuery;
+  String feedbackDocuments;
   bool TRECResultFormat;
   void get() {
     expandedQuery = ParamGetString("expandedQuery");
+    initQuery = ParamGetString("initQuery",""); 
+    feedbackDocuments = ParamGetString("feedbackDocuments");
     TRECResultFormat = ParamGetInt("resultFormat",1); // default is TREC format
   }
 };
@@ -101,53 +105,92 @@ void GetAppParam()
 }
 
 
+void updateQueryModel(QueryRep *qr, char *qid, ResultFile &resFile, RetrievalMethod *model, ofstream &os)
+
+{
+  IndexedRealVector *res;
+  cout << "query : "<< qid << endl;
+  SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
+  if (resFile.findResult(qid, res)) {
+    res->Sort();
+   PseudoFBDocs *topDoc = new PseudoFBDocs(*res, RetrievalParameter::fbDocCount);
+   model->updateQuery(*qr, *topDoc);
+   os << qid;
+   qm->save(os);
+   delete topDoc;
+  } else {
+    cerr << "Warning: no feedback documents found for query: "<< qid << endl;
+  }
+}
 
 /// A query model estimation program
 
 int AppMain(int argc, char *argv[]) {
   
   Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
-  DocStream *qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+
 
   ArrayAccumulator accumulator(ind->docCount());
 
-  ifstream result(RetrievalParameter::resultFile, ios::in);
-  if (result.fail()) {
-    throw Exception("AppMain", "can't open the result file, check parameter value for resultFile");
+  ifstream fbdoc(LocalParameter::feedbackDocuments, ios::in);
+  if (fbdoc.fail()) {
+    throw Exception("AppMain", "can't open the feedback doc file, check parameter value for feedbackDocuments");
   }
 
   ofstream os(LocalParameter::expandedQuery);
   
   ResultFile resFile(LocalParameter::TRECResultFormat);
-  resFile.openForRead(result, *ind);
+  resFile.load(fbdoc, *ind);
   SimpleKLRetMethod *model =  new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, accumulator);
   model->setDocSmoothParam(SimpleKLParameter::docPrm);
   model->setQueryModelParam(SimpleKLParameter::qryPrm);
 
-  IndexedRealVector res;
 
-  qryStream->startDocIteration();
-  TextQuery *q;
-  while (qryStream->hasMore()) {
-    Document *d = qryStream->nextDoc();
-    q = new TextQuery(*d);
-    cout << "query : "<< q->id() << endl;
-    QueryRep *qr = model->computeQueryRep(*q);
-    resFile.getResult(q->id(), res);
-    res.Sort();
-    PseudoFBDocs *topDoc = new PseudoFBDocs(res, RetrievalParameter::fbDocCount);
-    model->updateQuery(*qr, *topDoc);
-    SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
-    os << q->id();
-    qm->save(os);
-    delete qr;
-    delete q;
-    delete topDoc;
+  // Use either the original query text or the initial query model stored in 
+  // LocalParameter::origQuery.
+  DocStream *qryStream;
+  ifstream *initQIFS;
+
+  bool useOrigQuery = (strlen(LocalParameter::initQuery)==0);
+  
+  if (useOrigQuery) {
+    cerr << "### Expanding the original text query ...\n";
+    qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+  } else {
+    cerr << "### Expanding the saved initial query ...\n";
+    initQIFS = new ifstream(LocalParameter::initQuery);
+    if (initQIFS->fail()) {
+      throw Exception("GenerateQueryModel", "Can't open initial query file");
+    } 
   }
-
+  
+  if (useOrigQuery) {
+    qryStream->startDocIteration();
+    TextQuery *q;
+    while (qryStream->hasMore()) {
+      Document *d = qryStream->nextDoc();
+      q = new TextQuery(*d);
+      QueryRep *qr = model->computeQueryRep(*q);
+      updateQueryModel(qr, q->id(),  resFile, model, os);     
+      delete qr;
+      delete q;
+    }
+  } else {
+    char qid[1024];
+    while ( *initQIFS >> qid) {
+      SimpleKLQueryModel *qm = new SimpleKLQueryModel(*ind);
+      qm->load(*initQIFS);
+      updateQueryModel(qm, qid,  resFile, model, os);      
+    }
+  }
   os.close();
   delete model;
-  delete qryStream;
+  if (useOrigQuery) {
+    delete qryStream;
+  } else {
+    delete initQIFS;
+  }
+
   delete ind;
   return 0;
 }
