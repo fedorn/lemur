@@ -84,7 +84,7 @@ long trecpos;
 [&][a-zA-Z]+[;]                     { trecpos += trecleng; /* zap symbols */ }
 [&][#][0-9]*[;]                    { trecpos += trecleng; /* zap symbols */ } 
 [A-Z][A-Z]+                         { trecpos += trecleng; return UPWORD; }
-[a-zA-Z0-9¡-ÿ]+                        { trecpos += trecleng; return WORD; }/* add 8-bit acsii chars */
+[a-zA-Z0-9]+                        { trecpos += trecleng; return WORD; }
 [A-Z][A-Z]+((\')?[s])?              { trecpos += trecleng; return ACRONYM2; }
 [a-zA-Z0-9]+\'[a-zA-Z]+            { trecpos += trecleng; return CONTRACTION;}
 [A-Z]\.([A-Z]\.)+                   { trecpos += trecleng; return ACRONYM; }
