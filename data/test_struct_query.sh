@@ -25,7 +25,7 @@ cp structparam/*_param .
 # Structured queries require the use of a position index.             #
 #######################################################################
 
-../app/obj/PushIndexer build_param database.sgml
+../app/obj/BuildInvertedIndex build_param database.sgml
 
 
 #######################################################################
