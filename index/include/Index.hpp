@@ -161,7 +161,7 @@ public:
   /*! This function should be pure virtual; the default implementation
      is just for convenience. Appropriate implementation to be done in the future. 
   */
-  virtual char *termLexiconID() { return NULL;} 
+  virtual const char *termLexiconID() { return NULL;} 
   //@}
 
   /// @name Summary counts
