@@ -1,3 +1,4 @@
 index = kindex;
+indexType = key;
 docFormat = web;
 memory = 256000000;
