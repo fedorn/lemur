@@ -135,6 +135,7 @@ protected:
 
 class PseudoFBDocs : public DocIDSet {
 public:
+  /// howManyDocs < 0 means using all results
   PseudoFBDocs(IndexedRealVector &results, int howManyDoc):
     res(&results), howMany(howManyDoc) {
   }
@@ -145,7 +146,10 @@ public:
     i=0;
   }  
   virtual bool hasMore() {
-    return (it != res->end() && i < howMany);
+    if (howMany>=0 && i >= howMany) {
+      return false;
+    }
+    return (it != res->end());
   }
 
   virtual void nextIDInfo(int &id, double &relProb) {
