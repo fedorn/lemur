@@ -68,6 +68,8 @@ public:
   int length() { return end-begin; };
   int termID() { return uid; };
   int termLen() { return strlength; };
+  int curDocIDdiff() { return lastid-begin; };
+  int curDocIDtf() { return *(lastid+1); };
 
   /// write this object in binary to the given filestream.  the stream should support
   /// binary writing.
