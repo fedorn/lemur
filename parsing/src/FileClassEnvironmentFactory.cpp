@@ -39,21 +39,6 @@ struct file_class_environment_spec {
   const char** conflations;
 };
 
-struct file_class_environment_spec_stl {
-  std::string name;
-  std::string parser;
-  std::string iterator;
-
-  std::string startDocTag;
-  std::string endDocTag;
-  std::string endMetadataTag;
-
-  std::vector<std::string> include;
-  std::vector<std::string> exclude;
-  std::vector<std::string> index;
-  std::vector<std::string> metadata;
-  std::map<std::string,std::string> conflations;
-};
 
 //
 // Preconfigured environments
@@ -191,7 +176,7 @@ static void copy_string_pairs_to_map( std::map< std::string, std::string >& m, c
 }
 
 FileClassEnvironmentFactory::~FileClassEnvironmentFactory() { 
-  std::map<std::string, file_class_environment_spec_stl*>::iterator iter;
+  std::map<std::string, FileClassEnvironmentFactory::Specification*>::iterator iter;
 
   for( iter = _userTable.begin(); iter != _userTable.end(); iter++ ) {
     delete iter->second;
@@ -218,7 +203,7 @@ FileClassEnvironment* build_file_class_environment( const file_class_environment
   return env;
 }
 
-FileClassEnvironment* build_file_class_environment( const file_class_environment_spec_stl* spec ) {
+FileClassEnvironment* build_file_class_environment( const FileClassEnvironmentFactory::Specification * spec ) {
   FileClassEnvironment* env = new FileClassEnvironment;
   env->iterator = DocumentIteratorFactory::get( spec->iterator,
                                                 spec->startDocTag.c_str(),
@@ -235,9 +220,61 @@ FileClassEnvironment* build_file_class_environment( const file_class_environment
   return env;
 }
 
+FileClassEnvironmentFactory::Specification* FileClassEnvironmentFactory::getFileClassSpec( const std::string& name ) {
+  // look for a user-specified environment:
+  std::map<std::string, FileClassEnvironmentFactory::Specification*>::iterator iter;
+  iter = _userTable.find( name );
+
+  if( iter != _userTable.end() ) {
+    // copy and return;
+    FileClassEnvironmentFactory::Specification* spec = new FileClassEnvironmentFactory::Specification;
+    *spec = *(iter->second);
+    return spec;
+  }
+  // look for a default environment
+  const file_class_environment_spec* spec = 0;
+  for( unsigned int i=0; environments[i].name; i++ ) {
+    if( !strcmp( name.c_str(), environments[i].name ) ) {
+      spec = &environments[i];
+      break;
+    }
+  }
+
+  if( spec ) {
+      FileClassEnvironmentFactory::Specification* newSpec = new FileClassEnvironmentFactory::Specification;
+
+
+    std::vector<std::string> includeTags;
+    std::vector<std::string> excludeTags;
+    std::vector<std::string> indexTags;
+    std::vector<std::string> metadataTags;
+    std::map<std::string, std::string> conflations;
+
+    copy_strings_to_vector( includeTags, spec->includeTags );
+    copy_strings_to_vector( excludeTags, spec->excludeTags );
+    copy_string_pairs_to_map( conflations, spec->conflations );
+    copy_strings_to_vector(indexTags, spec->indexTags);
+    copy_strings_to_vector(metadataTags, spec->metadataTags);
+
+    newSpec->name = spec->name;
+    newSpec->iterator = spec->iterator;
+    newSpec->parser = spec->parser;    
+    newSpec->index = indexTags;
+    newSpec->metadata = metadataTags;
+    newSpec->include = includeTags;
+    newSpec->exclude = excludeTags;
+    newSpec->conflations = conflations;
+    newSpec->startDocTag = spec->startDocTag ? spec->startDocTag : "";
+    newSpec->endDocTag = spec->endDocTag ? spec->endDocTag : "" ;
+    newSpec->endMetadataTag = spec->endMetadataTag ? spec->endMetadataTag : "";
+    return newSpec;
+  }
+  return 0;
+}
+
 FileClassEnvironment* FileClassEnvironmentFactory::get( const std::string& name ) {
   // look for a user-specified environment:
-  std::map<std::string, file_class_environment_spec_stl*>::iterator iter;
+  std::map<std::string, FileClassEnvironmentFactory::Specification*>::iterator iter;
   iter = _userTable.find( name );
 
   if( iter != _userTable.end() ) {
@@ -268,11 +305,12 @@ void FileClassEnvironmentFactory::addFileClass( const std::string& name,
                                                 const std::string& endMetadataTag,
                                                 const std::vector<std::string>& include,
                                                 const std::vector<std::string>& exclude,
-                                                const std::vector<std::string>& index,
+                                                const std::vector<std::string>&
+ index,
                                                 const std::vector<std::string>& metadata, 
                                                 const std::map<std::string,std::string>& conflations )
 {
-  file_class_environment_spec_stl* spec = new file_class_environment_spec_stl;
+  FileClassEnvironmentFactory::Specification* spec = new FileClassEnvironmentFactory::Specification;
 
   spec->name = name;
   spec->iterator = iterator;
@@ -289,4 +327,18 @@ void FileClassEnvironmentFactory::addFileClass( const std::string& name,
   spec->endMetadataTag = endMetadataTag;
 
   _userTable[spec->name] = spec;
+}
+
+void FileClassEnvironmentFactory::addFileClass( const FileClassEnvironmentFactory::Specification &spec) {
+  // make a copy
+  FileClassEnvironmentFactory::Specification* newSpec = new FileClassEnvironmentFactory::Specification;
+  *newSpec = spec;
+  // see if there is already an entry for this name
+  std::map<std::string, FileClassEnvironmentFactory::Specification*>::iterator iter;
+  iter = _userTable.find( newSpec->name );
+  // delete it.
+  if( iter != _userTable.end() ) {
+    delete(iter->second);
+  }
+  _userTable[newSpec->name] = newSpec;
 }

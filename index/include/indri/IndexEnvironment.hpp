@@ -85,7 +85,7 @@ public:
   /// @param documentRoot path to document root.
   /// @param anchorTextRoot path to anchor text root.
   void setAnchorTextPath( const std::string& documentRoot, const std::string& anchorTextRoot );
-  /// A parsing information for a file class. Data for these parameters
+  /// Add parsing information for a file class. Data for these parameters
   /// is passed into the FileClassEnvironmentFactory
   /// @param name name of this file class, eg trecweb
   /// @param iterator document iterator for this file class
@@ -109,6 +109,16 @@ public:
                      const std::vector<std::string>& index,
                      const std::vector<std::string>& metadata, 
                      const std::map<std::string,std::string>& conflations );
+  /// getthe named file class.
+  FileClassEnvironmentFactory::Specification *getFileClassSpec( const std::string& name) {
+    return _fileClassFactory.getFileClassSpec(name);
+  }
+  /// add a file class.
+  void addFileClass( const FileClassEnvironmentFactory::Specification &spec){
+    _fileClassFactory.addFileClass(spec);
+  }
+  
+
   /// set names of fields to be indexed as data
   /// @param fieldNames the list of fields.
   void setIndexedFields( const std::vector<std::string>& fieldNames );
