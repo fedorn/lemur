@@ -12,6 +12,8 @@
 #include "DocMgrManager.hpp"
 #include "TextHandlerManager.hpp"
 #include "InvFPTextHandler.hpp"
+#include "KeyfileTextHandler.hpp"
+#include "KeyfileIncIndex.hpp"
 #include "Param.hpp"
 #include "Exception.hpp"
 
@@ -19,7 +21,9 @@
 namespace LocalParameter {
   int memory;
   string index;  // optional name (minus extension) of the database
-  string manager; // name of flat text document manager
+  string indexType;  // index type (one of key or inv)
+  string manager; // name of document manager
+  string mgrType; // which doc mgr to use
   string stopwords;  // name of file containing stopwords
   string acronyms;   // name of file containing acronyms
   string docFormat;  // format of documents (trec or web)
@@ -29,8 +33,11 @@ namespace LocalParameter {
   bool countStopWords;
 
   void get() {
-    index =ParamGetString("index");
+    index = ParamGetString("index");
+    indexType = ParamGetString("indexType", "inv");
     manager = ParamGetString("manager");
+    // default is FlattextDocMgr.
+    mgrType = ParamGetString("managerType", "flat");
     memory = ParamGetInt("memory", 96000000);
     stopwords = ParamGetString("stopwords");
     acronyms = ParamGetString("acronyms");
@@ -51,6 +58,7 @@ void usage(int argc, char ** argv) {
        << endl
        << "Summary of parameters:" << endl << endl
        << "\tmanager -  required name of the document manager (without extension)" << endl    
+       << "\tmanagerType -  required name of the document manager type, one of flat (FlatfileDocMgr) or bdm (KeyfileDocMgr)." << endl    
        << "\tdocFormat - \"trec\" for standard TREC formatted documents "<< endl
        << "\t            \"web\" for web TREC formatted documents " << endl
        << "\t            \"reuters\" for Reuters XML documents " << endl
@@ -61,6 +69,8 @@ void usage(int argc, char ** argv) {
        << "\t              (one line per datafile name) " << endl
        << "\tFollowing parameters optional for building index" << endl
        << "\tindex - name of the index (without the extension)" << endl
+       << "\tindexType - the type of index, one of key (for KeyfileIncIndex) "
+       << "\tor inv (for Inv(FP)PushIndex) respectively." << endl
        << "\tmemory - memory (in bytes) of index cache (def = 96000000)" << endl
        << "\tposition - store position information (def = 1)" << endl
        << "\tstopwords - name of file containing stopword list" << endl
@@ -95,31 +105,52 @@ int AppMain(int argc, char * argv[]) {
   }
 
   // Create DocumentManager with appropriate parse mode
-  FlattextDocMgr* docmgr;
-  // there's currently only one docmanager
-  docmgr = (FlattextDocMgr*)DocMgrManager::createDocMgr("flat", LocalParameter::manager, LocalParameter::docFormat, LocalParameter::dataFiles);
+  DocumentManager* docmgr;
+  // there's currently only two docmanagers
+  docmgr = DocMgrManager::createDocMgr(LocalParameter::mgrType, 
+				       LocalParameter::manager, 
+				       LocalParameter::docFormat, 
+				       LocalParameter::dataFiles);
   if (!docmgr)
     throw Exception ("BuildDocMgr", "\nInsufficient parameters for creating document manager. Check manager, dataFiles, and docFormat");
 
   // are we building an index?
   Stopper * stopper = NULL;
   Stemmer * stemmer = NULL;
-  InvFPTextHandler* indexer = NULL;
+  TextHandler* indexer = NULL;
+  Index *ind = NULL;
   if (!LocalParameter::index.empty()) {
     // Create the stopper if needed.
     stopper = TextHandlerManager::createStopper(LocalParameter::stopwords);
     
     // Create the stemmer if needed.
     stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
+    // needs to handle alternative index types...
 
-    // Create the indexer. 
-    indexer = new InvFPTextHandler((char*)LocalParameter::index.c_str(), LocalParameter::memory, LocalParameter::countStopWords, LocalParameter::position);
+    // Create the right type of indexer (DocMgrManager should handle this).
+    // Need an abstract class to hang the setDocManager call on here...
+    if (LocalParameter::indexType == "inv") {
+      indexer = new InvFPTextHandler((char*)LocalParameter::index.c_str(), 
+				     LocalParameter::memory, 
+				     LocalParameter::countStopWords, 
+				     LocalParameter::position);
+      // register document manager with PushIndex
+      ((InvFPTextHandler *)indexer)->setDocManager(docmgr->getMyID());
+
+    } else if (LocalParameter::indexType == "key"){
+      ind = new KeyfileIncIndex((char*)LocalParameter::index.c_str(),
+				       LocalParameter::memory);
+      indexer = new KeyfileTextHandler((KeyfileIncIndex *)ind,
+				       LocalParameter::countStopWords);
+      // register document manager with PushIndex
+      ((KeyfileTextHandler *)indexer)->setDocManager(docmgr->getMyID());
+    } else {
+    throw Exception ("BuildDocMgr", "Unknown index type");
+    }
     
-    // register document manager with PushIndex
-    indexer->setDocManager(docmgr->getMyID());
     
     // chain the document manager(parser)/stopper/stemmer/indexer
-    TextHandler *th = docmgr;
+    TextHandler *th = docmgr->getTextHandler();
 
     if (stopper != NULL) {
       th->setTextHandler(stopper);
@@ -137,9 +168,10 @@ int AppMain(int argc, char * argv[]) {
   docmgr->buildMgr();
   
   // free memory
-  if (stopper) delete stopper;
-  if (stemmer) delete stemmer;
-  if (indexer) delete indexer;
-  delete docmgr;
+  delete(stopper);
+  delete(stemmer);
+  delete(indexer);
+  delete(ind);
+  delete(docmgr);
   return 0;
 }
