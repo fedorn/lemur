@@ -15,6 +15,7 @@
 
 ///  Class for retrieving indexed document collection based on the abstract class Index.hpp
 #include "common_headers.hpp"
+#include "Param.hpp"
 #include "Index.hpp"
 #include "InvDocList.hpp"
 #include "InvTermList.hpp"
@@ -130,6 +131,7 @@ protected:
   float aveDocLen; // the average document length in this index
   inv_entry* lookup;  // the array holding entries (index is termid)
   dt_entry* dtlookup; // the array holding entries to dt index (index of array is docid)
+  int dtloaded; // indicate load status of the dt index (loaded or not)
   TERM_T* terms;   // array of the term spellings (index is termid)
   EXDOCID_T* docnames; // array of the external docids (index is docid)
   char** dtfiles; // array of dt index filenames

@@ -208,13 +208,20 @@ int InvIndex::docLength(int docID) const{
     
   if (docID == 0)
     return 0;
-
+  if (!dtloaded) {
+    cerr << "DT index must be loaded to obtain docLength" << endl;
+    return 0;
+  }
   return dtlookup[docID].length;
 }
 
 int InvIndex::docLengthCounted(int docID) {
   if ((docID < 0) || (docID > counts[DOCS])) {
     fprintf(stderr, "Error trying to get docLengthCounted for invalid docID.\n");
+    return 0;
+  }
+  if (!dtloaded) {
+    cerr << "DT index must be loaded to obtain docLength" << endl;
     return 0;
   }
     
@@ -269,6 +276,10 @@ TermInfoList* InvIndex::termInfoList(int docID){
   if ((docID < 0) || (docID > counts[DOCS])) {
     fprintf(stderr, "Error trying to get termInfoList for invalid docID.\n");
     return NULL;
+  }
+  if (!dtloaded) {
+    cerr << "DT index must be loaded to obtain termInfoList" << endl;
+    return 0;
   }
     
   if (docID == 0)
@@ -395,6 +406,11 @@ bool InvIndex::indexLookup() {
 
 bool InvIndex::dtLookup() {
   FILE* in = fopen(names[TERM_LOOKUP], "rb");
+  dtloaded = ParamGetInt("loadDT", 1);
+  if (!dtloaded) {
+    cerr << "Skipping dtlist at user request" << endl;
+    return true;
+  }
   cerr << "Trying to open dtlist lookup: " << names[TERM_LOOKUP] << endl;
   if (in == NULL) {
     fprintf(stderr, "Couldn't open dt lookup table for reading\n");
