@@ -18,27 +18,20 @@
 
 #include "InvFPIndex.hpp"
 
-#include "SimpleKLRetMethod.hpp"
-#include "OkapiRetMethod.hpp"
-#include "TFIDFRetMethod.hpp"
-//#include "CORIRetMethod.hpp"
-#include "RetParamManager.hpp"
-
+#include "RetrievalMethod.hpp"
 #include "LemurMemParser.hpp"
+#include "RetMethodManager.hpp"
 
 /// Parameters needed for querying Lemur databases
 namespace LemurParameter {
-  //  enum RetModel {TFIDF=0, OKAPI=1, KL=2, CORI=3};
-  enum RetModel {TFIDF=0, OKAPI=1, KL=2};
-  /// Retrieval model 
-  static enum RetModel mod;
+  static RetMethodManager::RetModel mod;
   /// Database name
   static String dbname;
 
   /// Get the parameters
   static void get() {
     // default is KL divergence model
-    mod = (RetModel) ParamGetInt("retModel", KL); 
+    mod = (RetMethodManager::RetModel) ParamGetInt("retModel", RetMethodManager::KL); 
     dbname = ParamGetString("index");
     RetrievalParameter::get();  
   }
