@@ -22,7 +22,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
-#include <assert.h>
+#include <cassert>
 
 //#define FILE_PAGE_SIZE              (4096)
 #define FILE_PAGE_SIZE              (8192)
@@ -39,11 +39,13 @@ public:
   typedef __int64 offset_type;
   /// IO library offset type
   typedef int library_offset_type;
+  #define _UNLINK ::unlink
 #else
   /// Large file offset type
   typedef off_t offset_type;
   /// IO library offset type
   typedef off_t library_offset_type;
+  #define _UNLINK std::remove
 #endif
 
 
@@ -228,12 +230,13 @@ public:
         break;
       } else if ( mode & std::fstream::trunc ) {
         // segment opened properly, but we're doing a trunc, so 
-	// this segment must go away
+		// this segment must go away
         segment->stream.close();
         delete segment;
-	// g++ doesn't like this -- dmf
-	//        ::unlink( name.c_str() );
-        std::remove( name.c_str() );
+		// g++ doesn't like this -- dmf
+		//        ::unlink( name.c_str() );
+    	//std::remove( name.c_str() );
+		_UNLINK(name.c_str());
       } else {
         // segment opened properly and we'd like to keep it
         
@@ -241,13 +244,16 @@ public:
         if( mode & std::fstream::out ) {
           segment->stream.close();
           segment->stream.open( name.c_str(), 
-				// g++ doesn't like this -- dmf
-				// mode & (std::fstream::binary | 
-				// std::fstream::in | std::fstream::out) );
-				std::_Ios_Openmode(mode) & 
-				(std::fstream::binary | std::fstream::in | 
-				 std::fstream::out) );
-
+		  // g++ doesn't like this -- dmf
+		  // need to move this ifdef out of here
+		  #ifdef WIN32 
+			mode & (std::fstream::binary | 
+			std::fstream::in | std::fstream::out) );
+		  #else 
+			std::_Ios_Openmode(mode) & 
+			(std::fstream::binary | std::fstream::in | 
+			 std::fstream::out) );
+		  #endif
           if( segment->stream.rdstate() & std::fstream::failbit ) {
             delete segment;
             break;
@@ -417,9 +423,9 @@ public:
   static void unlink( const std::string& fileName ) {
     for( int i=0; ; i++ ) {
       std::string segment = segmentName( fileName, i );
-
-      //      if( ::unlink( segment.c_str() ) != 0 ) {
-      if( std::remove( segment.c_str() ) != 0 ) {
+	  if (_UNLINK( segment.c_str() ) != 0 ) {
+      //if( ::unlink( segment.c_str() ) != 0 ) {
+      //if( std::remove( segment.c_str() ) != 0 ) {
         break;
       }
     }
