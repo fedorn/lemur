@@ -93,7 +93,7 @@ InvIndex::~InvIndex() {
   }
 
   for (i = 0; i < docmgrs.size(); i++)
-    delete[](docmgrs[i]);
+    delete(docmgrs[i]);
 
   if (terms != NULL) {
     for (i = 0; i < counts[UNIQUE_TERMS]+1; i++)
@@ -194,7 +194,8 @@ const char* InvIndex::document(int docID) {
   return docnames[docID]; 
 }
 
-const char* InvIndex::docManager(int docID) {
+//const char* InvIndex::docManager(int docID) {
+DocumentManager* InvIndex::docManager(int docID) {
   // no such thing previous to version 1.9
   if (!strcmp(names[VERSION_NUM], "")) 
     return NULL;
@@ -534,7 +535,9 @@ bool InvIndex::docMgrIDs() {
       continue;
     }
     str[len] = '\0';
-    docmgrs.push_back(str);
+    DocumentManager* dm = DocMgrManager::openDocMgr(str);
+    docmgrs.push_back(dm);
+    //docmgrs.push_back(str);
   }
   fclose(in);
   return true;

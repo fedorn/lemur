@@ -24,6 +24,7 @@
 #include "InvTermList.hpp"
 #include "InvFPTypes.hpp"
 #include "Param.hpp"
+#include "DocMgrManager.hpp"
 
 // for counts array
 #define UNIQUE_TERMS 0
@@ -71,7 +72,8 @@ public:
   /// Convert a docID to its spelling
   const char* document(int docID); 
 
-  const char* docManager(int docID);
+  //  const char* docManager(int docID);
+  DocumentManager* docManager(int docID);
 
   //@}
 
@@ -150,7 +152,8 @@ protected:
   ifstream *dtfstreams; // array of dt index input streams
   char** invfiles; // array of inv index filenames
   ifstream *invfstreams; // array of inv index input streams
-  vector<char*> docmgrs; // list of document managers
+  //  vector<char*> docmgrs; // list of document managers
+  vector<DocumentManager*> docmgrs; // list of document managers
   map<TERM_T, TERMID_T, ltstr> termtable; // table of terms to termid
   map<EXDOCID_T, DOCID_T, ltstr> doctable; // table of exdocids to docid
   ostream* msgstream; // Lemur code messages stream		

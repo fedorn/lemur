@@ -124,6 +124,7 @@ delete docList;
 
 #include "TermInfoList.hpp"
 #include "DocInfoList.hpp"
+#include "DocumentManager.hpp"
 
 class Index {
 public:
@@ -154,7 +155,8 @@ public:
 
   /// A String identifier for the document manager to get at the source
   /// of the document with this document id
-  virtual const char* docManager(int docID) { return NULL;}
+  //  virtual const char* docManager(int docID) { return NULL;}
+  virtual DocumentManager* docManager(int docID) {return NULL;}
 
 
   /// Return a string ID for the term lexicon (usually the file name of the lexicon)
