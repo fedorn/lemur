@@ -122,7 +122,9 @@ public:
   BasicDocStream() {}
   BasicDocStream (const char * inputFile) {
     ifs = new ifstream(inputFile, ios::in);
-    assert(ifs);
+    if (ifs->fail() ) {
+      throw Exception("BasicDocStream", "can't open BasicDocStream source file");
+    }
   }
   virtual ~BasicDocStream() {  delete ifs;}
 
