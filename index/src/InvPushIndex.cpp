@@ -62,20 +62,19 @@ bool InvPushIndex::beginDoc(const DocumentProps* dp){
 bool InvPushIndex::addTerm(const Term& t){
   TABLE_T::iterator placehold;
   InvDocList* curlist;
-  const InvFPTerm* term;
-
-  term = dynamic_cast< const InvFPTerm* >(&t);
-  if (term->strLength() < 1) {
-    cerr << "Trying to add term with string length less than 1.  Term ignored." << endl;
-    return false;
-  }
-  if (term->spelling() == NULL) {
+  if (t.spelling() == NULL) {
     cerr << "Trying to add null term.  Term ignored. " << endl;
     return false;
   }
 
+  string spell = t.spelling();
+
+  if (spell.length() < 1) {
+    cerr << "Trying to add term with string length less than 1.  Term ignored." << endl;
+    return false;
+  }
+
   //search to see if this is a new term 
-  string spell = term->spelling();  
   placehold = wordtable.find(spell);
   if (placehold != wordtable.end()) {
     //* OLD WORD *//
@@ -103,10 +102,9 @@ bool InvPushIndex::addTerm(const Term& t){
     // update unique word counter
     tidcount++;
     //store new word in list of ids
-    string spell = term->spelling();
     termIDs.push_back(spell);
 
-    curlist = new InvDocList(cache, termIDs.size(), term->strLength());
+    curlist = new InvDocList(cache, termIDs.size(), spell.length());
     curlist->addTerm(docIDs.size());
 
     if (curlist->hasNoMem()) {
