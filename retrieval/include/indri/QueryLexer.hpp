@@ -54,6 +54,8 @@ public:
 	public: void mC_ANGLE(bool _createToken);
 	public: void mO_SQUARE(bool _createToken);
 	public: void mC_SQUARE(bool _createToken);
+	public: void mO_BRACE(bool _createToken);
+	public: void mC_BRACE(bool _createToken);
 	public: void mDBL_QUOTE(bool _createToken);
 	public: void mQUOTE(bool _createToken);
 	public: void mDOT(bool _createToken);
