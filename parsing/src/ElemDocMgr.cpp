@@ -65,7 +65,7 @@ ElemDocMgr::~ElemDocMgr() {
   elements.close();
 }
 
-char* ElemDocMgr::handleBeginTag(char* tag, char* orig, PropertyList* props) {
+char* ElemDocMgr::handleBeginTag(char* tag, const char* orig, PropertyList* props) {
   const Property* prop = NULL;
   prop = props->getProperty("B_ELEM");
   if (prop) {
@@ -84,7 +84,7 @@ char* ElemDocMgr::handleBeginTag(char* tag, char* orig, PropertyList* props) {
   return tag;
 }
 
-char* ElemDocMgr::handleEndTag(char* tag, char* orig, PropertyList* props){
+char* ElemDocMgr::handleEndTag(char* tag, const char* orig, PropertyList* props){
   // find the tag
   const Property* prop=NULL;
   prop = props->getProperty("E_ELEM");

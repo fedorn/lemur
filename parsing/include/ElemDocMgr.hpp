@@ -60,10 +60,10 @@ public:
   virtual ~ElemDocMgr();
 
   /// Handle a begin tag token
-  virtual char* handleBeginTag(char* tag, char* orig, PropertyList* props);
+  virtual char* handleBeginTag(char* tag, const char* orig, PropertyList* props);
 
   /// Handle a end tag token
-  virtual char* handleEndTag(char* tag, char* orig, PropertyList* props);
+  virtual char* handleEndTag(char* tag, const char* orig, PropertyList* props);
 
   /// Get an element of a document with "element" name
   /// caller deletes memory with delete[]
