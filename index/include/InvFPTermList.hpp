@@ -55,6 +55,9 @@ public:
   /// Assumes the following format: DOCID DOCLENGTH UNIQUE_TERM_COUNT [TERM LOC]..[]
   bool binRead(ifstream& infile);
 
+  /// Change our default sequence of words representation to be bag of words
+  void countTerms();
+
 private:
 
   DOCID_T uid; // this doc's id
@@ -62,6 +65,7 @@ private:
   LocatedTerm* list; // list of terms and locations
   int listlen; // number of items we have in list  (same as number of terms)
   int index;   // index for iterator
+  int* counts; // keep track of counts of terms for bag of words
 };
 
 
