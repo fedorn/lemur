@@ -51,7 +51,7 @@ public:
 
 
 protected:
-  void writeTOC(int numinv);
+  void writeTOC(int numinv, const CollectionProps* cp);
   /// signify the end of current document
   void doendDoc(const DocumentProps* dp, int mgrid);
 

@@ -32,7 +32,7 @@
 #include "InvDocList.hpp"
 #include "InvFPTerm.hpp"
 #include "InvIndexMerge.hpp"
-
+#include "BasicCollectionProps.hpp"
 
 typedef map<string, InvDocList*, less<string> > TABLE_T;
 
@@ -64,7 +64,7 @@ public:
   void setDocManager(const string &mgrID);
 
 protected:
-  void writeTOC(int numinv);
+  void writeTOC(int numinv, const CollectionProps* cp);
   void writeDocIDs();
   void writeCache();
   void lastWriteCache();

@@ -155,7 +155,7 @@ void InvPushIndex::endCollection(const CollectionProps* cp){
   delete(merger);
 
   //write out the main toc file
-  writeTOC(numinv);
+  writeTOC(numinv, cp);
 
 }
 
@@ -166,28 +166,43 @@ void InvPushIndex::setDocManager (const string &mgrID) {
 /*==========================================================================
  *  PRIVATE METHODS
  *==========================================================================*/
-void InvPushIndex::writeTOC(int numinv) {
+void InvPushIndex::writeTOC(int numinv, const CollectionProps* cp) {
+  const BasicCollectionProps* props = dynamic_cast<const BasicCollectionProps*>(cp);
   string fname = name + MAINTOC;
-  FILE* toc = fopen(fname.c_str(), "wb");
-  if (!toc) {
+  ofstream toc(fname.c_str());
+  if (!toc.is_open()) {
     fprintf(stderr, "Could not open .toc file for writing.\n");
     return;
   }
-  fprintf(toc, "%s %s\n", VERSION_PAR, IND_VERSION);
-  fprintf(toc, "%s  %d\n", NUMDOCS_PAR, docIDs.size());
-  fprintf(toc, "%s  %d\n", NUMTERMS_PAR, tcount);
-  fprintf(toc, "%s  %d\n", NUMUTERMS_PAR, tidcount);
-  fprintf(toc, "%s  %d\n", AVEDOCLEN_PAR, tcount/docIDs.size());
-  fprintf(toc, "%s  %s%s\n", INVINDEX_PAR, name.c_str(), INVINDEX);
-  fprintf(toc, "%s  %d\n", NUMINV_PAR, numinv); 
-  fprintf(toc, "%s  %s%s\n", INVLOOKUP_PAR, name.c_str(), INVLOOKUP);
-  fprintf(toc, "%s  %s%s\n", DTINDEX_PAR, name.c_str(), DTINDEX);
-  fprintf(toc, "%s  %d\n", NUMDT_PAR, dtfiles.size());
-  fprintf(toc, "%s  %s%s\n", DTLOOKUP_PAR, name.c_str(), DTLOOKUP);
-  fprintf(toc, "%s  %s%s\n", DOCIDMAP_PAR, name.c_str(), DOCIDMAP);
-  fprintf(toc, "%s  %s%s\n", TERMIDMAP_PAR, name.c_str(), TERMIDMAP);
-  fprintf(toc, "%s  %s%s\n", DOCMGR_PAR, name.c_str(), DOCMGRMAP);
-  fclose(toc);
+  toc << VERSION_PAR << "  " << IND_VERSION << endl;
+  toc << NUMDOCS_PAR << "  " << docIDs.size() << endl;
+  toc << NUMTERMS_PAR << "  " << tcount << endl;
+  toc << NUMUTERMS_PAR << "  " << tidcount << endl;
+  toc << AVEDOCLEN_PAR << "  " << tcount/docIDs.size() << endl;
+  toc << INVINDEX_PAR << "  " << name << INVINDEX << endl;
+  toc << NUMINV_PAR << "  " << numinv << endl; 
+  toc << INVLOOKUP_PAR << "  " << name << INVLOOKUP << endl;
+  toc << DTINDEX_PAR << "  " << name <<  DTINDEX << endl;
+  toc << NUMDT_PAR << "  " << dtfiles.size() << endl;
+  toc << DTLOOKUP_PAR << "  " << name <<  DTLOOKUP << endl;
+  toc << DOCIDMAP_PAR << "  " << name << DOCIDMAP << endl;
+  toc << TERMIDMAP_PAR << "  " << name << TERMIDMAP << endl;
+  toc << DOCMGR_PAR << "  " << name << DOCMGRMAP << endl;
+
+  if (props) {
+    const Property* p = NULL;
+    string value;
+    props->startIteration();
+    while (props->hasMore()) {
+      p = props->nextEntry();
+      if (p->getType() == Property::STDSTRING)
+	toc << p->getName() << "  " << *(string*)p->getValue() << endl;
+      else if (p->getType() == Property::STRING)
+	toc << p->getName() << "  " << (char*)p->getValue() << endl;
+    }
+  }
+
+  toc.close();
 }
 
 void InvPushIndex::writeDocIDs() {
