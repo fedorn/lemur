@@ -34,10 +34,10 @@ void BasicTokenDoc::skipToEnd() const
   }
 }
 
-const TokenTerm * BasicTokenDoc::nextTerm() const
+const Term * BasicTokenDoc::nextTerm() const
 {
   //  static BasicTokenTerm t;
-  t.str = curWord;
+  t.spelling(curWord);
   if (curWord == buf1) {
     curWord = buf2;
   } else {

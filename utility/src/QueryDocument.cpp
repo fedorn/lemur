@@ -24,8 +24,8 @@ QueryDocument::~QueryDocument() {
   free(id);
 }
 
-const TokenTerm* QueryDocument::nextTerm() const{
-  tt.str = tokens[iter];
+const Term* QueryDocument::nextTerm() const{
+  tt.spelling(tokens[iter]);
   iter++;
   return &tt;
 }
