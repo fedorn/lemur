@@ -80,6 +80,8 @@ private:
   int listlen; // number of items we have in list  (same as number of terms)
   int index;   // index for iterator
   int* counts; // keep track of counts of terms for bag of word
+  InvFPTerm entry;
+  vector<int> loclist; //list of locations to return 
 
 };
 

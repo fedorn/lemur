@@ -59,6 +59,7 @@ private:
   int* end; // end of list
   int listlen; // number of terms in list
   int* iter;   // index for iterator
+  InvFPTerm entry;
 };
 
 
