@@ -19,9 +19,9 @@ hand out memory in chunk sizes of powers of 2 from 2^10 through 2^22.
 #include <math.h>
 #include "vector.hpp"
 
-#define MIN 5
-#define MAX 22
-#define NLISTS MAX-MIN+1
+#define MINPOW 5
+#define MAXPOW 22
+#define NLISTS MAXPOW-MINPOW+1
 
 class MemCache {
 public:

@@ -41,10 +41,10 @@ int* MemCache::getMoreMem(int newsize, int* location, int oldsize) {
   if (oldsize >= newsize)
     return NULL;
   
-  if ((oldsize < MIN) || (oldsize > MAX))
+  if ((oldsize < MINPOW) || (oldsize > MAXPOW))
     return NULL;
 
-  if ((newsize < MIN) || (newsize > MAX))
+  if ((newsize < MINPOW) || (newsize > MAXPOW))
     return NULL;
 
   //get the big chunk
@@ -58,7 +58,7 @@ int* MemCache::getMoreMem(int newsize, int* location, int oldsize) {
   //store this free spot
 //  *location = oldsize;
 //  freelist.push_back(location);
-	freelist[oldsize-MIN].push_back(location);
+	freelist[oldsize-MINPOW].push_back(location);
 
   return retval;
 }
@@ -67,7 +67,7 @@ void MemCache::freeMem(int* location, int memsize) {
   // add this memory location to the free list
   //*location = memsize;
   //freelist.push_back(location);
-  freelist[memsize-MIN].push_back(location);
+  freelist[memsize-MINPOW].push_back(location);
 }
 
 
@@ -91,11 +91,11 @@ int* MemCache::getEnd() {
 
 /** PRIVATE **/
 int* MemCache::getFromFree(int csize) {
-  if (freelist[csize-MIN].empty())
+  if (freelist[csize-MINPOW].empty())
     return NULL;
 
-  int* retval = freelist[csize-MIN].back();
-  freelist[csize-MIN].pop_back();
+  int* retval = freelist[csize-MINPOW].back();
+  freelist[csize-MINPOW].pop_back();
 
   return retval;
 
