@@ -13,37 +13,26 @@
 #define _INVFPTERM_HPP
 
 #include "TermInfoList.hpp"
+#include "Term.hpp"
 #include "InvFPTypes.hpp"
 
 /// term class for InvIndex and InvFPIndex
 /*! 
 */
 
-class InvFPTerm: public TermInfo {
+class InvFPTerm: public TermInfo, public Term {
 public:
-  friend class InvTermList;
-  friend class InvFPTermList;
-  friend class InvFPTermPropList;
-
-  InvFPTerm() { freq=1;};
+  InvFPTerm() { tcount=1;}
   ~InvFPTerm() {};
 
-  const char* spelling() const { return word; }
-  void spelling(const char* term) { word = term; }
   int strLength() const { return strlen; }
   void strLength(int len) { strlen = len; }
-  int count() const {return freq; }
-  TERMID_T id() const { return tid; }
   LOC_T position() const { return loc; }
   const int* positions() const {vector<LOC_T>::const_iterator it(loclist->begin()); return &(*it); }
   void position(LOC_T pos) { loc = pos; }
-
+  void positions(vector<LOC_T>* list) { loclist = list; }
 protected:
-
-  TERMID_T tid;
   int strlen;
-  const char* word; 
-  int freq; // number of times this term occurs in this documen
   LOC_T loc;  // where this term (currently) occurs in the document
   vector<LOC_T>* loclist; // list of all places term occurs in the document                  
 };
