@@ -6,7 +6,7 @@ const char BasicIndexWithCat::OOVSTRING[]="[OOV]";
 
 BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &categoryIndex, bool catIsTerm):
     baseIndex(&wordIndex), catIndex(&categoryIndex), catAsTerm(catIsTerm) 
-{
+{ 
   // synchronize doc id lexicons
   base2cat = new int[baseIndex->docCount()];
   int i;
@@ -105,9 +105,6 @@ int BasicIndexWithCat::nextDocID()
     return (cat2base[docInfo->docID()]);
   }
 }
-
-
-
 
 
 
