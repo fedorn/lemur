@@ -21,6 +21,7 @@
 #include "CORIRetMethod.hpp"
 #include "CosSimRetMethod.hpp"
 #include "InQueryRetMethod.hpp"
+#include "IndriRetMethod.hpp"
 
 /// General retrieval-related parameters
 namespace RetrievalParameter {
@@ -68,6 +69,8 @@ namespace RetrievalParameter {
     if (retModel == "3") retModel = "inquery";
     if (retModel == "4") retModel = "cori_cs";
     if (retModel == "5") retModel = "cos";
+    if (retModel == "6") retModel = "inq_struct";
+    if (retModel == "7") retModel = "indri";
 
     string tmp = getLower("cacheDocReps", "true");
     cacheDocReps = (tmp == "true" || tmp == "1");
@@ -287,6 +290,36 @@ namespace InQueryParameter {
     fbTermCount = ParamGetInt("feedbackTermCount", fbTermCount);
     string tmpString = RetrievalParameter::getLower("cacheIDF", "true");
     cacheIDF = (tmpString == "true" || tmpString == "1");
+  }
+};
+
+/// Parameters used in the Indri query language
+namespace IndriParameter {
+  /// @name Indri query language parameters
+  /// Parameters object passed into the IndriRetMethod
+  static Parameters params;
+  /// For query time stopping.
+  static string stopwords;
+  /// get parameters.
+  static void get()
+  {
+    RetrievalParameter::get();
+    // stopwords
+    stopwords = ParamGetString("stopwords", "");
+
+    // RM expansion parameters
+    int fbTerms = ParamGetInt("feedbackTermCount", 10);
+    double fbOrigWt = ParamGetDouble("fbOrigWt", 0.5);
+    double fbMu = ParamGetDouble("fbMu", 0);
+    params.set( "fbDocs" , RetrievalParameter::fbDocCount);
+    params.set( "fbTerms" , fbTerms );
+    params.set( "fbOrigWt", fbOrigWt);
+    params.set( "fbMu", fbMu );
+    // set retrieval rules -- NB limit to one.
+    string rule = ParamGetString("rule", "method:dirichlet,mu:2500");
+    params.set("rule", rule);
+    // results count
+    params.set( "count", RetrievalParameter::resultCount );
   }
 };
 
