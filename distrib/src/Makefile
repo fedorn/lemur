@@ -1,7 +1,7 @@
 
 
 #define this module
-MODULE	= distrib_util
+MODULE	= distrib
 
 #define the modules it depends on
 #important: the order should reflect the desired order for linking
