@@ -59,7 +59,7 @@ CC = @CC@
 
 # configure script will replace @CFLAGS@ and @CPPFLAGS@ with the right values
 
-CFLAGS = $(INCPATH) @CFLAGS@ @CPPFLAGS@
+CFLAGS = -D_CCVER=$(CCVER) $(INCPATH) @CFLAGS@ @CPPFLAGS@
 
 # C++ compiler and compiling/linking options
 # configure script will replace @CXX@ with the right value
@@ -70,11 +70,23 @@ CXX = @CXX@
 
 # configure script will replace @CXXFLAGS@ and @CPPFLAGS@ with the right values
 
-CPPFLAGS    = $(INCPATH) @CXXFLAGS@ @CPPFLAGS@
+CPPFLAGS    = -D_CXXVER=$(CXXVER) $(INCPATH) @CXXFLAGS@ @CPPFLAGS@
 
 CPPLDFLAGS  =   $(LIBPATH) $(LIBFLAGS) -lm
 
+CCVER = $(shell $(CC) --version | sed 's/\.//g')
 
+CXXVER = $(shell $(CXX) --version |sed 's/\.//g')
 
 
   
+
+
+
+
+
+
+
+
+
+
