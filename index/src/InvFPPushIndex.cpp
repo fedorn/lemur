@@ -6,23 +6,24 @@
  *
  *========================================================================*/
 
-InvFPPushIndex::InvFPPushIndex(char* prefix, int cachesize, DOCID_T startdocid) {
+InvFPPushIndex::InvFPPushIndex(char* prefix, int cachesize, long maxfilesize, DOCID_T startdocid) {
   name = NULL;
   setName(prefix);
   fprintf(stderr, "building %s\n ", name);
 
   cache = new MemCache(cachesize);
-  char* docfname = new char[namelen+strlen(DTINDEX)];
+  char* docfname = new char[namelen+strlen(DTINDEX)+1];
   char* lfname = new char[namelen+strlen(DTLOOKUP)];
-  sprintf(docfname, "%s%s", name, DTINDEX);
+  sprintf(docfname, "%s%s%d", name, DTINDEX, 0);
   sprintf(lfname, "%s%s", name, DTLOOKUP);
 //  fprintf(stderr, "file name is %s\n.", docfname);
   //writetlist = fopen(docfname, "wb");
-  writetlist.open(docfname, ios::out | ios::binary);
+  writetlist.open(docfname, ios::binary | ios::out);
+  dtfiles.push_back(docfname);
   writetlookup = fopen(lfname, "wb");
-  delete[](docfname);
   delete[](lfname);
   tcount = tidcount = 0;
+  maxfile = maxfilesize;
 }
 
 InvFPPushIndex::~InvFPPushIndex() {
@@ -111,35 +112,34 @@ bool InvFPPushIndex::addTerm(Term& t){
 }
 
 void InvFPPushIndex::endDoc(DocumentProps* dp){
-  // we have only one file for now
-  int fid = 0;
-
   //flush list and write to lookup table
   //index of last item in docIDs is current internal docid
   if (dp != NULL) {
     int docid = docIDs.size()-1;
     int len = dp->length();
+    int tls = termlist.size();
     
     // make sure the ftell is correct
-//    fflush(writetlist);
     writetlist.flush();
-    fprintf(writetlookup, "%d %d %d ", docid, fid, (long)writetlist.tellp());
-//    fprintf(writetlookup, "%d %d %d ", docid, fid, ftell(writetlist));
-//    fprintf(writetlist, "%d %d %d ", docid, len, termlist.size());
-    int tls = termlist.size();
+    long offset = (long)writetlist.tellp();
+
+    if (offset+(3*sizeof(int))+(tls*sizeof(LocatedTerm)) > maxfile) {
+      writetlist.close();
+      char* docfname = new char[namelen+strlen(DTINDEX)+1];
+      sprintf(docfname, "%s%s%d", name, DTINDEX, dtfiles.size());
+      dtfiles.push_back(docfname);
+      writetlist.open(docfname, ios::binary | ios::out);
+    }
+
+    fprintf(writetlookup, "%d %d %d ", docid, dtfiles.size()-1, offset);
+
     writetlist.write((const char*)&docid, sizeof(DOCID_T));
     writetlist.write((const char*)&len, sizeof(int));
-//    writetlist.write((const char*)&dtidcount, sizeof(int));
-    
     writetlist.write((const char*)&tls, sizeof(int));
+
     for (int i=0;i<tls;i++) {
       writetlist.write((const char*)&termlist[i], sizeof(LocatedTerm));
     }
-    /*
-    for (int i=0;i<termlist.size();i++) {
-      fprintf(writetlist, "%d %d ", termlist[i].term, termlist[i].loc);
-    }
-    */
     tcount += len;
   }  
   termlist.clear();  
@@ -151,6 +151,8 @@ void InvFPPushIndex::endCollection(CollectionProps* cp){
 
   // write our list of external docids in internal docid order
   writeDocIDs();
+  // write our list of dt index files in internal fid order
+  writeDTIDs();
   // flush everything in the cache
   lastWriteCache();
   // merge them
@@ -160,6 +162,7 @@ void InvFPPushIndex::endCollection(CollectionProps* cp){
 
   //write out the main toc file
   writeTOC();
+
 }
 
 /*==================================================================================
@@ -168,26 +171,27 @@ void InvFPPushIndex::endCollection(CollectionProps* cp){
 void InvFPPushIndex::writeTOC() {
   char* fname = new char[namelen+strlen(MAINTOC)];
   sprintf(fname, "%s%s", name, MAINTOC);
-  fprintf(stderr, "Writing out main stats table\n");
-  FILE* toc = fopen(fname, "wb");
-  if (!toc) {
-    fprintf(stderr, "Could not open .toc file for writing.\n");
-    delete[](fname);
-    return;
-  }
-  fprintf(toc, "%s: %d\n", NUMDOCS_PAR, docIDs.size());
-  fprintf(toc, "%s: %d\n", NUMTERMS_PAR, tcount);
-  fprintf(toc, "%s: %d\n", NUMUTERMS_PAR, tidcount);
-  fprintf(toc, "%s: %d\n", AVEDOCLEN_PAR, tcount/docIDs.size());
-  fprintf(toc, "%s: %s%s\n", INVINDEX_PAR, name, INVINDEX);
-  fprintf(toc, "%s: %s%s\n", INVLOOKUP_PAR, name, INVLOOKUP);
-  fprintf(toc, "%s: %s%s\n", DTINDEX_PAR, name, DTINDEX);
-  fprintf(toc, "%s: %s%s\n", DTLOOKUP_PAR, name, DTLOOKUP);
-  fprintf(toc, "%s: %s%s\n", DOCIDMAP_PAR, name, DOCIDMAP);
-  fprintf(toc, "%s: %s%s\n", TERMIDMAP_PAR, name, TERMIDMAP);
+  //char* fname = strcat(name, MAINTOC);
+     fprintf(stderr, "Writing out main stats table\n");
+   FILE* toc = fopen(fname, "wb");
+   if (!toc) {
+     fprintf(stderr, "Could not open .toc file for writing.\n");
+     delete[](fname);
+     return;
+   }
+   fprintf(toc, "%s: %d\n", NUMDOCS_PAR, docIDs.size());
+   fprintf(toc, "%s: %d\n", NUMTERMS_PAR, tcount);
+   fprintf(toc, "%s: %d\n", NUMUTERMS_PAR, tidcount);
+   fprintf(toc, "%s: %d\n", AVEDOCLEN_PAR, tcount/docIDs.size());
+   fprintf(toc, "%s: %s%s\n", INVINDEX_PAR, name, INVINDEX);
+   fprintf(toc, "%s: %s%s\n", INVLOOKUP_PAR, name, INVLOOKUP);
+   fprintf(toc, "%s: %s%s\n", DTINDEX_PAR, name, DTINDEX);
+   fprintf(toc, "%s: %s%s\n", DTLOOKUP_PAR, name, DTLOOKUP);
+   fprintf(toc, "%s: %s%s\n", DOCIDMAP_PAR, name, DOCIDMAP);
+   fprintf(toc, "%s: %s%s\n", TERMIDMAP_PAR, name, TERMIDMAP);
 
-  fclose(toc);
-  delete[](fname);
+   fclose(toc);
+   delete[](fname);
 }
 
 void InvFPPushIndex::writeDocIDs() {
@@ -199,6 +203,17 @@ void InvFPPushIndex::writeDocIDs() {
    }
    fclose(docid);
    delete[](dname);
+}
+
+void InvFPPushIndex::writeDTIDs() {
+  char* dname = new char[namelen+strlen(DTINDEX)];
+  sprintf(dname, "%s%s", name, DTINDEX);
+  FILE* dtid = fopen(dname, "wb");
+  for (int i=0;i<dtfiles.size();i++) {
+    fprintf(dtid, "%d %d %s ", i, strlen(dtfiles[i]), dtfiles[i]);
+  }
+  fclose(dtid);
+  delete[](dname);
 }
 
 void InvFPPushIndex::writeCache() {
