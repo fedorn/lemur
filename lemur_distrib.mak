@@ -46,11 +46,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FreqCounter.obj"
 	-@erase "$(INTDIR)\LemurDBManager.obj"
 	-@erase "$(INTDIR)\LemurMemParser.obj"
-	-@erase "$(INTDIR)\MindDBManager.obj"
 	-@erase "$(INTDIR)\QryBasedSampler.obj"
-	-@erase "$(INTDIR)\soapC.obj"
-	-@erase "$(INTDIR)\soapClient.obj"
-	-@erase "$(INTDIR)\stdsoap2.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase ".\lemur_distrib.lib"
 
@@ -72,11 +68,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\FreqCounter.obj" \
 	"$(INTDIR)\LemurDBManager.obj" \
 	"$(INTDIR)\LemurMemParser.obj" \
-	"$(INTDIR)\MindDBManager.obj" \
 	"$(INTDIR)\QryBasedSampler.obj" \
-	"$(INTDIR)\soapC.obj" \
-	"$(INTDIR)\soapClient.obj" \
-	"$(INTDIR)\stdsoap2.obj" \
 	"$(INTDIR)\DocFreqIndexer.obj" \
 	"$(INTDIR)\CtfIndexer.obj"
 
@@ -103,11 +95,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FreqCounter.obj"
 	-@erase "$(INTDIR)\LemurDBManager.obj"
 	-@erase "$(INTDIR)\LemurMemParser.obj"
-	-@erase "$(INTDIR)\MindDBManager.obj"
 	-@erase "$(INTDIR)\QryBasedSampler.obj"
-	-@erase "$(INTDIR)\soapC.obj"
-	-@erase "$(INTDIR)\soapClient.obj"
-	-@erase "$(INTDIR)\stdsoap2.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
 	-@erase ".\lemur_distrib.lib"
@@ -130,11 +118,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\FreqCounter.obj" \
 	"$(INTDIR)\LemurDBManager.obj" \
 	"$(INTDIR)\LemurMemParser.obj" \
-	"$(INTDIR)\MindDBManager.obj" \
 	"$(INTDIR)\QryBasedSampler.obj" \
-	"$(INTDIR)\soapC.obj" \
-	"$(INTDIR)\soapClient.obj" \
-	"$(INTDIR)\stdsoap2.obj" \
 	"$(INTDIR)\DocFreqIndexer.obj" \
 	"$(INTDIR)\CtfIndexer.obj"
 
@@ -240,35 +224,10 @@ SOURCE=.\distrib\src\LemurMemParser.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=.\distrib\src\MindDBManager.cpp
-
-"$(INTDIR)\MindDBManager.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
 SOURCE=.\distrib\src\QryBasedSampler.cpp
 
 "$(INTDIR)\QryBasedSampler.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=.\distrib\src\soapC.cpp
-
-"$(INTDIR)\soapC.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=.\distrib\src\soapClient.cpp
-
-"$(INTDIR)\soapClient.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=.\distrib\src\stdsoap2.cpp
-
-"$(INTDIR)\stdsoap2.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
 
 
 !ENDIF 
