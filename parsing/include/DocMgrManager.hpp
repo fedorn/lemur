@@ -15,17 +15,22 @@
  *
  */
 
-#include "FlattextDocMgr.hpp"
+#include "DocumentManager.hpp"
 
 class DocMgrManager {
 public:
   /// create a new DocumentManager object 
+  /// Recognized types are: flat -- FlattextDocMgr; or 
+  /// bdm -- KeyfileDocMgr.
   static DocumentManager* createDocMgr(string type, string name="", 
-				       string parsetype="", string sources = "");
+				       string parsetype="", 
+				       string sources = "");
 
   /// open an existing DocumentManager using the specified name
   /// similar to indexes, the DM's name extension should indicate what
   /// MD it is.
+  /// Recognized extensions are : .flat -- FlattextDocMgr; or 
+  /// .bdm -- KeyfileDocMgr.
   static DocumentManager* openDocMgr(string name);
 };
 

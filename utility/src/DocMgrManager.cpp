@@ -7,7 +7,9 @@
 */
 
 #include "DocMgrManager.hpp"
-
+#include "Param.hpp"
+#include "FlattextDocMgr.hpp"
+#include "KeyfileDocMgr.hpp"
 
 DocumentManager* DocMgrManager::createDocMgr(string type, string name, 
 					     string parsetype, string sources) {
@@ -17,18 +19,24 @@ DocumentManager* DocMgrManager::createDocMgr(string type, string name,
     // try to get it from the stack
     name = ParamGetString("manager");
   }
-  // not checking type from stack since there's no param name yet
-  if (type == "flat") {
-    if (parsetype.empty()) {
-      parsetype = ParamGetString("docFormat");
-    }
-    if (sources.empty()) {
-      sources = ParamGetString("dataFiles");
-    }
-    if ((!name.empty()) && (!parsetype.empty()) && (!sources.empty())) {
-      return new FlattextDocMgr(name, parsetype, sources);
-    }
+  if (parsetype.empty()) {
+    parsetype = ParamGetString("docFormat");
   }
+  if (sources.empty()) {
+    sources = ParamGetString("dataFiles");
+  }
+  if (type.empty()) {
+    type = ParamGetString("managerType");
+  }
+  if (type == "flat") {
+    if ((!name.empty()) && (!parsetype.empty()) && (!sources.empty())) {
+      dm = new FlattextDocMgr(name, parsetype, sources);
+    }
+  } else if (type == "bdm") {
+    if ((!name.empty()) && (!parsetype.empty()) && (!sources.empty())) {
+      dm = new KeyfileDocMgr(name, parsetype, sources);
+    }
+  } // Add else if new types here...
   return dm;
 }
 
@@ -38,7 +46,9 @@ DocumentManager* DocMgrManager::openDocMgr(string name) {
 
   // look for name ending in .flat
   if (len - name.rfind(".flat") == 5)
-    return new FlattextDocMgr(name.c_str());
-
+    dm = new FlattextDocMgr(name.c_str());
+  else if (len - name.rfind(".bdm") == 4)
+    dm = new KeyfileDocMgr(name.c_str());
+  // Add else if new types here...
   return dm;
 }
