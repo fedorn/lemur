@@ -14,7 +14,6 @@
 
 #include "StructQueryRetMethod.hpp"
 #include "StructQryDocRep.hpp"
-#include "BasicDocInfoList.hpp"
 
 void StructQueryRetMethod::scoreCollection(const QueryRep &qry, 
 					   IndexedRealVector &results) {
