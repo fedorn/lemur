@@ -33,11 +33,9 @@ public:
   /// returns a handle to a Parser object that can handle parsing the raw format of these documents
   virtual Parser* getParser() { return myparser; } ;
 
-  /// returns self cast to TextHandler (FIX INHERITANCE HERE!)
-  virtual TextHandler* getTextHandler() { return NULL; } ;  
-
   /// Construct the data tables for the previously given input files. 
   virtual void buildMgr() = 0;
+
   /// get the ID string to use for opening this later
   virtual const char* getMyID() = 0;
 
