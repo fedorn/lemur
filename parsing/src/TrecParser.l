@@ -42,6 +42,8 @@
 #define E_HEADLN 22
 #define B_TITLE 23
 #define E_TITLE 24
+#define B_DATE 25
+#define E_DATE 26
 
 extern FILE * trecin;
 extern char * trectext;
@@ -66,6 +68,10 @@ long trecpos;
 "</TITLE>"                            { trecpos += trecleng; return E_TITLE; }
 "<TTL>"                             { trecpos += trecleng; return B_TITLE; }
 "</TTL>"                            { trecpos += trecleng; return E_TITLE; }
+"<DD>"                              { trecpos += trecleng; return B_DATE; }
+"</DD>"                             { trecpos += trecleng; return E_DATE; }
+"<DATE>"                            { trecpos += trecleng; return B_DATE; }
+"</DATE>"                           { trecpos += trecleng; return E_DATE; }
 "<LP>"                              { trecpos += trecleng; return B_TEXT; }
 "</LP>"                             { trecpos += trecleng; return E_TEXT; }
 "<LEADPARA>"                        { trecpos += trecleng; return B_TEXT; }
@@ -196,6 +202,24 @@ void TrecParser::doParse() {
     case E_TITLE:
       state = DOC;
       endelem.setValue("TITLE");
+      proplist.clear();
+      proplist.setProperty(&endelem);
+      if (textHandler)
+        textHandler->foundToken(ENDTAG, trectext, trectext, &proplist);
+      break;
+
+    case B_DATE:
+      // state = DOC;
+      begelem.setValue("DATE");
+      proplist.clear();
+      proplist.setProperty(&begelem);
+      if (textHandler)
+        textHandler->foundToken(BEGINTAG, trectext, trectext, &proplist);
+      break;
+
+    case E_DATE:
+      // state = DOC;
+      endelem.setValue("DATE");
       proplist.clear();
       proplist.setProperty(&endelem);
       if (textHandler)

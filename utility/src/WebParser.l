@@ -47,6 +47,9 @@
 #define E_STYLE 20
 #define B_TITLE 21
 #define E_TITLE 22
+#define B_DATE 25
+#define E_DATE 26
+
 
 extern FILE * webin;
 extern char * webtext;
@@ -70,6 +73,8 @@ long webloc;
 "</"[sS][cC][rR][iI][pP][tT]">"         {webloc += webleng; return E_SCRIPT; } 
 "<"[tT][iI][tT][lL][eE][^>]*">"         {webloc += webleng; return B_TITLE; }
 "</"[tT][iI][tT][lL][eE]">"             {webloc += webleng; return E_TITLE; }
+"<"[dD][aA][tT][eE][^>]*">"             {webloc += webleng; return B_DATE; }
+"</"[dD][aA][tT][eE]">"                 {webloc += webleng; return E_DATE; }
 "<!--"                                  {webloc += webleng; return B_COMMENT; }
 "-->"                                   {webloc += webleng; return E_COMMENT; }
 "<"[/]?[a-zA-Z][^>]*">"                 {webloc += webleng; /* zap tags */ }
@@ -236,6 +241,24 @@ void WebParser::doParse() {
     case E_TITLE:
       state = DOC;
       endelem.setValue("TITLE");
+      proplist.clear();
+      proplist.setProperty(&endelem);
+      if (textHandler)
+        textHandler->foundToken(ENDTAG, webtext, webtext, &proplist);
+      break;
+
+    case B_DATE:
+      // state = DOC;
+      begelem.setValue("DATE");
+      proplist.clear();
+      proplist.setProperty(&begelem);
+      if (textHandler)
+        textHandler->foundToken(BEGINTAG, webtext, webtext, &proplist);
+      break;
+
+    case E_DATE:
+      // state = DOC;
+      endelem.setValue("DATE");
       proplist.clear();
       proplist.setProperty(&endelem);
       if (textHandler)
