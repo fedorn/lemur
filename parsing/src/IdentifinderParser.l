@@ -194,9 +194,7 @@ void IdentifinderParser::doParse() {
 	proplist.setProperty(&tag);
 	proplist.setProperty(&btag);
 	if (textHandler != NULL) 
-	  // 3 is TextHandler::WORD for some reason the compiler is not happy with
-	  // the enumerated type. Might be Flex
-	  textHandler->foundToken(3, identext, identext, &proplist);
+	  textHandler->foundToken(WORDTOK, identext, identext, &proplist);
 	poscount++;
 	// reset begin tag
 	btag.setValue("\0");
@@ -227,7 +225,7 @@ void IdentifinderParser::doParse() {
 	proplist.setProperty(&tag);
 	proplist.setProperty(&btag);
 	if (textHandler != NULL) 
-	  textHandler->foundToken(3, identext, identext, &proplist);
+	  textHandler->foundToken(WORDTOK, identext, identext, &proplist);
         // reset begin tag
         btag.setValue("\0");
       }
@@ -247,7 +245,7 @@ void IdentifinderParser::doParse() {
 	proplist.setProperty(&tag);
 	proplist.setProperty(&btag);
 	if (textHandler != NULL) 
-	  textHandler->foundToken(3, identext, identext, &proplist);
+	  textHandler->foundToken(WORDTOK, identext, identext, &proplist);
 	// reset begin tag
 	btag.setValue("\0");
       }
@@ -273,7 +271,7 @@ void IdentifinderParser::doParse() {
 	proplist.setProperty(&tag);
 	proplist.setProperty(&btag);
 	if (textHandler != NULL) 
-	  textHandler->foundToken(3, identext, identext, &proplist);
+	  textHandler->foundToken(WORDTOK, identext, identext, &proplist);
 	// reset begin tag
         btag.setValue("\0");
       }
@@ -316,7 +314,7 @@ void IdentifinderParser::doParse() {
 	proplist.setProperty(&wordpos);
 	proplist.setProperty(&etag);
 	if (textHandler)
-	  textHandler->foundToken(3,"","",&proplist);
+	  textHandler->foundToken(WORDTOK,"","",&proplist);
 
 	etag.setValue("\0");
 	tag.setValue("\0");

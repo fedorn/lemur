@@ -57,8 +57,8 @@
 class TextHandler {
 
 public:
-  enum TokenType {BEGINDOC = 1, ENDDOC = 2, WORD = 3, 
-		  BEGINTAG = 4, ENDTAG = 5, SYMBOL = 6};
+  enum TokenType {BEGINDOC = 1, ENDDOC = 2, WORDTOK = 3, 
+		  BEGINTAG = 4, ENDTAG = 5, SYMBOLTOK = 6};
 
   TextHandler() {
     textHandler = NULL;
@@ -75,7 +75,7 @@ public:
     return textHandler;
   }
 
-  virtual void foundToken(int type, 
+  virtual void foundToken(TokenType type, 
 			  char * token = NULL, 
 			  char * orig = NULL,
 			  PropertyList * properties = NULL) {
@@ -94,7 +94,7 @@ public:
     case ENDDOC:
       t = handleEndDoc(t, orig, properties);
       break;
-    case WORD:
+    case WORDTOK:
       t = handleWord(t, orig, properties);
       break;
     case BEGINTAG:
@@ -103,7 +103,7 @@ public:
     case ENDTAG:
       t = handleEndTag(t, orig, properties);
       break;            
-    case SYMBOL:
+    case SYMBOLTOK:
       t = handleSymbol(t, orig, properties);
       break;            
     }
@@ -162,10 +162,10 @@ public:
   }
   /// Found a word
   virtual void foundWord(char * word) {
-    foundToken(WORD, word, word);
+    foundToken(WORDTOK, word, word);
   }
   virtual void foundWord(char * word, char * original) {
-    foundToken(WORD, word, original);
+    foundToken(WORDTOK, word, original);
   }
   /// Found end of doc
   virtual void foundEndDoc() {
@@ -173,7 +173,7 @@ public:
   }
   /// Found a word
   virtual void foundSymbol(char * sym) {
-    foundToken(SYMBOL, sym, sym);
+    foundToken(SYMBOLTOK, sym, sym);
   }  
   // Kept for backwords compatability
   /// Handle a doc

@@ -176,7 +176,7 @@ void BrillPOSParser::doParse() {
       proplist.clear();
       proplist.setProperty(&wordpos);
       if (textHandler != NULL)
-        textHandler->foundToken(3, "[EOS]", "[EOS]", &proplist);
+        textHandler->foundToken(WORDTOK, "[EOS]", "[EOS]", &proplist);
       break;
 
     case WORD:
@@ -188,9 +188,7 @@ void BrillPOSParser::doParse() {
         proplist.clear();
 	proplist.setProperty(&wordpos);
 	if (textHandler != NULL) 
-	  // 3 is TextHandler::WORD for some reason the compiler is not happy with
-	  // the enumerated type. 	
-	  textHandler->foundToken(3, bpostext, bpostext, &proplist);
+	  textHandler->foundToken(WORDTOK, bpostext, bpostext, &proplist);
 	poscount++;
       }
       break;
@@ -217,7 +215,7 @@ void BrillPOSParser::doParse() {
         proplist.clear();
 	proplist.setProperty(&wordpos);
 	if (textHandler != NULL) 
-	  textHandler->foundToken(3, bpostext, bpostext, &proplist);
+	  textHandler->foundToken(WORDTOK, bpostext, bpostext, &proplist);
       }
       break;
 
@@ -233,7 +231,7 @@ void BrillPOSParser::doParse() {
         proplist.clear();
 	proplist.setProperty(&wordpos);
 	if (textHandler != NULL) 
-	  textHandler->foundToken(3, bpostext, bpostext, &proplist);
+	  textHandler->foundToken(WORDTOK, bpostext, bpostext, &proplist);
       }
       break;
 
@@ -255,7 +253,7 @@ void BrillPOSParser::doParse() {
         proplist.clear();
 	proplist.setProperty(&wordpos);
 	if (textHandler != NULL) 
-	  textHandler->foundToken(3, bpostext, bpostext, &proplist);
+	  textHandler->foundToken(WORDTOK, bpostext, bpostext, &proplist);
       }
       break;
     
