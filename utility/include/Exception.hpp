@@ -12,7 +12,8 @@
 
 #ifndef _EXCEPTION_HPP
 #define _EXCEPTION_HPP
-#include <iostream.h>
+#include <iostream>
+using namespace std;
 
 /// Default Exception class
 /*!
