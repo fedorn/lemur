@@ -19,7 +19,7 @@ smoothMethod = 0; /* Jelinek-Mercer = 0; Bayesian =1; Abs. Discount =2; */
 
 discountDelta = 0.5; /* not used since smoothMethod is Jelinek-Mercer */
 
-JelinekMercerLambda = 0.5; 
+JelinekMercerLambda = 0.9; 
 
 DirichletPrior = 3000; /* not used since smoothMethod is Jelinek-Mercer */
 

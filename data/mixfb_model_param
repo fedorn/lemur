@@ -1,7 +1,7 @@
 
 /* Parameter file to be used with GenerateQueryModel  */
 
-expandedQuery = query.mixfb_kl;
+expandedQuery = query_mixfb_kl;
 
 /* Basic retrieval parameters */
 
@@ -21,7 +21,7 @@ discountDelta = 0.5; /* not used since smoothMethod is Dirichlet prior */
 
 JelinekMercerLambda = 0.5;  /* not used since smoothMethod is Dirichlet prior */
 
-DirichletPrior = 1000; 
+DirichletPrior = 2000; 
 
 
 /* Pseudo feedback parameters */

@@ -1,7 +1,7 @@
 
 /* Parameter file to be used with QueryModelEval  */
 
-queryModel = query.mixfb_kl;
+queryModel = query_mixfb_kl;
 
 /* Basic retrieval parameters */
 
