@@ -91,7 +91,7 @@ public:
     std::stringstream lineString;
     lineString << whereLine;
 
-    _what = whoString + "(" + lineString.str() + ")" + ": " + whatString + "\n\t" + inner.what();
+     _what = whoString + "(" + lineString.str() + "): " + whatString + "\n\t" + inner.what();
     _code = inner.code();
   }
 
@@ -99,7 +99,7 @@ public:
 
   inline void writeMessage(std::ostream &os = std::cerr)
   {
-    os << "Exception [" << _what << "], code = " << _code << std::endl;
+    os << "Exception [code = " << _code << "]" << std::endl << _what << std::endl;
   }
 
   const std::string& what() const {
@@ -123,6 +123,7 @@ private:
 
 #define LEMUR_GENERIC_ERROR               ((LemurErrorType)0xFFFFFFFF)
 #define LEMUR_MISSING_PARAMETER_ERROR     ((LemurErrorType)0xFFFFFFFE)
+#define LEMUR_BAD_PARAMETER_ERROR         ((LemurErrorType)0xFFFFFFF7)
 #define LEMUR_PARSE_ERROR                 ((LemurErrorType)0xFFFFFFFD)
 #define LEMUR_KEYFILE_IO_ERROR            ((LemurErrorType)0xFFFFFFFC)
 #define LEMUR_IO_ERROR                    ((LemurErrorType)0xFFFFFFFB)
