@@ -265,10 +265,10 @@ int AppMain(int argc, char * argv[]) {
     }
   }
   // free memory
-  delete(stopper);
-  delete(stemmer);
-  delete(parser);
   delete(indexer);
+  delete(stemmer);
+  delete(stopper);
+  delete(parser);
   if (index)
     delete(index);
   return 0;
