@@ -328,14 +328,15 @@ void Repository::close() {
       _index->openRead( indexPath );
       
       _topdocs->update( *_index );
-      _topdocs->close();
-      delete _topdocs;
-      _topdocs = 0;
 
       _index->close();
       delete _index;
       _index = 0;      
     }
+    // close and delete whether or not read only.
+    _topdocs->close();
+    delete _topdocs;
+    _topdocs = 0;
 
     delete _collection;
     _collection = 0;
