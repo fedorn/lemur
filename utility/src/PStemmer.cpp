@@ -496,9 +496,9 @@ Stem(char * word )
 
    } /* Stem */
 
-#include "Stemmer.hpp"
+#include "PStemmer.hpp"
 
-int Stemmer::stemWord(char *word)
+int PStemmer::stemWord(char *word)
 {
   return (Stem(word));
   
