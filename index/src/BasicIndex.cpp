@@ -12,8 +12,6 @@
 #include <cassert>
 #include <cstdio>
 
-using namespace std;
-
 extern "C" { 
 #include "util.h"
 }
@@ -499,7 +497,7 @@ int BasicIndex::indexCollection()
   // way that works for both Windows and Unix
 
   int erased=0;
-  for (int i=0; i<MAXINDEX; ++i) {
+  for (i=0; i<MAXINDEX; ++i) {
     sprintf(name, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, i);
     if (remove(name)>=0) {
       cerr << "\tErased " << name << endl;
