@@ -100,7 +100,7 @@ long all_flag = 0;                /* If set, all evaluation measures will
                                      be printed instead of just the
                                      final TREC 2 measures. */
 
-void main (argc, argv)
+int main (argc, argv)
 int argc;
 char *argv[];
 {
