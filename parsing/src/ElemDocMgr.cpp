@@ -107,6 +107,7 @@ char* ElemDocMgr::handleEndTag(char* tag, char* orig, PropertyList* props){
     }
     // else we didn't get it, then there's nothing to do
   }
+  return tag;
 }
 
 // caller delete[]
