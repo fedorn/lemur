@@ -156,8 +156,6 @@ char *KeyfileDocMgr::getDoc(const string &docID) const{
 
   doclookup.get( docName, &documentLocation, actual, sizeof(btl) );
 
-  if(docName != docID) delete[](docName);
-
   char *doc = new char[documentLocation.bytes + 1];
   ifstream read(sources[documentLocation.fid].c_str(), ios::binary);
   if (!read.is_open()) {
