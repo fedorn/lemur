@@ -68,7 +68,7 @@ namespace TFIDFParameter {
     qryTFPrm.bm25K1 = ParamGetDouble("query.bm25K1",defaultQryK1);
     qryTFPrm.bm25B = defaultQryB;
     
-    fbPrm.howManyTerms = ParamGetInt("feedbackDocCount",defaultHowManyTerms); 
+    fbPrm.howManyTerms = ParamGetInt("feedbackTermCount",defaultHowManyTerms); 
     fbPrm.posCoeff = ParamGetDouble("feedbackPosCoeff", defaultPosCoeff); 
     
   }
