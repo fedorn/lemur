@@ -20,11 +20,25 @@ ProxInfo::ProxInfo(int num, int tf, const DocInfoList *dl) : nextPos(0),
 						       listSize(tf) { 
   dList = dynamic_cast<const InvFPDocList *>(dl);
   if (dList == NULL) {
-    throw Exception("ProxInfo", "InvFPDocList required from index");
+    //    throw Exception("ProxInfo", "InvFPDocList required from index");
+    //    cerr << "ProxInfo: InvFPDocList required from index for positions. "
+    //	 << "Setting all positions to 0." << endl;
+    LOC_T *posList = new LOC_T[2*num + tf];
+    LOC_T *tmpList = posList;
+    for (DocInfoList::iterator iter = dl->begin(); iter != dl->end(); iter++){
+      DocInfo &info = *iter;
+      DOCID_T did = info.docID();
+      COUNT_T cnt = info.termCount();
+      *tmpList++ = did;
+      *tmpList++ = cnt;
+      for (int i = 0; i < cnt; i++) *tmpList++ = 0; 
+    }
+    dList = new InvFPDocList(0, (2*num + tf), posList, 0, posList, 0);
+    delete(dl);
   }
 }
 
-ProxInfo::ProxInfo(int num, int tf, int *pl) : nextPos(0), 
+ProxInfo::ProxInfo(int num, int tf, LOC_T *pl) : nextPos(0), 
 					       posList(pl),  
 					       size(0), 
 					       dList(NULL),
@@ -50,7 +64,7 @@ bool ProxInfo::nextDoc() {
 }
 
 
-bool ProxInfo::nextDoc(int did) {
+bool ProxInfo::nextDoc(DOCID_T did) {
   if (!dList) return false;
   while (did > id() && nextDoc()) {
   }
