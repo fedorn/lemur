@@ -17,7 +17,7 @@
 
 #include "RetrievalMethod.hpp"
 #include "Document.hpp"
-#include "InvFPIndex.hpp"
+#include "Index.hpp"
 #include "QueryNode.hpp"
 
 //------------------------------------------------------------
@@ -46,7 +46,7 @@ private:
 class StructQueryRep : public QueryRep {
 public:
   /// Parse the text representation into a structured query rep  
-  StructQueryRep(StructQuery &qry, InvFPIndex &dbIndex, 
+  StructQueryRep(StructQuery &qry, Index &dbIndex, 
 		 double dbelief = 0);
 
   virtual ~StructQueryRep() {
@@ -77,8 +77,8 @@ private:
   int topqStack;
   /// default weight.
   double dw;
-  /// Our index. Must be an InvFPIndex.
-  InvFPIndex &ind;
+  /// Our index.
+  Index &ind;
   /// number of docs in collection (reduce calls to docCount.
   int numDocs;
 };

@@ -48,7 +48,7 @@ function <tt>g</tt> of the scores of each child query node in
 
 class StructQueryRetMethod : public RetrievalMethod {
 public:
-  StructQueryRetMethod(InvFPIndex &ind) : RetrievalMethod(ind) {}
+  StructQueryRetMethod(Index &ind) : RetrievalMethod(ind) {}
   virtual ~StructQueryRetMethod() {}
   /// compute the query representation for a text query 
   //(caller responsible for deleting the memory of the generated new instance)
