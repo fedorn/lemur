@@ -43,7 +43,6 @@ based on "leave-one-out".
 #include "Param.hpp"
 #include "IndexManager.hpp"
 #include "BasicDocStream.hpp"
-#include <iostream.h>
 #include "SimpleKLRetMethod.hpp"
 #include "RetParamManager.hpp"
 #include "ResultFile.hpp"
