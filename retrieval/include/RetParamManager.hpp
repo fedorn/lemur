@@ -114,9 +114,9 @@ namespace TFIDFParameter {
     docTFPrm.bm25B = ParamGetDouble("doc.bm25B",defaultDocB);
 
     tfmethod = RetrievalParameter::getLower("query.tfMethod", "bm25");
-    if (tfmethod == "rawtf") qryTFPrm.tf = RAWTF;
-    else if (tfmethod == "logf") qryTFPrm.tf = LOGTF;    
-    else if (tfmethod == "bm25") qryTFPrm.tf = BM25;
+    if ((tfmethod == "rawtf") || (tfmethod == "0")) qryTFPrm.tf = RAWTF;
+    else if ((tfmethod == "logf") || (tfmethod == "1")) qryTFPrm.tf = LOGTF;    
+    else if ((tfmethod == "bm25") || (tfmethod == "2")) qryTFPrm.tf = BM25;
 
     qryTFPrm.bm25K1 = ParamGetDouble("query.bm25K1",defaultQryK1);
     qryTFPrm.bm25B = defaultQryB;
