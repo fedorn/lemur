@@ -17,6 +17,12 @@
 #define show_errors false
 #define short_lc sizeof(short)
 
+#ifndef WIN32
+#define PATH_SEPARATOR '/'
+#else
+#define PATH_SEPARATOR '\\'
+#endif
+
 /*int
   get_buffer_cnt=0,
   replace_buffer_cnt=0,
@@ -93,7 +99,7 @@ static int uncompress_int(unsigned long *i, unsigned char p[])
     if ( (p[j] & 128)!=0 ) {
       *i = *i << 7;
       j++;
-  }
+    }
     else done = true;
   } while ( !done );
   return(j+1);
@@ -572,11 +578,6 @@ static boolean eq_ix_block(struct ix_block *b, struct ix_block *b1)
 /* init_file_name separates the file name and any extension */
 /*   and saves the two parts in the fcb                     */
 
-#ifdef WIN32
-#define PATH_SEPARATOR '\\'
-#else
-#define PATH_SEPARATOR '/'
-#endif
 
 static void init_file_name(struct fcb *f, char id[])
 {int i, name_lc, f_lc, ext_lc = 0;
@@ -656,7 +657,7 @@ static short read_short(struct fcb *f, FILE *file)
   if ( fread(&n,sizeof(short),(size_t)1,file)!=1 ) {
     set_error(f,read_err,"read_short failed\n");
     return(0);
-    }
+  }
   if ( f->byte_swapping_required ) {
     ch = p[1];
     p[1] = p[0];
@@ -1250,8 +1251,8 @@ static int get_index(struct fcb *f, struct leveln_pntr b)
   if ( not_found ) read_page(f,b,&(f->buffer[bufix].b));
   /*  print_ix_block(stdout,&(f->buffer[bufix].b));*/
   if ( f->error_code==no_err ) {
-  index_type = f->buffer[bufix].b.ix.index_type;
-  f->mru_at_level[f->buffer[bufix].b.ix.level][index_type] = b;
+    index_type = f->buffer[bufix].b.ix.index_type;
+    f->mru_at_level[f->buffer[bufix].b.ix.level][index_type] = b;
   }
   else initialize_index_block(&(f->buffer[bufix].b.ix),user_ix,level_zero,&dummy,0);
   return(bufix);
@@ -1280,7 +1281,7 @@ static int find_prefix_lc(struct key *k1, struct key *k2)
   while ( i<max_lc && (k1->text[i]==k2->text[i]) ) i++;
   /*
     print_user_key(k1,"prefix lc of ");
-  print_user_key(k2," and ");
+    print_user_key(k2," and ");
     printf(" is %d\n",i);
   */
   return(i);
@@ -1683,18 +1684,18 @@ static int simple_delete(struct ix_block *b, int ix)
     return(0);
   }
   else {
-  key_sc = keyspace_lc - b->chars_in_use;
-  if ( b->level>0 ) plc = unpackn_ptr(b,ix,&pn);
-  else plc = unpack0_ptr(b,ix,&p0);
-  deleted_lc = b->keys[ix].lc + plc;
-  deleted_sc = b->keys[ix].sc;
-  mvc(b->keys,key_sc,b->keys,key_sc+deleted_lc,deleted_sc-key_sc);
-  b->chars_in_use = b->chars_in_use - deleted_lc;
-  b->keys_in_block--;
-  for (i=ix; i<b->keys_in_block; i++) b->keys[i] = b->keys[i+1];
-  for (i=0; i<b->keys_in_block; i++)
-    if (b->keys[i].sc<deleted_sc )
-      b->keys[i].sc = b->keys[i].sc + deleted_lc;
+    key_sc = keyspace_lc - b->chars_in_use;
+    if ( b->level>0 ) plc = unpackn_ptr(b,ix,&pn);
+    else plc = unpack0_ptr(b,ix,&p0);
+    deleted_lc = b->keys[ix].lc + plc;
+    deleted_sc = b->keys[ix].sc;
+    mvc(b->keys,key_sc,b->keys,key_sc+deleted_lc,deleted_sc-key_sc);
+    b->chars_in_use = b->chars_in_use - deleted_lc;
+    b->keys_in_block--;
+    for (i=ix; i<b->keys_in_block; i++) b->keys[i] = b->keys[i+1];
+    for (i=0; i<b->keys_in_block; i++)
+      if (b->keys[i].sc<deleted_sc )
+        b->keys[i].sc = b->keys[i].sc + deleted_lc;
     return(deleted_lc+key_ptr_lc);
   }
 }
@@ -1861,12 +1862,12 @@ static boolean simple_insert(struct ix_block *b, int ix, struct key *k, levelx_p
   else plc = packn_ptr(b,p.pn);
   entry_lc = k->lc - b->prefix_lc + plc;
   if ( (b->chars_in_use+entry_lc+(b->keys_in_block+1)*key_ptr_lc)<=keyspace_lc ) {
-  b->keys_in_block++;
+    b->keys_in_block++;
     b->chars_in_use = b->chars_in_use + entry_lc;
-  for (i=b->keys_in_block-1; i>ix; i--) b->keys[i] = b->keys[i-1];
-  b->keys[ix].lc = k->lc - b->prefix_lc;
-  b->keys[ix].sc = keyspace_lc - b->chars_in_use;
-  mvc(k->text,b->prefix_lc,b->keys,b->keys[ix].sc,b->keys[ix].lc);
+    for (i=b->keys_in_block-1; i>ix; i--) b->keys[i] = b->keys[i-1];
+    b->keys[ix].lc = k->lc - b->prefix_lc;
+    b->keys[ix].sc = keyspace_lc - b->chars_in_use;
+    mvc(k->text,b->prefix_lc,b->keys,b->keys[ix].sc,b->keys[ix].lc);
   }
   else {
     ok = false;
@@ -2100,12 +2101,12 @@ static boolean prefix_simple_insert(struct ix_block *b, int ix, struct key *k, l
       }
       else ok = simple_insert(b,ix,k,p);
       if ( !ok && show_errors ) printf("**insert at beginning failed in prefix_simple_insert\n");
-      }
-      else {
+    }
+    else {
       ok = simple_insert(b,ix,k,p);
       if ( !ok && show_errors ) printf("**insert mid block failed in prefix_simple_insert\n");
-	}
-      }
+    }
+  }
   return(fits);
 }
 
@@ -2169,7 +2170,7 @@ boolean found=false,propagate; struct leveln_pntr p; struct key k; levelx_pntr p
 	propagate = false;
       }
       if ( propagate && level<f->primary_level[index] ) replace_max_key(f,index,old_key,new_key,p,level+1);
-  }
+    }
   }
 }
 
@@ -2235,7 +2236,7 @@ static boolean replace_max_key_and_pntr(struct fcb *f, int index, struct key *ol
 	propagate = false;
       }
       if ( propagate && level<f->primary_level[index] ) replace_max_key(f,index,old_key,new_key,p,level+1);
-  }
+    }
   }
   return(split);
 }
@@ -2514,7 +2515,7 @@ int *mid_lc_in_out, int *mid_prefix_lc_in_out, int *lt_lc_out, int *lt_prefix_lc
     if ( mid_prefix_lc!=new_mid_prefix_lc ) { 
       prefix_difference = mid_prefix_lc - new_mid_prefix_lc;
       mid_change = -(lc-new_mid_prefix_lc) + prefix_difference * (mid_keys_in_block - lt_cnt + 1) - prefix_difference;
-  }
+    }
     else mid_change = -(lc-new_mid_prefix_lc);
     if ( f->trace ) {
       print_key(mid->index_type,&move_key,"  checked move key=");
@@ -2705,7 +2706,7 @@ static void create_new_primary(struct fcb *f, int index, struct leveln_pntr b, s
 /*   next pointers. It then updates the parent block with a new     */
 /*   pointer for the right block and a new max_key for the left or  */
 /*   creates a new primary, as appropriate.                         */
-/*   If we are inserting at eof (next=null, ix=keys_in_block)    */
+/*   If we are inserting at eof (next=null, ix=keys_in_block)       */
 /*   then sequential inserts are assumed, otherwise random.         */
 /*   Note, however, that we do not use sequential mode for free     */
 /*   space blocks.  This is because freespace management repeatedly */
@@ -2792,7 +2793,7 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, 
       if ( !moved_new_key ) {
         if ( !insert ) simple_delete(old_block,ix);
         if ( !simple_insert(old_block,ix,k,p) && show_errors ) printf("**insert failed in split_block, new is on rt\n");
-  }
+      }
     }
   }
 
@@ -2878,7 +2879,7 @@ struct key old_max_key;
     print_key(index_type,k,""); printf(", ");
   }
 
-  if ( found  ) {
+  if ( found ) {
     insert = false;
     new_lc = ix_pool_lc_after_replace(&(f->buffer[bufix].b.ix),k,&p,ix,&new_prefix_lc,false);
   }
@@ -3077,12 +3078,12 @@ static int kf_put_ptr(struct fcb *f, int index, char t[], int key_lc, struct lev
 
   if ( f->read_only ) f->error_code = read_only_err;
   else {
-  set_up(f,t,key_lc,&k);
-  if ( f->error_code==no_err ) {
-    b = search_index(f,index,level_one,&k);
+    set_up(f,t,key_lc,&k);
+    if ( f->error_code==no_err ) {
+      b = search_index(f,index,level_one,&k);
       px.p0 = p;
       update_index(f,&k,b,px);
-    kf_set_bof(f,index);
+      kf_set_bof(f,index);
     }
   }
   return(f->error_code);
@@ -3093,11 +3094,11 @@ static int kf_delete_ptr(struct fcb *f, int index, char t[], int key_lc)
 
   if ( f->read_only ) f->error_code = read_only_err;
   else {
-  set_up(f,t,key_lc,&k);
-  if (f->error_code==no_err ) {
+    set_up(f,t,key_lc,&k);
+    if (f->error_code==no_err ) {
       index_delete(f,index,k,&p,level_zero);
-    kf_set_bof(f,index);
-  }
+      kf_set_bof(f,index);
+    }
   }
   return(f->error_code);
 }
@@ -3107,30 +3108,30 @@ static int kf_put_rec(struct fcb *f,int index, unsigned char t[], int key_lc, ch
 
   if ( f->read_only ) f->error_code = read_only_err;
   else {
-  kf_get_ptr(f,index,t,key_lc,&p);
-  if (f->error_code==no_err ) {
-    if ( rlc<=long_lc ) { /* new rec goes into pointer */
-      if ( p.lc>long_lc ) deallocate_rec(f,p);
-      have_space = true; p = dummy_ptr; p.lc = rlc;
-    }
-    else { /* new rec goes on disk */
-      if ( p.lc>long_lc && (rec_allocation_lc(rlc)==rec_allocation_lc(p.lc)) ) {
-        have_space = true; p.lc = rlc;
-      }
-      else {
+    kf_get_ptr(f,index,t,key_lc,&p);
+    if (f->error_code==no_err ) {
+      if ( rlc<=long_lc ) { /* new rec goes into pointer */
         if ( p.lc>long_lc ) deallocate_rec(f,p);
-        have_space =  allocate_rec(f,(long)rlc,&p);
+        have_space = true; p = dummy_ptr; p.lc = rlc;
+      }
+      else { /* new rec goes on disk */
+        if ( p.lc>long_lc && (rec_allocation_lc(rlc)==rec_allocation_lc(p.lc)) ) {
+          have_space = true; p.lc = rlc;
+        }
+        else {
+          if ( p.lc>long_lc ) deallocate_rec(f,p);
+          have_space =  allocate_rec(f,(long)rlc,&p);
+        }
       }
     }
-  }
-  else if ( f->error_code==getnokey_err ) {
-    f->error_code = no_err;
-    have_space = allocate_rec(f,(long)rlc,&p);
-  }
-  if ( have_space ) {
-    move_from_rec(f,r,&p); 
-    kf_put_ptr(f,index,t,key_lc,p);
-  }
+    else if ( f->error_code==getnokey_err ) {
+      f->error_code = no_err;
+      have_space = allocate_rec(f,(long)rlc,&p);
+    }
+    if ( have_space ) {
+      move_from_rec(f,r,&p); 
+      kf_put_ptr(f,index,t,key_lc,p);
+    }
   }
   return(f->error_code);
 }
@@ -3140,12 +3141,12 @@ static int kf_delete_rec(struct fcb *f, int index, unsigned char t[], int key_lc
 
   if ( f->read_only ) f->error_code = read_only_err;
   else {
-  set_up(f,t,key_lc,&k);
-  if (f->error_code==no_err ) {
+    set_up(f,t,key_lc,&k);
+    if (f->error_code==no_err ) {
       index_delete(f,index,k,&p,level_zero);
-    if (f->error_code==no_err ) deallocate_rec(f,p);
-    kf_set_bof(f,index);
-  }
+      if (f->error_code==no_err ) deallocate_rec(f,p);
+      kf_set_bof(f,index);
+    }
   }
   return(f->error_code);
 }
@@ -3172,10 +3173,10 @@ static int allocate_block(struct fcb *f, int index_type, int level)
 
   if ( null_pntr(f->first_free_block[level][index_type]) ) {
     if ( extend_file(f,(long)block_allocation_unit*block_lc,&p) ) {
-  bufix = vacate_oldest_buffer(f);
-  f->buffer[bufix].contents = p;
-  f->buffer[bufix].modified = true;
-  hash_chain_insert(f,bufix);
+      bufix = vacate_oldest_buffer(f);
+      f->buffer[bufix].contents = p;
+      f->buffer[bufix].modified = true;
+      hash_chain_insert(f,bufix);
       /* now add any remaining blocks to a free_block chain */
       p1.segment = p.segment;
       p1.block = p.block+1;
@@ -3323,8 +3324,8 @@ static void delete_freespace_entry(struct fcb *f, struct level0_pntr *p0)
       f->error_code = free_dlt_err;
       if ( show_errors )
         printf("**Couldn't delete free_rec entry %d/%lu, err=%d, free_rec_ix=%d\n",p.segment,p.sc,err,free_rec_ix);
-  }
     }
+  }
 }
 
 static boolean allocate_rec(struct fcb *f, long lc, struct level0_pntr *p)
@@ -3491,8 +3492,8 @@ int open_key(struct fcb *f, char id[], int lc, int read_only)
   read_fib(f,id,machine_is_little_endian(),read_only);
   if ( f->error_code!=no_err ) fatal_error(f,badopen_err);
   else {
-  init_key(f,id,lc);
-  kf_set_bof(f,user_ix);
+    init_key(f,id,lc);
+    kf_set_bof(f,user_ix);
     kf_set_bof(f,free_rec_ix);
     kf_set_bof(f,free_lc_ix);
   }

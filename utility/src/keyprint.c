@@ -533,7 +533,7 @@ void print_levels(FILE *list, struct fcb *f)
       f->first_at_level[i][user_ix].segment,f->first_at_level[i][user_ix].block,
       f->last_pntr[i][user_ix].segment,f->last_pntr[i][user_ix].block,
       f->first_free_block[i][user_ix].segment,f->first_free_block[i][user_ix].block);
-    }
+  }
   fprintf(list," lvl frec MRU     frec first   frec last  free_block\n");
   for (i=0; i<=f->primary_level[free_rec_ix]; i++) {
     fprintf(list,"  %2d ",i);
