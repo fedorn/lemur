@@ -10,6 +10,10 @@
 */
 
 #include <cassert>
+#include <cstdio>
+
+using namespace std;
+
 extern "C" { 
 #include "util.h"
 }
@@ -34,6 +38,7 @@ extern "C" {
 
 
 #define MAXLINE 65536
+#define MAXINDEX 1024
 #define MIN(a,b) (a<=b) ? a : b
 #define MAX(a,b) (a<=b) ? b : a
 const int maxDocSize=5000;
@@ -489,11 +494,19 @@ int BasicIndex::indexCollection()
 
   cerr << "Erasing existing index files" << endl;
 
-  sprintf(cmd, "echo \"/bin/rm %s.%s.*\"", 
-	  (const char *) prefix, wordIndexSuffix);
-  system(cmd);
-  sprintf(cmd, "/bin/rm %s.%s.*", (const char *) prefix, wordIndexSuffix);
-  system(cmd);
+  // We'll just check up to some preset max, since
+  // we currently don't know how to use regexps in a
+  // way that works for both Windows and Unix
+
+  int erased=0;
+  for (int i=0; i<MAXINDEX; ++i) {
+    sprintf(name, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, i);
+    if (remove(name)>=0) {
+      cerr << "\tErased " << name << endl;
+      erased++;
+    }
+  }
+  cerr << "A total of " << erased << " files were removed." << endl;
 
   avgDocumentLength = 0;
   maxDocumentLength = 0;
@@ -778,11 +791,9 @@ void BasicIndex::mergeIndexFiles()
       if (!(fileExist(fname1))) break;
       //      else if (!qfilef(fname2)) {
       else if (!fileExist(fname2)) {
-      
 	sprintf(tmpnam1, "%s.%s.%d", 
 		(const char *) prefix, wordIndexSuffix, i/2);
-	sprintf(cmd, "/bin/mv %s %s", fname1, tmpnam1);
-	system(cmd);
+	assert(rename(fname1, tmpnam1) == 0);
       }
       else {
 	sprintf(tmpnam1, "%s.%s.tmp.%d.%d", 
@@ -790,19 +801,17 @@ void BasicIndex::mergeIndexFiles()
 	sprintf(tmpnam2, "%s.%s.%d", 
 		(const char *) prefix, wordIndexSuffix, i/2);
 	mergePair(fname1, fname2, tmpnam1);
-	sprintf(cmd, "/bin/rm %s %s", fname1, fname2);
-	system(cmd);
-	sprintf(cmd, "/bin/mv %s %s", tmpnam1, tmpnam2);
-	system(cmd);
+	assert(remove(fname1)==0);
+	assert(remove(fname2)==0);
+	assert (rename(tmpnam1, tmpnam2) == 0);
       }
     }
   }
 
   sprintf(fname1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, 0);
   sprintf(tmpnam1, "%s.%s", (const char *) prefix, wordIndexSuffix);
-  sprintf(cmd, "/bin/mv %s %s", fname1, tmpnam1);
+  assert(rename(fname1, tmpnam1)==0);
   wordIndexFile = tmpnam1;
-  system(cmd);
 
   headWordIndex();
 }
