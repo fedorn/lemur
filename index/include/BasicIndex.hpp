@@ -85,7 +85,8 @@ public:
   virtual int termCount (int termID) const { return countOfTerm[termID] ;}
 
   /// Total counts of all terms in collection
-  virtual int termCount () const {return (int)avgDocumentLength*(docids.size()-1) ;}
+  //  virtual int termCount () const {return (int)avgDocumentLength*(docids.size()-1) ;}
+  virtual int termCount () const {return numWords ;}
   // XXX Better to have an exact count!
 
   /// Average document length 
