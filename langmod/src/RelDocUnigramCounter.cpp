@@ -40,7 +40,7 @@ void RelDocUnigramCounter::countRelDocUnigram(int docID, double weight)
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
-    incCount(info->id(), weight*((double)info->count()/dlength));
+    incCount(info->termID(), weight*((double)info->count()/dlength));
   }
   delete tList;
 }

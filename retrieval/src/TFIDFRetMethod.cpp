@@ -108,7 +108,7 @@ void TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, const DocIDSet &relDo
       TermInfo *info = tList->nextEntry();
       TFIDFDocRep *dr;
       dr = dynamic_cast<TFIDFDocRep *>(computeDocRep(docID));
-      centroidVector[info->id()] += dr->docTFWeight(info->count());
+      centroidVector[info->termID()] += dr->docTFWeight(info->count());
       delete dr;
     }
     delete tList;

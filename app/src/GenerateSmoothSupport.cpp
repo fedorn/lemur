@@ -107,10 +107,10 @@ int AppMain(int argc, char *argv[]) {
     while (tList->hasMore()) {
       TermInfo *info = tList->nextEntry();
 
-      wdPr[info->id()] += info->count()/(double)ind->docLength(i);
+      wdPr[info->termID()] += info->count()/(double)ind->docLength(i);
       // compute Markov chain support
 
-      prSum += ind->termCount(info->id());
+      prSum += ind->termCount(info->termID());
 	
 
       // cout << i << "\t" <<  ind->termCount(info->id()) << "\t" << ind->term(info->id()) << endl;

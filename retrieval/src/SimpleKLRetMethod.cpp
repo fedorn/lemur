@@ -457,8 +457,8 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep,
     tList->startIteration();
     while (tList->hasMore()) {
       info = tList->nextEntry();
-      ct[info->id()] += log(dm->seenProb(info->count(), info->id())/
-			    (dm->unseenCoeff()*collectLM->prob(info->id())));
+      ct[info->termID()] += log(dm->seenProb(info->count(), info->termID())/
+			    (dm->unseenCoeff()*collectLM->prob(info->termID())));
     }
     delete tList;
     delete dm;
@@ -649,9 +649,9 @@ void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep,
 	  while (tList->hasMore()) {
 	  t = tList->nextEntry();
 	  termProb prob;
-	  prob.id = t->id();
+	  prob.id = t->termID();
 	  prob.prob = expWeight*t->count()/dlength+
-	    (1-expWeight)*ind.termCount(t->id())/termCount;
+	    (1-expWeight)*ind.termCount(t->termID())/termCount;
 	  pList->push_back(prob);
 	  }
 	  delete(tList);

@@ -62,7 +62,7 @@ void InQueryRetMethod::updateStructQuery(StructQueryRep &qryRep,
     tList->startIteration();
     while (tList->hasMore()) {
       TermInfo *info = tList->nextEntry();
-      int tid = info->id();
+      int tid = info->termID();
       double dtf = (double)info->count();
       if (idfV != NULL)
 	expandTerms[tid] += fbCoeff * (dr->beliefScore(dtf, idfV[tid]));

@@ -83,7 +83,7 @@ int AppMain(int argc, char *argv[]) {
     double norm = 0, tmp;
     while (qList->hasMore()) {
       qInfo = qList->nextEntry();
-      idx = qInfo->id();
+      idx = qInfo->termID();
       dtf = qInfo->count();
       tmp = dtf * idfV[idx];
       norm += tmp * tmp;

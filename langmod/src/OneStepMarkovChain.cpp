@@ -83,7 +83,7 @@ void OneStepMarkovChain::computeFromWordProb(int toWord) const
     while (tList->hasMore()) {
       tinfo = tList->nextEntry();
       // accumulate p(q_i|d)*p(w|d)
-      fromWordPr[tinfo->id()] += p_qi_given_d * tinfo->count()/dLength;
+      fromWordPr[tinfo->termID()] += p_qi_given_d * tinfo->count()/dLength;
     }
     delete tList;
   }

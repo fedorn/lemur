@@ -61,7 +61,7 @@ void DocUnigramCounter::countDocUnigram(int docID, double weight)
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
-    incCount(info->id(), weight*info->count());
+    incCount(info->termID(), weight*info->count());
   }
   delete tList;
 }

@@ -82,7 +82,7 @@ int AppMain(int argc, char *argv[]) {
       while (tList->hasMore()) {
 	TermInfo *info = tList->nextEntry();
 	double fq = info->count();
-	int id = info->id();
+	int id = info->termID();
 	double colPr = (ind->termCount(id)+1)
 	  /(double)(ind->termCountUnique()+ind->termCount());
 	double tmp1 = fq-1+mu*colPr;

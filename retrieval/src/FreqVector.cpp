@@ -20,7 +20,7 @@ HashFreqVector::HashFreqVector(const Index &index, int docID)
   while (tList->hasMore()) {
     info = tList->nextEntry();
     static FreqCount ct;
-    ct.key = info->id();
+    ct.key = info->termID();
     add(ct, info->count());
   }
   delete tList;

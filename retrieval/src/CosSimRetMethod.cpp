@@ -54,7 +54,7 @@ CosSimQueryRep::CosSimQueryRep(int docId, const Index &dbIndex,
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
-    id = info->id();
+    id = info->termID();
     cnt = info->count();
     tmpval = cnt * idf[id];
     setCount(id, tmpval);
@@ -142,7 +142,7 @@ double CosSimRetMethod::docNorm(int docID) {
     double norm = 0, tmp;
     while (qList->hasMore()) {
       qInfo = qList->nextEntry();
-      idx = qInfo->id();
+      idx = qInfo->termID();
       dtf = qInfo->count();
       tmp = dtf * idfV[idx];
       norm += tmp * tmp;
@@ -179,7 +179,7 @@ void CosSimRetMethod::updateTextQuery(TextQueryRep &qryRep,
     tList->startIteration();
     while (tList->hasMore()) {
       TermInfo *info = tList->nextEntry();
-      centroidVector[info->id()] += info->count(); // raw TF
+      centroidVector[info->termID()] += info->count(); // raw TF
     }
     delete tList;
   }

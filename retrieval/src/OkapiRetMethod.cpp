@@ -83,7 +83,7 @@ void OkapiRetMethod::updateTextQuery(TextQueryRep &origRep, const DocIDSet &relD
     tList->startIteration();
     while (tList->hasMore()) {
       TermInfo *info = tList->nextEntry();
-      relCounts[info->id()]++;
+      relCounts[info->termID()]++;
     }
     delete tList;
   }
