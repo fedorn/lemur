@@ -87,7 +87,7 @@ cp posparam/*_param .
 
 # Construct a query model using the collection mixture method based on 
 # previously retrieved result file "res.simple_kl_dir", store the expanded
-# query in query.mixfb_kl.
+# query in query_mixfb_kl.
 ../app/obj/GenerateQueryModel mixfb_model_param
 
 # Then evaluate it with Dirichlet smoothing
@@ -124,7 +124,32 @@ awk '{print $1, $3, $5;}'  < res.simple_tfidf > res_simple_tfidf
 ######################################################################
 
 # This performs relevance feedback using the mixture model approach
+# You can use any other retrieval methods
 ../app/obj/RelFBEval mixrelfb_kl_dir_param
 ../app/src/ireval.pl -j qrel -trec  < res.mixrelfb_kl_dir > pr.mixrelfb_kl_dir
+
+
+
+######################################################################
+#								     #
+# The following examples show how one can do iterative feedback      #
+# with the KL-divergence model. Basically, GenerateQueryModel allows #
+# you to expand any previously saved query model; the newly          #
+# expanded query is saved in a (different) file                      #
+#                                                                    #
+######################################################################
+
+# We do relevance feedback to expand the saved query from pseudo feedback 
+# The saved query is generated using GenerateQueryModel with parameter file mixfb_model_param, see above
+# The new expanded query is saved in "query_it"
+../app/obj/GenerateQueryModel mixrelfb_it_param
+
+# Then use the expanded query "query_it" to retrieve documents 
+../app/obj/QueryModelEval mixrelfb_it_eval_param
+../app/src/ireval.pl -j qrel -trec < res.mixrelfb_it > pr.mixrelfb_it
+
+
+
+
 
 
