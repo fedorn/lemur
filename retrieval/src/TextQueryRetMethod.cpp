@@ -11,7 +11,22 @@
 /** czhai */
 
 #include "TextQueryRetMethod.hpp"
+#include "RetParamManager.hpp"
 #include "BasicDocInfoList.hpp"
+
+TextQueryRetMethod::TextQueryRetMethod(Index &ind, 
+				       ScoreAccumulator & accumulator)  : 
+  RetrievalMethod(ind), scAcc(accumulator) {
+  // have to fix this to be passed in.
+  RetrievalParameter::get();
+  cacheDocReps = RetrievalParameter::cacheDocReps;
+  
+  if (cacheDocReps) {
+    docRepsSize = ind.docCount() + 1;
+    docReps = new DocumentRep *[docRepsSize];
+    for (int i = 0; i <= ind.docCount(); i++) docReps[i] = NULL;
+  }
+}
 
 void TextQueryRetMethod::scoreCollection(int docID, 
 					 IndexedRealVector &results){
@@ -19,7 +34,7 @@ void TextQueryRetMethod::scoreCollection(int docID,
   scoreCollection(*rep, results);
   delete(rep);
 }
-
+//fix this to pass scoreAll down.
 void TextQueryRetMethod::scoreCollection(QueryRep &qry, 
 					 IndexedRealVector &results) {
   scoreInvertedIndex(qry, results);
