@@ -32,6 +32,8 @@ public:
 /// Abstract query representation
 
 class QueryRep {
+public:
+  virtual ~QueryRep(){}
 };
 
 
