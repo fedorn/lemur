@@ -344,16 +344,17 @@ int AppMain(int argc, char *argv[]) {
       model->scoreCollection(*qr, results);
     }
     results.Sort();
+    // prune to number of feedback docs.
+    if (RetrievalParameter::fbDocCount > 0 &&
+	results.size() > RetrievalParameter::fbDocCount)
+      results.erase(results.begin() + RetrievalParameter::fbDocCount, 
+		    results.end());
     if (doingRelModel) {
       if (SimpleKLParameter::qryPrm.adjScoreMethod != 
 	  SimpleKLParameter::QUERYLIKELIHOOD) {
 	throw Exception("RetEval:FB", 
 			"Relevance models require query likelihood scores.");
       }
-      // prune to number of feedback docs.
-      if (results.size() > RetrievalParameter::fbDocCount)
-	results.erase(results.begin() + RetrievalParameter::fbDocCount,
-		      results.end());
       ignoreWeights = false;
       results.LogToPosterior();
     }
