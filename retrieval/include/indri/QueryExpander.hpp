@@ -34,7 +34,7 @@ public:
 
 class QueryExpander {
 private:
-  std::map<std::string, int> _cf_cache;
+  std::map<std::string, UINT64> _cf_cache;
   
 protected:
   QueryEnvironment * _env;
@@ -43,7 +43,10 @@ protected:
   std::vector<DocumentVector*> getDocumentVectors( std::vector<ScoredExtentResult>& results, int rmDocs );
   std::vector<std::string> * getVocabulary( std::vector<ScoredExtentResult>& results, int rmDocs );
   std::vector<std::string> * getVocabulary( std::vector<DocumentVector*>& docVectors );
-  int getCF( std::string term );
+  std::string buildQuery( const std::string& originalQuery, double originalWeight,
+                          const std::vector< std::pair<std::string, double> >& expansionTerms,
+                          int termCount );
+  UINT64 getCF( const std::string& term );
   
 public:
   QueryExpander( QueryEnvironment * env , Parameters& param );

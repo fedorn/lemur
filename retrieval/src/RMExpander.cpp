@@ -20,10 +20,6 @@
 #include <stdio.h>
 #include <sstream>
 
-#ifdef WIN32
-#define snprintf _snprintf
-#endif
-
 RMExpander::RMExpander( QueryEnvironment * env , Parameters& param ) : QueryExpander( env, param ) { }
 
 std::string RMExpander::expand( std::string originalQuery , std::vector<ScoredExtentResult>& results ) {
@@ -34,8 +30,8 @@ std::string RMExpander::expand( std::string originalQuery , std::vector<ScoredEx
 
   std::vector<DocumentVector*> docVectors = getDocumentVectors( results, fbDocs );
   std::vector<std::string> * rm_vocab = getVocabulary( docVectors );
-  int vocabSize = rm_vocab->size();
-  int colLen = _env->termCount();
+  size_t vocabSize = rm_vocab->size();
+  UINT64 colLen = _env->termCount();
 
   std::map<std::string, double> query_model;
   std::vector< std::pair<std::string, double> > probs;
@@ -49,7 +45,7 @@ std::string RMExpander::expand( std::string originalQuery , std::vector<ScoredEx
     std::vector<int> term_positions = docVec->positions();
     std::vector<std::string> term_list = docVec->stems();
 
-    int docLen = term_positions.size();
+    size_t docLen = term_positions.size();
 
     // add in "seen" proportion of term probability
     std::vector<int>::iterator pos_iter;
@@ -60,7 +56,7 @@ std::string RMExpander::expand( std::string originalQuery , std::vector<ScoredEx
     if( mu != 0.0 ) {
       std::vector<std::string>::iterator vocab_iter;
       for( vocab_iter = rm_vocab->begin() ; vocab_iter != rm_vocab->end() ; ++vocab_iter )
-        query_model[ *vocab_iter ] += ( 1.0 / fbDocs ) * exp( results[ doc ].score ) * ( mu * getCF( *vocab_iter ) ) / ( docLen + mu );
+        query_model[ *vocab_iter ] += ( 1.0 / fbDocs ) * exp( results[ doc ].score ) * ( mu * double( getCF( *vocab_iter ) )/double(colLen) ) / ( docLen + mu );
     }
     
     delete docVec;
@@ -72,39 +68,8 @@ std::string RMExpander::expand( std::string originalQuery , std::vector<ScoredEx
     probs.push_back( std::pair<std::string, double>( *vocab_iter , query_model[ *vocab_iter ] ) );    
 
   std::sort( probs.begin() , probs.end() , QueryExpanderSort() );
-
-  std::stringstream ret;
-  
-  ret.setf( std::ios_base::fixed );
-  ret.precision( 32 );
-
-  ret << "#weight( " 
-      << fbOrigWt
-      << " "
-      << originalQuery
-      << " "
-      << (1.0 - fbOrigWt)
-      << " #weight( ";
-
-  // extract top fbTerms and construct a new query
-  std::vector< std::pair<std::string, double> >::iterator query_model_iter;
-  int num_added = 0;
-  for( query_model_iter = probs.begin() ; query_model_iter != probs.end() && num_added < fbTerms; ++query_model_iter ) {
-    std::string term = query_model_iter->first;
-    // skip out of vocabulary term and those terms assigned 0 probability in the query model
-    if( term != "[OOV]" && query_model_iter->second != 0.0 ) {
-      ret << " " 
-          << query_model_iter->second
-          << " \""
-          << term
-          << "\" ";
-      num_added++;
-    }
-  }
-
-  ret << " ) ) ";
-
   delete rm_vocab;
-  return ret.str();
+
+  return buildQuery( originalQuery, fbOrigWt, probs, fbTerms );
 }
 

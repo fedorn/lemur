@@ -81,8 +81,8 @@ std::vector<std::string> * QueryExpander::getVocabulary( std::vector<DocumentVec
   return vocab;
 }
 
-int QueryExpander::getCF( std::string term ) {
-  int cf = _cf_cache[ term ];
+UINT64 QueryExpander::getCF( const std::string& term ) {
+  UINT64 cf = _cf_cache[ term ];
 
   if( cf == 0 ) {
     cf = _env->stemCount( term );
@@ -91,5 +91,45 @@ int QueryExpander::getCF( std::string term ) {
   }
 
   return cf;
+}
+
+std::string QueryExpander::buildQuery( const std::string& originalQuery, double originalWeight,
+                                       const std::vector< std::pair<std::string, double> >& expandedTerms,
+                                       int termCount ) {
+  std::stringstream ret;
+
+  ret.setf( std::ios_base::fixed );
+  ret.precision( 32 );
+
+  ret << "#weight( " 
+      << originalWeight
+      << " #combine( "
+      << originalQuery
+      << " ) "
+      << (1.0 - originalWeight)
+      << " #weight( ";
+
+  // extract top fbTerms and construct a new query
+  std::vector< std::pair<std::string, double> >::const_iterator iter;
+  int num_added = 0;
+
+  for( iter = expandedTerms.begin();
+       iter != expandedTerms.end() && num_added < termCount;
+       ++iter ) {
+    std::string term = iter->first;
+    // skip out of vocabulary term and those terms assigned 0 probability in the query model
+    if( term != "[OOV]" && iter->second != 0.0 ) {
+      ret << " " 
+          << iter->second
+          << " \""
+          << term
+          << "\" ";
+      num_added++;
+    }
+  }
+
+  ret << " ) ) ";
+
+  return ret.str();
 }
 
