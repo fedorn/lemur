@@ -226,7 +226,7 @@ bool KeyfileIncIndex::open(const string &indexName){
     setMesgStream(&cerr);
   }
 
-  counts = new int[5]; // should not be here.
+  counts = new COUNT_T[5]; // should not be here.
   *msgstream << "Trying to open toc: " << indexName << endl;
   if (! ParamPushFile(indexName)) {
     *msgstream << "Couldn't open toc file for reading" << endl;
@@ -256,7 +256,7 @@ bool KeyfileIncIndex::open(const string &indexName){
   *msgstream << "Load index complete." << endl;
   return true;
 }
-int KeyfileIncIndex::term(const string &inWord) const{
+TERMID_T KeyfileIncIndex::term(const TERM_T &inWord) const{
   const char* word = inWord.c_str();
 
   if (inWord.length() > (MAX_TERM_LENGTH - 1)) {
@@ -264,7 +264,7 @@ int KeyfileIncIndex::term(const string &inWord) const{
     return 0;
   }
 
-  int id = _cache.find( word );
+  TERMID_T id = _cache.find( word );
 
   if( id <= 0 ) {
     int actual = 0;
@@ -278,18 +278,18 @@ int KeyfileIncIndex::term(const string &inWord) const{
   return id;
 }
 
-const string KeyfileIncIndex::term(int termID)  const{
+const TERM_T KeyfileIncIndex::term(TERMID_T termID)  const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS]))
-    return NULL;
+    return "";
   int actual = 0;
   tSTRs.get( termID, this->termKey, actual, sizeof this->termKey );
   termKey[actual] = 0;
   return this->termKey;
 }
 
-int KeyfileIncIndex::document(const string &docID) const{
+DOCID_T KeyfileIncIndex::document(const EXDOCID_T &docID) const{
   int actual = 0;
-  int documentID = 0;
+  DOCID_T documentID = 0;
 
   const char *did = docID.c_str();
 
@@ -310,16 +310,16 @@ int KeyfileIncIndex::document(const string &docID) const{
   return documentID;
 }
 
-const string KeyfileIncIndex::document(int docID) const{
+const EXDOCID_T KeyfileIncIndex::document(DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS]))
-    return NULL;
+    return "";
   int actual = 0;
   dSTRs.get( docID, this->docKey, actual, sizeof this->docKey );
   this->docKey[actual] = 0;
   return this->docKey;
 }
 
-const DocumentManager * KeyfileIncIndex::docManager(int docID) const{
+const DocumentManager * KeyfileIncIndex::docManager(DOCID_T docID) const{
   if ((docID <= 0) || (docID > counts[DOCS]))
     return NULL;
   record r = fetchDocumentRecord( docID );
@@ -331,7 +331,7 @@ const DocumentManager * KeyfileIncIndex::docManager(int docID) const{
   return docMgrs[docManagerID]; 
 }
 
-int KeyfileIncIndex::termCount(int termID) const {
+COUNT_T KeyfileIncIndex::termCount(TERMID_T termID) const {
   if ((termID <= 0) || (termID > counts[UNIQUE_TERMS]))
     return 0;
 
@@ -351,7 +351,7 @@ float KeyfileIncIndex::docLengthAvg() const{
   return aveDocLen;
 }
 
-int KeyfileIncIndex::docCount(int termID) const {
+COUNT_T KeyfileIncIndex::docCount(TERMID_T termID) const {
   if ((termID <= 0) || (termID > counts[UNIQUE_TERMS]))
     return 0;
 
@@ -367,7 +367,7 @@ int KeyfileIncIndex::docCount(int termID) const {
   }
 }
 
-int KeyfileIncIndex::docLength(int docID) const {
+COUNT_T KeyfileIncIndex::docLength(DOCID_T docID) const {
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return 0;
   }
@@ -376,7 +376,7 @@ int KeyfileIncIndex::docLength(int docID) const {
   return r.len;
 }
 
-int KeyfileIncIndex::totaldocLength(int docID) const {
+COUNT_T KeyfileIncIndex::totaldocLength(DOCID_T docID) const {
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return 0;
   }
@@ -384,7 +384,7 @@ int KeyfileIncIndex::totaldocLength(int docID) const {
   return r.totalLen;
 }
 
-int KeyfileIncIndex::docLengthCounted(int docID) const {
+COUNT_T KeyfileIncIndex::docLengthCounted(DOCID_T docID) const {
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return 0;
   }
@@ -392,12 +392,12 @@ int KeyfileIncIndex::docLengthCounted(int docID) const {
   // if this fails for whatever reason
   if (!tl)
     return 0;
-  int count = tl->termCount();
+  COUNT_T count = tl->termCount();
   delete tl;
   return count;
 }
 
-InvFPDocList* KeyfileIncIndex::internalDocInfoList(int termID) const{
+InvFPDocList* KeyfileIncIndex::internalDocInfoList(TERMID_T termID) const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS]) ) {
     *msgstream << "Error:  Trying to get docInfoList for invalid termID" 
 	       << endl;
@@ -429,9 +429,9 @@ InvFPDocList* KeyfileIncIndex::internalDocInfoList(int termID) const{
       segment->read( buffer, termData.segments[i].length );
 
       if( !total ) {
-        total = new InvFPDocList( (int*) buffer );
+        total = new InvFPDocList( (LOC_T*) buffer );
       } else {
-        InvFPDocList* segmentList = new InvFPDocList( (int*) buffer );
+        InvFPDocList* segmentList = new InvFPDocList( (LOC_T*) buffer );
         total->append( segmentList );
         delete segmentList;
       }
@@ -450,7 +450,7 @@ InvFPDocList* KeyfileIncIndex::internalDocInfoList(int termID) const{
   }
 }
 
-DocInfoList* KeyfileIncIndex::docInfoList(int termID) const{
+DocInfoList* KeyfileIncIndex::docInfoList(TERMID_T termID) const{
   if ((termID <= 0) || (termID > counts[UNIQUE_TERMS]) ) {
     return NULL;
   }
@@ -465,7 +465,7 @@ DocInfoList* KeyfileIncIndex::docInfoList(int termID) const{
   return result;
 }
 
-TermInfoList* KeyfileIncIndex::termInfoList(int docID) const{
+TermInfoList* KeyfileIncIndex::termInfoList(DOCID_T docID) const{
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return NULL;
   }
@@ -475,7 +475,7 @@ TermInfoList* KeyfileIncIndex::termInfoList(int docID) const{
   return tlist;
 }
 
-TermInfoList* KeyfileIncIndex::termInfoListSeq(int docID) const{
+TermInfoList* KeyfileIncIndex::termInfoListSeq(DOCID_T docID) const{
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return NULL;
   }
@@ -555,7 +555,7 @@ bool KeyfileIncIndex::beginDoc(const DocumentProps* dp){
   if (dp == NULL)
     return false;
   const char *did = dp->stringID();
-  int docID = document(did);
+  DOCID_T docID = document(did);
   if (docID > 0) {
     //already have seen this document's id.
     cerr << "KeyfileIncIndex::beginDoc: duplicate document id " << did 
@@ -575,12 +575,12 @@ bool KeyfileIncIndex::beginDoc(const DocumentProps* dp){
     cerr << "truncating to " << docKey << endl;
   }
   counts[DOCS]++;
-  int documentID = counts[DOCS];
+  DOCID_T documentID = counts[DOCS];
   addDocumentLookup( documentID, did);
   return true;
 }
 
-void KeyfileIncIndex::_updateTermlist( InvFPDocList* curlist, int position ) {
+void KeyfileIncIndex::_updateTermlist( InvFPDocList* curlist, LOC_T position ) {
   LocatedTerm lt;
   lt.loc = position;
   lt.term = curlist->termID();
@@ -588,7 +588,7 @@ void KeyfileIncIndex::_updateTermlist( InvFPDocList* curlist, int position ) {
   listlengths++;
 }
 
-void KeyfileIncIndex::addKnownTerm( int termID, int position ) {
+void KeyfileIncIndex::addKnownTerm( TERMID_T termID, LOC_T position ) {
   InvFPDocList* curlist;
 
   curlist = invertlists[termID - 1];
@@ -602,10 +602,10 @@ void KeyfileIncIndex::addKnownTerm( int termID, int position ) {
   _updateTermlist( curlist, position );
 }
 
-int KeyfileIncIndex::addUnknownTerm( const InvFPTerm* term ) {
+TERMID_T KeyfileIncIndex::addUnknownTerm( const InvFPTerm* term ) {
   // update unique word counter
   counts[UNIQUE_TERMS]++;
-  int termID = counts[UNIQUE_TERMS];
+  TERMID_T termID = counts[UNIQUE_TERMS];
 
   InvFPDocList* curlist = new InvFPDocList(termID, term->strLength());
   invertlists.push_back( curlist );  // term is added at index termID-1
@@ -617,8 +617,8 @@ int KeyfileIncIndex::addUnknownTerm( const InvFPTerm* term ) {
   return termID;
 }
 
-int KeyfileIncIndex::addUncachedTerm( const InvFPTerm* term ) {
-  int tid;
+TERMID_T KeyfileIncIndex::addUncachedTerm( const InvFPTerm* term ) {
+  TERMID_T tid;
   int actual = 0;
     
   if( tIDs.get( term->spelling(), &tid, actual, sizeof tid ) ) {
@@ -644,7 +644,7 @@ bool KeyfileIncIndex::addTerm(const Term& t){
     return false;
   }
 
-  int id = _cache.find( term->spelling() );
+  TERMID_T id = _cache.find( term->spelling() );
 
   if( id > 0 ) {
     addKnownTerm( id, term->position() );
@@ -784,8 +784,8 @@ void KeyfileIncIndex::writeCacheSegment() {
     InvFPDocList* list = invertlists[i];
   
     if( list != NULL ) {
-      int vecLen;
-      std::auto_ptr<int> byteVec( list->byteVec(vecLen) );
+      COUNT_T vecLen;
+      std::auto_ptr<LOC_T> byteVec( list->byteVec(vecLen) );
 
       TermData termData;
 
@@ -895,7 +895,7 @@ void KeyfileIncIndex::mergeCacheSegments() {
     // find the minimum term id
     KeyfileDocListSegmentReader* reader = readers.top();
     InvFPDocList* list = reader->top();
-    int termID = list->termID();
+    TERMID_T termID = list->termID();
 
     reader->pop();
     // reindex the reader
@@ -934,8 +934,8 @@ void KeyfileIncIndex::mergeCacheSegments() {
     termData.documentCount = list->docFreq();
 
     // now the list is complete, so write it out
-    int listLength;
-    int* listBuffer = list->byteVec( listLength );
+    COUNT_T listLength;
+    LOC_T* listBuffer = list->byteVec( listLength );
     File::offset_type offset = out.tellp();
     out.write( (char*) listBuffer, listLength );
     delete[](listBuffer);
@@ -1031,7 +1031,7 @@ void KeyfileIncIndex::doendDoc(const DocumentProps* dp, int mgrid){
       rec.totalLen = 0;
     }
     
-    int docID = counts[DOCS];
+    DOCID_T docID = counts[DOCS];
 
     dtlookup.write( (char*) &rec, sizeof rec );
 
@@ -1066,7 +1066,7 @@ void KeyfileIncIndex::doendDoc(const DocumentProps* dp, int mgrid){
 //
 // ----------------------------------------------------------------------------------
 
-KeyfileIncIndex::record KeyfileIncIndex::fetchDocumentRecord(int key) const {
+KeyfileIncIndex::record KeyfileIncIndex::fetchDocumentRecord(TERMID_T key) const {
   if (key == 0)
     return record();
 
@@ -1078,18 +1078,18 @@ KeyfileIncIndex::record KeyfileIncIndex::fetchDocumentRecord(int key) const {
   return rec;
 }
 
-void KeyfileIncIndex::addDocumentLookup( int documentKey, 
+void KeyfileIncIndex::addDocumentLookup( DOCID_T documentKey, 
 					 const char* documentName ) {
   addGeneralLookup( dSTRs, dIDs, documentKey, documentName );
 }
 
-void KeyfileIncIndex::addTermLookup( int termKey, const char* termSpelling ) {
+void KeyfileIncIndex::addTermLookup( TERMID_T termKey, const char* termSpelling ) {
   addGeneralLookup( tSTRs, tIDs, termKey, termSpelling );
 }
 
 void KeyfileIncIndex::addGeneralLookup( Keyfile& numberNameIndex, 
 					Keyfile& nameNumberIndex, 
-					int number, const char* name ) {
+					TERMID_T number, const char* name ) {
   numberNameIndex.put( number, (void*) name, strlen(name) );
   nameNumberIndex.put( name, &number, sizeof number );
 }
