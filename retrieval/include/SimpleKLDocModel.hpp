@@ -20,7 +20,7 @@
 
 /// Simple KL divergence retrieval model parameters
 namespace SimpleKLParameter {
-  enum SmoothMethod  {JELINEKMERCER=0, DIRICHLETPRIOR=1, ABSOLUTEDISCOUNT=2};
+  enum SmoothMethod  {JELINEKMERCER=0, DIRICHLETPRIOR=1, ABSOLUTEDISCOUNT=2, TWOSTAGE=3};
  
   enum SmoothStrategy  {INTERPOLATE=0, BACKOFF=1};
 
@@ -46,6 +46,9 @@ namespace SimpleKLParameter {
   static double defaultDirPrior = 1000;
 
   struct QueryModelParam {
+    /// query noise coefficient
+    double qryNoise;
+
     /// query model re-estimation/updating method
     enum QueryUpdateMethod fbMethod;
     /// Q_new = (1-fbCoeff)*Q_old + fbCoeff*FBModel
@@ -69,7 +72,7 @@ namespace SimpleKLParameter {
   static double defaultFBPrSumTh = 1;
   static double defaultFBMixNoise = 0.5;
   static int defaultEMIterations = 50;
-
+  static double defaultQryNoise = 0; //maximum likelihood estimator
 };
 
 
@@ -275,6 +278,62 @@ private:
   SimpleKLParameter::SmoothStrategy strategy;
 };
 
+
+
+/// Two stage smoothing : JM + DirichletPrior
+// alpha = (mu+lambda*dLength)/(dLength+mu)
+// pseen(w) = [(1-lambda)*c(w;d)+ (mu+lambda*dLength)*Pc(w)]/(dLength + mu)
+class TwoStageDocModel : public SimpleKLDocModel {
+public:
+  TwoStageDocModel(int docID,
+		   Index *referenceIndex, 
+		   UnigramLM &collectLM,
+		   double *docProbMass,
+		   double firstStageMu, 
+		   double secondStageLambda, 
+		SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
+    SimpleKLDocModel(docID, collectLM),
+    refIndex(referenceIndex),
+    docPrMass(docProbMass),
+    mu(firstStageMu),
+    lambda(secondStageLambda),
+      strategy(smthStrategy) {
+  };
+
+  virtual ~TwoStageDocModel() {};
+
+  virtual double unseenCoeff() {
+
+    if (strategy == SimpleKLParameter::INTERPOLATE) {
+      return (mu+lambda*refIndex->docLength(id))/(mu+refIndex->docLength(id));
+    } else if (strategy == SimpleKLParameter::BACKOFF) {
+      return ((mu+lambda*refIndex->docLength(id))
+	      /((mu+refIndex->docLength(id))*
+		(1-docPrMass[id])));
+    } else {
+            throw Exception("TwoStageDocModel", "Unknown smoothing strategy");
+    }
+  }
+
+  virtual double seenProb(double termFreq, int termID) {
+    if (strategy == SimpleKLParameter::INTERPOLATE) {      
+      return ((1-lambda)*(termFreq+mu*refLM.prob(termID))/
+	      (double)(refIndex->docLength(id)+mu) 
+	      + lambda*refLM.prob(termID));
+    } else if (strategy == SimpleKLParameter::BACKOFF) {
+      return (termFreq*(1-lambda)/
+	      (double)(refIndex->docLength(id)+mu));
+    } else {
+            throw Exception("TwoStageDocModel", "Unknown smoothing strategy");
+    }
+  }
+private:
+  Index *refIndex;
+  double *docPrMass;
+  double mu;
+  double lambda;
+  SimpleKLParameter::SmoothStrategy strategy;
+};
 
 #endif /* _SIMPLEKLDOCMODEL_HPP */
 
