@@ -11,7 +11,7 @@
 
 
 #include "RetrievalEngine.hpp"
-
+#include "BasicDocInfoList.hpp"
 
 RetrievalEngine::RetrievalEngine(RetrievalMethod &retMethod): method(retMethod) , ind(retMethod.index()){
   
@@ -26,10 +26,14 @@ RetrievalEngine::RetrievalEngine(RetrievalMethod &retMethod): method(retMethod) 
 
 }
 
-void RetrievalEngine::retrieve(TextQuery &qry, IndexedRealVector *&results)
+void RetrievalEngine::retrieve(TextQuery &qry, IndexedRealVector *&results, bool rankAll)
 {
   qryRep = method.computeQueryRep(qry);
-  scoreInvertedIndex(*qryRep, *res);
+  if (rankAll) {
+    scoreAll(*qryRep, *res);
+  } else {
+    scoreInvertedIndex(*qryRep, *res);
+  }
   results = res;
   delete qryRep;
 
@@ -92,6 +96,69 @@ void RetrievalEngine::scoreInvertedIndex(QueryRep &qRep, IndexedRealVector &sort
     }
   }
   sortedScores.Sort();
+}
+
+void RetrievalEngine::scoreAll(QueryRep &qRep, IndexedRealVector &sortedScores)
+{
+
+  int numDocs = ind->docCount();
+
+  bool * scored  = new bool[numDocs+1];
+
+  int i;
+  for (i=1; i<=numDocs; i++) {
+    scAcc[i]= 0;
+
+  }
+
+  qRep.startIteration();
+  
+  while (qRep.hasMore()) {
+    QueryTerm *qTerm = qRep.nextTerm();
+
+    for (i=1; i<=numDocs; i++) {
+      scored[i] = false;
+    }
+
+    DocInfoList *dList = ind->docInfoList(qTerm->id());
+    dList->startIteration();
+    while (dList->hasMore()) {
+      DocInfo *info = dList->nextEntry();
+      int did = info->docID();
+      DocumentRep *dRep = method.computeDocRep(did);
+      scAcc[did] += method.scoreFunc()
+	->matchedTermWeight(qTerm, &qRep, info, dRep);
+
+      scored[did]=true;
+      delete dRep;
+      delete info;
+    }
+    delete dList;
+    for (i = 1; i <= numDocs; i++) {
+      if (scored[i] == false) {
+	DocInfo * info = new BasicDocInfo(i, 0);
+	DocumentRep * dRep = method.computeDocRep(i);
+	scAcc[i] += method.scoreFunc()->matchedTermWeight(qTerm, &qRep, info, dRep);
+	delete info;
+	delete dRep;
+      }
+    }
+    delete qTerm;
+  }
+
+  sortedScores.clear();
+  for (i=1; i<= numDocs; i++) {
+    // copy scores 
+    IndexedReal entry;
+    entry.ind = i;
+    DocumentRep *dr = method.computeDocRep(i);
+    entry.val = method.scoreFunc()->adjustedScore(scAcc[i], &qRep, dr);
+    sortedScores.push_back(entry);
+    delete dr;
+  }
+  sortedScores.Sort();
+
+  delete [] scored;
 }
 
 
