@@ -17,9 +17,13 @@
 #include "common_headers.hpp"
 
 typedef int   FILEID_T;
-typedef int   TERMID_T;
-typedef TERMID_T LOC_T;  // for simplifying implementation of memory management, it's helpful for termid and location to be of the same type.
+// All four of TERMID_T, DOCID_T, LOC_T, and COUNT_T need to be
+// the same size for the Inv(FP) and Keyfile indexes to work
+// without rewrite. 10/05/2004 -- dmf
+typedef int TERMID_T;
+typedef TERMID_T LOC_T;
 typedef TERMID_T DOCID_T;
+typedef TERMID_T COUNT_T;
 typedef float SCORE_T;
 typedef string TERM_T;
 typedef string EXDOCID_T;
