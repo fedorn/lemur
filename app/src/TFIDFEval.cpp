@@ -2,7 +2,7 @@
 
 
 
-/*!
+/*! \page TFIDFEval TFIDFEval Application
 
 This application evaluates the TFIDF model on a testing collection
 composed of a query source stream (query set) and an indexed database.

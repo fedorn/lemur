@@ -1,6 +1,6 @@
 
 /// Simple Unigram Retrieval Model Evaluation Program
-/*!
+/*! \page SimpleUnigEval SimpleUnigEval Application
 
 This application evaluates
 the  unigram language model retrieval approach on a testing

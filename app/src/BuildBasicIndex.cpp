@@ -1,6 +1,6 @@
 
 /// A BasicIndex builder
-/*!
+/*! \page BuildBasicIndex BuildBasicIndex Application
 
 This application builds a BasicIndex. 
 

@@ -1,7 +1,7 @@
 
 /// Okapi Retrieval Evaluation Program 
 
-/*!
+/*! \page OkapiEval OkapiEval application
 
 This application evaluates the Okapi retrieval function on a
 testing collection composed of a query source stream (query set)

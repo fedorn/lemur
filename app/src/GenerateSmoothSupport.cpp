@@ -1,6 +1,6 @@
 /// Smoothing support file generator
 
-/*!
+/*! \page GenerateSmoothSupport  GenerateSmoothSupport Application
 
  
 
