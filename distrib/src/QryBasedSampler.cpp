@@ -97,8 +97,8 @@ QryBasedSampler::probe(char * initQuery) {
 	 (i < docsPerQuery) && 
 	   (i < numResults) &&
 	   (!(((termMode & T_NDOCS) && (done >= numDocs)) ||
-	      ((termMode & T_NWORDS)&&(freqCounter->numWords() >= numWords)) ||
-	      ((termMode & T_NQRYS) && (qcount >= numQueries)))); 
+	      ((termMode & T_NWORDS)&&(freqCounter->numWords() >= numWords)) ) );
+
 	 i++) {
 
       docid_t id = results->ids[i];
