@@ -429,21 +429,6 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
 int InvFPIndexMerge::finalMerge(vector<char*>* files) {
   fprintf(stderr, "%s: Final Merge of files\n", name);
   int i=0;
-  int namelen = strlen(name)+1;
-
-  namelen += strlen(INVINDEX);
-  char* indexname = (char*)malloc(namelen+1);
-  sprintf(indexname, "%s%s%d", name, INVINDEX, 0);
-  invfiles.push_back(indexname);
-
-  // if we're only merging one file, no merging is necessary
-  if (files->size() == 1) {
-    // have to do the remove because rename wont' work if file exists
-    remove(indexname);
-    rename((*files)[0], indexname);
-    return 1;
-  }
-
   vector<IndexReader*> readers;
   char* bufptr = readbuffer;
 
@@ -465,6 +450,13 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
   vector<int> working;  // list of least words
   map<DOCID_T, int> tfs; // combined tf's for overlapping docids
   map<DOCID_T, int>::iterator finder;
+
+  int namelen = strlen(name)+1;
+
+  namelen += strlen(INVINDEX);
+  char* indexname = (char*)malloc(namelen+1);
+  sprintf(indexname, "%s%s%d", name, INVINDEX, 0);
+  invfiles.push_back(indexname);
   char* lookup = (char*)malloc(namelen+strlen(INVLOOKUP));
   sprintf(lookup, "%s%s", name, INVLOOKUP);
 
