@@ -1,79 +1,88 @@
+SHELL = @SHELL@
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
+pkgdatadir = $(datadir)/@PACKAGE_TARNAME@
+pkglibdir = $(libdir)/@PACKAGE_TARNAME@
+pkgincludedir = $(includedir)/@PACKAGE_TARNAME@
+top_builddir = .
 
+AR = @AR@
+CC = @CC@
+CXX = @CXX@
+LEX = @LEX@
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DIR = ${INSTALL} -m 755 -d
 
-# these are common definitions that the Makefile in
-# each subdirectory includes
-AR = ar
-SHELL = /bin/sh
-LEX = flex
+MODULES = @MODULES@
+PACKAGE = @PACKAGE_TARNAME@
+VERSION = @PACKAGE_VERSION@
+distdir = $(PACKAGE)-$(VERSION)
+top_distdir = $(distdir)
+
+LEMURLIB = lib$(PACKAGE).a
+WITH_DISTRIB = @WITH_DISTRIB@
+WITH_SUMMARIZATION = @WITH_SUMMARIZATION@
+
+ALLMODULES=summarization distrib retrieval langmod index utility
+
 # C++ source files
-CPPSRC = $(shell cd ../src; ls *.cpp 2> /dev/null)
-
+CPPSRC1 = $(notdir $(wildcard ../src/*.cpp))
 # C source files
-CSRC =  $(shell cd ../src; ls *.c 2> /dev/null)
-
-
+CSRC =  $(notdir $(wildcard ../src/*.c))
+# flex source files
+FSRC =  $(notdir $(wildcard ../src/*.l))
+# Flex objects
+FCPP = $(filter-out $(CPPSRC1), $(FSRC:.l=.cpp))
+CPPSRC = $(CPPSRC1) $(FCPP)
+.SECONDARY: $($(wildcard ../src/*.l).l=.cpp)
 # C++ header files
-
-CPPHEADER = $(shell cd ../include; ls *.hpp 2> /dev/null)
-
+CPPHEADER = $(wildcard ../include/*.hpp)
 # C header files
-
-CHEADER = $(shell cd ../include; ls *.h 2> /dev/null)
-
+CHEADER = $(wildcard ../include/*.h)
 # All header files
-
 ALLHEADER = $(CPPHEADER) $(CHEADER)
 
-
 # Include path
-INCPATH = -I../include $(patsubst %, -I../../%/include, $(DEPENDMODS))
-
-# Library path
-LIBPATH = $(patsubst %, -L../../%/obj, $(DEPENDMODS))
-
-# library linking options
-LIBFLAGS = $(patsubst %, -l%, $(DEPENDMODS))
-
-# module library name
-OBJLIBS = $(foreach dir, $(DEPENDMODS), ../../$(dir)/obj/lib$(dir).a)
+INCPATH = -I../include $(patsubst %, -I../../%/include, $(MODULES))
+ALLINCPATH = -I../include $(patsubst %, -I../../%/include, $(ALLMODULES))
 
 # C++ objects
 CPPOBJ = $(CPPSRC:.cpp=.o) 
 
 # C objects
 COBJ = $(CSRC:.c=.o)
-
 # all objects
 OBJ = $(CPPOBJ) $(COBJ)
 
-# library name for a module 
-# "MODULE" defined in the Makefile of a subdirectory
-OBJLIB = lib$(MODULE).a
-
 # C compiler and compiling options
-#
-# Let configure script set CC to an appropriate value
-CC = @CC@
-
-# CFLAGS = $(INCPATH) -g -c -O -Wall
-
-# Let configure script set CFLAGS to an appropriate value
-
-CFLAGS = -D_CCVER=$(CCVER) $(INCPATH) @CFLAGS@ 
-
 # C++ compiler and compiling/linking options
-# Let configure script set CXX to an appropriate value
+CFLAGS = @DEFS@ @CFLAGS@ 
+CXXFLAGS    = @DEFS@ @CXXFLAGS@
+CPPLDFLAGS  = @LDFLAGS@  @LIBS@ -lm
 
-CXX = @CXX@
+ALLBIN = BuildBasicIndex BuildDocMgr BuildInvertedIndex BuildPropIndex EstimateDirPrior GenL2Norm GenerateQueryModel GenerateSmoothSupport IncIndexer IncPassageIndexer KeyfileIncIndexer ParseInQueryOp ParseQuery ParseToFile PassageIndexer PushIndexer QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval TwoStageRetEval
 
-# CPPFLAGS    = $(INCPATH) -fnonnull-objects -fguiding-decls -c -g -Wall
+ifneq ($(WITH_DISTRIB),0)
+ALLBIN += CollSelIndex DistRetEval QryBasedSample
+endif
 
-# Let configure script set CPPFLAGS to an appropriate value
-
-CPPFLAGS    = -D_CXXVER=$(CXXVER) $(INCPATH) @CPPFLAGS@
-
-CPPLDFLAGS  =   $(LIBPATH) $(LIBFLAGS) -lm
-
-CCVER = $(shell $(CC) -dumpversion | sed 's/\.//g')
-
-CXXVER = $(shell $(CXX) -dumpversion |sed 's/\.//g')
+ifneq ($(WITH_SUMMARIZATION),0)
+ALLBIN += BasicSummApp MMRSummApp
+endif
