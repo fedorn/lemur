@@ -186,6 +186,7 @@ void InvFPPushIndex::writeTOC() {
    fprintf(toc, "%s: %s%s\n", INVINDEX_PAR, name, INVINDEX);
    fprintf(toc, "%s: %s%s\n", INVLOOKUP_PAR, name, INVLOOKUP);
    fprintf(toc, "%s: %s%s\n", DTINDEX_PAR, name, DTINDEX);
+   fprintf(toc, "%s: %d\n", NUMDT_PAR, dtfiles.size());
    fprintf(toc, "%s: %s%s\n", DTLOOKUP_PAR, name, DTLOOKUP);
    fprintf(toc, "%s: %s%s\n", DOCIDMAP_PAR, name, DOCIDMAP);
    fprintf(toc, "%s: %s%s\n", TERMIDMAP_PAR, name, TERMIDMAP);
