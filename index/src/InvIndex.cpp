@@ -23,6 +23,8 @@ InvIndex::InvIndex() {
   dtlookup = NULL;
   dtfiles = NULL;
   invfiles = NULL;
+  docnames = NULL;
+  terms = NULL;
   aveDocLen = 0;
 }
 
@@ -31,6 +33,8 @@ InvIndex::InvIndex(const char* indexName) {
   dtlookup = NULL;
   dtfiles = NULL;
   invfiles = NULL;
+  docnames = NULL;
+  terms = NULL;
   aveDocLen = 0;
   open(indexName);
 }
@@ -44,7 +48,7 @@ InvIndex::~InvIndex() {
   if (names != NULL) {
     for (i = 0; i < NAMES_SIZE; i++) {
       if (names[i] != NULL) {
-        delete[](names[i]);
+	free(names[i]); //	delete[](names[i]); // allocated w strdup
         names[i] = NULL;
       }
     }
@@ -55,13 +59,32 @@ InvIndex::~InvIndex() {
     for (i=0;i<counts[DT_FILES];i++) {
       delete[](dtfiles[i]);
     }
+    delete[](dtfiles);
   }
 
   if (invfiles != NULL) {
     for (i=0;i<counts[INV_FILES];i++) {
       delete[](invfiles[i]);
     }
+    delete[](invfiles);
   }
+
+  for (i = 0; i < docmgrs.size(); i++)
+    delete[](docmgrs[i]);
+
+  if (terms != NULL) {
+    for (i = 0; i < counts[UNIQUE_TERMS]+1; i++)
+      delete[](terms[i]);
+    delete[](terms);
+  }
+
+  if (docnames != NULL) {
+    for (i = 0; i < counts[DOCS]+1; i++)
+      delete[](docnames[i]);
+    delete[](docnames);
+  }
+
+  delete[](counts);
 }
 
 bool InvIndex::open(const char* indexName){
@@ -462,12 +485,12 @@ bool InvIndex::dtFileIDs() {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
         continue;
 
-    str = (char*) malloc(sizeof(char) * (len+1));
+    str = new char[len + 1]; 
     if (fscanf(in, "%s", str) != 1) {
-       free(str);
-       continue;
+      delete[](str);
+      continue;
     }
-
+    str[len] = '\0';
     dtfiles[index] = str;
   }
 
@@ -489,12 +512,13 @@ bool InvIndex::docMgrIDs() {
   while (!feof(in)) {
     if (fscanf(in, "%d %d", &ind, &len) != 2)
       continue;
-    str = (char*) malloc(sizeof(char) * (len+1));
+
+    str = new char[len + 1]; 
     if (fscanf(in, "%s", str) != 1) {
-      free(str);
+      delete[](str);
       continue;
     }
-
+    str[len] = '\0';
     docmgrs.push_back(str);
   }
   fclose(in);
@@ -519,12 +543,12 @@ bool InvIndex::invFileIDs() {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
         continue;
 
-    str = (char*) malloc(sizeof(char) * (len+1));
+    str = new char[len + 1]; 
     if (fscanf(in, "%s", str) != 1) {
-       free(str);
-       continue;
+      delete[](str); 
+      continue;
     }
-
+    str[len] = '\0';
     invfiles[index] = str;
   }
 
@@ -549,12 +573,12 @@ bool InvIndex::termIDs() {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
         continue;
 
-    str = (char*) malloc(sizeof(char) * (len+1));
+    str = new char[len + 1]; 
     if (fscanf(in, "%s", str) != 1) {
-       free(str);
-       continue;
+      delete[](str);
+      continue;
     }
-
+    str[len] = '\0';
     terms[index] = str;
     termtable[terms[index]] = index;
   }
@@ -585,12 +609,12 @@ bool InvIndex::docIDs() {
     if (fscanf(in, "%d %d", &index, &len) != 2)
       continue;
 
-    str = (char*) malloc(sizeof(char) * (len+1));
+    str = new char[len + 1]; 
     if (fscanf(in, "%s", str) != 1) {
-      free(str);
+      delete[](str);
       continue;
     }
-
+    str[len] = '\0';
     docnames[index] = str;
     doctable[docnames[index]] = index;
   }
