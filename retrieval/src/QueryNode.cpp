@@ -319,8 +319,8 @@ bool OdnQNode::foundOrderedProx(int currPos, int wsize,
     childPos = nextChild->proxList->position(nextChild->proxList->nextPos);
     if (childPos < currPos) {
       while (nextChild->proxList->nextPos < nextChild->proxList->count() &&
-	     (childPos = nextChild->proxList->position(nextChild->proxList->nextPos) <
-currPos)) {
+	     ((childPos = nextChild->proxList->position(nextChild->proxList->nextPos)) <
+currPos) ) {
 	nextChild->proxList->nextPos++;
       }
       if(nextChild->proxList->nextPos >= nextChild->proxList->count())
