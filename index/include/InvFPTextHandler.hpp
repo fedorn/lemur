@@ -1,13 +1,13 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2001, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
+
 #include "TextHandler.hpp"
 #include "InvPushIndex.hpp"
 #include "InvFPPushIndex.hpp"
@@ -24,6 +24,9 @@
 class InvFPTextHandler : public TextHandler {
 
 public:
+  // want to subclass this class for incremental.
+  InvFPTextHandler() { }
+  
   /// Create a InvFPTextHandler with index name filename 
   /// (minus the .ifp extension) and specified buffer size.
   InvFPTextHandler(char * filename, int bufferSize, bool countStopWds = false, int ind = 1);
@@ -36,7 +39,8 @@ public:
 
   /// passes mgrID onto index
   void setDocManager(const char* mgrID);
-private:
+  // want to subclass this class for incremental.
+protected:
   /// Ends a document in the collection
   void endDoc();
 
