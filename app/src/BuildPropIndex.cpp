@@ -21,6 +21,7 @@ The parameters are:
 <p>
 <ol>
 <li> <tt>index</tt>: name of the index to create (don't include extension)
+<li> <tt>indexType</tt>:the type of index to create, "key" (KeyfileIncIndex) or "inv" (InvFPIndex). default is inv
 <li> <tt>memory</tt>: memory (in bytes) of InvFPPushIndex cache (def = 96000000).
 <li> <tt>stopwords</tt>: name of file containing the stopword list.
 <li> <tt>acronyms</tt>: name of file containing the acronym list.
@@ -66,6 +67,7 @@ namespace LocalParameter {
 
   // name (minus extension) of the database
   string index;
+  string indexType;
   // name of file containing stopwords
   string stopwords;
   // name of file containing acronyms
@@ -82,6 +84,7 @@ namespace LocalParameter {
     // strings.  maybe I should convert to strings...
     docFormat = ParamGetString("docFormat");
     index = ParamGetString("index");
+    indexType = ParamGetString("indexType", "inv");
     memory = ParamGetInt("memory", 96000000);
     stopwords = ParamGetString("stopwords");
     acronyms = ParamGetString("acronyms");
@@ -100,6 +103,8 @@ void usage(int argc, char ** argv) {
        << endl
        << "Summary of parameters:" << endl << endl
        << "\tindex - name of the index to create (don't include extension)"<< endl
+       << "\tindexType - the type of index, one of key (for KeyfileIncIndex) "
+       << "\tor inv (for InvFPPushIndex) respectively. (def = inv)" << endl
        << "\tmemory - memory (in bytes) of InvFPPushIndex cache (def = 96000000)." << endl
        << "\tstopwords - name of file containing stopword list" << endl
        << "\t            Words in this file should be one per line." << endl
@@ -174,7 +179,8 @@ int AppMain(int argc, char * argv[]) {
   // for more info.)
   PropIndexTH indexer((char *)LocalParameter::index.c_str(), 
 		      LocalParameter::memory, 
-		      LocalParameter::countStopWords);
+		      LocalParameter::countStopWords, 
+		      LocalParameter::indexType);
 
   // chain the parser/stopper/stemmer/indexer
   if (stopper) {

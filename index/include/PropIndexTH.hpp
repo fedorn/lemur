@@ -8,7 +8,7 @@
 
 #include "TextHandler.hpp"
 #include "InvFPPushIndex.hpp"
-
+#include "KeyfileIncIndex.hpp"
 
 #ifndef _PROPINDEXTH_HPP
 #define _PROPINDEXTH_HPP
@@ -36,6 +36,7 @@ public:
   /// Create a PropIndexTH with index name filename 
   /// (minus the .ifp extension) and specified buffer size.
   PropIndexTH(char * filename, int bufferSize, bool countStopWds = false, int ind = 1);
+  PropIndexTH(char * filename, int bufferSize, bool countStopWds, string ind);
   ~PropIndexTH();
 
   /// Pushes the doc into the InvFPPushIndex.
