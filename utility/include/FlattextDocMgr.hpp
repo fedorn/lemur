@@ -59,7 +59,7 @@ public:
   virtual void buildMgr();
 
   char* handleDoc(char * docno);
-
+  void  handleEndDoc();
   /// returns self cast to TextHandler (FIX INHERITANCE HERE!)
   virtual TextHandler* getTextHandler() { return this; }
 
@@ -78,8 +78,9 @@ private:
   string parseMode;           // what type of parser we have
   long prevpos;              // pos of previous doc beginning
   string IDname;            // my name
+  string IDnameext;         // my name with type extension
   vector<string> sources;   // list of all source files
-  int fileid, lastid;       // fileid of current/last file being processed
+  int fileid;			    // fileid of current file being processed
   ofstream writefpos;       // stream for writing out file positions
   map<char*, lookup_e*, abc> table; 
   lookup_e* entries;        // array of lookup entries

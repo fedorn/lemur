@@ -20,9 +20,10 @@
 KeyfileDocMgr::KeyfileDocMgr(const char* name) {
   myDoc = NULL;
   numdocs = 0;
+
+  IDnameext = name;
   // strip extension
-  string tmp(name);
-  IDname = tmp.substr(0, tmp.length() - 4);
+  IDname = IDnameext.substr(0, IDnameext.length() - 4);
 
   if (!loadTOC()) {
     // brand new.
@@ -40,6 +41,7 @@ KeyfileDocMgr::KeyfileDocMgr(string name, string mode, string source) {
   myDoc = NULL;
   numdocs = 0;
   IDname = name;
+  IDnameext = IDname+BT_TOC;
   pm = mode;
   setParser(TextHandlerManager::createParser(mode));
   string val = IDname + BT_LOOKUP;
@@ -113,7 +115,7 @@ char *KeyfileDocMgr::getDoc(const char *docID) {
   doclookup.get( docID, &documentLocation, actual, sizeof(btl) );
 
   char *doc = new char[documentLocation.bytes + 1];  
-  ifstream read(sources[documentLocation.fid].c_str());
+  ifstream read(sources[documentLocation.fid].c_str(), ios::binary);
   if (!read.is_open()) {
     cerr << "Could not open file " << sources[documentLocation.fid] 
 	       << " to get document" << endl;

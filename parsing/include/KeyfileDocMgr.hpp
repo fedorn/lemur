@@ -81,8 +81,7 @@ public:
   virtual void buildMgr();
   /// return name of this document manager, with the file extension (.bdm).
   virtual const char *getMyID() {
-    string val = IDname + BT_TOC;
-    return val.c_str();
+    return IDnameext.c_str();
   }
 
   /// get the array of Match entries for the tokens in the document
@@ -119,6 +118,7 @@ private:
   char *myDoc;
   int doclen;
   string IDname;            // my name
+  string IDnameext;			// my name w/ extension
   vector<string> sources;   // list of all source files
   int fileid;       // fileid of current/last file being processed
 };

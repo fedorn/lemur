@@ -30,6 +30,8 @@ FlattextDocMgr::FlattextDocMgr(string name, string mode, string source) {
   parseMode = mode;
   myparser = TextHandlerManager::createParser(mode);
   IDname = name;
+  // build mode doens't have extension on name
+  IDnameext = IDname+FT_SUFFIX;
   prevpos = 0;
 }
 
@@ -45,7 +47,11 @@ FlattextDocMgr::~FlattextDocMgr() {
 }
 
 bool FlattextDocMgr::open(const char* manname) {
-  IDname = manname;
+  // open mode has extension
+  IDnameext = manname;
+  // strip extension, but this doesn't really get used
+  IDname = IDnameext.substr(0, IDnameext.length() - 5);
+
   return loadTOC(manname);
 }
 
@@ -60,7 +66,7 @@ void FlattextDocMgr::buildMgr() {
   ofstream fid(n.c_str());
 
   long one = 1;
-  lastid = -1;
+//  lastid = -1;
   cerr << "Building " << IDname << endl;
   for (int i=0;i<sources.size();i++) {
     fileid = i;
@@ -86,27 +92,25 @@ void FlattextDocMgr::buildMgr() {
 }
 
 char* FlattextDocMgr::handleDoc(char* docno) {
-  long one = 1;
   numdocs ++;
   int pos = myparser->getDocBytePos();
 
-  /// don't write out bytelength if it's the first doc in a new file
-  if (lastid == fileid)
-    writefpos << pos-prevpos-one << endl;
-
   writefpos << docno << " " << fileid << " " << pos << " ";
   prevpos = pos;
-  lastid = fileid;
+//  lastid = fileid;
 
   return docno;
 }
 
+void FlattextDocMgr::handleEndDoc() {
+  int end = myparser->fileTell();
+
+  // write out number of bytes
+  writefpos << end-prevpos << endl;
+}
+
 const char* FlattextDocMgr::getMyID() {
-  if (IDname.find(FT_SUFFIX) == -1) {
-    string s = IDname+FT_SUFFIX;
-    return s.c_str();
-  }
-  return IDname.c_str();
+  return IDnameext.c_str();
 }
 
 char* FlattextDocMgr::getDoc(const char* docID) {
@@ -118,8 +122,9 @@ char* FlattextDocMgr::getDoc(const char* docID) {
   }
 
   lookup_e* e = finder->second;
-  char* doc = (char*) malloc((*e).bytes * sizeof(char)+1);
-  ifstream read(sources[(*e).fid].c_str());
+//  char* doc = (char*) malloc((*e).bytes * sizeof(char)+1);
+  char* doc = new char[(*e).bytes +1];
+  ifstream read(sources[(*e).fid].c_str(), ios::binary);
   if (!read.is_open()) {
     cerr << "Could not open file " << sources[(*e).fid] << " to get document" << endl;
     return "";
