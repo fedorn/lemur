@@ -30,7 +30,7 @@
 //
 //---------------------------------------------------------------
 
-#include "BitVector.hpp"
+#include "common_headers.hpp"
 #include "Compress.hpp"
 
 class GammaCompress : public Compress 
@@ -48,11 +48,14 @@ private:
   void initBitMasks ();
   int floorlog2 (double x);
   int gamma_size(int x);
-  int gamma_encode(int x, int offset, BitVector & bv);
-  int gamma_decode(int * y, int offset, BitVector & bv);
+  int gamma_encode(int x, int offset, vector<bool> &bv);
+  int gamma_decode(int * y, int offset, vector<bool> &bv);
+  int read_bits(istream & is, vector<bool> &bv, int size);
+  void write_bits(ostream & os, vector<bool> &bv);
 
 private:
-  BitVector bv;
+  vector<bool> bv;
+  static char bits[8];
 };
 
 #endif
