@@ -247,7 +247,7 @@ int InvFPIndex::docLength(int docID) const{
 }
 
 DocInfoList* InvFPIndex::docInfoList(int termID){
-  fprintf(stderr, "looking for termid %d\n", termID);
+//  fprintf(stderr, "looking for termid %d\n", termID);
 //  entry e = contents[wordid];
 //  char* filename = IDmanager.getFile(e.fileid);
 // for now our index is always one file
