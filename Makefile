@@ -7,7 +7,7 @@ SHELL = /bin/sh
 #            It is usually safe to add your module directory at the end of all
 #            other module directories but before any application directory,
 #            and add your application directory at the end of the whole list
-DIRS = eval utility index langmod retrieval app
+DIRS = utility index langmod retrieval app
 
 
 # IN GENERAL, DO NOT CHANGE THE FOLLOWING LINES
