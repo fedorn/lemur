@@ -24,6 +24,25 @@ PropIndexTH::PropIndexTH(char * filename, int bufferSize,
   first = true;
 }
 
+PropIndexTH::PropIndexTH(char * filename, int bufferSize,
+			 bool countStopWords, string ind) {
+  // create index and helper objects  
+  if (ind == "inv")
+    index = new InvFPPushIndex(filename, bufferSize);
+  else if (ind == "key")
+    index = new KeyfileIncIndex(filename, bufferSize);
+  // add support for future positional indexes here
+  else 
+    throw Exception("PropIndexTH", "Unknown index type");
+
+  dp = NULL;
+  term = new InvFPTerm();
+  countStopWds = countStopWords;
+  docLength = 0;
+  // set state that is on first doc
+  first = true;
+}
+
 PropIndexTH::~PropIndexTH() {
   // end the doc and close the collection
   if (!first) endDoc(); // if we haven't done any yet, don't bother.
@@ -96,6 +115,10 @@ char* PropIndexTH::handleWord(char* word, char* original, PropertyList *list) {
     }
   } else {
     if (countStopWds) docLength++;
+    // if the original was null too, there's nothing we can do
+    if (!original)
+      return word;
+
     // when the word is null, it usually means it was a stopword
     // sometimes stop words have named entity tags, in this case we want to index it
     // check to see if it has a named entity tag
@@ -136,6 +159,17 @@ char* PropIndexTH::handleWord(char* word, char* original, PropertyList *list) {
 	    index->addTerm(*term);
 	  }
 	} // B_NE
+
+	// index the E_NE tag if any
+	prop = list->getProperty("E_NE");
+	if (prop) {
+	  tag = (char*)prop->getValue();
+	  term->strLength(strlen(tag));
+	  if (term->strLength() > 0) {
+	    term->spelling(tag);
+	    index->addTerm(*term);
+	  }
+	} // E_NE
       }     
     } // if NE
   } // else word is NULL
