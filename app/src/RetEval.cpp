@@ -11,6 +11,7 @@
 
 
 
+
 /// A General Retrieval Evaluation Program
 
 
@@ -128,7 +129,6 @@ The collection mixture method also recognizes the following two additional param
 #include "TFIDFRetMethod.hpp"
 #include "SimpleKLRetMethod.hpp"
 #include "OkapiRetMethod.hpp"
-#include "RetrievalEngine.hpp"
 
 #include "ParamManager.hpp"
 #include "ResultFile.hpp"
@@ -159,11 +159,13 @@ int AppMain(int argc, char *argv[]) {
   DocStream *qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
   ofstream result(RetrievalParameter::resultFile);
 
+  ArrayAccumulator accumulator(ind->docCount());
+
   ResultFile resFile(LocalParameter::TRECResultFormat);
 
   resFile.openForWrite(result, *ind);
 
-  IndexedRealVector *results;
+  IndexedRealVector results(ind->docCount());
 
   RetrievalMethod *model;
 
@@ -171,21 +173,21 @@ int AppMain(int argc, char *argv[]) {
 
   switch (LocalParameter::mod) {
   case LocalParameter::TFIDF: 
-    model = new TFIDFRetMethod(*ind);
+    model = new TFIDFRetMethod(*ind, accumulator);
     TFIDFParameter::get();
     ((TFIDFRetMethod *)model)->setDocTFParam(TFIDFParameter::docTFPrm);
     ((TFIDFRetMethod *)model)->setQueryTFParam(TFIDFParameter::qryTFPrm);
     ((TFIDFRetMethod *)model)->setFeedbackParam(TFIDFParameter::fbPrm);
     break;
   case LocalParameter::OKAPI:
-    model = new OkapiRetMethod(*ind);
+    model = new OkapiRetMethod(*ind, accumulator);
     OkapiParameter::get();
     ((OkapiRetMethod *)model)->setTFParam(OkapiParameter::tfPrm);
     ((OkapiRetMethod *)model)->setFeedbackParam(OkapiParameter::fbPrm);
     break;
   case LocalParameter::KL:
     SimpleKLParameter::get();
-    model = new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile);
+    model = new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, accumulator);
     ((SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
     ((SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
     break;
@@ -195,19 +197,26 @@ int AppMain(int argc, char *argv[]) {
     
   }
 
-  RetrievalEngine eng(*model);
   qryStream->startDocIteration();
   TextQuery *q;
+  
   while (qryStream->hasMore()) {
     Document *d = qryStream->nextDoc();
-    q = (TextQuery *) d;
-    cout << "query : "<< q->getID() << endl;
+    q = new TextQuery(*d);
+    cout << "query : "<< q->id() << endl;
+    QueryRep * qr = model->computeQueryRep(*q);
+    model->scoreCollection(*qr, results);
+    results.Sort();
     if (RetrievalParameter::fbDocCount>0) {
-      eng.retrievePseudoFeedback(*q, RetrievalParameter::fbDocCount, results);
-    } else {
-      eng.retrieve(*q, results);
+      PseudoFBDocs *topDoc = new PseudoFBDocs(results, RetrievalParameter::fbDocCount);
+      model->updateQuery(*qr, *topDoc);
+      model->scoreCollection(*qr, results);
+      results.Sort();
+      delete topDoc;
     }
-    resFile.writeResults(q->getID(), results, RetrievalParameter::resultCount);
+    resFile.writeResults(q->id(), &results, RetrievalParameter::resultCount);
+    delete qr;
+    delete q;
   }
 
   result.close();

@@ -50,7 +50,7 @@ void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff,
   IndexedRealVector::iterator it;
   it = qm->begin();
   while (it != qm->end() && prSum < prSumThresh && wdCount < howManyWord && (*it).val >=prThresh) {
-    cout << "==new-term== " << ind.term((*it).ind) << " "<< (*it).val << endl;
+    // cout << "==new-term== " << ind.term((*it).ind) << " "<< (*it).val << endl;
     incCount((*it).ind, (*it).val*(1-origModCoeff));
     it++;
     prSum += (*it).val;
@@ -97,9 +97,9 @@ void SimpleKLQueryModel::save(ostream &os)
 }
 
 
-SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName) 
+SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName, ScoreAccumulator &accumulator) : 
+  TextQueryRetMethod(dbIndex, accumulator)
 {
-  ind = &dbIndex;
 
   docParam.smthMethod = SimpleKLParameter::defaultSmoothMethod;
   docParam.smthStrategy= SimpleKLParameter::defaultSmoothStrategy;
@@ -121,7 +121,7 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName
   if (ifs.fail()) {
     throw  Exception("SimpleKLRetMethod", "smoothing support file open failure");
   }
-  int numDocs = ind->docCount();
+  int numDocs = ind.docCount();
   docProbMass = new double[numDocs+1];
   uniqueTermCount = new int[numDocs+1];
   
@@ -141,10 +141,10 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName
   
   ifs.close();
 
-  collectLMCounter = new DocUnigramCounter(*ind);
-  //  collectLM = new MLUnigramLM(*collectLMCounter, ind->termLexiconID()); 
-  collectLM = new LaplaceUnigramLM(*collectLMCounter, ind->termLexiconID(), 
-				   ind->termCountUnique()); 
+  collectLMCounter = new DocUnigramCounter(ind);
+  //  collectLM = new MLUnigramLM(*collectLMCounter, ind.termLexiconID()); 
+  collectLM = new LaplaceUnigramLM(*collectLMCounter, ind.termLexiconID(), 
+				   ind.termCountUnique()); 
 
 
   char mcSuppFN[500];
@@ -185,21 +185,21 @@ DocumentRep *SimpleKLRetMethod::computeDocRep(int docID)
   switch (docParam.smthMethod) {
   case SimpleKLParameter::JELINEKMERCER:
     return( new JelinekMercerDocModel(docID,
-				      ind, 
+				      &ind, 
 				      *collectLM,
 				      docProbMass,
 				      docParam.JMLambda,
 				      docParam.smthStrategy));
   case SimpleKLParameter::DIRICHLETPRIOR:
     return (new BayesianDocModel(docID,
-				 ind, 
+				 &ind, 
 				 *collectLM,
 				 docProbMass,  
 				 docParam.DirPrior,
 				 docParam.smthStrategy));
   case SimpleKLParameter::ABSOLUTEDISCOUNT:
     return (new AbsoluteDiscountDocModel(docID,
-					 ind, 
+					 &ind, 
 					 *collectLM,
 					 docProbMass,
 					 uniqueTermCount,
@@ -213,7 +213,7 @@ DocumentRep *SimpleKLRetMethod::computeDocRep(int docID)
 }
 
 
-void SimpleKLRetMethod::updateQuery(QueryRep &origRep, DocIDSet &relDocs)
+void SimpleKLRetMethod::updateQuery(TextQueryRep &origRep, DocIDSet &relDocs)
 {
   SimpleKLQueryModel *qr = dynamic_cast<SimpleKLQueryModel *> (&origRep);
   
@@ -236,9 +236,9 @@ void SimpleKLRetMethod::updateQuery(QueryRep &origRep, DocIDSet &relDocs)
 
 void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs)
 {
-  int numTerms = ind->termCountUnique();
+  int numTerms = ind.termCountUnique();
 
-  DocUnigramCounter *dCounter = new DocUnigramCounter(relDocs, *ind);
+  DocUnigramCounter *dCounter = new DocUnigramCounter(relDocs, ind);
 
   static double *distQuery = new double[numTerms+1];
   static double *distQueryEst = new double[numTerms+1];
@@ -311,7 +311,7 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocID
       lmCounter.incCount(i, distQuery[i]);
     }
   }
-  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind->termLexiconID());
+  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind.termLexiconID());
   origRep.interpolateWith(*fblm, (1-qryParam.fbCoeff), qryParam.fbTermCount,
 			qryParam.fbPrSumTh, qryParam.fbPrTh);
   delete fblm;
@@ -321,7 +321,7 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocID
 
 void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs)
 {
-  int numTerms = ind->termCountUnique();
+  int numTerms = ind.termCountUnique();
 
   double * ct = new double[numTerms+1];
 
@@ -340,7 +340,7 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDS
       ct[i] += log(dm->unseenCoeff()*collectLM->prob(i));
     }
 
-    TermInfoList *tList = ind->termInfoList(id);
+    TermInfoList *tList = ind.termInfoList(id);
     TermInfo *info;
     tList->startIteration();
     while (tList->hasMore()) {
@@ -365,7 +365,7 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDS
   delete [] ct;
 
   
-  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind->termLexiconID());
+  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind.termLexiconID());
   origRep.interpolateWith(*fblm, (1-qryParam.fbCoeff), qryParam.fbTermCount,
 			qryParam.fbPrSumTh, qryParam.fbPrTh);
   delete fblm;
@@ -375,7 +375,7 @@ void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, D
 {
   int stopWordCutoff =50;
 
-  ArrayCounter<double> *counter = new ArrayCounter<double>(ind->termCountUnique()+1);
+  ArrayCounter<double> *counter = new ArrayCounter<double>(ind.termCountUnique()+1);
 
   OneStepMarkovChain * mc = new OneStepMarkovChain(relDocs, *ind, mcNorm,
 						   1-qryParam.fbMixtureNoise);
@@ -418,7 +418,7 @@ void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, D
   }
   delete mc;
 
-  UnigramLM *fbLM = new MLUnigramLM(*counter, ind->termLexiconID());
+  UnigramLM *fbLM = new MLUnigramLM(*counter, ind.termLexiconID());
 
   origRep.interpolateWith(*fbLM, 1-qryParam.fbCoeff, qryParam.fbTermCount,
 			  qryParam.fbPrSumTh, qryParam.fbPrTh);

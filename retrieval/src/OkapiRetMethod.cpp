@@ -26,7 +26,7 @@ OkapiQueryRep::OkapiQueryRep(TextQuery &qry, Index &dbIndex, double paramK3): Ar
 
 
 double OkapiScoreFunc::matchedTermWeight(QueryTerm *qTerm, 
-					 QueryRep *qRep, 
+					 TextQueryRep *qRep, 
 					 DocInfo *info, 
 					 DocumentRep *dRep)
 {
@@ -44,9 +44,9 @@ double OkapiScoreFunc::matchedTermWeight(QueryTerm *qTerm,
 }
 
 
-OkapiRetMethod::OkapiRetMethod(Index &dbIndex)
+OkapiRetMethod::OkapiRetMethod(Index &dbIndex, ScoreAccumulator &accumulator):
+  TextQueryRetMethod(dbIndex, accumulator)
 {
-  ind = &dbIndex;
   scFunc = new OkapiScoreFunc(dbIndex);
 
   tfParam.k1 = OkapiParameter::defaultK1;
@@ -59,11 +59,11 @@ OkapiRetMethod::OkapiRetMethod(Index &dbIndex)
 
 
 
-void OkapiRetMethod::updateQuery(QueryRep &origRep, DocIDSet &relDocs)
+void OkapiRetMethod::updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs)
 {
   
-  int totalTerm=ind->termCountUnique();  
-  static int * relCounts = new int[totalTerm+1];
+  int totalTerm=ind.termCountUnique();  
+  int * relCounts = new int[totalTerm+1];
 
 
   int i;
@@ -79,7 +79,7 @@ void OkapiRetMethod::updateQuery(QueryRep &origRep, DocIDSet &relDocs)
     double relPr;
     relDocs.nextIDInfo(docID, relPr);
     actualDocs++;
-    TermInfoList *tList = ind->termInfoList(docID);
+    TermInfoList *tList = ind.termInfoList(docID);
     tList->startIteration();
     while (tList->hasMore()) {
       TermInfo *info = tList->nextEntry();
@@ -89,14 +89,15 @@ void OkapiRetMethod::updateQuery(QueryRep &origRep, DocIDSet &relDocs)
   }
 
   IndexedRealVector weightedTerms(0);
-  
+  weightedTerms.clear();
+
   // adjust term weight for term selection
   for (i=1; i<= totalTerm; i++) {
     if (relCounts[i] >0 ) {
       weightedTerms.PushValue(i, relCounts[i]*
 			      RSJWeight(relCounts[i],actualDocs, 
-					ind->docCount(i),
-					ind->docCount()));
+					ind.docCount(i),
+					ind.docCount()));
     }
   }
 
@@ -116,6 +117,7 @@ void OkapiRetMethod::updateQuery(QueryRep &origRep, DocIDSet &relDocs)
       
     } 
   }
+  delete [] relCounts;
 }
 
 

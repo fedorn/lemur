@@ -10,10 +10,11 @@
 */
 
 
+
 #ifndef _TFIDFRETMETHOD_HPP
 #define _TFIDFRETMETHOD_HPP
 
-#include "RetrievalMethod.hpp"
+#include "TextQueryRetMethod.hpp"
 
 /// Parameters used in the TFIDF retrieval method
 namespace TFIDFParameter {
@@ -74,25 +75,25 @@ private:
 
 /// The TFIDF retrieval method with a few TF formula options
 
-class TFIDFRetMethod : public RetrievalMethod {
+class TFIDFRetMethod : public TextQueryRetMethod {
 public:
 
-  TFIDFRetMethod(Index &dbIndex);
+  TFIDFRetMethod(Index &dbIndex, ScoreAccumulator &accumulator);
   ~TFIDFRetMethod() {delete [] idfV; delete scFunc;}
 
-  virtual QueryRep *computeQueryRep(TextQuery &qry) {
-    return (new TFIDFQueryRep(qry, *ind, idfV, qryTFParam));
+  virtual TextQueryRep *computeTextQueryRep(TextQuery &qry) {
+    return (new TFIDFQueryRep(qry, ind, idfV, qryTFParam));
   }
 
   virtual DocumentRep *computeDocRep(int docID) { 
-    return (new TFIDFDocRep(docID, *ind, idfV, docTFParam));
+    return (new TFIDFDocRep(docID, ind, idfV, docTFParam));
   }
   virtual ScoreFunction *scoreFunc() {
     return (scFunc);
   }
 
 
-  virtual void updateQuery(QueryRep &qryRep, DocIDSet &relDocs);
+  virtual void updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs);
 
   void setDocTFParam(TFIDFParameter::WeightParam &docTFWeightParam);
 

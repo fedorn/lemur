@@ -100,6 +100,8 @@ int AppMain(int argc, char *argv[]) {
   Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
   DocStream *qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
 
+  ArrayAccumulator accumulator(ind->docCount());
+
   ifstream result(RetrievalParameter::resultFile, ios::in);
   if (result.fail()) {
     throw Exception("AppMain", "can't open the result file, check parameter value for resultFile");
@@ -109,7 +111,7 @@ int AppMain(int argc, char *argv[]) {
   
   ResultFile resFile(LocalParameter::TRECResultFormat);
   resFile.openForRead(result, *ind);
-  SimpleKLRetMethod *model =  new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile);
+  SimpleKLRetMethod *model =  new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, accumulator);
   model->setDocSmoothParam(SimpleKLParameter::docPrm);
   model->setQueryModelParam(SimpleKLParameter::qryPrm);
 
@@ -119,17 +121,18 @@ int AppMain(int argc, char *argv[]) {
   TextQuery *q;
   while (qryStream->hasMore()) {
     Document *d = qryStream->nextDoc();
-    q = (TextQuery *) d;
-    cout << "query : "<< q->getID() << endl;
+    q = new TextQuery(*d);
+    cout << "query : "<< q->id() << endl;
     QueryRep *qr = model->computeQueryRep(*q);
-    resFile.getResult(q->getID(), res);
+    resFile.getResult(q->id(), res);
     res.Sort();
     PseudoFBDocs *topDoc = new PseudoFBDocs(res, RetrievalParameter::fbDocCount);
     model->updateQuery(*qr, *topDoc);
     SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
-    os << q->getID();
+    os << q->id();
     qm->save(os);
     delete qr;
+    delete q;
     delete topDoc;
   }
 

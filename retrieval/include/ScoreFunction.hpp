@@ -1,3 +1,4 @@
+
 /*==========================================================================
  * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
@@ -13,7 +14,7 @@
 #ifndef _SCOREFUNCTION_HPP
 #define _SCOREFUNCTION_HPP
 
-#include "QueryRep.hpp"
+#include "TextQueryRep.hpp"
 #include "DocumentRep.hpp"
 
 //------------------------------------------------------------
@@ -25,12 +26,12 @@
 class ScoreFunction {
 public:
   /// compute the score contribution of a matched term
-  virtual double matchedTermWeight(QueryTerm *qTerm, QueryRep *qRep, DocInfo *info, DocumentRep *dRep) { 
+  virtual double matchedTermWeight(QueryTerm *qTerm, TextQueryRep *qRep, DocInfo *info, DocumentRep *dRep) { 
     return (qTerm->weight()*dRep->termWeight(qTerm->id(),info));
   }
 	    
   /// score adjustment (e.g., appropriate length normalization)
-  virtual double adjustedScore(double origScore, QueryRep *qRep, DocumentRep *dRep) {
+  virtual double adjustedScore(double origScore, TextQueryRep *qRep, DocumentRep *dRep) {
     return origScore; 
   }
 };

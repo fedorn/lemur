@@ -10,7 +10,6 @@
 */
 
 
-
 /// Evaluating a query model using the KL-divergence retrieval function
 
 
@@ -55,7 +54,6 @@ The following are document model smoothing parameters:
 #include "BasicDocStream.hpp"
 #include <iostream.h>
 #include "SimpleKLRetMethod.hpp"
-#include "RetrievalEngine.hpp"
 #include "ParamManager.hpp"
 #include "ResultFile.hpp"
 namespace LocalParameter {
@@ -83,6 +81,9 @@ int AppMain(int argc, char *argv[]) {
   
   Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
   ifstream qmodel(LocalParameter::queryModel, ios::in);
+
+  ArrayAccumulator accumulator(ind->docCount());
+
   if (qmodel.fail()) {
     throw Exception("AppMain", "can't open the query model file, check the value for parameter queryModel");
   }
@@ -93,12 +94,10 @@ int AppMain(int argc, char *argv[]) {
 
   resFile.openForWrite(result, *ind);
 
-  SimpleKLRetMethod model(*ind, SimpleKLParameter::smoothSupportFile);
+  SimpleKLRetMethod model(*ind, SimpleKLParameter::smoothSupportFile, accumulator);
   
   model.setDocSmoothParam(SimpleKLParameter::docPrm);
   model.setQueryModelParam(SimpleKLParameter::qryPrm);
-
-  RetrievalEngine eng(model);
 
   IndexedRealVector res;
   char qid[300];
@@ -108,7 +107,8 @@ int AppMain(int argc, char *argv[]) {
     cout << "Query "<< qid << endl;
     q = new SimpleKLQueryModel(*ind);
     q->load(qmodel);
-    eng.scoreInvertedIndex(*q,res);
+    model.scoreInvertedIndex(*q,res);
+    res.Sort();
     resFile.writeResults(qid, &res, RetrievalParameter::resultCount);
     delete q;
   }

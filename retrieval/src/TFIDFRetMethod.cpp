@@ -58,10 +58,8 @@ double TFIDFDocRep::docTFWeight(const double rawTF)
 }
 
 
-TFIDFRetMethod::TFIDFRetMethod(Index &dbIndex)
+TFIDFRetMethod::TFIDFRetMethod(Index &dbIndex, ScoreAccumulator &accumulator) :TextQueryRetMethod(dbIndex, accumulator) 
 {
-  ind = &dbIndex;
-
   // set default parameter value
   docTFParam.tf = TFIDFParameter::BM25;
   docTFParam.bm25K1 = TFIDFParameter::defaultDocK1;
@@ -85,9 +83,9 @@ TFIDFRetMethod::TFIDFRetMethod(Index &dbIndex)
 
 
 
-void TFIDFRetMethod::updateQuery(QueryRep &qryRep, DocIDSet &relDocs)
+void TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs)
 {
-  int totalTerm=ind->termCountUnique();  
+  int totalTerm=ind.termCountUnique();  
   static float * centroidVector = new float[totalTerm+1]; // one extra for OOV
 
   int i;
@@ -103,7 +101,7 @@ void TFIDFRetMethod::updateQuery(QueryRep &qryRep, DocIDSet &relDocs)
     relDocs.nextIDInfo(docID, relPr);
     actualDocs++;
 
-    TermInfoList *tList = ind->termInfoList(docID);
+    TermInfoList *tList = ind.termInfoList(docID);
     tList->startIteration();
     while (tList->hasMore()) {
       TermInfo *info = tList->nextEntry();

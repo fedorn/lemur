@@ -17,8 +17,8 @@
 #include "UnigramLM.hpp"
 #include "ScoreFunction.hpp"
 #include "SimpleKLDocModel.hpp"
-#include "QueryRep.hpp"
-#include "RetrievalMethod.hpp"
+#include "TextQueryRep.hpp"
+#include "TextQueryRetMethod.hpp"
 #include "Counter.hpp"
 #include "DocUnigramCounter.hpp"
 
@@ -121,12 +121,12 @@ private:
 class SimpleKLScoreFunc : public ScoreFunction {
 public:
 
-  virtual double matchedTermWeight(QueryTerm *qTerm, QueryRep *qRep, DocInfo *info, DocumentRep *dRep) { 
+  virtual double matchedTermWeight(QueryTerm *qTerm, TextQueryRep *qRep, DocInfo *info, DocumentRep *dRep) { 
     return (qTerm->weight()*log(dRep->termWeight(qTerm->id(),info)));
   }
 
   /// score adjustment (e.g., appropriate length normalization)
-  virtual double adjustedScore(double origScore, QueryRep *qRep, DocumentRep *dRep) {
+  virtual double adjustedScore(double origScore, TextQueryRep *qRep, DocumentRep *dRep) {
     SimpleKLQueryModel *qm = (SimpleKLQueryModel *)qRep;
     // dynamic_cast<SimpleKLQueryModel *>qRep;
     SimpleKLDocModel *dm = (SimpleKLDocModel *)dRep;
@@ -139,14 +139,14 @@ public:
 /// KL Divergence retrieval model with simple document model smoothing
 
 
-class SimpleKLRetMethod : public RetrievalMethod {
+class SimpleKLRetMethod : public TextQueryRetMethod {
 public:
 
-  SimpleKLRetMethod(Index &dbIndex, const char *supportFileName);
+  SimpleKLRetMethod(Index &dbIndex, const char *supportFileName, ScoreAccumulator &accumulator);
   virtual ~SimpleKLRetMethod();
   
-  virtual QueryRep *computeQueryRep(TextQuery &qry) {
-    return (new SimpleKLQueryModel(qry, *ind));
+  virtual TextQueryRep *computeTextQueryRep(TextQuery &qry) {
+    return (new SimpleKLQueryModel(qry, ind));
   }
   
   virtual DocumentRep *computeDocRep(int docID);
@@ -157,7 +157,7 @@ public:
   }
   
 
-  virtual void updateQuery(QueryRep &origRep, DocIDSet &relDocs);
+  virtual void updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs);
 
   void setDocSmoothParam(SimpleKLParameter::DocSmoothParam &docSmthParam);
   void setQueryModelParam(SimpleKLParameter::QueryModelParam &queryModParam);
@@ -165,7 +165,7 @@ public:
 protected:
 
   double *mcNorm; // needed for fast one-step Markov chain   
-
+  
   double *docProbMass; // needed for fast alpha computing
   int *uniqueTermCount; // needed for supporting fast absolute discounting
   UnigramLM *collectLM; // a little faster if pre-computed
@@ -177,9 +177,9 @@ protected:
   /// Mixture model feedback method
   void computeMixtureFBModel(SimpleKLQueryModel &origRep, DocIDSet & relDocs);
   /// Divergence minimization feedback method, not implemented
-  void computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs);
+  void computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) {}
   /// Markov chain feedback method, not implemented
-  void computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) ;
+  void computeMarkovChainFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs) {}
   //@}
 
   SimpleKLParameter::DocSmoothParam docParam;

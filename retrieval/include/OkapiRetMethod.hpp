@@ -13,9 +13,9 @@
 #ifndef _OKAPIRETMETHOD_HPP
 #define _OKAPIRETMETHOD_HPP
 
-#include "QueryRep.hpp"
+#include "TextQueryRep.hpp"
 #include "ScoreFunction.hpp"
-#include "RetrievalMethod.hpp"
+#include "TextQueryRetMethod.hpp"
 #include <math.h>
 
 /// Okapi retrieval model parameter namespace
@@ -65,7 +65,7 @@ private:
 class OkapiScoreFunc : public ScoreFunction {
 public:
   OkapiScoreFunc(Index &dbIndex): ind(dbIndex) {}
-  virtual double matchedTermWeight(QueryTerm *qTerm, QueryRep *qRep, DocInfo *info, DocumentRep *dRep);
+  virtual double matchedTermWeight(QueryTerm *qTerm, TextQueryRep *qRep, DocInfo *info, DocumentRep *dRep);
 protected:
   Index &ind;
 };
@@ -111,25 +111,25 @@ protected:
 
 /// The Okapi BM25 retrieval function, as described in their TREC-3 paper
 
-class OkapiRetMethod : public RetrievalMethod  {
+class OkapiRetMethod : public TextQueryRetMethod  {
 public:
 
 
-  OkapiRetMethod(Index &dbIndex);
+  OkapiRetMethod(Index &dbIndex, ScoreAccumulator &accumulator);
 
   virtual ~OkapiRetMethod() { delete scFunc;}
 
-  virtual QueryRep *computeQueryRep(TextQuery &qry) {
-    return (new OkapiQueryRep(qry, *ind, tfParam.k3));
+  virtual TextQueryRep *computeTextQueryRep(TextQuery &qry) {
+    return (new OkapiQueryRep(qry, ind, tfParam.k3));
   }
 
   virtual DocumentRep *computeDocRep(int docID) {
-    return (new OkapiDocRep(docID, *ind, tfParam));
+    return (new OkapiDocRep(docID, ind, tfParam));
   }
 
   virtual ScoreFunction *scoreFunc();
   
-  virtual void updateQuery(QueryRep &origRep, DocIDSet &relDocs);
+  virtual void updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs);
 
   void setTFParam(OkapiParameter::TFParam &tfWeightParam);
 
