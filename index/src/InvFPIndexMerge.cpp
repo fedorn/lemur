@@ -852,6 +852,11 @@ void InvFPIndexMerge::setbuf(ifstream* fs, char* bp, int bytes){
   #ifdef _WIN32
   fs->rdbuf()->pubsetbuf(bp, bytes);
   #else
+
+  #if (_CXXVER == 301 || _CXXVER == 302 )
+  fs->rdbuf()->pubsetbuf(bp, bytes);
+  #else 
   fs->setbuf(bp, bytes);
+  #endif
   #endif
 }
