@@ -635,7 +635,7 @@ static int vacate_oldest_buffer(struct fcb *f)
 }
 
 static int get_buffer(struct fcb *f, struct leveln_pntr block, boolean *not_found)
-{int i,bufix;
+{int bufix;
 
 /*  get_buffer_cnt++; */
 
@@ -672,7 +672,8 @@ static int get_index(struct fcb *f, struct leveln_pntr b)
 }
 
 int kf_wire_index(struct fcb *f, struct leveln_pntr b)
-{boolean not_found; int bufix;
+{
+  int bufix;
 
 /*  get_index_cnt++; */
   bufix = get_index(f,b);
@@ -750,7 +751,7 @@ static struct leveln_pntr search_index(struct fcb *f, int stop_lvl, struct key *
 /*   variables.  It assumes that the fib has been initialized.          */
 
 static void init_key(struct fcb *f, int lc, enum file_access insert_mode)
-{int i,bufix,hash_target,hash_blocks;;
+{int i,hash_target,hash_blocks;;
 
   null0_ptr.segment = max_segments; null0_ptr.sc = 0; null0_ptr.lc = 0;
   nulln_ptr.segment = max_segments; nulln_ptr.block = 0;
@@ -859,7 +860,7 @@ static void extract_next(struct fcb *f, int ix, char t[], struct level0_pntr *p)
 }
 
 int next_ptr(struct fcb *f, char t[], struct level0_pntr *p)
-{int ix,lc; struct leveln_pntr next;
+{int ix; struct leveln_pntr next;
 
   if ( check_fcb(f) ) {
     ix = get_index(f,f->position);
@@ -915,7 +916,7 @@ int keyrec_lc(struct level0_pntr *p)
 
 int get_ptr(struct fcb *f, char t[], struct level0_pntr *p)
 {struct leveln_pntr b; int sc,bufix; struct key k; enum comparison result;
-char t1[max_key_lc]; struct level0_pntr p1;
+char t1[max_key_lc]; 
 
   set_up(f,t,&k);
   if ( f->error_code==no_err ) {
@@ -1124,7 +1125,7 @@ static void simple_delete(struct block *blok, int ix)
 
 static void remove_index(f,b)
 struct fcb *f; struct leveln_pntr b;
-{struct leveln_pntr parent,save_next,save_prev; int ix=0,bufix,i; boolean done=false;
+{struct leveln_pntr parent,save_next,save_prev; int ix=0,bufix; boolean done=false;
  struct leveln_pntr p;
 
   bufix = get_index(f,b); f->buffer[bufix].modified = false;
@@ -1449,7 +1450,7 @@ static void move_from_rec(struct fcb *f, char r[], struct level0_pntr *p)
 /* user callable entries */
 
 int create_key(struct fcb *f, char id[], int lc, enum file_access insert_mode)
-{int i,ix,bufix; struct leveln_pntr b; struct key max_key; FILE *file;
+{int i,bufix; struct leveln_pntr b; struct key max_key; 
 
   f->error_code = no_err; f->version = current_version;
   f->segment_cnt = 0;

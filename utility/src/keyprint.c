@@ -178,7 +178,7 @@ void print_levels(FILE *list, struct fcb *f)
 }
 
 void print_fib(FILE *list, struct fcb *f)
-{int i;
+{
   fprintf(list,"FCB Print for file=%s",f->file_name);
   if ( f->file_extension[0]=='\0' ) fprintf(list,"\n");
   else fprintf(list,"%s\n",f->file_extension);
