@@ -9,12 +9,6 @@
  *==========================================================================
 */
 
-/*
- * NAME DATE - COMMENTS
- * lsi 09/2002 - created
- *
- *========================================================================*/
-
 #include "SingleRegrMergeMethod.hpp"
 #include <map>
 
@@ -44,9 +38,9 @@ void SingleRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScore
   docsidmap centerScoreHash;
   double indexscore;
   int maxArraySize=0;
+  int i;
 
-
-  for (int i=0;i<indexset.size();i++) {
+  for (i=0;i<indexset.size();i++) {
     docscores = scoresset[i];
     maxArraySize+=docscores->size();
   }
@@ -54,10 +48,10 @@ void SingleRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScore
   /// the following arrays are created to calculate the linear regression parameters.
   /// here we wants to figure out the parameters of D''=a*D'+b*C'*D';
   /// Yi=a*X1i+b*X2i
-  double yVals[maxArraySize];
-  double x1Vals[maxArraySize];
-  double dbVals[maxArraySize];
-  double x2Vals[maxArraySize];
+  double* yVals = new double[maxArraySize];
+  double* x1Vals = new double[maxArraySize];
+  double* dbVals = new double[maxArraySize];
+  double* x2Vals = new double[maxArraySize];
   double sum_x1_x1=0;
   double sum_x2_x2=0;
   double sum_x1_x2=0;
@@ -76,7 +70,7 @@ void SingleRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScore
   int overlapNum=0;//the total number of overlap documents for all databases.
   int lessDbNum=0; //the number of databases that has less overlap documents than the threshold.
   int dbCount=indexset.size();
-  for (int i=0;i<indexset.size();i++) {
+  for (i=0;i<indexset.size();i++) {
     int dbOverlapNum=0; //the number of overlap documents for this specific database
     docscores = scoresset[i];
     indexscore = indexset[i].val;
@@ -118,5 +112,10 @@ void SingleRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScore
     parama=0.71428;
     paramb=0.5714;
   }
+
+  delete[] yVals;
+  delete[] x1Vals;
+  delete[] dbVals;
+  delete[] x2Vals;
 }
 
