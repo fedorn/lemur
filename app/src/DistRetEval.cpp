@@ -10,11 +10,17 @@
 */
 
 
+/*
+ * NAME DATE - COMMENTS
+ * tnt 06/2002 - created
+ * lsi 09/2002 - modified to support other merge methods
+ *
+ *========================================================================*/
+
 /** This is a sample application that does distributed retrieval, using
     a collection selection index and individual indexes.  Database ranking
     is done using the CORIRetMethod (the only db ranking implemented thus
-    far).  Database score merging uses CORIMergeMethod (the only merge 
-    method implemented so far).
+    far).  Merging can be done using any available DistMergeMethod.
 
     Parameters should be set as follows:
     index = the collection selection database
@@ -27,13 +33,16 @@
     "dbids" = "db's param file" - required for each database in the collection selection index.  key should be the dbcharid and value should be name of file that has parameters for that database: 
             index = the individual database
 	    retModel = the retrieval model to use
+	    mergeMethod = the merging method to use
 	    "modelvals" - whatever parameters are required for that retModel
     
 **/
 
 #include "CORIRetMethod.hpp"
 #include "DistSearchMethod.hpp"
+#include "DistMergeMethod.hpp"
 #include "CORIMergeMethod.hpp"
+#include "SingleRegrMergeMethod.hpp"
 #include "Param.hpp"
 #include "RetParamManager.hpp"
 #include "IndexManager.hpp"
@@ -43,9 +52,11 @@ namespace LocalParameter {
   // the index cutoff for how many indexes to search
   static int cutoff;
   static string ranksfile;
+  static char* textQuerySet2;
   static void get() {
     cutoff = ParamGetInt("cutoff", 10); // default is 10
     ranksfile = ParamGetString("ranksFile", ""); // write out ranking scores
+    textQuerySet2=strdup(ParamGetString("textQuerySet2",""));
   }
 };
 
@@ -53,20 +64,47 @@ void GetAppParam() {
   RetrievalParameter::get();
   CORIParameter::get();
   LocalParameter::get();
+  DistMergeMethodParameter::get();
 }
 
 int AppMain(int argc, char *argv[]) {
   // this should be a collection selection index
   Index *csindex;
+  // the centralized sample database
+  Index *csdbindex;
+  int csdoccount                      ;
+  ArrayAccumulator *accumCsDb;
+  IndexedRealVector *rankingsCsDb;
+  CORIRetMethod *modelCsDb;
   try {
     csindex = IndexManager::openIndex(RetrievalParameter::databaseIndex);
   }
   catch (Exception &ex) {
     ex.writeMessage(cerr);
-    throw Exception("DistRetEval", "Can't open index, check parameter index");
+    throw Exception("DistRetEval", "Can't open the collection selection index, check parameter index");
+  }
+
+
+  if ( DistMergeMethodParameter::mergeMethod==SINGLETYPEREGR_MERGE){
+    //use some regression method
+    try {
+      SingleRegrMergeMethodParameter::get();
+      csdbindex = IndexManager::openIndex(SingleRegrMergeMethodParameter::csDbDataBaseIndex);
+      int doccount = csdbindex->docCount();
+      accumCsDb=new ArrayAccumulator (doccount);
+      rankingsCsDb=new IndexedRealVector(doccount);
+      modelCsDb=new   CORIRetMethod (*csdbindex,*accumCsDb,"USE_INDEX_COUNTS",0);
+
+    }
+    catch (Exception &ex) {
+      ex.writeMessage(cerr);
+      throw Exception("DistRetEval", "Can't open the centralized database index, check parameter index");
+    }
   }
   
   DocStream *qryStream;
+
+
   try {
     qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
   }
@@ -76,29 +114,62 @@ int AppMain(int argc, char *argv[]) {
   }
 
   int i;
+ 
+  //creat the collecion selection retireval model
   int doccount = csindex->docCount();
   ArrayAccumulator accum(csindex->docCount());
   IndexedRealVector rankings(doccount);
-  CORIRetMethod model(*csindex, accum, CORIParameter::collectionCounts);
-  DistSearchMethod search(csindex);
-  DocScoreVector** scoreset = new DocScoreVector*[LocalParameter::cutoff];
-  CORIMergeMethod merger;
+  //creat the collecion selection retireval model
+  CORIRetMethod model(*csindex, accum, CORIParameter::collectionCounts,1);
   DocScoreVector results;
 
+
+  //Notice assume that collectionCounts i USE_INDEX_COUNT
+
+
+  DistSearchMethod search(csindex,RetMethodManager::CORI_DOC);
+  DocScoreVector** scoreset = new DocScoreVector*[LocalParameter::cutoff];
+  DocScoreVector resultsCsDb;
+  CORIMergeMethod merger;
+  SingleRegrMergeMethod singleRegrMerger;
+
+
+
+  cout<<"Write Results File to "<<RetrievalParameter::resultFile<<endl;
   ofstream resfile(RetrievalParameter::resultFile);
+  assert(resfile);
   ofstream writeranks;
   if (LocalParameter::ranksfile.compare("") != 0)
     writeranks.open(LocalParameter::ranksfile.c_str());
 
   qryStream->startDocIteration();
   TextQuery *q;
+  TextQuery *qCsDb;
+  DistMergeMethodParameter::get();
 
-  while (qryStream->hasMore()) {
+  while (qryStream->hasMore() ) {
     Document *d = qryStream->nextDoc();
+    //Document *dCs=qryCSStream->nextDoc();
     q = new TextQuery(*d);
     cout << "query : " << q->id() << endl;
+
+    //to calculate the centralized scores;
+ 
+    if (DistMergeMethodParameter::mergeMethod==SINGLETYPEREGR_MERGE){
+      QueryRep *qrCs = modelCsDb->computeQueryRep(*q);
+      resultsCsDb.clear();
+      modelCsDb->scoreCollection(*qrCs, *rankingsCsDb);    
+      for (i=0;i<rankingsCsDb->size();i++) {
+	resultsCsDb.PushValue(csdbindex->document((*rankingsCsDb)[i].ind), (*rankingsCsDb)[i].val);
+      }
+      rankingsCsDb->clear();
+      delete qrCs;
+    }
+
     QueryRep *qr = model.computeQueryRep(*q);
     model.scoreCollection(*qr, rankings);
+
+
 
     rankings.Sort();
 
@@ -111,18 +182,29 @@ int AppMain(int argc, char *argv[]) {
 
     // we want to search only so many databases
     rankings.assign(rankings.begin(), rankings.begin()+LocalParameter::cutoff);
+    // set return document counts for each individual databases
+    search.setReturnCount(RetrievalParameter::resultCount);
     // search those databases and put the scores into scoreset
     search.scoreIndexSet(*q, rankings, scoreset);
     // now merge the scores
-    merger.mergeScoreSet(rankings, scoreset, results);
+
+    if (DistMergeMethodParameter::mergeMethod==CORI_MERGE){
+      merger.mergeScoreSet(rankings, scoreset, results);
+    }else if  (DistMergeMethodParameter::mergeMethod==SINGLETYPEREGR_MERGE){
+      singleRegrMerger.calcRegrParams(rankings,&resultsCsDb,scoreset);
+      singleRegrMerger.mergeScoreSet(rankings, scoreset, results);
+    }
 
     for (i=0;i<RetrievalParameter::resultCount && i<results.size();i++) 
       resfile << q->id() << " Q0 " << results[i].id << " 0 " << results[i].val << " Exp" << endl;
 
     rankings.clear();
     results.clear();
+    resultsCsDb.clear();
+
     for (i=0;i<LocalParameter::cutoff;i++) 
 	delete (scoreset[i]);
+
     delete q;
     delete qr;
   }
@@ -132,6 +214,12 @@ int AppMain(int argc, char *argv[]) {
   delete csindex;
   delete qryStream;
   delete[]scoreset;
+
+  if ( DistMergeMethodParameter::mergeMethod==SINGLETYPEREGR_MERGE){
+    delete accumCsDb;
+    delete rankingsCsDb;
+    delete modelCsDb;
+  }
 
   return 0;
 }
