@@ -16,12 +16,12 @@ endif
 # how to generate .d  file from a .C file
 ../depend/%.d: ../src/%.cpp
 	set -e; $(CPP) -M $(CPPFLAGS) $< \
-     | sed 's/:/ \.\.\/depend\/%.d :/g' > $@; [ -s $@ ] || rm -f $@
+     | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
 
 # how to generate .d file from a .c file
 ../depend/%.d: ../src/%.c
 	set -e; $(CC) -M $(CPPFLAGS) $< \
-     | sed 's/:/ \.\.\/depend\/%.d :/g' > $@; [ -s $@ ] || rm -f $@
+	| sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
 
 # compiling C++ code
 %.o: ../src/%.cpp
