@@ -48,13 +48,13 @@ private:
   void initBitMasks ();
   int floorlog2 (double x);
   int gamma_size(int x);
-  int gamma_encode(int x, int offset, vector<bool> &bv);
-  int gamma_decode(int * y, int offset, vector<bool> &bv);
-  int read_bits(istream & is, vector<bool> &bv, int size);
-  void write_bits(ostream & os, vector<bool> &bv);
+  int gamma_encode(int x, int offset, vector<int> &bv);
+  int gamma_decode(int * y, int offset, vector<int> &bv);
+  int read_bits(istream & is, vector<int> &bv, int size);
+  void write_bits(ostream & os, vector<int> &bv);
 
 private:
-  vector<bool> bv;
+  vector<int> bv;
   static char bits[8];
 };
 
