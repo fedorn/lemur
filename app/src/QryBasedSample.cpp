@@ -11,14 +11,14 @@
 
 #include <fstream>
 #include <cstring>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 
 
 #include "QryBasedSampler.hpp"
-#include "MindDBManager.hpp"
 #include "LemurDBManager.hpp"
 #include "FreqCounter.hpp"
+#include "Exception.hpp"
 
 //#include "DocFreqIndexer.hpp"
 //#include "CtfIndexer.hpp"
@@ -188,8 +188,8 @@ int AppMain (int argc, char * argv []) {
   DBManager * dbm;
   if (LocalParameter::dbManager == "lemur") {
     dbm = new LemurDBManager();
-  } else if (LocalParameter::dbManager == "mind") {
-    dbm = new MindDBManager();
+  } else {
+    throw Exception("QryBasedSample", "Unknown dbManager specified.");
   }
 
   // Create and initialize the query-based sampler object
