@@ -32,6 +32,13 @@ public:
   {
     res.clear();
     if (eof || strcmp(curQID, expectedQID)) {
+      if (!eof) {
+	cerr << "expected query ID: "<< expectedQID << " actual ID: "<<curQID <<endl;
+      } else {
+	cerr << "Unexpected end of the result file\n";
+      }
+      cerr.flush();
+ 
       throw Exception("ResultFile", "query id mismatch between the original query and the result file");
     }
     do {
