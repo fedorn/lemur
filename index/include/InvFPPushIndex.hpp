@@ -13,7 +13,8 @@
  * NAME DATE - COMMENTS
  * tnt 03/01 - created
  ======================================================================*/
-#include <stdio.h>
+#include <iostream>
+#include <fstream>
 #include "PushIndex.hpp"
 #include "MemCache.hpp"
 #include "InvFPTypes.hpp"
@@ -22,13 +23,6 @@
 #include "InvFPIndexMerge.hpp"
 #include "map.hpp"
 #include "vector.hpp"
-
-struct ltstr
-{
-  bool operator()(char* s1, char* s2) const{
-    return strcmp(s1, s2) < 0;
-  }
-};
 
 typedef map<char*, InvFPDocList*, ltstr> TABLE_T;
 
@@ -54,12 +48,15 @@ public:
 
 
 private:
+  void writeTOC();
   void writeDocIDs();
   void writeCache();
   void lastWriteCache();
 
   MemCache* cache; /// the main memory handler
-  FILE* writetlist; /// filestream for writing the list of located terms for each document
+ // FILE* writetlist; /// filestream for writing the list of located terms for each document
+  ofstream writetlist;
+  FILE* writetlookup; /// filestream for writing the lookup table to the docterm db
   vector<LocatedTerm> termlist; /// list of terms and their locations in this document
   vector<char*> docIDs; /// list of external docids in internal docid order
   vector<char*> termIDs; /// list of terms in termid order
