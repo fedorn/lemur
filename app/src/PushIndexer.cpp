@@ -129,6 +129,7 @@ namespace LocalParameter {
 
   // free the memory allocated in get()
   void freeMem() {
+    // these strings were created using strdup
     free(index);
     free(stopwords);
     free(acronyms);
@@ -191,7 +192,7 @@ int AppMain(int argc, char * argv[]) {
   }
 
   // Create the appropriate parser.
-  Parser * parser;
+  Parser * parser = NULL;
   if (!strcmp(LocalParameter::docFormat, "web")) {
     parser = new WebParser();
   } else if (!strcmp (LocalParameter::docFormat, "reuters")) {
@@ -283,6 +284,7 @@ int AppMain(int argc, char * argv[]) {
   // free memory
   if (acros != NULL) delete acros;
   if (stopper != NULL) delete stopper;
+  if (stemmer != NULL) delete stemmer;
   delete parser;
   LocalParameter::freeMem();
   return 0;
