@@ -138,6 +138,9 @@
 				RelativePath=".\src\IndriTermInfoList.cpp">
 			</File>
 			<File
+				RelativePath=".\src\IndriTextHandler.cpp">
+			</File>
+			<File
 				RelativePath=".\src\InvDocList.cpp">
 			</File>
 			<File
@@ -294,6 +297,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\IndriTermInfoList.hpp">
+			</File>
+			<File
+				RelativePath=".\include\IndriTextHandler.hpp">
 			</File>
 			<File
 				RelativePath=".\include\InvDocInfo.hpp">
