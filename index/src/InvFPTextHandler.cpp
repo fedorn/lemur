@@ -25,7 +25,7 @@ InvFPTextHandler::InvFPTextHandler(char * filename, int bufferSize,
   docLength = 0;
   pos = 0;
   // set state that is on first doc
-  bool first = true;
+  first = true;
 }
 
 InvFPTextHandler::~InvFPTextHandler() {
