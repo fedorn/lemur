@@ -77,7 +77,7 @@ CFLAGS = @DEFS@ @CFLAGS@
 CXXFLAGS    = @DEFS@ @CXXFLAGS@
 CPPLDFLAGS  = @LDFLAGS@  @LIBS@ -lm
 
-ALLBIN = BuildBasicIndex BuildDocMgr BuildInvertedIndex BuildPropIndex EstimateDirPrior GenL2Norm GenerateQueryModel GenerateSmoothSupport IncIndexer IncPassageIndexer KeyfileIncIndexer ParseInQueryOp ParseQuery ParseToFile PassageIndexer PushIndexer QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval TwoStageRetEval
+ALLBIN = BuildBasicIndex BuildDocMgr BuildKeyfileIncIndex BuildInvertedIndex BuildPropIndex EstimateDirPrior GenL2Norm GenerateQueryModel GenerateSmoothSupport IncIndexer IncPassageIndexer ParseInQueryOp ParseQuery ParseToFile PassageIndexer PushIndexer QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval TwoStageRetEval
 
 ifneq ($(WITH_DISTRIB),0)
 ALLBIN += CollSelIndex DistRetEval QryBasedSample
