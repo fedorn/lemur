@@ -1,9 +1,11 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(Lemur, 3.0, lemur-project@cs.cmu.edu)
+AC_INIT(Lemur, 3.1, lemur-project@cs.cmu.edu)
 AC_CONFIG_SRCDIR(app/src/RetEval.cpp)
 AC_CONFIG_FILES(MakeDefns Makefile Makefile.app)
 dnl To use a header file instead of command line -D defs, use
 dnl AC_CONFIG_HEADERS(config.h)
+dnl canonical host
+AC_CANONICAL_HOST
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -12,10 +14,24 @@ AC_PROG_LEX
 AC_PROG_INSTALL
 AC_CHECK_PROGS(AR, ar gar)
 
+AC_SUBST(HOST_OS)
 dnl Checks for libraries.
+
 dnl If/when we add client server
-dnl AC_CHECK_LIB(nsl, gethostbyname)
-dnl AC_CHECK_LIB(socket, socket)
+case $host in
+   *-*-solaris*) 
+     AC_CHECK_LIB(nsl, gethostbyname)
+     AC_CHECK_LIB(socket, socket)
+     HOST_OS=solaris
+     AC_DEFINE(HOST_OS, solaris, [osname for jni build])
+     ;;
+   *linux*) 
+     HOST_OS=linux
+     AC_DEFINE(HOST_OS, linux, [osname for jni build])
+     ;;
+   *);;
+esac
+AC_CHECK_LIB(z, deflate)
 
 dnl Checks for header files.
 
@@ -30,8 +46,9 @@ AC_SUBST(MODULES)
 AC_SUBST(WITH_SUMMARIZATION)
 AC_SUBST(WITH_DISTRIB)
 AC_SUBST(WITH_CLUSTER)
+
 dnl Base lemur modules
-MODULES="retrieval langmod index utility"
+MODULES="retrieval langmod index parsing utility contrib/antlr contrib/xpdf"
 
 AC_ARG_ENABLE(distrib,
 	    AC_HELP_STRING([--enable-distrib],
