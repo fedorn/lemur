@@ -39,17 +39,17 @@
 static const float SPARSENESS = 1.5;
 static const float GROW_FACTOR = 2.0;
 
+
 template <class ObjType>
 class PSet
 {
-private:
-  typedef struct set_node {
+protected:
+  struct SET_NODE {
     ObjType          u;
     int              idx;           // used in derived classes, but not here
-    struct set_node *next;
-  } SET_NODE;
-  
-  
+    struct SET_NODE *next;
+  } ;
+    
 public:
   PSet(): currentSize(0),maxSize(0),hashTable(0) {}
   PSet(const int maxSize_p) : currentSize(0),hashTable(0) { open(maxSize_p); }

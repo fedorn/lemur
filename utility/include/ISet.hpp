@@ -35,8 +35,8 @@ public:
 
   void open(const int maxSize_p) {
     PSet<ObjType>::open(maxSize_p);
-    index = new SET_NODE* [maxSize+1];
-    memset(index, 0, (maxSize+1)*sizeof(SET_NODE*));
+    index = new typename PSet<ObjType>::SET_NODE* [maxSize+1];
+    memset(index, 0, (maxSize+1)*sizeof(typename PSet<ObjType>::SET_NODE*));
   }
   
   void close() {
@@ -54,7 +54,7 @@ public:
   int size() const { return currentSize; }
 
   int add(const ObjType& u) {
-    SET_NODE *sn = PSet<ObjType>::internalAdd(u);
+    typename PSet<ObjType>::SET_NODE *sn = PSet<ObjType>::internalAdd(u);
     if (sn==0) return -1;
     index[sn->idx] = sn;
     if (++currentSize > maxSize) grow((int) (currentSize*GROW_FACTOR+1));
@@ -83,7 +83,7 @@ public:
   
   int operator[](const ObjType& u) const {    // get idx of u, -1 if not there
     int hashval = computeHash(u);    
-    SET_NODE *p = hashTable[hashval];
+    typename PSet<ObjType>::SET_NODE *p = hashTable[hashval];
     while(p!=0 && !(p->u==u)) p=p->next;
     return ((p==0)? -1: p->idx);
   }
@@ -91,13 +91,13 @@ public:
   void grow(const int newSize) {
     maxSize = newSize;
     hashTableSize = smallestPrimeGreaterThan((int) (maxSize*SPARSENESS));
-    SET_NODE **newIndex = new SET_NODE* [maxSize+1];
-    SET_NODE **newHashTable = new SET_NODE* [hashTableSize];
-    memset(newHashTable, 0, hashTableSize*sizeof(SET_NODE *));
+    typename PSet<ObjType>::SET_NODE **newIndex = new typename PSet<ObjType>::SET_NODE* [maxSize+1];
+    typename PSet<ObjType>::SET_NODE **newHashTable = new typename PSet<ObjType>::SET_NODE* [hashTableSize];
+    memset(newHashTable, 0, hashTableSize*sizeof(typename PSet<ObjType>::SET_NODE *));
     for (int i=0; i<currentSize; i++) {
-      SET_NODE *sn = index[i];
+      typename PSet<ObjType>::SET_NODE *sn = index[i];
       const int hashval = computeHash(sn->u);
-      SET_NODE *snNew = createNode(sn->u);
+      typename PSet<ObjType>::SET_NODE *snNew = createNode(sn->u);
       snNew->idx = i;
       snNew->next = newHashTable[hashval];
       newHashTable[hashval] = snNew;
@@ -132,7 +132,7 @@ protected:
    }
 
 protected:
-  SET_NODE* (*index);              // goes from [dense idx] -> node
+ typename PSet<ObjType>::SET_NODE* (*index);              // goes from [dense idx] -> node
 };
 
 #endif

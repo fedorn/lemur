@@ -52,7 +52,7 @@ public:
 
   int add(const ObjType& u, const CountType &count=(CountType) 1.0) {
      // add u <count> times to set; return idx of u if new, -1 if old
-    SET_NODE *sn = PSet<ObjType>::internalAdd(u);
+    typename PSet<ObjType>::SET_NODE  *sn = PSet<ObjType>::internalAdd(u);
     if (sn==0) {
       // already in set, but need to increment count anyway
       int idx = operator[](u);
