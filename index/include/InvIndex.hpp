@@ -19,7 +19,7 @@
 #include "InvDocList.hpp"
 #include "InvTermList.hpp"
 #include "InvFPTypes.hpp"
-
+#include "Param.hpp"
 
 // for counts array
 #define UNIQUE_TERMS 0
@@ -109,6 +109,10 @@ public:
   TermInfoList* termInfoList(int docID);
 
   //@}
+
+  /// set the mesg stream
+ void setMesgStream(ostream * lemStream);
+
 protected:
   /// readin all toc
   bool fullToc(const char* fileName);
@@ -129,6 +133,7 @@ protected:
   /// read in docIDs to doc spelling map
   bool docIDs();
 
+
   int* counts;    // array to hold all the overall count stats of this db
   char** names;   // array to hold all the names for files we need for this db
   float aveDocLen; // the average document length in this index
@@ -142,7 +147,7 @@ protected:
   vector<char*> docmgrs; // list of document managers
   map<TERM_T, TERMID_T, ltstr> termtable; // table of terms to termid
   map<EXDOCID_T, DOCID_T, ltstr> doctable; // table of exdocids to docid
-  ostream* lemurstream; // Lemur code messages stream		
+  ostream* msgstream; // Lemur code messages stream		
 };
 
 #endif
