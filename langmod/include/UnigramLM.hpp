@@ -119,32 +119,29 @@ private:
 };
 
 
-/// Linear interpolation
 
-class InterpUnigramLM : public UnigramLM {
+
+
+
+/// Linear interpolation smoothing
+
+class InterpUnigramLM : public SmoothedMLEstimator { 
 public:
-  InterpUnigramLM(UnigramLM &langMod1, UnigramLM &langMod2, double coeff1) : 
-    lm1(langMod1), lm2(langMod2), c1(coeff1) { 
-    if (strcmp(lm1.lexiconID(), lm2.lexiconID())) {
-      throw Exception("InterpUnigramLM", "non-compatible lexicon");
-      // ensure compatible lexicons
-    }
-  }
+  InterpUnigramLM(Counter & counter, const char *lexiconID, 
+		     UnigramLM &refLM, double refCoeff) 
+    : SmoothedMLEstimator(counter, lexiconID), ref(&refLM), 
+    refC(refCoeff) {}
 
   virtual ~InterpUnigramLM() {}
   
-  virtual double prob(int wordIndex) {
-    return (c1*lm1.prob(wordIndex)+(1-c1)*lm2.prob(wordIndex));
-  }
-
-  virtual const char *lexiconID() {
-    return lm1.lexiconID();
+  virtual double probEstimate(int wordIndex, double count, double sum) {
+    return ((1-refC)*count/sum + refC*ref->prob(wordIndex));
   }
 
 private:
-  UnigramLM &lm1;
-  UnigramLM &lm2;
-  double c1;  
+  UnigramLM *ref;
+  /// coefficient for the reference language model
+  double refC;  
 };
 
 
