@@ -1,6 +1,6 @@
 
 #include "TextHandler.hpp"
-#include "InvFPPushIndex.hpp"
+#include "InvPushIndex.hpp"
 #include "Parser.hpp"
 #include "WordSet.hpp"
 
@@ -31,7 +31,7 @@ private:
   int dfCount;
   bool first;
 
-  InvFPPushIndex * collsel;
+  InvPushIndex * collsel;
 
   DocumentProps * csdp;
   InvFPTerm * term;

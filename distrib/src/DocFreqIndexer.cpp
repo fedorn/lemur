@@ -4,7 +4,7 @@
 
 DocFreqIndexer::DocFreqIndexer(char * csName, char * cwName, 
 			 char * ssName, int bufferSize, bool countStopWords) {
-  collsel = new InvFPPushIndex(csName, bufferSize);
+  collsel = new InvPushIndex(csName, bufferSize);
   collWords = fopen(cwName, "wb");
   serverSizes = fopen(ssName, "wb");
 

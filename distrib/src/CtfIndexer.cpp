@@ -4,7 +4,7 @@
 
  
 CtfIndexer::CtfIndexer(char * csName, int bufferSize, bool countStopWords) {
-  collsel = new InvFPPushIndex(csName, bufferSize);
+  collsel = new InvPushIndex(csName, bufferSize);
 
   csdp = new DocumentProps();
   term = new InvFPTerm();
