@@ -26,8 +26,8 @@
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
 
-#include <stdio.h>
-#include <unistd.h>
+#include <cstdio>
+//#include <unistd.h>
 
 
 /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
@@ -2428,6 +2428,7 @@ int main()
 
 ChineseCharParser::ChineseCharParser() {
   state = OUTER;
+  iden = identifier;
 }
 
 long ChineseCharParser::fileTell() {
