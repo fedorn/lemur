@@ -81,7 +81,7 @@ public:
     TermInfo* tEntry;
     while (tList->hasMore()) {
       tEntry = tList->nextEntry();
-      if ( isEOS(idx->term(tEntry->id())) ) return true;
+      if ( isEOS(idx->term(tEntry->termID())) ) return true;
     }
     return false;
   }
@@ -117,9 +117,9 @@ public:
     if (eos) {
       while (tList->hasMore()) {
 	tEntry = tList->nextEntry();
-	if ( isEOS(idx->term(tEntry->id())) ) return;
+	if ( isEOS(idx->term(tEntry->termID())) ) return;
 	storage = new termCount;
-	storage->termID = tEntry->id();
+	storage->termID = tEntry->termID();
 	storage->tf = tEntry->count();
 	psg.addTerm(*storage);
       }
@@ -128,7 +128,7 @@ public:
 	if (tList->hasMore()) {
 	  tEntry = tList->nextEntry();
 	  storage = new termCount;
-	  storage->termID = tEntry->id();
+	  storage->termID = tEntry->termID();
 	  storage->tf = tEntry->count();
 	  psg.addTerm(*storage);
 	} else {

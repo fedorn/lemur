@@ -88,9 +88,9 @@ void MMRSumm::findNextPassage(MMRPassage &psg, const InvFPIndex* idx,
   if (eos) {
     while (tList->hasMore()) {
       tEntry = tList->nextEntry();
-      if ( isEOS(idx->term(tEntry->id())) ) return;
+      if ( isEOS(idx->term(tEntry->termID())) ) return;
       storage = new termCount;
-      storage->termID = tEntry->id();
+      storage->termID = tEntry->termID();
       storage->tf = tEntry->count();
       storage->val = tEntry->count();
       psg.addTerm(*storage);
@@ -100,7 +100,7 @@ void MMRSumm::findNextPassage(MMRPassage &psg, const InvFPIndex* idx,
       if (tList->hasMore()) {
 	tEntry = tList->nextEntry();
 	storage = new termCount;
-	storage->termID = tEntry->id();
+	storage->termID = tEntry->termID();
 	storage->tf = tEntry->count();
 	storage->val = tEntry->count();
 	psg.addTerm(*storage);

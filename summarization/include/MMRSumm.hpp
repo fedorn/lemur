@@ -55,10 +55,10 @@ private:
       cout << "title found" << endl;
       while (tList->hasMore()) {
 	tEntry = tList->nextEntry();
-	if ( isTITLE(idx->term(tEntry->id())) ) {
+	if ( isTITLE(idx->term(tEntry->termID())) ) {
 	  tEntry = tList->nextEntry(); // the actual word after title token
 	  storage = new termCount;
-	  storage->termID = tEntry->id();
+	  storage->termID = tEntry->termID();
 	  storage->tf = tEntry->count();
 	  storage->val = tEntry->count();
 	  queryPassage->addTerm(*storage);
@@ -70,7 +70,7 @@ private:
 	if (tList->hasMore()) {
 	  tEntry = tList->nextEntry();
 	  storage = new termCount;
-	  storage->termID = tEntry->id();
+	  storage->termID = tEntry->termID();
 	  storage->tf = tEntry->count();
 	  storage->val = tEntry->count();
 	  queryPassage->addTerm(*storage);
@@ -144,7 +144,7 @@ public:
     TermInfo* tEntry;
     while (tList->hasMore()) {
       tEntry = tList->nextEntry();
-      if ( isEOS(idx->term(tEntry->id())) ) return true;
+      if ( isEOS(idx->term(tEntry->termID())) ) return true;
     }
     return false;
   }
@@ -159,7 +159,7 @@ public:
     TermInfo* tEntry;
     while (tList->hasMore()) {
       tEntry = tList->nextEntry();
-      if ( isTITLE(idx->term(tEntry->id())) ) return true;
+      if ( isTITLE(idx->term(tEntry->termID())) ) return true;
     }
     return false;
   }

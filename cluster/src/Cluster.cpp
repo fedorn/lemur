@@ -169,7 +169,7 @@ string Cluster::getKeyWords(int maxTerms) const {
 		tlist->startIteration();
 		while (tlist->hasMore()) {
 			info = tlist->nextEntry();
-			int id = info->id();
+			int id = info->termID();
 			int freq = info->count();
 			tf[id] += freq;
 			if (tf[id] > maxtf)

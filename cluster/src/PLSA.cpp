@@ -108,7 +108,7 @@ void PLSA::selectTestTrain(int testPercentage) {
     tList->startIteration();
     while (tList->hasMore()) { // TERM
       info = tList->nextEntry();
-      ct.key = info->id();
+      ct.key = info->termID();
       // K % test
       if ((rand() % testPercentage) == 0)
 	test[i]->add(ct, info->count());

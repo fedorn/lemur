@@ -20,7 +20,7 @@ FloatFreqVector::FloatFreqVector(const Index &index, int docID)
   while (tList->hasMore()) {
     info = tList->nextEntry();
     FreqCounter ct;
-    ct.key = info->id();
+    ct.key = info->termID();
     add(ct, info->count());
   }
   delete tList;
@@ -35,7 +35,7 @@ FloatFreqVector::FloatFreqVector(const Index &index, TermInfoList *tList)
   while (tList->hasMore()) {
     info = tList->nextEntry();
     FreqCounter ct;
-    ct.key = info->id();
+    ct.key = info->termID();
     add(ct, info->count());
   }
   s2 = 0;
@@ -52,7 +52,7 @@ FloatFreqVector::FloatFreqVector(const Index &index, vector<int> &dids)
     while (tList->hasMore()) {
       info = tList->nextEntry();
       FreqCounter ct;
-      ct.key = info->id();
+      ct.key = info->termID();
       add(ct, info->count());
     }
     delete tList;
