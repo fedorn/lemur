@@ -87,10 +87,10 @@ bool Keyfile::get( const char* key, char** value, int& actualSize ) const {
 
 bool Keyfile::get( const char* key, void* value, int& actualSize, 
 		      int maxSize ) const {
-  //  assert( key && "key cannot be null" );
-  //  assert( value && "value cannot be null" );
-  //  assert( _handle && "call open() or create() first" );
-  //  assert( maxSize > 0 && "maxSize must be positive" );
+  assert( key && "key cannot be null" );
+  assert( value && "value cannot be null" );
+  assert( _handle && "call open() or create() first" );
+  assert( maxSize > 0 && "maxSize must be positive" );
   int len = strlen(key); // fix for UTF-8
   
   int error = get_rec( _handle, const_cast<char*>(key), len,
@@ -103,8 +103,8 @@ bool Keyfile::get( const char* key, void* value, int& actualSize,
 }
 
 void Keyfile::put( const char* key, const void* value, int valueSize ) {
-  //  assert( key && "key cannot be null" );
-  //  assert( value && "value cannot be null" );
+  assert( key && "key cannot be null" );
+  assert( value && "value cannot be null" );
   int len = strlen(key); // fix for UTF-8
   int error = put_rec( _handle,
                        const_cast<char*>(key), len,
@@ -152,8 +152,8 @@ bool Keyfile::previous( char* key, int& keyLength, char* value, int& valueLength
 }
 
 void Keyfile::remove( const char* key ) {
-  //  assert( key && "key cannot be null" );
-  //  assert( _handle && "call open() or create() first" );
+  assert( key && "key cannot be null" );
+  assert( _handle && "call open() or create() first" );
   int len = strlen(key); // fix for UTF-8
   int error = delete_rec( _handle, const_cast<char*>(key), len );
 
@@ -162,8 +162,8 @@ void Keyfile::remove( const char* key ) {
 }
 
 int Keyfile::getSize( const char* key ) const {
-  //  assert( key && "key cannot be null" );
-  //  assert( _handle && "call open() or create() first" );
+  assert( key && "key cannot be null" );
+  assert( _handle && "call open() or create() first" );
   char pointer[buffer_lc];
   int size;
   int len = strlen(key); // fix for UTF-8
