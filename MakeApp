@@ -1,0 +1,46 @@
+
+# this is the common definitions and rules for making an application directory
+# it is included in the Makefile in each application directory
+
+# define the binary executables
+
+# C++ applications
+CPPAPPBIN = $(CPPSRC:.cpp=)
+
+# C applications
+CAPPBIN = $(CSRC:.c=)
+
+# all applications
+
+ALLBIN = $(CPPAPPBIN) $(CAPPBIN)
+
+# targets for installing applications
+
+INSTALLBIN = $(ALLBIN:%=install%)
+
+#IMPORTANT: MakeDefns should be included before MakeRules
+
+# include common definitions
+include ../../MakeDefns
+
+# specify what it means by "make all" and "make clean"
+
+all: $(CPPAPPBIN) $(CAPPBIN)
+
+clean: cleanapp
+
+# include common rules
+include ../../MakeRules
+
+# how to make an application
+
+%: %.o $(OBJLIBS)
+	$(CXX) -o $@ $< $(INCPATH) $(CPPLDFLAGS)
+
+# how to install applications
+install Install INSTALL: $(INSTALLBIN)
+
+$(INSTALLBIN):
+	cp $(patsubst install%, %,$@) $(LEMUR_INSTALL_PATH)/lemur/bin/
+
+

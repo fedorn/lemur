@@ -1,0 +1,40 @@
+# this is the common definitions and rules for making a module directory
+# The Makefile in each module directory includes this file
+
+
+
+# IN GENERAL,  DO NOT CHANGE ANY LINES BELOW THIS POINT
+# IMPORTANT: MakeDefns must be included before MakeRules!
+
+#include common definitions
+include ../../MakeDefns
+
+# Targets for installing header files
+
+INSTALLHEADER = $(ALLHEADER:%=install%)
+
+# specify what it means by "make all" and "make clean"
+
+all: $(OBJLIB)
+
+clean: cleanlib
+
+#include common rules
+include ../../MakeRules
+
+
+#specify what it means by "make install"
+#install the header files and the library for the module
+
+install Install INSTALL: $(INSTALLHEADER) INSTALLLIB
+	
+
+# how to install header files
+$(INSTALLHEADER):
+	cp $(patsubst install%, %,$@) $(LEMUR_INSTALL_PATH)/lemur/include/
+
+
+# how to install a library for a module
+INSTALLLIB:
+	ar -rs $(LEMUR_INSTALL_PATH)/lemur/lib/liblemur.a $(OBJLIB)
+
