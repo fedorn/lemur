@@ -11,7 +11,7 @@
 
 #include "CORIMergeMethod.hpp"
 
-CORIMergeMethod::CORIMergeMethod(double constA=0.4, double constB=1.4) {
+CORIMergeMethod::CORIMergeMethod(double constA, double constB) {
   A = constA;
   B = constB;
 }
