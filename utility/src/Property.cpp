@@ -74,7 +74,7 @@ void Property::copyValue(Property * property) {
     buffer = new char[bufferSize];
   }
   if (dataSize > 0) {
-    strncpy(buffer, (char *) property->getValue(), dataSize);
+    memcpy(buffer, property->getValue(), dataSize);
   }
 }
 
