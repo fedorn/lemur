@@ -67,6 +67,7 @@ const greedy_vector<ScoredExtentResult>& WeightedSumNode::score( int documentID,
   }
 
   _scores.clear();
+  s = log(s); // return to log space
   _scores.push_back( ScoredExtentResult(s, documentID, begin, end) );
 
   return _scores;
