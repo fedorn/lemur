@@ -39,12 +39,12 @@ public:
 
 
   /// Set the index used to check for acronyms.
-  void setIndex(Index * ind);
+  void setIndex(const Index * ind);
 
 private:
   
   /// The Index that will be used for acronym checking.
-  Index * index;
+  const Index * index;
 
 };
 

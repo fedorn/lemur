@@ -22,19 +22,18 @@ InvTermList::InvTermList() {
 }
 
 InvTermList::~InvTermList() {
-  if (list != NULL)
-    free(list);
+  delete[](list);
 }
 
-void InvTermList::startIteration(){
+void InvTermList::startIteration() const{
   iter = list;
 }
 
-bool InvTermList::hasMore(){
+bool InvTermList::hasMore() const{
   return iter != end;
 }
 
-TermInfo* InvTermList::nextEntry(){
+TermInfo* InvTermList::nextEntry() const{
   //  static InvFPTerm info;
 
   entry.tid = *iter;
@@ -61,13 +60,16 @@ bool InvTermList::binRead(ifstream& infile){
   if (!(infile.gcount() == sizeof(int)))
     return false;
 
-  if (list)
-    free(list);
-
-  list = (int*) malloc(sizeof(int)*listlen);
+  //  if (list)
+  //    free(list);
+  delete[](list);
+  //  list = (int*) malloc(sizeof(int)*listlen);
+  // use new/delete[] so an exception will be thrown if out of memory.
+  list = new int[listlen];
   infile.read((char*) list, sizeof(int) * listlen);
   if (!(infile.gcount() == (sizeof(int) * listlen))) {
-    free(list);
+    //    free(list);
+    delete[](list);
     list = NULL;
     end = NULL;
     return false;

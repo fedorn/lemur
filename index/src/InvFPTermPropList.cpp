@@ -1,10 +1,10 @@
 #include "InvFPTermPropList.hpp"
 
-bool InvFPTermPropList::hasMoreTerm() {
+bool InvFPTermPropList::hasMoreTerm() const {
   return (nextTermPos() != -1);
 }
 
-TermInfo* InvFPTermPropList::nextTerm() {
+TermInfo* InvFPTermPropList::nextTerm()  const{
   // we'll do this only for sequence of terms lists
   if (counts)
     return NULL;
@@ -27,7 +27,7 @@ TermInfo* InvFPTermPropList::nextTerm() {
   return &entry;
 }
 
-void InvFPTermPropList::skipTo(int pos) {
+void InvFPTermPropList::skipTo(int pos)  const{
   // we'll do this only for sequence of terms lists
   if (counts)
     return;
@@ -41,7 +41,7 @@ void InvFPTermPropList::skipTo(int pos) {
   }
 }
 
-int InvFPTermPropList::nextEntryPos() {
+int InvFPTermPropList::nextEntryPos()  const{
   if (counts)
     return -1;
   if (index == listlen)
@@ -49,7 +49,7 @@ int InvFPTermPropList::nextEntryPos() {
   return list[index].loc;
 }
 
-int InvFPTermPropList::nextTermPos() {
+int InvFPTermPropList::nextTermPos()  const{
   if (counts)
     return -1;
 

@@ -34,34 +34,34 @@
 #include "InvIndexMerge.hpp"
 
 
-typedef map<char*, InvDocList*, ltstr> TABLE_T;
+typedef map<string, InvDocList*, less<string> > TABLE_T;
 
 class InvPushIndex : public PushIndex {
 public:
   InvPushIndex(){ };
-  InvPushIndex(char* prefix, int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=1);
+  InvPushIndex(const string &prefix, int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=1);
   ~InvPushIndex();
 
   /// sets the name for this index. the name will be the prefix for all files related to this index
-  void setName(char* prefix);
+  void setName(const string &prefix);
 
   /// the beginning of a new document, returns true if initiation was successful
-  bool beginDoc(DocumentProps* dp);
+  bool beginDoc(const DocumentProps* dp);
 
   /// adding a term to the current document, returns true if term was added successfully.  
-  bool addTerm(Term& t);
+  bool addTerm(const Term& t);
 
   /// signify the end of current document
-  void endDoc(DocumentProps* dp);
+  void endDoc(const DocumentProps* dp);
 
   /// signify the end of current document and associate with certain document manager. this doesn't change the mgr that was previously set.
-  virtual void endDoc(DocumentProps* dp, const char* mgr);
+  virtual void endDoc(const DocumentProps* dp, const string &mgr);
 
   /// signify the end of this collection.  properties passed at the beginning of a collection should be handled by the constructor.
-  void endCollection(CollectionProps* cp);
+  void endCollection(const CollectionProps* cp);
 
   /// set the document manager to use for succeeding documents
-  void setDocManager(const char* mgrID);
+  void setDocManager(const string &mgrID);
 
 protected:
   void writeTOC(int numinv);
@@ -72,16 +72,16 @@ protected:
   void writeDocMgrIDs();
   /// returns the internal id of given docmgr
   /// if not already registered, mgr will be added
-  int docMgrID(const char* mgr);
-  virtual void doendDoc(DocumentProps* dp, int mgrid);
+  int docMgrID(const string &mgr);
+  virtual void doendDoc(const DocumentProps* dp, int mgrid);
 
   long maxfile; /// the biggest our file size can be
   MemCache* cache; /// the main memory handler for building
-  vector<char*> docIDs; /// list of external docids in internal docid order
-  vector<char*> termIDs; /// list of terms in termid order
-  vector<char*> tempfiles; /// list of tempfiles we've written to flush cache
-  vector<char*> dtfiles; /// list of dt index files
-  vector<char*> docmgrs;  // the list of doc managers we have (index = id)
+  vector<string> docIDs; /// list of external docids in internal docid order
+  vector<string> termIDs; /// list of terms in termid order
+  vector<string> tempfiles; /// list of tempfiles we've written to flush cache
+  vector<string> dtfiles; /// list of dt index files
+  vector<string> docmgrs;  // the list of doc managers we have (index = id)
 
   FILE* writetlookup; /// filestream for writing the lookup table to the docterm db
   ofstream writetlist; /// filestream for writing the list of located terms for each document
@@ -89,8 +89,7 @@ protected:
   int tcount;    /// count of total terms
   int tidcount ; /// count of unique terms
   int dtidcount; /// count of unique terms in a current doc
-  char* name;    /// the prefix name
-  int namelen;   /// the length of the name (avoid many calls to strlen)
+  string name;    /// the prefix name
   TABLE_T wordtable; /// table of all terms and their doclists
   map<int, int> termlist; /// maps of terms and freqs
   int* membuf; /// memory to use for cache and buffers

@@ -38,22 +38,22 @@ public:
   ~InvFPTermList();
 
   /// prepare iteration
-  void startIteration();
+  void startIteration() const;
 
   /// has more entries
-  bool hasMore();
+  bool hasMore() const;
 
   /// Get a pointer to the next entry (pointer to a local static memory)
-  TermInfo *nextEntry();
+  TermInfo *nextEntry() const;
 
   /// Get the length of this document
-  int docLength(){ return length; }
+  int docLength() const{ return length; }
 
   /// Get the number of terms in this document
-  int termCount() { return listlen; }
+  int termCount()  const{ return listlen; }
 
   /// Get the docid this list is for
-  int docID() { return uid; }
+  int docID()  const{ return uid; }
 
   /// Read in a TermInfoList object from a file
   /// Assumes the following format: DOCID DOCLENGTH UNIQUE_TERM_COUNT [TERM LOC]..[]
@@ -82,10 +82,10 @@ protected:
   LocatedTerm* list; // list of terms and locations
   LLTerm* listcounted; // list of terms and location lists
   int listlen; // number of items we have in list  (same as number of terms)
-  int index;   // index for iterator
+  mutable int index;   // index for iterator
   int* counts; // keep track of counts of terms for bag of word
-  InvFPTerm entry;
-  vector<int> loclist; //list of locations to return 
+  mutable InvFPTerm entry;
+  mutable vector<int> loclist; //list of locations to return 
 
 };
 

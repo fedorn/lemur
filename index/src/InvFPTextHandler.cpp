@@ -13,7 +13,7 @@
 
 
 
-InvFPTextHandler::InvFPTextHandler(char * filename, int bufferSize,
+InvFPTextHandler::InvFPTextHandler(const string &filename, int bufferSize,
 				   bool countStopWords, int ind) {
   // create index and helper objects  
   if (ind == 0)
@@ -87,6 +87,6 @@ InvFPTextHandler::handleWord(char * word) {
 }
 
 
-void InvFPTextHandler::setDocManager(const char* mgrID) {
+void InvFPTextHandler::setDocManager(const string &mgrID) {
   index->setDocManager(mgrID);
 }

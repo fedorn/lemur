@@ -31,15 +31,15 @@ class IncFPPushIndex : public InvFPPushIndex {
 public:
   /// opens the index named by prefix, if it exists, and initializes
   /// the state of the indexer to begin adding new documents.
-  IncFPPushIndex(char* prefix, int cachesize=128000000, 
+  IncFPPushIndex(const string &prefix, int cachesize=128000000, 
 		 long maxfilesize=2100000000, DOCID_T startdocid=1);
 private:
   /// existing index filenames
-  char *invfpF, *dtF, *dmgrF, *didF, *tidF;
+  string invfpF, dtF, dmgrF, didF, tidF;
   /// try to open the index
-  bool tryOpen(char *name);
+  bool tryOpen(const string &name);
   /// read the table of contents (.ifp) file.
-  bool readToc(char *name);
+  bool readToc(const string &name);
   /// read the inverted file ids.
   void readInvFileIDs();
   /// read the dt file ids.

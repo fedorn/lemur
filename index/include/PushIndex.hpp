@@ -36,18 +36,18 @@ public:
   virtual ~PushIndex() {};
  
   /// the beginning of a new document, returns true if initiation was successful
-  virtual bool beginDoc(DocumentProps* dp)=0;
+  virtual bool beginDoc(const DocumentProps* dp)=0;
 
   /// adding a term to the current document, returns true if term was added successfully.  
-  virtual bool addTerm(Term& t)=0;
+  virtual bool addTerm(const Term& t)=0;
 
   /// signify the end of current document
-  virtual void endDoc(DocumentProps* dp)=0;
+  virtual void endDoc(const DocumentProps* dp)=0;
 
   /// signify the end of this collection.  properties passed at the beginning of a collection should be handled by the constructor.
-  virtual void endCollection(CollectionProps* cp)=0;
+  virtual void endCollection(const CollectionProps* cp)=0;
 
-  virtual void setDocManager(const char* mgrID)=0;
+  virtual void setDocManager(const string &mgrID)=0;
 
 private:
 };

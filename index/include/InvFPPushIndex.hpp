@@ -40,20 +40,20 @@
 class InvFPPushIndex : public InvPushIndex {
 public:
   InvFPPushIndex(){ };
-  InvFPPushIndex(char* prefix, int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=1);
+  InvFPPushIndex(const string &prefix, int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=1);
   ~InvFPPushIndex();
 
   /// adding a term to the current document, returns true if term was added successfully.  
-  bool addTerm(Term& t);
+  bool addTerm(const Term& t);
 
   /// signify the end of this collection.  properties passed at the beginning of a collection should be handled by the constructor.
-  void endCollection(CollectionProps* cp);
+  void endCollection(const CollectionProps* cp);
 
 
 protected:
   void writeTOC(int numinv);
   /// signify the end of current document
-  void doendDoc(DocumentProps* dp, int mgrid);
+  void doendDoc(const DocumentProps* dp, int mgrid);
 
 
   vector<LocatedTerm> termlist; /// list of terms and their locations in this document

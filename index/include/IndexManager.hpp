@@ -19,7 +19,7 @@ class IndexManager {
 public:
   /// An utility function to open an index, automatically recognizing the indexer based on file extension. Caller must delete the Index instance when finishing using it.
 
-  static Index *openIndex(const char *indexTOCFile);
+  static Index *openIndex(const string &indexTOCFile);
 };
 
 

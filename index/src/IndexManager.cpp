@@ -16,8 +16,10 @@
 #include "InvIndex.hpp"
 #include "KeyfileIncIndex.hpp"
 
-Index *IndexManager::openIndex(const char *indexTOCFile)
+Index *IndexManager::openIndex(const string &tocFile)
 {
+  const char *indexTOCFile = tocFile.c_str(); // rewrite this to use the string.
+   
   int len = strlen(indexTOCFile);
   if (!(len>4 && indexTOCFile[len-4]=='.')) {
     ; // it must have format .xxx 

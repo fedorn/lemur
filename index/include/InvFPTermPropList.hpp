@@ -30,29 +30,29 @@ public:
   /// Skip all tags and give me the next term
   /// Basicaly skips to first item with different position
   /// Returns NULL if no more terms.
-  TermInfo* nextTerm();
+  TermInfo* nextTerm() const;
 
   /// returns true if there is another term 
   /// can use to know that nextTerm will not return NULL
   /// check is slower than hasMore(), depending on number of properties
-  bool hasMoreTerm();
+  bool hasMoreTerm() const;
 
   /// Advance the pointer to the next entry with the given position
   /// goes to next available term past pos if no actually pos is found 
   /// (can happen because of stopwords)
   /// goes to end if pos is beyond end of list
-  void skipTo(int pos);
+  void skipTo(int pos) const;
 
   /// Peek ahead and tell me what the position of the next entry is
   /// Does not change position of iterator
   /// returns -1 on error or end of list
-  int nextEntryPos();
+  int nextEntryPos() const;
  
   /// Peak ahead and tell me what the position of the next term is 
   /// (skips all entries with same position and gives the next different position)
   /// Does not change position of iterator
   /// returns -1 on error or end of list
-  int nextTermPos();
+  int nextTermPos() const;
 };
 
 #endif

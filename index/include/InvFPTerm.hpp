@@ -28,21 +28,21 @@ public:
   InvFPTerm() { freq=1;};
   ~InvFPTerm() {};
 
-  const char* spelling() { return word; };
-  void spelling(TERM_T term) { word = term; };
-  int strLength() { return strlen; };
-  void strLength(int len) { strlen = len; };
-  int count() {return freq; };
-  TERMID_T id() { return tid; };
-  LOC_T position() { return loc; };
-  vector<LOC_T>* positions() { return loclist; };
-  void position(LOC_T pos) { loc = pos; };
+  const char* spelling() const { return word; }
+  void spelling(const char* term) { word = term; }
+  int strLength() const { return strlen; }
+  void strLength(int len) { strlen = len; }
+  int count() const {return freq; }
+  TERMID_T id() const { return tid; }
+  LOC_T position() const { return loc; }
+  const int* positions() const {vector<LOC_T>::const_iterator it(loclist->begin()); return &(*it); }
+  void position(LOC_T pos) { loc = pos; }
 
 protected:
 
   TERMID_T tid;
   int strlen;
-  TERM_T word; 
+  const char* word; 
   int freq; // number of times this term occurs in this documen
   LOC_T loc;  // where this term (currently) occurs in the document
   vector<LOC_T>* loclist; // list of all places term occurs in the document                  

@@ -11,7 +11,7 @@
 
 
 #include "InvFPPushIndex.hpp"
-
+#include <sstream>
 /*
  * NAME DATE - COMMENTS
  * tnt 03/2001 - created
@@ -21,18 +21,18 @@
  *
  *========================================================================*/
 
-InvFPPushIndex::InvFPPushIndex(char* prefix, int cachesize, long maxfilesize, DOCID_T startdocid) : InvPushIndex(prefix, cachesize, maxfilesize, startdocid) {
+InvFPPushIndex::InvFPPushIndex(const string &prefix, int cachesize, long maxfilesize, DOCID_T startdocid) : InvPushIndex(prefix, cachesize, maxfilesize, startdocid) {
 }
 
 InvFPPushIndex::~InvFPPushIndex() {
 }
 
-bool InvFPPushIndex::addTerm(Term& t){
+bool InvFPPushIndex::addTerm(const Term& t){
   TABLE_T::iterator placehold;
   InvFPDocList* curlist;
-  InvFPTerm* term;
+  const InvFPTerm* term;
 
-  term = static_cast< InvFPTerm* >(&t);
+  term = dynamic_cast< const InvFPTerm* >(&t);
   if (term->strLength() < 1) {
     cerr << "Trying to add term with string length less than 1.  Term ignored." << endl;
     return false;
@@ -43,7 +43,8 @@ bool InvFPPushIndex::addTerm(Term& t){
   }
 
   //search to see if this is a new term 
-  placehold = wordtable.find((char*)term->spelling());
+  string spell = term->spelling();
+  placehold = wordtable.find(spell);
   if (placehold != wordtable.end()) {
     //* OLD WORD *//
     curlist = (InvFPDocList*) placehold->second;
@@ -68,7 +69,7 @@ bool InvFPPushIndex::addTerm(Term& t){
     // update unique word counter
     tidcount++;
     //store new word in list of ids
-    char* spell = strdup(term->spelling());
+    string spell = term->spelling();
     termIDs.push_back(spell);
 
     curlist = new InvFPDocList(cache, termIDs.size(), term->strLength(), docIDs.size(), term->position() );
@@ -94,7 +95,7 @@ bool InvFPPushIndex::addTerm(Term& t){
   return true;
 }
 
-void InvFPPushIndex::endCollection(CollectionProps* cp){
+void InvFPPushIndex::endCollection(const CollectionProps* cp){
   // flush last time
   // merge temp files
 
@@ -124,37 +125,33 @@ void InvFPPushIndex::endCollection(CollectionProps* cp){
  *  PRIVATE METHODS
  *=============================================================================*/
 void InvFPPushIndex::writeTOC(int numinv) {
-  char* fname = new char[namelen+strlen(INVFPTOC)];
-  sprintf(fname, "%s%s", name, INVFPTOC);
-  //char* fname = strcat(name, INVFPTOC);
-     fprintf(stderr, "Writing out main stats table\n");
-   FILE* toc = fopen(fname, "wb");
-   if (!toc) {
-     fprintf(stderr, "Could not open .toc file for writing.\n");
-     delete[](fname);
-     return;
-   }
-   fprintf(toc, "%s %s\n", VERSION_PAR, IND_VERSION);
-   fprintf(toc, "%s  %d\n", NUMDOCS_PAR, docIDs.size());
-   fprintf(toc, "%s  %d\n", NUMTERMS_PAR, tcount);
-   fprintf(toc, "%s  %d\n", NUMUTERMS_PAR, tidcount);
-   fprintf(toc, "%s  %d\n", AVEDOCLEN_PAR, tcount/docIDs.size());
-   fprintf(toc, "%s  %s%s\n", INVINDEX_PAR, name, INVFPINDEX);
-   fprintf(toc, "%s  %d\n", NUMINV_PAR, numinv); 
-   fprintf(toc, "%s  %s%s\n", INVLOOKUP_PAR, name, INVLOOKUP);
-   fprintf(toc, "%s  %s%s\n", DTINDEX_PAR, name, DTINDEX);
-   fprintf(toc, "%s  %d\n", NUMDT_PAR, dtfiles.size());
-   fprintf(toc, "%s  %s%s\n", DTLOOKUP_PAR, name, DTLOOKUP);
-   fprintf(toc, "%s  %s%s\n", DOCIDMAP_PAR, name, DOCIDMAP);
-   fprintf(toc, "%s  %s%s\n", TERMIDMAP_PAR, name, TERMIDMAP);
-   fprintf(toc, "%s  %s%s\n", DOCMGR_PAR, name, DOCMGRMAP);
+  string fname = name + INVFPTOC;
+  fprintf(stderr, "Writing out main stats table\n");
+  FILE* toc = fopen(fname.c_str(), "wb");
+  if (!toc) {
+    fprintf(stderr, "Could not open .toc file for writing.\n");
+    return;
+  }
+  fprintf(toc, "%s %s\n", VERSION_PAR, IND_VERSION);
+  fprintf(toc, "%s  %d\n", NUMDOCS_PAR, docIDs.size());
+  fprintf(toc, "%s  %d\n", NUMTERMS_PAR, tcount);
+  fprintf(toc, "%s  %d\n", NUMUTERMS_PAR, tidcount);
+  fprintf(toc, "%s  %d\n", AVEDOCLEN_PAR, tcount/docIDs.size());
+  fprintf(toc, "%s  %s%s\n", INVINDEX_PAR, name.c_str(), INVFPINDEX);
+  fprintf(toc, "%s  %d\n", NUMINV_PAR, numinv); 
+  fprintf(toc, "%s  %s%s\n", INVLOOKUP_PAR, name.c_str(), INVLOOKUP);
+  fprintf(toc, "%s  %s%s\n", DTINDEX_PAR, name.c_str(), DTINDEX);
+  fprintf(toc, "%s  %d\n", NUMDT_PAR, dtfiles.size());
+  fprintf(toc, "%s  %s%s\n", DTLOOKUP_PAR, name.c_str(), DTLOOKUP);
+  fprintf(toc, "%s  %s%s\n", DOCIDMAP_PAR, name.c_str(), DOCIDMAP);
+  fprintf(toc, "%s  %s%s\n", TERMIDMAP_PAR, name.c_str(), TERMIDMAP);
+  fprintf(toc, "%s  %s%s\n", DOCMGR_PAR, name.c_str(), DOCMGRMAP);
 
    fclose(toc);
-   delete[](fname);
 }
 
 
-void InvFPPushIndex::doendDoc(DocumentProps* dp, int mgrid){
+void InvFPPushIndex::doendDoc(const DocumentProps* dp, int mgrid){
   //flush list and write to lookup table
   if (dp != NULL) {
     int docid = docIDs.size();
@@ -167,23 +164,15 @@ void InvFPPushIndex::doendDoc(DocumentProps* dp, int mgrid){
 
     if (offset+(3*sizeof(int))+(tls*sizeof(LocatedTerm)) > maxfile) {
       writetlist.close();
-      char* docfname = new char[namelen+strlen(DTINDEX)+2];
-      sprintf(docfname, "%s%s%d", name, DTINDEX, dtfiles.size());
+      std::stringstream nameStr;
+      nameStr << name << DTINDEX << dtfiles.size();
+      string docfname = nameStr.str();
       dtfiles.push_back(docfname);
-      writetlist.open(docfname, ios::binary | ios::out);
+      writetlist.open(docfname.c_str(), ios::binary | ios::out);
       offset = 0;
     }
 
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset, len, mgrid);
-#if 0
-    writetlist.write((const char*)&docid, sizeof(DOCID_T));
-    writetlist.write((const char*)&len, sizeof(int));
-    writetlist.write((const char*)&tls, sizeof(int));
-
-    for (int i=0;i<tls;i++) {
-      writetlist.write((const char*)&termlist[i], sizeof(LocatedTerm));
-    }
-#endif
     InvFPTermList *tlist = new InvFPTermList(docid, len, termlist);
     tlist->binWriteC(writetlist);
     delete tlist;

@@ -32,7 +32,9 @@ InvDocList::InvDocList() {
 InvDocList::InvDocList(int id, int len){
   READ_ONLY = false;
   size = (int) pow(2.0,DEFAULT);
-  begin = (int*) malloc(size);
+  //  begin = (int*) malloc(size);
+  // use new/delete[] so an exception will be thrown if out of memory.
+  begin = new int[size/sizeof(int)];
   lastid = begin;
   *lastid = -1;
   end = begin;
@@ -83,8 +85,13 @@ InvDocList::~InvDocList() {
     int pow = logb2(size);
       cache->freeMem(begin, pow);      
   } */
+/*
   if ((begin != NULL) && (!hascache) && (!READ_ONLY))
     free(begin);
+*/
+  if ((!hascache) && (!READ_ONLY))
+    delete[](begin);
+
 }
 
 void InvDocList::setList(int id, int listlen, int* list, int fr, int* ldocid, int len){
@@ -125,15 +132,15 @@ void InvDocList::setListSafe(int id, int listlen, int* list, int fr, int* ldocid
   freq = lastid+1;
 }
  
-void InvDocList::startIteration() {
+void InvDocList::startIteration() const{
   iter = begin;
 }
 
-bool InvDocList::hasMore() {
+bool InvDocList::hasMore() const{
   return (iter != end);
 }
 
-DocInfo* InvDocList::nextEntry() {
+DocInfo* InvDocList::nextEntry() const{
   // use the attribute entry.
   //  static InvDocInfo info;
   // info is stored in int* as docid freq .. .. 
@@ -144,7 +151,7 @@ DocInfo* InvDocList::nextEntry() {
   return &entry;
 }
 
-void InvDocList::nextEntry(InvDocInfo* info) {
+void InvDocList::nextEntry(InvDocInfo* info) const{
   info->id = *iter;
   iter++;
   info->count = *iter;
@@ -160,7 +167,9 @@ bool InvDocList::allocMem() {
   if (hascache) {
     begin = cache->getMem(DEFAULT);
   } else {
-    begin = (TERMID_T*) malloc(size);
+    //    begin = (TERMID_T*) malloc(size);
+    // use new/delete[] so an exception will be thrown if out of memory.
+    begin = new int[size/sizeof(int)];
   }
   lastid = begin;
   if (lastid != NULL) *lastid = -1;
@@ -242,7 +251,7 @@ bool InvDocList::append(InvDocList* tail) {
   return true;
 }
 
-int InvDocList::termCTF() {
+int InvDocList::termCTF() const{
   int ctf = 0;
   int *start = begin;
   while (start != lastid){
@@ -282,7 +291,8 @@ void InvDocList::resetFree() {
     int pow = logb2(size);
     cache->freeMem(begin, pow);   
   } else if (begin != NULL) {
-    free(begin);
+    //    free(begin);
+    delete[](begin);
   } 
 
   begin = end = lastid = freq = NULL;
@@ -323,7 +333,10 @@ bool InvDocList::binRead(ifstream& inf) {
     return false;
 
   int s = sizeof(LOC_T)*size;
-  begin = (LOC_T*) malloc(s);
+  //  begin = (LOC_T*) malloc(s);
+  // use new/delete[] so an exception will be thrown if out of memory.
+  begin = new int[s/sizeof(int)];
+
   inf.read((char*) begin, s);
   if (!inf.gcount() == s) {
     resetFree();
@@ -348,7 +361,9 @@ void InvDocList::binWriteC(ofstream& of) {
 
   // compress it
   // it's ok to make comp the same size.  the compressed will be smaller
-  unsigned char* comp = (unsigned char*) malloc(len*intsize);
+  //  unsigned char* comp = (unsigned char*) malloc(len*intsize);
+  // use new/delete so an exception will be thrown if out of memory
+  unsigned char* comp = new unsigned char[len*intsize];
   int compbyte = RVLCompress::compress_ints(begin, comp, len);
   
   // write out the compressed bits
@@ -357,7 +372,8 @@ void InvDocList::binWriteC(ofstream& of) {
 
   //  of.write((const char*) &len, intsize);
   //of.write((const char*) begin, sizeof(LOC_T)*len);
-  free(comp);
+  //  free(comp);
+  delete[](comp);
 }
 
 bool InvDocList::binReadC(ifstream& inf) {
@@ -381,7 +397,9 @@ bool InvDocList::binReadC(ifstream& inf) {
   if (!inf.gcount() == intsize)
     return false;
 
-  unsigned char* buffer = (unsigned char*) malloc(size);
+  //  unsigned char* buffer = (unsigned char*) malloc(size);
+  // use new/delete[] so an exception will be thrown if out of memory.
+  unsigned char* buffer = new unsigned char[size];
   inf.read((char*) buffer, size);
   if (!inf.gcount() == size) {
     resetFree();
@@ -389,8 +407,10 @@ bool InvDocList::binReadC(ifstream& inf) {
   }
 
   // this should be big enough
-  begin = (LOC_T*) malloc(size*4);
-  
+  //  begin = (LOC_T*) malloc(size*4);  
+  // use new/delete[] so an exception will be thrown if out of memory.
+  begin = new int[(size*4)/sizeof(int)];  
+
   // decompress it
   int len = RVLCompress::decompress_ints(buffer, begin, size);
 
@@ -406,7 +426,8 @@ bool InvDocList::binReadC(ifstream& inf) {
   deltaDecode();
 
   READ_ONLY = false;
-  free(buffer);
+  //  free(buffer);
+  delete[](buffer);
   return true;
 }
 
@@ -457,9 +478,12 @@ bool InvDocList::getMoreMem() {
     begin = loc;
   } else {
     int* old = begin;
-    begin = (int*) malloc(bigger);
+    //    begin = (int*) malloc(bigger);
+    // use new/delete[] so an exception will be thrown if out of memory
+    begin = new int[bigger/sizeof(int)];
     memcpy(begin, old, size);
-    free(old);
+    //free(old);
+    delete[](old);
   }
   lastid = begin+ldiff;
   freq = lastid+1;

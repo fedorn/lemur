@@ -9,7 +9,7 @@
 */
 
 #include "InvPushIndex.hpp"
-
+#include <sstream>
 /*
  * NAME DATE - COMMENTS
  * tnt 01/2002 - created
@@ -17,10 +17,10 @@
  *
  *========================================================================*/
 
-InvPushIndex::InvPushIndex(char* prefix, int cachesize, long maxfilesize, DOCID_T startdocid) {
-  name = NULL;
+InvPushIndex::InvPushIndex(const string &prefix, int cachesize, 
+			   long maxfilesize, DOCID_T startdocid) {
   setName(prefix);
-  fprintf(stderr, "building %s\n ", name);
+  fprintf(stderr, "building %s\n ", name.c_str());
 
   membuf = (int*) malloc(cachesize);
   membufsize = cachesize;
@@ -30,14 +30,13 @@ InvPushIndex::InvPushIndex(char* prefix, int cachesize, long maxfilesize, DOCID_
   curdocmgr = -1;
 
   // docterm index stuff
-  char* docfname = new char[namelen+strlen(DTINDEX)+1];
-  char* lfname = new char[namelen+strlen(DTLOOKUP)];
-  sprintf(docfname, "%s%s%d", name, DTINDEX, 0);
-  sprintf(lfname, "%s%s", name, DTLOOKUP);
-  writetlist.open(docfname, ios::binary | ios::out);
+  std::stringstream nameStr;
+  nameStr << name << DTINDEX << dtfiles.size();
+  string docfname = nameStr.str();
+  string lfname = name + DTLOOKUP;
+  writetlist.open(docfname.c_str(), ios::binary | ios::out);
   dtfiles.push_back(docfname);
-  writetlookup = fopen(lfname, "wb");
-  delete[](lfname);
+  writetlookup = fopen(lfname.c_str(), "wb");
 }
 
 InvPushIndex::~InvPushIndex() {
@@ -45,40 +44,27 @@ InvPushIndex::~InvPushIndex() {
   fclose(writetlookup);
   if (cache)
     delete(cache);
-  free(name);
   free(membuf);
-  int i;
-  for (i=1;i<termIDs.size(); i++)
-    free(termIDs[i]);
-  for (i=0;i<tempfiles.size();i++) {
-    delete[](tempfiles[i]);
-  }
 }
 
-void InvPushIndex::setName(char* prefix) {
-  if (name != NULL)
-    free(name);
-
-  name = strdup(prefix);
-  namelen = strlen(name)+1;
+void InvPushIndex::setName(const string &prefix) {
+  name = prefix;
 }
 
-bool InvPushIndex::beginDoc(DocumentProps* dp){
+bool InvPushIndex::beginDoc(const DocumentProps* dp){
   if (dp == NULL)
     return false;
-
-  char* id = strdup(dp->stringID());
-  docIDs.push_back(id);
+  docIDs.push_back(dp->stringID());
   dtidcount = 0;
   return true;
 }
 
-bool InvPushIndex::addTerm(Term& t){
+bool InvPushIndex::addTerm(const Term& t){
   TABLE_T::iterator placehold;
   InvDocList* curlist;
-  InvFPTerm* term;
+  const InvFPTerm* term;
 
-  term = static_cast< InvFPTerm* >(&t);
+  term = dynamic_cast< const InvFPTerm* >(&t);
   if (term->strLength() < 1) {
     cerr << "Trying to add term with string length less than 1.  Term ignored." << endl;
     return false;
@@ -89,7 +75,8 @@ bool InvPushIndex::addTerm(Term& t){
   }
 
   //search to see if this is a new term 
-  placehold = wordtable.find((char*)term->spelling());
+  string spell = term->spelling();  
+  placehold = wordtable.find(spell);
   if (placehold != wordtable.end()) {
     //* OLD WORD *//
     curlist = placehold->second;
@@ -116,7 +103,7 @@ bool InvPushIndex::addTerm(Term& t){
     // update unique word counter
     tidcount++;
     //store new word in list of ids
-    char* spell = strdup(term->spelling());
+    string spell = term->spelling();
     termIDs.push_back(spell);
 
     curlist = new InvDocList(cache, termIDs.size(), term->strLength());
@@ -140,15 +127,15 @@ bool InvPushIndex::addTerm(Term& t){
   return true;
 }
 
-void InvPushIndex::endDoc(DocumentProps* dp) {
+void InvPushIndex::endDoc(const DocumentProps* dp) {
   doendDoc(dp, curdocmgr);
 }
 
-void InvPushIndex::endDoc(DocumentProps* dp, const char* mgr){
+void InvPushIndex::endDoc(const DocumentProps* dp, const string &mgr){
   doendDoc(dp, docMgrID(mgr));
 }
 
-void InvPushIndex::endCollection(CollectionProps* cp){
+void InvPushIndex::endCollection(const CollectionProps* cp){
   // flush last time
   // merge temp files
 
@@ -174,7 +161,7 @@ void InvPushIndex::endCollection(CollectionProps* cp){
 
 }
 
-void InvPushIndex::setDocManager (const char* mgrID) {
+void InvPushIndex::setDocManager (const string &mgrID) {
   curdocmgr = docMgrID(mgrID);
 }
 
@@ -182,94 +169,79 @@ void InvPushIndex::setDocManager (const char* mgrID) {
  *  PRIVATE METHODS
  *==========================================================================*/
 void InvPushIndex::writeTOC(int numinv) {
-  char* fname = new char[namelen+strlen(MAINTOC)];
-  sprintf(fname, "%s%s", name, MAINTOC);
-  //char* fname = strcat(name, MAINTOC);
-     fprintf(stderr, "Writing out main stats table\n");
-   FILE* toc = fopen(fname, "wb");
-   if (!toc) {
-     fprintf(stderr, "Could not open .toc file for writing.\n");
-     delete[](fname);
-     return;
-   }
-   fprintf(toc, "%s %s\n", VERSION_PAR, IND_VERSION);
-   fprintf(toc, "%s  %d\n", NUMDOCS_PAR, docIDs.size());
-   fprintf(toc, "%s  %d\n", NUMTERMS_PAR, tcount);
-   fprintf(toc, "%s  %d\n", NUMUTERMS_PAR, tidcount);
-   fprintf(toc, "%s  %d\n", AVEDOCLEN_PAR, tcount/docIDs.size());
-   fprintf(toc, "%s  %s%s\n", INVINDEX_PAR, name, INVINDEX);
-   fprintf(toc, "%s  %d\n", NUMINV_PAR, numinv); 
-   fprintf(toc, "%s  %s%s\n", INVLOOKUP_PAR, name, INVLOOKUP);
-   fprintf(toc, "%s  %s%s\n", DTINDEX_PAR, name, DTINDEX);
-   fprintf(toc, "%s  %d\n", NUMDT_PAR, dtfiles.size());
-   fprintf(toc, "%s  %s%s\n", DTLOOKUP_PAR, name, DTLOOKUP);
-   fprintf(toc, "%s  %s%s\n", DOCIDMAP_PAR, name, DOCIDMAP);
-   fprintf(toc, "%s  %s%s\n", TERMIDMAP_PAR, name, TERMIDMAP);
-   fprintf(toc, "%s  %s%s\n", DOCMGR_PAR, name, DOCMGRMAP);
-
-   fclose(toc);
-   delete[](fname);
+  string fname = name + MAINTOC;
+  FILE* toc = fopen(fname.c_str(), "wb");
+  if (!toc) {
+    fprintf(stderr, "Could not open .toc file for writing.\n");
+    return;
+  }
+  fprintf(toc, "%s %s\n", VERSION_PAR, IND_VERSION);
+  fprintf(toc, "%s  %d\n", NUMDOCS_PAR, docIDs.size());
+  fprintf(toc, "%s  %d\n", NUMTERMS_PAR, tcount);
+  fprintf(toc, "%s  %d\n", NUMUTERMS_PAR, tidcount);
+  fprintf(toc, "%s  %d\n", AVEDOCLEN_PAR, tcount/docIDs.size());
+  fprintf(toc, "%s  %s%s\n", INVINDEX_PAR, name.c_str(), INVINDEX);
+  fprintf(toc, "%s  %d\n", NUMINV_PAR, numinv); 
+  fprintf(toc, "%s  %s%s\n", INVLOOKUP_PAR, name.c_str(), INVLOOKUP);
+  fprintf(toc, "%s  %s%s\n", DTINDEX_PAR, name.c_str(), DTINDEX);
+  fprintf(toc, "%s  %d\n", NUMDT_PAR, dtfiles.size());
+  fprintf(toc, "%s  %s%s\n", DTLOOKUP_PAR, name.c_str(), DTLOOKUP);
+  fprintf(toc, "%s  %s%s\n", DOCIDMAP_PAR, name.c_str(), DOCIDMAP);
+  fprintf(toc, "%s  %s%s\n", TERMIDMAP_PAR, name.c_str(), TERMIDMAP);
+  fprintf(toc, "%s  %s%s\n", DOCMGR_PAR, name.c_str(), DOCMGRMAP);
+  fclose(toc);
 }
 
 void InvPushIndex::writeDocIDs() {
-   char* dname = new char[namelen+strlen(DOCIDMAP)];
-   sprintf(dname, "%s%s", name, DOCIDMAP);
-   FILE* docid = fopen(dname, "wb");
-   // first write out the string value for an unknown docid
-   fprintf(docid, "%d %d %s ", 0, strlen(INVALID_STR), INVALID_STR);
-   for (int i=0;i<docIDs.size();i++) {
-     fprintf(docid, "%d %d %s ", i+1, strlen(docIDs[i]), docIDs[i]);
-     free(docIDs[i]);
-   }
-   fclose(docid);
-   delete[](dname);
+  string dname = name + DOCIDMAP;
+  FILE* docid = fopen(dname.c_str(), "wb");
+  // first write out the string value for an unknown docid
+  fprintf(docid, "%d %d %s ", 0, strlen(INVALID_STR), INVALID_STR);
+  for (int i=0;i<docIDs.size();i++) {
+    fprintf(docid, "%d %d %s ", i+1, docIDs[i].size(), docIDs[i].c_str());
+  }
+  fclose(docid);
 }
 
 void InvPushIndex::writeDTIDs() {
-  char* dname = new char[namelen+strlen(DTINDEX)];
-  sprintf(dname, "%s%s", name, DTINDEX);
-  FILE* dtid = fopen(dname, "wb");
+  string dname = name + DTINDEX;
+  FILE* dtid = fopen(dname.c_str(), "wb");
   for (int i=0;i<dtfiles.size();i++) {
-    fprintf(dtid, "%d %d %s ", i, strlen(dtfiles[i]), dtfiles[i]);
-    delete[](dtfiles[i]);
+    fprintf(dtid, "%d %d %s ", i, dtfiles[i].size(), dtfiles[i].c_str());
   }
   fclose(dtid);
-  delete[](dname);
 }
 
 void InvPushIndex::writeDocMgrIDs() {
-  char* dmname = new char[namelen+strlen(DOCMGRMAP)];
-  sprintf(dmname, "%s%s", name, DOCMGRMAP);
-  FILE* dmid = fopen(dmname, "wb");
+  string dmname = name + DOCMGRMAP;
+  FILE* dmid = fopen(dmname.c_str(), "wb");
   for (int i=0;i<docmgrs.size();i++) {
-    fprintf(dmid, "%d %d %s ", i, strlen(docmgrs[i]), docmgrs[i]);
-    free(docmgrs[i]);
+    fprintf(dmid, "%d %d %s ", i, docmgrs[i].size(), docmgrs[i].c_str());
   }
   fclose(dmid);
-  delete[]dmname;
 }
 
 void InvPushIndex::writeCache() {
   bool written = false;   // did we actually write anything?
-  char* fname = new char[8 + namelen];
-  sprintf(fname, "%stemp%d", name, tempfiles.size());
+
+  std::stringstream nameStr;
+  nameStr << name << "temp" << tempfiles.size();
+  string fname = nameStr.str();
   ofstream fout;
-  fout.open(fname, ios::binary | ios::out);
+  fout.open(fname.c_str(), ios::binary | ios::out);
 
    if (!fout) {
     fprintf(stderr, "Can't open file for writing. Cache not written.\n");
-    delete[](fname);
     return; 
   }
 
   tempfiles.push_back(fname);
-  
-  char* term;
+
   TABLE_T::iterator finder;
   InvDocList* list;
   // write the file out in termid order
   for (int i=0;i<termIDs.size();i++) {
-    term = termIDs[i];
+    string &term = termIDs[i];
     finder = wordtable.find(term);
     if (finder == wordtable.end() ) {
       // this really shouldn't happen. means can't find term in table
@@ -293,37 +265,34 @@ void InvPushIndex::writeCache() {
   fout.close();
   if (!written) {
     cerr << "No terms written to " << fname << ". Deleting." << endl;
-    remove(fname);
+    remove(fname.c_str());
     tempfiles.pop_back();
-    delete[](fname);
   }
 }
 
 void InvPushIndex::lastWriteCache() {
   bool written = false;   // did we actually write anything?
-  char* fname = new char[8 + namelen];
-  sprintf(fname, "%stemp%d", name, tempfiles.size());
+  std::stringstream nameStr;
+  nameStr << name << "temp" << tempfiles.size();
+  string fname = nameStr.str();
   ofstream fout;
-  fout.open(fname, ios::binary | ios::out);
+  fout.open(fname.c_str(), ios::binary | ios::out);
 
   if (!fout) {
     fprintf(stderr, "Can't open file for writing. Cache not written.\n");
-    delete[](fname);
     return; 
   }
   tempfiles.push_back(fname);
   
-  char* tidname = new char[namelen+strlen(TERMIDMAP)];
-  sprintf(tidname, "%s%s", name, TERMIDMAP);
-  FILE* tid = fopen(tidname, "wb");
+  string tidname = name + TERMIDMAP;
+  FILE* tid = fopen(tidname.c_str(), "wb");
   fprintf(tid, "%d %d %s ", 0, strlen(INVALID_STR), INVALID_STR);
-  char* term;
   TABLE_T::iterator finder;
   InvDocList* list;
 
   // write the file out in termid order
   for (int i=0;i<termIDs.size();i++) {
-    term = termIDs[i];
+    string &term = termIDs[i];
 
     finder = wordtable.find(term);
     if (finder == wordtable.end() ) {
@@ -337,7 +306,7 @@ void InvPushIndex::lastWriteCache() {
       list = finder->second;
     }
     //write out word to term id table
-    fprintf(tid, "%d %d %s ", i+1, list->termLen(), term);
+    fprintf(tid, "%d %d %s ", i+1, list->termLen(), term.c_str());
 
     // check to see that there is a list that requires flushing
     if (!list->hasNoMem()) {
@@ -347,32 +316,28 @@ void InvPushIndex::lastWriteCache() {
     } // if needs flushing   
   } // for each term
   
-//  fclose(write);
   fout.close();
   if (!written) {
     cerr << "Last write: No terms written to " << fname << ". Deleting." << 
       endl;
-    remove(fname);
-    delete[](fname);
+    remove(fname.c_str());
     tempfiles.pop_back();
   }
   fclose(tid);
-  delete[](tidname);
 }
 
 
-int InvPushIndex::docMgrID(const char* mgr) {
-  for (int i=0;i<docmgrs.size();i++) {
-    if (!strcmp(mgr, docmgrs[i])) {
+int InvPushIndex::docMgrID(const string &mgrString) {
+  for(int i = 0; i < docmgrs.size(); i++) {
+    if (mgrString == docmgrs[i]) {
       return i;
     }
   }
-  docmgrs.push_back(strdup(mgr));
- 
+  docmgrs.push_back(mgrString);
   return docmgrs.size()-1;
 }
 
-void InvPushIndex::doendDoc(DocumentProps* dp, int mgrid){
+void InvPushIndex::doendDoc(const DocumentProps* dp, int mgrid){
   //flush list and write to lookup table
   if (dp != NULL) {
     int docid = docIDs.size();
@@ -385,10 +350,11 @@ void InvPushIndex::doendDoc(DocumentProps* dp, int mgrid){
 
     if (offset+(3*sizeof(int))+(tls*sizeof(int)) > maxfile) {
       writetlist.close();
-      char* docfname = new char[namelen+strlen(DTINDEX)+2];
-      sprintf(docfname, "%s%s%d", name, DTINDEX, dtfiles.size());
+      std::stringstream nameStr;
+      nameStr << name << DTINDEX << dtfiles.size();
+      string docfname = nameStr.str();
       dtfiles.push_back(docfname);
-      writetlist.open(docfname, ios::binary | ios::out);
+      writetlist.open(docfname.c_str(), ios::binary | ios::out);
       offset = 0;
     }
 

@@ -25,7 +25,7 @@ class IncPassageTextHandler : public IncFPTextHandler {
 public:
   /// Create a IncPassageTextHandler with index name filename 
   /// (minus the .ifp extension) and specified buffer size.
-  IncPassageTextHandler(char * filename, int psgSize, int bufferSize, 
+  IncPassageTextHandler(const string &filename, int psgSize, int bufferSize, 
 			bool countStopWords = false) {
     // create index and helper objects  
     index = new IncPassagePushIndex(filename, psgSize, bufferSize);

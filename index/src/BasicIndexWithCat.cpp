@@ -12,8 +12,9 @@
 
 #include "BasicIndexWithCat.hpp"
 
-const char BasicIndexWithCat::OOVSTRING[]="[OOV]";
- 
+//const char BasicIndexWithCat::OOVSTRING[]="[OOV]";
+const string BasicIndexWithCat::OOVSTRING = "[OOV]"; 
+
 #include "Exception.hpp"
 #include <iostream>
 
@@ -50,7 +51,7 @@ BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &categoryIndex, boo
   }
 }
 
-void BasicIndexWithCat::startCatIDIteration(int docID)
+void BasicIndexWithCat::startCatIDIteration(int docID) const
 {
   if (catAsTerm) {
     if(base2cat[docID]==catIndex->term(OOVSTRING)){ tmInfoBuffer=NULL; return; }
@@ -64,7 +65,7 @@ void BasicIndexWithCat::startCatIDIteration(int docID)
   
 }
 
-bool BasicIndexWithCat::hasMoreCatID()
+bool BasicIndexWithCat::hasMoreCatID() const
 { 
   if (catAsTerm) {
     if(!tmInfoBuffer) return false;
@@ -76,7 +77,7 @@ bool BasicIndexWithCat::hasMoreCatID()
 }
 
 
-int BasicIndexWithCat::nextCatID()
+int BasicIndexWithCat::nextCatID() const
 {
   if (catAsTerm) {
     tmInfo = tmInfoBuffer->nextEntry();
@@ -90,7 +91,7 @@ int BasicIndexWithCat::nextCatID()
 
 
 
-void BasicIndexWithCat::startDocIDIteration(int catID)
+void BasicIndexWithCat::startDocIDIteration(int catID) const
 {
   if (!catAsTerm) { // i.e., cat is actually doc
     tmInfoBuffer = catIndex->termInfoList(catID);
@@ -102,7 +103,7 @@ void BasicIndexWithCat::startDocIDIteration(int catID)
   
 }
 
-bool BasicIndexWithCat::hasMoreDocID()
+bool BasicIndexWithCat::hasMoreDocID() const
 {
   if (!catAsTerm) {
     return (tmInfoBuffer->hasMore());
@@ -112,7 +113,7 @@ bool BasicIndexWithCat::hasMoreDocID()
 }
 
 
-int BasicIndexWithCat::nextDocID()
+int BasicIndexWithCat::nextDocID() const
 {
   if (!catAsTerm) {
     tmInfo = tmInfoBuffer->nextEntry();

@@ -33,7 +33,7 @@ InvIndex::InvIndex() {
   aveDocLen = 0;
 }
 
-InvIndex::InvIndex(const char* indexName) {
+InvIndex::InvIndex(const string &indexName) {
   lookup = NULL;  
   dtlookup = NULL;
   dtfiles = NULL;
@@ -48,30 +48,11 @@ InvIndex::InvIndex(const char* indexName) {
 
 InvIndex::~InvIndex() {
   int i;
-  if (lookup != NULL)
-    delete[](lookup);
-  if (dtlookup  != NULL)
-    delete[](dtlookup);
-  if (names != NULL) {
-    // if we opened an old index, the memory for this cell
-    // should not be freed.
-    if (!strcmp(names[VERSION_NUM], ""))
-      names[VERSION_NUM] = NULL;
-    for (i = 0; i < NAMES_SIZE; i++) {
-      if (names[i] != NULL) {
-	free(names[i]); //	delete[](names[i]); // allocated w strdup
-        names[i] = NULL;
-      }
-    }
-    delete[](names);
-  }
-  
-  if (dtfiles != NULL) {
-    for (i=0;i<counts[DT_FILES];i++) {
-      delete[](dtfiles[i]);
-    }
-    delete[](dtfiles);
-  }
+  delete[](lookup);
+  delete[](dtlookup);
+  delete[](names);
+  delete[](dtfiles);
+
   if (dtfstreams != NULL) {
     for (i=0;i<counts[DT_FILES];i++) {
       dtfstreams[i].close();
@@ -79,12 +60,8 @@ InvIndex::~InvIndex() {
     delete[](dtfstreams);
   }
 
-  if (invfiles != NULL) {
-    for (i=0;i<counts[INV_FILES];i++) {
-      delete[](invfiles[i]);
-    }
-    delete[](invfiles);
-  }
+  delete[](invfiles);
+
   if (invfstreams != NULL) {
     for (i=0;i<counts[INV_FILES];i++) {
       invfstreams[i].close();
@@ -95,26 +72,16 @@ InvIndex::~InvIndex() {
   for (i = 0; i < docmgrs.size(); i++)
     delete(docmgrs[i]);
 
-  if (terms != NULL) {
-    for (i = 0; i < counts[UNIQUE_TERMS]+1; i++)
-      delete[](terms[i]);
-    delete[](terms);
-  }
-
-  if (docnames != NULL) {
-    for (i = 0; i < counts[DOCS]+1; i++)
-      delete[](docnames[i]);
-    delete[](docnames);
-  }
-
+  delete[](terms);
+  delete[](docnames);
   delete[](counts);
 }
 
-bool InvIndex::open(const char* indexName){
+bool InvIndex::open(const string &indexName){
   counts = new int[5];
-  names = new char*[NAMES_SIZE];  
+  names = new string[NAMES_SIZE];  
   names[VERSION_NUM] = "";
-  names[DOCMGR_IDS] = NULL;
+  names[DOCMGR_IDS] = "";
 
   String streamSelect = ParamGetString("stream", "cerr");
   if (streamSelect == "cout") {
@@ -136,7 +103,7 @@ bool InvIndex::open(const char* indexName){
 
     // older versions didn't specify version name and will be blank
     // if it's new we call new load functions
-    if (strcmp(names[VERSION_NUM], "")) {
+    if (!names[VERSION_NUM].empty()) {
       if (!dtLookup())
 	return false;
     if (!docMgrIDs())
@@ -166,38 +133,38 @@ bool InvIndex::open(const char* indexName){
   return true;
 }
 
-int InvIndex::term(const char* word){
-  map<TERM_T, TERMID_T, ltstr>::iterator point = termtable.find((char*)word);
+int InvIndex::term(const string &word) const{
+  map<TERM_T, TERMID_T, less<TERM_T> >::iterator point = termtable.find(word);
   if (point != termtable.end()) 
     return point->second;
 
   return 0;
 }
 
-const char* InvIndex::term(int termID) {
+const string InvIndex::term(int termID) const {
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS]))
     return NULL;
   return terms[termID];
 }
 
-int InvIndex::document(const char* docIDStr){
-  map<EXDOCID_T, DOCID_T, ltstr>::iterator point = doctable.find( (char*) docIDStr);
+int InvIndex::document(const string &docIDStr) const{
+  map<EXDOCID_T, DOCID_T, less<EXDOCID_T> >::iterator point = doctable.find(docIDStr);
   if (point != doctable.end()) 
     return point->second;
 
   return 0;
 }
 
-const char* InvIndex::document(int docID) { 
+const string InvIndex::document(int docID) const { 
   if ((docID < 0) || (docID > counts[DOCS]))
     return NULL;
   return docnames[docID]; 
 }
 
 //const char* InvIndex::docManager(int docID) {
-DocumentManager* InvIndex::docManager(int docID) {
+const DocumentManager* InvIndex::docManager(int docID) const{
   // no such thing previous to version 1.9
-  if (!strcmp(names[VERSION_NUM], "")) 
+  if (names[VERSION_NUM].empty()) 
     return NULL;
 
   if ((docID < 0) || (docID > counts[DOCS])) {
@@ -232,11 +199,11 @@ int InvIndex::termCount(int termID) const{
   return lookup[termID].ctf;
 }
 
-float InvIndex::docLengthAvg(){
+float InvIndex::docLengthAvg() const{
   return aveDocLen;
 }
 
-int InvIndex::docCount(int termID) {
+int InvIndex::docCount(int termID)  const{
   if ((termID <0) || (termID > counts[UNIQUE_TERMS])) {
     *msgstream << "Error:  Trying to get docCount for invalid termID" << endl;
     return 0;
@@ -266,7 +233,7 @@ int InvIndex::docLength(int docID) const{
   return dtlookup[docID].length;
 }
 
-int InvIndex::docLengthCounted(int docID) {
+int InvIndex::docLengthCounted(int docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get docLengthCounted for invalid docID." << endl;
     return 0;
@@ -297,7 +264,7 @@ int InvIndex::docLengthCounted(int docID) {
   return dl;
 }
 
-DocInfoList* InvIndex::docInfoList(int termID){
+DocInfoList* InvIndex::docInfoList(int termID) const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS])) {
     *msgstream << "Error:  Trying to get docInfoList for invalid termID" << endl;
     return NULL;
@@ -311,7 +278,7 @@ DocInfoList* InvIndex::docInfoList(int termID){
   InvDocList* dlist = new InvDocList();
   bool success;
 
-  if (strcmp(names[VERSION_NUM], "")) {
+  if (!names[VERSION_NUM].empty()) {
     // version 1.9 is compressed and must be decompressed
     success = dlist->binReadC(*indexin);
   } else {
@@ -325,7 +292,7 @@ DocInfoList* InvIndex::docInfoList(int termID){
   }
 }
 
-TermInfoList* InvIndex::termInfoList(int docID){
+TermInfoList* InvIndex::termInfoList(int docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get termInfoList for invalid docID." << endl;
     return NULL;
@@ -352,8 +319,8 @@ TermInfoList* InvIndex::termInfoList(int docID){
 /*=======================================================================
  * PRIVATE METHODS 
  =======================================================================*/
-bool InvIndex::fullToc(const char * fileName) {
-  FILE* in = fopen(fileName, "rb");
+bool InvIndex::fullToc(const string &fileName) {
+  FILE* in = fopen(fileName.c_str(), "rb");
   *msgstream << "Trying to open toc: " << fileName << endl;
   if (in == NULL) {
      *msgstream << "Couldn't open toc file for reading" << endl;
@@ -376,21 +343,21 @@ bool InvIndex::fullToc(const char * fileName) {
     } else if (strcmp(key, NUMINV_PAR) == 0) {
       counts[INV_FILES] = atoi(val);
     } else if (strcmp(key, INVINDEX_PAR) == 0) {
-      names[DOC_INDEX] = strdup(val);
+      names[DOC_INDEX] = val;
     } else if (strcmp(key, INVLOOKUP_PAR) == 0) {
-      names[DOC_LOOKUP] = strdup(val);
+      names[DOC_LOOKUP] = val;
     } else if (strcmp(key, DTINDEX_PAR) == 0) {
-      names[TERM_INDEX] = strdup(val);
+      names[TERM_INDEX] = val;
     } else if (strcmp(key, DTLOOKUP_PAR) == 0) {
-      names[TERM_LOOKUP] = strdup(val);
+      names[TERM_LOOKUP] = val;
     } else if (strcmp(key, TERMIDMAP_PAR) == 0) {
-      names[TERM_IDS] = strdup(val);
+      names[TERM_IDS] = val;
     } else if (strcmp(key, DOCIDMAP_PAR) == 0) {
-      names[DOC_IDS] = strdup(val);
+      names[DOC_IDS] = val;
     } else if (strcmp(key, DOCMGR_PAR) == 0) {
-      names[DOCMGR_IDS] = strdup(val);
+      names[DOCMGR_IDS] = val;
     } else if (strcmp(key, VERSION_PAR) == 0) {
-      names[VERSION_NUM] = strdup(val);
+      names[VERSION_NUM] = val;
     }
   }    
 
@@ -401,7 +368,7 @@ bool InvIndex::fullToc(const char * fileName) {
 }
 
 bool InvIndex::indexLookup() {
-  FILE* in = fopen(names[DOC_LOOKUP], "rb");
+  FILE* in = fopen(names[DOC_LOOKUP].c_str(), "rb");
   *msgstream << "Trying to open invlist lookup: " << names[DOC_LOOKUP] << endl;
   if (in == NULL) {
     *msgstream << "Couldn't open invlist lookup table for reading" << endl;
@@ -428,8 +395,9 @@ bool InvIndex::indexLookup() {
 }
 
 bool InvIndex::dtLookup_ver1() {
-  FILE* in = fopen(names[TERM_LOOKUP], "rb");
-  *msgstream << "Trying to open dtlist lookup: " << names[TERM_LOOKUP] << endl;
+  FILE* in = fopen(names[TERM_LOOKUP].c_str(), "rb");
+  *msgstream << "Trying to open dtlist lookup: " 
+	     << names[TERM_LOOKUP] << endl;
   if (in == NULL) {
     *msgstream <<  "Couldn't open dt lookup table for reading" << endl;
     return false;
@@ -454,7 +422,7 @@ bool InvIndex::dtLookup_ver1() {
 bool InvIndex::dtLookup() {
   *msgstream << "Trying to open dtlist lookup: " << names[TERM_LOOKUP] << endl;
 
-  FILE* in = fopen(names[TERM_LOOKUP], "rb");
+  FILE* in = fopen(names[TERM_LOOKUP].c_str(), "rb");
 
   if (in == NULL) {
     *msgstream << "Couldn't open dt lookup table for reading" << endl;
@@ -480,7 +448,7 @@ bool InvIndex::dtLookup() {
 }
 
 bool InvIndex::dtFileIDs() {
-  FILE* in = fopen(names[TERM_INDEX], "rb");
+  FILE* in = fopen(names[TERM_INDEX].c_str(), "rb");
   *msgstream << "Trying to open term index filenames: " << names[TERM_INDEX] << endl;
   if (in == NULL) {
     *msgstream << "Error opening term index filenames file" << endl;
@@ -488,7 +456,7 @@ bool InvIndex::dtFileIDs() {
   }
 
 
-  dtfiles = new char*[counts[DT_FILES]];
+  dtfiles = new string [counts[DT_FILES]];
   dtfstreams = new ifstream[counts[DT_FILES]];
   int index;
   int len;
@@ -498,14 +466,15 @@ bool InvIndex::dtFileIDs() {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
         continue;
 
-    str = new char[len + 1]; 
+    str = new char[len + 1];  // fixed PATH_MAX buffer here.
     if (fscanf(in, "%s", str) != 1) {
       delete[](str);
       continue;
     }
     str[len] = '\0';
     dtfiles[index] = str;
-    dtfstreams[index].open(dtfiles[index], ios::in | ios::binary);
+    delete[](str);
+    dtfstreams[index].open(dtfiles[index].c_str(), ios::in | ios::binary);
     if (dtfstreams[index] == NULL)
       cerr << "error opening: " << dtfiles[index] << endl;
   }
@@ -515,7 +484,7 @@ bool InvIndex::dtFileIDs() {
 }
 
 bool InvIndex::docMgrIDs() {
-  FILE* in = fopen(names[DOCMGR_IDS], "r");
+  FILE* in = fopen(names[DOCMGR_IDS].c_str(), "r");
   *msgstream << "Trying to open doc manager ids file: " << names[DOCMGR_IDS] << endl;
   if (in == NULL) {
     fprintf(stderr, "Error opening doc manager ids \n");
@@ -538,21 +507,20 @@ bool InvIndex::docMgrIDs() {
     DocumentManager* dm = DocMgrManager::openDocMgr(str);
     docmgrs.push_back(dm);
     delete[]str;
-    //docmgrs.push_back(str);
   }
   fclose(in);
   return true;
 }
 
 bool InvIndex::invFileIDs() {
-  FILE* in = fopen(names[DOC_INDEX], "rb");
+  FILE* in = fopen(names[DOC_INDEX].c_str(), "rb");
   *msgstream << "Trying to open inverted index filenames: " << names[DOC_INDEX] << endl;
   if (in == NULL) {
     *msgstream <<  "Error opening inverted index filenames file"<< endl;
     return false;
   }
 
-  invfiles = new char*[counts[INV_FILES]];
+  invfiles = new string[counts[INV_FILES]];
   invfstreams = new ifstream[counts[INV_FILES]];
   int index;
   int len;
@@ -562,14 +530,15 @@ bool InvIndex::invFileIDs() {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
         continue;
 
-    str = new char[len + 1]; 
+    str = new char[len + 1];  // fixed PATH_MAX buffer here
     if (fscanf(in, "%s", str) != 1) {
       delete[](str); 
       continue;
     }
     str[len] = '\0';
     invfiles[index] = str;
-    invfstreams[index].open(invfiles[index], ios::in | ios::binary);
+    delete[](str);
+    invfstreams[index].open(invfiles[index].c_str(), ios::in | ios::binary);
   }
 
   fclose(in);
@@ -577,7 +546,7 @@ bool InvIndex::invFileIDs() {
 }
 
 bool InvIndex::termIDs() {
-  FILE* in = fopen(names[TERM_IDS], "rb");
+  FILE* in = fopen(names[TERM_IDS].c_str(), "rb");
   *msgstream << "Trying to open term ids file: " << names[TERM_IDS] << endl;
   if (in == NULL) {
     *msgstream <<  "Error opening termfile" << endl;
@@ -593,13 +562,14 @@ bool InvIndex::termIDs() {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
         continue;
 
-    str = new char[len + 1]; 
+    str = new char[len + 1]; // fixed size MAX_TERM_LENGTH buffer here.
     if (fscanf(in, "%s", str) != 1) {
       delete[](str);
       continue;
     }
     str[len] = '\0';
     terms[index] = str;
+    delete[](str);
     termtable[terms[index]] = index;
   }
 
@@ -613,7 +583,7 @@ bool InvIndex::termIDs() {
 }
 
 bool InvIndex::docIDs() {
-  FILE* in = fopen(names[DOC_IDS], "rb");
+  FILE* in = fopen(names[DOC_IDS].c_str(), "rb");
    *msgstream<< "Trying to open doc ids file: " << names[DOC_IDS] << endl;
   if (in == NULL) {
     *msgstream << "Error opening docfile" << endl;
@@ -629,7 +599,7 @@ bool InvIndex::docIDs() {
     if (fscanf(in, "%d %d", &index, &len) != 2)
       continue;
 
-    str = new char[len + 1]; 
+    str = new char[len + 1]; // fixed size buffer here
     if (fscanf(in, "%s", str) != 1) {
       delete[](str);
       continue;
@@ -637,6 +607,7 @@ bool InvIndex::docIDs() {
     str[len] = '\0';
     docnames[index] = str;
     doctable[docnames[index]] = index;
+    delete[](str);
   }
   fclose(in);
 

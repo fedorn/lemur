@@ -22,14 +22,14 @@
 InvFPIndex::InvFPIndex() : InvIndex() {
 }
 
-InvFPIndex::InvFPIndex(const char* indexName) : InvIndex(indexName) {
+InvFPIndex::InvFPIndex(const string &indexName) : InvIndex(indexName) {
 }
 
 InvFPIndex::~InvFPIndex() {
   // base class will take care of everything
 }
 
-DocInfoList* InvFPIndex::docInfoList(int termID){
+DocInfoList* InvFPIndex::docInfoList(int termID) const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS])) {
     *msgstream << "Error:  Trying to get docInfoList for invalid termID" << endl;    
     return NULL;
@@ -43,7 +43,7 @@ DocInfoList* InvFPIndex::docInfoList(int termID){
   InvFPDocList* dlist = new InvFPDocList();
   bool success;
 
-  if (strcmp(names[VERSION_NUM], "")) {
+  if (!names[VERSION_NUM].empty()) {
     // version 1.9 is compressed and must be decompressed
     success = dlist->binReadC(*indexin);
   } else {
@@ -58,7 +58,7 @@ DocInfoList* InvFPIndex::docInfoList(int termID){
   }
 }
 
-TermInfoList* InvFPIndex::termInfoList(int docID){
+TermInfoList* InvFPIndex::termInfoList(int docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream <<  "Error trying to get termInfoList for invalid docID.\n" << endl;
     return NULL;
@@ -71,7 +71,7 @@ TermInfoList* InvFPIndex::termInfoList(int docID){
   indexin->seekg(dtlookup[docID].offset, ios::beg);
   TermInfoList* termlist;
   InvFPTermList* tlist = new InvFPTermList();
-  if (strcmp(names[VERSION_NUM], "2.0.1") >= 0 )
+  if (names[VERSION_NUM] >= "2.0.1")
     // version 2.0 is compressed and must be decompressed
     success = tlist->binReadC(*indexin);
   else
@@ -87,7 +87,7 @@ TermInfoList* InvFPIndex::termInfoList(int docID){
   return termlist;
 }
 
-TermInfoList* InvFPIndex::termInfoListSeq(int docID){
+TermInfoList* InvFPIndex::termInfoListSeq(int docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get termInfoList for invalid docID.\n"<< endl;
     return NULL;
@@ -100,7 +100,7 @@ TermInfoList* InvFPIndex::termInfoListSeq(int docID){
   indexin->seekg(dtlookup[docID].offset, ios::beg);
   TermInfoList* termlist;
   InvFPTermList* tlist = new InvFPTermList();
-  if (strcmp(names[VERSION_NUM], "2.0.1") >= 0)
+  if (names[VERSION_NUM] >= "2.0.1")
     // version 2.0 is compressed and must be decompressed
     success = tlist->binReadC(*indexin);
   else
@@ -113,7 +113,7 @@ TermInfoList* InvFPIndex::termInfoListSeq(int docID){
   return termlist;
 }
 
-int InvFPIndex::docLengthCounted(int docID) {
+int InvFPIndex::docLengthCounted(int docID)  const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get docLengthCounted for invalid docID."<< endl;
     return 0;

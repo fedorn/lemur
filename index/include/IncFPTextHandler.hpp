@@ -26,7 +26,7 @@ public:
   IncFPTextHandler() { }
   /// Create a IncFPTextHandler with index name filename 
   /// (minus the .ifp extension) and specified buffer size.
-  IncFPTextHandler(char * filename, int bufferSize, 
+  IncFPTextHandler(const string &filename, int bufferSize, 
 		   bool countStopWds = false, int ind = 1);
 };
 

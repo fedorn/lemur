@@ -40,6 +40,6 @@ QueryTextHandler::handleWord(char * word) {
 }
 
 void 
-QueryTextHandler::setIndex(Index * ind) {
+QueryTextHandler::setIndex(const Index * ind) {
   index = ind;
 }

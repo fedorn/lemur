@@ -29,7 +29,8 @@ public:
   
   /// Create a InvFPTextHandler with index name filename 
   /// (minus the .ifp extension) and specified buffer size.
-  InvFPTextHandler(char * filename, int bufferSize, bool countStopWds = false, int ind = 1);
+  InvFPTextHandler(const string &filename, int bufferSize, 
+		   bool countStopWds = false, int ind = 1);
   ~InvFPTextHandler();
 
   /// Pushes the doc into the InvFPPushIndex.
@@ -38,7 +39,7 @@ public:
   char * handleWord(char * word);
 
   /// passes mgrID onto index
-  void setDocManager(const char* mgrID);
+  void setDocManager(const string &mgrID);
   // want to subclass this class for incremental.
 protected:
   /// Ends a document in the collection

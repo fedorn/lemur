@@ -26,7 +26,7 @@ class InvPassageTextHandler : public InvFPTextHandler {
 public:
   /// Create a InvPassageTextHandler with index name filename 
   /// (minus the .ifp extension) and specified buffer size.
-  InvPassageTextHandler(char * filename, int psgSize, int bufferSize, 
+  InvPassageTextHandler(const string &filename, int psgSize, int bufferSize, 
 			bool countStopWords = false) {
     // create index and helper objects  
     index = new InvPassagePushIndex(filename, psgSize, bufferSize);

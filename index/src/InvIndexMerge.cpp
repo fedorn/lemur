@@ -9,7 +9,7 @@
  *==========================================================================
 */
 #include "InvIndexMerge.hpp"
-
+#include <sstream>
 InvIndexMerge::InvIndexMerge(char* buffer, long size, long maxfilesize) {
   maxfile = maxfilesize;
   readbuffer = NULL;
@@ -29,15 +29,15 @@ InvIndexMerge::InvIndexMerge(long buffersize, long maxfilesize) {
 
 
 InvIndexMerge::~InvIndexMerge() {
-  free(name);
 }
 
-int InvIndexMerge::merge(vector<char*>* tf, char* prefix) {
+int InvIndexMerge::merge(vector<string>* tf, const string &prefix) {
   if (bufsize < READBUFSIZE * 2) {
-    fprintf(stderr, "merge:  Need a larger buffer size (at least %d).\n", READBUFSIZE*2);
+    fprintf(stderr, "merge:  Need a larger buffer size (at least %d).\n", 
+	    READBUFSIZE*2);
     return 0;
   }
-  name = strdup(prefix);
+  name = prefix;
   return this->hierMerge(tf, 0);
 }
 
@@ -57,8 +57,9 @@ void InvIndexMerge::setMaxFileSize(long size) {
     maxfile = size;
 }
 
-int InvIndexMerge::hierMerge(vector<char*>* files, int level) {  
-  fprintf(stderr, "%s: Begin hierchical merge level %d\n", name, level);
+int InvIndexMerge::hierMerge(vector<string>* files, int level) {  
+  fprintf(stderr, "%s: Begin hierchical merge level %d\n", name.c_str(), 
+	  level);
   int numfh = bufsize/READBUFSIZE;
 
   if (numfh > NUM_FH_OPEN) {
@@ -66,10 +67,10 @@ int InvIndexMerge::hierMerge(vector<char*>* files, int level) {
   }
 
   if (files->size() > numfh) {
-    vector<char*> intmedfiles;
-    vector<char*> subset;
-    vector<char*>::iterator begin;
-    vector<char*>::iterator end;
+    vector<string> intmedfiles;
+    vector<string> subset;
+    vector<string>::iterator begin;
+    vector<string>::iterator end;
 
     for (begin=files->begin(); begin<files->end(); begin+=numfh) {
       if (begin+numfh < files->end())
@@ -87,25 +88,23 @@ int InvIndexMerge::hierMerge(vector<char*>* files, int level) {
   }
 }
 
-int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int level) {
-  fprintf(stderr, "%s: Merging Intermediate files\n", name);
+int InvIndexMerge::mergeFiles(vector<string>* files, 
+			      vector<string>* intmed, int level) {
+  fprintf(stderr, "%s: Merging Intermediate files\n", name.c_str());
 
   vector<IndexReader*> readers;
   char* bufptr = readbuffer;
 
-  int namelen = strlen(name)+1;
-  char* indexname = (char*)malloc(namelen+3);
-  if (!indexname) 
-    throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
-
-  sprintf(indexname, "%s%d.%d", name, level, intmed->size());
+  std::stringstream nameStr;
+  nameStr << name << level << "." << intmed->size();
+  string indexname = nameStr.str();
   intmed->push_back(indexname);
 
   // if we're only merging one file, no merging is necessary
   if (files->size() == 1) {
     // have to do the remove because rename wont' work if file exists
-    remove(indexname);
-    rename((*files)[0], indexname);
+    remove(indexname.c_str());
+    rename((*files)[0].c_str(), indexname.c_str());
     return 1;
   }
     
@@ -117,10 +116,10 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
     setbuf(readers[i]->reader, bufptr, READBUFSIZE);
     bufptr += READBUFSIZE;
 
-    fprintf(stderr, "Opening %s\n", (*files)[i]);
-    readers[i]->reader->open((*files)[i], ios::in | ios::binary);
+    fprintf(stderr, "Opening %s\n", (*files)[i].c_str());
+    readers[i]->reader->open((*files)[i].c_str(), ios::in | ios::binary);
     if (!readers[i]->reader->is_open()) {
-      fprintf(stderr, "mergeFiles %d: Error! Couldn't open %s!\n", level,(*files)[i]);
+      fprintf(stderr, "mergeFiles %d: Error! Couldn't open %s!\n", level,(*files)[i].c_str());
       return 0;
     }
     readers[i]->list = new InvDocList();
@@ -129,7 +128,7 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
   }
 
   ofstream indexfile;
-  indexfile.open(indexname, ios::binary | ios::out);
+  indexfile.open(indexname.c_str(), ios::binary | ios::out);
 
   vector<int> working;  // list of least words
   int offset;
@@ -154,17 +153,11 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
     filelen = (long)indexfile.tellp();
     if (filelen + ((first->length()+4) *sizeof(int)) > maxfile) {
       indexfile.close();
-      char* newindex = (char*)malloc(namelen+3);
-      if (!newindex) 
-	throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
-
-      sprintf(newindex, "%s%d.%d", name, level, intmed->size());
+      std::stringstream nameStr;
+      nameStr << name << level << "." << intmed->size();
+      string newindex = nameStr.str();
       intmed->push_back(newindex);
-      indexfile.open(newindex, ios::binary | ios::out);
-      if (!indexfile) {
-        cerr << name << " :Error in merge. Could not open another index file for writing." << endl;
-        return 0;
-      }
+      indexfile.open(newindex.c_str(), ios::binary | ios::out);
       filelen = 0;
     }
 
@@ -198,12 +191,11 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
     filelen = (long)indexfile.tellp();
     if (filelen + ((myreader->list->length()+4) *sizeof(int)) > maxfile) {
       indexfile.close();
-      char* newindex = (char*)malloc(namelen+3);
-      if (! newindex) 
-	throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
-      sprintf(newindex, "%s%d.%d", name, level, intmed->size());
+      std::stringstream nameStr;
+      nameStr << name << level << "." << intmed->size();
+      string newindex = nameStr.str();
       intmed->push_back(newindex);
-      indexfile.open(newindex, ios::binary | ios::out);
+      indexfile.open(newindex.c_str(), ios::binary | ios::out);
       filelen =0;
     }
 
@@ -216,13 +208,11 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
       indexfile.flush();
       filelen = (long)indexfile.tellp();
       if (filelen + ((myreader->list->length()+4) *sizeof(int)) > maxfile) {
-        indexfile.close();
-        char* newindex = (char*)malloc(namelen+3);
-	if (! newindex) 
-	  throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
-        sprintf(newindex, "%s%d.%d", name, level, intmed->size());
+	std::stringstream nameStr;
+	nameStr << name << level << "." << intmed->size();
+	string newindex = nameStr.str();
         intmed->push_back(newindex);
-        indexfile.open(newindex, ios::binary | ios::out);
+        indexfile.open(newindex.c_str(), ios::binary | ios::out);
         filelen=0;
       }
       
@@ -243,14 +233,14 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
 
   //remove files already merged
   for (int f=0;f<files->size();f++) {
-    remove((*files)[f]);
+    remove((*files)[f].c_str());
   }
 
   return intmed->size();
 }
 
-int InvIndexMerge::finalMerge(vector<char*>* files) {
-  fprintf(stderr, "%s: Final Merge of files\n", name);
+int InvIndexMerge::finalMerge(vector<string>* files) {
+  fprintf(stderr, "%s: Final Merge of files\n", name.c_str());
   int i=0;
   vector<IndexReader*> readers;
   char* bufptr = readbuffer;
@@ -260,8 +250,8 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
     readers[i]->reader = new ifstream();
     setbuf(readers[i]->reader, bufptr, READBUFSIZE);
     bufptr += READBUFSIZE;
-    fprintf(stderr, "Opening file %s\n", (*files)[i]);
-    readers[i]->reader->open((*files)[i], ios::in | ios::binary);
+    fprintf(stderr, "Opening file %s\n", (*files)[i].c_str());
+    readers[i]->reader->open((*files)[i].c_str(), ios::in | ios::binary);
     if (!readers[i]->reader->is_open())
       fprintf(stderr, "Error: Could not open file\n");
     readers[i]->list = new InvDocList();
@@ -269,22 +259,16 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
   }
 
   vector<int> working;  // list of least words
-  int namelen = strlen(name)+1;
 
-  namelen += strlen(INVINDEX);
-  char* indexname = (char*)malloc(namelen+1);
-  if (!indexname) 
-    throw Exception("InvIndexMerge", "Error allocating memory for index file.");
-  sprintf(indexname, "%s%s%d", name, INVINDEX, 0);
+  std::stringstream nameStr;
+  nameStr << name << INVINDEX << 0;
+  string indexname = nameStr.str();
   invfiles.push_back(indexname);
-  char* lookup = (char*)malloc(namelen+strlen(INVLOOKUP));
-  if (!lookup) 
-    throw Exception("InvIndexMerge", "Error allocating memory for lookup file.");
-  sprintf(lookup, "%s%s", name, INVLOOKUP);
+  string lookup = name + INVLOOKUP;
 
   ofstream indexfile;
-  indexfile.open(indexname, ios::binary | ios::out);
-  FILE* listing = fopen(lookup, "wb");
+  indexfile.open(indexname.c_str(), ios::binary | ios::out);
+  FILE* listing = fopen(lookup.c_str(), "wb");
 
   int fid;
   int offset, ll, df;
@@ -318,16 +302,11 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
     filelen = (long)indexfile.tellp();
     if ((filelen + (ll+4) *sizeof(int)) > maxfile) {
       indexfile.close();
-      char* newindex = (char*)malloc(namelen+1);
-      if (! newindex) 
-	throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
-      sprintf(newindex, "%s%s%d", name, INVINDEX, invfiles.size());
+      std::stringstream nameStr;
+      nameStr << name << INVINDEX << invfiles.size();
+      string newindex = nameStr.str();
       invfiles.push_back(newindex);
-      indexfile.open(newindex, ios::binary | ios::out);
-      if (!indexfile) {
-        cerr << name << " :Error in merge. Could not open another index file for writing." << endl;
-        return 0;
-      }
+      indexfile.open(newindex.c_str(), ios::binary | ios::out);
       filelen = 0;
     }
     fid = invfiles.size()-1;
@@ -368,12 +347,11 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
     filelen = (long)indexfile.tellp();
     if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
       indexfile.close();
-      char* newindex = (char*)malloc(namelen+1);
-      if (! newindex) 
-	throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
-      sprintf(newindex, "%s%s%d", name, INVINDEX, invfiles.size());
+      std::stringstream nameStr;
+      nameStr << name << INVINDEX << invfiles.size();
+      string newindex = nameStr.str();
       invfiles.push_back(newindex);
-      indexfile.open(newindex, ios::binary | ios::out);
+      indexfile.open(newindex.c_str(), ios::binary | ios::out);
       filelen =0;
     }
     fid = invfiles.size()-1;
@@ -393,12 +371,11 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
       filelen = (long)indexfile.tellp();
       if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
         indexfile.close();
-        char* newindex = (char*)malloc(namelen+1);
-	if (! newindex) 
-	  throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
-        sprintf(newindex, "%s%s%d", name, INVINDEX, invfiles.size());
-        invfiles.push_back(newindex);
-        indexfile.open(newindex, ios::binary | ios::out);
+	std::stringstream nameStr;
+	nameStr << name << INVINDEX << invfiles.size();
+	string newindex = nameStr.str();
+	invfiles.push_back(newindex);
+	indexfile.open(newindex.c_str(), ios::binary | ios::out);
         filelen=0;
       }
       fid = invfiles.size()-1;
@@ -421,12 +398,9 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
 
   writeInvFIDs();
 
-  free(indexname);
-  free(lookup);
-
   //remove files already merged
   for (int f=0;f<files->size();f++) {
-    remove((*files)[f]);
+    remove((*files)[f].c_str());
   }
 
   return invfiles.size();
@@ -434,40 +408,18 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
 
 /*=====================PRIVATE METHODS =========================*/
 void InvIndexMerge::writeInvFIDs() {
-  char* fidmap = (char*)malloc(strlen(name)+strlen(INVINDEX)+1);
-  if (! fidmap) 
-    throw Exception("InvIndexMerge", "Couldn't create inverted index files to file ids map");
-
-  sprintf(fidmap, "%s%s", name, INVINDEX);
-  FILE* write = fopen(fidmap, "wb");
+  string fidmap = name + INVINDEX;
+  FILE* write = fopen(fidmap.c_str(), "wb");
   if (!write) 
     throw Exception("InvIndexMerge", "Couldn't create inverted index files to file ids map");
 
   for (int i=0;i<invfiles.size();i++) {
-    fprintf(write, "%d %d %s ", i, strlen(invfiles[i]), invfiles[i]);
+    fprintf(write, "%d %d %s ", i, invfiles[i].size(), invfiles[i].c_str());
   }
   fclose(write);
-  free(fidmap);
 }
 
 void InvIndexMerge::least(vector<IndexReader*>* r, vector<int>* ret) {
-  /*
-  int cmp;
-  char* least = readers[0]->getWord();
-  ret->push_back(0);
-
-  for (int i=1;i<readers.size(); i++) {
-    cmp = strcmp(readers[i]->getWord(), least);
-    if (cmp == 0) 
-      //they are equal
-      ret->push_back(i);
-    else if (cmp < 0) {
-      least = readers[i]->getWord();
-      ret->clear();
-      ret->push_back(i);
-    }
-  } */
-
   InvDocList* list;
 
   int lid, id;

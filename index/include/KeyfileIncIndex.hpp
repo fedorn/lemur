@@ -43,8 +43,9 @@
 #define DOCS         2
 #define DT_FILES     3
 #define INV_FILES    4
-#define MAX_DOCID_LENGTH 256
-#define MAX_TERM_LENGTH 256
+// keyref.h -- 512
+#define MAX_DOCID_LENGTH 512
+#define MAX_TERM_LENGTH 512
 
 #define KEYFILE_MAX_SEGMENTS (16)
 
@@ -94,35 +95,35 @@ public:
     /// segments containing the data associated with the the term
     SegmentOffset segments[ KEYFILE_MAX_SEGMENTS ];
   };
-  /// Instantiate with an existing index name, including extension.
-  KeyfileIncIndex(const char* indexName = 0); 
   /// Instantiate with index name without extension. Optionally pass in
   /// cachesize and starting document id number.
-  KeyfileIncIndex(char* prefix, int cachesize=128000000, 
+  KeyfileIncIndex(const string &prefix, int cachesize=128000000, 
 		  DOCID_T startdocid=1);
+  /// New empty one for index manager to use.
+  KeyfileIncIndex();
   /// Clean up.
   ~KeyfileIncIndex();
 
   /// sets the name for this index
-  void setName(char* prefix);
+  void setName(const string &prefix);
 
   /// the beginning of a new document
-  bool beginDoc(DocumentProps* dp);
+  bool beginDoc(const DocumentProps* dp);
 
   /// adding a term to the current document
-  bool addTerm(Term& t);
+  bool addTerm(const Term& t);
 
   /// signify the end of current document
-  void endDoc(DocumentProps* dp);
+  void endDoc(const DocumentProps* dp);
 
   /// signify the end of current document
-  virtual void endDoc(DocumentProps* dp, const char* mgr);
+  virtual void endDoc(const DocumentProps* dp, const string &mgr);
 
   /// signify the end of this collection.
-  void endCollection(CollectionProps* cp);
+  void endCollection(const CollectionProps* cp);
 
   /// set the document manager to use for succeeding documents
-  void setDocManager(const char* mgrID);
+  void setDocManager(const string &mgrID);
     
 protected:
   /// try to open an existing index
@@ -142,9 +143,9 @@ protected:
   void writeDocMgrIDs();
   /// returns the internal id of given docmgr
   /// if not already registered, mgr will be added
-  int docMgrID(const char* mgr);
+  int docMgrID(const string &mgr);
   /// handle end of document token.
-  virtual void doendDoc(DocumentProps* dp, int mgrid);
+  virtual void doendDoc(const DocumentProps* dp, int mgrid);
   /// how long all the lists are
   int listlengths;
   
@@ -153,26 +154,26 @@ public:
   //@{
 
   /// Open previously created Index with given prefix
-  bool open(const char* indexName);
+  bool open(const string &indexName);
   //@}
 
   /// @name Spelling and index conversion
   //@{
 
   /// Convert a term spelling to a termID
-  int term(const char* word);
+  int term(const string &word) const;
 
   /// Convert a termID to its spelling
-  const char* term(int termID);
+  const string term(int termID) const;
 
   /// Convert a spelling to docID
-  int document(const char* docIDStr);
+  int document(const string &docIDStr) const;
 
   /// Convert a docID to its spelling
-  const char* document(int docID); 
+  const string document(int docID) const; 
 
   /// The document manager for this document
-  DocumentManager *docManager(int docID);
+  const DocumentManager *docManager(int docID) const;
 
   //@}
 
@@ -180,10 +181,10 @@ public:
   //@{
 
   /// Total count (i.e., number) of documents in collection
-  int docCount() { return counts[DOCS]; };
+  int docCount() const { return counts[DOCS]; };
 
   /// Total count of unique terms in collection
-  int termCountUnique() { return counts[UNIQUE_TERMS]; };
+  int termCountUnique() const { return counts[UNIQUE_TERMS]; };
 
   /// Total counts of a term in collection
   int termCount(int termID) const;
@@ -192,10 +193,10 @@ public:
   int termCount() const { return counts[TOTAL_TERMS]; };
 
   /// Average document length 
-  float docLengthAvg();
+  float docLengthAvg() const;
 
   /// Total counts of doc with a given term
-  int docCount(int termID);
+  int docCount(int termID) const;
 
   /// Total counts of terms in a document, including stop words maybe
   int docLength(DOCID_T docID) const; // should use DOCID_T everywhere...
@@ -204,19 +205,19 @@ public:
   virtual int totaldocLength (int docID) const;
 
   /// Total count of terms in given document, not including stop words
-  int docLengthCounted(int docID);
+  int docLengthCounted(int docID) const;
 
   //@}
 
   /// @name Index entry access
   //@{
   /// doc entries in a term index, @see DocList @see InvFPDocList
-  DocInfoList* docInfoList(int termID);
+  DocInfoList* docInfoList(int termID) const;
 
   /// word entries in a document index (bag of words), @see TermList
-  TermInfoList* termInfoList(int docID);
+  TermInfoList* termInfoList(int docID) const;
   /// word entries in a document index (sequence of words), @see TermList
-  TermInfoList* termInfoListSeq(int docID);
+  TermInfoList* termInfoListSeq(int docID) const;
 
   //@}
 
@@ -225,9 +226,9 @@ public:
   /// update data for an already seen term
   void addKnownTerm( int termID, int position );
   /// initialize data for a previously unseen term.
-  int addUnknownTerm( InvFPTerm* term );
+  int addUnknownTerm( const InvFPTerm* term );
   /// update data for a term that is not cached in the term cache.
-  int addUncachedTerm( InvFPTerm* term );
+  int addUncachedTerm( const InvFPTerm* term );
 
 protected:
   /// open the database files
@@ -251,7 +252,7 @@ protected:
   void addGeneralLookup( Keyfile& numberNameIndex, Keyfile& nameNumberIndex, 
 			 int number, const char* name );
   /// retrieve and construct the DocInfoList for a term.
-  InvFPDocList* internalDocInfoList(int termID);
+  InvFPDocList* internalDocInfoList(int termID) const;
   /// add a position to a DocInfoList
   void _updateTermlist( InvFPDocList* curlist, int position );
   /// total memory used by cache
@@ -290,12 +291,13 @@ protected:
   /// read buffer for dtlookup
   ReadBuffer* dtlookupReadBuffer; 
   /// filestream for writing the list of located terms
-  File writetlist; 
+  /// mutable for index access mode of Index API (not PushIndex)
+  mutable File writetlist; 
 
   /// buffers for term() lookup functions
-  char termKey[MAX_TERM_LENGTH];
+  mutable char termKey[MAX_TERM_LENGTH];
   /// buffers for document() lookup functions
-  char docKey[MAX_DOCID_LENGTH];
+  mutable char docKey[MAX_DOCID_LENGTH];
   /// memory for use by inverted list buffers
   int _listsSize;
   /// upper bound for memory use

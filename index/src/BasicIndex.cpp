@@ -40,13 +40,13 @@ extern "C" {
 #define MAX(a,b) (a<=b) ? b : a
 const int maxDocSize=5000;
 
-const char * wordIndexSuffix     = "windex";
-const char * documentIndexSuffix = "dindex";
-const char * wordVocSuffix       = "terms";
-const char * documentVocSuffix   = "docids";
-const char * wordKeySuffix       = "wkey";
-const char * documentKeySuffix   = "dkey";
-const char * indexFileSuffix     = "bsc";
+const string wordIndexSuffix("windex");
+const string documentIndexSuffix("dindex");
+const string wordVocSuffix("terms");
+const string documentVocSuffix("docids");
+const string wordKeySuffix("wkey");
+const string documentKeySuffix("dkey");
+const string indexFileSuffix("bsc");
 
 static void my_assert(int exp, char * msg) {
   if (exp == 0) {
@@ -110,7 +110,7 @@ BasicIndex::~BasicIndex()
 }
 
 void BasicIndex::build(DocStream *collectionStream, 
-		       const char *file, const char * outputPrefix, 
+		       const string &file, const string &outputPrefix, 
 		  int totalDocs, int maxMemory, 
 		  int minimumCount, int maxVocSize) 
 {
@@ -158,9 +158,8 @@ void BasicIndex::build(DocStream *collectionStream,
 
 void BasicIndex::writeIndexFile() 
 {
-  char fn[1024];
-  sprintf(fn, "%s.%s", (const char *) prefix, indexFileSuffix);
-  FILE * fp = fopen(fn, "w");
+  string  fn = prefix + "." + indexFileSuffix;
+  FILE * fp = fopen(fn.c_str(), "w");
   my_assert((fp != (FILE *)NULL), "Opening index file.");
   time_t t;
   time(&t);
@@ -184,13 +183,13 @@ void BasicIndex::writeIndexFile()
   fprintf(fp, "%-20s =  %d;\n", "numBytes", numBytes);
   fprintf(fp, "%-20s =  %d;\n", "maxDocLength", maxDocumentLength);
   fprintf(fp, "%-20s =  %.2f;\n", "avgDocLength", avgDocumentLength);
-  fprintf(fp, "%-20s =  %s;\n", "wordVocabulary", (const char *) wordVocabulary);
+  fprintf(fp, "%-20s =  %s;\n", "wordVocabulary", wordVocabulary.c_str());
   fprintf(fp, "%-20s =  %s;\n", "docVocabulary", (const char *) documentVocabulary);
   fprintf(fp, "%-20s =  %s;\n", "wordIndex", (const char *) wordIndexFile);
   fprintf(fp, "%-20s =  %s;\n", "documentIndex", (const char *) documentIndexFile);
   fprintf(fp, "%-20s =  %s;\n", "wordKey", (const char *) wordKeyFile);
   fprintf(fp, "%-20s =  %s;\n", "documentKey", (const char *) documentKeyFile);
-  fprintf(fp, "%-20s =  %s;\n", "compression", pCompressor->type());
+  fprintf(fp, "%-20s =  %s;\n", "compression", pCompressor->type().c_str());
   fclose(fp);
 }
 
@@ -214,7 +213,7 @@ static float extractFloatID(const char * id) {
   return f;
 }
 
-bool BasicIndex::open(const char * fn) 
+bool BasicIndex::open(const string &fn) 
 {
   cout << "Opening index " << fn << endl;
   ParamPushFile(fn);
@@ -347,7 +346,7 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
     //    cerr << "id: "<< thisDoc->getID() << endl;
     thisDoc->startTermIteration();
     while (thisDoc->hasMore()) {
-      TokenTerm *term = thisDoc->nextTerm();
+      const TokenTerm *term = thisDoc->nextTerm();
       
       if (term->spelling()[0]  == '\0') {
 	continue;
@@ -379,8 +378,7 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
   IndexCount::rqSort(n, ti.Get());
   sorttime.Stop();
 
-  char name[1024];
-  sprintf(name, "%s.%s", (const char *) prefix, wordVocSuffix);
+  string name = prefix + "." +  wordVocSuffix;
   wordVocabulary = name;
   ofstream ofs(wordVocabulary);
   my_assert(ofs.good(), "Invalid word vocabulary");
@@ -392,11 +390,8 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
     if (ti[i].count < minCount) break;
     ofs << s << endl;
   }
-  
-
   ofs.close();    // CZ 
-  
-  sprintf(name, "%s.%s", (const char *) prefix, documentVocSuffix);
+  name = prefix + "." + documentVocSuffix;
   documentVocabulary = name;
   ofstream ofs2(documentVocabulary);
   my_assert(ofs2.good(), "Invalid document vocabulary");
@@ -405,8 +400,6 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
   for (i=0; i<doc.size(); ++i) {
     ofs2 << doc[i] << endl;
   }
-
-
   ofs2.close();    // CZ 
   numDocuments = numDocs;
 }
@@ -417,8 +410,8 @@ void BasicIndex::writeWordIndex(int indexNum, FastList<IndexCount> * dlw)
 {
   char outputName[1024];
   int * a = new int[2*numDocuments];
-  sprintf(outputName, "%s.%s.%d", 
-	  (const char *) prefix, wordIndexSuffix, indexNum);
+  sprintf(outputName, "%s.%s.%d", prefix.c_str(), wordIndexSuffix.c_str(), 
+	  indexNum);
   wordIndexFile = outputName;
   ofstream ofs(outputName, ios::binary | ios::out);
   my_assert(ofs.good(), "Opening word index");
@@ -468,15 +461,15 @@ int BasicIndex::indexCollection()
   int * docEntry = new int[2*terms.size()];
   ISet<Int> docSet(maxDocSize);
   string word;
-  char rec[MAXLINE];
+  //  char rec[MAXLINE];
   int numWordsRead=0;
   int numDocs=0;
   int numIndices=0;
-  char cmd[1024];
+  //  char cmd[1024];
   int did;
   int i;
   char name[1024];
-  sprintf(name, "%s.%s", (const char *) prefix, documentIndexSuffix);
+  sprintf(name, "%s.%s", prefix.c_str(), documentIndexSuffix.c_str());
   documentIndexFile = name;
   ofstream ofs(name, ios::binary | ios::out);
   my_assert(ofs.good(), "Opening document index file");
@@ -499,7 +492,7 @@ int BasicIndex::indexCollection()
 
   int erased=0;
   for (i=0; i<MAXINDEX; ++i) {
-    sprintf(name, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, i);
+    sprintf(name, "%s.%s.%d", prefix.c_str(), wordIndexSuffix.c_str(), i);
     if (remove(name)>=0) {
       cerr << "\tErased " << name << endl;
       erased++;
@@ -519,7 +512,7 @@ int BasicIndex::indexCollection()
     thisDoc->startTermIteration();
     while (thisDoc->hasMore()) {
 
-      TokenTerm *term = thisDoc->nextTerm();
+      const TokenTerm *term = thisDoc->nextTerm();
       //      cerr << "term: "<< term->spelling() << endl;
       if (term->spelling()[0]  == '\0') {
 	continue;
@@ -598,9 +591,8 @@ int BasicIndex::headWordIndex()
 {
   int w, d, totalCount, nWords=0;
   int * a = new int[2*numDocuments];
-  char fn[1024];
-  sprintf(fn, "%s.%s", (const char *) prefix, wordIndexSuffix);
-  ifstream ifs(fn, ios::binary | ios::in);
+  string fn = prefix + "." +  wordIndexSuffix;
+  ifstream ifs(fn.c_str(), ios::binary | ios::in);
   my_assert(ifs.good(), "Opening word index");
 
   while (ifs.peek() != EOF) {
@@ -630,9 +622,8 @@ int BasicIndex::headDocIndex()
   int w, d, m, nDocs=0;
   int * a = new int[2*terms.size()];
 
-  char fn[1024];
-  sprintf(fn, "%s.%s", (const char *) prefix, documentIndexSuffix);
-  ifstream ifs(fn, ios::binary | ios::in);
+  string fn = prefix + "." + documentIndexSuffix;
+  ifstream ifs(fn.c_str(), ios::binary | ios::in);
   my_assert(ifs.good(), "Opening doc index");
 
   while (ifs.peek() != EOF) {
@@ -655,7 +646,8 @@ int BasicIndex::headDocIndex()
   return 0;
 }
 
-int BasicIndex::mergePair(const char * fn1, const char * fn2, const char * fn3) 
+int BasicIndex::mergePair(const string &fn1, const string &fn2, 
+			  const string &fn3) 
 {
   int n1, n2, n3, w1, w2, c1, c2, c3, i;
   static int inited=0;
@@ -670,11 +662,11 @@ int BasicIndex::mergePair(const char * fn1, const char * fn2, const char * fn3)
 
   cerr << "Merging: \n " << fn1 << "\n " << fn2 << endl;
 
-  ifstream ifs1(fn1, ios::binary | ios::in);
+  ifstream ifs1(fn1.c_str(), ios::binary | ios::in);
   my_assert(ifs1.good(), "opening index file1");
-  ifstream ifs2(fn2, ios::binary | ios::in);
+  ifstream ifs2(fn2.c_str(), ios::binary | ios::in);
   my_assert(ifs2.good(), "opening index file2");
-  ofstream ofs(fn3, ios::binary | ios::out);
+  ofstream ofs(fn3.c_str(), ios::binary | ios::out);
   my_assert(ofs.good(), "opening output index file");
 
   ifs1.read((char *)&w1, sizeof(int));
@@ -767,40 +759,37 @@ int BasicIndex::mergePair(const char * fn1, const char * fn2, const char * fn3)
 
 void BasicIndex::mergeIndexFiles() 
 {
-  char fname1[1024], fname2[1024], cmd[1024], tmpnam1[1024], tmpnam2[1024];
+  //  char fname1[1024], fname2[1024], cmd[1024], tmpnam1[1024], tmpnam2[1024];
+  char fname1[1024], fname2[1024], tmpnam1[1024], tmpnam2[1024];
   cerr << "Merging index files " << endl;
-
+  string s, s2;
   while (1) {
-
-
-
-
     // We're finished when only indexPrefix.0 is present;
-    sprintf(tmpnam1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, 0);
+    sprintf(tmpnam1, "%s.%s.%d", prefix.c_str(), wordIndexSuffix.c_str(), 0);
+    s = tmpnam1;
+    my_assert(fileExist(s), "Tmp file does not exist");
 
-    my_assert(fileExist(tmpnam1), "Tmp file does not exist");
-
-    sprintf(tmpnam1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, 1);
-    //if (!qfilef(tmpnam1)) break;
-    if (!fileExist(tmpnam1)) break;
+    sprintf(tmpnam1, "%s.%s.%d", prefix.c_str(), wordIndexSuffix.c_str(), 1);
+    s = tmpnam1;
+    if (!fileExist(s)) break;
 
     for (int i=0; ; i+=2) {
-      sprintf(fname1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, i);
-      sprintf(fname2, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, i+1);
-      //      if (!(qfilef(fname1))) break;
-      if (!(fileExist(fname1))) break;
-      //      else if (!qfilef(fname2)) {
-      else if (!fileExist(fname2)) {
-	sprintf(tmpnam1, "%s.%s.%d", 
-		(const char *) prefix, wordIndexSuffix, i/2);
+      sprintf(fname1, "%s.%s.%d", prefix.c_str(), wordIndexSuffix.c_str(), i);
+      sprintf(fname2, "%s.%s.%d", prefix.c_str(), wordIndexSuffix.c_str(), i+1);
+      s = fname1;
+      s2 = fname2;
+      if (!(fileExist(s))) break;
+      else if (!fileExist(s2)) {
+	sprintf(tmpnam1, "%s.%s.%d",  prefix.c_str(), 
+		wordIndexSuffix.c_str(), i/2);
 	remove(tmpnam1);
 	my_assert((rename(fname1, tmpnam1) == 0), "Unable to rename");
       }
       else {
-	sprintf(tmpnam1, "%s.%s.tmp.%d.%d", 
-		(const char *) prefix, wordIndexSuffix, i, i+1);
-	sprintf(tmpnam2, "%s.%s.%d", 
-		(const char *) prefix, wordIndexSuffix, i/2);
+	sprintf(tmpnam1, "%s.%s.tmp.%d.%d", prefix.c_str(), 
+		wordIndexSuffix.c_str(), i, i+1);
+	sprintf(tmpnam2, "%s.%s.%d", prefix.c_str(), 
+		wordIndexSuffix.c_str(), i/2);
 	mergePair(fname1, fname2, tmpnam1);
 	my_assert((remove(fname1)==0), "Could not remove file1");
 	my_assert((remove(fname2)==0), "Could not remove file2");
@@ -810,8 +799,8 @@ void BasicIndex::mergeIndexFiles()
     }
   }
 
-  sprintf(fname1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, 0);
-  sprintf(tmpnam1, "%s.%s", (const char *) prefix, wordIndexSuffix);
+  sprintf(fname1, "%s.%s.%d", prefix.c_str(), wordIndexSuffix.c_str(), 0);
+  sprintf(tmpnam1, "%s.%s", prefix.c_str(), wordIndexSuffix.c_str());
   remove(tmpnam1);
   my_assert((rename(fname1, tmpnam1)==0), "Renaming file1");
   wordIndexFile = tmpnam1;
@@ -819,11 +808,11 @@ void BasicIndex::mergeIndexFiles()
   headWordIndex();
 }
 
-void BasicIndex::createKey(const char * inName, const char * outName, 
+void BasicIndex::createKey(const string &inName, const string &outName, 
 		      Terms & voc, int * byteOffset) {
-  ofstream ofs(outName);
+  ofstream ofs(outName.c_str());
   my_assert(ofs.good(), "opening key file");
-  ifstream ifs(inName, ios::binary | ios::in);
+  ifstream ifs(inName.c_str(), ios::binary | ios::in);
   my_assert(ifs.good(), "Opening input key file");
 
   int d, c;
@@ -850,19 +839,19 @@ void BasicIndex::createKeys()
   char outputName[1024];
   char inputName[1024];
 
-  sprintf(outputName, "%s.%s", (const char *) prefix, documentKeySuffix);
-  sprintf(inputName, "%s.%s", (const char *) prefix, documentIndexSuffix);
+  sprintf(outputName, "%s.%s", prefix.c_str(), documentKeySuffix.c_str());
+  sprintf(inputName, "%s.%s",  prefix.c_str(), documentIndexSuffix.c_str());
   // createKey(inputName, outputName, docids, byteOffsetOfDoc);
   createKey(inputName, outputName, docids, NULL); 
   documentKeyFile = outputName;
 
-  sprintf(outputName, "%s.%s", (const char *) prefix, wordKeySuffix);
-  sprintf(inputName, "%s.%s", (const char *) prefix, wordIndexSuffix);
+  sprintf(outputName, "%s.%s", prefix.c_str(), wordKeySuffix.c_str());
+  sprintf(inputName, "%s.%s", prefix.c_str(), wordIndexSuffix.c_str());
   createKey(inputName, outputName, terms, NULL);
   wordKeyFile = outputName;
 }
 
-DocInfoList * BasicIndex::docInfoList(int termID)
+DocInfoList * BasicIndex::docInfoList(int termID) const
 {
   wordIndexStream.seekg(woffset[termID]);
   int w;
@@ -875,7 +864,7 @@ DocInfoList * BasicIndex::docInfoList(int termID)
 }
 
 
-TermInfoList *BasicIndex::termInfoList(int docID) 
+TermInfoList *BasicIndex::termInfoList(int docID) const
 {
   documentIndexStream.seekg(doffset[docID]);
   int d, count;
@@ -886,7 +875,7 @@ TermInfoList *BasicIndex::termInfoList(int docID)
   
 }
 
-int BasicIndex::docCount(int t)
+int BasicIndex::docCount(int t) const
 {
   int w;
   int count;

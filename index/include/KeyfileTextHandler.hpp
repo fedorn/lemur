@@ -34,7 +34,7 @@ public:
   /// add or update a term
   char * handleWord(char * word);
   /// set the document manager id in the index.
-  void setDocManager(const char* mgrID);
+  void setDocManager(const string &mgrID);
 
 private:
   void endDoc();

@@ -30,22 +30,22 @@ public:
   ~InvTermList();
 
   /// prepare iteration
-  void startIteration();
+  void startIteration() const;
 
   /// has more entries
-  bool hasMore();
+  bool hasMore() const;
 
   /// Get a pointer to the next entry (pointer to a local static memory)
-  TermInfo *nextEntry();
+  TermInfo *nextEntry() const;
 
   /// Get the length of this document
-  int docLength(){ return length; }
+  int docLength() const { return length; }
 
   /// Get the number of terms in this document
-  int termCount() { return listlen/2; }
+  int termCount() const{ return listlen/2; }
 
   /// Get the docid this list is for
-  int docID() { return uid; }
+  int docID() const{ return uid; }
 
   /// Read in a TermInfoList object from a file
   /// Assumes the following format: DOCID DOCLENGTH TID TERM_COUNT ..
@@ -58,8 +58,8 @@ private:
   int* list; // beginning of list of terms and counts
   int* end; // end of list
   int listlen; // number of terms in list
-  int* iter;   // index for iterator
-  InvFPTerm entry;
+  mutable int* iter;   // index for iterator
+  mutable InvFPTerm entry;
 };
 
 

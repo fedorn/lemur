@@ -67,35 +67,35 @@ public:
   //@{
 
   /// Open previously created Index, return true if opened successfully, <tt>indexName</tt> should be the full name of the table-of-content file for the index. E.g., "index.bsc" for an index built with the basic indexer. 
-  virtual bool open(const char * indexName)=0;
+  virtual bool open(const string &indexName)=0;
   //@}
 
   /// @name Spelling and index conversion
   //@{
 
   /// Convert a term spelling to a termID, returns 0 if out of vocabulary. Valid index starts at 1.
-  virtual int term (const char * word)=0;
+  virtual int term (const string &word) const=0;
 
   /// Convert a valid termID to its spelling
-  virtual const char * term (int termID)=0;
+  virtual const string term (int termID) const=0;
 
   /// Convert a spelling to docID, returns 0 if out of vocabulary. Valid index starts at 1.
-  virtual int document (const char * docIDStr)=0;
+  virtual int document (const string &docIDStr) const=0;
 
   /// Convert a valid docID to its spelling
-  virtual const char * document (int docID)=0;
+  virtual const string document (int docID) const=0;
 
   /// A String identifier for the document manager to get at the source
   /// of the document with this document id
   //  virtual const char* docManager(int docID) { return NULL;}
-  virtual DocumentManager* docManager(int docID) {return NULL;}
+  virtual const DocumentManager* docManager(int docID) const {return NULL;}
 
 
   /// Return a string ID for the term lexicon (usually the file name of the lexicon)
   /*! This function should be pure virtual; the default implementation
      is just for convenience. Appropriate implementation to be done in the future. 
   */
-  virtual const char *termLexiconID() { return NULL;} 
+  virtual const string termLexiconID() const { return "";} 
 
   //@}
 
@@ -103,37 +103,41 @@ public:
   //@{
 
   /// Total count (i.e., number) of documents in collection
-  virtual int docCount () =0;
+  virtual int docCount () const=0;
 
   /// Total count of unique terms in collection, i.e., the term vocabulary size
-  virtual int termCountUnique ()=0;
+  virtual int termCountUnique () const=0;
 
   /// Total counts of a term in collection
-  virtual int termCount (int termID) const =0;
+  virtual int termCount (int termID) const=0;
 
   /// Total counts of all terms in collection
-  virtual int termCount () const =0;
+  virtual int termCount () const=0;
 
   /// Average document length 
-  virtual float docLengthAvg()=0;
+  virtual float docLengthAvg() const=0;
 
   /// Total counts of doc with a given term
-  virtual int docCount(int termID)=0;
+  virtual int docCount(int termID) const=0;
 
   /// Total counts of terms in a document  
-  virtual int docLength (int docID) const =0;
+  virtual int docLength (int docID) const=0;
 
   //@}
 
   /// @name Index entry access
   //@{
   /// returns a new instance of DocInfoList which represents the doc entries in a term index, you must delete the instance later. @see DocInfoList
-  virtual DocInfoList *docInfoList(int termID)=0;
+  virtual DocInfoList *docInfoList(int termID) const=0;
 
   /// returns a new instance of TermInfoList which represents the word entries in a document index, you must delete the instance later. @see TermInfoList
-  virtual TermInfoList *termInfoList(int docID)=0;
+  virtual TermInfoList *termInfoList(int docID) const=0;
 
   //@}
+
+  // returns TermInfoList is sequential representation (not bag of words)
+  // return NULL list when sequence is not available.
+  virtual TermInfoList *termInfoListSeq(int docID) const { return NULL; }
 
 };
 

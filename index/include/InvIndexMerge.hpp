@@ -35,11 +35,11 @@ public:
   /// long  : the maximum size the index can be
   InvIndexMerge(char* buffer, long size, long maxfilesize=2100000000);
   InvIndexMerge(long buffersize=64000000, long maxfilesize=2100000000);
-  ~InvIndexMerge();
+  virtual ~InvIndexMerge();
 
   /// output of this merge operation and the lookup table for the merged index
   /// returns the number of index files this merge created
-  int merge(vector<char*>* tf, char* prefix);
+  int merge(vector<string>* tf, const string &prefix);
 
   void setMaxFileSize(long size);
   char* setBuffer(char* buffer, long size);
@@ -47,13 +47,13 @@ public:
   /// recursive hierarchical merge
   /// calls mergeFiles() when intermediate files are necessary
   /// base case if finalMerge()
-  int hierMerge(vector<char*>* files, int level);
+  int hierMerge(vector<string>* files, int level);
 
   /// merge these files and put the results into the intmed list
-  virtual int mergeFiles(vector<char*>* files, vector<char*>* intmed, int level);
+  virtual int mergeFiles(vector<string>* files, vector<string>* intmed, int level);
 
   /// do the final merge and write the lookup table
-  virtual int finalMerge(vector<char*>* files);
+  virtual int finalMerge(vector<string>* files);
 
 protected:
   /// write file ids for indexes created
@@ -63,8 +63,8 @@ protected:
   /// setbuffer for ifstream.  trying to keep ugly os specific code out of main code
   void setbuf(ifstream* fs, char* bp, int bytes);
 
-  char* name;
-  vector<char*> invfiles; // list of files that we've written to
+  string name;
+  vector<string> invfiles; // list of files that we've written to
   long maxfile; // maximum file size for each index
   long bufsize;
   char* readbuffer;

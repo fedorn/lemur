@@ -31,10 +31,14 @@ public:
   virtual ~DocInfo() {}
   
   /// doc id
-  virtual int docID() =0;
+  virtual int docID() const=0;
   
   /// term count in the doc
-  virtual int termCount()=0;
+  virtual int termCount() const=0;
+
+  // return list of positions this term occurs in this document
+  // default implementation to return NULL if no position information available for this DocInfo
+  virtual const int* positions() const { return NULL; }  
 };
 
 
@@ -53,13 +57,13 @@ public:
   virtual ~DocInfoList() {}
   
   /// prepare iteration
-  virtual void startIteration()=0;
+  virtual void startIteration() const=0;
 
   /// test if there's any entry
-  virtual bool hasMore()=0;
+  virtual bool hasMore() const=0;
 
   /// fetch the next entry, return a pointer to a local static memory, so do not delete it
-  virtual DocInfo *nextEntry()=0;
+  virtual DocInfo *nextEntry() const=0;
 
 };
 

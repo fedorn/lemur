@@ -38,8 +38,8 @@ public:
   InvDocInfo() {};
   ~InvDocInfo() {}; 
   
-  DOCID_T docID() { return id; };
-  int termCount() { return count; };
+  DOCID_T docID() const{ return id; };
+  int termCount() const{ return count; };
  
 protected:
   DOCID_T id;    // id of this doc

@@ -14,7 +14,7 @@
 #ifndef _INVFPTYPES_H
 #define _INVFPTYPES_H
 
-#define IND_VERSION "2.2"
+#define IND_VERSION "3.0"
 
 #include "common_headers.hpp"
 
@@ -23,8 +23,8 @@ typedef int   TERMID_T;
 typedef TERMID_T LOC_T;  // for simplifying implementation of memory management, it's helpful for termid and location to be of the same type.
 typedef TERMID_T DOCID_T;
 typedef float SCORE_T;
-typedef char* TERM_T;
-typedef char* EXDOCID_T;
+typedef string TERM_T;
+typedef string EXDOCID_T;
 
 // suffixes for filenames
 #define INVINDEX  ".invf"

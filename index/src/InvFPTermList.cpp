@@ -45,15 +45,15 @@ InvFPTermList::~InvFPTermList() {
   }
 }
 
-void InvFPTermList::startIteration(){
+void InvFPTermList::startIteration() const{
   index = 0;
 }
 
-bool InvFPTermList::hasMore(){
+bool InvFPTermList::hasMore() const{
   return index != listlen;
 }
 
-TermInfo* InvFPTermList::nextEntry(){
+TermInfo* InvFPTermList::nextEntry() const{
   if (counts) {
     entry.freq = counts[index];
     entry.loclist = &(listcounted[index].loc);    
@@ -160,7 +160,7 @@ bool InvFPTermList::binReadC( File& infile ){
 // Stream-based functions
 // 
 
-void InvFPTermList::binWriteC(ofstream& of) {
+void InvFPTermList::binWriteC(ofstream& of){
   of.write((const char*) &uid, sizeof(DOCID_T));
   of.write((const char*) &length, sizeof(int));
   //  if (length == 0) {

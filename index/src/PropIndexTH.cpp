@@ -9,7 +9,7 @@
 #include "PropIndexTH.hpp"
 #include "KeyfileIncIndex.hpp"
 
-PropIndexTH::PropIndexTH(char * filename, int bufferSize,
+PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
 			 bool countStopWords, int ind) {
   // create index and helper objects  
   if (ind == 1)
@@ -26,7 +26,7 @@ PropIndexTH::PropIndexTH(char * filename, int bufferSize,
   first = true;
 }
 
-PropIndexTH::PropIndexTH(char * filename, int bufferSize,
+PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
 			 bool countStopWords, string ind) {
   // create index and helper objects  
   if (ind == "inv")
@@ -77,8 +77,8 @@ char* PropIndexTH::handleDoc(char* docno) {
   return docno;
 }
 
-char* PropIndexTH::handleWord(char* word, char* original, PropertyList *list) {
-  Property* prop = NULL;
+char* PropIndexTH::handleWord(char* word, const char* original, PropertyList *list) {
+  const Property* prop = NULL;
   int position = -1;
   char* tag = NULL;
   if (word) {
@@ -179,6 +179,6 @@ char* PropIndexTH::handleWord(char* word, char* original, PropertyList *list) {
 }
 
 
-void PropIndexTH::setDocManager(const char* mgrID) {
+void PropIndexTH::setDocManager(const string &mgrID) {
   index->setDocManager(mgrID);
 }

@@ -23,9 +23,9 @@ public:
   BasicDocInfo() {}
   BasicDocInfo( int docID, int termCount) : 
     id(docID), count(termCount) {}
-  virtual int termCount() { return count;}
+  virtual int termCount() const { return count;}
 
-  virtual int docID() { return id;}
+  virtual int docID() const { return id;}
   friend class BasicDocInfoList;
 private:
   int id, count;
@@ -39,18 +39,20 @@ public:
   BasicDocInfoList(int *tmpDocArray, int size);
 
   virtual ~BasicDocInfoList() {}
-  virtual void startIteration() {
+  virtual void startIteration() const {
     it = 0;
     prevDocID = 0;
   }
 
-  virtual bool hasMore() { return (it<sz); }
+  virtual bool hasMore() const { return (it<sz); }
 
-  virtual DocInfo * nextEntry();
+  virtual DocInfo * nextEntry() const;
 
 
 private:
-  int sz, it, prevDocID;
+  int sz;
+  mutable int it;
+  mutable int prevDocID;
   int *tmpdarr;
 };
 
@@ -61,7 +63,7 @@ inline BasicDocInfoList::BasicDocInfoList(int *tmpDocArray, int size):
 }
 
 /// This function is implemented inline, because it gets called frequently
-inline DocInfo * BasicDocInfoList::nextEntry() {
+inline DocInfo * BasicDocInfoList::nextEntry() const{
   // assert (hasMore());
   static BasicDocInfo info;
   info.id =  tmpdarr[it]+prevDocID;

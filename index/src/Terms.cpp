@@ -22,11 +22,12 @@ static void my_assert(int exp, char * msg) {
   }
 }
 
-Terms *Terms::construct(const char *path_) {
+Terms *Terms::construct(const string &path_) {
   // access only through here 
   int n = NSetsOpen();
   for (int i=0; i<n; i++) 
-    if (!strcmp(SetOfSets()[i].path, path_)) return &(SetOfSets()[i]);
+    //    if (!strcmp(SetOfSets()[i].path, path_)) return &(SetOfSets()[i]);
+    if (SetOfSets()[i].path == path_) return &(SetOfSets()[i]);
   SetOfSets()[n].open(path_);
   NSetsOpen()++;
   return &(SetOfSets()[n]);
@@ -60,10 +61,10 @@ int Terms::tokenize(const char *buff, Array<int> &tokenized) const {
   return nTerms;
 }
 
-void Terms::open(const char *path_) {
+void Terms::open(const string &path_) {
   path = path_; 
   char buff[65536];
-  ifstream ifs(path, ios::in);
+  ifstream ifs(path.c_str(), ios::in);
   if (!ifs) {
     cerr << "Can't open "<< path <<endl;
     abort(); 

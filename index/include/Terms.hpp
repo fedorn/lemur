@@ -28,29 +28,29 @@
 #include "ISet.hpp"
 #include "Array.hpp"
 
-static const char *OOV_SPELLING  = "[OOV]";
-static const char *NULL_SPELLING = "[NULL]";
+static const string OOV_SPELLING("[OOV]");
+static const string NULL_SPELLING("[NULL]");
 static const int MAX_SETS_OPEN = 128;
 
 
 class Terms {
 public:
-  static Terms *construct(const char *path_);
-  const char *operator[](int idx) const { return terms[idx]; }
-  int operator[](const char *t)   const 
+  static Terms *construct(const string &path_);
+  const string &operator[](int idx) const { return terms[idx]; }
+  int operator[](const string &t)   const 
     { int k=terms[t]; if (k==-1) return getIndexOfOOV(); else return k;} 
   int size()                      const { return terms.size(); }
   int getIndexOfOOV()             const { return terms[OOV_SPELLING];  }
   int getIndexOfNullTerm()        const { return terms[NULL_SPELLING]; }
-  const char *getPath()           const { return path; }  
-  static const char * getOOVSpelling() { return OOV_SPELLING; }
+  const string &getPath()           const { return path; }  
+  static const string &getOOVSpelling() { return OOV_SPELLING; }
   int tokenize(const char *buff, Array<int> &tokenized) const;
 
   // for back-compatibility with 089 code 
   int tokenize(const char *buff, Array<unsigned short> &tokenized) const;
 
 public:
-  void open(const char *path_);
+  void open(const string &path_);
 
 private:
   ISet<String> terms;

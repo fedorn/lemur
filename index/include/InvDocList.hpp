@@ -75,20 +75,20 @@ public:
   /// append the given list to the end of this list.  watch for overlap of lastdocid of this list and first docid of given list.
   virtual bool append(InvDocList* tail);
 
-  virtual void startIteration();
-  virtual bool hasMore();
-  virtual DocInfo* nextEntry();
-  virtual void nextEntry(InvDocInfo* info);
+  virtual void startIteration() const;
+  virtual bool hasMore() const;
+  virtual DocInfo* nextEntry() const;
+  virtual void nextEntry(InvDocInfo* info) const;
 
-  DOCID_T curDocID() { if (lastid == NULL) return -1; return *lastid; };
-  int docFreq() { return df; };
-  int length() { return end-begin; };
-  int termID() { return uid; };
-  int termLen() { return strlength; };
-  virtual int termCTF();
-  int curDocIDdiff() { return lastid-begin; };
-  int curDocIDtf() { return *(lastid+1); };
-  int memorySize() { return size; };
+  DOCID_T curDocID() const{ if (lastid == NULL) return -1; return *lastid; };
+  int docFreq() const{ return df; };
+  int length() const{ return end-begin; };
+  int termID() const{ return uid; };
+  int termLen() const{ return strlength; };
+  virtual int termCTF() const;
+  int curDocIDdiff() const{ return lastid-begin; };
+  int curDocIDtf() const{ return *(lastid+1); };
+  int memorySize() const{ return size; };
   
   /// write this object in binary to the given filestream.  the stream should support binary writing.
   void binWrite(ofstream& of);
@@ -121,7 +121,7 @@ protected:
   int* lastid;	// pointer to the most recent DocID added
   int* freq;		// pointer to the frequency of the last DocID
   int* end;		  // pointer to the next free memory
-  int* iter;    // pointer tells us where we are in iteration
+  mutable int* iter;    // pointer tells us where we are in iteration
   int  size;		// how big are we, increment in powers of 2, start at 16K
   int  intsize;	// sizeof(int) value
   int  strlength;       // the character length of our corresponding string
@@ -132,7 +132,7 @@ protected:
 
   bool READ_ONLY;    // flag for whether this list can be added
 private:
-  InvDocInfo entry;
+  mutable InvDocInfo entry;
 };
 
 #endif

@@ -51,9 +51,9 @@ public:
   bool addLocation(int docid, LOC_T location);
   bool append(InvDocList* tail);
 
-  virtual DocInfo* nextEntry();
-  virtual void nextEntry(InvFPDocInfo* info);
-  virtual int termCTF();
+  virtual DocInfo* nextEntry() const;
+  virtual void nextEntry(InvFPDocInfo* info) const;
+  virtual int termCTF() const;
   int *byteVec(int &len);
 
 protected:
@@ -65,7 +65,7 @@ protected:
   /// call after read
   virtual void deltaDecode();
   private:
-  InvFPDocInfo entry;
+  mutable InvFPDocInfo entry;
 };
 
 #endif

@@ -11,7 +11,7 @@
 
 #include "IncFPTextHandler.hpp"
 
-IncFPTextHandler::IncFPTextHandler(char * filename, int bufferSize,
+IncFPTextHandler::IncFPTextHandler(const string &filename, int bufferSize,
 				   bool countStopWords, int ind) {
   index = new IncFPPushIndex(filename, bufferSize);
 

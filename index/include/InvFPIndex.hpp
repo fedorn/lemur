@@ -24,22 +24,22 @@
 class InvFPIndex : public InvIndex {
 public:
    InvFPIndex();
-   InvFPIndex(const char* indexName);
+   InvFPIndex(const string &indexName);
   ~InvFPIndex(); 
 
   /// @name Index entry access
   //@{
   /// doc entries in a term index, @see DocList @see InvFPDocList
-  DocInfoList* docInfoList(int termID);
+  DocInfoList* docInfoList(int termID) const;
 
   /// word entries in a document index (bag of words), @see TermList
-  TermInfoList* termInfoList(int docID);
+  TermInfoList* termInfoList(int docID) const;
 
   /// word entries in a document index (sequence of words), @see TermList
-  TermInfoList* termInfoListSeq(int docID);
+  TermInfoList* termInfoListSeq(int docID) const;
 
   /// Total count of terms in given document, not including stop words
-  int docLengthCounted(int docID);
+  int docLengthCounted(int docID) const;
 
   //@}
 private:

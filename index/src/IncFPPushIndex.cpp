@@ -10,20 +10,22 @@
 */
 
 #include "IncFPPushIndex.hpp"
-
+#include <sstream>
 /*
  * NAME DATE - COMMENTS
  * dmf 07/2002 - subclass InvFPPushIndex
  *
  *========================================================================*/
 
-IncFPPushIndex::IncFPPushIndex(char* prefix, int cachesize, 
+IncFPPushIndex::IncFPPushIndex(const string &prefix, int cachesize, 
 			       long maxfilesize, DOCID_T startdocid) {
-  name = NULL;
   setName(prefix);
-  fprintf(stderr, "building %s\n ", name);
+  fprintf(stderr, "building %s\n ", name.c_str());
   
-  membuf = (int*) malloc(cachesize);
+  //  membuf = (int*) malloc(cachesize);
+  // use new so it throws an exception if it fails
+  membuf = new int[cachesize/sizeof(int)];
+  
   membufsize = cachesize;
   cache = new MemCache(membuf, membufsize);
   tcount = tidcount = 0;
@@ -32,31 +34,28 @@ IncFPPushIndex::IncFPPushIndex(char* prefix, int cachesize,
 
   // docterm index stuff
   if (tryOpen(name)) {
-    char* docfname = dtfiles[dtfiles.size() - 1];
-    char* lfname = new char[namelen+strlen(DTLOOKUP)];
-    sprintf(lfname, "%s%s", name, DTLOOKUP);
-    writetlist.open(docfname, ios::binary | ios::app);
-    writetlookup = fopen(lfname, "ab");
-    delete[](lfname);
+    string docfname = dtfiles[dtfiles.size() - 1];
+    string lfname = name + DTLOOKUP;
+    writetlist.open(docfname.c_str(), ios::binary | ios::in | ios::out);
+    writetlist.seekp(0, ios::end);
+    writetlookup = fopen(lfname.c_str(), "rb+");
+    fseek(writetlookup, 0, SEEK_END);
   } else {
-    char* docfname = new char[namelen+strlen(DTINDEX)+1];
-    char* lfname = new char[namelen+strlen(DTLOOKUP)];
-    sprintf(docfname, "%s%s%d", name, DTINDEX, 0);
-    sprintf(lfname, "%s%s", name, DTLOOKUP);
-    writetlist.open(docfname, ios::binary | ios::out);
+    std::stringstream nameStr;
+    nameStr << name << DTINDEX << dtfiles.size();
+    string docfname = nameStr.str();
+    string lfname = name + DTLOOKUP;
+    writetlist.open(docfname.c_str(), ios::binary | ios::out);
     dtfiles.push_back(docfname);
-    writetlookup = fopen(lfname, "wb");
-    delete[](lfname);
+    writetlookup = fopen(lfname.c_str(), "wb");
   }
 }
 
 
-bool IncFPPushIndex::tryOpen(char *name) {
+bool IncFPPushIndex::tryOpen(const string &name) {
   // Check if we have a TOC
-  char* fname = new char[namelen+strlen(INVFPTOC)];
-  sprintf(fname, "%s%s", name, INVFPTOC);
+  string fname = name + INVFPTOC;
   if (!readToc(fname)) {
-    delete[](fname);
     return false;
   }
   // Load existing dtfile ids to memory (dtfiles)
@@ -80,40 +79,32 @@ bool IncFPPushIndex::tryOpen(char *name) {
   // curdocmgr set by texthandler call to setDocMgr.
   // all docmgr ids written at endCollection.
   readDocMgrIDs();
-  // clean up
-  if (dtF) free(dtF);
-  if (invfpF) free(invfpF);
-  if (didF) free(didF);
-  if (tidF) free(tidF);
-  if (dmgrF) free(dmgrF);
-  delete[](fname);
   return true;
 }
 
-bool IncFPPushIndex::readToc(char * fileName) {
-  FILE* in = fopen(fileName, "rb");
+bool IncFPPushIndex::readToc(const string &fileName) {
+  FILE* in = fopen(fileName.c_str(), "rb");
   if (in == NULL) {
     return false;
   }
-  invfpF = dtF = dmgrF = didF = tidF = NULL;
   char key[128];
   char val[128];
   while (!feof(in)) {
     if (fscanf(in, "%s %s", key, val) != 2) continue;
     if (strcmp(key, INVINDEX_PAR) == 0) {
-      invfpF = strdup(val);
+      invfpF = val;
     } else if (strcmp(key, NUMTERMS_PAR) == 0) {
       tcount = atoi(val);
     } else if (strcmp(key, NUMUTERMS_PAR) == 0) {
       tidcount = atoi(val);
     } else if (strcmp(key, DTINDEX_PAR) == 0) {
-      dtF = strdup(val);
+      dtF = val;
     } else if (strcmp(key, TERMIDMAP_PAR) == 0) {
-      tidF = strdup(val);
+      tidF = val;
     } else if (strcmp(key, DOCIDMAP_PAR) == 0) {
-      didF = strdup(val);
+      didF = val;
     } else if (strcmp(key, DOCMGR_PAR) == 0) {
-      dmgrF = strdup(val);
+      dmgrF = val;
     } 
   }
   return true;
@@ -121,7 +112,7 @@ bool IncFPPushIndex::readToc(char * fileName) {
 
 
 void IncFPPushIndex::readDtFileIDs() {
-  FILE* in = fopen(dtF, "rb");
+  FILE* in = fopen(dtF.c_str(), "rb");
   int index;
   int len;
   char* str;
@@ -130,18 +121,19 @@ void IncFPPushIndex::readDtFileIDs() {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
         continue;
 
-    str = new char[len + 1];
+    str = new char[len + 1]; // change to fixed size buffer
     if (fscanf(in, "%s", str) != 1) {
       delete[](str);
        continue;
     }
     dtfiles.push_back(str);
+    delete[](str);
   }
   fclose(in);
 }
 
 void IncFPPushIndex::readDocMgrIDs() {
-  FILE* in = fopen(dmgrF, "r");
+  FILE* in = fopen(dmgrF.c_str(), "r");
 
   int ind, len;
   char* str;
@@ -150,18 +142,20 @@ void IncFPPushIndex::readDocMgrIDs() {
     if (fscanf(in, "%d %d", &ind, &len) != 2)
       continue;
     // new docmgr ids are made w/ strdup, ugh, so malloc here.
-    str = (char*) malloc(sizeof(char) * (len+1));
+    str = new char[(len+1)]; // change to fixed size buffer
     if (fscanf(in, "%s", str) != 1) {
+      delete[](str);
       free(str);
       continue;
     }
     docmgrs.push_back(str);
+    delete[](str);
   }
   fclose(in);
 }
 
 void IncFPPushIndex::readInvFileIDs() {
-  FILE* in = fopen(invfpF, "rb");
+  FILE* in = fopen(invfpF.c_str(), "rb");
   int index;
   int len;
   char* str;
@@ -175,9 +169,10 @@ void IncFPPushIndex::readInvFileIDs() {
        continue;
     }
     // make a new temp name, rename file, push on tempfiles.
-    char* fname = new char[8 + namelen];
-    sprintf(fname, "%stemp%d", name, tempfiles.size());
-    if (rename(str, fname)){
+    std::stringstream nameStr;
+    nameStr << name << "temp" << tempfiles.size();
+    string fname = nameStr.str();
+    if (rename(str, fname.c_str())){
       cerr << "unable to rename: " << str << " to " << fname << endl;
       delete[](str);
       return;
@@ -189,7 +184,7 @@ void IncFPPushIndex::readInvFileIDs() {
 }
 
 void IncFPPushIndex::readTermIDs() {
-  FILE* in = fopen(tidF, "rb");
+  FILE* in = fopen(tidF.c_str(), "rb");
   int index;
   int len;
   char* str;
@@ -197,15 +192,14 @@ void IncFPPushIndex::readTermIDs() {
   while (!feof(in)) {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
         continue;
-    // new terms are made w/ strdup, ugh, so malloc here.
-    str = (char*) malloc(sizeof(char) * (len+1));
+    str = new char[(len+1)];
     if (fscanf(in, "%s", str) != 1) {
-      free(str);
+      delete[](str);
       continue;
     }
     // skip OOV entry
     if (!strcmp(str, "[OOV]")) {
-      free(str);
+      delete[](str);
       continue;
     }
     
@@ -216,13 +210,14 @@ void IncFPPushIndex::readTermIDs() {
     // update to add a method to resetFree without zapping term id.
     newlist->reset();
     wordtable[str] = newlist;
+    delete[](str);
   }
   fclose(in);
   cache->flushMem(); // reset the cache to empty.
 }
 
 void IncFPPushIndex::readDocIDs() {
-  FILE* in = fopen(didF, "rb");
+  FILE* in = fopen(didF.c_str(), "rb");
   int index;
   int len;
   char* str;
@@ -230,18 +225,18 @@ void IncFPPushIndex::readDocIDs() {
   while (!feof(in)) {
     if (fscanf(in, "%d %d", &index, &len) != 2)
       continue;
-    // new docids are made w/ strdup, ugh, so malloc here.
-    str = (char*) malloc(sizeof(char) * (len+1));
+    str = new char[(len+1)];
     if (fscanf(in, "%s", str) != 1) {
-      free(str);
+      delete[](str);
       continue;
     }
     // skip OOV entry
     if (!strcmp(str, "[OOV]")) {
-      free(str);
+      delete[](str);
       continue;
     }
     docIDs.push_back(str);
+    delete[](str);
   }
   fclose(in);
 }

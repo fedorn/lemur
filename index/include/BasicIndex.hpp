@@ -51,35 +51,35 @@ public:
   virtual ~BasicIndex();
   
   /// Open previously created Index, return true if opened successfully
-  virtual bool open(const char * indexName);
+  virtual bool open(const string &indexName);
 
   /// @name Spelling and index conversion
   //@{
 
   /// Convert a term spelling to a termID
-  virtual int term (const char * word) { return terms[word];}
+  virtual int term (const string &word) const { return terms[word];}
 
   /// Convert a termID to its spelling
-  virtual const char * term (int termID) { return terms[termID];} 
+  virtual const string term (int termID) const { return terms[termID];} 
 
   /// Convert a spelling to docID
-  virtual int document (const char * docIDStr) {return docids[docIDStr];}
+  virtual int document (const string &docIDStr) const {return docids[docIDStr];}
 
   /// Convert a docID to its spelling
-  virtual const char * document (int docID) {return docids[docID];}
+  virtual const string document (int docID) const {return docids[docID];}
 
   /// return the term lexicon ID
-  virtual const char *termLexiconID() { return wordVocabulary;} 
+  virtual const string termLexiconID() const { return wordVocabulary;} 
   //@}
 
   /// @name Summary counts
   //@{
 
   /// Total count (i.e., number) of documents in collection
-  virtual int docCount ()  { return docids.size()-1;}
+  virtual int docCount () const  { return docids.size()-1;}
 
   /// Total count of unique terms in collection
-  virtual int termCountUnique () { return terms.size()-1;}
+  virtual int termCountUnique () const { return terms.size()-1;}
 
   /// Total counts of a term in collection
   virtual int termCount (int termID) const { return countOfTerm[termID] ;}
@@ -90,10 +90,10 @@ public:
   // XXX Better to have an exact count!
 
   /// Average document length 
-  virtual float docLengthAvg() { return avgDocumentLength;}
+  virtual float docLengthAvg() const { return avgDocumentLength;}
 
   /// Total counts of doc with a given term
-  virtual int docCount(int termID);
+  virtual int docCount(int termID) const;
 
   /// Total counts of terms in a document  
   virtual int docLength (int docID) const { return countOfDoc[docID];}  ;
@@ -103,18 +103,18 @@ public:
   /// @name Index entry access
   //@{
   /// doc entries in a term index, caller should release the memory @see DocList
-  virtual DocInfoList *docInfoList(int termID) ;
+  virtual DocInfoList *docInfoList(int termID) const ;
 
   /// word entries in a document index, caller should release the memory @see TermList
-  virtual TermInfoList *termInfoList(int docID) ;
+  virtual TermInfoList *termInfoList(int docID) const ;
 
   //@}
 
 
   // Create basic inverted indices 
   void build(DocStream *collectionStream,
-	     const char *file,
-	     const char * outputPrefix, 
+	     const string &file,
+	     const string &outputPrefix, 
 	     int totalDocs=0x1000000, int maxMemory=0x4000000,
 	     int minimumCount=1, int maxVocSize=2000000);
 private:
@@ -125,8 +125,9 @@ private:
   int headWordIndex();
   void createKeys();
   void mergeIndexFiles();
-  void createKey(const char * inName, const char * outName, Terms & voc, int * byteOffset);
-  int mergePair(const char * fn1, const char * fn2, const char * fn3);
+  void createKey(const string &inName, const string &outName, 
+		 Terms & voc, int * byteOffset);
+  int mergePair(const string &fn1, const string &fn2, const string &fn3);
   void writeIndexFile();
 
   ifstream textStream;
@@ -160,7 +161,7 @@ private:
 
 private:
   // fields for managing indices
-  ifstream  wordIndexStream, documentIndexStream;
+  mutable ifstream  wordIndexStream, documentIndexStream;
   int * woffset, * doffset; //  *toffset;
   int * tmpdarr, * tmpwarr;
   int * countOfTerm;

@@ -45,7 +45,7 @@ public:
   
   // Read into bit array, do not decompress
   virtual int read(istream &is)=0;
-  virtual const char * type ()=0;
+  virtual const string type ()=0;
 };
 
 #endif

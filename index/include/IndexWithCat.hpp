@@ -31,10 +31,10 @@ public:
   //@{
 
   /// Convert a spelling to catID
-  virtual int category (const char * catIDStr)=0;
+  virtual int category (const string &catIDStr) const=0;
 
   /// Convert a catID to its spelling
-  virtual const char * category (int catID)=0;
+  virtual const string category (int catID) const=0;
 
   //@}
 
@@ -42,10 +42,10 @@ public:
   //@{
 
   /// Total counts of categories
-  virtual int catCount()=0;
+  virtual int catCount() const=0;
 
   /// Total counts of documents in a category
-  virtual int docCountInCat(int catID)=0;
+  virtual int docCountInCat(int catID) const=0;
 
   //@}
 
@@ -54,25 +54,25 @@ public:
   //@{
 
 
-  virtual void startCatIDIteration(int docID)=0;
-  virtual bool hasMoreCatID()=0;
+  virtual void startCatIDIteration(int docID) const=0;
+  virtual bool hasMoreCatID() const=0;
   /// Iteration over all category ids that a doc belongs to
   /*! 
     startCatIDIteration, hasMoreCatID, and nextCatID go together
     to support iteration over category ids that a document has.
   */
-  virtual int nextCatID()=0;
+  virtual int nextCatID() const=0;
 
 
-  virtual void startDocIDIteration(int catID)=0;
-  virtual bool hasMoreDocID()=0;
+  virtual void startDocIDIteration(int catID) const=0;
+  virtual bool hasMoreDocID() const=0;
 
   /// Iteration over all doc ids that belong to a given category
   /*! 
     startDocIDIteration, hasMoreDocID, and nextDocID go together
     to support iteration over all doc ids in a given category
   */
-  virtual int nextDocID()=0;
+  virtual int nextDocID() const=0;
 
   //@}
 

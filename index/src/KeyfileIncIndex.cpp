@@ -27,14 +27,15 @@
 #include <sstream>
 
 // Keyfiles get 1mb each, and there are 6 of them
+// dtlookup gets 10MB read buffer
 // 16MB goes to the TermCache
 // 1MB for the output buffer at flush time
 // 1MB for general data structures
 // 4MB for the invlists vector (4 bytes * 1M terms)
 // 10MB for heap overhead, general breathing room
-// Total base RAM usage: 40MB
+// Total base RAM usage: 50MB
 
-#define KEYFILE_BASE_MEMORY_USAGE       (40*1024*1024)
+#define KEYFILE_BASE_MEMORY_USAGE       (50*1024*1024)
 #define KEYFILE_WRITEBUFFER_SIZE           (1024*1024)
 #define KEYFILE_DOCLISTREADER_SIZE         (1024*1024)
 
@@ -59,7 +60,7 @@
 
 #define IVLINDEX  ".ivl"
 
-KeyfileIncIndex::KeyfileIncIndex(char* prefix, int cachesize, 
+KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesize, 
 				 DOCID_T startdocid) {
   listlengths = 0;
   setName(prefix);
@@ -109,16 +110,12 @@ KeyfileIncIndex::KeyfileIncIndex(char* prefix, int cachesize,
   }
 }
 
-KeyfileIncIndex::KeyfileIncIndex(const char* indexName) {
+KeyfileIncIndex::KeyfileIncIndex() {
   listlengths = 0;
   curdocmgr = -1;
   _computeMemoryBounds( 128 * 1024 * 1024 );
   _largestFlushedTermID = 0;
   aveDocLen = 0;
-
-  if( indexName ) {
-    open(indexName);
-  }
 }
 
 KeyfileIncIndex::~KeyfileIncIndex() {
@@ -192,15 +189,15 @@ void KeyfileIncIndex::openDBs() {
 		 //std::ios::binary | std::ios::in);
   dtlookup.seekg( 0, std::ios::beg );
   dtlookup.seekp( 0, std::ios::end );
-  dtlookupReadBuffer = new ReadBuffer( dtlookup, 128*1024 );
+  //  dtlookupReadBuffer = new ReadBuffer( dtlookup, 128*1024 );
   // try bigger. But why are there writes in solaris?
-  //  dtlookupReadBuffer = new ReadBuffer( dtlookup, 32*1024*1024 );
+  dtlookupReadBuffer = new ReadBuffer( dtlookup, 10*1024*1024 );
 
-  invlookup.open( names[DOC_LOOKUP], Keyfile::sequential );
-  dIDs.open( names[DOC_IDS], Keyfile::random );
-  dSTRs.open( names[DOC_IDSTRS], Keyfile::random );
-  tIDs.open( names[TERM_IDS], Keyfile::random );
-  tSTRs.open( names[TERM_IDSTRS], Keyfile::random );
+  invlookup.open( names[DOC_LOOKUP] );
+  dIDs.open( names[DOC_IDS] );
+  dSTRs.open( names[DOC_IDSTRS] );
+  tIDs.open( names[TERM_IDS] );
+  tSTRs.open( names[TERM_IDSTRS] );
 }
 
 void KeyfileIncIndex::createDBs() {
@@ -209,16 +206,16 @@ void KeyfileIncIndex::createDBs() {
   dtlookup.seekg( 0, std::ios::beg );
   dtlookup.seekp( 0, std::ios::end );
 
-  dtlookupReadBuffer = new ReadBuffer( dtlookup, 128*1024 );
-
-  invlookup.create( names[DOC_LOOKUP], Keyfile::sequential );
-  dIDs.create( names[DOC_IDS], Keyfile::random );
-  dSTRs.create( names[DOC_IDSTRS], Keyfile::random );
-  tIDs.create( names[TERM_IDS], Keyfile::random );
-  tSTRs.create( names[TERM_IDSTRS], Keyfile::random );
+  //  dtlookupReadBuffer = new ReadBuffer( dtlookup, 128*1024 );
+  dtlookupReadBuffer = new ReadBuffer( dtlookup, 10*1024*1024 );
+  invlookup.create( names[DOC_LOOKUP] );
+  dIDs.create( names[DOC_IDS] );
+  dSTRs.create( names[DOC_IDSTRS] );
+  tIDs.create( names[TERM_IDS] );
+  tSTRs.create( names[TERM_IDSTRS] );
 }
 
-bool KeyfileIncIndex::open(const char* indexName){
+bool KeyfileIncIndex::open(const string &indexName){
   // stupid
   String streamSelect = ParamGetString("stream", "cerr");
   if (streamSelect == "cout") {
@@ -237,9 +234,8 @@ bool KeyfileIncIndex::open(const char* indexName){
   invertlists.resize(counts[UNIQUE_TERMS], 0 );
   _largestFlushedTermID = counts[UNIQUE_TERMS];
 
-  std::string indexNameString(indexName);
-  std::string prefix = indexNameString.substr( 0, indexNameString.rfind('.'));
-  setName(const_cast<char*>(prefix.c_str()));
+  std::string prefix = indexName.substr( 0, indexName.rfind('.'));
+  setName(prefix);
 
   openDBs();
   openSegments();
@@ -258,7 +254,8 @@ bool KeyfileIncIndex::open(const char* indexName){
   *msgstream << "Load index complete." << endl;
   return true;
 }
-int KeyfileIncIndex::term(const char* word){
+int KeyfileIncIndex::term(const string &inWord) const{
+  const char* word = inWord.c_str();
   int len = strlen(word);
 
   if (len > (MAX_TERM_LENGTH - 1)) {
@@ -280,7 +277,7 @@ int KeyfileIncIndex::term(const char* word){
   return id;
 }
 
-const char* KeyfileIncIndex::term(int termID) {
+const string KeyfileIncIndex::term(int termID)  const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS]))
     return NULL;
   int actual = 0;
@@ -289,11 +286,11 @@ const char* KeyfileIncIndex::term(int termID) {
   return this->termKey;
 }
 
-int KeyfileIncIndex::document(const char* docIDStr){
+int KeyfileIncIndex::document(const string &docID) const{
   int actual = 0;
   int documentID = 0;
 
-  const char *did = docIDStr;
+  const char *did = docID.c_str();
 
   int len = strlen(did);
   if (len > (MAX_DOCID_LENGTH - 1)) {
@@ -311,7 +308,7 @@ int KeyfileIncIndex::document(const char* docIDStr){
   return documentID;
 }
 
-const char* KeyfileIncIndex::document(int docID) {
+const string KeyfileIncIndex::document(int docID) const{
   if ((docID < 0) || (docID > counts[DOCS]))
     return NULL;
   int actual = 0;
@@ -320,7 +317,7 @@ const char* KeyfileIncIndex::document(int docID) {
   return this->docKey;
 }
 
-DocumentManager * KeyfileIncIndex::docManager(int docID) {
+const DocumentManager * KeyfileIncIndex::docManager(int docID) const{
   if ((docID <= 0) || (docID > counts[DOCS]))
     return NULL;
   record r = fetchDocumentRecord( docID );
@@ -348,11 +345,11 @@ int KeyfileIncIndex::termCount(int termID) const {
   }
 }
 
-float KeyfileIncIndex::docLengthAvg(){
+float KeyfileIncIndex::docLengthAvg() const{
   return aveDocLen;
 }
 
-int KeyfileIncIndex::docCount(int termID) {
+int KeyfileIncIndex::docCount(int termID) const {
   if ((termID <= 0) || (termID > counts[UNIQUE_TERMS]))
     return 0;
 
@@ -385,7 +382,7 @@ int KeyfileIncIndex::totaldocLength(int docID) const {
   return r.totalLen;
 }
 
-int KeyfileIncIndex::docLengthCounted(int docID) {
+int KeyfileIncIndex::docLengthCounted(int docID) const {
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return 0;
   }
@@ -398,7 +395,7 @@ int KeyfileIncIndex::docLengthCounted(int docID) {
   return count;
 }
 
-InvFPDocList* KeyfileIncIndex::internalDocInfoList(int termID) {
+InvFPDocList* KeyfileIncIndex::internalDocInfoList(int termID) const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS]) ) {
     *msgstream << "Error:  Trying to get docInfoList for invalid termID" 
 	       << endl;
@@ -451,7 +448,7 @@ InvFPDocList* KeyfileIncIndex::internalDocInfoList(int termID) {
   }
 }
 
-DocInfoList* KeyfileIncIndex::docInfoList(int termID){
+DocInfoList* KeyfileIncIndex::docInfoList(int termID) const{
   if ((termID <= 0) || (termID > counts[UNIQUE_TERMS]) ) {
     return NULL;
   }
@@ -466,7 +463,7 @@ DocInfoList* KeyfileIncIndex::docInfoList(int termID){
   return result;
 }
 
-TermInfoList* KeyfileIncIndex::termInfoList(int docID){
+TermInfoList* KeyfileIncIndex::termInfoList(int docID) const{
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return NULL;
   }
@@ -476,11 +473,12 @@ TermInfoList* KeyfileIncIndex::termInfoList(int docID){
   return tlist;
 }
 
-TermInfoList* KeyfileIncIndex::termInfoListSeq(int docID){
+TermInfoList* KeyfileIncIndex::termInfoListSeq(int docID) const{
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return NULL;
   }
   record r = fetchDocumentRecord( docID );
+  // shouldn't really be re-using this varname like this
   writetlist.seekg( r.offset, std::fstream::beg );
   InvFPTermList* tlist = new InvFPTermList();
   if (!tlist->binReadC(writetlist)) {
@@ -547,15 +545,15 @@ void KeyfileIncIndex::setMesgStream(ostream * lemStream) {
   msgstream = lemStream;
 }
 
-void KeyfileIncIndex::setName(char* prefix) {
+void KeyfileIncIndex::setName(const string &prefix) {
   name = prefix;
 }
 
-bool KeyfileIncIndex::beginDoc(DocumentProps* dp){
+bool KeyfileIncIndex::beginDoc(const DocumentProps* dp){
   if (dp == NULL)
     return false;
-  char *did = dp->stringID();
-
+  const char *did = dp->stringID();
+  
   int len = strlen(did);
   if (len > (MAX_DOCID_LENGTH - 1)) {
     cerr << "beginDoc: document id " << did << " is too long ("
@@ -593,7 +591,7 @@ void KeyfileIncIndex::addKnownTerm( int termID, int position ) {
   _updateTermlist( curlist, position );
 }
 
-int KeyfileIncIndex::addUnknownTerm( InvFPTerm* term ) {
+int KeyfileIncIndex::addUnknownTerm( const InvFPTerm* term ) {
   // update unique word counter
   counts[UNIQUE_TERMS]++;
   int termID = counts[UNIQUE_TERMS];
@@ -608,7 +606,7 @@ int KeyfileIncIndex::addUnknownTerm( InvFPTerm* term ) {
   return termID;
 }
 
-int KeyfileIncIndex::addUncachedTerm( InvFPTerm* term ) {
+int KeyfileIncIndex::addUncachedTerm( const InvFPTerm* term ) {
   int tid;
   int actual = 0;
     
@@ -620,8 +618,9 @@ int KeyfileIncIndex::addUncachedTerm( InvFPTerm* term ) {
 
   return tid;
 }
-bool KeyfileIncIndex::addTerm(Term& t){
-  InvFPTerm* term = static_cast< InvFPTerm* >(&t);
+
+bool KeyfileIncIndex::addTerm(const Term& t){
+  const InvFPTerm* term = dynamic_cast< const InvFPTerm* >(&t);
   assert( term->strLength() > 0 );
   assert( term->spelling() != NULL );
   int len = term->strLength();
@@ -645,15 +644,15 @@ bool KeyfileIncIndex::addTerm(Term& t){
   return true;
 }
 
-void KeyfileIncIndex::endDoc(DocumentProps* dp) {
+void KeyfileIncIndex::endDoc(const DocumentProps* dp) {
   doendDoc(dp, curdocmgr);
 }
 
-void KeyfileIncIndex::endDoc(DocumentProps* dp, const char* mgr){
+void KeyfileIncIndex::endDoc(const DocumentProps* dp, const string &mgr){
   doendDoc(dp, docMgrID(mgr));
 }
 
-void KeyfileIncIndex::endCollection(CollectionProps* cp){
+void KeyfileIncIndex::endCollection(const CollectionProps* cp){
   // flush everything in the cache
   lastWriteCache();
   // write list of document managers
@@ -662,7 +661,7 @@ void KeyfileIncIndex::endCollection(CollectionProps* cp){
   writeTOC();
 }
 
-void KeyfileIncIndex::setDocManager (const char* mgrID) {
+void KeyfileIncIndex::setDocManager (const string &mgrID) {
   curdocmgr = docMgrID(mgrID);
 }
 
@@ -671,7 +670,6 @@ void KeyfileIncIndex::setDocManager (const char* mgrID) {
  *==========================================================================*/
 bool KeyfileIncIndex::tryOpen() {
   // open an existing index and load up all of the data structures.
-  bool retval = false;
   std::string fname;
   fname = name + ".key"; // fix this.
   return open(fname.c_str());
@@ -845,7 +843,7 @@ void KeyfileIncIndex::mergeCacheSegments() {
 #else
     std::remove( names[DOC_LOOKUP].c_str() );
 #endif
-    invlookup.create( names[DOC_LOOKUP].c_str(), Keyfile::sequential );
+    invlookup.create( names[DOC_LOOKUP].c_str() );
   }
 
   std::priority_queue<KeyfileDocListSegmentReader*,
@@ -869,6 +867,7 @@ void KeyfileIncIndex::mergeCacheSegments() {
       new KeyfileDocListSegmentReader(fileToOpen, nameToOpen, i, 
 				      KEYFILE_DOCLISTREADER_SIZE );
     reader->pop(); // read the first list into memory
+    // if it is empty, don't push it.
     if( reader->top() ) {
       readers.push(reader);
     } else {
@@ -954,7 +953,6 @@ void KeyfileIncIndex::mergeCacheSegments() {
   }
 
   out.flush();
-  File::offset_type length = outFile.size();
   outFile.close();
   
   // all the old files are deleted now, so we can rename the 
@@ -979,8 +977,8 @@ void KeyfileIncIndex::mergeCacheSegments() {
 //
 // -----------------------------------------------------------------------------
 
-int KeyfileIncIndex::docMgrID(const char* mgr) {
-  std::string mgrString( mgr );
+int KeyfileIncIndex::docMgrID(const string &mgrString) {
+  //  std::string mgrString( mgr );
   std::vector<std::string>::iterator iter;
 
   iter = std::find( docmgrs.begin(), docmgrs.end(), mgrString );
@@ -1000,14 +998,10 @@ int KeyfileIncIndex::docMgrID(const char* mgr) {
   }
 }
 
-void KeyfileIncIndex::doendDoc(DocumentProps* dp, int mgrid){
+void KeyfileIncIndex::doendDoc(const DocumentProps* dp, int mgrid){
   //flush list and write to lookup table
   if (dp != NULL) {
     int len = dp->length();
-    int tls = termlist.size();
-
-    // make sure the ftell is correct
-    long offset = (long)writetlist.tellp();
     
     record rec;
     rec.offset = writetlist.tellp();

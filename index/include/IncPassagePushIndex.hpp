@@ -30,20 +30,20 @@ stemming (if any) occurs before the term is passed in.
 
 class IncPassagePushIndex : public IncFPPushIndex {
 public:
-  IncPassagePushIndex(char* prefix="DefaultIndex", int psgSize=50,
+  IncPassagePushIndex(const string &prefix="DefaultIndex", int psgSize=50,
 		      int cachesize=128000000, long maxfilesize=2100000000);
   IncPassagePushIndex(int psgSize);
   virtual ~IncPassagePushIndex();
   /// Set the number of terms per passage.
   void setPassageSize(int n);
   /// the beginning of a new document, returns true if initiation was successful
-  virtual bool beginDoc(DocumentProps* dp);
+  virtual bool beginDoc(const DocumentProps* dp);
 
   /// adding a term to the current document, returns true if term was added successfully.  
-  virtual bool addTerm(Term& t);
+  virtual bool addTerm(const Term& t);
 
   /// signify the end of current document
-  virtual void doendDoc(DocumentProps* dp, int mgrid);
+  virtual void doendDoc(const DocumentProps* dp, int mgrid);
 
 private:
   /// size of passages, in terms.
@@ -53,9 +53,9 @@ private:
   /// number of passages so far this document.
   int psgCounter;
   /// the current document
-  DocumentProps *curDoc;
+  //  DocumentProps *curDoc;
   /// the current document name
-  char *curDocName;
+  string curDocName;
 };
 
 #endif

@@ -30,7 +30,6 @@ int GammaCompress::read_bits(istream & is, vector<int> &bv, int size)
   int bytes = size / BYTESIZE;
   if (size % BYTESIZE > 0) bytes++;
 
-  int j=0;
   for (int i=0; i<bytes; ++i) {
     char b;
     is.read(&b, sizeof(char));
@@ -84,7 +83,6 @@ int GammaCompress::gamma_size(int x) {
 
 // x > 0
 int GammaCompress::gamma_encode(int x, int offset, vector<int> &ba) {
-  int o=offset;
   int l = floorlog2(x);
   int i;
   for (i=0; i<l; ++i) {

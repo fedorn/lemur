@@ -10,7 +10,7 @@
 */
 
 #include "IncPassagePushIndex.hpp"
-
+#include <sstream>
 /*
  * NAME DATE - COMMENTS
  * tnt 03/2001 - created
@@ -20,17 +20,15 @@
  * dmf 10/22/2002 -- Add writing of compressed TermInfoLists.
  *========================================================================*/
 
-IncPassagePushIndex::IncPassagePushIndex(char* prefix, int psgSize,
+IncPassagePushIndex::IncPassagePushIndex(const string &prefix, int psgSize,
 					 int cachesize, long maxfilesize)
   : IncFPPushIndex(prefix, cachesize, maxfilesize),
-    passageSize(psgSize), curDocName(NULL) { 
+    passageSize(psgSize), curDocName("") { 
   passageEnd = passageSize/2;
   if (passageSize%2 != 0) passageEnd++;
 }
 
 IncPassagePushIndex::~IncPassagePushIndex() { 
-  if (curDocName != NULL)
-    free(curDocName);
 }
 
 void IncPassagePushIndex::setPassageSize(int n) {
@@ -39,29 +37,26 @@ void IncPassagePushIndex::setPassageSize(int n) {
   if (passageSize%2 != 0) passageEnd++;
 }
 
-bool IncPassagePushIndex::beginDoc(DocumentProps* dp){
+bool IncPassagePushIndex::beginDoc(const DocumentProps* dp){
   if (dp == NULL)
     return false;
-  curDoc = dp;
-  if (curDocName != NULL)
-    free(curDocName);
-  curDocName = strdup(dp->stringID());
+  //  curDoc = dp;
+  curDocName = dp->stringID();
   char buf[1024];
   psgCounter = 0;
   sprintf(buf, "%s-%d", dp->stringID(), psgCounter);
-  char* id = strdup(buf);
+  string id = buf;
   docIDs.push_back(id);
-  int docid = docIDs.size() - 1;
   dtidcount = 0;
   return true;
 }
 
-bool IncPassagePushIndex::addTerm(Term& t){
+bool IncPassagePushIndex::addTerm(const Term& t){
   TABLE_T::iterator placehold;
   InvFPDocList* curlist;
-  InvFPTerm* term;
+  const InvFPTerm* term;
 
-  term = static_cast< InvFPTerm* >(&t);
+  term = dynamic_cast< const InvFPTerm* >(&t);
   if (term->strLength() < 1) {
     cerr << "Trying to add term with length less than 1.  Term ignored." 
 	 << endl;
@@ -74,7 +69,8 @@ bool IncPassagePushIndex::addTerm(Term& t){
   
   int pos = termlist.size() + 1;
   //search to see if this is a new term 
-  placehold = wordtable.find((char*)term->spelling());
+  string spell = term->spelling();
+  placehold = wordtable.find(spell);
   if (placehold != wordtable.end()) {
     //* OLD WORD *//
     curlist = (InvFPDocList*)placehold->second;
@@ -99,7 +95,7 @@ bool IncPassagePushIndex::addTerm(Term& t){
     // update unique word counter
     tidcount++;
     //store new word in list of ids
-    char* spell = strdup(term->spelling());
+    string spell = term->spelling();
     termIDs.push_back(spell);
 
     curlist = new InvFPDocList(cache, termIDs.size(), term->strLength(), 
@@ -133,22 +129,15 @@ bool IncPassagePushIndex::addTerm(Term& t){
     long offset = (long)writetlist.tellp();
     if (offset+(3*sizeof(int))+(tls*sizeof(LocatedTerm)) > maxfile) {
       writetlist.close();
-      char* docfname = new char[namelen+strlen(DTINDEX)+2];
-      sprintf(docfname, "%s%s%d", name, DTINDEX, dtfiles.size());
+      std::stringstream nameStr;
+      nameStr << name << DTINDEX << dtfiles.size();
+      string docfname = nameStr.str();
       dtfiles.push_back(docfname);
-      writetlist.open(docfname, ios::binary | ios::out);
+      writetlist.open(docfname.c_str(), ios::binary | ios::out);
       offset = 0;
     }
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset,
 	    len, curdocmgr);
-#if 0
-    writetlist.write((const char*)&docid, sizeof(DOCID_T));
-    writetlist.write((const char*)&len, sizeof(int));
-    writetlist.write((const char*)&tls, sizeof(int));
-    for (i=0;i<tls;i++) {
-      writetlist.write((const char*)&termlist[i], sizeof(LocatedTerm));
-    }
-#endif
     InvFPTermList *tlist = new InvFPTermList(docid, len, termlist);
     tlist->binWriteC(writetlist);
     delete tlist;
@@ -157,13 +146,14 @@ bool IncPassagePushIndex::addTerm(Term& t){
     // begin a new passage.
     psgCounter++;
     char buf[1024];
-    sprintf(buf, "%s-%d", curDocName, psgCounter);
-    char* id = strdup(buf);
+    sprintf(buf, "%s-%d", curDocName.c_str(), psgCounter);
+    string id = buf;
     docIDs.push_back(id);
     //update positions.
     for (i = 0; i < termlist.size(); i++) {            
       termlist[i].loc = i + 1;
-      char *word = termIDs[termlist[i].term - 1]; // off by one for OOV
+      // off by one for OOV
+      string &word = termIDs[termlist[i].term - 1];
       placehold = wordtable.find(word);
       // must be there.
       curlist = (InvFPDocList*)placehold->second;
@@ -181,7 +171,7 @@ bool IncPassagePushIndex::addTerm(Term& t){
   return true;
 }
 
-void IncPassagePushIndex::doendDoc(DocumentProps* dp, int mgrid) {
+void IncPassagePushIndex::doendDoc(const DocumentProps* dp, int mgrid) {
   //flush list and write to lookup table
   if (dp != NULL) {
     int docid = docIDs.size();
@@ -194,23 +184,16 @@ void IncPassagePushIndex::doendDoc(DocumentProps* dp, int mgrid) {
 
     if (offset+(3*sizeof(int))+(tls*sizeof(LocatedTerm)) > maxfile) {
       writetlist.close();
-      char* docfname = new char[namelen+strlen(DTINDEX)+2];
-      sprintf(docfname, "%s%s%d", name, DTINDEX, dtfiles.size());
+      std::stringstream nameStr;
+      nameStr << name << DTINDEX << dtfiles.size();
+      string docfname = nameStr.str();
       dtfiles.push_back(docfname);
-      writetlist.open(docfname, ios::binary | ios::out);
+      writetlist.open(docfname.c_str(), ios::binary | ios::out);
       offset = 0;
     }
 
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset, 
       len, mgrid);
-#if 0
-    writetlist.write((const char*)&docid, sizeof(DOCID_T));
-    writetlist.write((const char*)&len, sizeof(int));
-    writetlist.write((const char*)&tls, sizeof(int));
-    for (int i=0;i<tls;i++) {
-      writetlist.write((const char*)&termlist[i], sizeof(LocatedTerm));
-    }
-#endif
     InvFPTermList *tlist = new InvFPTermList(docid, len, termlist);
     tlist->binWriteC(writetlist);
     delete tlist;

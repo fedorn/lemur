@@ -72,7 +72,7 @@ KeyfileTextHandler::handleDoc(char * docno) {
   return docno;
 }
 
-char *
+char * 
 KeyfileTextHandler::handleWord(char * word) {
   InvFPTerm term;
   bool success = false;
@@ -92,6 +92,6 @@ KeyfileTextHandler::handleWord(char * word) {
   return word;
 }
 
-void KeyfileTextHandler::setDocManager(const char* mgrID) {
+void KeyfileTextHandler::setDocManager(const string &mgrID) {
     _index->setDocManager(mgrID);
   }

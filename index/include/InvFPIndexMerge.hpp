@@ -32,13 +32,13 @@ public:
   /// long  : the maximum size the index can be
   InvFPIndexMerge(char* buffer, long size, long maxfilesize=2100000000);
   InvFPIndexMerge(long buffersize=64000000, long maxfilesize=2100000000);
-  ~InvFPIndexMerge();
+  virtual ~InvFPIndexMerge();
 
   /// merge these files and put the results into the intmed list
-  virtual int mergeFiles(vector<char*>* files, vector<char*>* intmed, int level);
+  virtual int mergeFiles(vector<string>* files, vector<string>* intmed, int level);
 
   /// do the final merge and write the lookup table
-  virtual int finalMerge(vector<char*>* files);
+  virtual int finalMerge(vector<string>* files);
 
 
 private:

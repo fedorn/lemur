@@ -39,7 +39,7 @@ public:
   InvFPDocInfo() {};
   ~InvFPDocInfo() {}; 
   
-  LOC_T* positions() {return pos; };
+  const LOC_T* positions() const {return pos; };
  
 private:
   LOC_T* pos;  // list of positions in this doc (size is count)

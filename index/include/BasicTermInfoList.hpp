@@ -19,12 +19,12 @@ public:
   BasicTermInfo() {}
   BasicTermInfo( int termID, int termCount) : 
     tid(termID), tcount(termCount) {}
-  virtual int count() { return tcount;}
+  virtual int count() const { return tcount;}
 
-  virtual int id() { return tid;}
+  virtual int id() const { return tid;}
   
   /// pretend we have position
-  int position() { return tid;}
+  int position() const { return tid;}
   friend class BasicTermInfoList;
 private:
   int tid, tcount;
@@ -39,16 +39,17 @@ public:
   BasicTermInfoList(int *tmpWordArray, int size);
   
   virtual ~BasicTermInfoList() {}
-  virtual void startIteration() {
+  virtual void startIteration() const{
     it = 0;
   }
 
-  virtual bool hasMore() { return (it<sz); }
+  virtual bool hasMore() const{ return (it<sz); }
 
-  virtual TermInfo *nextEntry();
+  virtual TermInfo *nextEntry() const;
 
 private:
-  int sz, it;
+  int sz;
+  mutable int it;
   int *tmpwarr;
 };
 
@@ -59,7 +60,7 @@ inline BasicTermInfoList::BasicTermInfoList(int *tmpWordArray, int size):
 }
 
 /// This function is implemented inline, because it gets called frequently
-inline TermInfo * BasicTermInfoList::nextEntry() {
+inline TermInfo * BasicTermInfoList::nextEntry() const{
   // assert (hasMore());
   static BasicTermInfo info;
   info.tid =  tmpwarr[it];

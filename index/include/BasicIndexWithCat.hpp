@@ -33,28 +33,28 @@ public:
   ~BasicIndexWithCat() { delete [] base2cat; delete [] cat2base ;};
 
   /// to be implemented later
-  bool open(const char *) {return false;} 
+  bool open(const  string &name) {return false;} 
 
   /// @name Spelling and index conversion
   //@{
 
   /// Convert a term spelling to a termID
-  virtual int term (const char * word) { return baseIndex->term(word);}
+  virtual int term (const string &word) const { return baseIndex->term(word);}
 
   /// Convert a termID to its spelling
-  virtual const char * term (int termID) { return baseIndex->term(termID);}
+  virtual const string term (int termID) const { return baseIndex->term(termID);}
 
   /// Convert a spelling to docID
-  virtual int document (const char * docIDStr) { return baseIndex->document(docIDStr);}
+  virtual int document (const string &docIDStr) const { return baseIndex->document(docIDStr);}
 
   /// Convert a docID to its spelling
-  virtual const char * document (int docID) { return baseIndex->document(docID);}
+  virtual const string document (int docID) const { return baseIndex->document(docID);}
 
   /// Convert a spelling to catID
-  virtual int category (const char * catIDStr);
+  virtual int category (const string &catIDStr) const;
 
   /// Convert a catID to its spelling
-  virtual const char * category (int catID);
+  virtual const string category (int catID) const;
 
   //@}
 
@@ -62,10 +62,10 @@ public:
   //@{
 
   /// Total count (i.e., number) of documents in collection
-  virtual int docCount () { return baseIndex->docCount();}
+  virtual int docCount () const { return baseIndex->docCount();}
 
   /// Total count of unique terms in collection
-  virtual int termCountUnique () { return baseIndex->termCountUnique();}
+  virtual int termCountUnique () const { return baseIndex->termCountUnique();}
 
   /// Total counts of a term in collection
   virtual int termCount (int termID) const { return baseIndex->termCount(termID); }
@@ -74,29 +74,29 @@ public:
   virtual int termCount () const { return baseIndex->termCount(); }
 
   /// Average document length 
-  virtual float docLengthAvg() { return baseIndex->docLengthAvg(); }
+  virtual float docLengthAvg() const { return baseIndex->docLengthAvg(); }
 
   /// Total counts of doc with a given term
-  virtual int docCount(int termID) { return baseIndex->docCount(termID);}
+  virtual int docCount(int termID) const { return baseIndex->docCount(termID);}
 
   /// Total counts of terms in a document  
   virtual int docLength (int docID) const {return baseIndex->docLength(docID); }
 
   /// Total counts of categories
-  virtual int catCount();
+  virtual int catCount() const;
 
   /// Total counts of documents in a category
-  virtual int docCountInCat(int catID);
+  virtual int docCountInCat(int catID) const;
 
   //@}
 
   /// @name Base Index entry access (Term X Doc)
   //@{
   /// doc entries in a term index, @see DocList
-  virtual DocInfoList *docInfoList(int termID) { return baseIndex->docInfoList(termID); }
+  virtual DocInfoList *docInfoList(int termID) const { return baseIndex->docInfoList(termID); }
 
   /// word entries in a document index, @see TermList
-  virtual TermInfoList *termInfoList(int docID) { return baseIndex->termInfoList(docID); }
+  virtual TermInfoList *termInfoList(int docID) const { return baseIndex->termInfoList(docID); }
 
   //@}
 
@@ -104,25 +104,25 @@ public:
   //@{
 
 
-  virtual void startCatIDIteration(int docID);
-  virtual bool hasMoreCatID();
+  virtual void startCatIDIteration(int docID) const;
+  virtual bool hasMoreCatID() const;
   /// Iteration over all category ids that a doc belongs to
   /*! 
     startCatIDIteration, hasMoreCatID, and nextCatID go together
     to support iteration over category ids that a document has
   */
-  virtual int nextCatID();
+  virtual int nextCatID() const;
 
 
-  virtual void startDocIDIteration(int catID);
-  virtual bool hasMoreDocID();
+  virtual void startDocIDIteration(int catID) const;
+  virtual bool hasMoreDocID() const;
 
   /// Iteration over all doc ids that belong to a given category
   /*! 
     startDocIDIteration, hasMoreDocID, and nextDocID go together
     to support iteration over all doc ids in a given category
   */
-  virtual int nextDocID();
+  virtual int nextDocID() const;
 
   //@}
 
@@ -136,19 +136,19 @@ private:
   bool catAsTerm;
 
   /// buffers for iteration support
-  TermInfoList *tmInfoBuffer;
-  DocInfoList *docInfoBuffer;
-  TermInfo *tmInfo;
-  DocInfo *docInfo;
+  mutable TermInfoList *tmInfoBuffer;
+  mutable DocInfoList *docInfoBuffer;
+  mutable TermInfo *tmInfo;
+  mutable DocInfo *docInfo;
 
   /// synchronized doc id lexicons
   int *base2cat;
   int *cat2base;
  
-  static const char OOVSTRING[];
+  static const string OOVSTRING;  
 };
 
-inline int BasicIndexWithCat::category (const char * catIDStr)
+inline int BasicIndexWithCat::category (const string &catIDStr) const
 {
   if (catAsTerm) {
     return (catIndex->term(catIDStr));
@@ -159,7 +159,7 @@ inline int BasicIndexWithCat::category (const char * catIDStr)
 }
 
 
-inline const char *BasicIndexWithCat::category (int catID)
+inline const string BasicIndexWithCat::category (int catID) const
 {
   if (catAsTerm) {
     return (catIndex->term(catID));
@@ -171,7 +171,7 @@ inline const char *BasicIndexWithCat::category (int catID)
 
 
 
-inline int BasicIndexWithCat::catCount()
+inline int BasicIndexWithCat::catCount() const
 {
   if (catAsTerm) {
     return (catIndex->termCountUnique()-1); // -1 because of [OOV]
@@ -181,7 +181,7 @@ inline int BasicIndexWithCat::catCount()
   }
 }
 
-inline int BasicIndexWithCat::docCountInCat(int catID)
+inline int BasicIndexWithCat::docCountInCat(int catID) const
 {
   if (catAsTerm) {
     return (catIndex->docCount(catID));

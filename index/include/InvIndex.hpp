@@ -47,33 +47,32 @@
 class InvIndex : public Index {
 public:
    InvIndex();
-   InvIndex(const char* indexName);
+   InvIndex(const string &indexName);
   ~InvIndex(); 
 
   /// @name Open index 
   //@{
 
   /// Open previously created Index with given prefix, return true if opened successfully
-  bool open(const char* indexName);
+  bool open(const string &indexName);
   //@}
 
   /// @name Spelling and index conversion
   //@{
 
   /// Convert a term spelling to a termID
-  int term(const char* word);
+  int term(const string &word) const;
 
   /// Convert a termID to its spelling
-  const char* term(int termID);
+  const string term(int termID) const;
 
   /// Convert a spelling to docID
-  int document(const char* docIDStr);
+  int document(const string &docIDStr) const;
 
   /// Convert a docID to its spelling
-  const char* document(int docID); 
+  const string document(int docID) const; 
 
-  //  const char* docManager(int docID);
-  DocumentManager* docManager(int docID);
+  const DocumentManager* docManager(int docID) const;
 
   //@}
 
@@ -81,10 +80,10 @@ public:
   //@{
 
   /// Total count (i.e., number) of documents in collection
-  int docCount() { return counts[DOCS]; };
+  int docCount() const { return counts[DOCS]; };
 
   /// Total count of unique terms in collection
-  int termCountUnique() { return counts[UNIQUE_TERMS]; };
+  int termCountUnique() const { return counts[UNIQUE_TERMS]; };
 
   /// Total counts of a term in collection
   int termCount(int termID) const;
@@ -93,26 +92,26 @@ public:
   int termCount() const { return counts[TOTAL_TERMS]; };
 
   /// Average document length 
-  float docLengthAvg();
+  float docLengthAvg() const;
 
   /// Total counts of doc with a given term
-  int docCount(int termID);
+  int docCount(int termID) const;
 
   /// Total counts of terms in a document, including stop words
   int docLength(DOCID_T docID) const;
 
   /// Total count of terms in given document, not including stop words
-  virtual int docLengthCounted(int docID);
+  virtual int docLengthCounted(int docID) const;
 
   //@}
 
   /// @name Index entry access
   //@{
   /// doc entries in a term index, @see DocList @see InvFPDocList
-  DocInfoList* docInfoList(int termID);
+  DocInfoList* docInfoList(int termID) const;
 
   /// word entries in a document index (bag of words), @see TermList
-  TermInfoList* termInfoList(int docID);
+  TermInfoList* termInfoList(int docID) const;
 
   //@}
 
@@ -121,7 +120,7 @@ public:
 
 protected:
   /// readin all toc
-  bool fullToc(const char* fileName);
+  bool fullToc(const string &fileName);
   /// readin index lookup table
   bool indexLookup();
   /// readin inverted index filenames map
@@ -141,21 +140,21 @@ protected:
 
 
   int* counts;    // array to hold all the overall count stats of this db
-  char** names;   // array to hold all the names for files we need for this db
+  string *names;  // array to hold all the names for files we need for this db
   float aveDocLen; // the average document length in this index
   inv_entry* lookup;  // the array holding entries (index is termid)
   dt_entry* dtlookup; // the array holding entries to dt index (index of array is docid)
   int dtloaded; // indicate load status of the dt index (loaded or not)
   TERM_T* terms;   // array of the term spellings (index is termid)
   EXDOCID_T* docnames; // array of the external docids (index is docid)
-  char** dtfiles; // array of dt index filenames
+  string * dtfiles; // array of dt index filenames
   ifstream *dtfstreams; // array of dt index input streams
-  char** invfiles; // array of inv index filenames
+  string * invfiles; // array of inv index filenames
   ifstream *invfstreams; // array of inv index input streams
-  //  vector<char*> docmgrs; // list of document managers
   vector<DocumentManager*> docmgrs; // list of document managers
-  map<TERM_T, TERMID_T, ltstr> termtable; // table of terms to termid
-  map<EXDOCID_T, DOCID_T, ltstr> doctable; // table of exdocids to docid
+  // we make them mutable, but they don't actually get changed. this seems to be necessary for map::find method
+  mutable map<TERM_T, TERMID_T, less<TERM_T> > termtable; // table of terms to termid
+  mutable map<EXDOCID_T, DOCID_T, less<EXDOCID_T> > doctable; // table of exdocids to docid
   ostream* msgstream; // Lemur code messages stream		
 };
 

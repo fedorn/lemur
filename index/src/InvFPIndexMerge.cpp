@@ -9,6 +9,7 @@
  *==========================================================================
 */
 #include "InvFPIndexMerge.hpp"
+#include <sstream>
 
 InvFPIndexMerge::InvFPIndexMerge(char* buffer, long size, long maxfilesize) : InvIndexMerge(buffer, size, maxfilesize) {
 }
@@ -20,26 +21,24 @@ InvFPIndexMerge::InvFPIndexMerge(long buffersize, long maxfilesize) : InvIndexMe
 InvFPIndexMerge::~InvFPIndexMerge() {
 }
 
-int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int level) {
-  fprintf(stderr, "%s: Merging Intermediate files\n", name);
+int InvFPIndexMerge::mergeFiles(vector<string>* files, 
+				vector<string>* intmed, 
+				int level) {
+  fprintf(stderr, "%s: Merging Intermediate files\n", name.c_str());
 
   vector<InvFPIndexReader*> readers;
   char* bufptr = readbuffer;
 
-  int namelen = strlen(name)+1;
-  char* indexname = (char*)malloc(namelen+3);
-  if (!indexname) {
-    throw Exception("InvFPIndexMerge", "Couldn't allocate name for temporary files");
-  }
-
-  sprintf(indexname, "%s%d.%d", name, level, intmed->size());
+  std::stringstream nameStr;
+  nameStr << name << level << "." << intmed->size();
+  string indexname = nameStr.str();
   intmed->push_back(indexname);
 
   // if we're only merging one file, no merging is necessary
   if (files->size() == 1) {
     // have to do the remove because rename wont' work if file exists
-    remove(indexname);
-    rename((*files)[0], indexname);
+    remove(indexname.c_str());
+    rename((*files)[0].c_str(), indexname.c_str());
     return 1;
   }
     
@@ -51,10 +50,10 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
     setbuf(readers[i]->reader, bufptr, READBUFSIZE);
     bufptr += READBUFSIZE;
 
-    fprintf(stderr, "Opening %s\n", (*files)[i]);
-    readers[i]->reader->open((*files)[i], ios::in | ios::binary);
+    fprintf(stderr, "Opening %s\n", (*files)[i].c_str());
+    readers[i]->reader->open((*files)[i].c_str(), ios::in | ios::binary);
     if (!readers[i]->reader->is_open()) {
-      fprintf(stderr, "mergeFiles %d: Error! Couldn't open %s!\n", level,(*files)[i]);
+      fprintf(stderr, "mergeFiles %d: Error! Couldn't open %s!\n", level,(*files)[i].c_str());
       return 0;
     }
     readers[i]->list = new InvFPDocList();
@@ -63,7 +62,7 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
   }
 
   ofstream indexfile;
-  indexfile.open(indexname, ios::binary | ios::out);
+  indexfile.open(indexname.c_str(), ios::binary | ios::out);
 
   vector<int> working;  // list of least words
   int offset;
@@ -88,17 +87,11 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
     filelen = (long)indexfile.tellp();
     if (filelen + ((first->length()+4) *sizeof(int)) > maxfile) {
       indexfile.close();
-      char* newindex = (char*)malloc(namelen+3);
-      if (!newindex) {
-	throw Exception("InvFPIndexMerge", "Couldn't allocate name for temporary files");
-      }
-      sprintf(newindex, "%s%d.%d", name, level, intmed->size());
+      std::stringstream nameStr;
+      nameStr << name << level << "." << intmed->size();
+      string newindex = nameStr.str();
       intmed->push_back(newindex);
-      indexfile.open(newindex, ios::binary | ios::out);
-      if (!indexfile) {
-        cerr << name << " :Error in merge. Could not open another index file for writing." << endl;
-        return 0;
-      }
+      indexfile.open(newindex.c_str(), ios::binary | ios::out);
       filelen = 0;
     }
 
@@ -132,13 +125,11 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
     filelen = (long)indexfile.tellp();
     if (filelen + ((myreader->list->length()+4) *sizeof(int)) > maxfile) {
       indexfile.close();
-      char* newindex = (char*)malloc(namelen+3);
-      if (!newindex) {
-	throw Exception("InvFPIndexMerge", "Couldn't allocate name for temporary files");
-      }
-      sprintf(newindex, "%s%d.%d", name, level, intmed->size());
+      std::stringstream nameStr;
+      nameStr << name << level << "." << intmed->size();
+      string newindex = nameStr.str();
       intmed->push_back(newindex);
-      indexfile.open(newindex, ios::binary | ios::out);
+      indexfile.open(newindex.c_str(), ios::binary | ios::out);
       filelen =0;
     }
 
@@ -152,13 +143,11 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
       filelen = (long)indexfile.tellp();
       if (filelen + ((myreader->list->length()+4) *sizeof(int)) > maxfile) {
         indexfile.close();
-        char* newindex = (char*)malloc(namelen+3);
-	if (!newindex) {
-	  throw Exception("InvFPIndexMerge", "Couldn't allocate name for temporary files");
-	}
-        sprintf(newindex, "%s%d.%d", name, level, intmed->size());
-        intmed->push_back(newindex);
-        indexfile.open(newindex, ios::binary | ios::out);
+	std::stringstream nameStr;
+	nameStr << name << level << "." << intmed->size();
+	string newindex = nameStr.str();
+	intmed->push_back(newindex);
+	indexfile.open(newindex.c_str(), ios::binary | ios::out);
         filelen=0;
       }
       
@@ -179,14 +168,14 @@ int InvFPIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int
 
   //remove files already merged
   for (int f=0;f<files->size();f++) {
-    remove((*files)[f]);
+    remove((*files)[f].c_str());
   }
 
   return intmed->size();
 }
 
-int InvFPIndexMerge::finalMerge(vector<char*>* files) {
-  fprintf(stderr, "%s: Final Merge of files\n", name);
+int InvFPIndexMerge::finalMerge(vector<string>* files) {
+  fprintf(stderr, "%s: Final Merge of files\n", name.c_str());
   int i=0;
   vector<InvFPIndexReader*> readers;
   char* bufptr = readbuffer;
@@ -196,8 +185,8 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     readers[i]->reader = new ifstream();
     setbuf(readers[i]->reader, bufptr, READBUFSIZE);
     bufptr += READBUFSIZE;
-    fprintf(stderr, "Opening file %s\n", (*files)[i]);
-    readers[i]->reader->open((*files)[i], ios::in | ios::binary);
+    fprintf(stderr, "Opening file %s\n", (*files)[i].c_str());
+    readers[i]->reader->open((*files)[i].c_str(), ios::in | ios::binary);
     if (!readers[i]->reader->is_open())
       fprintf(stderr, "Error: Could not open file\n");
     readers[i]->list = new InvFPDocList();
@@ -205,23 +194,16 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
   }
 
   vector<int> working;  // list of least words
-  int namelen = strlen(name)+1;
 
-  namelen += strlen(INVFPINDEX);
-  char* indexname = (char*)malloc(namelen+1);
-  if (!indexname) 
-    throw Exception("InvFPIndexMerge", "Couldn't allocate name for index file");
-      
-  sprintf(indexname, "%s%s%d", name, INVFPINDEX, 0);
+  std::stringstream nameStr;
+  nameStr << name << INVFPINDEX << 0;
+  string indexname = nameStr.str();
   invfiles.push_back(indexname);
-  char* lookup = (char*)malloc(namelen+strlen(INVLOOKUP));
-  if (!lookup) 
-    throw Exception("InvFPIndexMerge", "Couldn't allocate name for lookup file");
-  sprintf(lookup, "%s%s", name, INVLOOKUP);
+  string lookup = name + INVLOOKUP;
 
   ofstream indexfile;
-  indexfile.open(indexname, ios::binary | ios::out);
-  FILE* listing = fopen(lookup, "wb");
+  indexfile.open(indexname.c_str(), ios::binary | ios::out);
+  FILE* listing = fopen(lookup.c_str(), "wb");
 
   int fid;
   int offset, ll, df;
@@ -255,16 +237,11 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     filelen = (long)indexfile.tellp();
     if ((filelen + (ll+4) *sizeof(int)) > maxfile) {
       indexfile.close();
-      char* newindex = (char*)malloc(namelen+1);
-      if (!newindex)
-	throw Exception("InvFPIndexMerge", "Couldn't allocate name for temporary files");
-      sprintf(newindex, "%s%s%d", name, INVFPINDEX, invfiles.size());
+      std::stringstream nameStr;
+      nameStr << name << INVFPINDEX << invfiles.size();
+      string newindex = nameStr.str();
       invfiles.push_back(newindex);
-      indexfile.open(newindex, ios::binary | ios::out);
-      if (!indexfile) {
-        cerr << name << " :Error in merge. Could not open another index file for writing." << endl;
-        return 0;
-      }
+      indexfile.open(newindex.c_str(), ios::binary | ios::out);
       filelen = 0;
     }
     fid = invfiles.size()-1;
@@ -305,12 +282,11 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
     filelen = (long)indexfile.tellp();
     if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
       indexfile.close();
-      char* newindex = (char*)malloc(namelen+1);
-      if (!newindex)
-	throw Exception("InvFPIndexMerge", "Couldn't allocate name for temporary files");
-      sprintf(newindex, "%s%s%d", name, INVFPINDEX, invfiles.size());
+      std::stringstream nameStr;
+      nameStr << name << INVFPINDEX << invfiles.size();
+      string newindex = nameStr.str();
       invfiles.push_back(newindex);
-      indexfile.open(newindex, ios::binary | ios::out);
+      indexfile.open(newindex.c_str(), ios::binary | ios::out);
       filelen =0;
     }
     fid = invfiles.size()-1;
@@ -330,12 +306,11 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
       filelen = (long)indexfile.tellp();
       if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
         indexfile.close();
-        char* newindex = (char*)malloc(namelen+1);
-	if (!newindex)
-	  throw Exception("InvFPIndexMerge", "Couldn't allocate name for temporary files");
-        sprintf(newindex, "%s%s%d", name, INVFPINDEX, invfiles.size());
-        invfiles.push_back(newindex);
-        indexfile.open(newindex, ios::binary | ios::out);
+	std::stringstream nameStr;
+	nameStr << name << INVFPINDEX << invfiles.size();
+	string newindex = nameStr.str();
+	invfiles.push_back(newindex);
+	indexfile.open(newindex.c_str(), ios::binary | ios::out);
         filelen=0;
       }
       fid = invfiles.size()-1;
@@ -357,13 +332,9 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
   fclose(listing);
 
   writeInvFIDs();
-
-  free(indexname);
-  free(lookup);
-
   //remove files already merged
   for (int f=0;f<files->size();f++) {
-    remove((*files)[f]);
+    remove((*files)[f].c_str());
   }
 
   return invfiles.size();
@@ -371,20 +342,17 @@ int InvFPIndexMerge::finalMerge(vector<char*>* files) {
 
 /*===================PRIVATE METHODS ================================ */
 void InvFPIndexMerge::writeInvFIDs() {
-  char* fidmap = (char*)malloc(strlen(name)+strlen(INVFPINDEX)+1);
-  if (!fidmap)
-    throw Exception("InvFPIndexMerge", "Couldn't allocate name for file ids map");
-  sprintf(fidmap, "%s%s", name, INVFPINDEX);
-  FILE* write = fopen(fidmap, "wb");
+  string fidmap = name + INVFPINDEX;
+  FILE* write = fopen(fidmap.c_str(), "wb");
   if (!write) {
-    cerr << "Error: Couldn't create inverted index files to file ids map" << endl;
+    cerr << "Error: Couldn't create inverted index files to file ids map" 
+	 << endl;
     return;
   }
   for (int i=0;i<invfiles.size();i++) {
-    fprintf(write, "%d %d %s ", i, strlen(invfiles[i]), invfiles[i]);
+    fprintf(write, "%d %d %s ", i, invfiles[i].size(), invfiles[i].c_str());
   }
   fclose(write);
-  free(fidmap);
 }
 
 void InvFPIndexMerge::least(vector<InvFPIndexReader*>* r, vector<int>*ret) {

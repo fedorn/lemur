@@ -47,7 +47,10 @@ InvFPDocList::InvFPDocList(int *vec) {
   size = vecLength * 4;
   unsigned char* buffer = (unsigned char *) (vec + 4);
   // this should be big enough
-  begin = (LOC_T*) malloc(size);
+  //  begin = (LOC_T*) malloc(s);
+  // use new/delete[] so an exception will be thrown if out of memory.
+  begin = new int[size/sizeof(int)];
+
   // decompress it
   int len = RVLCompress::decompress_ints(buffer, begin, vecLength);
   
@@ -61,7 +64,7 @@ InvFPDocList::InvFPDocList(int *vec) {
 InvFPDocList::~InvFPDocList() {
 }
 
-DocInfo* InvFPDocList::nextEntry() {
+DocInfo* InvFPDocList::nextEntry() const{
   // info is stored in int* as docid freq pos1 pos2 .. 
   entry.id = *iter;
   iter++;
@@ -72,7 +75,7 @@ DocInfo* InvFPDocList::nextEntry() {
   return &entry;
 }
 
-void InvFPDocList::nextEntry(InvFPDocInfo* info) {
+void InvFPDocList::nextEntry(InvFPDocInfo* info) const{
   info->id = *iter;
   iter++;
   info->count = *iter;
@@ -174,7 +177,7 @@ bool InvFPDocList::addLocation(int docid, int location) {
   return true;
 }
 
-int InvFPDocList::termCTF() {
+int InvFPDocList::termCTF() const {
   int ctf = 0;
   int *ptr = begin;
   while (ptr != lastid) {

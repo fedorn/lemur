@@ -37,12 +37,13 @@ class GammaCompress : public Compress
 {
 public:
   GammaCompress();
-
+  virtual ~GammaCompress(){}
+  
 public:
   void compress (ostream &os, int n, int * a);
   int decompress (istream &is, int * a);
   int read(istream &is);
-  const char * type() { return "gamma"; }
+  const string type() { return "gamma";  }
 
 private:
   void initBitMasks ();

@@ -32,10 +32,23 @@ public:
   virtual ~TermInfo() {}
   
   /// term id
-  virtual int id() =0;
+  virtual int id() const=0;
   
   /// term count in the doc
-  virtual int count()=0;
+  virtual int count() const=0;
+
+  // return list of positions this term occurs in this document
+  // (can be a list of 1 item)
+  // default implementation to return NULL if no position information available for this TermInfo
+  // list of positions is better used for bag of words support
+  virtual const int* positions() const{ return NULL; }
+
+  // return position this term occurs in this document
+  // better for sequence of words support
+  // when list of positions can be obtained, this returns the first item in the list
+  // default implementation to return -1 if no position information available for this TermInfo
+  virtual int position() const { return -1; }
+
 };
 
 
@@ -53,13 +66,13 @@ public:
   virtual ~TermInfoList() {}
 
   /// prepare iteration
-  virtual void startIteration()=0;
+  virtual void startIteration()const=0;
 
   /// has more entries
-  virtual bool hasMore()=0;
+  virtual bool hasMore()const=0;
 
   /// Get a pointer to the next entry (pointer to a local static memory), so do not delete it
-  virtual TermInfo *nextEntry()=0;
+  virtual TermInfo *nextEntry()const=0;
 };
 
 
