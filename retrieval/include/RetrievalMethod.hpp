@@ -21,11 +21,11 @@
 
 class RetrievalMethod {
 public:
-  /// compute the query representation for a text query 
+  /// compute the query representation for a text query (caller responsible for deleting the memory of the generated new instance)
   virtual QueryRep *computeQueryRep(TextQuery &qry)=0;
-  /// compute the doc representation
+  /// compute the doc representation (caller responsible for deleting the memory of the generated new instance)
   virtual DocumentRep *computeDocRep(int docID) =0;
-  /// return the scoring function
+  /// return the scoring function pointer
   virtual ScoreFunction *scoreFunc() = 0;
   /// update the query
   virtual void updateQuery(QueryRep &qryRep, DocIDSet &relDocs) = 0;

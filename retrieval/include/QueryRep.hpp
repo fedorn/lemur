@@ -48,6 +48,8 @@ public:
   /// This, along with hasMore(), nextTerm(), supports iteration over terms
   virtual void startIteration() = 0;
   virtual bool hasMore() = 0;
+
+  /// Fetch the next term. A new instance is generated; the caller is responsible for deleting it!
   virtual QueryTerm *nextTerm() = 0;
 
   /// Any query-specific constant term in the scoring formula

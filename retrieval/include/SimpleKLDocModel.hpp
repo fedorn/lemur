@@ -14,8 +14,7 @@
  <PRE>
  p(w|d) = q(w|d) if w seen
         = a(d) * Pc(w)  if w unseen
-   where, a(d) is the sum of probability mass allocated to all unseen words
-          Pc(w) is the collection language model
+   where,  a(d) controls the probability mass allocated to all unseen words and     Pc(w) is the collection language model
 </PRE>
 
 */
@@ -25,7 +24,7 @@ public:
   SimpleKLDocModel(int docID, UnigramLM &collectLM) : DocumentRep(docID), refLM(collectLM) {}
   ~SimpleKLDocModel() {};
 
-  /// term weighting function
+  /// term weighting function, weight(w) = p_seen(w)/p_unseen(w)
   virtual double termWeight(int termID, DocInfo *info) {
     return (seenProb(info->termCount(), termID)/(unseenCoeff()* refLM.prob(termID)));
   }
@@ -39,6 +38,7 @@ public:
   virtual double unseenCoeff()=0; // a(d)
   /// p(w|d), w seen
   virtual double seenProb(double termFreq, int termID)=0; // p(w|d), w seen
+protected:
   UnigramLM &refLM;
 };
 
@@ -49,7 +49,7 @@ public:
 /*!
 
 <PRE>
- P(w|d) = lambda*Pml(w|d)+(1-lambda)*Pc(w)
+ P(w|d) = (1-lambda)*Pml(w|d)+ lambda*Pc(w)
 </PRE>
 */
 
@@ -93,7 +93,7 @@ private:
 /// Bayesian smoothing with Dirichlet prior
 /*!
 <PRE>
- P(w|d) = (c(w;d)+lambda*Pc(w))/(|d|+lambda)
+ P(w|d) = (c(w;d)+mu*Pc(w))/(|d|+mu)
 </PRE>
 */
 class BayesianDocModel : public SimpleKLDocModel {

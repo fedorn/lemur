@@ -10,13 +10,13 @@ public:
   RetrievalEngine(RetrievalMethod &retMethod);
   ~RetrievalEngine();
 
-  /// Performs simple retrieval and returns a ranked list of documents with scores
+  /// Performs simple retrieval and returns a ranked list of documents with scores (The reference pointer "results" will point to the ranked list inside the engine, so the user doesn't need to allocate memory for "results") 
   virtual void retrieve(TextQuery &qry, IndexedRealVector * &results);
 
-  /// Performs pseudo-feedback retrieval and returns a ranked list of documents with scores
+  /// Performs pseudo-feedback retrieval and returns a ranked list of documents  with scores (The reference pointer "results" will point to the ranked list inside the engine, so the user doesn't need to allocate memory for "results") 
   virtual void retrievePseudoFeedback(TextQuery &qry, int howManyDoc, IndexedRealVector *&results);
 
-  /// a general scoring procedure shared by many different models
+  /// a general scoring procedure shared by many different models (assuming "sortedScores has memory allocated)
   virtual void scoreInvertedIndex(QueryRep &qryRep, IndexedRealVector &sortedScores);
 
 protected:
@@ -26,9 +26,9 @@ protected:
   double *scAcc; // score accumulators
   int *status; // scoring status
   IndexedRealVector *res; // sorted doc scores
-  QueryRep *qryRep;
-  DocumentRep *docRep;
-  RetrievalMethod &method;
+  QueryRep *qryRep; // query representation variable
+  DocumentRep *docRep; // doc representation variable
+  RetrievalMethod &method; //retrieval method handle
 };
 
 

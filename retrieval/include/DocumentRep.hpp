@@ -7,7 +7,7 @@
 //      Abstract Interface for Document Representation 
 //------------------------------------------------------------
 
-/// Representation of documents in a collection with default implementation
+/// Representation of documents in a collection 
 
 class DocumentRep {
 public:
