@@ -79,15 +79,15 @@ void MultiRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScoreV
   DocScoreVector* docscores;
   docsidmap centerScoreHash;
   double indexscore;
-  int maxArraySize=0;
-
+  int i,maxArraySize=0;
+	
 
 
   int NUM_DB=indexset.size();
   parama=new double[NUM_DB];
   paramb=new double[NUM_DB];
 
-  for (int i=0;i<indexset.size();i++) {
+  for (i=0;i<indexset.size();i++) {
     docscores = scoresset[i];
     if (maxArraySize<docscores->size())
       maxArraySize=docscores->size();
@@ -106,7 +106,7 @@ void MultiRegrMergeMethod::calcRegrParams(IndexedRealVector &indexset, DocScoreV
   /// Yi=a*X+b
 
   int lessDbNum=0; //the number of databases that has less overlap documents than the threshold.
-  for (int i=0;i<NUM_DB;i++){
+  for (i=0;i<NUM_DB;i++){
     double sum_x_x=0;
     double sum_x_y=0;
     double sum_x=0;
