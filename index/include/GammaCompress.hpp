@@ -47,7 +47,7 @@ public:
 
 private:
   void initBitMasks ();
-  int floorlog2 (int x);
+  int floorlog2 (double x);
   int gamma_size(int x);
   int gamma_encode(int x, int offset, BitArray * ba);
   int gamma_decode(int * y, int offset, BitArray * ba);

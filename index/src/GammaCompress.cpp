@@ -25,9 +25,10 @@ void GammaCompress::initBitMasks() {
 }
 
 // x > 0 
-int GammaCompress::floorlog2 (int x) {
-  static double loge2=log(2);
-  return (int) floor((log(x) / loge2));
+int GammaCompress::floorlog2 (double x) {
+  static double loge2=log(2.0);
+  static double epsilon=1.0e-8;
+  return (int) floor((log(x) / loge2)+epsilon);
 }
 
 // x > 0
