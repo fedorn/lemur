@@ -26,7 +26,7 @@ class InvFPTerm: public TermInfo {
 public:
   friend class InvFPTermList;
 
-  InvFPTerm() { freq=-1;};
+  InvFPTerm() { freq=1;};
   ~InvFPTerm() {};
 
   TERM_T spelling() { return word; };
