@@ -29,20 +29,18 @@
  *
  *========================================================================*/
 
-#include "InvDocInfo.hpp"
 #include "InvFPTypes.hpp"
 
-class InvFPDocInfo: public InvDocInfo {
+class InvFPDocInfo: public DocInfo {
 public: 
-  friend class InvFPDocList;
-
-  InvFPDocInfo() {};
-  ~InvFPDocInfo() {}; 
+  InvFPDocInfo() {}
+  ~InvFPDocInfo() {} 
   
-  const LOC_T* positions() const {return pos; };
- 
+  const LOC_T* positions() const {return pos; }
+  void positions(const LOC_T* p) {pos = p;}
+
 private:
-  LOC_T* pos;  // list of positions in this doc (size is count)
+  const LOC_T* pos;  // list of positions in this doc (size is count)
 };
 
 #endif
