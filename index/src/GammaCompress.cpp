@@ -37,40 +37,40 @@ int GammaCompress::gamma_size(int x) {
 }
 
 // x > 0
-int GammaCompress::gamma_encode(int x, int offset, BitArray * ba) {
+int GammaCompress::gamma_encode(int x, int offset, BitVector &ba) {
   int o=offset;
   int l = floorlog2(x);
   int i;
   for (i=0; i<l; ++i) {
-    ba->Sett(o++);
+    ba[o++] = true;
   }
-  ba->Clear(o++);
+  ba[o++] = false;
   int z = x - (1 << l);
   for (i=l-1; i>=0; --i) {
     if (bitmask[i]&z) 
-      ba->Sett(o++);
+      ba[o++] = true;
     else 
-      ba->Clear(o++);
+      ba[o++] = false;
   }
   return 1+2*l;
 }
 
-int GammaCompress::gamma_decode(int * y, int offset, BitArray * ba) {
+int GammaCompress::gamma_decode(int * y, int offset, BitVector &ba) {
   int o=offset;
   int l=0;
-  while(ba->Get(o++)) {
+  while(ba[o++]) {
     l++;
   }
   int z=0;
   for (int i=l-1; i>=0; --i) {
-    if (ba->Get(o++))
+    if (ba[o++])
       z ^= bitmask[i];
   }
   *y = z + (1<<l);
   return 1+2*l;
 }
 
-GammaCompress::GammaCompress() : ba(NULL) { initBitMasks(); }
+GammaCompress::GammaCompress() { initBitMasks(); }
 
 void GammaCompress::compress(ostream &os, int n, int * a) {
   int size=0;
@@ -78,16 +78,18 @@ void GammaCompress::compress(ostream &os, int n, int * a) {
   for (i=0; i<n; ++i) {
     size += gamma_size(a[i]);
   }
-  BitArray * ba = new BitArray(size);
+  cerr << "size=" << size << endl;
+  BitVector ba(size);
   int offset=0;
   for (i=0; i<n; ++i) {
     offset += gamma_encode(a[i], offset, ba);
   }
-  int s=ba->Size();
+  int s=ba.size();
   os.write((char *)&n, sizeof(int));
   os.write((char *)&s, sizeof(int));
-  ba->Write(os);
-  delete ba;
+  ba.write(os);
+  // ba->Write(os);
+  // delete ba;
 }
 
 int GammaCompress::decompress(istream &is, int * a) {
@@ -95,25 +97,23 @@ int GammaCompress::decompress(istream &is, int * a) {
   is.read((char *)&n, sizeof(int));
   is.read((char *)&size, sizeof(int));
   if (is.peek() == EOF) return 0;
-  BitArray * ca = new BitArray(size);
-  ca->Read(is);
+  BitVector ca(size);
+  ca.read(is, size);
   int y, offset=0;
   for (int i=0; i<n; ++i) {
     offset += gamma_decode(&y, offset, ca);
     a[i] = y;
   }
-  delete ca;
   return n;
 }
 
 // Read into bit array, do not decompress
-int GammaCompress::read(istream &is, BitArray * ba) {
+int GammaCompress::read(istream &is) {
   int n, size;
   is.read((char *)&n, sizeof(int));
   is.read((char *)&size, sizeof(int));
   if (is.peek() == EOF) return 0;
-  ba->Grow(size, 0);
-  ba->Read(is);
-  return n;
+  bv.reserve(size);
+  return bv.read(is, size);
 }
 

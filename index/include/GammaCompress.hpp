@@ -17,7 +17,6 @@
 
 /*!
 
-
  GammaCompress
 
  Implementation of the "gamma" method, as described in
@@ -31,8 +30,9 @@
 //
 //---------------------------------------------------------------
 
-#include "Compress.hpp"
+#include "BitVector.hpp"
 #include "BitArray.hpp"
+#include "Compress.hpp"
 
 class GammaCompress : public Compress 
 {
@@ -42,18 +42,19 @@ public:
 public:
   void compress (ostream &os, int n, int * a);
   int decompress (istream &is, int * a);
-  int read(istream &is, BitArray * ba);
+  int read(istream &is);
+  int read(istream &is, BitArray *b) { assert(0); }
   const char * type() { return "gamma"; }
 
 private:
   void initBitMasks ();
   int floorlog2 (double x);
   int gamma_size(int x);
-  int gamma_encode(int x, int offset, BitArray * ba);
-  int gamma_decode(int * y, int offset, BitArray * ba);
+  int gamma_encode(int x, int offset, BitVector & bv);
+  int gamma_decode(int * y, int offset, BitVector & bv);
 
 private:
-  BitArray *ba;
+  BitVector bv;
 };
 
 #endif
