@@ -1,6 +1,9 @@
-This is the Lemur Toolkit for Language Modeling and Information Retrieval, 
-version 1.0. For more information, including the full documentation
-of the toolkit, please visit the web site http://www.cs.cmu.edu/~lemur.
+This is the Lemur Toolkit for Language Modeling and 
+Information Retrieval, version 1.0. For more information, 
+including the full documentation of the toolkit, please 
+visit the web site http://www.cs.cmu.edu/~lemur.
 
-If you have any questions, please send email to lemur-project@cs.cmu.edu.
+See the file LICENSE in this same directory for the 
+terms of redistribution and use. If you have any questions, 
+please send email to lemur-project@cs.cmu.edu.
 
