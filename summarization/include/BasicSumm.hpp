@@ -19,6 +19,10 @@
 
 using std::vector;
 
+#ifndef min
+#define min(x,y) __min(x,y)
+#endif
+
 #ifndef _BASICSUMM_HPP
 #define _BASICSUMM_HPP
 
@@ -94,7 +98,7 @@ public:
       tf = psgV[i].tf;
       Tf = tf / (tf + 0.5 + 1.5 * (docLen/avgDocLen) );
       //cout << "score1: " << log((double)idx->docCount()/(double)idx->docCount(psgV[i].termID)) << endl;
-      idf = __min(M, log((double)idx->docCount()/(double)idx->docCount(psgV[i].termID))); 
+      idf = min(M, log((double)idx->docCount()/(double)idx->docCount(psgV[i].termID))); 
       endScore += (Tf * idf * P);
     }
     endScore = endScore / 1+psgLen;
