@@ -22,8 +22,7 @@ KStemmer::KStemmer(string &datadir) {
   stemdir = new char[datadir.length() + 1];
   strcpy(stemdir, datadir.c_str());
   if (read_dict_info()) {
-    cerr << "Failure reading kstemmer data files. Check KstemmerDir = " <<
-      datadir << " parameter." << endl;
+    //    cerr << "Failure reading kstemmer data files. Check KstemmerDir = " <<      datadir << " parameter." << endl;
     LEMUR_THROW( LEMUR_IO_ERROR, "Error opening stemmer datafiles");
   }
   iden=identifier;
