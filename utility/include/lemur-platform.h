@@ -34,6 +34,10 @@
   typedef off_t FILE_OFFSET;
   typedef int socket_t;
 
+  #ifndef __CYGWIN__
+    #define HAS_READDIR_R
+  #endif /* __CYGWIN__ */
+
   #ifndef INADDR_NONE
   /* solaris does not define INADDR_NONE */
   #define INADDR_NONE INADDR_BROADCAST
