@@ -76,7 +76,7 @@ RetrievalMethod* RetMethodManager::createModel (Index* ind,
     mod = createModel(ind, accum, TFIDF);
   if (type == "okapi")
     mod = createModel(ind, accum, OKAPI);
-  if (type == "cori")
+  if (type == "inquery")
     mod = createModel(ind, accum, INQUERY);
   if (type == "kl")
     mod = createModel(ind, accum, KL);

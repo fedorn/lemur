@@ -65,7 +65,7 @@ namespace RetrievalParameter {
     if (retModel == "0") retModel = "tfidf";
     if (retModel == "1") retModel = "okapi";
     if (retModel == "2") retModel = "kl";
-    if (retModel == "3") retModel = "cori";
+    if (retModel == "3") retModel = "inquery";
     if (retModel == "4") retModel = "cori_cs";
     if (retModel == "5") retModel = "cos";
 
