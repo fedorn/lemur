@@ -44,6 +44,10 @@
 ../app/obj/RetEval simple_kl_dir_param
 ../app/src/ireval.pl -j qrel -trec < res.simple_kl_dir > pr.simple_kl_dir
 
+# simple language model (KL-divergence) retrieval example, using absolute discounting smoothing
+../app/obj/RetEval simple_kl_abs_param
+../app/src/ireval.pl -j qrel -trec < res.simple_kl_abs > pr.simple_kl_abs
+
 
 # Language model (KL-divergence) feedback retrieval example, using collection mixture method and Dirichlet smoothing
 ../app/obj/RetEval mixfb_kl_dir_param
