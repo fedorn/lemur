@@ -21,12 +21,19 @@ void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff,
     qm->push_back(entry);
   }
   qm->Sort();
+  
+  double countSum = totalCount();
 
   // discounting the original model
   startIteration();
   while (hasMore()) {
     QueryTerm *qt = nextTerm();
-    setCount(qt->id(), qt->weight()*origModCoeff);
+    setCount(qt->id(), qt->weight()*origModCoeff/countSum);
+  }
+
+  startIteration();
+  while (hasMore()) {
+    QueryTerm *qt = nextTerm();
   }
   
   // now adding the new model
@@ -41,7 +48,50 @@ void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff,
     prSum += (*it).val;
     wdCount++;
   }
+  startIteration();
+  while (hasMore()) {
+    QueryTerm *qt = nextTerm();
+  }
 }
+
+void SimpleKLQueryModel::load(istream &is)
+{
+  // clear existing counts
+  startIteration();
+  QueryTerm *qt;
+  while (hasMore()) {
+    qt = nextTerm();
+    setCount(qt->id(),0);
+  }
+  int count;
+  is >> count;
+  char wd[500];
+  double pr;
+  while (count-- >0) {
+    is >> wd >> pr;
+    setCount(ind.term(wd), pr);
+  }
+}
+
+void SimpleKLQueryModel::save(ostream &os)
+{
+  int count = 0;
+  startIteration();
+  QueryTerm *qt;
+  while (hasMore()) {
+    qt = nextTerm();
+    count++;
+    delete qt;
+  }
+  os << " " << count << endl;
+  startIteration();
+  while (hasMore()) {
+    qt = nextTerm();
+    os << ind.term(qt->id()) << " "<< qt->weight() << endl;
+    delete qt;
+  }
+}
+
 
 SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex) 
 {
@@ -66,13 +116,12 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex)
   ifs.open(ParamGetString("smoothSupportFile"));
   
   int numDocs = ind->docCount();
-
   docProbMass = new double[numDocs+1];
   uniqueTermCount = new int[numDocs+1];
   
   int i;
   
-  for (i=0; i< numDocs; i++) {
+  for (i=1; i<= numDocs; i++) {
     int id, uniqCount;
     double prMass;
     ifs >> id >> uniqCount >> prMass;
@@ -146,14 +195,6 @@ void SimpleKLRetMethod::updateQuery(QueryRep &origRep, DocIDSet &relDocs)
   SimpleKLQueryModel *qm;
 
   switch ((QueryUpdateMethod)param.fbMethod) {
-  case MAXLIKE:
-    dCounter = new DocUnigramCounter(relDocs, *ind); 
-    fbLM = new MLUnigramLM(*dCounter, ind->termLexiconID());
-    qr->interpolateWith(*fbLM, (1-param.fbCoeff), param.fbTermCount,
-			param.fbPrSumTh, param.fbPrTh);
-    delete fbLM;
-    delete dCounter;
-    break;
   case MIXTURE:
     computeMixtureFBModel(*qr, relDocs);
     break;
@@ -265,10 +306,9 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocID
       ll += wdCt * log (noisePr*collectLM->prob(wd)  // Pc(w)
 			+ (1-noisePr)*distQuery[wd]); // Pq(w)
     }
-    cerr << "new likelihood = "<< ll << endl;
     if (itNum < param.emIterations && 
-	ll - convergeLL < 0.001) {
-      cerr << "converged at "<< param.emIterations - itNum+1 << " with "<< convergeLL << endl;
+	ll - convergeLL < 0.5) {
+      cerr << "converged at "<< param.emIterations - itNum+1 << " with likelihood= "<< convergeLL << endl;
       break;
     } else {
       convergeLL = ll;
@@ -323,7 +363,7 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDS
     relDocs.nextIDInfo(id,pr);
     SimpleKLDocModel *dm = dynamic_cast<SimpleKLDocModel *> (computeDocRep(id));
     for (i=1; i<=numTerms; i++) { // pretend every word is unseen
-      ct[i] += dm->unseenCoeff()*collectLM->prob(i);
+      ct[i] += log(dm->unseenCoeff()*collectLM->prob(i));
     }
 
     TermInfoList *tList = ind->termInfoList(id);
@@ -331,7 +371,7 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDS
     tList->startIteration();
     while (tList->hasMore()) {
       info = tList->nextEntry();
-      ct[i] += dm->seenProb(info->count(), info->id()) - dm->unseenCoeff()*collectLM->prob(i);
+      ct[i] += log(dm->seenProb(info->count(), info->id())/(dm->unseenCoeff()*collectLM->prob(i)));
     }
     delete tList;
     delete dm;
@@ -342,7 +382,7 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDS
   
   double norm = 1.0/(double)actualDocCount;
   for (i=1; i<=numTerms; i++) { 
-    lmCounter.incCount(i, exp(( ct[i]*norm - param.fbMixtureNoise*collectLM->prob(i))* 1.0/(1.0-param.fbMixtureNoise)));
+    lmCounter.incCount(i, exp(( ct[i]*norm - param.fbMixtureNoise*log(collectLM->prob(i)))* 1.0/(1.0-param.fbMixtureNoise)));
   }
   
   MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind->termLexiconID());
