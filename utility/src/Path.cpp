@@ -194,3 +194,16 @@ std::string Path::extension( const std::string& path ) {
 
   return std::string();
 }
+
+std::string Path::basename( const std::string& path ) {
+  int last = path_last_separator( path );
+  std::string::size_type lastDot = path.find_last_of( '.' );
+
+  if( int(lastDot) > last ) {
+    return path.substr( 0, lastDot );
+  }
+
+  return path;
+}
+
+

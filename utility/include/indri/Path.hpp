@@ -40,6 +40,7 @@ public:
   static std::string extension( const std::string& path );
   static std::string directory( const std::string& path );
   static std::string filename( const std::string& path );
+  static std::string basename( const std::string& path );
 };
 
 #endif // INDRI_PATH_HPP
