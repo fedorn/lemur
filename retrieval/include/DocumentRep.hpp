@@ -19,17 +19,17 @@
 //      Abstract Interface for Document Representation 
 //------------------------------------------------------------
 
-/// Representation of documents in a collection 
+/// Representation of documents in a collection for efficient inverted index scoring
 
 class DocumentRep {
 public:
   DocumentRep(int docID) : id(docID) {}
   virtual ~DocumentRep() {}
 
-  /// term weighting function
+  /// term weighting function @see TextQueryRetMethod
   virtual double termWeight(int termID, DocInfo *info) = 0;
 
-  /// doc-specific constant term in the scoring formula
+  /// doc-specific constant term in the scoring formula @see TextQueryRetMethod 
   virtual double scoreConstant() = 0 ;
 protected:
   int id;

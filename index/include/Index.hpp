@@ -187,10 +187,10 @@ public:
 
   /// @name Index entry access
   //@{
-  /// returns a new instance of DocInfoList which represents the doc entries in a term index, you must delete the instance later. @see DocList
+  /// returns a new instance of DocInfoList which represents the doc entries in a term index, you must delete the instance later. @see DocInfoList
   virtual DocInfoList *docInfoList(int termID)=0;
 
-  /// returns a new instance of TermInfoList which represents the word entries in a document index, you must delete the instance later. @see TermList
+  /// returns a new instance of TermInfoList which represents the word entries in a document index, you must delete the instance later. @see TermInfoList
   virtual TermInfoList *termInfoList(int docID)=0;
 
   //@}

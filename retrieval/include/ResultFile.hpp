@@ -22,12 +22,14 @@ public:
   
   ~ResultFile() {}
 
+  /// Open and associate an input stream for reading, e.g., with getResult function
   void openForRead(istream &is, Index &index) {
     inStr=&is;
     ind = &index;
     eof = !readLine();
   }
   
+  /// Read the results for a given query from the associated input stream into memory (stored in res) 
   void getResult(char *expectedQID, IndexedRealVector &res)
   {
     res.clear();
@@ -51,12 +53,14 @@ public:
     } while (!strcmp(curQID, expectedQID));
   }
   
+  /// Associate an output stream for writing results
   void openForWrite( ostream &os, Index &index) {
     
     outStr = &os;
     ind = &index;
   }
 
+  /// writing the results (stored in <tt> results</tt>) into the associated output stream, up to a maximum count.
   void writeResults(char *queryID, IndexedRealVector *results, int maxCountOfResult)
   {
     IndexedRealVector::iterator j;
@@ -109,3 +113,13 @@ bool ResultFile::readLine()
 }
 
 #endif /* _RESULTFILE_HPP */
+
+
+
+
+
+
+
+
+
+

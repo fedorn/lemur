@@ -58,7 +58,7 @@ public:
   /// has more entries
   virtual bool hasMore()=0;
 
-  /// Get a pointer to the next entry (pointer to a local static memory)
+  /// Get a pointer to the next entry (pointer to a local static memory), so do not delete it
   virtual TermInfo *nextEntry()=0;
 };
 

@@ -58,7 +58,7 @@ public:
   /// test if there's any entry
   virtual bool hasMore()=0;
 
-  /// fetch the next entry, return a pointer to a local static memory
+  /// fetch the next entry, return a pointer to a local static memory, so do not delete it
   virtual DocInfo *nextEntry()=0;
 
 };

@@ -17,6 +17,7 @@
 #include "Index.hpp"
 #include "CSet.hpp"
 
+/// Record with frequency information to be stored in a hash table
 class FreqCount {
 public:
   int key;
@@ -30,16 +31,22 @@ public:
 
 class FreqVector {
 public:
+
+  /// Find the frequency of a word identified by the index "ind"
   virtual bool find(int ind, int &freq)=0;
   virtual void startIteration()=0;
   virtual bool hasMore()=0;
+  /// Fetch the next frequency entry
   virtual void nextFreq(int &id, int &freq)=0;
   virtual int size()=0;
 };
 
+
+/// Representation of a frequency vector with a hash table
 class HashFreqVector : public FreqVector, public CSet<FreqCount, int> {
 public:
   HashFreqVector() : CSet<FreqCount, int>(300) {}
+  /// Construct a document frequency vector based on the counts stored in an index
   HashFreqVector(Index &index, int docID) : CSet<FreqCount, int>(300) {
     TermInfoList *tList = index.termInfoList(docID);
     TermInfo *info;
@@ -53,12 +60,15 @@ public:
 
   }
   virtual ~HashFreqVector() {};
+
+  
   virtual bool find(int ind, int &freq) {
     static FreqCount c;
     c.key = ind;
     freq = count(c);
     if (freq==0) return false;
   }
+
   virtual void startIteration() {
     i=0;
   }
@@ -74,6 +84,7 @@ public:
     i++;
   }
 
+  /// return the total number of non-zero elements in the vector
   virtual int size() {
     return (ISet<FreqCount>::size());
   }
