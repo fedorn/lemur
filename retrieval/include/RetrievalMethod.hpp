@@ -18,7 +18,6 @@
 #include "WeightedIDSet.hpp"
 #include "IndexedReal.hpp"
 
-
 //------------------------------------------------------------
 //      Abstract Interface for A Query
 //------------------------------------------------------------
@@ -26,7 +25,13 @@
 /// Abstract query
 class Query {
 public:
-  virtual const char *id() const = 0;
+  virtual ~Query() {}
+
+  virtual const string& id() const { return qid; }
+  virtual void id(const string& str) { qid = str; }
+
+protected:
+  string qid;
 };
 
 /// Abstract query representation
