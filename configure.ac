@@ -41,6 +41,8 @@ AC_SYS_LARGEFILE
 
 dnl Checks for library functions.
 
+AC_CHECK_FUNCS(mkstemp)
+
 dnl Finish up and output.
 AC_SUBST(MODULES)
 AC_SUBST(WITH_SUMMARIZATION)
