@@ -26,7 +26,7 @@ void IndexedRealVector::Sort(bool descending)
 void IndexedRealVector::NormalizeValues()
 {
   iterator it = begin();
-  static double sum=0;
+  double sum=0;
   while (it != end()) {
     sum+=(*it).val;
     it++;
@@ -50,8 +50,8 @@ void IndexedRealVector::LogToPosterior()
 // but could be altered to a min or average, or whatever...
 
   iterator it = begin();
-  static double sum=0;
-  static double K=(*it).val; 
+  double sum=0;
+  double K=(*it).val; 
   while (it != end()) { // find the max value;
     if((*it).val>K)
       K=(*it).val;
