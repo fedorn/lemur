@@ -18,8 +18,11 @@
 #include "RelDocUnigramCounter.hpp"
 #include "OneStepMarkovChain.hpp"
 
-void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff, int howManyWord, double prSumThresh, double prThresh) 
-{
+void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, 
+					 double origModCoeff, 
+					 int howManyWord, 
+					 double prSumThresh, 
+					 double prThresh) {
   if (!qm) {
     qm = new IndexedRealVector();
   } else {
@@ -50,12 +53,26 @@ void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff,
   int wdCount = 0;
   IndexedRealVector::iterator it;
   it = qm->begin();
-  while (it != qm->end() && prSum < prSumThresh && wdCount < howManyWord && (*it).val >=prThresh) {
-    // cout << "==new-term== " << ind.term((*it).ind) << " "<< (*it).val << endl;
+  while (it != qm->end() && prSum < prSumThresh && 
+	 wdCount < howManyWord && (*it).val >=prThresh) {
     incCount((*it).ind, (*it).val*(1-origModCoeff));
-    it++;
     prSum += (*it).val;
+    it++;
     wdCount++;
+  }
+
+  //Sum w in Q qtf * log(qtcf/termcount);
+  colQLikelihood = 0;
+  int tc = ind.termCount();
+  startIteration();
+  while (hasMore()) {
+    QueryTerm *qt = nextTerm();
+    int id = qt->id();
+    double qtf = qt->weight();
+    int qtcf = ind.termCount(id);
+    double s = qtf * log((double)qtcf/(double)tc);
+    colQLikelihood += s;
+    delete qt;
   }
   colKLComputed = false;
 }
@@ -69,13 +86,21 @@ void SimpleKLQueryModel::load(istream &is)
     qt = nextTerm();
     setCount(qt->id(),0);
   }
+  colQLikelihood = 0;
+  //Sum w in Q qtf * log(qtcf/termcount);
+
   int count;
   is >> count;
   char wd[500];
   double pr;
+  int tc = ind.termCount();
   while (count-- >0) {
     is >> wd >> pr;
-    setCount(ind.term(wd), pr);
+    int id = ind.term(wd);
+    setCount(id, pr);
+    int qtcf = ind.termCount(ind.term(wd));
+    double s = pr * log((double)qtcf/(double)tc);
+    colQLikelihood += s;
   }
   colKLComputed = false;
 }
@@ -108,19 +133,26 @@ void SimpleKLQueryModel::clarity(ostream &os)
   while (hasMore()) {
     qt = nextTerm();
     count++;
-    sum += qt->weight();
     // query-clarity = SUM_w{P(w|Q)*log(P(w|Q)/P(w))}
     // P(w)=cf(w)/|C|
+    double pw = ((double)ind.termCount(qt->id())/(double)ind.termCount());
     // P(w|Q) is a prob computed by any model, e.g. relevance models
-    ln_Pr += (qt->weight())*log(qt->weight()/((double)ind.termCount(qt->id())/(double)ind.termCount()));
+    double pwq = qt->weight();
+    sum += pwq;    
+    ln_Pr += (pwq)*log(pwq/pw);
     delete qt;
   }
-  os << "=" << count << " " << ln_Pr/(sum ? sum : 1.0) << endl;
+  // clarity should be computed with log_2, so divide by log(2).
+  os << "=" << count << " " << (ln_Pr/(sum ? sum : 1.0)/log(2.0)) << endl;
   startIteration();
   while (hasMore()) {
     qt = nextTerm();
     // print clarity for each query term
-    os << ind.term(qt->id()) << " "<< qt->weight()*log(qt->weight()/((double)ind.termCount(qt->id())/(double)ind.termCount())) << endl;
+    // clarity should be computed with log_2, so divide by log(2).
+    os << ind.term(qt->id()) << " "
+       << (qt->weight()*log(qt->weight()/
+			    ((double)ind.termCount(qt->id())/
+			     (double)ind.termCount())))/log(2.0) << endl;
     delete qt;
   }
 }
@@ -134,19 +166,25 @@ double SimpleKLQueryModel::clarity()
   while (hasMore()) {
     qt = nextTerm();
     count++;
-    sum += qt->weight();
     // query-clarity = SUM_w{P(w|Q)*log(P(w|Q)/P(w))}
     // P(w)=cf(w)/|C|
+    double pw = ((double)ind.termCount(qt->id())/(double)ind.termCount());
     // P(w|Q) is a prob computed by any model, e.g. relevance models
-    ln_Pr += (qt->weight())*log(qt->weight()/((double)ind.termCount(qt->id())/(double)ind.termCount()));
+    double pwq = qt->weight();
+    sum += pwq;    
+    ln_Pr += (pwq)*log(pwq/pw);
     delete qt;
   }
-  return (ln_Pr/(sum ? sum : 1.0));
+  // normalize by sum of probabilities in the input model
+  ln_Pr = ln_Pr/(sum ? sum : 1.0);
+  // clarity should be computed with log_2, so divide by log(2).
+  return (ln_Pr/log(2.0));
 }
 
-SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName, ScoreAccumulator &accumulator) : 
-  TextQueryRetMethod(dbIndex, accumulator)
-{
+SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, 
+				     const char *supportFileName, 
+				     ScoreAccumulator &accumulator) : 
+  TextQueryRetMethod(dbIndex, accumulator) {
 
   docParam.smthMethod = SimpleKLParameter::defaultSmoothMethod;
   docParam.smthStrategy= SimpleKLParameter::defaultSmoothStrategy;
@@ -154,7 +192,7 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName
   docParam.JMLambda = SimpleKLParameter::defaultJMLambda;
   docParam.DirPrior = SimpleKLParameter::defaultDirPrior;
 
-
+  qryParam.adjScoreMethod = SimpleKLParameter::NEGATIVEKLD;
   qryParam.fbMethod = SimpleKLParameter::defaultFBMethod;
   qryParam.fbCoeff = SimpleKLParameter::defaultFBCoeff;
   qryParam.fbPrTh = SimpleKLParameter::defaultFBPrTh;
@@ -166,7 +204,8 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName
   ifstream ifs;
   ifs.open(supportFileName);
   if (ifs.fail()) {
-    throw  Exception("SimpleKLRetMethod", "smoothing support file open failure");
+    throw  Exception("SimpleKLRetMethod", 
+		     "smoothing support file open failure");
   }
   int numDocs = ind.docCount();
   docProbMass = new double[numDocs+1];
@@ -179,7 +218,8 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName
     double prMass;
     ifs >> id >> uniqCount >> prMass;
     if (id != i) {
-      cerr << "alignment error in smoothing support file, wrong id:" << id << endl; 
+      cerr << "alignment error in smoothing support file, wrong id:" 
+	   << id << endl; 
       exit(1);
     }
     docProbMass[i]=prMass;
@@ -189,17 +229,20 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName
   ifs.close();
 
   collectLMCounter = new DocUnigramCounter(ind);
-  //  collectLM = new MLUnigramLM(*collectLMCounter, ind.termLexiconID()); 
+  collectLM = new MLUnigramLM(*collectLMCounter, ind.termLexiconID()); 
+  /// dmf 12/18/2003 -- Why was the laplace estimator used here?
+  /*
   collectLM = new LaplaceUnigramLM(*collectLMCounter, ind.termLexiconID(), 
 				   ind.termCountUnique()); 
-
+  */
 
   char mcSuppFN[500];
   strcpy(mcSuppFN, supportFileName);
   strcat(mcSuppFN, ".mc");
   ifs.open(mcSuppFN);
   if (ifs.fail()) {
-    throw Exception("SimpleKLRetMethod", "Markov chain support file can't be opened");
+    throw Exception("SimpleKLRetMethod", 
+		    "Markov chain support file can't be opened");
   }
 
   mcNorm = new double[ind.termCountUnique()+1];
@@ -209,7 +252,8 @@ SimpleKLRetMethod::SimpleKLRetMethod(Index &dbIndex, const char *supportFileName
     double norm;
     ifs >> id >> norm;
     if (id != i) {
-      cerr << "alignment error in Markov chain support file, wrong id:" << id << endl; 
+      cerr << "alignment error in Markov chain support file, wrong id:" 
+	   << id << endl; 
       exit(1);
     }
     mcNorm[i] = norm;
@@ -271,7 +315,8 @@ DocumentRep *SimpleKLRetMethod::computeDocRep(int docID)
 }
 
 
-void SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs)
+void SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep, 
+					DocIDSet &relDocs)
 {
   SimpleKLQueryModel *qr;
 
@@ -300,7 +345,8 @@ void SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs
 }
 
 
-void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs)
+void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, 
+					      DocIDSet &relDocs)
 {
   int numTerms = ind.termCountUnique();
 
@@ -347,7 +393,8 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocID
     }
     meanLL = 0.5*meanLL + 0.5*ll;
     if (fabs((meanLL-ll)/meanLL)< 0.0001) {
-      cerr << "converged at "<< qryParam.emIterations - itNum+1 << " with likelihood= "<< ll << endl;
+      cerr << "converged at "<< qryParam.emIterations - itNum+1 
+	   << " with likelihood= "<< ll << endl;
       break;
     } 
 
@@ -382,7 +429,8 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocID
 }
 
 
-void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs)
+void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, 
+					     DocIDSet &relDocs)
 {
   int numTerms = ind.termCountUnique();
 
@@ -422,11 +470,11 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDS
   
   double norm = 1.0/(double)actualDocCount;
   for (i=1; i<=numTerms; i++) { 
-    lmCounter.incCount(i, exp(( ct[i]*norm -
-				qryParam.fbMixtureNoise*log(collectLM->prob(i)))
-			      / (1.0-qryParam.fbMixtureNoise)));
+    lmCounter.incCount(i, 
+		       exp((ct[i]*norm -
+			    qryParam.fbMixtureNoise*log(collectLM->prob(i)))
+			   / (1.0-qryParam.fbMixtureNoise)));
   }
-
   delete [] ct;
 
   
@@ -475,7 +523,8 @@ void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, D
 	continue;
       }
 
-      counter->incCount(fromWd, (qt->weight()*fromWdPr*collectLM->prob(fromWd)/summ));
+      counter->incCount(fromWd, 
+			(qt->weight()*fromWdPr*collectLM->prob(fromWd)/summ));
       // counter->incCount(fromWd, (qt->weight()*fromWdPr/summ));
 
     }
@@ -491,7 +540,8 @@ void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, D
   delete counter;
 }
 
-void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs)
+void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep, 
+					  DocIDSet &relDocs)
 {  
   int numTerms = ind.termCountUnique();
 
@@ -516,7 +566,8 @@ void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep, DocIDSet 
   }
 
   for (i=1; i<=numTerms;i++) {
-    distQuery[i] = expWeight*distQuery[i]/pSum+(1-expWeight)*ind.termCount(i)/ind.termCount();
+    distQuery[i] = expWeight*distQuery[i]/pSum +
+      (1-expWeight)*ind.termCount(i)/ind.termCount();
   }
 
   ArrayCounter<double> lmCounter(numTerms+1);
