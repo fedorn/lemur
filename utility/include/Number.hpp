@@ -18,7 +18,7 @@
 #ifndef _NUMBERH_
 #define _NUMBERH_
 
-#pragma interface
+// #pragma interface
 
 #include "common_headers.hpp"
 

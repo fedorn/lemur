@@ -20,7 +20,7 @@
 #ifndef _CSETH_
 #define _CSETH_
 
-#pragma interface
+// #pragma interface
 
 #include <ISet.hpp>
 

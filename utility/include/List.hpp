@@ -13,7 +13,7 @@
 #ifndef _LISTH_
 #define _LISTH_
 
-#pragma interface
+// #pragma interface
 
 #include <LL.hpp>
 #include <Null.hpp>

@@ -13,7 +13,7 @@
 #ifndef _INTH_
 #define _INTH_
 
-#pragma interface
+// #pragma interface
 
 #include <Number.hpp>
 
