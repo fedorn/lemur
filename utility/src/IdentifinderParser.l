@@ -300,7 +300,7 @@ void IdentifinderParser::doParse() {
     case E_NE_TIME:
     case E_NE_NUMBER:
       if ((state == DOC) && (tag.getLength() > 1)) {
-        char val[tag.getLength()+PREFIX_LEN];
+        char* val = new char[tag.getLength()+PREFIX_LEN];
 	strncpy(val, END_PREFIX, PREFIX_LEN);
 	strcpy(val+PREFIX_LEN, (char*)tag.getValue());
 	etag.setValue(val);
@@ -314,6 +314,7 @@ void IdentifinderParser::doParse() {
 
 	etag.setValue("\0");
 	tag.setValue("\0");
+	delete[]val;
       }
     break;   
     }
