@@ -14,11 +14,9 @@
 #include "QryBasedSampler.hpp"
 #include "Exception.hpp"
 
-#include <fstream>
-#include <cstring>
-#include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "common_headers.hpp"
+#include <cassert>
+#include <cstdio>
 
 
 QryBasedSampler::QryBasedSampler() {
