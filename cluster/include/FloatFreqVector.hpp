@@ -16,37 +16,37 @@
 #include "FreqVector.hpp"
 
 /// Record with frequency information to be stored in a hash table
-class FreqCounter {
+class FloatFreqCounter {
 public:
-  int key;
+  TERMID_T key;
   // used for termid->f mappings, no need to compute a hash
   unsigned int Hash() const { return (unsigned int)key; }
   unsigned int hash() const { return Hash(); }
-  bool operator==(const FreqCounter count) { return count.key == this->key;} 
+  bool operator==(const FloatFreqCounter count) { return count.key == this->key;} 
 };
 
-class FloatFreqVector : public FreqVector, public CSet<FreqCounter, double> {
+class FloatFreqVector : public FreqVector, public CSet<FloatFreqCounter, double> {
 public:
-  FloatFreqVector() : CSet<FreqCounter, double>(1000) {s2 = 0;}
+  FloatFreqVector() : CSet<FloatFreqCounter, double>(1000) {s2 = 0;}
   /// Construct a document frequency vector based on the counts stored in an index
-  FloatFreqVector(const Index &index, int docID);
+  FloatFreqVector(const Index &index, DOCID_T docID);
   FloatFreqVector(const Index &index, TermInfoList *tList);
-  FloatFreqVector(const Index &index, vector<int> &dids);
+  FloatFreqVector(const Index &index, vector<DOCID_T> &dids);
   FloatFreqVector(FloatFreqVector *old);
 
   virtual ~FloatFreqVector() {};
-  virtual bool find(int ind, double &freq) const;
+  virtual bool find(TERMID_T ind, double &freq) const;
   virtual void startIteration() const {  i=0; }
   virtual bool hasMore() const {  return (i < size()); }
-  virtual void nextFreq(int &id, double &freq) const;
+  virtual void nextFreq(TERMID_T &id, double &freq) const;
   /// return the total number of non-zero elements in the vector
-  virtual int size() const {    return (ISet<FreqCounter>::size()); }
+  virtual int size() const {    return (ISet<FloatFreqCounter>::size()); }
 
-  virtual void nextFreq (int &id, int &freq)  const;
-  virtual bool find(int ind, int &freq) const ;
+  virtual void nextFreq (TERMID_T &id, int &freq)  const;
+  virtual bool find(TERMID_T ind, int &freq) const ;
 
-  void addVal(int id, int cnt);
-  void addVal(int id, double val);
+  void addVal(TERMID_T id, int cnt);
+  void addVal(TERMID_T id, double val);
   double sum() const; 
   double sum2() const;
   void weigh(const double *vals);

@@ -11,15 +11,15 @@
 
 #include "FloatFreqVector.hpp"
 
-FloatFreqVector::FloatFreqVector(const Index &index, int docID) 
-  : CSet<FreqCounter, double>(1000)
+FloatFreqVector::FloatFreqVector(const Index &index, DOCID_T docID) 
+  : CSet<FloatFreqCounter, double>(1000)
 {
   TermInfoList *tList = index.termInfoList(docID);
   TermInfo *info;
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
-    FreqCounter ct;
+    FloatFreqCounter ct;
     ct.key = info->termID();
     add(ct, info->count());
   }
@@ -28,30 +28,30 @@ FloatFreqVector::FloatFreqVector(const Index &index, int docID)
 }
 
 FloatFreqVector::FloatFreqVector(const Index &index, TermInfoList *tList) 
-  : CSet<FreqCounter, double>(1000)
+  : CSet<FloatFreqCounter, double>(1000)
 {
   TermInfo *info;
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
-    FreqCounter ct;
+    FloatFreqCounter ct;
     ct.key = info->termID();
     add(ct, info->count());
   }
   s2 = 0;
 }
 
-FloatFreqVector::FloatFreqVector(const Index &index, vector<int> &dids) 
-  : CSet<FreqCounter, double>(1000)
+FloatFreqVector::FloatFreqVector(const Index &index, vector<DOCID_T> &dids) 
+  : CSet<FloatFreqCounter, double>(1000)
 {
-  for (int j = 0; j < dids.size(); j++) {
-    int did = dids[j];
+  for (unsigned int j = 0; j < dids.size(); j++) {
+    DOCID_T did = dids[j];
     TermInfoList *tList = index.termInfoList(did);
     TermInfo *info;
     tList->startIteration();
     while (tList->hasMore()) {
       info = tList->nextEntry();
-      FreqCounter ct;
+      FloatFreqCounter ct;
       ct.key = info->termID();
       add(ct, info->count());
     }
@@ -61,11 +61,11 @@ FloatFreqVector::FloatFreqVector(const Index &index, vector<int> &dids)
 }
 
 FloatFreqVector::FloatFreqVector(FloatFreqVector *v2) 
-  : CSet<FreqCounter, double>(1000)
+  : CSet<FloatFreqCounter, double>(1000)
 {
   double tmp;
-  int idx;
-  FreqCounter c;
+  TERMID_T idx;
+  FloatFreqCounter c;
   v2->startIteration();
   while(v2->hasMore()) {
     v2->nextFreq(idx, tmp);
@@ -75,28 +75,28 @@ FloatFreqVector::FloatFreqVector(FloatFreqVector *v2)
   s2 = 0;
 }
 
-void FloatFreqVector::addVal(int id, int cnt) {
-  FreqCounter ct;
+void FloatFreqVector::addVal(TERMID_T id, int cnt) {
+  FloatFreqCounter ct;
   ct.key = id;
   add(ct, cnt);
 }
 
-void FloatFreqVector::addVal(int id, double freq) {
-  FreqCounter ct;
+void FloatFreqVector::addVal(TERMID_T id, double freq) {
+  FloatFreqCounter ct;
   ct.key = id;
   add(ct, freq);
 }
 
-bool FloatFreqVector::find(int ind, double &freq) const
+bool FloatFreqVector::find(TERMID_T ind, double &freq) const
 {
-  FreqCounter c;
+  FloatFreqCounter c;
   c.key = ind;
   freq = count(c);
   if (freq==0) return false;
   return true;
 }
 
-bool FloatFreqVector::find(int ind, int &freq) const
+bool FloatFreqVector::find(TERMID_T ind, int &freq) const
 {
   double tmp;
   bool ret = find(ind, tmp);
@@ -104,19 +104,19 @@ bool FloatFreqVector::find(int ind, int &freq) const
   return ret;
 }
 
-void FloatFreqVector::nextFreq(int &id, int &freq)  const {
+void FloatFreqVector::nextFreq(TERMID_T &id, int &freq)  const {
   double tmp;
-  int idx;
+  TERMID_T idx;
   nextFreq(idx, tmp);
   id = idx;
   freq = (int) tmp;
 }
 
-void FloatFreqVector::nextFreq(int &id, double &freq) const
+void FloatFreqVector::nextFreq(TERMID_T &id, double &freq) const
 {
   // get the i-th element
-  FreqCounter c;
-  id = (ISet<FreqCounter>::operator[](i)).key;
+  FloatFreqCounter c;
+  id = (ISet<FloatFreqCounter>::operator[](i)).key;
   c.key = id;
   freq = count(c)    ;
   i++;
@@ -124,7 +124,7 @@ void FloatFreqVector::nextFreq(int &id, double &freq) const
 
 double FloatFreqVector::sum() const {
   double ret = 0, tmp;
-  int idx;
+  TERMID_T idx;
   startIteration();
   while(hasMore()) {
     nextFreq(idx, tmp);
@@ -136,7 +136,7 @@ double FloatFreqVector::sum() const {
 double FloatFreqVector::sum2() const {
   if (s2 != 0) return s2;
   double ret = 0, tmp;
-  int idx;
+  TERMID_T idx;
   startIteration();
   while(hasMore()) {
     nextFreq(idx, tmp);
@@ -148,8 +148,8 @@ double FloatFreqVector::sum2() const {
 
 void FloatFreqVector::weigh(const double *vals) {
   double tmp;
-  int idx;
-  FreqCounter c;
+  TERMID_T idx;
+  FloatFreqCounter c;
   startIteration();
   while(hasMore()) {
     nextFreq(idx, tmp);
@@ -162,8 +162,8 @@ void FloatFreqVector::weigh(const double *vals) {
 
 void FloatFreqVector::weigh(double val) {
   double tmp;
-  int idx;
-  FreqCounter c;
+  TERMID_T idx;
+  FloatFreqCounter c;
   startIteration();
   while(hasMore()) {
     nextFreq(idx, tmp);
@@ -176,8 +176,8 @@ void FloatFreqVector::weigh(double val) {
 
 void FloatFreqVector::addVec(const FloatFreqVector *v2) {
   double tmp;
-  int idx;
-  FreqCounter c;
+  TERMID_T idx;
+  FloatFreqCounter c;
   v2->startIteration();
   while(v2->hasMore()) {
     v2->nextFreq(idx, tmp);
@@ -189,8 +189,8 @@ void FloatFreqVector::addVec(const FloatFreqVector *v2) {
 
 void FloatFreqVector::subtract(const FloatFreqVector *v2) {
   double tmp;
-  int idx;
-  FreqCounter c;
+  TERMID_T idx;
+  FloatFreqCounter c;
   v2->startIteration();
   while(v2->hasMore()) {
     v2->nextFreq(idx, tmp);
@@ -202,7 +202,7 @@ void FloatFreqVector::subtract(const FloatFreqVector *v2) {
 
 double FloatFreqVector::dotProd(const FloatFreqVector *v2) {
   double tmp1, tmp2, ret = 0;  
-  int idx;
+  TERMID_T idx;
   startIteration();
   while(hasMore()) {
     nextFreq(idx, tmp1);
