@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(Lemur, 2.2, lemur-project@cs.cmu.edu)
+AC_INIT(Lemur, 3.0, lemur-project@cs.cmu.edu)
 AC_CONFIG_SRCDIR(app/src/RetEval.cpp)
 AC_CONFIG_FILES(MakeDefns Makefile Makefile.app)
 dnl To use a header file instead of command line -D defs, use
@@ -29,6 +29,7 @@ dnl Finish up and output.
 AC_SUBST(MODULES)
 AC_SUBST(WITH_SUMMARIZATION)
 AC_SUBST(WITH_DISTRIB)
+AC_SUBST(WITH_CLUSTER)
 dnl Base lemur modules
 MODULES="retrieval langmod index utility"
 
@@ -64,5 +65,18 @@ AC_ARG_ENABLE(assert,
 			    AC_DEFINE(NDEBUG, 1, [Turn off assert statements])
 			   fi],
 			   AC_DEFINE(NDEBUG, 1, [Turn off assert statements]))
+
+AC_ARG_ENABLE(cluster,
+	    AC_HELP_STRING([--enable-cluster],
+	                   [Enable cluster package]))
+
+if test "$enable_cluster" = "yes" ; then
+  MODULES="cluster $MODULES"
+  WITH_CLUSTER=1
+  AC_DEFINE(WITH_CLUSTER, 1, [Enable cluster package])
+else
+  WITH_CLUSTER=0
+  AC_DEFINE(WITH_CLUSTER, 0, [Enable cluster package])
+fi
 
 AC_OUTPUT

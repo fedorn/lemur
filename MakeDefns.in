@@ -39,8 +39,9 @@ top_distdir = $(distdir)
 LEMURLIB = lib$(PACKAGE).a
 WITH_DISTRIB = @WITH_DISTRIB@
 WITH_SUMMARIZATION = @WITH_SUMMARIZATION@
+WITH_CLUSTER = @WITH_CLUSTER@
 
-ALLMODULES=summarization distrib retrieval langmod index utility
+ALLMODULES=cluster summarization distrib retrieval langmod index utility
 
 # C++ source files
 CPPSRC1 = $(notdir $(wildcard ../src/*.cpp))
@@ -75,9 +76,9 @@ OBJ = $(CPPOBJ) $(COBJ)
 # C++ compiler and compiling/linking options
 CFLAGS = @DEFS@ @CFLAGS@ -shared -fPIC
 CXXFLAGS    = @DEFS@ @CXXFLAGS@ -shared -fPIC
-CPPLDFLAGS  = @LDFLAGS@  @LIBS@ -lm
+CPPLDFLAGS  = @LDFLAGS@  @LIBS@ -g -lm
 
-ALLBIN = BuildBasicIndex BuildDocMgr BuildKeyfileIncIndex BuildInvertedIndex BuildPropIndex EstimateDirPrior GenL2Norm GenerateQueryModel GenerateSmoothSupport IncIndexer IncPassageIndexer ParseInQueryOp ParseQuery ParseToFile PassageIndexer PushIndexer QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval TwoStageRetEval
+ALLBIN = BuildBasicIndex BuildDocMgr BuildKeyfileIncIndex BuildInvertedIndex BuildPropIndex EstimateDirPrior GenL2Norm GenerateQueryModel GenerateSmoothSupport IncIndexer IncPassageIndexer ParseInQueryOp ParseQuery ParseToFile PassageIndexer PushIndexer QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval TwoStageRetEval RetQueryClarity XlingRetEval PDictManager
 
 ifneq ($(WITH_DISTRIB),0)
 ALLBIN += CollSelIndex DistRetEval QryBasedSample
@@ -85,4 +86,8 @@ endif
 
 ifneq ($(WITH_SUMMARIZATION),0)
 ALLBIN += BasicSummApp MMRSummApp
+endif
+
+ifneq ($(WITH_CLUSTER),0)
+ALLBIN += Cluster OfflineCluster PLSA
 endif

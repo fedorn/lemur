@@ -10,6 +10,10 @@
 		  the distributed retrieval components. Default is disabled.
 		- <tt>--enable-summarization</tt> compiles and installs the
 		  summarization components. Default is disabled.
+		- <tt>--enable-cluster</tt> compiles and installs the
+		  document clustering components. Default is disabled.
+		- <tt>--enable-assert</tt> Enable assert statements in
+                  the code. Default is disabled.
 		- <tt>--prefix=<install-directory></tt> Specifies the 
 		  directory for the installed toolkit. 
 		  Default is /usr/local.
