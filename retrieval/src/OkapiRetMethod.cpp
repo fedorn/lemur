@@ -30,12 +30,20 @@ double OkapiScoreFunc::matchedTermWeight(QueryTerm *qTerm,
 					 DocInfo *info, 
 					 DocumentRep *dRep)
 {
-  OkapiQueryTerm * qt = (OkapiQueryTerm *)qTerm;
-    //dynamic_cast<OkapiQueryTerm *>qTerm;
+  OkapiQueryTerm * qt;
+  #ifdef _WIN32
+  qt = (OkapiQueryTerm *)qTerm;
+  #else
+  qt = dynamic_cast<OkapiQueryTerm *> (qTerm);
+  #endif
 
-  OkapiQueryRep *qr = (OkapiQueryRep *)qRep;
-  
-  // (dynamic_cast<OkapiQueryRep *>qRep);
+  OkapiQueryRep *qr;
+  #ifdef _WIN32
+  qr= (OkapiQueryRep *)qRep;
+  #else 
+  qr = dynamic_cast<OkapiQueryRep *> (qRep);
+  #endif
+
   return (OkapiRetMethod::RSJWeight(qt->pEstCount(), qr->pNormCount(), 
 		    ind.docCount(qt->id()),
 		    ind.docCount()) * 
@@ -101,7 +109,13 @@ void OkapiRetMethod::updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs)
     }
   }
 
-  OkapiQueryRep *qr =  dynamic_cast<OkapiQueryRep *> (&origRep);
+  OkapiQueryRep *qr;
+  #ifdef _WIN32
+  qr =  (OkapiQueryRep *) (&origRep);
+  #else
+  qr =  dynamic_cast<OkapiQueryRep *> (&origRep);
+  #endif
+
   qr->setPNormCount(actualDocs);
   weightedTerms.Sort();
   IndexedRealVector::iterator j;
