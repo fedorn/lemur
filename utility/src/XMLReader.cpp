@@ -122,7 +122,6 @@ int XMLReader::_readTag( const char* buffer, int bufferStart, int bufferEnd, std
 
   if( endLocation - position < 1 ) 
     LEMUR_THROW( LEMUR_GENERIC_ERROR, "Found a tag with no body" );
-
   // is it an opening tag?
   if( buffer[position] == '/' ) {
     if( tagType )
@@ -283,7 +282,20 @@ void XMLReader::_read( XMLNode** parent, const char* buffer, int start, int end 
 
 XMLNode* XMLReader::read( const char* buffer, size_t length ) {
   XMLNode* result = NULL;
-  _read( &result, buffer, 0, int(length) );
+  std::string s = buffer;
+  std::string::size_type commentstart = s.find("<!--",0);
+  if (commentstart != std::string::npos) {
+    //contains comments, strip 'em
+    while (commentstart != std::string::npos) {
+      std::string::size_type commentend = s.find("-->",0);
+      s.erase(commentstart, (commentend + 3) - commentstart);
+      commentstart = s.find("<!--",0);
+    }
+    _read( &result, s.c_str(), 0, int(s.length()) );
+  } else {
+    // no comments in string
+    _read( &result, buffer, 0, int(length) );
+  }
   return result;
 }
 

@@ -1,4 +1,4 @@
- /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * 
  * The Lemur toolkit for language modeling and information retrieval.
  * Copyright (c) 2001 Carnegie Mellon University.  All rights reserved.
@@ -11,16 +11,18 @@
  * This is a research system.  The code is distributed on an "as is" basis,
  * without any warranty, express or implied. 
  * 
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
+ ** 02/2005 -- dmf Rework to use indri Parameters.
+*/
 
 #ifndef _ParamH_
 #define _ParamH_
 
+#include "lemur-platform.h"
 #include "String.hpp"
 
-extern "C" {
-  #include "parameters.h"
-}
+// replace with #defines?
 //  Get routines:
 /////////////////////////////////////
 String ParamGetString(const String &s, const String &def);
@@ -40,21 +42,14 @@ double ParamGetDouble(const String &s, double def);
 float  ParamGetFloat(const String &s, float def);
 INT64  ParamGetLongLong(const String &s, INT64 def);
 
-//  Checkpointing:
-/////////////////////////////////////
-int    ParamCheckpointed (void);
-void   ParamCheckpoint (void);
-
 //  Miscellaneous:
 /////////////////////////////////////
-void   ParamDump (ostream &os);
-void   ParamPushPrefix (const String &s);
-void   ParamPopPrefix (void);
 int    ParamPushFile (const String &s);
 String ParamPopFile (void);
-void ParamSet(const String &key, const String &value);
+void   ParamDisplay();
 
-/// Display parameter bindings
-void  ParamDisplay();
+/// add a parameter value pair. If no parameter file has been pushed,
+/// a new empty Parameters object is put on the stack.
+void ParamSet(const String &key, const String &value);
 
 #endif

@@ -720,6 +720,7 @@ bool KeyfileIncIndex::tryOpen() {
 }
 
 void KeyfileIncIndex::writeTOC(const CollectionProps* cp) {
+  // change format to match indri parameters xml format
   std::string fname = name + ".key";
   *msgstream << "Writing out main stats table" << std::endl;
 
@@ -729,25 +730,26 @@ void KeyfileIncIndex::writeTOC(const CollectionProps* cp) {
     fprintf(stderr, "Could not open .toc file for writing.\n");
     return;
   }
-  toc << VERSION_PAR << " = " << IND_VERSION << ";\n";
-  toc << NUMDOCS_PAR << " = " << counts[DOCS] << ";\n";
-  toc << NUMTERMS_PAR << " = " << counts[TOTAL_TERMS] << ";\n";
-  toc << NUMUTERMS_PAR << " = " << counts[UNIQUE_TERMS] << ";\n";
-  toc << AVEDOCLEN_PAR << " = " << counts[TOTAL_TERMS]/counts[DOCS] << ";\n";
-  toc << INVINDEX_PAR << " = " << name << IVLINDEX << ";\n";
-  toc << INVLOOKUP_PAR << " = " << name << INVLOOKUP << ";\n";
-  toc << DTINDEX_PAR << " = " << name << DTINDEX << ";\n"; 
-  toc << DTLOOKUP_PAR << " = " << name << DTLOOKUP << ";\n";
-  toc << DOCIDMAP_PAR << " = " << name << DOCIDMAP << ";\n";
-  toc << DOCIDSTRMAP_PAR << " = " << name << DOCIDSTRMAP << ";\n";
-  toc << TERMIDMAP_PAR << " = " << name << TERMIDMAP << ";\n";
-  toc << TERMIDSTRMAP_PAR << " = " << name << TERMIDSTRMAP << ";\n";
-  toc << DOCMGR_PAR << " = " << name << DOCMGRMAP << ";\n";
-  toc << COLPROPS_PAR << " = " << name << COLPROPS << ";\n";
+  toc << "<parameters>\n";
+  toc << "<" << VERSION_PAR << ">" << IND_VERSION << "</" << VERSION_PAR << ">\n";
+  toc << "<" << NUMDOCS_PAR << ">" << counts[DOCS] << "</" << NUMDOCS_PAR <<">\n";
+  toc << "<" << NUMTERMS_PAR << ">" << counts[TOTAL_TERMS] << "</" << NUMTERMS_PAR<< ">\n";
+  toc << "<" << NUMUTERMS_PAR << ">" << counts[UNIQUE_TERMS] << "</" << NUMUTERMS_PAR<< ">\n";
+  toc << "<" << AVEDOCLEN_PAR << ">" << counts[TOTAL_TERMS]/counts[DOCS] << "</" << AVEDOCLEN_PAR << ">\n";
+  toc << "<" << INVINDEX_PAR << ">" << name << IVLINDEX << "</" << INVINDEX_PAR<< ">\n";
+  toc << "<" << INVLOOKUP_PAR << ">" << name << INVLOOKUP << "</" << INVLOOKUP_PAR << ">\n";
+  toc << "<" << DTINDEX_PAR << ">" << name << DTINDEX << "</" << DTINDEX_PAR << ">\n"; 
+  toc << "<" << DTLOOKUP_PAR << ">" << name << DTLOOKUP << "</" << DTLOOKUP_PAR << ">\n";
+  toc << "<" << DOCIDMAP_PAR << ">" << name << DOCIDMAP << "</" << DOCIDMAP_PAR << ">\n";
+  toc << "<" << DOCIDSTRMAP_PAR << ">" << name << DOCIDSTRMAP << "</" << DOCIDSTRMAP_PAR << ">\n";
+  toc << "<" << TERMIDMAP_PAR << ">" << name << TERMIDMAP << "</" << TERMIDMAP_PAR << ">\n";
+  toc << "<" << TERMIDSTRMAP_PAR << ">" << name << TERMIDSTRMAP << "</" << TERMIDSTRMAP_PAR << ">\n";
+  toc << "<" << DOCMGR_PAR << ">" << name << DOCMGRMAP << "</" << DOCMGR_PAR << ">\n";
+  toc << "<" << COLPROPS_PAR << ">" << name << COLPROPS << "</" << COLPROPS_PAR << ">" <<";\n";
+  toc << "</parameters>\n";
+  toc.close();
 
   const BasicCollectionProps* props = dynamic_cast<const BasicCollectionProps*>(cp);
-
-  toc.close();
 
   if (props) {
     fname = name + COLPROPS;
@@ -771,7 +773,6 @@ void KeyfileIncIndex::writeTOC(const CollectionProps* cp) {
     
     pf.close();
   }
-  
 }
 
 void KeyfileIncIndex::writeDocMgrIDs() {
@@ -1124,7 +1125,7 @@ void KeyfileIncIndex::doendDoc(const DocumentProps* dp, int mgrid){
 //
 // ----------------------------------------------------------------------------------
 
-KeyfileIncIndex::record KeyfileIncIndex::fetchDocumentRecord(TERMID_T key) const {
+KeyfileIncIndex::record KeyfileIncIndex::fetchDocumentRecord(DOCID_T key) const {
   if (key == 0)
     return record();
 
