@@ -59,8 +59,9 @@ bool PseudoFBDocs::hasMore()
 
 void PseudoFBDocs::nextIDInfo(int &id, double &relProb) 
 {
-  id = (*it).ind;
-  relProb = (*it).val;
-  it++;
   i++;
+  id = (*it).ind;
+  relProb = (noWeight? 1.0 : (*it).val); 
+  it++;
+
 }

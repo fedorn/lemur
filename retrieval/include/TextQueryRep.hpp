@@ -133,9 +133,9 @@ protected:
 
 class PseudoFBDocs : public DocIDSet {
 public:
-  /// howManyDocs < 0 means using all results
-  PseudoFBDocs(IndexedRealVector &results, int howManyDoc):
-    res(&results), howMany(howManyDoc) {
+  /// howManyDocs < 0 means using all results. If ignoreWeight=true, each doc will have the same weight (1.0); otherwise the weight comes from "results".
+  PseudoFBDocs(IndexedRealVector &results, int howManyDoc, bool ignoreWeight=true):
+    res(&results), howMany(howManyDoc), noWeight(ignoreWeight) {
   }
   virtual ~PseudoFBDocs() {}
 
@@ -151,6 +151,7 @@ private:
   IndexedRealVector *res;
   int howMany;
   int i;
+  bool noWeight;
   IndexedRealVector::iterator it;
 };
 
