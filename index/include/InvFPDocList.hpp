@@ -47,12 +47,18 @@ public:
 
   bool addTerm(int docid);
   bool addLocation(int docid, LOC_T location);
+  bool append(InvDocList* tail);
 
   virtual DocInfo* nextEntry();
   virtual void nextEntry(InvFPDocInfo* info);
+protected:
+  /// delta encode docids and positions from begin through end
+  /// call before write
+  virtual void deltaEncode();
 
-private:
-
+  /// delta decode docids and positions from begin through end
+  /// call after read
+  virtual void deltaDecode();
 };
 
 #endif

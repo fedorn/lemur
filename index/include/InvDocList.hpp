@@ -23,6 +23,7 @@
 #include "DocInfoList.hpp"
 #include "InvDocInfo.hpp"
 #include "MemCache.hpp"
+#include "RVLCompress.hpp"
 
 extern "C" {
   #include <cstdio>
@@ -69,7 +70,10 @@ public:
   bool hasNoMem();
 
   /// increase count for this docid, we don't care about location
-  bool addTerm(int docid);
+  virtual bool addTerm(int docid);
+
+  /// append the given list to the end of this list.  watch for overlap of lastdocid of this list and first docid of given list.
+  virtual bool append(InvDocList* tail);
 
   virtual void startIteration();
   virtual bool hasMore();
@@ -84,15 +88,17 @@ public:
   int curDocIDdiff() { return lastid-begin; };
   int curDocIDtf() { return *(lastid+1); };
 
-  /// write this object in binary to the given filestream.  the stream should support
-  /// binary writing.
+  /// write this object in binary to the given filestream.  the stream should support binary writing.
   void binWrite(ofstream& of);
 
-  /// read an object from the given stream into memory.  the stream should be pointing
-  /// to the correct place, starting exactly where binWrite began writing.
-  /// this method should be used with the empty constructor, else watch out for mem leaks.
-  /// returns whether the read was successful
+  /// read an object from the given stream into memory.  the stream should be pointing to the correct place, starting exactly where binWrite began writing.  this method should be used with the empty constructor, else watch out for mem leaks. returns whether the read was successful
   bool binRead(ifstream& inf);
+
+  /// write this object in binary to the given filestream.  the stream should support binary writing.  RVL compression is used before writing
+  void binWriteC(ofstream& of);
+
+  /// read an object from the given stream into memory.  the stream should be pointing to the correct place, starting exactly where binWrite began writing.  this method should be used with the empty constructor, else watch out for mem leaks. returns whether the read was successful.  RVL decompression is done. 
+  bool binReadC(ifstream& inf);
 
 protected:
   /** internal method for allocating more memory to list as needed
@@ -101,6 +107,13 @@ protected:
   bool getMoreMem();
   int logb2(int num);
 
+  /// delta encode docids from begin through end
+  /// call before write
+  virtual void deltaEncode();
+
+  /// delta decode docids from begin through end
+  /// call after read
+  virtual void deltaDecode();
 
   int* begin;		// pointer to the beginning of this list
   int* lastid;	// pointer to the most recent DocID added
