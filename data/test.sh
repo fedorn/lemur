@@ -70,5 +70,24 @@
 ../app/obj/trec_eval -a qrel res.mixfb_kl > pr.mixfb_kl
 
 
+######################################################################
+#								     #
+# The following examples show how one can re-rank a subset of docs   #
+# e.g., when the scoring method is computationally complex.          #
+######################################################################
 
+# ==!!! First, we need to convert the TREC format result to
+#       a simple format so that it can be used as a working set
+awk '{print $1, $3, $5;}' < res.simple_tfidf > res_simple_tfidf
 
+# This re-ranks res_simple_tfidf with the tf-idf method  
+../app/obj/RetEval rerank_tfidf_param
+../app/obj/trec_eval -a qrel res.rerank_simple_tfidf > pr.rerank_simple_tfidf
+
+# This re-ranks res_simple_tfidf with KL-div.+ Dirichlet. Note how this improves the precision
+../app/obj/RetEval rerank_simple_kl_dir_param
+../app/obj/trec_eval -a qrel res.rerank_simple_kl_dir > pr.rerank_simple_kl_dir
+
+# This re-ranks the res_simple_tfidf with tfidf+Rocchio pseudo feedback
+../app/obj/RetEval rerank_fb_tfidf_param
+../app/obj/trec_eval -a qrel res.rerank_fb_tfidf > pr.rerank_fb_tfidf
