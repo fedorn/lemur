@@ -9,27 +9,35 @@
 #include "Parser.hpp"
 
 Parser::Parser() {
-  mine = true;
-  acros = NULL;
+  borrowedacros = NULL;
+  myacros = NULL;
 }
 
 Parser::~Parser() {
-  if ((mine) && (acros))
-    delete acros;
+  if (myacros)
+    delete myacros;
 }
 
-void Parser::setAcroList(WordSet* acronyms) {
-  acros = acronyms;
-  mine = false;
+void Parser::setAcroList(const WordSet* acronyms) {
+  clearAcros();
+  borrowedacros = acronyms;
 }
 
 void Parser::setAcroList(string filename) {
-  acros = new WordSet((char*)filename.c_str());
-  mine = true;
+  clearAcros();
+  myacros = new WordSet(filename);
 }
 
-bool Parser::isAcronym(char* word) {
-  if (acros) 
-    return acros->contains(word);
+bool Parser::isAcronym(const char* word) {
+  if (myacros) 
+    return myacros->contains(word);
+  if (borrowedacros)
+    return borrowedacros->contains(word);
   return false;
+}
+
+void Parser::clearAcros() {
+  if (myacros)
+    delete myacros;
+  borrowedacros = NULL;
 }
