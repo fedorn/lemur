@@ -56,17 +56,9 @@ The parameters are:
 </ul>
 <li> <tt>dataFiles</tt>: name of file containing list of datafiles to index.
 </ol>
- */
-#include "Stopper.hpp"
-#include "PorterStemmer.hpp"
-#include "KStemmer.hpp"
-#include "ArabicStemmer.hpp"
-#include "WebParser.hpp"
-#include "TrecParser.hpp"
-#include "ChineseParser.hpp"
-#include "ChineseCharParser.hpp"
-#include "ReutersParser.hpp"
-#include "ArabicParser.hpp"
+*/
+
+#include "TextHandlerManager.hpp"
 #include "InvFPTextHandler.hpp"
 #include "Param.hpp"
 #include "FUtil.hpp"
@@ -75,68 +67,52 @@ namespace LocalParameter {
   int memory;
 
   // name (minus extension) of the database
-  char * index;
+  char* index;
   // name of file containing stopwords
-  char * stopwords;
+  string stopwords;
   // name of file containing acronyms
-  char * acronyms;
+  string acronyms;
   // format of documents (trec or web)
-  char * docFormat;
+  string docFormat;
   // whether or not to stem
-  char * stemmer;
+  string stemmer;
   //whether to keep positions and dtindex
   int position;
   // file with source files
   char * dataFiles;
-  // path name to data files used by kstemmer
-  char *kstemmer_dir;
 
   bool countStopWords;
 
   void get() {
     // my code uses char *'s while the param utils use
     // strings.  maybe I should convert to strings...
-
+    
     index = strdup(ParamGetString("index"));
     memory = ParamGetInt("memory", 96000000);
-    stopwords = strdup(ParamGetString("stopwords"));
-    acronyms = strdup(ParamGetString("acronyms"));
-    docFormat = strdup(ParamGetString("docFormat"));
+    stopwords = ParamGetString("stopwords");
+    acronyms = ParamGetString("acronyms");
+    docFormat = ParamGetString("docFormat");
     dataFiles = strdup(ParamGetString("dataFiles"));
     position = ParamGetInt("position", 1);
-    // convert docFormat to lowercase
-    for (char * d = docFormat; *d != '\0'; d++) *d = tolower(*d);
-
-    stemmer = strdup(ParamGetString("stemmer"));
-    // convert docFormat to lowercase
-    for (char * e = stemmer; *e != '\0'; e++) *e = tolower(*e);
-    if(!strcmp(stemmer, "krovetz")) {
-      // Using kstemmer needs a path to data files
-      if(strlen(ParamGetString("KstemmerDir"))>0) {
-	// if KstemmerDir is declared then resets STEM_DIR otherwise uses the default
-	kstemmer_dir = new char[MAX_FILENAME_LENGTH];
-	kstemmer_dir[0]='\0';
-	strcat(kstemmer_dir, "STEM_DIR=");
-	strcat(kstemmer_dir,ParamGetString("KstemmerDir"));
-	if(putenv(kstemmer_dir))
-	  cout << "putenv can not set STEM_DIR" << endl;
-      }
-    } else if (!strcmp(stemmer, "arabic")){
-      ArabicStemmerParameter::get();
-    }    
+    // convert docFormat to lowercase    
+    for (int d=0;d<docFormat.length();d++) {
+      docFormat[d] = tolower(docFormat[d]);
+    }      
+    
+    stemmer = ParamGetString("stemmer");
+    // convert stemmer to lowercase
+    //    for (char * e = stemmer; *e != '\0'; e++) *e = tolower(*e);
+    for (int e=0;e<stemmer.length();e++) {
+      stemmer[e] = tolower(stemmer[e]);
+    }
     countStopWords = (ParamGetString("countStopWords", "false") == "true");
   }
-
+  
   // free the memory allocated in get()
   void freeMem() {
     // these strings were created using strdup
     free(index);
-    free(stopwords);
-    free(acronyms);
-    free(docFormat);
-    free(stemmer);
     free(dataFiles);
-    delete[](kstemmer_dir);
   }
 };
 
@@ -190,52 +166,21 @@ int AppMain(int argc, char * argv[]) {
     usage(argc, argv);
     return -1;
   }
-
-  // Create the appropriate parser.
+  
+  // Create the appropriate parser and acronyms list if needed
   Parser * parser = NULL;
-  if (!strcmp(LocalParameter::docFormat, "web")) {
-    parser = new WebParser();
-  } else if (!strcmp (LocalParameter::docFormat, "reuters")) {
-    parser = new ReutersParser();
-  } else if (!strcmp (LocalParameter::docFormat, "trec")) {
+  parser = TextHandlerManager::createParser(LocalParameter::docFormat, LocalParameter::acronyms);
+  // if failed to create parser, create a default
+  if (!parser)
     parser = new TrecParser();
-  } else if (!strcmp(LocalParameter::docFormat, "chinese")) {
-    parser = new ChineseParser();
-  } else if (!strcmp(LocalParameter::docFormat, "chinesechar")) {
-    parser = new ChineseCharParser();
-  } else if (!strcmp(LocalParameter::docFormat, "arabic")) {
-    parser = new ArabicParser();
-  } else if (strcmp (LocalParameter::docFormat, "")) {
-    throw Exception("PushIndexer", "Unknown docFormat specified");
-  } else {
-    parser = new TrecParser();
-  }
-
+  
   // Create the stopper if needed.
   Stopper * stopper = NULL;
-  if (strcmp(LocalParameter::stopwords, "")) {
-    stopper = new Stopper(LocalParameter::stopwords);
-  }
+  stopper = TextHandlerManager::createStopper(LocalParameter::stopwords);
 
-  // Create the acronym list and tell parser if needed.
-  WordSet * acros = NULL;
-  if (strcmp(LocalParameter::acronyms, "")) {
-    acros = new WordSet(LocalParameter::acronyms);
-    parser->setAcroList(acros);
-  }
-  
   // Create the stemmer if needed.
   Stemmer * stemmer = NULL;
-  if (!strcmp(LocalParameter::stemmer, "porter")) {
-    stemmer = new PorterStemmer();
-  } else if (!strcmp(LocalParameter::stemmer, "krovetz")) {
-    stemmer = new KStemmer();
-  } else if (!strcmp(LocalParameter::stemmer, "arabic")) {
-    stemmer = new ArabicStemmer(ArabicStemmerParameter::stemDir, 
-				ArabicStemmerParameter::stemFunc);
-  } else if (strcmp(LocalParameter::stemmer, "")) {
-    throw Exception("PushIndexer", "Unknown stemmer specified");
-  }
+  stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
 
   // Create the indexer. (Note: this has an InvFPPushIndex that 
   // it uses to do the indexing, but InvFPTextHandler implements the
@@ -245,7 +190,6 @@ int AppMain(int argc, char * argv[]) {
   InvFPTextHandler indexer(LocalParameter::index, LocalParameter::memory, LocalParameter::countStopWords, LocalParameter::position);
 
   // chain the parser/stopper/stemmer/indexer
-
   TextHandler * th = parser;
 
   if (stopper != NULL) {
@@ -271,20 +215,19 @@ int AppMain(int argc, char * argv[]) {
     } else {
       string filename;
       while (getline(source, filename)) {
-	cerr << "Parsing " << filename <<endl;
+	cerr << "Parsing file: " << filename <<endl;
 	parser->parse((char*)filename.c_str());
       }
     }
   } else {
     for (int i = 2; i < argc; i++) {
-      cerr << "Parsing " << argv[i] << endl;
+      cerr << "Parsing file: " << argv[i] << endl;
       parser->parse(argv[i]);
     }
   }
   // free memory
-  if (acros != NULL) delete acros;
-  if (stopper != NULL) delete stopper;
-  if (stemmer != NULL) delete stemmer;
+  if (stopper) delete stopper;
+  if (stemmer) delete stemmer;
   delete parser;
   LocalParameter::freeMem();
   return 0;
