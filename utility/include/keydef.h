@@ -1,35 +1,41 @@
 
 /*                                                               */
-/* Copyright 1984,1985,1986,1988,1989,1990,2003 by Howard Turtle      */
+/* Copyright 1984,1985,1986,1988,1989,1990,2003,2004 by Howard Turtle      */
 /*                                                               */
 
 #define max_long 2147483647
 #define keyf 32472                   /* marker for fcb */
-#define current_version  4           /* version of keyed file software */
-#define max_key_lc 256                /* maximum key length */
+#define current_version  5           /* version of keyed file software */
+#define maxkey_lc 512                /* maximum key length */
+#define max_prefix_lc 255
 #define key_ptrs_per_block 506       /* number of key_ptrs in index block */
 #define random_split_lc 880          /* chars to be freed on random split */
 #define level_zero 0                 /* level of index leaves */
 #define level_one 1                  /* level immediately above leaves */
 #define long_lc   sizeof(long)       /* lc of a long int */
-#define min_buffer_cnt 3             /* default number of buffers allocated */
+#define min_buffer_cnt 4             /* default number of buffers allocated */
 #define max_buffer_cnt 1024          /* max buffers allowed */
 #define buf_hash_load_factor 3       /* hash table is>=this times buffers alloc,*/
 #define max_level 32                 /* number of index block levels */
-#define max_char '\377'
-#define fib_lc min_fcb_lc-(min_buffer_cnt*buffer_lc) /* length of fib */
+/* fib_lc is set to size of fcb minus buffers and segment_ix table */
+/*   it's still longer than it needs to be */
+#define fib_lc min_fcb_lc-(min_buffer_cnt*buffer_lc)-(max_segments*sizeof(int))
 #define max_segment_lc max_long      /* max length of a file segment */
 #define max_segments 1024            /* max number of file segments */
 #define max_files 10                 /* max number of open files */
-/*POSIX VALUES HERE?!? was 82, 40*/
-#define max_filename_lc 245 /* max length of a file name -10 for init_filename HACK! */
-#define max_extension_lc 40 /* max length of file name extension unused?!? */
-enum file_access {random,seq};
+#define max_filename_lc 128          /* max length of a file name */
+#define max_extension_lc 40          /* max length of file name extension */
+#define rec_allocation_unit 8        /* user rec allocation unit */
+#define user_ix 0
+#define free_rec_ix 1
+#define free_lc_ix 2
+#define max_index 3
+
 enum comparison {less,equal,greater};
 
 struct key {
   unsigned char
-    text[max_key_lc];
+    text[maxkey_lc];
   short
     lc;
 };
@@ -37,7 +43,7 @@ struct key {
 struct leveln_pntr{
   int
     segment;
-  long
+  unsigned long
     block;
 };
 #define leveln_lc sizeof(struct leveln_pntr)
@@ -45,7 +51,7 @@ struct leveln_pntr{
 struct level0_pntr {
   int
     segment;
-  long
+  unsigned long
     sc,
     lc;
 };
@@ -59,20 +65,45 @@ struct key_ptr_t {
 #define key_ptr_lc sizeof(struct key_ptr_t)
 #define keyspace_lc (key_ptr_lc*key_ptrs_per_block)
 
-struct block {                  /* block is the disk resident image of */
+struct ix_block {                  /* block is the disk resident image of */
   short                         /*   an index block */
     keys_in_block,
-    chars_in_use,               /* chars in key/pointer pool, does not */
+    chars_in_use;               /* chars in key/pointer pool, does not */
                                 /*   include length of key_ptr_t entries */
+  unsigned char
+    index_type,
+    prefix_lc,
     level;
   struct leveln_pntr
     next,prev;
   struct key_ptr_t              /* key_ptrs are inserted from 0, keys and */
     keys[key_ptrs_per_block];   /*  file pointers overlay the top end */
 };
-#define block_lc sizeof(struct block)
+#define ix_block_lc sizeof(struct ix_block)
 
-/* Buffer handling.  Buffers contain the disk image of an index block */
+/* Free space management.  Available space is recorded in two separate */
+/*   indexes.  The first (free_rec_ix) records each space in address   */
+/*   order using a binary key of segment/sc and lc as the record,  The */
+/*   second (free_lc_ix) records each space in length order using a    */
+/*   key of lc/segment/sc.  To allocate a record the lc list is        */
+/*   searched with a key of lc/0/0 then next_rec is used to find a     */
+/*   space of lc or longer (if it exists).  To deallocate, the rec     */
+/*   list searched and any contiguous entries are combined.            */
+
+typedef union ix_or_freespace_block {
+  struct ix_block        ix;
+  /*  struct freespace_block free;*/
+} block_type_t;
+#define block_lc sizeof(block_type_t)
+
+typedef union level0orn_pntr {
+  struct level0_pntr     p0;
+  struct leveln_pntr     pn;
+} levelx_pntr;
+
+
+/* Buffer handling.  Buffers contain the disk image of an index or    */
+/*   freespace block */
 /*   together with additional information.  A hashing technique is    */
 /*   used to find a buffer that holds a given block.  A hash table is */
 /*   allocated as the last buffers in the fcb of roughly three times  */
@@ -82,16 +113,18 @@ struct block {                  /* block is the disk resident image of */
 /*   value k then they are linked using hash_next.                    */
 
 struct buffer_type {            /* buffer is the memory resident image of */
-  boolean                       /*   an index block */
+                                /* a disk block */
+  unsigned char
     locked,
-    modified;
+    modified,
+    notused;
   int
     older,                      /* index to prev element in LRU list */
     younger,                    /* index to next element in LRU list */
     hash_next;
   struct leveln_pntr
     contents;                   /* block in buffer, nulln_ptr if empty */
-  struct block
+  block_type_t
     b;
 };
 #define buffer_lc sizeof(struct buffer_type)
@@ -117,23 +150,24 @@ struct fcb {
     error_code,
     version,                    /* version of keyed file manager */
     segment_cnt,                /* number of segments in use     */
-    primary_level;              /* level of primary index block */
+    primary_level[max_index],              /* level of primary index block */
+    marker;
   boolean
     file_ok;
-  long
-    marker;
   struct leveln_pntr
-    first_at_level[max_level];  /* block containing lowest key at level */
+    first_at_level[max_level][max_index],  /* block containing lowest key at level */
+    last_pntr[max_level][max_index];       /* last pointer at each level */
   long
     segment_length[max_segments];/* length in bytes of each segment     */
-  char
-    file_name[max_filename_lc],
-    file_extension[max_extension_lc];
 
     /* start of temporary information */
 
-  enum file_access
-    insert_mode;                /* random or sequential inserts */
+  char
+    file_name[max_filename_lc],
+    file_extension[max_extension_lc];
+  unsigned char
+    trace,                      /* true means trace execution */
+    trace_freespace;
   int
     open_file_cnt,              /* number of files actually open */
     open_segment[max_files],    /* segment to which each file is open */
@@ -141,19 +175,19 @@ struct fcb {
     oldest_buffer,              /* first buffer in LRU buffer list */
     youngest_buffer;            /* last buffer in LRU buffer list */
   FILE
-    *open_file[max_files];      /* pointers to  open files */
+    *open_file[max_files];      /* pointers to open files */
 
   int
     segment_ix[max_segments],   /* index into open_file[] if segment open */
-    position_ix,                /* posn. in level0 blk of last retrieval */
+    position_ix[max_index],                /* posn. in level0 blk of last retrieval */
     current_age,                /* age of file pool (0..maxint)*/
     buffers_allocated,          /* number of buffers actually allocated */
     buffers_in_use,             /* buffers actually used */
-    *buf_hash_table,                /* pointer to base of buffer hash table */
+    *buf_hash_table,            /* pointer to base of buffer hash table */
     buf_hash_entries;           /* size of buf_hash_table              */
   struct leveln_pntr
-    mru_at_level[max_level],    /* most recently used block at each level*/
-    position;                   /* level0 block of last retrieval */
+    mru_at_level[max_level][max_index],    /* most recently used block at each level*/
+    position[max_index];                   /* level0 block of last retrieval */
   struct buffer_type
     buffer[min_buffer_cnt];     /* should be at end of fcb so we can extend */
 };

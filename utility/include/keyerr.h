@@ -1,4 +1,3 @@
-/* Copyright 1984,1985,1986,1988,1989,1990,2003 by Howard Turtle      */
 #define no_err 0
 #define badopen_err 1
 #define badcreat_err 2
@@ -10,9 +9,9 @@
 #define badkey_err 8
 #define maxlevel_err 9
 #define ateof_err 10
-#define nospace_err 11
+#define atbof_err 11
 #define longrec_err 12
-#define atbof_err 13
+#define longkey_err 13
 #define version_err 14
 #define seek_err 15
 #define read_err 16
@@ -22,5 +21,12 @@
 #define bad_name_err 20
 #define bad_dlt_err 21
 #define max_key_err 22
-
-
+#define nospace_err 23
+#define free_insrt_err 24
+#define free_dlt_err 25
+#define alloc_rec_err 26
+#define dealloc_rec_err 27
+#define alloc_buf_err 28
+#define move_rec_err 29
+#define bad_close_err 30
+#define ix_struct_err 31

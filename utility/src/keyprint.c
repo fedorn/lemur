@@ -5,38 +5,188 @@
 #include <stdio.h>
 #include "ht.h"
 #include "keydef.h"
+#include "keyerr.h"
 
+#define null_ptr(p) ((p.segment==max_segments) && (p.block==0))
+
+void print_index_block();
 void unpack_ptr();
 void mvc();
 
 boolean null_pntr(struct leveln_pntr p)
 {
-  if (p.segment==-1 && p.block==0) return(true);
+  if (p.segment==max_segments && p.block==0) return(true);
   else return(false);
 }
 
-void get_page(struct fcb *f, struct leveln_pntr blk, struct block buf)
+boolean is_primary(struct fcb *f, int bufix)
+{int index;
+
+  index = f->buffer[bufix].b.ix.index_type;
+  if ( f->buffer[bufix].b.ix.level==f->primary_level[index] ) return(true);
+  else return(false);
+}
+
+void get_page(struct fcb *f, struct leveln_pntr blk, block_type_t *buf)
 {int i; boolean found; struct leveln_pntr p;
 
   found = false;
   for (i=0; i<f->buffers_in_use; i++) {
     p = f->buffer[i].contents;
-    if ( p.segment==blk.segment && p.block==blk.block ) { buf = f->buffer[i].b; found = true; }
+    if ( p.segment==blk.segment && p.block==blk.block ) { *buf = f->buffer[i].b; found = true; }
   }
   if ( ! found ) read_page(f,blk,buf);
 }
 
+void print_key1(FILE *list, struct key *k, char caption[])
+{int i; boolean is_text;
+
+  is_text = true;
+  for (i=0; i<k->lc; i++) if ( !isprint(k->text[i]) ) is_text = false;
+  fprintf(list,"%s",caption);
+  if ( k->lc==0 ) fprintf(list,"null");
+  else if ( is_text ) for (i=0; i<k->lc; i++) fprintf(list,"%c",k->text[i]);
+  else {
+    fprintf(list,"0x");
+    for (i=0; i<k->lc; i++) fprintf(list,"%2x",k->text[i]);
+  }
+}
+
+void print_key(FILE *list, unsigned char key[], int lc, char caption[])
+{struct key k;
+
+  k.lc = lc;
+  mvc(key,0,k.text,0,lc);
+  print_key1(list,&k,caption);
+}
+
 /** fcb print procedures **/
+
+static boolean block_is_sorted(struct ix_block *b)
+{int i,r,lc,lc1,min; boolean sorted=true;
+
+  for (i=0; i<b->keys_in_block-1; i++) {
+    lc = b->keys[i].lc;  lc1 = b->keys[i+1].lc;
+    if ( lc<lc1 ) min = lc; else min = lc1;
+    r = memcmp( (char *)b->keys+b->keys[i].sc, (char *)b->keys+b->keys[i+1].sc,min);
+    if ( r>0 ) sorted = false;
+    else if ( r==0 && lc>=lc1 ) sorted = false;
+  }
+  return(sorted);
+}
+
+
+static void check_index_chain(FILE *list, struct fcb *f, struct leveln_pntr head)
+{int block_cnt=0,key_cnt=0,min_cnt=32767,max_cnt=0; struct leveln_pntr p; block_type_t b;
+struct key last_max,min;
+
+  last_max.lc = 0; last_max.text[0] = '\0';
+  p = head;
+  while ( !null_ptr(p) ) {
+    get_page(f,p,&b);
+    block_cnt++;
+    if ( b.ix.keys_in_block>0 ) {
+      get_nth_key(&(b.ix),&min,0);
+      if ( compare_full_key(&last_max,&(b.ix),0)==greater ) {
+        print_key1(list,&last_max,"  block sequence problem, last_max=");
+        print_key1(list,&min,", current min=");
+        fprintf(list,"\n");
+      }
+      else get_nth_key(&(b.ix),&last_max,b.ix.keys_in_block-1);
+    }
+    key_cnt = key_cnt + b.ix.keys_in_block;
+    if ( b.ix.keys_in_block>max_cnt ) max_cnt = b.ix.keys_in_block;
+    if ( b.ix.keys_in_block<min_cnt ) min_cnt = b.ix.keys_in_block;
+    if ( !block_is_sorted(&(b.ix)) ) {
+      fprintf(list,"  Block %d/%d is not sorted\n",p.segment,p.block);
+      print_index_block(list,&(b.ix));
+    }
+    p = b.ix.next;
+  }
+  fprintf(list,"  chain contains %d blocks, %d keys, min=%d, max=%d\n",
+    block_cnt,key_cnt,min_cnt,max_cnt);
+}
+
+void check_index(FILE *list,struct fcb *f, int index)
+{int i; struct leveln_pntr head;
+
+  fprintf(list,"Index type=%d\n",index);
+  for (i=f->primary_level[index]; i>=0; i--) {
+    head = f->first_at_level[i][index];
+    fprintf(list,"Beginning sort check of level %d\n",i);
+    check_index_chain(list,f,head);
+  }
+}
+
+int print_freespace_chain(FILE *list, struct fcb *f)
+{int err,lc,key_lc,rec_lc; long lc_entries=0,rec_entries=0,total_lc=0,total_rec=0;struct level0_pntr p0;
+ unsigned char key[maxkey_lc];
+
+  kf_set_bof(f,free_lc_ix);
+  err = kf_next_ptr(f,free_lc_ix,key,&key_lc,maxkey_lc,&p0);
+  if ( err==ateof_err ) fprintf(list," freespace chain is empty\n");
+  else {
+    fprintf(list,"freespace lc list\n");
+    while ( err==no_err ) {
+      lc_entries++;
+      unpack_lc_key(key,&p0);
+      fprintf(list,"%5d  lc=%10d, %4d/%10d\n",lc_entries,p0.lc,p0.segment,p0.sc);
+      total_lc = total_lc + p0.lc;
+      err = kf_next_ptr(f,free_lc_ix,key,&key_lc,maxkey_lc,&p0);
+    }
+    fprintf(list,"freespace rec list\n");
+    kf_set_bof(f,free_rec_ix);
+    err = kf_next_rec(f,free_rec_ix,key,&key_lc,maxkey_lc,&lc,&rec_lc,sizeof(int));
+    while ( err==no_err ) {
+      rec_entries++;
+      unpack_rec_key(key,&p0);
+      fprintf(list,"%5d  %4d/%10d, lc=%d\n",rec_entries,p0.segment,p0.sc,lc);
+      total_rec = total_rec + lc;
+      err = kf_next_rec(f,free_rec_ix,key,&key_lc,maxkey_lc,&lc,&rec_lc,sizeof(int));
+    }
+    if ( rec_entries!=lc_entries )
+      fprintf(list,"**list mismatch, %d entries in lc, %d entries in rec\n",lc_entries,rec_entries);
+    if ( total_lc!=total_rec )
+      fprintf(list,"**length mismatch, lc list has %d bytes, rec list has%d\n",total_lc,total_rec);
+    fprintf(list,"  entries=%d, total_lc=%ld, mean_entry=%5.1f\n",rec_entries,total_rec,(double)total_rec/rec_entries);
+  }
+  return err;
+}
+
+static boolean contiguous(struct level0_pntr p1, struct level0_pntr p2)
+{
+  if ( p1.segment!=p2.segment ) return(false);
+  if ( (p1.sc+p1.lc)==p2.sc ) return(true);
+  else return(false);
+}
+
+int print_freespace_summary(FILE *list, struct fcb *f)
+{int i; long cnt=0,lc=0,entries=0; struct leveln_pntr p; block_type_t b;
+
+  fprintf(list,"Freespace rec summary:");
+  check_index(list,f,free_rec_ix);
+  fprintf(list,"Freespace lc summary:");
+  check_index(list,f,free_lc_ix);
+  return cnt;
+}
+
+int print_freespace(FILE *list, struct fcb *f)
+{struct leveln_pntr next;
+
+  print_freespace_summary(list,f);
+  print_freespace_chain(list,f);
+  return 0;
+}
 
 int print_hash_chain(FILE *list,struct fcb *f, int ix)
 {int next,cnt=0;
 
   next = f->buf_hash_table[ix];
   while ( next>=0 ) {
-    if ( f->buffer[next].b.level==f->primary_level ) fprintf(list,"**");
+    if ( is_primary(f,next) ) fprintf(list,"**");
     fprintf(list," %d(%d/%d)(%d)",next,f->buffer[next].contents.segment,
-      f->buffer[next].contents.block,f->buffer[next].b.level);
-    if ( f->buffer[next].b.level==f->primary_level ) fprintf(list,"**");
+      f->buffer[next].contents.block,f->buffer[next].b.ix.level);
+    if ( is_primary(f,next) ) fprintf(list,"**");
     cnt++;
     next = f->buffer[next].hash_next;
   }
@@ -46,13 +196,28 @@ int print_hash_chain(FILE *list,struct fcb *f, int ix)
 
 
 void print_buffer_MRU_chain(FILE *list,struct fcb *f)
-{int ix,cnt=0;
+{int ix,cnt=0,index_type,level;
 
   ix = f->youngest_buffer;
   while ( ix>=0 ) {
     if ( (cnt%10)==0) fprintf(list,"\n    ");
     cnt++;
-    fprintf(list," %4d(%2d)",ix,f->buffer[ix].b.level);
+    index_type = f->buffer[ix].b.ix.index_type;
+    level = f->buffer[ix].b.ix.level;
+    if (index_type==user_ix) {
+      if ( is_primary(f,ix) ) fprintf(list," %4d(X%2d",ix,level);
+      else fprintf(list," %4d(x%2d",ix,level);
+    }
+    else if (index_type==free_lc_ix) {
+      if ( is_primary(f,ix) ) fprintf(list," %4d(L%2d",ix,level);
+      else fprintf(list," %4d(l%2d",ix,level);
+    }
+    else if (index_type==free_rec_ix) {
+      if ( is_primary(f,ix) ) fprintf(list," %4d(R%2d",ix,level);
+      else fprintf(list," %4d(r%2d",ix,level);
+    }
+    if ( f->buffer[ix].modified ) fprintf(list,"*)");
+    else fprintf(list," )");
     ix = f->buffer[ix].older;
   }
   fprintf(list,"\n");
@@ -63,7 +228,7 @@ void print_buffer_summary(FILE *list, struct fcb *f)
 
   fprintf(list,"Buffer summary, buffers_allocated=%d, buffers_in_use=%d, hash table size=%d\n",
     f->buffers_allocated,f->buffers_in_use,f->buf_hash_entries);
-  fprintf(list,"  MRU chain is ( bufix(level) )");
+  fprintf(list,"  MRU chain is ( bufix(type level modified) x=user l=free_lc r=free_rec *=modified)");
   print_buffer_MRU_chain(list,f);
   fprintf(list,"  Hash table\n");
   allocated = f->buf_hash_entries;
@@ -72,10 +237,10 @@ void print_buffer_summary(FILE *list, struct fcb *f)
     while ( i<allocated && f->buf_hash_table[i]<0 ) {
       i++; empties++; 
     }
-    if ( i==min+1 )  fprintf(list,"hash chain  from %d is empty\n",min);
-    else if ( i>min) fprintf(list,"hash chains from %d to %d are empty\n",min,i-1);
+    if ( i==min+1 )  fprintf(list,"    chain  from %d is empty\n",min);
+    else if ( i>min) fprintf(list,"    chains from %d to %d are empty\n",min,i-1);
     if ( i<allocated ) {
-      fprintf(list,"hash chain  from %d ",i);
+      fprintf(list,"    chain  from %d ",i);
       j =  print_hash_chain(list,f,i);
       if ( j>max ) max = j;
       entries = entries + j;
@@ -123,101 +288,128 @@ void print_files(FILE *list, struct fcb *f)
   else fprintf(list,"  **no files open\n");
 }
 
-void print_block(FILE *list, struct block *b)
-{int i,j,lc,load; struct level0_pntr ptr; struct leveln_pntr pn; char t[max_key_lc];
+void print_index_block(FILE *list, struct ix_block *b)
+{int i,j,lc,load; struct level0_pntr ptr; struct leveln_pntr pn; unsigned char t[maxkey_lc]; struct key k;
 
   fprintf(list," keys=%d",b->keys_in_block);
   lc = b->chars_in_use + (b->keys_in_block * key_ptr_lc);
   load = (lc*100) / (keyspace_lc);
   fprintf(list,", chars=%d(%d) %d%% loaded",b->chars_in_use,lc,load);
   fprintf(list,", level=%d",b->level);
+  fprintf(list,", index_type=%d",b->index_type);
+  fprintf(list,", prefix_lc=%d",b->prefix_lc);
+  if ( b->prefix_lc>0 ) {
+    fprintf(list,", prefix=");
+    mvc(b->keys,keyspace_lc-b->prefix_lc,t,0,b->prefix_lc);
+    for (i=0; i<b->prefix_lc; i++) fprintf(list,"%c",t[i]);
+  }
   fprintf(list,", next=%d,%ld, prev=%d,%ld\n",b->next.segment,
     b->next.block,b->prev.segment,b->prev.block);
   for (i=0; i<b->keys_in_block; i++) {
-    fprintf(list,"%4d%3d ",b->keys[i].sc,b->keys[i].lc);
-    mvc(b->keys,b->keys[i].sc,t,0,b->keys[i].lc);
-    for (j=0; j<b->keys[i].lc; j++) fprintf(list,"%c",t[j]);
+    lc = b->keys[i].lc;
+    fprintf(list,"%4d%3d ",b->keys[i].sc,lc);
+    k.lc = b->keys[i].lc;
+    mvc(b->keys,b->keys[i].sc,k.text,0,k.lc);
+    print_key1(list,&k,"");
     if ( b->level>0 ) {
       unpackn_ptr(b,i,&pn);
-      fprintf(list," %d %ld\n",pn.segment,pn.block);
+      fprintf(list," - %d %ld\n",pn.segment,pn.block);
     }
     else {
       unpack0_ptr(b,i,&ptr);
-      fprintf(list," %d %ld %ld\n",ptr.segment,ptr.sc,ptr.lc);
+      fprintf(list," - %d %ld %ld\n",ptr.segment,ptr.sc,ptr.lc);
     }
   }
 }
 
-void print_index(FILE *list, struct fcb *f)
-{int i; struct leveln_pntr next; struct block buf;
+void print_index_block1(FILE *list, struct fcb *f, int bufix)
+{
+  print_index_block(list,&(f->buffer[bufix].b.ix));
+}
 
-  for (i=f->primary_level; i>=0; i--) {
+void print_index(FILE *list, struct fcb *f)
+{int i; struct leveln_pntr next; block_type_t buf;
+
+  for (i=f->primary_level[user_ix]; i>=0; i--) {
     fprintf(list,"**Start of level %d\n",i);
-    next = f->first_at_level[i];
+    next = f->first_at_level[i][user_ix];
     while ( !null_pntr(next) ) {
       fprintf(list,"block number %d/%ld\n",next.segment,next.block);
-      get_page(f,next,buf);
-      print_block(list,&buf);
-      next =buf.next;
+      get_page(f,next,&buf);
+      print_index_block(list,&buf.ix);
+      next = buf.ix.next;
     }
   }
 }
 
 void print_levels(FILE *list, struct fcb *f)
-{int i;
+{int i,j;
 
-  fprintf(list,"Level pointers\n");
-  for (i=0; i<2; i++) fprintf(list,"      lvl    first          MRU       ");
-  for (i=0; i<=f->primary_level; i++) {
-    if (i % 2==0) fprintf(list,"\n");
-    fprintf(list,"       %2d%4d/%-9ld %4d/%-9ld",i,
-      f->first_at_level[i].segment,f->first_at_level[i].block,
-      f->mru_at_level[i].segment,f->mru_at_level[i].block);
+  fprintf(list,"Level pointers\n lvl");
+  fprintf(list," user MRU     user first   user last   frec MRU     frec first   frec last   f_lc MRU     f_lc first   f_lc last  \n");
+  for (i=0; i<=f->primary_level[user_ix]; i++) {
+    fprintf(list,"  %2d ",i);
+    for (j=0; j<max_index; j++) {
+      fprintf(list,"%4d/%-7ld %4d/%-7ld %4d/%-7ld",
+        f->mru_at_level[i][j].segment,f->mru_at_level[i][j].block,
+        f->first_at_level[i][j].segment,f->first_at_level[i][j].block,
+        f->last_pntr[i][j].segment,f->last_pntr[i][j].block);
+    }
+    fprintf(list,"\n");
   }
   fprintf(list,"\n");
 }
 
 void print_fib(FILE *list, struct fcb *f)
-{
+{int i;
   fprintf(list,"FCB Print for file=%s",f->file_name);
   if ( f->file_extension[0]=='\0' ) fprintf(list,"\n");
   else fprintf(list,"%s\n",f->file_extension);
   fprintf(list,"  status is ");
   if ( f->file_ok ) fprintf(list,"ok");
     else fprintf(list,"damaged");
-  fprintf(list,",    error_code=%d",f->error_code);
-  fprintf(list,",  version=%d",f->version);
-  fprintf(list,",     marker=%ld",f->marker);
-  fprintf(list,", insert mode=");
-  if ( f->insert_mode==seq ) fprintf(list,"seq\n");
-    else fprintf(list,"random\n");
-  fprintf(list,"  primary level=%d,",f->primary_level);
-  fprintf(list," current_age=%d, block_lc=%d,",f->current_age,block_lc);
-  fprintf(list," position=%d/%ld %d\n",f->position.segment,
-    f->position.block,f->position_ix);
-  fprintf(list,"  buffers_allocated=%d, buffers_in_use=%d\n",f->buffers_allocated,f->buffers_in_use);
+  fprintf(list,", error_code=%d",f->error_code);
+  fprintf(list,", version=%d",f->version);
+  fprintf(list,", marker=%ld",f->marker);
+  fprintf(list,", current_age=%d, block_lc=%d\n",f->current_age,block_lc);
+  fprintf(list,"  primary level[user    ]=%d,",f->primary_level[user_ix]);
+  fprintf(list," position[user    ]=%d/%ld %d\n",f->position[user_ix].segment,
+    f->position[user_ix].block,f->position_ix[user_ix]);
+  fprintf(list,"  primary level[free_rec]=%d,",f->primary_level[free_rec_ix]);
+  fprintf(list," position[free_rec]=%d/%ld %d\n",f->position[free_rec_ix].segment,
+    f->position[free_rec_ix].block,f->position_ix[free_rec_ix]);
+  fprintf(list,"  primary level[free_lc ]=%d,",f->primary_level[free_lc_ix]);
+  fprintf(list," position[free_lc ]=%d/%ld %d\n",f->position[free_lc_ix].segment,
+    f->position[free_lc_ix].block,f->position_ix[free_lc_ix]);
   fprintf(list,"  buf_hash_entries=%d, hash_entries_per_buf=%d\n",f->buf_hash_entries,hash_entries_per_buf);
   print_segments(list,f);
   print_files(list,f);
   print_levels(list,f);
+  print_freespace_summary(list,f);
+  fprintf(list,"Buffers_allocated=%d, in use=%d, age list (young to old) is (x=user l=free_lc r=free_rec  *=modified)",
+    f->buffers_allocated,f->buffers_in_use);
+  print_buffer_MRU_chain(list,f);
 }
 
 void print_fcb(FILE *list, struct fcb *f)
 {int i;
   print_fib(list,f);
-  fprintf(list,"**buffer directory, buffers_allocated=%d, age list (young to old) is",f->buffers_allocated);
-  print_buffer_MRU_chain(list,f);
-  fprintf(list,"         contnt      level lock?  modified?    next\n");
+  fprintf(list,"**buffer directory\n");
+  fprintf(list,"         contnt        lock?   mod?   next   type\n");
   for (i=0; i<f->buffers_in_use; i++) {
-    fprintf(list,"%5d %4d/%10ld %5d",i,f->buffer[i].contents.segment,f->buffer[i].contents.block,f->buffer[i].b.level);
-    if (f->buffer[i].locked) fprintf(list,"  true  ");
-      else fprintf(list,"  false ");
-    if ( f->buffer[i].modified    ) fprintf(list,"   true");
-      else fprintf(list,"  false");
-    fprintf(list," %6d\n",f->buffer[i].hash_next);
+    fprintf(list,"%5d %4d/%10ld ",i,f->buffer[i].contents.segment,f->buffer[i].contents.block);
+    if (f->buffer[i].locked) fprintf(list," true  ");
+      else fprintf(list," false ");
+    if ( f->buffer[i].modified    ) fprintf(list,"  true");
+      else fprintf(list," false");
+    fprintf(list," %6d ",f->buffer[i].hash_next);
+    fprintf(list," index, level=%d\n",f->buffer[i].b.ix.level);
   }
   for (i=0; i<f->buffers_in_use; i++) {
-    fprintf(list,"**buffer %d\n",i);
-    print_block(list,&(f->buffer[i].b) );
+    fprintf(list,"**buffer %d ",i);
+    fprintf(list,"index block\n");
+    print_index_block1(list,f,i);
   }
+  /*  fprintf(list,"**freespace chain\n");
+      print_freespace_chain(list,f);*/
 }
