@@ -21971,8 +21971,12 @@ static const char* const headwords[] =
 //
 // Functions for loading the KStem table
 //
+bool KrovetzStemmerTransformation::_indri_kstem_loaded = false;
 
 void indri_kstem_load_table() {
+  // only initialize once, no matter how many instances get made.
+  if (KrovetzStemmerTransformation::_indri_kstem_loaded) return;
+  KrovetzStemmerTransformation::_indri_kstem_loaded = true;
   for( unsigned int i=0; headwords[i]; i++ ) {
     kstem_add_table_entry( headwords[i], "" );
   }

@@ -42,6 +42,7 @@ public:
 
   void setHandler( ObjectHandler<ParsedDocument>& handler );
   void handle( ParsedDocument* document ); 
+  static bool _indri_kstem_loaded;
 };
 
 #endif // INDRI_KROVETZSTEMMERTRANSFORMATION_HPP
