@@ -48,6 +48,11 @@ RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* ac
     ((CORIRetMethod*)model)->setTFFactor(CORIParameter::doctffactor);
     ((CORIRetMethod*)model)->setTFBaseline(CORIParameter::doctfbaseline);
     break;
+  case COS: 
+    CosSimParameter::get();
+    model = new CosSimRetMethod(*ind, CosSimParameter::L2NormFile, *accum);
+    ((CosSimRetMethod *)model)->setFeedbackParam(CosSimParameter::fbPrm);
+    break;
   default:
     throw Exception("RetrievalExp", "unknown retModel parameter");
     break;
