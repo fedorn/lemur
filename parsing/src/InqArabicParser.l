@@ -47,6 +47,7 @@
 #define NUMBER 26
 #define QBEGIN 30
 #define QEND 31
+#define PROP 32
 
 /* PAREN OPERATIONS:
  * NL_LPAREN :   called when a left paren is seen.  If paren_stack is 
@@ -240,6 +241,10 @@ numobj	({n1}|{n2}|{n3})
 			  BEGIN(NEST);
                           return (ODN);
 			}
+#(p|P)(r|R)(o|O)(p|P)	{ 
+			  BEGIN(NEST);
+                          return (PROP);
+			}
 
 #(U|u)(W|w)[0-9]+	{ BEGIN(NEST);
 			  return (UWN);
@@ -365,6 +370,22 @@ void InqArabicParser::parseSynOp(char *op) {
   return;
 }
 
+void InqArabicParser::parsePropOp(char *op) {
+  if (state) {
+    int nxtok=InqArabiclex();
+    if (textHandler != NULL) {
+      textHandler->foundSymbol(op);
+    }
+    if(nxtok == LEFT_PAREN) {
+      if (textHandler != NULL) textHandler->foundSymbol("LPAREN");
+      finishing_prox_qnote(ara_parenstack_top-1);
+    }
+    else 
+      parseError (" parsePropOp: missing LEFT_PAREN");
+  }
+  return;
+}
+
 void InqArabicParser::parseTermOp(char *op) {
   if (state) {
     int nxtok=InqArabiclex();
@@ -421,6 +442,10 @@ void InqArabicParser::parseProxNode(int tok) {
     case UWN:
       parseProxOp("#UWN", ara_getsize());
       break;
+  case PROP:
+    parsePropOp("#PROP"); // should have its own parse method.
+      break;
+  
     default:
       parseError ("parseProxNode: PARSE ERROR: proximity op allows only prox child");
     }
@@ -547,6 +572,10 @@ void InqArabicParser::parseQryNode(int tok) {
 	  parseError ("parseQryNode: #WSUM needs a LEFT_PAREN");
       }
       break;
+  case PROP:
+    parsePropOp("#PROP"); // should have its own parse method.
+      break;
+  
     default:
       parseError ("parseQryNode: PARSE ERROR: unknown token");
     }
@@ -597,7 +626,7 @@ void InqArabicParser::doParse() {
       state = 1;
       while(*qid && !isdigit(*qid))
 	qid++;
-      while(ql>0 && !isdigit(tofree[ql-1]))
+      while(ql > 0 && !isdigit(tofree[ql-1])) 
 	tofree[--ql]='\0';
       ara_parenstack_top=0;
       if (textHandler != NULL) textHandler->foundDoc(qid);
