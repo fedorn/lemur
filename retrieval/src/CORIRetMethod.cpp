@@ -108,12 +108,13 @@ CORIRetMethod::CORIRetMethod(Index & dbIndex, ScoreAccumulator &accumulator,
     fclose(fp);
   
 
-    double cwTot;
-    for (int i = 0; i < dc; i++) {
+    double cwTot=0;
+    int i;
+    for (i = 0; i < dc; i++) {
       cwTot += cwCount[i];
     }
     double cwAve = cwTot / dc;
-    for (int i = 0; i < dc; i++) {
+    for (i = 0; i < dc; i++) {
       cwRatio[i] = cwCount[i] / cwAve;
     }
 
