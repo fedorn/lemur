@@ -17,7 +17,6 @@ extern "C" {
 }
 #include "BasicIndex.hpp"
 #include "Array.hpp"
-#include "BitArray.hpp"
 #include "BasicDocStream.hpp"
 #include "FastList.hpp"
 #include "GammaCompress.hpp"
@@ -48,8 +47,6 @@ const char * documentVocSuffix   = "docids";
 const char * wordKeySuffix       = "wkey";
 const char * documentKeySuffix   = "dkey";
 const char * indexFileSuffix     = "bsc";
-
-
 
 
 static bool fileExist(char *name)
@@ -829,19 +826,18 @@ void BasicIndex::createKey(const char * inName, const char * outName,
 
   int d, c;
   cerr << "Creating key file " << outName << endl;
-  BitArray * ba = new BitArray(1024);
 
   int bytesRead=0;
   while (ifs.peek() != EOF) {
     ifs.read((char *)&d, sizeof(int));
     ifs.read((char *)&c, sizeof(int));
-    pCompressor->read(ifs, ba);
+    int cbytes = pCompressor->read(ifs);
     ofs << voc[d] << " " << c << " " << bytesRead;
     if (byteOffset != (int *) NULL) {
       ofs << " " << byteOffset[d];
     }
     ofs << endl;
-    bytesRead += 4*sizeof(int) + ba->Bytes();
+    bytesRead += 4*sizeof(int) + cbytes;
   }
 }
 

@@ -78,7 +78,6 @@ void GammaCompress::compress(ostream &os, int n, int * a) {
   for (i=0; i<n; ++i) {
     size += gamma_size(a[i]);
   }
-  cerr << "size=" << size << endl;
   BitVector ba(size);
   int offset=0;
   for (i=0; i<n; ++i) {
