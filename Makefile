@@ -8,7 +8,7 @@ SHELL = /bin/sh
 #            other module directories
 
 # module ("library") directories
-LIBDIRS = utility index langmod retrieval distrib
+LIBDIRS = utility index langmod retrieval distrib summarization
 
 # application directories
 APPDIRS = app
