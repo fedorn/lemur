@@ -42,7 +42,7 @@ WordSet::load(char * filename) {
   }
  
   char word[MAXLINE];
-  word[MAXLINE] = '\0';
+  word[MAXLINE-1] = '\0';
 
   // load in the words
   while (! ifstr.eof()) {
