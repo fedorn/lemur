@@ -15,22 +15,19 @@
 #include <cctype>
 #include "common_headers.hpp"
 
+extern char *arabic_stemdir;
 extern void *set_stemmer(char *);
 extern void freeWordSets();
 
 ArabicStemmer::ArabicStemmer(const char *stemDir, const char *stemmer) {
-  stemmer_dir = new char[255];
-  stemmer_dir[0]='\0';
-  strcat(stemmer_dir, "ARABIC_STEM_DIR=");
-  strcat(stemmer_dir, stemDir);
-  if(putenv(stemmer_dir))
-    cerr << "putenv can not set ARABIC_STEM_DIR" << endl;
+  arabic_stemdir = new char[strlen(stemDir) + 1];
+  strcpy(arabic_stemdir, stemDir);
   stem_fct = (void (*)(char *, char *)) set_stemmer((char *)stemmer);
 }
 
 ArabicStemmer::~ArabicStemmer() {
   freeWordSets();
-  delete[](stemmer_dir);
+  delete[](arabic_stemdir);
 }  
 
 char * ArabicStemmer::stemWord(char * word) {

@@ -184,10 +184,13 @@ void load_static_files (const char *path) {
 /***************************************************************************/
 /* CHECK STEMMER FILES ******/
 /* Load files if not yet loaded ********************************************/
+char *arabic_stemdir;
+
 void check_stemmer_files () {
    char *path;
    if (!files_loaded) {
-      path = getenv ("ARABIC_STEM_DIR");
+     //      path = getenv ("ARABIC_STEM_DIR");
+     path = arabic_stemdir;
       if (path == NULL) {
 	 load_static_files("StemmerFiles");
 	 files_loaded = 1;
@@ -371,16 +374,10 @@ void show_stemmer_options() {
    for (i=0 ; i < NUMSTEMMERS; i++)
      fprintf(stderr, "               %-20s : %s\n", 
 	     stemtable[i].option, stemtable[i].description);
-   fprintf(stderr, "          ***Requires $ARABIC_STEM_DIR to be set\n");
    fprintf(stderr, "          Arabic text must be in windows encoding\n");
 }
 void *set_stemmer(char *stemval) {
     int i ;
-    if (!getenv ("ARABIC_STEM_DIR")) {
-  	fprintf (stderr, 
-    "*** $ARABIC_STEM_DIR environment variable must be set\n");
-    exit (1);
-    }
     for (i=0 ; i < NUMSTEMMERS; i++) {
       if (strcmp(stemval, stemtable[i].option)==0)
 	return((void *)stemtable[i].stem_fct);

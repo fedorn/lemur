@@ -22,10 +22,14 @@
 class KStemmer : public Stemmer {
 
 public:
-  
+  KStemmer(string &datadir);
+
+  ~KStemmer();  
+    
   /// Stem a word using the Krovetz Stemmer.
   char * stemWord(char * word);
-  
+private:
+  char *ddir;
 };
 
 #endif

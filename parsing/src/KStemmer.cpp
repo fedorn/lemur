@@ -17,6 +17,16 @@
 
 // the Krovetz stemmer is in C
 extern char *kstem_stemmer(char *);
+extern char *stemdir;
+
+KStemmer::KStemmer(string &datadir) {
+  stemdir = new char[datadir.length() + 1];
+  strcpy(stemdir, datadir.c_str());
+}
+
+KStemmer::~KStemmer() {
+  delete[](stemdir);
+}
 
 char * KStemmer::stemWord(char * word) {
   return kstem_stemmer(word);

@@ -623,6 +623,7 @@ char *add_file(char name[], char directory[], char filename[])
    dictionary files, direct mappings for irregular variants, etc.)
    */
 
+  char *stemdir;                         /* the directory where all these files reside */
 void read_dict_info() 
 {
   
@@ -634,7 +635,7 @@ void read_dict_info()
   FILE *direct_conflation_file;         /* variants that can be directly conflated */
   
   
-  char *stemdir;                         /* the directory where all these files reside */
+
   char exc_file_name[MAX_FILENAME_LENGTH], 
        dc_file_name[MAX_FILENAME_LENGTH], 
        hw_file_name[MAX_FILENAME_LENGTH], 
@@ -662,10 +663,10 @@ void read_dict_info()
   
   /* get the directory name from an environment variable, and then build
      the name of the file (including the path) in the *_file_name variables */
-  stemdir = (char *)getenv((char *)"STEM_DIR");  
+  //  stemdir = (char *)getenv((char *)"STEM_DIR");  
          
-  if (!stemdir) 
-    fprintf(stderr,"The environment variable STEM_DIR is not defined.\nIt must be set to the directory that contains files used by the stemmer.");
+  //  if (!stemdir) 
+  //    fprintf(stderr,"The environment variable STEM_DIR is not defined.\nIt must be set to the directory that contains files used by the stemmer.");
 
   if (strlen(stemdir) > 70) 
     fprintf(stderr,"The directory path in the environment variable STEM_DIR is too long. \nThe limit is 70 characters.");

@@ -46,8 +46,6 @@ public:
   char * stemWord(char * word);
 
 private:
-  /// location of the stemmer data files.
-  char *stemmer_dir;
   /// pointer to selected stemmer function.
   void (*stem_fct)(char *, char *);
 };
