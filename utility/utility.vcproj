@@ -278,9 +278,6 @@
 				RelativePath=".\include\indri\HashTable.hpp">
 			</File>
 			<File
-				RelativePath=".\include\ht.h">
-			</File>
-			<File
 				RelativePath=".\include\IndexTypes.hpp">
 			</File>
 			<File
@@ -293,16 +290,28 @@
 				RelativePath=".\include\ISet.hpp">
 			</File>
 			<File
+				RelativePath=".\include\keyconst.h">
+			</File>
+			<File
 				RelativePath=".\include\keydef.h">
 			</File>
 			<File
 				RelativePath=".\include\keyerr.h">
 			</File>
 			<File
+				RelativePath=".\include\keyfile.h">
+			</File>
+			<File
 				RelativePath=".\include\Keyfile.hpp">
 			</File>
 			<File
+				RelativePath=".\include\keyprint.h">
+			</File>
+			<File
 				RelativePath=".\include\keyref.h">
+			</File>
+			<File
+				RelativePath=".\include\kfversion.h">
 			</File>
 			<File
 				RelativePath=".\include\lemur-compat.hpp">
