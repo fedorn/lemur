@@ -89,6 +89,7 @@ class BasicTokenDoc : public Document {
     
   TokenTerm * nextTerm();
 
+  void skipToEnd();
   friend class BasicDocStream;
  private:
   void readID(); 
@@ -97,6 +98,7 @@ class BasicTokenDoc : public Document {
   char buf2[20000];
   char id[2000];
   ifstream *docStr;
+  streampos startPos; // starting position of the terms in the file
 };
 
 

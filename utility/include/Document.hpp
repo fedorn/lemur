@@ -51,6 +51,9 @@ public:
   /// returns a pointer to next term (static memory, do not delete the returned instance). caller should check hasMore() before calling it
   virtual TokenTerm *nextTerm()=0;
 
+  /// "fast forward" to the end of the document
+  virtual void skipToEnd()=0;
+
   /// return the DocumentProps handle
   virtual DocumentProps *property() {
     return (props);

@@ -19,9 +19,19 @@
 
 void BasicTokenDoc::startTermIteration() 
 {
+  // ensure the start position of the terms
+  docStr->seekg(startPos);
   curWord = buf1;
   // peek one term
   *docStr >> curWord;
+}
+
+void BasicTokenDoc::skipToEnd()
+{
+  startTermIteration();
+  while (hasMore()) {
+    nextTerm();
+  }
 }
 
 TokenTerm * BasicTokenDoc::nextTerm()
@@ -47,6 +57,7 @@ void BasicTokenDoc::readID()
     throw Exception("BasicTokenDoc","ill-formatted doc id, > expected");
   }
   id[len-1]='\0';
+  startPos = docStr->tellg(); // record the start position of terms
 }
 
 
