@@ -206,6 +206,16 @@ DocumentRep *SimpleKLRetMethod::computeDocRep(int docID)
 					 uniqueTermCount,
 					 docParam.ADDelta,
 					 docParam.smthStrategy));
+  case SimpleKLParameter::TWOSTAGE:
+    return (new TwoStageDocModel(docID,
+				 &ind, 
+				 *collectLM,
+				 docProbMass,
+				 docParam.DirPrior, // 1st stage mu
+				 docParam.JMLambda, // 2nd stage lambda
+				 docParam.smthStrategy));
+    
+    
   default:
     cerr << "Unknown document language model smoothing method\n";
     exit(1);
