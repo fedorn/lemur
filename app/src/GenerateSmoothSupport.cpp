@@ -91,7 +91,7 @@ int AppMain(int argc, char *argv[]) {
   ofstream mcOFS;
   mcOFS.open(mcSuppFileName);
 
-  int i;
+  TERMID_T i;
 
 
   double *wdPr = new double[ind->termCountUnique()+1];

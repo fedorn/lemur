@@ -94,7 +94,7 @@ int AppMain(int argc, char * argv[]) {
     }
     // crank through the collection
     double score;
-    for (int i = 1; i <= myIndex->docCount(); i++) {
+    for (DOCID_T i = 1; i <= myIndex->docCount(); i++) {
       if (clusterDB->getDocClusterId(i).size() == 0) {
 	// Hasn't been clustered yet.
 	int myCluster = clusterDB->cluster(i, score);

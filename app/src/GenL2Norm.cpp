@@ -70,7 +70,7 @@ int AppMain(int argc, char *argv[]) {
   }
   // pre-compute IDF values
   double *idfV = new double[dbIndex->termCountUnique()+1];
-  int i;
+  TERMID_T i;
   for (i=1; i<=dbIndex->termCountUnique(); i++) {
     idfV[i] = log((dbIndex->docCount()+1)/(0.5+dbIndex->docCount(i)));
   }
@@ -79,7 +79,8 @@ int AppMain(int argc, char *argv[]) {
     TermInfoList *qList = dbIndex->termInfoList(i);
     TermInfo *qInfo;
     qList->startIteration();
-    int idx, dtf;
+    TERMID_T idx;
+    COUNT_T dtf;
     double norm = 0, tmp;
     while (qList->hasMore()) {
       qInfo = qList->nextEntry();
