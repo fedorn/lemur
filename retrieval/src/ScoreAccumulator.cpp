@@ -9,8 +9,7 @@
  *==========================================================================
 */
 
-#include <iostream>
-#include <stdlib.h>
+#include "common_headers.hpp"
 #include "ScoreAccumulator.hpp"
 
 void ArrayAccumulator::reset()
