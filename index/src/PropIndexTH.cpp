@@ -48,7 +48,7 @@ PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
 PropIndexTH::~PropIndexTH() {
   // end the doc and close the collection
   if (!first) endDoc(); // if we haven't done any yet, don't bother.
-  index->endCollection(NULL);
+  endCollection();
   delete dp;
   delete term;
   delete index;
@@ -58,6 +58,25 @@ void PropIndexTH::endDoc() {
   dp->length(docLength);
   index->endDoc(dp);
   dp->stringID(NULL);
+}
+
+void
+PropIndexTH::endCollection() {
+  // write out properties from chain, excluding this 
+  BasicCollectionProps* props = new BasicCollectionProps();
+  if (!props) {
+    cout << "could not initialize" << endl;
+    return;
+  }
+  
+  TextHandler* temphandler = this->getPrevHandler();
+  while (temphandler) {
+    temphandler->writePropertyList(props);
+    temphandler = temphandler->getPrevHandler();
+  }
+
+  index->endCollection(props);
+  delete (props);
 }
 
 char* PropIndexTH::handleDoc(char* docno) {

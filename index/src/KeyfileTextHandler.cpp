@@ -38,7 +38,7 @@ KeyfileTextHandler::~KeyfileTextHandler() {
   // end the doc and close the collection
   if (!first) {
     endDoc(); // if we haven't done any yet, don't bother.
-    _index->endCollection(NULL);
+    endCollection();
   }
   if( dp )
     delete dp;
@@ -49,6 +49,25 @@ KeyfileTextHandler::endDoc() {
   dp->length(docLength);
   _index->endDoc(dp);
   dp->stringID(NULL);
+}
+
+void
+KeyfileTextHandler::endCollection() {
+  // write out properties from chain, excluding this 
+  BasicCollectionProps* props = new BasicCollectionProps();
+  if (!props) {
+    cout << "could not initialize" << endl;
+    return;
+  }
+  
+  TextHandler* temphandler = this->getPrevHandler();
+  while (temphandler) {
+    temphandler->writePropertyList(props);
+    temphandler = temphandler->getPrevHandler();
+  }
+
+  _index->endCollection(props);
+  delete (props);
 }
 
 char * 

@@ -10,7 +10,7 @@
 */
 
 #include "InvFPTextHandler.hpp"
-
+#include "WebParser.hpp"
 
 
 InvFPTextHandler::InvFPTextHandler(const string &filename, int bufferSize,
@@ -32,7 +32,9 @@ InvFPTextHandler::InvFPTextHandler(const string &filename, int bufferSize,
 InvFPTextHandler::~InvFPTextHandler() {
   // end the doc and close the collection
   if (!first) endDoc(); // if we haven't done any yet, don't bother.
-  index->endCollection(NULL);
+
+  endCollection();
+
   delete dp;
   delete term;
   delete index;
@@ -43,6 +45,25 @@ InvFPTextHandler::endDoc() {
   dp->length(docLength);
   index->endDoc(dp);
   dp->stringID(NULL);
+}
+
+void
+InvFPTextHandler::endCollection() {
+  // write out properties from chain, excluding this 
+  BasicCollectionProps* props = new BasicCollectionProps();
+  if (!props) {
+    cout << "could not initialize" << endl;
+    return;
+  }
+  
+  TextHandler* temphandler = this->getPrevHandler();
+  while (temphandler) {
+    temphandler->writePropertyList(props);
+    temphandler = temphandler->getPrevHandler();
+  }
+
+  index->endCollection(props);
+  delete (props);
 }
 
 char * 
