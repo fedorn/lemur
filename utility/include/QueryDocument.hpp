@@ -24,17 +24,6 @@
 /// TH so it can be chained at the end of stoppers, stemmers, InqueryOpParser,
 /// (etc.) for query processing.
 
-class QueryToken: public TokenTerm {
-public:
-  QueryToken() {}
-  virtual ~QueryToken(){}
-  virtual const char *spelling() const { return str; }
-  friend class QueryDocument;
-  friend class StrStructQuery;
-private:
-  char *str;
-};
-
 class QueryDocument: public Document, public TextHandler {
 public:
   QueryDocument();
@@ -44,7 +33,7 @@ public:
   void skipToEnd() const{iter = tokens.size();}
 
   /// get the next term. do not delete TT returned
-  const TokenTerm* nextTerm() const;
+  const Term* nextTerm() const;
   void addTerm(const char* token);
   char* handleWord(char *word);
   char* handleSymbol(char *sym);
@@ -56,7 +45,7 @@ private:
   char* id;
   vector<char*> tokens;
   mutable int iter;
-  mutable QueryToken tt;
+  mutable Term tt;
 };
 
 #endif
