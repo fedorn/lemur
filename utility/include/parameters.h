@@ -19,6 +19,14 @@
 #include <stdio.h>
 /* #include "util.h" */
 
+#ifdef WIN32
+typedef __int64 INT64;
+#else
+typedef long long INT64;
+#endif
+
+INT64  param_getll(const char *parameter_name, INT64 default_value);
+
 int    param_geti(const char *parameter_name, int default_value);
 
 double param_getf(const char *parameter_name, double default_value);
@@ -71,9 +79,4 @@ void param_display();
 /* display parameter bindings */ 
    
 #endif
-
-
-
-
-
 

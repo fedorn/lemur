@@ -786,6 +786,31 @@ int param_geti(const char *var_name, int dflt){
     else return safe_atol(var_name, lp->ddvalue);
 }
 
+/*******************************************************/
+INT64 param_getll(const char* var_name, INT64 default_value) {
+    ddlink *lp;
+    INT64 result;
+    char* value;
+
+    param_init_par();
+    if ((lp = prefixed_lookup(var_name)) == NULL) {
+      result = default_value;
+    } else {
+      result = 0;
+      value = lp->ddvalue;
+
+      for( value = lp->ddvalue; *value; value++ ) {
+        if( *value < '0' || *value > '9' ) {
+          result = default_value;
+          break;
+        } else {
+          result = (result*10) + (*value - '0');
+        }
+      }
+    }
+
+    return result;
+}
 
 /*******************************************************/
 int param_symvarie(const char *var_name, int *var){

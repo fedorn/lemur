@@ -13,15 +13,12 @@
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include <Null.hpp>
 #include "common_headers.hpp"
-
 #include "String.hpp"
 #include "Param.hpp"
 extern "C" {
 #include "parameters.h"
 }
-#include "Null.hpp"
 
 #define MAXLEN 65536
 
@@ -38,6 +35,11 @@ int ParamGetBit(const String &s, int def)
 int ParamGetInt(const String &s, int def)
   {
     return param_geti(s, def);
+  }
+
+INT64 ParamGetLongLong(const String &s, INT64 def)
+  {
+    return param_getll(s, def);
   }
 
 int ParamGet(const String &s, int &value)
@@ -205,17 +207,13 @@ int    ParamPushFile (const String &s)
 
 String ParamPopFile (void) 
   {
-     String fn;
-     fn = param_pop_file();
-     return fn;
+     char *retval;
+     retval = param_pop_file();
+     if (retval == NULL) retval = "";
+     return String(retval);
   }
 
 void ParamDisplay() {
   param_display();
 }
-
-
-
-
-
 

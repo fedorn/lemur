@@ -18,6 +18,9 @@
 
 #include "String.hpp"
 
+extern "C" {
+  #include "parameters.h"
+}
 //  Get routines:
 /////////////////////////////////////
 String ParamGetString(const String &s, const String &def);
@@ -35,6 +38,7 @@ int    ParamGetInt(const String &s, int def);
 int    ParamGetBit(const String &s, int def);
 double ParamGetDouble(const String &s, double def);
 float  ParamGetFloat(const String &s, float def);
+INT64  ParamGetLongLong(const String &s, INT64 def);
 
 //  Checkpointing:
 /////////////////////////////////////
