@@ -3,6 +3,7 @@
 
 ///  Class for retrieving indexed document collection based on the abstract class Index.hpp
 #include <iostream>
+
 #include <fstream>
 #include <stdlib.h>
 #include <string>
@@ -103,6 +104,8 @@ private:
   bool mainToc(char* fileName);
   /// readin index lookup table
   bool indexLookup();
+  /// readin inverted index filenames map
+  bool invFileIDs();
   /// read in dt index lookup table
   bool dtLookup();
   /// read in dt index filenames map
@@ -120,6 +123,7 @@ private:
   TERM_T* terms;   // array of the term spellings (index is termid)
   EXDOCID_T* docnames; // array of the external docids (index is docid)
   char** dtfiles; // array of dt index filenames
+  char** invfiles; // array of inv index filenames
   map<TERM_T, TERMID_T, ltstr> termtable; // table of terms to termid
   map<EXDOCID_T, DOCID_T, ltstr> doctable; // table of exdocids to docid
 };
