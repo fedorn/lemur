@@ -26,7 +26,7 @@ parameter settings for those models.
 Scoring is either done over a working set of documents (essentially
 re-ranking), or over the whole collection. This is indicated by the
 parameter "useWorkingSet". When "useWorkingSet" has either a non-zero
-(integer) value or the value <tt>false</tt>, scoring will be on a working set
+(integer) value or the value <tt>true</tt>, scoring will be on a working set
 specified in a file given by "workSetFile". The file should have three
 columns. The first is the query id; the second the document id; and the
 last a numerical value, which is ignored. The reason for having a third
@@ -54,7 +54,7 @@ The parameter to select the model is <tt>retModel</tt>. Valid values are:
 <ul> <tt>tfidf</tt> or 0 for TFIDF
 <li> <tt>okapi</tt> or 1 for Okapi
 <li> <tt>kl</tt> or 2 for Simple KL
-<li> <tt>inqueyr</tt> or 3 for INQUERY
+<li> <tt>inquery</tt> or 3 for INQUERY
 <li> <tt>cori_cs</tt> or 4 for CORI_CS
 <li> <tt>cos</tt> or 5 for cosine similarity
 </ul> 

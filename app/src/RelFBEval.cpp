@@ -43,7 +43,7 @@ three-column format of a result file.
 Scoring is either done over a working set of documents (essentially
 re-ranking), or over the whole collection. This is indicated by the
 parameter "useWorkingSet". When "useWorkingSet" has either a non-zero
-(integer) value or the value <tt>false</tt>, scoring will be on a working set
+(integer) value or the value <tt>true</tt>, scoring will be on a working set
 specified in a file given by "workSetFile". The file should have three
 columns. The first is the query id; the second the document id; and the
 last a numerical value, which is ignored. The reason for having a third
