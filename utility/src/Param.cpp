@@ -217,3 +217,6 @@ void ParamDisplay() {
   param_display();
 }
 
+void ParamSet(const String &key, const String &value) {
+  param_set(key, value);
+}

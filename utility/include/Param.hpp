@@ -52,6 +52,8 @@ void   ParamPushPrefix (const String &s);
 void   ParamPopPrefix (void);
 int    ParamPushFile (const String &s);
 String ParamPopFile (void);
+void ParamSet(const String &key, const String &value);
+
 /// Display parameter bindings
 void  ParamDisplay();
 
