@@ -22,7 +22,23 @@ This application (GenerateQueryModel.cpp) computes an expanded query model based
 language modeling approach to retrieval. The original query model can be computed based on the original query text (when the parameter "initQuery" is not set,
 or set to a null string), or based on a previously saved query model (the model
 is given by the parameter "initQuery"). Expanding a saved query model makes
-it possible to do iterative feedback. 
+it possible to do iterative feedback. Feedback can be based on true
+relevance judgments or any previously returned retrieval results. 
+<p>
+Two important notes:
+<ul>
+<li> All the feedback algorithms currently in Lemur assume that all entries in a judgment file are <em> relevant </em> documents, so you must remove all the entries of judged non-relevant documents. However, the judgment status is recorded
+in the internal representation of judgments, so that it is possible to distinguish judged relevant documents from judged non-relevant documents in a feedback
+algorithm. 
+<li> The format of the judgment file, when used for feedback, 
+must be of three columns, i.e., with the second column removed so that
+each line has a query id, a document id, and a judgment value. This is to be
+consistent with the format of a result file. An alternative would be 
+to use the original four-column format directly, but, then we would need
+to add a parameter to distinguish this four-column format from the
+three-column format of a result file. 
+ </uL>
+
 
 <p>
 Parameters:
@@ -38,7 +54,8 @@ parameter is set to a non-empty string, the model stored in this file will be
 used for expansion; otherwise, the original query text is used the initial
 query model for expansion.
 
-<li> <tt>feedbackDocuments</tt>: the file of feedback documents to be used for feedback. In the case of pseudo feedback, this can be a result file generated from an initial retrieval process. In the case of relevance feedback, this is usually a 3-column relevance judgment file. 
+<li> <tt>feedbackDocuments</tt>: the file of feedback documents to be used for feedback. In the case of pseudo feedback, this can be a result file generated from an initial retrieval process. In the case of relevance feedback, this is usually a 3-column relevance judgment file. Note that this means you can <em>NOT</em> use a TREC-style judgment file
+directly; you must remove the second column to convert it to three-column.  
 
 <li> <tt>TRECResultFormat</tt>: whether the feedback document file (given
 by <tt>feedbackDocuments</tt>  is of the TREC format (i.e., six-column) or just

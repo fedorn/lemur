@@ -20,7 +20,25 @@
 <p>
 This application (RelFBEval.cpp) runs retrieval experiments with relevance
 feedback. Different retrieval models can be used with different settings
-for the corresponding parameters.
+for the corresponding parameters. Although this program is designed for
+relevance feedback, it can be easily used for pseudo feedback -- you just
+need to set the parameter <tt> feedbackDocuments</tt> to a result file, i.e., 
+interpreting a result file as if all the entries represent relevant documents.
+<p>
+Two important notes:
+<ul>
+<li> All the feedback algorithms currently in Lemur assume that all entries in a judgment file are <em> relevant </em> documents, so you must remove all the entries of judged non-relevant documents. However, the judgment status is recorded
+in the internal representation of judgments, so that it is possible to distinguish judged relevant documents from judged non-relevant documents in a feedback
+algorithm. 
+<li> The format of the judgment file, when used for feedback, 
+must be of three columns, i.e., with the second column removed so that
+each line has a query id, a document id, and a judgment value. This is to be
+consistent with the format of a result file. An alternative would be 
+to use the original four-column format directly, but, then we would need
+to add a parameter to distinguish this four-column format from the
+three-column format of a result file. 
+ </uL>
+
 <p>
 Scoring is either done over a working set of documents (essentially re-ranking), or over the whole collection. This is indicated by the parameter "useWorkingSet". When "useWorkingSet" has a non-zero (integer) value, scoring will
 be on a working set specified in a file given by "workSetFile". The file
@@ -52,10 +70,11 @@ Other common parameters (for all retrieval methods)  are:
 
 <li> <tt>resultCount</tt>: the number of documents to return as result for each query
 
-<li><tt>judgmentFile </tt>: the file of relevance judgments
+<li><tt>feedbackDocuments </tt>: the file of feedback documents to be used for feedback. In the case of pseudo feedback, this can be a result file generated from an initial retrieval process. In the case of relevance feedback, this is usually a 3-column relevance judgment file. Note that this means you can <em>NOT</em> use a TREC-style judgment file
+directly; you must remove the second column to convert it to three-column.  
 
 <li> <tt>feedbackDocCount</tt>: the number of docs to use for feedback (negative value means using all judged documents for feedback). The documents in 
-the <tt> judgmentFile</tt> are sorted in decreasing order according to the numerical value in the third column, and then the top documents are used for feedback. 
+the <tt> feedbackDocuments</tt> are sorted in decreasing order according to the numerical value in the third column, and then the top documents are used for feedback. 
 
 <li> <tt>feedbackTermCount</tt>: the number of terms to add to a query when doing feedback. Note that
     in the KL-div. approach, the actual number of terms is also affected by two other parameters.(See below.)
@@ -162,13 +181,13 @@ namespace LocalParameter {
   static bool TRECResultFormat;
   bool useWorkingSet;
   String workSetFile;
-  String judgmentFile;
+  String feedbackDocuments;
   void get() {
     mod = (RetModel) ParamGetInt("retModel",KL); // default is KL divergence model
     TRECResultFormat = ParamGetInt("resultFormat",1); // default is TREC format
     useWorkingSet = ParamGetInt("useWorkingSet", 0); //default is to score the whole collection; otherwise, score a subset
     workSetFile = ParamGetString("workingSetFile",""); // working set file name
-    judgmentFile = ParamGetString("judgmentFile",""); // judgments file name
+    feedbackDocuments = ParamGetString("feedbackDocuments",""); // judgments file name
   }
 };
 
@@ -253,7 +272,7 @@ int AppMain(int argc, char *argv[]) {
 
   ifstream *judgmentStr;
   ResultFile *judgments;
-  judgmentStr = new ifstream(LocalParameter::judgmentFile, ios::in);
+  judgmentStr = new ifstream(LocalParameter::feedbackDocuments, ios::in);
   if (judgmentStr->fail()) {
       throw Exception("RelFBEval", "can't open judgment file");
   }
