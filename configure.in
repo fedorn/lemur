@@ -19,4 +19,22 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(strdup strspn strstr strtol)
 
 AC_SUBST(CFLAGS CPPFLAGS CXXFLAGS LDFLAGS LIBS CC CXX)
+
+AC_ARG_WITH(comp-mode,
+[ --with-comp-mode=<mode>
+   Specify a compilation mode:
+   optimize or debug],
+[comp_mode=$withval],
+[comp_mode=debug])
+
+case "$comp_mode" in 
+  optimize)
+	CPPFLAGS=-O
+	CFLAGS=-O ;;
+  debug | *)
+	CFLAGS=-g
+	CPPFLAGS=-g
+	AC_DEFINE(NDEBUG) ;;
+esac
+
 AC_OUTPUT(MakeDefns)
