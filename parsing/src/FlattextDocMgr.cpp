@@ -82,7 +82,8 @@ void FlattextDocMgr::buildMgr() {
     */
     ifstream check(sources[i].c_str());
     check.seekg(0, ios::end);
-    writefpos << check.tellg() - prevpos-one << endl;
+    long p = check.tellg();
+    writefpos << p - prevpos-one << endl;
     check.close();
   }
 

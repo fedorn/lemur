@@ -45,24 +45,25 @@ public:
   }
 
   void clear() {
-    if (maxSize==0) return;
+    if (this->maxSize==0) return;
     close();
-    open(maxSize);
+    open(this->maxSize);
   }
 
   int add(const ObjType& u, const CountType &count=(CountType) 1.0) {
      // add u <count> times to set; return idx of u if new, -1 if old
-    typename PSet<ObjType>::SET_NODE  *sn = PSet<ObjType>::internalAdd(u);
+    typename PSet<ObjType>::SET_NODE  *sn;
+    sn = PSet<ObjType>::internalAdd(u);
     if (sn==0) {
       // already in set, but need to increment count anyway
       int idx = operator[](u);
       countOfIndex[idx] += count;
       return -1;
     }
-    index[sn->idx] = sn;
+    this->index[sn->idx] = sn;
     countOfIndex[sn->idx] = count;
-    if (++currentSize>maxSize) 
-      grow((int) (currentSize*GROW_FACTOR + 1));
+    if (++this->currentSize>this->maxSize) 
+      grow((int) (this->currentSize*GROW_FACTOR + 1));
     return sn->idx;
   }
   
@@ -70,9 +71,9 @@ public:
     // remove u from set completely: returns 1 iff u was in set
     const int idx = ISet<ObjType>::internalRemove(u);
     if (idx==-1) return 0;                 // not a member
-    countOfIndex[idx] = countOfIndex[currentSize-1];
-    countOfIndex[currentSize-1] = 0;
-    currentSize--;
+    countOfIndex[idx] = countOfIndex[this->currentSize-1];
+    countOfIndex[this->currentSize-1] = 0;
+    this->currentSize--;
     return 1;                              // was a member (not anymore)
   }
 
@@ -100,8 +101,8 @@ public:
   
   void grow(const int newSize) {
     ISet<ObjType>::grow(newSize);
-    CountType *newCountOfIndex = new CountType [maxSize+1];
-    memcpy(newCountOfIndex, countOfIndex, currentSize*sizeof(CountType));
+    CountType *newCountOfIndex = new CountType [this->maxSize+1];
+    memcpy(newCountOfIndex, countOfIndex, this->currentSize*sizeof(CountType));
     delete  [] countOfIndex;
     countOfIndex = newCountOfIndex;
   }

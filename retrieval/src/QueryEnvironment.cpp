@@ -566,8 +566,8 @@ std::vector<ScoredExtentResult> QueryEnvironment::_runQuery( InferenceNetwork::M
 
   try {
     rootNode = parser.query();
-  } catch( antlr::ANTLRException exception ) {
-    LEMUR_THROW( LEMUR_PARSE_ERROR, "Couldn't understand this query: " + exception.toString() );
+  } catch( antlr::ANTLRException exc ) {
+    LEMUR_THROW( LEMUR_PARSE_ERROR, "Couldn't understand this query: " + exc.toString() );
   }
   
   PRINT_TIMER( "Parsing complete" );

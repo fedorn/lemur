@@ -35,8 +35,8 @@ public:
 
   void open(const int maxSize_p) {
     PSet<ObjType>::open(maxSize_p);
-    index = new typename PSet<ObjType>::SET_NODE* [maxSize+1];
-    memset(index, 0, (maxSize+1)*sizeof(typename PSet<ObjType>::SET_NODE*));
+    index = new typename PSet<ObjType>::SET_NODE* [this->maxSize+1];
+    memset(index, 0, (this->maxSize+1)*sizeof(typename PSet<ObjType>::SET_NODE*));
   }
   
   void close() {
@@ -46,25 +46,25 @@ public:
   }
 
   void clear() {
-    if (maxSize==0) return;
+    if (this->maxSize==0) return;
     close();
-    open(maxSize);
+    open(this->maxSize);
   }
 
-  int size() const { return currentSize; }
+  int size() const { return this->currentSize; }
 
   int add(const ObjType& u) {
     typename PSet<ObjType>::SET_NODE *sn = PSet<ObjType>::internalAdd(u);
     if (sn==0) return -1;
     index[sn->idx] = sn;
-    if (++currentSize > maxSize) grow((int) (currentSize*GROW_FACTOR+1));
+    if (++this->currentSize > this->maxSize) grow((int) (this->currentSize*GROW_FACTOR+1));
     return sn->idx;
   }
 
   int remove(const ObjType& u) { // remove u from set: returns 1 iff u was in set
     const int idx = internalRemove(u);
     if (idx==-1) return 0;                 // not a member
-    currentSize--;
+    this->currentSize--;
     return 1;                              // was a member (not anymore)
   }
 
@@ -77,24 +77,24 @@ public:
  // NB: When user removes elts. from set, the set is re-indexed, so
  // what is the n'th elt. now may be the n-m'th elt. sometime later
   ObjType& operator[](const int idx) const {   // get n'th elt
-    assert(idx<currentSize);
+    assert(idx<this->currentSize);
     return index[idx]->u; 
   }
   
   int operator[](const ObjType& u) const {    // get idx of u, -1 if not there
     int hashval = computeHash(u);    
-    typename PSet<ObjType>::SET_NODE *p = hashTable[hashval];
+    typename PSet<ObjType>::SET_NODE *p = this->hashTable[hashval];
     while(p!=0 && !(p->u==u)) p=p->next;
     return ((p==0)? -1: p->idx);
   }
   
   void grow(const int newSize) {
-    maxSize = newSize;
-    hashTableSize = smallestPrimeGreaterThan((int) (maxSize*SPARSENESS));
-    typename PSet<ObjType>::SET_NODE **newIndex = new typename PSet<ObjType>::SET_NODE* [maxSize+1];
-    typename PSet<ObjType>::SET_NODE **newHashTable = new typename PSet<ObjType>::SET_NODE* [hashTableSize];
-    memset(newHashTable, 0, hashTableSize*sizeof(typename PSet<ObjType>::SET_NODE *));
-    for (int i=0; i<currentSize; i++) {
+    this->maxSize = newSize;
+    this->hashTableSize = this->smallestPrimeGreaterThan((int) (this->maxSize*SPARSENESS));
+    typename PSet<ObjType>::SET_NODE **newIndex = new typename PSet<ObjType>::SET_NODE* [this->maxSize+1];
+    typename PSet<ObjType>::SET_NODE **newHashTable = new typename PSet<ObjType>::SET_NODE* [this->hashTableSize];
+    memset(newHashTable, 0, this->hashTableSize*sizeof(typename PSet<ObjType>::SET_NODE *));
+    for (int i=0; i<this->currentSize; i++) {
       typename PSet<ObjType>::SET_NODE *sn = index[i];
       const int hashval = computeHash(sn->u);
       typename PSet<ObjType>::SET_NODE *snNew = createNode(sn->u);
@@ -105,9 +105,9 @@ public:
       newIndex[i] = snNew;
     }
     delete [] index;
-    delete [] hashTable;
+    delete [] this->hashTable;
     index = newIndex;
-    hashTable = newHashTable;
+    this->hashTable = newHashTable;
   }
  
 protected:
@@ -117,17 +117,17 @@ protected:
     // (rather than renumbering the entire set starting from idx)
     int idx=PSet<ObjType>::internalRemove(u);
     if (idx==-1) return -1;
-    index[idx] = index[currentSize-1];
+    index[idx] = index[this->currentSize-1];
     index[idx]->idx = idx;
-    index[currentSize-1] = 0;
+    index[this->currentSize-1] = 0;
     return idx;
   }
 
   int internalRemove(const ObjType &u, const int idx) {
     PSet<ObjType>::internalRemove(u);
-    index[idx] = index[currentSize-1];
+    index[idx] = index[this->currentSize-1];
     if (index[idx]->idx != -2) index[idx]->idx=idx;
-    index[currentSize-1] = 0;
+    index[this->currentSize-1] = 0;
     return idx;
    }
 
