@@ -13,12 +13,12 @@
 #ifndef _INVFPINDEXMERGE_HPP
 #define _INVFPINDEXMERGE_HPP
 
-#include "vector.hpp"
-#include "map.hpp"
+#include "common_headers.hpp"
 #include "InvFPDocList.hpp"
 #include "InvFPTypes.hpp"
 
 #define READBUFSIZE 2000000
+#define NUM_FH_OPEN 32
 
 struct IndexReader {
   InvFPDocList* list;
@@ -59,6 +59,8 @@ private:
   void writeInvFIDs();
   /// figure out which readers point to the lowest termids
   void least(vector<IndexReader*>* r, vector<int>* ret);
+  /// setbuffer for ifstream.  trying to keep ugly os specific code out of main code
+  void setbuf(ifstream* fs, char* bp, int bytes);
 
   char* name;
   vector<char*> invfiles; // list of files that we've written to
