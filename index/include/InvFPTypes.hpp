@@ -14,7 +14,7 @@
 #ifndef _INVFPTYPES_H
 #define _INVFPTYPES_H
 
-#define IND_VERSION "3.1.1"
+#define IND_VERSION "3.1.2"
 
 #include "common_headers.hpp"
 #include "IndexTypes.hpp"
