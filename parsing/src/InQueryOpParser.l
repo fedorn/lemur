@@ -47,6 +47,7 @@
 #define WSUM 25
 #define NUMBER 26
 #define QBEGIN 30
+#define QBEGINT 33
 #define QEND 31
 #define PROP 32
 
@@ -92,8 +93,7 @@ num     ([0-9])
 alphanum ({alpha}|{num})
 
 w1      ({alpha}{alphanum}*)
-w2      ({alpha}+(\'{alpha}*)*)
-w3      ({num}+{alpha}{alphanum}*)
+w2      ({num}+{alpha}{alphanum}*)
 
 s       ({num}+\.{alphanum}+(\.{alphanum}+)+)
 a       (({alpha}+\.)+({alpha}+\.?)) 
@@ -101,13 +101,14 @@ b       ({alpha}{alphanum}*(\.{alphanum}+)+)
 h       ({alpha}+\-\n?{alphanum}+)
 ch_char ([\200-\377][\001-\377])
      
-wordobj	({w1}|{w2}|{w3}|{s}|{a}|{b}|{h}|{ch_char}+)
+wordobj	({w1}|{w2}|{s}|{a}|{b}|{h}|{ch_char}+)
 
 es1     (["']?[;:\.\?\!][ \n\t]+)
 es2     ([;:\.\?\!]["']?[ \n\t]+)
 es      ({es1}|{es2})
 eq      [;]
 bq      \#?[Qq][0-9]*[ ]*\=[ ]*
+bqt      \#?[Qq][0-9]*[ ]*\=[ ]*[^\#]
 
 n1      ({num}+(\.{num}+)?)
 n2      ({num}{1,3}(\,{num}{num}{num})+(\.{num}+)?)
@@ -259,8 +260,13 @@ numobj	({n1}|{n2}|{n3})
 			  return QEND;
                         }
 
-{bq}                    { /* end of query token */
+{bq}                    { /* begin query token */
 			  return QBEGIN;
+                        }
+
+{bqt}                    { /* begin text query token */
+                          yyless(yyleng-1);
+			  return QBEGINT;
                         }
 
 {numobj}		{
@@ -634,6 +640,35 @@ void InQueryOpParser::doParse() {
       if (textHandler != NULL) textHandler->foundDoc(qid);
       free(tofree);
       break;
+    }
+
+    case QBEGINT: {
+      // start a new query, its id is treated as a docid
+      // It doesn't start with an operator, so wrap it in a #SUM
+      char * qid=strdup(InQuerytext);
+      char *tofree=qid;
+      int ql = strlen(InQuerytext);
+      state = 1;
+      while(*qid && !isdigit(*qid))
+	qid++;
+      while(ql > 0 && !isdigit(tofree[ql-1]))
+	tofree[--ql]='\0';
+      paren_stack_top=0;
+      if (textHandler != NULL) textHandler->foundDoc(qid);
+      free(tofree);
+      if (textHandler != NULL) textHandler->foundSymbol("#SUM");
+      if (textHandler != NULL) textHandler->foundSymbol("LPAREN");
+      while((tok = InQuerylex())) {
+	if (tok == QEND) {	  
+	  if (textHandler != NULL) textHandler->foundSymbol("RPAREN");
+	  state = 0;
+	  break;
+	} else {
+	  parseQryNode(tok);
+	}
+      }
+    
+    break;
     }
     default:
       parseQryNode(tok);

@@ -46,6 +46,7 @@
 #define WSUM 25
 #define NUMBER 26
 #define QBEGIN 30
+#define QBEGINT 33
 #define QEND 31
 #define PROP 32
 
@@ -107,6 +108,7 @@ es2     ([;:\.\?\!]["']?[ \n\t]+)
 es      ({es1}|{es2})
 eq      [;]
 bq      \#?[Qq][0-9]*[ ]*\=[ ]*
+bqt      \#?[Qq][0-9]*[ ]*\=[ ]*[^\#]
 
 n1      ({num}+(\.{num}+)?)
 n2      ({num}{1,3}(\,{num}{num}{num})+(\.{num}+)?)
@@ -260,6 +262,10 @@ numobj	({n1}|{n2}|{n3})
 
 {bq}                    { /* end of query token */
 			  return QBEGIN;
+                        }
+{bqt}                    { /* begin text query token */
+                          yyless(yyleng-1);
+			  return QBEGINT;
                         }
 
 {numobj}		{
@@ -632,6 +638,34 @@ void InqArabicParser::doParse() {
       if (textHandler != NULL) textHandler->foundDoc(qid);
       free(tofree);
       break;
+    }
+    case QBEGINT: {
+      // start a new query, its id is treated as a docid
+      // It doesn't start with an operator, so wrap it in a #SUM
+      char * qid=strdup(InqArabictext);
+      char *tofree=qid;
+      int ql = strlen(InqArabictext);
+      state = 1;
+      while(*qid && !isdigit(*qid))
+	qid++;
+      while(ql > 0 && !isdigit(tofree[ql-1]))
+	tofree[--ql]='\0';
+      ara_parenstack_top=0;
+      if (textHandler != NULL) textHandler->foundDoc(qid);
+      free(tofree);
+      if (textHandler != NULL) textHandler->foundSymbol("#SUM");
+      if (textHandler != NULL) textHandler->foundSymbol("LPAREN");
+      while((tok = InqArabiclex())) {
+	if (tok == QEND) {	  
+	  if (textHandler != NULL) textHandler->foundSymbol("RPAREN");
+	  state = 0;
+	  break;
+	} else {
+	  parseQryNode(tok);
+	}
+      }
+    
+    break;
     }
     default:
       parseQryNode(tok);
