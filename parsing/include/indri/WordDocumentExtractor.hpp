@@ -18,6 +18,8 @@
 // Code is based in part on the AutoWord class
 // by Poonam Bajaj.
 //
+#ifndef INDRI_WORDDOCUMENTEXTRACTOR_HPP
+#define INDRI_WORDDOCUMENTEXTRACTOR_HPP
 
 #include "lemur-compat.hpp"
 #include "indri/Buffer.hpp"
@@ -26,8 +28,6 @@
 #include <string>
 #include "indri/DocumentIterator.hpp"
 
-#ifndef INDRI_WORDDOCUMENTEXTRACTOR_HPP
-#define INDRI_WORDDOCUMENTEXTRACTOR_HPP
 #ifdef WIN32
 class WordDocumentExtractor : public DocumentIterator {
   void* _internal;
