@@ -83,8 +83,6 @@ double estimateQueryNoise(QueryRep *qrep, Index *ind)
 
   double mu = SimpleKLParameter::docPrm.DirPrior;
 
-  int i;
-
   lambda = 0.5;
 
 
