@@ -17,7 +17,7 @@
 #include "StructQryDocRep.hpp"
 #include <cmath>
 
-InQueryRetMethod::InQueryRetMethod(InvFPIndex &dbIndex, double belief,
+InQueryRetMethod::InQueryRetMethod(Index &dbIndex, double belief,
 				   int fbTerms, double fbCoef, bool cacheIDF):
   StructQueryRetMethod(dbIndex), fbCoeff(fbCoef), fbTermCount(fbTerms), 
   defaultBelief(belief) {

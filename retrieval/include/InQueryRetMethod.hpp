@@ -20,7 +20,7 @@
 /// Representation of a query in the InQuery method
 class InQueryRep : public StructQueryRep {
 public:
-  InQueryRep(StructQuery &qry, InvFPIndex &dbIndex, double db):
+  InQueryRep(StructQuery &qry, Index &dbIndex, double db):
     StructQueryRep(qry, dbIndex, db) {}
   virtual ~InQueryRep() {}
 };
@@ -34,8 +34,8 @@ public:
 class InQueryRetMethod : public StructQueryRetMethod {
 public:
 
-  //  InQueryRetMethod(InvFPIndex &dbIndex, ScoreAccumulator &accumulator);
-  InQueryRetMethod(InvFPIndex &dbIndex, double belief, int fbTerms, 
+  //  InQueryRetMethod(Index &dbIndex, ScoreAccumulator &accumulator);
+  InQueryRetMethod(Index &dbIndex, double belief, int fbTerms, 
 		   double fbCoef, bool cacheIDF);
   virtual ~InQueryRetMethod() {
     delete[](idfV); 
@@ -43,7 +43,7 @@ public:
   }
 
   virtual StructQueryRep *computeStructQueryRep(StructQuery &qry) {
-    return (new InQueryRep(qry, (InvFPIndex &)ind, defaultBelief));
+    return (new InQueryRep(qry, ind, defaultBelief));
   }
 
   virtual DocumentRep *computeDocRep(int docID) { 

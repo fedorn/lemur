@@ -295,7 +295,7 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
   }
 }
 
-StructQueryRep::StructQueryRep(StructQuery &qry, InvFPIndex &dbIndex, 
+StructQueryRep::StructQueryRep(StructQuery &qry, Index &dbIndex, 
 			       double dbelief):
   topqStack(0), dw(dbelief), ind(dbIndex) {
   for (int i = 0; i < 100; i++)
