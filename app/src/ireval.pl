@@ -156,7 +156,7 @@ print STDOUT "Set breakeven precision = ", $setExactPr/$countQuery,"\n";
 
 sub PrintFigure {
     if ($totalRels{$curQ}==0) {
-	print STDERR "Topic $curQ ignored: no judgments found\n";
+#	print STDERR "Topic $curQ ignored: no judgments found\n";
 	return;
     }
     $countQuery ++;

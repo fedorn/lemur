@@ -22,7 +22,7 @@ ArrayQueryRep::ArrayQueryRep(int size, TextQuery &qry, Index &dbIndex):
     if (ti>0) {
       incCount(ti, 1);
     } else {
-      cerr << "Unknown query term :"<< t->spelling() << " [ignored]\n";
+      // cerr << "Unknown query term: "<< t->spelling() << " [ignored]\n";
     }
   }
 }
