@@ -16,28 +16,9 @@
 #define _STRUCTQUERYREP_HPP
 
 #include "RetrievalMethod.hpp"
-#include "Document.hpp"
+#include "TextQuery.hpp"
 #include "Index.hpp"
 #include "QueryNode.hpp"
-
-//------------------------------------------------------------
-//      Abstract Interface for Structured Query 
-//------------------------------------------------------------
-
-/// A structured query is an adaptor of Document
-class StructQuery : public Query {
-public:
-  StructQuery(Document &doc) : d(doc) {}
-  virtual ~StructQuery() {}
-
-  virtual const char *id() const { return d.getID();}
-  virtual void startTermIteration() const { d.startTermIteration();}
-  virtual bool hasMore() const { return d.hasMore();}
-  virtual const Term *nextTerm() const { return d.nextTerm();}
-private:
-  Document &d;
-};
-
 
 /// Structured query representation. Converts the textual representation of
 /// the structured query into a tree structure of QueryNodes. Constructs the
@@ -46,7 +27,7 @@ private:
 class StructQueryRep : public QueryRep {
 public:
   /// Parse the text representation into a structured query rep  
-  StructQueryRep(const StructQuery &qry, const Index &dbIndex, 
+  StructQueryRep(const TermQuery &qry, const Index &dbIndex, 
 		 double dbelief = 0);
 
   virtual ~StructQueryRep() {
@@ -61,15 +42,15 @@ public:
   
 private:
   /// pointer to member function for getting a node.
-  typedef QueryNode *(StructQueryRep::*getFunc)(const StructQuery &, const Term *,
+  typedef QueryNode *(StructQueryRep::*getFunc)(const TermQuery &, const Term *,
 						double);
   /// Parse the text representation of the children of a query node.
-  QnList * getChildren(const StructQuery &qry, getFunc fn, 
+  QnList * getChildren(const TermQuery &qry, getFunc fn, 
 			       bool weigh = false);
   /// Parse the text representation of a weighted query node.  
-  QueryNode * getQryNode(const StructQuery &qry, const Term *tok, double w);
+  QueryNode * getQryNode(const TermQuery &qry, const Term *tok, double w);
   /// Parse the text representation of a proximity query node.  
-  QueryNode * getProxQryNode(const StructQuery &qry, const Term *tok,
+  QueryNode * getProxQryNode(const TermQuery &qry, const Term *tok,
 				     double w = 1.0);
   /// Top node of the query parse tree.
   QueryNode *topNode;
