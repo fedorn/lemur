@@ -1,17 +1,14 @@
- /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  
- * 
- * The Lemur toolkit for language modeling and information retrieval.
- * Copyright (c) 2001 Carnegie Mellon University.  All rights reserved.
+/*==========================================================================
+ * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted for research or educational purposes,
- * provided that this copyright notice is maintained and note is made
- * of any changes to the source code.
- * 
- * This is a research system.  The code is distributed on an "as is" basis,
- * without any warranty, express or implied. 
- * 
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software, and also available at
+ * http://www.cs.cmu.edu/~lemur/license.html
+ *
+ *==========================================================================
+*/
+
 
 #ifndef _DOCUMENTPROPS_HPP
 #define _DOCUMENTPROPS_HPP
