@@ -48,14 +48,14 @@ public:
 
 
 private:
-  void writeTOC();
+  void writeTOC(int numinv);
   void writeDocIDs();
   void writeDTIDs();
   void writeCache();
   void lastWriteCache();
 
   long maxfile; /// the biggest our file size can be
-  MemCache* cache; /// the main memory handler
+  MemCache* cache; /// the main memory handler for building
  // FILE* writetlist; /// filestream for writing the list of located terms for each document
   ofstream writetlist;
   FILE* writetlookup; /// filestream for writing the lookup table to the docterm db
@@ -71,6 +71,9 @@ private:
   char* name;    /// the prefix name
   int namelen;   /// the length of the name (avoid many calls to strlen)
   TABLE_T wordtable; /// table of all terms and their doclists
+
+  int* membuf; /// memory to use for cache and buffers
+  int membufsize;  // how much memory we have
 };
 
 #endif
