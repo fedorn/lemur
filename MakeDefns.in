@@ -1,4 +1,6 @@
 SHELL = @SHELL@
+host_os = @host_os@
+HOST_OS = @HOST_OS@
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -40,18 +42,21 @@ LEMURLIB = lib$(PACKAGE).a
 WITH_DISTRIB = @WITH_DISTRIB@
 WITH_SUMMARIZATION = @WITH_SUMMARIZATION@
 WITH_CLUSTER = @WITH_CLUSTER@
+WITH_SWIG = @WITH_SWIG@
 
-ALLMODULES=cluster summarization distrib retrieval langmod index utility
+ALLMODULES=cluster summarization distrib retrieval langmod index parsing utility contrib/antlr contrib/xpdf 
 
 # C++ source files
 CPPSRC1 = $(notdir $(wildcard ../src/*.cpp))
+CPPSRC2 = $(notdir $(wildcard ../src/*.cc))
+CPPSRC3 = $(notdir $(wildcard ../src/*.C))
 # C source files
 CSRC =  $(notdir $(wildcard ../src/*.c))
 # flex source files
 FSRC =  $(notdir $(wildcard ../src/*.l))
 # Flex objects
 FCPP = $(filter-out $(CPPSRC1), $(FSRC:.l=.cpp))
-CPPSRC = $(CPPSRC1) $(FCPP)
+CPPSRC = $(CPPSRC1) $(CPPSRC3) $(CPPSRC3) $(FCPP)
 .SECONDARY: $($(wildcard ../src/*.l).l=.cpp)
 # C++ header files
 CPPHEADER = $(wildcard ../include/*.hpp)
@@ -59,13 +64,13 @@ CPPHEADER = $(wildcard ../include/*.hpp)
 CHEADER = $(wildcard ../include/*.h)
 # All header files
 ALLHEADER = $(CPPHEADER) $(CHEADER)
-
+INDRIHEADER = $(wildcard ../include/indri/*.h*)
 # Include path
 INCPATH = -I../include $(patsubst %, -I../../%/include, $(MODULES))
 ALLINCPATH = -I../include $(patsubst %, -I../../%/include, $(ALLMODULES))
 
 # C++ objects
-CPPOBJ = $(CPPSRC:.cpp=.o) 
+CPPOBJ = $(CPPSRC:.cpp=.o) $(CPPSRC2:.cc=.o) $(CPPSRC3:.C=.o)
 
 # C objects
 COBJ = $(CSRC:.c=.o)
@@ -76,9 +81,9 @@ OBJ = $(CPPOBJ) $(COBJ)
 # C++ compiler and compiling/linking options
 CFLAGS = @DEFS@ @CFLAGS@ -shared -fPIC
 CXXFLAGS    = @DEFS@ @CXXFLAGS@ -shared -fPIC
-CPPLDFLAGS  = @LDFLAGS@  @LIBS@ -g -lm
+CPPLDFLAGS  = @LDFLAGS@ @LIBS@ -lm
 
-ALLBIN = BuildDocMgr BuildKeyfileIncIndex BuildInvertedIndex BuildPropIndex EstimateDirPrior GenL2Norm GenerateQueryModel GenerateSmoothSupport IncIndexer IncPassageIndexer ParseInQueryOp ParseQuery ParseToFile PassageIndexer QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval TwoStageRetEval RetQueryClarity XlingRetEval PDictManager
+ALLBIN = BuildDocMgr BuildKeyfileIncIndex BuildInvertedIndex BuildPropIndex EstimateDirPrior GenL2Norm GenerateQueryModel GenerateSmoothSupport IncIndexer IncPassageIndexer ParseInQueryOp ParseQuery ParseToFile PassageIndexer QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval TwoStageRetEval RetQueryClarity XlingRetEval PDictManager  dumpDoc dumpTerm BuildIndriIndex IndriDaemon IndriRunQuery 
 
 ifneq ($(WITH_DISTRIB),0)
 ALLBIN += CollSelIndex DistRetEval QryBasedSample
