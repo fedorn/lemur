@@ -44,6 +44,8 @@ public:
   void parsePassageOp(char *op, char *size);
   /// parse synonym operator node
   void parseSynOp(char *op);
+  /// parse property operator node
+  void parsePropOp(char *op);
   /// parse term node
   void parseTermOp(char *op);
   /// parse query node
