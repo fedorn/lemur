@@ -22,32 +22,32 @@
 
 # simple TFIDF retrieval example
 ../app/obj/RetEval simple_tfidf_param
-../app/obj/trec_eval -a qrel res.simple_tfidf > pr.simple_tfidf
+../app/src/ireval.pl -j qrel -trec < res.simple_tfidf  > pr.simple_tfidf
 
 # TFIDF feedback retrieval example
 ../app/obj/RetEval fb_tfidf_param
-../app/obj/trec_eval -a qrel res.fb_tfidf > pr.fb_tfidf
+../app/src/ireval.pl -j qrel -trec < res.fb_tfidf > pr.fb_tfidf
 
 # simple Okapi retrieval example
 ../app/obj/RetEval simple_okapi_param
-../app/obj/trec_eval -a qrel res.simple_okapi > pr.simple_okapi
+../app/src/ireval.pl -j qrel -trec < res.simple_okapi  > pr.simple_okapi
 
 # TFIDF feedback retrieval example
 ../app/obj/RetEval fb_okapi_param
-../app/obj/trec_eval -a qrel res.fb_okapi > pr.fb_okapi
+../app/src/ireval.pl -j qrel -trec < res.fb_okapi > pr.fb_okapi
 
 # simple language model (KL-divergence) retrieval example, using JM smoothing
 ../app/obj/RetEval simple_kl_jm_param
-../app/obj/trec_eval -a qrel res.simple_kl_jm > pr.simple_kl_jm
+../app/src/ireval.pl -j qrel -trec < res.simple_kl_jm  > pr.simple_kl_jm
 
 # simple language model (KL-divergence) retrieval example, using Dirichlet smoothing
 ../app/obj/RetEval simple_kl_dir_param
-../app/obj/trec_eval -a qrel res.simple_kl_dir > pr.simple_kl_dir
+../app/src/ireval.pl -j qrel -trec < res.simple_kl_dir > pr.simple_kl_dir
 
 
 # Language model (KL-divergence) feedback retrieval example, using collection mixture method and Dirichlet smoothing
 ../app/obj/RetEval mixfb_kl_dir_param
-../app/obj/trec_eval -a qrel res.mixfb_kl_dir > pr.mixfb_kl_dir
+../app/src/ireval.pl -j qrel -trec < res.mixfb_kl_dir  > pr.mixfb_kl_dir
 
 ######################################################################
 #								     #
@@ -67,7 +67,7 @@
 
 # Then evaluate it with Dirichlet smoothing
 ../app/obj/QueryModelEval mixfb_model_eval_param
-../app/obj/trec_eval -a qrel res.mixfb_kl > pr.mixfb_kl
+../app/src/ireval.pl -j qrel -trec < qrel res.mixfb_kl > pr.mixfb_kl
 
 
 ######################################################################
@@ -78,16 +78,20 @@
 
 # ==!!! First, we need to convert the TREC format result to
 #       a simple format so that it can be used as a working set
-awk '{print $1, $3, $5;}' < res.simple_tfidf > res_simple_tfidf
+awk '{print $1, $3, $5;}'  < res.simple_tfidf > res_simple_tfidf
 
 # This re-ranks res_simple_tfidf with the tf-idf method  
 ../app/obj/RetEval rerank_tfidf_param
-../app/obj/trec_eval -a qrel res.rerank_simple_tfidf > pr.rerank_simple_tfidf
+../app/src/ireval.pl -j qrel -trec < res.rerank_simple_tfidf > pr.rerank_simple_tfidf
 
 # This re-ranks res_simple_tfidf with KL-div.+ Dirichlet. Note how this improves the precision
 ../app/obj/RetEval rerank_simple_kl_dir_param
-../app/obj/trec_eval -a qrel res.rerank_simple_kl_dir > pr.rerank_simple_kl_dir
+../app/src/ireval.pl -j qrel -trec < res.rerank_simple_kl_dir > pr.rerank_simple_kl_dir
 
 # This re-ranks the res_simple_tfidf with tfidf+Rocchio pseudo feedback
 ../app/obj/RetEval rerank_fb_tfidf_param
-../app/obj/trec_eval -a qrel res.rerank_fb_tfidf > pr.rerank_fb_tfidf
+../app/src/ireval.pl -j qrel -trec  < res.rerank_fb_tfidf > pr.rerank_fb_tfidf
+
+
+
+
