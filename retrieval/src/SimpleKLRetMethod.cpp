@@ -174,6 +174,7 @@ SimpleKLRetMethod::~SimpleKLRetMethod()
 {
   delete [] docProbMass;
   delete [] uniqueTermCount;
+  delete [] mcNorm;
   delete collectLM;
   delete collectLMCounter;
   delete scFunc;
