@@ -1,21 +1,24 @@
 
+
 # these are common definitions that the Makefile in
 # each subdirectory includes
 
+SHELL = /bin/sh
+
 # C++ source files
-CPPSRC = $(shell find ../src -maxdepth 1 -name "*.cpp" -printf "%f ")
+CPPSRC = $(shell cd ../src; ls *.cpp 2> /dev/null)
 
 # C source files
-CSRC = $(shell find ../src -maxdepth 1 -name "*.c" -printf "%f ")
+CSRC =  $(shell cd ../src; ls *.c 2> /dev/null)
 
 
 # C++ header files
 
-CPPHEADER = $(shell find ../include -maxdepth 1 -name "*.hpp" -printf "%f ")
+CPPHEADER = $(shell cd ../include; ls *.hpp 2> /dev/null)
 
 # C header files
 
-CHEADER = $(shell find ../include -maxdepth 1 -name "*.h" -printf "%f ")
+CHEADER = $(shell cd ../include; ls *.h 2> /dev/null)
 
 # All header files
 
