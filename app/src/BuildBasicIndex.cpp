@@ -14,18 +14,24 @@
 /// A BasicIndex builder
 /*! \page BuildBasicIndex BuildBasicIndex Application
 
+
+
 This application (BuildBasicIndex.cpp) builds a BasicIndex. 
 
-To use it, follow the general steps of running a lemur application
-and set the following variables in the parameter file:
 
-(1) inputFile: the path to the source file (e.g., /user/xxx/data/source)
-
-(2) outputPrefix: the path prefix name for your index (e.g.,  /user/xxx/data/index)
-
-(3) maxDocuments: maximum number of documents to index (default: 1000000)
-
-(4) maxMemory: maximum amount of memory to use for indexing (default:0x8000000, or 128MB)
+<P>
+ This application builds a basic index for a collection of documents.
+<P>
+To use it, follow the general steps of running a lemur application and set the following variables in the parameter file:
+<p>
+<ol>
+<li><tt>inputFile</tt>: the  path to the source file.
+<li><tt>outputPrefix</tt>: a prefix name for your index.<br>
+<li><tt>maxDocuments</tt>: maximum number of documents to index (default: 1000000)
+<li><tt> maxMemory</tt>: maximum amount of memory to use for indexing (default:0x8000000, or 128MB)
+</ol>
+<p>
+In general, the <tt>outputPrefix</tt> should be an absolute path, unless you always open the index from the same directory as where the index is. 
 
 A "table-of-content" (TOC) file with a name of the format outputPrefix.bsc will be written
 in the directory where the index is stored. 
@@ -45,6 +51,10 @@ The following is an example of use:
  The TOC file is /usr0/mydata/index.bsc.
  
  </PRE>
+
+
+See also the testing scripts in <tt>test_basic_index.sh</tt> and
+the parameter file <tt>build_param</tt> in the direcotry <tt>data/basicparam</tt>.
 
 
 

@@ -16,27 +16,23 @@
 
  
 
-This application (GenerateSmoothSupport.cpp) generates two support files
+This application (<tt> GenerateSmoothSupport.cpp </tt>) generates two support files
 for retrieval using the language modeling approach. Both files contain
 some pre-computed quantities that are needed to speed up the retrieval process.
-One file has the suffix ".supp" and is needed by 
+One file (name given by the parameter <tt>smoothSupportFile</tt>, see below) is needed by 
 retrieval using smoothed unigram language model based on BasicIndex. 
 Each entry in this support file corresponds to one document and records
 two pieces of information: (a) the count of unique terms in the document;
 (b) the sum of collection language model probabilities for the words in the document.
-The other
-file has the suffix ".supp.mc" and is needed by feedback based on the Markov chain query model. Each line in this file contains a term and a sum of the probability of the word given all documents in the collection. (i.e., a sum of p(w|d) over all possible d's.) 
+The other file (with an extra suffix "<tt>.mc</tt>" is needed if you run feedback based on the Markov chain query model. Each line in this file contains a term and a sum of the probability of the word given all documents in the collection. (i.e., a sum of <tt>p(w|d)</tt> over all possible <tt>d</tt>'s.) 
 
 To run the application, follow the general steps of running a lemur
 application and set the following variables in the parameter file:
 
-(1) index: the table-of-content (TOC) record file of the index (i.e., the .bsc file created by 
-BuildBasicIndex, e.g., /usr0/mydata/index.bsc)
+(1) <tt>index</tt>: the table-of-content (TOC) record file of the index (e.g., the <tt>.bsc</tt> file created by <tt>BuildBasicIndex</tt> or the <tt>.ifp</tt> file created by <tt> PushIndexer</tt>.  )
 
-(2) smoothSupportFile: file path for the support file
-(e.g., /usr0/mydata/index.supp)
-
-
+(2) <tt>smoothSupportFile</tt>: file path for the support file
+(e.g.,<tt> /usr0/mydata/index.supp</tt>)
 
 This application is also a good example of using the doc index (i.e., doc->term index).
 
