@@ -12,7 +12,7 @@ class Term {
 public:
 
   virtual ~Term() {};
-  virtual char* spelling() { throw Exception("Term", "spelling() not supported by subclass");}
+  virtual const char* spelling() { throw Exception("Term", "spelling() not supported by subclass");}
   virtual int count() { throw Exception("Term", "count() not supported by subclass");}
   virtual int id() { throw Exception("Term", "id() not supported by subclass");}
 };
