@@ -23,7 +23,7 @@ InvIndexMerge::InvIndexMerge(long buffersize, long maxfilesize) {
     bufsize = buffersize;
   else {
     bufsize = 0;
-    fprintf(stderr, "InvIndexMerge: Error allocating buffer for IndexMerge\n");
+    throw Exception("InvIndexMerge","Error allocating buffer for IndexMerge\n");
   }
 }
 
@@ -95,6 +95,8 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
 
   int namelen = strlen(name)+1;
   char* indexname = (char*)malloc(namelen+3);
+  if (!indexname) 
+    throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
 
   sprintf(indexname, "%s%d.%d", name, level, intmed->size());
   intmed->push_back(indexname);
@@ -153,6 +155,9 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
     if (filelen + ((first->length()+4) *sizeof(int)) > maxfile) {
       indexfile.close();
       char* newindex = (char*)malloc(namelen+3);
+      if (!newindex) 
+	throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
+
       sprintf(newindex, "%s%d.%d", name, level, intmed->size());
       intmed->push_back(newindex);
       indexfile.open(newindex, ios::binary | ios::out);
@@ -194,6 +199,8 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
     if (filelen + ((myreader->list->length()+4) *sizeof(int)) > maxfile) {
       indexfile.close();
       char* newindex = (char*)malloc(namelen+3);
+      if (! newindex) 
+	throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
       sprintf(newindex, "%s%d.%d", name, level, intmed->size());
       intmed->push_back(newindex);
       indexfile.open(newindex, ios::binary | ios::out);
@@ -211,6 +218,8 @@ int InvIndexMerge::mergeFiles(vector<char*>* files, vector<char*>* intmed, int l
       if (filelen + ((myreader->list->length()+4) *sizeof(int)) > maxfile) {
         indexfile.close();
         char* newindex = (char*)malloc(namelen+3);
+	if (! newindex) 
+	  throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
         sprintf(newindex, "%s%d.%d", name, level, intmed->size());
         intmed->push_back(newindex);
         indexfile.open(newindex, ios::binary | ios::out);
@@ -264,9 +273,13 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
 
   namelen += strlen(INVINDEX);
   char* indexname = (char*)malloc(namelen+1);
+  if (!indexname) 
+    throw Exception("InvIndexMerge", "Error allocating memory for index file.");
   sprintf(indexname, "%s%s%d", name, INVINDEX, 0);
   invfiles.push_back(indexname);
   char* lookup = (char*)malloc(namelen+strlen(INVLOOKUP));
+  if (!lookup) 
+    throw Exception("InvIndexMerge", "Error allocating memory for lookup file.");
   sprintf(lookup, "%s%s", name, INVLOOKUP);
 
   ofstream indexfile;
@@ -306,6 +319,8 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
     if ((filelen + (ll+4) *sizeof(int)) > maxfile) {
       indexfile.close();
       char* newindex = (char*)malloc(namelen+1);
+      if (! newindex) 
+	throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
       sprintf(newindex, "%s%s%d", name, INVINDEX, invfiles.size());
       invfiles.push_back(newindex);
       indexfile.open(newindex, ios::binary | ios::out);
@@ -354,6 +369,8 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
     if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
       indexfile.close();
       char* newindex = (char*)malloc(namelen+1);
+      if (! newindex) 
+	throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
       sprintf(newindex, "%s%s%d", name, INVINDEX, invfiles.size());
       invfiles.push_back(newindex);
       indexfile.open(newindex, ios::binary | ios::out);
@@ -377,6 +394,8 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
       if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
         indexfile.close();
         char* newindex = (char*)malloc(namelen+1);
+	if (! newindex) 
+	  throw Exception("InvIndexMerge", "Error allocating memory for temporary index files.");
         sprintf(newindex, "%s%s%d", name, INVINDEX, invfiles.size());
         invfiles.push_back(newindex);
         indexfile.open(newindex, ios::binary | ios::out);
@@ -416,12 +435,14 @@ int InvIndexMerge::finalMerge(vector<char*>* files) {
 /*=====================PRIVATE METHODS =========================*/
 void InvIndexMerge::writeInvFIDs() {
   char* fidmap = (char*)malloc(strlen(name)+strlen(INVINDEX)+1);
+  if (! fidmap) 
+    throw Exception("InvIndexMerge", "Couldn't create inverted index files to file ids map");
+
   sprintf(fidmap, "%s%s", name, INVINDEX);
   FILE* write = fopen(fidmap, "wb");
-  if (!write) {
-    cerr << "Error: Couldn't create inverted index files to file ids map" << endl;
-    return;
-  }
+  if (!write) 
+    throw Exception("InvIndexMerge", "Couldn't create inverted index files to file ids map");
+
   for (int i=0;i<invfiles.size();i++) {
     fprintf(write, "%d %d %s ", i, strlen(invfiles[i]), invfiles[i]);
   }
