@@ -31,20 +31,25 @@ OneStepMarkovChain::OneStepMarkovChain(WeightedIDSet &docSet, Index &homeIndex, 
     norm[i] = 0;
   }
 
+  // compute normalizer for each word, not an efficient way.
+  // In the future, they should be pre-computed, e.g., in GenerateSmoothSupport.
+
+  for (i=1; i<= ind.docCount(); i++) {
+    TermInfoList *tList = ind.termInfoList(i);
+    tList->startIteration();
+    while (tList->hasMore()) {
+      TermInfo *info = tList->nextEntry();
+      norm[info->id()] += info->count()/(double)ind.docLength(i);
+    }
+    delete tList;
+  }
+
   docSet.startIteration();
   while (docSet.hasMore()) {
     int id;
     double pr;
     docSet.nextIDInfo(id,pr);
     dSet[id] = 1; //indicating presence in the doc set
-    TermInfoList *tList = ind.termInfoList(id);
-    TermInfo *info;
-    tList->startIteration();
-    while (tList->hasMore()) {
-      info = tList->nextEntry();
-      norm[info->id()] += info->count()/(double)ind.docLength(id);
-    }
-    delete tList;
   }
 }
 
@@ -89,6 +94,8 @@ void OneStepMarkovChain::computeFromWordProb(int toWord)
   for (i=1; i<=ind.termCountUnique(); i++) {
     if (norm[i]>0) {
       fromWordPr[i] = (1-alpha)*fromWordPr[i]/norm[i];
+    } else { 
+      fromWordPr[i] = 0;
     }
     if (toWord == i) {
       fromWordPr[i] += alpha;
