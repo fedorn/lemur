@@ -14,7 +14,7 @@
 #pragma mklibrary(Class)
 #endif
 
-#pragma implementation
+//#pragma implementation
 
 #include <MemList.hpp>
 
