@@ -10,8 +10,8 @@
 */
 
 #include "Parser.hpp"
-
 #include "TextHandler.hpp"
+#include "LinkedPropertyList.hpp"
 
 #ifndef _TRECPARSER_HPP
 #define _TRECPARSER_HPP
@@ -53,6 +53,12 @@ private:
   /// The state of the parser.
   int state;
 
+  /// keep a property for being and end of elements
+  Property begelem;
+  Property endelem;
+
+  /// list
+  LinkedPropertyList proplist;
 };
 
 #endif

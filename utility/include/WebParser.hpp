@@ -11,6 +11,7 @@
 
 #include "Parser.hpp"
 #include "TextHandler.hpp"
+#include "LinkedPropertyList.hpp"
 
 #ifndef _WEBPARSER_HPP
 #define _WEBPARSER_HPP
@@ -49,6 +50,12 @@ private:
   /// The state of the parser.
   int state;
 
+  /// keep a property for being and end of elements
+  Property begelem;
+  Property endelem;
+
+  /// list
+  LinkedPropertyList proplist;
 };
 
 #endif
