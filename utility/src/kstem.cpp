@@ -624,7 +624,7 @@ char *add_file(char name[], char directory[], char filename[])
    */
 
   char *stemdir;                         /* the directory where all these files reside */
-void read_dict_info() 
+int read_dict_info() 
 {
   
   FILE *dict_file;                      /* main list of words in dictionary */
@@ -684,13 +684,20 @@ void read_dict_info()
   add_file((char *)pn_file_name,  (char *)stemdir, 
 	   (char *)"proper_nouns.txt");
 
-  if ((num_deps = count_lines(exc_file_name)) < 0) 
+  if ((num_deps = count_lines(exc_file_name)) < 0) {
     fprintf(stderr,"Couldn't open/read file: \"%s\"",exc_file_name);
-  if ((temp_num = count_lines(dc_file_name)) < 0)
+    return -1;
+  }
+  
+  if ((temp_num = count_lines(dc_file_name)) < 0) {
     fprintf(stderr,"Couldn't open/read file: \"%s\"",dc_file_name);
+    return -1;
+  }
   num_deps += temp_num;
-  if ((temp_num = count_lines(cn_file_name)) < 0)
+  if ((temp_num = count_lines(cn_file_name)) < 0) {    
     fprintf(stderr,"Couldn't open/read file: \"%s\"",cn_file_name);
+    return -1;
+  }
   num_deps += temp_num;
 
   dict_ht = get_hashobj(num_deps);    /* HASH_DICT_SIZE */
@@ -702,8 +709,11 @@ void read_dict_info()
   main_deps[default_val].root[0] = '\0';
 
   exception_file = fopen(exc_file_name,  "r");
-  if (!exception_file) 
+  if (!exception_file) {
     fprintf(stderr,"Couldn't open file (%s) of words that are exceptions to stemming.",exc_file_name);
+    return -1;
+  }
+
   
   /* read in a list of words that are exceptions to the stemming rule I use 
      (i.e., if a word can end with an `e', it does).  So, `automating' -> `automate' 
@@ -733,9 +743,11 @@ void read_dict_info()
       the user wishes to over-ride the normal operation of the stemmer */
   
   direct_conflation_file = fopen(dc_file_name, "r");
-  if (!direct_conflation_file) 
+  if (!direct_conflation_file) {    
     fprintf(stderr,"Couldn't open file (%s) of conflation words for the dictionary.",dc_file_name);
-  
+      return -1;
+  }
+
   fscanf(direct_conflation_file, "%s %s", variant, word);
   while (!feof(direct_conflation_file))  {
     lookup_value = ho_lookup(dict_ht, variant);
@@ -757,8 +769,12 @@ void read_dict_info()
      and morphology associated with continents (european/europe).  */
   
   country_nationality_file = fopen(cn_file_name, "r");
-  if (!country_nationality_file)  
+  if (!country_nationality_file) {
+    
     fprintf(stderr,"Couldn't open file (%s) of variants associated with the names of countries.",cn_file_name);
+    return -1;
+  }
+
   
   /* Just as with the previous direct-conflation file, we want to create a direct
      mapping from a variant to a root form.  In this case the mapping is between
@@ -782,9 +798,11 @@ void read_dict_info()
       in the table */
   
   dict_file = fopen(hw_file_name, "r");
-  if (!dict_file) 
+  if (!dict_file) {    
     fprintf(stderr,"Couldn't open dictionary headword file (%s).",hw_file_name);
-  
+      return -1;
+  }
+
   fscanf(dict_file, "%s", word);
   while (!feof(dict_file))  {
     lookup_value = ho_lookup(dict_ht, word);
@@ -803,9 +821,11 @@ void read_dict_info()
   /* now store words that are not found in the main dictionary */
   
   dict_supplement_file = fopen(ds_file_name, "r");
-  if (!dict_supplement_file) 
+  if (!dict_supplement_file) {    
     fprintf(stderr,"Couldn't open file (%s) of supplemental words to the dictionary.",ds_file_name);
-  
+      return -1;
+  }
+
   fscanf(dict_supplement_file, "%s", word);
   while (!feof(dict_supplement_file))  {
     lookup_value = ho_lookup(dict_ht, word);
@@ -826,8 +846,10 @@ void read_dict_info()
   
   
   proper_noun_file = fopen(pn_file_name, "r");
-  if (!proper_noun_file)  
+  if (!proper_noun_file) {
     fprintf(stderr,"Couldn't open file (%s) of proper nouns.\n",pn_file_name);
+    return -1;
+  }
   
   fscanf(proper_noun_file, "%s", word);
   while (!feof(proper_noun_file))  {
@@ -838,8 +860,8 @@ void read_dict_info()
   
   fclose(proper_noun_file);
   
-  
   dict_initialized_flag = TRUE;
+  return 0;
 }
 
 /* getdep(word) returns NULL if word is not found in the dictionary,
