@@ -12,6 +12,8 @@
 Parser::Parser() {
   borrowedacros = NULL;
   myacros = NULL;
+  cat = category;
+  iden = identifier;
 }
 
 Parser::~Parser() {

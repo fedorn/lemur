@@ -25,7 +25,7 @@ extern int porter_stem(char * p, int i, int j);
 
 PorterStemmer::PorterStemmer() : Stemmer() {
   // use the same identifier as we do for the application parameters
-  //  identifier = "porter";
+  iden = identifier;
 }
 
 char * PorterStemmer::stemWord(char * word) {
