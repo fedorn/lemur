@@ -11,12 +11,13 @@
 
 #include "RetMethodManager.hpp"
 
-RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* accum, RetModel def) 
+RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* accum, RetModel type) 
 {
-  static enum RetModel mod = (RetModel) ParamGetInt("retModel", def);
-  RetrievalMethod* model;
+  if (type == UNKNOWN)
+    type = (RetModel) ParamGetInt("retModel", UNKNOWN);
+  RetrievalMethod* model = NULL;
   
-  switch (mod) {
+  switch (type) {
   case TFIDF:
     model = new TFIDFRetMethod(*ind, *accum);
     TFIDFParameter::get();
@@ -53,10 +54,34 @@ RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* ac
     model = new CosSimRetMethod(*ind, CosSimParameter::L2NormFile, *accum);
     ((CosSimRetMethod *)model)->setFeedbackParam(CosSimParameter::fbPrm);
     break;
-  default:
-    throw Exception("RetrievalExp", "unknown retModel parameter");
-    break;
-    
-    }  
+  }  
   return model;
+}
+
+RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* accum, string type) {
+  RetModel mod;
+  if (type.empty()) {
+    // eventually we want to change to string parameter, but now it's still int
+    mod = (RetModel) ParamGetInt("retModel", UNKNOWN);
+    return createModel(ind, accum, mod);
+  }
+
+  // make it all lowercase
+  for (int i=0;i<type.length();i++)
+    type[i] = tolower(type[i]);
+
+  if (type == "tfidf")
+    return createModel(ind, accum, TFIDF);
+  if (type == "okapi")
+    return createModel(ind, accum, OKAPI);
+  if (type == "inquery")
+    return createModel(ind, accum, INQUERY);
+  if (type == "kl")
+    return createModel(ind, accum, KL);
+  if (type == "cori_cs")
+    return createModel(ind, accum, CORI_CS);
+  if (type == "cos")
+    return createModel(ind, accum, COS);
+
+  return NULL;
 }
