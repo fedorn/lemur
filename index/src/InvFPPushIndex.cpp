@@ -19,6 +19,7 @@
  * NAME DATE - COMMENTS
  * tnt 03/2001 - created
  * tnt 07/2001 - adding [OOV] term and docid
+ * tnt 09/2001 - writing more info to disk for load during index open
  *
  *========================================================================*/
 
@@ -152,7 +153,7 @@ void InvFPPushIndex::endDoc(DocumentProps* dp){
       offset = 0;
     }
 
-    fprintf(writetlookup, "%d %d %d ", docid, dtfiles.size()-1, offset);
+    fprintf(writetlookup, "%d %d %d %d ", docid, dtfiles.size()-1, offset, len);
 
     writetlist.write((const char*)&docid, sizeof(DOCID_T));
     writetlist.write((const char*)&len, sizeof(int));
