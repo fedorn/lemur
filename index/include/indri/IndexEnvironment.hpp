@@ -112,6 +112,7 @@ public:
   /// set names of fields to be indexed as data
   /// @param fieldNames the list of fields.
   void setIndexedFields( const std::vector<std::string>& fieldNames );
+  void setNumericField( const std::string& fieldName, bool isNumeric );
   /// set names of fields to be indexed as metadata
   /// @param fieldNames the list of fields.
   void setMetadataIndexedFields( const std::vector<std::string>& fieldNames );

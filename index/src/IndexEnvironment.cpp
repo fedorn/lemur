@@ -110,6 +110,26 @@ void IndexEnvironment::setIndexedFields( const std::vector<std::string>& fieldNa
   }
 }
 
+void IndexEnvironment::setNumericField( const std::string& fieldName, bool isNumeric ) {
+  if( !_parameters.exists( "field" ) )
+    _parameters.set( "field" );
+
+  Parameters fields = _parameters["field"];
+
+  for( int i=0; i<fields.size(); i++ ) {
+    std::string parameterFieldName = fields[i]["name"];
+
+    if( parameterFieldName == fieldName ) {
+      fields[i].set( "numeric", isNumeric );
+      return;
+    }
+  }
+  
+  Parameters field = _parameters.append("field");
+  field.set( "name", fieldName );
+  field.set( "numeric", isNumeric );
+}
+
 void IndexEnvironment::setMetadataIndexedFields( const std::vector<std::string>& fieldNames ) {
   if( !_parameters.exists("collection") )
     _parameters.set("collection", "");
