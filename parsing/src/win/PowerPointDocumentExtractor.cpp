@@ -24,8 +24,8 @@
 
 #include "indri/PowerPointDocumentExtractor.hpp"
 #include "indri/Buffer.hpp"
-#include "lemur/lemur-compat.hpp"
-#include "lemur/Exception.hpp"
+#include "lemur-compat.hpp"
+#include "Exception.hpp"
 
 //
 // PowerPoint.Application:
