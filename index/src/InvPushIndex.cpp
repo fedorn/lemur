@@ -1,14 +1,12 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2002, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
-
 
 #include "InvPushIndex.hpp"
 
@@ -49,6 +47,12 @@ InvPushIndex::~InvPushIndex() {
     delete(cache);
   free(name);
   free(membuf);
+  int i;
+  for (i=1;i<termIDs.size(); i++)
+    free(termIDs[i]);
+  for (i=0;i<tempfiles.size();i++) {
+    delete[](tempfiles[i]);
+  }
 }
 
 void InvPushIndex::setName(char* prefix) {
@@ -162,7 +166,7 @@ void InvPushIndex::endCollection(CollectionProps* cp){
 
   // merge them
   InvIndexMerge* merger = new InvIndexMerge((char*)membuf, membufsize,maxfile);
-  int numinv = merger->merge(&tempfiles, name);
+  int numinv = merger->merge(&tempfiles, name); 
   delete(merger);
 
   //write out the main toc file
@@ -239,20 +243,22 @@ void InvPushIndex::writeDocMgrIDs() {
   FILE* dmid = fopen(dmname, "wb");
   for (int i=0;i<docmgrs.size();i++) {
     fprintf(dmid, "%d %d %s ", i, strlen(docmgrs[i]), docmgrs[i]);
+    free(docmgrs[i]);
   }
   fclose(dmid);
   delete[]dmname;
 }
 
 void InvPushIndex::writeCache() {
+  bool written = false;   // did we actually write anything?
   char* fname = new char[8 + namelen];
   sprintf(fname, "%stemp%d", name, tempfiles.size());
   ofstream fout;
   fout.open(fname, ios::binary | ios::out);
 
-
    if (!fout) {
     fprintf(stderr, "Can't open file for writing. Cache not written.\n");
+    delete[](fname);
     return; 
   }
 
@@ -267,10 +273,10 @@ void InvPushIndex::writeCache() {
     finder = wordtable.find(term);
     if (finder == wordtable.end() ) {
       // this really shouldn't happen. means can't find term in table
-	  // this does happen... stl table might be managing it in a way i don't fully understand.
-	  // despite the code entering here, it all works fine.
+      // this does happen... stl table might be managing it in a way i don't fully understand.
+      // despite the code entering here, it all works fine.
       // tends to enter here with a large data set and a small cache size   
-//      fprintf (stderr, "Weird things are happening.\n");
+      //      fprintf (stderr, "Weird things are happening.\n");
       continue;
     } else {
       list = finder->second;
@@ -280,13 +286,21 @@ void InvPushIndex::writeCache() {
       // write the list out
       list->binWriteC(fout);
       list->reset();
+      written = true; // at least one entry in temp file.
     } // if needs flushing
   } // for each term
   
   fout.close();
+  if (!written) {
+    cerr << "No terms written to " << fname << ". Deleting." << endl;
+    remove(fname);
+    tempfiles.pop_back();
+    delete[](fname);
+  }
 }
 
 void InvPushIndex::lastWriteCache() {
+  bool written = false;   // did we actually write anything?
   char* fname = new char[8 + namelen];
   sprintf(fname, "%stemp%d", name, tempfiles.size());
   ofstream fout;
@@ -294,6 +308,7 @@ void InvPushIndex::lastWriteCache() {
 
   if (!fout) {
     fprintf(stderr, "Can't open file for writing. Cache not written.\n");
+    delete[](fname);
     return; 
   }
   tempfiles.push_back(fname);
@@ -328,11 +343,19 @@ void InvPushIndex::lastWriteCache() {
     if (!list->hasNoMem()) {
       list->binWriteC(fout);
       list->reset();
+      written = true;      
     } // if needs flushing   
   } // for each term
   
 //  fclose(write);
   fout.close();
+  if (!written) {
+    cerr << "Last write: No terms written to " << fname << ". Deleting." << 
+      endl;
+    remove(fname);
+    delete[](fname);
+    tempfiles.pop_back();
+  }
   fclose(tid);
   delete[](tidname);
 }

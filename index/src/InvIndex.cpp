@@ -46,6 +46,10 @@ InvIndex::~InvIndex() {
   if (dtlookup  != NULL)
     delete[](dtlookup);
   if (names != NULL) {
+    // if we opened an old index, the memory for this cell
+    // should not be freed.
+    if (!strcmp(names[VERSION_NUM], ""))
+      names[VERSION_NUM] = NULL;
     for (i = 0; i < NAMES_SIZE; i++) {
       if (names[i] != NULL) {
 	free(names[i]); //	delete[](names[i]); // allocated w strdup
@@ -351,7 +355,7 @@ bool InvIndex::fullToc(const char * fileName) {
   char key[128];
   char val[128];
   while (!feof(in)) {
-    fscanf(in, "%s %s", key, val);
+    if (fscanf(in, "%s %s", key, val) != 2) continue;
     cerr << key << ":" << val << endl;
     if (strcmp(key, NUMDOCS_PAR) == 0) {
       counts[DOCS] = atoi(val);
