@@ -40,3 +40,10 @@ char * KStemmer::stemWord(char * word) {
   }
   return word;
 }
+
+void KStemmer::writePropertyList(PropertyList* list) const {
+  TextHandler::writePropertyList(list);
+  Property p("KstemmerDir");
+  p.setValue(stemdir);
+  list->setProperty(&p);
+}

@@ -21,6 +21,7 @@ extern void freeWordSets();
 
 ArabicStemmer::ArabicStemmer(const string &stemDir, const string &stemmer) {
   arabic_stemdir = new char[stemDir.length() + 1];
+  stemfunc = stemmer;
   strcpy(arabic_stemdir, stemDir.c_str());
   stem_fct = (void (*)(char *, char *)) set_stemmer((char *)stemmer.c_str());
   // use the same identifier as we do for application stemmer parameter
@@ -39,4 +40,14 @@ char * ArabicStemmer::stemWord(char * word) {
     return buffer;
   else
     return NULL;
+}
+
+void ArabicStemmer::writePropertyList(PropertyList* list) const {
+  TextHandler::writePropertyList(list);
+  Property p("arabicStemFunc");
+  p.setValue(stemfunc);
+  list->setProperty(&p);
+  p.setName("arabicStemDir");
+  p.setValue(arabic_stemdir);
+  list->setProperty(&p);
 }

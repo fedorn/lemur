@@ -35,3 +35,11 @@ Stopper::handleWord(char * word) {
   }
   return word;
 }
+
+void
+Stopper::writePropertyList(PropertyList* list) const{
+  TextHandler::writePropertyList(list);
+  Property p("stopwords");
+  p.setValue(lastfile);
+  list->setProperty(&p);
+}

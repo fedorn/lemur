@@ -30,6 +30,8 @@ public:
     
   /// Stem a word using the Krovetz Stemmer.
   char * stemWord(char * word);
+
+  void writePropertyList(PropertyList* list) const;
 };
 
 #endif

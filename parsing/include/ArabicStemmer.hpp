@@ -46,10 +46,11 @@ public:
   ~ArabicStemmer();
   /// Stem a word using an Arabic stemmer.
   char * stemWord(char * word);
-
+  void writePropertyList(PropertyList* list) const;
 private:
   /// pointer to selected stemmer function.
   void (*stem_fct)(char *, char *);
+  string stemfunc;
 };
 
 #endif

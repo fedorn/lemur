@@ -38,8 +38,8 @@ public:
   /// Words not in the stopword list
   /// are passed on as is.
   char *  handleWord(char * word);
-
-
+  
+  void writePropertyList(PropertyList* list) const;
 };
 
 #endif
