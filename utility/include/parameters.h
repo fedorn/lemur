@@ -50,7 +50,7 @@ int param_symvarce(const char *parameter_name, char *returned_value);
   /* Ditto. Note that the second argument is a "pointer to a char *",
      i.e., approximately a pointer to a string. */
 
-void param_set(const char *parameter_name, char *new_value);
+void param_set(const char *parameter_name, const char *new_value);
   /* Changes the value of ddinf parameter <parameter_name>. This can be
      used to communicate with subroutines which expect ddinf
      parameters without having to make sure they exist in the ddinf file.
