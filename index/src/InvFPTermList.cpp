@@ -21,11 +21,14 @@ InvFPTermList::InvFPTermList() {
   listlen = 0;
   uid = -1;
   list = NULL;
+  counts = NULL;
 }
 
 InvFPTermList::~InvFPTermList() {
   if (list != NULL)
     delete[](list);
+  if (counts != NULL)
+    free(counts);
 }
 
 void InvFPTermList::startIteration(){
@@ -41,6 +44,8 @@ TermInfo* InvFPTermList::nextEntry(){
   InvFPTerm* info = new InvFPTerm();
   info->loc = list[index].loc;
   info->tid = list[index].term;
+  if (counts)
+    info->freq = counts[index];
   index++;
   tinfo = info;
   return tinfo;
@@ -76,4 +81,33 @@ bool InvFPTermList::binRead(ifstream& infile){
   return true;
 }
 
+void InvFPTermList::countTerms(){
+  // this is probably not the best way of doing this, but..
+  // this is what happens when you adapt one implementation of something to match
+  // something else that originally had other data structures.
+  map<int, int> table;
+  map<int, int>::iterator place;
+  for (int i=0;i<listlen;i++) {
+    place = table.find(list[i].term);
+    if (place != table.end()) {
+      (place->second)++;      
+    } else {
+      //store to table
+      table[list[i].term]=1;
+    }
+  }
+
+  listlen = table.size();
+  LocatedTerm* listcopy = new LocatedTerm[listlen];
+  counts = (int*) malloc(sizeof(int) * listlen);
+  int ind = 0;
+  for (place = table.begin(); place != table.end(); place++) {
+    listcopy[ind].term = place->first;
+    listcopy[ind].loc = -1;
+    counts[ind] = place->second;
+    ind++;
+  }
+  delete[](list);
+  list = listcopy;
+}
 
