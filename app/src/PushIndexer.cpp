@@ -64,7 +64,7 @@ void usage(int argc, char ** argv) {
   cerr << "Usage:" << endl
        << argv[0] << " paramfile datfile1 datfile2 ... " << endl
        << endl
-       << "PushIndex builds a database using either the TrecParser or " << endl
+       << "PushIndexer builds a database using either the TrecParser or " << endl
        << "WebParser class and InvFPPushIndex.  Summary of parameters:" << endl << endl
        << "\tindex - name of the index (without the .ifp extension)" << endl
        << "\tmemory - memory (in bytes) of InvFPPushIndex (def = 96000000)" << endl
