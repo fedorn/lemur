@@ -240,6 +240,9 @@ void InvFPTermList::countTerms(){
   //already been counted then we don't want to count again.
   if (counts)
     return;
+  // if listlen is 0, nothing to count
+  if (listlen == 0)
+    return;
   map<int, int> table;
   map<int, int>::iterator place;
   int idx = 0;
