@@ -22,7 +22,11 @@
 class Stemmer : public TextHandler {
 
 public:
-  
+  static const string category;
+  static const string identifier;
+
+  Stemmer() { cat=category; iden=identifier;}
+
   virtual char * handleWord(char * word) {
     if (word != NULL) {
       return stemWord(word);

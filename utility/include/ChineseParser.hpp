@@ -24,6 +24,8 @@
 class ChineseParser : public Parser {
 
 public:
+  static const string identifier;
+
   ChineseParser();
 
 

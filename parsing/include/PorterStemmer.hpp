@@ -22,7 +22,10 @@
 class PorterStemmer : public Stemmer {
 
 public:
-  
+  static const string identifier;
+
+  PorterStemmer();
+
   /// Stem a word using the Porter Stemmer.
   char * stemWord(char * word);
 

@@ -25,6 +25,9 @@
 
 class Parser : public TextHandler {
 public:
+  static const string category;
+  static const string identifier;
+
   Parser();
   virtual ~Parser();
 

@@ -284,6 +284,7 @@ numobj	({n1}|{n2}|{n3})
 
 InQueryOpParser::InQueryOpParser() {
   state = 0;
+  iden = identifier;
 }
 
 void InQueryOpParser::finishing_nesting_qnote(int top) {

@@ -20,6 +20,8 @@
 class InQueryOpParser : public Parser {
 
 public:
+  static const string identifier;
+
   InQueryOpParser();
 
   /// Parse a file.

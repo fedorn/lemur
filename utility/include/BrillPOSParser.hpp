@@ -35,6 +35,8 @@
 class BrillPOSParser : public Parser {
 
 public:
+  static const string identifier;
+
   BrillPOSParser();
 
   /// Parse a file.

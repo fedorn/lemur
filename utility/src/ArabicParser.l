@@ -91,6 +91,7 @@ not_arabic_skip [^\r\t\n ~`!@#$%^&*()_\-+=[\]{}|\\:;"'<>,.?/¡÷×º¿]
 
 ArabicParser::ArabicParser() {
   state = OUTER;
+  iden = identifier;
 }
 
 long ArabicParser::fileTell() {

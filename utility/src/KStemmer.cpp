@@ -26,6 +26,7 @@ KStemmer::KStemmer(string &datadir) {
       datadir << " parameter." << endl;
     LEMUR_THROW( LEMUR_IO_ERROR, "Error opening stemmer datafiles");
   }
+  iden=identifier;
 }
 
 KStemmer::~KStemmer() {

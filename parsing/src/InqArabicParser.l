@@ -283,6 +283,7 @@ numobj	({n1}|{n2}|{n3})
 
 InqArabicParser::InqArabicParser() {
   state = 0;
+  iden = identifier;
 }
 
 void InqArabicParser::finishing_nesting_qnote(int top) {

@@ -125,6 +125,7 @@ gb_dateline  [ ]新华社(..){1,5}{gb_ch_date}{2,3}[ ]|[ ]新华社(..){1,5}{gb_ch_dat
 
 ChineseCharParser::ChineseCharParser() {
   state = OUTER;
+  iden = identifier;
 }
 
 long ChineseCharParser::fileTell() {

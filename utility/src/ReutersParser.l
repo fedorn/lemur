@@ -76,6 +76,7 @@ long reuterspos;
 
 ReutersParser::ReutersParser() {
   state = OUTER;
+  iden = identifier;
 }
 
 

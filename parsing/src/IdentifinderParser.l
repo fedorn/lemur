@@ -105,6 +105,7 @@ IdentifinderParser::IdentifinderParser() {
   btag.setValue("\0");
   etag.setName("E_NE");
   etag.setValue("\0");
+  iden = identifier;
 }
 
 long IdentifinderParser::fileTell() {

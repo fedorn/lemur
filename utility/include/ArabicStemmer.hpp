@@ -39,6 +39,8 @@ namespace ArabicStemmerParameter {
 ///  inheritance, the TextHandler interface.
 class ArabicStemmer : public Stemmer {
 public:
+  static const string identifier;
+
   ArabicStemmer(const string &stemDir=ArabicStemmerParameter::defaultStemDir, 
 		const string &stemmer=ArabicStemmerParameter::defaultStemFunc);
   ~ArabicStemmer();

@@ -19,6 +19,8 @@
 class InqArabicParser : public Parser {
 
 public:
+  static const string identifier;
+
   InqArabicParser();
 
   /// Parse a file.

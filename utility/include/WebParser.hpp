@@ -34,6 +34,8 @@
 class WebParser : public Parser {
 
 public:
+  static const string identifier;
+
   WebParser();
 
   /// Parse a file.

@@ -110,6 +110,7 @@ WebParser::WebParser() {
   endelem.setName("E_ELEM");
   begelem.setValue("\0");
   endelem.setValue("\0");
+  iden=identifier;
 }
 
 long WebParser::fileTell() {

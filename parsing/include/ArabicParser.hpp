@@ -23,6 +23,8 @@
 class ArabicParser : public Parser {
 
 public:
+  static const string identifier;
+
   ArabicParser();
 
   /// Parse a file.

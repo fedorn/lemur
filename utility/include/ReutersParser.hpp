@@ -32,6 +32,8 @@
 class ReutersParser : public Parser {
 
 public:
+  static const string identifier;
+
   ReutersParser();
 
   /// Parse a file.

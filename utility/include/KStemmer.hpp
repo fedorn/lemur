@@ -22,6 +22,8 @@
 class KStemmer : public Stemmer {
 
 public:
+  static const string identifier;
+
   KStemmer(string &datadir);
 
   ~KStemmer();  

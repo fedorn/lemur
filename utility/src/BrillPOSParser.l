@@ -92,6 +92,7 @@ BrillPOSParser::BrillPOSParser() {
   poscount = 0;
   wordpos.setName("position");
   tag.setName("POS");
+  iden = identifier;
 }
 
 long BrillPOSParser::fileTell() {

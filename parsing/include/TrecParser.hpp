@@ -32,8 +32,10 @@
 // Source code in trecparser.lex
 
 class TrecParser : public Parser {
-
+  
 public:
+  static const string identifier;
+
   TrecParser();
 
   /// Parse a file.

@@ -22,6 +22,8 @@
 class ChineseCharParser : public Parser {
 
 public:
+  static const string identifier;
+
   ChineseCharParser();
 
   /// Parse a file.

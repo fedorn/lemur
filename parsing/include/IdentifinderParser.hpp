@@ -44,6 +44,8 @@
 class IdentifinderParser : public Parser {
 
 public:
+  static const string identifier;
+
   IdentifinderParser();
 
   /// Parse a file.

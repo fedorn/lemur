@@ -94,6 +94,7 @@ gb_skip {gb_punct}|{gb_space}|{gb_skip_punct}|{gb_decpt}
 
 ChineseParser::ChineseParser() {
   state = OUTER;
+  iden = identifier;
 }
 
 long ChineseParser::fileTell() {
