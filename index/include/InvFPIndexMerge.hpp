@@ -14,19 +14,17 @@
 #define _INVFPINDEXMERGE_HPP
 
 #include "common_headers.hpp"
+#include "InvIndexMerge.hpp"
 #include "InvFPDocList.hpp"
 #include "InvFPTypes.hpp"
 
-#define READBUFSIZE 2000000
-#define NUM_FH_OPEN 32
-
-struct IndexReader {
+struct InvFPIndexReader {
   InvFPDocList* list;
   ifstream* reader;
 };
 
 // this class could actually be static
-class InvFPIndexMerge {
+class InvFPIndexMerge : public InvIndexMerge {
 public:
   /// constructor.  
   /// vector : a list of files to merge
@@ -36,37 +34,17 @@ public:
   InvFPIndexMerge(long buffersize=64000000, long maxfilesize=2100000000);
   ~InvFPIndexMerge();
 
-  /// output of this merge operation and the lookup table for the merged index
-  /// returns the number of index files this merge created
-  int merge(vector<char*>* tf, char* prefix);
-
-  void setMaxFileSize(long size);
-  char* setBuffer(char* buffer, long size);
-
-  /// recursive hierarchical merge
-  /// calls mergeFiles() when intermediate files are necessary
-  /// base case if finalMerge()
-  int hierMerge(vector<char*>* files, int level);
-
   /// merge these files and put the results into the intmed list
-  int mergeFiles(vector<char*>* files, vector<char*>* intmed, int level);
+  virtual int mergeFiles(vector<char*>* files, vector<char*>* intmed, int level);
 
   /// do the final merge and write the lookup table
-  int finalMerge(vector<char*>* files);
+  virtual int finalMerge(vector<char*>* files);
+
 
 private:
-  /// write file ids for indexes created
   void writeInvFIDs();
   /// figure out which readers point to the lowest termids
-  void least(vector<IndexReader*>* r, vector<int>* ret);
-  /// setbuffer for ifstream.  trying to keep ugly os specific code out of main code
-  void setbuf(ifstream* fs, char* bp, int bytes);
-
-  char* name;
-  vector<char*> invfiles; // list of files that we've written to
-  long maxfile; // maximum file size for each index
-  long bufsize;
-  char* readbuffer;
+  void least(vector<InvFPIndexReader*>* r, vector<int>* ret);
 };
 
 #endif

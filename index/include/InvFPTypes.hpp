@@ -14,6 +14,8 @@
 #ifndef _INVFPTYPES_H
 #define _INVFPTYPES_H
 
+#define VERSION "1.9"
+
 #include "common_headers.hpp"
 
 typedef int   FILEID_T;
@@ -25,18 +27,21 @@ typedef char* TERM_T;
 typedef char* EXDOCID_T;
 
 // suffixes for filenames
-#define INVINDEX  ".invfp"
+#define INVINDEX  ".invf"
+#define INVFPINDEX ".invfp"
 #define INVLOOKUP  ".invlookup"
 #define DTINDEX  ".dt"
 #define DTLOOKUP  ".dtlookup"
 #define TERMIDMAP  ".tid"
 #define DOCIDMAP  ".did"
-#define MAINTOC  ".ifp"
+#define MAINTOC  ".inv"
+#define INVFPTOC ".ifp"
 
 // what to call out of vocabulary ids
 #define INVALID_STR "[OOV]"
 
 // name for parameters
+#define VERSION_PAR "VERSION"
 #define NUMDOCS_PAR "NUM_DOCS"
 #define NUMTERMS_PAR "NUM_TERMS"
 #define NUMUTERMS_PAR "NUM_UNIQUE_TERMS"
@@ -53,6 +58,11 @@ typedef char* EXDOCID_T;
 struct LocatedTerm { // pair of term and its location
   TERMID_T term;
   LOC_T loc;
+};
+
+struct LLTerm { // pair of term and list of locations
+  TERMID_T term;
+  vector<LOC_T> loc;
 };
 
 struct dt_entry {   // an entry in the lookup table for docterm lists index

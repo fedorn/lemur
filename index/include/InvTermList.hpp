@@ -9,8 +9,8 @@
  *==========================================================================
 */
 
-#ifndef _INVFPTERMLIST_HPP
-#define _INVFPTERMLIST_HPP
+#ifndef _INVTERMLIST_HPP
+#define _INVTERMLIST_HPP
 
 #include "common_headers.hpp"
 #include "InvFPTerm.hpp"
@@ -24,10 +24,10 @@
 
 */
 
-class InvFPTermList : public TermInfoList {
+class InvTermList : public TermInfoList {
 public:
-  InvFPTermList();
-  ~InvFPTermList();
+  InvTermList();
+  ~InvTermList();
 
   /// prepare iteration
   void startIteration();
@@ -42,28 +42,23 @@ public:
   int docLength(){ return length; }
 
   /// Get the number of terms in this document
-  int termCount() { return listlen; }
+  int termCount() { return listlen/2; }
 
   /// Get the docid this list is for
   int docID() { return uid; }
 
   /// Read in a TermInfoList object from a file
-  /// Assumes the following format: DOCID DOCLENGTH UNIQUE_TERM_COUNT [TERM LOC]..[]
+  /// Assumes the following format: DOCID DOCLENGTH TID TERM_COUNT ..
   bool binRead(ifstream& infile);
-
-  /// Change our default sequence of words representation to be bag of words
-  void countTerms();
 
 private:
 
   DOCID_T uid; // this doc's id
   int length;  // length of this document (terms + stopwords)
-  LocatedTerm* list; // list of terms and locations
-  LLTerm* listcounted; // list of terms and location lists
-  int listlen; // number of items we have in list  (same as number of terms)
-  int index;   // index for iterator
-  int* counts; // keep track of counts of terms for bag of word
-
+  int* list; // beginning of list of terms and counts
+  int* end; // end of list
+  int listlen; // number of terms in list
+  int* iter;   // index for iterator
 };
 
 

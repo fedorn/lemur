@@ -24,28 +24,21 @@
 /*
  * NAME DATE - COMMENTS
  * tnt 03/01 - created
+ * tnt 06/02 - subclass from InvPushIndex
+ *
  ======================================================================*/
 #include "common_headers.hpp"
-#include "PushIndex.hpp"
 #include "MemCache.hpp"
 #include "InvFPTypes.hpp"
 #include "InvFPDocList.hpp"
 #include "InvFPTerm.hpp"
 #include "InvFPIndexMerge.hpp"
+#include "InvPushIndex.hpp"
 
-
-typedef map<char*, InvFPDocList*, ltstr> TABLE_T;
-
-class InvFPPushIndex : public PushIndex {
+class InvFPPushIndex : public InvPushIndex {
 public:
   InvFPPushIndex(char* prefix="DefaultIndex", int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=1);
   ~InvFPPushIndex();
-
-  /// sets the name for this index. the name will be the prefix for all files related to this index
-  void setName(char* prefix);
-
-  /// the beginning of a new document, returns true if initiation was successful
-  bool beginDoc(DocumentProps* dp);
 
   /// adding a term to the current document, returns true if term was added successfully.  
   bool addTerm(Term& t);
@@ -59,31 +52,8 @@ public:
 
 private:
   void writeTOC(int numinv);
-  void writeDocIDs();
-  void writeDTIDs();
-  void writeCache();
-  void lastWriteCache();
 
-  long maxfile; /// the biggest our file size can be
-  MemCache* cache; /// the main memory handler for building
- // FILE* writetlist; /// filestream for writing the list of located terms for each document
-  ofstream writetlist;
-  FILE* writetlookup; /// filestream for writing the lookup table to the docterm db
   vector<LocatedTerm> termlist; /// list of terms and their locations in this document
-  vector<char*> docIDs; /// list of external docids in internal docid order
-  vector<char*> termIDs; /// list of terms in termid order
-  vector<char*> tempfiles; /// list of tempfiles we've written to flush cache
-  vector<char*> dtfiles; /// list of dt index files
-  
-  int tcount;    /// count of total terms
-  int tidcount ; /// count of unique terms
-  int dtidcount; /// count of unique terms in a current doc
-  char* name;    /// the prefix name
-  int namelen;   /// the length of the name (avoid many calls to strlen)
-  TABLE_T wordtable; /// table of all terms and their doclists
-
-  int* membuf; /// memory to use for cache and buffers
-  int membufsize;  // how much memory we have
 };
 
 #endif

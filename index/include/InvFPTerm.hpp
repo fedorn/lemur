@@ -15,12 +15,13 @@
 #include "TermInfoList.hpp"
 #include "InvFPTypes.hpp"
 
-/// term class for InvFPIndex
+/// term class for InvIndex and InvFPIndex
 /*! 
 */
 
 class InvFPTerm: public TermInfo {
 public:
+  friend class InvTermList;
   friend class InvFPTermList;
 
   InvFPTerm() { freq=1;};
@@ -33,16 +34,17 @@ public:
   int count() {return freq; };
   TERMID_T id() { return tid; };
   LOC_T position() { return loc; };
-//  LOC_T* positions() { return loclist; };
+  vector<LOC_T>* positions() { return loclist; };
   void position(LOC_T pos) { loc = pos; };
 
-private:
-  LOC_T loc;  // where this term (currently) occurs in the document
- // LOC_T* loclist; // list of all places term occurs in the document                  
+protected:
+
   TERMID_T tid;
   int strlen;
   TERM_T word; 
-  int freq; // number of times this term occurs in this document
+  int freq; // number of times this term occurs in this documen
+  LOC_T loc;  // where this term (currently) occurs in the document
+  vector<LOC_T>* loclist; // list of all places term occurs in the document                  
 };
 
 #endif

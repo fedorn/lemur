@@ -15,6 +15,7 @@
 
 #include "BasicIndex.hpp"
 #include "InvFPIndex.hpp"
+#include "InvIndex.hpp"
 
 /// A group of index management functions
 class IndexManager {

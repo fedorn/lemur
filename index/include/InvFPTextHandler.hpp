@@ -9,8 +9,8 @@
  *==========================================================================
 */
 #include "TextHandler.hpp"
+#include "InvPushIndex.hpp"
 #include "InvFPPushIndex.hpp"
-
 
 
 #ifndef _INVFPTEXTHANDLER_HPP
@@ -26,7 +26,7 @@ class InvFPTextHandler : public TextHandler {
 public:
   /// Create a InvFPTextHandler with index name filename 
   /// (minus the .ifp extension) and specified buffer size.
-  InvFPTextHandler(char * filename, int bufferSize, bool countStopWds = false);
+  InvFPTextHandler(char * filename, int bufferSize, bool countStopWds = false, int ind = 1);
   ~InvFPTextHandler();
 
   /// Pushes the doc into the InvFPPushIndex.
@@ -41,7 +41,7 @@ private:
 
 
   /// The indexer.
-  InvFPPushIndex * index;
+  PushIndex * index;
   /// Document properties object to be reused over repeated calls.
   DocumentProps * dp;
   /// Term object to be reused over repeated calls.

@@ -10,8 +10,8 @@
 */
 
 
-#ifndef _INVFPDOCINFO_HPP
-#define _INVFPDOCINFO_HPP
+#ifndef _INVDOCINFO_HPP
+#define _INVDOCINFO_HPP
 
 //! Example Class for push method of building an index
 
@@ -24,25 +24,26 @@
 
 /*
  * NAME DATE - COMMENTS
- * tnt 03/2001 - created
- * tnt 06/2002 - subclass from InvDocInfo
+ * tnt 03/2002 - created
  *
  *========================================================================*/
 
-#include "InvDocInfo.hpp"
+#include "DocInfoList.hpp"
 #include "InvFPTypes.hpp"
 
-class InvFPDocInfo: public InvDocInfo {
+class InvDocInfo: public DocInfo {
 public: 
-  friend class InvFPDocList;
+  friend class InvDocList;
 
-  InvFPDocInfo() {};
-  ~InvFPDocInfo() {}; 
+  InvDocInfo() {};
+  ~InvDocInfo() {}; 
   
-  LOC_T* positions() {return pos; };
+  DOCID_T docID() { return id; };
+  int termCount() { return count; };
  
-private:
-  LOC_T* pos;  // list of positions in this doc (size is count)
+protected:
+  DOCID_T id;    // id of this doc
+  int count; // count of this term in this doc
 };
 
 #endif
