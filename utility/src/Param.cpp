@@ -179,9 +179,9 @@ int ParamGet(const String &s, double &value, const double &def)
   }
 
 
-float ParamGetFloat(const String &s, float def)
+float ParamGetFloat(const String &s, float &def)
   {
-    return (float) ParamGet(s, (double) def);
+    return (float) ParamGet(s, (double&) def);
   }
 
 
