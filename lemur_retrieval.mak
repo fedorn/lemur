@@ -38,14 +38,18 @@ ALL : ".\lemur_retrieval.lib"
 
 CLEAN :
 	-@erase "$(INTDIR)\CORIRetMethod.obj"
+	-@erase "$(INTDIR)\CosSimRetMethod.obj"
 	-@erase "$(INTDIR)\FreqVector.obj"
 	-@erase "$(INTDIR)\IndexedReal.obj"
+	-@erase "$(INTDIR)\InQueryRetMethod.obj"
 	-@erase "$(INTDIR)\OkapiRetMethod.obj"
 	-@erase "$(INTDIR)\ResultFile.obj"
 	-@erase "$(INTDIR)\RetMethodManager.obj"
 	-@erase "$(INTDIR)\RetrievalMethod.obj"
 	-@erase "$(INTDIR)\ScoreAccumulator.obj"
 	-@erase "$(INTDIR)\SimpleKLRetMethod.obj"
+	-@erase "$(INTDIR)\StructQueryRep.obj"
+	-@erase "$(INTDIR)\StructQueryRetMethod.obj"
 	-@erase "$(INTDIR)\TextQueryRep.obj"
 	-@erase "$(INTDIR)\TextQueryRetMethod.obj"
 	-@erase "$(INTDIR)\TFIDFRetMethod.obj"
@@ -55,7 +59,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "retrieval\include" /I "langmod\include" /I "index\include" /I "utility\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "retrieval\include" /I "langmod\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_retrieval.bsc" 
 BSC32_SBRS= \
@@ -64,14 +68,18 @@ LIB32=link.exe -lib
 LIB32_FLAGS=/nologo /out:"lemur_retrieval.lib" 
 LIB32_OBJS= \
 	"$(INTDIR)\CORIRetMethod.obj" \
+	"$(INTDIR)\CosSimRetMethod.obj" \
 	"$(INTDIR)\FreqVector.obj" \
 	"$(INTDIR)\IndexedReal.obj" \
+	"$(INTDIR)\InQueryRetMethod.obj" \
 	"$(INTDIR)\OkapiRetMethod.obj" \
 	"$(INTDIR)\ResultFile.obj" \
 	"$(INTDIR)\RetMethodManager.obj" \
 	"$(INTDIR)\RetrievalMethod.obj" \
 	"$(INTDIR)\ScoreAccumulator.obj" \
 	"$(INTDIR)\SimpleKLRetMethod.obj" \
+	"$(INTDIR)\StructQueryRep.obj" \
+	"$(INTDIR)\StructQueryRetMethod.obj" \
 	"$(INTDIR)\TextQueryRep.obj" \
 	"$(INTDIR)\TextQueryRetMethod.obj" \
 	"$(INTDIR)\TFIDFRetMethod.obj"
@@ -91,14 +99,18 @@ ALL : ".\lemur_retrieval.lib"
 
 CLEAN :
 	-@erase "$(INTDIR)\CORIRetMethod.obj"
+	-@erase "$(INTDIR)\CosSimRetMethod.obj"
 	-@erase "$(INTDIR)\FreqVector.obj"
 	-@erase "$(INTDIR)\IndexedReal.obj"
+	-@erase "$(INTDIR)\InQueryRetMethod.obj"
 	-@erase "$(INTDIR)\OkapiRetMethod.obj"
 	-@erase "$(INTDIR)\ResultFile.obj"
 	-@erase "$(INTDIR)\RetMethodManager.obj"
 	-@erase "$(INTDIR)\RetrievalMethod.obj"
 	-@erase "$(INTDIR)\ScoreAccumulator.obj"
 	-@erase "$(INTDIR)\SimpleKLRetMethod.obj"
+	-@erase "$(INTDIR)\StructQueryRep.obj"
+	-@erase "$(INTDIR)\StructQueryRetMethod.obj"
 	-@erase "$(INTDIR)\TextQueryRep.obj"
 	-@erase "$(INTDIR)\TextQueryRetMethod.obj"
 	-@erase "$(INTDIR)\TFIDFRetMethod.obj"
@@ -109,7 +121,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "retrieval\include" /I "langmod\include" /I "index\include" /I "utility\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
+CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /I "retrieval\include" /I "langmod\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_retrieval.bsc" 
 BSC32_SBRS= \
@@ -118,14 +130,18 @@ LIB32=link.exe -lib
 LIB32_FLAGS=/nologo /out:"lemur_retrieval.lib" 
 LIB32_OBJS= \
 	"$(INTDIR)\CORIRetMethod.obj" \
+	"$(INTDIR)\CosSimRetMethod.obj" \
 	"$(INTDIR)\FreqVector.obj" \
 	"$(INTDIR)\IndexedReal.obj" \
+	"$(INTDIR)\InQueryRetMethod.obj" \
 	"$(INTDIR)\OkapiRetMethod.obj" \
 	"$(INTDIR)\ResultFile.obj" \
 	"$(INTDIR)\RetMethodManager.obj" \
 	"$(INTDIR)\RetrievalMethod.obj" \
 	"$(INTDIR)\ScoreAccumulator.obj" \
 	"$(INTDIR)\SimpleKLRetMethod.obj" \
+	"$(INTDIR)\StructQueryRep.obj" \
+	"$(INTDIR)\StructQueryRetMethod.obj" \
 	"$(INTDIR)\TextQueryRep.obj" \
 	"$(INTDIR)\TextQueryRetMethod.obj" \
 	"$(INTDIR)\TFIDFRetMethod.obj"
@@ -184,6 +200,12 @@ SOURCE=.\retrieval\src\CORIRetMethod.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=.\retrieval\src\CosSimRetMethod.cpp
+
+"$(INTDIR)\CosSimRetMethod.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\retrieval\src\FreqVector.cpp
 
 "$(INTDIR)\FreqVector.obj" : $(SOURCE) "$(INTDIR)"
@@ -193,6 +215,12 @@ SOURCE=.\retrieval\src\FreqVector.cpp
 SOURCE=.\retrieval\src\IndexedReal.cpp
 
 "$(INTDIR)\IndexedReal.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\retrieval\src\InQueryRetMethod.cpp
+
+"$(INTDIR)\InQueryRetMethod.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -229,6 +257,18 @@ SOURCE=.\retrieval\src\ScoreAccumulator.cpp
 SOURCE=.\retrieval\src\SimpleKLRetMethod.cpp
 
 "$(INTDIR)\SimpleKLRetMethod.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\retrieval\src\StructQueryRep.cpp
+
+"$(INTDIR)\StructQueryRep.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\retrieval\src\StructQueryRetMethod.cpp
+
+"$(INTDIR)\StructQueryRetMethod.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

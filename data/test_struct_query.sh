@@ -17,7 +17,7 @@ cp structparam/*_param .
 # query format to the basic lemur format  (output file: struct_query) #
 #######################################################################
 
-../app/obj/ParseInQuery parse_struct_query_param query.struct
+../app/obj/ParseInQueryOp parse_struct_query_param query.struct
 
 #######################################################################
 # The following command builds a position index of the CACM database  #

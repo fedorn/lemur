@@ -1,7 +1,7 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on lemur_distrib.dsp
 !IF "$(CFG)" == ""
 CFG=lemur_distrib - Win32 Release
-!MESSAGE No configuration specified. Defaulting to lemur_distrib - Win32 Release
+!MESSAGE No configuration specified. Defaulting to lemur_distrib - Win32 Release.
 !ENDIF 
 
 !IF "$(CFG)" != "lemur_distrib - Win32 Release" && "$(CFG)" != "lemur_distrib - Win32 Debug"
@@ -47,13 +47,14 @@ CLEAN :
 	-@erase "$(INTDIR)\LemurDBManager.obj"
 	-@erase "$(INTDIR)\LemurMemParser.obj"
 	-@erase "$(INTDIR)\QryBasedSampler.obj"
+	-@erase "$(INTDIR)\SingleRegrMergeMethod.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase ".\lemur_distrib.lib"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "distrib\include" /I "retrieval\include" /I "langmod\include" /I "index\include" /I "utility\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_distrib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "retrieval\include" /I "langmod\include" /I "distrib\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_distrib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_distrib.bsc" 
 BSC32_SBRS= \
@@ -62,15 +63,16 @@ LIB32=link.exe -lib
 LIB32_FLAGS=/nologo /out:"lemur_distrib.lib" 
 LIB32_OBJS= \
 	"$(INTDIR)\CORIMergeMethod.obj" \
+	"$(INTDIR)\CtfIndexer.obj" \
 	"$(INTDIR)\DistMergeMethod.obj" \
 	"$(INTDIR)\DistSearchMethod.obj" \
+	"$(INTDIR)\DocFreqIndexer.obj" \
 	"$(INTDIR)\DocScore.obj" \
 	"$(INTDIR)\FreqCounter.obj" \
 	"$(INTDIR)\LemurDBManager.obj" \
 	"$(INTDIR)\LemurMemParser.obj" \
 	"$(INTDIR)\QryBasedSampler.obj" \
-	"$(INTDIR)\DocFreqIndexer.obj" \
-	"$(INTDIR)\CtfIndexer.obj"
+	"$(INTDIR)\SingleRegrMergeMethod.obj"
 
 ".\lemur_distrib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -96,6 +98,7 @@ CLEAN :
 	-@erase "$(INTDIR)\LemurDBManager.obj"
 	-@erase "$(INTDIR)\LemurMemParser.obj"
 	-@erase "$(INTDIR)\QryBasedSampler.obj"
+	-@erase "$(INTDIR)\SingleRegrMergeMethod.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
 	-@erase ".\lemur_distrib.lib"
@@ -103,7 +106,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "distrib\include" /I "retrieval\include" /I "index\include" /I "utility\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_distrib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
+CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /I "retrieval\include" /I "langmod\include" /I "distrib\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_distrib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_distrib.bsc" 
 BSC32_SBRS= \
@@ -112,15 +115,16 @@ LIB32=link.exe -lib
 LIB32_FLAGS=/nologo /out:"lemur_distrib.lib" 
 LIB32_OBJS= \
 	"$(INTDIR)\CORIMergeMethod.obj" \
+	"$(INTDIR)\CtfIndexer.obj" \
 	"$(INTDIR)\DistMergeMethod.obj" \
 	"$(INTDIR)\DistSearchMethod.obj" \
+	"$(INTDIR)\DocFreqIndexer.obj" \
 	"$(INTDIR)\DocScore.obj" \
 	"$(INTDIR)\FreqCounter.obj" \
 	"$(INTDIR)\LemurDBManager.obj" \
 	"$(INTDIR)\LemurMemParser.obj" \
 	"$(INTDIR)\QryBasedSampler.obj" \
-	"$(INTDIR)\DocFreqIndexer.obj" \
-	"$(INTDIR)\CtfIndexer.obj"
+	"$(INTDIR)\SingleRegrMergeMethod.obj"
 
 ".\lemur_distrib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -228,6 +232,13 @@ SOURCE=.\distrib\src\QryBasedSampler.cpp
 
 "$(INTDIR)\QryBasedSampler.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\distrib\src\SingleRegrMergeMethod.cpp
+
+"$(INTDIR)\SingleRegrMergeMethod.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
 
 
 !ENDIF 

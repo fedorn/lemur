@@ -37,11 +37,20 @@ ALL : ".\lemur_utility.lib"
 
 
 CLEAN :
+	-@erase "$(INTDIR)\arabic_stem.obj"
+	-@erase "$(INTDIR)\ArabicParser.obj"
+	-@erase "$(INTDIR)\ArabicStemmer.obj"
 	-@erase "$(INTDIR)\BasicDocStream.obj"
 	-@erase "$(INTDIR)\ByteHash.obj"
+	-@erase "$(INTDIR)\ChineseCharParser.obj"
+	-@erase "$(INTDIR)\ChineseParser.obj"
 	-@erase "$(INTDIR)\error.obj"
 	-@erase "$(INTDIR)\FlattextDocMgr.obj"
 	-@erase "$(INTDIR)\FUtil.obj"
+	-@erase "$(INTDIR)\InqArabicParser.obj"
+	-@erase "$(INTDIR)\InQueryOpParser.obj"
+	-@erase "$(INTDIR)\kstem.obj"
+	-@erase "$(INTDIR)\KStemmer.obj"
 	-@erase "$(INTDIR)\lex_parser.obj"
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\MemCache.obj"
@@ -61,6 +70,7 @@ CLEAN :
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\WebParser.obj"
 	-@erase "$(INTDIR)\WordSet.obj"
+	-@erase "$(INTDIR)\WriterInQueryHandler.obj"
 	-@erase "$(INTDIR)\WriterTextHandler.obj"
 	-@erase ".\lemur_utility.lib"
 
@@ -75,11 +85,20 @@ BSC32_SBRS= \
 LIB32=link.exe -lib
 LIB32_FLAGS=/nologo /out:"lemur_utility.lib" 
 LIB32_OBJS= \
+	"$(INTDIR)\arabic_stem.obj" \
+	"$(INTDIR)\ArabicParser.obj" \
+	"$(INTDIR)\ArabicStemmer.obj" \
 	"$(INTDIR)\BasicDocStream.obj" \
 	"$(INTDIR)\ByteHash.obj" \
+	"$(INTDIR)\ChineseCharParser.obj" \
+	"$(INTDIR)\ChineseParser.obj" \
 	"$(INTDIR)\error.obj" \
 	"$(INTDIR)\FlattextDocMgr.obj" \
 	"$(INTDIR)\FUtil.obj" \
+	"$(INTDIR)\InqArabicParser.obj" \
+	"$(INTDIR)\InQueryOpParser.obj" \
+	"$(INTDIR)\kstem.obj" \
+	"$(INTDIR)\KStemmer.obj" \
 	"$(INTDIR)\lex_parser.obj" \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\MemCache.obj" \
@@ -98,6 +117,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\util.obj" \
 	"$(INTDIR)\WebParser.obj" \
 	"$(INTDIR)\WordSet.obj" \
+	"$(INTDIR)\WriterInQueryHandler.obj" \
 	"$(INTDIR)\WriterTextHandler.obj"
 
 ".\lemur_utility.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
@@ -114,11 +134,20 @@ ALL : ".\lemur_utility.lib"
 
 
 CLEAN :
+	-@erase "$(INTDIR)\arabic_stem.obj"
+	-@erase "$(INTDIR)\ArabicParser.obj"
+	-@erase "$(INTDIR)\ArabicStemmer.obj"
 	-@erase "$(INTDIR)\BasicDocStream.obj"
 	-@erase "$(INTDIR)\ByteHash.obj"
+	-@erase "$(INTDIR)\ChineseCharParser.obj"
+	-@erase "$(INTDIR)\ChineseParser.obj"
 	-@erase "$(INTDIR)\error.obj"
 	-@erase "$(INTDIR)\FlattextDocMgr.obj"
 	-@erase "$(INTDIR)\FUtil.obj"
+	-@erase "$(INTDIR)\InqArabicParser.obj"
+	-@erase "$(INTDIR)\InQueryOpParser.obj"
+	-@erase "$(INTDIR)\kstem.obj"
+	-@erase "$(INTDIR)\KStemmer.obj"
 	-@erase "$(INTDIR)\lex_parser.obj"
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\MemCache.obj"
@@ -139,6 +168,7 @@ CLEAN :
 	-@erase "$(INTDIR)\vc60.pdb"
 	-@erase "$(INTDIR)\WebParser.obj"
 	-@erase "$(INTDIR)\WordSet.obj"
+	-@erase "$(INTDIR)\WriterInQueryHandler.obj"
 	-@erase "$(INTDIR)\WriterTextHandler.obj"
 	-@erase ".\lemur_utility.lib"
 
@@ -153,11 +183,20 @@ BSC32_SBRS= \
 LIB32=link.exe -lib
 LIB32_FLAGS=/nologo /out:"lemur_utility.lib" 
 LIB32_OBJS= \
+	"$(INTDIR)\arabic_stem.obj" \
+	"$(INTDIR)\ArabicParser.obj" \
+	"$(INTDIR)\ArabicStemmer.obj" \
 	"$(INTDIR)\BasicDocStream.obj" \
 	"$(INTDIR)\ByteHash.obj" \
+	"$(INTDIR)\ChineseCharParser.obj" \
+	"$(INTDIR)\ChineseParser.obj" \
 	"$(INTDIR)\error.obj" \
 	"$(INTDIR)\FlattextDocMgr.obj" \
 	"$(INTDIR)\FUtil.obj" \
+	"$(INTDIR)\InqArabicParser.obj" \
+	"$(INTDIR)\InQueryOpParser.obj" \
+	"$(INTDIR)\kstem.obj" \
+	"$(INTDIR)\KStemmer.obj" \
 	"$(INTDIR)\lex_parser.obj" \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\MemCache.obj" \
@@ -176,6 +215,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\util.obj" \
 	"$(INTDIR)\WebParser.obj" \
 	"$(INTDIR)\WordSet.obj" \
+	"$(INTDIR)\WriterInQueryHandler.obj" \
 	"$(INTDIR)\WriterTextHandler.obj"
 
 ".\lemur_utility.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
@@ -226,6 +266,24 @@ LIB32_OBJS= \
 
 
 !IF "$(CFG)" == "lemur_utility - Win32 Release" || "$(CFG)" == "lemur_utility - Win32 Debug"
+SOURCE=.\utility\src\arabic_stem.cpp
+
+"$(INTDIR)\arabic_stem.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\ArabicParser.cpp
+
+"$(INTDIR)\ArabicParser.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\ArabicStemmer.cpp
+
+"$(INTDIR)\ArabicStemmer.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\utility\src\BasicDocStream.cpp
 
 "$(INTDIR)\BasicDocStream.obj" : $(SOURCE) "$(INTDIR)"
@@ -235,6 +293,18 @@ SOURCE=.\utility\src\BasicDocStream.cpp
 SOURCE=.\utility\src\ByteHash.cpp
 
 "$(INTDIR)\ByteHash.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\ChineseCharParser.cpp
+
+"$(INTDIR)\ChineseCharParser.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\ChineseParser.cpp
+
+"$(INTDIR)\ChineseParser.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -253,6 +323,30 @@ SOURCE=.\utility\src\FlattextDocMgr.cpp
 SOURCE=.\utility\src\FUtil.cpp
 
 "$(INTDIR)\FUtil.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\InqArabicParser.cpp
+
+"$(INTDIR)\InqArabicParser.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\InQueryOpParser.cpp
+
+"$(INTDIR)\InQueryOpParser.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\kstem.cpp
+
+"$(INTDIR)\kstem.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\KStemmer.cpp
+
+"$(INTDIR)\KStemmer.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -361,6 +455,12 @@ SOURCE=.\utility\src\WebParser.cpp
 SOURCE=.\utility\src\WordSet.cpp
 
 "$(INTDIR)\WordSet.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\WriterInQueryHandler.cpp
+
+"$(INTDIR)\WriterInQueryHandler.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

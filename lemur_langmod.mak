@@ -39,13 +39,14 @@ ALL : ".\lemur_langmod.lib"
 CLEAN :
 	-@erase "$(INTDIR)\DocUnigramCounter.obj"
 	-@erase "$(INTDIR)\OneStepMarkovChain.obj"
+	-@erase "$(INTDIR)\RelDocUnigramCounter.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase ".\lemur_langmod.lib"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "index\include" /I "utility\include" /I "langmod\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_langmod.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "langmod\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_langmod.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_langmod.bsc" 
 BSC32_SBRS= \
@@ -54,7 +55,8 @@ LIB32=link.exe -lib
 LIB32_FLAGS=/nologo /out:"lemur_langmod.lib" 
 LIB32_OBJS= \
 	"$(INTDIR)\DocUnigramCounter.obj" \
-	"$(INTDIR)\OneStepMarkovChain.obj"
+	"$(INTDIR)\OneStepMarkovChain.obj" \
+	"$(INTDIR)\RelDocUnigramCounter.obj"
 
 ".\lemur_langmod.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -72,6 +74,7 @@ ALL : ".\lemur_langmod.lib"
 CLEAN :
 	-@erase "$(INTDIR)\DocUnigramCounter.obj"
 	-@erase "$(INTDIR)\OneStepMarkovChain.obj"
+	-@erase "$(INTDIR)\RelDocUnigramCounter.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
 	-@erase ".\lemur_langmod.lib"
@@ -79,7 +82,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "index\include" /I "utility\include" /I "langmod\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_langmod.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
+CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /I "langmod\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_langmod.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_langmod.bsc" 
 BSC32_SBRS= \
@@ -88,7 +91,8 @@ LIB32=link.exe -lib
 LIB32_FLAGS=/nologo /out:"lemur_langmod.lib" 
 LIB32_OBJS= \
 	"$(INTDIR)\DocUnigramCounter.obj" \
-	"$(INTDIR)\OneStepMarkovChain.obj"
+	"$(INTDIR)\OneStepMarkovChain.obj" \
+	"$(INTDIR)\RelDocUnigramCounter.obj"
 
 ".\lemur_langmod.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -140,15 +144,75 @@ LIB32_OBJS= \
 !IF "$(CFG)" == "lemur_langmod - Win32 Release" || "$(CFG)" == "lemur_langmod - Win32 Debug"
 SOURCE=.\langmod\src\DocUnigramCounter.cpp
 
-"$(INTDIR)\DocUnigramCounter.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
+!IF  "$(CFG)" == "lemur_langmod - Win32 Release"
 
+CPP_SWITCHES=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "langmod\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_langmod.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+
+"$(INTDIR)\DocUnigramCounter.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) @<<
+  $(CPP_SWITCHES) $(SOURCE)
+<<
+
+
+!ELSEIF  "$(CFG)" == "lemur_langmod - Win32 Debug"
+
+CPP_SWITCHES=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /I "langmod\include" /I "retrieval\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_langmod.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
+
+"$(INTDIR)\DocUnigramCounter.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) @<<
+  $(CPP_SWITCHES) $(SOURCE)
+<<
+
+
+!ENDIF 
 
 SOURCE=.\langmod\src\OneStepMarkovChain.cpp
 
-"$(INTDIR)\OneStepMarkovChain.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
+!IF  "$(CFG)" == "lemur_langmod - Win32 Release"
 
+CPP_SWITCHES=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "langmod\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_langmod.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+
+"$(INTDIR)\OneStepMarkovChain.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) @<<
+  $(CPP_SWITCHES) $(SOURCE)
+<<
+
+
+!ELSEIF  "$(CFG)" == "lemur_langmod - Win32 Debug"
+
+CPP_SWITCHES=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /I "langmod\include" /I "retrieval\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_langmod.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
+
+"$(INTDIR)\OneStepMarkovChain.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) @<<
+  $(CPP_SWITCHES) $(SOURCE)
+<<
+
+
+!ENDIF 
+
+SOURCE=.\langmod\src\RelDocUnigramCounter.cpp
+
+!IF  "$(CFG)" == "lemur_langmod - Win32 Release"
+
+CPP_SWITCHES=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "langmod\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_langmod.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+
+"$(INTDIR)\RelDocUnigramCounter.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) @<<
+  $(CPP_SWITCHES) $(SOURCE)
+<<
+
+
+!ELSEIF  "$(CFG)" == "lemur_langmod - Win32 Debug"
+
+CPP_SWITCHES=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /I "langmod\include" /I "retrieval\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_langmod.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
+
+"$(INTDIR)\RelDocUnigramCounter.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) @<<
+  $(CPP_SWITCHES) $(SOURCE)
+<<
+
+
+!ENDIF 
 
 
 !ENDIF 

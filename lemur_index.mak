@@ -1,6 +1,6 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on lemur_index.dsp
 !IF "$(CFG)" == ""
-CFG=lemur_index - Win32 Release
+CFG=lemur_index - Release
 !MESSAGE No configuration specified. Defaulting to lemur_index - Win32 Release.
 !ENDIF 
 
@@ -40,6 +40,9 @@ CLEAN :
 	-@erase "$(INTDIR)\BasicIndex.obj"
 	-@erase "$(INTDIR)\BasicIndexWithCat.obj"
 	-@erase "$(INTDIR)\GammaCompress.obj"
+	-@erase "$(INTDIR)\IncFPPushIndex.obj"
+	-@erase "$(INTDIR)\IncFPTextHandler.obj"
+	-@erase "$(INTDIR)\IncPassagePushIndex.obj"
 	-@erase "$(INTDIR)\IndexCount.obj"
 	-@erase "$(INTDIR)\IndexManager.obj"
 	-@erase "$(INTDIR)\IndexProb.obj"
@@ -52,6 +55,7 @@ CLEAN :
 	-@erase "$(INTDIR)\InvFPTextHandler.obj"
 	-@erase "$(INTDIR)\InvIndex.obj"
 	-@erase "$(INTDIR)\InvIndexMerge.obj"
+	-@erase "$(INTDIR)\InvPassagePushIndex.obj"
 	-@erase "$(INTDIR)\InvPushIndex.obj"
 	-@erase "$(INTDIR)\InvTermList.obj"
 	-@erase "$(INTDIR)\QueryTextHandler.obj"
@@ -62,7 +66,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "index\include" /I "utility\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_index.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_index.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_index.bsc" 
 BSC32_SBRS= \
@@ -73,6 +77,9 @@ LIB32_OBJS= \
 	"$(INTDIR)\BasicIndex.obj" \
 	"$(INTDIR)\BasicIndexWithCat.obj" \
 	"$(INTDIR)\GammaCompress.obj" \
+	"$(INTDIR)\IncFPPushIndex.obj" \
+	"$(INTDIR)\IncFPTextHandler.obj" \
+	"$(INTDIR)\IncPassagePushIndex.obj" \
 	"$(INTDIR)\IndexCount.obj" \
 	"$(INTDIR)\IndexManager.obj" \
 	"$(INTDIR)\IndexProb.obj" \
@@ -85,6 +92,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\InvFPTextHandler.obj" \
 	"$(INTDIR)\InvIndex.obj" \
 	"$(INTDIR)\InvIndexMerge.obj" \
+	"$(INTDIR)\InvPassagePushIndex.obj" \
 	"$(INTDIR)\InvPushIndex.obj" \
 	"$(INTDIR)\InvTermList.obj" \
 	"$(INTDIR)\QueryTextHandler.obj" \
@@ -107,6 +115,9 @@ CLEAN :
 	-@erase "$(INTDIR)\BasicIndex.obj"
 	-@erase "$(INTDIR)\BasicIndexWithCat.obj"
 	-@erase "$(INTDIR)\GammaCompress.obj"
+	-@erase "$(INTDIR)\IncFPPushIndex.obj"
+	-@erase "$(INTDIR)\IncFPTextHandler.obj"
+	-@erase "$(INTDIR)\IncPassagePushIndex.obj"
 	-@erase "$(INTDIR)\IndexCount.obj"
 	-@erase "$(INTDIR)\IndexManager.obj"
 	-@erase "$(INTDIR)\IndexProb.obj"
@@ -119,6 +130,7 @@ CLEAN :
 	-@erase "$(INTDIR)\InvFPTextHandler.obj"
 	-@erase "$(INTDIR)\InvIndex.obj"
 	-@erase "$(INTDIR)\InvIndexMerge.obj"
+	-@erase "$(INTDIR)\InvPassagePushIndex.obj"
 	-@erase "$(INTDIR)\InvPushIndex.obj"
 	-@erase "$(INTDIR)\InvTermList.obj"
 	-@erase "$(INTDIR)\QueryTextHandler.obj"
@@ -130,7 +142,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "index\include" /I "utility\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_index.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
+CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_index.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_index.bsc" 
 BSC32_SBRS= \
@@ -141,6 +153,9 @@ LIB32_OBJS= \
 	"$(INTDIR)\BasicIndex.obj" \
 	"$(INTDIR)\BasicIndexWithCat.obj" \
 	"$(INTDIR)\GammaCompress.obj" \
+	"$(INTDIR)\IncFPPushIndex.obj" \
+	"$(INTDIR)\IncFPTextHandler.obj" \
+	"$(INTDIR)\IncPassagePushIndex.obj" \
 	"$(INTDIR)\IndexCount.obj" \
 	"$(INTDIR)\IndexManager.obj" \
 	"$(INTDIR)\IndexProb.obj" \
@@ -153,6 +168,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\InvFPTextHandler.obj" \
 	"$(INTDIR)\InvIndex.obj" \
 	"$(INTDIR)\InvIndexMerge.obj" \
+	"$(INTDIR)\InvPassagePushIndex.obj" \
 	"$(INTDIR)\InvPushIndex.obj" \
 	"$(INTDIR)\InvTermList.obj" \
 	"$(INTDIR)\QueryTextHandler.obj" \
@@ -221,6 +237,24 @@ SOURCE=.\index\src\BasicIndexWithCat.cpp
 SOURCE=.\index\src\GammaCompress.cpp
 
 "$(INTDIR)\GammaCompress.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\IncFPPushIndex.cpp
+
+"$(INTDIR)\IncFPPushIndex.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\IncFPTextHandler.cpp
+
+"$(INTDIR)\IncFPTextHandler.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\IncPassagePushIndex.cpp
+
+"$(INTDIR)\IncPassagePushIndex.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -293,6 +327,12 @@ SOURCE=.\index\src\InvIndex.cpp
 SOURCE=.\index\src\InvIndexMerge.cpp
 
 "$(INTDIR)\InvIndexMerge.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\InvPassagePushIndex.cpp
+
+"$(INTDIR)\InvPassagePushIndex.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
