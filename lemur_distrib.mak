@@ -1,7 +1,7 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on lemur_distrib.dsp
 !IF "$(CFG)" == ""
 CFG=lemur_distrib - Win32 Release
-!MESSAGE No configuration specified. Defaulting to lemur_distrib - Win32 Release.
+!MESSAGE No configuration specified. Defaulting to lemur_distrib - Win32 Release
 !ENDIF 
 
 !IF "$(CFG)" != "lemur_distrib - Win32 Release" && "$(CFG)" != "lemur_distrib - Win32 Debug"
@@ -38,8 +38,10 @@ ALL : ".\lemur_distrib.lib"
 
 CLEAN :
 	-@erase "$(INTDIR)\CORIMergeMethod.obj"
+	-@erase "$(INTDIR)\CtfIndexer.obj"
 	-@erase "$(INTDIR)\DistMergeMethod.obj"
 	-@erase "$(INTDIR)\DistSearchMethod.obj"
+	-@erase "$(INTDIR)\DocFreqIndexer.obj"
 	-@erase "$(INTDIR)\DocScore.obj"
 	-@erase "$(INTDIR)\FreqCounter.obj"
 	-@erase "$(INTDIR)\LemurDBManager.obj"
@@ -74,7 +76,9 @@ LIB32_OBJS= \
 	"$(INTDIR)\QryBasedSampler.obj" \
 	"$(INTDIR)\soapC.obj" \
 	"$(INTDIR)\soapClient.obj" \
-	"$(INTDIR)\stdsoap2.obj"
+	"$(INTDIR)\stdsoap2.obj" \
+	"$(INTDIR)\DocFreqIndexer.obj" \
+	"$(INTDIR)\CtfIndexer.obj"
 
 ".\lemur_distrib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -91,8 +95,10 @@ ALL : ".\lemur_distrib.lib"
 
 CLEAN :
 	-@erase "$(INTDIR)\CORIMergeMethod.obj"
+	-@erase "$(INTDIR)\CtfIndexer.obj"
 	-@erase "$(INTDIR)\DistMergeMethod.obj"
 	-@erase "$(INTDIR)\DistSearchMethod.obj"
+	-@erase "$(INTDIR)\DocFreqIndexer.obj"
 	-@erase "$(INTDIR)\DocScore.obj"
 	-@erase "$(INTDIR)\FreqCounter.obj"
 	-@erase "$(INTDIR)\LemurDBManager.obj"
@@ -128,7 +134,9 @@ LIB32_OBJS= \
 	"$(INTDIR)\QryBasedSampler.obj" \
 	"$(INTDIR)\soapC.obj" \
 	"$(INTDIR)\soapClient.obj" \
-	"$(INTDIR)\stdsoap2.obj"
+	"$(INTDIR)\stdsoap2.obj" \
+	"$(INTDIR)\DocFreqIndexer.obj" \
+	"$(INTDIR)\CtfIndexer.obj"
 
 ".\lemur_distrib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -184,6 +192,12 @@ SOURCE=.\distrib\src\CORIMergeMethod.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=.\distrib\src\CtfIndexer.cpp
+
+"$(INTDIR)\CtfIndexer.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\distrib\src\DistMergeMethod.cpp
 
 "$(INTDIR)\DistMergeMethod.obj" : $(SOURCE) "$(INTDIR)"
@@ -193,6 +207,12 @@ SOURCE=.\distrib\src\DistMergeMethod.cpp
 SOURCE=.\distrib\src\DistSearchMethod.cpp
 
 "$(INTDIR)\DistSearchMethod.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\distrib\src\DocFreqIndexer.cpp
+
+"$(INTDIR)\DocFreqIndexer.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
