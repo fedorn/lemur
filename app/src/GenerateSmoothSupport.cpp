@@ -42,6 +42,7 @@ This application is also a good example of using the doc index (i.e., doc->term 
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "IndexManager.hpp"
 #include "BasicIndex.hpp"
 #include "IndexCount.hpp"
 #include "Param.hpp"
@@ -66,10 +67,11 @@ void GetAppParam()
 
 int AppMain(int argc, char *argv[]) {
 
-  BasicIndex lemur;
+
   ofstream ofs;
 
-  lemur.open(LocalParameter::index);
+  Index * ind = IndexManager::openIndex(LocalParameter::index);
+
 
   ofs.open(LocalParameter::smoothSupportFile);
 
@@ -84,30 +86,30 @@ int AppMain(int argc, char *argv[]) {
   int i;
 
 
-  double *wdPr = new double[lemur.termCountUnique()+1];
-  for (i=1; i<=lemur.termCountUnique();i++)
+  double *wdPr = new double[ind->termCountUnique()+1];
+  for (i=1; i<=ind->termCountUnique();i++)
     wdPr[i]=0;
 
   double prSum=0;
-  for (i=1; i<= lemur.docCount(); i++) {
+  for (i=1; i<= ind->docCount(); i++) {
     prSum =  0;
-    TermInfoList *tList = lemur.termInfoList(i);
+    TermInfoList *tList = ind->termInfoList(i);
     tList->startIteration();
     int size=0;
     while (tList->hasMore()) {
       TermInfo *info = tList->nextEntry();
 
-      wdPr[info->id()] += info->count()/(double)lemur.docLength(i);
+      wdPr[info->id()] += info->count()/(double)ind->docLength(i);
       // compute Markov chain support
 
-      prSum += (lemur.termCount(info->id())+1)/
-      (double)(lemur.termCount()+lemur.termCountUnique());
+      prSum += (ind->termCount(info->id())+1)/
+      (double)(ind->termCount()+ind->termCountUnique());
       size++;
     }
     ofs << i << " " << size << " "<< prSum << endl;
   }
 
-  for (i=1;i<=lemur.termCountUnique();i++) 
+  for (i=1;i<=ind->termCountUnique();i++) 
     mcOFS << i << " " << wdPr[i] << endl;
   mcOFS.close();
 
