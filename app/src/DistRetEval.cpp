@@ -81,7 +81,7 @@ int AppMain(int argc, char *argv[]) {
   IndexedRealVector rankings(doccount);
   CORIRetMethod model(*csindex, accum, CORIParameter::collectionCounts);
   DistSearchMethod search(csindex);
-  DocScoreVector** scoreset = new (DocScoreVector*)[LocalParameter::cutoff];
+  DocScoreVector** scoreset = new DocScoreVector*[LocalParameter::cutoff];
   CORIMergeMethod merger;
   DocScoreVector results;
 
@@ -116,10 +116,13 @@ int AppMain(int argc, char *argv[]) {
     // now merge the scores
     merger.mergeScoreSet(rankings, scoreset, results);
 
-    for (int i=0;i<RetrievalParameter::resultCount && i<results.size();i++) 
+    for (i=0;i<RetrievalParameter::resultCount && i<results.size();i++) 
       resfile << q->id() << " Q0 " << results[i].id << " 0 " << results[i].val << " Exp" << endl;
 
     rankings.clear();
+    results.clear();
+    for (i=0;i<LocalParameter::cutoff;i++) 
+	delete (scoreset[i]);
     delete q;
     delete qr;
   }
@@ -128,4 +131,7 @@ int AppMain(int argc, char *argv[]) {
     writeranks.close();
   delete csindex;
   delete qryStream;
+  delete[]scoreset;
+
+  return 0;
 }
