@@ -53,6 +53,37 @@ InvFPIndex::~InvFPIndex() {
 bool InvFPIndex::open(const char* indexName){
   counts = new int[5];
   names = new char*[6];  
+
+  if (!fullToc(indexName)) {
+    cerr << "Couldn't not properly parse param file. Index was not loaded." << endl;
+    return false;
+  }
+
+  if (!indexLookup())
+    return false;
+
+  if (!dtLookup())
+    return false;
+
+  if (!dtFileIDs())
+    return false;
+
+  if (!invFileIDs())
+    return false;
+
+  if (!termIDs())
+    return false;
+
+  if (!docIDs())
+    return false;
+
+  cerr << "Load index complete." << endl;
+  return true;
+}
+
+bool InvFPIndex::openName(char* indexName){
+  counts = new int[5];
+  names = new char*[6];  
   int nameLen = strlen(indexName)+1;
 
   char * tocName = new char[nameLen + strlen(MAINTOC) + 1];
@@ -109,10 +140,6 @@ bool InvFPIndex::open(const char* indexName){
 
   cerr << "Load index complete." << endl;
   return true;
-}
-
-bool InvFPIndex::openFile(char* indexName){
-  return false;
 }
 
 int InvFPIndex::term(const char* word){
@@ -325,6 +352,49 @@ TermInfoList* InvFPIndex::termInfoList(int docID){
 /*=======================================================================
  * PRIVATE METHODS 
  =======================================================================*/
+bool InvFPIndex::fullToc(const char * fileName) {
+  FILE* in = fopen(fileName, "rb");
+  cerr << "Trying to open toc: " << fileName << endl;
+  if (in == NULL) {
+    cerr << "Couldn't open toc file for reading" << endl;
+    return false;
+  }
+
+  char key[128];
+  char val[128];
+  while (!feof(in)) {
+    fscanf(in, "%s %s", key, val);
+    cerr << key << ":" << val << endl;
+    if (strcmp(key, NUMDOCS_PAR) == 0) {
+      counts[DOCS] = atoi(val);
+    } else if (strcmp(key, NUMTERMS_PAR) == 0) {
+      counts[TOTAL_TERMS] = atoi(val);
+    } else if (strcmp(key, NUMUTERMS_PAR) == 0) {
+      counts[UNIQUE_TERMS] = atoi(val);
+    } else if (strcmp(key, NUMDT_PAR) == 0) {
+      counts[DT_FILES] = atoi(val);
+    } else if (strcmp(key, NUMINV_PAR) == 0) {
+      counts[INV_FILES] = atoi(val);
+    } else if (strcmp(key, INVINDEX_PAR) == 0) {
+      names[DOC_INDEX] = strdup(val);
+    } else if (strcmp(key, INVLOOKUP_PAR) == 0) {
+      names[DOC_LOOKUP] = strdup(val);
+    } else if (strcmp(key, DTINDEX_PAR) == 0) {
+      names[TERM_INDEX] = strdup(val);
+    } else if (strcmp(key, DTLOOKUP_PAR) == 0) {
+      names[TERM_LOOKUP] = strdup(val);
+    } else if (strcmp(key, TERMIDMAP_PAR) == 0) {
+      names[TERM_IDS] = strdup(val);
+    } else if (strcmp(key, DOCIDMAP_PAR) == 0) {
+      names[DOC_IDS] = strdup(val);
+    }
+  }    
+
+  aveDocLen = counts[TOTAL_TERMS] / (float) counts[DOCS];
+
+  return true;
+}
+
 bool InvFPIndex::mainToc(char * fileName) {
   FILE* in = fopen(fileName, "r");
   cerr << "Trying to open toc: " << fileName << endl;
