@@ -139,6 +139,24 @@ public:
         new(buffer.front()) ParsedDocument;
         ParsedDocument* parsedDocument = (ParsedDocument*) buffer.front();
 
+        const XMLNode* positions = child->getChild( "positions" );
+
+        if( positions ) {
+          const std::vector<XMLNode*>& children = positions->getChildren();
+          
+ 
+          for( size_t j=0; j<children.size(); j++ ) {
+            TermExtent extent;
+            std::string begin = children[j]->getChildValue("begin");
+            std::string end = children[j]->getChildValue("end");    
+
+            extent.begin = (int) string_to_i64( begin );
+            extent.end = (int) string_to_i64( end );
+
+            parsedDocument->positions.push_back( extent );
+          }
+        }
+
         for( size_t j=0; j<metadataKeyOffset.size(); j++ ) {
           MetadataPair pair;
 

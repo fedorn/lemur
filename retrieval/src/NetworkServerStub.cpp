@@ -100,6 +100,7 @@ void NetworkServerStub::_handleDocuments( XMLNode* request ) {
 
     XMLNode* metadata = 0; 
     XMLNode* textNode = 0;
+    XMLNode* positions = 0;
 
     if( documents[i]->metadata.size() ) {
       metadata = new XMLNode( "metadata" );
@@ -122,11 +123,29 @@ void NetworkServerStub::_handleDocuments( XMLNode* request ) {
       textNode = new XMLNode( "text", text );
     }
 
+    if( documents[i]->positions.size() ) {
+      positions = new XMLNode( "positions" );
+
+      for( size_t j=0; j<document->positions.size(); j++ ) {
+        XMLNode* position = new XMLNode( "position" );
+        XMLNode* begin = new XMLNode( "begin", i64_to_string( document->positions[j].begin ) );
+        XMLNode* end = new XMLNode( "end", i64_to_string( document->positions[j].end ) );
+        
+        position->addChild( begin );
+        position->addChild( end );
+
+        positions->addChild( position );
+      }
+    }
+
     if( metadata )
       docNode->addChild( metadata );
 
     if( textNode )
       docNode->addChild( textNode );
+
+    if( positions )
+      docNode->addChild( positions );
 
     response->addChild( docNode );
   }
