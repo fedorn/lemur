@@ -1,26 +1,31 @@
-/*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
+ /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * 
+ * The Lemur toolkit for language modeling and information retrieval.
+ * Copyright (c) 2001 Carnegie Mellon University.  All rights reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
- *
- *==========================================================================
-*/
-
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted for research or educational purposes,
+ * provided that this copyright notice is maintained and note is made
+ * of any changes to the source code.
+ * 
+ * This is a research system.  The code is distributed on an "as is" basis,
+ * without any warranty, express or implied. 
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <Null.hpp>
-#include <fstream.h>
+#include "common_headers.hpp"
 
 #include "String.hpp"
 #include "Param.hpp"
-#include "param.hpp"
+extern "C" {
+#include "parameters.h"
+}
 #include "Null.hpp"
 
 #define MAXLEN 65536
 
-static char *pChar=NULL;
+static char *pChar=(char *)NULL;
 
 //  Get routines:
 /////////////////////////////////////
@@ -175,46 +180,6 @@ String ParamGetString(const String &s)
       // assert(0);
       return ""; // null(String);
     }
-  }
-
-//  Put routines:
-/////////////////////////////////////
-
-void   ParamSetRestartFile(const String &s)
-{
-  param_set_restart_file(s);
-}
-
-void   ParamPut(const String &s, const double &value)
-  {
-     param_putf(s, value);
-  }
-
-void   ParamPut(const String &s, const float  &value) 
-  {
-     param_putf(s, (double) value);
-  }
-
-void   ParamPut(const String &s, const int    &value)
-  {
-     param_puti(s, value);
-  }
-
-void   ParamPut(const String &s, const String &value) 
-  {
-     param_putc(s, value);
-  }
-
-//  Checkpointing:
-/////////////////////////////////////
-int    ParamCheckpointed (void) 
-  {
-     return param_checkpointed();
-  }
-
-void   ParamCheckpoint (void)
-  {
-     param_checkpoint();
   }
 
 //  Miscellaneous:

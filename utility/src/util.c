@@ -1,14 +1,17 @@
-/*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
+ /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * 
+ * The Lemur toolkit for language modeling and information retrieval.
+ * Copyright (c) 2001 Carnegie Mellon University.  All rights reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
- *
- *==========================================================================
-*/
-
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted for research or educational purposes,
+ * provided that this copyright notice is maintained and note is made
+ * of any changes to the source code.
+ * 
+ * This is a research system.  The code is distributed on an "as is" basis,
+ * without any warranty, express or implied. 
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
 #define ABNORMAL_RETURN_CODE 1
@@ -17,8 +20,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
 #include <errno.h>
 #include <ctype.h>
 #include "util.h"
@@ -34,8 +35,7 @@
 
 #include <malloc.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/vfs.h>
+#define F_OK 0
 
 #endif
 
@@ -43,60 +43,6 @@ char   buf[1024];
 static int space_in_use=0;
 static int pointers_in_use=0;
 int    display_allocs=FALSE;
-
-
-/*********
-already defined in error.c 
-
-void error(char *fmt, ...){
-   va_list args;
-   va_start(args, fmt);
-   vfprintf(stderr, fmt, args); CRLF;
-   va_end(args);
-   fprintf(stderr, "\n");
-   if (errno > 0) {
-      perror(buf);
-      fprintf(stderr, "errno=%d\n", errno);
-      fprintf(stderr, buf);
-      fprintf(stderr, "\n");
-      }
-   fflush(stderr);
-   fflush(stdout);
-   assert(0);
-   }
-*********/
-
-
-void bomb(char *fmt, ...)
-{
-   /* just break out, with error code =1 (fail) */
-
-   va_list args;
-   va_start(args, fmt);
-   vfprintf(stderr, fmt, args); CRLF;
-   va_end(args);
-   fprintf(stderr, "\n");
-   fflush(stderr);
-   fflush(stdout);
-   exit(1);
-}
-
-
-void bail(char *fmt, ...)
-{
-   /* just break out, with error code =0 (success) */
-
-   va_list args;
-   va_start(args, fmt);
-   vfprintf(stderr, fmt, args); CRLF;
-   va_end(args);
-   fprintf(stderr, "\n");
-   fflush(stderr);
-   fflush(stdout);
-   exit(0);
-}
-
-
 
 char *dequote (char *s) {
     static char *sbuf=NULL;
@@ -147,21 +93,6 @@ const char *quote (const char *s) {
 } 
 
 
-
-void sleepx (int time) {
-  int child_pid;
-  if ((child_pid=fork())) {
-      fprintf(stderr, "UTIL: WARNING, wait not implemented!\n");
-    /* if((waitpid(child_pid,&status,WUNTRACED)!=child_pid) 
-        || (WEXITSTATUS(status) > 0)) 
-      error("restawhile: wait failed."); */
-    }
-  else {
-     execlp("sleep","sleep",time);
-     exit(-1);}
-}
-  
-
 /* returns TRUE iff string only contains chars in valid. */
 int verify(char *string, char *valid)
 {
@@ -207,43 +138,14 @@ char * lower(char *s) {
 
 /* queries existence of file */
 int qfilef(const char *fname) {
+   FILE * fp;
    if (fname == FALSE) return FALSE;
-   if (access(fname, F_OK)==0) return TRUE;
+   fp = fopen(fname, "r");
+   fclose(fp);
+   if (fp != NULL) return TRUE;
    else return FALSE;
 }
 
-/* erases file */
-void erasef(char *tfn) 
-{
-  int child_pid;
-  if ((child_pid=fork())) {
-      fprintf(stderr, "UTIL: WARNING, wait not implemented!\n");
-    /* if((waitpid(child_pid,&status,WUNTRACED)!=child_pid) 
-          || (WEXITSTATUS(status) > 0)) 
-      error("ERASEF: wait failed."); */
-  }
-  else {
-     execlp("rm","rm",tfn,0);
-     exit(-1);
-  }
-}
-  
-/* moves file */
-void mv(char *t, char *s) 
-{
-  int child_pid;
-  if ((child_pid=fork())) {
-      fprintf(stderr, "UTIL: WARNING, wait not implemented!\n");
-    /* if((waitpid(child_pid,&status,WUNTRACED)!=child_pid) 
-        || (WEXITSTATUS(status) > 0)) */
-      error("MV: wait failed.");
-  }
-  else {
-     execlp("mv","mv", t, s,0);
-     exit(-1);
-  }
-}
-  
 
 /* returns free storage in file system */
 int free_storage (char *fn) 
@@ -256,16 +158,6 @@ int free_storage (char *fn)
     return -1;
   return sfs.f_bsize * sfs.f_bfree;
 */
-}
-
-/* Return the size of file named filename */
-int file_size(char *filename)
-{
-  struct stat status;
-
-  if (stat(filename,&status) != 0)
-    return -1;
-  return (int)status.st_size;
 }
 
 /* Return an allocated duplicate of string */
