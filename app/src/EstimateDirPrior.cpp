@@ -34,7 +34,7 @@ It will print out the estimated parameter value to the standard output.
 #include "common_headers.hpp"
 #include <cassert>
 #include <cstdio>
-
+#include <cmath>
 #include "IndexManager.hpp"
 #include "Param.hpp"
 #include "String.hpp"

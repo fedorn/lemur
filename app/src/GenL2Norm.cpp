@@ -34,7 +34,7 @@ This application is also a good example of using the doc index (i.e., doc->term 
  */
 
 #include "common_headers.hpp"
-
+#include <cmath>
 #include "IndexManager.hpp"
 #include "Param.hpp"
 #include "String.hpp"
