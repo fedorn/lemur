@@ -85,13 +85,13 @@ bool InvFPIndex::openName(char* indexName){
   if (!docIDs())
     return false;
 
-  cerr << "Load index complete." << endl;
+  *lemurstream << "Load index complete." << endl;
   return true;
 }
 
 DocInfoList* InvFPIndex::docInfoList(int termID){
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS])) {
-    cerr << "Error:  Trying to get docInfoList for invalid termID" << endl;    
+    *lemurstream << "Error:  Trying to get docInfoList for invalid termID" << endl;    
     return NULL;
   }
 
