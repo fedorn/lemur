@@ -57,7 +57,7 @@ public:
   //@}
 
   /// Open previously created Index using names in given param file, return true if opened successfully
-  bool openFile(char* filename);
+  bool openName(char* filename);
 
   /// @name Spelling and index conversion
   //@{
@@ -115,6 +115,8 @@ public:
 
   //@}
 private:
+  /// readin all toc
+  bool fullToc(const char* fileName);
   /// readin main stats
   bool mainToc(char* fileName);
   /// readin index lookup table
