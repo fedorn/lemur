@@ -8,31 +8,24 @@
  *
  *==========================================================================
 */
-#include "TextHandler.hpp"
 
-#ifndef _STEMMER_HPP
-#define _STEMMER_HPP
+#include "Stemmer.hpp"
+
+#ifndef _PORTERSTEMMER_HPP
+#define _PORTERSTEMMER_HPP
 
 
 ///
-///  A generic interface for Stemmers.  They should
-///  support the TextHandler interface.
-///
+///  Provides a wrapper to the Porter stemmer
+///  that supports the Stemmer interface, and by
+///  inheritance, the TextHandler interface.
 
-class Stemmer : public TextHandler {
+class PorterStemmer : public Stemmer {
 
 public:
   
-  virtual char * handleWord(char * word) {
-    if (word != NULL) {
-      stemWord(word);
-    }
-    return word;
-  }
-
-  /// Stem a word.  Overwrites the char *
-  /// passed in.
-  virtual void stemWord(char * word) = 0;
+  /// Stem a word using the Porter Stemmer.
+  void stemWord(char * word);
 
 };
 

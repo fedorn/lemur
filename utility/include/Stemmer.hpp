@@ -8,24 +8,32 @@
  *
  *==========================================================================
 */
+#include "TextHandler.hpp"
 
-#ifndef  _STEMMER_HPP
+#ifndef _STEMMER_HPP
 #define _STEMMER_HPP
 
-/// Porter stemmer
 
-/*! 
-  A C++ wrapper for a Porter stemmer originally implemented in C. 
-  The original stemmer was written by B. Frakes and C. Cox in 1986, and 
-later changed   by C. Fox in 1990 and 1991.
+///
+///  A generic interface for Stemmers.  They should
+///  support the TextHandler interface.
+///
 
-*/
+class Stemmer : public TextHandler {
 
-class Stemmer {
 public:
-  static int stemWord(char *word);
+  
+  virtual char * handleWord(char * word) {
+    if (word != NULL) {
+      stemWord(word);
+    }
+    return word;
+  }
+
+  /// Stem a word.  Overwrites the char *
+  /// passed in.
+  virtual void stemWord(char * word) = 0;
+
 };
 
-
-#endif  /* _STEMMER_HPP  */
-/* EOF */
+#endif
