@@ -38,14 +38,12 @@ Parser* TextHandlerManager::createParser(string type, string acros) {
   }
   
   if (parser) {
-    // Create the acronym list and tell parser if needed.
-    WordSet * acronyms = NULL;
+    // tell the parser about the acronyms list
     if (acros.empty()) {
       acros = ParamGetString("acronyms");
     }
     if (!acros.empty()) {
-      acronyms = new WordSet((char*)acros.c_str());
-      parser->setAcroList(acronyms);
+      parser->setAcroList(acros);
     }
   }
 
