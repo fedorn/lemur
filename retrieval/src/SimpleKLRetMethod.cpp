@@ -157,13 +157,9 @@ void SimpleKLRetMethod::updateQuery(QueryRep &origRep, DocIDSet &relDocs)
   case MIXTURE:
     computeMixtureFBModel(*qr, relDocs);
     break;
-    /* case DIVMIN:
-    fbLM = new DivMinFBModel(relDocs, *ind, &collectLM, param.fbCoeff);
-    qr->interpolateWith(*fbLM, (1-param.fbCoeff), param.fbTermCount,
-			param.fbPrSumTh, param.fbPrTh);
-    delete fbLM;
+  case DIVMIN:
+    computeDivMinFBModel(*qr, relDocs);
     break;
-    */
   case MARKOVCHAIN:
     counter = new ArrayCounter<double>(ind->termCountUnique()+1);
     qm = dynamic_cast<SimpleKLQueryModel *> (&origRep);
@@ -307,3 +303,56 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocID
   delete fblm;
   delete dCounter;
 }
+
+
+void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs)
+{
+  int numTerms = ind->termCountUnique();
+
+  static double * ct = new double[numTerms+1];
+
+  int i;
+  for (i=1; i<=numTerms; i++) ct[i]=0;
+
+  int actualDocCount=0;
+  relDocs.startIteration();
+  while (relDocs.hasMore()) {
+    actualDocCount++;
+    int id;
+    double pr;
+    relDocs.nextIDInfo(id,pr);
+    SimpleKLDocModel *dm = dynamic_cast<SimpleKLDocModel *> (computeDocRep(id));
+    for (i=1; i<=numTerms; i++) { // pretend every word is unseen
+      ct[i] += dm->unseenCoeff()*collectLM->prob(i);
+    }
+
+    TermInfoList *tList = ind->termInfoList(id);
+    TermInfo *info;
+    tList->startIteration();
+    while (tList->hasMore()) {
+      info = tList->nextEntry();
+      ct[i] += dm->seenProb(info->count(), info->id()) - dm->unseenCoeff()*collectLM->prob(i);
+    }
+    delete tList;
+    delete dm;
+  }
+  if (actualDocCount==0) return;
+
+  ArrayCounter<double> lmCounter(numTerms+1);
+  
+  double norm = 1.0/(double)actualDocCount;
+  for (i=1; i<=numTerms; i++) { 
+    lmCounter.incCount(i, exp(( ct[i]*norm - param.fbMixtureNoise*collectLM->prob(i))* 1.0/(1.0-param.fbMixtureNoise)));
+  }
+  
+  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind->termLexiconID());
+  origRep.interpolateWith(*fblm, (1-param.fbCoeff), param.fbTermCount,
+			param.fbPrSumTh, param.fbPrTh);
+}
+
+
+
+
+
+
+

@@ -130,6 +130,7 @@ private:
 				   int stopWordCutoff, 
 				   double alpha);
   void computeMixtureFBModel(SimpleKLQueryModel &origRep, DocIDSet & relDocs);
+  void computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDSet &relDocs);
 };
 
 #endif /* _SIMPLEKLRETMETHOD_HPP */

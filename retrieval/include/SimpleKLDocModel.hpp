@@ -34,7 +34,7 @@ public:
   virtual double scoreConstant() {
     return unseenCoeff();
   }
-protected:
+
   /// a(d)
   virtual double unseenCoeff()=0; // a(d)
   /// p(w|d), w seen
