@@ -43,6 +43,7 @@ void DistSearchMethod::scoreIndexSet(Query &qry, vector<string> &indexset, DocSc
   }
 }
 
+
 void DistSearchMethod::indexToID(Index* ind, IndexedRealVector* ivec, DocScoreVector* dvec) {
 
   IndexedRealVector::iterator i;
@@ -63,8 +64,10 @@ void DistSearchMethod::doSingleRetr() {
   QueryRep* qr = model->computeQueryRep(*query);
   model->scoreCollection(*qr, *res);
   DocScoreVector* dscore = new DocScoreVector();
-  //  dscore->clear();
-
+  res->Sort();
+  if (returnCount<res->size()){
+    res->assign(res->begin(), res->begin()+returnCount);
+  }
   // convert results from internal to external docids
   indexToID(single, res, dscore);
   //  dscore->Sort();
