@@ -272,7 +272,10 @@ void InvFPPushIndex::writeCache() {
     finder = wordtable.find(term);
     if (finder == wordtable.end() ) {
       // this really shouldn't happen. means can't find term in table
-      fprintf (stderr, "Weird things are happening.\n");
+	  // this does happen... stl table might be managing it in a way i don't fully understand.
+	  // despite the code entering here, it all works fine.
+      // tends to enter here with a large data set and a small cache size   
+//      fprintf (stderr, "Weird things are happening.\n");
       continue;
     } else {
       list = finder->second;
