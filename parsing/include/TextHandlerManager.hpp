@@ -36,19 +36,19 @@ public:
   /// if nothing is passed in and nothing is on param stack, return NULL
   /// checks for "docFormat" parameter for type 
   /// checks for "acronyms" parameter for acronyms list
-  static Parser* createParser(string type, string acros="");
+  static Parser* createParser(string type="", string acros="");
 
   /// current known types are proter, krovetz, and arabic
   /// if nothing is passed in and nothing is on param stack, return NULL
   /// checks for "stemmer" parameter for type 
   /// "KstemmerDir" or "arabicStemDir" for datadir
   /// "arabicStemFunc" for func
-  static Stemmer* createStemmer(string type, string datadir="", string func="");
+  static Stemmer* createStemmer(string type="", string datadir="", string func="");
 
   /// as of now, there is only 1 stopper so no type is passed in. 
   /// this can easily be changed.
   /// "stopwords" param for filename
-  static Stopper* createStopper(string filename);
+  static Stopper* createStopper(string filename="");
 };
 
 #endif //_TEXTHANDLERMGR_HPP
