@@ -11,7 +11,8 @@
 
 #include "IndexedReal.hpp"
 
-
+IndexedRealVector::IndexedRealAscending IndexedRealVector::ascendOrder;
+IndexedRealVector::IndexedRealDescending IndexedRealVector::descendOrder;
 
 void IndexedRealVector::Sort(bool descending)
 {
