@@ -66,4 +66,11 @@ struct inv_entry {   // an entry in the lookup table for docterm lists index
   int df;             // doc freq
 };
 
+struct ltstr
+{
+  bool operator()(char* s1, char* s2) const{
+    return strcmp(s1, s2) < 0;
+  }
+};
+
 #endif
