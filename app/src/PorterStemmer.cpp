@@ -29,7 +29,7 @@ and set the following variables in the parameter file:
 */
 
 #include "BasicDocStream.hpp"
-#include "Stemmer.hpp"
+#include "PStemmer.hpp"
 #include "Param.hpp"
 #include "String.hpp"
 
@@ -61,7 +61,7 @@ int AppMain(int argc, char * argv[]) {
       TokenTerm *term = doc->nextTerm();
       char buffer[5000];
       strcpy(buffer,term->spelling());
-      Stemmer::stemWord(buffer);
+      PStemmer::stemWord(buffer);
       ofs << buffer << endl;
     }
     ofs << "</DOC>\n";
