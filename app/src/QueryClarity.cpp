@@ -106,31 +106,22 @@ In addition, the collection mixture model also recognizes the parameter
   author: fff
  */
 
-
-#include "Param.hpp"
+#include "common_headers.hpp" 
 #include "IndexManager.hpp"
 #include "BasicDocStream.hpp"
-#include "common_headers.hpp" 
-#include "SimpleKLRetMethod.hpp"
 #include "RetParamManager.hpp"
 #include "ResultFile.hpp"
 
 
 namespace LocalParameter {
-  enum FBMethod {MIX=0, DIV=1, MAR=2, RM1=3, RM2=4};
-  /// retrieval model 
-  static enum FBMethod fbmethod;
 
   String expandedQuery;
   String initQuery;
   String feedbackDocuments;
-  bool TRECResultFormat;
   void get() {
-    fbmethod = (FBMethod) ParamGetInt("queryUpdateMethod",MIX); // default is MIX divergence model
     expandedQuery = ParamGetString("expandedQuery");
     initQuery = ParamGetString("initQuery",""); 
     feedbackDocuments = ParamGetString("feedbackDocuments");
-    TRECResultFormat = ParamGetInt("resultFormat",1); // default is TREC format
   }
 };
 
@@ -141,38 +132,41 @@ void GetAppParam()
   SimpleKLParameter::get();
 }
 
-
-void QueryClarity(QueryRep *qr, char *qid, ResultFile &resFile, RetrievalMethod *model, ofstream &os)
+void QueryClarity(QueryRep *qr, char *qid, ResultFile &resFile, 
+		  RetrievalMethod *model, ofstream &os)
 
 {
   IndexedRealVector *res;
+  bool ignoreWeights = true;
   cout << "query : "<< qid << endl;
   SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
-  if(RetrievalParameter::fbDocCount>0) {
+  if (RetrievalParameter::fbDocCount > 0) {
     if (resFile.findResult(qid, res)) {
       res->Sort();
-      if(LocalParameter::fbmethod == LocalParameter::RM1 || 
-	 LocalParameter::fbmethod == LocalParameter::RM2)
-	res->NormalizeValues();
-      PseudoFBDocs *topDoc = new PseudoFBDocs(*res, RetrievalParameter::fbDocCount);
+      if (SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM1 || 
+	  SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM2) {
+	res->LogToPosterior();
+	ignoreWeights = false;
+      }
+
+      PseudoFBDocs *topDoc = new PseudoFBDocs(*res, 
+					      RetrievalParameter::fbDocCount,
+					      ignoreWeights);
       model->updateQuery(*qr, *topDoc);
       delete topDoc;
       os << qid;
       qm->clarity(os);
     } else {
-      cerr << "Warning: no feedback documents found for query: "<< qid << endl;
+      cerr << "Warning: no feedback documents found for query: "
+	   << qid << endl;
     }
   } else {
     os << qid;
     qm->clarity(os);
   }
-
 }
 
-/// A query model estimation program
-
 int AppMain(int argc, char *argv[]) {
-
 
   Index  *ind;
 
@@ -181,18 +175,20 @@ int AppMain(int argc, char *argv[]) {
   } 
   catch (Exception &ex) {
     ex.writeMessage();
-    throw Exception("QueryClarity", "Can't open index, check parameter index");
+    throw Exception("QueryClarity", 
+		    "Can't open index, check parameter index");
   }
- 
 
   ArrayAccumulator accumulator(ind->docCount());
   ofstream os(LocalParameter::expandedQuery);
-  ResultFile resFile(LocalParameter::TRECResultFormat);
-  SimpleKLRetMethod *model =  new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, accumulator);
+  ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
+  SimpleKLRetMethod *model;
+  model =  new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, 
+				 accumulator);
   model->setDocSmoothParam(SimpleKLParameter::docPrm);
   model->setQueryModelParam(SimpleKLParameter::qryPrm);
 
-  if(RetrievalParameter::fbDocCount>0) {
+  if(RetrievalParameter::fbDocCount > 0) {
     ifstream fbdoc(LocalParameter::feedbackDocuments, ios::in);
     if (fbdoc.fail()) {
       throw Exception("AppMain", "can't open the feedback doc file, check parameter value for feedbackDocuments");
@@ -247,7 +243,6 @@ int AppMain(int argc, char *argv[]) {
   } else {
     delete initQIFS;
   }
-
   delete ind;
   return 0;
 }

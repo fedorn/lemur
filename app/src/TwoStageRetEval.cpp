@@ -40,30 +40,14 @@ based on "leave-one-out".
 
 
 
-#include "Param.hpp"
 #include "IndexManager.hpp"
 #include "BasicDocStream.hpp"
-#include "SimpleKLRetMethod.hpp"
-#include "RetParamManager.hpp"
+#include "RetMethodManager.hpp"
 #include "ResultFile.hpp"
-
-namespace LocalParameter {
-  enum RetModel {TFIDF=0, OKAPI=1, KL=2};
-  /// retrieval model 
-  static bool TRECResultFormat;
-  bool useWorkingSet;
-  String workSetFile;
-  void get() {
-    TRECResultFormat = ParamGetInt("resultFormat",1); // default is TREC format
-    useWorkingSet = ParamGetInt("useWorkingSet", 0); //default is to score the whole collection; otherwise, score a subset
-    workSetFile = ParamGetString("workingSetFile",""); // working set file name
-  }
-};
 
 void GetAppParam()
 {
   RetrievalParameter::get();
-  LocalParameter::get();
 }
 
 
@@ -178,10 +162,10 @@ int AppMain(int argc, char *argv[]) {
   DocStream *qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
 
   ofstream result(RetrievalParameter::resultFile);
-  ResultFile resFile(LocalParameter::TRECResultFormat);
+  ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
   resFile.openForWrite(result, *ind);
 
-  ifstream workSetStr(LocalParameter::workSetFile);
+  ifstream workSetStr(RetrievalParameter::workSetFile);
   ResultFile docPool(false); // working set is always simple format
   docPool.openForRead(workSetStr, *ind);
 
@@ -197,7 +181,8 @@ int AppMain(int argc, char *argv[]) {
   SimpleKLParameter::docPrm.smthMethod = SimpleKLParameter::TWOSTAGE;
   // force two-stage smoothing
 
-  model = new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, accumulator);
+  model = new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, 
+				accumulator);
   ((SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
   ((SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
 
@@ -206,6 +191,11 @@ int AppMain(int argc, char *argv[]) {
   TextQuery *q;
   
   IndexedRealVector workSetRes;
+
+  bool ignoreWeights = true;
+  if (SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM1 ||
+      SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM2)
+    ignoreWeights = false;
   
   while (qryStream->hasMore()) {
     Document *d = qryStream->nextDoc();
@@ -221,7 +211,7 @@ int AppMain(int argc, char *argv[]) {
      ((SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
     PseudoFBDocs *workSet;
 
-    if (LocalParameter::useWorkingSet) {
+    if (RetrievalParameter::useWorkingSet) {
       docPool.getResult(q->id(), workSetRes);
       workSet = new PseudoFBDocs(workSetRes, -1); // -1 means using all docs
       model->scoreDocSet(*qr,*workSet,results);
@@ -231,10 +221,12 @@ int AppMain(int argc, char *argv[]) {
 
     results.Sort();
     if (RetrievalParameter::fbDocCount>0) {
-      PseudoFBDocs *topDoc = new PseudoFBDocs(results, RetrievalParameter::fbDocCount);
+      PseudoFBDocs *topDoc = new PseudoFBDocs(results, 
+					      RetrievalParameter::fbDocCount,
+					      ignoreWeights);
       model->updateQuery(*qr, *topDoc);
      
-      if (LocalParameter::useWorkingSet) {
+      if (RetrievalParameter::useWorkingSet) {
 	model->scoreDocSet(*qr,*workSet,results);
       } else {
 	model->scoreCollection(*qr, results);
@@ -244,7 +236,7 @@ int AppMain(int argc, char *argv[]) {
     }
     resFile.writeResults(q->id(), &results, RetrievalParameter::resultCount);
     
-    if (LocalParameter::useWorkingSet) {
+    if (RetrievalParameter::useWorkingSet) {
       delete workSet;
     }
     delete qr;

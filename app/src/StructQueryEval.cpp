@@ -15,7 +15,7 @@
 This application (StructQueryEval.cpp) runs retrieval experiments to 
 evaluate the performance of the structured query model using the inquery 
 retrieval method. StructQueryEval requires that its index parameter be a
-positional index (InvFPIndex).
+positional index (currently one of InvFPIndex or KeyfileIncIndex).
 
 <p>Feedback is implemented as a WSUM of the original query 
 combined with terms selected from the feedback documents based on belief 
@@ -31,30 +31,34 @@ score. The expanded query has the form:
 
 </pre><br>
 where <b>a</b> is the value of the parameter <tt>feedbackPosCoeff</tt>.
+
 <p>
 Scoring is either done over a working set of documents (essentially
 re-ranking), or over the whole collection. This is indicated by the
-parameter "useWorkingSet". When "useWorkingSet" has a non-zero (integer)
-value, scoring will be on a working set specified in a file given by
-"workSetFile". The file should have three columns. The first is the
-query id; the second the document id; and the last a numerical value,
-which is ignored. By default, scoring is on the whole collection.
+parameter "useWorkingSet". When "useWorkingSet" has either a non-zero
+(integer) value or the value <tt>false</tt>, scoring will be on a working set
+specified in a file given by "workSetFile". The file should have three
+columns. The first is the query id; the second the document id; and the
+last a numerical value, which is ignored. By default, scoring is on the
+whole collection.
 
 <p>
 The parameters are:
 <p>
 <ol>
 <li> <tt>index</tt>: The complete name of the index table-of-content file 
-for the database index. This must be a positional index (InvFPIndex).
+for the database index. This must be a positional index (currently one
+of InvFPIndex or KeyfileIncIndex).
 
 <li> <tt>textQuery</tt>: the query text stream parsed by ParseInQuery
 
 <li> <tt>resultFile</tt>: the result file
 <li> <tt>resultFormat</tt>: whether the result format should be of the 
 TREC format (i.e., six-column) or just a simple three-column format 
-<tt>&lt;queryID, docID, score><tt>. Integer value, zero for non-TREC 
-format, and non-zero for TREC format. Default: 1 (i.e., TREC format)
-
+<tt>&lt;queryID, docID, score><tt>. String value, either <tt>trec</tt>
+for TREC format or <tt>3col</tt> for three column format. The integer
+values, zero for non-TREC format, and non-zero for TREC format used in
+previous versions of lemur are accepted. Default: TREC format.
 <li> <tt>resultCount</tt>: the number of documents to return as result 
 for each query
 <li> <tt>defaultBelief</tt>: The default belief for a document: Default=0.4
@@ -74,45 +78,35 @@ the expanded query.
 #include "ResultFile.hpp"
 #include "BasicDocStream.hpp"
 
-namespace LocalParameter {
-
-  bool TRECResultFormat;
-  bool useWorkingSet;
-  String workSetFile;
-
-  void get() {
-    // should be in RetMethodParamManager...
-    // default is TREC format
-    TRECResultFormat = ParamGetInt("resultFormat", 1); 
-    //default is to score the whole collection; otherwise, score a subset
-    useWorkingSet = ParamGetInt("useWorkingSet", 0);
-    // working set file name
-    workSetFile = ParamGetString("workingSetFile","");
-  }
-};
 
 void GetAppParam() {
-  LocalParameter::get();
   RetrievalParameter::get();
   InQueryParameter::get();
 }
 
 /// A retrieval evaluation program
 int AppMain(int argc, char *argv[]) {
-  InvFPIndex  *ind;
+  Index  *ind;
   try {
-    ind  = dynamic_cast <InvFPIndex *>
-      (IndexManager::openIndex(RetrievalParameter::databaseIndex));
-    if (ind == NULL) {
-    throw Exception("StructQueryEval", 
-		    "Index must be an InvFPIndex");
+    ind  = IndexManager::openIndex(RetrievalParameter::databaseIndex);
+    // Test that index returns InvFPDocList * from docInfoList.
+    InvFPDocList *dList;
+    DocInfoList *dl;
+    // use last term in vocab to make this a small read (hopefully).
+    int lastTerm = ind->termCountUnique();
+    dl = ind->docInfoList(lastTerm);
+    dList = dynamic_cast<InvFPDocList *>(dl);
+    if (dList == NULL) {
+      throw Exception("StructQueryEval", 
+		      "InvFPDocList required from index->docInfoList()");
     }
-    
+    delete(dl);
   } catch (Exception &ex) {
     ex.writeMessage();
     throw Exception("StructQueryEval", 
 		    "Can't open index, check parameter index");
   }
+
   DocStream *qryStream;
   try {
     qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
@@ -122,12 +116,12 @@ int AppMain(int argc, char *argv[]) {
 		    "Can't open query file, check parameter textQuery");
   }
   ofstream result(RetrievalParameter::resultFile);
-  ResultFile resFile(LocalParameter::TRECResultFormat);
+  ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
   resFile.openForWrite(result, *ind);
   ifstream *workSetStr;
   ResultFile *docPool;
-  if (LocalParameter::useWorkingSet) {
-    workSetStr = new ifstream(LocalParameter::workSetFile, ios::in);
+  if (RetrievalParameter::useWorkingSet) {
+    workSetStr = new ifstream(RetrievalParameter::workSetFile, ios::in);
     if (workSetStr->fail()) {
       throw Exception("StructQueryEval", "can't open working set file");
     }
@@ -149,7 +143,7 @@ int AppMain(int argc, char *argv[]) {
     cout << "query : "<< q->id() << endl;
     QueryRep *qr = model->computeQueryRep(*q);
     PseudoFBDocs *workSet;
-    if (LocalParameter::useWorkingSet) {
+    if (RetrievalParameter::useWorkingSet) {
       docPool->getResult(q->id(), workSetRes);
       workSet = new PseudoFBDocs(workSetRes, -1); // -1 means using all docs
       model->scoreDocSet(*qr, *workSet, results);
@@ -161,7 +155,7 @@ int AppMain(int argc, char *argv[]) {
       PseudoFBDocs *topDoc = new PseudoFBDocs(results, 
 					      RetrievalParameter::fbDocCount);
       model->updateQuery(*qr, *topDoc);
-      if (LocalParameter::useWorkingSet) {
+      if (RetrievalParameter::useWorkingSet) {
 	model->scoreDocSet(*qr, *workSet, results);
       } else {
 	model->scoreCollection(*qr, results);
@@ -170,25 +164,19 @@ int AppMain(int argc, char *argv[]) {
       delete topDoc;
     }
     resFile.writeResults(q->id(), &results, RetrievalParameter::resultCount);
-    if (LocalParameter::useWorkingSet) {
+    if (RetrievalParameter::useWorkingSet) {
       delete workSet;
     }
     delete qr;
     delete q;
   }
   result.close();
-  /* Skip all deletes, none of these objects need to 
-     be destroyed, the OS can just have all of their
-     memory back -- nasty speed hack. dmf 03/24
-   */
-#if 1
-  if (LocalParameter::useWorkingSet) {
+  if (RetrievalParameter::useWorkingSet) {
     delete docPool;
     delete workSetStr;
   }
   delete model;
   delete qryStream;
   delete ind;
-#endif
   return 0;
 }

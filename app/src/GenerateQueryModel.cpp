@@ -103,32 +103,22 @@ In addition, the collection mixture model also recognizes the parameter
  */
 
 
-#include "Param.hpp"
+#include "common_headers.hpp"
 #include "IndexManager.hpp"
 #include "BasicDocStream.hpp"
-#include "common_headers.hpp" 
-#include "SimpleKLRetMethod.hpp"
 #include "RetParamManager.hpp"
 #include "ResultFile.hpp"
 
 
 namespace LocalParameter {
-  enum FBMethod {MIX=0, DIV=1, MAR=2, RM1=3, RM2=4};
-  /// retrieval model 
-  static enum FBMethod fbmethod;
-
   String expandedQuery;
   String initQuery;
   String feedbackDocuments;
-  bool TRECResultFormat;
+
   void get() {
-    // default is MIX divergence model
-    fbmethod = (FBMethod) ParamGetInt("queryUpdateMethod",MIX);    
     expandedQuery = ParamGetString("expandedQuery");
     initQuery = ParamGetString("initQuery",""); 
     feedbackDocuments = ParamGetString("feedbackDocuments");
-    // default is TREC format
-    TRECResultFormat = ParamGetInt("resultFormat",1); 
   }
 };
 
@@ -143,16 +133,26 @@ void GetAppParam()
 void updateQueryModel(QueryRep *qr, char *qid, ResultFile &resFile, RetrievalMethod *model, ofstream &os)
 
 {
+  bool	ignoreWeights = true;  
   IndexedRealVector *res;
   cout << "query : "<< qid << endl;
   SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
   if (resFile.findResult(qid, res)) {
     res->Sort();
-    if(LocalParameter::fbmethod == LocalParameter::RM1 || 
-       LocalParameter::fbmethod == LocalParameter::RM2)
-      res->NormalizeValues();
+    if (SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM1 || 
+	SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM2) {
+      // need a parameter here
+      // NON-KL should use
+      // res->NormalizeValues();
+      // KL should use querylikelihood score method
+      // and
+      res->LogToPosterior();
+      ignoreWeights = false;  
+    }
+    
     PseudoFBDocs *topDoc = new PseudoFBDocs(*res, 
-					    RetrievalParameter::fbDocCount);
+					    RetrievalParameter::fbDocCount,
+					    ignoreWeights);
     model->updateQuery(*qr, *topDoc);
     os << qid;
     qm->save(os);
@@ -187,7 +187,7 @@ int AppMain(int argc, char *argv[]) {
 
   ofstream os(LocalParameter::expandedQuery);
   
-  ResultFile resFile(LocalParameter::TRECResultFormat);
+  ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
   resFile.load(fbdoc, *ind);
   SimpleKLRetMethod *model =  new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, accumulator);
   model->setDocSmoothParam(SimpleKLParameter::docPrm);

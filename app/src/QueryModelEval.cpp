@@ -41,6 +41,13 @@ The following are document model smoothing parameters:
 
 <li> <tt>smoothStrategy</tt>: Either <tt>interpolate</tt> (0) or <tt>backoff</tt> (1)
 
+<li> <tt>adjustedScoreMethod</tt>: Which type of score to output, one of:
+<ul>
+<li> "querylikelihood" or "ql" for query likelihood.
+<li> "crossentropy" or "ce" for cross entropy.
+<li> "negativekld" or "-d" for negative KL divergence.
+</ul>
+
 <li> <tt>JelinekMercerLambda</tt>: The collection model weight in the JM interpolation method. Default: 0.5
 
 <li> <tt>DirichletPrior</tt>: The prior parameter in the Dirichlet prior smoothing method. Default: 1000
@@ -49,25 +56,17 @@ The following are document model smoothing parameters:
 </ol>
  */
 
-
-#include "Param.hpp"
+#include "common_headers.hpp" 
 #include "IndexManager.hpp"
 #include "BasicDocStream.hpp"
-#include "common_headers.hpp" 
-#include "SimpleKLRetMethod.hpp"
 #include "RetParamManager.hpp"
 #include "ResultFile.hpp"
+
 namespace LocalParameter {
   String queryModel;
-  bool TRECResultFormat;
-  bool useWorkingSet;
-  String workSetFile;
 
   void get() {
     queryModel = ParamGetString("queryModel","");
-    TRECResultFormat = ParamGetInt("resultFormat",1); // default is TREC format
-    useWorkingSet = ParamGetInt("useWorkingSet", 0); //default is to score the whole collection; otherwise, score a subset
-    workSetFile = ParamGetString("workingSetFile",""); // working set file name 
   }
 };
 
@@ -83,7 +82,6 @@ void GetAppParam()
 /// A query model estimation program
 int AppMain(int argc, char *argv[]) {
   
-
   Index  *ind;
 
   try {
@@ -91,13 +89,14 @@ int AppMain(int argc, char *argv[]) {
   } 
   catch (Exception &ex) {
     ex.writeMessage();
-    throw Exception("QueryModelEval", "Can't open index, check parameter index");
+    throw Exception("QueryModelEval", 
+		    "Can't open index, check parameter index");
   }
 
   ifstream *workSetStr;
   ResultFile *docPool;
-  if (LocalParameter::useWorkingSet) {
-    workSetStr = new ifstream(LocalParameter::workSetFile, ios::in);
+  if (RetrievalParameter::useWorkingSet) {
+    workSetStr = new ifstream(RetrievalParameter::workSetFile, ios::in);
     if (workSetStr->fail()) {
       throw Exception("RetEval", "can't open working set file");
     }
@@ -110,16 +109,18 @@ int AppMain(int argc, char *argv[]) {
   ArrayAccumulator accumulator(ind->docCount());
 
   if (qmodel.fail()) {
-    throw Exception("QueryModelEval", "can't open the query model file, check the value for parameter queryModel");
+    throw Exception("QueryModelEval", 
+		    "can't open the query model file, check the value for parameter queryModel");
   }
   
   ofstream result(RetrievalParameter::resultFile);
 
-  ResultFile resFile(LocalParameter::TRECResultFormat);
+  ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
 
   resFile.openForWrite(result, *ind);
 
-  SimpleKLRetMethod model(*ind, SimpleKLParameter::smoothSupportFile, accumulator);
+  SimpleKLRetMethod model(*ind, SimpleKLParameter::smoothSupportFile, 
+			  accumulator);
   
   model.setDocSmoothParam(SimpleKLParameter::docPrm);
   model.setQueryModelParam(SimpleKLParameter::qryPrm);
@@ -135,7 +136,7 @@ int AppMain(int argc, char *argv[]) {
     q = new SimpleKLQueryModel(*ind);
     q->load(qmodel);
     PseudoFBDocs *workSet;
-    if (LocalParameter::useWorkingSet) {
+    if (RetrievalParameter::useWorkingSet) {
       docPool->getResult(qid, workSetRes);
       workSet = new PseudoFBDocs(workSetRes, -1); // -1 means using all docs
       model.scoreDocSet(*q,*workSet,res);
