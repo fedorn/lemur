@@ -14,7 +14,7 @@
 #ifndef _INVFPTYPES_H
 #define _INVFPTYPES_H
 
-#define IND_VERSION "2.0.3"
+#define IND_VERSION "2.1"
 
 #include "common_headers.hpp"
 
