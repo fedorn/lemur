@@ -39,7 +39,7 @@
 class KeyfileDocMgr : public DocumentManager, public TextHandler {
 public:
   /// default constructor 
-  KeyfileDocMgr() {  myDoc = NULL;  numdocs = 0; }
+  KeyfileDocMgr() {  myDoc = NULL;  numdocs = 0; ignoreDoc = false; }
 
   /// constructor (for open)
   ///             name = toc file for this manager (same as getMyID) 
@@ -61,7 +61,7 @@ public:
   virtual void handleEndDoc();
   /// Add start and end byte offsets for this term to the list of offsets
   virtual char *handleWord(char * word) {
-    if (word != NULL) {
+    if (!ignoreDoc && word != NULL) {
       int end = myparser->fileTell() - 1;
       int start = (end - strlen(word)) + 1;
       Match m;
@@ -126,7 +126,11 @@ protected:
   string IDname;            // my name
   string IDnameext;			// my name w/ extension
   vector<string> sources;   // list of all source files
+  /// how many sources already processed?
+  int numOldSources;
   int fileid;       // fileid of current/last file being processed
+  /// are we ignoring this document?
+  bool ignoreDoc;
 };
 
 #endif // _LEMUR_KEYFILE_DOCMGR_HPP

@@ -35,20 +35,25 @@ ElemDocMgr::ElemDocMgr(const string &name) {
     val = IDname + ELEM_ELS;
     elements.create( val.c_str());    
   }
+  // how many have been parsed already.
+  numOldSources = sources.size();
 }
 
 ElemDocMgr::ElemDocMgr(string name, string mode, string source) {
   IDname = name;
   IDnameext = IDname+ELEM_TOC;
-  pm = mode;
-  setParser(TextHandlerManager::createParser(mode));
-  string val = IDname + BT_LOOKUP;
-  doclookup.create( val.c_str() );
-  val = IDname + BT_POSITIONS;
-  poslookup.create( val.c_str() );
-  val = IDname + ELEM_ELS;
-  elements.create( val.c_str());
-
+  if (! loadTOC()) {    
+    pm = mode;
+    setParser(TextHandlerManager::createParser(mode));
+    string val = IDname + BT_LOOKUP;
+    doclookup.create( val.c_str() );
+    val = IDname + BT_POSITIONS;
+    poslookup.create( val.c_str() );
+    val = IDname + ELEM_ELS;
+    elements.create( val.c_str());
+  }
+  // how many have been parsed already.
+  numOldSources = sources.size();
   ifstream files(source.c_str());
   string file;
   if (files.is_open()) {
@@ -66,46 +71,50 @@ ElemDocMgr::~ElemDocMgr() {
 }
 
 char* ElemDocMgr::handleBeginTag(char* tag, const char* orig, PropertyList* props) {
-  const Property* prop = NULL;
-  prop = props->getProperty("B_ELEM");
-  if (prop) {
-    map<char*, btl, abc>::iterator point = elemtable.find((char*)prop->getValue());
-    if (point == elemtable.end()) {
-      // new one
-      btl entry;
-      entry.fid = fileid;
-      entry.offset = myparser->fileTell();
-      entry.bytes = 0;
-      // table should copy this value
-      elemtable[(char*)prop->getValue()] = entry;
-    } 
-    // else we already have a tag with the same name being created. ignore it.
+  if (! ignoreDoc) {
+    const Property* prop = NULL;
+    prop = props->getProperty("B_ELEM");
+    if (prop) {
+      map<char*, btl, abc>::iterator point = elemtable.find((char*)prop->getValue());
+      if (point == elemtable.end()) {
+	// new one
+	btl entry;
+	entry.fid = fileid;
+	entry.offset = myparser->fileTell();
+	entry.bytes = 0;
+	// table should copy this value
+	elemtable[(char*)prop->getValue()] = entry;
+      } 
+      // else we already have a tag with the same name being created. ignore it.
+    }
   }
   return tag;
 }
 
 char* ElemDocMgr::handleEndTag(char* tag, const char* orig, PropertyList* props){
-  // find the tag
-  const Property* prop=NULL;
-  prop = props->getProperty("E_ELEM");
-  if (prop) {
-    char* elname = (char*)prop->getValue();
+  if (!ignoreDoc) {
+    // find the tag
+    const Property* prop=NULL;
+    prop = props->getProperty("E_ELEM");
+    if (prop) {
+      char* elname = (char*)prop->getValue();
     
-    map<char*, btl, abc>::iterator point = elemtable.find(elname);
-    if (point != elemtable.end()) {    
-      // got it
-      // overwrites previous keys
-      char* key = new char[strlen(myDoc)+strlen(elname)+1];
-      strcpy(key, myDoc);
-      strcat(key, elname);
-      // fileTell gives us current file position, don't store actual end tag
-      (point->second).bytes = myparser->fileTell()-(point->second).offset-strlen(orig);
-      elements.put(key, &(point->second), sizeof(btl));
-      delete[]key;
-      // remove from table
-      elemtable.erase(point);
+      map<char*, btl, abc>::iterator point = elemtable.find(elname);
+      if (point != elemtable.end()) {    
+	// got it
+	// overwrites previous keys
+	char* key = new char[strlen(myDoc)+strlen(elname)+1];
+	strcpy(key, myDoc);
+	strcat(key, elname);
+	// fileTell gives us current file position, don't store actual end tag
+	(point->second).bytes = myparser->fileTell()-(point->second).offset-strlen(orig);
+	elements.put(key, &(point->second), sizeof(btl));
+	delete[]key;
+	// remove from table
+	elemtable.erase(point);
+      }
+      // else we didn't get it, then there's nothing to do
     }
-    // else we didn't get it, then there's nothing to do
   }
   return tag;
 }

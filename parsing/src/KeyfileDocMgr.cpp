@@ -22,7 +22,7 @@
 KeyfileDocMgr::KeyfileDocMgr(const string &name) {
   myDoc = NULL;
   numdocs = 0;
-
+  ignoreDoc = false;
   IDnameext = name;
   // strip extension
   IDname = IDnameext.substr(0, IDnameext.length() - 4);
@@ -37,20 +37,28 @@ KeyfileDocMgr::KeyfileDocMgr(const string &name) {
     pm = "trec"; /// bleah fix me
     setParser(TextHandlerManager::createParser());
   }
+  // how many have been parsed already.
+  numOldSources = sources.size();
 }
 
 KeyfileDocMgr::KeyfileDocMgr(string name, string mode, string source) {
   myDoc = NULL;
   numdocs = 0;
+  ignoreDoc = false;
   IDname = name;
   IDnameext = IDname+BT_TOC;
-  pm = mode;
-  setParser(TextHandlerManager::createParser(mode));
-  string val = IDname + BT_LOOKUP;
-  doclookup.create(val);
-  val = IDname + BT_POSITIONS;
-  poslookup.create(val);
-
+  if (!loadTOC()) {
+    // brand new. create
+    pm = mode;
+    setParser(TextHandlerManager::createParser(mode));
+    string val = IDname + BT_LOOKUP;
+    doclookup.create(val);
+    val = IDname + BT_POSITIONS;
+    poslookup.create(val);
+  }
+  // how many have been parsed already.
+  numOldSources = sources.size();
+  // add the new files.
   ifstream files(source.c_str());
   string file;
   if (files.is_open()) {
@@ -72,35 +80,37 @@ KeyfileDocMgr::~KeyfileDocMgr() {
 }
 
 void KeyfileDocMgr::handleEndDoc() {
-  int end = myparser->fileTell();
-  docEntry.bytes = end - docEntry.offset;
+  if (!ignoreDoc) {
+    int end = myparser->fileTell();
+    docEntry.bytes = end - docEntry.offset;
+    
+    // store into table
+    doclookup.put( myDoc, &docEntry, sizeof (btl) );
 
-  // store into table
-  doclookup.put( myDoc, &docEntry, sizeof (btl) );
-
-  // write out byte positions array.
-  int numOffs = offsets.size();
-  int *offs = new int[numOffs * 2];
-  int i = 0;
-  for (vector <Match>::iterator iter = offsets.begin();
-       iter != offsets.end();
-       iter++) {
-    offs[i++] = (*iter).start;
-    offs[i++] = (*iter).end - (*iter).start;
+    // write out byte positions array.
+    int numOffs = offsets.size();
+    int *offs = new int[numOffs * 2];
+    int i = 0;
+    for (vector <Match>::iterator iter = offsets.begin();
+	 iter != offsets.end();
+	 iter++) {
+      offs[i++] = (*iter).start;
+      offs[i++] = (*iter).end - (*iter).start;
+    }
+    // compress it
+    unsigned char* comp = new unsigned char[numOffs * sizeof(int) * 2];
+    int datalen = (numOffs * 2);
+    int compbyte = RVLCompress::compress_ints(offs, comp, datalen);
+    
+    poslookup.put( myDoc, comp, compbyte );
+    offsets.clear();
+    delete[](offs);
+    delete[](comp);
   }
-  // compress it
-  unsigned char* comp = new unsigned char[numOffs * sizeof(int) * 2];
-  int datalen = (numOffs * 2);
-  int compbyte = RVLCompress::compress_ints(offs, comp, datalen);
-
-  poslookup.put( myDoc, comp, compbyte );
-  offsets.clear();
-  delete[](offs);
-  delete[](comp);
+  ignoreDoc = false;
 }
 
 char* KeyfileDocMgr::handleDoc(char* docno) {
-  numdocs++;
   docEntry.offset = myparser->getDocBytePos();
   docEntry.fid = fileid;
   doclen = strlen(docno) + 1;
@@ -114,6 +124,16 @@ char* KeyfileDocMgr::handleDoc(char* docno) {
   myDoc = new char[doclen];
   strncpy(myDoc, docno, doclen - 1);
   myDoc[doclen - 1] = '\0';
+  btl documentLocation;
+  int actual;
+  if (doclookup.get( myDoc, &documentLocation, actual, sizeof(btl) )) {
+    // duplicate document id.
+    cerr << "KeyfileDocMgr::handleDoc: duplicate document id " << myDoc 
+	 << ". Document will be ignored." << endl;
+    ignoreDoc = true;
+  } else {
+    numdocs++;
+  }
   return docno;
 }
 
@@ -126,7 +146,7 @@ char *KeyfileDocMgr::getDoc(const string &docID) const{
   int doclen = strlen(docName) + 1;
   if (doclen > (MAX_DOCID_LENGTH - 1)) {
     doclen = MAX_DOCID_LENGTH;
-    cerr << "getDoc: document id " << docName << " is too long ("
+    cerr << "KeyfileDocMgr::getDoc: document id " << docName << " is too long ("
          << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     cerr << "truncating " << docName << endl;
     strncpy(tmpdoc, docID.c_str(), doclen - 1);
@@ -141,8 +161,8 @@ char *KeyfileDocMgr::getDoc(const string &docID) const{
   char *doc = new char[documentLocation.bytes + 1];
   ifstream read(sources[documentLocation.fid].c_str(), ios::binary);
   if (!read.is_open()) {
-    cerr << "Could not open file " << sources[documentLocation.fid]
-               << " to get document" << endl;
+    cerr << "KeyfileDocMgr::getDoc: Could not open file " 
+	 << sources[documentLocation.fid] << " to get document" << endl;
     return NULL;
   }
   read.seekg(documentLocation.offset, ios::beg);
@@ -161,7 +181,8 @@ vector<Match> KeyfileDocMgr::getOffsets(const string &docID) const{
   int doclen = strlen(docName) + 1;
   if (doclen > (MAX_DOCID_LENGTH - 1)) {
     doclen = MAX_DOCID_LENGTH;
-    cerr << "getOffsets: document id " << docName << " is too long ("
+    cerr << "KeyfileDocMgr::getOffsets: document id " << docName 
+	 << " is too long ("
          << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     cerr << "truncating " << docName << endl;
     strncpy(tmpdoc, docID.c_str(), doclen - 1);
@@ -189,7 +210,7 @@ vector<Match> KeyfileDocMgr::getOffsets(const string &docID) const{
 void KeyfileDocMgr::buildMgr() {
   myparser->setTextHandler(this);
   cerr << "Building " << IDname << endl;
-  for (int i = 0; i < sources.size(); i++) {
+  for (int i = numOldSources; i < sources.size(); i++) {
     fileid = i;
     cerr << "  *Parsing " << sources[i] << endl;
     myparser->parse(sources[i]);
