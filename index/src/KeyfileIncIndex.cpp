@@ -191,22 +191,21 @@ void KeyfileIncIndex::openSegments() {
 }
 
 void KeyfileIncIndex::openDBs() {
-  dtlookup.open( names[TERM_LOOKUP], 
-		 std::ios::binary | std::ios::in | std::ios::out );
-		 // try doing input only (separate file pointers for i/o?
-		 // seems to help
-		 //std::ios::binary | std::ios::in);
+  if (_readOnly) {
+    dtlookup.open( names[TERM_LOOKUP], std::ios::binary | std::ios::in );
+  } else {
+    dtlookup.open( names[TERM_LOOKUP], 
+		   std::ios::binary | std::ios::in | std::ios::out );
+    dtlookup.seekp( 0, std::ios::end );
+  }
   dtlookup.seekg( 0, std::ios::beg );
-  dtlookup.seekp( 0, std::ios::end );
-  //  dtlookupReadBuffer = new ReadBuffer( dtlookup, 128*1024 );
-  // try bigger. But why are there writes in solaris?
   dtlookupReadBuffer = new ReadBuffer( dtlookup, 10*1024*1024 );
-
-  invlookup.open( names[DOC_LOOKUP] );
-  dIDs.open( names[DOC_IDS] );
-  dSTRs.open( names[DOC_IDSTRS] );
-  tIDs.open( names[TERM_IDS] );
-  tSTRs.open( names[TERM_IDSTRS] );
+  int cacheSize = 1024 * 1024;
+  invlookup.open( names[DOC_LOOKUP], cacheSize, _readOnly );
+  dIDs.open( names[DOC_IDS], cacheSize, _readOnly  );
+  dSTRs.open( names[DOC_IDSTRS], cacheSize, _readOnly  );
+  tIDs.open( names[TERM_IDS], cacheSize, _readOnly  );
+  tSTRs.open( names[TERM_IDSTRS], cacheSize, _readOnly  );
 }
 
 void KeyfileIncIndex::createDBs() {
@@ -215,7 +214,6 @@ void KeyfileIncIndex::createDBs() {
   dtlookup.seekg( 0, std::ios::beg );
   dtlookup.seekp( 0, std::ios::end );
 
-  //  dtlookupReadBuffer = new ReadBuffer( dtlookup, 128*1024 );
   dtlookupReadBuffer = new ReadBuffer( dtlookup, 10*1024*1024 );
   invlookup.create( names[DOC_LOOKUP] );
   dIDs.create( names[DOC_IDS] );
@@ -251,8 +249,11 @@ bool KeyfileIncIndex::open(const string &indexName){
 
   std::stringstream docfname;
   docfname << name << DTINDEX;
-  writetlist.open( docfname.str(), 
-		   ios::in | ios::out | ios::binary | ios::ate );
+  if (_readOnly)
+    writetlist.open( docfname.str(), ios::in | ios::binary );
+  else 
+    writetlist.open( docfname.str(), 
+		     ios::in | ios::out | ios::binary | ios::ate );
   writetlist.seekg( 0, std::ios::beg );
 
   ParamPopFile();
@@ -564,7 +565,7 @@ bool KeyfileIncIndex::docMgrIDs() {
       continue;
     }
     str[len] = '\0';
-    DocumentManager* dm = DocMgrManager::openDocMgr(str);
+    DocumentManager* dm = DocMgrManager::openDocMgr(str, _readOnly);
     docMgrs.push_back(dm);
     docmgrs.push_back(str);
   }

@@ -29,33 +29,29 @@ DocumentManager* DocMgrManager::createDocMgr(string type, string name,
   if (type.empty()) {
     type = ParamGetString("managerType");
   }
-  if (type == "flat") {
-    if ((!name.empty()) && (!parsetype.empty()) && (!sources.empty())) {
+  if ((!name.empty()) && (!parsetype.empty()) && (!sources.empty())) {
+    if (type == "flat") {
       dm = new FlattextDocMgr(name, parsetype, sources);
-    }
-  } else if (type == "bdm") {
-    if ((!name.empty()) && (!parsetype.empty()) && (!sources.empty())) {
+    } else if (type == "bdm") {
       dm = new KeyfileDocMgr(name, parsetype, sources);
-    }
-  } else if (type == "elem") {
-    if ((!name.empty()) && (!parsetype.empty()) && (!sources.empty())) {
+    } else if (type == "elem") {
       dm = new ElemDocMgr(name, parsetype, sources);
-    }
-  }  // Add else if new types here...
+    } // Add else if new types here...
+  }  
   return dm;
 }
 
-DocumentManager* DocMgrManager::openDocMgr(const string name) {
+DocumentManager* DocMgrManager::openDocMgr(const string name, bool readOnly) {
   DocumentManager* dm = NULL;
   int len = name.length();
 
   // look for name ending in .flat
   if (len - name.rfind(".flat") == 5)
-    dm = new FlattextDocMgr(name.c_str());
+    dm = new FlattextDocMgr(name);
   else if (len - name.rfind(".bdm") == 4)
-    dm = new KeyfileDocMgr(name.c_str());
+    dm = new KeyfileDocMgr(name, readOnly);
   else if (len - name.rfind(".elem") == 5)
-    dm = new ElemDocMgr(name.c_str());
+    dm = new ElemDocMgr(name, readOnly);
   // Add else if new types here...
   return dm;
 }

@@ -17,7 +17,8 @@
 
 #include "ElemDocMgr.hpp"
 
-ElemDocMgr::ElemDocMgr(const string &name) {
+ElemDocMgr::ElemDocMgr(const string &name, bool readOnly) {
+  _readOnly = readOnly;
   IDnameext = name;
   // strip extension
   IDname = IDnameext.substr(0, IDnameext.length() - ELEM_TOC_LEN);
@@ -40,6 +41,7 @@ ElemDocMgr::ElemDocMgr(const string &name) {
 }
 
 ElemDocMgr::ElemDocMgr(string name, string mode, string source) {
+  _readOnly = false;
   IDname = name;
   IDnameext = IDname+ELEM_TOC;
   if (! loadTOC()) {    
@@ -150,6 +152,7 @@ char* ElemDocMgr::getElement(const char* docid, const char* element) const{
 }
 
 void ElemDocMgr::writeTOC() {
+  if (_readOnly) return;
   string n = IDname + ELEM_TOC;
   ofstream toc(n.c_str());
   toc << "FILE_LOOKUP  " << IDname << BT_LOOKUP << endl;
@@ -175,17 +178,18 @@ bool ElemDocMgr::loadTOC() {
   if (!toc.is_open()) {
     return false;
   }
+  int cacheSize = 1024 * 1024;
   string key, val;
   int num = 0;
   string files;
 
   while (toc >> key >> val) {
     if (key.compare("FILE_LOOKUP") == 0)
-      doclookup.open( val.c_str() );
+      doclookup.open( val, cacheSize,  _readOnly );
     else if (key.compare("POS_LOOKUP") == 0)
-      poslookup.open( val.c_str() );
+      poslookup.open( val, cacheSize, _readOnly );
     else if (key.compare("DOC_ELEMENTS") == 0)
-      elements.open( val.c_str() );
+      elements.open( val, cacheSize, _readOnly );
     else if (key.compare("FILE_IDS") == 0)
       files = val;    
     else if (key.compare("NUM_DOCS") == 0)

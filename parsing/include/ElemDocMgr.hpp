@@ -49,7 +49,8 @@ public:
 
   /// constructor (for open)
   ///             name = toc file for this manager (same as getMyID) 
-  ElemDocMgr(const string &name);
+  /// @param readOnly whether or not to open the manager in read only mode.
+  ElemDocMgr(const string &name, bool readOnly = true);
 
   /// constructor (for build) 
   ///             name = what to name this manager

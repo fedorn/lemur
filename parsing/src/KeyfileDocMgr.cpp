@@ -245,15 +245,16 @@ bool KeyfileDocMgr::loadTOC() {
   if (!toc.is_open()) {
     return false;
   }
+  int cacheSize = 1024 * 1024;
   string key, val;
   int num = 0;
   string files;
 
   while (toc >> key >> val) {
     if (key.compare("FILE_LOOKUP") == 0)
-      doclookup.open(val);
+      doclookup.open( val, cacheSize,  _readOnly );
     else if (key.compare("POS_LOOKUP") == 0)
-      poslookup.open(val);
+      poslookup.open( val, cacheSize, _readOnly );
     else if (key.compare("FILE_IDS") == 0)
       files = val;    
     else if (key.compare("NUM_DOCS") == 0)

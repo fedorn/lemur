@@ -34,7 +34,8 @@ public:
   /// .bdm -- KeyfileDocMgr.
   /// elem -- ElemDocMgr.
   /// caller deletes
-  static DocumentManager* openDocMgr(const string name);
+  /// @param readOnly  open the manager in read only mode.
+  static DocumentManager* openDocMgr(const string name, bool readOnly = true);
 };
 
 #endif
