@@ -12,7 +12,7 @@
 #ifndef _MEMPARSER_HPP
 #define _MEMPARSER_HPP
 
-#include "Parser.hpp"
+#include "TextHandler.hpp"
 
 /// A document id is a null terminated character array.
 typedef char * docid_t;
@@ -30,7 +30,7 @@ typedef struct doct {
  * Parses a document that is in memory, rather than on disk.
  * Should be paired with a DBManager for query based sampling.
  */
-class MemParser : public Parser {
+class MemParser : public TextHandler {
  
 public:
  
@@ -38,9 +38,6 @@ public:
   /// This call may be desctructive to the buffer.
   virtual void parse (doc_t * doc) = 0;
   
-  virtual void parse (char * filename) { };
-
-
 };
 
 #endif

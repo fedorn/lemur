@@ -26,16 +26,7 @@ public:
  
   /// Parses a document in memory.
   void parse (doc_t * doc);
-  /// Not supported by this class.
-  void parse (char * filename) { }
   
-  /// Not supported by this class.
-  void setAcronymList(WordSet * acronyms) { }
-
-protected:
-  /// Not supported by this class.
-  bool isAcronym(char * word) { return false; }
-
 private:
   Index * index;
 
