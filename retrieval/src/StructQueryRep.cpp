@@ -14,9 +14,9 @@
 
 #include "StructQueryRep.hpp"
 
-QnList * StructQueryRep::getChildren(StructQuery &qry, getFunc getFn, 
+QnList * StructQueryRep::getChildren(const StructQuery &qry, getFunc getFn, 
 					bool weigh) {
-  TokenTerm *tok;
+  const TokenTerm *tok;
   QueryNode *qn;
   QueryNode *qParent = qStack[topqStack-1];
   QnList *chlist = new QnList();
@@ -50,8 +50,7 @@ QnList * StructQueryRep::getChildren(StructQuery &qry, getFunc getFn,
   return chlist;
 }
 
-QueryNode * StructQueryRep::getProxQryNode(StructQuery &qry, TokenTerm *tok, 
-					   double w) {
+QueryNode * StructQueryRep::getProxQryNode(const StructQuery &qry, const TokenTerm *tok, double w) {
   // using a separate function for parsing proximity ops
   // because they allow only proximity children
   QueryNode *qn;
@@ -119,7 +118,7 @@ QueryNode * StructQueryRep::getProxQryNode(StructQuery &qry, TokenTerm *tok,
 }
 
 
-QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok, 
+QueryNode * StructQueryRep::getQryNode(const StructQuery &qry, const TokenTerm *tok, 
 				       double w) {
 
   QueryNode *qn;
@@ -295,13 +294,13 @@ QueryNode * StructQueryRep::getQryNode(StructQuery &qry, TokenTerm *tok,
   }
 }
 
-StructQueryRep::StructQueryRep(StructQuery &qry, Index &dbIndex, 
+StructQueryRep::StructQueryRep(const StructQuery &qry, const Index &dbIndex, 
 			       double dbelief):
   topqStack(0), dw(dbelief), ind(dbIndex) {
   for (int i = 0; i < 100; i++)
     qStack[i] = NULL; /// fix this size assumption.
   numDocs = ind.docCount();
   qry.startTermIteration();
-  TokenTerm *tok = qry.nextTerm();
+  const TokenTerm *tok = qry.nextTerm();
   topNode = getQryNode(qry, tok, 1.0);
 }

@@ -29,32 +29,32 @@
 
 class CORIQueryRep : public ArrayQueryRep {
 public:
-  CORIQueryRep(TextQuery & qry, Index & dbIndex);
+  CORIQueryRep(const TextQuery & qry, const Index & dbIndex);
   virtual ~CORIQueryRep() {}
 
 protected:
-  Index & ind;
+  const Index & ind;
 };
 
 class CORIDocRep : public DocumentRep {
 public:
-  CORIDocRep(int docID, Index & dbIndex, double * cwRatio, 
+  CORIDocRep(int docID, const Index & dbIndex, double * cwRatio, 
 	     double TFfact = 150, double TFbase = 50, 
-	     SimpleKLDocModel * smoother = NULL,
-	     UnigramLM * collectLM = NULL);
+	     const SimpleKLDocModel * smoother = NULL,
+	     const UnigramLM * collectLM = NULL);
   virtual ~CORIDocRep() { }
-  virtual double termWeight(int termID, DocInfo * info);
+  virtual double termWeight(int termID, const DocInfo * info) const ;
 
-  virtual double scoreConstant() { return 0; }
+  virtual double scoreConstant() const { return 0; }
 
 private:
 
-  Index & ind;
+  const Index & ind;
 
   int * cwCounts;
 
-  SimpleKLDocModel * dfSmooth;
-  UnigramLM * collLM;
+  const SimpleKLDocModel * dfSmooth;
+  const UnigramLM * collLM;
 
   double c05;
   double idiv;
@@ -66,13 +66,13 @@ private:
 class CORIRetMethod : public TextQueryRetMethod {
 public:
 
-  CORIRetMethod(Index & dbIndex, ScoreAccumulator &accumulator, 
+  CORIRetMethod(const Index & dbIndex, ScoreAccumulator &accumulator, 
 		   String cwName, int isCSIndex=0,
-		SimpleKLDocModel ** smoothers = NULL, 
-		UnigramLM * collectLM = NULL);
+		const SimpleKLDocModel ** smoothers = NULL, 
+		const UnigramLM * collectLM = NULL);
   ~CORIRetMethod() { delete scFunc; delete [] cwRatio; }
 
-  virtual TextQueryRep * computeTextQueryRep(TextQuery & qry) {
+  virtual TextQueryRep * computeTextQueryRep(const TextQuery & qry) {
     return new CORIQueryRep(qry, ind);
   }
   virtual DocumentRep * computeDocRep(int docID) { 
@@ -85,9 +85,9 @@ public:
     return scFunc;
   }
 
-  virtual void scoreCollection(QueryRep &qry, IndexedRealVector &results);
+  virtual void scoreCollection(const QueryRep &qry, IndexedRealVector &results);
 
-  virtual void updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs) { }
+  virtual void updateTextQuery(TextQueryRep &qryRep, const DocIDSet &relDocs) { }
   
   void setTFFactor(double tf) { tffactor = tf; }
   void setTFBaseline(double tf) { tfbaseline = tf; }
@@ -95,8 +95,8 @@ public:
 protected:
 
   ScoreFunction * scFunc;
-  SimpleKLDocModel ** dfSmooth;
-  UnigramLM * collLM;
+  const SimpleKLDocModel ** dfSmooth;
+  const UnigramLM * collLM;
 
   double * cwRatio;
   double tffactor;
@@ -106,18 +106,18 @@ protected:
 
 class CORIScoreFunc : public ScoreFunction {
 public:
-  CORIScoreFunc(Index & index) : ind(index) {
+  CORIScoreFunc(const Index & index) : ind(index) {
     rmax=0;
     double dc = ind.docCount();
     c05 = dc + 0.5;
     idiv = log(dc + 1);
-    qr=NULL;
+    //    qr=NULL;
     first=0;
   }
 
-  virtual double adjustedScore(double origScore, TextQueryRep * qRep,
-			       DocumentRep * dRep) {
-
+  virtual double adjustedScore(double origScore, const TextQueryRep * qRep,
+			       const DocumentRep * dRep) const {
+    /*
     if (qr != qRep) {
       qr = qRep;
       
@@ -132,15 +132,15 @@ public:
     if ((origScore/rmax)>=1){
       cout<<"!!!!!!!!!"<<endl;
       cout<<origScore<<" "<<rmax<<" "<<(origScore / rmax)<<endl;
-    }
+      }*/
     //return (origScore / rmax);
     return origScore;
   }
 
 private:
-  Index & ind;
+  const Index & ind;
   int first;
-  TextQueryRep * qr;
+  //TextQueryRep * qr;
   double rmax;
   double c05;
   double idiv;

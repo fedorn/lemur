@@ -57,8 +57,8 @@ void QueryNode::transformPassageOps() {
 
   /// weighted sum of prox children
   /// all belief operators have already been removed/flattened.
- double PassageQNode::passageScore(StructQryDocRep *dRep) {
-    QueryNode *child;
+ double PassageQNode::passageScore(const StructQryDocRep *dRep) const{
+    const QueryNode *child;
     int did = dRep->did;
     double score = 0;
     int tf;
@@ -94,7 +94,7 @@ void QueryNode::transformPassageOps() {
 // net done completely.
 
 void TermQnode::copyDocList(int listlen, int tf,
-			    DocInfoList *dl, int numDocs) {
+			    const DocInfoList *dl, int numDocs) {
   int dc = numDocs + 1;
   int nd = dc;
   int cnt = 0;
@@ -195,7 +195,7 @@ void QueryNode::intersectDocList(int numDocs) {
   ch->startIteration();
   while (ch->hasMore()) {
     int i;
-    QueryNode *child = ch->nextNode();
+    const QueryNode *child = ch->nextNode();
     child->startProxIteration();
     /// this should iterate over the sets of prox lists
     /// pairwise intersect (or clever).
@@ -239,7 +239,7 @@ void SynQNode::synonymProxList() {
   // Have to union the proxinfos.
   // dCnt, dList, nextDoc all have been set.
   // proxList is NULL.
-  QueryNode *child;
+  const QueryNode *child;
   int numChildren = entries;  
   int nextPos, minIDX, minVal;
   int i, j, k,  df = 0;
@@ -254,7 +254,7 @@ void SynQNode::synonymProxList() {
   totalPos += totalTF;
   int *newProx = new int[totalPos];
   int *tmpDF = new int[numChildren]; /// collect freqs
-  int **tmpPos = new int *[numChildren]; /// collect pos vectors to merge.
+  const int** tmpPos = new const int *[numChildren]; /// collect pos vectors to merge.
   int *posIDX = new int[numChildren]; /// pos buffer idx
   int newProxIDX = 0;
   for(j = 0, i = nextDoc; j < dCnt; i++) {
@@ -309,10 +309,10 @@ void SynQNode::synonymProxList() {
 
 
 bool OdnQNode::foundOrderedProx(int currPos, int wsize, 
-				      QnList *cl,  int ith) {
+				      const QnList *cl,  int ith) {
   // recursively find the matched window in children order
   if(ith < cl->size()) {
-    QueryNode *nextChild = cl->getNode(ith);
+    const QueryNode *nextChild = cl->getNode(ith);
     if(nextChild->proxList->nextPos >= nextChild->proxList->count())
       return false; // no more positions for this child
     int childPos;
@@ -339,10 +339,9 @@ currPos)) {
 
 void OdnQNode::orderedProxList(int numDocs) {
   static int intsize = sizeof(int);
-  QueryNode *child;
+  const QueryNode *child;
   int i, j, cnt, df = 0;
   int nd = numDocs + 1;
-  bool no_more = false;
 
   // Choose min num doc positions for allocation.
   int totalPos = INT_MAX;
@@ -358,7 +357,6 @@ void OdnQNode::orderedProxList(int numDocs) {
   int *newProx = new int[totalPos];
   int newProxIDX = 0;
   int totalTF = 0;
-  int nxtProx = 0;
   
   for(j = 0, i = nextDoc; j < dCnt; i++) {
     if(dList[i]) {  /// doc in the list
@@ -376,7 +374,7 @@ void OdnQNode::orderedProxList(int numDocs) {
       // start with the first child
       child = ch->getNode(0);
       int numPos = child->proxList->count();
-      int *positions = child->proxList->positions();
+      const int *positions = child->proxList->positions();
       for(int k = 0; k < numPos; k++) {
 	// find the matched window from the rest of children
 	if(foundOrderedProx(positions[k], winSize, ch, 1)) {
@@ -426,7 +424,7 @@ void OdnQNode::orderedProxList(int numDocs) {
   ch = NULL;
 }
 
-bool UwnQNode::findUnorderedWin(QueryNode *cqn, QnList *cl, 
+bool UwnQNode::findUnorderedWin(const QueryNode *cqn, QnList *cl, 
 				      int winSize) {
   bool found = true;
   cl->startIteration();
@@ -447,7 +445,6 @@ void UwnQNode::unorderedProxList(int numDocs) {
   QueryNode *child; 
   int i, j, cnt, df = 0;
   int nd = numDocs + 1;
-  bool no_more = false;
   //  int winSize = ((UwnQNode *)qn)->winSize;
 
   // Choose min num doc positions for allocation.
@@ -464,7 +461,6 @@ void UwnQNode::unorderedProxList(int numDocs) {
   int *tmpPos = NULL;
   int newProxIDX = 0;
   int totalTF = 0;
-  int nxtProx = 0;
   for (j = 0, i = nextDoc; j < dCnt; i++) {
     if(dList[i]) {
       j++;

@@ -14,13 +14,12 @@
 
 #include <stdio.h>
 
-CORIDocRep::CORIDocRep(int docID, Index & dbIndex, double * cwRatio, 
+CORIDocRep::CORIDocRep(int docID, const Index & dbIndex, double * cwRatio, 
 		       double TFfact, double TFbase, 
-		       SimpleKLDocModel * smoother,
-		       UnigramLM * collectLM) : 
-  DocumentRep(docID), ind(dbIndex) {
+		       const SimpleKLDocModel * smoother,
+		       const UnigramLM * collectLM) : 
+  DocumentRep(docID, dbIndex.docLength(docID)), ind(dbIndex) {
    
-
   double c = ind.docCount();
   idiv = log (c + 1);    
   c05 = c + 0.5;
@@ -32,7 +31,7 @@ CORIDocRep::CORIDocRep(int docID, Index & dbIndex, double * cwRatio,
 }
 
 double 
-CORIDocRep::termWeight(int termID, DocInfo * info) { 
+CORIDocRep::termWeight(int termID, const DocInfo * info) const { 
   
   double cf = ind.docCount(termID);
   double df = info->termCount(); 
@@ -40,10 +39,12 @@ CORIDocRep::termWeight(int termID, DocInfo * info) {
   if (dfSmooth != NULL) {
     cout<<"smooth:"<<endl;
     if (df > 0) {
-      df = dfSmooth->seenProb(df, termID) * ind.docLength(info->docID());
+      //      df = dfSmooth->seenProb(df, termID) * ind.docLength(info->docID());
+      df = dfSmooth->seenProb(df, termID) * docLength;
     } else {
-      df = dfSmooth->unseenCoeff() * collLM->prob(termID) * 
-	ind.docLength(info->docID());
+      //      df = dfSmooth->unseenCoeff() * collLM->prob(termID) * 
+      //	ind.docLength(info->docID());
+      df = dfSmooth->unseenCoeff() * collLM->prob(termID) * docLength;
     }
   }
   
@@ -60,7 +61,7 @@ CORIDocRep::termWeight(int termID, DocInfo * info) {
   return p;
 }
 
-CORIQueryRep::CORIQueryRep(TextQuery &qry, Index &dbIndex) : 
+CORIQueryRep::CORIQueryRep(const TextQuery &qry, const Index &dbIndex) : 
   ArrayQueryRep (dbIndex.termCountUnique() + 1, qry, dbIndex), ind(dbIndex) {
 
   startIteration();
@@ -70,7 +71,7 @@ CORIQueryRep::CORIQueryRep(TextQuery &qry, Index &dbIndex) :
   }
 }
 
-void CORIRetMethod::scoreCollection(QueryRep &qry, 
+void CORIRetMethod::scoreCollection(const QueryRep &qry, 
 				    IndexedRealVector &results) {
   scoreInvertedIndex(qry, results, false);
   //adjust the score;
@@ -98,10 +99,10 @@ void CORIRetMethod::scoreCollection(QueryRep &qry,
 
 
 
-CORIRetMethod::CORIRetMethod(Index & dbIndex, ScoreAccumulator &accumulator, 
+CORIRetMethod::CORIRetMethod(const Index & dbIndex, ScoreAccumulator &accumulator, 
 				   String cwName, int isCSIndex,
-			     SimpleKLDocModel ** smoothers,
-			     UnigramLM * collectLM) : 
+			     const SimpleKLDocModel ** smoothers,
+			     const UnigramLM * collectLM) : 
   TextQueryRetMethod (dbIndex, accumulator) {
 
 

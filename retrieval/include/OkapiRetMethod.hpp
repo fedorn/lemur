@@ -49,10 +49,10 @@ public:
   OkapiQueryTerm(int termID, double count, int pEstCount, double paramK3) : QueryTerm(termID, count), pEst(pEstCount), k3(paramK3) {
   }
   /// return the number of rel docs with the term
-  virtual int pEstCount() { return pEst;}
+  virtual int pEstCount() const { return pEst;}
 
   /// return query term TF weight
-  virtual double weight() { 
+  virtual double weight() const { 
     return ((k3+1)*w/(k3+w));
   } 
 private:
@@ -64,10 +64,10 @@ private:
 
 class OkapiScoreFunc : public ScoreFunction {
 public:
-  OkapiScoreFunc(Index &dbIndex): ind(dbIndex) {}
-  virtual double matchedTermWeight(QueryTerm *qTerm, TextQueryRep *qRep, DocInfo *info, DocumentRep *dRep);
+  OkapiScoreFunc(const Index &dbIndex): ind(dbIndex) {}
+  virtual double matchedTermWeight(const QueryTerm *qTerm, const TextQueryRep *qRep, const DocInfo *info, const DocumentRep *dRep) const;
 protected:
-  Index &ind;
+  const Index &ind;
 };
 
 
@@ -75,17 +75,17 @@ protected:
 class OkapiQueryRep : public ArrayQueryRep {
 public:
   // initial query constructor, no feedback docs assumed
-  OkapiQueryRep(TextQuery &qry, Index &dbIndex, double paramK3);
+  OkapiQueryRep(const TextQuery &qry, const Index &dbIndex, double paramK3);
 
   virtual ~OkapiQueryRep() { delete [] pEst; }
   /// return total number of relevant/feedback documents
-  int pNormCount() { return pNorm;}
+  int pNormCount() const { return pNorm;}
   /// set total number of relevant/feedback documents
   void setPNormCount(int count) { pNorm = count;}
   /// increase the count of relevant/feedback doc in which a term occurs
   void incPEst(int wdIndex, int val) { pEst[wdIndex]+=val;}
 protected:
-  virtual QueryTerm *makeQueryTerm(int wdIndex, double wdCount) {
+  virtual QueryTerm *makeQueryTerm(int wdIndex, double wdCount) const{
     return (new OkapiQueryTerm(wdIndex, wdCount, pEst[wdIndex], k3));
   }
   double k3;
@@ -97,15 +97,15 @@ protected:
 
 class OkapiDocRep : public DocumentRep {
 public:
-  OkapiDocRep(int docID, Index &dbIndex, OkapiParameter::TFParam &param) : DocumentRep(docID), ind(dbIndex),
+  OkapiDocRep(int docID, const Index &dbIndex, OkapiParameter::TFParam &param) : DocumentRep(docID, dbIndex.docLength(docID)), ind(dbIndex),
   prm(param) {
   }
   virtual ~OkapiDocRep() { }
-  virtual double termWeight(int termID, DocInfo *info);
-  double BM25TF(double rawTF, double docLength);
-  virtual double scoreConstant() { return 0;}
+  virtual double termWeight(int termID, const DocInfo *info) const;
+  double BM25TF(double rawTF, double docLength) const;
+  virtual double scoreConstant() const { return 0;}
 protected:
-  Index &ind;
+  const Index &ind;
   OkapiParameter::TFParam &prm;
 };
 
@@ -115,11 +115,11 @@ class OkapiRetMethod : public TextQueryRetMethod  {
 public:
 
 
-  OkapiRetMethod(Index &dbIndex, ScoreAccumulator &accumulator);
+  OkapiRetMethod(const Index &dbIndex, ScoreAccumulator &accumulator);
 
   virtual ~OkapiRetMethod() { delete scFunc;}
 
-  virtual TextQueryRep *computeTextQueryRep(TextQuery &qry) {
+  virtual TextQueryRep *computeTextQueryRep(const TextQuery &qry) {
     return (new OkapiQueryRep(qry, ind, tfParam.k3));
   }
 
@@ -130,7 +130,7 @@ public:
   virtual ScoreFunction *scoreFunc();
 
   /// It's suspected that there is a bug in the implementation of feedback; the performance is not as expected.   
-  virtual void updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs);
+  virtual void updateTextQuery(TextQueryRep &origRep, const DocIDSet &relDocs);
 
   void setTFParam(OkapiParameter::TFParam &tfWeightParam);
 
@@ -163,13 +163,13 @@ inline void OkapiRetMethod::setFeedbackParam(OkapiParameter::FeedbackParam &feed
   fbParam = feedbackParam;
 }
 
-inline double OkapiDocRep::BM25TF(double rawTF, double docLength) 
+inline double OkapiDocRep::BM25TF(double rawTF, double docLength) const 
 {
   return ((prm.k1+1)*rawTF/(rawTF +  prm.k1*(1-prm.b + prm.b*docLength/ind.docLengthAvg())));
 }
 
 
-inline double OkapiDocRep::termWeight(int termID, DocInfo *info)
+inline double OkapiDocRep::termWeight(int termID, const DocInfo *info) const
 {
   return BM25TF(info->termCount(), ind.docLength(info->docID()));
 } 

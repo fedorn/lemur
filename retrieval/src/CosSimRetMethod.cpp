@@ -17,7 +17,7 @@
 #include <cmath>
 
 /// Construct a query rep from a text query.
-CosSimQueryRep::CosSimQueryRep(TextQuery &qry, Index &dbIndex, 
+CosSimQueryRep::CosSimQueryRep(const TextQuery &qry, const Index &dbIndex, 
 			       double *idfValue): 
   ArrayQueryRep (dbIndex.termCountUnique()+1, qry, dbIndex), 
   ind(dbIndex), idf(idfValue) {
@@ -41,7 +41,7 @@ CosSimQueryRep::CosSimQueryRep(TextQuery &qry, Index &dbIndex,
 }
 
 /// Construct a query rep from an existing document (given document id).
-CosSimQueryRep::CosSimQueryRep(int docId, Index &dbIndex, 
+CosSimQueryRep::CosSimQueryRep(int docId, const Index &dbIndex, 
 			       double *idfValue): 
   ArrayQueryRep (dbIndex.termCountUnique() + 1), 
   ind(dbIndex), idf(idfValue) {
@@ -70,12 +70,12 @@ CosSimQueryRep::CosSimQueryRep(int docId, Index &dbIndex,
   }
 }
 
-CosSimRetMethod::CosSimRetMethod(Index &dbIndex, 
+CosSimRetMethod::CosSimRetMethod(const Index &dbIndex, 
 				 ScoreAccumulator &accumulator) :
-  TextQueryRetMethod(dbIndex, accumulator) {
+  TextQueryRetMethod(dbIndex, accumulator), 
+  L2FileName(CosSimParameter::defaultL2File) {
   fbParam.howManyTerms = CosSimParameter::defaultHowManyTerms;
   fbParam.posCoeff = CosSimParameter::defaultPosCoeff;
-  L2FileName = CosSimParameter::defaultL2File;
   // pre-compute IDF values
   idfV = new double[dbIndex.termCountUnique()+1];
   for (int i=1; i<=dbIndex.termCountUnique(); i++) {
@@ -85,7 +85,7 @@ CosSimRetMethod::CosSimRetMethod(Index &dbIndex,
   scFunc = new CosSimScoreFunc(dbIndex);
 }
 
-CosSimRetMethod::CosSimRetMethod(Index &dbIndex, const char *L2file,
+CosSimRetMethod::CosSimRetMethod(const Index &dbIndex, const string &L2file,
 				 ScoreAccumulator &accumulator) :
   TextQueryRetMethod(dbIndex, accumulator), L2FileName(L2file) {
   fbParam.howManyTerms = CosSimParameter::defaultHowManyTerms;
@@ -107,7 +107,7 @@ void CosSimRetMethod::loadDocNorms() {
     docNorms[j] = 0;
   }
   ifstream ifs;
-  ifs.open(L2FileName);
+  ifs.open(L2FileName.c_str());
   if (ifs.fail()) {
     cerr << "open file, wrong name:" << L2FileName << endl; 
     return;
@@ -156,7 +156,8 @@ double CosSimRetMethod::docNorm(int docID) {
 }
 
 /// Use same as TFIDFRetMethod
-void CosSimRetMethod::updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs)
+void CosSimRetMethod::updateTextQuery(TextQueryRep &qryRep, 
+				      const DocIDSet &relDocs)
 {
   int totalTerm=ind.termCountUnique();  
   float * centroidVector = new float[totalTerm+1]; // one extra for OOV

@@ -20,7 +20,7 @@
 /// Representation of a query in the InQuery method
 class InQueryRep : public StructQueryRep {
 public:
-  InQueryRep(StructQuery &qry, Index &dbIndex, double db):
+  InQueryRep(const StructQuery &qry, const Index &dbIndex, double db):
     StructQueryRep(qry, dbIndex, db) {}
   virtual ~InQueryRep() {}
 };
@@ -35,14 +35,14 @@ class InQueryRetMethod : public StructQueryRetMethod {
 public:
 
   //  InQueryRetMethod(Index &dbIndex, ScoreAccumulator &accumulator);
-  InQueryRetMethod(Index &dbIndex, double belief, int fbTerms, 
+  InQueryRetMethod(const Index &dbIndex, double belief, int fbTerms, 
 		   double fbCoef, bool cacheIDF);
   virtual ~InQueryRetMethod() {
     delete[](idfV); 
     delete(scFunc);
   }
 
-  virtual StructQueryRep *computeStructQueryRep(StructQuery &qry) {
+  virtual StructQueryRep *computeStructQueryRep(const StructQuery &qry) {
     return (new InQueryRep(qry, ind, defaultBelief));
   }
 
@@ -56,7 +56,7 @@ public:
   }
   /// Create new structured query that is a weighted sum of the original
   /// query and the terms selected.
-  virtual void updateStructQuery(StructQueryRep &qryRep, DocIDSet &relDocs);
+  virtual void updateStructQuery(StructQueryRep &qryRep, const DocIDSet &relDocs);
 private:
   double *idfV;
   ScoreFunction *scFunc; 

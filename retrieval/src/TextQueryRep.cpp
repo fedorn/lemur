@@ -12,12 +12,12 @@
 
 #include "TextQueryRep.hpp"
 
-ArrayQueryRep::ArrayQueryRep(int size, TextQuery &qry, Index &dbIndex):
+ArrayQueryRep::ArrayQueryRep(int size, const TextQuery &qry, const Index &dbIndex):
   ct(new ArrayCounter<double>(size)), scConst(0) 
 {
   qry.startTermIteration();
   while (qry.hasMore()) {
-    TokenTerm *t = qry.nextTerm();
+    const TokenTerm *t = qry.nextTerm();
     int ti = dbIndex.term(t->spelling());
     if (ti>0) {
       incCount(ti, 1);
@@ -27,7 +27,7 @@ ArrayQueryRep::ArrayQueryRep(int size, TextQuery &qry, Index &dbIndex):
   }
 }
 
-ArrayQueryRep::ArrayQueryRep(int size, FreqVector &qryVec):
+ArrayQueryRep::ArrayQueryRep(int size, const FreqVector &qryVec):
   ct(new ArrayCounter<double>(size)), scConst(0) 
 {
   qryVec.startIteration();
@@ -39,7 +39,7 @@ ArrayQueryRep::ArrayQueryRep(int size, FreqVector &qryVec):
 }
 
 
-QueryTerm *ArrayQueryRep::nextTerm()
+QueryTerm *ArrayQueryRep::nextTerm() const 
 {
   int wdIndex;
   double wdCount;
@@ -49,7 +49,7 @@ QueryTerm *ArrayQueryRep::nextTerm()
 
 
 
-bool PseudoFBDocs::hasMore() 
+bool PseudoFBDocs::hasMore() const 
 {
   if (howMany>=0 && i >= howMany) {
     return false;
@@ -57,7 +57,7 @@ bool PseudoFBDocs::hasMore()
   return (it != res->end());
 }
 
-void PseudoFBDocs::nextIDInfo(int &id, double &relProb) 
+void PseudoFBDocs::nextIDInfo(int &id, double &relProb) const 
 {
   i++;
   id = (*it).ind;

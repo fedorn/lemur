@@ -21,7 +21,7 @@ void ArrayAccumulator::reset()
   p=0;
 }
 
-bool ArrayAccumulator::findScore(int id, double &score)
+bool ArrayAccumulator::findScore(int id, double &score) const
 { 
   if (status[id-1]>0) {
     score = acc[id-1];
@@ -31,7 +31,7 @@ bool ArrayAccumulator::findScore(int id, double &score)
   }
 }
 
-bool ArrayAccumulator::hasMore() {
+bool ArrayAccumulator::hasMore() const {
   if (!(p>=0 && p<=sz)) {
     cerr << "Illegal score" << endl;
     exit(0);
@@ -40,7 +40,7 @@ bool ArrayAccumulator::hasMore() {
   return (p<sz);
 }
 
-void ArrayAccumulator::nextScore(int &id, double &score) {
+void ArrayAccumulator::nextScore(int &id, double &score) const{
   if (p<sz) id = p+1;
   score = acc[p];
   p++;

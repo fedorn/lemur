@@ -15,7 +15,7 @@
 #include <cmath>
 
 
-TFIDFQueryRep::TFIDFQueryRep(TextQuery &qry, Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param): ArrayQueryRep (dbIndex.termCountUnique()+1, qry, dbIndex), ind(dbIndex), idf(idfValue), prm(param)
+TFIDFQueryRep::TFIDFQueryRep(const TextQuery &qry, const Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param): ArrayQueryRep (dbIndex.termCountUnique()+1, qry, dbIndex), ind(dbIndex), idf(idfValue), prm(param)
 {
   startIteration();
   while (hasMore()) {
@@ -25,7 +25,7 @@ TFIDFQueryRep::TFIDFQueryRep(TextQuery &qry, Index &dbIndex, double *idfValue, T
     delete qt;
   }
 }
-double TFIDFQueryRep::queryTFWeight(const double rawTF)
+double TFIDFQueryRep::queryTFWeight(const double rawTF) const
 {
   if (prm.tf == TFIDFParameter::RAWTF) {
     return (rawTF);
@@ -42,7 +42,7 @@ double TFIDFQueryRep::queryTFWeight(const double rawTF)
 
 
 
-double TFIDFDocRep::docTFWeight(const double rawTF)
+double TFIDFDocRep::docTFWeight(const double rawTF) const
 {
   if (prm.tf == TFIDFParameter::RAWTF) {
     return (rawTF);
@@ -51,7 +51,7 @@ double TFIDFDocRep::docTFWeight(const double rawTF)
   } else if (prm.tf == TFIDFParameter::BM25) {
     
     return (TFIDFRetMethod::BM25TF(rawTF, prm.bm25K1, prm.bm25B,
-		   ind.docLength(id), ind.docLengthAvg()));
+		   docLength, ind.docLengthAvg()));
   } else {  // default to raw TF
     cerr << "Warning: unknown TF method, raw TF assumed\n";
     return rawTF;
@@ -59,7 +59,7 @@ double TFIDFDocRep::docTFWeight(const double rawTF)
 }
 
 
-TFIDFRetMethod::TFIDFRetMethod(Index &dbIndex, ScoreAccumulator &accumulator) :TextQueryRetMethod(dbIndex, accumulator) 
+TFIDFRetMethod::TFIDFRetMethod(const Index &dbIndex, ScoreAccumulator &accumulator) :TextQueryRetMethod(dbIndex, accumulator) 
 {
   // set default parameter value
   docTFParam.tf = TFIDFParameter::BM25;
@@ -84,7 +84,7 @@ TFIDFRetMethod::TFIDFRetMethod(Index &dbIndex, ScoreAccumulator &accumulator) :T
 
 
 
-void TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs)
+void TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, const DocIDSet &relDocs)
 {
   int totalTerm=ind.termCountUnique();  
   static float * centroidVector = new float[totalTerm+1]; // one extra for OOV

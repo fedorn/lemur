@@ -26,7 +26,7 @@ public:
   ProxInfo() : nextPos(0), posList(NULL), size(0),
 	       dList(NULL), listSize(0) { }
   /// Make one from an InvFPDocList
-  ProxInfo::ProxInfo(int num, int tf, DocInfoList *dl);
+  ProxInfo::ProxInfo(int num, int tf, const DocInfoList *dl);
   
   /// Make one from a doc positions list.
   ProxInfo(int  num, int tf, int *pl);
@@ -34,14 +34,14 @@ public:
   ~ProxInfo() { delete(dList); delete[](posList);}
 
   /// document id of current entry
-  int id() {return currEntry.docID();}
+  int id() const {return currEntry.docID();}
   /// term freq of current entry
-  int count() {return currEntry.termCount();}
+  int count() const {return currEntry.termCount();}
   /// positions array of current entry
-  int *positions() {return currEntry.positions();}
+  const int *positions() const {return currEntry.positions();}
   /// return position value at index k in the current entry's
   /// position list
-  int position(int k) {return *(positions() + k);}
+  int position(int k) const {return *(positions() + k);}
   /// Iteration support (restartable).
   void startIteration() {
     if (dList != NULL) dList->startIteration();
@@ -54,7 +54,7 @@ public:
   /// stop on next doc after did.
   bool nextDoc(int did);
   /// how long is the list of positions for all docs.
-  int posSize();  
+  int posSize() const;  
   /// window size
   int size;
   /// next position of this term in document
@@ -64,7 +64,7 @@ private:
   /// list of positions in document for operators
   int *posList; // internally allocated, must use delete[]()
   /// contains list of positions in document for terms
-  InvFPDocList *dList;
+  const InvFPDocList *dList;
   InvFPDocInfo currEntry;
   int listSize;
 };

@@ -15,7 +15,7 @@
 
 
 // initial query constructor, no feedback docs assumed
-OkapiQueryRep::OkapiQueryRep(TextQuery &qry, Index &dbIndex, double paramK3): ArrayQueryRep(dbIndex.termCountUnique()+1, qry, dbIndex), k3(paramK3) {
+OkapiQueryRep::OkapiQueryRep(const TextQuery &qry, const Index &dbIndex, double paramK3): ArrayQueryRep(dbIndex.termCountUnique()+1, qry, dbIndex), k3(paramK3) {
   pEst = new int[dbIndex.termCountUnique()+1];
   for (int i=0; i<=dbIndex.termCountUnique(); i++) {
     pEst[i] = 0;
@@ -25,16 +25,16 @@ OkapiQueryRep::OkapiQueryRep(TextQuery &qry, Index &dbIndex, double paramK3): Ar
 
 
 
-double OkapiScoreFunc::matchedTermWeight(QueryTerm *qTerm, 
-					 TextQueryRep *qRep, 
-					 DocInfo *info, 
-					 DocumentRep *dRep)
+double OkapiScoreFunc::matchedTermWeight(const QueryTerm *qTerm, 
+					 const TextQueryRep *qRep, 
+					 const DocInfo *info, 
+					 const DocumentRep *dRep) const
 {
-  OkapiQueryTerm * qt;
-  qt = dynamic_cast<OkapiQueryTerm *> (qTerm);
+  const OkapiQueryTerm * qt;
+  qt = dynamic_cast<const OkapiQueryTerm *> (qTerm);
 
-  OkapiQueryRep *qr;
-  qr = dynamic_cast<OkapiQueryRep *> (qRep);
+  const OkapiQueryRep *qr;
+  qr = dynamic_cast<const OkapiQueryRep *> (qRep);
 
   return (OkapiRetMethod::RSJWeight(qt->pEstCount(), qr->pNormCount(), 
 		    ind.docCount(qt->id()),
@@ -44,7 +44,7 @@ double OkapiScoreFunc::matchedTermWeight(QueryTerm *qTerm,
 }
 
 
-OkapiRetMethod::OkapiRetMethod(Index &dbIndex, ScoreAccumulator &accumulator):
+OkapiRetMethod::OkapiRetMethod(const Index &dbIndex, ScoreAccumulator &accumulator):
   TextQueryRetMethod(dbIndex, accumulator)
 {
   scFunc = new OkapiScoreFunc(dbIndex);
@@ -59,7 +59,7 @@ OkapiRetMethod::OkapiRetMethod(Index &dbIndex, ScoreAccumulator &accumulator):
 
 
 
-void OkapiRetMethod::updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs)
+void OkapiRetMethod::updateTextQuery(TextQueryRep &origRep, const DocIDSet &relDocs)
 {
   
   int totalTerm=ind.termCountUnique();  

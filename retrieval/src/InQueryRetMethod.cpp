@@ -17,7 +17,7 @@
 #include "StructQryDocRep.hpp"
 #include <cmath>
 
-InQueryRetMethod::InQueryRetMethod(Index &dbIndex, double belief,
+InQueryRetMethod::InQueryRetMethod(const Index &dbIndex, double belief,
 				   int fbTerms, double fbCoef, bool cacheIDF):
   StructQueryRetMethod(dbIndex), fbCoeff(fbCoef), fbTermCount(fbTerms), 
   defaultBelief(belief) {
@@ -40,7 +40,7 @@ InQueryRetMethod::InQueryRetMethod(Index &dbIndex, double belief,
 }
 
 void InQueryRetMethod::updateStructQuery(StructQueryRep &qryRep, 
-					 DocIDSet &relDocs) {
+					 const DocIDSet &relDocs) {
   // build a top query node of wsum, choose new terms as is done by
   // TFIDF
   int totalTerm = ind.termCountUnique();  

@@ -34,11 +34,11 @@ public:
   /// are there any more elements in the list.
   bool hasMore() {  return (i < qnList.size()); }
   /// return the next element from the list.
-  QueryNode * nextNode(){QueryNode *qn = qnList[i++]; return qn; }
+  QueryNode * nextNode()  {QueryNode *qn = qnList[i++]; return qn; }
   /// return the i'th element of the list.
-  QueryNode * getNode(int j){QueryNode *qn = qnList[j]; return qn; }
+  const QueryNode * getNode(int j) const{QueryNode *qn = qnList[j]; return qn; }
   /// return the number of elements in the list.
-  int size(){return qnList.size();}
+  int size() const{return qnList.size();}
   /// Add a new element to the back of the list.
   void push_back(QueryNode *qn){qnList.push_back(qn);}
   /// remove an elt and return it (allows moving from list to list).
@@ -49,7 +49,7 @@ public:
   }
 private:
   /// index counter for iteration.
-  int i;
+  mutable int i;
   /// the actual vector of QueryNodes.
   vector<QueryNode *> qnList;
 };
@@ -84,37 +84,37 @@ public:
     delete(ch);
   }
   /// the children of this node
-  QnList *children() { return ch;}
+  const QnList *children() const { return ch;}
   /// set the children of this node
   void setChildren(QnList *cl) {ch = cl;}
   /// the node's id
-  int id() { return it;}
+  int id() const { return it;}
   /// the weight of this node.
-  double weight() { return w; }
+  double weight() const { return w; }
   // update weight
   void setWeight(double wt) { w = wt; }
   // update entries count
   void setEntries(int cnt) { entries = cnt; }
 
   /// Copy the DocInfoList for a given node.
-  virtual void copyDocList(int len, int tf, DocInfoList *dl, int dc) {
+  virtual void copyDocList(int len, int tf, const DocInfoList *dl, int dc) {
   }
   /// update doc list from children's doc lists.
   virtual void updateDocList(int numDocs) = 0;
   /// evaluate the node on the given document, returning a score.
-  virtual double eval(DocumentRep *dRep) = 0;
+  virtual double eval(const DocumentRep *dRep) const = 0;
 
   /// Does this node have a proxList?
-  bool isProxNode() { return proxList != NULL; }
+  bool isProxNode() const { return proxList != NULL; }
   /// Iteration through a node's prox lists.
-  void startProxIteration() {if (proxList) proxList->startIteration();}
+  void startProxIteration() const {if (proxList) proxList->startIteration();}
   /// Any entries left in the list?
-  bool hasMoreProx() {return proxList && proxList->hasMore();}
+  bool hasMoreProx() const {return proxList && proxList->hasMore();}
   /// advance to next element in list. return false if empty.
-  bool nextProxItem() {return proxList && proxList->nextDoc();}
+  bool nextProxItem() const {return proxList && proxList->nextDoc();}
   /// advance to element with id did, or to next element beyond if
   /// did is not found. Return true if found, false if not.
-  bool nextProxItem(int did) {
+  bool nextProxItem(int did) const{
     return proxList && proxList->nextDoc(did);
   }
 
@@ -123,7 +123,7 @@ public:
   /// array of bool matched docs indexed by docid
   bool *dList;
   /// the next document this node matched.
-  int nextDoc;
+  mutable int nextDoc;
   /// This node's ProxInfo list
   ProxInfo * proxList;
 
@@ -172,7 +172,7 @@ public:
   ProxNode(int size, double w, double d) : QueryNode(w, d), winSize(size) {}
   virtual ~ProxNode() { }
   /// Score as the proximityScore for this document representation.
-  virtual double eval(DocumentRep *dRep) {
+  virtual double eval(const DocumentRep *dRep) const {
     return proximityScore(dRep, dw);
   }
   /// Intersect the doc lists of the children of this node.
@@ -187,8 +187,8 @@ private:
   /// evaluate proximity operator against a document
   /// Prunes proxList to remove any entries that are no longer
   /// relevant to scoring this operator.
-  double proximityScore(DocumentRep *dR, double defaultScore) {
-    StructQryDocRep *dRep = (StructQryDocRep *)dR;
+  double proximityScore(const DocumentRep *dR, double defaultScore) const {
+    const StructQryDocRep *dRep = (const StructQryDocRep *)dR;
     int tf = 0;
     double score;
     if(dRep->did < nextDoc) {
@@ -223,10 +223,10 @@ public:
   virtual ~SumQnode() {}
   /// Score this node as the sum of the scores of its children divided
   /// by the number of children.
-  virtual double eval(DocumentRep *dRep) {
+  virtual double eval(const DocumentRep *dRep) const{
     double sum = 0;
     int count = 0;
-    QueryNode *qn;
+    const QueryNode *qn;
     ch->startIteration();
     while(ch->hasMore()) {
       qn = ch->nextNode();
@@ -246,10 +246,10 @@ public:
   virtual ~WsumQnode() {}
   /// Score this node as the sum of the weighted scores of its children 
   /// divided by the sum of the weights.
-  virtual double eval(DocumentRep *dRep) {
+  virtual double eval(const DocumentRep *dRep) const{
     double sum = 0;
     double total_wt = 0;
-    QueryNode *qn;
+    const QueryNode *qn;
     double wt;
     ch->startIteration();
     while(ch->hasMore()) {
@@ -275,9 +275,9 @@ public:
   /// Score this node as the product of the scores of its children. If 
   /// a child's score is less that the default score, the default
   /// score is used in the product instead of that childs score.
-  virtual double eval(DocumentRep *dRep) {
+  virtual double eval(const DocumentRep *dRep) const{
     double prod = 1;
-    QueryNode *qn;
+    const QueryNode *qn;
     double wt;
     ch->startIteration();
     while(ch->hasMore()) {
@@ -301,9 +301,9 @@ public:
   virtual ~OrQnode() {}
   /// Score this node as  (1 - the product of (1 - score) for each child 
   /// node whose score is greater than the default weight. 
-  virtual double eval(DocumentRep *dRep) {
+  virtual double eval(const DocumentRep *dRep) const {
     double prod = 1.0;
-    QueryNode *qn;
+    const QueryNode *qn;
     double wt;
     ch->startIteration();
     while(ch->hasMore()) {
@@ -323,9 +323,9 @@ public:
   NotQnode(double dbelief, double wt) : BeliefNode(wt, dbelief) {}
   virtual ~NotQnode() {}
   /// Score as 1 - the score of the single child node.
-  virtual double eval(DocumentRep *dRep) {
+  virtual double eval(const DocumentRep *dRep) const{
     // inverting the belief in the only child node
-    QueryNode *qn;
+    const QueryNode *qn;
     ch->startIteration();
     qn = ch->nextNode();
     return (1.0 - qn->eval(dRep));
@@ -340,9 +340,9 @@ public:
   virtual ~MaxQnode() {}
   /// Score as the maximum of
   /// the scores of its child nodes and the default score.
-  virtual double eval(DocumentRep *dRep) {
+  virtual double eval(const DocumentRep *dRep) const{
     double mx = dw;
-    QueryNode *qn;
+    const QueryNode *qn;
     double wt;
     ch->startIteration();
     while(ch->hasMore()) {
@@ -365,9 +365,9 @@ public:
   /// Score as the product of the scores of all child nodes. If any
   /// child node returns a score less than or equal to the default score,
   /// return 0.
-  virtual double eval(DocumentRep *dRep) {
+  virtual double eval(const DocumentRep *dRep) const{
     double prod = 1.0;
-    QueryNode *qn;
+    const QueryNode *qn;
     double wt;
     StructQryDocRep * myRep = (StructQryDocRep *)dRep;
     int did = myRep->did;
@@ -401,11 +401,11 @@ public:
   /// Score as the score of its first child node if
   /// the score of its second child is less than or equal to the 
   /// default score, otherwise 0.
-  virtual double eval(DocumentRep *dRep) {
+  virtual double eval(const DocumentRep *dRep) const{
     double child1Wt;
     double child2Wt;
     // boolean_and_not consider only two children
-    QueryNode *qn;
+    const QueryNode *qn;
     ch->startIteration();
     qn = ch->nextNode();
     child1Wt = qn->eval(dRep);
@@ -431,11 +431,11 @@ public:
   /// the score of its second child is less than or equal to the 
   /// default score and the score of the first child is greater
   /// than the default score. Otherwise, return the default score.
-  virtual double eval(DocumentRep *dRep) {
+  virtual double eval(const DocumentRep *dRep) const{
     double child1Wt;
     double child2Wt;
     // filter_reject consider only two children
-    QueryNode *qn;
+    const QueryNode *qn;
     ch->startIteration();
     qn = ch->nextNode();
     child1Wt = qn->eval(dRep);
@@ -459,11 +459,11 @@ public:
   /// Score as the score of its first child node if
   /// the scores of both children are greater than the 
   /// default score, otherwise the default score.
-  virtual double eval(DocumentRep *dRep) {
+  virtual double eval(const DocumentRep *dRep) const{
     double child1Wt;
     double child2Wt;
     // filter_require consider only two children
-    QueryNode *qn;
+    const QueryNode *qn;
     ch->startIteration();
     qn = ch->nextNode();
     child1Wt = qn->eval(dRep);
@@ -485,7 +485,7 @@ public:
   TermQnode(int id, double weight) : ProxNode(id, weight) { }
   virtual ~TermQnode() {}
   /// Score as the termWeight of this term in the document.
-  virtual double eval(DocumentRep *dRep) { 
+  virtual double eval(const DocumentRep *dRep) const{ 
     StructQryDocRep * myRep = (StructQryDocRep *)dRep;
     int did = myRep->did;
     double freq = 0.0;
@@ -503,7 +503,7 @@ public:
     return(myRep->termWeight(it, freq, dCnt));
   }
   /// Copy the DocInfoList for a given node.
-  virtual void copyDocList(int len, int tf, DocInfoList *dl, int dc);
+  virtual void copyDocList(int len, int tf, const DocInfoList *dl, int dc);
 };
 
 /// Implements the ODN operator. This is the ORDERED WINDOW operator.
@@ -521,7 +521,7 @@ private:
   /// Prune proximity list for ordered proximity operator
   void orderedProxList(int numDocs);
   /// recursively find matching windows for ordered proximity operator.
-  bool foundOrderedProx(int bpos, int wsize, QnList *cl, int ith);
+  bool foundOrderedProx(int bpos, int wsize, const QnList *cl, int ith);
 };
 
 /// Implements the UWN operator. This is the UNORDERED WINDOW operator.
@@ -538,7 +538,7 @@ private:
   /// Prune proximity list for unordered proximity operator
   void unorderedProxList(int numDocs);
   /// find matching windows for unordered proximity operators.
-  bool findUnorderedWin(QueryNode *cqn, QnList *cl, int winSize);
+  bool findUnorderedWin(const QueryNode *cqn, QnList *cl, int winSize);
 };
 
 
@@ -556,7 +556,7 @@ public:
   /// by window size. The StructQueryDocRep provides passage iteration
   /// over the overlapping windows. The score for an individual passage
   /// is the sum of the scores of the children nodes.
-  virtual double eval(DocumentRep *dR) {
+  virtual double eval(const DocumentRep *dR) const{
     StructQryDocRep *dRep = (StructQryDocRep *)dR;
     double maxScore = 0;
     double score;      
@@ -578,7 +578,7 @@ public:
 private:
   /// weighted sum of prox children
   /// all belief operators have already been removed/flattened.
-  double passageScore(StructQryDocRep *dRep);
+  double passageScore(const StructQryDocRep *dRep) const;
 };
 
 /// Implements the SYN operator. Evaluates to the proximityScore 

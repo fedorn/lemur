@@ -14,11 +14,11 @@
 #include "ProxInfo.hpp"
 #include "Exception.hpp"
 
-ProxInfo::ProxInfo(int num, int tf, DocInfoList *dl) : nextPos(0), 
+ProxInfo::ProxInfo(int num, int tf, const DocInfoList *dl) : nextPos(0), 
 						       posList(NULL),  
 						       size(0),
 						       listSize(tf) { 
-  dList = dynamic_cast<InvFPDocList *>(dl);
+  dList = dynamic_cast<const InvFPDocList *>(dl);
   if (dList == NULL) {
     throw Exception("ProxInfo", "InvFPDocList required from index");
   }
@@ -57,6 +57,6 @@ bool ProxInfo::nextDoc(int did) {
   return (did == id());
 }
 
-int ProxInfo::posSize() {
+int ProxInfo::posSize() const{
   return listSize;
 }

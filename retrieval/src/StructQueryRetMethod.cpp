@@ -16,13 +16,13 @@
 #include "StructQryDocRep.hpp"
 #include "BasicDocInfoList.hpp"
 
-void StructQueryRetMethod::scoreCollection(QueryRep &qry, 
+void StructQueryRetMethod::scoreCollection(const QueryRep &qry, 
 					   IndexedRealVector &results) {
   scoreInvertedIndex(qry, results);
 }
 
 
-void StructQueryRetMethod::scoreInvertedIndex(QueryRep &qRep, 
+void StructQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
 					      IndexedRealVector &scores, 
 					      bool scoreAll) {
   int numDocs = ind.docCount();
@@ -42,7 +42,7 @@ void StructQueryRetMethod::scoreInvertedIndex(QueryRep &qRep,
   }
 }
 
-double StructQueryRetMethod::scoreDoc(QueryRep &qry, int docID) {
+double StructQueryRetMethod::scoreDoc(const QueryRep &qry, int docID) {
   double score = 0;
   QueryNode *structQR = ((StructQueryRep &)qry).topnode();
   DocumentRep *dRep = computeDocRep(docID);

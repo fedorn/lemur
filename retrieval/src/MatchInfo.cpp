@@ -22,7 +22,8 @@
 #include "DocOffsetParser.hpp"
 #include "KeyfileDocMgr.hpp"
 
-MatchInfo *MatchInfo::getMatches(Index &ind, Query &qry, int docID) {
+MatchInfo *MatchInfo::getMatches(const Index &ind, const Query &qry, 
+				 int docID) {
     InvFPTermList *docTerms;
     MatchInfo *matches = new MatchInfo();
     TermInfoList *dt = ind.termInfoList(docID);
@@ -34,13 +35,13 @@ MatchInfo *MatchInfo::getMatches(Index &ind, Query &qry, int docID) {
     }
     InvFPTerm *nextTerm;
 
-    DocumentManager *docMgr = ind.docManager(docID);    
+   const DocumentManager *docMgr = ind.docManager(docID);    
     vector<Match> offsets;
     if (docMgr != NULL) {
-      KeyfileDocMgr *kdm = dynamic_cast<KeyfileDocMgr *>(docMgr);
+      const KeyfileDocMgr *kdm = dynamic_cast<const KeyfileDocMgr *>(docMgr);
       if (kdm != NULL) {
 	// we have a KeyfileDocMgr, no need to parse anything.
-	offsets = kdm->getOffsets((char *)ind.document(docID));
+	offsets = kdm->getOffsets(ind.document(docID));
       } else {
 	char *rawDoc = NULL;
 	Parser *p = NULL;
@@ -58,11 +59,11 @@ MatchInfo *MatchInfo::getMatches(Index &ind, Query &qry, int docID) {
     
     // collect up the query terms.
     // is it a TextQuery?
-    TextQuery *tq = dynamic_cast<TextQuery *>(&qry);
+    const TextQuery *tq = dynamic_cast<const TextQuery *>(&qry);
     // or is it a StructQuery?
-    StructQuery *sq = dynamic_cast<StructQuery *>(&qry);
+    const StructQuery *sq = dynamic_cast<const StructQuery *>(&qry);
     // the api should be promoted to Query, as both need it.
-    TokenTerm *t;
+    const TokenTerm *t;
     set<int, less<int> > termIDs;
     if (tq != NULL) {// TextQuery
       tq->startTermIteration();
@@ -97,10 +98,13 @@ MatchInfo *MatchInfo::getMatches(Index &ind, Query &qry, int docID) {
 	   iter != termIDs.end(); iter++) {
 	int tid = *iter;
 	if (tid == did) {
-	  vector <LOC_T> *pos = nextTerm->positions();
-	  for (vector <LOC_T>::iterator iter1 = pos->begin();
-	       iter1 != pos->end(); iter1++) {
-	    int pos1 = *iter1;
+	  //	  vector <LOC_T> *pos = nextTerm->positions();
+	  //for (vector <LOC_T>::iterator iter1 = pos->begin();
+	  //     iter1 != pos->end(); iter1++) {
+	  //int pos1 = *iter1;
+	  const int* pos = nextTerm->positions();
+	  for (int i=0;i<nextTerm->count();i++) {
+	    int pos1 = pos[i];
 	    if (offsets.size() > 0) 
 	      matches->add(tid, pos1, offsets[pos1].start, offsets[pos1].end);
 	    else

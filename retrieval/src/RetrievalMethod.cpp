@@ -14,7 +14,7 @@
 
 
 // the most general, but probably also most inefficient implementation
-void RetrievalMethod::scoreCollection(QueryRep &qry, IndexedRealVector &results)
+void RetrievalMethod::scoreCollection(const QueryRep &qry, IndexedRealVector &results)
 {
   results.clear();
   for (int id=1; id<=ind.docCount();id++) {
@@ -23,7 +23,7 @@ void RetrievalMethod::scoreCollection(QueryRep &qry, IndexedRealVector &results)
 }
 
 /// Score a set of documents w.r.t. a query rep (e.g. for re-ranking)
-void RetrievalMethod::scoreDocSet(QueryRep &qry, DocIDSet &docSet, IndexedRealVector &results)
+void RetrievalMethod::scoreDocSet(const QueryRep &qry, const DocIDSet &docSet, IndexedRealVector &results)
 {
   results.clear();
   docSet.startIteration();

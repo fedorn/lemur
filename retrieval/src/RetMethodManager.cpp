@@ -11,7 +11,7 @@
 
 #include "RetMethodManager.hpp"
 
-RetrievalMethod* RetMethodManager::createModel (Index* ind, 
+RetrievalMethod* RetMethodManager::createModel (const Index* ind, 
 						ArrayAccumulator* accum, 
 						RetModel type) {
   // type set externally as string.
@@ -60,7 +60,7 @@ RetrievalMethod* RetMethodManager::createModel (Index* ind,
   return model;
 }
 
-RetrievalMethod* RetMethodManager::createModel (Index* ind, 
+RetrievalMethod* RetMethodManager::createModel (const Index* ind, 
 						ArrayAccumulator* accum, 
 						string type) {
   RetrievalMethod *mod = NULL;
