@@ -9,6 +9,7 @@
  *==========================================================================
 */
 
+#include <math.h>
 #include "MemCache.hpp"
 
 MemCache::MemCache(int cachesize) {
@@ -37,7 +38,7 @@ MemCache::~MemCache() {
 }
 
 int* MemCache::getMem(int chunksize) {
-  int bytesize = (int) pow(2,chunksize);
+  int bytesize = (int) pow(2.0, chunksize);
   int s = bytesize/intsize;
   int *retval = NULL;
 
@@ -74,7 +75,7 @@ int* MemCache::getMoreMem(int newsize, int* location, int oldsize) {
     return NULL;
 
   //do the copy
-  memcpy(retval, location, (int) pow(2,oldsize));
+  memcpy(retval, location, (int) pow(2.0, oldsize));
 	
   //store this free spot
 //  *location = oldsize;
