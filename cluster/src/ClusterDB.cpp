@@ -49,12 +49,12 @@ void ClusterDB::printClusters() const {
   }
 }
 
-int ClusterDB::cluster(int docId) {
+int ClusterDB::cluster(DOCID_T docId) {
   double score;
   return cluster(docId, score);
 }
 
-int ClusterDB::cluster(int docId, double &finalScore) {
+int ClusterDB::cluster(DOCID_T docId, double &finalScore) {
   Cluster *cluster;
   int cid, myCluster;
   double score;
@@ -91,6 +91,17 @@ int ClusterDB::cluster(int docId, double &finalScore) {
   delete (docRep);
   delete(tList);
   return cid;
+}
+
+/* copy the cluster, allocating it in the db */
+int ClusterDB::addCluster(Cluster *oldCluster) {
+  Cluster *cluster = newCluster(); 
+  double score = 1.0;
+  vector <DOCID_T> docs = oldCluster->getDocIds();
+  for (vector<DOCID_T>::iterator d = docs.begin(); d != docs.end(); d++) {
+    addToCluster(*d, cluster, score);
+  }
+  return cluster->getId();
 }
 
 Cluster* ClusterDB::allocateCluster(int clusterID) const {

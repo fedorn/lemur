@@ -51,27 +51,30 @@ public:
   virtual int maxID() const = 0;
 
   /// Get the Cluster for the given docId.
-  virtual vector<Cluster*> getDocCluster(int docId) const = 0;
+  virtual vector<Cluster*> getDocCluster(DOCID_T docId) const = 0;
 
   /// Get the Cluster for the given clusterId.
   virtual Cluster *getCluster(int clusterId) const = 0;
 
   /// Get the Cluster id for the given docId.
-  virtual vector<int> getDocClusterId(int docId) const = 0;
+  virtual vector<int> getDocClusterId(DOCID_T docId) const = 0;
 
   /// Add a document id to a cluster, given the cluster id.
-  virtual int addToCluster(int docId, int clusterId, double score) = 0;
+  virtual int addToCluster(DOCID_T docId, int clusterId, double score) = 0;
 
   /// Add a document id to a cluster, given the cluster.
-  virtual int addToCluster(int docId, Cluster *cluster, double score) = 0;
+  virtual int addToCluster(DOCID_T docId, Cluster *cluster, double score) = 0;
 
   /// Remove a document id from a cluster, given the cluster id.
-  virtual int removeFromCluster(int docId, int clusterID) = 0;
+  virtual int removeFromCluster(DOCID_T docId, int clusterID) = 0;
   /// Delete a cluster entirely
   virtual int deleteCluster(int clusterID) = 0;
 
   /// Delete a cluster entirely
   virtual int deleteCluster (Cluster *target) = 0;
+
+  /// Add a cluster to the DB (renumbers the cluster id). Returns new id.
+  int addCluster(Cluster *oldCluster);
 
   /// split cluster using Cluster::split
   virtual vector<int> splitCluster(int cid, int num = 2) = 0;
@@ -83,10 +86,10 @@ public:
   virtual void printClusters() const;
 
   /// Assign a document to a cluster.
-  virtual int cluster(int docId);
+  virtual int cluster(DOCID_T docId);
 
   /// Assign a document to a cluster, returning score.
-  virtual int cluster(int docId, double &finalScore);
+  virtual int cluster(DOCID_T docId, double &finalScore);
 
   /// Get the top N keywords for a cluster.
   virtual string getKeyWords(int cid, int numTerms = 10) const;
