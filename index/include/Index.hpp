@@ -28,12 +28,12 @@
   - To make the lemur toolkit
 
       -# go to directory lemur
-      -# type in "make all" or "make"
+      -# type in "gmake all" or "gmake"
 
   - To clean the lemur toolkit (remove everything but the source)
 
       -# go to directory lemur
-      -# type in "make clean"
+      -# type in "gmake clean"
 
   \section change  Change the toolkit
 
@@ -42,7 +42,7 @@
 
       -# Make the changes
       -# Go to directory lemur
-      -# Type in "make all"
+      -# Type in "gmake all"
 
   - To add a new (library) module to the toolkit:
 
@@ -65,37 +65,17 @@
 
   - Create a parameter file with value definitions for all the  input variables of an application. Terminate each line with a semicolon. 	For example, 
   <PRE>
-    lemur = /usr0/mydata/index.lemur;
+    index = /usr0/mydata/index.bsc;
   </PRE>
    Most applications will display a list of required input variables, 
    if you run it with the "--help" option. 
 
-  - Do 
-  <PRE>
-   "setenv PARAM YOUR-PARAM-FILENAME" 
-</PRE>
-or
-<PRE> 
-      "export PARAM=YOUR-PARAM-FILENAME"
-</PRE>
-
-      depending on the shell you are running.
-
-
-  -  Run the application program without any argument.
+  -  Run the application program without the parameter file as the only argument.
 
 
   \section sampledata To try the sample data
 
-  - Go to the data directory
-
-  - First, try to build the index by running "lemur/app/src/BuildIndex" with "buildparam" as the parameter file.
-  - Second, built the support file (needed by the language model retrieval evaluation program) by running "lemur/app/src/GenerateSmoothSupport" with "suppparam" as the parameter file.
-  - Now you can try any of the retrieval evaluation program with the appropriate parameter files. Each evaluation program will write the result to a file specified in the parameter file. 
-      -# tfidfparam (result in res.tfidf) or tfidffbparam (result in res.tfidffb) are for \code app/src/TFIDFEval \endcode
-      -# okapiparam (result in res.okapi) or okapifbparam (result in res.okapifb) are for \code app/src/OkapiEval \endcode
-      -# lmparam1 (result in res.lm1)  or lmparam2 (res.lm2) are for \code app/src/SimpleUnigEval \endcode
-  - Finally, you can compute the TREC style performance figures for any of the results by running \code "./eval result-file-name" \endcode. For example, \code "./eval res.tfidf" \endcode would generate figures for res.tfidf. 
+  - Go to the data directory, run "test.sh" which is a self-explained shell script that will build an index, run several retrieval algorithms with some sample parameter files, and then evaluate the retrieval performance.
 
 
  */
@@ -122,18 +102,21 @@ int t1;
 ... 
 
 // now fetch doc info list for term t1
+// this returns a dynamic instance, so you'll need to delete it
 DocInfoList *docList = myIndex.docInfoList(t1);
 
 docList->startIteration();
 
 DocInfo *entry;
 while (docList->hasMore()) {
-  entry = docList->nextEntry();
+  entry = docList->nextEntry(); 
+  // this returns a pointer to a *static* memory, do don't delete entry!
   
   cout << "entry doc id: "<< entry->docID() <<endl;
   cout << "entry term count: "<< entry->termCount() << endl;
 }
 
+delete docList;
 </PRE>
 */
 
@@ -150,23 +133,23 @@ public:
   /// @name Open index 
   //@{
 
-  /// Open previously created Index, return true if opened successfully
+  /// Open previously created Index, return true if opened successfully, <tt>indexName</tt> should be the full name of the table-of-content file for the index. E.g., "index.bsc" for an index built with the basic indexer. 
   virtual bool open(const char * indexName)=0;
   //@}
 
   /// @name Spelling and index conversion
   //@{
 
-  /// Convert a term spelling to a termID
+  /// Convert a term spelling to a termID, returns 0 if out of vocabulary. Valid index starts at 1.
   virtual int term (const char * word)=0;
 
-  /// Convert a termID to its spelling
+  /// Convert a valid termID to its spelling
   virtual const char * term (int termID)=0;
 
-  /// Convert a spelling to docID
+  /// Convert a spelling to docID, returns 0 if out of vocabulary. Valid index starts at 1.
   virtual int document (const char * docIDStr)=0;
 
-  /// Convert a docID to its spelling
+  /// Convert a valid docID to its spelling
   virtual const char * document (int docID)=0;
 
   /// Return a string ID for the term lexicon (usually the file name of the lexicon)
@@ -182,7 +165,7 @@ public:
   /// Total count (i.e., number) of documents in collection
   virtual int docCount () =0;
 
-  /// Total count of unique terms in collection
+  /// Total count of unique terms in collection, i.e., the term vocabulary size
   virtual int termCountUnique ()=0;
 
   /// Total counts of a term in collection
@@ -204,10 +187,10 @@ public:
 
   /// @name Index entry access
   //@{
-  /// doc entries in a term index, @see DocList
+  /// returns a new instance of DocInfoList which represents the doc entries in a term index, you must delete the instance later. @see DocList
   virtual DocInfoList *docInfoList(int termID)=0;
 
-  /// word entries in a document index, @see TermList
+  /// returns a new instance of TermInfoList which represents the word entries in a document index, you must delete the instance later. @see TermList
   virtual TermInfoList *termInfoList(int docID)=0;
 
   //@}
@@ -216,3 +199,6 @@ public:
 
 
 #endif
+
+
+
