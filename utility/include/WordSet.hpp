@@ -14,8 +14,8 @@
 #include <set>
 
 
-#ifndef _LT_STR_
-#define _LT_STR_
+#ifndef _LT_STR
+#define _LT_STR
 
 #include "common_headers.hpp"
 
@@ -29,8 +29,8 @@ struct lt_str
 };
 #endif
 
-#ifndef _WORDSET_H_
-#define _WORDSET_H_
+#ifndef _WORDSET_HPP
+#define _WORDSET_HPP
 
 
 ///

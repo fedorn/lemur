@@ -11,6 +11,8 @@
 #include "TextHandler.hpp"
 #include "WordSet.hpp"
 
+#ifndef _STOPPER_HPP
+#define _STOPPER_HPP
 
 ///
 ///  Provides a stopword list that can be chained with a Parser using
