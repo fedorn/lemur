@@ -16,6 +16,7 @@
 #define _PROXINFO_HPP_
 
 #include "InvFPIndex.hpp"
+
 /// Proximity information for a term within a document. Provides support
 /// for ordered and unordered window operators. Used to prune document
 /// lists before scoring the documents.
@@ -24,12 +25,9 @@ public:
   /// Make an empty one.
   ProxInfo() : nextPos(0), posList(NULL), size(0),
 	       dList(NULL), listSize(0) { }
-  /// Make one from a DocInfoList
-  ProxInfo::ProxInfo(int num, int tf, DocInfoList *dl) : nextPos(0), 
-							 posList(NULL),  
-							 size(0),
-							 dList(dl),  
-							 listSize(tf) { }
+  /// Make one from an InvFPDocList
+  ProxInfo::ProxInfo(int num, int tf, DocInfoList *dl);
+  
   /// Make one from a doc positions list.
   ProxInfo(int  num, int tf, int *pl);
   /// clean up.
@@ -66,7 +64,7 @@ private:
   /// list of positions in document for operators
   int *posList; // internally allocated, must use delete[]()
   /// contains list of positions in document for terms
-  DocInfoList *dList;
+  InvFPDocList *dList;
   InvFPDocInfo currEntry;
   int listSize;
 };
