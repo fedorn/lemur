@@ -77,6 +77,14 @@ bool InvFPPushIndex::addTerm(Term& t){
   InvFPTerm* term;
 
   term = static_cast< InvFPTerm* >(&t);
+  if (term->strLength() < 1) {
+    cerr << "Trying to add term with string length less than 1.  Term ignored." << endl;
+    return false;
+  }
+  if (term->spelling() == NULL) {
+    cerr << "Trying to add null term.  Term ignored. " << endl;
+    return false;
+  }
 
   //search to see if this is a new term 
   placehold = wordtable.find((char*)term->spelling());
