@@ -1,0 +1,8 @@
+<parameters>
+   <index>indri_index/CACM</index>
+   <count>1000</count>
+   <rule>method:dirichlet,mu:2500</rule>
+   <trecFormat>true</trecFormat>
+   <runID>Exp</runID>
+</parameters>
+

@@ -1,0 +1,14 @@
+<parameters>
+   <index>indri_index/CACM</index>
+   <corpus>
+      <path>indriparam/database.sgml</path>
+      <class>trectext</class>
+   </corpus>
+   <memory>500m</memory>
+   <collection>
+       <field>docno</field>
+   </collection>
+   <stemmer>
+      <name>krovetz</name>
+   </stemmer>
+</parameters>

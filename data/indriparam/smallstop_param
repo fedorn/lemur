@@ -1,0 +1,8 @@
+<parameters>
+   <stopper>
+       <word>a</word>
+       <word>an</word>
+       <word>the</word>
+       <word>as</word>
+   </stopper>
+</parameters>

@@ -8,3 +8,4 @@ rm -f pr.*
 rm -f source query struct_query
 rm -f core
 rm -f *_param
+rm -rf indri_index
