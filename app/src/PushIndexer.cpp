@@ -31,6 +31,8 @@ namespace LocalParameter {
   // whether or not to stem
   char * stemmer;
 
+  bool countStopWords;
+
   void get() {
     // my code uses char *'s while the param utils use
     // strings.  maybe I should convert to strings...
@@ -45,8 +47,10 @@ namespace LocalParameter {
 
     stemmer = strdup(ParamGetString("stemmer"));
     // convert docFormat to lowercase
-    for (char * d = stemmer; *d != '\0'; d++) *d = tolower(*d);
+    for (char * e = stemmer; *e != '\0'; e++) *e = tolower(*e);
     
+    countStopWords = (ParamGetString("countStopWords", "false") == "true");
+
   }
 
   // free the memory allocated in get()
@@ -79,7 +83,9 @@ void usage(int argc, char ** argv) {
        << "\tdocFormat - \"trec\" for standard TREC formatted documents "<< endl
        << "\t            web for web TREC formatted documents (def = trec)" << endl
        << "\tstemmer - \"porter\" to use Porter's stemmer. " << endl
-       << "\t          (def = no stemmer)" << endl;
+       << "\t          (def = no stemmer)" << endl
+       << "\tcountStopWords - \"true\" to count stopwords in doc length. " << endl
+       << "\t                 (def = false)" << endl;
 }
 
 // get application parameters
@@ -88,7 +94,7 @@ void GetAppParam() {
 }
 
 
-int AppMain(int argc, char ** argv) {
+int AppMain(int argc, char * argv[]) {
   if (argc < 3) {
     usage(argc, argv);
     return -1;
@@ -126,7 +132,7 @@ int AppMain(int argc, char ** argv) {
   // TextHandler class, so that it is compatible with my parser
   // architecture.  See the TextHandler and InvFPTextHandler classes
   // for more info.)
-  InvFPTextHandler indexer(LocalParameter::index, LocalParameter::memory);
+  InvFPTextHandler indexer(LocalParameter::index, LocalParameter::memory, LocalParameter::countStopWords);
 
 
   // chain the parser/stopper/stemmer/indexer

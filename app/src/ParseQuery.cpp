@@ -50,7 +50,7 @@ namespace LocalParameter {
 
     stemmer = strdup(ParamGetString("stemmer"));
     // convert stemmer to lowercase
-    for (char * d = stemmer; *d != '\0'; d++) *d = tolower(*d);
+    for (char * e = stemmer; *e != '\0'; e++) *e = tolower(*e);
     
     qryOutFile = strdup(ParamGetString("qryOutFile"));
   }
@@ -94,7 +94,7 @@ void GetAppParam() {
 }
 
 
-int AppMain(int argc, char ** argv) {
+int AppMain(int argc, char * argv[]) {
   if (argc < 3) {
     usage(argc, argv);
     return -1;
