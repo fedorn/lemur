@@ -19,6 +19,8 @@
 #include "OkapiRetMethod.hpp"
 #include "SimpleKLRetMethod.hpp"
 #include "CORIRetMethod.hpp"
+#include "CosSimRetMethod.hpp"
+#include "InQueryRetMethod.hpp"
 
 /// General retrieval-related parameters
 namespace RetrievalParameter {
@@ -102,7 +104,7 @@ namespace SimpleKLParameter {
   static SimpleKLParameter::QueryModelParam qryPrm;
   static String smoothSupportFile;
   //@}
-
+  
 
   static void get()
   {
@@ -138,6 +140,38 @@ namespace CORIParameter {
     cstfbaseline = ParamGetDouble("CSCTF_baseline", 50);
     doctffactor = ParamGetDouble("DOCCTF_factor", 1.5);
     doctfbaseline = ParamGetDouble("DOCCTF_baseline", 0.5);
+  }
+};
+
+namespace CosSimParameter {
+
+  /// @name CosSim model parameters
+  //@{
+  static FeedbackParam fbPrm;
+  static String L2NormFile;
+  //@}
+  
+  static void get()
+  {
+    fbPrm.howManyTerms = ParamGetInt("feedbackTermCount",defaultHowManyTerms);
+    fbPrm.posCoeff = ParamGetDouble("feedbackPosCoeff", defaultPosCoeff); 
+    L2NormFile = ParamGetString("L2File", defaultL2File);
+  }
+};
+
+namespace InQueryParameter {
+  /// @name InQuery structured query parameters
+  //@{
+  static qryParam qryPrm;
+  static docParam docPrm;
+  //@}
+
+
+  static void get()
+  {
+    docPrm.defaultBelief = ParamGetDouble("defaultBelief",defaultBelief);
+    qryPrm.fbCoeff = ParamGetDouble("feedbackPosCoeff",defaultFBCoeff);
+    qryPrm.fbTermCount = ParamGetInt("feedbackTermCount",defaultFBTermCount);
   }
 };
 
