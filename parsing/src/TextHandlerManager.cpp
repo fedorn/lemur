@@ -34,7 +34,7 @@ const string TextHandler::category = "TextHandler";
 const string TextHandler::identifier = "TextHandler";
 
 // these in Parser category
-const string Parser::category = "Parser";
+const string Parser::category = "parser";
 const string Parser::identifier = "parser";
 const string TrecParser::identifier = "trec";
 const string WebParser::identifier = "web";
@@ -49,14 +49,14 @@ const string InQueryOpParser::identifier = "inqueryop";
 
 
 // these in Stemmer category
-const string Stemmer::category = "Stemmer";
+const string Stemmer::category = "stemmer";
 const string Stemmer::identifier = "stemmer";
 const string PorterStemmer::identifier = "porter";
 const string KStemmer::identifier = "krovetz";
 const string ArabicStemmer::identifier = "arabic";
 
-const string Stopper::category = "Stopper";
-const string Stopper::identifier = "Stopper";
+const string Stopper::category = "stopper";
+const string Stopper::identifier = "stopper";
 
 Parser* TextHandlerManager::createParser(string type, string acros) {  
   // Create the appropriate parser.
@@ -128,6 +128,7 @@ Stemmer* TextHandlerManager::createStemmer(string type, string datadir, string f
 	datadir = ParamGetString("KstemmerDir");
       }
       stemmer = new KStemmer(datadir);
+      //      cerr << "created Kstemmer" << endl;
     } else if (type == ArabicStemmer::identifier){
       if ((datadir.empty()) || (func.empty())) {
 	ArabicStemmerParameter::get();
@@ -137,8 +138,10 @@ Stemmer* TextHandlerManager::createStemmer(string type, string datadir, string f
       } else {
 	stemmer = new ArabicStemmer((char*)datadir.c_str(),(char*)func.c_str());    
       }
+      //cerr << "created arabic stemmer" << endl;
     } else if (type == PorterStemmer::identifier) {
       stemmer = new PorterStemmer();
+      //cerr << "created porter stemmer" << endl;
     }
   } catch (Exception &ex) {
     LEMUR_RETHROW(ex, "Could not create Stemmer");
@@ -151,10 +154,11 @@ Stopper* TextHandlerManager::createStopper(string filename) {
   Stopper* stopper = NULL;
   if (filename.empty()) 
     filename = ParamGetString("stopwords");
-  
+
   if (!filename.empty()) {
     try {
       stopper = new Stopper(filename);
+      //cerr << "created stopper" << endl;
     } catch (Exception &ex) {
       LEMUR_RETHROW(ex, "Could not create Stopper using file name");
     }
