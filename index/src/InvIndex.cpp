@@ -320,50 +320,54 @@ TermInfoList* InvIndex::termInfoList(DOCID_T docID) const{
  * PRIVATE METHODS 
  =======================================================================*/
 bool InvIndex::fullToc(const string &fileName) {
-  FILE* in = fopen(fileName.c_str(), "rb");
+  ifstream in(fileName.c_str());
   *msgstream << "Trying to open toc: " << fileName << endl;
-  if (in == NULL) {
-     *msgstream << "Couldn't open toc file for reading" << endl;
+  if (!in.is_open()) {
+    *msgstream << "Couldn't open toc file for reading" << endl;
     return false;
   }
 
-  char key[128];
-  char val[128];
-  while (!feof(in)) {
-    if (fscanf(in, "%s %s", key, val) != 2) continue;
-    cerr << key << ":" << val << endl;
-    if (strcmp(key, NUMDOCS_PAR) == 0) {
-      counts[DOCS] = atoi(val);
-    } else if (strcmp(key, NUMTERMS_PAR) == 0) {
-      counts[TOTAL_TERMS] = atoi(val);
-    } else if (strcmp(key, NUMUTERMS_PAR) == 0) {
-      counts[UNIQUE_TERMS] = atoi(val);
-    } else if (strcmp(key, NUMDT_PAR) == 0) {
-      counts[DT_FILES] = atoi(val);
-    } else if (strcmp(key, NUMINV_PAR) == 0) {
-      counts[INV_FILES] = atoi(val);
-    } else if (strcmp(key, INVINDEX_PAR) == 0) {
+  Property p;
+
+  string key,val;
+
+  while (in >> key >> val) {
+    if (key.compare(NUMDOCS_PAR) == 0) {
+      counts[DOCS] = atoi(val.c_str());
+    } else if (key.compare(NUMTERMS_PAR) == 0) {
+      counts[TOTAL_TERMS] = atoi(val.c_str());
+    } else if (key.compare(NUMUTERMS_PAR) == 0) {
+      counts[UNIQUE_TERMS] = atoi(val.c_str());
+    } else if (key.compare(NUMDT_PAR) == 0) {
+      counts[DT_FILES] = atoi(val.c_str());
+    } else if (key.compare(NUMINV_PAR) == 0) {
+      counts[INV_FILES] = atoi(val.c_str());
+    } else if (key.compare(INVINDEX_PAR) == 0) {
       names[DOC_INDEX] = val;
-    } else if (strcmp(key, INVLOOKUP_PAR) == 0) {
+    } else if (key.compare(INVLOOKUP_PAR) == 0) {
       names[DOC_LOOKUP] = val;
-    } else if (strcmp(key, DTINDEX_PAR) == 0) {
+    } else if (key.compare(DTINDEX_PAR) == 0) {
       names[TERM_INDEX] = val;
-    } else if (strcmp(key, DTLOOKUP_PAR) == 0) {
+    } else if (key.compare(DTLOOKUP_PAR) == 0) {
       names[TERM_LOOKUP] = val;
-    } else if (strcmp(key, TERMIDMAP_PAR) == 0) {
+    } else if (key.compare(TERMIDMAP_PAR) == 0) {
       names[TERM_IDS] = val;
-    } else if (strcmp(key, DOCIDMAP_PAR) == 0) {
+    } else if (key.compare(DOCIDMAP_PAR) == 0) {
       names[DOC_IDS] = val;
-    } else if (strcmp(key, DOCMGR_PAR) == 0) {
+    } else if (key.compare(DOCMGR_PAR) == 0) {
       names[DOCMGR_IDS] = val;
-    } else if (strcmp(key, VERSION_PAR) == 0) {
+    } else if (key.compare(VERSION_PAR) == 0) {
       names[VERSION_NUM] = val;
+    } else {
+      p.setName(key);
+      p.setValue(val.c_str());
+      colprops.setProperty(&p);
     }
   }    
 
   aveDocLen = counts[TOTAL_TERMS] / (float) counts[DOCS];
 
-  fclose(in);
+  in.close();
   return true;
 }
 
