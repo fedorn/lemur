@@ -11,7 +11,9 @@ InvFPPushIndex::InvFPPushIndex(char* prefix, int cachesize, long maxfilesize, DO
   setName(prefix);
   fprintf(stderr, "building %s\n ", name);
 
-  cache = new MemCache(cachesize);
+  membuf = (int*) malloc(cachesize);
+  membufsize = cachesize;
+  cache = new MemCache(membuf, membufsize);
   char* docfname = new char[namelen+strlen(DTINDEX)+1];
   char* lfname = new char[namelen+strlen(DTLOOKUP)];
   sprintf(docfname, "%s%s%d", name, DTINDEX, 0);
@@ -29,8 +31,10 @@ InvFPPushIndex::InvFPPushIndex(char* prefix, int cachesize, long maxfilesize, DO
 InvFPPushIndex::~InvFPPushIndex() {
 //  fclose(writetlist);
   writetlist.close();
-  delete(cache);
+  if (cache)
+    delete(cache);
   free(name);
+  free(membuf);
 }
 
 void InvFPPushIndex::setName(char* prefix) {
@@ -125,7 +129,7 @@ void InvFPPushIndex::endDoc(DocumentProps* dp){
 
     if (offset+(3*sizeof(int))+(tls*sizeof(LocatedTerm)) > maxfile) {
       writetlist.close();
-      char* docfname = new char[namelen+strlen(DTINDEX)+1];
+      char* docfname = new char[namelen+strlen(DTINDEX)+2];
       sprintf(docfname, "%s%s%d", name, DTINDEX, dtfiles.size());
       dtfiles.push_back(docfname);
       writetlist.open(docfname, ios::binary | ios::out);
@@ -150,26 +154,29 @@ void InvFPPushIndex::endCollection(CollectionProps* cp){
   // flush last time
   // merge temp files
 
+  // flush everything in the cache
+  lastWriteCache();
+  delete(cache);
+  cache = NULL;
+
   // write our list of external docids in internal docid order
   writeDocIDs();
   // write our list of dt index files in internal fid order
   writeDTIDs();
-  // flush everything in the cache
-  lastWriteCache();
   // merge them
-  InvFPIndexMerge* merger = new InvFPIndexMerge(&tempfiles);
-  merger->merge(name);
+  InvFPIndexMerge* merger = new InvFPIndexMerge((char*)membuf, membufsize,maxfile);
+  int numinv = merger->merge(&tempfiles, name);
   delete(merger);
 
   //write out the main toc file
-  writeTOC();
+  writeTOC(numinv);
 
 }
 
 /*==================================================================================
  *  PRIVATE METHODS
  *==================================================================================*/
-void InvFPPushIndex::writeTOC() {
+void InvFPPushIndex::writeTOC(int numinv) {
   char* fname = new char[namelen+strlen(MAINTOC)];
   sprintf(fname, "%s%s", name, MAINTOC);
   //char* fname = strcat(name, MAINTOC);
@@ -185,6 +192,7 @@ void InvFPPushIndex::writeTOC() {
    fprintf(toc, "%s: %d\n", NUMUTERMS_PAR, tidcount);
    fprintf(toc, "%s: %d\n", AVEDOCLEN_PAR, tcount/docIDs.size());
    fprintf(toc, "%s: %s%s\n", INVINDEX_PAR, name, INVINDEX);
+   fprintf(toc, "%s: %d\n", NUMINV_PAR, numinv); 
    fprintf(toc, "%s: %s%s\n", INVLOOKUP_PAR, name, INVLOOKUP);
    fprintf(toc, "%s: %s%s\n", DTINDEX_PAR, name, DTINDEX);
    fprintf(toc, "%s: %d\n", NUMDT_PAR, dtfiles.size());
@@ -213,6 +221,7 @@ void InvFPPushIndex::writeDTIDs() {
   FILE* dtid = fopen(dname, "wb");
   for (int i=0;i<dtfiles.size();i++) {
     fprintf(dtid, "%d %d %s ", i, strlen(dtfiles[i]), dtfiles[i]);
+    delete[](dtfiles[i]);
   }
   fclose(dtid);
   delete[](dname);
