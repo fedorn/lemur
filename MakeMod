@@ -38,7 +38,9 @@ $(INSTALLHEADER):
 # how to install a library for a module
 INSTALLLIB:
 	echo "ar -rs $(LEMUR_INSTALL_PATH)/lemur/lib/liblemur.a $(OBJLIB)"
-	ar -rs $(LEMUR_INSTALL_PATH)/lemur/lib/liblemur.a $(OBJLIB)
+#	$(AR) -rs $(LEMUR_INSTALL_PATH)/lemur/lib/liblemur.a $(OBJLIB)
+	$(AR) -rs $(LEMUR_INSTALL_PATH)/lemur/lib/liblemur.a $(OBJ)
+
 
 
 
