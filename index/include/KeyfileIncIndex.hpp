@@ -321,6 +321,8 @@ protected:
   int _largestFlushedTermID;
   /// invertlists point where we should next check on the cache size
   int _estimatePoint; 
+  /// are we in a bad document state?
+  bool ignoreDoc;  
 };
 
 

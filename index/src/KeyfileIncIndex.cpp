@@ -62,6 +62,7 @@
 
 KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesize, 
 				 DOCID_T startdocid) {
+  ignoreDoc = false;
   listlengths = 0;
   setName(prefix);
 
@@ -111,6 +112,7 @@ KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesize,
 }
 
 KeyfileIncIndex::KeyfileIncIndex() {
+  ignoreDoc = false;
   listlengths = 0;
   curdocmgr = -1;
   _computeMemoryBounds( 128 * 1024 * 1024 );
@@ -293,7 +295,8 @@ int KeyfileIncIndex::document(const string &docID) const{
 
   int len = docID.length();
   if (len > (MAX_DOCID_LENGTH - 1)) {
-    cerr << "document: document id " << did << " is too long ("
+    cerr << "KeyfileIncIndex::document: document id " << did 
+	 << " is too long ("
 	 << len << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     strncpy(docKey, did, (MAX_DOCID_LENGTH - 1));
     docKey[(MAX_DOCID_LENGTH - 1)] = '\0';
@@ -552,10 +555,19 @@ bool KeyfileIncIndex::beginDoc(const DocumentProps* dp){
   if (dp == NULL)
     return false;
   const char *did = dp->stringID();
+  int docID = document(did);
+  if (docID > 0) {
+    //already have seen this document's id.
+    cerr << "KeyfileIncIndex::beginDoc: duplicate document id " << did 
+	 << ". Document will be ignored." << endl;
+    ignoreDoc = true;
+    return false;
+  }
   
   int len = strlen(did);
   if (len > (MAX_DOCID_LENGTH - 1)) {
-    cerr << "beginDoc: document id " << did << " is too long ("
+    cerr << "KeyfileIncIndex::beginDoc: document id " << did 
+	 << " is too long ("
 	 << len << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     strncpy(docKey, did, (MAX_DOCID_LENGTH - 1));
     docKey[(MAX_DOCID_LENGTH - 1)] = '\0';
@@ -619,13 +631,14 @@ int KeyfileIncIndex::addUncachedTerm( const InvFPTerm* term ) {
 }
 
 bool KeyfileIncIndex::addTerm(const Term& t){
+  if (ignoreDoc) return false; // skipping this document.
   const InvFPTerm* term = dynamic_cast< const InvFPTerm* >(&t);
   assert( term->strLength() > 0 );
   assert( term->spelling() != NULL );
   int len = term->strLength();
   if (len > (MAX_TERM_LENGTH - 1)) {
     //term is too big to be a key.
-    cerr << "addTerm: ignoring " << term->spelling()
+    cerr << "KeyfileIncIndex::addTerm: ignoring " << term->spelling()
 	 << " which is too long ("
 	 << len << " > " << (MAX_TERM_LENGTH - 1) << ")" << endl;
     return false;
@@ -644,11 +657,13 @@ bool KeyfileIncIndex::addTerm(const Term& t){
 }
 
 void KeyfileIncIndex::endDoc(const DocumentProps* dp) {
-  doendDoc(dp, curdocmgr);
+  if (! ignoreDoc) doendDoc(dp, curdocmgr);
+  ignoreDoc = false;
 }
 
 void KeyfileIncIndex::endDoc(const DocumentProps* dp, const string &mgr){
-  doendDoc(dp, docMgrID(mgr));
+  if (! ignoreDoc) doendDoc(dp, docMgrID(mgr));
+  ignoreDoc = false;
 }
 
 void KeyfileIncIndex::endCollection(const CollectionProps* cp){
