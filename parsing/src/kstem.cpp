@@ -106,6 +106,12 @@
    12/8/94 (MIK) Added the unit testing code
 
    3/20/95 (RJK) Fixed bug with -ble, -nce, -ncy.
+
+   6/16/04 (tds) Added kstem_allocate_memory, kstem_stem_to_buffer,
+                 and kstem_add_table_entry.  The kstem_allocate_memory/
+                 kstem_add_table_entry calls allow stemmer initialization
+                 without forcing the user to store stem dictionaries in
+                 flat files.
    */
 
 #include <stdio.h>
@@ -190,16 +196,16 @@ typedef struct            /* hash table object: per-object variables */
 #define MAX(A,B)  ((A) > (B) ? (A) : (B))
 hashobj *get_hashobj(int);
 hashobj *read_hashobj(int, char *);
-int ho_find_ent(hashobj *t, char *s);
-int ho_lookup(hashobj *, char *);
-int ho_insert(hashobj *, char *, int);
+int ho_find_ent(hashobj *t, const char *s);
+int ho_lookup(hashobj *, const char *);
+int ho_insert(hashobj *, const char *, int);
 int set_size_hashobj(hashobj *, double);
 void free_hashobj(hashobj *);
 int  ho_size(hashobj *);
 int  ho_used(hashobj *);
 double ho_load_factor();
 static int stralloc(hashobj *, int);
-static int hash1(hashobj *, char *);
+static int hash1(hashobj *, const char *);
 static int prime_lte(int);
 static int prime_gte(int) ;
 static int prime(int);
@@ -246,7 +252,7 @@ hashobj *get_hashobj(int entries)
 ho_lookup() returns FAIL if term not found, the term id otherwise .
 */
 
-int ho_lookup(hashobj *t, char *s)
+int ho_lookup(hashobj *t, const char *s)
 {
     int index;
     
@@ -262,7 +268,7 @@ If term is not found, it sets lastkey to point to the first empty entry
 found.
 */
 
-int ho_find_ent(hashobj *t, char *s)
+int ho_find_ent(hashobj *t, const char *s)
 {
     int key, firstkey;
     int probe_step = 0;
@@ -292,7 +298,7 @@ int ho_find_ent(hashobj *t, char *s)
 ho_insert() returns key if successful, FAIL otherwise
 */
 
-int ho_insert(hashobj *t, char *s, int id)
+int ho_insert(hashobj *t, const char *s, int id)
 {
     hte e;
     
@@ -461,7 +467,7 @@ have been processed, the object is treated as an integer, of which we
 then take the remainder mod tablesize.
 */
 
-static int hash1(hashobj *t, char *s)
+static int hash1(hashobj *t, const char *s)
 {
     int j;
     char *p;
@@ -566,6 +572,7 @@ static hashobj *dict_ht;    /* the hashtable used to store the dictionary */
 static dictentry *dep;       /* for general use with dictionary entries    */
 static dictentry *main_deps;  /* store the dictentry entries (dynamically sized) */
 static int default_val;
+static int dep_count;
 
 /* -------------------------- Function Definitions --------------------------*/
 
@@ -616,6 +623,43 @@ char *add_file(char name[], char directory[], char filename[])
   return(name);
 }
 
+/* Allocate hash table structures */
+
+void kstem_allocate_memory( int num_deps ) {
+  if( !dict_initialized_flag ) {
+    dict_ht = get_hashobj(num_deps);    /* HASH_DICT_SIZE */
+    main_deps = (dictentry *)malloc((num_deps+1) * sizeof (dictentry));
+    main_deps[default_val].exception = FALSE;
+    main_deps[default_val].root[0] = '\0';
+    default_val = num_deps;
+    dep_count = 0;
+
+    dict_initialized_flag = TRUE;
+  }
+
+  if( !stemht_init_flag )
+    stemht_init();
+}
+
+/* Adds a stem entry into the hash table; forces the stemmer to stem
+ * <variant> to <word>.  If <word> == "", <variant> is stemmed to itself.
+ */
+
+void kstem_add_table_entry( const char* variant, const char* word ) {
+  int lookup_value;
+
+  if( !dict_initialized_flag )
+    fprintf( stderr, "Must call kstem_allocate_memory before adding table entries" );
+
+  lookup_value = ho_lookup(dict_ht, variant);
+  if (lookup_value != FAIL)  {
+    fprintf(stderr,"kstem_add_table_entry: %s appears to be a duplicate entry (%d), skipping it...", variant, lookup_value);
+  } else {         
+    main_deps[dep_count].exception = FALSE;
+    strcpy(main_deps[dep_count].root,word);
+    ho_insert(dict_ht, variant, (int)dep_count++);
+  }
+}
 
 /* read_dict_info() reads the words from the dictionary and puts them into a
    hash table.  It also stores the other lexicon information
@@ -1768,15 +1812,10 @@ static void nce_endings()
   return;
 }
 
-
-
-
-char * kstem_stemmer(char *term)
-{
+int kstem_stem_tobuffer( char* term, char* buffer ) {
   int i;
   int stem_it = TRUE;
   int hval;
-  static char stem[MAX_WORD_LENGTH];
 
   if (!dict_initialized_flag) 
     read_dict_info();
@@ -1789,18 +1828,23 @@ char * kstem_stemmer(char *term)
      alphabetic, just lowercase copy it into stem and return */
   if ((k <= 2-1) || (k >= MAX_WORD_LENGTH-1))
     stem_it = FALSE;
-  else
-    for (i=0; i<=k; i++)
-      if (!isalpha(term[i])) {
+  else {
+    for (i=0; i<=k; i++) {
+      // 8 bit characters can be a problem on windows
+      if (!isalpha((unsigned char)term[i])) {
 	stem_it = FALSE;
 	break;
       }
+    }
+  }
+
   if (!stem_it) {
     for (i=0; i<=k; i++)
       term[i] = tolower(term[i]);
     term[k+1] = '\0';
-    return term;
+    return 0;
   }
+
   /* Check to see if it's in the cache. */
   /* If it's found, mark the slot in which it is found */
   /* Note that there is no need to lowercase the term in this case */
@@ -1808,19 +1852,19 @@ char * kstem_stemmer(char *term)
   
   if (strcmp(term, stemht[hval].word1) == 0) 
     {
-      strcpy(stem, stemht[hval].stem1);
+      strcpy(buffer, stemht[hval].stem1);
       stemht[hval].flag = 1; 
-      return stem;
+      return strlen(buffer)+1;
     }
   else if (strcmp(term, stemht[hval].word2) == 0) 
     {
-      strcpy(stem, stemht[hval].stem2);
+      strcpy(buffer, stemht[hval].stem2);
       stemht[hval].flag = 2; 
-      return stem;
+      return strlen(buffer)+1;
     }
   /* 'word' is a pointer, global to this file, for manipulating the word in
      the buffer provided through the passed in pointer 'stem'. */
-  word = stem;
+  word = buffer;
 
   for (i=0; i<=k; i++)           /* lowercase the local copy */
     word[i] = tolower(term[i]);
@@ -1883,22 +1927,33 @@ char * kstem_stemmer(char *term)
      `Italians'->`Italy')
    */
   if (dep != (dictentry *)NULL && dep->root[0] != '\0')  {                 
-    strcpy((char *)stem, (char *)dep->root);   
+    strcpy((char *)buffer, (char *)dep->root);   
   }
   /* Enter into cache, at the place not used by the last cache hit */
   if (stemht[hval].flag == 2) 
     {
       strcpy(stemht[hval].word1, term);
-      strcpy(stemht[hval].stem1, stem);
+      strcpy(stemht[hval].stem1, buffer);
       stemht[hval].flag = 1; 
     }
   else 
     {
       strcpy(stemht[hval].word2, term);
-      strcpy(stemht[hval].stem2, stem);
+      strcpy(stemht[hval].stem2, buffer);
       stemht[hval].flag = 2;
     }
+  return strlen(buffer)+1;
+}
+
+char * kstem_stemmer(char *term)
+{
+  static char stem[MAX_WORD_LENGTH];
+  int length = kstem_stem_tobuffer( term, stem );
+
+  if( length )
   return stem;
+  else
+    return term;
 }
 
 static int buf_size = 0;
