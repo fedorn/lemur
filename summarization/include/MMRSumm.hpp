@@ -58,12 +58,11 @@ private:
 	  storage = new termCount;
 	  storage->termID = tEntry->id();
 	  storage->tf = tEntry->count();
-	  storage->val = tEntry->count(); // :TODO: fix
+	  storage->val = tEntry->count();
 	  queryPassage->addTerm(*storage);
 	}
       }      
     } else {
-      // :TODO: replace with something smarter
       tList->startIteration();
       for (int i=0; i<10; i++) {
 	if (tList->hasMore()) {
@@ -71,7 +70,7 @@ private:
 	  storage = new termCount;
 	  storage->termID = tEntry->id();
 	  storage->tf = tEntry->count();
-	  storage->val = tEntry->count(); // :TODO: fix
+	  storage->val = tEntry->count();
 	  queryPassage->addTerm(*storage);
 	}
       } 
@@ -84,7 +83,15 @@ private:
   }
 
   int setMMRQuery(char* qInfo) {
-    //:TODO: 
+    if (qInfo != "") {
+      termCount* storage;
+      storage = new termCount;
+      storage->termID = idx->term(qInfo);
+      storage->tf = 1;
+      storage->val = 1;
+      queryPassage->addTerm(*storage);
+      return 1;
+    }
     return autoMMRQuery();
   }
 
@@ -99,7 +106,6 @@ public:
     lambda = 1.0;
   };
   
-  //:TODO: undo qInfo here
   virtual void markPassages(int optLen, char* qInfo);
 
   virtual void addPassage(Passage &psg);

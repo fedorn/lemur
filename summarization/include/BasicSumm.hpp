@@ -97,13 +97,11 @@ public:
       avgDocLen = idx->docLengthAvg();
       tf = psgV[i].tf;
       Tf = tf / (tf + 0.5 + 1.5 * (docLen/avgDocLen) );
-      //cout << "score1: " << log((double)idx->docCount()/(double)idx->docCount(psgV[i].termID)) << endl;
       idf = min(M, log((double)idx->docCount()/(double)idx->docCount(psgV[i].termID))); 
       endScore += (Tf * idf * P);
     }
     endScore = endScore / 1+psgLen;
     psg.score = endScore;
-    //cout << "score2: " << endScore << endl;
     return endScore;
   }
 

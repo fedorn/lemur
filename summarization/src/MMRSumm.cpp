@@ -18,7 +18,6 @@ void MMRSumm::markPassages(int optLen, char* qInfo) {
     summLen = optLen;
   }
   int ctr = 1;
-  //scorePassages(qInfo);
   vector<MMRPassage> copyPsgs(doc);
   vector<MMRPassage>::iterator it;
   for (int i=0; i< summLen; i++) {
@@ -138,7 +137,7 @@ void MMRSumm::summDocument(const char* docID, const int optLen, const char* qInf
   delete tList;
   
   scorePassages(qInfo);
-  markPassages();
+  markPassages(-1, NULL);
   
   if (oldLen != -1) {
     summLen = oldLen;
@@ -166,7 +165,10 @@ void MMRSumm::scorePassages(const char* qInfo) {
     j++;
     while ((j < docCopy.end()) && ((*j).computeMMR(lambda) > maxMMR)) {
       for(k = docCopy.begin(); k<i; k++) {
-	(*j).maxSim = (*j).dotProduct(*k);
+	double dP = (*j).dotProduct(*k);
+	if (dP > (*j).maxSim) {
+	  (*j).maxSim = dP;
+	}
       }
       double s=(*j).computeMMR(lambda);
       if (s>maxMMR) {
