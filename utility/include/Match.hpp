@@ -11,6 +11,7 @@
 
 #ifndef _MATCH_HPP
 #define _MATCH_HPP
+#include "IndexTypes.hpp"
 ///  Byte offsets of a document term (first char to last char inclusive).
 class Match {
 public:
@@ -18,5 +19,9 @@ public:
   int start;
   /// byte offset of last character of token
   int end;
+  /// token position
+  LOC_T pos;
+  /// term ID
+  TERMID_T termid;
 };
 #endif
