@@ -1,47 +1,62 @@
 # this is the common definitions and rules for making a module directory
-# The Makefile in each module directory includes this file
-
-
-
-# IN GENERAL,  DO NOT CHANGE ANY LINES BELOW THIS POINT
-# IMPORTANT: MakeDefns must be included before MakeRules!
-
 #include common definitions
 include ../../MakeDefns
+# library name for a module 
+# "MODULE" defined in the Makefile of a subdirectory
+OBJLIB = lib$(MODULE).a
+CFLAGS += $(INCPATH)
+CXXFLAGS += $(INCPATH)
 
-# Targets for installing header files
-
-INSTALLHEADER = $(ALLHEADER:%=install%)
-
-# specify what it means by "make all" and "make clean"
+.PHONY: all clean install
 
 all: $(OBJLIB)
 
-clean: cleanlib
+clean:
+	rm -f *.o; rm -f ../depend/*.d; rm -f *.a
 
-#include common rules
-include ../../MakeRules
+# Each source file has a corresponding ".d" file
+# that specifies its dependents. 
+ifneq (clean, $(MAKECMDGOALS))
+ifneq (install, $(MAKECMDGOALS))
+ifneq ($(strip $(CPPSRC)),)
+-include $(patsubst %, ../depend/%, $(CPPSRC:.cpp=.d))
+endif
 
+ifneq ($(strip $(CSRC)),)
+-include $(patsubst %, ../depend/%, $(CSRC:.c=.d))
+endif
+endif
+endif
+
+# how to generate .d  file from a .C file
+../depend/%.d: ../src/%.cpp
+	@echo "Generating $@ for $<"
+	@set -e; $(CXX) -MM $(CXXFLAGS) $< | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
+
+# how to generate .d file from a .c file
+../depend/%.d: ../src/%.c
+	@echo "Generating $@ for $<"
+	@set -e; $(CC) -MM $(CFLAGS) $< | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
+
+# compiling C++ code
+%.o: ../src/%.cpp
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+# compiling C code
+%.o: ../src/%.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+# generating C++ with flex
+../src/%.cpp: ../src/%.l
+	$(LEX) -8 -o$@ $<
+
+# how to make a library from object files
+$(OBJLIB): $(OBJ)
+	rm -f $@; $(AR) -rs $@ $(OBJ)
 
 #specify what it means by "make install"
 #install the header files and the library for the module
 
-install Install INSTALL: $(INSTALLHEADER) INSTALLLIB
-	
-
-# how to install header files
-$(INSTALLHEADER):
-	echo "cp ../include/$(patsubst install%,%,$@) $(LEMUR_INSTALL_PATH)/lemur/include/"
-	cp ../include/$(patsubst install%,%,$@) $(LEMUR_INSTALL_PATH)/lemur/include/
-
-
-# how to install a library for a module
-INSTALLLIB:
-	echo "ar -rs $(LEMUR_INSTALL_PATH)/lemur/lib/liblemur.a $(OBJLIB)"
-#	$(AR) -rs $(LEMUR_INSTALL_PATH)/lemur/lib/liblemur.a $(OBJLIB)
-	$(AR) -rs $(LEMUR_INSTALL_PATH)/lemur/lib/liblemur.a $(OBJ)
-
-
-
-
-
+install:
+	$(INSTALL_DATA) $(ALLHEADER) $(includedir)
+	$(AR) -rs $(libdir)/$(LEMURLIB) $(OBJ)
