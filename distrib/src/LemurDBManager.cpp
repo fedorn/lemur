@@ -51,7 +51,7 @@ LemurDBManager::query(const char * query, int numdocs) const {
   res->ids = new docid_t[numdocs];
 
   // Create the query object.
-  StringQuery qry(NULL, query);
+  StringQuery qry(query);
 
   // Create the query representation.
   QueryRep * qryRep = model->computeQueryRep(qry); 
