@@ -404,6 +404,9 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
     ofs << s << endl;
   }
   
+
+  ofs.close();    // CZ 
+  
   sprintf(name, "%s.%s", (const char *) prefix, documentVocSuffix);
   documentVocabulary = name;
   ofstream ofs2(documentVocabulary);
@@ -414,6 +417,8 @@ void BasicIndex::buildVocabulary(int maxVocSize, int minCount)
     ofs2 << doc[i] << endl;
   }
 
+
+  ofs2.close();    // CZ 
   numDocuments = numDocs;
 }
 
@@ -459,6 +464,9 @@ void BasicIndex::writeWordIndex(int indexNum, FastList<IndexCount> * dlw)
     }
   }
   fprintf(stderr, "\n");
+
+
+  ofs.close();    // CZ 
   delete [] a;
 }
 
@@ -762,6 +770,9 @@ int BasicIndex::mergePair(const char * fn1, const char * fn2, const char * fn3)
     n2 = pCompressor->decompress(ifs2, dc2);
   }
 
+
+  ofs.close();   // CZ 
+
   return 0;
 }
 
@@ -841,6 +852,8 @@ void BasicIndex::createKey(const char * inName, const char * outName,
     ofs << endl;
     bytesRead += 4*sizeof(int) + cbytes;
   }
+  
+  ofs.close();  // CZ 
 }
 
 void BasicIndex::createKeys() 
