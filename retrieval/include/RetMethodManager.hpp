@@ -16,7 +16,7 @@
 
 class RetMethodManager {
 public:
-  enum RetModel {TFIDF=0, OKAPI=1, KL=2, CORI_DOC=3,CORI_CS=4,COS=5};
+  enum RetModel {TFIDF=0, OKAPI=1, KL=2, INQUERY=3,CORI_CS=4,COS=5};
 
   /// use specified default if no model is specified in parameters
   static RetrievalMethod* createModel(Index* ind, ArrayAccumulator* accum, RetModel def=KL);

@@ -17,8 +17,8 @@
     resource selection index and individual indexes. resource selection is done
     using the CORI_CS  (the only resource selection implemented thus far).
     results merging uses either CORIMergeMethod (The retrieval method of each
-    individual databases should be CORI_DOC) or SingleRegrMergeMethod (The
-    retrieval method of each individual databases should be CORI_DOC).
+    individual databases should be INQUERY) or SingleRegrMergeMethod (The
+    retrieval method of each individual databases should be INQUERY).
 
     Parameters should be set as follows:
     index = the collection selection database
@@ -50,11 +50,10 @@
     
 	 1. csDbDataBaseIndex the centralized sampling database index
 
-         2. DOCTF_factor  The TFfactor parameter in the CORI_DOC retrieval
+         2. DOCTF_factor  The TFfactor parameter in the INQUERY retrieval
 	 method for the centralized sampling database.
 	 
-         3. DOCTF_baseline The TFbaseline parameter in the CORI_DOC
-retrieval method for the centralized sampling database.
+         3. DOCTF_baseline The TFbaseline parameter in the INQUERY retrieval method for the centralized sampling database.
 
 **/
 
@@ -146,7 +145,7 @@ int AppMain(int argc, char *argv[]) {
   //Notice assume that collectionCounts i USE_INDEX_COUNT
 
 
-  DistSearchMethod search(csindex,RetMethodManager::CORI_DOC);
+  DistSearchMethod search(csindex,RetMethodManager::INQUERY);
   DocScoreVector** scoreset = new DocScoreVector*[LocalParameter::cutoff];
   DocScoreVector resultsCsDb;
   CORIMergeMethod merger;

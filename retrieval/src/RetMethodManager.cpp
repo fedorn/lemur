@@ -42,7 +42,7 @@ RetrievalMethod* RetMethodManager::createModel (Index* ind, ArrayAccumulator* ac
     ((CORIRetMethod*)model)->setTFFactor(CORIParameter::cstffactor);
     ((CORIRetMethod*)model)->setTFBaseline(CORIParameter::cstfbaseline);
     break;
-  case CORI_DOC:
+  case INQUERY:
     CORIParameter::get();
     model = new CORIRetMethod(*ind, *accum, CORIParameter::collectionCounts,0);
     ((CORIRetMethod*)model)->setTFFactor(CORIParameter::doctffactor);

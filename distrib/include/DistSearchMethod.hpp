@@ -25,8 +25,8 @@
 
 class DistSearchMethod {
 public:
-  DistSearchMethod() {csindex = NULL; defrt = RetMethodManager::CORI_DOC; returnCount=1000;} 
-  DistSearchMethod(Index* index, RetMethodManager::RetModel defmodel=RetMethodManager::CORI_DOC) {csindex = index; defrt = defmodel;} 
+  DistSearchMethod() {csindex = NULL; defrt = RetMethodManager::INQUERY; returnCount=1000;} 
+  DistSearchMethod(Index* index, RetMethodManager::RetModel defmodel=RetMethodManager::INQUERY) {csindex = index; defrt = defmodel;} 
   ~DistSearchMethod() {}
 
   /// set the return documents number;
