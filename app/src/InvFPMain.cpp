@@ -1,14 +1,7 @@
 #include "InvFPPushIndex.hpp"
 #include "DocumentProps.hpp"
 #include "InvFPTerm.hpp"
-
-#define DOCID "<DOCNO>"
-
-// stuff to use lex parser
-extern FILE* yyin; 
-extern char* yytext; 
-extern int yyleng;
-int yylex();
+#include "lex_parser.hpp"
 
 int main(int argc, char* argv[]) {
   FILE* readin = NULL;
@@ -18,7 +11,7 @@ int main(int argc, char* argv[]) {
 
   int tcount = 0; // count of total terms (not unique)
   int dtcount = 0;  // count of total terms in document
-
+  int token;
   for (int i=2;i<argc;i++) {    
     // if there was one, close the previous file pointer
     if (readin != NULL)
@@ -27,30 +20,33 @@ int main(int argc, char* argv[]) {
     fprintf (stderr, "begin indexing: %s\n", argv[i]);
     readin = fopen(argv[i], "r");
     yyin = readin;
-    while (yylex() != 0) {
-      // check for new doc
-      if (strcmp(yytext, DOCID) == 0) {
-        if (yylex() != 0) {
-          // close out the previous
-          if (dtcount != 0) {
-            dp->length(dtcount);
-            index->endDoc(dp);
-            // we want to keep using the same dp object so reset values after they're used
-            dp->length(0);
-          }
-          dp->stringID(yytext);
-          index->beginDoc(dp);
-          tcount += dtcount;
-          dtcount = 0;
+          
+    while ((token = yylex()) != 0) {
+      switch (token) {
+      case DOCID:
+        // close out the previous
+        if (dtcount != 0) {
+          dp->length(dtcount);
+          index->endDoc(dp);
+          // we want to keep using the same dp object so reset values after they're used
+          dp->length(0);
         }
-        continue;
-      } // if we found a new DOCID
-      dtcount++;
-      term->strLength(yyleng);
-      term->spelling(yytext);
-      term->position(dtcount);
-      index->addTerm(*term);
-
+        dp->stringID(yytext);
+        index->beginDoc(dp);
+        tcount += dtcount;
+        dtcount = 0;
+        break;
+      case TERM:
+        dtcount++;
+        term->strLength(yyleng);
+        term->spelling(yytext);
+        term->position(dtcount);
+        index->addTerm(*term);
+        break;
+      default:
+        fprintf(stderr, "Main: encountered token type we were not expecting.\n");
+        break;
+      } // switch
     } // while there is more text
     // close out the last document of this file
     tcount += dtcount;
