@@ -43,6 +43,7 @@ char* IndriTextHandler::handleDoc(char * docno) {
     docid.valueLength = strlen(docno);
     document.metadata.push_back(docid);
   } 
+  return docno;
 }
 
 char * IndriTextHandler::handleWord(char * word, const char* original, PropertyList* list){
