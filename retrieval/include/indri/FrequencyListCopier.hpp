@@ -120,6 +120,7 @@ public:
   }
 
   indri::lang::Node* after( indri::lang::RawScorerNode* oldNode, indri::lang::RawScorerNode* newNode ) {
+    indri::lang::Node* result = 0;
 
     if( _lastTerm && !_disqualifiers.size() && !_disqualifiedTree && oldNode->getContext() == NULL ) {
       indri::lang::TermFrequencyScorerNode* scorerNode;
@@ -135,7 +136,7 @@ public:
                                  oldNode->getMaxContextFraction() );
 
       delete newNode;
-      return defaultAfter( oldNode, scorerNode );
+      result = defaultAfter( oldNode, scorerNode );
     } else if( !_disqualifiers.size() ) {
       ListCache::CachedList* list = 0; 
 
@@ -150,11 +151,14 @@ public:
         cachedNode->setList( list );
 
         delete newNode;
-        return defaultAfter( oldNode, cachedNode );
+        result = defaultAfter( oldNode, cachedNode );
       } else {
-        return defaultAfter( oldNode, newNode );
+        result = defaultAfter( oldNode, newNode );
       }
     }
+
+    _disqualifiedTree = false;
+    return result; 
   }
 };
 

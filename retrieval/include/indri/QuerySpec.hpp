@@ -1269,7 +1269,7 @@ namespace indri {
       std::string queryText() const {
         std::stringstream qtext;
         
-        if( _stemmed )
+        if( !_stemmed )
           qtext << _text;
         else
           qtext << "\"" << _text << "\"";

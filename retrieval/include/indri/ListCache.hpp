@@ -16,6 +16,7 @@
 #include "indri/DocumentCount.hpp"
 #include "indri/QuerySpec.hpp"
 #include "indri/TreePrinterWalker.hpp"
+#include "indri/Parameters.hpp"
 
 class ListCache {
 public:

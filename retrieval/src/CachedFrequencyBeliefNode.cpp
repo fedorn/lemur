@@ -79,16 +79,24 @@ const greedy_vector<ScoredExtentResult>& CachedFrequencyBeliefNode::score( int d
   const DocumentContextCount* entry = _iter < _list->entries.end() ? _iter : 0;
   _extents.clear();
 
-  int count = ( entry && entry->document == documentID ) ? entry->count : 0;
-  int contextSize = entry ? entry->contextSize : documentLength;
+  int count = 0;
+  int contextSize = 0;
+
+  if( entry && entry->document == documentID ) {
+    count = entry->count;
+    contextSize = entry->contextSize;
+
+  // advance this pointer so we're looking at the next document
+  _iter++;
+  } else {
+    count = 0;
+    contextSize = documentLength;
+  }
+
   double score = _function.scoreOccurrence( count, contextSize );
 
   assert( score <= _maximumScore );
   _extents.push_back( ScoredExtentResult( score, documentID, begin, end ) );
-
-  // advance this pointer so we're looking at the next document
-  // note that this means this node cannot be duplicated!!!
-  _iter++;
 
   return _extents;
 }
