@@ -18,7 +18,11 @@ void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff,
   while (qModel.hasMore()) {
     IndexedReal entry;
     qModel.nextWordProb(entry.ind,entry.val);
+    if (entry.ind >500 && entry.ind < 1000) {
+      cout << ind.term(entry.ind) << " "<< entry.val <<endl;
+    }
     qm->push_back(entry);
+
   }
   qm->Sort();
   
@@ -29,11 +33,6 @@ void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff,
   while (hasMore()) {
     QueryTerm *qt = nextTerm();
     setCount(qt->id(), qt->weight()*origModCoeff/countSum);
-  }
-
-  startIteration();
-  while (hasMore()) {
-    QueryTerm *qt = nextTerm();
   }
   
   // now adding the new model
@@ -47,10 +46,6 @@ void SimpleKLQueryModel::interpolateWith(UnigramLM &qModel, double origModCoeff,
     it++;
     prSum += (*it).val;
     wdCount++;
-  }
-  startIteration();
-  while (hasMore()) {
-    QueryTerm *qt = nextTerm();
   }
 }
 
@@ -226,10 +221,11 @@ MLUnigramLM *SimpleKLRetMethod::computeMCQueryModel(ArrayCounter<double> &counte
   OneStepMarkovChain * mc = new OneStepMarkovChain(relDocs, ind, 
 						   alpha);
   origRep.startIteration();
+  double summ;
   while (origRep.hasMore()) {
     QueryTerm *qt;
     qt = origRep.nextTerm();
-    double sum =0;
+    summ =0;
     mc->startFromWordIteration(qt->id());
     // cout << " +++++++++ "<< ind.term(qt->id()) <<endl;
     int fromWd;
@@ -240,22 +236,27 @@ MLUnigramLM *SimpleKLRetMethod::computeMCQueryModel(ArrayCounter<double> &counte
       if (fromWd <= stopWordCutoff) { // a stop word
 	continue;
       }
-      sum += fromWdPr*(mc->wordNorm())[fromWd];
-      //      if (fromWdPr > 0.001) 
-      // cout << ind.term(fromWd) << " " << fromWdPr << endl;
+      summ += fromWdPr*((mc->wordNorm())[fromWd]);
     }
-    
+    if (summ==0) {
+      // query term doesn't exist in the feedback documents, skip
+      continue;
+    }
+
     mc->startFromWordIteration(qt->id());
     while (mc->hasMoreFromWord()) {
       mc->nextFromWordProb(fromWd, fromWdPr);
       if (fromWd <= stopWordCutoff) { // a stop word
 	continue;
       }
-      counter.incCount(fromWd, qt->weight()*fromWdPr*(mc->wordNorm())[fromWd]/sum);
+
+      counter.incCount(fromWd, (qt->weight()*fromWdPr*((mc->wordNorm())[fromWd])/summ));
+
     }
     delete qt;
   }
   delete mc;
+
   return (new MLUnigramLM(counter, ind.termLexiconID()));
 }
 
@@ -371,7 +372,7 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDS
     tList->startIteration();
     while (tList->hasMore()) {
       info = tList->nextEntry();
-      ct[i] += log(dm->seenProb(info->count(), info->id())/(dm->unseenCoeff()*collectLM->prob(i)));
+      ct[info->id()] += log(dm->seenProb(info->count(), info->id())/(dm->unseenCoeff()*collectLM->prob(info->id())));
     }
     delete tList;
     delete dm;
