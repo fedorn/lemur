@@ -46,12 +46,12 @@ public:
     { return ((index!=that.index) || (count!=that.count)); }
   int operator>(const IndexCount &that) const { return count > that.count; }
   void read(ifstream &ifs) { 
-    ifs.read(&index, sizeof(int));
-    ifs.read(&count, sizeof(int));
+    ifs.read((char *)&index, sizeof(int));
+    ifs.read((char *)&count, sizeof(int));
   }
   void write(ofstream &ofs) const { 
-    ofs.write(&index, sizeof(int));
-    ofs.write(&count, sizeof(int));
+    ofs.write((char *)&index, sizeof(int));
+    ofs.write((char *)&count, sizeof(int));
   }
 
 public:

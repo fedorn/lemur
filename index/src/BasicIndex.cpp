@@ -376,8 +376,8 @@ void BasicIndex::writeWordIndex(int indexNum, FastList<IndexCount> * dlw)
       assert(c > 0);
     }
     assert(index == numEntries);
-    ofs.write(&i, sizeof(int));
-    ofs.write(&totalCount, sizeof(int));
+    ofs.write((char *)&i, sizeof(int));
+    ofs.write((char *)&totalCount, sizeof(int));
     pCompressor->compress(ofs, 2*numEntries, a);
     if (++termsWritten % 100 == 0) {
       fprintf(stderr, "\r%d term entries written", termsWritten);
@@ -471,8 +471,8 @@ int BasicIndex::indexCollection()
     }
     avgDocumentLength += totalCount;
     maxDocumentLength = MAX(maxDocumentLength, totalCount);
-    ofs.write(&did, sizeof(int));
-    ofs.write(&totalCount, sizeof(int));
+    ofs.write((char *)&did, sizeof(int));
+    ofs.write((char *) &totalCount, sizeof(int));
     pCompressor->compress(ofs, n, docEntry);
     
     // Now add to the lists for the word index
@@ -526,8 +526,8 @@ int BasicIndex::headWordIndex()
   assert(ifs);
 
   while (ifs.peek() != EOF) {
-    ifs.read(&w, sizeof(int));
-    ifs.read(&totalCount, sizeof(int));
+    ifs.read((char *)&w, sizeof(int));
+    ifs.read((char *)&totalCount, sizeof(int));
     int size = pCompressor->decompress(ifs, a)/2;
     nWords++;
     if (nWords > 20) break;
@@ -558,8 +558,8 @@ int BasicIndex::headDocIndex()
   assert(ifs);
 
   while (ifs.peek() != EOF) {
-    ifs.read(&d, sizeof(int));
-    ifs.read(&m, sizeof(int));
+    ifs.read((char *)&d, sizeof(int));
+    ifs.read((char *)&m, sizeof(int));
     int size = pCompressor->decompress(ifs, a)/2;
     nDocs++;
     if (nDocs > 10) break;
@@ -599,29 +599,29 @@ int BasicIndex::mergePair(const char * fn1, const char * fn2, const char * fn3)
   ofstream ofs(fn3);
   assert(ofs);
 
-  ifs1.read(&w1, sizeof(int));
-  ifs1.read(&c1, sizeof(int));
+  ifs1.read((char *)&w1, sizeof(int));
+  ifs1.read((char *)&c1, sizeof(int));
   n1 = pCompressor->decompress(ifs1, dc1);
   
-  ifs2.read(&w2, sizeof(int));
-  ifs2.read(&c2, sizeof(int));
+  ifs2.read((char *)&w2, sizeof(int));
+  ifs2.read((char *)&c2, sizeof(int));
   n2 = pCompressor->decompress(ifs2, dc2);
 
   while ((!ifs1.eof()) && (!ifs2.eof())) {
     if (w1 < w2) {
-      ofs.write(&w1, sizeof(int));
-      ofs.write(&c1, sizeof(int));
+      ofs.write((char *)&w1, sizeof(int));
+      ofs.write((char *)&c1, sizeof(int));
       pCompressor->compress(ofs, n1, dc1);
-      ifs1.read(&w1, sizeof(int));
-      ifs1.read(&c1, sizeof(int));
+      ifs1.read((char *)&w1, sizeof(int));
+      ifs1.read((char *)&c1, sizeof(int));
       n1 = pCompressor->decompress(ifs1, dc1);
     }
     else if (w1 > w2) {
-      ofs.write(&w2, sizeof(int));
-      ofs.write(&c2, sizeof(int));
+      ofs.write((char *)&w2, sizeof(int));
+      ofs.write((char *)&c2, sizeof(int));
       pCompressor->compress(ofs, n2, dc2);
-      ifs2.read(&w2, sizeof(int));
-      ifs2.read(&c2, sizeof(int));
+      ifs2.read((char *)&w2, sizeof(int));
+      ifs2.read((char *)&c2, sizeof(int));
       n2 = pCompressor->decompress(ifs2, dc2);
     }
     else if (w1 == w2) {
@@ -649,34 +649,34 @@ int BasicIndex::mergePair(const char * fn1, const char * fn2, const char * fn3)
       for (int i=0; i<m2; ++i) {
 	dc3[m1+m2+m1+i] = dc2[m2+i];
       }
-      ofs.write(&w1, sizeof(int));
-      ofs.write(&c3, sizeof(int));
+      ofs.write((char *)&w1, sizeof(int));
+      ofs.write((char *)&c3, sizeof(int));
       pCompressor->compress(ofs, n3, dc3);
       // read in new records
-      ifs1.read(&w1, sizeof(int));
-      ifs1.read(&c1, sizeof(int));
+      ifs1.read((char *)&w1, sizeof(int));
+      ifs1.read((char *)&c1, sizeof(int));
       n1 = pCompressor->decompress(ifs1, dc1);
-      ifs2.read(&w2, sizeof(int));
-      ifs2.read(&c2, sizeof(int));
+      ifs2.read((char *)&w2, sizeof(int));
+      ifs2.read((char *)&c2, sizeof(int));
       n2 = pCompressor->decompress(ifs2, dc2);
     }
   }
   
   while (!ifs1.eof()) {
-    ofs.write(&w1, sizeof(int));
-    ofs.write(&c1, sizeof(int));
+    ofs.write((char *)&w1, sizeof(int));
+    ofs.write((char *)&c1, sizeof(int));
     pCompressor->compress(ofs, n1, dc1);
-    ifs1.read(&w1, sizeof(int));
-    ifs1.read(&c1, sizeof(int));
+    ifs1.read((char *)&w1, sizeof(int));
+    ifs1.read((char *)&c1, sizeof(int));
     n1 = pCompressor->decompress(ifs1, dc1);
   }
 
   while (!ifs2.eof()) {
-    ofs.write(&w2, sizeof(int));
-    ofs.write(&c2, sizeof(int));
+    ofs.write((char *)&w2, sizeof(int));
+    ofs.write((char *)&c2, sizeof(int));
     pCompressor->compress(ofs, n2, dc2);
-    ifs2.read(&w2, sizeof(int));
-    ifs2.read(&c2, sizeof(int));
+    ifs2.read((char *)&w2, sizeof(int));
+    ifs2.read((char *)&c2, sizeof(int));
     n2 = pCompressor->decompress(ifs2, dc2);
   }
 
@@ -742,8 +742,8 @@ void BasicIndex::createKey(const char * inName, const char * outName,
 
   int bytesRead=0;
   while (ifs.peek() != EOF) {
-    ifs.read(&d, sizeof(int));
-    ifs.read(&c, sizeof(int));
+    ifs.read((char *)&d, sizeof(int));
+    ifs.read((char *)&c, sizeof(int));
     pCompressor->read(ifs, ba);
     ofs << voc[d] << " " << c << " " << bytesRead;
     if (byteOffset != (int *) NULL) {
@@ -776,8 +776,8 @@ DocInfoList * BasicIndex::docInfoList(int termID)
   wordIndexStream.seekg(woffset[termID]);
   int w;
   int count;
-  wordIndexStream.read(&w, sizeof(int));
-  wordIndexStream.read(&count, sizeof(int));
+  wordIndexStream.read((char *)&w, sizeof(int));
+  wordIndexStream.read((char *)&count, sizeof(int));
 
   int size = pCompressor->decompress(wordIndexStream, tmpdarr)/2;
   return (new BasicDocInfoList(tmpdarr,size));
@@ -788,8 +788,8 @@ TermInfoList *BasicIndex::termInfoList(int docID)
 {
   documentIndexStream.seekg(doffset[docID]);
   int d, count;
-  documentIndexStream.read(&d, sizeof(int));
-  documentIndexStream.read(&count, sizeof(int));
+  documentIndexStream.read((char *)&d, sizeof(int));
+  documentIndexStream.read((char *)&count, sizeof(int));
   int size = pCompressor->decompress(documentIndexStream, tmpwarr)/2;
   return (new BasicTermInfoList(tmpwarr,size));
   
@@ -800,10 +800,10 @@ int BasicIndex::docCount(int t)
   int w;
   int count;
   wordIndexStream.seekg(woffset[t]);
-  wordIndexStream.read(&w, sizeof(int));
-  wordIndexStream.read(&count, sizeof(int));
+  wordIndexStream.read((char *)&w, sizeof(int));
+  wordIndexStream.read((char *)&count, sizeof(int));
   //  return (pCompressor->decompress(wordIndexStream, tmpdarr)/2);
-  wordIndexStream.read(&count, sizeof(int));
+  wordIndexStream.read((char *)&count, sizeof(int));
   return count/2;
 }
 

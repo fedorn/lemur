@@ -48,12 +48,12 @@ public:
     { return ((index!=that.index) || (prob!=that.prob)); }
   int operator>(const IndexProb &that) const { return prob > that.prob; }
   void read(ifstream &ifs) { 
-    ifs.read(&index, sizeof(int));
-    ifs.read(&prob, sizeof(double));
+    ifs.read((char *)&index, sizeof(int));
+    ifs.read((char *)&prob, sizeof(double));
   }
   void write(ofstream &ofs) const { 
-    ofs.write(&index, sizeof(int));
-    ofs.write(&prob, sizeof(double));
+    ofs.write((char *)&index, sizeof(int));
+    ofs.write((char *)&prob, sizeof(double));
   }
 
 public:
