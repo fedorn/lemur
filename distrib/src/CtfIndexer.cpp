@@ -30,7 +30,7 @@ CtfIndexer::~CtfIndexer() {
 
 
 char *
-CtfIndexer::handleWord(char * word, char * orig) {
+CtfIndexer::handleWord(char * word) {
 
   if (word != NULL) {
 

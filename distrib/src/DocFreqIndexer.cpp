@@ -36,7 +36,7 @@ DocFreqIndexer::~DocFreqIndexer() {
 }
 
 char *
-DocFreqIndexer::handleDoc(char * docno, char * orig) {
+DocFreqIndexer::handleDoc(char * docno) {
   numDocs++;
   return docno;
 }
@@ -47,7 +47,7 @@ DocFreqIndexer::handleEndDoc() {
 }
 
 char *
-DocFreqIndexer::handleWord(char * word, char * orig) {
+DocFreqIndexer::handleWord(char * word) {
   if (word != NULL) {
 
     int len = strlen(word);

@@ -17,8 +17,8 @@ public:
 		 char * ssName, int bufferSize, bool countStopWords = false);
   ~DocFreqIndexer();
 
-  char * handleDoc(char * docno, char * orig);
-  char * handleWord(char * word, char * orig);
+  char * handleDoc(char * docno);
+  char * handleWord(char * word);
   void handleEndDoc();
 
   void newDb(char * name);

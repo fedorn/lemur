@@ -16,7 +16,7 @@ public:
   CtfIndexer(char * csName, int bufferSize, bool countStopWords = false);
   ~CtfIndexer();
 
-  char * handleWord(char * word, char * orig);
+  char * handleWord(char * word);
 
   void newDb(char * name);
 
