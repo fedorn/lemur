@@ -210,7 +210,7 @@ int InvFPIndex::docCount(int termID) {
   */
 }
 
-int InvFPIndex::docLengthTotal(int docID){
+int InvFPIndex::docLength(int docID){
   int dl;
   DOCID_T id;
   ifstream look;
@@ -229,7 +229,7 @@ int InvFPIndex::docLengthTotal(int docID){
   return dl;
 }
 
-int InvFPIndex::docLength(int docID) const{
+int InvFPIndex::docLengthCounted(int docID) const{
   int dl;
   DOCID_T id;
   ifstream look;

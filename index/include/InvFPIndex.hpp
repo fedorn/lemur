@@ -83,10 +83,10 @@ public:
   int docCount(int termID);
 
   /// Total counts of terms in a document, including stop words
-  int docLengthTotal(DOCID_T docID);
+  int docLength(DOCID_T docID);
 
   /// Total count of terms in given document, not including stop words
-  int docLength(int docID) const;
+  int docLengthCounted(int docID) const;
 
   //@}
 
