@@ -17,7 +17,7 @@ cp indriparam/*_param .
 # Uses the stopword list provided in smallstop_param.                 #
 #######################################################################
 
-$OBJ/BuildIndriIndex build_param smallstop_param
+$OBJ/IndriBuildIndex build_param smallstop_param
 
 #######################################################################
 # The following shows how to run simple retrieval                     #
