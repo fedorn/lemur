@@ -13,9 +13,9 @@
 #include <cctype>
 
 
-WriterTextHandler::WriterTextHandler(char * filename) {
+WriterTextHandler::WriterTextHandler(const string &filename) {
   // create the output file
-  outfile = new ofstream(filename);
+  outfile = new ofstream(filename.c_str());
   // set state in first doc
   first = true;
 }

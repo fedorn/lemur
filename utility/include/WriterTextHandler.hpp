@@ -30,7 +30,7 @@ class WriterTextHandler : public TextHandler {
 public:
 
   /// Create and set the file to write to.
-  WriterTextHandler(char * filename);
+  WriterTextHandler(const string &filename);
   ~WriterTextHandler();
 
   /// Begin a doc.

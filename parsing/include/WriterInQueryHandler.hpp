@@ -30,7 +30,7 @@ class WriterInQueryHandler : public TextHandler {
 public:
 
   /// Create and set the file to write to.
-  WriterInQueryHandler(char * filename);
+  WriterInQueryHandler(const string &filename);
   ~WriterInQueryHandler();
 
   /// Begin a doc.
