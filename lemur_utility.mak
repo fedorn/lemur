@@ -1,7 +1,7 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on lemur_utility.dsp
 !IF "$(CFG)" == ""
 CFG=lemur_utility - Win32 Release
-!MESSAGE No configuration specified. Defaulting to lemur_utility - Win32 Release
+!MESSAGE No configuration specified. Defaulting to lemur_utility - Win32 Release.
 !ENDIF 
 
 !IF "$(CFG)" != "lemur_utility - Win32 Release" && "$(CFG)" != "lemur_utility - Win32 Debug"
@@ -53,6 +53,10 @@ CLEAN :
 	-@erase "$(INTDIR)\IdentifinderParser.obj"
 	-@erase "$(INTDIR)\InqArabicParser.obj"
 	-@erase "$(INTDIR)\InQueryOpParser.obj"
+	-@erase "$(INTDIR)\Keyfile.obj"
+	-@erase "$(INTDIR)\keyfilecode.obj"
+	-@erase "$(INTDIR)\KeyfileDocMgr.obj"
+	-@erase "$(INTDIR)\keyprint.obj"
 	-@erase "$(INTDIR)\kstem.obj"
 	-@erase "$(INTDIR)\KStemmer.obj"
 	-@erase "$(INTDIR)\lex_parser.obj"
@@ -66,11 +70,14 @@ CLEAN :
 	-@erase "$(INTDIR)\porter_stemmer.obj"
 	-@erase "$(INTDIR)\PorterStemmer.obj"
 	-@erase "$(INTDIR)\Property.obj"
+	-@erase "$(INTDIR)\QueryDocument.obj"
+	-@erase "$(INTDIR)\ReadBuffer.obj"
 	-@erase "$(INTDIR)\ReutersParser.obj"
 	-@erase "$(INTDIR)\RVLCompress.obj"
 	-@erase "$(INTDIR)\Stopper.obj"
 	-@erase "$(INTDIR)\string-set.obj"
 	-@erase "$(INTDIR)\String.obj"
+	-@erase "$(INTDIR)\TermCache.obj"
 	-@erase "$(INTDIR)\TextHandlerManager.obj"
 	-@erase "$(INTDIR)\Timer.obj"
 	-@erase "$(INTDIR)\TrecParser.obj"
@@ -78,6 +85,7 @@ CLEAN :
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\WebParser.obj"
 	-@erase "$(INTDIR)\WordSet.obj"
+	-@erase "$(INTDIR)\WriteBuffer.obj"
 	-@erase "$(INTDIR)\WriterInQueryHandler.obj"
 	-@erase "$(INTDIR)\WriterTextHandler.obj"
 	-@erase ".\lemur_utility.lib"
@@ -109,6 +117,10 @@ LIB32_OBJS= \
 	"$(INTDIR)\IdentifinderParser.obj" \
 	"$(INTDIR)\InqArabicParser.obj" \
 	"$(INTDIR)\InQueryOpParser.obj" \
+	"$(INTDIR)\Keyfile.obj" \
+	"$(INTDIR)\keyfilecode.obj" \
+	"$(INTDIR)\KeyfileDocMgr.obj" \
+	"$(INTDIR)\keyprint.obj" \
 	"$(INTDIR)\kstem.obj" \
 	"$(INTDIR)\KStemmer.obj" \
 	"$(INTDIR)\lex_parser.obj" \
@@ -122,17 +134,21 @@ LIB32_OBJS= \
 	"$(INTDIR)\porter_stemmer.obj" \
 	"$(INTDIR)\PorterStemmer.obj" \
 	"$(INTDIR)\Property.obj" \
+	"$(INTDIR)\QueryDocument.obj" \
+	"$(INTDIR)\ReadBuffer.obj" \
 	"$(INTDIR)\ReutersParser.obj" \
 	"$(INTDIR)\RVLCompress.obj" \
 	"$(INTDIR)\Stopper.obj" \
-	"$(INTDIR)\String.obj" \
 	"$(INTDIR)\string-set.obj" \
+	"$(INTDIR)\String.obj" \
+	"$(INTDIR)\TermCache.obj" \
 	"$(INTDIR)\TextHandlerManager.obj" \
 	"$(INTDIR)\Timer.obj" \
 	"$(INTDIR)\TrecParser.obj" \
 	"$(INTDIR)\util.obj" \
 	"$(INTDIR)\WebParser.obj" \
 	"$(INTDIR)\WordSet.obj" \
+	"$(INTDIR)\WriteBuffer.obj" \
 	"$(INTDIR)\WriterInQueryHandler.obj" \
 	"$(INTDIR)\WriterTextHandler.obj"
 
@@ -166,6 +182,10 @@ CLEAN :
 	-@erase "$(INTDIR)\IdentifinderParser.obj"
 	-@erase "$(INTDIR)\InqArabicParser.obj"
 	-@erase "$(INTDIR)\InQueryOpParser.obj"
+	-@erase "$(INTDIR)\Keyfile.obj"
+	-@erase "$(INTDIR)\keyfilecode.obj"
+	-@erase "$(INTDIR)\KeyfileDocMgr.obj"
+	-@erase "$(INTDIR)\keyprint.obj"
 	-@erase "$(INTDIR)\kstem.obj"
 	-@erase "$(INTDIR)\KStemmer.obj"
 	-@erase "$(INTDIR)\lex_parser.obj"
@@ -179,11 +199,14 @@ CLEAN :
 	-@erase "$(INTDIR)\porter_stemmer.obj"
 	-@erase "$(INTDIR)\PorterStemmer.obj"
 	-@erase "$(INTDIR)\Property.obj"
+	-@erase "$(INTDIR)\QueryDocument.obj"
+	-@erase "$(INTDIR)\ReadBuffer.obj"
 	-@erase "$(INTDIR)\ReutersParser.obj"
 	-@erase "$(INTDIR)\RVLCompress.obj"
 	-@erase "$(INTDIR)\Stopper.obj"
 	-@erase "$(INTDIR)\string-set.obj"
 	-@erase "$(INTDIR)\String.obj"
+	-@erase "$(INTDIR)\TermCache.obj"
 	-@erase "$(INTDIR)\TextHandlerManager.obj"
 	-@erase "$(INTDIR)\Timer.obj"
 	-@erase "$(INTDIR)\TrecParser.obj"
@@ -192,6 +215,7 @@ CLEAN :
 	-@erase "$(INTDIR)\vc60.pdb"
 	-@erase "$(INTDIR)\WebParser.obj"
 	-@erase "$(INTDIR)\WordSet.obj"
+	-@erase "$(INTDIR)\WriteBuffer.obj"
 	-@erase "$(INTDIR)\WriterInQueryHandler.obj"
 	-@erase "$(INTDIR)\WriterTextHandler.obj"
 	-@erase ".\lemur_utility.lib"
@@ -199,7 +223,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_utility.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
+CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_utility.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_utility.bsc" 
 BSC32_SBRS= \
@@ -223,6 +247,10 @@ LIB32_OBJS= \
 	"$(INTDIR)\IdentifinderParser.obj" \
 	"$(INTDIR)\InqArabicParser.obj" \
 	"$(INTDIR)\InQueryOpParser.obj" \
+	"$(INTDIR)\Keyfile.obj" \
+	"$(INTDIR)\keyfilecode.obj" \
+	"$(INTDIR)\KeyfileDocMgr.obj" \
+	"$(INTDIR)\keyprint.obj" \
 	"$(INTDIR)\kstem.obj" \
 	"$(INTDIR)\KStemmer.obj" \
 	"$(INTDIR)\lex_parser.obj" \
@@ -236,17 +264,21 @@ LIB32_OBJS= \
 	"$(INTDIR)\porter_stemmer.obj" \
 	"$(INTDIR)\PorterStemmer.obj" \
 	"$(INTDIR)\Property.obj" \
+	"$(INTDIR)\QueryDocument.obj" \
+	"$(INTDIR)\ReadBuffer.obj" \
 	"$(INTDIR)\ReutersParser.obj" \
 	"$(INTDIR)\RVLCompress.obj" \
 	"$(INTDIR)\Stopper.obj" \
-	"$(INTDIR)\String.obj" \
 	"$(INTDIR)\string-set.obj" \
+	"$(INTDIR)\String.obj" \
+	"$(INTDIR)\TermCache.obj" \
 	"$(INTDIR)\TextHandlerManager.obj" \
 	"$(INTDIR)\Timer.obj" \
 	"$(INTDIR)\TrecParser.obj" \
 	"$(INTDIR)\util.obj" \
 	"$(INTDIR)\WebParser.obj" \
 	"$(INTDIR)\WordSet.obj" \
+	"$(INTDIR)\WriteBuffer.obj" \
 	"$(INTDIR)\WriterInQueryHandler.obj" \
 	"$(INTDIR)\WriterTextHandler.obj"
 
@@ -394,6 +426,30 @@ SOURCE=.\utility\src\InQueryOpParser.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=.\utility\src\Keyfile.cpp
+
+"$(INTDIR)\Keyfile.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\keyfilecode.c
+
+"$(INTDIR)\keyfilecode.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\KeyfileDocMgr.cpp
+
+"$(INTDIR)\KeyfileDocMgr.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\keyprint.c
+
+"$(INTDIR)\keyprint.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\utility\src\kstem.cpp
 
 "$(INTDIR)\kstem.obj" : $(SOURCE) "$(INTDIR)"
@@ -472,6 +528,18 @@ SOURCE=.\utility\src\Property.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=.\utility\src\QueryDocument.cpp
+
+"$(INTDIR)\QueryDocument.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\ReadBuffer.cpp
+
+"$(INTDIR)\ReadBuffer.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\utility\src\ReutersParser.cpp
 
 "$(INTDIR)\ReutersParser.obj" : $(SOURCE) "$(INTDIR)"
@@ -499,6 +567,12 @@ SOURCE=".\utility\src\string-set.c"
 SOURCE=.\utility\src\String.cpp
 
 "$(INTDIR)\String.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\TermCache.cpp
+
+"$(INTDIR)\TermCache.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -535,6 +609,12 @@ SOURCE=.\utility\src\WebParser.cpp
 SOURCE=.\utility\src\WordSet.cpp
 
 "$(INTDIR)\WordSet.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\WriteBuffer.cpp
+
+"$(INTDIR)\WriteBuffer.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

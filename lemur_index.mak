@@ -59,6 +59,9 @@ CLEAN :
 	-@erase "$(INTDIR)\InvPassagePushIndex.obj"
 	-@erase "$(INTDIR)\InvPushIndex.obj"
 	-@erase "$(INTDIR)\InvTermList.obj"
+	-@erase "$(INTDIR)\KeyfileDocListSegmentReader.obj"
+	-@erase "$(INTDIR)\KeyfileIncIndex.obj"
+	-@erase "$(INTDIR)\KeyfileTextHandler.obj"
 	-@erase "$(INTDIR)\PropIndexTH.obj"
 	-@erase "$(INTDIR)\QueryTextHandler.obj"
 	-@erase "$(INTDIR)\Terms.obj"
@@ -98,6 +101,9 @@ LIB32_OBJS= \
 	"$(INTDIR)\InvPassagePushIndex.obj" \
 	"$(INTDIR)\InvPushIndex.obj" \
 	"$(INTDIR)\InvTermList.obj" \
+	"$(INTDIR)\KeyfileDocListSegmentReader.obj" \
+	"$(INTDIR)\KeyfileIncIndex.obj" \
+	"$(INTDIR)\KeyfileTextHandler.obj" \
 	"$(INTDIR)\PropIndexTH.obj" \
 	"$(INTDIR)\QueryTextHandler.obj" \
 	"$(INTDIR)\Terms.obj"
@@ -138,6 +144,9 @@ CLEAN :
 	-@erase "$(INTDIR)\InvPassagePushIndex.obj"
 	-@erase "$(INTDIR)\InvPushIndex.obj"
 	-@erase "$(INTDIR)\InvTermList.obj"
+	-@erase "$(INTDIR)\KeyfileDocListSegmentReader.obj"
+	-@erase "$(INTDIR)\KeyfileIncIndex.obj"
+	-@erase "$(INTDIR)\KeyfileTextHandler.obj"
 	-@erase "$(INTDIR)\PropIndexTH.obj"
 	-@erase "$(INTDIR)\QueryTextHandler.obj"
 	-@erase "$(INTDIR)\Terms.obj"
@@ -148,7 +157,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_index.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
+CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_index.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_index.bsc" 
 BSC32_SBRS= \
@@ -178,6 +187,9 @@ LIB32_OBJS= \
 	"$(INTDIR)\InvPassagePushIndex.obj" \
 	"$(INTDIR)\InvPushIndex.obj" \
 	"$(INTDIR)\InvTermList.obj" \
+	"$(INTDIR)\KeyfileDocListSegmentReader.obj" \
+	"$(INTDIR)\KeyfileIncIndex.obj" \
+	"$(INTDIR)\KeyfileTextHandler.obj" \
 	"$(INTDIR)\PropIndexTH.obj" \
 	"$(INTDIR)\QueryTextHandler.obj" \
 	"$(INTDIR)\Terms.obj"
@@ -359,6 +371,24 @@ SOURCE=.\index\src\InvPushIndex.cpp
 SOURCE=.\index\src\InvTermList.cpp
 
 "$(INTDIR)\InvTermList.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\KeyfileDocListSegmentReader.cpp
+
+"$(INTDIR)\KeyfileDocListSegmentReader.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\KeyfileIncIndex.cpp
+
+"$(INTDIR)\KeyfileIncIndex.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\KeyfileTextHandler.cpp
+
+"$(INTDIR)\KeyfileTextHandler.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

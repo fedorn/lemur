@@ -46,6 +46,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FreqCounter.obj"
 	-@erase "$(INTDIR)\LemurDBManager.obj"
 	-@erase "$(INTDIR)\LemurMemParser.obj"
+	-@erase "$(INTDIR)\MultiRegrMergeMethod.obj"
 	-@erase "$(INTDIR)\QryBasedSampler.obj"
 	-@erase "$(INTDIR)\SingleRegrMergeMethod.obj"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -71,6 +72,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\FreqCounter.obj" \
 	"$(INTDIR)\LemurDBManager.obj" \
 	"$(INTDIR)\LemurMemParser.obj" \
+	"$(INTDIR)\MultiRegrMergeMethod.obj" \
 	"$(INTDIR)\QryBasedSampler.obj" \
 	"$(INTDIR)\SingleRegrMergeMethod.obj"
 
@@ -97,6 +99,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FreqCounter.obj"
 	-@erase "$(INTDIR)\LemurDBManager.obj"
 	-@erase "$(INTDIR)\LemurMemParser.obj"
+	-@erase "$(INTDIR)\MultiRegrMergeMethod.obj"
 	-@erase "$(INTDIR)\QryBasedSampler.obj"
 	-@erase "$(INTDIR)\SingleRegrMergeMethod.obj"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -123,6 +126,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\FreqCounter.obj" \
 	"$(INTDIR)\LemurDBManager.obj" \
 	"$(INTDIR)\LemurMemParser.obj" \
+	"$(INTDIR)\MultiRegrMergeMethod.obj" \
 	"$(INTDIR)\QryBasedSampler.obj" \
 	"$(INTDIR)\SingleRegrMergeMethod.obj"
 
@@ -225,6 +229,12 @@ SOURCE=.\distrib\src\LemurDBManager.cpp
 SOURCE=.\distrib\src\LemurMemParser.cpp
 
 "$(INTDIR)\LemurMemParser.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\distrib\src\MultiRegrMergeMethod.cpp
+
+"$(INTDIR)\MultiRegrMergeMethod.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

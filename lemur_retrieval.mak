@@ -42,6 +42,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FreqVector.obj"
 	-@erase "$(INTDIR)\IndexedReal.obj"
 	-@erase "$(INTDIR)\InQueryRetMethod.obj"
+	-@erase "$(INTDIR)\MatchInfo.obj"
 	-@erase "$(INTDIR)\OkapiRetMethod.obj"
 	-@erase "$(INTDIR)\ProxInfo.obj"
 	-@erase "$(INTDIR)\QueryNode.obj"
@@ -61,7 +62,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "langmod\include" /I "retrieval\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "langmod\include" /I "utility\include" /I "index\include" /I "retrieval\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_retrieval.bsc" 
 BSC32_SBRS= \
@@ -74,6 +75,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\FreqVector.obj" \
 	"$(INTDIR)\IndexedReal.obj" \
 	"$(INTDIR)\InQueryRetMethod.obj" \
+	"$(INTDIR)\MatchInfo.obj" \
 	"$(INTDIR)\OkapiRetMethod.obj" \
 	"$(INTDIR)\ProxInfo.obj" \
 	"$(INTDIR)\QueryNode.obj" \
@@ -107,6 +109,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FreqVector.obj"
 	-@erase "$(INTDIR)\IndexedReal.obj"
 	-@erase "$(INTDIR)\InQueryRetMethod.obj"
+	-@erase "$(INTDIR)\MatchInfo.obj"
 	-@erase "$(INTDIR)\OkapiRetMethod.obj"
 	-@erase "$(INTDIR)\ProxInfo.obj"
 	-@erase "$(INTDIR)\QueryNode.obj"
@@ -127,7 +130,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /I "langmod\include" /I "retrieval\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
+CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "langmod\retrieval" /I "utility\include" /I "index\include" /I "retrieval\include" /I "langmod\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_retrieval.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_retrieval.bsc" 
 BSC32_SBRS= \
@@ -140,6 +143,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\FreqVector.obj" \
 	"$(INTDIR)\IndexedReal.obj" \
 	"$(INTDIR)\InQueryRetMethod.obj" \
+	"$(INTDIR)\MatchInfo.obj" \
 	"$(INTDIR)\OkapiRetMethod.obj" \
 	"$(INTDIR)\ProxInfo.obj" \
 	"$(INTDIR)\QueryNode.obj" \
@@ -229,6 +233,12 @@ SOURCE=.\retrieval\src\IndexedReal.cpp
 SOURCE=.\retrieval\src\InQueryRetMethod.cpp
 
 "$(INTDIR)\InQueryRetMethod.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\retrieval\src\MatchInfo.cpp
+
+"$(INTDIR)\MatchInfo.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
