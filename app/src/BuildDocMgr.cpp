@@ -58,7 +58,7 @@ void usage(int argc, char ** argv) {
        << endl
        << "Summary of parameters:" << endl << endl
        << "\tmanager -  required name of the document manager (without extension)" << endl    
-       << "\tmanagerType -  required name of the document manager type, one of flat (FlatfileDocMgr) or bdm (KeyfileDocMgr)." << endl    
+       << "\tmanagerType -  required name of the document manager type, one of flat (FlatfileDocMgr) bdm (KeyfileDocMgr) or elem (ElemDocMgr)." << endl    
        << "\tdocFormat - \"trec\" for standard TREC formatted documents "<< endl
        << "\t            \"web\" for web TREC formatted documents " << endl
        << "\t            \"reuters\" for Reuters XML documents " << endl
@@ -149,8 +149,10 @@ int AppMain(int argc, char * argv[]) {
     }
     
     
-    // chain the document manager(parser)/stopper/stemmer/indexer
-    TextHandler *th = docmgr->getTextHandler();
+    // chain the document manager(parser)/stopper/stemmer/indexer    
+    TextHandler *th = dynamic_cast<TextHandler*> (docmgr);
+    if (!th)
+      throw Exception ("BuildDocMgr", "This application currently only supports special DocumentManagers that also behave like TextHandlers, ie FlattextDocMgr, KeyfileDocMgr, ElemDocMgr");
 
     if (stopper != NULL) {
       th->setTextHandler(stopper);
