@@ -29,7 +29,7 @@
 
 class CORIQueryRep : public ArrayQueryRep {
 public:
-  CORIQueryRep(const TextQuery & qry, const Index & dbIndex);
+  CORIQueryRep(const TermQuery & qry, const Index & dbIndex);
   virtual ~CORIQueryRep() {}
 
 protected:
@@ -72,7 +72,7 @@ public:
 		const UnigramLM * collectLM = NULL);
   ~CORIRetMethod() { delete scFunc; delete [] cwRatio; }
 
-  virtual TextQueryRep * computeTextQueryRep(const TextQuery & qry) {
+  virtual TextQueryRep * computeTextQueryRep(const TermQuery & qry) {
     return new CORIQueryRep(qry, ind);
   }
   virtual DocumentRep * computeDocRep(int docID) { 

@@ -40,7 +40,7 @@ namespace TFIDFParameter {
 /// Representation of a query (as a weighted vector) in the TFIDF method
 class TFIDFQueryRep : public ArrayQueryRep {
 public:
-  TFIDFQueryRep(const TextQuery &qry, const Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param);
+  TFIDFQueryRep(const TermQuery &qry, const Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param);
 
   virtual ~TFIDFQueryRep() {}
 
@@ -81,7 +81,7 @@ public:
   TFIDFRetMethod(const Index &dbIndex, ScoreAccumulator &accumulator);
   virtual ~TFIDFRetMethod() {delete [] idfV; delete scFunc;}
 
-  virtual TextQueryRep *computeTextQueryRep(const TextQuery &qry) {
+  virtual TextQueryRep *computeTextQueryRep(const TermQuery &qry) {
     return (new TFIDFQueryRep(qry, ind, idfV, qryTFParam));
   }
 

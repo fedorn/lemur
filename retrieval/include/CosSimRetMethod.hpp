@@ -32,7 +32,7 @@ namespace CosSimParameter {
 class CosSimQueryRep : public ArrayQueryRep {
 public:
   /// Create a query representation for a text query.
-  CosSimQueryRep(const TextQuery &qry, const Index &dbIndex, 
+  CosSimQueryRep(const TermQuery &qry, const Index &dbIndex, 
 		 double *idfValue);
   /// Create a query representation for the given document id.
   CosSimQueryRep(int docId, const Index &dbIndex, double *idfValue);
@@ -90,7 +90,7 @@ public:
 
   virtual ~CosSimRetMethod();
 
-  virtual TextQueryRep *computeTextQueryRep(const TextQuery &qry) {
+  virtual TextQueryRep *computeTextQueryRep(const TermQuery &qry) {
     return (new CosSimQueryRep(qry, ind, idfV));
   }
 

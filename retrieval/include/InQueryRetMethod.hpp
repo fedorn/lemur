@@ -20,7 +20,7 @@
 /// Representation of a query in the InQuery method
 class InQueryRep : public StructQueryRep {
 public:
-  InQueryRep(const StructQuery &qry, const Index &dbIndex, double db):
+  InQueryRep(const TermQuery &qry, const Index &dbIndex, double db):
     StructQueryRep(qry, dbIndex, db) {}
   virtual ~InQueryRep() {}
 };
@@ -42,7 +42,7 @@ public:
     delete(scFunc);
   }
 
-  virtual StructQueryRep *computeStructQueryRep(const StructQuery &qry) {
+  virtual StructQueryRep *computeStructQueryRep(const TermQuery &qry) {
     return (new InQueryRep(qry, ind, defaultBelief));
   }
 

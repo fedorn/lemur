@@ -26,7 +26,7 @@
 class SimpleKLQueryModel : public ArrayQueryRep {
 public:
   /// construct a query model based on query text
-  SimpleKLQueryModel(const TextQuery &qry, const Index &dbIndex) : 
+  SimpleKLQueryModel(const TermQuery &qry, const Index &dbIndex) : 
     ArrayQueryRep(dbIndex.termCountUnique()+1, qry, dbIndex), qm(NULL), 
     ind(dbIndex), colKLComputed(false) {
     colQLikelihood = 0;
@@ -243,7 +243,7 @@ public:
 		    ScoreAccumulator &accumulator);
   virtual ~SimpleKLRetMethod();
   
-  virtual TextQueryRep *computeTextQueryRep(const TextQuery &qry) {
+  virtual TextQueryRep *computeTextQueryRep(const TermQuery &qry) {
     return (new SimpleKLQueryModel(qry, ind));
   }
   

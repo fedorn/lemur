@@ -75,7 +75,7 @@ protected:
 class OkapiQueryRep : public ArrayQueryRep {
 public:
   // initial query constructor, no feedback docs assumed
-  OkapiQueryRep(const TextQuery &qry, const Index &dbIndex, double paramK3);
+  OkapiQueryRep(const TermQuery &qry, const Index &dbIndex, double paramK3);
 
   virtual ~OkapiQueryRep() { delete [] pEst; }
   /// return total number of relevant/feedback documents
@@ -119,7 +119,7 @@ public:
 
   virtual ~OkapiRetMethod() { delete scFunc;}
 
-  virtual TextQueryRep *computeTextQueryRep(const TextQuery &qry) {
+  virtual TextQueryRep *computeTextQueryRep(const TermQuery &qry) {
     return (new OkapiQueryRep(qry, ind, tfParam.k3));
   }
 
