@@ -41,10 +41,18 @@ Parameters:
 #include "SimpleKLRetMethod.hpp"
 #include "RetrievalEngine.hpp"
 
-String inputIndex = ParamGetString("index");
-String inputQuerySet = ParamGetString("querySet", "query");
-String inputResultFile = ParamGetString("resultFile", "result");
-String inputQueryModelFile = ParamGetString("queryModelFile", "expQuery");
+String inputIndex;
+String inputQuerySet;
+String inputResultFile;
+String inputQueryModelFile;
+
+void GetAppParam()
+{
+ inputIndex = ParamGetString("index");
+ inputQuerySet = ParamGetString("querySet", "query");
+ inputResultFile = ParamGetString("resultFile", "result");
+ inputQueryModelFile = ParamGetString("queryModelFile", "expQuery");
+}
 
 int maxCountOfResult = ParamGetInt("resultCount", 1000);
 
