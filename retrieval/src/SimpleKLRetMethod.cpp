@@ -248,7 +248,7 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocID
 
   int i;
 
-  double convergeLL;
+  double meanLL=1e-40;
   double distQueryNorm=0;
 
   for (i=1; i<=numTerms;i++) {
@@ -280,13 +280,11 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, DocID
       ll += wdCt * log (noisePr*collectLM->prob(wd)  // Pc(w)
 			+ (1-noisePr)*distQuery[wd]); // Pq(w)
     }
-    if (itNum < qryParam.emIterations && 
-	ll - convergeLL < 0.5) {
-      cerr << "converged at "<< qryParam.emIterations - itNum+1 << " with likelihood= "<< convergeLL << endl;
+    meanLL = 0.5*meanLL + 0.5*ll;
+    if (fabs((meanLL-ll)/meanLL)< 0.0001) {
+      cerr << "converged at "<< qryParam.emIterations - itNum+1 << " with likelihood= "<< ll << endl;
       break;
-    } else {
-      convergeLL = ll;
-    }
+    } 
 
     // update counts
 
