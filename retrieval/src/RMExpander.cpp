@@ -25,7 +25,7 @@ RMExpander::RMExpander( QueryEnvironment * env , Parameters& param ) : QueryExpa
 std::string RMExpander::expand( std::string originalQuery , std::vector<ScoredExtentResult>& results ) {
   int fbDocs = _param.get( "fbDocs" , 10 );
   int fbTerms = _param.get( "fbTerms" , 10 );
-  double fbOrigWt = _param.get( "fbOrigWt", 0.5 );
+  double fbOrigWt = _param.get( "fbOrigWeight", 0.5 );
   double mu = _param.get( "fbMu", 0 );
 
   std::vector<DocumentVector*> docVectors = getDocumentVectors( results, fbDocs );
