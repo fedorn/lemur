@@ -15,7 +15,10 @@ application and set the following variables in the parameter file:
 (2) smoothSupportFile: file path for the support file
 (e.g., /usr0/mydata/index.supp)
 
- 
+Each entry in the support file corresponds to one document and records
+two pieces of information: (a) the count of unique terms in the document;
+(b) the sum of collection language model probabilities for the words in the document.
+
 */
 
 
@@ -29,30 +32,31 @@ application and set the following variables in the parameter file:
 #include "Param.hpp"
 #include "String.hpp"
 
-#define MIN(a,b) (a<=b) ? a : b
 
-String inputLemur;
-String inputSmoothSupportFile;
-BasicIndex lemur;
-ofstream ofs;
-
-
+namespace LocalParameter {
+  static String index;
+  static String smoothSupportFile;
+  
+  void get() {
+    index = ParamGetString("index");
+    smoothSupportFile = ParamGetString("smoothSupportFile");
+  }
+};
 
 void GetAppParam()
 {
-
- inputLemur = ParamGetString("lemur");
- inputSmoothSupportFile = ParamGetString("smoothSupportFile");
+  LocalParameter::get();
 }
 
 
 int AppMain(int argc, char *argv[]) {
 
+  BasicIndex lemur;
+  ofstream ofs;
 
-  lemur.open(inputLemur);
+  lemur.open(LocalParameter::index);
 
-  ofs.open(inputSmoothSupportFile);
-
+  ofs.open(LocalParameter::smoothSupportFile);
 
   int i;
 
@@ -74,4 +78,7 @@ int AppMain(int argc, char *argv[]) {
   return 0;
 
 }
+
+
+
 

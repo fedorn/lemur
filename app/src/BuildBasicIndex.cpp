@@ -42,24 +42,30 @@ The following is an example of use:
 #include "Param.hpp"
 #include "String.hpp"
 
-String inputFile;   
-String outputPrefix;
-int maxDocuments;   
-int maxMemory;      
+namespace LocalParameter{
+  String inputFile;   
+  String outputPrefix;
+  int maxDocuments;   
+  int maxMemory;      
+  void get() {
+    inputFile    = ParamGetString("inputFile");
+    outputPrefix = ParamGetString("outputPrefix");
+    maxDocuments   = ParamGetInt("maxDocuments", 1000000);
+    maxMemory      = ParamGetInt("maxMemory", 0x8000000);
+    
+  }    
+};
 
 void GetAppParam() 
 {
- inputFile    = ParamGetString("inputFile");
- outputPrefix = ParamGetString("outputPrefix");
- maxDocuments   = ParamGetInt("maxDocuments", 1000000);
- maxMemory      = ParamGetInt("maxMemory", 0x8000000);
+  LocalParameter::get();
 }
 
 int AppMain(int argc, char * argv[]) {
   
   BasicIndex lemur(new GammaCompress());
-  BasicDocStream dstream(inputFile);
-  lemur.build(&dstream, inputFile, outputPrefix, maxDocuments, maxMemory);
+  BasicDocStream dstream(LocalParameter::inputFile);
+  lemur.build(&dstream, LocalParameter::inputFile, LocalParameter::outputPrefix, LocalParameter::maxDocuments, LocalParameter::maxMemory);
 
   return 0;
 }

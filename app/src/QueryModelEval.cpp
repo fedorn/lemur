@@ -40,21 +40,25 @@ Parameters:
 #include <iostream.h>
 #include "SimpleKLRetMethod.hpp"
 #include "RetrievalEngine.hpp"
+#include "ParamManager.hpp"
+#include "ResultFile.hpp"
+namespace LocalParameter {
+  String queryModel;
+  bool TRECResultFormat;
 
-String inputIndex;
-String inputQuerySet;
-String inputResultFile;
-String inputQueryModelFile;
+  void get() {
+    queryModel = ParamGetString("queryModel","");
+    TRECResultFormat = ParamGetInt("resultFormat",1); // default is TREC format
+ 
+  }
+};
 
 void GetAppParam()
 {
- inputIndex = ParamGetString("index");
- inputQuerySet = ParamGetString("querySet", "query");
- inputResultFile = ParamGetString("resultFile", "result");
- inputQueryModelFile = ParamGetString("queryModelFile", "expQuery");
+  LocalParameter::get();
+  RetrievalParameter::get();
+  SimpleKLParameter::get();
 }
-
-int maxCountOfResult = ParamGetInt("resultCount", 1000);
 
 static void writeResults(char *queryID, IndexedRealVector *results, Index *ind, int maxCountOfResult, ostream *resStream)
 {
@@ -78,16 +82,22 @@ static void writeResults(char *queryID, IndexedRealVector *results, Index *ind, 
 /// A query model estimation program
 int AppMain(int argc, char *argv[]) {
   
-  Index  *ind = IndexManager::openIndex(inputIndex);
-  ifstream qmodel(inputQueryModelFile, ios::in);
+  Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
+  ifstream qmodel(LocalParameter::queryModel, ios::in);
   if (qmodel.fail()) {
     throw Exception("AppMain", "can't open the query model file, check the value for parameter queryModelFile");
   }
+  
+  ofstream result(RetrievalParameter::resultFile);
 
-  ofstream os(inputResultFile);
+  ResultFile resFile(LocalParameter::TRECResultFormat);
 
+  resFile.openForWrite(result, *ind);
 
-  SimpleKLRetMethod model(*ind);
+  SimpleKLRetMethod model(*ind, SimpleKLParameter::smoothSupportFile);
+  
+  model.setDocSmoothParam(SimpleKLParameter::docPrm);
+  model.setQueryModelParam(SimpleKLParameter::qryPrm);
 
   RetrievalEngine eng(model);
 
@@ -96,14 +106,15 @@ int AppMain(int argc, char *argv[]) {
 
   SimpleKLQueryModel *q;
   while (qmodel >> qid) {
+    cout << "Query "<< qid << endl;
     q = new SimpleKLQueryModel(*ind);
     q->load(qmodel);
     eng.scoreInvertedIndex(*q,res);
-    writeResults(qid, &res, ind, maxCountOfResult, &os);
+    resFile.writeResults(qid, &res, RetrievalParameter::resultCount);
     delete q;
   }
   
-  os.close();
+  result.close();
 
   delete ind;
   return 0;

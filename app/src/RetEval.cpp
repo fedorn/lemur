@@ -101,38 +101,23 @@ two-stage smoothing  (1 means no collection model mixed, so essentially the quer
 #include "OkapiRetMethod.hpp"
 #include "RetrievalEngine.hpp"
 
-String inputIndex;
-String inputQuerySet;
-String inputResultFile;
-
-
-
-enum RetModel {TFIDF=0, OKAPI=1, KL=2};
-
+#include "ParamManager.hpp"
+#include "ResultFile.hpp"
+namespace LocalParameter {
+  enum RetModel {TFIDF=0, OKAPI=1, KL=2};
+  /// retrieval model 
+  static enum RetModel mod;
+  static bool TRECResultFormat;
+  void get() {
+    mod = (RetModel) ParamGetInt("retModel",KL); // default is KL divergence model
+    TRECResultFormat = ParamGetInt("resultFormat",1); // default is TREC format
+  }
+};
 
 void GetAppParam()
 {
- inputIndex = ParamGetString("index");
- inputQuerySet = ParamGetString("querySet", "query");
- inputResultFile = ParamGetString("resultFile", "result");
-}
-
-static void writeResults(char *queryID, IndexedRealVector *results, Index *ind, int maxCountOfResult, ostream *resStream)
-{
-  IndexedRealVector::iterator j;
-  int count=0;
-  for (j= results->begin();j!=results->end();j++) {
-    if (count >= maxCountOfResult) {
-      break;
-    } else {
-      *resStream << queryID << " "  
-	  << ind->document((*j).ind) << " " 
-	  <<  (*j).val << endl;
-      count++;
-
-    }
-  }  
-  resStream->flush();
+  RetrievalParameter::get();
+  LocalParameter::get();
 }
 
 
@@ -140,14 +125,13 @@ static void writeResults(char *queryID, IndexedRealVector *results, Index *ind, 
 /// A retrieval evaluation program
 int AppMain(int argc, char *argv[]) {
   
-  Index  *ind = IndexManager::openIndex(inputIndex);
-  DocStream *qryStream = new BasicDocStream(inputQuerySet);
-  ofstream result(inputResultFile);
+  Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
+  DocStream *qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+  ofstream result(RetrievalParameter::resultFile);
 
-  int mod = ParamGetInt("retModel",3); // default is KL divergence model
+  ResultFile resFile(LocalParameter::TRECResultFormat);
 
-  int fbDocCount = ParamGetInt("feedbackDocCount",0); 
-  int maxCountOfResult = ParamGetInt("resultCount", 1000);
+  resFile.openForWrite(result, *ind);
 
   IndexedRealVector *results;
 
@@ -155,15 +139,25 @@ int AppMain(int argc, char *argv[]) {
 
   // construct retrieval model
 
-  switch (mod) {
-  case 0: 
+  switch (LocalParameter::mod) {
+  case LocalParameter::TFIDF: 
     model = new TFIDFRetMethod(*ind);
+    TFIDFParameter::get();
+    ((TFIDFRetMethod *)model)->setDocTFParam(TFIDFParameter::docTFPrm);
+    ((TFIDFRetMethod *)model)->setQueryTFParam(TFIDFParameter::qryTFPrm);
+    ((TFIDFRetMethod *)model)->setFeedbackParam(TFIDFParameter::fbPrm);
     break;
-  case 1:
+  case LocalParameter::OKAPI:
     model = new OkapiRetMethod(*ind);
+    OkapiParameter::get();
+    ((OkapiRetMethod *)model)->setTFParam(OkapiParameter::tfPrm);
+    ((OkapiRetMethod *)model)->setFeedbackParam(OkapiParameter::fbPrm);
     break;
-  case 2:
-    model = new SimpleKLRetMethod(*ind);
+  case LocalParameter::KL:
+    SimpleKLParameter::get();
+    model = new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile);
+    ((SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
+    ((SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
     break;
   default:
     throw Exception("RetrievalExp", "unknown retModel parameter");
@@ -178,18 +172,19 @@ int AppMain(int argc, char *argv[]) {
     Document *d = qryStream->nextDoc();
     q = (TextQuery *) d;
     cout << "query : "<< q->getID() << endl;
-    if (fbDocCount>0) {
-      eng.retrievePseudoFeedback(*q, fbDocCount, results);
+    if (RetrievalParameter::fbDocCount>0) {
+      eng.retrievePseudoFeedback(*q, RetrievalParameter::fbDocCount, results);
     } else {
       eng.retrieve(*q, results);
     }
-    writeResults(q->getID(), results, ind, maxCountOfResult, &result);
+    resFile.writeResults(q->getID(), results, RetrievalParameter::resultCount);
   }
 
   result.close();
   delete qryStream;
   delete ind;
   return 0;
+
 }
 
 

@@ -36,74 +36,48 @@ Parameters:
 #include "BasicDocStream.hpp"
 #include <iostream.h>
 #include "SimpleKLRetMethod.hpp"
-
-String inputIndex;
-String inputQuerySet;
-String inputResultFile;
-String inputExpandedQueryFile ;
+#include "ParamManager.hpp"
+#include "ResultFile.hpp"
 
 
+namespace LocalParameter {
+  String expandedQuery;
+  bool TRECResultFormat;
+  void get() {
+    expandedQuery = ParamGetString("expandedQuery");
+    TRECResultFormat = ParamGetInt("resultFormat",1); // default is TREC format
+  }
+};
 
 void GetAppParam()
 {
-
- inputIndex = ParamGetString("index");
- inputQuerySet = ParamGetString("querySet", "query");
- inputResultFile = ParamGetString("resultFile");
- inputExpandedQueryFile = ParamGetString("expandedQuery", "expQuery");
-
-
-}
-class ResultFile {
-public:
-  ResultFile(istream &is, Index &index) : s(is), ind(index), eof(false) {
-    eof = !(s >> curQID >> curDID >> curSC);
-  }
-  ~ResultFile() {}
+  LocalParameter::get();
+  RetrievalParameter::get();
+  SimpleKLParameter::get();
   
-  void getResult(char *expectedQID, IndexedRealVector &res)
-  {
-    res.clear();
-    if (eof || strcmp(curQID, expectedQID)) {
-      throw Exception("ResultFile", "query id mismatch between the original query and the result file");
-    }
-    do {
-      res.PushValue(ind.document(curDID), curSC);
-      if (!(s >> curQID >> curDID >> curSC)) {
-	// end of file
-	eof = true;
-	break;
-      }
-    } while (!strcmp(curQID, expectedQID));
-  }
-	
-private:
-  char curQID[300];
-  char curDID[300];
-  double curSC;
-  Index &ind;
-  istream &s;
-  bool eof;
-};
+}
+
 
 
 /// A query model estimation program
+
 int AppMain(int argc, char *argv[]) {
   
-  Index  *ind = IndexManager::openIndex(inputIndex);
-  DocStream *qryStream = new BasicDocStream(inputQuerySet);
-  ifstream result(inputResultFile, ios::in);
+  Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
+  DocStream *qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+
+  ifstream result(RetrievalParameter::resultFile, ios::in);
   if (result.fail()) {
     throw Exception("AppMain", "can't open the result file, check parameter value for resultFile");
   }
 
-  ofstream os(inputExpandedQueryFile);
+  ofstream os(LocalParameter::expandedQuery);
   
-  ResultFile resFile(result, *ind);
-
-  int fbDocCount = ParamGetInt("feedbackDocCount",10); 
-
-  SimpleKLRetMethod *model =  new SimpleKLRetMethod(*ind);
+  ResultFile resFile(LocalParameter::TRECResultFormat);
+  resFile.openForRead(result, *ind);
+  SimpleKLRetMethod *model =  new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile);
+  model->setDocSmoothParam(SimpleKLParameter::docPrm);
+  model->setQueryModelParam(SimpleKLParameter::qryPrm);
 
   IndexedRealVector res;
 
@@ -116,7 +90,7 @@ int AppMain(int argc, char *argv[]) {
     QueryRep *qr = model->computeQueryRep(*q);
     resFile.getResult(q->getID(), res);
     res.Sort();
-    PseudoFBDocs *topDoc = new PseudoFBDocs(res, fbDocCount);
+    PseudoFBDocs *topDoc = new PseudoFBDocs(res, RetrievalParameter::fbDocCount);
     model->updateQuery(*qr, *topDoc);
     SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
     os << q->getID();
