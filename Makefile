@@ -1,3 +1,4 @@
+SHELL = /bin/sh
 
 # this line specifies all the subdirectories
 # and should be the only line you want to change
