@@ -49,7 +49,6 @@ CLEAN :
 	-@erase "$(INTDIR)\InvFPPushIndex.obj"
 	-@erase "$(INTDIR)\InvFPTermList.obj"
 	-@erase "$(INTDIR)\InvFPTextHandler.obj"
-	-@erase "$(INTDIR)\MemList.obj"
 	-@erase "$(INTDIR)\QueryTextHandler.obj"
 	-@erase "$(INTDIR)\Terms.obj"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -78,7 +77,6 @@ LIB32_OBJS= \
 	"$(INTDIR)\InvFPPushIndex.obj" \
 	"$(INTDIR)\InvFPTermList.obj" \
 	"$(INTDIR)\InvFPTextHandler.obj" \
-	"$(INTDIR)\MemList.obj" \
 	"$(INTDIR)\QueryTextHandler.obj" \
 	"$(INTDIR)\Terms.obj"
 
@@ -108,7 +106,6 @@ CLEAN :
 	-@erase "$(INTDIR)\InvFPPushIndex.obj"
 	-@erase "$(INTDIR)\InvFPTermList.obj"
 	-@erase "$(INTDIR)\InvFPTextHandler.obj"
-	-@erase "$(INTDIR)\MemList.obj"
 	-@erase "$(INTDIR)\QueryTextHandler.obj"
 	-@erase "$(INTDIR)\Terms.obj"
 	-@erase "$(INTDIR)\vc60.idb"
@@ -138,7 +135,6 @@ LIB32_OBJS= \
 	"$(INTDIR)\InvFPPushIndex.obj" \
 	"$(INTDIR)\InvFPTermList.obj" \
 	"$(INTDIR)\InvFPTextHandler.obj" \
-	"$(INTDIR)\MemList.obj" \
 	"$(INTDIR)\QueryTextHandler.obj" \
 	"$(INTDIR)\Terms.obj"
 
@@ -259,12 +255,6 @@ SOURCE=.\index\src\InvFPTermList.cpp
 SOURCE=.\index\src\InvFPTextHandler.cpp
 
 "$(INTDIR)\InvFPTextHandler.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=.\index\src\MemList.cpp
-
-"$(INTDIR)\MemList.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
