@@ -38,7 +38,6 @@ ALL : ".\lemur_utility.lib"
 
 CLEAN :
 	-@erase "$(INTDIR)\BasicDocStream.obj"
-	-@erase "$(INTDIR)\BitArray.obj"
 	-@erase "$(INTDIR)\ByteHash.obj"
 	-@erase "$(INTDIR)\error.obj"
 	-@erase "$(INTDIR)\lex_parser.obj"
@@ -72,7 +71,6 @@ LIB32=link.exe -lib
 LIB32_FLAGS=/nologo /out:"lemur_utility.lib" 
 LIB32_OBJS= \
 	"$(INTDIR)\BasicDocStream.obj" \
-	"$(INTDIR)\BitArray.obj" \
 	"$(INTDIR)\ByteHash.obj" \
 	"$(INTDIR)\error.obj" \
 	"$(INTDIR)\lex_parser.obj" \
@@ -107,7 +105,6 @@ ALL : ".\lemur_utility.lib"
 
 CLEAN :
 	-@erase "$(INTDIR)\BasicDocStream.obj"
-	-@erase "$(INTDIR)\BitArray.obj"
 	-@erase "$(INTDIR)\ByteHash.obj"
 	-@erase "$(INTDIR)\error.obj"
 	-@erase "$(INTDIR)\lex_parser.obj"
@@ -142,7 +139,6 @@ LIB32=link.exe -lib
 LIB32_FLAGS=/nologo /out:"lemur_utility.lib" 
 LIB32_OBJS= \
 	"$(INTDIR)\BasicDocStream.obj" \
-	"$(INTDIR)\BitArray.obj" \
 	"$(INTDIR)\ByteHash.obj" \
 	"$(INTDIR)\error.obj" \
 	"$(INTDIR)\lex_parser.obj" \
@@ -213,12 +209,6 @@ LIB32_OBJS= \
 SOURCE=.\utility\src\BasicDocStream.cpp
 
 "$(INTDIR)\BasicDocStream.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=.\utility\src\BitArray.cpp
-
-"$(INTDIR)\BitArray.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
