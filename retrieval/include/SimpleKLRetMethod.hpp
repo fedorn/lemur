@@ -13,7 +13,7 @@
 #ifndef _SIMPLEKLRETMETHOD_HPP
 #define _SIMPLEKLRETMETHOD_HPP
 
-#include <math.h>
+#include <cmath>
 #include "UnigramLM.hpp"
 #include "ScoreFunction.hpp"
 #include "SimpleKLDocModel.hpp"

@@ -53,11 +53,11 @@
 */
 
 
-#include <assert.h>
+#include <cassert>
 #include <fstream.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "DocStream.hpp"
 #include "Exception.hpp"
 

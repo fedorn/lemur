@@ -11,8 +11,8 @@
 
 
 
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 #include "GammaCompress.hpp"
 
 #define NUMBITS 32

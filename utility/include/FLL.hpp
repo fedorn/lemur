@@ -13,8 +13,8 @@
 #ifndef _FLL_H
 #define _FLL_H
 
-#include <stdlib.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cassert>
 #include <MemList.hpp>
 
 template <class Type> class FastList;

@@ -14,7 +14,7 @@
 #include "Param.hpp"
 #include <iostream.h>
 #include <fstream.h>
-#include <math.h>
+#include <cmath>
 #include "DocUnigramCounter.hpp"
 #include "OneStepMarkovChain.hpp"
 

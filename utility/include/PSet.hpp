@@ -32,10 +32,10 @@
 #define _PSETH_
 
 #include <iostream.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
 #include <memory.h>
-#include <assert.h>
+#include <cassert>
 #include <iostream.h>
 
 static const float SPARSENESS = 1.5;

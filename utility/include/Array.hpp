@@ -19,7 +19,7 @@
 
 // #define ARRAY_BOUNDARY_CHECK
 #include <unistd.h>
-#include <assert.h>
+#include <cassert>
 
 // basic array class, fixed size, not automatically growable
 template <class Type>

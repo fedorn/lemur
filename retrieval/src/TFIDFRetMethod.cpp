@@ -12,7 +12,7 @@
 
 #include "TFIDFRetMethod.hpp"
 #include "Param.hpp"
-#include <math.h>
+#include <cmath>
 
 
 TFIDFQueryRep::TFIDFQueryRep(TextQuery &qry, Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param): ArrayQueryRep (dbIndex.termCountUnique()+1, qry, dbIndex), ind(dbIndex), idf(idfValue), prm(param)

@@ -17,9 +17,9 @@
 
 #include <LL.hpp>
 #include <Null.hpp>
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream.h>
-#include <assert.h>
+#include <cassert>
 
 #define LIST_NOTFOUND (-1)
 

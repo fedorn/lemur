@@ -10,9 +10,9 @@
 */
 
 
-#include <string.h>
-#include <ctype.h>
-#include <assert.h>
+#include <cstring>
+#include <cctype>
+#include <cassert>
 #include "BasicDocStream.hpp"
 
 

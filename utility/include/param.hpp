@@ -10,7 +10,7 @@
 */
 
 
-#include <stdio.h>
+#include <cstdio>
 #include "util.h"
 
 extern "C" {

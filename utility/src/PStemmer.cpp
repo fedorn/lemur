@@ -35,9 +35,9 @@
 
 /************************   Standard Include Files   *************************/
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
 
 /*****************************************************************************/
 /*****************   Private Defines and Data Structures   *******************/

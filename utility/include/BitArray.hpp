@@ -22,8 +22,8 @@
 //
 
 #include <iostream.h>
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 #include <memory.h>		// for memset
 #include "ByteHash.hpp"
 #include "MemList.hpp"

@@ -20,11 +20,11 @@
 #define _ALL_SOURCE
 #endif
 
-#include <stdio.h>
+#include <cstdio>
 #include <iostream.h>
 #include <fstream.h>
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 //#include <sys/statfs.h>
 //extern "C" int statfs(const char *, struct statfs *);
-#include <errno.h>
+#include <cerrno>
 
 #include <CUtil.hpp>
 

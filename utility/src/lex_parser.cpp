@@ -20,7 +20,7 @@
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
 
-#include <stdio.h>
+#include <cstdio>
 
 
 /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
@@ -33,7 +33,7 @@
 
 #ifdef __cplusplus
 
-#include <stdlib.h>
+#include <cstdlib>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -55,7 +55,7 @@
  #pragma warn -rch
  #pragma warn -use
 #include <io.h>
-#include <stdlib.h>
+#include <cstdlib>
 #define YY_USE_CONST
 #define YY_USE_PROTOS
 #endif
@@ -482,7 +482,7 @@ YY_MALLOC_DECL
 #else
 #if __STDC__
 #ifndef __cplusplus
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 #else
 /* Just try to get by without declaring the routines.  This will fail

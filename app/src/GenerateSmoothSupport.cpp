@@ -38,9 +38,9 @@ This application is also a good example of using the doc index (i.e., doc->term 
 
 
 #include <fstream.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cassert>
+#include <cstdlib>
+#include <cstdio>
 
 #include "IndexManager.hpp"
 #include "BasicIndex.hpp"

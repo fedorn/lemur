@@ -16,7 +16,7 @@
 #include "TextQueryRep.hpp"
 #include "ScoreFunction.hpp"
 #include "TextQueryRetMethod.hpp"
-#include <math.h>
+#include <cmath>
 
 /// Okapi retrieval model parameter namespace
 

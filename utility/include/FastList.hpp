@@ -13,8 +13,8 @@
 #ifndef _FASTLISTH_
 #define _FASTLISTH_
 
-#include <stdlib.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cassert>
 #include <Null.hpp>
 #include <MemList.hpp>
 #include <FLL.hpp>

@@ -36,7 +36,7 @@
 //
 //---------------------------------------------------------------
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream.h>
 #include "BitArray.hpp"
 

@@ -81,7 +81,7 @@ The following is an example of supporting an index with position information:
 
 */
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream.h>
 
 

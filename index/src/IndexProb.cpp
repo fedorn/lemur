@@ -11,7 +11,7 @@
 
 
 
-#include <assert.h>
+#include <cassert>
 #include "FastList.hpp"
 #include "FLL.hpp"
 #include "IndexProb.hpp"

@@ -15,7 +15,7 @@
 
 #include "Counter.hpp"
 #include "Exception.hpp"
-#include <string.h>
+#include <cstring>
 /// Abstract Unigram Language Model class
 /*!
   The index range ([0,N]) is assumed to be defined by the lexicon.

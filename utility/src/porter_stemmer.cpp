@@ -26,7 +26,7 @@
    Release 1
 */
 
-#include <string.h>  /* for memmove */
+#include <cstring>  /* for memmove */
 
 #define TRUE 1
 #define FALSE 0

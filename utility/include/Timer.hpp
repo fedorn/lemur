@@ -13,7 +13,7 @@
 #ifndef _TIMERH_
 #define _TIMERH_
 
-#include <time.h>
+#include <ctime>
 #include <iostream.h>
 #include "String.hpp"
 

@@ -28,9 +28,9 @@ two indices (term->doc and doc->term) as well as a term lexicon and document id 
 
 
 #include <fstream.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
 #include "Compress.hpp"
 #include "DocStream.hpp"

@@ -11,10 +11,10 @@
 
 
 #include <fstream.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+#include <cassert>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
 
 #include "BasicIndex.hpp"
 #include "Array.hpp"

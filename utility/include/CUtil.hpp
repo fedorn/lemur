@@ -14,7 +14,7 @@
 #define _CUTILH_
 
 #include <String.hpp>
-#include <ctype.h>
+#include <cctype>
 
 // If soft is zero, CUError assert's 0.
 // Otherwise, CUError exits with error code -soft.

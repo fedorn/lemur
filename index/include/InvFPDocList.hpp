@@ -25,7 +25,7 @@
 #include "MemCache.hpp"
 
 extern "C" {
-  #include <stdio.h>
+  #include <cstdio>
 }
 
 #define DEFAULT 9
