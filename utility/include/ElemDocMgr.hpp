@@ -20,6 +20,16 @@
 // elems
 #define ELEM_ELS ".els"
 
+// we should really do something about this, it appears all over the toolkit
+#ifndef _ABC_OP
+#define _ABC_OP
+struct abc
+{
+  bool operator()(char* s1, char* s2) const{
+    return strcmp(s1, s2) < 0;
+  }
+};
+#endif
 
 /*!
   Document manager using Keyfile for data storage. In addition to providing
@@ -33,17 +43,6 @@
   type of element, the last one is the one actually saved. If more than one of
   the same type element tags are nested, the inner tags are ignored.
  */
-
-// we should really do something about this, it appears all over the toolkit
-#ifndef _ABC_OP
-#define _ABC_OP
-struct abc
-{
-  bool operator()(char* s1, char* s2) const{
-    return strcmp(s1, s2) < 0;
-  }
-};
-#endif
 
 class ElemDocMgr : public KeyfileDocMgr {
 public:
