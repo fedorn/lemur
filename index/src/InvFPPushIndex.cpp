@@ -129,6 +129,7 @@ void InvFPPushIndex::endDoc(DocumentProps* dp){
       sprintf(docfname, "%s%s%d", name, DTINDEX, dtfiles.size());
       dtfiles.push_back(docfname);
       writetlist.open(docfname, ios::binary | ios::out);
+      offset = 0;
     }
 
     fprintf(writetlookup, "%d %d %d ", docid, dtfiles.size()-1, offset);
