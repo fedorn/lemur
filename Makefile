@@ -1,66 +1,51 @@
 
-# these two lines specifies all the subdirectories
-# and should be the only lines you want to change
-
-# add the directory name here when you add a new MODULE
-# directory to lemur
-
-MODDIRS = eval cl_utility utility cl_index index classify retrieval
-
-# add the directory name here when you add a new APPLICATION
-# directory to lemur
-
-APPDIRS = cl_app app test
-
-DIRS = $(MODDIRS) $(APPDIRS)
+# this line specifies all the subdirectories
+# and should be the only line you want to change
+# add the directory name here when you add a new module  or application directory to lemur
+# IMPORTANT: Make sure the order reflects the dependency!
+#            It is usually safe to add your module directory at the end of all
+#            other module directories but before any application directory,
+#            and add your application directory at the end of the whole list
+DIRS = eval utility index cl_utility cl_index retrieval classify cl_app app test
 
 
 # IN GENERAL, DO NOT CHANGE THE FOLLOWING LINES
 
-
-MODLIBS = $(foreach dir, $(MODDIRS), $(dir)/src/lib$(dir).a)
-
-CINCS = $(foreach dir, $(MODDIRS), $(shell ls $(dir)/include/*.h))
-CPPINCS = $(foreach dir, $(MODDIRS), $(shell ls $(dir)/include/*.hpp))
-
-ALLINCS = $(CINCS) $(CPPINCS)
-
-INSTALLINCS = $(ALLINCS:%=install%)
-
+# derived targets for cleaning directories
 CLEANDIRS = $(DIRS:%=clean%)
 
-.PHONY: $(DIRS) $(CLEANDIRS)
+# derived targets for installing directories
+INSTALLDIRS = $(DIRS:%=install%)
+
+.PHONY: $(DIRS) $(CLEANDIRS) $(INSTALLDIRS) CLEANDEST
 
 # "make all" means making each directory
-all: $(DIRS)
+all All ALL: $(DIRS)
 
 # how to make each directory
 $(DIRS): 
 	cd $@/src && $(MAKE) all
 
 # "make clean" means cleaning each directory
-clean: $(CLEANDIRS)
+clean Clean CLEAN: $(CLEANDIRS)
 
 # how to clean each directory
 $(CLEANDIRS):
 	cd $(patsubst clean%,%,$@)/src && $(MAKE) clean
 
-
-# how to install LEMUR lib and header files
-install Install INSTALL:  $(LEMUR_INSTALL_PATH)/lemur $(LEMUR_INSTALL_PATH)/lemur/include $(LEMUR_INSTALL_PATH)/lemur/lib  $(INSTALLINCS) InstallLib
+# "make install" means creating destination directories and installing each module and application directory
+install Install INSTALL:  $(LEMUR_INSTALL_PATH)/lemur $(LEMUR_INSTALL_PATH)/lemur/include $(LEMUR_INSTALL_PATH)/lemur/lib  $(LEMUR_INSTALL_PATH)/lemur/bin  CLEANDEST $(INSTALLDIRS)
 
 # how to make the installation directory
-$(LEMUR_INSTALL_PATH)/lemur $(LEMUR_INSTALL_PATH)/lemur/include $(LEMUR_INSTALL_PATH)/lemur/lib:
+$(LEMUR_INSTALL_PATH)/lemur $(LEMUR_INSTALL_PATH)/lemur/include $(LEMUR_INSTALL_PATH)/lemur/lib $(LEMUR_INSTALL_PATH)/lemur/bin:
 	mkdir $@; echo $@ created
 
-# how to install LEMUR library
-InstallLib:
-	ar -rs $(LEMUR_INSTALL_PATH)/lemur/lib/liblemur.a $(MODLIBS)
+#clean the destination directories
+CLEANDEST:
+	rm -f $(LEMUR_INSTALL_PATH)/lemur/include/* ;\
+	rm -f $(LEMUR_INSTALL_PATH)/lemur/lib/*	; \
+	rm -f $(LEMUR_INSTALL_PATH)/lemur/bin/*
 
-
-# how to install header files
-
-$(INSTALLINCS):
-	cp $(patsubst install%, %,$@) $(LEMUR_INSTALL_PATH)/lemur/include/
-
-
+# how to install each directory
+$(INSTALLDIRS):
+	cd $(patsubst install%,%,$@)/src && $(MAKE) install

@@ -8,6 +8,20 @@ CPPSRC = $(shell ls *.cpp)
 # C source files
 CSRC = $(shell ls *.c)
 
+
+# C++ header files
+
+CPPHEADER = $(shell ls ../include/*.hpp)
+
+# C header files
+
+CHEADER = $(shell ls ../include/*.h)
+
+# All header files
+
+ALLHEADER = $(CPPHEADER) $(CHEADER)
+
+
 # Include path
 INCPATH = -I../include $(patsubst %, -I../../%/include, $(DEPENDMODS))
 
