@@ -12,6 +12,8 @@
 #ifndef _STRUCTQRYDOCREP_HPP
 #define _STRUCTQRYDOCREP_HPP
 #include "DocumentRep.hpp"
+#include <cmath>
+
 /// Representation of a document for structured query retrieval method.
 /// Provides support for passage level operations on a document.
 class StructQryDocRep : public DocumentRep {
