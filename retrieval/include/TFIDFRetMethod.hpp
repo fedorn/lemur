@@ -79,7 +79,7 @@ class TFIDFRetMethod : public TextQueryRetMethod {
 public:
 
   TFIDFRetMethod(Index &dbIndex, ScoreAccumulator &accumulator);
-  ~TFIDFRetMethod() {delete [] idfV; delete scFunc;}
+  virtual ~TFIDFRetMethod() {delete [] idfV; delete scFunc;}
 
   virtual TextQueryRep *computeTextQueryRep(TextQuery &qry) {
     return (new TFIDFQueryRep(qry, ind, idfV, qryTFParam));
