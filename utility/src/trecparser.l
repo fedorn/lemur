@@ -81,17 +81,33 @@ extern char * trectext;
 #define DOC 1
 #define TEXT 9
 
+
 TrecParser::TrecParser() {
   state = OUTER;
 }
 
 
+long TrecParser::fileTell() {
+  int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
+  if (trecin) {
+    long begin = ftell(trecin)-YY_CURRENT_BUFFER->yy_n_chars;
+    return begin+offset;
+  } 
+  return offset;
+}
 
-void 
-TrecParser::parse(char * filename) {
-  
+void TrecParser::parseFile(char * filename) {  
   trecin = fopen(filename, "r");
+  doParse();
+  fclose(trecin);
+}
 
+void TrecParser::parseBuffer(char* buf, int len) {
+  yy_scan_bytes(buf, len);
+  doParse();
+}
+
+void TrecParser::doParse() {
   int tok;
   // The core loop of the parser.
   // The parser is state based.  Encountering a tag
@@ -106,6 +122,7 @@ TrecParser::parse(char * filename) {
     
     case B_DOC:
       state = DOC;
+      docpos = fileTell() - trecleng;
       break;
 
     case F_DOCNO:
@@ -192,7 +209,7 @@ TrecParser::parse(char * filename) {
     }
 
   }
-  fclose(trecin);
 
 }
+
 
