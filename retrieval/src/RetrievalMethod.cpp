@@ -1,14 +1,14 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ *  Original source copyright (c) 2001, Carnegie Mellon University.
+ *  See copyright.cmu for details.
+ *  Modifications copyright (c) 2002, University of Massachusetts.
+ *  See copyright.umass for details.
  *
  *==========================================================================
 */
 
+/** czhai */
 
 #include "RetrievalMethod.hpp"
 
@@ -16,6 +16,7 @@
 // the most general, but probably also most inefficient implementation
 void RetrievalMethod::scoreCollection(QueryRep &qry, IndexedRealVector &results)
 {
+  results.clear();
   for (int id=1; id<=ind.docCount();id++) {
     results.PushValue(id, scoreDoc(qry, id));
   }
