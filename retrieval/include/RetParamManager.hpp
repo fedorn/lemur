@@ -80,7 +80,7 @@ namespace RetrievalParameter {
     textQuerySet = ParamGetString("textQuery","");
     resultFile = ParamGetString("resultFile","");
 
-    tmp = getLower("resultFileFormat","trec");
+    tmp = getLower("resultFormat","trec");
     TRECresultFileFormat = (tmp == "trec" || tmp == "1");
 
     // default being no feedback
