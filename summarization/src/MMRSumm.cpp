@@ -138,7 +138,7 @@ void MMRSumm::summDocument(const char* docID, const int optLen, const char* qInf
   delete tList;
   
   scorePassages(qInfo);
-  markPassages(-1, NULL);
+  markPassages();
   
   if (oldLen != -1) {
     summLen = oldLen;
