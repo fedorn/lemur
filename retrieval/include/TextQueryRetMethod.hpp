@@ -34,8 +34,11 @@
   <LI> A method to update the query representation based on a set of (relevant) documents
   </UL>
 
-  The scoring function supported by this class and its subclasses is assumed to 
-be of the following form:
+
+Given a query <tt>q =(q<sub>1</sub>,q<sub>2</sub>,...,q<sub>N</sub>)</tt> 
+and a document <tt>d=(d<sub>1</sub>,d<sub>2</sub>,...,d<sub>N</sub>)</tt>, 
+where <tt>q<sub>1</sub>,...,q<sub>N</sub></tt> and <tt>d<sub>1</sub>,...,d<sub>N</sub></tt> are terms, <tt>TextQueryRetMethod</tt> assumes the following general scoring function:
+
 <blockquote>
 <pre>
 s(q,d) = g(w(q<sub>1</sub>,d<sub>1</sub>,q,d) + ... + w(q<sub>N</sub>,d<sub>N</sub>,q,d),q,d)
