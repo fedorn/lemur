@@ -1,6 +1,7 @@
 #ifndef _UNIGRAMLM_HPP
 #define _UNIGRAMLM_HPP
 
+#include <string.h>
 #include "Counter.hpp"
 #include "Exception.hpp"
 
