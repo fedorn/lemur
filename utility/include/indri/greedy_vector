@@ -85,7 +85,7 @@ private:
 
   template<typename _Iter>
   void _copy( _Type* start, _Iter other, _Iter otherEnd ) {
-    _Type* current = start;
+//    _Type* current = start;
     
     for( _Type* current = start; other != otherEnd; current++, other++ ) {
       new(current) _Type(*other);
