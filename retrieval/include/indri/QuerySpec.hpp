@@ -2037,7 +2037,7 @@ namespace indri {
       }
 
       FilterNode( Unpacker& unpacker ) {
-        _child = unpacker.getScoredExtentNode( "scoredNode" );
+        _child = unpacker.getScoredExtentNode( "child" );
         _documents = unpacker.getIntVector( "documents" );
       }
 
