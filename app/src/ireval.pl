@@ -42,7 +42,9 @@ while (<T>) {
 	($q,$d,$v) = split;
     }
     $dict{$q ."=".$d} =$v;
-    $totalRels{$q} ++;
+    if ($v == 1) {
+	$totalRels{$q} ++;
+    }
 }
 
 $curQ="";
