@@ -25,7 +25,7 @@ cp posparam/*_param .
 #  directly from a simple SGML format source                          #
 #######################################################################
 
-../app/obj/BuildInvertedIndex build_param database.sgml
+../app/obj/BuildIndex build_param database.sgml
 
 #######################################################################
 # The following command computes the necessary support information    # 
