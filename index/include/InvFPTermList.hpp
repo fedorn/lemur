@@ -71,8 +71,7 @@ public:
   /// Change our default sequence of words representation to be bag of words
   void countTerms();
 
-private:
-
+protected:
   DOCID_T uid; // this doc's id
   int length;  // length of this document (terms + stopwords)
   LocatedTerm* list; // list of terms and locations
