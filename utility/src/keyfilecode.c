@@ -572,6 +572,12 @@ static boolean eq_ix_block(struct ix_block *b, struct ix_block *b1)
 /* init_file_name separates the file name and any extension */
 /*   and saves the two parts in the fcb                     */
 
+#ifdef WIN32
+#define PATH_SEPARATOR '\\'
+#else
+#define PATH_SEPARATOR '/'
+#endif
+
 static void init_file_name(struct fcb *f, char id[])
 {int i, name_lc, f_lc, ext_lc = 0;
 
@@ -579,9 +585,12 @@ static void init_file_name(struct fcb *f, char id[])
   if (name_lc > max_filename_lc + max_extension_lc)
     fatal_error(f,bad_name_err); /* whole thing too long */
   i = name_lc - 1;
-  /* scan  from right to left */
-  while ( i >= 0 && id[i] != '.') {i--; ext_lc++;}
-  if (i >= 0) {
+  /* scan  from right to left 
+     stop when we hit either a . or a path separator.
+   */
+  while ( i >= 0 && id[i] != '.' && id[i] != PATH_SEPARATOR) {i--; ext_lc++;}
+  if (i >= 0 && id[i] == '.') {
+    /* have an extension */
     f_lc = i;
     ext_lc++;
   }

@@ -47,6 +47,7 @@
 #include "indri/RVLDecompressStream.hpp"
 
 #include "indri/ParsedDocument.hpp"
+#include "indri/Path.hpp"
 #include <math.h>
 
 // suffixes for filenames
@@ -275,8 +276,13 @@ bool IndriIndex::open(const std::string& indexName){
   _readOnly = false;
 
   std::string indexNameString(indexName);
+  std::string ext = Path::extension(indexNameString);
   std::string prefix = indexNameString.substr( 0, indexNameString.rfind('.') );
-  setName(prefix);
+  if (ext.size() > 0) {
+    setName(prefix); 
+  } else {
+    setName(indexNameString); 
+  }
 
   std::string parametersName = _baseName + EXTENSION;
   if( ! _readParameters( parametersName ) )
@@ -300,8 +306,13 @@ bool IndriIndex::openRead(const std::string& indexName) {
   _readOnly = true;
 
   std::string indexNameString(indexName);
+  std::string ext = Path::extension(indexNameString);
   std::string prefix = indexNameString.substr( 0, indexNameString.rfind('.') );
-  setName(prefix);
+  if (ext.size() > 0) {
+    setName(prefix); 
+  } else {
+    setName(indexNameString); 
+  }
 
   std::string parametersName = _baseName + EXTENSION;
   if( ! _readParameters( parametersName ) )
@@ -1529,7 +1540,7 @@ void IndriIndex::_openMergeFiles( int startSegment,
     mappingBuffers.back()->write( (const char*) &zero, sizeof zero );
 
     // set up buffers
-    terms.push_back( new char[256] );
+    terms.push_back( new char[Keyfile::MAX_KEY_LENGTH + 1] );
     termDatas.push_back( termdata_create( _fieldData.size() ) );
 
     // read first entry
