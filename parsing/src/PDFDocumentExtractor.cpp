@@ -70,18 +70,20 @@ UnparsedDocument* PDFDocumentExtractor::nextDocument() {
   TextOutputDev* textOut = 0;
   GString* gfilename = new GString(_documentPath.c_str());
   doc = new PDFDoc( gfilename );
-
-  int firstPage = 1;
-  int lastPage = doc->getNumPages();
-
+  // if the doc is not ok, or ok to copy, it
+  // will be a document of length 0.
   if( doc->isOk() && doc->okToCopy() ) {
     void* stream = &_documentTextBuffer;
     textOut = new TextOutputDev( buffer_write, stream, gFalse, gFalse);
   
     if ( textOut->isOk() ) {
+      int firstPage = 1;
+      int lastPage = doc->getNumPages();
+
       doc->displayPages(textOut, firstPage, lastPage, 72, 72, 0, gTrue, gFalse);
     }
   }
+  
 
   delete textOut;
   delete doc;
