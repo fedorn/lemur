@@ -473,7 +473,7 @@ INT64 NetworkServerProxy::documentCount() {
 }
 
 INT64 NetworkServerProxy::documentCount( const std::string& term ) {
-  XMLNode* request = new XMLNode( "document-term-count" );
+  XMLNode* request = new XMLNode( "document-term-count", term );
   _stream->request( request );
   delete request;
 
