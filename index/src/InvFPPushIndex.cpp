@@ -17,6 +17,7 @@
  * tnt 03/2001 - created
  * tnt 07/2001 - adding [OOV] term and docid
  * tnt 09/2001 - writing more info to disk for load during index open
+ * dmf 10/18/2002 -- Add writing of compressed TermInfoLists.
  *
  *========================================================================*/
 
@@ -174,7 +175,7 @@ void InvFPPushIndex::doendDoc(DocumentProps* dp, int mgrid){
     }
 
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset, len, mgrid);
-
+#if 0
     writetlist.write((const char*)&docid, sizeof(DOCID_T));
     writetlist.write((const char*)&len, sizeof(int));
     writetlist.write((const char*)&tls, sizeof(int));
@@ -182,6 +183,10 @@ void InvFPPushIndex::doendDoc(DocumentProps* dp, int mgrid){
     for (int i=0;i<tls;i++) {
       writetlist.write((const char*)&termlist[i], sizeof(LocatedTerm));
     }
+#endif
+    InvFPTermList *tlist = new InvFPTermList(docid, len, termlist);
+    tlist->binWriteC(writetlist);
+    delete tlist;
     tcount += len;
   }  
   termlist.clear();  

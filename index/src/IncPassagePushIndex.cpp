@@ -17,6 +17,7 @@
  * tnt 07/2001 - adding [OOV] term and docid
  * tnt 09/2001 - writing more info to disk for load during index open
  * dmf 07/24/2002 subclass for passage indexing.
+ * dmf 10/22/2002 -- Add writing of compressed TermInfoLists.
  *========================================================================*/
 
 IncPassagePushIndex::IncPassagePushIndex(char* prefix, int psgSize,
@@ -140,12 +141,17 @@ bool IncPassagePushIndex::addTerm(Term& t){
     }
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset,
 	    len, curdocmgr);
+#if 0
     writetlist.write((const char*)&docid, sizeof(DOCID_T));
     writetlist.write((const char*)&len, sizeof(int));
     writetlist.write((const char*)&tls, sizeof(int));
     for (i=0;i<tls;i++) {
       writetlist.write((const char*)&termlist[i], sizeof(LocatedTerm));
     }
+#endif
+    InvFPTermList *tlist = new InvFPTermList(docid, len, termlist);
+    tlist->binWriteC(writetlist);
+    delete tlist;
     tcount += len;
     termlist.erase(termlist.begin(), termlist.begin() + passageEnd);
     // begin a new passage.
@@ -197,13 +203,17 @@ void IncPassagePushIndex::doendDoc(DocumentProps* dp, int mgrid) {
 
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset, 
       len, mgrid);
-
+#if 0
     writetlist.write((const char*)&docid, sizeof(DOCID_T));
     writetlist.write((const char*)&len, sizeof(int));
     writetlist.write((const char*)&tls, sizeof(int));
     for (int i=0;i<tls;i++) {
       writetlist.write((const char*)&termlist[i], sizeof(LocatedTerm));
     }
+#endif
+    InvFPTermList *tlist = new InvFPTermList(docid, len, termlist);
+    tlist->binWriteC(writetlist);
+    delete tlist;
     tcount += len;
   }  
   termlist.clear();  
