@@ -43,6 +43,8 @@
 #define ACRONYM 15
 #define ACRONYM2 17
 #define UNKNOWN 16
+#define B_STYLE 19
+#define E_STYLE 20
 
 
 extern FILE * webin;
@@ -58,9 +60,11 @@ long webloc;
 "</DOC>"                                {webloc += webleng; return E_DOC; }
 "<DOCHDR>"                              {webloc += webleng; return B_DOCHDR; }
 "</DOCHDR>"                             {webloc += webleng; return E_DOCHDR; }
-"<DOCNO>"[[:space:]]*[A-Za-z0-9\-]+[[:space:]]*"</DOCNO>" {webloc += webleng; return F_DOCNO; }
+"<DOCNO>"[^<]*"</DOCNO>"                {webloc += webleng; return F_DOCNO; }
 "<DOCOLDNO>"                            {webloc += webleng; return B_DOCOLDNO; }
 "</DOCOLDNO>"                           {webloc += webleng; return E_DOCOLDNO; }
+"<"[sS][tT][yY][lL][eE][^>]*">"         {webloc += webleng; return B_STYLE; }
+"</"[sS][tT][yY][lL][eE]">"             {webloc += webleng; return E_STYLE; } 
 "<"[sS][cC][rR][iI][pP][tT][^>]*">"     {webloc += webleng; return B_SCRIPT; }
 "</"[sS][cC][rR][iI][pP][tT]">"         {webloc += webleng; return E_SCRIPT; } 
 "<!--"                                  {webloc += webleng; return B_COMMENT; }
@@ -87,6 +91,7 @@ long webloc;
 #define COMMENT 5
 #define TAG 6
 #define SYMBOL 8
+#define STYLE 9
 
 WebParser::WebParser() {
   state = OUTER;
@@ -184,6 +189,19 @@ void WebParser::doParse() {
 
     case E_SCRIPT:
       if (state == SCRIPT)
+        state = DOC;
+      break;
+         
+    case B_STYLE:
+      // Style fields are ignored
+      // Can only transition to a STYLE state if in the DOC state,
+      // handling style tags within comment tags appropriately.
+      if (state == DOC)
+        state = SCRIPT;
+      break;
+
+    case E_STYLE:
+      if (state == STYLE)
         state = DOC;
       break;
          
