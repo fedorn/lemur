@@ -519,14 +519,17 @@ char *yytext;
 #define UNKNOWN 16
 #define B_TEXT 19
 #define E_TEXT 20
-
+#define B_HEADLN 21
+#define E_HEADLN 22
+#define B_TITLE 23
+#define E_TITLE 24
 
 extern FILE * trecin;
 extern char * trectext;
 
 long trecpos;
 
-#line 530 "../src/TrecParser.cpp"
+#line 533 "../src/TrecParser.cpp"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -677,10 +680,10 @@ YY_DECL
 	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
-#line 49 "../src/TrecParser.l"
+#line 52 "../src/TrecParser.l"
 
 
-#line 684 "../src/TrecParser.cpp"
+#line 687 "../src/TrecParser.cpp"
 
 	if ( yy_init )
 		{
@@ -765,155 +768,155 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 51 "../src/TrecParser.l"
+#line 54 "../src/TrecParser.l"
 { trecpos += trecleng; return B_DOC; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 52 "../src/TrecParser.l"
+#line 55 "../src/TrecParser.l"
 { trecpos += trecleng; return E_DOC; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 53 "../src/TrecParser.l"
+#line 56 "../src/TrecParser.l"
 { trecpos += trecleng; return F_DOCNO; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 54 "../src/TrecParser.l"
+#line 57 "../src/TrecParser.l"
 { trecpos += trecleng; return B_TEXT; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 55 "../src/TrecParser.l"
+#line 58 "../src/TrecParser.l"
 { trecpos += trecleng; return E_TEXT; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 56 "../src/TrecParser.l"
-{ trecpos += trecleng; return B_TEXT; }
+#line 59 "../src/TrecParser.l"
+{ trecpos += trecleng; return B_HEADLN; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 57 "../src/TrecParser.l"
-{ trecpos += trecleng; return E_TEXT; }
+#line 60 "../src/TrecParser.l"
+{ trecpos += trecleng; return E_HEADLN; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 58 "../src/TrecParser.l"
-{ trecpos += trecleng; return B_TEXT; }
+#line 61 "../src/TrecParser.l"
+{ trecpos += trecleng; return B_HEADLN; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 59 "../src/TrecParser.l"
-{ trecpos += trecleng; return E_TEXT; }
+#line 62 "../src/TrecParser.l"
+{ trecpos += trecleng; return E_HEADLN; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 60 "../src/TrecParser.l"
-{ trecpos += trecleng; return B_TEXT; }
+#line 63 "../src/TrecParser.l"
+{ trecpos += trecleng; return B_HEADLN; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 61 "../src/TrecParser.l"
-{ trecpos += trecleng; return E_TEXT; }
+#line 64 "../src/TrecParser.l"
+{ trecpos += trecleng; return E_HEADLN; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 62 "../src/TrecParser.l"
-{ trecpos += trecleng; return B_TEXT; }
+#line 65 "../src/TrecParser.l"
+{ trecpos += trecleng; return B_TITLE; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 63 "../src/TrecParser.l"
-{ trecpos += trecleng; return E_TEXT; }
+#line 66 "../src/TrecParser.l"
+{ trecpos += trecleng; return E_TITLE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 64 "../src/TrecParser.l"
+#line 67 "../src/TrecParser.l"
 { trecpos += trecleng; return B_TEXT; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 65 "../src/TrecParser.l"
+#line 68 "../src/TrecParser.l"
 { trecpos += trecleng; return E_TEXT; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 66 "../src/TrecParser.l"
+#line 69 "../src/TrecParser.l"
 { trecpos += trecleng; return B_TEXT; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 67 "../src/TrecParser.l"
+#line 70 "../src/TrecParser.l"
 { trecpos += trecleng; return E_TEXT; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 68 "../src/TrecParser.l"
+#line 71 "../src/TrecParser.l"
 { trecpos += trecleng; /* zap tags */ }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 69 "../src/TrecParser.l"
+#line 72 "../src/TrecParser.l"
 { trecpos += trecleng; /* zap other tags*/}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 70 "../src/TrecParser.l"
+#line 73 "../src/TrecParser.l"
 { trecpos += trecleng; /* zap sgml/html comments*/}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 73 "../src/TrecParser.l"
+#line 76 "../src/TrecParser.l"
 { trecpos += trecleng; /* zap symbols */ }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 74 "../src/TrecParser.l"
+#line 77 "../src/TrecParser.l"
 { trecpos += trecleng; /* zap symbols */ } 
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 75 "../src/TrecParser.l"
+#line 78 "../src/TrecParser.l"
 { trecpos += trecleng; return UPWORD; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 76 "../src/TrecParser.l"
+#line 79 "../src/TrecParser.l"
 { trecpos += trecleng; return WORD; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 77 "../src/TrecParser.l"
+#line 80 "../src/TrecParser.l"
 { trecpos += trecleng; return ACRONYM2; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 78 "../src/TrecParser.l"
+#line 81 "../src/TrecParser.l"
 { trecpos += trecleng; return CONTRACTION;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 79 "../src/TrecParser.l"
+#line 82 "../src/TrecParser.l"
 { trecpos += trecleng; return ACRONYM; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 80 "../src/TrecParser.l"
+#line 83 "../src/TrecParser.l"
 { trecpos += trecleng; /* zap newline */ }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 81 "../src/TrecParser.l"
+#line 84 "../src/TrecParser.l"
 { trecpos += trecleng; return UNKNOWN; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 83 "../src/TrecParser.l"
+#line 86 "../src/TrecParser.l"
 ECHO;
 	YY_BREAK
-#line 917 "../src/TrecParser.cpp"
+#line 920 "../src/TrecParser.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1795,7 +1798,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 83 "../src/TrecParser.l"
+#line 86 "../src/TrecParser.l"
 
 
 #define OUTER 0
@@ -1804,6 +1807,13 @@ int main()
 
 TrecParser::TrecParser() {
   state = OUTER;
+// tags for signaling the beginning and ending of an element
+// for ElemDocMgr, actual tag values don't matter as long as 
+// begin and end tags send same value. Retrieve later using same string
+  begelem.setName("B_ELEM");
+  endelem.setName("E_ELEM");
+  begelem.setValue("\0");
+  endelem.setValue("\0");
 }
 
 
@@ -1869,7 +1879,43 @@ void TrecParser::doParse() {
     case E_TEXT:
       state = DOC;
       break;
-         
+
+    case B_HEADLN:
+      state = TEXT;
+      begelem.setValue("HEADLINE");
+      proplist.clear();
+      proplist.setProperty(&begelem);
+      if (textHandler)
+        textHandler->foundToken(BEGINTAG, trectext, trectext, &proplist);
+      break;
+
+    case B_TITLE:
+      state = TEXT;
+      begelem.setValue("TITLE");
+      proplist.clear();
+      proplist.setProperty(&begelem);
+      if (textHandler)
+        textHandler->foundToken(BEGINTAG, trectext, trectext, &proplist);
+      break;
+
+    case E_HEADLN:
+      state = DOC;
+      endelem.setValue("HEADLINE");
+      proplist.clear();
+      proplist.setProperty(&endelem);
+      if (textHandler)
+        textHandler->foundToken(ENDTAG, trectext, trectext, &proplist);
+      break;
+
+    case E_TITLE:
+      state = DOC;
+      endelem.setValue("TITLE");
+      proplist.clear();
+      proplist.setProperty(&endelem);
+      if (textHandler)
+        textHandler->foundToken(ENDTAG, trectext, trectext, &proplist);
+      break;
+
     case WORD:
       if (state == TEXT) {
         // convert word to lowercase and pass it on

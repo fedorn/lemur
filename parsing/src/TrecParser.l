@@ -38,7 +38,10 @@
 #define UNKNOWN 16
 #define B_TEXT 19
 #define E_TEXT 20
-
+#define B_HEADLN 21
+#define E_HEADLN 22
+#define B_TITLE 23
+#define E_TITLE 24
 
 extern FILE * trecin;
 extern char * trectext;
@@ -53,14 +56,14 @@ long trecpos;
 "<DOCNO>"[^<]*"</DOCNO>"            { trecpos += trecleng; return F_DOCNO; }
 "<TEXT>"                            { trecpos += trecleng; return B_TEXT; }
 "</TEXT>"                           { trecpos += trecleng; return E_TEXT; }
-"<HL>"                              { trecpos += trecleng; return B_TEXT; }
-"</HL>"                             { trecpos += trecleng; return E_TEXT; }
-"<HEAD>"                            { trecpos += trecleng; return B_TEXT; }
-"</HEAD>"                           { trecpos += trecleng; return E_TEXT; }
-"<HEADLINE>"                        { trecpos += trecleng; return B_TEXT; }
-"</HEADLINE>"                       { trecpos += trecleng; return E_TEXT; }
-"<TTL>"                             { trecpos += trecleng; return B_TEXT; }
-"</TTL>"                            { trecpos += trecleng; return E_TEXT; }
+"<HL>"                              { trecpos += trecleng; return B_HEADLN; }
+"</HL>"                             { trecpos += trecleng; return E_HEADLN; }
+"<HEAD>"                            { trecpos += trecleng; return B_HEADLN; }
+"</HEAD>"                           { trecpos += trecleng; return E_HEADLN; }
+"<HEADLINE>"                        { trecpos += trecleng; return B_HEADLN; }
+"</HEADLINE>"                       { trecpos += trecleng; return E_HEADLN; }
+"<TTL>"                             { trecpos += trecleng; return B_TITLE; }
+"</TTL>"                            { trecpos += trecleng; return E_TITLE; }
 "<LP>"                              { trecpos += trecleng; return B_TEXT; }
 "</LP>"                             { trecpos += trecleng; return E_TEXT; }
 "<LEADPARA>"                        { trecpos += trecleng; return B_TEXT; }
@@ -88,6 +91,13 @@ long trecpos;
 
 TrecParser::TrecParser() {
   state = OUTER;
+// tags for signaling the beginning and ending of an element
+// for ElemDocMgr, actual tag values don't matter as long as 
+// begin and end tags send same value. Retrieve later using same string
+  begelem.setName("B_ELEM");
+  endelem.setName("E_ELEM");
+  begelem.setValue("\0");
+  endelem.setValue("\0");
 }
 
 
@@ -153,7 +163,43 @@ void TrecParser::doParse() {
     case E_TEXT:
       state = DOC;
       break;
-         
+
+    case B_HEADLN:
+      state = TEXT;
+      begelem.setValue("HEADLINE");
+      proplist.clear();
+      proplist.setProperty(&begelem);
+      if (textHandler)
+        textHandler->foundToken(BEGINTAG, trectext, trectext, &proplist);
+      break;
+
+    case B_TITLE:
+      state = TEXT;
+      begelem.setValue("TITLE");
+      proplist.clear();
+      proplist.setProperty(&begelem);
+      if (textHandler)
+        textHandler->foundToken(BEGINTAG, trectext, trectext, &proplist);
+      break;
+
+    case E_HEADLN:
+      state = DOC;
+      endelem.setValue("HEADLINE");
+      proplist.clear();
+      proplist.setProperty(&endelem);
+      if (textHandler)
+        textHandler->foundToken(ENDTAG, trectext, trectext, &proplist);
+      break;
+
+    case E_TITLE:
+      state = DOC;
+      endelem.setValue("TITLE");
+      proplist.clear();
+      proplist.setProperty(&endelem);
+      if (textHandler)
+        textHandler->foundToken(ENDTAG, trectext, trectext, &proplist);
+      break;
+
     case WORD:
       if (state == TEXT) {
         // convert word to lowercase and pass it on
