@@ -359,6 +359,8 @@ int AppMain(int argc, char *argv[]) {
       results.LogToPosterior();
     }
 
+    if (RetrievalParameter::retModel == "indri")
+      ignoreWeights = false;
     if (RetrievalParameter::fbDocCount > 0) {
       PseudoFBDocs *topDoc = new PseudoFBDocs(results, 
 					      RetrievalParameter::fbDocCount,
