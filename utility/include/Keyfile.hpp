@@ -37,6 +37,13 @@ public:
   /// Returns false if key does not exist in the b-tree.
   bool get( int key, char** value, int& actualSize ) const;
 
+  // redundant with getNext... combine.
+  bool next( char* key, int& keyLength, char* value, int& valueLength );
+  bool next( int& key, char* value, int& valueLength );
+
+  bool previous( char* key, int& keyLength, char* value, int& valueLength );
+  bool previous( int& key, char* value, int& valueLength );
+
   /// Return the size of the data in the b-tree for the given key. 
   /// Returns -1 if key does not exist in the b-tree.
   int getSize( const char* key ) const;
@@ -50,10 +57,13 @@ public:
   void remove( int key );
 
   /// Open a keyfile with the given filename, with cacheSize (default 1MB).
-  void open( const std::string& filename, int cacheSize = 1024 * 1024 );
+  void open( const std::string& filename, int cacheSize = 1024 * 1024, bool readOnly = false);
   /// Open a keyfile with the given filename, with cacheSize (default 1MB).
-  void open( const char* filename, int cacheSize = 1024 * 1024 );
-  /// Createa keyfile with the given filename, with cacheSize (default 1MB).
+  void open( const char* filename, int cacheSize = 1024 * 1024, bool readOnly = false );
+
+  void openRead( const std::string& filename, int cacheSize = 1024 * 1024 );
+
+  /// Create a keyfile with the given filename, with cacheSize (default 1MB).
   void create( const std::string& filename, int cacheSize = 1024 * 1024 );
   /// Create a keyfile with the given filename, with cacheSize (default 1MB).
   void create( const char* filename, int cacheSize = 1024 * 1024 );
@@ -66,10 +76,16 @@ public:
   ///get the next key and value pair from the keyfile.
   bool getNext( char* key, int maxKeySize, void* value, 
 		int& actualSize, int maxSize ) const;
+
+  ///get the next key and value pair from the keyfile.
+  /// return size of key in actKeySize
+  bool getNext( char* key, int& actKeySize, int maxKeySize, void* value, 
+		int& actualSize, int maxSize ) const;
   ///initialize to empty
   //  Keyfile() : _handleSize(0), _handle(std::auto_ptr<char>(NULL)) {
   Keyfile() : _handleSize(0), _handle(NULL) {
   }
+  void verify();
   
 private:
   //  std::auto_ptr<char> _handle; // file control block of the keyfile
