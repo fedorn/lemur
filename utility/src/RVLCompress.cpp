@@ -9,6 +9,11 @@
  *==========================================================================
 */
 
+/*
+  10/18/2002 -- dmf Remove warning value exceeded int limit in compression
+  from compress_ints because it is exercised to often with the termInfoList
+  compression.
+ */
 #include "RVLCompress.hpp"
 
 
@@ -92,9 +97,11 @@ int RVLCompress::compress_ints (int *data_ptr,
       *(out_ptr_end + 3) = 127 & (n >> 21);
       *(out_ptr_end + 4) = 128 | (n >> 28);
       out_ptr_end += 5;
+      #if 0
       if (n >= pow2_31) {
 	cerr << "WARNING: value exceeded int limit in compression" << endl;
       }
+      #endif
     }
   } // for
 
