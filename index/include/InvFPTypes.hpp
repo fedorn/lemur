@@ -56,10 +56,17 @@ struct LocatedTerm { // pair of term and its location
   LOC_T loc;
 };
 
-struct entry {        // an entry in the lookup table for inverted lists index
+struct dt_entry {   // an entry in the lookup table for docterm lists index
   FILEID_T fileid;  // which file the word is in
   long offset;        // what the offset into the file is
   int length;         // the length of the inverted list
+};
+
+struct inv_entry {   // an entry in the lookup table for docterm lists index
+  FILEID_T fileid;  // which file the word is in
+  long offset;        // what the offset into the file is
+  int ctf;            // collection term freq
+  int df;             // doc freq
 };
 
 #endif
