@@ -1,3 +1,18 @@
+ /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  
+ * 
+ * The Lemur toolkit for language modeling and information retrieval.
+ * Copyright (c) 2001 Carnegie Mellon University.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted for research or educational purposes,
+ * provided that this copyright notice is maintained and note is made
+ * of any changes to the source code.
+ * 
+ * This is a research system.  The code is distributed on an "as is" basis,
+ * without any warranty, express or implied. 
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 /* type definitions for objects we will use */
 #ifndef _INVFPTYPES_H
 #define _INVFPTYPES_H
@@ -17,7 +32,10 @@ typedef char* EXDOCID_T;
 #define DTLOOKUP  ".dtlookup"
 #define TERMIDMAP  ".tid"
 #define DOCIDMAP  ".did"
-#define MAINTOC  ".toc"
+#define MAINTOC  ".ifp"
+
+// what to call out of vocabulary ids
+#define INVALID_STR "[OOV]"
 
 // name for parameters
 #define NUMDOCS_PAR "NUM_DOCS"
