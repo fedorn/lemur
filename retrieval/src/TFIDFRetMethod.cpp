@@ -107,11 +107,7 @@ void TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs)
     while (tList->hasMore()) {
       TermInfo *info = tList->nextEntry();
       TFIDFDocRep *dr;
-      #ifdef _WIN32
-      dr = (TFIDFDocRep *)(computeDocRep(docID));
-      #else
       dr = dynamic_cast<TFIDFDocRep *>(computeDocRep(docID));
-      #endif
       centroidVector[info->id()] += dr->docTFWeight(info->count());
       delete dr;
     }
@@ -143,11 +139,7 @@ void TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, DocIDSet &relDocs)
       break;
     } else {
       // add the term to the query vector
-      #ifdef _WIN32
-      ((TFIDFQueryRep *)(&qryRep))->incCount((*j).ind, (*j).val*fbParam.posCoeff);
-      #else
       (dynamic_cast<TFIDFQueryRep *>(&qryRep))->incCount((*j).ind, (*j).val*fbParam.posCoeff);
-      #endif
     }
   }
 

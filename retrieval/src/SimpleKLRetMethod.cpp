@@ -228,11 +228,7 @@ void SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep, DocIDSet &relDocs
 {
   SimpleKLQueryModel *qr;
 
-  #ifdef _WIN32
-  qr = (SimpleKLQueryModel *) (&origRep);
-  #else
   qr = dynamic_cast<SimpleKLQueryModel *> (&origRep);
-  #endif
  
   switch (qryParam.fbMethod) {
   case SimpleKLParameter::MIXTURE:
@@ -350,11 +346,7 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, DocIDS
     double pr;
     relDocs.nextIDInfo(id,pr);
     SimpleKLDocModel *dm;
-    #ifdef _WIN32
-    dm = (SimpleKLDocModel *) (computeDocRep(id));
-    #else
     dm = dynamic_cast<SimpleKLDocModel *> (computeDocRep(id));
-    #endif
 
     for (i=1; i<=numTerms; i++) { // pretend every word is unseen
       ct[i] += log(dm->unseenCoeff()*collectLM->prob(i));
