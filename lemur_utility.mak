@@ -1,20 +1,19 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on lemur_utility.dsp
 !IF "$(CFG)" == ""
-CFG=lemur_utility - Win32 Release
-!MESSAGE No configuration specified. Defaulting to lemur_utility - Win32 Release.
+CFG=LEMUR_UTILITY - WIN32 RELEASE
+!MESSAGE No configuration specified. Defaulting to LEMUR_UTILITY - WIN32 RELEASE.
 !ENDIF 
 
-!IF "$(CFG)" != "lemur_utility - Win32 Release" && "$(CFG)" != "lemur_utility - Win32 Debug"
+!IF "$(CFG)" != "lemur_utility - Win32 Release"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "lemur_utility.mak" CFG="lemur_utility - Win32 Debug"
+!MESSAGE NMAKE /f "lemur_utility.mak" CFG="LEMUR_UTILITY - WIN32 RELEASE"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "lemur_utility - Win32 Release" (based on "Win32 (x86) Static Library")
-!MESSAGE "lemur_utility - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -27,9 +26,6 @@ NULL=nul
 
 CPP=cl.exe
 RSC=rc.exe
-
-!IF  "$(CFG)" == "lemur_utility - Win32 Release"
-
 OUTDIR=.\utility\obj
 INTDIR=.\utility\obj
 
@@ -47,8 +43,8 @@ CLEAN :
 	-@erase "$(INTDIR)\ChineseCharParser.obj"
 	-@erase "$(INTDIR)\ChineseParser.obj"
 	-@erase "$(INTDIR)\DocMgrManager.obj"
-	-@erase "$(INTDIR)\error.obj"
 	-@erase "$(INTDIR)\ElemDocMgr.obj"
+	-@erase "$(INTDIR)\error.obj"
 	-@erase "$(INTDIR)\FlattextDocMgr.obj"
 	-@erase "$(INTDIR)\FUtil.obj"
 	-@erase "$(INTDIR)\IdentifinderParser.obj"
@@ -68,6 +64,7 @@ CLEAN :
 	-@erase "$(INTDIR)\Param.obj"
 	-@erase "$(INTDIR)\parameters.obj"
 	-@erase "$(INTDIR)\Parser.obj"
+	-@erase "$(INTDIR)\PDict.obj"
 	-@erase "$(INTDIR)\porter_stemmer.obj"
 	-@erase "$(INTDIR)\PorterStemmer.obj"
 	-@erase "$(INTDIR)\Property.obj"
@@ -93,205 +90,73 @@ CLEAN :
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_utility.bsc" 
+BSC32_SBRS= \
+	
+LIB32=link.exe -lib
+LIB32_FLAGS=/nologo /out:"lemur_utility.lib" 
+LIB32_OBJS= \
+	"$(INTDIR)\arabic_stem.obj" \
+	"$(INTDIR)\ArabicParser.obj" \
+	"$(INTDIR)\ArabicStemmer.obj" \
+	"$(INTDIR)\BasicDocStream.obj" \
+	"$(INTDIR)\BrillPOSParser.obj" \
+	"$(INTDIR)\BrillPOSTokenizer.obj" \
+	"$(INTDIR)\ByteHash.obj" \
+	"$(INTDIR)\ChineseCharParser.obj" \
+	"$(INTDIR)\ChineseParser.obj" \
+	"$(INTDIR)\DocMgrManager.obj" \
+	"$(INTDIR)\ElemDocMgr.obj" \
+	"$(INTDIR)\error.obj" \
+	"$(INTDIR)\FlattextDocMgr.obj" \
+	"$(INTDIR)\FUtil.obj" \
+	"$(INTDIR)\IdentifinderParser.obj" \
+	"$(INTDIR)\InqArabicParser.obj" \
+	"$(INTDIR)\InQueryOpParser.obj" \
+	"$(INTDIR)\Keyfile.obj" \
+	"$(INTDIR)\keyfilecode.obj" \
+	"$(INTDIR)\KeyfileDocMgr.obj" \
+	"$(INTDIR)\keyprint.obj" \
+	"$(INTDIR)\kstem.obj" \
+	"$(INTDIR)\KStemmer.obj" \
+	"$(INTDIR)\lex_parser.obj" \
+	"$(INTDIR)\LinkedPropertyList.obj" \
+	"$(INTDIR)\main.obj" \
+	"$(INTDIR)\MemCache.obj" \
+	"$(INTDIR)\MemList.obj" \
+	"$(INTDIR)\Param.obj" \
+	"$(INTDIR)\parameters.obj" \
+	"$(INTDIR)\Parser.obj" \
+	"$(INTDIR)\PDict.obj" \
+	"$(INTDIR)\porter_stemmer.obj" \
+	"$(INTDIR)\PorterStemmer.obj" \
+	"$(INTDIR)\Property.obj" \
+	"$(INTDIR)\QueryDocument.obj" \
+	"$(INTDIR)\ReadBuffer.obj" \
+	"$(INTDIR)\ReutersParser.obj" \
+	"$(INTDIR)\RVLCompress.obj" \
+	"$(INTDIR)\Stopper.obj" \
+	"$(INTDIR)\String.obj" \
+	"$(INTDIR)\string-set.obj" \
+	"$(INTDIR)\TermCache.obj" \
+	"$(INTDIR)\TextHandlerManager.obj" \
+	"$(INTDIR)\Timer.obj" \
+	"$(INTDIR)\TrecParser.obj" \
+	"$(INTDIR)\util.obj" \
+	"$(INTDIR)\WebParser.obj" \
+	"$(INTDIR)\WordSet.obj" \
+	"$(INTDIR)\WriteBuffer.obj" \
+	"$(INTDIR)\WriterInQueryHandler.obj" \
+	"$(INTDIR)\WriterTextHandler.obj"
+
+".\lemur_utility.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
+    $(LIB32) @<<
+  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
+<<
 
 CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_utility.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_utility.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"lemur_utility.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\arabic_stem.obj" \
-	"$(INTDIR)\ArabicParser.obj" \
-	"$(INTDIR)\ArabicStemmer.obj" \
-	"$(INTDIR)\BasicDocStream.obj" \
-	"$(INTDIR)\BrillPOSParser.obj" \
-	"$(INTDIR)\BrillPOSTokenizer.obj" \
-	"$(INTDIR)\ByteHash.obj" \
-	"$(INTDIR)\ChineseCharParser.obj" \
-	"$(INTDIR)\ChineseParser.obj" \
-	"$(INTDIR)\DocMgrManager.obj" \
-	"$(INTDIR)\error.obj" \
-	"$(INTDIR)\ElemDocMgr.obj" \
-	"$(INTDIR)\FlattextDocMgr.obj" \
-	"$(INTDIR)\FUtil.obj" \
-	"$(INTDIR)\IdentifinderParser.obj" \
-	"$(INTDIR)\InqArabicParser.obj" \
-	"$(INTDIR)\InQueryOpParser.obj" \
-	"$(INTDIR)\Keyfile.obj" \
-	"$(INTDIR)\keyfilecode.obj" \
-	"$(INTDIR)\KeyfileDocMgr.obj" \
-	"$(INTDIR)\keyprint.obj" \
-	"$(INTDIR)\kstem.obj" \
-	"$(INTDIR)\KStemmer.obj" \
-	"$(INTDIR)\lex_parser.obj" \
-	"$(INTDIR)\LinkedPropertyList.obj" \
-	"$(INTDIR)\main.obj" \
-	"$(INTDIR)\MemCache.obj" \
-	"$(INTDIR)\MemList.obj" \
-	"$(INTDIR)\Param.obj" \
-	"$(INTDIR)\parameters.obj" \
-	"$(INTDIR)\Parser.obj" \
-	"$(INTDIR)\porter_stemmer.obj" \
-	"$(INTDIR)\PorterStemmer.obj" \
-	"$(INTDIR)\Property.obj" \
-	"$(INTDIR)\QueryDocument.obj" \
-	"$(INTDIR)\ReadBuffer.obj" \
-	"$(INTDIR)\ReutersParser.obj" \
-	"$(INTDIR)\RVLCompress.obj" \
-	"$(INTDIR)\Stopper.obj" \
-	"$(INTDIR)\string-set.obj" \
-	"$(INTDIR)\String.obj" \
-	"$(INTDIR)\TermCache.obj" \
-	"$(INTDIR)\TextHandlerManager.obj" \
-	"$(INTDIR)\Timer.obj" \
-	"$(INTDIR)\TrecParser.obj" \
-	"$(INTDIR)\util.obj" \
-	"$(INTDIR)\WebParser.obj" \
-	"$(INTDIR)\WordSet.obj" \
-	"$(INTDIR)\WriteBuffer.obj" \
-	"$(INTDIR)\WriterInQueryHandler.obj" \
-	"$(INTDIR)\WriterTextHandler.obj"
-
-".\lemur_utility.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "lemur_utility - Win32 Debug"
-
-OUTDIR=.\utility\obj
-INTDIR=.\utility\obj
-
-ALL : ".\lemur_utility.lib"
-
-
-CLEAN :
-	-@erase "$(INTDIR)\arabic_stem.obj"
-	-@erase "$(INTDIR)\ArabicParser.obj"
-	-@erase "$(INTDIR)\ArabicStemmer.obj"
-	-@erase "$(INTDIR)\BasicDocStream.obj"
-	-@erase "$(INTDIR)\BrillPOSParser.obj"
-	-@erase "$(INTDIR)\BrillPOSTokenizer.obj"
-	-@erase "$(INTDIR)\ByteHash.obj"
-	-@erase "$(INTDIR)\ChineseCharParser.obj"
-	-@erase "$(INTDIR)\ChineseParser.obj"
-	-@erase "$(INTDIR)\DocMgrManager.obj"
-	-@erase "$(INTDIR)\error.obj"
-	-@erase "$(INTDIR)\ElemDocMgr.obj"
-	-@erase "$(INTDIR)\FlattextDocMgr.obj"
-	-@erase "$(INTDIR)\FUtil.obj"
-	-@erase "$(INTDIR)\IdentifinderParser.obj"
-	-@erase "$(INTDIR)\InqArabicParser.obj"
-	-@erase "$(INTDIR)\InQueryOpParser.obj"
-	-@erase "$(INTDIR)\Keyfile.obj"
-	-@erase "$(INTDIR)\keyfilecode.obj"
-	-@erase "$(INTDIR)\KeyfileDocMgr.obj"
-	-@erase "$(INTDIR)\keyprint.obj"
-	-@erase "$(INTDIR)\kstem.obj"
-	-@erase "$(INTDIR)\KStemmer.obj"
-	-@erase "$(INTDIR)\lex_parser.obj"
-	-@erase "$(INTDIR)\LinkedPropertyList.obj"
-	-@erase "$(INTDIR)\main.obj"
-	-@erase "$(INTDIR)\MemCache.obj"
-	-@erase "$(INTDIR)\MemList.obj"
-	-@erase "$(INTDIR)\Param.obj"
-	-@erase "$(INTDIR)\parameters.obj"
-	-@erase "$(INTDIR)\Parser.obj"
-	-@erase "$(INTDIR)\porter_stemmer.obj"
-	-@erase "$(INTDIR)\PorterStemmer.obj"
-	-@erase "$(INTDIR)\Property.obj"
-	-@erase "$(INTDIR)\QueryDocument.obj"
-	-@erase "$(INTDIR)\ReadBuffer.obj"
-	-@erase "$(INTDIR)\ReutersParser.obj"
-	-@erase "$(INTDIR)\RVLCompress.obj"
-	-@erase "$(INTDIR)\Stopper.obj"
-	-@erase "$(INTDIR)\string-set.obj"
-	-@erase "$(INTDIR)\String.obj"
-	-@erase "$(INTDIR)\TermCache.obj"
-	-@erase "$(INTDIR)\TextHandlerManager.obj"
-	-@erase "$(INTDIR)\Timer.obj"
-	-@erase "$(INTDIR)\TrecParser.obj"
-	-@erase "$(INTDIR)\util.obj"
-	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase "$(INTDIR)\WebParser.obj"
-	-@erase "$(INTDIR)\WordSet.obj"
-	-@erase "$(INTDIR)\WriteBuffer.obj"
-	-@erase "$(INTDIR)\WriterInQueryHandler.obj"
-	-@erase "$(INTDIR)\WriterTextHandler.obj"
-	-@erase ".\lemur_utility.lib"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_utility.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_utility.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"lemur_utility.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\arabic_stem.obj" \
-	"$(INTDIR)\ArabicParser.obj" \
-	"$(INTDIR)\ArabicStemmer.obj" \
-	"$(INTDIR)\BasicDocStream.obj" \
-	"$(INTDIR)\BrillPOSParser.obj" \
-	"$(INTDIR)\BrillPOSTokenizer.obj" \
-	"$(INTDIR)\ByteHash.obj" \
-	"$(INTDIR)\ChineseCharParser.obj" \
-	"$(INTDIR)\ChineseParser.obj" \
-	"$(INTDIR)\DocMgrManager.obj" \
-	"$(INTDIR)\error.obj" \
-	"$(INTDIR)\ElemDocMgr.obj" \
-	"$(INTDIR)\FlattextDocMgr.obj" \
-	"$(INTDIR)\FUtil.obj" \
-	"$(INTDIR)\IdentifinderParser.obj" \
-	"$(INTDIR)\InqArabicParser.obj" \
-	"$(INTDIR)\InQueryOpParser.obj" \
-	"$(INTDIR)\Keyfile.obj" \
-	"$(INTDIR)\keyfilecode.obj" \
-	"$(INTDIR)\KeyfileDocMgr.obj" \
-	"$(INTDIR)\keyprint.obj" \
-	"$(INTDIR)\kstem.obj" \
-	"$(INTDIR)\KStemmer.obj" \
-	"$(INTDIR)\lex_parser.obj" \
-	"$(INTDIR)\LinkedPropertyList.obj" \
-	"$(INTDIR)\main.obj" \
-	"$(INTDIR)\MemCache.obj" \
-	"$(INTDIR)\MemList.obj" \
-	"$(INTDIR)\Param.obj" \
-	"$(INTDIR)\parameters.obj" \
-	"$(INTDIR)\Parser.obj" \
-	"$(INTDIR)\porter_stemmer.obj" \
-	"$(INTDIR)\PorterStemmer.obj" \
-	"$(INTDIR)\Property.obj" \
-	"$(INTDIR)\QueryDocument.obj" \
-	"$(INTDIR)\ReadBuffer.obj" \
-	"$(INTDIR)\ReutersParser.obj" \
-	"$(INTDIR)\RVLCompress.obj" \
-	"$(INTDIR)\Stopper.obj" \
-	"$(INTDIR)\string-set.obj" \
-	"$(INTDIR)\String.obj" \
-	"$(INTDIR)\TermCache.obj" \
-	"$(INTDIR)\TextHandlerManager.obj" \
-	"$(INTDIR)\Timer.obj" \
-	"$(INTDIR)\TrecParser.obj" \
-	"$(INTDIR)\util.obj" \
-	"$(INTDIR)\WebParser.obj" \
-	"$(INTDIR)\WordSet.obj" \
-	"$(INTDIR)\WriteBuffer.obj" \
-	"$(INTDIR)\WriterInQueryHandler.obj" \
-	"$(INTDIR)\WriterTextHandler.obj"
-
-".\lemur_utility.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
-!ENDIF 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -333,7 +198,7 @@ LIB32_OBJS= \
 !ENDIF 
 
 
-!IF "$(CFG)" == "lemur_utility - Win32 Release" || "$(CFG)" == "lemur_utility - Win32 Debug"
+!IF "$(CFG)" == "lemur_utility - Win32 Release"
 SOURCE=.\utility\src\arabic_stem.cpp
 
 "$(INTDIR)\arabic_stem.obj" : $(SOURCE) "$(INTDIR)"
@@ -394,15 +259,15 @@ SOURCE=.\utility\src\DocMgrManager.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=.\utility\src\error.c
-
-"$(INTDIR)\error.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
 SOURCE=.\utility\src\ElemDocMgr.cpp
 
 "$(INTDIR)\ElemDocMgr.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\error.c
+
+"$(INTDIR)\error.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -517,6 +382,12 @@ SOURCE=.\utility\src\parameters.c
 SOURCE=.\utility\src\Parser.cpp
 
 "$(INTDIR)\Parser.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\utility\src\PDict.cpp
+
+"$(INTDIR)\PDict.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

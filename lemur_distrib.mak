@@ -4,17 +4,16 @@ CFG=lemur_distrib - Win32 Release
 !MESSAGE No configuration specified. Defaulting to lemur_distrib - Win32 Release.
 !ENDIF 
 
-!IF "$(CFG)" != "lemur_distrib - Win32 Release" && "$(CFG)" != "lemur_distrib - Win32 Debug"
+!IF "$(CFG)" != "lemur_distrib - Win32 Release"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "lemur_distrib.mak" CFG="lemur_distrib - Win32 Debug"
+!MESSAGE NMAKE /f "lemur_distrib.mak" CFG="lemur_distrib - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "lemur_distrib - Win32 Release" (based on "Win32 (x86) Static Library")
-!MESSAGE "lemur_distrib - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -27,9 +26,6 @@ NULL=nul
 
 CPP=cl.exe
 RSC=rc.exe
-
-!IF  "$(CFG)" == "lemur_distrib - Win32 Release"
-
 OUTDIR=.\distrib\obj
 INTDIR=.\distrib\obj
 
@@ -55,7 +51,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "retrieval\include" /I "langmod\include" /I "distrib\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_distrib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_distrib.bsc" 
 BSC32_SBRS= \
@@ -81,61 +76,7 @@ LIB32_OBJS= \
   $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
 <<
 
-!ELSEIF  "$(CFG)" == "lemur_distrib - Win32 Debug"
-
-OUTDIR=.\distrib\obj
-INTDIR=.\distrib\obj
-
-ALL : ".\lemur_distrib.lib"
-
-
-CLEAN :
-	-@erase "$(INTDIR)\CORIMergeMethod.obj"
-	-@erase "$(INTDIR)\CtfIndexer.obj"
-	-@erase "$(INTDIR)\DistMergeMethod.obj"
-	-@erase "$(INTDIR)\DistSearchMethod.obj"
-	-@erase "$(INTDIR)\DocFreqIndexer.obj"
-	-@erase "$(INTDIR)\DocScore.obj"
-	-@erase "$(INTDIR)\FreqCounter.obj"
-	-@erase "$(INTDIR)\LemurDBManager.obj"
-	-@erase "$(INTDIR)\LemurMemParser.obj"
-	-@erase "$(INTDIR)\MultiRegrMergeMethod.obj"
-	-@erase "$(INTDIR)\QryBasedSampler.obj"
-	-@erase "$(INTDIR)\SingleRegrMergeMethod.obj"
-	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase ".\lemur_distrib.lib"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /I "retrieval\include" /I "langmod\include" /I "distrib\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_distrib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_distrib.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"lemur_distrib.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\CORIMergeMethod.obj" \
-	"$(INTDIR)\CtfIndexer.obj" \
-	"$(INTDIR)\DistMergeMethod.obj" \
-	"$(INTDIR)\DistSearchMethod.obj" \
-	"$(INTDIR)\DocFreqIndexer.obj" \
-	"$(INTDIR)\DocScore.obj" \
-	"$(INTDIR)\FreqCounter.obj" \
-	"$(INTDIR)\LemurDBManager.obj" \
-	"$(INTDIR)\LemurMemParser.obj" \
-	"$(INTDIR)\MultiRegrMergeMethod.obj" \
-	"$(INTDIR)\QryBasedSampler.obj" \
-	"$(INTDIR)\SingleRegrMergeMethod.obj"
-
-".\lemur_distrib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
-!ENDIF 
+CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "langmod\include" /I "retrieval\include" /I "distrib\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_distrib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -177,7 +118,7 @@ LIB32_OBJS= \
 !ENDIF 
 
 
-!IF "$(CFG)" == "lemur_distrib - Win32 Release" || "$(CFG)" == "lemur_distrib - Win32 Debug"
+!IF "$(CFG)" == "lemur_distrib - Win32 Release"
 SOURCE=.\distrib\src\CORIMergeMethod.cpp
 
 "$(INTDIR)\CORIMergeMethod.obj" : $(SOURCE) "$(INTDIR)"

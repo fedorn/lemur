@@ -1,20 +1,19 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on lemur_index.dsp
 !IF "$(CFG)" == ""
-CFG=lemur_index - Win32 Release
-!MESSAGE No configuration specified. Defaulting to lemur_index - Win32 Release.
+CFG=LEMUR_INDEX - WIN32 RELEASE
+!MESSAGE No configuration specified. Defaulting to LEMUR_INDEX - WIN32 RELEASE.
 !ENDIF 
 
-!IF "$(CFG)" != "lemur_index - Win32 Release" && "$(CFG)" != "lemur_index - Win32 Debug"
+!IF "$(CFG)" != "lemur_index - Win32 Release"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "lemur_index.mak" CFG="lemur_index - Win32 Debug"
+!MESSAGE NMAKE /f "lemur_index.mak" CFG="LEMUR_INDEX - WIN32 RELEASE"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "lemur_index - Win32 Release" (based on "Win32 (x86) Static Library")
-!MESSAGE "lemur_index - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -27,9 +26,6 @@ NULL=nul
 
 CPP=cl.exe
 RSC=rc.exe
-
-!IF  "$(CFG)" == "lemur_index - Win32 Release"
-
 OUTDIR=.\index\obj
 INTDIR=.\index\obj
 
@@ -37,8 +33,10 @@ ALL : ".\lemur_index.lib"
 
 
 CLEAN :
+	-@erase "$(INTDIR)\BasicDocInfoList.obj"
 	-@erase "$(INTDIR)\BasicIndex.obj"
 	-@erase "$(INTDIR)\BasicIndexWithCat.obj"
+	-@erase "$(INTDIR)\BasicTermInfoList.obj"
 	-@erase "$(INTDIR)\GammaCompress.obj"
 	-@erase "$(INTDIR)\IncFPPushIndex.obj"
 	-@erase "$(INTDIR)\IncFPTextHandler.obj"
@@ -70,136 +68,51 @@ CLEAN :
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_index.bsc" 
+BSC32_SBRS= \
+	
+LIB32=link.exe -lib
+LIB32_FLAGS=/nologo /out:"lemur_index.lib" 
+LIB32_OBJS= \
+	"$(INTDIR)\BasicDocInfoList.obj" \
+	"$(INTDIR)\BasicIndex.obj" \
+	"$(INTDIR)\BasicIndexWithCat.obj" \
+	"$(INTDIR)\BasicTermInfoList.obj" \
+	"$(INTDIR)\GammaCompress.obj" \
+	"$(INTDIR)\IncFPPushIndex.obj" \
+	"$(INTDIR)\IncFPTextHandler.obj" \
+	"$(INTDIR)\IncPassagePushIndex.obj" \
+	"$(INTDIR)\IndexCount.obj" \
+	"$(INTDIR)\IndexManager.obj" \
+	"$(INTDIR)\IndexProb.obj" \
+	"$(INTDIR)\InvDocList.obj" \
+	"$(INTDIR)\InvFPDocList.obj" \
+	"$(INTDIR)\InvFPIndex.obj" \
+	"$(INTDIR)\InvFPIndexMerge.obj" \
+	"$(INTDIR)\InvFPPushIndex.obj" \
+	"$(INTDIR)\InvFPTermList.obj" \
+	"$(INTDIR)\InvFPTermPropList.obj" \
+	"$(INTDIR)\InvFPTextHandler.obj" \
+	"$(INTDIR)\InvIndex.obj" \
+	"$(INTDIR)\InvIndexMerge.obj" \
+	"$(INTDIR)\InvPassagePushIndex.obj" \
+	"$(INTDIR)\InvPushIndex.obj" \
+	"$(INTDIR)\InvTermList.obj" \
+	"$(INTDIR)\KeyfileDocListSegmentReader.obj" \
+	"$(INTDIR)\KeyfileIncIndex.obj" \
+	"$(INTDIR)\KeyfileTextHandler.obj" \
+	"$(INTDIR)\PropIndexTH.obj" \
+	"$(INTDIR)\QueryTextHandler.obj" \
+	"$(INTDIR)\Terms.obj"
+
+".\lemur_index.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
+    $(LIB32) @<<
+  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
+<<
 
 CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_index.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_index.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"lemur_index.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\BasicIndex.obj" \
-	"$(INTDIR)\BasicIndexWithCat.obj" \
-	"$(INTDIR)\GammaCompress.obj" \
-	"$(INTDIR)\IncFPPushIndex.obj" \
-	"$(INTDIR)\IncFPTextHandler.obj" \
-	"$(INTDIR)\IncPassagePushIndex.obj" \
-	"$(INTDIR)\IndexCount.obj" \
-	"$(INTDIR)\IndexManager.obj" \
-	"$(INTDIR)\IndexProb.obj" \
-	"$(INTDIR)\InvDocList.obj" \
-	"$(INTDIR)\InvFPDocList.obj" \
-	"$(INTDIR)\InvFPIndex.obj" \
-	"$(INTDIR)\InvFPIndexMerge.obj" \
-	"$(INTDIR)\InvFPPushIndex.obj" \
-	"$(INTDIR)\InvFPTermList.obj" \
-	"$(INTDIR)\InvFPTermPropList.obj" \
-	"$(INTDIR)\InvFPTextHandler.obj" \
-	"$(INTDIR)\InvIndex.obj" \
-	"$(INTDIR)\InvIndexMerge.obj" \
-	"$(INTDIR)\InvPassagePushIndex.obj" \
-	"$(INTDIR)\InvPushIndex.obj" \
-	"$(INTDIR)\InvTermList.obj" \
-	"$(INTDIR)\KeyfileDocListSegmentReader.obj" \
-	"$(INTDIR)\KeyfileIncIndex.obj" \
-	"$(INTDIR)\KeyfileTextHandler.obj" \
-	"$(INTDIR)\PropIndexTH.obj" \
-	"$(INTDIR)\QueryTextHandler.obj" \
-	"$(INTDIR)\Terms.obj"
-
-".\lemur_index.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "lemur_index - Win32 Debug"
-
-OUTDIR=.\index\obj
-INTDIR=.\index\obj
-
-ALL : ".\lemur_index.lib"
-
-
-CLEAN :
-	-@erase "$(INTDIR)\BasicIndex.obj"
-	-@erase "$(INTDIR)\BasicIndexWithCat.obj"
-	-@erase "$(INTDIR)\GammaCompress.obj"
-	-@erase "$(INTDIR)\IncFPPushIndex.obj"
-	-@erase "$(INTDIR)\IncFPTextHandler.obj"
-	-@erase "$(INTDIR)\IncPassagePushIndex.obj"
-	-@erase "$(INTDIR)\IndexCount.obj"
-	-@erase "$(INTDIR)\IndexManager.obj"
-	-@erase "$(INTDIR)\IndexProb.obj"
-	-@erase "$(INTDIR)\InvDocList.obj"
-	-@erase "$(INTDIR)\InvFPDocList.obj"
-	-@erase "$(INTDIR)\InvFPIndex.obj"
-	-@erase "$(INTDIR)\InvFPIndexMerge.obj"
-	-@erase "$(INTDIR)\InvFPPushIndex.obj"
-	-@erase "$(INTDIR)\InvFPTermList.obj"
-	-@erase "$(INTDIR)\InvFPTermPropList.obj"
-	-@erase "$(INTDIR)\InvFPTextHandler.obj"
-	-@erase "$(INTDIR)\InvIndex.obj"
-	-@erase "$(INTDIR)\InvIndexMerge.obj"
-	-@erase "$(INTDIR)\InvPassagePushIndex.obj"
-	-@erase "$(INTDIR)\InvPushIndex.obj"
-	-@erase "$(INTDIR)\InvTermList.obj"
-	-@erase "$(INTDIR)\KeyfileDocListSegmentReader.obj"
-	-@erase "$(INTDIR)\KeyfileIncIndex.obj"
-	-@erase "$(INTDIR)\KeyfileTextHandler.obj"
-	-@erase "$(INTDIR)\PropIndexTH.obj"
-	-@erase "$(INTDIR)\QueryTextHandler.obj"
-	-@erase "$(INTDIR)\Terms.obj"
-	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase ".\lemur_index.lib"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "utility\include" /I "index\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_index.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_index.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"lemur_index.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\BasicIndex.obj" \
-	"$(INTDIR)\BasicIndexWithCat.obj" \
-	"$(INTDIR)\GammaCompress.obj" \
-	"$(INTDIR)\IncFPPushIndex.obj" \
-	"$(INTDIR)\IncFPTextHandler.obj" \
-	"$(INTDIR)\IncPassagePushIndex.obj" \
-	"$(INTDIR)\IndexCount.obj" \
-	"$(INTDIR)\IndexManager.obj" \
-	"$(INTDIR)\IndexProb.obj" \
-	"$(INTDIR)\InvDocList.obj" \
-	"$(INTDIR)\InvFPDocList.obj" \
-	"$(INTDIR)\InvFPIndex.obj" \
-	"$(INTDIR)\InvFPIndexMerge.obj" \
-	"$(INTDIR)\InvFPPushIndex.obj" \
-	"$(INTDIR)\InvFPTermList.obj" \
-	"$(INTDIR)\InvFPTermPropList.obj" \
-	"$(INTDIR)\InvFPTextHandler.obj" \
-	"$(INTDIR)\InvIndex.obj" \
-	"$(INTDIR)\InvIndexMerge.obj" \
-	"$(INTDIR)\InvPassagePushIndex.obj" \
-	"$(INTDIR)\InvPushIndex.obj" \
-	"$(INTDIR)\InvTermList.obj" \
-	"$(INTDIR)\KeyfileDocListSegmentReader.obj" \
-	"$(INTDIR)\KeyfileIncIndex.obj" \
-	"$(INTDIR)\KeyfileTextHandler.obj" \
-	"$(INTDIR)\PropIndexTH.obj" \
-	"$(INTDIR)\QueryTextHandler.obj" \
-	"$(INTDIR)\Terms.obj"
-
-".\lemur_index.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
-!ENDIF 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -241,7 +154,13 @@ LIB32_OBJS= \
 !ENDIF 
 
 
-!IF "$(CFG)" == "lemur_index - Win32 Release" || "$(CFG)" == "lemur_index - Win32 Debug"
+!IF "$(CFG)" == "lemur_index - Win32 Release"
+SOURCE=.\index\src\BasicDocInfoList.cpp
+
+"$(INTDIR)\BasicDocInfoList.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=.\index\src\BasicIndex.cpp
 
 "$(INTDIR)\BasicIndex.obj" : $(SOURCE) "$(INTDIR)"
@@ -251,6 +170,12 @@ SOURCE=.\index\src\BasicIndex.cpp
 SOURCE=.\index\src\BasicIndexWithCat.cpp
 
 "$(INTDIR)\BasicIndexWithCat.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\index\src\BasicTermInfoList.cpp
+
+"$(INTDIR)\BasicTermInfoList.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

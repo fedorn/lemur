@@ -4,17 +4,16 @@ CFG=lemur_summarization - Win32 Release
 !MESSAGE No configuration specified. Defaulting to lemur_summarization - Win32 Release.
 !ENDIF 
 
-!IF "$(CFG)" != "lemur_summarization - Win32 Release" && "$(CFG)" != "lemur_summarization - Win32 Debug"
+!IF "$(CFG)" != "lemur_summarization - Win32 Release"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "lemur_summarization.mak" CFG="lemur_summarization - Win32 Debug"
+!MESSAGE NMAKE /f "lemur_summarization.mak" CFG="lemur_summarization - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "lemur_summarization - Win32 Release" (based on "Win32 (x86) Static Library")
-!MESSAGE "lemur_summarization - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -27,9 +26,6 @@ NULL=nul
 
 CPP=cl.exe
 RSC=rc.exe
-
-!IF  "$(CFG)" == "lemur_summarization - Win32 Release"
-
 OUTDIR=.\summarization\obj
 INTDIR=.\summarization\obj
 
@@ -49,7 +45,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "summarization\include" /I "index\include" /I "utility\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_summarization.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_summarization.bsc" 
 BSC32_SBRS= \
@@ -69,49 +64,7 @@ LIB32_OBJS= \
   $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
 <<
 
-!ELSEIF  "$(CFG)" == "lemur_summarization - Win32 Debug"
-
-OUTDIR=.\summarization\obj
-INTDIR=.\summarization\obj
-
-ALL : ".\lemur_summarization.lib"
-
-
-CLEAN :
-	-@erase "$(INTDIR)\BasicPassage.obj"
-	-@erase "$(INTDIR)\BasicSumm.obj"
-	-@erase "$(INTDIR)\MMRPassage.obj"
-	-@erase "$(INTDIR)\MMRSumm.obj"
-	-@erase "$(INTDIR)\Passage.obj"
-	-@erase "$(INTDIR)\Summarizer.obj"
-	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase ".\lemur_summarization.lib"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MLd /W3 /Gm /GR /GX /ZI /Od /I "summarization\include" /I "index\include" /I "utility\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_summarization.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ  /c 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\lemur_summarization.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"lemur_summarization.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\BasicPassage.obj" \
-	"$(INTDIR)\BasicSumm.obj" \
-	"$(INTDIR)\MMRPassage.obj" \
-	"$(INTDIR)\MMRSumm.obj" \
-	"$(INTDIR)\Passage.obj" \
-	"$(INTDIR)\Summarizer.obj"
-
-".\lemur_summarization.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
-!ENDIF 
+CPP_PROJ=/nologo /ML /W3 /GR /GX /O2 /I "utility\include" /I "index\include" /I "langmod\include" /I "retrieval\include" /I "summarization\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"$(INTDIR)\lemur_summarization.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -153,7 +106,7 @@ LIB32_OBJS= \
 !ENDIF 
 
 
-!IF "$(CFG)" == "lemur_summarization - Win32 Release" || "$(CFG)" == "lemur_summarization - Win32 Debug"
+!IF "$(CFG)" == "lemur_summarization - Win32 Release"
 SOURCE=.\summarization\src\BasicPassage.cpp
 
 "$(INTDIR)\BasicPassage.obj" : $(SOURCE) "$(INTDIR)"
