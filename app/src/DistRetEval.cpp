@@ -186,8 +186,10 @@ int AppMain(int argc, char *argv[]) {
 
     QueryRep *qr = model.computeQueryRep(*q);
     model.scoreCollection(*qr, rankings);
-
-
+    if(rankings.size() == 0) {
+      cerr << "No database selected for query " << q->id() << endl;
+      continue;
+    }
 
     rankings.Sort();
 
@@ -199,7 +201,10 @@ int AppMain(int argc, char *argv[]) {
     }
 
     // we want to search only so many databases
-    rankings.assign(rankings.begin(), rankings.begin()+LocalParameter::cutoff);
+
+   if(rankings.size()>LocalParameter::cutoff)
+     rankings.assign(rankings.begin(), 
+		     rankings.begin()+LocalParameter::cutoff);
     // set return document counts for each individual databases
     search.setReturnCount(RetrievalParameter::resultCount);
     // search those databases and put the scores into scoreset
@@ -216,12 +221,13 @@ int AppMain(int argc, char *argv[]) {
     for (i=0;i<RetrievalParameter::resultCount && i<results.size();i++) 
       resfile << q->id() << " Q0 " << results[i].id << " 0 " << results[i].val << " Exp" << endl;
 
+    //    for (i=0;i<LocalParameter::cutoff;i++) 
+    for (i=0;i<rankings.size();i++) 
+	delete (scoreset[i]);
+
     rankings.clear();
     results.clear();
     resultsCsDb.clear();
-
-    for (i=0;i<LocalParameter::cutoff;i++) 
-	delete (scoreset[i]);
 
     delete q;
     delete qr;
