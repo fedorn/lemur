@@ -113,7 +113,7 @@ const char* ReadBuffer::peek( int length ) {
     // the file stream may not be in the correct place for reading
     // seek in the file if necessary
     if( !_gValid ) {
-      _file.seekg( _filePosition, std::ios::beg );
+      _file.seekg( _filePosition + _bufferDataLength, std::ios::beg );
       _gValid = true;
     }
 
