@@ -14,7 +14,10 @@
 <p>
 This application (StructQueryEval.cpp) runs retrieval experiments to 
 evaluate the performance of the structured query model using the inquery 
-retrieval method. Feedback is implemented as a WSUM of the original query 
+retrieval method. StructQueryEval requires that its index parameter be a
+positional index (InvFPIndex).
+
+<p>Feedback is implemented as a WSUM of the original query 
 combined with terms selected from the feedback documents based on belief 
 score. The expanded query has the form:
 <p>
@@ -42,9 +45,9 @@ The parameters are:
 <p>
 <ol>
 <li> <tt>index</tt>: The complete name of the index table-of-content file 
-for the database index.
+for the database index. This must be a positional index (InvFPIndex).
 
-<li> <tt>QuerySet</tt>: the query text stream parsed by ParseInQuery
+<li> <tt>textQuery</tt>: the query text stream parsed by ParseInQuery
 
 <li> <tt>resultFile</tt>: the result file
 <li> <tt>resultFormat</tt>: whether the result format should be of the 
@@ -100,6 +103,11 @@ int AppMain(int argc, char *argv[]) {
   try {
     ind  = dynamic_cast <InvFPIndex *>
       (IndexManager::openIndex(RetrievalParameter::databaseIndex));
+    if (ind == NULL) {
+    throw Exception("StructQueryEval", 
+		    "Index must be an InvFPIndex");
+    }
+    
   } catch (Exception &ex) {
     ex.writeMessage();
     throw Exception("StructQueryEval", 
