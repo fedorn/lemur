@@ -24,12 +24,9 @@
 ///
 
 class Parser : public TextHandler {
-
 public:
-
-  Parser() {
-    acros = NULL;
-  }
+  Parser();
+  virtual ~Parser();
 
   /// Parse a file.  
   /// use parseFile.  this method will be deprecated in future
@@ -43,10 +40,11 @@ public:
 
   /// Set the acronym list.  Can be an empty implementation if
   /// the parser is not designed to deal with acronyms by
-  /// using a list.
-  virtual void setAcroList(WordSet * acronyms)  {
-    acros = acronyms;
-  }
+  /// using a list. WordSet still belongs to the caller
+  virtual void setAcroList(WordSet * acronyms);
+
+  /// Set the acronym list from this file.
+  virtual void setAcroList(string filename);
 
   /// return the current byte position of the file being parsed
   virtual long fileTell() = 0;
@@ -57,18 +55,14 @@ public:
 protected: 
   /// Checks to see if the word is in the acronym list.
   /// Returns false if the list is not set.
-  bool isAcronym(char * word) {
-    if (acros != NULL) 
-      return acros->contains(word);
-    return false;
-  }
-
+  bool isAcronym(char * word);
   long docpos; 
 
 private:
   /// The acronym list.
   WordSet * acros;
-
+  ///whether acros belongs to us
+  bool mine;
 };
 
 #endif
