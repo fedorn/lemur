@@ -66,22 +66,22 @@ InvFPDocList::~InvFPDocList() {
 
 DocInfo* InvFPDocList::nextEntry() const{
   // info is stored in int* as docid freq pos1 pos2 .. 
-  entry.id = *iter;
+  entry.docID(*iter);
   iter++;
-  entry.count = *iter;
+  entry.termCount(*iter);
   iter++;
-  entry.pos = iter;
-  iter+=entry.count;
+  entry.positions(iter);
+  iter+=entry.termCount();
   return &entry;
 }
 
 void InvFPDocList::nextEntry(InvFPDocInfo* info) const{
-  info->id = *iter;
+  info->docID(*iter);
   iter++;
-  info->count = *iter;
+  info->termCount(*iter);
   iter++;
-  info->pos = iter;
-  iter+=info->count;
+  info->positions(iter);
+  iter+=info->termCount();
 }
 
 bool InvFPDocList::addTerm(int docid) {
