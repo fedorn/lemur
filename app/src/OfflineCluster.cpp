@@ -58,7 +58,7 @@ int AppMain(int argc, char * argv[]) {
     cerr << "Usage: OfflineCluster <parameter file>" << endl;
     return -1;
   }
-  int i;
+  COUNT_T i;
   Index *myIndex;
   try {
     myIndex  = IndexManager::openIndex(ClusterParam::databaseIndex);
@@ -73,9 +73,9 @@ int AppMain(int argc, char * argv[]) {
 						 ClusterParam::clusterType,
 						 ClusterParam::docMode);
   // crank through the collection
-  int numDocs = myIndex->docCount();
+  COUNT_T numDocs = myIndex->docCount();
   if (numDocs > 100) numDocs = 100;
-  vector <int> toCluster;
+  vector <DOCID_T> toCluster;
   for (i = 1; i <= numDocs; i++) {
     toCluster.push_back(i);
   }
