@@ -268,6 +268,8 @@ by some hard-coded criterion. See the source code in
 void GetAppParam()
 {
   RetrievalParameter::get();
+  // for rel model test.
+  SimpleKLParameter::get();
 }
 
 /// A retrieval evaluation program
@@ -341,17 +343,21 @@ int AppMain(int argc, char *argv[]) {
     } else {
       model->scoreCollection(*qr, results);
     }
+    results.Sort();
     if (doingRelModel) {
       if (SimpleKLParameter::qryPrm.adjScoreMethod != 
 	  SimpleKLParameter::QUERYLIKELIHOOD) {
 	throw Exception("RetEval:FB", 
 			"Relevance models require query likelihood scores.");
       }
+      // prune to number of feedback docs.
+      if (results.size() > RetrievalParameter::fbDocCount)
+	results.erase(results.begin() + RetrievalParameter::fbDocCount,
+		      results.end());
       ignoreWeights = false;
       results.LogToPosterior();
     }
 
-    results.Sort();
     if (RetrievalParameter::fbDocCount > 0) {
       PseudoFBDocs *topDoc = new PseudoFBDocs(results, 
 					      RetrievalParameter::fbDocCount,
