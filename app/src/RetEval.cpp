@@ -38,7 +38,7 @@ probability value for each document, which could be useful for some
 algorithms. By default, scoring is on the whole collection.
 
 <p>
-It currently supports five different models:
+It currently supports six different models:
 <ol>
 <li> The popular TFIDF retrieval model
 
@@ -47,6 +47,7 @@ It currently supports five different models:
 <li> The KL-divergence language model based retrieval method
 <li> The InQuery (CORI) retrieval model
 <li> Cosine similarity model
+<li> Indri structured query language
 </ol>
 
 <p>
@@ -57,7 +58,9 @@ The parameter to select the model is <tt>retModel</tt>. Valid values are:
 <li> <tt>inquery</tt> or 3 for INQUERY
 <li> <tt>cori_cs</tt> or 4 for CORI_CS
 <li> <tt>cos</tt> or 5 for cosine similarity
+<li> <tt>indri</tt> or 7 for INDRI
 </ul> 
+
 It is suspected that there is a bug in the implementation of the feedback
 for Okapi BM25 retrieval function, because the performance is not as
 expected.  
