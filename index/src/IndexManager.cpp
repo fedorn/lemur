@@ -9,9 +9,12 @@
  *==========================================================================
 */
 
-
 #include "IndexManager.hpp"
 
+#include "BasicIndex.hpp"
+#include "InvFPIndex.hpp"
+#include "InvIndex.hpp"
+#include "KeyfileIncIndex.hpp"
 
 Index *IndexManager::openIndex(const char *indexTOCFile)
 {
@@ -34,9 +37,13 @@ Index *IndexManager::openIndex(const char *indexTOCFile)
   } else if ((!strcmp(extension, "INV")) ||
 	     (!strcmp(extension, "inv"))) {
     ind = new InvIndex();
+  } else if (!strcmp(extension, "key")) {
+    ind = new KeyfileIncIndex();
   } else {
     throw Exception("IndexManager", "unknown index file extension");
   }
-  ind->open(indexTOCFile);
+  if (!(ind->open(indexTOCFile))) {
+    throw Exception("IndexManager", "open index failed");
+  }
   return (ind);
 }
