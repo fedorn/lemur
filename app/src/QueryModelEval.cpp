@@ -60,11 +60,14 @@ The following are document model smoothing parameters:
 namespace LocalParameter {
   String queryModel;
   bool TRECResultFormat;
+  bool useWorkingSet;
+  String workSetFile;
 
   void get() {
     queryModel = ParamGetString("queryModel","");
     TRECResultFormat = ParamGetInt("resultFormat",1); // default is TREC format
- 
+    useWorkingSet = ParamGetInt("useWorkingSet", 0); //default is to score the whole collection; otherwise, score a subset
+    workSetFile = ParamGetString("workingSetFile",""); // working set file name 
   }
 };
 
@@ -91,6 +94,16 @@ int AppMain(int argc, char *argv[]) {
     throw Exception("QueryModelEval", "Can't open index, check parameter index");
   }
 
+  ifstream *workSetStr;
+  ResultFile *docPool;
+  if (LocalParameter::useWorkingSet) {
+    workSetStr = new ifstream(LocalParameter::workSetFile, ios::in);
+    if (workSetStr->fail()) {
+      throw Exception("RetEval", "can't open working set file");
+    }
+    docPool = new ResultFile(false); // working set is always simple format
+    docPool->openForRead(*workSetStr, *ind);
+  }
 
   ifstream qmodel(LocalParameter::queryModel, ios::in);
 
@@ -115,18 +128,27 @@ int AppMain(int argc, char *argv[]) {
   char qid[300];
 
   SimpleKLQueryModel *q;
+  IndexedRealVector workSetRes;
+
   while (qmodel >> qid) {
     cout << "Query "<< qid << endl;
     q = new SimpleKLQueryModel(*ind);
     q->load(qmodel);
-    model.scoreInvertedIndex(*q,res);
+    PseudoFBDocs *workSet;
+    if (LocalParameter::useWorkingSet) {
+      docPool->getResult(qid, workSetRes);
+      workSet = new PseudoFBDocs(workSetRes, -1); // -1 means using all docs
+      model.scoreDocSet(*q,*workSet,res);
+    } else {
+      model.scoreCollection(*q, res);
+    }
+
     res.Sort();
     resFile.writeResults(qid, &res, RetrievalParameter::resultCount);
     delete q;
   }
   
   result.close();
-
   delete ind;
   return 0;
 }
