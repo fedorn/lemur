@@ -1,5 +1,5 @@
 /*==========================================================================
- * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
+ * Copyright (c) 2004 Carnegie Mellon University.  All Rights Reserved.
  *
  * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
  * is subject to the terms of the software license set forth in the LICENSE
@@ -9,58 +9,46 @@
  *==========================================================================
 */
 
+// tnt - 6/2004
 
 #ifndef _STRINGQUERY_HPP
 #define _STRINGQUERY_HPP
 
+#include "TermQuery.hpp"
+#include "TextHandler.hpp"
+#include "common_headers.hpp"
 
-#include "Document.hpp"
-#include "RetrievalMethod.hpp"
+/// A query class for handling string queries. Tokenizes at spaces.
+/// Also a TextHandler to begin a chain (call empty constructor, add
+/// other TH, then call parse)
+/// Can be used at the end of a chain also after other TH.
+/// i.e. look at RetMethodManager::runTextQuery
 
-/// A string query takes a char * and splits it by spaces
-class StringQuery : public Query {
+class StringQuery: public TermQuery, public TextHandler {
 public:
-  StringQuery(const char * qid, const char * qry) { 
-    if (qid != NULL) { 
-      tid = strdup(qid); 
-    } else {
-      tid = NULL;
-    }
-    if (qry != NULL) {
-      query = strdup(qry); 
-    } else {
-      query = NULL;
-    }
-  }
-  virtual ~StringQuery() { 
-    free(tid);
-    free(query); 
-  }
-  virtual const char * id() const { return tid; }
-  virtual void startTermIteration() const { 
-    current = strtok(query, " ");
-  }
-  virtual bool hasMore() const {
-    if (current == NULL) {
-      return false;
-    }
-    return true;
-  }
-  virtual Term * nextTerm() const { 
-    if (!hasMore()) {
-      return NULL;
-    }
-    Term * term = new Term();
-    term->copyspelling(current);
-    current = strtok(NULL, " ");
-    return term;
-  }
-protected:
-  char * tid;
-  char * query;
-  mutable char * current;
-};
+  StringQuery();
+  StringQuery(const char* query, const char* qid=NULL);
+  StringQuery(const string& query, const string& qid="");
+  ~StringQuery();
 
+  /// TermQuery methods
+  void startTermIteration() const{iter = 0;}
+  bool hasMore() const{ return iter < tokens.size();}
+  const Term* nextTerm() const;
+
+  void addTerm(const string& token);
+  void addTerm(const char* token);
+  void parse(const string& token);
+
+  /// TextHandler methods
+  char* handleWord(char* word);
+  char* handleSymbol(char* sym);
+  
+protected:
+  vector<string> tokens;
+  mutable int iter;
+  mutable Term tt;
+};
 
 
 #endif
