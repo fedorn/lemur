@@ -39,11 +39,11 @@
 class KeyfileDocMgr : public DocumentManager, public TextHandler {
 public:
   /// default constructor 
-  KeyfileDocMgr() {  myDoc = NULL;  numdocs = 0; ignoreDoc = false; }
+  KeyfileDocMgr() {  myDoc = NULL;  numdocs = 0; ignoreDoc = false; _readOnly = true;}
 
   /// constructor (for open)
   ///             name = toc file for this manager (same as getMyID) 
-  KeyfileDocMgr(const string &name);
+  KeyfileDocMgr(const string &name, bool readOnly = true);
 
   /// constructor (for build) 
   ///             name = what to name this manager
@@ -131,6 +131,8 @@ protected:
   int fileid;       // fileid of current/last file being processed
   /// are we ignoring this document?
   bool ignoreDoc;
+  /// are we read only.
+  bool _readOnly;
 };
 
 #endif // _LEMUR_KEYFILE_DOCMGR_HPP

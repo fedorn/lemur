@@ -19,8 +19,9 @@
 //keyref.h
 #define MAX_DOCID_LENGTH 512 
 
-KeyfileDocMgr::KeyfileDocMgr(const string &name) {
+KeyfileDocMgr::KeyfileDocMgr(const string &name, bool readOnly) {
   myDoc = NULL;
+  _readOnly = readOnly;
   numdocs = 0;
   ignoreDoc = false;
   IDnameext = name;
@@ -44,6 +45,7 @@ KeyfileDocMgr::KeyfileDocMgr(const string &name) {
 KeyfileDocMgr::KeyfileDocMgr(string name, string mode, string source) {
   myDoc = NULL;
   numdocs = 0;
+  _readOnly = false;
   ignoreDoc = false;
   IDname = name;
   IDnameext = IDname+BT_TOC;
@@ -206,6 +208,7 @@ vector<Match> KeyfileDocMgr::getOffsets(const string &docID) const{
 }
 
 void KeyfileDocMgr::buildMgr() {
+  _readOnly = false;
   myparser->setTextHandler(this);
   cerr << "Building " << IDname << endl;
   for (int i = numOldSources; i < sources.size(); i++) {
@@ -217,6 +220,7 @@ void KeyfileDocMgr::buildMgr() {
 }
 
 void KeyfileDocMgr::writeTOC() {
+  if (_readOnly) return;
   string n = IDname + BT_TOC;
   ofstream toc(n.c_str());
   toc << "FILE_LOOKUP  " << IDname << BT_LOOKUP << endl;

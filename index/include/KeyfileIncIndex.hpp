@@ -323,6 +323,8 @@ protected:
   int _estimatePoint; 
   /// are we in a bad document state?
   bool ignoreDoc;  
+  /// are we read only
+  bool _readOnly;
 };
 
 

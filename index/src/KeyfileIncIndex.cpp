@@ -115,6 +115,7 @@ KeyfileIncIndex::KeyfileIncIndex() {
   ignoreDoc = false;
   listlengths = 0;
   curdocmgr = -1;
+  _readOnly = true;
   _computeMemoryBounds( 128 * 1024 * 1024 );
   _largestFlushedTermID = 0;
   aveDocLen = 0;
@@ -668,6 +669,7 @@ void KeyfileIncIndex::endDoc(const DocumentProps* dp, const string &mgr){
 
 void KeyfileIncIndex::endCollection(const CollectionProps* cp){
   // flush everything in the cache
+  if (_readOnly) return;
   lastWriteCache();
   // write list of document managers
   writeDocMgrIDs();
