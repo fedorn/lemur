@@ -37,7 +37,7 @@ InvFPIndex::~InvFPIndex() {
 bool InvFPIndex::open(const char* indexName){
   counts = new int[5];
   names = new char*[6];  
-  int nameLen = strlen(indexName);
+  int nameLen = strlen(indexName)+1;
 
   char * tocName = new char[nameLen + strlen(MAINTOC) + 1];
   strncpy(tocName, indexName, nameLen);
@@ -49,27 +49,27 @@ bool InvFPIndex::open(const char* indexName){
   }
   delete[](tocName);
 
-  names[DOC_INDEX] = new char[nameLen + strlen(INVINDEX) + 1];
+  names[DOC_INDEX] = new char[nameLen + strlen(INVINDEX)];
   strncpy(names[DOC_INDEX], indexName, nameLen);
   strcpy(names[DOC_INDEX] + nameLen, INVINDEX);
 
-  names[DOC_LOOKUP] = new char[nameLen + strlen(INVLOOKUP) + 1];
+  names[DOC_LOOKUP] = new char[nameLen + strlen(INVLOOKUP)];
   strncpy(names[DOC_LOOKUP], indexName, nameLen);
   strcpy(names[DOC_LOOKUP] + nameLen, INVLOOKUP);
 
-  names[TERM_INDEX] = new char[nameLen + strlen(DTINDEX) + 1];
+  names[TERM_INDEX] = new char[nameLen + strlen(DTINDEX)];
   strncpy(names[TERM_INDEX], indexName, nameLen);
   strcpy(names[TERM_INDEX] + nameLen, DTINDEX);
 
-  names[TERM_LOOKUP] = new char[nameLen + strlen(DTLOOKUP) + 1];
+  names[TERM_LOOKUP] = new char[nameLen + strlen(DTLOOKUP)];
   strncpy(names[TERM_LOOKUP], indexName, nameLen);
   strcpy(names[TERM_LOOKUP] + nameLen, DTLOOKUP);
 
-  names[TERM_IDS] = new char[nameLen + strlen(TERMIDMAP) + 1];
+  names[TERM_IDS] = new char[nameLen + strlen(TERMIDMAP)];
   strncpy(names[TERM_IDS], indexName, nameLen);
   strcpy(names[TERM_IDS] + nameLen, TERMIDMAP);
 
-  names[DOC_IDS] = new char[nameLen + strlen(DOCIDMAP) + 1];
+  names[DOC_IDS] = new char[nameLen + strlen(DOCIDMAP)];
   strncpy(names[DOC_IDS], indexName, nameLen);
   strcpy(names[DOC_IDS] + nameLen, DOCIDMAP);
 
@@ -80,6 +80,9 @@ bool InvFPIndex::open(const char* indexName){
     return false;
 
   if (!dtFileIDs())
+    return false;
+
+  if (!invFileIDs())
     return false;
 
   if (!termIDs())
@@ -135,7 +138,7 @@ int InvFPIndex::termCount(int termID) const{
 
   TERM_T t;
   ifstream look;
-  look.open(names[DOC_INDEX], ios::in | ios::binary);
+  look.open(invfiles[lookup[termID].fileid], ios::in | ios::binary);
   if (!look) {
     fprintf(stderr, "Error:  Could not open indexfile for reading.\n");
     return -1;
@@ -167,7 +170,7 @@ int InvFPIndex::docCount(int termID) {
   int df;
   TERMID_T t;
   ifstream look;
-  look.open(names[DOC_INDEX], ios::in | ios::binary);
+  look.open(invfiles[lookup[termID].fileid], ios::in | ios::binary);
   if (!look) {
     fprintf(stderr, "Could not open indexfile for reading.\n");
     return -1;
@@ -256,7 +259,7 @@ DocInfoList* InvFPIndex::docInfoList(int termID){
 
   ifstream indexin;
 
-  indexin.open(names[DOC_INDEX], ios::in | ios::binary);
+  indexin.open(invfiles[lookup[termID].fileid], ios::in | ios::binary);
   indexin.seekg(lookup[termID].offset, ios::beg);
   DocInfoList* doclist;
   InvFPDocList* dlist = new InvFPDocList();
@@ -423,6 +426,37 @@ bool InvFPIndex::dtFileIDs() {
     }
 
     dtfiles[index] = str;
+  }
+
+  fclose(in);
+  return true;
+}
+
+bool InvFPIndex::invFileIDs() {
+  FILE* in = fopen(names[DOC_INDEX], "rb");
+  cerr << "Trying to open inverted index filenames: " << names[DOC_INDEX] << endl;
+  if (in == NULL) {
+    fprintf(stderr, "Error opening inverted index filenames file\n");
+    return false;
+  }
+
+  invfiles = new char*[counts[INV_FILES]];
+
+  int index;
+  int len;
+  char* str;
+
+  while (!feof(in)) {
+    if (fscanf(in, "%d %d", &index, &len) != 2) 
+        continue;
+
+    str = (char*) malloc(sizeof(char) * (len+1));
+    if (fscanf(in, "%s", str) != 1) {
+       free(str);
+       continue;
+    }
+
+    invfiles[index] = str;
   }
 
   fclose(in);
