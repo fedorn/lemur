@@ -183,6 +183,9 @@ int InvFPIndex::termCount(int termID) const{
   if (termID == 0)
     return 0;
 
+  return lookup[termID].ctf;
+
+  /* // look off disk
   TERM_T t;
   ifstream look;
   look.open(invfiles[lookup[termID].fileid], ios::in | ios::binary);
@@ -206,7 +209,8 @@ int InvFPIndex::termCount(int termID) const{
   int docf = stuff[0];
 
   delete[](stuff);
-  return length - (docf*2); 
+  return length - (docf*2);  
+  */
 }
 
 float InvFPIndex::docLengthAvg(){
@@ -223,6 +227,9 @@ int InvFPIndex::docCount(int termID) {
   if (termID == 0)
     return 0;
 
+  return lookup[termID].df;
+
+  /* // read off disk
   int df;
   TERMID_T t;
   ifstream look;
@@ -242,7 +249,7 @@ int InvFPIndex::docCount(int termID) {
     return 0;
   
   return df;
-
+  */
 }
 
 int InvFPIndex::docLength(int docID) const{
@@ -254,6 +261,9 @@ int InvFPIndex::docLength(int docID) const{
   if (docID == 0)
     return 0;
 
+  return dtlookup[docID].length;
+
+  /*  // getting off disk
   int dl;
   DOCID_T id;
   ifstream look;
@@ -270,6 +280,7 @@ int InvFPIndex::docLength(int docID) const{
     return 0;
   
   return dl;
+  */
 }
 
 int InvFPIndex::docLengthCounted(int docID) {
@@ -461,15 +472,19 @@ bool InvFPIndex::indexLookup() {
     return false;
   }
 
-  lookup = new entry[counts[UNIQUE_TERMS]+1];
-  entry* e;
+  lookup = new inv_entry[counts[UNIQUE_TERMS]+1];
+  inv_entry* e;
   TERMID_T tid =0;
   int fid =0;
   long off =0;
-  while (fscanf(in, "%d %d %d", &tid, &fid, &off) == 3) {
+  int ctf = 0;
+  int df = 0;
+  while (fscanf(in, "%d %d %d %d %d", &tid, &fid, &off, &ctf, &df) == 5) {
     e = &lookup[tid];
     e->fileid = fid;
     e->offset = off;
+    e->ctf = ctf;
+    e->df = df;
   }
   fclose(in);
  
@@ -484,15 +499,17 @@ bool InvFPIndex::dtLookup() {
     return false;
   }
 
-  dtlookup = new entry[counts[DOCS]+1];
-  entry* e;
+  dtlookup = new dt_entry[counts[DOCS]+1];
+  dt_entry* e;
   TERMID_T tid =0;
   int fid =0;
   long off =0;
-  while (fscanf(in, "%d %d %d", &tid, &fid, &off) == 3) {
+  int len =0;
+  while (fscanf(in, "%d %d %d %d", &tid, &fid, &off, &len) == 4) {
     e = &dtlookup[tid];
     e->fileid = fid;
     e->offset = off;
+    e->length = len;
   }
   fclose(in);
   return true;
