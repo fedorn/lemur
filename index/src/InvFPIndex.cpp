@@ -30,7 +30,7 @@ InvFPIndex::~InvFPIndex() {
 
 DocInfoList* InvFPIndex::docInfoList(int termID){
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS])) {
-    *lemurstream << "Error:  Trying to get docInfoList for invalid termID" << endl;    
+    *msgstream << "Error:  Trying to get docInfoList for invalid termID" << endl;    
     return NULL;
   }
 
@@ -43,7 +43,16 @@ DocInfoList* InvFPIndex::docInfoList(int termID){
   indexin.seekg(lookup[termID].offset, ios::beg);
   DocInfoList* doclist;
   InvFPDocList* dlist = new InvFPDocList();
-  if (!dlist->binRead(indexin)) {
+  bool success;
+
+  if (strcmp(names[VERSION_NUM], "")) {
+    // version 1.9 is compressed and must be decompressed
+    success = dlist->binReadC(indexin);
+  } else {
+    success = dlist->binRead(indexin);
+  }
+
+  if (!success) {
     indexin.close();
     return NULL;
   } else {
@@ -55,7 +64,7 @@ DocInfoList* InvFPIndex::docInfoList(int termID){
 
 TermInfoList* InvFPIndex::termInfoList(int docID){
   if ((docID < 0) || (docID > counts[DOCS])) {
-    *lemurstream <<  "Error trying to get termInfoList for invalid docID.\n" << endl;
+    *msgstream <<  "Error trying to get termInfoList for invalid docID.\n" << endl;
     return NULL;
   }
     
@@ -82,7 +91,7 @@ TermInfoList* InvFPIndex::termInfoList(int docID){
 
 TermInfoList* InvFPIndex::termInfoListSeq(int docID){
   if ((docID < 0) || (docID > counts[DOCS])) {
-    *lemurstream << "Error trying to get termInfoList for invalid docID.\n"<< endl;
+    *msgstream << "Error trying to get termInfoList for invalid docID.\n"<< endl;
     return NULL;
   }
     
