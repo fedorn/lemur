@@ -353,6 +353,7 @@ void IndriIndex::close() {
 
   delete _documentStatisticsBuffer;
   _documentStatisticsBuffer = 0;
+  _documentLengthFile.close();
   delete _documentLengthBuffer;
 }
 

@@ -333,6 +333,8 @@ void Repository::close() {
       _topdocs = 0;
 
       _index->close();
+      delete _index;
+      _index = 0;      
     }
 
     delete _collection;
