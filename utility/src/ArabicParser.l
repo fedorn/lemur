@@ -97,9 +97,9 @@ long ArabicParser::fileTell() {
   return arabicpos;
 }
 
-void ArabicParser::parseFile(char * filename) {  
+void ArabicParser::parseFile(const string &filename) {  
   arabicpos = 0;
-  Arabicin = fopen(filename, "rb");
+  Arabicin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(Arabicin);
 }

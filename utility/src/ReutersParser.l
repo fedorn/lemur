@@ -85,9 +85,9 @@ long ReutersParser::fileTell() {
 }
 
 void 
-ReutersParser::parseFile(char * filename) {
+ReutersParser::parseFile(const string &filename) {
   reuterspos = 0;
-  reutersin = fopen(filename, "rb");
+  reutersin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(reutersin);
 

@@ -100,9 +100,9 @@ long ChineseParser::fileTell() {
   return chinesepos;
 }
 
-void ChineseParser::parseFile(char * filename) {  
+void ChineseParser::parseFile(const string &filename) {  
   chinesepos = 0;
-  Chinesein = fopen(filename, "rb");
+  Chinesein = fopen(filename.c_str(), "rb");
   doParse();
   fclose(Chinesein);
 }

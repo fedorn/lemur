@@ -112,9 +112,9 @@ long WebParser::fileTell() {
 }
 
 void 
-WebParser::parseFile(char * filename) {
+WebParser::parseFile(const string &filename) {
   webloc = 0;
-  webin = fopen(filename, "rb");
+  webin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(webin);
 }

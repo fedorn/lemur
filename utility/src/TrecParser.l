@@ -62,6 +62,8 @@ long trecpos;
 "</HEAD>"                           { trecpos += trecleng; return E_HEADLN; }
 "<HEADLINE>"                        { trecpos += trecleng; return B_HEADLN; }
 "</HEADLINE>"                       { trecpos += trecleng; return E_HEADLN; }
+"<TITLE>"                             { trecpos += trecleng; return B_TITLE; }
+"</TITLE>"                            { trecpos += trecleng; return E_TITLE; }
 "<TTL>"                             { trecpos += trecleng; return B_TITLE; }
 "</TTL>"                            { trecpos += trecleng; return E_TITLE; }
 "<LP>"                              { trecpos += trecleng; return B_TEXT; }
@@ -76,7 +78,7 @@ long trecpos;
 [&][a-zA-Z]+[;]                     { trecpos += trecleng; /* zap symbols */ }
 [&][#][0-9]*[;]                    { trecpos += trecleng; /* zap symbols */ } 
 [A-Z][A-Z]+                         { trecpos += trecleng; return UPWORD; }
-[a-zA-Z0-9]+                        { trecpos += trecleng; return WORD; }
+[a-zA-Z0-9¡-ÿ]+                        { trecpos += trecleng; return WORD; }/* add 8-bit acsii chars */
 [A-Z][A-Z]+((\')?[s])?              { trecpos += trecleng; return ACRONYM2; }
 [a-zA-Z0-9]+\'[a-zA-Z]+            { trecpos += trecleng; return CONTRACTION;}
 [A-Z]\.([A-Z]\.)+                   { trecpos += trecleng; return ACRONYM; }
@@ -105,9 +107,9 @@ long TrecParser::fileTell() {
   return trecpos;
 }
 
-void TrecParser::parseFile(char * filename) {  
+void TrecParser::parseFile(const string &filename) {  
   trecpos = 0;
-  trecin = fopen(filename, "rb");
+  trecin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(trecin);
 }
@@ -212,7 +214,7 @@ void TrecParser::doParse() {
     case CONTRACTION:
       if (state == TEXT) {
 	// strip suffix and convert to lowercase
-	char * c;
+	char * c, *tmpc;
 	int len = 0, diff;
 	for (c = trectext; *c != '\''; c++, len++)
 	  *(c) = tolower(*c);	
@@ -222,6 +224,8 @@ void TrecParser::doParse() {
 	if (textHandler != NULL) textHandler->foundWord(trectext);
 	trecpos += diff;
 	c++;
+	for (tmpc = c; *tmpc != '\0'; tmpc++)
+	  *(tmpc) = tolower(*tmpc);	
 	if (textHandler != NULL) textHandler->foundWord(c);
       }
       break;

@@ -30,10 +30,10 @@ public:
 
   /// Parse a file.  
   /// use parseFile.  this method will be deprecated in future
-  virtual void parse(char * filename) { parseFile(filename); } ;
+  virtual void parse(const string &filename) { parseFile(filename); } ;
   
   /// Parse a file.
-  virtual void parseFile(char* filename) = 0;
+  virtual void parseFile(const string &filename) = 0;
 
   /// Parse a buffer.  
   virtual void parseBuffer(char * buf, int len) = 0;
@@ -41,7 +41,7 @@ public:
   /// Set the acronym list.  Can be an empty implementation if
   /// the parser is not designed to deal with acronyms by
   /// using a list. WordSet still belongs to the caller
-  virtual void setAcroList(WordSet * acronyms);
+  virtual void setAcroList(const WordSet * acronyms);
 
   /// Set the acronym list from this file.
   virtual void setAcroList(string filename);
@@ -55,14 +55,16 @@ public:
 protected: 
   /// Checks to see if the word is in the acronym list.
   /// Returns false if the list is not set.
-  bool isAcronym(char * word);
+  bool isAcronym(const char * word);
+  /// clears internal acronym list
+  void clearAcros();
+
   long docpos; 
 
 private:
   /// The acronym list.
-  WordSet * acros;
-  ///whether acros belongs to us
-  bool mine;
+  WordSet * myacros;
+  const WordSet* borrowedacros;
 };
 
 #endif

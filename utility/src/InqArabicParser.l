@@ -602,9 +602,9 @@ void InqArabicParser::parseBuffer(char* buf, int len) {
   doParse();
 }
 
-void InqArabicParser::parseFile(char * filename) {
+void InqArabicParser::parseFile(const string &filename) {
   
-  InqArabicin = fopen(filename, "rb");
+  InqArabicin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(InqArabicin);
 }

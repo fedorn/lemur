@@ -131,9 +131,9 @@ long ChineseCharParser::fileTell() {
   return CCpos;
 }
 
-void ChineseCharParser::parseFile(char * filename) {  
+void ChineseCharParser::parseFile(const string &filename) {  
   CCpos = 0;
-  ChineseCharin = fopen(filename, "rb");
+  ChineseCharin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(ChineseCharin);
 }

@@ -22,7 +22,7 @@ public:
   InqArabicParser();
 
   /// Parse a file.
-  void parseFile (char * filename);
+  void parseFile (const string &filename);
 
   /// Parse a buffer of len length
   void parseBuffer (char * buf, int len);

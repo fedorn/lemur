@@ -112,9 +112,9 @@ long IdentifinderParser::fileTell() {
 }
 
 void 
-IdentifinderParser::parseFile(char * filename) {
+IdentifinderParser::parseFile(const string &filename) {
   idenloc = 0;
-  idenin = fopen(filename, "rb");
+  idenin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(idenin);
 }

@@ -38,7 +38,7 @@ public:
   BrillPOSParser();
 
   /// Parse a file.
-  void parseFile(char * filename);
+  void parseFile(const string &filename);
   
   void parseBuffer(char * buf, int len);
  
