@@ -25,14 +25,14 @@
 class UnigramLM {
 public:
   /// return p(w) 
-  virtual double prob(int wordIndex) = 0;
+  virtual double prob(int wordIndex) const = 0;
   /// return a string ID of the lexicon on which the word index should be interpreted
-  virtual const char * lexiconID() = 0;
+  virtual const string lexiconID() const= 0;
 
   /// iteration over non-zero probability entries
-  virtual void startIteration() = 0;
-  virtual bool hasMore() = 0;
-  virtual void nextWordProb(int &wordIndex, double &prob) = 0;
+  virtual void startIteration() const = 0;
+  virtual bool hasMore() const = 0;
+  virtual void nextWordProb(int &wordIndex, double &prob) const = 0;
 };
 
 
@@ -40,45 +40,45 @@ public:
 
 class SmoothedMLEstimator : public UnigramLM {
 public:
-  SmoothedMLEstimator(Counter &counter, const char *lexiconID) : ct(counter), lexID(lexiconID) {}
+  SmoothedMLEstimator(const Counter &counter, const string &lexiconID) : ct(counter), lexID(lexiconID) {}
   virtual ~SmoothedMLEstimator() {}
 
-  virtual double prob(int wordIndex) {
+  virtual double prob(int wordIndex) const {
     return (probEstimate(wordIndex, ct.count(wordIndex),ct.sum()));
   }
 
-  virtual void startIteration() {
+  virtual void startIteration() const {
     ct.startIteration();
   }
 
-  virtual bool hasMore() {
+  virtual bool hasMore() const {
     return ct.hasMore();
   }
 
-  virtual void nextWordProb(int &wordIndex, double &prob) {
+  virtual void nextWordProb(int &wordIndex, double &prob) const{
     double count;
     ct.nextCount(wordIndex, count);
     prob = probEstimate(wordIndex, count, ct.sum());
   }
   
-  virtual const char * lexiconID() { return lexID;}
+  virtual const string lexiconID() const { return lexID;}
 
   /// individual model differs in its implementation of probEstimate() method
-  virtual double probEstimate(int wordIndex, double wdCount, double sumCount) =0;
+  virtual double probEstimate(int wordIndex, double wdCount, double sumCount) const=0;
 
 protected:
-  Counter &ct;
-  const char *lexID;
+  const Counter &ct;
+  const string lexID;
 };
   
 /// Maximum Likelihood Estimator
 
 class MLUnigramLM : public SmoothedMLEstimator { 
 public:
-  MLUnigramLM(Counter & counter, const char *lexiconID) : SmoothedMLEstimator(counter, lexiconID) {};
+  MLUnigramLM(const Counter & counter, const string &lexiconID) : SmoothedMLEstimator(counter, lexiconID) {};
   virtual ~MLUnigramLM() {}
   
-  virtual double probEstimate(int wordIndex, double count, double sum) {
+  virtual double probEstimate(int wordIndex, double count, double sum) const{
     return (count/sum);
   }
 };
@@ -86,10 +86,10 @@ public:
 /// Laplace-smoothed unigram language model
 class LaplaceUnigramLM : public SmoothedMLEstimator { 
 public:
-  LaplaceUnigramLM(Counter & counter, const char *lexiconID, double vocabSize) : SmoothedMLEstimator(counter, lexiconID), vocSz(vocabSize) {};
+  LaplaceUnigramLM(const Counter & counter, const string &lexiconID, double vocabSize) : SmoothedMLEstimator(counter, lexiconID), vocSz(vocabSize) {};
   virtual ~LaplaceUnigramLM() {}
   
-  virtual double probEstimate(int wordIndex, double count, double sum) {
+  virtual double probEstimate(int wordIndex, double count, double sum) const {
     return ((count+1)/(sum+vocSz));
   }
 private:
@@ -101,19 +101,19 @@ private:
 
 class DirichletUnigramLM : public SmoothedMLEstimator { 
 public:
-  DirichletUnigramLM(Counter & counter, const char *lexiconID, 
-		     UnigramLM &refLM, double priorSampleSize) 
+  DirichletUnigramLM(const Counter & counter, const string &lexiconID, 
+		     const UnigramLM &refLM, double priorSampleSize) 
     : SmoothedMLEstimator(counter, lexiconID), ref(&refLM), 
     s(priorSampleSize) {}
 
   virtual ~DirichletUnigramLM() {}
   
-  virtual double probEstimate(int wordIndex, double count, double sum) {
+  virtual double probEstimate(int wordIndex, double count, double sum) const {
     return ((count+s*ref->prob(wordIndex))/(sum+s));
   }
 
 private:
-  UnigramLM *ref;
+  const UnigramLM *ref;
   /// prior sample size
   double s;  
 };
@@ -127,19 +127,19 @@ private:
 
 class InterpUnigramLM : public SmoothedMLEstimator { 
 public:
-  InterpUnigramLM(Counter & counter, const char *lexiconID, 
-		     UnigramLM &refLM, double refCoeff) 
+  InterpUnigramLM(const Counter & counter, const string &lexiconID, 
+		     const UnigramLM &refLM, double refCoeff) 
     : SmoothedMLEstimator(counter, lexiconID), ref(&refLM), 
     refC(refCoeff) {}
 
   virtual ~InterpUnigramLM() {}
   
-  virtual double probEstimate(int wordIndex, double count, double sum) {
+  virtual double probEstimate(int wordIndex, double count, double sum) const {
     return ((1-refC)*count/sum + refC*ref->prob(wordIndex));
   }
 
 private:
-  UnigramLM *ref;
+  const UnigramLM *ref;
   /// coefficient for the reference language model
   double refC;  
 };

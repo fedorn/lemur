@@ -17,7 +17,7 @@
 
 #include "ElemDocMgr.hpp"
 
-ElemDocMgr::ElemDocMgr(const char* name) {
+ElemDocMgr::ElemDocMgr(const string &name) {
   IDnameext = name;
   // strip extension
   IDname = IDnameext.substr(0, IDnameext.length() - ELEM_TOC_LEN);
@@ -25,15 +25,15 @@ ElemDocMgr::ElemDocMgr(const char* name) {
   if (!loadTOC()) {
     // brand new.
     string val = IDname + BT_LOOKUP;
-    doclookup.create( val.c_str(), Keyfile::random );
+    doclookup.create( val.c_str() );
 
     val = IDname + BT_POSITIONS;
-    poslookup.create( val.c_str(), Keyfile::random );
+    poslookup.create( val.c_str() );
     pm = "trec"; /// bleah fix me
     setParser(TextHandlerManager::createParser());
 
     val = IDname + ELEM_ELS;
-    elements.create( val.c_str(), Keyfile::random);    
+    elements.create( val.c_str());    
   }
 }
 
@@ -43,11 +43,11 @@ ElemDocMgr::ElemDocMgr(string name, string mode, string source) {
   pm = mode;
   setParser(TextHandlerManager::createParser(mode));
   string val = IDname + BT_LOOKUP;
-  doclookup.create( val.c_str(), Keyfile::random );
+  doclookup.create( val.c_str() );
   val = IDname + BT_POSITIONS;
-  poslookup.create( val.c_str(), Keyfile::random );
+  poslookup.create( val.c_str() );
   val = IDname + ELEM_ELS;
-  elements.create( val.c_str(), Keyfile::random);
+  elements.create( val.c_str());
 
   ifstream files(source.c_str());
   string file;
@@ -66,7 +66,7 @@ ElemDocMgr::~ElemDocMgr() {
 }
 
 char* ElemDocMgr::handleBeginTag(char* tag, char* orig, PropertyList* props) {
-  Property* prop = NULL;
+  const Property* prop = NULL;
   prop = props->getProperty("B_ELEM");
   if (prop) {
     map<char*, btl, abc>::iterator point = elemtable.find((char*)prop->getValue());
@@ -86,7 +86,7 @@ char* ElemDocMgr::handleBeginTag(char* tag, char* orig, PropertyList* props) {
 
 char* ElemDocMgr::handleEndTag(char* tag, char* orig, PropertyList* props){
   // find the tag
-  Property* prop=NULL;
+  const Property* prop=NULL;
   prop = props->getProperty("E_ELEM");
   if (prop) {
     char* elname = (char*)prop->getValue();
@@ -167,16 +167,16 @@ bool ElemDocMgr::loadTOC() {
     return false;
   }
   string key, val;
-  int num;
+  int num = 0;
   string files;
 
   while (toc >> key >> val) {
     if (key.compare("FILE_LOOKUP") == 0)
-      doclookup.open( val.c_str(), Keyfile::random );
+      doclookup.open( val.c_str() );
     else if (key.compare("POS_LOOKUP") == 0)
-      poslookup.open( val.c_str(), Keyfile::random );
+      poslookup.open( val.c_str() );
     else if (key.compare("DOC_ELEMENTS") == 0)
-      elements.open( val.c_str(), Keyfile::random );
+      elements.open( val.c_str() );
     else if (key.compare("FILE_IDS") == 0)
       files = val;    
     else if (key.compare("NUM_DOCS") == 0)
@@ -187,7 +187,7 @@ bool ElemDocMgr::loadTOC() {
       pm = val;    
   }
   toc.close();
-  loadFTFiles(files.c_str(), num);
+  loadFTFiles(files, num);
   setParser(TextHandlerManager::createParser(pm));
   return true;
 }

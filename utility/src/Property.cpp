@@ -23,7 +23,7 @@ Property::Property() {
   destructor = 0;
 }
 
-Property::Property(char * initName) {
+Property::Property(const char * initName) {
   nameSize = INITNAMESIZE;
   int length = strlen(initName) + 1;
   if (length > nameSize) {
@@ -50,7 +50,7 @@ Property::~Property() {
   delete [] buffer;
 }
 
-void Property::setName(char * newName) {
+void Property::setName(const char * newName) {
   if (newName != (char *) NULL) {
     int length = strlen(newName) + 1;
     if (length > nameSize) {
@@ -65,7 +65,7 @@ void Property::setName(char * newName) {
   }
 }
 
-void Property::copyValue(Property * property) {
+void Property::copyValue(const Property * property) {
   type = property->getType();
   dataSize = property->getSize();
   if (dataSize > bufferSize) {
@@ -78,22 +78,22 @@ void Property::copyValue(Property * property) {
   }
 }
 
-char * Property::getName() {
+const char * Property::getName() const{
   return (nullName ? NULL : name);
 }
 
-void * Property::getValue() {
+const void * Property::getValue() const{
   if (dataSize > 0) {
     return buffer;
   } 
   return NULL;
 }
 
-int Property::getSize() {
+int Property::getSize() const{
   return dataSize;
 }
 
-int Property::getLength() {
+int Property::getLength() const{
   int length = 0;
   switch (type) {
   case INT:
@@ -106,7 +106,7 @@ int Property::getLength() {
   return length;
 }
 
-Property::DataType Property::getType() {
+Property::DataType Property::getType() const{
   return type;
 }
 

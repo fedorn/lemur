@@ -45,7 +45,7 @@ DocumentManager* DocMgrManager::createDocMgr(string type, string name,
   return dm;
 }
 
-DocumentManager* DocMgrManager::openDocMgr(string name) {
+DocumentManager* DocMgrManager::openDocMgr(const string name) {
   DocumentManager* dm = NULL;
   int len = name.length();
 

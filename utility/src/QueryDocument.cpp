@@ -24,7 +24,7 @@ QueryDocument::~QueryDocument() {
   free(id);
 }
 
-TokenTerm* QueryDocument::nextTerm() {
+const TokenTerm* QueryDocument::nextTerm() const{
   tt.str = tokens[iter];
   iter++;
   return &tt;

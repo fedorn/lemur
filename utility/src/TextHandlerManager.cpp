@@ -115,7 +115,7 @@ Stopper* TextHandlerManager::createStopper(string filename) {
     filename = ParamGetString("stopwords");
   
   if (!filename.empty()) 
-    stopper = new Stopper((char*)filename.c_str());
+    stopper = new Stopper(filename);
   
   return stopper;
 }

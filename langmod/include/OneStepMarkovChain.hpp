@@ -25,7 +25,7 @@ for estimating such models.
 class OneStepMarkovChain {
 public:
   /// construct a MC restricted to a subset of docs
-  OneStepMarkovChain(WeightedIDSet &docSet, Index &homeIndex, double *wdNorm, double stopProbAlpha);
+  OneStepMarkovChain(const WeightedIDSet &docSet, const Index &homeIndex, double *wdNorm, double stopProbAlpha);
   ~OneStepMarkovChain();
   
   /// @name Iteration support
@@ -36,25 +36,25 @@ public:
    */
   //@{
   /// Start iteration over w's for t(toWord |w)
-  void startFromWordIteration(int toWord);
-  bool hasMoreFromWord() { 
+  void startFromWordIteration(int toWord) const;
+  bool hasMoreFromWord() const { 
     while (itPos <= ind.termCountUnique() && fromWordPr[itPos]==0) 
       itPos++;
     return (itPos<= ind.termCountUnique());
   }
   /// Fetch the next word and the prob of "translating" it to the toWord
-  void nextFromWordProb(int &fromWord, double &prob);
+  void nextFromWordProb(int &fromWord, double &prob) const ;
   //@}
 
 private:
-  void computeFromWordProb(int toWord);
-  Index &ind;
+  void computeFromWordProb(int toWord) const;
+  const Index &ind;
   double alpha;
   int *dSet;
   double *norm;
-  double *fromWordPr;
-  int itPos;
-  int curToWord;
+  mutable double *fromWordPr;
+  mutable int itPos;
+  mutable int curToWord;
 };
 
 

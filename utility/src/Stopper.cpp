@@ -9,13 +9,13 @@
 Stopper::Stopper() {
 }
 
-Stopper::Stopper(char * filename) {
+Stopper::Stopper(const string &filename) {
   load(filename);
 }
 
 
 bool 
-Stopper::stopWord(char * word) {
+Stopper::stopWord(const char * word) const {
   // return true if the word is in the stopword list
   return contains(word);
 }

@@ -17,7 +17,7 @@
 
 
 
-void BasicTokenDoc::startTermIteration() 
+void BasicTokenDoc::startTermIteration() const
 {
   // ensure the start position of the terms
   docStr->seekg(startPos);
@@ -26,7 +26,7 @@ void BasicTokenDoc::startTermIteration()
   *docStr >> curWord;
 }
 
-void BasicTokenDoc::skipToEnd()
+void BasicTokenDoc::skipToEnd() const
 {
   startTermIteration();
   while (hasMore()) {
@@ -34,7 +34,7 @@ void BasicTokenDoc::skipToEnd()
   }
 }
 
-TokenTerm * BasicTokenDoc::nextTerm()
+const TokenTerm * BasicTokenDoc::nextTerm() const
 {
   //  static BasicTokenTerm t;
   t.str = curWord;
@@ -61,10 +61,10 @@ void BasicTokenDoc::readID()
 }
 
 
-BasicDocStream::BasicDocStream (const char * inputFile)
+BasicDocStream::BasicDocStream (const string &inputFile)
 {
-  strcpy(file, inputFile);
-  ifs = new ifstream(inputFile, ios::in);
+  strcpy(file, inputFile.c_str());
+  ifs = new ifstream(file, ios::in);
   if (ifs->fail() ) {
     throw Exception("BasicDocStream", "can't open BasicDocStream source file");
   }

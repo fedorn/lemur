@@ -23,7 +23,7 @@
 WordSet::WordSet() {
 }
 
-WordSet::WordSet(char * filename) {
+WordSet::WordSet(const string &filename) {
   load(filename);
 }
 
@@ -34,8 +34,8 @@ WordSet::~WordSet() {
 
 
 void
-WordSet::load(char * filename) {
-  ifstream ifstr(filename);
+WordSet::load(const string &filename) {
+  ifstream ifstr(filename.c_str());
   // return if the file can't be opened
   if (ifstr == NULL) {
     return;
@@ -54,7 +54,7 @@ WordSet::load(char * filename) {
 }
 
 void
-WordSet::add(char * word) {
+WordSet::add(const char * word) {
   // insert the word into the set if it isn't already there
   if (!contains(word)) {
     words.insert(strdup(word));
@@ -62,10 +62,10 @@ WordSet::add(char * word) {
 }
 
 bool 
-WordSet::contains(char * word) {
+WordSet::contains(const char * word) const{
   // check to see if the word is in the set
-  set<char *, lt_str>::const_iterator it
-    = words.find(word);
+  // can't make this a set of const char* because we need to free it
+  set<char *, lt_str>::const_iterator it = words.find((char*)word);
   return (it != words.end());
 }
 

@@ -103,11 +103,11 @@ void MemCache::flushMem(){
   }
 }
 
-int* MemCache::getBegin() {
+const int* MemCache::getBegin() {
   return begin;
 }
 
-int* MemCache::getEnd() {
+const int* MemCache::getEnd() {
   return end;
 }
 

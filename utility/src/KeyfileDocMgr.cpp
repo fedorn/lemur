@@ -16,8 +16,10 @@
  */
 
 #include "KeyfileDocMgr.hpp"
+//keyref.h
+#define MAX_DOCID_LENGTH 512 
 
-KeyfileDocMgr::KeyfileDocMgr(const char* name) {
+KeyfileDocMgr::KeyfileDocMgr(const string &name) {
   myDoc = NULL;
   numdocs = 0;
 
@@ -28,10 +30,10 @@ KeyfileDocMgr::KeyfileDocMgr(const char* name) {
   if (!loadTOC()) {
     // brand new.
     string val = IDname + BT_LOOKUP;
-    doclookup.create( val.c_str(), Keyfile::random );
+    doclookup.create(val);
 
     val = IDname + BT_POSITIONS;
-    poslookup.create( val.c_str(), Keyfile::random );
+    poslookup.create(val);
     pm = "trec"; /// bleah fix me
     setParser(TextHandlerManager::createParser());
   }
@@ -45,9 +47,9 @@ KeyfileDocMgr::KeyfileDocMgr(string name, string mode, string source) {
   pm = mode;
   setParser(TextHandlerManager::createParser(mode));
   string val = IDname + BT_LOOKUP;
-  doclookup.create( val.c_str(), Keyfile::random );
+  doclookup.create(val);
   val = IDname + BT_POSITIONS;
-  poslookup.create( val.c_str(), Keyfile::random );
+  poslookup.create(val);
 
   ifstream files(source.c_str());
   string file;
@@ -107,7 +109,7 @@ char* KeyfileDocMgr::handleDoc(char* docno) {
     doclen = MAX_DOCID_LENGTH;
     cerr << "handleDoc: document id " << docno << " is too long ("
 	 << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
-    cerr << "truncating" << docno << endl;
+    cerr << "truncating " << docno << endl;
   }
   myDoc = new char[doclen];
   strncpy(myDoc, docno, doclen - 1);
@@ -116,20 +118,20 @@ char* KeyfileDocMgr::handleDoc(char* docno) {
 }
 
 // caller delete[]s
-char *KeyfileDocMgr::getDoc(const char *docID) {
+char *KeyfileDocMgr::getDoc(const string &docID) const{
   int actual = 0;
   btl documentLocation;
-
-  char *docName = (char *)docID;
+  char tmpdoc[MAX_DOCID_LENGTH];
+  const char *docName = docID.c_str();
   int doclen = strlen(docName) + 1;
   if (doclen > (MAX_DOCID_LENGTH - 1)) {
     doclen = MAX_DOCID_LENGTH;
     cerr << "getDoc: document id " << docName << " is too long ("
          << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     cerr << "truncating " << docName << endl;
-    docName = new char[doclen];
-    strncpy(docName, docID, doclen - 1);
-    docName[doclen - 1] = '\0';
+    strncpy(tmpdoc, docID.c_str(), doclen - 1);
+    tmpdoc[doclen - 1] = '\0';
+    docName = tmpdoc;
   }
 
   doclookup.get( docName, &documentLocation, actual, sizeof(btl) );
@@ -149,26 +151,25 @@ char *KeyfileDocMgr::getDoc(const char *docID) {
   doc[documentLocation.bytes] = '\0';
   return doc;
 }
-vector<Match> KeyfileDocMgr::getOffsets(char *docID) {
+vector<Match> KeyfileDocMgr::getOffsets(const string &docID) const{
   // reset to empty
   offsets.clear();
   int size = 0;
   unsigned char* data = 0;
-
-  char *docName = (char *)docID;
+  char tmpdoc[MAX_DOCID_LENGTH];
+  const char *docName = docID.c_str();
   int doclen = strlen(docName) + 1;
   if (doclen > (MAX_DOCID_LENGTH - 1)) {
     doclen = MAX_DOCID_LENGTH;
     cerr << "getOffsets: document id " << docName << " is too long ("
          << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     cerr << "truncating " << docName << endl;
-    docName = new char[doclen];
-    strncpy(docName, docID, doclen - 1);
-    docName[doclen - 1] = '\0';
+    strncpy(tmpdoc, docID.c_str(), doclen - 1);
+    tmpdoc[doclen - 1] = '\0';
+    docName = tmpdoc;
   }
 
   poslookup.get( docName, (char**) &data, size );
-  if(docName != docID) delete[](docName);
 
   int *buffer = new int[(size * 4)];
 
@@ -191,7 +192,7 @@ void KeyfileDocMgr::buildMgr() {
   for (int i = 0; i < sources.size(); i++) {
     fileid = i;
     cerr << "  *Parsing " << sources[i] << endl;
-    myparser->parse((char*)sources[i].c_str());
+    myparser->parse(sources[i]);
   }
   writeTOC();
 }
@@ -222,14 +223,14 @@ bool KeyfileDocMgr::loadTOC() {
     return false;
   }
   string key, val;
-  int num;
+  int num = 0;
   string files;
 
   while (toc >> key >> val) {
     if (key.compare("FILE_LOOKUP") == 0)
-      doclookup.open( val.c_str(), Keyfile::random );
+      doclookup.open(val);
     else if (key.compare("POS_LOOKUP") == 0)
-      poslookup.open( val.c_str(), Keyfile::random );
+      poslookup.open(val);
     else if (key.compare("FILE_IDS") == 0)
       files = val;    
     else if (key.compare("NUM_DOCS") == 0)
@@ -240,14 +241,14 @@ bool KeyfileDocMgr::loadTOC() {
       pm = val;    
   }
   toc.close();
-  loadFTFiles(files.c_str(), num);
+  loadFTFiles(files, num);
   setParser(TextHandlerManager::createParser(pm));
   return true;
 }
 
 
-bool KeyfileDocMgr::loadFTFiles(const char* fn, int num) {
-  ifstream fns (fn);
+bool KeyfileDocMgr::loadFTFiles(const string &fn, int num) {
+  ifstream fns (fn.c_str());
   if (!fns.is_open()) {
     return false;
   }

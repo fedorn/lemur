@@ -14,7 +14,7 @@
 
 #include "FlattextDocMgr.hpp"
 
-FlattextDocMgr::FlattextDocMgr(const char* name) {
+FlattextDocMgr::FlattextDocMgr(const string &name) {
   myparser = NULL;
   entries = NULL;
   open(name);
@@ -23,7 +23,7 @@ FlattextDocMgr::FlattextDocMgr(const char* name) {
 FlattextDocMgr::FlattextDocMgr(string name, string mode, string source) {
   entries = NULL;
   numdocs = 0;
-  readinSources(source.c_str());
+  readinSources(source);
   // convert mode to lower
   for (int i=0;i<mode.length();i++)
     mode[i] = tolower(mode[i]);
@@ -41,12 +41,12 @@ FlattextDocMgr::~FlattextDocMgr() {
   if (entries)
     delete[]entries;
   // free docids
-  map<char*, lookup_e*, abc>::iterator finder;
-  for (finder=table.begin();finder != table.end();finder++) 
-    free(finder->first);
+  //  map<char*, lookup_e*, abc>::iterator finder;
+  //  for (finder=table.begin();finder != table.end();finder++) 
+  //    free(finder->first);
 }
 
-bool FlattextDocMgr::open(const char* manname) {
+bool FlattextDocMgr::open(const string &manname) {
   // open mode has extension
   IDnameext = manname;
   // strip extension, but this doesn't really get used
@@ -71,7 +71,7 @@ void FlattextDocMgr::buildMgr() {
   for (int i=0;i<sources.size();i++) {
     fileid = i;
     cerr << "  *Parsing " << sources[i] << endl;
-    myparser->parse((char*)sources[i].c_str());
+    myparser->parse(sources[i]);
     fid << i << " " << sources[i] << endl;
 
     /* we need to get position at end of last doc.  can't really do it 
@@ -109,13 +109,13 @@ void FlattextDocMgr::handleEndDoc() {
   writefpos << end-prevpos << endl;
 }
 
-const char* FlattextDocMgr::getMyID() {
-  return IDnameext.c_str();
+const string &FlattextDocMgr::getMyID() const{
+  return IDnameext;
 }
 
-char* FlattextDocMgr::getDoc(const char* docID) {
-  map<char*, lookup_e*, abc>::iterator finder;
-  finder = table.find((char*)docID);
+char* FlattextDocMgr::getDoc(const string &docID) const{
+  map<string , lookup_e*, less<string> >::iterator finder;
+  finder = table.find(docID);
   if (finder == table.end()) {
     cerr << "This docid " << docID << " was not found." << endl;
     return "";
@@ -139,8 +139,8 @@ char* FlattextDocMgr::getDoc(const char* docID) {
 
 
 /*=================  PRIVATE  ==========================*/
-bool FlattextDocMgr::readinSources(const char* fn){
-  ifstream files(fn);
+bool FlattextDocMgr::readinSources(const string &fn){
+  ifstream files(fn.c_str());
   string file;
 
   if (!files.is_open()) {
@@ -168,14 +168,14 @@ void FlattextDocMgr::writeTOC() {
   toc.close();
 }
 
-bool FlattextDocMgr::loadTOC(const char* fn) {
-  ifstream toc(fn);
+bool FlattextDocMgr::loadTOC(const string &fn) {
+  ifstream toc(fn.c_str());
   if (!toc.is_open()) {
     throw Exception ("FlattextDocMgr", "Cannot open TOC file for reading");
     return false;
   }
   string key, val;
-  int num;
+  int num = 0;
   string files;
   string lookup;
   while (toc >> key >> val) {
@@ -190,10 +190,10 @@ bool FlattextDocMgr::loadTOC(const char* fn) {
     else if (key.compare("PARSE_MODE") == 0) 
       parseMode = val;
   }
-  if (!loadFTLookup(lookup.c_str())) {
+  if (!loadFTLookup(lookup)) {
     return false;
   }
-  if (!loadFTFiles(files.c_str(), num)) {
+  if (!loadFTFiles(files, num)) {
     return false;
   }
   myparser = TextHandlerManager::createParser(parseMode);
@@ -201,8 +201,8 @@ bool FlattextDocMgr::loadTOC(const char* fn) {
   return true;
 }
 
-bool FlattextDocMgr::loadFTLookup(const char* fn) {
-  ifstream lup (fn);
+bool FlattextDocMgr::loadFTLookup(const string &fn) {
+  ifstream lup (fn.c_str());
   if (!lup.is_open()) {
     throw Exception ("FlattextDocMgr", "Cannot open list lookup file");
     return false;
@@ -214,22 +214,23 @@ bool FlattextDocMgr::loadFTLookup(const char* fn) {
   lookup_e* e;
   int index=0;
   while (lup >> docid >> fid >> pos >> bytes) {
-    char* id = strdup(docid.c_str());
+    //    char* id = strdup(docid.c_str());
     e = &entries[index];
     index++;
     e->fid = fid;
     e->offset = pos;
     e->bytes = bytes;
     // map does shallow copy
-    table[id] = e;
+    //    table[id] = e;
+    table[docid] = e;
   }
 
   lup.close();
   return true;
 }
 
-bool FlattextDocMgr::loadFTFiles(const char* fn, int num) {
-  ifstream fns (fn);
+bool FlattextDocMgr::loadFTFiles(const string &fn, int num) {
+  ifstream fns (fn.c_str());
   if (!fns.is_open()) {
     throw Exception ("FlattextDocMgr", "Cannot open list of sources");
     return false;

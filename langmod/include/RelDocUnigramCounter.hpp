@@ -27,20 +27,20 @@
 class RelDocUnigramCounter : public ArrayCounter <double> {
 public:
   /// construct a counter for a doc
-  RelDocUnigramCounter(int docID, Index &homeIndex);
+  RelDocUnigramCounter(int docID, const Index &homeIndex);
 
   /// construct a counter for a subset of weighted docs in a collection
-  RelDocUnigramCounter(WeightedIDSet &docSet, Index &homeIndex);
+  RelDocUnigramCounter(const WeightedIDSet &docSet, const Index &homeIndex);
 
   virtual ~RelDocUnigramCounter() {}
-  const char *lexiconID() { return (ind.termLexiconID());}
+  const string lexiconID() const { return (ind.termLexiconID());}
 
 protected:
   /// Fill in the counter values with the probability of each term in
   /// in the document (count/length).
   void countRelDocUnigram(int docID, double weight=1);
 
-  Index &ind;
+  const Index &ind;
 };
 
 

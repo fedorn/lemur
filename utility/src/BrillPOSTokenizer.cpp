@@ -20,7 +20,7 @@ BrillPOSTokenizer::BrillPOSTokenizer(char s) {
   pos.setName("POS");
 }
 
-char* BrillPOSTokenizer::handleWord(char* word, char* original, PropertyList* list){
+char* BrillPOSTokenizer::handleWord(char* word, const char* original, PropertyList* list){
   char* term = strtok(word, &splitter);
   char* tag = strtok(NULL, &splitter);
   if (tag) {

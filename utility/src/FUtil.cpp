@@ -12,10 +12,10 @@
 #include "FUtil.hpp"
 #include "common_headers.hpp"
 
-bool fileExist(char* name)
+bool fileExist(const string &name)
 {
   ifstream ifs;
-  ifs.open(name);
+  ifs.open(name.c_str());
   if (!ifs.fail()) {
     ifs.close();
     return true;

@@ -23,25 +23,25 @@
 class DocUnigramCounter : public ArrayCounter <int> {
 public:
   /// construct a counter for a doc
-  DocUnigramCounter(int docID, Index &homeIndex);
+  DocUnigramCounter(int docID, const Index &homeIndex);
 
   /// construct a counter for a subset of docs in a collection
-  DocUnigramCounter(vector<int> &docSet, Index &homeIndex);
+  DocUnigramCounter(const vector<int> &docSet, const Index &homeIndex);
 
   /// construct a counter for a subset of weighted docs in a collection
-  DocUnigramCounter(WeightedIDSet &docSet, Index &homeIndex);
+  DocUnigramCounter(const WeightedIDSet &docSet, const Index &homeIndex);
 
   /// construct a counter for a whole collection of docs 
-  DocUnigramCounter(Index &collectionIndex);
+  DocUnigramCounter(const Index &collectionIndex);
 
   virtual ~DocUnigramCounter() {}
-  const char *lexiconID() { return (ind.termLexiconID());}
+  const string lexiconID() const { return (ind.termLexiconID());}
 
 protected:
 
   void countDocUnigram(int docID, double weight=1);
 
-  Index &ind;
+  const Index &ind;
 };
 
 
