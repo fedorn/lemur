@@ -33,6 +33,11 @@ endif
 	@echo "Generating $@ for $<"
 	@set -e; $(CXX) -MM $(CXXFLAGS) $< | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
 
+# how to generate .d  file from a .C file
+../depend/%.d: ../src/%.cc
+	@echo "Generating $@ for $<"
+	@set -e; $(CXX) -MM $(CXXFLAGS) $< | sed 's/\($*\)\.o[ :]*/\1.o \.\.\/depend\/\1.d : /g' > $@; [ -s $@ ] || rm -f $@
+
 # how to generate .d file from a .c file
 ../depend/%.d: ../src/%.c
 	@echo "Generating $@ for $<"
@@ -40,6 +45,9 @@ endif
 
 # compiling C++ code
 %.o: ../src/%.cpp
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+%.o: ../src/%.cc
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 # compiling C code
@@ -59,4 +67,7 @@ $(OBJLIB): $(OBJ)
 
 install:
 	$(INSTALL_DATA) $(ALLHEADER) $(includedir)
+ifneq ($(strip $(INDRIHEADER)),)
+	$(INSTALL_DATA) $(INDRIHEADER) $(includedir)/indri
+endif
 	$(AR) -rs $(libdir)/$(LEMURLIB) $(OBJ)
