@@ -19,7 +19,7 @@
 
 class RetMethodManager {
 public:
-  enum RetModel {UNKNOWN=-1, TFIDF=0, OKAPI=1, KL=2, INQUERY=3,CORI_CS=4,COS=5, INQ_STRUCT};
+  enum RetModel {UNKNOWN=-1, TFIDF=0, OKAPI=1, KL=2, INQUERY=3,CORI_CS=4,COS=5, INQ_STRUCT=6, INDRI=7};
 
   /// use specified model or check in parameters
   static RetrievalMethod* createModel(const Index* ind, ArrayAccumulator* accum, RetModel type);
