@@ -7,4 +7,4 @@ ALLHEADER += $(wildcard ../include/*.xpm)
 install:
 	$(INSTALL_DIR) $(INCDIR)
 	$(INSTALL_DATA) $(ALLHEADER) $(INCDIR)
-	$(AR) -rs $(libdir)/$(LEMURLIB) $(OBJ)
+	$(AR) -qs $(libdir)/$(LEMURLIB) $(OBJ)
