@@ -28,7 +28,7 @@ typedef map<char*, InvFPDocList*, ltstr> TABLE_T;
 
 class InvFPPushIndex : public PushIndex {
 public:
-  InvFPPushIndex(char* prefix="DefaultIndex", int cachesize=128000000, DOCID_T startdocid=0);
+  InvFPPushIndex(char* prefix="DefaultIndex", int cachesize=128000000, long maxfilesize=2100000000, DOCID_T startdocid=0);
   ~InvFPPushIndex();
 
   /// sets the name for this index. the name will be the prefix for all files related to this index
@@ -50,9 +50,11 @@ public:
 private:
   void writeTOC();
   void writeDocIDs();
+  void writeDTIDs();
   void writeCache();
   void lastWriteCache();
 
+  long maxfile; /// the biggest our file size can be
   MemCache* cache; /// the main memory handler
  // FILE* writetlist; /// filestream for writing the list of located terms for each document
   ofstream writetlist;
@@ -61,6 +63,8 @@ private:
   vector<char*> docIDs; /// list of external docids in internal docid order
   vector<char*> termIDs; /// list of terms in termid order
   vector<char*> tempfiles; /// list of tempfiles we've written to flush cache
+  vector<char*> dtfiles; /// list of dt index files
+  
   int tcount;    /// count of total terms
   int tidcount ; /// count of unique terms
   int dtidcount; /// count of unique terms in a current doc
