@@ -41,7 +41,7 @@ void BasicSumm::addPassage(Passage &psg) {
   doc.push_back(*bPsg);
 }  
 
-int BasicSumm::fetchPassages(Passage psgs[], int optLen = -1) {
+int BasicSumm::fetchPassages(Passage* psgs, int optLen = -1) {
   int l, count=0;
   if (optLen >0) {
     l = optLen;

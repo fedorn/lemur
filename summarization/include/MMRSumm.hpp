@@ -112,7 +112,7 @@ public:
 
   void addDocument(const char* docID);
 
-  virtual int fetchPassages(Passage psgs[], int optLen);
+  virtual int fetchPassages(Passage* psgs, int optLen);
   
   virtual void summDocument(const char* docID, const int optLen, const char* qInfo);
 

@@ -63,7 +63,7 @@ void MMRSumm::addDocument(const char* docID) {
 }
 
   
-int MMRSumm::fetchPassages(Passage psgs[], int optLen) {
+int MMRSumm::fetchPassages(Passage* psgs, int optLen) {
   int l, count=0;
   if (optLen >0) {
     l = optLen;

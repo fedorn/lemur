@@ -59,7 +59,7 @@ public:
 
   virtual void clear(void);
 
-  virtual int fetchPassages(Passage psgs[], int optLen);
+  virtual int fetchPassages(Passage* psgs, int optLen);
 
   virtual int nextPassage(Passage* psg);
 

@@ -43,7 +43,7 @@ public:
   virtual void clear(void) = 0;
 
   /// Place marked passages into an array
-  virtual int fetchPassages(Passage psgs[], int optLen) = 0;
+  virtual int fetchPassages(Passage* psgs, int optLen) = 0;
 
   /// Get the next passage in iterative manner
   virtual int nextPassage(Passage* psg) = 0;
