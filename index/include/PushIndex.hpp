@@ -23,6 +23,8 @@
 /*
  * NAME DATE - COMMENTS
  * tnt 03/01 - created
+ * tnt 07/02 - modified to add registering of docmgr
+ *
  ======================================================================*/
 
 #include "Term.hpp"
@@ -45,6 +47,7 @@ public:
   /// signify the end of this collection.  properties passed at the beginning of a collection should be handled by the constructor.
   virtual void endCollection(CollectionProps* cp)=0;
 
+  virtual void setDocManager(const char* mgrID)=0;
 
 private:
 };

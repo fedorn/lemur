@@ -43,15 +43,15 @@ public:
   /// adding a term to the current document, returns true if term was added successfully.  
   bool addTerm(Term& t);
 
-  /// signify the end of current document
-  void endDoc(DocumentProps* dp);
-
   /// signify the end of this collection.  properties passed at the beginning of a collection should be handled by the constructor.
   void endCollection(CollectionProps* cp);
 
 
-private:
+protected:
   void writeTOC(int numinv);
+  /// signify the end of current document
+  void doendDoc(DocumentProps* dp, int mgrid);
+
 
   vector<LocatedTerm> termlist; /// list of terms and their locations in this document
 };

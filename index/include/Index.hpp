@@ -152,11 +152,17 @@ public:
   /// Convert a valid docID to its spelling
   virtual const char * document (int docID)=0;
 
+  /// A String identifier for the document manager to get at the source
+  /// of the document with this document id
+  virtual const char* docManager(int docID) { return NULL;}
+
+
   /// Return a string ID for the term lexicon (usually the file name of the lexicon)
   /*! This function should be pure virtual; the default implementation
      is just for convenience. Appropriate implementation to be done in the future. 
   */
   virtual const char *termLexiconID() { return NULL;} 
+
   //@}
 
   /// @name Summary counts

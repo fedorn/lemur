@@ -34,7 +34,8 @@ public:
   /// Pushes the word into the InvFPPushIndex.
   char * handleWord(char * word);
 
-
+  /// passes mgrID onto index
+  void setDocManager(const char* mgrID);
 private:
   /// Ends a document in the collection
   void endDoc();

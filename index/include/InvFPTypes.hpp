@@ -14,7 +14,8 @@
 #ifndef _INVFPTYPES_H
 #define _INVFPTYPES_H
 
-#define VERSION "1.9"
+/// version is 1.9 but leave out the point
+#define IND_VERSION "1.9"
 
 #include "common_headers.hpp"
 
@@ -36,6 +37,7 @@ typedef char* EXDOCID_T;
 #define DOCIDMAP  ".did"
 #define MAINTOC  ".inv"
 #define INVFPTOC ".ifp"
+#define DOCMGRMAP ".dm"
 
 // what to call out of vocabulary ids
 #define INVALID_STR "[OOV]"
@@ -54,6 +56,7 @@ typedef char* EXDOCID_T;
 #define DOCIDMAP_PAR  "DOCIDS"
 #define NUMDT_PAR  "NUM_DTFILES"
 #define NUMINV_PAR  "NUM_INVFILES"
+#define DOCMGR_PAR  "DOCMGR_IDS"
 
 struct LocatedTerm { // pair of term and its location
   TERMID_T term;
@@ -69,6 +72,7 @@ struct dt_entry {   // an entry in the lookup table for docterm lists index
   FILEID_T fileid;  // which file the word is in
   long offset;        // what the offset into the file is
   int length;         // the length of the inverted list
+  int docmgr;         // the docmgr id of manager for this doc
 };
 
 struct inv_entry {   // an entry in the lookup table for docterm lists index

@@ -53,9 +53,14 @@ public:
   /// signify the end of current document
   void endDoc(DocumentProps* dp);
 
+  /// signify the end of current document and associate with certain document manager. this doesn't change the mgr that was previously set.
+  virtual void endDoc(DocumentProps* dp, const char* mgr);
+
   /// signify the end of this collection.  properties passed at the beginning of a collection should be handled by the constructor.
   void endCollection(CollectionProps* cp);
 
+  /// set the document manager to use for succeeding documents
+  void setDocManager(const char* mgrID);
 
 protected:
   void writeTOC(int numinv);
@@ -63,6 +68,11 @@ protected:
   void writeCache();
   void lastWriteCache();
   void writeDTIDs();
+  void writeDocMgrIDs();
+  /// returns the internal id of given docmgr
+  /// if not already registered, mgr will be added
+  int docMgrID(const char* mgr);
+  virtual void doendDoc(DocumentProps* dp, int mgrid);
 
   long maxfile; /// the biggest our file size can be
   MemCache* cache; /// the main memory handler for building
@@ -70,6 +80,7 @@ protected:
   vector<char*> termIDs; /// list of terms in termid order
   vector<char*> tempfiles; /// list of tempfiles we've written to flush cache
   vector<char*> dtfiles; /// list of dt index files
+  vector<char*> docmgrs;  // the list of doc managers we have (index = id)
 
   FILE* writetlookup; /// filestream for writing the lookup table to the docterm db
   ofstream writetlist; /// filestream for writing the list of located terms for each document
@@ -83,6 +94,7 @@ protected:
   map<int, int> termlist; /// maps of terms and freqs
   int* membuf; /// memory to use for cache and buffers
   int membufsize;  // how much memory we have
+  int curdocmgr; // the current docmanager to use
 };
 
 #endif

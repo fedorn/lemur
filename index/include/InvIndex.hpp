@@ -15,7 +15,6 @@
 
 ///  Class for retrieving indexed document collection based on the abstract class Index.hpp
 #include "common_headers.hpp"
-#include "Param.hpp"
 #include "Index.hpp"
 #include "InvDocList.hpp"
 #include "InvTermList.hpp"
@@ -29,6 +28,7 @@
 #define DT_FILES     3
 #define INV_FILES    4
 
+#define NAMES_SIZE   8
 // for names array
 #define DOC_INDEX    0
 #define DOC_LOOKUP   1
@@ -36,6 +36,8 @@
 #define TERM_LOOKUP  3
 #define TERM_IDS     4
 #define DOC_IDS      5
+#define DOCMGR_IDS   6
+#define VERSION_NUM  7
 
 class InvIndex : public Index {
 public:
@@ -49,9 +51,6 @@ public:
   /// Open previously created Index with given prefix, return true if opened successfully
   bool open(const char* indexName);
   //@}
-
-  /// Open previously created Index using names in given param file, return true if opened successfully
-  bool openName(char* filename);
 
   /// @name Spelling and index conversion
   //@{
@@ -67,6 +66,8 @@ public:
 
   /// Convert a docID to its spelling
   const char* document(int docID); 
+
+  const char* docManager(int docID);
 
   //@}
 
@@ -111,22 +112,22 @@ public:
 protected:
   /// readin all toc
   bool fullToc(const char* fileName);
-  /// readin main stats
-  bool mainToc(char* fileName);
   /// readin index lookup table
   bool indexLookup();
   /// readin inverted index filenames map
   bool invFileIDs();
-  /// read in dt index lookup table
+  /// read in document manager internal and external ids map
+  bool docMgrIDs();
+  /// read in dt index lookup table of format ver1.9 (and up?)
   bool dtLookup();
+  /// read in dt index lookup table of format older than ver1.9 
+  bool dtLookup_ver1();
   /// read in dt index filenames map
   bool dtFileIDs();
   /// read in termIDs to term spelling map
   bool termIDs();
   /// read in docIDs to doc spelling map
   bool docIDs();
-  /// set stream for Lemur messages (default: cerr)
-  void setLemurStream(ostream* lemStream);
 
   int* counts;    // array to hold all the overall count stats of this db
   char** names;   // array to hold all the names for files we need for this db
@@ -138,9 +139,10 @@ protected:
   EXDOCID_T* docnames; // array of the external docids (index is docid)
   char** dtfiles; // array of dt index filenames
   char** invfiles; // array of inv index filenames
+  vector<char*> docmgrs; // list of document managers
   map<TERM_T, TERMID_T, ltstr> termtable; // table of terms to termid
   map<EXDOCID_T, DOCID_T, ltstr> doctable; // table of exdocids to docid
-  ostream* lemurstream; // Lemur code messages stream
+  ostream* lemurstream; // Lemur code messages stream		
 };
 
 #endif
