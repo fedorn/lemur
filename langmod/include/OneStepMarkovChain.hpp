@@ -17,6 +17,10 @@
 #define _ONESTEPMARKOVCHAIN_HPP
 
 /// One step markov chain translation model, not fully tested yet
+/*!
+  This code is included mainly to illustrate how the toolkit can be used
+for estimating such models. 
+ */
 
 #include "Index.hpp"
 #include "WeightedIDSet.hpp"
