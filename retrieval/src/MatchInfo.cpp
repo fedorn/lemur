@@ -63,7 +63,7 @@ MatchInfo *MatchInfo::getMatches(const Index &ind, const Query &qry,
     // or is it a StructQuery?
     const StructQuery *sq = dynamic_cast<const StructQuery *>(&qry);
     // the api should be promoted to Query, as both need it.
-    const TokenTerm *t;
+    const Term *t;
     set<int, less<int> > termIDs;
     if (tq != NULL) {// TextQuery
       tq->startTermIteration();
@@ -93,7 +93,7 @@ MatchInfo *MatchInfo::getMatches(const Index &ind, const Query &qry,
     docTerms->startIteration();
     while (docTerms->hasMore()) {
       nextTerm = dynamic_cast<InvFPTerm *>(docTerms->nextEntry());
-      int did = nextTerm->id();
+      int did = nextTerm->termID();
       for (set<int, less<int> >::iterator iter = termIDs.begin();
 	   iter != termIDs.end(); iter++) {
 	int tid = *iter;

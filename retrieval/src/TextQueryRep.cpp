@@ -17,7 +17,7 @@ ArrayQueryRep::ArrayQueryRep(int size, const TextQuery &qry, const Index &dbInde
 {
   qry.startTermIteration();
   while (qry.hasMore()) {
-    const TokenTerm *t = qry.nextTerm();
+    const Term *t = qry.nextTerm();
     int ti = dbIndex.term(t->spelling());
     if (ti>0) {
       incCount(ti, 1);
