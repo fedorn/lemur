@@ -129,12 +129,12 @@ BitArray &BitArray::operator<<(const BitArray &ba)
 
 void BitArray::Read(istream & is)
 {
-  is.read(pBit, BitsToBytes(size));
+  is.read((char *)pBit, BitsToBytes(size));
 }
 
 void BitArray::Write(ostream & os) const
 {
-  os.write(pBit, BitsToBytes(size));
+  os.write((char *)pBit, BitsToBytes(size));
 }
 
 // Bitmasks for bit operations
