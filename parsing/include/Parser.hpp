@@ -8,17 +8,15 @@
  *
  *==========================================================================
 */
-#include "TextHandler.hpp"
 
 #ifndef _PARSER_HPP
 #define _PARSER_HPP
 
+#include "TextHandler.hpp"
 #include "WordSet.hpp"
 
 ///
-///  Provides a generic parser interface.  Supports the 
-///  TextHandler interface as a source (so foundDoc and
-///  foundWord have empty implementations).  Also assumes
+///  Provides a generic parser interface.  Assumes
 ///  that the parser uses an acronym list.  If, when developing
 ///  your parser, you do not use an acronym list, you can
 ///  just provide an empty implementation of the setAcroList
@@ -34,7 +32,14 @@ public:
   }
 
   /// Parse a file.  
-  virtual void parse(char * filename) = 0;
+  /// use parseFile.  this method will be deprecated in future
+  virtual void parse(char * filename) { parseFile(filename); } ;
+  
+  /// Parse a file.
+  virtual void parseFile(char* filename) = 0;
+
+  /// Parse a buffer.  
+  virtual void parseBuffer(char * buf, int len) = 0;
 
   /// Set the acronym list.  Can be an empty implementation if
   /// the parser is not designed to deal with acronyms by
@@ -43,6 +48,11 @@ public:
     acros = acronyms;
   }
 
+  /// return the current byte position of the file being parsed
+  virtual long fileTell() = 0;
+
+  /// return the byte position at the beginning of the current document
+  virtual long getDocBytePos() { return docpos; }
 
 protected: 
   /// Checks to see if the word is in the acronym list.
@@ -52,6 +62,8 @@ protected:
       return acros->contains(word);
     return false;
   }
+
+  long docpos; 
 
 private:
   /// The acronym list.

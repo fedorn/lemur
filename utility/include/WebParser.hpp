@@ -10,7 +10,6 @@
 */
 
 #include "Parser.hpp"
-
 #include "TextHandler.hpp"
 
 #ifndef _WEBPARSER_HPP
@@ -37,11 +36,15 @@ public:
   WebParser();
 
   /// Parse a file.
-  void parse(char * filename);
-
+  void parseFile(char * filename);
+  
+  void parseBuffer(char * buf, int len);
  
-private:
+  long fileTell();
 
+private:
+  /// Actual parsing action flow
+  void doParse();
 
   /// The state of the parser.
   int state;

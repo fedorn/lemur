@@ -37,10 +37,18 @@ public:
   TrecParser();
 
   /// Parse a file.
-  void parse(char * filename);
+  void parseFile(char * filename);
 
- 
+  /// Parse a buffer of len length
+  void parseBuffer(char * buf, int len);
+
+  /// Gives current byte position offset into file being parsed.
+  /// Don't use with parseBuffer
+  long fileTell();
+
 private:
+  /// Actual parsing action flow
+  void doParse();
 
   /// The state of the parser.
   int state;

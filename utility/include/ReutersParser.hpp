@@ -10,7 +10,6 @@
 */
 
 #include "Parser.hpp"
-
 #include "TextHandler.hpp"
 
 #ifndef _REUTERSPARSER_HPP
@@ -36,10 +35,13 @@ public:
   ReutersParser();
 
   /// Parse a file.
-  void parse(char * filename);
-
+  void parseFile (char * filename);
+  void parseBuffer (char * buf, int len);
+  long fileTell();
  
 private:
+  /// Actual parsing action flow
+  void doParse();
 
   /// The state of the parser.
   int state;
