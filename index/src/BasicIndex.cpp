@@ -36,7 +36,7 @@ const char * wordVocSuffix       = "terms";
 const char * documentVocSuffix   = "docids";
 const char * wordKeySuffix       = "wkey";
 const char * documentKeySuffix   = "dkey";
-const char * indexFileSuffix     = "lemur";
+const char * indexFileSuffix     = "bsc";
 
 void BasicIndex::build(DocStream *collectionStream, 
 		       const char *file, const char * outputPrefix, 

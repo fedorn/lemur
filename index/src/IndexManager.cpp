@@ -12,8 +12,8 @@ Index *IndexManager::openIndex(const char *indexTOCFile)
        (!strcmp(extension, "toc"))) {
     // InvFP
     ind = new InvFPIndex();
-  } else if ((!strcmp(extension, "LMR")) ||
-	     (!strcmp(extension, "lmr"))) {
+  } else if ((!strcmp(extension, "BSC")) ||
+	     (!strcmp(extension, "bsc"))) {
     
     ind = new BasicIndex();
   }
