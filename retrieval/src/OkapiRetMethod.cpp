@@ -15,7 +15,7 @@
 
 
 // initial query constructor, no feedback docs assumed
-OkapiQueryRep::OkapiQueryRep(const TextQuery &qry, const Index &dbIndex, double paramK3): ArrayQueryRep(dbIndex.termCountUnique()+1, qry, dbIndex), k3(paramK3) {
+OkapiQueryRep::OkapiQueryRep(const TermQuery &qry, const Index &dbIndex, double paramK3): ArrayQueryRep(dbIndex.termCountUnique()+1, qry, dbIndex), k3(paramK3) {
   pEst = new int[dbIndex.termCountUnique()+1];
   for (int i=0; i<=dbIndex.termCountUnique(); i++) {
     pEst[i] = 0;

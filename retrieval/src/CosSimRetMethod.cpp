@@ -17,7 +17,7 @@
 #include <cmath>
 
 /// Construct a query rep from a text query.
-CosSimQueryRep::CosSimQueryRep(const TextQuery &qry, const Index &dbIndex, 
+CosSimQueryRep::CosSimQueryRep(const TermQuery &qry, const Index &dbIndex, 
 			       double *idfValue): 
   ArrayQueryRep (dbIndex.termCountUnique()+1, qry, dbIndex), 
   ind(dbIndex), idf(idfValue) {

@@ -135,7 +135,7 @@ double TextQueryRetMethod::scoreDocVector(const TextQueryRep &qRep, int docID,
 }
 
 #include <float.h> // for -DBL_MAX
-double TextQueryRetMethod::scoreDocPassages(const TextQuery &qry, int docID, 
+double TextQueryRetMethod::scoreDocPassages(const TermQuery &qry, int docID, 
 					    PassageScoreVector &scores, 
 					    int psgSize, int overlap) {
   double score = 0, maxScore = -DBL_MAX;

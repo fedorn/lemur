@@ -59,9 +59,11 @@ MatchInfo *MatchInfo::getMatches(const Index &ind, const Query &qry,
     
     // collect up the query terms.
     // is it a TextQuery?
-    const TextQuery *tq = dynamic_cast<const TextQuery *>(&qry);
+    //    const TextQuery *tq = dynamic_cast<const TextQuery *>(&qry);
+    const TermQuery *tq = dynamic_cast<const TermQuery*>(&qry);
+
     // or is it a StructQuery?
-    const StructQuery *sq = dynamic_cast<const StructQuery *>(&qry);
+    //const StructQuery *sq = dynamic_cast<const StructQuery *>(&qry);
     // the api should be promoted to Query, as both need it.
     const Term *t;
     set<int, less<int> > termIDs;
@@ -74,21 +76,22 @@ MatchInfo *MatchInfo::getMatches(const Index &ind, const Query &qry,
 	  termIDs.insert(tid);
 	}
       }      
-    } else if (sq != NULL) { //StructQuery
-      sq->startTermIteration();
-      while (sq->hasMore()) {
-	t = sq->nextTerm();
-	int tid = ind.term(t->spelling());
-	if (tid > 0) {
+      /*	  } else if (sq != NULL) { //StructQuery
+	  sq->startTermIteration();
+	  while (sq->hasMore()) {
+	  t = sq->nextTerm();
+	  int tid = ind.term(t->spelling());
+	  if (tid > 0) {
 	  termIDs.insert(tid);
-	}
-      }
+	  }
+	  }*/
     } else {
       // Augh! error.
       // not a known query type
       //cerr << "Unknown query type.";
       return (matches);
     }
+
     
     docTerms->startIteration();
     while (docTerms->hasMore()) {

@@ -15,7 +15,7 @@
 #include <cmath>
 
 
-TFIDFQueryRep::TFIDFQueryRep(const TextQuery &qry, const Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param): ArrayQueryRep (dbIndex.termCountUnique()+1, qry, dbIndex), ind(dbIndex), idf(idfValue), prm(param)
+TFIDFQueryRep::TFIDFQueryRep(const TermQuery &qry, const Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param): ArrayQueryRep (dbIndex.termCountUnique()+1, qry, dbIndex), ind(dbIndex), idf(idfValue), prm(param)
 {
   startIteration();
   while (hasMore()) {

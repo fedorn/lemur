@@ -61,7 +61,7 @@ CORIDocRep::termWeight(int termID, const DocInfo * info) const {
   return p;
 }
 
-CORIQueryRep::CORIQueryRep(const TextQuery &qry, const Index &dbIndex) : 
+CORIQueryRep::CORIQueryRep(const TermQuery &qry, const Index &dbIndex) : 
   ArrayQueryRep (dbIndex.termCountUnique() + 1, qry, dbIndex), ind(dbIndex) {
 
   startIteration();

@@ -12,7 +12,7 @@
 
 #include "TextQueryRep.hpp"
 
-ArrayQueryRep::ArrayQueryRep(int size, const TextQuery &qry, const Index &dbIndex):
+ArrayQueryRep::ArrayQueryRep(int size, const TermQuery &qry, const Index &dbIndex):
   ct(new ArrayCounter<double>(size)), scConst(0) 
 {
   qry.startTermIteration();
