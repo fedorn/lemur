@@ -46,6 +46,61 @@ const char * wordKeySuffix       = "wkey";
 const char * documentKeySuffix   = "dkey";
 const char * indexFileSuffix     = "bsc";
 
+
+
+
+static bool fileExist(char *name)
+{
+  ifstream ifs;
+  ifs.open(name);
+  if (!ifs.fail()) {
+    ifs.close();
+    return true;
+  } 
+  return  false;
+}
+
+BasicIndex::BasicIndex()
+{
+ woffset = NULL;
+ doffset = NULL;
+ tmpdarr = NULL;
+ tmpwarr = NULL;
+}
+
+BasicIndex::BasicIndex (Compress * pc) 
+  :  pCompressor(pc) 
+{
+  woffset = NULL;
+  doffset = NULL;
+  tmpdarr = NULL;
+  tmpwarr = NULL;
+
+}
+
+BasicIndex::~BasicIndex()
+{
+  if (woffset) {
+    delete [] woffset;
+  }
+
+  if (doffset) {
+    delete [] doffset;
+  }
+
+  if (tmpdarr) {
+    delete [] tmpdarr;
+  }
+
+  if (tmpwarr) {
+    delete [] tmpwarr;
+  }
+
+}
+
+
+
+
 void BasicIndex::build(DocStream *collectionStream, 
 		       const char *file, const char * outputPrefix, 
 		  int totalDocs, int maxMemory, 
@@ -61,10 +116,11 @@ void BasicIndex::build(DocStream *collectionStream,
   pDocStream = collectionStream;
 
   //textFile = file;
-textFile = "xxx";
+  textFile = "[unknown]";
   prefix = outputPrefix;
   totalDocuments = totalDocs;
   numDocuments = 0;
+  numBytes = 0;
   maximumMemory = maxMemory;
   pMemList = NULL;
 
@@ -422,13 +478,9 @@ int BasicIndex::indexCollection()
   sprintf(cmd, "/bin/rm %s.%s.*", (const char *) prefix, wordIndexSuffix);
   system(cmd);
 
-  int bytesRead=0;
-  // byteOffsetOfDoc = new int[numDocuments];
   avgDocumentLength = 0;
   maxDocumentLength = 0;
   int n, totalCount;
-
-
 
   while (pDocStream->hasMore() && (numDocs < totalDocuments)) {
     Document *thisDoc = pDocStream->nextDoc();
@@ -443,6 +495,8 @@ int BasicIndex::indexCollection()
       if (term->spelling()[0]  == '\0') {
 	continue;
       }
+      numBytes += strlen(term->spelling());
+
       int k = terms[term->spelling()];
       if (k == -1) {
 	cerr << "Unknown spelling: \"" << term->spelling() << "\"" << endl;
@@ -686,21 +740,52 @@ void BasicIndex::mergeIndexFiles()
 
   while (1) {
 
+
+
+
     // We're finished when only indexPrefix.0 is present;
     sprintf(tmpnam1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, 0);
-    assert(qfilef(tmpnam1));
+
+    //  assert(qfilef(tmpnam1));
+    
+    assert(fileExist(tmpnam1));
+
     sprintf(tmpnam1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, 1);
-    if (!qfilef(tmpnam1)) break;
+    //if (!qfilef(tmpnam1)) break;
+    if (!fileExist(tmpnam1)) break;
 
     for (int i=0; ; i+=2) {
       sprintf(fname1, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, i);
       sprintf(fname2, "%s.%s.%d", (const char *) prefix, wordIndexSuffix, i+1);
-      if (!(qfilef(fname1))) break;
-      else if (!qfilef(fname2)) {
+      //      if (!(qfilef(fname1))) break;
+      if (!(fileExist(fname1))) break;
+      //      else if (!qfilef(fname2)) {
+      else if (!fileExist(fname2)) {
+      
 	sprintf(tmpnam1, "%s.%s.%d", 
 		(const char *) prefix, wordIndexSuffix, i/2);
 	sprintf(cmd, "/bin/mv %s %s", fname1, tmpnam1);
 	system(cmd);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       }
       else {
 	sprintf(tmpnam1, "%s.%s.tmp.%d.%d", 

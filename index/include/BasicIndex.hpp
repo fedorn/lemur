@@ -43,12 +43,12 @@ two indices (term->doc and doc->term) as well as a term lexicon and document id 
 class BasicIndex : public Index {
 public:
   /// constructor (used when opening an index)
-  BasicIndex() {};
+  BasicIndex();
 
   /// constructor (used when building an index)
-  BasicIndex (Compress * pc) :  pCompressor(pc) {}
+  BasicIndex (Compress * pc);
 
-  virtual ~BasicIndex(){};
+  virtual ~BasicIndex();
   
   /// Open previously created Index, return true if opened successfully
   virtual bool open(const char * indexName);
