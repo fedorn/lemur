@@ -1,7 +1,7 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on lemur_retrieval.dsp
 !IF "$(CFG)" == ""
-CFG=lemur_retrieval - Win32 Debug
-!MESSAGE No configuration specified. Defaulting to lemur_retrieval - Win32 Debug.
+CFG=lemur_retrieval - Win32 Release
+!MESSAGE No configuration specified. Defaulting to lemur_retrieval - Win32 Release.
 !ENDIF 
 
 !IF "$(CFG)" != "lemur_retrieval - Win32 Release" && "$(CFG)" != "lemur_retrieval - Win32 Debug"
