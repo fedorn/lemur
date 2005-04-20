@@ -88,10 +88,10 @@ COUNT_T LemurIndriIndex::termCountUnique() const {
 COUNT_T LemurIndriIndex::termCount(TERMID_T termID) const { 
   indri::collection::Repository::index_state indexes = _repository->indexes();
   COUNT_T total = 0;
-  std::string term(term(termID));
+  std::string word(term(termID));
   for( int i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
-    total += (*indexes)[i]->termCount( term );
+    total += (*indexes)[i]->termCount( word );
   }
 
   return total;
@@ -115,12 +115,12 @@ float LemurIndriIndex::docLengthAvg() const {
 }
 
 COUNT_T LemurIndriIndex::docCount(TERMID_T termID) const { 
-  std::string term(term(termID));
+  std::string word(term(termID));
   indri::collection::Repository::index_state indexes = _repository->indexes();
   COUNT_T total = 0;
   for( int i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
-    total += (*indexes)[i]->documentCount( term );
+    total += (*indexes)[i]->documentCount( word );
   }
   return total;
 }
