@@ -76,7 +76,7 @@ gb_skip {gb_punct}|{gb_space}|{gb_skip_punct}|{gb_decpt}
 "<!"[^-][^>]*">"                    { chinesepos += Chineseleng;/* zap other tags*/}
 [&][a-zA-Z]+[;]                     { chinesepos += Chineseleng;/* zap symbols */ }
 [&][#][0-9]*[;]                     { chinesepos += Chineseleng;/* zap symbols */ }
-{gb_skip}[^\r\t\n ]*                { chinesepos += Chineseleng; yyless(2); /* zap one chinese punctutions */ } 
+{gb_skip}[^\r\t\n ]*                { yyless(2); chinesepos += Chineseleng;  /* zap one chinese punctutions */ } 
 [A-Z][A-Z]+                         { chinesepos += Chineseleng;return UPWORD; }
 [a-zA-Z0-9]+                        { chinesepos += Chineseleng;return WORD; }
 [A-Z][A-Z]+((\')?[s])?              { chinesepos += Chineseleng;return ACRONYM2; }
