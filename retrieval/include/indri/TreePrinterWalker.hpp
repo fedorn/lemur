@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -20,58 +20,64 @@
 #define INDRI_TREEPRINTERWALKER_HPP
 
 #include "indri/QuerySpec.hpp"
+namespace indri
+{
+  namespace lang
+  {
 
-class TreePrinterWalker : public indri::lang::Walker {
-private:
-  unsigned int _tabs;
-public:
-  TreePrinterWalker() : _tabs(0) {}
+    class TreePrinterWalker : public indri::lang::Walker {
+    private:
+      unsigned int _tabs;
+    public:
+      TreePrinterWalker() : _tabs(0) {}
 
-  void before( indri::lang::IndexTerm* node ) {
-    for( unsigned int i=0; i<_tabs; i++ )
-      std::cout << "\t";
+      void before( indri::lang::IndexTerm* node ) {
+        for( unsigned int i=0; i<_tabs; i++ )
+          std::cout << "\t";
 
-    std::cout << "IndexTerm "
-              << node->getText().c_str()
-              << " "
-              << node->nodeName().c_str()
-              << std::endl;
+        std::cout << "IndexTerm "
+                  << node->getText().c_str()
+                  << " "
+                  << node->nodeName().c_str()
+                  << std::endl;
 
-    _tabs++;
+        _tabs++;
+      }
+
+      void before( indri::lang::Field* node ) {
+        for( unsigned int i=0; i<_tabs; i++ )
+          std::cout << "\t";
+
+        std::cout << "Field "
+                  << node->getFieldName().c_str()
+                  << " "
+                  << node->nodeName().c_str()
+                  << std::endl;
+
+        _tabs++;
+      }
+
+      void defaultBefore( indri::lang::Node* node ) {
+        for( unsigned int i=0; i<_tabs; i++ )
+          std::cout << "\t";
+
+        std::string type = node->typeName();
+        std::string query = node->queryText();
+
+        std::cout << type
+                  << " "
+                  << query
+                  << std::endl;
+
+        _tabs++;
+      }
+
+      void defaultAfter( indri::lang::Node* node ) {
+        _tabs--;
+      }
+    };
   }
-
-  void before( indri::lang::Field* node ) {
-    for( unsigned int i=0; i<_tabs; i++ )
-      std::cout << "\t";
-
-    std::cout << "Field "
-              << node->getFieldName().c_str()
-              << " "
-              << node->nodeName().c_str()
-              << std::endl;
-
-    _tabs++;
-  }
-
-  void defaultBefore( indri::lang::Node* node ) {
-    for( unsigned int i=0; i<_tabs; i++ )
-      std::cout << "\t";
-
-    std::string type = node->typeName();
-    std::string query = node->queryText();
-
-    std::cout << type
-              << " "
-              << query
-              << std::endl;
-
-    _tabs++;
-  }
-
-  void defaultAfter( indri::lang::Node* node ) {
-    _tabs--;
-  }
-};
+}
 
 #endif // INDRI_TREEPRINTERWALKER_HPP
 

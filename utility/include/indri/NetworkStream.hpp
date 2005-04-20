@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,114 +21,139 @@
 
 #include "lemur-platform.h"
 #include "lemur-compat.hpp"
+#include "indri/indri-platform.h"
 #include <string>
-
-class NetworkStream {
-private:
-  socket_t _socket;
-
-  struct sockaddr_in _getSockaddr( const char* name, unsigned int port ) {
-    long address;
-
-    if( name && isdigit(name[0]) ) {
-      address = inet_addr(name);
-    } else {
-      hostent* host = gethostbyname(name);
-      
-      if( host && host->h_length ) {
-        address = *( (long*) host->h_addr );
-      }
-    }
-
-    struct sockaddr_in sa;
-
-    sa.sin_addr.s_addr = address;
-    sa.sin_port = htons(port);
-    sa.sin_family = AF_INET;
-    memset(&sa.sin_zero, 0, sizeof sa.sin_zero );
-
-    return sa;
-  }
-
-public:
-  NetworkStream() : _socket(-1) {}
-  NetworkStream( socket_t s ) : _socket(s) {}
-  ~NetworkStream() {
-    close();
-  }
-
-  bool connect( const std::string& name, unsigned int port ) {
-    return connect(name.c_str(), port);
-  }
-
-  bool connect( const char* name, unsigned int port ) {
-    lemur_compat::initializeNetwork();
-
-    _socket = ::socket( AF_INET, SOCK_STREAM, 0 );
-    struct sockaddr_in sa = _getSockaddr( name, port );
-    int result = ::connect( _socket, (const sockaddr*) &sa, sizeof sa );
-
-    if( result ) {
-      close();
-    }
-
-    return !result;
-  }
-
-  void close() {
-    lemur_compat::closesocket( _socket );
-    _socket = -1;
-  }
-
-  int write( const void* buffer, size_t length ) {
-    return ::send( _socket, (const char*) buffer, int(length), 0 );
-  }
-
-  int read( void* buffer, size_t length ) {
-    return ::recv( _socket, (char*) buffer, int(length), 0 );
-  }
-
-  int blockingRead( void* buffer, size_t length ) {
-    size_t bytesRead = 0;
-    size_t chunkRead = 0;
-    int result;
+namespace indri
+{
+  namespace net
+  {
     
-    while( bytesRead < (int) length ) {
-      chunkRead = length - bytesRead;
-      result = read( (char*)buffer + bytesRead, chunkRead );
+    class NetworkStream {
+    private:
+      socket_t _socket;
 
-      if( result <= 0 ) {
+      struct sockaddr_in _getSockaddr( const char* name, unsigned int port ) {
+        long address;
+
+        if( name && isdigit(name[0]) ) {
+          address = inet_addr(name);
+        } else {
+          hostent* host = gethostbyname(name);
+      
+          if( host && host->h_length ) {
+            address = *( (long*) host->h_addr );
+          }
+        }
+
+        struct sockaddr_in sa;
+
+        sa.sin_addr.s_addr = address;
+        sa.sin_port = htons(port);
+        sa.sin_family = AF_INET;
+        memset(&sa.sin_zero, 0, sizeof sa.sin_zero );
+
+        return sa;
+      }
+
+    public:
+      NetworkStream() : _socket(-1) {}
+      NetworkStream( socket_t s ) : _socket(s) {}
+      ~NetworkStream() {
         close();
+      }
+
+      std::string peer() {
+        struct sockaddr_in sa;
+        socklen_t addrlen = sizeof sa;
+        std::string result;
+
+        int error = ::getpeername( _socket, (struct sockaddr*) &sa, &addrlen );
+
+        if( !error ) {
+          hostent* he = ::gethostbyaddr( (const char*) &sa.sin_addr, sizeof sa.sin_addr.s_addr, AF_INET );
+
+          if( he->h_length ) {
+            return he->h_name;
+          }
+        }
+
+        return "unknown";
+      }
+
+      bool connect( const std::string& name, unsigned int port ) {
+        return connect(name.c_str(), port);
+      }
+
+      bool connect( const char* name, unsigned int port ) {
+        lemur_compat::initializeNetwork();
+
+        _socket = ::socket( AF_INET, SOCK_STREAM, 0 );
+        struct sockaddr_in sa = _getSockaddr( name, port );
+        int result = ::connect( _socket, (const sockaddr*) &sa, sizeof sa );
+
+        if( result ) {
+          close();
+        }
+
+        return !result;
+      }
+
+      void close() {
+        lemur_compat::closesocket( _socket );
+        _socket = -1;
+      }
+
+      int write( const void* buffer, size_t length ) {
+        return ::send( _socket, (const char*) buffer, int(length), 0 );
+      }
+
+      int read( void* buffer, size_t length ) {
+        return ::recv( _socket, (char*) buffer, int(length), 0 );
+      }
+
+      int blockingRead( void* buffer, size_t length ) {
+        size_t bytesRead = 0;
+        size_t chunkRead = 0;
+        int result;
+    
+        while( bytesRead < (int) length ) {
+          chunkRead = length - bytesRead;
+          result = read( (char*)buffer + bytesRead, chunkRead );
+
+          if( result <= 0 ) {
+            close();
+            return int(bytesRead);
+          }
+
+          bytesRead += result;
+        }
+
         return int(bytesRead);
       }
 
-      bytesRead += result;
-    }
+      int blockingWrite( const void* buffer, unsigned int length ) {
+        size_t bytesWritten = 0;
 
-    return int(bytesRead);
-  }
+        while( bytesWritten < (int) length ) {
+          size_t chunkWrite = length - bytesWritten;
+          int result = write( (const char*)buffer + bytesWritten, chunkWrite );
 
-  int blockingWrite( const void* buffer, unsigned int length ) {
-    size_t bytesWritten = 0;
+          if( result <= 0 ) {
+            close();
+            return int(bytesWritten);
+          }
 
-    while( bytesWritten < (int) length ) {
-      size_t chunkWrite = length - bytesWritten;
-      int result = write( (const char*)buffer + bytesWritten, chunkWrite );
+          bytesWritten += result;
+        }
 
-      if( result <= 0 ) {
-        close();
         return int(bytesWritten);
       }
 
-      bytesWritten += result;
-    }
-
-    return int(bytesWritten);
+      bool alive() {
+        return _socket != -1;
+      }
+    };
   }
-
-  bool alive() {
-    return _socket != -1;
-  }
-};
+}
 
 #endif // INDRI_NETWORKSTREAM_HPP

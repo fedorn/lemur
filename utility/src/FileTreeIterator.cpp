@@ -21,34 +21,34 @@
 #include <iostream>
 
 // static construction
-FileTreeIterator FileTreeIterator::_end;
+indri::file::FileTreeIterator indri::file::FileTreeIterator::_end;
 
-FileTreeIterator::FileTreeIterator() {
+indri::file::FileTreeIterator::FileTreeIterator() {
 }
 
-FileTreeIterator::FileTreeIterator( const std::string& path ) {
+indri::file::FileTreeIterator::FileTreeIterator( const std::string& path ) {
   _stack.push( new DirectoryIterator( path ) );
 
-  while( Path::isDirectory( *(*_stack.top()) ) ) {
-    _stack.push( new DirectoryIterator( **_stack.top() ) );
+  while( indri::file::Path::isDirectory( *(*_stack.top()) ) ) {
+    _stack.push( new indri::file::DirectoryIterator( **_stack.top() ) );
   }
 }
 
-FileTreeIterator::~FileTreeIterator() {
+indri::file::FileTreeIterator::~FileTreeIterator() {
   while( _stack.size() ) {
     delete _stack.top();
     _stack.pop();
   }
 }
 
-void FileTreeIterator::_nextCandidate() {
+void indri::file::FileTreeIterator::_nextCandidate() {
   // go to the next file.  If the current directory is complete,
   // go up levels until we find a directory with stuff left in it
   while( _stack.size() ) {
-    DirectoryIterator& top = (*_stack.top());
+    indri::file::DirectoryIterator& top = (*_stack.top());
     top++;
 
-    if( top == DirectoryIterator::end() ) {
+    if( top == indri::file::DirectoryIterator::end() ) {
       delete _stack.top();
       _stack.pop();
     } else {
@@ -57,57 +57,57 @@ void FileTreeIterator::_nextCandidate() {
   }
 }
 
-void FileTreeIterator::_next() {
+void indri::file::FileTreeIterator::_next() {
   _nextCandidate();
 
   // need to make sure we've found a file
   while( _stack.size() ) {
-    DirectoryIterator& top = (*_stack.top());
+    indri::file::DirectoryIterator& top = (*_stack.top());
     
-    if( top == DirectoryIterator::end() ) {
+    if( top == indri::file::DirectoryIterator::end() ) {
       _nextCandidate();
       continue;
     } 
 
-    if( Path::isFile( *top ) ) {
+    if( indri::file::Path::isFile( *top ) ) {
       // found a file, so we're done
       break;
     }
-    // have to recurse                                                              
-	// only if a directory
-    if ( Path::isDirectory( *top ) ) {
-      DirectoryIterator* child = new DirectoryIterator( *top );
+
+    // have to recurse
+    // only if a directory
+    if ( indri::file::Path::isDirectory( *top ) ) {
+      indri::file::DirectoryIterator* child = new indri::file::DirectoryIterator( *top );
       _stack.push(child);
     } else {
-      // bad things happening here, not a file, not a directory                       
-	  // perhaps a bad symlink, skip the entry                                        
-	  _nextCandidate();
+      // bad things happening here, not a file, not a directory
+      // perhaps a bad symlink, skip the entry
+      _nextCandidate();
     }
-
   }
 }
 
-void FileTreeIterator::operator ++ ( int ) {
+void indri::file::FileTreeIterator::operator ++ ( int ) {
   _next();
 }
 
-void FileTreeIterator::operator ++ () {
+void indri::file::FileTreeIterator::operator ++ () {
   _next();
 }
 
-const std::string& FileTreeIterator::operator* () {
+const std::string& indri::file::FileTreeIterator::operator* () {
   DirectoryIterator& top = (*_stack.top());
   return *top;
 }
 
-bool FileTreeIterator::operator== ( const FileTreeIterator& other ) const {
+bool indri::file::FileTreeIterator::operator== ( const indri::file::FileTreeIterator& other ) const {
   return ( &other == &_end ) && ( _stack.size() == 0 );
 }
 
-bool FileTreeIterator::operator!= ( const FileTreeIterator& other ) const {
+bool indri::file::FileTreeIterator::operator!= ( const indri::file::FileTreeIterator& other ) const {
   return ! this->operator== ( other );
 }
 
-const FileTreeIterator& FileTreeIterator::end() {
+const indri::file::FileTreeIterator& indri::file::FileTreeIterator::end() {
   return _end;
 }

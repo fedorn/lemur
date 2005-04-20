@@ -20,24 +20,24 @@
 #include "lemur-compat.hpp"
 #include "indri/Annotator.hpp"
 
-ExtentInsideNode::ExtentInsideNode( const std::string& name, ListIteratorNode* inner, ListIteratorNode* outer ) :
+indri::infnet::ExtentInsideNode::ExtentInsideNode( const std::string& name, ListIteratorNode* inner, ListIteratorNode* outer ) :
   _inner(inner),
   _outer(outer),
   _name(name)
 {
 }
 
-void ExtentInsideNode::prepare( int documentID ) {
+void indri::infnet::ExtentInsideNode::prepare( int documentID ) {
   _extents.clear();
 
   if( !_inner || !_outer )
     return;
 
-  const greedy_vector<Extent>& inExtents = _inner->extents();
-  const greedy_vector<Extent>& outExtents = _outer->extents();
+  const indri::utility::greedy_vector<indri::index::Extent>& inExtents = _inner->extents();
+  const indri::utility::greedy_vector<indri::index::Extent>& outExtents = _outer->extents();
 
-  greedy_vector<Extent>::const_iterator innerIter = inExtents.begin();
-  greedy_vector<Extent>::const_iterator outerIter = outExtents.begin();
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator innerIter = inExtents.begin();
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator outerIter = outExtents.begin();
 
   while( innerIter != inExtents.end() && outerIter != outExtents.end() ) {
     if( outerIter->contains( *innerIter ) ) {
@@ -51,19 +51,19 @@ void ExtentInsideNode::prepare( int documentID ) {
   }
 }
 
-const greedy_vector<Extent>& ExtentInsideNode::extents() {
+const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::ExtentInsideNode::extents() {
   return _extents;
 }
 
-int ExtentInsideNode::nextCandidateDocument() {
+int indri::infnet::ExtentInsideNode::nextCandidateDocument() {
   return lemur_compat::max( _inner->nextCandidateDocument(), _outer->nextCandidateDocument() );
 }
 
-const std::string& ExtentInsideNode::getName() const {
+const std::string& indri::infnet::ExtentInsideNode::getName() const {
   return _name;
 }
 
-void ExtentInsideNode::annotate( class Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::ExtentInsideNode::annotate( class Annotator& annotator, int documentID, int begin, int end ) {
   annotator.addMatches( _extents, this, documentID, begin, end );
   
   for( unsigned int i=0; i<_extents.size(); i++ ) {
@@ -71,3 +71,9 @@ void ExtentInsideNode::annotate( class Annotator& annotator, int documentID, int
     _outer->annotate( annotator, documentID, _extents[i].begin, _extents[i].end );
   }
 }
+
+void indri::infnet::ExtentInsideNode::indexChanged( indri::index::Index& index ) {
+  // do nothing
+}
+
+

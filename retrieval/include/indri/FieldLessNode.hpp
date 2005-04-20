@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -23,23 +23,31 @@
 #include "indri/greedy_vector"
 #include "lemur-platform.h"
 #include <string>
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class FieldLessNode : public ListIteratorNode {
+    private:
+      class FieldIteratorNode* _field;
+      indri::utility::greedy_vector<indri::index::Extent> _extents;
+      INT64 _constant;
+      std::string _name;
 
-class FieldLessNode : public ListIteratorNode {
-private:
-  class FieldIteratorNode* _field;
-  greedy_vector<Extent> _extents;
-  INT64 _constant;
-  std::string _name;
+    public:
+      FieldLessNode( const std::string& name, class FieldIteratorNode* iterator, INT64 constant );
 
-public:
-  FieldLessNode( const std::string& name, class FieldIteratorNode* iterator, INT64 constant );
+      void prepare( int documentID );
+      indri::utility::greedy_vector<indri::index::Extent>& extents();
+      int nextCandidateDocument();
+      void indexChanged( indri::index::Index& index );
 
-  void prepare( int documentID );
-  greedy_vector<Extent>& extents();
-  int nextCandidateDocument();
-  const std::string& getName() const;
-  void annotate( class Annotator& annotator, int documentID, int begin, int end );
-};
+      const std::string& getName() const;
+      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+    };
+  }
+}
 
 #endif // INDRI_FIELDLESSNODE_HPP
 

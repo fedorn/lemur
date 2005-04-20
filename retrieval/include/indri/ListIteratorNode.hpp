@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -22,18 +22,23 @@
 #include "indri/InferenceNetworkNode.hpp"
 #include "indri/Extent.hpp"
 #include <indri/greedy_vector>
+namespace indri
+{
+  namespace infnet 
+  {
+    class ListIteratorNode : public InferenceNetworkNode {
+    public:
+      /// sets up as much as we can with just the document ID
+      virtual void prepare( int documentID ) = 0;
 
-class ListIteratorNode : public InferenceNetworkNode {
-public:
-  /// sets up as much as we can with just the document ID
-  virtual void prepare( int documentID ) = 0;
+      /// returns a list of intervals describing positions of children
+      virtual const indri::utility::greedy_vector<indri::index::Extent>& extents() = 0;
 
-  /// returns a list of intervals describing positions of children
-  virtual const greedy_vector<Extent>& extents() = 0;
-
-  /// annotate any results from this node from position begin to position end
-  virtual void annotate( class Annotator& annotator, int documentID, int begin, int end ) = 0;
-};
+      /// annotate any results from this node from position begin to position end
+      virtual void annotate( class Annotator& annotator, int documentID, int begin, int end ) = 0;
+    };
+  }
+}
 
 #endif // INDRI_LISTNODE_HPP
 

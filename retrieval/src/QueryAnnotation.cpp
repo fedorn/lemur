@@ -22,24 +22,27 @@
 #include <set>
 #include <stack>
 #include "indri/QuerySpec.hpp"
-
+namespace indri
+{
+  namespace lang
+  {
 class QueryNodeBuilder : public indri::lang::Walker {
 private:
-  QueryAnnotationNode* _root;
-  std::map< indri::lang::Node*, QueryAnnotationNode* > _nodes;
-  std::stack< QueryAnnotationNode* > _stack;
+  indri::api::QueryAnnotationNode* _root;
+  std::map< indri::lang::Node*, indri::api::QueryAnnotationNode* > _nodes;
+  std::stack< indri::api::QueryAnnotationNode* > _stack;
 
 public:
   QueryNodeBuilder() : _root(0) {}
 
   void defaultBefore( indri::lang::Node* n ) {
-    std::map< indri::lang::Node*, QueryAnnotationNode* >::iterator iter = _nodes.find(n);
-    QueryAnnotationNode* next = 0;
+    std::map< indri::lang::Node*, indri::api::QueryAnnotationNode* >::iterator iter = _nodes.find(n);
+    indri::api::QueryAnnotationNode* next = 0;
 
     if( iter != _nodes.end() ) {
       next = iter->second;
     } else {
-      next = new QueryAnnotationNode;
+      next = new indri::api::QueryAnnotationNode;
       next->name = n->nodeName();
       next->queryText = n->queryText();
       next->type = n->typeName();
@@ -60,49 +63,52 @@ public:
     _stack.pop();
   }
 
-  QueryAnnotationNode* getRoot() {
+  indri::api::QueryAnnotationNode* getRoot() {
     return _root;
   }
 };
+  }
+}
 
-void delete_query_node( QueryAnnotationNode* node, std::set<QueryAnnotationNode*>& deleted ) {
+  
+void delete_query_node( indri::api::QueryAnnotationNode* node, std::set<indri::api::QueryAnnotationNode*>& deleted ) {
   // query tree may be a dag, so we have to be careful
   deleted.insert(node);
   
   for( unsigned int i=0; i<node->children.size(); i++ ) {
-    QueryAnnotationNode* child = node->children[i];
+    indri::api::QueryAnnotationNode* child = node->children[i];
     if( deleted.find(child) != deleted.end() )
       delete_query_node(node->children[i], deleted);
   }
 }
 
 
-QueryAnnotation::QueryAnnotation() :
+indri::api::QueryAnnotation::QueryAnnotation() :
   _queryTree(0)
 {
 }
 
-QueryAnnotation::~QueryAnnotation() {
-  std::set<QueryAnnotationNode*> deleted;
+indri::api::QueryAnnotation::~QueryAnnotation() {
+  std::set<indri::api::QueryAnnotationNode*> deleted;
   delete_query_node(_queryTree, deleted);
 }
 
-QueryAnnotation::QueryAnnotation( indri::lang::Node* queryRoot, EvaluatorNode::MResults& annotations, std::vector<ScoredExtentResult>& results ) {
-  QueryNodeBuilder builder;
+indri::api::QueryAnnotation::QueryAnnotation( indri::lang::Node* queryRoot, indri::infnet::EvaluatorNode::MResults& annotations, std::vector<indri::api::ScoredExtentResult>& results ) {
+  indri::lang::QueryNodeBuilder builder;
   queryRoot->walk(builder);
   _queryTree = builder.getRoot();
   _annotations = annotations;
   _results = results;
 }
 
-const QueryAnnotationNode* QueryAnnotation::getQueryTree() const {
+const indri::api::QueryAnnotationNode* indri::api::QueryAnnotation::getQueryTree() const {
   return _queryTree;
 }
 
-const std::vector<ScoredExtentResult>& QueryAnnotation::getResults() const {
+const std::vector<indri::api::ScoredExtentResult>& indri::api::QueryAnnotation::getResults() const {
   return _results;
 }
 
-const EvaluatorNode::MResults& QueryAnnotation::getAnnotations() const {
+const indri::infnet::EvaluatorNode::MResults& indri::api::QueryAnnotation::getAnnotations() const {
   return _annotations;
 }

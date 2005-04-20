@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -22,24 +22,31 @@
 #include "indri/ListIteratorNode.hpp"
 #include <vector>
 #include "indri/greedy_vector"
+namespace indri 
+{
+  namespace infnet
+  {
+    
+    class ExtentAndNode : public ListIteratorNode {
+    private:
+      std::vector<ListIteratorNode*> _children;
+      indri::utility::greedy_vector<indri::index::Extent> _extents;
+      indri::utility::greedy_vector<indri::index::Extent> _partialExtents;
+      std::string _name;
 
-class ExtentAndNode : public ListIteratorNode {
-private:
-  std::vector<ListIteratorNode*> _children;
-  greedy_vector<Extent> _extents;
-  greedy_vector<Extent> _partialExtents;
-  std::string _name;
+      void _and( indri::utility::greedy_vector<indri::index::Extent>& out, const indri::utility::greedy_vector<indri::index::Extent>& one, const indri::utility::greedy_vector<indri::index::Extent>& two );
 
-  void _and( greedy_vector<Extent>& out, const greedy_vector<Extent>& one, const greedy_vector<Extent>& two );
-
-public:
-  ExtentAndNode( const std::string& name, std::vector<ListIteratorNode*>& children );
-  void prepare( int documentID );
-  const greedy_vector<Extent>& extents();
-  int nextCandidateDocument();
-  const std::string& getName() const;
-  void annotate( class Annotator& annotator, int documentID, int begin, int end );
-};
+    public:
+      ExtentAndNode( const std::string& name, std::vector<ListIteratorNode*>& children );
+      void prepare( int documentID );
+      const indri::utility::greedy_vector<indri::index::Extent>& extents();
+      int nextCandidateDocument();
+      void indexChanged( indri::index::Index& index );
+      const std::string& getName() const;
+      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+    };
+  }
+}
 
 #endif //INDRI_EXTENTANDNODE_HPP
 

@@ -23,7 +23,7 @@
 #include "indri/TwoStageTermScoreFunction.hpp"
 #include "indri/Parameters.hpp"
 
-static void termscorefunctionfactory_parse( Parameters& converted, const std::string& spec );
+static void termscorefunctionfactory_parse( indri::api::Parameters& converted, const std::string& spec );
 
 //
 // Here's the place to add your own TermScoreFunction.
@@ -39,15 +39,15 @@ static void termscorefunctionfactory_parse( Parameters& converted, const std::st
 // it is finished with it.
 //
 
-TermScoreFunction* TermScoreFunctionFactory::get( const std::string& stringSpec, double collectionFrequency ) {
-  Parameters spec;
+indri::query::TermScoreFunction* indri::query::TermScoreFunctionFactory::get( const std::string& stringSpec, double collectionFrequency ) {
+  indri::api::Parameters spec;
   termscorefunctionfactory_parse( spec, stringSpec );
   std::string method = spec.get( "method", "dirichlet" );
 
   if( method == "dirichlet" || method == "d" || method == "dir" ) {
     // dirichlet -- takes parameter "mu"
     double mu = spec.get( "mu", 2500 );
-    return new DirichletTermScoreFunction( mu, collectionFrequency );
+    return new indri::query::DirichletTermScoreFunction( mu, collectionFrequency );
   } else if( method == "linear" || method == "jm" || method == "jelinek-mercer" ) {
     // jelinek-mercer -- can take parameters collectionLambda (or just lambda) and documentLambda
     double documentLambda = spec.get( "documentLambda", 0.0 );
@@ -58,20 +58,20 @@ TermScoreFunction* TermScoreFunctionFactory::get( const std::string& stringSpec,
     else
       collectionLambda = spec.get( "lambda", 0.4 );
 
-    return new JelinekMercerTermScoreFunction( collectionFrequency, collectionLambda, documentLambda );
+    return new indri::query::JelinekMercerTermScoreFunction( collectionFrequency, collectionLambda, documentLambda );
   } else if( method == "two" || method == "two-stage" || method == "twostage" ) {
     // twostage -- takes parameters mu and lambda
     double mu = spec.get( "mu", 2500 );
     double lambda = spec.get( "lambda", 0.4 );
     
-    return new TwoStageTermScoreFunction( mu, lambda, collectionFrequency );
+    return new indri::query::TwoStageTermScoreFunction( mu, lambda, collectionFrequency );
   }
 
   // if nothing else worked, we'll use dirichlet with mu=2500
-  return new DirichletTermScoreFunction( 2500, collectionFrequency );
+  return new indri::query::DirichletTermScoreFunction( 2500, collectionFrequency );
 }
 
-static void termscorefunctionfactory_parse( Parameters& converted, const std::string& spec ) {
+static void termscorefunctionfactory_parse( indri::api::Parameters& converted, const std::string& spec ) {
   int nextComma = 0;
   int nextColon = 0;
   int location = 0;

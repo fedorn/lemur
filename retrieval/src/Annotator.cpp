@@ -18,15 +18,15 @@
 
 #include "indri/Annotator.hpp"
 
-Annotator::Annotator( const std::string& name, BeliefNode* belief )
+indri::infnet::Annotator::Annotator( const std::string& name, BeliefNode* belief )
   :
   _name(name),
   _belief(belief)
 {
 }
 
-void Annotator::add( InferenceNetworkNode* node, int documentID, int begin, int end ) {
-  ScoredExtentResult a;
+void indri::infnet::Annotator::add( InferenceNetworkNode* node, int documentID, int begin, int end ) {
+  indri::api::ScoredExtentResult a;
 
   a.document = documentID;
   a.begin = begin;
@@ -36,7 +36,7 @@ void Annotator::add( InferenceNetworkNode* node, int documentID, int begin, int 
   _annotations[node->getName()].push_back(a);
 }
 
-void Annotator::addMatches( greedy_vector<Extent>& extents, InferenceNetworkNode* node, int documentID, int begin, int end ) {
+void indri::infnet::Annotator::addMatches( indri::utility::greedy_vector<indri::index::Extent>& extents, InferenceNetworkNode* node, int documentID, int begin, int end ) {
   for( size_t i=0; i<extents.size(); i++ ) {
     if( begin > extents[i].begin )
       continue;
@@ -48,22 +48,26 @@ void Annotator::addMatches( greedy_vector<Extent>& extents, InferenceNetworkNode
   }
 }
 
-void Annotator::evaluate( int documentID, int documentLength ) {
+void indri::infnet::Annotator::evaluate( int documentID, int documentLength ) {
   _belief->annotate( *this, documentID, 0, documentLength );
 }
 
-int Annotator::nextCandidateDocument() {
+int indri::infnet::Annotator::nextCandidateDocument() {
   return _belief->nextCandidateDocument();
 }
 
-EvaluatorNode::MResults& Annotator::getResults() {
+indri::infnet::EvaluatorNode::MResults& indri::infnet::Annotator::getResults() {
   return _annotations;
 }
 
-const std::string& Annotator::getName() const {
+const std::string& indri::infnet::Annotator::getName() const {
   return _name;
 }
 
-const EvaluatorNode::MResults& Annotator::getResults() const {
+const indri::infnet::EvaluatorNode::MResults& indri::infnet::Annotator::getResults() const {
   return _annotations;
+}
+
+void indri::infnet::Annotator::indexChanged( indri::index::Index& index ) {
+  // do nothing
 }

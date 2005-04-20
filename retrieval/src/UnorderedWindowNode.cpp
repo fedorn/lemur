@@ -19,21 +19,21 @@
 #include "indri/Annotator.hpp"
 #include <algorithm>
 
-UnorderedWindowNode::UnorderedWindowNode( const std::string& name, std::vector<ListIteratorNode*>& children ) :
+indri::infnet::UnorderedWindowNode::UnorderedWindowNode( const std::string& name, std::vector<indri::infnet::ListIteratorNode*>& children ) :
   _name(name),
   _children(children),
   _windowSize(-1) // unlimited window size
 {
 }
 
-UnorderedWindowNode::UnorderedWindowNode( const std::string& name, std::vector<ListIteratorNode*>& children, int windowSize ) :
+indri::infnet::UnorderedWindowNode::UnorderedWindowNode( const std::string& name, std::vector<indri::infnet::ListIteratorNode*>& children, int windowSize ) :
   _name(name),
   _children(children),
   _windowSize(windowSize)
 {
 }
 
-int UnorderedWindowNode::nextCandidateDocument() {
+int indri::infnet::UnorderedWindowNode::nextCandidateDocument() {
   int maxDocument = 0;
 
   for( unsigned int i=0; i<_children.size(); i++ ) {
@@ -64,15 +64,15 @@ int UnorderedWindowNode::nextCandidateDocument() {
 // as the first term.  That covers all possibilities.
 //
 
-void UnorderedWindowNode::prepare( int documentID ) {
+void indri::infnet::UnorderedWindowNode::prepare( int documentID ) {
   _extents.clear();
   assert( _children.size() >= 2 );
-  greedy_vector<term_position> allPositions;
+  indri::utility::greedy_vector<term_position> allPositions;
   int termsSeen = 0;
 
   // add every term position from every list
   for( unsigned int i=0; i<_children.size(); i++ ) {
-    const greedy_vector<Extent>& childPositions = _children[i]->extents();
+    const indri::utility::greedy_vector<indri::index::Extent>& childPositions = _children[i]->extents();
 
     if( childPositions.size() )
       termsSeen++;
@@ -84,6 +84,7 @@ void UnorderedWindowNode::prepare( int documentID ) {
       p.begin = childPositions[j].begin;
       p.end = childPositions[j].end;
       p.last = -1;
+      p.weight = childPositions[j].weight;
 
       allPositions.push_back( p );
     }
@@ -96,7 +97,7 @@ void UnorderedWindowNode::prepare( int documentID ) {
 
   // sort all positions by <begin> index
   std::sort( allPositions.begin(), allPositions.end() );
-  greedy_vector<int> lastPositions;
+  indri::utility::greedy_vector<int> lastPositions;
   lastPositions.resize(_children.size());
   std::fill( lastPositions.begin(), lastPositions.end(), -1 );
 
@@ -110,6 +111,7 @@ void UnorderedWindowNode::prepare( int documentID ) {
   for( int i=0; i<allPositions.size(); i++ ) {
     int termsFound = 1;
     unsigned int current;
+    double weight = 1;
 
     for( current=i+1; current < allPositions.size() && termsFound != _children.size(); current++ ) {
       if( (allPositions[current].end - allPositions[i].begin > _windowSize) && (_windowSize >= 0) )
@@ -119,24 +121,25 @@ void UnorderedWindowNode::prepare( int documentID ) {
       // then this is a new term for this window
       if( allPositions[current].last < i ) {
         termsFound++;
+        weight *= allPositions[current].weight;
       } 
     }
 
     if( termsFound == _children.size() ) {
-      _extents.push_back( Extent( allPositions[i].begin, allPositions[current-1].end ) );
+      _extents.push_back( indri::index::Extent( weight, allPositions[i].begin, allPositions[current-1].end ) );
     }
   }
 }
 
-const greedy_vector<Extent>& UnorderedWindowNode::extents() {
+const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::UnorderedWindowNode::extents() {
   return _extents;
 }
 
-const std::string& UnorderedWindowNode::getName() const {
+const std::string& indri::infnet::UnorderedWindowNode::getName() const {
   return _name;
 }
 
-void UnorderedWindowNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::UnorderedWindowNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
   annotator.addMatches( _extents, this, documentID, begin, end );
 
   for( size_t i=0; i<_extents.size(); i++ ) {
@@ -145,3 +148,8 @@ void UnorderedWindowNode::annotate( Annotator& annotator, int documentID, int be
     }
   }
 }
+
+void indri::infnet::UnorderedWindowNode::indexChanged( indri::index::Index& index ) {
+  // do nothing
+}
+

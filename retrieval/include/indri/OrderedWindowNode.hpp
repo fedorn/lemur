@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -39,28 +39,37 @@
 //    #2(george bush) matches "george w. bush" but not "george herbert walker bush"
 //    #2(george w bush) matches "george this w. that bush" but not "george w. this that bush"
 //
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class OrderedWindowNode : public ListIteratorNode {
+    private:
+      struct extents_pointer {
+        indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+        indri::utility::greedy_vector<indri::index::Extent>::const_iterator end;
+      };
+      int _windowSize;
+      std::vector<ListIteratorNode*> _children;
+      indri::utility::greedy_vector<indri::index::Extent> _extents;
+      std::vector<extents_pointer> _pointers;
+      std::string _name;
 
-class OrderedWindowNode : public ListIteratorNode {
-private:
-  struct extents_pointer {
-    greedy_vector<Extent>::const_iterator iter;
-    greedy_vector<Extent>::const_iterator end;
-  };
-  int _windowSize;
-  std::vector<ListIteratorNode*> _children;
-  greedy_vector<Extent> _extents;
-  std::vector<extents_pointer> _pointers;
-  std::string _name;
+    public:
+      OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children );
+      OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children, int windowSize );
 
-public:
-  OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children );
-  OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children, int windowSize );
-  int nextCandidateDocument();
-  void prepare( int documentID );
-  const greedy_vector<Extent>& extents();
-  const std::string& getName() const ;
-  void annotate( class Annotator& annotator, int documentID, int begin, int end );
-};
+      int nextCandidateDocument();
+      void indexChanged( indri::index::Index& index );
+
+      void prepare( int documentID );
+      const indri::utility::greedy_vector<indri::index::Extent>& extents();
+      const std::string& getName() const ;
+      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+    };
+  }
+}
 
 #endif // INDRI_ORDEREDWINDOWNODE_HPP
 

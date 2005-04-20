@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -30,137 +30,179 @@
 #include "indri/ParserFactory.hpp"
 #include "indri/FileClassEnvironmentFactory.hpp"
 #include <map>
+namespace indri 
+{
+  namespace api 
+  {
+    
+    struct IndexStatus {
+      enum action_code {
+        FileOpen,
+        FileSkip,
+        FileError,
+        FileClose,
+        DocumentCount
+      };
 
-struct IndexStatus {
-  enum action_code {
-    FileOpen,
-    FileSkip,
-    FileError,
-    FileClose,
-    DocumentCount
-  };
+      virtual void operator () ( int code, const std::string& documentPath, const std::string& error, int documentsIndexed, int documentsSeen ) {
+        status( code, documentPath, error, documentsIndexed, documentsSeen );
+      }
 
-  virtual void operator () ( int code, const std::string& documentPath, const std::string& error, int documentsIndexed, int documentsSeen ) {
-    status( code, documentPath, error, documentsIndexed, documentsSeen );
-  }
+      virtual void status( int code, const std::string& documentPath, const std::string& error, int documentsIndexed, int documentsSeen ) {};
+    };
 
-  virtual void status( int code, const std::string& documentPath, const std::string& error, int documentsIndexed, int documentsSeen ) {};
-};
+    /*! Principal class for interacting with Indri indexes during index 
+      construction. Provides the API for opening or creating an index and its
+      associated repository, setting indexing and text parsing parameters, and
+      adding documents to the repository.
+    */
+    class IndexEnvironment {
+    private:
+      IndexStatus* _callback;
+      Parameters* _options;
 
-/*! Principal class for interacting with Indri indexes during index 
-  construction. Provides the API for opening or creating an index and its
-  associated repository, setting indexing and text parsing parameters, and
-  adding documents to the repository.
-*/
-class IndexEnvironment {
-private:
-  IndexStatus* _callback;
-  Parameters* _options;
+      std::string _repositoryPath;
+      indri::collection::Repository _repository;
+      int _documents;
+      std::string _error;
 
-  std::string _repositoryPath;
-  Repository _repository;
-  int _documents;
-  std::string _error;
+      std::string _anchorTextRoot;
+      std::string _documentRoot;
 
-  std::string _anchorTextRoot;
-  std::string _documentRoot;
+      Parameters _parameters;
+      indri::parse::FileClassEnvironmentFactory _fileClassFactory;
 
-  Parameters _parameters;
-  FileClassEnvironmentFactory _fileClassFactory;
+      indri::parse::AnchorTextAnnotator _annotator;
+      std::map<std::string, indri::parse::FileClassEnvironment*> _environments;
 
-  AnchorTextAnnotator _annotator;
-  std::map<std::string, FileClassEnvironment*> _environments;
+      int _documentsIndexed;
+      int _documentsSeen;
 
-  int _documentsIndexed;
-  int _documentsSeen;
+      void _getParsingContext( indri::parse::Parser** parser,
+                               indri::parse::DocumentIterator** iterator,
+                               const std::string& extension );
 
-  void _getParsingContext( indri::Parser** parser,
-                           DocumentIterator** iterator,
-                           const std::string& extension );
+    public:
+      friend class QueryEnvironment;
 
-public:
-  IndexEnvironment();
-  ~IndexEnvironment();
-  /// Set document root path and anchor text root path.
-  /// @param documentRoot path to document root.
-  /// @param anchorTextRoot path to anchor text root.
-  void setAnchorTextPath( const std::string& documentRoot, const std::string& anchorTextRoot );
-  /// Add parsing information for a file class. Data for these parameters
-  /// is passed into the FileClassEnvironmentFactory
-  /// @param name name of this file class, eg trecweb
-  /// @param iterator document iterator for this file class
-  /// @param parser document tokenizer for this file class
-  /// @param startDocTag tag indicating start of a document
-  /// @param endDocTag tag indicating the end of a document
-  /// @param endMetadataTag tag indicating the end of the metadata fields
-  /// @param include default tags whose contents should be included in the index
-  /// @param exclude tags whose contents should be excluded from the index
-  /// @param index tags that should be forwarded to the index for tag extents
-  /// @param metadata tags whose contents should be indexed as metadata
-  /// @param conflations tags that should be conflated
-  void addFileClass( const std::string& name, 
-                     const std::string& iterator,
-                     const std::string& parser,
-                     const std::string& startDocTag,
-                     const std::string& endDogTag,
-                     const std::string& endMetadataTag,
-                     const std::vector<std::string>& include,
-                     const std::vector<std::string>& exclude,
-                     const std::vector<std::string>& index,
-                     const std::vector<std::string>& metadata, 
-                     const std::map<std::string,std::string>& conflations );
-  /// getthe named file class.
-  FileClassEnvironmentFactory::Specification *getFileClassSpec( const std::string& name) {
-    return _fileClassFactory.getFileClassSpec(name);
-  }
-  /// add a file class.
-  void addFileClass( const FileClassEnvironmentFactory::Specification &spec){
-    _fileClassFactory.addFileClass(spec);
-  }
+      IndexEnvironment();
+      ~IndexEnvironment();
+      /// Set document root path and anchor text root path.
+      /// @param documentRoot path to document root.
+      /// @param anchorTextRoot path to anchor text root.
+      void setAnchorTextPath( const std::string& documentRoot, const std::string& anchorTextRoot );
+      /// Add parsing information for a file class. Data for these parameters
+      /// is passed into the FileClassEnvironmentFactory
+      /// @param name name of this file class, eg trecweb
+      /// @param iterator document iterator for this file class
+      /// @param parser document tokenizer for this file class
+      /// @param startDocTag tag indicating start of a document
+      /// @param endDocTag tag indicating the end of a document
+      /// @param endMetadataTag tag indicating the end of the metadata fields
+      /// @param include default tags whose contents should be included in the index
+      /// @param exclude tags whose contents should be excluded from the index
+      /// @param index tags that should be forwarded to the index for tag extents
+      /// @param metadata tags whose contents should be indexed as metadata
+      /// @param conflations tags that should be conflated
+      void addFileClass( const std::string& name, 
+                         const std::string& iterator,
+                         const std::string& parser,
+                         const std::string& startDocTag,
+                         const std::string& endDogTag,
+                         const std::string& endMetadataTag,
+                         const std::vector<std::string>& include,
+                         const std::vector<std::string>& exclude,
+                         const std::vector<std::string>& index,
+                         const std::vector<std::string>& metadata, 
+                         const std::map<std::string,std::string>& conflations );
+      /// Get a named file class.
+      /// @param name The name of the file class to retrieve.
+      indri::parse::FileClassEnvironmentFactory::Specification *getFileClassSpec( const std::string& name) {
+        return _fileClassFactory.getFileClassSpec(name);
+      }
+      /// Add a file class.
+      /// @param spec The file class to add.
+      void addFileClass( const indri::parse::FileClassEnvironmentFactory::Specification &spec ){
+        _fileClassFactory.addFileClass(spec);
+      }
   
+      /// Set names of fields to be indexed.  This call indicates to the index that information about
+      /// these fields should be stored in the index so they can be used in queries.  This does not
+      /// affect whether or not the text in a particular field is stored in an index.
+      /// @see addFileClass
+      /// @param fieldNames the list of fields.
+      void setIndexedFields( const std::vector<std::string>& fieldNames );
+      void setNumericField( const std::string& fieldName, bool isNumeric );
+      /// Set names of metadata fields to be indexed for fast retrieval.
+      /// The forward fields are indexed in a B-Tree mapping (documentID, metadataValue).
+      /// If a field is not forward indexed, the documentMetadata calls will still work, but they
+      /// will be slower (the document has to be retrieved, decompressed and parsed to get the metadata back,
+      /// instead of just a B-Tree lookup).  The backward indexed fields store a mapping of (metadataValue, documentID).
+      /// If a field is not backward indexed, the documentIDsFromMetadata and documentFromMetadata calls will not work.
+      /// @param fieldNames the list of fields.
+      void setMetadataIndexedFields( const std::vector<std::string>& forwardFieldNames, const std::vector<std::string>& backwardFieldNames );
+      /// set the list of stopwords
+      /// @param stopwords the list of stopwords
+      void setStopwords( const std::vector<std::string>& stopwords );
+      /// set the stemmer to use
+      /// @param stemmer the stemmer to use. One of krovetz, porter
+      void setStemmer( const std::string& stemmer );
+      /// set the amount of memory to use for internal structures
+      /// @param memory the number of bytes to use.
+      void setMemory( UINT64 memory );
+      /// set normalization of case and some punctuation; default is true (normalize during indexing and at query time)
+      /// @param flag True, if text should be normalized, false otherwise.
+      void setNormalization( bool flag );
+      /// create a new index and repository
+      /// @param repositoryPath the path to the repository
+      /// @param callback IndexStatus object to be notified of indexing progress.
+      void create( const std::string& repositoryPath, IndexStatus* callback = 0 );
+      /// open an existing index and repository
+      /// @param repositoryPath the path to the repository
+      /// @param callback IndexStatus object to be notified of indexing progress.
+      void open( const std::string& repositoryPath, IndexStatus* callback = 0 );
+      /// close the index and repository
+      void close();
+  
+      /// Add the text in a file to the index and repository.  The fileClass of this file
+      /// will be chosen based on the file extension.  If the file has no extension, it will
+      /// be skipped.  Information about indexing progress will be passed to the callback.
+      /// @see setCallback()
+      /// @param fileName the file to add
+      void addFile( const std::string& fileName );
 
-  /// set names of fields to be indexed as data
-  /// @param fieldNames the list of fields.
-  void setIndexedFields( const std::vector<std::string>& fieldNames );
-  void setNumericField( const std::string& fieldName, bool isNumeric );
-  /// set names of fields to be indexed as metadata
-  /// @param fieldNames the list of fields.
-  void setMetadataIndexedFields( const std::vector<std::string>& fieldNames );
-  /// set the list of stopwords
-  /// @param stopwords the list of stopwords
-  void setStopwords( const std::vector<std::string>& stopwords );
-  /// set the stemmer to use
-  /// @param stemmer the stemmer to use. One of krovetz, porter
-  void setStemmer( const std::string& stemmer );
-  /// set the amount of memory to use for internal structures
-  /// @param memory the number of bytes to use.
-  void setMemory( UINT64 memory );
-  /// create a new index and repository
-  /// @param repositoryPath the path to the repository
-  /// @param callback IndexStatus object to be notified of indexing progress.
-  void create( const std::string& repositoryPath, IndexStatus* callback = 0 );
-  /// open an existing index and repository
-  /// @param repositoryPath the path to the repository
-  /// @param callback IndexStatus object to be notified of indexing progress.
-  void open( const std::string& repositoryPath, IndexStatus* callback = 0 );
-  /// close the index and repository
-  void close();
-  /// add a file to the index and repository
-  /// @param fileName the file to add
-  void addFile( const std::string& fileName );
-  /// add a file of the specified file class to the index and repository
-  /// @param fileName the file to add
-  /// @param fileClass the file class to add (eg trecweb).
-  void addFile( const std::string& fileName, const std::string& fileClass );
-  /// add a string to the index and repository
-  /// @param documentString the document to add
-  /// @param fileClass the file class to add (eg trecweb).
-  /// @param metadata the metadata pairs associated with the string.
-  void addString( const std::string& documentString, const std::string& fileClass, const std::vector<MetadataPair>& metadata );
-  /// add an already parsed document to the index and repository
-  /// @param document the document to add
-  void addParsedDocument( ParsedDocument* document );
-};
+      /// add a file of the specified file class to the index and repository
+      /// @param fileName the file to add
+      /// @param fileClass the file class to add (eg trecweb).
+      void addFile( const std::string& fileName, const std::string& fileClass );
+
+      /// Adds a string to the index and repository.  The documentString is assumed to contain the kind of
+      /// text that would be found in a file of type fileClass.
+      /// @param documentString the document to add
+      /// @param fileClass the file class to add (eg trecweb).
+      /// @param metadata the metadata pairs associated with the string.
+      int addString( const std::string& documentString, 
+                      const std::string& fileClass, 
+                      const std::vector<indri::parse::MetadataPair>& metadata );
+
+      /// add an already parsed document to the index and repository
+      /// @param document the document to add
+      int addParsedDocument( ParsedDocument* document );
+
+      /// Delete an existing document.
+      /// @param documentID The document to delete.
+      void deleteDocument( int documentID );
+
+      /// Returns the number of documents indexed so far in this session.
+      int documentsIndexed();
+
+      /// Returns the number of documents considered for indexing,
+      /// which is the sum of the documents indexed and the documents
+      /// skipped.
+      int documentsSeen();
+    };
+  }
+}
 
 #endif // INDRI_INDEXENVIRONMENT_HPP
 

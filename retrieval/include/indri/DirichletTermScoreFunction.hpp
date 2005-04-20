@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -20,29 +20,36 @@
 #define INDRI_DIRICHLETTERMSCOREFUNCTION_HPP
 
 #include <math.h>
+namespace indri
+{
+  /*! Query processing, smoothing, and scoring classes. */
+  namespace query
+  {
+    
+    class DirichletTermScoreFunction : public TermScoreFunction {
+    private:
+      double _mu;
+      double _collectionFrequency;
+      double _muTimesCollectionFrequency;
 
-class DirichletTermScoreFunction : public TermScoreFunction {
-private:
-  double _mu;
-  double _collectionFrequency;
-  double _muTimesCollectionFrequency;
+    public:
+      DirichletTermScoreFunction( double mu, double collectionFrequency ) {
+        _collectionFrequency = collectionFrequency;
+        _mu = mu;
+        _muTimesCollectionFrequency = _mu * _collectionFrequency;
+      }
 
-public:
-  DirichletTermScoreFunction( double mu, double collectionFrequency ) {
-    _collectionFrequency = collectionFrequency;
-    _mu = mu;
-    _muTimesCollectionFrequency = _mu * _collectionFrequency;
+      double scoreOccurrence( double occurrences, int contextSize ) {
+        double seen = ( double(occurrences) + _muTimesCollectionFrequency ) / ( double(contextSize) + _mu );
+        return log( seen );
+      }
+
+      double scoreOccurrence( double occurrences, int contextSize, double documentOccurrences, int documentLength ) {
+        // can't two-level smooth with dirichlet
+        return scoreOccurrence( occurrences, contextSize );
+      }
+    };
   }
-
-  double scoreOccurrence( int occurrences, int contextSize ) {
-    double seen = ( double(occurrences) + _muTimesCollectionFrequency ) / ( double(contextSize) + _mu );
-    return log( seen );
-  }
-
-  double scoreOccurrence( int occurrences, int contextSize, int documentOccurrences, int documentLength ) {
-    // can't two-level smooth with dirichlet
-    return scoreOccurrence( occurrences, contextSize );
-  }
-};
+}
 
 #endif // INDRI_DIRICHLETTERMSCOREFUNCTION_HPP

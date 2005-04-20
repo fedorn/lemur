@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -22,11 +22,17 @@
 #include "indri/Transformation.hpp"
 #include <string>
 #include "indri/Parameters.hpp"
-
-class StemmerFactory {
-public:
-  static Transformation* get( const std::string& stemmerName, Parameters& stemmerParams );
-  static std::string preferredName( const std::string& stemmerName );
-};
+namespace indri
+{
+  namespace parse
+  {
+    
+    class StemmerFactory {
+    public:
+      static Transformation* get( const std::string& stemmerName, indri::api::Parameters& stemmerParams );
+      static std::string preferredName( const std::string& stemmerName );
+    };
+  }
+}
 
 #endif // INDRI_STEMMERFACTORY_HPP

@@ -23,45 +23,45 @@
 #include <fstream>
 #include <iostream>
 
-StopperTransformation::StopperTransformation() :
+indri::parse::StopperTransformation::StopperTransformation() :
   _table( string_set_create() ),
   _handler(0)
 {
 }
 
-StopperTransformation::StopperTransformation( const std::vector<char*>& stopwords ) :
-  _table( string_set_create() ),
-  _handler(0)
-{
-  read( stopwords );
-}
-
-StopperTransformation::StopperTransformation( const std::vector<const char*>& stopwords ) :
+indri::parse::StopperTransformation::StopperTransformation( const std::vector<char*>& stopwords ) :
   _table( string_set_create() ),
   _handler(0)
 {
   read( stopwords );
 }
 
-StopperTransformation::StopperTransformation( const std::vector<std::string>& stopwords ) :
+indri::parse::StopperTransformation::StopperTransformation( const std::vector<const char*>& stopwords ) :
   _table( string_set_create() ),
   _handler(0)
 {
   read( stopwords );
 }
 
-StopperTransformation::StopperTransformation( Parameters& stopwords ) :
+indri::parse::StopperTransformation::StopperTransformation( const std::vector<std::string>& stopwords ) :
   _table( string_set_create() ),
   _handler(0)
 {
   read( stopwords );
 }
 
-StopperTransformation::~StopperTransformation() {
+indri::parse::StopperTransformation::StopperTransformation( indri::api::Parameters& stopwords ) :
+  _table( string_set_create() ),
+  _handler(0)
+{
+  read( stopwords );
+}
+
+indri::parse::StopperTransformation::~StopperTransformation() {
   string_set_delete( _table );
 }
 
-void StopperTransformation::read( const std::string& filename ) {
+void indri::parse::StopperTransformation::read( const std::string& filename ) {
   std::ifstream in;
 
   in.open( filename.c_str(), std::ios::in );
@@ -82,32 +82,32 @@ void StopperTransformation::read( const std::string& filename ) {
   in.close();
 }
 
-void StopperTransformation::read( const std::vector<std::string>& stopwords ) {
+void indri::parse::StopperTransformation::read( const std::vector<std::string>& stopwords ) {
   for( size_t i=0; i<stopwords.size(); i++ ) {
     string_set_add( stopwords[i].c_str(), _table );
   }
 }
 
-void StopperTransformation::read( const std::vector<const char*>& stopwords ) {
+void indri::parse::StopperTransformation::read( const std::vector<const char*>& stopwords ) {
   for( size_t i=0; i<stopwords.size(); i++ ) {
     string_set_add( stopwords[i], _table );
   }
 }
 
-void StopperTransformation::read( const std::vector<char*>& stopwords ) {
+void indri::parse::StopperTransformation::read( const std::vector<char*>& stopwords ) {
   for( size_t i=0; i<stopwords.size(); i++ ) {
     string_set_add( stopwords[i], _table );
   }
 }
 
-void StopperTransformation::read( Parameters& stopwords ) {
+void indri::parse::StopperTransformation::read( indri::api::Parameters& stopwords ) {
   for( int i=0; unsigned(i) < stopwords.size(); i++ ) {
     string_set_add( ( (std::string) stopwords[i] ).c_str(), _table );
   }
 }
 
-ParsedDocument* StopperTransformation::transform( ParsedDocument* document ) {
-  greedy_vector<char*>& terms = document->terms;
+indri::api::ParsedDocument* indri::parse::StopperTransformation::transform( indri::api::ParsedDocument* document ) {
+  indri::utility::greedy_vector<char*>& terms = document->terms;
 
   for( size_t i=0; i<terms.size(); i++ ) {
     if( terms[i] && string_set_lookup( terms[i], _table ) != 0 ) {
@@ -118,10 +118,10 @@ ParsedDocument* StopperTransformation::transform( ParsedDocument* document ) {
   return document;
 }
 
-void StopperTransformation::handle( ParsedDocument* document ) {
+void indri::parse::StopperTransformation::handle( indri::api::ParsedDocument* document ) {
   _handler->handle( transform(document) );
 }
 
-void StopperTransformation::setHandler( ObjectHandler<ParsedDocument>& handler ) {
+void indri::parse::StopperTransformation::setHandler( ObjectHandler<indri::api::ParsedDocument>& handler ) {
   _handler = &handler;
 }

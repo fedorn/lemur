@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -24,35 +24,41 @@
 #include "indri/UnparsedDocument.hpp"
 #include <string>
 #include <fstream>
+namespace indri
+{
+  namespace parse
+  {
+    
+    class TaggedDocumentIterator : public DocumentIterator {
+    private:
+      UnparsedDocument _document;
+      FILE* _in;
+      indri::utility::Buffer _buffer;
+      std::string _lastMetadataTag;
+      std::string _fileName;
 
-class TaggedDocumentIterator : public DocumentIterator {
-private:
-  UnparsedDocument _document;
-  FILE* _in;
-  Buffer _buffer;
-  std::string _lastMetadataTag;
-  std::string _fileName;
+      bool _readLine( char*& beginLine, size_t& lineLength );
 
-  bool _readLine( char*& beginLine, size_t& lineLength );
+      const char* _startDocTag;
+      const char* _endDocTag;
+      const char* _endMetadataTag;
 
-  const char* _startDocTag;
-  const char* _endDocTag;
-  const char* _endMetadataTag;
+      int _startDocTagLength;
+      int _endDocTagLength;
+      int _endMetadataTagLength;
 
-  int _startDocTagLength;
-  int _endDocTagLength;
-  int _endMetadataTagLength;
+    public:
+      TaggedDocumentIterator();
+      ~TaggedDocumentIterator();
 
-public:
-  TaggedDocumentIterator();
-  ~TaggedDocumentIterator();
-
-  void setTags( const char* startDoc, const char* endDoc, const char* endMetadata );
+      void setTags( const char* startDoc, const char* endDoc, const char* endMetadata );
   
-  void open( const std::string& filename );
-  void close();
+      void open( const std::string& filename );
+      void close();
 
-  UnparsedDocument* nextDocument();
-};
+      UnparsedDocument* nextDocument();
+    };
+  }
+}
 
 #endif // INDRI_TRECDOCUMENTITERATOR_HPP

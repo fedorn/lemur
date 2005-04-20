@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,29 +21,36 @@
 
 #include "indri/DirectoryIterator.hpp"
 #include <stack>
-/*! Provides iteration over a directory tree.
- */
-class FileTreeIterator {
-private:
-  static FileTreeIterator _end;
-  std::stack<DirectoryIterator*> _stack;
-  std::string _current;
+namespace indri
+{
+  namespace file
+  {
+    
+    /*! Provides iteration over a directory tree.
+     */
+    class FileTreeIterator {
+    private:
+      static FileTreeIterator _end;
+      std::stack<DirectoryIterator*> _stack;
+      std::string _current;
   
-  void _nextCandidate();
-  void _next();
+      void _nextCandidate();
+      void _next();
 
-public:
-  FileTreeIterator();
-  FileTreeIterator( const std::string& path );
-  ~FileTreeIterator();
+    public:
+      FileTreeIterator();
+      FileTreeIterator( const std::string& path );
+      ~FileTreeIterator();
 
-  void operator ++ (int);
-  void operator ++ ();
-  bool operator == ( const FileTreeIterator& other ) const;
-  bool operator != ( const FileTreeIterator& other ) const;
-  const std::string& operator* ();
+      void operator ++ (int);
+      void operator ++ ();
+      bool operator == ( const FileTreeIterator& other ) const;
+      bool operator != ( const FileTreeIterator& other ) const;
+      const std::string& operator* ();
 
-  static const FileTreeIterator& end();
-};
+      static const FileTreeIterator& end();
+    };
+  }
+}
 
 #endif // INDRI_FILETREEITERATOR_HPP

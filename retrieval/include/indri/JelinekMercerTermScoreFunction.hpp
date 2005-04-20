@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -20,51 +20,57 @@
 #define INDRI_JELINEKMERCERTERMSCOREFUNCTION_HPP
 
 #include <math.h>
-
-class JelinekMercerTermScoreFunction : public TermScoreFunction {
-private:
-  double _lambda;
-  double _backgroundLambda;
-  double _collectionFrequency;
-  double _collectionComponent;
-  double _oneLevelCollectionComponent;
-  double _contextLambda;
-  double _collectionLambda;
-  double _documentLambda;
-  double _foregroundLambda;
-
-public:
-  JelinekMercerTermScoreFunction( double collectionFrequency, double collectionLambda, double documentLambda = 0.0 ) {
-    _contextLambda = (1 - collectionLambda - documentLambda);
-    _collectionFrequency = collectionFrequency;
-    _collectionLambda = collectionLambda;
-    _documentLambda = documentLambda;
-    _foregroundLambda = _collectionLambda + _documentLambda;
-
-    assert( _documentLambda >= 0.0 && _documentLambda <= 1.0 );
-    assert( _collectionLambda >= 0.0 && _collectionLambda <= 1.0 );
-    assert( _contextLambda >= 0.0 && _contextLambda <= 1.0 );
+namespace indri
+{
+  namespace query
+  {
     
-    _collectionComponent = _collectionLambda * _collectionFrequency;
-  }
+    class JelinekMercerTermScoreFunction : public TermScoreFunction {
+    private:
+      double _lambda;
+      double _backgroundLambda;
+      double _collectionFrequency;
+      double _collectionComponent;
+      double _oneLevelCollectionComponent;
+      double _contextLambda;
+      double _collectionLambda;
+      double _documentLambda;
+      double _foregroundLambda;
 
-  double scoreOccurrence( int occurrences, int contextSize ) {
-    //
-    //             [                      occurrences                                             ]
-    // score = log [ foregroundLambda * ---------------  + collectionLambda * collectionFrequency ]
-    //             [                      contextSize                                             ]
-    //
+    public:
+      JelinekMercerTermScoreFunction( double collectionFrequency, double collectionLambda, double documentLambda = 0.0 ) {
+        _contextLambda = (1 - collectionLambda - documentLambda);
+        _collectionFrequency = collectionFrequency;
+        _collectionLambda = collectionLambda;
+        _documentLambda = documentLambda;
+        _foregroundLambda = _collectionLambda + _documentLambda;
 
-    double contextFrequency = contextSize ? double(occurrences) / double(contextSize) : 0.0;
-    return log( _foregroundLambda * contextFrequency + _collectionComponent );
-  }
+        assert( _documentLambda >= 0.0 && _documentLambda <= 1.0 );
+        assert( _collectionLambda >= 0.0 && _collectionLambda <= 1.0 );
+        assert( _contextLambda >= 0.0 && _contextLambda <= 1.0 );
+    
+        _collectionComponent = _collectionLambda * _collectionFrequency;
+      }
 
-  double scoreOccurrence( int occurrences, int contextSize, int documentOccurrences, int documentLength ) {
-    double contextFrequency = contextSize ? double(occurrences) / double(contextSize) : 0.0;
-    double documentFrequency = documentLength ? double(documentOccurrences) / double(documentLength) : 0.0;
-    return log( _contextLambda * contextFrequency + _documentLambda * documentFrequency + _collectionComponent );
+      double scoreOccurrence( double occurrences, int contextSize ) {
+        //
+        //             [                      occurrences                                             ]
+        // score = log [ foregroundLambda * ---------------  + collectionLambda * collectionFrequency ]
+        //             [                      contextSize                                             ]
+        //
+
+        double contextFrequency = contextSize ? occurrences / double(contextSize) : 0.0;
+        return log( _foregroundLambda * contextFrequency + _collectionComponent );
+      }
+
+      double scoreOccurrence( double occurrences, int contextSize, double documentOccurrences, int documentLength ) {
+        double contextFrequency = contextSize ? occurrences / double(contextSize) : 0.0;
+        double documentFrequency = documentLength ? documentOccurrences / double(documentLength) : 0.0;
+        return log( _contextLambda * contextFrequency + _documentLambda * documentFrequency + _collectionComponent );
+      }
+    };
   }
-};
+}
 
 #endif // INDRI_JELINEKMERCERTERMSCOREFUNCTION_HPP
 

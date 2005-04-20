@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,40 +21,46 @@
 
 #include "indri/Walker.hpp"
 #include "indri/QuerySpec.hpp"
+namespace indri
+{
+  namespace lang
+  {
+    
+    class RawScorerNodeExtractor : public indri::lang::Walker {
+    private:
+      std::vector<indri::lang::RawScorerNode*> _scorerNodes;
+      std::vector<indri::lang::Node*> _reachableNodes;
+      int _insideCount; // used unitialized
 
-class RawScorerNodeExtractor : public indri::lang::Walker {
-private:
-  std::vector<indri::lang::RawScorerNode*> _scorerNodes;
-  std::vector<indri::lang::Node*> _reachableNodes;
-  int _insideCount; // used unitialized
-
-public:
-  RawScorerNodeExtractor() : _insideCount(0) { }
+    public:
+      RawScorerNodeExtractor() : _insideCount(0) { }
   
-  void defaultBefore( indri::lang::Node* n ) {
-    if( _insideCount ) {
-      _reachableNodes.push_back(n);
-    }
-  }
+      void defaultBefore( indri::lang::Node* n ) {
+        if( _insideCount ) {
+          _reachableNodes.push_back(n);
+        }
+      }
 
-  void before( indri::lang::RawScorerNode* node ) {
-    _insideCount++;
-    _scorerNodes.push_back(node);
-    _reachableNodes.push_back(node);
-  }
+      void before( indri::lang::RawScorerNode* node ) {
+        _insideCount++;
+        _scorerNodes.push_back(node);
+        _reachableNodes.push_back(node);
+      }
 
-  void after( indri::lang::RawScorerNode* node ) {
-    _insideCount--;
-  }
+      void after( indri::lang::RawScorerNode* node ) {
+        _insideCount--;
+      }
 
-  std::vector<indri::lang::RawScorerNode*>& getScorerNodes() {
-    return _scorerNodes;
-  }
+      std::vector<indri::lang::RawScorerNode*>& getScorerNodes() {
+        return _scorerNodes;
+      }
 
-  std::vector<indri::lang::Node*>& getReachableNodes() {
-    return _reachableNodes;
+      std::vector<indri::lang::Node*>& getReachableNodes() {
+        return _reachableNodes;
+      }
+    };
   }
-};
+}
 
 #endif // INDRI_RAWSCORERNODEEXTRACTOR_HPP
 

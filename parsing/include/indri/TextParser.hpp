@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -27,32 +27,38 @@
 #include "indri/IndriParser.hpp"
 #include "indri/Buffer.hpp"
 #include "string-set.h"
-
-class TextParser : public indri::Parser {
-public:
-  TextParser();
-  ~TextParser();
+namespace indri
+{
+  namespace parse
+  {
+    
+    class TextParser : public Parser {
+    public:
+      TextParser();
+      ~TextParser();
   
-  ParsedDocument* parse( UnparsedDocument* document );
+      indri::api::ParsedDocument* parse( UnparsedDocument* document );
 
-  void handle( UnparsedDocument* document );
-  void setHandler( ObjectHandler<ParsedDocument>& h );
+      void handle( UnparsedDocument* document );
+      void setHandler( ObjectHandler<indri::api::ParsedDocument>& h );
 
-  void setTags( const std::vector<std::string>& include,
-                const std::vector<std::string>& exclude,
-                const std::vector<std::string>& index,
-                const std::vector<std::string>& metadata, 
-                const std::map<std::string, std::string>& conflations );
+      void setTags( const std::vector<std::string>& include,
+                    const std::vector<std::string>& exclude,
+                    const std::vector<std::string>& index,
+                    const std::vector<std::string>& metadata, 
+                    const std::map<std::string, std::string>& conflations );
 
-protected:
-  void writeToken(char* token);
-  void writeToken(char *token, int start, int end);
-  Buffer _termBuffer;
+    protected:
+      void writeToken(char* token);
+      void writeToken(char *token, int start, int end);
+      indri::utility::Buffer _termBuffer;
 
-private:
-  ObjectHandler<ParsedDocument>* _handler;
-  ParsedDocument _document;
-};
+    private:
+      ObjectHandler<indri::api::ParsedDocument>* _handler;
+      indri::api::ParsedDocument _document;
+    };
+  }
+}
 
 #endif // INDRI_TEXTPARSER_HPP
 

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,36 +21,42 @@
 
 #include <string.h>
 #include <ctype.h>
+namespace indri
+{
+  namespace parse
+  {
+    
+    struct MetadataPair {
+      const char* key;
+      const void* value;
+      int valueLength;
 
-struct MetadataPair {
-  const char* key;
-  const void* value;
-  int valueLength;
+      class key_equal {
+        const char* k;
 
-  class key_equal {
-    const char* k;
+      public:
+        key_equal( const char* key ) {
+          k = key;
+        }
 
-  public:
-    key_equal( const char* key ) {
-      k = key;
-    }
+        bool operator() ( const MetadataPair& pair ) {
+          return strcmp( k, pair.key ) == 0;
+        }
+      };
 
-    bool operator() ( const MetadataPair& pair ) {
-      return strcmp( k, pair.key ) == 0;
-    }
-  };
+      void stripValue() {
+        while( isspace( *(char*)value ) ) {
+          value = (char*)value + 1;
+          valueLength -= 1;
+        }
 
-  void stripValue() {
-    while( isspace( *(char*)value ) ) {
-      value = (char*)value + 1;
-      valueLength -= 1;
-    }
-
-    while( isspace( ((char*)value)[valueLength-2] ) ) {
-      valueLength -= 1;
-      ((char*)value)[valueLength-1] = 0;
-    }
+        while( isspace( ((char*)value)[valueLength-2] ) ) {
+          valueLength -= 1;
+          ((char*)value)[valueLength-1] = 0;
+        }
+      }
+    };
   }
-};
+}
 
 #endif // INDRI_METADATAPAIR_HPP

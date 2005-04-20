@@ -329,7 +329,6 @@ optional parameter with the default of no stopping.</dd>
 */
 
 #include "indri/Parameters.hpp"
-#include "indri/FileClassEnvironmentFactory.hpp"
 #include "indri/IndexEnvironment.hpp"
 #include <time.h>
 #include "indri/Path.hpp"
@@ -339,7 +338,12 @@ optional parameter with the default of no stopping.</dd>
 #include <map>
 #include "indri/IndriTimer.hpp"
 
-static IndriTimer g_timer;
+#include "indri/QueryEnvironment.hpp"
+#include "indri/Thread.hpp"
+#include "indri/SequentialWriteBuffer.hpp"
+
+#include <math.h>
+static indri::utility::IndriTimer g_timer;
 
 static void buildindex_start_time() {
   g_timer.start();
@@ -368,44 +372,42 @@ static void buildindex_print_event( std::string event ) {
   buildindex_print_event( event.c_str() );
 }
 
-class StatusMonitor : public IndexStatus {
+class StatusMonitor : public indri::api::IndexStatus {
   void operator() ( int code, const std::string& documentFile, const std::string& error, int documentsParsed, int documentsSeen ) {
     std::stringstream event;
 
     switch(code) {
-      case IndexStatus::FileOpen:
+      case indri::api::IndexStatus::FileOpen:
         event << "Opened " << documentFile;
         buildindex_print_event( event.str() ); 
         buildindex_print_status( "Documents: ", documentsParsed );
         break;
 
-      case IndexStatus::FileSkip:
+      case indri::api::IndexStatus::FileSkip:
         event << "Skipped " << documentFile;
         buildindex_print_event( event.str() ); 
         break;
 
-      case IndexStatus::FileError:
+      case indri::api::IndexStatus::FileError:
         event << "Error in " << documentFile << " : " << error;
         buildindex_print_event( event.str() ); 
         break;
 
       default:
-      case IndexStatus::DocumentCount:
-        if( !(documentsParsed % 50) )
+      case indri::api::IndexStatus::DocumentCount:
+        if( !(documentsParsed % 500) )
           buildindex_print_status( "Documents: ", documentsParsed );
-        
-        if( !(documentsParsed % 250) )
           buildindex_flush_status();
         break;
     }
   }
 };
 
-static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, Parameters p, const std::string& parameterName, const std::string* subName = 0 ) {
+static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, indri::api::Parameters p, const std::string& parameterName, const std::string* subName = 0 ) {
   if( !p.exists(parameterName) )
     return false;
 
-  Parameters slice = p[parameterName];
+  indri::api::Parameters slice = p[parameterName];
   
   for( int i=0; i<slice.size(); i++ ) {
     if( subName ) {
@@ -420,49 +422,55 @@ static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, Par
   return true;
 }
 
-bool augmentSpec(FileClassEnvironmentFactory::Specification *spec,
-		 std::vector<std::string> &fields,
-		 std::vector<std::string> &metadata) {
-  //add to index and metadata fields in spec if necessary. 
+static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification *spec,
+		                    std::vector<std::string>& fields,
+		                    std::vector<std::string>& metadataForward,
+                        std::vector<std::string>& metadataBackward ) {
+  // add to index and metadata fields in spec if necessary. 
   // return true if a field is changed.
   bool retval = false;
   
-  std::vector<std::string>::iterator i1, i2;
+  std::vector<std::string>::iterator i1;
   for (i1 = fields.begin(); i1 != fields.end(); i1++) {
-    for (i2 = spec->index.begin(); i2 != spec->index.end() && (*i1) != (*i2); 
-	 i2++);
-    if (i2 == spec->index.end()) {
+    // only add the field for indexing if it doesn't already exist
+    if( std::find( spec->index.begin(), spec->index.end(), (*i1) ) == spec->index.end() ) {
       std::cerr << "Adding " << (*i1) << " to " << spec->name << " as an indexed field" << std::endl;
       spec->index.push_back(*i1);
+
       // added a field, make sure it is indexable
       // only add include tags if there are some already.
       // if it is empty, *all* tags are included.
-      if (! spec->include.empty()) {
-	std::vector<std::string>::iterator i3;
-	for (i3 = spec->include.begin(); 
-	     i3 != spec->include.end() && (*i1) != (*i3); i3++);
-	if (i3 == spec->include.end()) {
-	  spec->include.push_back(*i1);
-	  std::cerr << "Adding " << (*i1) << " to " << spec->name << " as an included tag" << std::endl;
-	}
+      if( !spec->include.empty() ) {
+        // only add the tag if it hasn't already been added
+        if( std::find( spec->include.begin(), spec->include.end(), (*i1) ) == spec->include.end() ) {
+          spec->include.push_back(*i1);
+          std::cerr << "Adding " << (*i1) << " to " << spec->name << " as an included tag" << std::endl;
+        }
       }
       retval = true;
     }
   }
   
-  for (i1 = metadata.begin(); i1 != metadata.end(); i1++) {
-    for (i2 = spec->metadata.begin(); 
-	 i2 != spec->metadata.end() && (*i1) != (*i2); i2++);
-    if (i2 == spec->metadata.end()) {
+  for (i1 = metadataForward.begin(); i1 != metadataForward.end(); i1++) {
+    if( std::find( spec->metadata.begin(), spec->metadata.end(), (*i1) ) == spec->index.end() ) {
       std::cerr << "Adding " << (*i1) << " to " << spec->name << " as a metadata field" << std::endl;
       spec->metadata.push_back(*i1);
       retval = true;
     }
   }
+
+  for (i1 = metadataBackward.begin(); i1 != metadataBackward.end(); i1++) {
+    if( std::find( spec->metadata.begin(), spec->metadata.end(), (*i1) ) == spec->index.end() ) {
+      std::cerr << "Adding " << (*i1) << " to " << spec->name << " as a metadata field" << std::endl;
+      spec->metadata.push_back(*i1);
+      retval = true;
+    }
+  }
+
   return retval;
 }
 
-void require_parameter( const char* name, Parameters& p ) {
+void require_parameter( const char* name, indri::api::Parameters& p ) {
   if( !p.exists( name ) ) {
     LEMUR_THROW( LEMUR_MISSING_PARAMETER_ERROR, "Must specify a " + name + " parameter." );
   }
@@ -470,14 +478,14 @@ void require_parameter( const char* name, Parameters& p ) {
 
 int main(int argc, char * argv[]) {
   try {
-    Parameters& parameters = Parameters::instance();
+    indri::api::Parameters& parameters = indri::api::Parameters::instance();
     parameters.loadCommandLine( argc, argv );
 
     require_parameter( "corpus", parameters );
     require_parameter( "index", parameters );
 
     StatusMonitor monitor;
-    IndexEnvironment env;
+    indri::api::IndexEnvironment env;
     std::string repositoryPath = parameters["index"];
 
     buildindex_start_time();
@@ -495,16 +503,19 @@ int main(int argc, char * argv[]) {
     if( copy_parameters_to_string_vector( stopwords, parameters, "stopper.word" ) )
       env.setStopwords(stopwords);
     
-    std::vector<std::string> metadata;
-    if( copy_parameters_to_string_vector( metadata, parameters, "metadata.field" ) )
-      env.setMetadataIndexedFields( metadata );
+    std::vector<std::string> metadataForward;
+    std::vector<std::string> metadataBackward;
+    
+    copy_parameters_to_string_vector( metadataForward, parameters, "metadata.forward" ); 
+    copy_parameters_to_string_vector( metadataBackward, parameters, "metadata.backward" );
+      env.setMetadataIndexedFields( metadataForward, metadataBackward );
     
     std::vector<std::string> fields;
     std::string subName = "name";
     if( copy_parameters_to_string_vector( fields, parameters, "field", &subName ) )
       env.setIndexedFields(fields);
 
-    if( Repository::exists( repositoryPath ) ) {
+    if( indri::collection::Repository::exists( repositoryPath ) ) {
       env.open( repositoryPath, &monitor );
       buildindex_print_event( std::string() + "Opened repository " + repositoryPath );
     } else {
@@ -512,33 +523,34 @@ int main(int argc, char * argv[]) {
       buildindex_print_event( std::string() + "Created repository " + repositoryPath );
     }
 
-    Parameters corpus = parameters["corpus"];
+    indri::api::Parameters corpus = parameters["corpus"];
 
     for( unsigned int i=0; i<corpus.size(); i++ ) {
-      Parameters thisCorpus = corpus[i];
+      indri::api::Parameters thisCorpus = corpus[i];
       require_parameter( "path", thisCorpus );
       std::string corpusPath = thisCorpus["path"];
       std::string fileClass = thisCorpus.get("class", "");
+      
       // augment field/metadata tags in the environment if needed.
-      if (fileClass.length()) {
-	FileClassEnvironmentFactory::Specification *spec = env.getFileClassSpec(fileClass);
-	if (spec) {
-	  // add fields if necessary, only update if changed.
-	  if (augmentSpec(spec, fields, metadata)) 
-	    env.addFileClass(*spec);
-	  delete(spec);
-	}
+      if( fileClass.length() ) {
+        indri::parse::FileClassEnvironmentFactory::Specification *spec = env.getFileClassSpec(fileClass);
+	      if( spec ) {
+          // add fields if necessary, only update if changed.
+          if( augmentSpec( spec, fields, metadataForward, metadataBackward ) ) 
+            env.addFileClass(*spec);
+          delete(spec);
+        }
       }
       
-      bool isDirectory = Path::isDirectory( corpusPath );
+      bool isDirectory = indri::file::Path::isDirectory( corpusPath );
       
       std::string anchorText = thisCorpus.get("inlink", "");
       env.setAnchorTextPath( corpusPath, anchorText );
 
       if( isDirectory ) {
-        FileTreeIterator files( corpusPath );
+        indri::file::FileTreeIterator files( corpusPath );
 
-        for( ; files != FileTreeIterator::end(); files++ ) {
+        for( ; files != indri::file::FileTreeIterator::end(); files++ ) {
           if( fileClass.length() )
             env.addFile( *files, fileClass );
           else

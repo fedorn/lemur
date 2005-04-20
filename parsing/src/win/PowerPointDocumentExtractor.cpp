@@ -39,7 +39,7 @@
 // copy_bstr_to_buffer
 //
 
-void copy_bstr_to_buffer( Buffer& docBuffer, BSTR bstr ) {
+void copy_bstr_to_buffer( indri::utility::Buffer& docBuffer, BSTR bstr ) {
   UINT textLength = ((UINT*)bstr)[-1];
   
   if( !textLength )
@@ -181,13 +181,13 @@ void com_property_put( VARIANT* result, IDispatch* dispatch, LPOLESTR name, VARI
   }
 }
 
-PowerPointDocumentExtractor::PowerPointDocumentExtractor() {
+indri::parse::PowerPointDocumentExtractor::PowerPointDocumentExtractor() {
   ::CoInitialize( NULL );
 
   HRESULT hr;
   VARIANT result;
-	CLSID pptClsid;
-	CLSIDFromProgID( L"PowerPoint.Application", &pptClsid );  
+  CLSID pptClsid;
+  CLSIDFromProgID( L"PowerPoint.Application", &pptClsid );  
 
   hr = ::CoCreateInstance( pptClsid,
                            NULL,
@@ -218,13 +218,13 @@ PowerPointDocumentExtractor::PowerPointDocumentExtractor() {
   _documentWaiting = false;
 }
 
-PowerPointDocumentExtractor::~PowerPointDocumentExtractor() {
+indri::parse::PowerPointDocumentExtractor::~PowerPointDocumentExtractor() {
   _presentationsDispatch->Release();
   _powerPointDispatch->Release();
   _powerPointUnknown->Release();
 }
 
-void PowerPointDocumentExtractor::open( const std::string& filename ) {
+void indri::parse::PowerPointDocumentExtractor::open( const std::string& filename ) {
   HRESULT hr;
   VARIANT result;
 
@@ -334,7 +334,7 @@ void PowerPointDocumentExtractor::open( const std::string& filename ) {
   slidesDispatch->Release();
 
   // add metadata to identify this file
-  MetadataPair pair;
+  indri::parse::MetadataPair pair;
 
   _unparsedDocument.metadata.clear();
 
@@ -362,7 +362,7 @@ void PowerPointDocumentExtractor::open( const std::string& filename ) {
   _documentWaiting = true;
 }
 
-UnparsedDocument* PowerPointDocumentExtractor::nextDocument() {
+indri::parse::UnparsedDocument* indri::parse::PowerPointDocumentExtractor::nextDocument() {
   if( _documentWaiting ) {
     _documentWaiting = false;
     return &_unparsedDocument;
@@ -370,6 +370,6 @@ UnparsedDocument* PowerPointDocumentExtractor::nextDocument() {
   return 0;
 }
 
-void PowerPointDocumentExtractor::close() {
+void indri::parse::PowerPointDocumentExtractor::close() {
 }
 #endif

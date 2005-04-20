@@ -21,7 +21,7 @@
 #include <fstream>
 #include "Exception.hpp"
 
-void PriorFactory::_readPriorFile( prior_data& data, const std::string& fileName ) {
+void indri::query::PriorFactory::_readPriorFile( prior_data& data, const std::string& fileName ) {
   // open a prior file
   std::ifstream in;
   in.open( fileName.c_str(), std::ifstream::in );
@@ -63,7 +63,7 @@ void PriorFactory::_readPriorFile( prior_data& data, const std::string& fileName
   in.close();
 }
 
-void PriorFactory::_readParamValues( prior_data& data, Parameters& range ) {
+void indri::query::PriorFactory::_readParamValues( prior_data& data, indri::api::Parameters& range ) {
   for( size_t j=0; j<range.size(); j++ ) {
     indri::lang::PriorNode::tuple_type t;
 
@@ -75,22 +75,22 @@ void PriorFactory::_readParamValues( prior_data& data, Parameters& range ) {
   }
 }
 
-PriorFactory::PriorFactory() 
+indri::query::PriorFactory::PriorFactory() 
 {
 }
 
-PriorFactory::PriorFactory( Parameters& parameters ) :
+indri::query::PriorFactory::PriorFactory( indri::api::Parameters& parameters ) :
   _parameters(parameters)
 {
   initialize();
 }
 
-void PriorFactory::initialize( ) {
+void indri::query::PriorFactory::initialize( ) {
   if( _parameters.exists( "prior" ) ) {
-    Parameters priors = _parameters["prior"];
+    indri::api::Parameters priors = _parameters["prior"];
 
     for( size_t i=0; i<priors.size(); i++ ) {
-      Parameters prior = priors[i];
+      indri::api::Parameters prior = priors[i];
       std::string paramName = prior["name"];
 
       prior_data data;
@@ -100,7 +100,7 @@ void PriorFactory::initialize( ) {
         std::string filename = prior["file"];
         _readPriorFile( data, filename );
       } else if( prior.exists( "range" ) ) {
-        Parameters range = priors["range"];
+        indri::api::Parameters range = priors["range"];
         _readParamValues( data, range );
       }
 
@@ -109,7 +109,7 @@ void PriorFactory::initialize( ) {
   }
 }
 
-indri::lang::PriorNode* PriorFactory::create( const std::string& name ) {
+indri::lang::PriorNode* indri::query::PriorFactory::create( const std::string& name ) {
   // look up the prior and return it if it exists
   if( _data.find( name ) != _data.end() ) {
     return new indri::lang::PriorNode( _data[name].field, _data[name].tuples );

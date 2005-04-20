@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // RMExpander
@@ -25,12 +25,18 @@
 #include "indri/QueryExpander.hpp"
 #include "indri/QueryEnvironment.hpp"
 #include "indri/Parameters.hpp"
+namespace indri
+{
+  namespace query
+  {
+    
+    class RMExpander : public QueryExpander  {
+    public:
+      RMExpander( indri::api::QueryEnvironment * env , indri::api::Parameters& param );
 
-class RMExpander : public QueryExpander  {
-public:
-  RMExpander( QueryEnvironment * env , Parameters& param );
-
-  virtual std::string expand( std::string originalQuery , std::vector<ScoredExtentResult>& results );
-};
+      virtual std::string expand( std::string originalQuery , std::vector<indri::api::ScoredExtentResult>& results );
+    };
+  }
+}
 
 #endif

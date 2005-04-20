@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -22,24 +22,30 @@
 #include "indri/XMLNode.hpp"
 #include <string>
 #include <map>
+namespace indri
+{
+  namespace xml
+  {
+    
+    class XMLWriter {
+    private:
+      XMLNode* _node;
 
-class XMLWriter {
-private:
-  XMLNode* _node;
+      void _writeChar( char ch, std::string& output ) const;
+      void _writeTabs( int tabs, std::string& output ) const;
+      void _writeTag( const std::string& tag,
+                      const std::map<std::string,std::string>& attributes,
+                      std::string& output,
+                      bool opening ) const;
+      void _writeEndOfLine( std::string& output ) const;
+      void _writeXML( int tabs, const XMLNode* node, std::string& output ) const;
 
-  void _writeChar( char ch, std::string& output ) const;
-  void _writeTabs( int tabs, std::string& output ) const;
-  void _writeTag( const std::string& tag,
-    const std::map<std::string,std::string>& attributes,
-    std::string& output,
-    bool opening ) const;
-  void _writeEndOfLine( std::string& output ) const;
-  void _writeXML( int tabs, const XMLNode* node, std::string& output ) const;
-
-public:
-  XMLWriter( XMLNode* node ); 
-  void write( std::string& output );
-};
+    public:
+      XMLWriter( XMLNode* node ); 
+      void write( std::string& output );
+    };
+  }
+}
 
 #endif // MONITOR_XMLWRITER_H
 

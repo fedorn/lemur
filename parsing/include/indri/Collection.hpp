@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,12 +21,19 @@
 
 #include "indri/ObjectHandler.hpp"
 #include "indri/ParsedDocument.hpp"
-
-class Collection {
-public:
-  virtual ~Collection() {};
-  virtual void addDocument( int documentID, ParsedDocument* document ) = 0;
-  virtual ParsedDocument* retrieve( int documentID ) = 0;
-};
+namespace indri
+{
+  /*! Collection element classes */
+  namespace collection
+  {
+    
+    class Collection {
+    public:
+      virtual ~Collection() {};
+      virtual void addDocument( int documentID, indri::api::ParsedDocument* document ) = 0;
+      virtual indri::api::ParsedDocument* retrieve( int documentID ) = 0;
+    };
+  }
+}
 
 #endif // INDRI_COLLECTION_HPP

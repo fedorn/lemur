@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // SimpleCopier
@@ -22,26 +22,32 @@
 #define INDRI_SIMPLECOPIER_HPP
 
 #include "Copier.hpp"
+namespace indri
+{
+  namespace lang
+  {
+    
+    class SimpleCopier : public indri::lang::Copier {
+    private:
+      std::vector<indri::lang::Node*> _nodes;
 
-class SimpleCopier : public indri::lang::Copier {
-private:
-  std::vector<indri::lang::Node*> _nodes;
+    public:
+      ~SimpleCopier() {
+        indri::utility::delete_vector_contents( _nodes );
+      }
 
-public:
-  ~SimpleCopier() {
-    delete_vector_contents( _nodes );
+      indri::lang::Node* defaultAfter( indri::lang::Node* oldNode, indri::lang::Node* newNode ) {
+        _nodes.push_back(newNode);
+        return newNode;
+      }
+
+      indri::lang::Node* root() {
+        if( _nodes.size() )
+          return _nodes.back();
+        return 0;
+      }
+    };
   }
-
-  indri::lang::Node* defaultAfter( indri::lang::Node* oldNode, indri::lang::Node* newNode ) {
-    _nodes.push_back(newNode);
-    return newNode;
-  }
-
-  indri::lang::Node* root() {
-    if( _nodes.size() )
-      return _nodes.back();
-    return 0;
-  }
-};
+}
 
 #endif // INDRI_SIMPLECOPIER_HPP

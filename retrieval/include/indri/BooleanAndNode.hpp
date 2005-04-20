@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // BooleanAndNode
@@ -23,21 +23,28 @@
 #include "lemur-platform.h"
 #include <vector>
 #include <string>
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class BooleanAndNode : public ListIteratorNode {
+      std::vector<ListIteratorNode*> _lists;
+      std::string _name;
+      indri::utility::greedy_vector<indri::index::Extent> _extents;
 
-class BooleanAndNode : public ListIteratorNode {
-  std::vector<ListIteratorNode*> _lists;
-  std::string _name;
-  greedy_vector<Extent> _extents;
+    public:
+      BooleanAndNode( const std::string& name, std::vector<ListIteratorNode*>& children );
 
-public:
-  BooleanAndNode( const std::string& name, std::vector<ListIteratorNode*>& children );
-
-  void prepare( int documentID );
-  greedy_vector<Extent>& extents();
-  int nextCandidateDocument();
-  const std::string& getName() const;
-  void annotate( class Annotator& annotator, int documentID, int begin, int end );
-};
+      void prepare( int documentID );
+      indri::utility::greedy_vector<indri::index::Extent>& extents();
+      int nextCandidateDocument();
+      void indexChanged( indri::index::Index& index );
+      const std::string& getName() const;
+      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+    };
+  }
+}
 
 #endif // INDRI_BOOLEANANDNODE_HPP
 

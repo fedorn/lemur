@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // NotNode
@@ -21,24 +21,34 @@
 #include "indri/BeliefNode.hpp"
 #include "indri/greedy_vector"
 #include <string>
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class NotNode : public BeliefNode {
+    private:
+      BeliefNode* _child;
+      indri::utility::greedy_vector<indri::api::ScoredExtentResult> _extents;
+      indri::utility::greedy_vector<bool> _matches;
+      std::string _name;
 
-class NotNode : public BeliefNode {
-private:
-  BeliefNode* _child;
-  greedy_vector<ScoredExtentResult> _extents;
-  std::string _name;
+    public:
+      NotNode( const std::string& name, BeliefNode* child );
 
-public:
-  NotNode( const std::string& name, BeliefNode* child );
+      double maximumBackgroundScore();
+      double maximumScore();
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int start, int end, int documentLength );
+      bool hasMatch( int documentID );
+const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
 
-  double maximumBackgroundScore();
-  double maximumScore();
-  const greedy_vector<ScoredExtentResult>& score( int documentID, int start, int end, int documentLength );
-  bool hasMatch( int documentID );
-  void annotate( class Annotator& annotator, int documentID, int begin, int end );
+      void annotate( class Annotator& annotator, int documentID, int begin, int end );
   
-  int nextCandidateDocument();
-  const std::string& getName() const; 
-};
+      int nextCandidateDocument();
+      void indexChanged( indri::index::Index& index );
+      const std::string& getName() const; 
+    };
+  }
+}
 
 #endif // INDRI_NOTNODE_HPP

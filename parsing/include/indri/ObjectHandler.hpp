@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -18,12 +18,18 @@
 
 #ifndef INDRI_OBJECTHANDLER_HPP
 #define INDRI_OBJECTHANDLER_HPP
-
-template<class _Type>
-class ObjectHandler {
-public:
-  virtual ~ObjectHandler() {};
-  virtual void handle( _Type* object ) = 0;
-};
+namespace indri
+{
+  namespace parse
+  {
+    
+    template<class _Type>
+    class ObjectHandler {
+    public:
+      virtual ~ObjectHandler() {};
+      virtual void handle( _Type* object ) = 0;
+    };
+  }
+}
 
 #endif // INDRI_OBJECTHANDLER_HPP

@@ -18,60 +18,65 @@
 
 #include "indri/FieldIteratorNode.hpp"
 #include "indri/FieldListIterator.hpp"
+#include "indri/InferenceNetwork.hpp"
 #include "indri/Annotator.hpp"
 
-FieldIteratorNode::FieldIteratorNode( const std::string& name, indri::index::FieldListIterator* field ) :
-  _field(field),
-  _name(name)
+indri::infnet::FieldIteratorNode::FieldIteratorNode( const std::string& name, InferenceNetwork& network, int listID ) :
+  _name(name),
+  _network(network),
+  _listID(listID)
 {
-  if( _field ) {
-    _field->startIteration();
-    _field->nextEntry();
-  }
 }
 
-void FieldIteratorNode::prepare( int documentID ) {
+void indri::infnet::FieldIteratorNode::indexChanged( indri::index::Index& index ) {
+  _list = _network.getFieldIterator( _listID );
+
+  if( _list )
+    _list->startIteration();
+}
+
+void indri::infnet::FieldIteratorNode::prepare( int documentID ) {
   _extents.clear();
   _numbers.clear();
 
-  if( !_field )
+  if( !_list )
     return;
 
-  const indri::index::FieldExtentInfo* info = _field->currentEntry();
+  const indri::index::DocExtentListIterator::DocumentExtentData* info = _list->currentEntry();
 
-  if( info && info->documentID == documentID ) {
+  if( info && info->document == documentID ) {
     _extents = info->extents;
     _numbers = info->numbers;
   }
 }
 
 /// returns a list of intervals describing positions of children
-const greedy_vector<Extent>& FieldIteratorNode::extents() {
+const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::FieldIteratorNode::extents() {
   return _extents;
 }
 
-const greedy_vector<INT64>& FieldIteratorNode::numbers() {
+const indri::utility::greedy_vector<INT64>& indri::infnet::FieldIteratorNode::numbers() {
   return _numbers;
 }
 
-int FieldIteratorNode::nextCandidateDocument() {
-  if( !_field )
+int indri::infnet::FieldIteratorNode::nextCandidateDocument() {
+  if( !_list )
     return MAX_INT32;
 
-  const indri::index::FieldExtentInfo* info = _field->currentEntry();
+  const indri::index::DocExtentListIterator::DocumentExtentData* info = _list->currentEntry();
 
   if( !info ) {
     return MAX_INT32;
   } else {
-    return info->documentID;
+    return info->document;
   }
 }
 
-const std::string& FieldIteratorNode::getName() const {
+const std::string& indri::infnet::FieldIteratorNode::getName() const {
   return _name;
 }
 
-void FieldIteratorNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::FieldIteratorNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
   annotator.addMatches( _extents, this, documentID, begin, end );
 }
 

@@ -19,6 +19,8 @@ namespace indri {
       virtual void after( class Field* n );
       virtual void before( class ExtentInside* n );
       virtual void after( class ExtentInside* n );
+      virtual void before( class WeightedExtentOr* n );
+      virtual void after( class WeightedExtentOr* n );
       virtual void before( class ExtentOr* n );
       virtual void after( class ExtentOr* n );
       virtual void before( class ExtentAnd* n );
@@ -65,10 +67,14 @@ namespace indri {
       virtual void after( class WeightNode* n );
       virtual void before( class ExtentRestriction* n );
       virtual void after( class ExtentRestriction* n );
+      virtual void before( class FixedPassage* n );
+      virtual void after( class FixedPassage* n );
       virtual void before( class FilterNode* n );
       virtual void after( class FilterNode* n );
       virtual void before( class ContextCounterNode* n );
       virtual void after( class ContextCounterNode* n );
+      virtual void before( class ContextSimpleCounterNode* n );
+      virtual void after( class ContextSimpleCounterNode* n );
       virtual void before( class ScoreAccumulatorNode* n );
       virtual void after( class ScoreAccumulatorNode* n );
       virtual void before( class AnnotatorNode* n );

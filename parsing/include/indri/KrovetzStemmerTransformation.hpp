@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,29 +21,35 @@
 
 #include "indri/Transformation.hpp"
 #include "indri/Parameters.hpp"
+namespace indri
+{
+  namespace parse
+  {
 
-class KrovetzStemmerTransformation : public Transformation {
-private:
-  char* _stemBuffer;
-  int _stemBufferSize;
-  ObjectHandler<ParsedDocument>* _handler;
+    class KrovetzStemmerTransformation : public Transformation {
+    private:
+      char* _stemBuffer;
+      int _stemBufferSize;
+      ObjectHandler<indri::api::ParsedDocument>* _handler;
 
-  char* _getBuffer( size_t length );
-  const char* _getBufferEnd() const;
-  ParsedDocument* _restart( ParsedDocument* document, size_t lastIndex, char* endOfStemming );
-  ParsedDocument* _processTerms( ParsedDocument* document, size_t start, char* stem, const char* end );
-  char* KrovetzStemmerTransformation::_growBuffer( size_t length, char* oldEnd );
+      char* _getBuffer( size_t length );
+      const char* _getBufferEnd() const;
+      indri::api::ParsedDocument* _restart( indri::api::ParsedDocument* document, size_t lastIndex, char* endOfStemming );
+      indri::api::ParsedDocument* _processTerms( indri::api::ParsedDocument* document, size_t start, char* stem, const char* end );
+      char* KrovetzStemmerTransformation::_growBuffer( size_t length, char* oldEnd );
 
-public:
-  KrovetzStemmerTransformation( Parameters& parameters );
-  ~KrovetzStemmerTransformation();
+    public:
+      KrovetzStemmerTransformation( indri::api::Parameters& parameters );
+      ~KrovetzStemmerTransformation();
 
-  ParsedDocument* transform( ParsedDocument* document );
+      indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document );
 
-  void setHandler( ObjectHandler<ParsedDocument>& handler );
-  void handle( ParsedDocument* document ); 
-  static bool _indri_kstem_loaded;
-};
+      void setHandler( ObjectHandler<indri::api::ParsedDocument>& handler );
+      void handle( indri::api::ParsedDocument* document ); 
+      static bool _indri_kstem_loaded;
+    };
+  }
+}
 
 #endif // INDRI_KROVETZSTEMMERTRANSFORMATION_HPP
 

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -18,38 +18,44 @@
 
 #ifndef INDRI_TWOSTAGETERMSCOREFUNCTION_HPP
 #define INDRI_TWOSTAGETERMSCOREFUNCTION_HPP
+namespace indri
+{
+  namespace query
+  {
+    
+    class TwoStageTermScoreFunction : public TermScoreFunction {
+    private:
+      double _mu;
+      double _lambda;
+      double _collectionFrequency;
 
-class TwoStageTermScoreFunction : public TermScoreFunction {
-private:
-  double _mu;
-  double _lambda;
-  double _collectionFrequency;
+    public:
+      TwoStageTermScoreFunction( double mu, double lambda, double collectionFrequency ) :
+        _mu(mu),
+        _lambda(lambda),
+        _collectionFrequency(collectionFrequency) {
+      }
 
-public:
-  TwoStageTermScoreFunction( double mu, double lambda, double collectionFrequency ) :
-    _mu(mu),
-    _lambda(lambda),
-    _collectionFrequency(collectionFrequency) {
+      double scoreOccurrence( double occurrences, int contextSize ) {
+
+        //                    [  c(w;d) + \mu * p(w|C)   ]
+        //    ( 1 - \lambda ) [ ------------------------ ] + \lambda * p(w|C)
+        //                    [       |d| + \mu          ]
+
+        double dirichlet = ((double(occurrences) + _mu*_collectionFrequency) / (double(contextSize) + _mu));
+        double p = ( 1-_lambda ) * dirichlet + _lambda * _collectionFrequency;
+        return log(p);
+      }
+
+      double scoreOccurrence( double occurrences, int contextSize, double documentOccurrences, int documentLength ) {
+        double documentFrequency = double(documentOccurrences) / double(documentLength);
+        double dirichlet = ((double(occurrences) + _mu*documentFrequency) / (double(contextSize) + _mu));
+        double p = ( 1-_lambda ) * dirichlet + _lambda * _collectionFrequency;
+        return log(p);
+      }
+    };
   }
-
-  double scoreOccurrence( int occurrences, int contextSize ) {
-
-    //                    [  c(w;d) + \mu * p(w|C)   ]
-    //    ( 1 - \lambda ) [ ------------------------ ] + \lambda * p(w|C)
-    //                    [       |d| + \mu          ]
-
-    double dirichlet = ((double(occurrences) + _mu*_collectionFrequency) / (double(contextSize) + _mu));
-    double p = ( 1-_lambda ) * dirichlet + _lambda * _collectionFrequency;
-    return log(p);
-  }
-
-  double scoreOccurrence( int occurrences, int contextSize, int documentOccurrences, int documentLength ) {
-    double documentFrequency = double(documentOccurrences) / double(documentLength);
-    double dirichlet = ((double(occurrences) + _mu*documentFrequency) / (double(contextSize) + _mu));
-    double p = ( 1-_lambda ) * dirichlet + _lambda * _collectionFrequency;
-    return log(p);
-  }
-};
+}
 
 #endif // INDRI_TWOSTAGETERMSCOREFUNCTION_HPP
 

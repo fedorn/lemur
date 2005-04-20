@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -18,12 +18,18 @@
 
 #ifndef INDRI_TAGEXTENT_HPP
 #define INDRI_TAGEXTENT_HPP
-
-struct TagExtent {
-  const char* name;
-  unsigned int begin;
-  unsigned int end;
-  INT64 number;
-};
+namespace indri
+{
+  namespace parse
+  {
+    
+    struct TagExtent {
+      const char* name;
+      unsigned int begin;
+      unsigned int end;
+      INT64 number;
+    };
+  }
+}
 
 #endif // INDRI_TAGEXTENT_HPP

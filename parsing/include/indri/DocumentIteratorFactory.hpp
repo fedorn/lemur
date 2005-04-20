@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -22,16 +22,22 @@
 #include "indri/DocumentIterator.hpp"
 #include <map>
 #include <string>
+namespace indri
+{
+  namespace parse
+  {
+    
+    class DocumentIteratorFactory {
+    public:
+      ~DocumentIteratorFactory();
 
-class DocumentIteratorFactory {
-public:
-  ~DocumentIteratorFactory();
+      static DocumentIterator* get( const std::string& type );
+      static DocumentIterator* get( const std::string& type, const char* startDocTag, const char* endDocTag, const char* startMetadataTag );
 
-  static DocumentIterator* get( const std::string& type );
-  static DocumentIterator* get( const std::string& type, const char* startDocTag, const char* endDocTag, const char* startMetadataTag );
-
-  static std::string preferredName( const std::string& type );
-};
+      static std::string preferredName( const std::string& type );
+    };
+  }
+}
 
 #endif // INDRI_DOCUMENTITERATORFACTORY_HPP
 

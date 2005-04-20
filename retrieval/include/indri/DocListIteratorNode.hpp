@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -19,23 +19,35 @@
 #ifndef INDRI_DOCLISTITERATORNODE_HPP
 #define INDRI_DOCLISTITERATORNODE_HPP
 
-#include "indri/DocPositionInfoList.hpp"
+#include "indri/DocListIterator.hpp"
 #include "indri/ListIteratorNode.hpp"
+#include "indri/Extent.hpp"
+#include "indri/greedy_vector"
+#include <string>
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class DocListIteratorNode : public ListIteratorNode {
+    private:
+      indri::index::DocListIterator* _list;
+      class InferenceNetwork& _network;
+      int _listID;
+      indri::utility::greedy_vector<indri::index::Extent> _extents;
+      std::string _name;
 
-class DocListIteratorNode : public ListIteratorNode {
-private:
-  DocPositionInfoList* _list;
-  greedy_vector<Extent> _extents;
-  std::string _name;
+    public:
+      DocListIteratorNode( const std::string& name, class InferenceNetwork& network, int listID );
 
-public:
-  DocListIteratorNode( const std::string& name, DocPositionInfoList* list );
+      int nextCandidateDocument();
+      void indexChanged( indri::index::Index& index );
 
-  int nextCandidateDocument();
-  void prepare( int documentID );
-  const greedy_vector<Extent>& extents();
-  const std::string& getName() const;
-  void annotate( Annotator& annotator, int documentID, int begin, int end );
-};
+      void prepare( int documentID );
+      const indri::utility::greedy_vector<indri::index::Extent>& extents();
+      const std::string& getName() const;  void annotate( Annotator& annotator, int documentID, int begin, int end );
+    };
+  }
+}
 
 #endif // INDRI_DOCLISTITERATORNODE_HPP

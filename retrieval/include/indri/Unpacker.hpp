@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -30,14 +30,14 @@ namespace indri {
 
     class Unpacker {
     private:
-      XMLNode* _root;
+      indri::xml::XMLNode* _root;
       std::map<std::string, class Node*> _nodes;
-      XMLNode* _current;
+      indri::xml::XMLNode* _current;
 
-      Node* _unpack( XMLNode* child );
+      Node* _unpack( indri::xml::XMLNode* child );
 
     public:
-      Unpacker( XMLNode* root );
+      Unpacker( indri::xml::XMLNode* root );
       std::vector<Node*> unpack();
       std::string getString( const char* stringName ) ;
       UINT64 getInteger( const char* name );
@@ -45,6 +45,7 @@ namespace indri {
       RawExtentNode* getRawExtentNode( const char* name );
       std::vector<RawExtentNode*> getRawExtentVector( const char* name );
       std::vector<ScoredExtentNode*> getScoredExtentVector( const char* name );
+      std::vector<std::string> getStringVector( const char* name );
       std::vector<int> getIntVector( const char* name );
       std::vector<double> getDoubleVector( const char* name ) ;
       ScoredExtentNode* getScoredExtentNode( const char* name );
@@ -53,10 +54,10 @@ namespace indri {
       template<class T>
       std::vector<T*> getNodeVector( const char* name ) {
         std::vector<T*> result;
-        const XMLNode* vector = _current->getChild(name);
+        const indri::xml::XMLNode* vector = _current->getChild(name);
 
         for( unsigned int i=0; i<vector->getChildren().size(); i++ ) {
-          XMLNode* ref = vector->getChildren()[i];
+          indri::xml::XMLNode* ref = vector->getChildren()[i];
           T* node = dynamic_cast<T*>(_nodes[ref->getValue()]);
           result.push_back(node);
         }

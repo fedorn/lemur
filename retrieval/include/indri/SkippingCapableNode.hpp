@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -20,11 +20,17 @@
 #define INDRI_SKIPPINGCAPABLENODE_HPP
 
 #include "indri/BeliefNode.hpp"
-
-class SkippingCapableNode : public BeliefNode {
-public:
-  virtual void setThreshold( double threshold ) = 0;
-};
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class SkippingCapableNode : public BeliefNode {
+    public:
+      virtual void setThreshold( double threshold ) = 0;
+    };
+  }
+}
 
 #endif // INDRI_SKIPPINGCAPABLENODE_HPP
 

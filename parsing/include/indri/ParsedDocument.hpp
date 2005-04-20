@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -23,16 +23,22 @@
 #include "indri/TagExtent.hpp"
 #include "indri/TermExtent.hpp"
 #include "indri/MetadataPair.hpp"
+namespace indri
+{
+  namespace api 
+  {
+    
+    struct ParsedDocument {  
+      const char* text;
+      size_t textLength;
 
-struct ParsedDocument {  
-  const char* text;
-  size_t textLength;
-
-  greedy_vector<char*> terms;
-  greedy_vector<TagExtent> tags;
-  greedy_vector<TermExtent> positions;
-  greedy_vector<MetadataPair> metadata;
-};
+      indri::utility::greedy_vector<char*> terms;
+      indri::utility::greedy_vector<indri::parse::TagExtent> tags;
+      indri::utility::greedy_vector<indri::parse::TermExtent> positions;
+      indri::utility::greedy_vector<indri::parse::MetadataPair> metadata;
+    };
+  }
+}
 
 #endif // INDRI_PARSEDDOCUMENT_HPP
 

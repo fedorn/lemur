@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -23,18 +23,24 @@
 #include "indri/UnparsedDocument.hpp"
 #include "indri/Buffer.hpp"
 #include <fstream>
+namespace indri
+{
+  namespace parse
+  {
+    
+    class TextDocumentExtractor : public DocumentIterator {
+    private:
+      std::string _filename;
+      UnparsedDocument _document;
+      indri::utility::Buffer _buffer;
+      std::ifstream _in;
 
-class TextDocumentExtractor : public DocumentIterator {
-private:
-  std::string _filename;
-  UnparsedDocument _document;
-  Buffer _buffer;
-  std::ifstream _in;
-
-public:
-  void open( const std::string& filename );
-  UnparsedDocument* nextDocument();
-  void close();
-};
+    public:
+      void open( const std::string& filename );
+      UnparsedDocument* nextDocument();
+      void close();
+    };
+  }
+}
 
 #endif // INDRI_TEXTDOCUMENTEXTRACTOR_HPP

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -30,153 +30,164 @@
 #include "indri/ParsedDocument.hpp"
 #include <fstream>
 
-class AnchorTextAnnotator : public Transformation {
-  std::ifstream _in;
-  char _docno[256];
-  int _count;
-  Buffer _buffer;
-  ObjectHandler<ParsedDocument>* _handler;
+/*! Top level namespace for all indri components. */
+namespace indri
+{
+  /*! File input, parsing, stemming, and stopping classes. */
+  namespace parse
+  {
+    /*! Reads anchor text in from files created by the 
+      combiner, and adds the text to the end of the parsed document
+    */    
+    class AnchorTextAnnotator : public Transformation {
+      std::ifstream _in;
+      char _docno[256];
+      int _count;
+      indri::utility::Buffer _buffer;
+      ObjectHandler<indri::api::ParsedDocument>* _handler;
 
-  void _readDocumentHeader() {
-    char line[65536];
+      void _readDocumentHeader() {
+        char line[65536];
 
-    if( !_in.good() || _in.eof() )
-      return;
+        if( !_in.good() || _in.eof() )
+          return;
 
-    // DOCNO=
-    _in.getline( _docno, sizeof _docno-1 );
-    // DOCURL=
-    _in.getline( line, sizeof line-1 );
+        // DOCNO=
+        _in.getline( _docno, sizeof _docno-1 );
+        // DOCURL=
+        _in.getline( line, sizeof line-1 );
 
-    // LINKS=
-    _in.getline( line, sizeof line-1 );
-    _count = atoi( line+6 );
-  }
-
-  void _fetchText( greedy_vector<TagExtent>& tags, greedy_vector<char*>& terms ) {
-    // first, surround current text with a mainbody tag
-    TagExtent mainbody;
-    mainbody.begin = 0;
-    mainbody.end = terms.size();
-    mainbody.name = "mainbody";
-    mainbody.number = 0;
-
-    greedy_vector<TagExtent> oldTags;
-    oldTags = tags;
-    tags.clear();
-    tags.push_back( mainbody );
-    tags.append( oldTags.begin(), oldTags.end() );
-
-    // now, fetch the additional terms
-    char line[65536];
-    _buffer.clear();
-
-    for( int i=0; i<_count; i++ ) {
-      // LINK
-      _in.getline( line, sizeof line-1 );
-
-      // TEXT=
-      _in.getline( line, sizeof line-1 );
-      int textLen = strlen(line+6);
-      strcpy( _buffer.write(textLen+1), line+6 );
-      _buffer.unwrite(1);
-
-      assert( *(_buffer.front()+_buffer.position()-1) == '\"' && "Last character should be a quote" );
-    }
-    *(_buffer.write(1)) = 0;
-
-    // now there's a bunch of text in _buffer, space separated, with each
-    // link separated by a " symbol
-
-    char* beginWord = 0;
-    int beginIndex = 0;
-    char* buffer = _buffer.front();
-
-    for( unsigned int i=0; i<_buffer.position(); i++ ) {
-      if( isalnum(buffer[i]) && !beginWord ) {
-        beginWord = buffer+i;
-
-        if(!beginIndex)
-          beginIndex = terms.size();
-      } else if( isspace(buffer[i]) ) {
-        if( beginWord )
-          terms.push_back( beginWord );
-        buffer[i] = 0;
-        beginWord = 0;
-      } else if( buffer[i] == '\"' ) {
-        buffer[i] = 0;
-        if( beginWord )
-          terms.push_back( beginWord );
-        beginWord = 0;
-        
-        TagExtent extent;
-        extent.name = "inlink";
-        extent.begin = beginIndex;
-        extent.end = terms.size();
-        extent.number = 0;
-
-        assert( extent.begin <= extent.end );
-
-        if( beginIndex )
-          tags.push_back(extent);
-
-        beginIndex = 0;
+        // LINKS=
+        _in.getline( line, sizeof line-1 );
+        _count = atoi( line+6 );
       }
-    }
-  }
 
-  bool _matchingDocno( ParsedDocument* document ) {
-    // find DOCNO attribute in document
-    for( size_t i=0; i<document->metadata.size(); i++ ) {
-      const char* attributeName = document->metadata[i].key;
-      const char* attributeValue = (const char*) document->metadata[i].value;
+      void _fetchText( indri::utility::greedy_vector<TagExtent>& tags, indri::utility::greedy_vector<char*>& terms ) {
+        // first, surround current text with a mainbody tag
+        TagExtent mainbody;
+        mainbody.begin = 0;
+        mainbody.end = terms.size();
+        mainbody.name = "mainbody";
+        mainbody.number = 0;
 
-      if( !strcmp( attributeName, "docno" ) ) {
-        if( !strcmp( attributeValue, _docno+6 ) ) {
-          return true;
-        } else {
-          return false;
+        indri::utility::greedy_vector<TagExtent> oldTags;
+        oldTags = tags;
+        tags.clear();
+        tags.push_back( mainbody );
+        tags.append( oldTags.begin(), oldTags.end() );
+
+        // now, fetch the additional terms
+        char line[65536];
+        _buffer.clear();
+
+        for( int i=0; i<_count; i++ ) {
+          // LINK
+          _in.getline( line, sizeof line-1 );
+
+          // TEXT=
+          _in.getline( line, sizeof line-1 );
+          int textLen = strlen(line+6);
+          strcpy( _buffer.write(textLen+1), line+6 );
+          _buffer.unwrite(1);
+
+          assert( *(_buffer.front()+_buffer.position()-1) == '\"' && "Last character should be a quote" );
+        }
+        *(_buffer.write(1)) = 0;
+
+        // now there's a bunch of text in _buffer, space separated, with each
+        // link separated by a " symbol
+
+        char* beginWord = 0;
+        int beginIndex = 0;
+        char* buffer = _buffer.front();
+
+        for( unsigned int i=0; i<_buffer.position(); i++ ) {
+          if( isalnum(buffer[i]) && !beginWord ) {
+            beginWord = buffer+i;
+
+            if(!beginIndex)
+              beginIndex = terms.size();
+          } else if( isspace(buffer[i]) ) {
+            if( beginWord )
+              terms.push_back( beginWord );
+            buffer[i] = 0;
+            beginWord = 0;
+          } else if( buffer[i] == '\"' ) {
+            buffer[i] = 0;
+            if( beginWord )
+              terms.push_back( beginWord );
+            beginWord = 0;
+        
+            TagExtent extent;
+            extent.name = "inlink";
+            extent.begin = beginIndex;
+            extent.end = terms.size();
+            extent.number = 0;
+
+            assert( extent.begin <= extent.end );
+
+            if( beginIndex )
+              tags.push_back(extent);
+
+            beginIndex = 0;
+          }
         }
       }
-    }
+
+      bool _matchingDocno( indri::api::ParsedDocument* document ) {
+        // find DOCNO attribute in document
+        for( size_t i=0; i<document->metadata.size(); i++ ) {
+          const char* attributeName = document->metadata[i].key;
+          const char* attributeValue = (const char*) document->metadata[i].value;
+
+          if( !strcmp( attributeName, "docno" ) ) {
+            if( !strcmp( attributeValue, _docno+6 ) ) {
+              return true;
+            } else {
+              return false;
+            }
+          }
+        }
  
-    return false;
-  }
+        return false;
+      }
 
-public:
-  AnchorTextAnnotator() {
-    _handler = 0;
-  }
+    public:
+      AnchorTextAnnotator() {
+        _handler = 0;
+      }
 
-  ~AnchorTextAnnotator() {
-    _in.close();
-  }
+      ~AnchorTextAnnotator() {
+        _in.close();
+      }
 
-  void open( const std::string& anchorFile ) {
-    _in.close();
-    _in.clear();
-    _in.open( anchorFile.c_str() );
-    _buffer.clear();
-    _readDocumentHeader();
-  }
+      void open( const std::string& anchorFile ) {
+        _in.close();
+        _in.clear();
+        _in.open( anchorFile.c_str() );
+        _buffer.clear();
+        _readDocumentHeader();
+      }
 
-  ParsedDocument* transform( ParsedDocument* document ) {
-    if( _matchingDocno( document ) ) {
-      _fetchText( document->tags, document->terms );
-      _readDocumentHeader();
-    }
+      indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document ) {
+        if( _matchingDocno( document ) ) {
+          _fetchText( document->tags, document->terms );
+          _readDocumentHeader();
+        }
   
-    return document;
-  }
+        return document;
+      }
 
-  void setHandler( ObjectHandler<ParsedDocument>& handler ) {
-    _handler = &handler;
-  }
+      void setHandler( ObjectHandler<indri::api::ParsedDocument>& handler ) {
+        _handler = &handler;
+      }
 
-  void handle( ParsedDocument* document ) {
-    _handler->handle( transform( document ) );
+      void handle( indri::api::ParsedDocument* document ) {
+        _handler->handle( transform( document ) );
+      }
+    };
   }
-};
+}
 
 #endif // INDRI_ANCHORTEXTANNOTATOR_HPP
 

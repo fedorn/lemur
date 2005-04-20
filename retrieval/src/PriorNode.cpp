@@ -21,26 +21,31 @@
 #include <math.h>
 #include "indri/Annotator.hpp"
 
-PriorNode::PriorNode( const std::string& name, FieldIteratorNode* field, const std::map<int, indri::lang::PriorNode::tuple_type>& table ) :
+indri::infnet::PriorNode::PriorNode( const std::string& name, FieldIteratorNode* field, const std::map<int, indri::lang::PriorNode::tuple_type>& table ) :
   _field(field),
   _table(table),
   _name(name)
 {
 }
 
-PriorNode::~PriorNode() {
+indri::infnet::PriorNode::~PriorNode() {
 }
 
-int PriorNode::nextCandidateDocument() {
+int indri::infnet::PriorNode::nextCandidateDocument() {
   return _field->nextCandidateDocument();
 }
 
-bool PriorNode::hasMatch( int documentID ) {
+bool indri::infnet::PriorNode::hasMatch( int documentID ) {
   // priors don't match; they only boost or cut
   return false;
 }
 
-const greedy_vector<ScoredExtentResult>& PriorNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::PriorNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+  _matches.resize( extents.size(), false );
+  return _matches;
+}
+
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::PriorNode::score( int documentID, int begin, int end, int documentLength ) {
   int key;
   double score;
 
@@ -53,7 +58,7 @@ const greedy_vector<ScoredExtentResult>& PriorNode::score( int documentID, int b
     } else {
       // no match, return 0 probability
       score = -DBL_MAX;
-      _scores.push_back( ScoredExtentResult( score, documentID, begin, end ) );
+      _scores.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
       return _scores;
     }
   } else {
@@ -74,11 +79,11 @@ const greedy_vector<ScoredExtentResult>& PriorNode::score( int documentID, int b
     score = -DBL_MAX;
   }
 
-  _scores.push_back( ScoredExtentResult( score, documentID, begin, end ) );
+  _scores.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
   return _scores;
 }
 
-void PriorNode::annotate( class Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::PriorNode::annotate( class indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
   score( documentID, begin, end, end );
   
   for( unsigned int i=0; i<_scores.size(); i++ ) {
@@ -86,14 +91,19 @@ void PriorNode::annotate( class Annotator& annotator, int documentID, int begin,
   }
 }
 
-double PriorNode::maximumScore() {
+double indri::infnet::PriorNode::maximumScore() {
   return INDRI_HUGE_SCORE;
 }
 
-double PriorNode::maximumBackgroundScore() {
+double indri::infnet::PriorNode::maximumBackgroundScore() {
   return INDRI_TINY_SCORE;
 }
 
-const std::string& PriorNode::getName() const {
+const std::string& indri::infnet::PriorNode::getName() const {
   return _name;
 }
+
+void indri::infnet::PriorNode::indexChanged( indri::index::Index& index ) {
+  // do nothing
+}
+

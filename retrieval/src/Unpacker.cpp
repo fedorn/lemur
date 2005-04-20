@@ -25,7 +25,7 @@ namespace indri {
   namespace lang {
     // Note: _unpack is automatically generated in UnpackerInternal.cpp
 
-    Unpacker::Unpacker( XMLNode* root ) :
+    Unpacker::Unpacker( indri::xml::XMLNode* root ) :
       _root(root)
     {
     }
@@ -34,7 +34,7 @@ namespace indri {
       std::vector<indri::lang::Node*> result;
 
       for( unsigned int i=0; i<_root->getChildren().size(); i++ ) {
-        XMLNode* child = _root->getChildren()[i];
+        indri::xml::XMLNode* child = _root->getChildren()[i];
         _current = child;
         Node* node = _unpack(child);
         _nodes[node->nodeName()] = node;
@@ -85,10 +85,10 @@ namespace indri {
 
     ::std::vector<int> Unpacker::getIntVector( const char* name ) {
       std::vector<int> result;
-      const XMLNode* vector = _current->getChild(name);
+      const indri::xml::XMLNode* vector = _current->getChild(name);
 
       for( unsigned int i=0; i<vector->getChildren().size(); i++ ) {
-        XMLNode* ref = vector->getChildren()[i];
+        indri::xml::XMLNode* ref = vector->getChildren()[i];
         std::stringstream s( ref->getValue() );
         int value;
         s >> value;
@@ -100,14 +100,26 @@ namespace indri {
 
     ::std::vector<double> Unpacker::getDoubleVector( const char* name ) {
       std::vector<double> result;
-      const XMLNode* vector = _current->getChild(name);
+      const indri::xml::XMLNode* vector = _current->getChild(name);
 
       for( unsigned int i=0; i<vector->getChildren().size(); i++ ) {
-        XMLNode* ref = vector->getChildren()[i];
+        indri::xml::XMLNode* ref = vector->getChildren()[i];
         std::stringstream s( ref->getValue() );
         double value;
         s >> value;
         result.push_back( value );
+      }
+
+      return result;
+    }
+
+    std::vector<std::string> Unpacker::getStringVector( const char* name ) {
+      std::vector<std::string> result;
+      const indri::xml::XMLNode* vector = _current->getChild(name);
+
+      for( unsigned int i=0; i<vector->getChildren().size(); i++ ) {
+        indri::xml::XMLNode* ref = vector->getChildren()[i];
+        result.push_back( ref->getValue() );
       }
 
       return result;

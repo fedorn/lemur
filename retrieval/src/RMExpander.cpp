@@ -20,15 +20,15 @@
 #include <stdio.h>
 #include <sstream>
 
-RMExpander::RMExpander( QueryEnvironment * env , Parameters& param ) : QueryExpander( env, param ) { }
+indri::query::RMExpander::RMExpander( indri::api::QueryEnvironment * env , indri::api::Parameters& param ) : indri::query::QueryExpander( env, param ) { }
 
-std::string RMExpander::expand( std::string originalQuery , std::vector<ScoredExtentResult>& results ) {
+std::string indri::query::RMExpander::expand( std::string originalQuery , std::vector<indri::api::ScoredExtentResult>& results ) {
   int fbDocs = _param.get( "fbDocs" , 10 );
   int fbTerms = _param.get( "fbTerms" , 10 );
   double fbOrigWt = _param.get( "fbOrigWeight", 0.5 );
   double mu = _param.get( "fbMu", 0 );
 
-  std::vector<DocumentVector*> docVectors = getDocumentVectors( results, fbDocs );
+  std::vector<indri::api::DocumentVector*> docVectors = getDocumentVectors( results, fbDocs );
   std::vector<std::string> * rm_vocab = getVocabulary( docVectors );
   size_t vocabSize = rm_vocab->size();
   UINT64 colLen = _env->termCount();
@@ -41,7 +41,7 @@ std::string RMExpander::expand( std::string originalQuery , std::vector<ScoredEx
     if( doc >= results.size() ) break;
     //std::cerr << "Expanding document " << doc << ", score = " << results[ doc ].score << std::endl;
 
-    DocumentVector * docVec = docVectors[ doc ];
+    indri::api::DocumentVector * docVec = docVectors[ doc ];
     std::vector<int> term_positions = docVec->positions();
     std::vector<std::string> term_list = docVec->stems();
 

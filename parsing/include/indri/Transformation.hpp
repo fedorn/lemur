@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,15 +21,21 @@
 
 #include "indri/ObjectHandler.hpp"
 #include "indri/ParsedDocument.hpp"
+namespace indri
+{
+  namespace parse
+  {
+    
+    class Transformation : public ObjectHandler<indri::api::ParsedDocument> {
+    public:
+      virtual ~Transformation() {}
+      virtual indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document ) = 0;
 
-class Transformation : public ObjectHandler<ParsedDocument> {
-public:
-  virtual ~Transformation() {}
-  virtual ParsedDocument* transform( ParsedDocument* document ) = 0;
-
-  virtual void handle( ParsedDocument* document ) = 0;
-  virtual void setHandler( ObjectHandler<ParsedDocument>& handler ) = 0;
-};
+      virtual void handle( indri::api::ParsedDocument* document ) = 0;
+      virtual void setHandler( ObjectHandler<indri::api::ParsedDocument>& handler ) = 0;
+    };
+  }
+}
 
 #endif // INDRI_TRANSFORMATION_HPP
 

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // DocumentCount
@@ -17,29 +17,35 @@
 
 #ifndef INDRI_DOCUMENTCOUNT_HPP
 #define INDRI_DOCUMENTCOUNT_HPP
+namespace indri
+{
+  namespace index
+  {
+    
+    struct DocumentCount {
+      DocumentCount() {}
 
-struct DocumentCount {
-  DocumentCount() {}
+      DocumentCount( int document, int count ) {
+        this->document = document;
+        this->count = count;
+      }
 
-  DocumentCount( int document, int count ) {
-    this->document = document;
-    this->count = count;
+      int document;
+      int count;
+    };
+
+    struct DocumentContextCount {
+      DocumentContextCount( int document, int count, int contextSize ) {
+        this->document = document;
+        this->count = count;
+        this->contextSize = contextSize;
+      }
+
+      int document;
+      int count;
+      int contextSize;
+    };
   }
-
-  int document;
-  int count;
-};
-
-struct DocumentContextCount {
-  DocumentContextCount( int document, int count, int contextSize ) {
-    this->document = document;
-    this->count = count;
-    this->contextSize = contextSize;
-  }
-
-  int document;
-  int count;
-  int contextSize;
-};
+}
 
 #endif // INDRI_DOCUMENTCOUNT_HPP

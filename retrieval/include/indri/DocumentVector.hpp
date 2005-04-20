@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -23,38 +23,45 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "indri/TermListBuilder.hpp"
+#include "indri/Index.hpp"
+namespace indri 
+{
+  /*! Indri API classes for interacting with indri collections. */
+  namespace api 
+  {
 
-class DocumentVector {
-public:
-  struct Field {
-    std::string name;
-    int begin;
-    int end;
-    INT64 number;
-  };
+    class DocumentVector {
+    public:
+      struct Field {
+        std::string name;
+        int begin;
+        int end;
+        INT64 number;
+      };
 
-private:
-  std::vector<std::string> _stems;
-  std::vector<int> _positions;
-  std::vector<Field> _fields;
+    private:
+      std::vector<std::string> _stems;
+      std::vector<int> _positions;
+      std::vector<Field> _fields;
 
-  void _init( class IndriIndex* index, const class indri::index::TermListBuilder* termList, std::map<int,std::string>* termStringMap );
+      void _init( indri::index::Index* index, const class indri::index::TermList* termList, std::map<int,std::string>* termStringMap );
 
-public:
-  DocumentVector();
-  DocumentVector( class IndriIndex* index, const class indri::index::TermListBuilder* termList );
-  DocumentVector( class IndriIndex* index, const class indri::index::TermListBuilder* termList, std::map<int,std::string>& termStringMap );
+    public:
+      DocumentVector();
+      DocumentVector( indri::index::Index* index, const class indri::index::TermList* termList );
+      DocumentVector( indri::index::Index* index, const class indri::index::TermList* termList, std::map<int,std::string>& termStringMap );
 
-  std::vector<std::string>& stems();
-  const std::vector<std::string>& stems() const;
+      std::vector<std::string>& stems();
+      const std::vector<std::string>& stems() const;
 
-  std::vector<int>& positions();
-  const std::vector<int>& positions() const;
+      std::vector<int>& positions();
+      const std::vector<int>& positions() const;
 
-  std::vector<Field>& fields();
-  const std::vector<Field>& fields() const;
-};
+      std::vector<Field>& fields();
+      const std::vector<Field>& fields() const;
+    };
+  }
+}
 
 #endif // INDRI_DOCUMENTVECTOR_HPP
 

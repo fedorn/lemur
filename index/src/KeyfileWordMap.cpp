@@ -18,7 +18,7 @@
 
 #include "indri/KeyfileWordMap.hpp"
 
-void KeyfileWordMap::open( std::string& path, const std::string& intSuffix, const std::string& wordSuffix ) {
+void indri::file::KeyfileWordMap::open( std::string& path, const std::string& intSuffix, const std::string& wordSuffix ) {
   std::string intName = path + intSuffix;
   std::string wordName = path + wordSuffix;
   
@@ -26,7 +26,7 @@ void KeyfileWordMap::open( std::string& path, const std::string& intSuffix, cons
   _intToWord.open( intName );
 }
 
-void KeyfileWordMap::openRead( std::string& path, const std::string& intSuffix, const std::string& wordSuffix ) {
+void indri::file::KeyfileWordMap::openRead( std::string& path, const std::string& intSuffix, const std::string& wordSuffix ) {
   std::string intName = path + intSuffix;
   std::string wordName = path + wordSuffix;
   
@@ -34,7 +34,7 @@ void KeyfileWordMap::openRead( std::string& path, const std::string& intSuffix, 
   _intToWord.openRead( intName );
 }
 
-void KeyfileWordMap::create( std::string& path, const std::string& intSuffix, const std::string& wordSuffix ) {
+void indri::file::KeyfileWordMap::create( std::string& path, const std::string& intSuffix, const std::string& wordSuffix ) {
   std::string intName = path + intSuffix;
   std::string wordName = path + wordSuffix;
   
@@ -42,12 +42,12 @@ void KeyfileWordMap::create( std::string& path, const std::string& intSuffix, co
   _intToWord.create( intName );
 }
 
-void KeyfileWordMap::close() {
+void indri::file::KeyfileWordMap::close() {
   _wordToInt.close();
   _intToWord.close();
 }
 
-int KeyfileWordMap::lookupID( const char* word ) {
+int indri::file::KeyfileWordMap::lookupID( const char* word ) {
   int id;
   int actual;
 
@@ -58,7 +58,7 @@ int KeyfileWordMap::lookupID( const char* word ) {
   }
 }
 
-const char* KeyfileWordMap::lookupWord( int id ) {
+const char* indri::file::KeyfileWordMap::lookupWord( int id ) {
   int actual;
 
   if( _intToWord.get( id, _wordBuffer, actual, sizeof _wordBuffer ) ) {
@@ -69,7 +69,7 @@ const char* KeyfileWordMap::lookupWord( int id ) {
   }
 }
 
-void KeyfileWordMap::put( int id, const char* word ) {
+void indri::file::KeyfileWordMap::put( int id, const char* word ) {
   _wordToInt.put( word, &id, sizeof id );
   _intToWord.put( id, word, int(strlen(word)) );
 }

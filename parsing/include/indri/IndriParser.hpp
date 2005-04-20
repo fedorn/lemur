@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -26,20 +26,24 @@
 #include <vector>
 
 namespace indri {
-  class Parser : public ObjectHandler<UnparsedDocument> {
-  public:
-    virtual ~Parser() {};
+  namespace parse
+  {
+      
+    class Parser : public ObjectHandler<UnparsedDocument> {
+    public:
+      virtual ~Parser() {};
 
-    virtual ParsedDocument* parse( UnparsedDocument* document ) = 0;
-    virtual void setTags( const std::vector<std::string>& include,
-                          const std::vector<std::string>& exclude,
-                          const std::vector<std::string>& index,
-                          const std::vector<std::string>& metadata,
-                          const std::map<std::string, std::string>& conflations ) = 0;
+      virtual indri::api::ParsedDocument* parse( UnparsedDocument* document ) = 0;
+      virtual void setTags( const std::vector<std::string>& include,
+                            const std::vector<std::string>& exclude,
+                            const std::vector<std::string>& index,
+                            const std::vector<std::string>& metadata,
+                            const std::map<std::string, std::string>& conflations ) = 0;
 
-    virtual void handle( UnparsedDocument* document ) = 0;
-    virtual void setHandler( ObjectHandler<ParsedDocument>& handler ) = 0;
-  };
+      virtual void handle( UnparsedDocument* document ) = 0;
+      virtual void setHandler( ObjectHandler<indri::api::ParsedDocument>& handler ) = 0;
+    };
+  }
 }
 
 #endif // INDRI_PARSER_HPP

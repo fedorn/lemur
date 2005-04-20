@@ -39,25 +39,25 @@
 #define TYPE_TEXT     ( "Text" )
 
 
-DocumentIterator* DocumentIteratorFactory::get( const std::string& type, const char* startDocTag, const char* endDocTag, const char* startMetadataTag ) {
+indri::parse::DocumentIterator* indri::parse::DocumentIteratorFactory::get( const std::string& type, const char* startDocTag, const char* endDocTag, const char* startMetadataTag ) {
   std::string preferred = preferredName( type );
-  DocumentIterator* result = 0;
+  indri::parse::DocumentIterator* result = 0;
 
   if( preferred == TYPE_TAGGED ) {
-    TaggedDocumentIterator* iter = new TaggedDocumentIterator();
+    indri::parse::TaggedDocumentIterator* iter = new indri::parse::TaggedDocumentIterator();
     iter->setTags( startDocTag, endDocTag, startMetadataTag );
     result = iter;
   } else if( preferred == TYPE_PDF ) {
-    result = new PDFDocumentExtractor();
+    result = new indri::parse::PDFDocumentExtractor();
   } else if( preferred == TYPE_TEXT ) {
-    result = new TextDocumentExtractor();
+    result = new indri::parse::TextDocumentExtractor();
   }
   
 #ifdef WIN32
   else if( preferred == TYPE_WORD ) {
-    result = new WordDocumentExtractor();
+    result = new indri::parse::WordDocumentExtractor();
   } else if( preferred == TYPE_PPT ) {
-    result = new PowerPointDocumentExtractor();
+    result = new indri::parse::PowerPointDocumentExtractor();
   }
 #endif
 
@@ -67,11 +67,11 @@ DocumentIterator* DocumentIteratorFactory::get( const std::string& type, const c
   return result;
 }
 
-DocumentIterator* DocumentIteratorFactory::get( const std::string& type ) {
+indri::parse::DocumentIterator* indri::parse::DocumentIteratorFactory::get( const std::string& type ) {
   return get(type, 0, 0, 0);
 }
 
-std::string DocumentIteratorFactory::preferredName( const std::string& type ) {
+std::string indri::parse::DocumentIteratorFactory::preferredName( const std::string& type ) {
   if( type == "tagged" || type == TYPE_TAGGED ) {
     return TYPE_TAGGED;
   } else if( type == "pdf" || type == "adobe pdf" || type == TYPE_PDF ) {

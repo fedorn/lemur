@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -38,22 +38,22 @@ namespace indri {
         node_element() : languageNode(0), xmlNode(0), flushed(false) {}
         node_element( class Node* langNode ) :
           languageNode( langNode ),
-          xmlNode( new XMLNode( "node" ) ),
+          xmlNode( new indri::xml::XMLNode( "node" ) ),
           flushed(false)
         {
         }
 
         class Node* languageNode;
-        XMLNode* xmlNode;
+        indri::xml::XMLNode* xmlNode;
         bool flushed;
       };
 
       std::map<class Node*, node_element*> _elements;
       std::stack<node_element*> _stack;
-      XMLNode* _packedNodes;
+      indri::xml::XMLNode* _packedNodes;
 
       node_element* _getElement( class Node* node );
-      XMLNode* _getNodeReference( class Node* node, const std::string& name );
+      indri::xml::XMLNode* _getNodeReference( class Node* node, const std::string& name );
 
     public:
       Packer();
@@ -69,13 +69,14 @@ namespace indri {
       void put( const char* name, const std::string& value );
       void put( const char* name, const std::vector<int>& value );
       void put( const char* name, const std::vector<double>& value );
+      void put( const char* name, const std::vector<std::string>& value );
       void put( const char* name, const std::vector<RawExtentNode*>& value );
       void put( const char* name, const std::vector<ScoredExtentNode*>& value );
       void put( const char* name, Node* value );
       void pack( class indri::lang::Node* root );
       void pack( std::vector<class indri::lang::Node*>& roots );
       std::string toString();
-      XMLNode* xml();
+      indri::xml::XMLNode* xml();
     };
   }
 }

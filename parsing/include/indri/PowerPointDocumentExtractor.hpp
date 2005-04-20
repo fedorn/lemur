@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -28,26 +28,33 @@
 #include <unknwn.h>
 #include <oaidl.h>
 #include "indri/DocumentIterator.hpp"
+namespace indri
+{
+  namespace parse
+  {
+    
+    class PowerPointDocumentExtractor : public DocumentIterator {
+    private:
+      IUnknown* _powerPointUnknown;
+      IDispatch* _powerPointDispatch;
+      IDispatch* _presentationsDispatch;
+      UnparsedDocument _unparsedDocument;
 
-class PowerPointDocumentExtractor : public DocumentIterator {
-private:
-  IUnknown* _powerPointUnknown;
-  IDispatch* _powerPointDispatch;
-  IDispatch* _presentationsDispatch;
-  UnparsedDocument _unparsedDocument;
+      std::string _documentPath;
+      indri::utility::Buffer _documentBuffer;
+      bool _documentWaiting;
 
-  std::string _documentPath;
-  Buffer _documentBuffer;
-  bool _documentWaiting;
+    public:
+      PowerPointDocumentExtractor();
+      ~PowerPointDocumentExtractor();
 
-public:
-  PowerPointDocumentExtractor();
-  ~PowerPointDocumentExtractor();
+      void open( const std::string& filename );
+      UnparsedDocument* nextDocument();
+      void close();
+    };
+  }
+}
 
-  void open( const std::string& filename );
-  UnparsedDocument* nextDocument();
-  void close();
-};
 #endif // WIN32
 #endif // INDRI_POWERPOINTDOCUMENTEXTRACTOR_HPP
 

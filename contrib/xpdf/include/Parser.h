@@ -42,10 +42,10 @@ public:
 #endif
 
   // Get stream.
-  Stream *getStream() { return lexer->getStream(); }
+  Stream *getStream();
 
   // Get current position in file.
-  int getPos() { return lexer->getPos(); }
+  int getPos();
 
 private:
 

@@ -20,30 +20,34 @@
 
 #include "indri/NullListNode.hpp"
 
-NullListNode::NullListNode( const std::string& name, bool stopword ) : _name(name), _stopword(stopword)
+indri::infnet::NullListNode::NullListNode( const std::string& name, bool stopword ) : _name(name), _stopword(stopword)
 {
 }
 
-bool NullListNode::isStopword() const {
+bool indri::infnet::NullListNode::isStopword() const {
   return _stopword;
 }
 
-const std::string& NullListNode::getName() const {
+const std::string& indri::infnet::NullListNode::getName() const {
   return _name;
 }
 
-int NullListNode::nextCandidateDocument() {
+int indri::infnet::NullListNode::nextCandidateDocument() {
   return MAX_INT32;
 }
 
-void NullListNode::prepare( int documentID ) {
+void indri::infnet::NullListNode::prepare( int documentID ) {
   // do nothing
 }
 
-const greedy_vector<Extent>& NullListNode::extents() {
+const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::NullListNode::extents() {
   return _extents;
 }
 
-void NullListNode::annotate( class Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::NullListNode::annotate( class indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
+  // do nothing
+}
+
+void indri::infnet::NullListNode::indexChanged( indri::index::Index& index ) {
   // do nothing
 }

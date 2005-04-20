@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,25 +21,31 @@
 
 #include "indri/QuerySpec.hpp"
 #include "indri/Parameters.hpp"
+namespace indri
+{
+  namespace query
+  {
+    
+    class PriorFactory {
+    private:
+      struct prior_data {
+        std::string field;
+        std::map<int, indri::lang::PriorNode::tuple_type> tuples;
+      };
 
-class PriorFactory {
-private:
-  struct prior_data {
-    std::string field;
-    std::map<int, indri::lang::PriorNode::tuple_type> tuples;
-  };
+      indri::api::Parameters _parameters;
+      std::map<std::string, prior_data> _data;
 
-  Parameters _parameters;
-  std::map<std::string, prior_data> _data;
+      void _readPriorFile( prior_data& data, const std::string& fileName );
+      void _readParamValues( prior_data& data, class indri::api::Parameters& range );
 
-  void _readPriorFile( prior_data& data, const std::string& fileName );
-  void _readParamValues( prior_data& data, class Parameters& range );
-
-public:
-  PriorFactory();
-  PriorFactory( Parameters& parameters );
-  void initialize();
-  indri::lang::PriorNode* create( const std::string& name );
-};
+    public:
+      PriorFactory();
+      PriorFactory( indri::api::Parameters& parameters );
+      void initialize();
+      indri::lang::PriorNode* create( const std::string& name );
+    };
+  }
+}
 
 #endif // INDRI_PRIORFACTORY_HPP

@@ -101,11 +101,11 @@ public:
     return _docMgr;
   }
   
-  //  const Repository *getRepository() const {return _repository;}
   const string &getRepositoryName() const {return _repositoryName;}
   
 private:
-  Repository *_repository;
+  indri::index::Index* _indexWithDocument( indri::collection::Repository::index_state& indexes, int documentID ) const;
+  indri::collection::Repository *_repository;
   string _repositoryName;
   DocumentManager *_docMgr;
 };

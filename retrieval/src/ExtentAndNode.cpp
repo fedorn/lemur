@@ -20,18 +20,18 @@
 #include "lemur-compat.hpp"
 #include "indri/Annotator.hpp"
 
-void ExtentAndNode::_and( greedy_vector<Extent>& out, const greedy_vector<Extent>& one, const greedy_vector<Extent>& two ) {
-  greedy_vector<Extent>::const_iterator oneIter = one.begin();
-  greedy_vector<Extent>::const_iterator twoIter = two.begin();
+void indri::infnet::ExtentAndNode::_and( indri::utility::greedy_vector<indri::index::Extent>& out, const indri::utility::greedy_vector<indri::index::Extent>& one, const indri::utility::greedy_vector<indri::index::Extent>& two ) {
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator oneIter = one.begin();
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator twoIter = two.begin();
 
   out.clear();
 
-  Extent current;
+  indri::index::Extent current;
   current.begin = 0;
   current.end = 0;
 
   while( oneIter != one.end() && twoIter != two.end() ) {
-    Extent intersection;
+    indri::index::Extent intersection;
 
     // compute the intersection (may be 0 length)
     intersection.begin = lemur_compat::max( oneIter->begin, twoIter->begin );
@@ -64,20 +64,20 @@ void ExtentAndNode::_and( greedy_vector<Extent>& out, const greedy_vector<Extent
 }
 
 
-ExtentAndNode::ExtentAndNode( const std::string& name, std::vector<ListIteratorNode*>& children ) :
+indri::infnet::ExtentAndNode::ExtentAndNode( const std::string& name, std::vector<ListIteratorNode*>& children ) :
   _children(children),
   _name(name)
 {
 }
 
-void ExtentAndNode::prepare( int documentID ) {
+void indri::infnet::ExtentAndNode::prepare( int documentID ) {
   _extents.clear();
 
   if( _children.size() == 2 ) {
     _and( _extents, _children[0]->extents(), _children[1]->extents() );
   } else if( _children.size() > 2 ) {
-    greedy_vector<Extent> first;
-    greedy_vector<Extent> second;
+    indri::utility::greedy_vector<indri::index::Extent> first;
+    indri::utility::greedy_vector<indri::index::Extent> second;
     unsigned int i;
 
     // this part is a little complex because I'm trying
@@ -97,11 +97,11 @@ void ExtentAndNode::prepare( int documentID ) {
   }
 }
 
-const greedy_vector<Extent>& ExtentAndNode::extents() {
+const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::ExtentAndNode::extents() {
   return _extents;
 }
 
-int ExtentAndNode::nextCandidateDocument() {
+int indri::infnet::ExtentAndNode::nextCandidateDocument() {
   assert( _children.size() );
   int candidate = 0;
 
@@ -112,11 +112,15 @@ int ExtentAndNode::nextCandidateDocument() {
   return candidate;
 }
 
-const std::string& ExtentAndNode::getName() const {
+const std::string& indri::infnet::ExtentAndNode::getName() const {
   return _name;
 }
 
-void ExtentAndNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::ExtentAndNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
   annotator.addMatches( _extents, this, documentID, begin, end );
+}
+
+void indri::infnet::ExtentAndNode::indexChanged( indri::index::Index& index ) {
+  // do nothing
 }
 

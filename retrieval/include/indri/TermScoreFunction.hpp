@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -18,17 +18,24 @@
 
 #ifndef INDRI_TERMSCOREFUNCTION_HPP
 #define INDRI_TERMSCOREFUNCTION_HPP
-/*! Abstract base class for all term scoring and smoothing functions. 
-  See <a href="IndriParameters.html#rule">the <tt>rule</tt> parameter
-  format</a> for a description of the rule parameter format. @see
-  TermScoreFunctionFactory for a description of how to add a new scoring
-  function.
- */
-class TermScoreFunction {
-public:
-  virtual double scoreOccurrence( int occurrences, int contextLength ) = 0;
-  virtual double scoreOccurrence( int occurrences, int contextLength, int documentOccurrences, int documentLength ) = 0;
-};
+namespace indri
+{
+  namespace query
+  {
+    
+    /*! Abstract base class for all term scoring and smoothing functions. 
+      See <a href="IndriParameters.html#rule">the <tt>rule</tt> parameter
+      format</a> for a description of the rule parameter format. @see
+      TermScoreFunctionFactory for a description of how to add a new scoring
+      function.
+    */
+    class TermScoreFunction {
+    public:
+      virtual double scoreOccurrence( double occurrences, int contextLength ) = 0;
+      virtual double scoreOccurrence( double occurrences, int contextLength, double documentOccurrences, int documentLength ) = 0;
+    };
+  }
+}
 
 #endif // INDRI_TERMSCOREFUNCTION_HPP
 

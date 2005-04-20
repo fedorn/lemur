@@ -19,39 +19,52 @@
 #ifndef INDRI_DOCLISTFILEITERATOR_HPP
 #define INDRI_DOCLISTFILEITERATOR_HPP
 
-#include "File.hpp"
-#include "indri/DocListDiskBlockReader.hpp"
-#include "ReadBuffer.hpp"
+#include "indri/DocListIterator.hpp"
+#include "indri/TermData.hpp"
 
 namespace indri {
   namespace index {
     class DocListFileIterator {
-      File* _file;
-      DocListDiskBlockReader _reader;
-      ReadBuffer _readBuffer;
-      DocListInfo _info;
-      int _segment;
-      bool _finished;
-      bool _partialDocument;
-      File::offset_type _fileOffset; /* starting offset */
-      
-      bool _skipToNextBlock();
-      void _fetchDocument();
-
     public:
-      DocListFileIterator( File* file, int segment, size_t bufferSize, File::offset_type fileOffset = 0 );
+      struct DocListData {
+        DocListIterator* iterator;
+        TermData* termData;
+      };
 
-      bool finished() const;
-      void startIteration();
+      struct iterator_greater {
+        bool operator() ( const DocListFileIterator*const& one, const DocListFileIterator*const& two ) const {
+          assert( !one->finished() && !two->finished() );
+          
+          const DocListData* oneData = one->currentEntry();
+          const DocListData* twoData = two->currentEntry();
 
-      bool skip( int termID, int documentID );
-      DocListInfo& currentDocument();
-      bool nextDocument();
+          const char* oneTerm = oneData->termData->term;
+          const char* twoTerm = twoData->termData->term;
 
-      int document() const;
-      int termID() const;
-      int segment() const;
-      void remove();
+          int result = strcmp( oneTerm, twoTerm );
+
+          // if terms don't match, we're done
+          if( result < 0 )
+            return false;
+          if( result > 0 )
+            return true;
+
+          // terms match, so go by document
+          int oneDocument = oneData->iterator->currentEntry()->document;
+          int twoDocument = twoData->iterator->currentEntry()->document;
+
+          return oneDocument > twoDocument;
+        }
+      };
+
+      virtual ~DocListFileIterator() {};
+      
+      virtual bool finished() const = 0;
+      virtual void startIteration() = 0;
+
+      virtual bool nextEntry() = 0;
+      virtual DocListData* currentEntry() = 0;
+      virtual const DocListData* currentEntry() const = 0;
     };
   }
 }

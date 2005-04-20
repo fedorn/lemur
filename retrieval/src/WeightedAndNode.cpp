@@ -23,8 +23,10 @@
 #include <iostream>
 #include "indri/Annotator.hpp"
 #include "indri/TermFrequencyBeliefNode.hpp"
+#include "indri/greedy_vector"
+#include "indri/delete_range.hpp"
 
-double WeightedAndNode::_computeMaxScore( unsigned int start ) {
+double indri::infnet::WeightedAndNode::_computeMaxScore( unsigned int start ) {
   // first, find the maximum score of the first few columns
   double maxScoreSum = 0;
 
@@ -42,7 +44,7 @@ double WeightedAndNode::_computeMaxScore( unsigned int start ) {
   return maxScoreSum + minScoreSum;
 }
 
-void WeightedAndNode::_computeQuorum() {
+void indri::infnet::WeightedAndNode::_computeQuorum() {
   double maximumScore = -DBL_MAX;
   unsigned int i;
 
@@ -61,7 +63,7 @@ void WeightedAndNode::_computeQuorum() {
     _recomputeThreshold = maximumScore;
 }
 
-void WeightedAndNode::addChild( double weight, BeliefNode* node ) {
+void indri::infnet::WeightedAndNode::addChild( double weight, BeliefNode* node ) {
   child_type child;
 
   child.node = node;
@@ -80,38 +82,51 @@ struct double_greater {
   }
 };
 
-void WeightedAndNode::doneAddingChildren() {
+void indri::infnet::WeightedAndNode::doneAddingChildren() {
+  // should be removed
+}
+
+void indri::infnet::WeightedAndNode::indexChanged( indri::index::Index& index ) {
   _candidates.clear();
   _candidatesIndex = 0;
 
-  greedy_vector< const TopdocsIndex::TopdocsList* > lists;
+  indri::utility::greedy_vector< indri::utility::greedy_vector<indri::index::DocListIterator::TopDocument>* > lists;
 
   // get all the relevant topdocs lists
   for( unsigned int i=0; i<_children.size(); i++ ) {
-    TermFrequencyBeliefNode* node = dynamic_cast<TermFrequencyBeliefNode*>(_children[i].node);
-    const TopdocsIndex::TopdocsList* topdocs = 0;
+    indri::infnet::TermFrequencyBeliefNode* node = dynamic_cast<indri::infnet::TermFrequencyBeliefNode*>(_children[i].node);
 
     if( node ) {
-      topdocs = node->getTopdocsList();
-    }
+      indri::utility::greedy_vector<indri::index::DocListIterator::TopDocument>* copy = new indri::utility::greedy_vector<indri::index::DocListIterator::TopDocument>( node->topdocs() );
+      lists.push_back( copy );
+      std::sort( copy->begin(), copy->end(), indri::index::DocListIterator::TopDocument::docid_less() );
 
-    if( topdocs ) {
-      assert( topdocs->entries.size() );
-      lists.push_back( topdocs );
+      _children[i].maximumWeightedScore = node->maximumScore() * _children[i].weight;
+      _children[i].backgroundWeightedScore = node->maximumBackgroundScore() * _children[i].weight;
     }
   }
 
+  std::sort( _children.begin(), _children.end(), child_type::maxscore_less() );
+
   // TODO: could compute an initial threshold here, but that may not be necessary
-  greedy_vector<int> indexes;
-  indexes.resize( lists.size(), 0 );
+  indri::utility::greedy_vector<int> indexes;
+
+  for( unsigned int i=0; i<lists.size(); i++ ) {
+    if( lists[i]->size() )
+      indexes.push_back( 0 );
+    else
+      indexes.push_back( -1 );
+  }
 
   while( true ) {
     // find the smallest document
     int smallestDocument = MAX_INT32;
 
     for( unsigned int i=0; i<lists.size(); i++ ) {
-      if( indexes[i] > 0 )
-        smallestDocument = lemur_compat::min( smallestDocument, lists[i]->entries[indexes[i]].documentID );
+      indri::utility::greedy_vector<indri::index::DocListIterator::TopDocument>& currentList = *lists[i];      
+
+      if( indexes[i] >= 0 )
+        smallestDocument = lemur_compat::min( smallestDocument, currentList[indexes[i]].document );
     }
 
     if( smallestDocument == MAX_INT32 )
@@ -121,21 +136,26 @@ void WeightedAndNode::doneAddingChildren() {
 
     // increment indexes
     for( unsigned int i=0; i<lists.size(); i++ ) {
-      if( lists[i]->entries[indexes[i]].documentID == smallestDocument ) {
+      indri::utility::greedy_vector<indri::index::DocListIterator::TopDocument>& currentList = *lists[i];      
+
+      if( indexes[i] >= 0 && currentList[indexes[i]].document == smallestDocument ) {
         indexes[i]++;
         
-        if( indexes[i] == lists[i]->entries.size() ) {
+        if( indexes[i] == currentList.size() ) {
           indexes[i] = -1;
         }
       }
     }
   }
 
+  for( int i=0; i<lists.size(); i++ )
+    delete lists[i];
+
   // compute quorum
   _computeQuorum();
 }
 
-void WeightedAndNode::setThreshold( double threshold ) {
+void indri::infnet::WeightedAndNode::setThreshold( double threshold ) {
   _threshold = threshold;
 
   if( _threshold >= _recomputeThreshold ) {
@@ -143,7 +163,7 @@ void WeightedAndNode::setThreshold( double threshold ) {
   }
 }
   
-int WeightedAndNode::nextCandidateDocument() {
+int indri::infnet::WeightedAndNode::nextCandidateDocument() {
   std::vector<child_type>::iterator iter;
   int minDocument = MAX_INT32;
   int currentCandidate;
@@ -163,7 +183,7 @@ int WeightedAndNode::nextCandidateDocument() {
   return minDocument;
 }
 
-void WeightedAndNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::WeightedAndNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
   std::vector<child_type>::iterator iter;
   annotator.add( this, documentID, begin, end );
 
@@ -172,7 +192,7 @@ void WeightedAndNode::annotate( Annotator& annotator, int documentID, int begin,
   }
 }
 
-double WeightedAndNode::maximumBackgroundScore() {
+double indri::infnet::WeightedAndNode::maximumBackgroundScore() {
   std::vector<child_type>::iterator iter;
   double minimum = 0.0;
 
@@ -183,7 +203,7 @@ double WeightedAndNode::maximumBackgroundScore() {
   return minimum;
 }
 
-double WeightedAndNode::maximumScore() {
+double indri::infnet::WeightedAndNode::maximumScore() {
   std::vector<child_type>::iterator iter;
   double maximum = 0.0;
 
@@ -194,12 +214,12 @@ double WeightedAndNode::maximumScore() {
   return maximum;
 }
 
-greedy_vector<ScoredExtentResult>& WeightedAndNode::score( int documentID, int begin, int end, int documentLength ) {
+indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedAndNode::score( int documentID, int begin, int end, int documentLength ) {
   std::vector<child_type>::iterator iter;
   double score = 0;
 
   for( iter = _children.begin(); iter != _children.end(); iter++ ) {
-    const greedy_vector<ScoredExtentResult>& childResults = (*iter).node->score( documentID, begin, end, documentLength );
+    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = (*iter).node->score( documentID, begin, end, documentLength );
 
     double childScore = 0;
     for( unsigned int j=0; j<childResults.size(); j++ ) {
@@ -210,7 +230,7 @@ greedy_vector<ScoredExtentResult>& WeightedAndNode::score( int documentID, int b
   }
 
   _scores.clear();
-  _scores.push_back( ScoredExtentResult(score, documentID, begin, end) );
+  _scores.push_back( indri::api::ScoredExtentResult(score, documentID, begin, end) );
 
   // advance candidates
   while( _candidatesIndex < _candidates.size() && _candidates[_candidatesIndex] <= documentID )
@@ -219,7 +239,15 @@ greedy_vector<ScoredExtentResult>& WeightedAndNode::score( int documentID, int b
   return _scores;
 }
 
-bool WeightedAndNode::hasMatch( int documentID ) {
+//
+// hasMatch
+//
+
+bool indri::infnet::WeightedAndNode::hasMatch( int documentID ) {
+  // advance candidates
+  while( _candidatesIndex < _candidates.size() && _candidates[_candidatesIndex] <= documentID )
+    _candidatesIndex++;
+
   for( unsigned int i=0; i<_children.size(); i++ ) {
     if( _children[i].node->hasMatch( documentID ) )
       return true;
@@ -228,7 +256,36 @@ bool WeightedAndNode::hasMatch( int documentID ) {
   return false;
 }
 
-const std::string& WeightedAndNode::getName() const {
+//
+// hasMatch
+//
+
+const indri::utility::greedy_vector<bool>& indri::infnet::WeightedAndNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+  // advance candidates
+  while( _candidatesIndex < _candidates.size() && _candidates[_candidatesIndex] <= documentID )
+    _candidatesIndex++;
+
+  _matches.clear();
+  _matches.resize( extents.size(), false );
+
+  for( unsigned int i=0; i<_children.size(); i++ ) {
+    const indri::utility::greedy_vector<bool>& kidMatches = _children[i].node->hasMatch( documentID, extents );
+
+    for( unsigned int j=0; j<kidMatches.size(); j++ ) {
+      if( kidMatches[j] ) {
+        _matches[j] = true;
+      }
+    }
+  }
+
+  return _matches;
+}
+
+//
+// getName
+//
+
+const std::string& indri::infnet::WeightedAndNode::getName() const {
   return _name;
 }
 

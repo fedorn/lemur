@@ -45,7 +45,7 @@ struct wde_internal {
 
 #define v_internal ( (wde_internal*) _internal )
 
-WordDocumentExtractor::WordDocumentExtractor() {
+indri::parse::WordDocumentExtractor::WordDocumentExtractor() {
   _internal = new wde_internal;
 
   v_internal->_documentsDispatch = 0;
@@ -56,11 +56,11 @@ WordDocumentExtractor::WordDocumentExtractor() {
   _documentWaiting = false;
 }
 
-WordDocumentExtractor::~WordDocumentExtractor() {
+indri::parse::WordDocumentExtractor::~WordDocumentExtractor() {
   uninitialize();
 }
 
-void WordDocumentExtractor::uninitialize() {
+void indri::parse::WordDocumentExtractor::uninitialize() {
   if( v_internal ) {
     // close application too?
     if( v_internal->_documentsDispatch )
@@ -73,12 +73,12 @@ void WordDocumentExtractor::uninitialize() {
   }
 }
 
-void WordDocumentExtractor::initialize() {
+void indri::parse::WordDocumentExtractor::initialize() {
   ::CoInitialize( NULL );
 
   HRESULT hr;
-	CLSID wordClsid;
-	CLSIDFromProgID( L"Word.Application", &wordClsid );  
+  CLSID wordClsid;
+  CLSIDFromProgID( L"Word.Application", &wordClsid );  
 
   hr = ::CoCreateInstance( wordClsid,
                             NULL,
@@ -137,7 +137,7 @@ void WordDocumentExtractor::initialize() {
                                           &v_internal->_openDispatchID );
 }
 
-void WordDocumentExtractor::open( const std::string& filename ) {
+void indri::parse::WordDocumentExtractor::open( const std::string& filename ) {
   // open the document
   HRESULT hr;
   VARIANT result;
@@ -242,7 +242,7 @@ void WordDocumentExtractor::open( const std::string& filename ) {
                                          NULL, NULL );
   _documentTextBuffer.unwrite( convertedLength-trueLength );
 
-  MetadataPair pair;
+  indri::parse::MetadataPair pair;
 
   _unparsedDocument.metadata.clear();
 
@@ -283,7 +283,7 @@ void WordDocumentExtractor::open( const std::string& filename ) {
   _documentWaiting = true;
 }
 
-UnparsedDocument* WordDocumentExtractor::nextDocument() {
+indri::parse::UnparsedDocument* indri::parse::WordDocumentExtractor::nextDocument() {
   if( _documentWaiting ) {
     _documentWaiting = false;
     return &_unparsedDocument;
@@ -292,7 +292,7 @@ UnparsedDocument* WordDocumentExtractor::nextDocument() {
   return 0;
 }
 
-void WordDocumentExtractor::close() {
+void indri::parse::WordDocumentExtractor::close() {
   _documentWaiting = false;
 }
 

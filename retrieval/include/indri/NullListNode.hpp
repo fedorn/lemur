@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -20,23 +20,32 @@
 #define INDRI_NULLLISTNODE_HPP
 
 #include "indri/ListIteratorNode.hpp"
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class NullListNode : public ListIteratorNode {
+    private:
+      indri::utility::greedy_vector<indri::index::Extent> _extents;
+      std::string _name;
+      bool _stopword;
 
-class NullListNode : public ListIteratorNode {
-private:
-  greedy_vector<Extent> _extents;
-  std::string _name;
-  bool _stopword;
+    public:
+      NullListNode( const std::string& name, bool stopword );
 
-public:
-  NullListNode( const std::string& name, bool stopword );
+      bool isStopword() const;
+      const std::string& getName() const;
 
-  bool isStopword() const;
-  const std::string& getName() const;
-  int nextCandidateDocument();
-  void prepare( int documentID );
-  const greedy_vector<Extent>& extents();
-  void annotate( class Annotator& annotator, int documentID, int begin, int end );
-};
+      int nextCandidateDocument();
+      void indexChanged( indri::index::Index& index );
+
+      void prepare( int documentID );
+      const indri::utility::greedy_vector<indri::index::Extent>& extents();
+      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+    };
+  }
+}
 
 #endif // INDRI_NULLLISTNODE_HPP
 

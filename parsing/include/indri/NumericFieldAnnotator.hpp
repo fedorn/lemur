@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -18,42 +18,48 @@
 
 #ifndef INDRI_NUMERICFIELDANNOTATOR_HPP
 #define INDRI_NUMERICFIELDANNOTATOR_HPP
-
-class NumericFieldAnnotator : public Transformation {
-private:
-  ObjectHandler<ParsedDocument>* _handler;
-  std::string& _field;
-
-public:
-  NumericFieldAnnotator( std::string& field ) :
-    _handler(0),
-    _field(field)
+namespace indri
+{
+  namespace parse
   {
-  }
 
-  ParsedDocument* transform( ParsedDocument* document ) {
-    for( size_t i=0; i<document->tags.size(); i++ ) {
-      TagExtent& extent = document->tags[i];
+    class NumericFieldAnnotator : public Transformation {
+    private:
+      ObjectHandler<indri::api::ParsedDocument>* _handler;
+      std::string& _field;
 
-      if( _field == extent.name ) {
-        char* numberText = document->terms[ extent.begin ]; 
-        INT64 value = string_to_i64( numberText );
-        extent.number = value;
+    public:
+      NumericFieldAnnotator( std::string& field ) :
+        _handler(0),
+        _field(field)
+      {
       }
-    }
 
-    return document;
+      indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document ) {
+        for( size_t i=0; i<document->tags.size(); i++ ) {
+          TagExtent& extent = document->tags[i];
+
+          if( _field == extent.name ) {
+            char* numberText = document->terms[ extent.begin ]; 
+            INT64 value = string_to_i64( numberText );
+            extent.number = value;
+          }
+        }
+
+        return document;
+      }
+
+      void setHandler( ObjectHandler<indri::api::ParsedDocument>& handler ) {
+        _handler = &handler;
+      }
+
+      void handle( indri::api::ParsedDocument* document ) {
+        _handler->handle( transform( document ) );
+      }
+    };
+ 
   }
-
-  void setHandler( ObjectHandler<ParsedDocument>& handler ) {
-    _handler = &handler;
-  }
-
-  void handle( ParsedDocument* document ) {
-    _handler->handle( transform( document ) );
-  }
-};
-
+}
 
 #endif // INDRI_NUMERICFIELDANNOTATOR_HPP
 

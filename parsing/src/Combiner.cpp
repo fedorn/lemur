@@ -30,7 +30,7 @@
 
 #define COMBINER_WRITE_BUFFER_SIZE (5*1024*1024)
 
-Combiner::url_entry* Combiner::_newUrlEntry( char* url, char* corpusPath, char* docNo ) {
+indri::parse::Combiner::url_entry* indri::parse::Combiner::_newUrlEntry( char* url, char* corpusPath, char* docNo ) {
   int urlLen = strlen(url) + 1;
   int corpusLen = strlen(corpusPath) + 1;
   int docLen = strlen(docNo) + 1;
@@ -52,17 +52,17 @@ Combiner::url_entry* Combiner::_newUrlEntry( char* url, char* corpusPath, char* 
   return e;
 }
 
-void Combiner::_deleteUrlEntry( void* buffer ) {
+void indri::parse::Combiner::_deleteUrlEntry( void* buffer ) {
   url_entry* e = (url_entry*) buffer;
   e->~url_entry();
   free(buffer);
 }
 
-void Combiner::_openWriteBuckets( std::vector<std::stringstream*>& buffers, std::vector<std::ofstream*>& buckets, const std::string& path, int bins ) {
+void indri::parse::Combiner::_openWriteBuckets( std::vector<std::stringstream*>& buffers, std::vector<std::ofstream*>& buckets, const std::string& path, int bins ) {
   for( int i=0; i<_bins; i++ ) {
     std::string number = i64_to_string(i);
 
-    std::string binpath = Path::combine( path, number );
+    std::string binpath = indri::file::Path::combine( path, number );
     std::ofstream* bucket = new std::ofstream;
     bucket->open( binpath.c_str(), std::ios::out | std::ios::app );
     buffers.push_back( new std::stringstream() );
@@ -70,7 +70,7 @@ void Combiner::_openWriteBuckets( std::vector<std::stringstream*>& buffers, std:
   }
 }
 
-void Combiner::_closeWriteBuckets( std::vector<std::stringstream*>& buffers, std::vector<std::ofstream*>& buckets ) {
+void indri::parse::Combiner::_closeWriteBuckets( std::vector<std::stringstream*>& buffers, std::vector<std::ofstream*>& buckets ) {
   for( unsigned int i=0; i<buckets.size(); i++ ) {
     _flushWriteBuffer( buffers, buckets, true, i );
     delete buffers[i];
@@ -79,13 +79,13 @@ void Combiner::_closeWriteBuckets( std::vector<std::stringstream*>& buffers, std
   }
 }
 
-void Combiner::_flushWriteBuffers( std::vector<std::stringstream*>& buffers, std::vector<std::ofstream*>& buckets, bool force ) {
+void indri::parse::Combiner::_flushWriteBuffers( std::vector<std::stringstream*>& buffers, std::vector<std::ofstream*>& buckets, bool force ) {
   for( unsigned int i=0; i<buckets.size(); i++ ) {
     _flushWriteBuffer( buffers, buckets, force, i );
   }
 }
 
-void Combiner::_flushWriteBuffer( std::vector<std::stringstream*>& buffers, std::vector<std::ofstream*>& buckets, bool force, int i ) {
+void indri::parse::Combiner::_flushWriteBuffer( std::vector<std::stringstream*>& buffers, std::vector<std::ofstream*>& buckets, bool force, int i ) {
   std::stringstream* buffer = buffers[i];
   if( buffer->tellp() > COMBINER_WRITE_BUFFER_SIZE || force ) {
     (*buckets[i]) << buffer->str();
@@ -94,18 +94,18 @@ void Combiner::_flushWriteBuffer( std::vector<std::stringstream*>& buffers, std:
   }
 }
 
-void Combiner::_openReadBuckets( std::vector<std::ifstream*>& buckets, const std::string& path, int bins ) {
+void indri::parse::Combiner::_openReadBuckets( std::vector<std::ifstream*>& buckets, const std::string& path, int bins ) {
   for( int i=0; i<_bins; i++ ) {
     std::string number = i64_to_string(i);
 
-    std::string binpath = Path::combine( path, number );
+    std::string binpath = indri::file::Path::combine( path, number );
     std::ifstream* bucket = new std::ifstream;
     bucket->open( binpath.c_str(), std::ios::in );
     buckets.push_back( bucket );
   }
 }
 
-void Combiner::_readDocBucket( UrlEntryTable& urlTable, std::ifstream& docIn ) {
+void indri::parse::Combiner::_readDocBucket( UrlEntryTable& urlTable, std::ifstream& docIn ) {
   char docno[512];
   char docurl[65536];
   char corpusPath[512];
@@ -123,7 +123,7 @@ void Combiner::_readDocBucket( UrlEntryTable& urlTable, std::ifstream& docIn ) {
   docIn.close();
 }
 
-int Combiner::hashString( const char* str ) {
+int indri::parse::Combiner::hashString( const char* str ) {
   unsigned int hash = 0;
   
   for( unsigned int i=0; str[i]; i++ ) {
@@ -134,13 +134,13 @@ int Combiner::hashString( const char* str ) {
   return hash % _bins;
 }
 
-void Combiner::hashRedirectTargets( const std::string& bucketPath, const std::string& redirectsPath ) {
+void indri::parse::Combiner::hashRedirectTargets( const std::string& bucketPath, const std::string& redirectsPath ) {
   std::cout << "hashing redirects" << std::endl;
 
   // read redirects file, and hash destinations into buckets
   std::vector<std::stringstream*> outputs;
   std::vector<std::ofstream*> outputFiles;
-  std::string targetPath = Path::combine( bucketPath, "target" );
+  std::string targetPath = indri::file::Path::combine( bucketPath, "target" );
   lemur_compat::mkdir( targetPath.c_str(), 0755 );
   _openWriteBuckets( outputs, outputFiles, targetPath, _bins );
 
@@ -174,15 +174,15 @@ void Combiner::hashRedirectTargets( const std::string& bucketPath, const std::st
   in.close();
 }
 
-void Combiner::combineRedirectDestinationBucket( const std::string& tmpPath, int i, std::vector<std::stringstream*>& outputs, std::vector<std::ofstream*>& outputFiles ) {
+void indri::parse::Combiner::combineRedirectDestinationBucket( const std::string& tmpPath, int i, std::vector<std::stringstream*>& outputs, std::vector<std::ofstream*>& outputFiles ) {
   std::cout << "combining dest bucket " << i << std::endl;
 
   std::string number = i64_to_string(i);
 
   // open docs file
   std::ifstream doc;
-  std::string docPath = Path::combine( tmpPath, "doc" );
-  std::string docFilePath = Path::combine( docPath, number ); 
+  std::string docPath = indri::file::Path::combine( tmpPath, "doc" );
+  std::string docFilePath = indri::file::Path::combine( docPath, number ); 
   doc.open( docFilePath.c_str(), std::ios::in );
 
   // read docs file
@@ -192,8 +192,8 @@ void Combiner::combineRedirectDestinationBucket( const std::string& tmpPath, int
 
   // open targets file
   std::ifstream target;
-  std::string targetPath = Path::combine( tmpPath, "target" );
-  std::string targetFilePath = Path::combine( targetPath, number ); 
+  std::string targetPath = indri::file::Path::combine( tmpPath, "target" );
+  std::string targetFilePath = indri::file::Path::combine( targetPath, number ); 
   target.open( targetFilePath.c_str(), std::ios::in );
 
   char aliasLine[65536];
@@ -225,12 +225,12 @@ void Combiner::combineRedirectDestinationBucket( const std::string& tmpPath, int
   }
 }
 
-void Combiner::combineRedirectDestinationBuckets( const std::string& tmpPath ) {
+void indri::parse::Combiner::combineRedirectDestinationBuckets( const std::string& tmpPath ) {
   std::cout << "combining redirect destination buckets" << std::endl;
 
   std::vector<std::stringstream*> outputs;
   std::vector<std::ofstream*> outputFiles;
-  std::string redirectPath = Path::combine( tmpPath, "redirect" );
+  std::string redirectPath = indri::file::Path::combine( tmpPath, "redirect" );
   lemur_compat::mkdir( redirectPath.c_str(), 0755 );
   _openWriteBuckets( outputs, outputFiles, redirectPath, _bins );
 
@@ -239,7 +239,7 @@ void Combiner::combineRedirectDestinationBuckets( const std::string& tmpPath ) {
   }
 }
 
-void Combiner::hashToBuckets( std::ifstream& in, const std::string& path ) {
+void indri::parse::Combiner::hashToBuckets( std::ifstream& in, const std::string& path ) {
   char docno[512];
   char docUrl[4096];
   char linkCountText[256];
@@ -270,7 +270,8 @@ void Combiner::hashToBuckets( std::ifstream& in, const std::string& path ) {
       int linkBucket = hashString( linkUrl + sizeof "LINKURL=" - 1 );
       std::stringstream* linkFile = _linkBuckets[ linkBucket ];
 
-      (*linkFile) << docUrl << std::endl
+      (*linkFile) << docno << std::endl
+                  << docUrl << std::endl
                   << linkUrl << std::endl
                   << text << std::endl;
     }
@@ -287,9 +288,9 @@ void Combiner::hashToBuckets( std::ifstream& in, const std::string& path ) {
   in.close();
 }
 
-void Combiner::createBuckets( const std::string& tmpPath ) {
-  std::string docPath = Path::combine( tmpPath, "doc" );
-  std::string linkPath = Path::combine( tmpPath, "link" );
+void indri::parse::Combiner::createBuckets( const std::string& tmpPath ) {
+  std::string docPath = indri::file::Path::combine( tmpPath, "doc" );
+  std::string linkPath = indri::file::Path::combine( tmpPath, "link" );
   
   lemur_compat::mkdir( docPath.c_str(), 0755 );
   lemur_compat::mkdir( linkPath.c_str(), 0755 );
@@ -297,13 +298,13 @@ void Combiner::createBuckets( const std::string& tmpPath ) {
   for( int i=0; i<_bins; i++ ) {
     std::string number = i64_to_string(i);
 
-    std::string docBinPath = Path::combine( docPath, number );
+    std::string docBinPath = indri::file::Path::combine( docPath, number );
     std::ofstream* docBucket = new std::ofstream;
     docBucket->open( docBinPath.c_str(), std::ios::out );
     _docBucketFiles.push_back( docBucket );
     _docBuckets.push_back( new std::stringstream() );
 
-    std::string linkBinPath = Path::combine( linkPath, number );
+    std::string linkBinPath = indri::file::Path::combine( linkPath, number );
     std::ofstream* linkBucket = new std::ofstream;
     linkBucket->open( linkBinPath.c_str(), std::ios::out );
     _linkBucketFiles.push_back( linkBucket );
@@ -321,7 +322,7 @@ std::stringstream* combiner_flush_stream( std::stringstream* buffer, std::ofstre
   }
 }
 
-void Combiner::closeBuckets() {
+void indri::parse::Combiner::closeBuckets() {
   for( unsigned int i=0; i<_docBuckets.size(); i++ ) {
     _docBucketFiles[i]->close();
     delete _docBuckets[i];
@@ -340,13 +341,13 @@ void Combiner::closeBuckets() {
 }
 
 
-void Combiner::combineBucket( const std::string& outputPath, const std::string& tmpPath, int bucket ) {
+void indri::parse::Combiner::combineBucket( const std::string& outputPath, const std::string& tmpPath, int bucket ) {
   UrlEntryTable urlTable( 5*1024*1024 );
   std::string number = i64_to_string(bucket);
 
   // read document information into the hash table
-  std::string docPath = Path::combine( tmpPath, "doc" );
-  std::string docBucketPath = Path::combine( docPath, number );
+  std::string docPath = indri::file::Path::combine( tmpPath, "doc" );
+  std::string docBucketPath = indri::file::Path::combine( docPath, number );
   std::ifstream docIn;
 
   std::cout << "  reading documents" << std::endl;
@@ -355,8 +356,8 @@ void Combiner::combineBucket( const std::string& outputPath, const std::string& 
   docIn.close();
 
   // update the hash table based on redirect information
-  std::string redirectPath = Path::combine( tmpPath, "redirect" );
-  std::string redirectBucketPath = Path::combine( redirectPath, number );
+  std::string redirectPath = indri::file::Path::combine( tmpPath, "redirect" );
+  std::string redirectBucketPath = indri::file::Path::combine( redirectPath, number );
   std::ifstream redirectIn;
   redirectIn.open( redirectBucketPath.c_str(), std::ios::in );
 
@@ -373,6 +374,9 @@ void Combiner::combineBucket( const std::string& outputPath, const std::string& 
     redirectIn.getline( pathline, sizeof pathline );
     redirectIn.getline( docnoline, sizeof docnoline );
     
+    if( strcmp( "ALIAS=", aliasurl ) )
+      break;
+
     // look for the aliasurl in the hash table
     url_entry** entry = urlTable.find( aliasurl + sizeof "ALIAS=" - 1 );
     url_entry* new_entry = _newUrlEntry( aliasurl + sizeof "ALIAS=" - 1,
@@ -380,7 +384,7 @@ void Combiner::combineBucket( const std::string& outputPath, const std::string& 
                                          pathline + sizeof "PATH=" - 1);
 
     if( entry ) {
-      delete *entry;
+      _deleteUrlEntry( *entry );
       urlTable.remove( aliasurl + sizeof "ALIAS=" - 1 );
     }
 
@@ -391,18 +395,20 @@ void Combiner::combineBucket( const std::string& outputPath, const std::string& 
   std::cout << "  reading links" << std::endl;
 
   // open link file
-  std::string linkPath = Path::combine( tmpPath, "link" );
-  std::string linkBucketPath = Path::combine( linkPath, number );
+  std::string linkPath = indri::file::Path::combine( tmpPath, "link" );
+  std::string linkBucketPath = indri::file::Path::combine( linkPath, number );
   std::ifstream linkIn;
 
   linkIn.open( linkBucketPath.c_str(), std::ios::in );
 
+  char docno[65536];
   char linkurl[65536];
   char linktext[65536];
   int linkCount = 0;
 
   // read the incoming link information and match it with document information
   while( !linkIn.eof() && linkIn.good() ) {
+    linkIn.getline( docno, sizeof docno-1 );
     linkIn.getline( docurl, sizeof docurl-1 );
     linkIn.getline( linkurl, sizeof linkurl-1 );
     linkIn.getline( linktext, sizeof linktext-1 );
@@ -412,7 +418,8 @@ void Combiner::combineBucket( const std::string& outputPath, const std::string& 
 
     // entry exists, so this is a link match
     if( entry ) {
-      (*entry)->addLink( docurl + sizeof "DOCURL=" - 1,
+      (*entry)->addLink( docno + sizeof "DOCNO=" - 1,
+                         docurl + sizeof "DOCURL=" - 1,
                          linktext + sizeof "TEXT=" - 1 );
     }
   }
@@ -455,7 +462,7 @@ void Combiner::combineBucket( const std::string& outputPath, const std::string& 
     
     // open the appropriate file
     std::string corpusPath = (*citer->first);
-    std::string anchorPath = Path::combine( outputPath, corpusPath );
+    std::string anchorPath = indri::file::Path::combine( outputPath, corpusPath );
     std::ofstream out;
     out.open( anchorPath.c_str(), std::ios::out | std::ios::app );
     out.seekp( 0, std::ios::end );
@@ -464,8 +471,8 @@ void Combiner::combineBucket( const std::string& outputPath, const std::string& 
       // wasn't able to create this file, so maybe we need to build
       // the directory structure
       out.clear();
-      std::string parent = Path::directory( anchorPath );
-      Path::make( parent );
+      std::string parent = indri::file::Path::directory( anchorPath );
+      indri::file::Path::make( parent );
       out.open( anchorPath.c_str(), std::ios::out | std::ios::app );
       out.seekp( 0, std::ios::end );
     }
@@ -488,8 +495,8 @@ void Combiner::combineBucket( const std::string& outputPath, const std::string& 
   }
 }
 
-void Combiner::combineBuckets( const std::string& outputPath, const std::string& tmpPath ) {
-  IndriTimer t;
+void indri::parse::Combiner::combineBuckets( const std::string& outputPath, const std::string& tmpPath ) {
+  indri::utility::IndriTimer t;
   t.start();
 
   for( int i=0; i<_bins; i++ ) {
@@ -499,19 +506,19 @@ void Combiner::combineBuckets( const std::string& outputPath, const std::string&
   }
 }
 
-void Combiner::hashToBuckets( const std::string& bucketPath, const std::string& inputPath ) {
+void indri::parse::Combiner::hashToBuckets( const std::string& bucketPath, const std::string& inputPath ) {
   createBuckets( bucketPath );
 
-  FileTreeIterator input( inputPath );
+  indri::file::FileTreeIterator input( inputPath );
 
-  for( ; input != FileTreeIterator::end(); input++ ) {
+  for( ; input != indri::file::FileTreeIterator::end(); input++ ) {
     std::string path = *input;
     std::ifstream in;
 
     in.open( path.c_str() );
 
     // make path relative
-    std::string relative = Path::relative( inputPath, path );
+    std::string relative = indri::file::Path::relative( inputPath, path );
     std::cout << "hashing " << relative << std::endl;
 
     hashToBuckets( in, relative );
@@ -523,12 +530,12 @@ void Combiner::hashToBuckets( const std::string& bucketPath, const std::string& 
   closeBuckets();
 }
 
-void Combiner::sortCorpusFiles( const std::string& outputPath, const std::string& preSortPath, const std::string& inputPath ) {
-  FileTreeIterator files( preSortPath );
+void indri::parse::Combiner::sortCorpusFiles( const std::string& outputPath, const std::string& preSortPath, const std::string& inputPath ) {
+  indri::file::FileTreeIterator files( preSortPath );
 
-  for( ; files != FileTreeIterator::end(); files++ ) {
+  for( ; files != indri::file::FileTreeIterator::end(); files++ ) {
     std::string unsortedPath = *files;
-    std::string relativePath = Path::relative( preSortPath, unsortedPath );
+    std::string relativePath = indri::file::Path::relative( preSortPath, unsortedPath );
     std::ifstream in;
   
     UrlEntryTable urlTable;
@@ -546,6 +553,7 @@ void Combiner::sortCorpusFiles( const std::string& outputPath, const std::string
       char linkCountText[512];
       
       char linkFrom[4096];
+      char linkDocno[4096];
       char linkText[65536];
 
       in.getline( docUrl, sizeof docUrl );
@@ -573,12 +581,17 @@ void Combiner::sortCorpusFiles( const std::string& outputPath, const std::string
       }
 
       for( int i=0; i<linkCount; i++ ) {
+        in.getline( linkDocno, sizeof linkDocno );
+        int linkDocnoLen = strlen(linkDocno);
+
         in.getline( linkFrom, sizeof linkFrom );
         int linkFromLen = strlen(linkFrom);
 
         in.getline( linkText, sizeof linkText );
         int linkTextLen = strlen(linkText);
 
+        sprintf( e->linkinfo.write(linkDocnoLen+2), "%s\n", linkDocno );
+        e->linkinfo.unwrite(1);
         sprintf( e->linkinfo.write(linkFromLen+2), "%s\n", linkFrom );
         e->linkinfo.unwrite(1);
         sprintf( e->linkinfo.write(linkTextLen+2), "%s\n", linkText );
@@ -597,19 +610,19 @@ void Combiner::sortCorpusFiles( const std::string& outputPath, const std::string
     // DOCNO in the hash table, and write it out if we find it.
 
     std::string inputFilePath;
-    inputFilePath = Path::combine( inputPath, relativePath );
+    inputFilePath = indri::file::Path::combine( inputPath, relativePath );
     in.open( inputFilePath.c_str(), std::ios::in );
 
     std::ofstream out;
     std::string outFilePath;
-    outFilePath = Path::combine( outputPath, relativePath );
+    outFilePath = indri::file::Path::combine( outputPath, relativePath );
 
     out.open( outFilePath.c_str(), std::ios::out );
 
     if( !out.good() ) {
       out.clear();
-      std::string parent = Path::directory( outFilePath );
-      Path::make( parent );
+      std::string parent = indri::file::Path::directory( outFilePath );
+      indri::file::Path::make( parent );
       out.open( outFilePath.c_str(), std::ios::out );
     }
 

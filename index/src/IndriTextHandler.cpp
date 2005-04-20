@@ -15,7 +15,7 @@ IndriTextHandler::IndriTextHandler(const string &name, int memory, const Parser*
   bufsize = 0;
   char* docsource = NULL;
   env.setMemory(memory);
-  if (Repository::exists(name)) {
+  if (indri::collection::Repository::exists(name)) {
     env.open(name);
     cout << "Existing repository "<< name <<" found, documents will be added to existing index" << endl;
   } else {
@@ -51,7 +51,7 @@ char * IndriTextHandler::handleWord(char * word, const char* original, PropertyL
   if (word) {
     char* wordcopy = strdup(word);
     document.terms.push_back(wordcopy);
-    TermExtent extent;
+    indri::parse::TermExtent extent;
     extent.end = parser->fileTell() - docbegin;
     extent.begin = extent.end - strlen(original);
     document.positions.push_back(extent);

@@ -16,50 +16,60 @@
 // 28 July 2004 -- tds
 //
 
+#include "indri/DocListIterator.hpp"
 #include "indri/DocListIteratorNode.hpp"
 #include "indri/Annotator.hpp"
+#include "indri/InferenceNetwork.hpp"
 
-DocListIteratorNode::DocListIteratorNode( const std::string& name, DocPositionInfoList* list ) :
-  _list(list),
-  _name(name)
+indri::infnet::DocListIteratorNode::DocListIteratorNode( const std::string& name, class InferenceNetwork& network, int listID ) :
+  _name(name),
+  _network(network),
+  _listID(listID)
 {
-  _list->startIteration();
-  _list->nextEntry();
 }
 
-int DocListIteratorNode::nextCandidateDocument() {
-  DocInfo* info = _list->currentEntry();
+int indri::infnet::DocListIteratorNode::nextCandidateDocument() {
+  if( _list ) {
+    indri::index::DocListIterator::DocumentData* info = _list->currentEntry();
+    if( info ) { 
+      return info->document;
+    }
+  }
 
-  if( info )
-    return info->docID();
-  else
-    return MAX_INT32;
+  return MAX_INT32;
 }
 
-void DocListIteratorNode::prepare( int documentID ) {
-  DocInfo* info = _list->currentEntry();
+void indri::infnet::DocListIteratorNode::prepare( int documentID ) {
   _extents.clear();
 
-  if( !info || info->docID() != documentID )
+  if( !_list )
     return;
 
-  int count = info->termCount();
-  // dmf FIXME
-  const int* pos = (const int *) info->positions();
+  indri::index::DocListIterator::DocumentData* info = _list->currentEntry();
+
+  if( !info || info->document != documentID )
+    return;
   
-  for( int i = 0; i < count; i++ ) {
-    _extents.push_back( Extent( pos[i], pos[i]+1 ) );
+  indri::utility::greedy_vector<int>& positions = info->positions;
+
+  for( int i = 0; i < positions.size(); i++ ) {
+    _extents.push_back( indri::index::Extent( positions[i], positions[i]+1 ) );
   }
 }
 
-const greedy_vector<Extent>& DocListIteratorNode::extents() {
+const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::DocListIteratorNode::extents() {
   return _extents;
 }
 
-const std::string& DocListIteratorNode::getName() const {
+const std::string& indri::infnet::DocListIteratorNode::getName() const {
   return _name;
 }
 
-void DocListIteratorNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::DocListIteratorNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
   annotator.addMatches( _extents, this, documentID, begin, end );
 }
+
+void indri::infnet::DocListIteratorNode::indexChanged( indri::index::Index& index ) {
+  _list = _network.getDocIterator( _listID );
+}
+

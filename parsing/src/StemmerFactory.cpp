@@ -35,20 +35,20 @@
 //        You may use the stemmerParams object if you like for additional stemmer options.
 //
 
-Transformation* StemmerFactory::get( const std::string& stemmerName, Parameters& stemmerParams ) {
+indri::parse::Transformation* indri::parse::StemmerFactory::get( const std::string& stemmerName, indri::api::Parameters& stemmerParams ) {
   std::string name = preferredName( stemmerName );
 
   if( name == STEMMER_PORTER ) {
-    return new PorterStemmerTransformation();
+    return new indri::parse::PorterStemmerTransformation();
   } else if( name == STEMMER_KROVETZ ) {
-    return new KrovetzStemmerTransformation( stemmerParams );
+    return new indri::parse::KrovetzStemmerTransformation( stemmerParams );
   }
   
   LEMUR_THROW( LEMUR_RUNTIME_ERROR, stemmerName + " is not a known stemmer." );
   return 0;
 }
 
-std::string StemmerFactory::preferredName( const std::string& name ) {
+std::string indri::parse::StemmerFactory::preferredName( const std::string& name ) {
   if( name[0] == 'k' || name[0] == 'K' ) {
     return STEMMER_KROVETZ;
   } else if( name[0] == 'p' || name[0] == 'P' ) {

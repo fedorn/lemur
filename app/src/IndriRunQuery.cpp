@@ -165,16 +165,18 @@ as <tt>-fbOrigWeight=number</tt> on the command line.</dd>
 #include "indri/RMExpander.hpp"
 #include "indri/PonteExpander.hpp"
 
+#include "indri/IndriTimer.hpp"
+
 #ifndef WIN32
 #include <sys/time.h>
 #endif
 
-void open_indexes( Parameters& params, QueryEnvironment& env ) {
+void open_indexes( indri::api::Parameters& params, indri::api::QueryEnvironment& env ) {
   if( !params.exists("index") && !params.exists("server") ) 
     LEMUR_THROW( LEMUR_MISSING_PARAMETER_ERROR, "Must specify a server or index to query against." );
 
   if( params.exists( "index" ) ) {
-    Parameters indexes = params["index"];
+    indri::api::Parameters indexes = params["index"];
 
     for( unsigned int i=0; i < indexes.size(); i++ ) {
       env.addIndex( std::string(indexes[i]) );
@@ -182,7 +184,7 @@ void open_indexes( Parameters& params, QueryEnvironment& env ) {
   }
 
   if( params.exists( "server" ) ) {
-    Parameters servers = params["server"];
+    indri::api::Parameters servers = params["server"];
 
     for( unsigned int i=0; i < servers.size(); i++ ) {
       env.addServer( std::string(servers[i]) );
@@ -190,11 +192,11 @@ void open_indexes( Parameters& params, QueryEnvironment& env ) {
   }
 }
 
-static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, Parameters p, const std::string& parameterName ) {
+static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, indri::api::Parameters p, const std::string& parameterName ) {
   if( !p.exists(parameterName) )
     return false;
 
-  Parameters slice = p[parameterName];
+  indri::api::Parameters slice = p[parameterName];
   
   for( int i=0; i<slice.size(); i++ ) {
     vec.push_back( slice[i] );
@@ -205,7 +207,7 @@ static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, Par
 
 int main(int argc, char * argv[]) {
   try {
-    Parameters& param = Parameters::instance();
+    indri::api::Parameters& param = indri::api::Parameters::instance();
     param.loadCommandLine( argc, argv );
 
     if( param.get( "version", 0 ) ) {
@@ -224,9 +226,9 @@ int main(int argc, char * argv[]) {
     int trecFormat = param.get( "trecFormat" , 0 );
     bool printQuery = param.get( "printQuery", false );
 
-    Parameters queries = param[ "query" ];
+    indri::api::Parameters queries = param[ "query" ];
 
-    QueryEnvironment env;
+    indri::api::QueryEnvironment env;
     open_indexes( param, env );
 
     env.setMemory( param.get("memory", 100*1024*1024) );
@@ -239,18 +241,18 @@ int main(int argc, char * argv[]) {
     if( copy_parameters_to_string_vector( smoothingRules, param, "rule" ) )
       env.setScoringRules( smoothingRules );
 
-    QueryExpander * qe = NULL;
+    indri::query::QueryExpander * qe = NULL;
 
     if( fbDocs ) {
-      qe = new RMExpander( &env, param );
+      qe = new indri::query::RMExpander( &env, param );
     }
     // actually perform the query (in parallel for servers, in series for
     // the local databases)
-    std::vector<ScoredExtentResult> results;
+    std::vector<indri::api::ScoredExtentResult> results;
 
     // fetch document information
     std::vector<std::string> documentNames;
-    std::vector<ParsedDocument*> documents;
+    std::vector<indri::api::ParsedDocument*> documents;
 
     for( int query = 0; query < queries.size(); query++ ) {
       std::string queryString = std::string( queries[ query ] );
@@ -271,12 +273,12 @@ int main(int argc, char * argv[]) {
         documentNames.clear();
 
         for( unsigned int i=0; i<results.size(); i++ ) {
-          ParsedDocument* doc = documents[i];
+          indri::api::ParsedDocument* doc = documents[i];
           std::string documentName;
 
-          greedy_vector<MetadataPair>::iterator iter = std::find_if( documents[i]->metadata.begin(),
+          indri::utility::greedy_vector<indri::parse::MetadataPair>::iterator iter = std::find_if( documents[i]->metadata.begin(),
             documents[i]->metadata.end(),
-            MetadataPair::key_equal( "docno" ) );
+            indri::parse::MetadataPair::key_equal( "docno" ) );
 
           if( iter != documents[i]->metadata.end() )
             documentName = (char*) iter->value;

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -20,12 +20,20 @@
 #define INDRI_INFERENCENETWORKNODE_HPP
 
 #include <string>
-
-class InferenceNetworkNode {
-public:
-  virtual ~InferenceNetworkNode() {}
-  virtual int nextCandidateDocument() = 0;
-  virtual const std::string& getName() const = 0;
-};
+#include "indri/Index.hpp"
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class InferenceNetworkNode {
+    public:
+      virtual ~InferenceNetworkNode() {}
+      virtual int nextCandidateDocument() = 0;
+      virtual void indexChanged( indri::index::Index& index ) = 0;
+      virtual const std::string& getName() const = 0;
+    };
+  }
+}
 
 #endif // INDRI_INFERENCENETWORKNODE_HPP

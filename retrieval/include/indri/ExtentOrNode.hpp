@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -23,21 +23,30 @@
 #include <string>
 #include "indri/greedy_vector"
 #include "indri/ListIteratorNode.hpp"
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class ExtentOrNode : public ListIteratorNode {
+    private:
+      std::vector<ListIteratorNode*> _children;
+      indri::utility::greedy_vector<indri::index::Extent> _extents;
+      std::string _name;
 
-class ExtentOrNode : public ListIteratorNode {
-private:
-  std::vector<ListIteratorNode*> _children;
-  greedy_vector<Extent> _extents;
-  std::string _name;
+    public:
+      ExtentOrNode( const std::string& name, std::vector<ListIteratorNode*>& children );
+      void prepare( int documentID );
+      const indri::utility::greedy_vector<indri::index::Extent>& extents();
+  
+      void indexChanged( indri::index::Index& index );
+      int nextCandidateDocument();
 
-public:
-  ExtentOrNode( const std::string& name, std::vector<ListIteratorNode*>& children );
-  void prepare( int documentID );
-  const greedy_vector<Extent>& extents();
-  int nextCandidateDocument();
-  const std::string& getName() const;
-  void annotate( class Annotator& annotator, int documentID, int begin, int end );
-};
+      const std::string& getName() const;
+      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+    };
+  }
+}
 
 #endif // INDRI_EXTENTORNODE_HPP
 

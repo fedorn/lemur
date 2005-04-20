@@ -14,25 +14,25 @@
 /* $ANTLR 2.7.4: "indrilang.g" -> "QueryParser.hpp"$ */
 #include <antlr/TokenStream.hpp>
 #include <antlr/TokenBuffer.hpp>
-#include "indri/QueryLexerTokenTypes.hpp"
+#include "QueryLexerTokenTypes.hpp"
 #include <antlr/LLkParser.hpp>
 
 ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API QueryParser : public ANTLR_USE_NAMESPACE(antlr)LLkParser, public QueryLexerTokenTypes
 {
-#line 151 "indrilang.g"
+#line 152 "indrilang.g"
 
 private:
   // storage for allocated nodes
   std::vector<indri::lang::Node*> _nodes;
   // makes sure nodes go away when parser goes away
-  VectorDeleter<indri::lang::Node*> _deleter;
+  indri::utility::VectorDeleter<indri::lang::Node*> _deleter;
   // gives us access to named priors
-  PriorFactory* _priorFactory;
+    indri::query::PriorFactory* _priorFactory;
   
 public:
-  void init( PriorFactory* factory, QueryLexer* lexer ) {
+  void init( indri::query::PriorFactory* factory, QueryLexer* lexer ) {
     _priorFactory = factory;
     _deleter.setVector( _nodes );
   }
@@ -73,14 +73,14 @@ public:
 	public:  indri::lang::PriorNode*  priorNode();
 	public:  indri::lang::FilRejNode*  filrejNode();
 	public:  indri::lang::FilReqNode*  filreqNode();
-	public:  ScoredExtentNode*  scoredRaw();
+	public:  indri::lang::ScoredExtentNode*  scoredRaw();
 	public:  RawExtentNode*  qualifiedTerm();
 	public:  ExtentOr*  context_list();
-	public:  RawExtentNode*  unqualifiedTerm();
+	public:  indri::lang::RawExtentNode*  unqualifiedTerm();
 	public:  indri::lang::ScoredExtentNode*  weightedList(
 		 indri::lang::WeightedCombinationNode* wn 
 	);
-	public:  indri::lang::ExtentRestriction*  extentRestriction(
+	public:  indri::lang::ScoredExtentNode*  extentRestriction(
 		 indri::lang::ScoredExtentNode* sn 
 	);
 	public:  double  floating();
@@ -91,24 +91,25 @@ public:
 		 indri::lang::UnweightedCombinationNode* cn 
 	);
 	public:  indri::lang::ScoredExtentNode*  sumNode();
-	public:  indri::lang::ODNode*  odNode();
+	public:  indri::lang::WeightedExtentOr*  wsynNode();
 	public:  RawExtentNode*  unscoredTerm();
+	public:  indri::lang::ODNode*  odNode();
 	public:  indri::lang::UWNode*  uwNode();
 	public:  indri::lang::BAndNode*  bandNode();
 	public:  indri::lang::Field*  anyField();
-	public:  ExtentAnd*  field_list();
-	public:  FieldLessNode*  dateBefore();
-	public:  FieldGreaterNode*  dateAfter();
-	public:  FieldBetweenNode*  dateBetween();
+	public:  indri::lang::ExtentAnd*  field_list();
+	public:  indri::lang::FieldLessNode*  dateBefore();
+	public:  indri::lang::FieldGreaterNode*  dateAfter();
+	public:  indri::lang::FieldBetweenNode*  dateBetween();
 	public:  indri::lang::ExtentOr*  synonym_list();
 	public:  indri::lang::ExtentOr*  synonym_list_brace();
 	public:  indri::lang::ExtentOr*  synonym_list_alt();
-	public:  FieldLessNode*  lessNode();
-	public:  FieldGreaterNode*  greaterNode();
-	public:  FieldBetweenNode*  betweenNode();
-	public:  FieldEqualsNode*  equalsNode();
-	public:  IndexTerm*  rawText();
-	public:  Field*  field_restriction();
+	public:  indri::lang::FieldLessNode*  lessNode();
+	public:  indri::lang::FieldGreaterNode*  greaterNode();
+	public:  indri::lang::FieldBetweenNode*  betweenNode();
+	public:  indri::lang::FieldEqualsNode*  equalsNode();
+	public:  indri::lang::IndexTerm*  rawText();
+	public:  indri::lang::Field*  field_restriction();
 	public:  UINT64  date();
 	public:  UINT64  slashDate();
 	public:  UINT64  spaceDate();
@@ -125,10 +126,10 @@ protected:
 private:
 	static const char* tokenNames[];
 #ifndef NO_STATIC_CONSTS
-	static const int NUM_TOKENS = 62;
+	static const int NUM_TOKENS = 63;
 #else
 	enum {
-		NUM_TOKENS = 62
+		NUM_TOKENS = 63
 	};
 #endif
 	

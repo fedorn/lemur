@@ -38,7 +38,7 @@
 //        will delete any parsers you create.
 //
 
-std::string ParserFactory::preferredName( const std::string& name ) {
+std::string indri::parse::ParserFactory::preferredName( const std::string& name ) {
   if( name[0] == 'h' || name[0] == 'H' ) {
     return PARSER_HTML;
   } else if( name[0] == 'x' || name[0] == 'X' || name[0] == 's' || name[0] == 'S' ) {
@@ -51,29 +51,29 @@ std::string ParserFactory::preferredName( const std::string& name ) {
   return "";
 }
 
-indri::Parser* ParserFactory::get( const std::string& name ) {
+indri::parse::Parser* indri::parse::ParserFactory::get( const std::string& name ) {
   std::vector<std::string> empty;
   std::map<std::string,std::string> mempty;
 
   return get( name, empty, empty, empty, empty, mempty );
 }
 
-indri::Parser* ParserFactory::get( const std::string& name,
+indri::parse::Parser* indri::parse::ParserFactory::get( const std::string& name,
                                    const std::vector<std::string>& includeTags,
                                    const std::vector<std::string>& excludeTags,
                                    const std::vector<std::string>& indexTags,
                                    const std::vector<std::string>& metadataTags,
                                    const std::map<std::string, std::string>& conflations )
 {
-  indri::Parser* parser;
+  indri::parse::Parser* parser;
   std::string preferred = preferredName( name );
 
   if( preferred == PARSER_HTML ) {
-    parser = new HTMLParser();
+    parser = new indri::parse::HTMLParser();
   } else if( preferred == PARSER_XML ) {
-    parser = new TaggedTextParser();
+    parser = new indri::parse::TaggedTextParser();
   } else if( preferred == PARSER_TEXT ) {
-    parser = new TextParser();
+    parser = new indri::parse::TextParser();
   } else {
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, name + " is not a known parser." );
   }

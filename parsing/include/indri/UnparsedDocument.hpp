@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,12 +21,18 @@
 
 #include "indri/MetadataPair.hpp"
 #include "indri/greedy_vector"
+namespace indri
+{
+  namespace parse
+  {
+    
+    struct UnparsedDocument {
+      const char* text;
+      size_t textLength;
 
-struct UnparsedDocument {
-  const char* text;
-  size_t textLength;
-
-  greedy_vector<MetadataPair> metadata;
-};
+      indri::utility::greedy_vector<MetadataPair> metadata;
+    };
+  }
+}
 
 #endif // INDRI_UNPARSEDDOCUMENT_HPP

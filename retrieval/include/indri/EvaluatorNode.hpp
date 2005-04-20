@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -24,17 +24,23 @@
 #include <string>
 #include <vector>
 #include <map>
+namespace indri 
+{
+  namespace infnet 
+  {
+    
+    class EvaluatorNode : public InferenceNetworkNode {
+    public:
+      typedef std::map< std::string, std::vector<indri::api::ScoredExtentResult> > MResults;
 
-class EvaluatorNode : public InferenceNetworkNode {
-public:
-  typedef std::map< std::string, std::vector<ScoredExtentResult> > MResults;
+      virtual ~EvaluatorNode() {};
 
-  virtual ~EvaluatorNode() {};
-
-  // Called once for every document ID returned by nextCandidateDocument().
-  // May be called for documents other than those returned by nextCandidateDocument().
-  virtual void evaluate( int documentID, int documentLength ) = 0;
-  virtual const MResults& getResults() = 0;
-};
+      // Called once for every document ID returned by nextCandidateDocument().
+      // May be called for documents other than those returned by nextCandidateDocument().
+      virtual void evaluate( int documentID, int documentLength ) = 0;
+      virtual const MResults& getResults() = 0;
+    };
+  }
+}
 
 #endif // INDRI_EVALUATORNODE_HPP

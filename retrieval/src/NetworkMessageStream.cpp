@@ -1,3 +1,4 @@
+
 /*==========================================================================
  * Copyright (c) 2004 University of Massachusetts.  All Rights Reserved.
  *
@@ -19,14 +20,15 @@
 #include "indri/NetworkMessageStream.hpp"
 #include "indri/XMLWriter.hpp"
 #include "indri/XMLReader.hpp"
+#include "indri/indri-platform.h"
 #include "Exception.hpp"
 #include <iostream>
 
-XMLReplyReceiver::~XMLReplyReceiver() {
+indri::net::XMLReplyReceiver::~XMLReplyReceiver() {
   delete _reply;
 }
 
-void XMLReplyReceiver::wait( NetworkMessageStream* stream ) {
+void indri::net::XMLReplyReceiver::wait( indri::net::NetworkMessageStream* stream ) {
   while( !done() && stream->alive() && !_exception.size() ) {
     stream->read(*this);
   }
@@ -35,7 +37,7 @@ void XMLReplyReceiver::wait( NetworkMessageStream* stream ) {
     LEMUR_THROW( LEMUR_NETWORK_ERROR, _exception );
 }
 
-int NetworkMessageStream::_findEOL() {
+int indri::net::NetworkMessageStream::_findEOL() {
   for( size_t i=_readPosition; i<_writePosition; i++ ) {
     if( _buffer.front()[i] == '\n' )
       return int(i);
@@ -44,17 +46,17 @@ int NetworkMessageStream::_findEOL() {
   return -1;
 }
 
-void NetworkMessageStream::_cleanBuffer() {
+void indri::net::NetworkMessageStream::_cleanBuffer() {
   _buffer.remove( _readPosition );
   _writePosition -= _readPosition;
   _readPosition = 0;
 }
 
-int NetworkMessageStream::_bufferLength() {
+int indri::net::NetworkMessageStream::_bufferLength() {
   return _writePosition - _readPosition;
 }
 
-NetworkMessageStream::NetworkMessageStream( NetworkStream* stream ) :
+indri::net::NetworkMessageStream::NetworkMessageStream( indri::net::NetworkStream* stream ) :
   _stream(stream)
 {
   _readPosition = 0;
@@ -65,11 +67,11 @@ NetworkMessageStream::NetworkMessageStream( NetworkStream* stream ) :
   _buffer.grow( 65536 ); 
 }
 
-bool NetworkMessageStream::alive() {
+bool indri::net::NetworkMessageStream::alive() {
   return _stream->alive();
 }
 
-void NetworkMessageStream::read( MessageStreamHandler& handler ) {
+void indri::net::NetworkMessageStream::read( MessageStreamHandler& handler ) {
   int endOfLine = _findEOL();
   int bytesRead = -1;
 
@@ -118,8 +120,8 @@ void NetworkMessageStream::read( MessageStreamHandler& handler ) {
       _writePosition += bytesRead;
     }
 
-    XMLReader reader;
-    XMLNode* node = reader.read( _buffer.front() + _readPosition, length );
+    indri::xml::XMLReader reader;
+    indri::xml::XMLNode* node = reader.read( _buffer.front() + _readPosition, length );
     handler.request( node );
     delete node;
     _readPosition += length;
@@ -140,8 +142,8 @@ void NetworkMessageStream::read( MessageStreamHandler& handler ) {
       _writePosition += bytesRead;
     }
 
-    XMLReader reader;
-    XMLNode* node = reader.read( _buffer.front() + _readPosition, length );
+    indri::xml::XMLReader reader;
+    indri::xml::XMLNode* node = reader.read( _buffer.front() + _readPosition, length );
     handler.reply( node );
     _readPosition += length;
   } else if( strncmp( "BRPY", _buffer.front() + _readPosition, 4 ) == 0 ) {
@@ -186,8 +188,8 @@ void NetworkMessageStream::read( MessageStreamHandler& handler ) {
   assert( _readPosition <= _writePosition );
 }
 
-void NetworkMessageStream::request( XMLNode* messageNode ) {
-  XMLWriter writer(messageNode);
+void indri::net::NetworkMessageStream::request( indri::xml::XMLNode* messageNode ) {
+  indri::xml::XMLWriter writer(messageNode);
   std::string body;
   writer.write( body );
   
@@ -199,8 +201,8 @@ void NetworkMessageStream::request( XMLNode* messageNode ) {
   _stream->write( body.c_str(), body.length() );
 }
 
-void NetworkMessageStream::reply( XMLNode* replyNode ) {
-  XMLWriter writer(replyNode);
+void indri::net::NetworkMessageStream::reply( indri::xml::XMLNode* replyNode ) {
+  indri::xml::XMLWriter writer(replyNode);
   std::string body;
   writer.write(body);
 
@@ -212,7 +214,7 @@ void NetworkMessageStream::reply( XMLNode* replyNode ) {
   _stream->write( body.c_str(), body.length() );
 }
 
-void NetworkMessageStream::reply( const std::string& name, const void* buffer, unsigned int size ) {
+void indri::net::NetworkMessageStream::reply( const std::string& name, const void* buffer, unsigned int size ) {
   std::string header = "BRPY ";
   header += i64_to_string( size );
   header += " ";
@@ -223,11 +225,11 @@ void NetworkMessageStream::reply( const std::string& name, const void* buffer, u
   _stream->write( buffer, size );
 }
 
-void NetworkMessageStream::replyDone() {
+void indri::net::NetworkMessageStream::replyDone() {
   _stream->write( "RFIN\n", 5 );
 }
 
-void NetworkMessageStream::error( const std::string& errorMessage ) {
+void indri::net::NetworkMessageStream::error( const std::string& errorMessage ) {
   std::string fullMessage;
   fullMessage = "ERR ";
   fullMessage += errorMessage;
@@ -235,3 +237,9 @@ void NetworkMessageStream::error( const std::string& errorMessage ) {
 
   _stream->write( fullMessage.c_str(), fullMessage.length() );
 }
+
+indri::thread::Lockable& indri::net::NetworkMessageStream::mutex() {
+  return _lock;
+}
+
+

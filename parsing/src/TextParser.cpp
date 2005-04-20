@@ -1,13 +1,3 @@
-/*==========================================================================
- * Copyright (c) 2003-2004 University of Massachusetts.  All Rights Reserved.
- *
- * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
- * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.lemurproject.org/license.html
- *
- *==========================================================================
-*/
 #define yy_create_buffer textparser_create_buffer
 #define yy_delete_buffer textparser_delete_buffer
 #define yy_scan_buffer textparser_scan_buffer
@@ -50,6 +40,7 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
+#include <unistd.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -405,7 +396,18 @@ char *yytext;
 #line 1 "../src/TextParser.l"
 #define INITIAL 0
 #define YY_NEVER_INTERACTIVE 1
-#line 6 "../src/TextParser.l"
+#line 5 "../src/TextParser.l"
+
+/*==========================================================================
+ * Copyright (c) 2003-2004 University of Massachusetts.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software, and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 
 //
 // TextParser.lex
@@ -420,7 +422,7 @@ char *yytext;
   
 static long byte_position;
 
-#line 461 "../src/TextParser.cpp"
+#line 426 "../src/TextParser.cpp"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -571,10 +573,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 68 "../src/TextParser.l"
+#line 32 "../src/TextParser.l"
 
 
-#line 615 "../src/TextParser.cpp"
+#line 580 "../src/TextParser.cpp"
 
 	if ( yy_init )
 		{
@@ -659,50 +661,50 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 70 "../src/TextParser.l"
+#line 34 "../src/TextParser.l"
 { byte_position += textparserleng; /* zap symbols */ }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 71 "../src/TextParser.l"
+#line 35 "../src/TextParser.l"
 { byte_position += textparserleng; /* zap symbols */ } 
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 72 "../src/TextParser.l"
+#line 36 "../src/TextParser.l"
 { byte_position += textparserleng; return 1; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 73 "../src/TextParser.l"
+#line 37 "../src/TextParser.l"
 { byte_position += textparserleng; return 1; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 74 "../src/TextParser.l"
+#line 38 "../src/TextParser.l"
 { byte_position += textparserleng; return 1;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 75 "../src/TextParser.l"
+#line 39 "../src/TextParser.l"
 { byte_position += textparserleng; return 1; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 76 "../src/TextParser.l"
+#line 40 "../src/TextParser.l"
 { byte_position += textparserleng; /* zap newline */ }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 77 "../src/TextParser.l"
+#line 41 "../src/TextParser.l"
 { byte_position += textparserleng; /* zap unknown char */ }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 79 "../src/TextParser.l"
+#line 43 "../src/TextParser.l"
 ECHO;
 	YY_BREAK
-#line 743 "../src/TextParser.cpp"
+#line 708 "../src/TextParser.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1588,18 +1590,18 @@ int main()
 	return 0;
 	}
 #endif
-#line 79 "../src/TextParser.l"
+#line 43 "../src/TextParser.l"
 
 
-TextParser::TextParser() :
+indri::parse::TextParser::TextParser() :
   _handler(0)
 {
 }
 
-TextParser::~TextParser() {
+indri::parse::TextParser::~TextParser() {
 }
 
-void TextParser::setTags( const std::vector<std::string>& include,
+void indri::parse::TextParser::setTags( const std::vector<std::string>& include,
                           const std::vector<std::string>& exclude,
                           const std::vector<std::string>& index,
                           const std::vector<std::string>& metadata, 
@@ -1607,7 +1609,7 @@ void TextParser::setTags( const std::vector<std::string>& include,
   // do nothing
 }
 
-ParsedDocument* TextParser::parse( UnparsedDocument* document ) {
+indri::api::ParsedDocument* indri::parse::TextParser::parse( indri::parse::UnparsedDocument* document ) {
   _termBuffer.clear();
   _termBuffer.grow( document->textLength * 2 ); // leave a little extra room
   _document.terms.clear();
@@ -1630,11 +1632,11 @@ ParsedDocument* TextParser::parse( UnparsedDocument* document ) {
   return &_document;
 }
 
-void TextParser::writeToken(char* token) {
+void indri::parse::TextParser::writeToken(char* token) {
   writeToken(token, byte_position-textparserleng, byte_position);
 }
 
-void TextParser::writeToken(char *token, int start, int end) {
+void indri::parse::TextParser::writeToken(char *token, int start, int end) {
   int tokenLength = strlen(token);
   
   TermExtent extent;
@@ -1647,11 +1649,11 @@ void TextParser::writeToken(char *token, int start, int end) {
   _document.terms.push_back( writeLocation );
 }
 
-void TextParser::handle( UnparsedDocument* document ) {
+void indri::parse::TextParser::handle( indri::parse::UnparsedDocument* document ) {
   _handler->handle( parse(document) );
 }
 
-void TextParser::setHandler( ObjectHandler<ParsedDocument>& h ) {
+void indri::parse::TextParser::setHandler( ObjectHandler<indri::api::ParsedDocument>& h ) {
   _handler = &h;
 }
 

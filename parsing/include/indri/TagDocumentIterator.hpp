@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -18,6 +18,12 @@
 
 #ifndef INDRI_TAGDOCUMENTITERATOR_HPP
 #define INDRI_TAGDOCUMENTITERATOR_HPP
+namespace indri
+{
+  namespace parse
+  {
+  }
+}
 
 #endif //
 

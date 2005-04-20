@@ -19,7 +19,7 @@
 #include "indri/NullScorerNode.hpp"
 #include "lemur-compat.hpp"
 
-NullScorerNode::NullScorerNode( const std::string& name, TermScoreFunction& scoreFunction ) :
+indri::infnet::NullScorerNode::NullScorerNode( const std::string& name, indri::query::TermScoreFunction& scoreFunction ) :
   _name(name),
   _scoreFunction(scoreFunction),
   _maximumBackgroundScore(scoreFunction.scoreOccurrence(0,100)),
@@ -27,33 +27,43 @@ NullScorerNode::NullScorerNode( const std::string& name, TermScoreFunction& scor
 {
 }
 
-int NullScorerNode::nextCandidateDocument() {
+int indri::infnet::NullScorerNode::nextCandidateDocument() {
   return MAX_INT32;
 }
 
-double NullScorerNode::maximumScore() {
+double indri::infnet::NullScorerNode::maximumScore() {
   return _maximumScore;
 }
   
-double NullScorerNode::maximumBackgroundScore() {
+double indri::infnet::NullScorerNode::maximumBackgroundScore() {
   return _maximumBackgroundScore;
 }
 
-bool NullScorerNode::hasMatch( int documentID ) {
+bool indri::infnet::NullScorerNode::hasMatch( int documentID ) {
   return false;
 }
 
-const greedy_vector<ScoredExtentResult>& NullScorerNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::NullScorerNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+  return _matches;
+}
+
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::NullScorerNode::score( int documentID, int begin, int end, int documentLength ) {
   _scores.clear();
-  _scores.push_back( ScoredExtentResult( _maximumScore, documentID, begin, end ) );
+  _scores.push_back( indri::api::ScoredExtentResult( _maximumScore, documentID, begin, end ) );
 
   return _scores;
 }
 
-void NullScorerNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::NullScorerNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
   // no need to annotate; there will never be any matches
 }
 
-const std::string& NullScorerNode::getName() const {
+const std::string& indri::infnet::NullScorerNode::getName() const {
   return _name;
 }
+
+void indri::infnet::NullScorerNode::indexChanged( indri::index::Index& index ) {
+  // do nothing
+}
+
+

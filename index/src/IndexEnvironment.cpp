@@ -22,35 +22,35 @@
 #include "indri/IndriParser.hpp"
 #include "indri/Path.hpp"
 
-void IndexEnvironment::_getParsingContext( indri::Parser** parser,
-                                           DocumentIterator** iterator,
+void indri::api::IndexEnvironment::_getParsingContext( indri::parse::Parser** parser,
+                                                       indri::parse::DocumentIterator** iterDoc,
                                            const std::string& className ) {
   std::string parserName;
   std::string iteratorName;
 
   *parser = 0;
-  *iterator = 0;
+  *iterDoc = 0;
 
   // look for an already-built environment
-  std::map<std::string, FileClassEnvironment*>::iterator iter;
+  std::map<std::string, indri::parse::FileClassEnvironment*>::iterator iter;
   iter = _environments.find(className);
 
   if( iter != _environments.end() ) {
     *parser = iter->second->parser;
-    *iterator = iter->second->iterator;
+    *iterDoc = iter->second->iterator;
     return;
   }
 
-  FileClassEnvironment* fce = _fileClassFactory.get( className );
+  indri::parse::FileClassEnvironment* fce = _fileClassFactory.get( className );
 
   if( fce ) {
     _environments[className] = fce;
     *parser = fce->parser;
-    *iterator = fce->iterator;
+    *iterDoc = fce->iterator;
   }
 }
 
-IndexEnvironment::IndexEnvironment() :
+indri::api::IndexEnvironment::IndexEnvironment() :
   _callback(0),
   _options(0),
   _documentsIndexed(0),
@@ -58,21 +58,25 @@ IndexEnvironment::IndexEnvironment() :
 {
 }
 
-IndexEnvironment::~IndexEnvironment() {
+indri::api::IndexEnvironment::~IndexEnvironment() {
   close();
-  delete_map_contents<std::string, FileClassEnvironment>( _environments );
+  indri::utility::delete_map_contents<std::string, indri::parse::FileClassEnvironment>( _environments );
 }
 
-void IndexEnvironment::setMemory( UINT64 memory ) {
+void indri::api::IndexEnvironment::setNormalization( bool flag ) {
+  _parameters.set( "normalize", flag );
+}
+
+void indri::api::IndexEnvironment::setMemory( UINT64 memory ) {
   _parameters.set("memory", memory);
 }
 
-void IndexEnvironment::setAnchorTextPath( const std::string& documentRoot, const std::string& anchorTextRoot ) {
+void indri::api::IndexEnvironment::setAnchorTextPath( const std::string& documentRoot, const std::string& anchorTextRoot ) {
   _documentRoot = documentRoot;
   _anchorTextRoot = anchorTextRoot;
 }
 
-void IndexEnvironment::setStopwords( const std::vector<std::string>& stopwords ) {
+void indri::api::IndexEnvironment::setStopwords( const std::vector<std::string>& stopwords ) {
   _parameters.set("stopper","");
   Parameters p = _parameters.get("stopper");
   for( unsigned int i=0; i<stopwords.size(); i++ ) {
@@ -80,12 +84,12 @@ void IndexEnvironment::setStopwords( const std::vector<std::string>& stopwords )
   }
 }
 
-void IndexEnvironment::setStemmer( const std::string& stemmer ) {
+void indri::api::IndexEnvironment::setStemmer( const std::string& stemmer ) {
   _parameters.set("stemmer.name", stemmer);
 }
 
-void IndexEnvironment::addFileClass( const std::string& name, 
-                                     const std::string& iterator,
+void indri::api::IndexEnvironment::addFileClass( const std::string& name, 
+                                     const std::string& iter,
                                      const std::string& parser,
                                      const std::string& startDocTag,
                                      const std::string& endDocTag,
@@ -96,12 +100,12 @@ void IndexEnvironment::addFileClass( const std::string& name,
                                      const std::vector<std::string>& metadata, 
                                      const std::map<std::string,std::string>& conflations )
 {
-  this->_fileClassFactory.addFileClass( name, iterator, parser, startDocTag, endDocTag, endMetadataTag,
+  this->_fileClassFactory.addFileClass( name, iter, parser, startDocTag, endDocTag, endMetadataTag,
                                               include, exclude, index, metadata, conflations );
 
 }
 
-void IndexEnvironment::setIndexedFields( const std::vector<std::string>& fieldNames ) {
+void indri::api::IndexEnvironment::setIndexedFields( const std::vector<std::string>& fieldNames ) {
   for( unsigned int i=0; i<fieldNames.size(); i++) { 
     if( i==0 )
       _parameters.set("field.name", fieldNames[i]);
@@ -110,7 +114,7 @@ void IndexEnvironment::setIndexedFields( const std::vector<std::string>& fieldNa
   }
 }
 
-void IndexEnvironment::setNumericField( const std::string& fieldName, bool isNumeric ) {
+void indri::api::IndexEnvironment::setNumericField( const std::string& fieldName, bool isNumeric ) {
   if( !_parameters.exists( "field" ) )
     _parameters.set( "field" );
 
@@ -130,61 +134,92 @@ void IndexEnvironment::setNumericField( const std::string& fieldName, bool isNum
   field.set( "numeric", isNumeric );
 }
 
-void IndexEnvironment::setMetadataIndexedFields( const std::vector<std::string>& fieldNames ) {
+//
+// setMetadataIndexedFields
+//
+
+void indri::api::IndexEnvironment::setMetadataIndexedFields( const std::vector<std::string>& forwardFields, const std::vector<std::string>& backwardFields ) {
   if( !_parameters.exists("collection") )
     _parameters.set("collection", "");
 
   Parameters collection = _parameters.get("collection");
-  for( unsigned int i=0; i<fieldNames.size(); i++ ) {
+  for( unsigned int i=0; i<forwardFields.size(); i++ ) {
     if( i==0 )
-      collection.set("field", fieldNames[i]);
+      collection.set("forward", forwardFields[i]);
     else
-      collection.append("field").set(fieldNames[i]);
+      collection.append("forward").set(forwardFields[i]);
+  }
+
+  for( unsigned int i=0; i<backwardFields.size(); i++ ) {
+    if( i==0 )
+      collection.set("backward", backwardFields[i]);
+    else
+      collection.append("backward").set(backwardFields[i]);
   }
 }
 
-void IndexEnvironment::create( const std::string& repositoryPath, IndexStatus* callback ) {
+//
+// create
+//
+
+void indri::api::IndexEnvironment::create( const std::string& repositoryPath, indri::api::IndexStatus* callback ) {
   _callback = callback;
   _repository.create( repositoryPath, &_parameters );
 }
 
-void IndexEnvironment::open( const std::string& repositoryPath, IndexStatus* callback ) {
+//
+// open
+//
+
+void indri::api::IndexEnvironment::open( const std::string& repositoryPath, indri::api::IndexStatus* callback ) {
   _callback = callback;
   _repository.open( repositoryPath, &_parameters );
 }
 
-void IndexEnvironment::close() {
+//
+// close
+//
+
+void indri::api::IndexEnvironment::close() {
   _repository.close();
 }
 
-void IndexEnvironment::addFile( const std::string& fileName ) {
-  std::string extension = Path::extension( fileName );
+//
+// addFile
+//
+
+void indri::api::IndexEnvironment::addFile( const std::string& fileName ) {
+  std::string extension = indri::file::Path::extension( fileName );
   addFile( fileName, extension );
 }
 
-void IndexEnvironment::addFile( const std::string& fileName, const std::string& fileClass ) {
-  indri::Parser* parser = 0;
-  DocumentIterator* iterator = 0;
-  AnchorTextAnnotator* annotator = 0;
+//
+// addFile
+//
+
+void indri::api::IndexEnvironment::addFile( const std::string& fileName, const std::string& fileClass ) {
+  indri::parse::Parser* parser = 0;
+  indri::parse::DocumentIterator* iterator = 0;
+  indri::parse::AnchorTextAnnotator* annotator = 0;
   
   _getParsingContext( &parser, &iterator, fileClass );
 
   if( !parser || !iterator ) {
     _documentsSeen++;
-    if( _callback ) (*_callback) ( IndexStatus::FileSkip, fileName, _error, _documentsIndexed, _documentsSeen );
+    if( _callback ) (*_callback) ( indri::api::IndexStatus::FileSkip, fileName, _error, _documentsIndexed, _documentsSeen );
   } else {
     try {
-      UnparsedDocument* document;
+      indri::parse::UnparsedDocument* document;
       ParsedDocument* parsed;
 
       iterator->open( fileName );
 
       if( _anchorTextRoot.length() ) {
         // if the user specified some anchor text, we'll add it in
-        std::string relativePath = Path::relative( _documentRoot, fileName );
+        std::string relativePath = indri::file::Path::relative( _documentRoot, fileName );
         std::string anchorTextPath;
         if( relativePath.length() > 0 )
-          anchorTextPath = Path::combine( _anchorTextRoot, relativePath );
+          anchorTextPath = indri::file::Path::combine( _anchorTextRoot, relativePath );
         else
           anchorTextPath = _anchorTextRoot;
         _annotator.open( anchorTextPath );
@@ -192,7 +227,7 @@ void IndexEnvironment::addFile( const std::string& fileName, const std::string& 
       }
 
       // notify caller that the file was successfully parsed
-      if( _callback ) (*_callback)( IndexStatus::FileOpen, fileName, _error, _documentsIndexed, _documentsSeen );
+      if( _callback ) (*_callback)( indri::api::IndexStatus::FileOpen, fileName, _error, _documentsIndexed, _documentsSeen );
 
       while( document = iterator->nextDocument() ) {
         _documentsSeen++;
@@ -203,11 +238,11 @@ void IndexEnvironment::addFile( const std::string& fileName, const std::string& 
         _repository.addDocument( parsed );
 
         _documentsIndexed++;
-        if( _callback ) (*_callback)( IndexStatus::DocumentCount, fileName, _error, _documentsIndexed, _documentsSeen );
+        if( _callback ) (*_callback)( indri::api::IndexStatus::DocumentCount, fileName, _error, _documentsIndexed, _documentsSeen );
       }
 
       // notify caller that the file was successfully closed
-      if( _callback ) (*_callback)( IndexStatus::FileClose, fileName, _error, _documentsIndexed, _documentsSeen );
+      if( _callback ) (*_callback)( indri::api::IndexStatus::FileClose, fileName, _error, _documentsIndexed, _documentsSeen );
 
       iterator->close();
     } catch( Exception& e ) {
@@ -215,15 +250,19 @@ void IndexEnvironment::addFile( const std::string& fileName, const std::string& 
         iterator->close();
 
       // notify caller of errors
-      if( _callback ) (*_callback)( IndexStatus::FileError, fileName, e.what(), _documentsIndexed, _documentsSeen );
+      if( _callback ) (*_callback)( indri::api::IndexStatus::FileError, fileName, e.what(), _documentsIndexed, _documentsSeen );
     }
   }
 }
 
-void IndexEnvironment::addString( const std::string& documentString, const std::string& fileClass, const std::vector<MetadataPair>& metadata ) {
-  UnparsedDocument document;
-  indri::Parser* parser;
-  DocumentIterator* iterator;
+//
+// addString
+//
+
+int indri::api::IndexEnvironment::addString( const std::string& documentString, const std::string& fileClass, const std::vector<indri::parse::MetadataPair>& metadata ) {
+  indri::parse::UnparsedDocument document;
+  indri::parse::Parser* parser;
+  indri::parse::DocumentIterator* iterator;
   std::string nothing;
 
   _documentsSeen++;
@@ -234,20 +273,55 @@ void IndexEnvironment::addString( const std::string& documentString, const std::
 
   _getParsingContext( &parser, &iterator, fileClass );
 
+  if( parser == 0 ) {
+    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "File class '" + fileClass + "' wasn't recognized." );
+  }
+
   ParsedDocument* parsed = parser->parse( &document );
-  _repository.addDocument( parsed );
+  int documentID =_repository.addDocument( parsed );
 
   _documentsIndexed++;
-  if( _callback ) (*_callback)( IndexStatus::DocumentCount, nothing, _error, _documentsIndexed, _documentsSeen );
+  if( _callback ) (*_callback)( indri::api::IndexStatus::DocumentCount, nothing, _error, _documentsIndexed, _documentsSeen );
+
+  return documentID;
 }
 
-void IndexEnvironment::addParsedDocument( ParsedDocument* document ) {
+//
+// addParsedDocument
+//
+
+int indri::api::IndexEnvironment::addParsedDocument( ParsedDocument* document ) {
   std::string nothing;
 
   _documentsSeen++;
-  _repository.addDocument( document );
+  int documentID = _repository.addDocument( document );
   _documentsIndexed++;
-  if( _callback ) (*_callback)( IndexStatus::DocumentCount, nothing, _error, _documentsIndexed, _documentsSeen );
+  if( _callback ) (*_callback)( indri::api::IndexStatus::DocumentCount, nothing, _error, _documentsIndexed, _documentsSeen );
+  
+  return documentID;
 }
 
+//
+// deleteDocument
+//
+
+void indri::api::IndexEnvironment::deleteDocument( int documentID ) {
+  _repository.deleteDocument( documentID );
+}
+
+//
+// documentsIndexed
+//
+
+int indri::api::IndexEnvironment::documentsIndexed() {
+  return _documentsIndexed;
+}
+
+//
+// documentsSeen
+//
+
+int indri::api::IndexEnvironment::documentsSeen() {
+  return _documentsSeen;
+}
 

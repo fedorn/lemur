@@ -40,6 +40,7 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
+#include <unistd.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -640,7 +641,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 20 "../src/TaggedTextParser.l"
-{ byte_position +=parserleng; return TaggedTextTokenType::tag; }
+{ byte_position +=parserleng; return indri::parse::TaggedTextTokenType::tag; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
@@ -650,7 +651,7 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 22 "../src/TaggedTextParser.l"
-{ byte_position += parserleng; return TaggedTextTokenType::word; }
+{ byte_position += parserleng; return indri::parse::TaggedTextTokenType::word; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
@@ -660,7 +661,7 @@ YY_RULE_SETUP
 case 5:
 YY_RULE_SETUP
 #line 24 "../src/TaggedTextParser.l"
-{ byte_position += parserleng; return TaggedTextTokenType::unknown; }
+{ byte_position += parserleng; return indri::parse::TaggedTextTokenType::unknown; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
@@ -1556,7 +1557,7 @@ int main()
 #line 26 "../src/TaggedTextParser.l"
 
 
-TaggedTextParser::TaggedTextParser() :
+indri::parse::TaggedTextParser::TaggedTextParser() :
   tl(new TagList()),
   _metaList(new TagList()),
   _tagTable(1024),
@@ -1564,17 +1565,17 @@ TaggedTextParser::TaggedTextParser() :
 {
 }
 
-TaggedTextParser::~TaggedTextParser() {
+indri::parse::TaggedTextParser::~TaggedTextParser() {
   delete tl;
   delete _metaList;
 
-  HashTable<const char*, tag_properties*>::iterator iter;
+  indri::utility::HashTable<const char*, tag_properties*>::iterator iter;
   for( iter = _tagTable.begin(); iter != _tagTable.end(); iter++ ) {
     free( *iter->second );
   }
 }
 
-void TaggedTextParser::initialize( UnparsedDocument* document, ParsedDocument* parsed ) {
+void indri::parse::TaggedTextParser::initialize( indri::parse::UnparsedDocument* document, indri::api::ParsedDocument* parsed ) {
   _exclude = false;
   _include = _defaultInclude;
   _startIncludeRegion = 0;
@@ -1584,12 +1585,12 @@ void TaggedTextParser::initialize( UnparsedDocument* document, ParsedDocument* p
   _metaList->clear();
 }
 
-void TaggedTextParser::cleanup( UnparsedDocument* unparsed, ParsedDocument* parsed ) {
+void indri::parse::TaggedTextParser::cleanup( indri::parse::UnparsedDocument* unparsed, indri::api::ParsedDocument* parsed ) {
   tl->writeTagList( parsed->tags );
   _metaList->writeMetadataList( parsed->metadata, _termBuffer, unparsed->text );
 }
 
-TaggedTextParser::tag_properties* TaggedTextParser::_findTag( const char* name ) {
+indri::parse::TaggedTextParser::tag_properties* indri::parse::TaggedTextParser::_findTag( const char* name ) {
   tag_properties** result = _tagTable.find(name);
   
   if(!result)
@@ -1598,7 +1599,7 @@ TaggedTextParser::tag_properties* TaggedTextParser::_findTag( const char* name )
     return *result;
 }
 
-TaggedTextParser::tag_properties* TaggedTextParser::_buildTag( const std::string& name, const std::map<std::string, std::string>& conflations ) {
+indri::parse::TaggedTextParser::tag_properties* indri::parse::TaggedTextParser::_buildTag( const std::string& name, const std::map<std::string, std::string>& conflations ) {
   tag_properties* result = 0;
 
   if( result = _findTag(name.c_str()) )
@@ -1627,7 +1628,7 @@ TaggedTextParser::tag_properties* TaggedTextParser::_buildTag( const std::string
   return result;
 }
 
-void TaggedTextParser::setTags( const std::vector<std::string>& include,
+void indri::parse::TaggedTextParser::setTags( const std::vector<std::string>& include,
                                 const std::vector<std::string>& exclude,
                                 const std::vector<std::string>& index,
                                 const std::vector<std::string>& metadata, 
@@ -1656,7 +1657,7 @@ void TaggedTextParser::setTags( const std::vector<std::string>& include,
   }
 }
 
-ParsedDocument* TaggedTextParser::parse( UnparsedDocument* document ) {
+indri::api::ParsedDocument* indri::parse::TaggedTextParser::parse( indri::parse::UnparsedDocument* document ) {
   _termBuffer.clear();
   _termBuffer.grow( document->textLength * 4 ); // need to leave room here for relative->absolute URL expansion
   _document.terms.clear();
@@ -1679,19 +1680,28 @@ ParsedDocument* TaggedTextParser::parse( UnparsedDocument* document ) {
 }
 
 // lex wrapper
-void TaggedTextParser::doParse() {
+void indri::parse::TaggedTextParser::doParse() {
   int tokenType;
 
-  while(tokenType = parserlex())
-    handleToken(parsertext, tokenType, _document.terms.size());
+  while(tokenType = parserlex()) {
+    if( indri::parse::TaggedTextTokenType::word == tokenType ) {
+      writeToken(parsertext, byte_position-parserleng, byte_position);
+    } else if( indri::parse::TaggedTextTokenType::tag == tokenType ) {
+      handleTag(parsertext, _document.terms.size());
+    }
+  }
 }
 
-void TaggedTextParser::handleTag(char* token, long pos) {
+void indri::parse::TaggedTextParser::handleTag(char* token, long pos) {
   // extract "element" from tag, stripping off any attributes
   char *e = token;
   // lowercase and remove leading <
-  for(char *c = token+1; *c != '\0' && *c != ' ' && *c != '\n' && *c != '\t' && *c != '>'; c++)
-    *(e++) = tolower(*c);
+  for(char *c = token+1; *c != '\0' && *c != ' ' && *c != '\n' && *c != '\t' && *c != '>'; c++) {
+    if( *c >= 'A' && *c <= 'Z' )
+      *(e++) = *c + ('a' - 'A');
+    else
+      *(e++) = *c;;
+  }
   *e = '\0';
   bool atEnd = (*token == '/');
   if(atEnd) token++;
@@ -1753,28 +1763,19 @@ void TaggedTextParser::handleTag(char* token, long pos) {
   }
 }
 
-void TaggedTextParser::handleToken(char *token, int type, long pos) {
-  switch(type) {
-
-  case TaggedTextTokenType::tag:
-    {
-      handleTag(token, pos);
-      break;
-    }
-
- case TaggedTextTokenType::word:
-   {
-     writeToken(token);
-     break;
-   }
+void indri::parse::TaggedTextParser::handleToken(char *token, int type, long pos) {
+  if( indri::parse::TaggedTextTokenType::word == type ) {
+    writeToken(token, byte_position-parserleng, byte_position);
+  } else if( indri::parse::TaggedTextTokenType::tag == type ) {
+    handleTag(token, pos);
   }
 }
 
-void TaggedTextParser::writeToken(char* token) {
+void indri::parse::TaggedTextParser::writeToken(char* token) {
   writeToken(token, byte_position-parserleng, byte_position);
 }
 
-void TaggedTextParser::writeToken(char *token, int start, int end) {
+void indri::parse::TaggedTextParser::writeToken(char *token, int start, int end) {
   if( _exclude || !_include )
     return;
 
@@ -1786,15 +1787,15 @@ void TaggedTextParser::writeToken(char *token, int start, int end) {
   _document.positions.push_back(extent);
   
   char* writeLocation = _termBuffer.write(tokenLength+1);
-  strcpy( writeLocation, token );
+  memcpy( writeLocation, token, tokenLength+1 );
   _document.terms.push_back( writeLocation );
 }
 
-void TaggedTextParser::handle( UnparsedDocument* document ) {
+void indri::parse::TaggedTextParser::handle( indri::parse::UnparsedDocument* document ) {
   _handler->handle( parse(document) );
 }
 
-void TaggedTextParser::setHandler( ObjectHandler<ParsedDocument>& h ) {
+void indri::parse::TaggedTextParser::setHandler( ObjectHandler<indri::api::ParsedDocument>& h ) {
   _handler = &h;
 }
 

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,64 +21,70 @@
 
 #include <indri/greedy_vector>
 #include <algorithm>
-
-template<typename _ObjectType, typename _IterType = typename greedy_vector<_ObjectType>::iterator>
-class count_iterator {
-public:
-  struct value_type {
-    unsigned int count;
-    _ObjectType object;
-  };
-
-private:
-  _IterType _begin;
-  _IterType _end;
-  _IterType _current;
-
-  value_type _value;
-
-  void _buildValue( _ObjectType object ) {
-    _value.count = 0;
-    _value.object = object;
-    
-    for( ;  _current != _end; _current++ ) {
-      if( (*_current) != object )
-        break;
-
-      _value.count++;
-    }
-  }
-
-public:
-  count_iterator( _IterType begin, _IterType end )
-    :
-    _begin( begin ),
-    _end( end ),
-    _current( begin )
+namespace indri
+{
+  namespace utility
   {
-    std::sort( _begin, _end );
+                      
+    template<typename _ObjectType, typename _IterType = typename greedy_vector<_ObjectType>::iterator>
+    class count_iterator {
+    public:
+      struct value_type {
+        unsigned int count;
+        _ObjectType object;
+      };
 
-    if( _current != _end )
-      ++(*this);
-  }
+    private:
+      _IterType _begin;
+      _IterType _end;
+      _IterType _current;
 
-  const value_type& operator* ( ) {
-    return _value;
-  }
+      value_type _value;
 
-  const count_iterator& operator++ ( ) {
-    assert( _current != _end );
-    _buildValue( *_current );
-    return *this;
-  }
-  
-  bool operator!= ( _IterType other ) {
-    return _current != other;
-  }
+      void _buildValue( _ObjectType object ) {
+        _value.count = 0;
+        _value.object = object;
+                                                        
+        for( ;  _current != _end; _current++ ) {
+          if( (*_current) != object )
+            break;
 
-  bool operator== ( _IterType other ) {
-    return _current == other;
+          _value.count++;
+        }
+      }
+
+    public:
+      count_iterator( _IterType begin, _IterType end )
+        :
+        _begin( begin ),
+        _end( end ),
+        _current( begin )
+      {
+        std::sort( _begin, _end );
+
+        if( _current != _end )
+          ++(*this);
+      }
+
+      const value_type& operator* ( ) {
+        return _value;
+      }
+
+      const count_iterator& operator++ ( ) {
+        assert( _current != _end );
+        _buildValue( *_current );
+        return *this;
+      }
+                                                                                                                                                    
+      bool operator!= ( _IterType other ) {
+        return _current != other;
+      }
+
+      bool operator== ( _IterType other ) {
+        return _current == other;
+      }
+    };
   }
-};
+}
 
 #endif // INDRI_COUNTITERATOR_HPP

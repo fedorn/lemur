@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -24,21 +24,27 @@
 
 #include <string>
 #include "Keyfile.hpp"
+namespace indri
+{
+  namespace file
+  {
+    
+    class KeyfileWordMap {
+    private:
+      Keyfile _wordToInt;
+      Keyfile _intToWord;
+      char _wordBuffer[ 1024 ];
 
-class KeyfileWordMap {
-private:
-  Keyfile _wordToInt;
-  Keyfile _intToWord;
-  char _wordBuffer[ 1024 ];
-
-public:
-  void create( std::string& path, const std::string& intSuffix, const std::string& wordSuffix );
-  void open( std::string& path, const std::string& intSuffix, const std::string& wordSuffix );
-  void openRead( std::string& path, const std::string& intSuffix, const std::string& wordSuffix );
-  void close();
-  int lookupID( const char* word );
-  const char* lookupWord( int id );
-  void put( int id, const char* word );
-};
+    public:
+      void create( std::string& path, const std::string& intSuffix, const std::string& wordSuffix );
+      void open( std::string& path, const std::string& intSuffix, const std::string& wordSuffix );
+      void openRead( std::string& path, const std::string& intSuffix, const std::string& wordSuffix );
+      void close();
+      int lookupID( const char* word );
+      const char* lookupWord( int id );
+      void put( int id, const char* word );
+    };
+  }
+}
 
 #endif // INDRI_KEYFILEWORDMAP_HPP

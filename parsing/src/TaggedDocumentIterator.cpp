@@ -28,7 +28,7 @@ struct metadata_range {
   int endTag;
 };
 
-TaggedDocumentIterator::TaggedDocumentIterator() {
+indri::parse::TaggedDocumentIterator::TaggedDocumentIterator() {
   _in = 0;
 
   _startDocTag = 0;
@@ -40,11 +40,11 @@ TaggedDocumentIterator::TaggedDocumentIterator() {
   _endMetadataTagLength = 0;
 }
 
-TaggedDocumentIterator::~TaggedDocumentIterator() {
+indri::parse::TaggedDocumentIterator::~TaggedDocumentIterator() {
   close();
 }
 
-void TaggedDocumentIterator::setTags( const char* startDoc, const char* endDoc, const char* endMetadata ) {
+void indri::parse::TaggedDocumentIterator::setTags( const char* startDoc, const char* endDoc, const char* endMetadata ) {
   _startDocTag = startDoc;
   _startDocTagLength = strlen(startDoc);
   _endDocTag = endDoc;
@@ -53,7 +53,7 @@ void TaggedDocumentIterator::setTags( const char* startDoc, const char* endDoc, 
   _endMetadataTagLength = endMetadata ? strlen(endMetadata) : 0;
 }
 
-void TaggedDocumentIterator::open( const std::string& filename ) {
+void indri::parse::TaggedDocumentIterator::open( const std::string& filename ) {
   _fileName = filename;
   _in = fopen( filename.c_str(), "r" );
 
@@ -61,13 +61,13 @@ void TaggedDocumentIterator::open( const std::string& filename ) {
     LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't open file " + filename + "." );
 }
 
-void TaggedDocumentIterator::close() {
+void indri::parse::TaggedDocumentIterator::close() {
   if( _in )
     fclose( _in );
   _in = 0;
 }
 
-bool TaggedDocumentIterator::_readLine( char*& beginLine, size_t& lineLength ) {
+bool indri::parse::TaggedDocumentIterator::_readLine( char*& beginLine, size_t& lineLength ) {
   lineLength = 0;
   size_t actual;
 
@@ -104,7 +104,7 @@ bool TaggedDocumentIterator::_readLine( char*& beginLine, size_t& lineLength ) {
   return true;
 }
 
-UnparsedDocument* TaggedDocumentIterator::nextDocument() {
+indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocument() {
   _document.metadata.clear();
   _buffer.clear();
 
@@ -112,7 +112,7 @@ UnparsedDocument* TaggedDocumentIterator::nextDocument() {
   size_t lineLength;  
   bool result;
 
-  greedy_vector<metadata_range> metadata;
+  indri::utility::greedy_vector<metadata_range> metadata;
 
   // look for <DOC> tag
   do {
@@ -221,7 +221,7 @@ UnparsedDocument* TaggedDocumentIterator::nextDocument() {
 
   // parse metadata
   for( size_t i=0; i<metadata.size(); i++ ) {
-    MetadataPair pair;
+    indri::parse::MetadataPair pair;
     char* key = _buffer.front() + metadata[i].beginTag;
     
     pair.key = _buffer.front() + metadata[i].beginTag;

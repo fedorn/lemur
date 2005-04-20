@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -29,69 +29,77 @@
 
 #include "indri/indri-platform.h"
 #include "lemur-compat.hpp"
-/*! Internal Representation of an XML node hierarchy.
- */
-class XMLNode {
-public:
-  typedef std::map<std::string,std::string> MAttributes;
+namespace indri
+{
+  /*! XML support classes. */
+  namespace xml
+  {
+    
+    /*! Internal Representation of an XML node hierarchy.
+     */
+    class XMLNode {
+    public:
+      typedef std::map<std::string,std::string> MAttributes;
   
-private:
-  std::string _name;
-  MAttributes _attributes;
-  std::vector<XMLNode*> _children;
-  std::string _value;
+    private:
+      std::string _name;
+      MAttributes _attributes;
+      std::vector<XMLNode*> _children;
+      std::string _value;
 
-public:
-  /// Create a node with the given name
-  /// @param name the name for the node.
-  XMLNode( const std::string& name );
-  /// Create a node with the given name and value
-  /// @param name the name for the node.
-  /// @param value the value for the node
-  XMLNode( const std::string& name, const std::string& value );
-  /// Create a node with the given name and value
-  /// @param name the name for the node.
-  /// @param attributes the map constituting the value for the node
-  XMLNode( const std::string& name, const MAttributes& attributes );
-  /// Create a node with the given name and value
-  /// @param name the name for the node.
-  /// @param attributes the map constituting the value for the node
-  /// @param value the string value for the node.
-  XMLNode( const std::string& name, const MAttributes& attributes, const std::string& value );
-  /// clean up
-  ~XMLNode();
-  /// Add a child to this node.
-  /// @param child the child to add
-  void addChild( XMLNode* child );
-  /// Add an attribute to this node.
-  /// @param key the key for the parameter
-  /// @param value the value for the parameter
-  void addAttribute( const std::string& key, const std::string& value );
-  /// Set the value of this node
-  /// @param value the new value
-  void setValue( const std::string& value );
-  /// @return the name of this node
-  const std::string& getName() const;
-  /// @return the value of this node
-  const std::string& getValue() const;
-  /// @return the attributes of this node
-  const MAttributes& getAttributes() const;
-  /// Get the named attribute value
-  /// @param name the key
-  /// @return the value
-  std::string getAttribute( const std::string& name ) const;
-  /// Get the children of this node
-  /// @return the vector of child node pointers.
-  const std::vector<XMLNode*>& getChildren() const;
-  /// Get the named child of this node.
-  /// @param name the key
-  /// @return the named child node
-  const XMLNode* getChild( const std::string& name ) const;  
-  /// Get the value of the named child of this node.
-  /// @param name the key
-  /// @return the value of the named child node
-  std::string getChildValue( const std::string& name ) const; 
-};
+    public:
+      /// Create a node with the given name
+      /// @param name the name for the node.
+      XMLNode( const std::string& name );
+      /// Create a node with the given name and value
+      /// @param name the name for the node.
+      /// @param value the value for the node
+      XMLNode( const std::string& name, const std::string& value );
+      /// Create a node with the given name and value
+      /// @param name the name for the node.
+      /// @param attributes the map constituting the value for the node
+      XMLNode( const std::string& name, const MAttributes& attributes );
+      /// Create a node with the given name and value
+      /// @param name the name for the node.
+      /// @param attributes the map constituting the value for the node
+      /// @param value the string value for the node.
+      XMLNode( const std::string& name, const MAttributes& attributes, const std::string& value );
+      /// clean up
+      ~XMLNode();
+      /// Add a child to this node.
+      /// @param child the child to add
+      void addChild( XMLNode* child );
+      /// Add an attribute to this node.
+      /// @param key the key for the parameter
+      /// @param value the value for the parameter
+      void addAttribute( const std::string& key, const std::string& value );
+      /// Set the value of this node
+      /// @param value the new value
+      void setValue( const std::string& value );
+      /// @return the name of this node
+      const std::string& getName() const;
+      /// @return the value of this node
+      const std::string& getValue() const;
+      /// @return the attributes of this node
+      const MAttributes& getAttributes() const;
+      /// Get the named attribute value
+      /// @param name the key
+      /// @return the value
+      std::string getAttribute( const std::string& name ) const;
+      /// Get the children of this node
+      /// @return the vector of child node pointers.
+      const std::vector<XMLNode*>& getChildren() const;
+      /// Get the named child of this node.
+      /// @param name the key
+      /// @return the named child node
+      const XMLNode* getChild( const std::string& name ) const;  
+      /// Get the value of the named child of this node.
+      /// @param name the key
+      /// @return the value of the named child node
+      std::string getChildValue( const std::string& name ) const; 
+    };
+  }
+}
 
 /// Convert an INT64 to a string
 inline std::string i64_to_string( INT64 value ) {
@@ -162,8 +170,8 @@ inline std::string base64_encode( const void* input, int length ) {
   // 4 6-bit chars
   for( unsigned int i=0; i<mainLength; i+=3 ) {
     value = (in[i+0] & 0xff) << 16 |
-            (in[i+1] & 0xff) <<  8 |
-            (in[i+2] & 0xff);
+      (in[i+1] & 0xff) <<  8 |
+      (in[i+2] & 0xff);
 
     unsigned char fourth = lookup[value & 0x3f];
     value >>= 6;
@@ -198,8 +206,8 @@ inline std::string base64_encode( const void* input, int length ) {
         third = in[mainLength+2];
 
       value = first << 16 |
-              second << 8 |
-              third;
+        second << 8 |
+        third;
     }
 
     {
@@ -271,9 +279,9 @@ inline int base64_decode( void* output, int outputLength, const std::string& inp
     unsigned int value;
 
     value = lookup[first] << 18 |
-            lookup[second] << 12 |
-            lookup[third] << 6 |
-            lookup[fourth];
+      lookup[second] << 12 |
+      lookup[third] << 6 |
+      lookup[fourth];
 
     if( fourth == '=' ) {
       // this chunk ends in padding, so handle it in a special way

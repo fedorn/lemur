@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -20,26 +20,33 @@
 #define INDRI_CONTEXTCOUNTGRAPHEXTRACTOR_HPP
 
 #include <indri/delete_range.hpp>
+namespace indri
+{
+  namespace lang
+  {
+    
+    class ContextCountGraphExtractor : public indri::lang::Copier {
+    private:
+      std::vector<indri::lang::Node*> _nodes;
 
-class ContextCountGraphExtractor : public indri::lang::Copier {
-private:
-  std::vector<indri::lang::Node*> _nodes;
+    public:
+      ~ContextCountGraphExtractor() {
+        delete_range( _nodes.begin(), _nodes.end() );
+      }
 
-public:
-  ~ContextCountGraphExtractor() {
-    delete_range( _nodes.begin(), _nodes.end() );
+      Node* defaultAfter( indri::lang::Node* node ) {
+
+      }
+
+      Node* after( indri::lang::RawScorerNode* oldNode, indri::lang::RawScorerNode* oldNode ) {
+
+
+
+      }
+    };
+ 
   }
-
-  Node* defaultAfter( indri::lang::Node* node ) {
-
-  }
-
-  Node* after( indri::lang::RawScorerNode* oldNode, indri::lang::RawScorerNode* oldNode ) {
-
-
-
-  }
-};
+}
 
 #endif // INDRI_CONTEXTCOUNTGRAPHEXTRACTOR_HPP
 

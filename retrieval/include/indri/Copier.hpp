@@ -19,6 +19,8 @@ namespace indri {
       virtual class Node* after( class Field* oldNode, class Field* newNode );
       virtual void before( class ExtentInside* oldNode );
       virtual class Node* after( class ExtentInside* oldNode, class ExtentInside* newNode );
+      virtual void before( class WeightedExtentOr* oldNode );
+      virtual class Node* after( class WeightedExtentOr* oldNode, class WeightedExtentOr* newNode );
       virtual void before( class ExtentOr* oldNode );
       virtual class Node* after( class ExtentOr* oldNode, class ExtentOr* newNode );
       virtual void before( class ExtentAnd* oldNode );
@@ -65,10 +67,14 @@ namespace indri {
       virtual class Node* after( class WeightNode* oldNode, class WeightNode* newNode );
       virtual void before( class ExtentRestriction* oldNode );
       virtual class Node* after( class ExtentRestriction* oldNode, class ExtentRestriction* newNode );
+      virtual void before( class FixedPassage* oldNode );
+      virtual class Node* after( class FixedPassage* oldNode, class FixedPassage* newNode );
       virtual void before( class FilterNode* oldNode );
       virtual class Node* after( class FilterNode* oldNode, class FilterNode* newNode );
       virtual void before( class ContextCounterNode* oldNode );
       virtual class Node* after( class ContextCounterNode* oldNode, class ContextCounterNode* newNode );
+      virtual void before( class ContextSimpleCounterNode* oldNode );
+      virtual class Node* after( class ContextSimpleCounterNode* oldNode, class ContextSimpleCounterNode* newNode );
       virtual void before( class ScoreAccumulatorNode* oldNode );
       virtual class Node* after( class ScoreAccumulatorNode* oldNode, class ScoreAccumulatorNode* newNode );
       virtual void before( class AnnotatorNode* oldNode );

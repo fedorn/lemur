@@ -15,14 +15,31 @@
  */
 
 #include "IndriDocMgr.hpp"
-#include "indri/IndriIndex.hpp"
 #include "indri/IndriTermInfoList.hpp"
 #include "indri/CompressedCollection.hpp"
+#include "indri/ScopedLock.hpp"
+//
+// _indexWithDocument
+//
+
+indri::index::Index* IndriDocMgr::_indexWithDocument( indri::collection::Repository::index_state& indexes, int documentID ) const {
+  for( int i=0; i<indexes->size(); i++ ) {
+    indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
+    int lowerBound = (*indexes)[i]->documentBase();
+    int upperBound = (*indexes)[i]->documentBase() + (*indexes)[i]->documentCount();
+    
+    if( lowerBound <= documentID && upperBound > documentID ) {
+      return (*indexes)[i];
+    }
+  }
+  return 0;
+}
 
 // caller delete[]s
 char *IndriDocMgr::getDoc(const EXDOCID_T &docID) const {
-  DOCID_T docid = _repository.index()->document(docID);
-  ParsedDocument *doc = _repository.collection()->retrieve(docid);
+  std::vector<int> ids = _repository.collection()->retrieveIDByMetadatum("docno", docID);
+  DOCID_T docid = ids[0];
+  indri::api::ParsedDocument *doc = _repository.collection()->retrieve(docid);
   const char *txt = doc->text;
   char *retval = new char[strlen(txt) + 1];
   strcpy(retval, txt);
@@ -30,26 +47,29 @@ char *IndriDocMgr::getDoc(const EXDOCID_T &docID) const {
   return retval;
 }
 
+
 vector<Match> IndriDocMgr::getOffsets(const EXDOCID_T &docID) const {
   vector<Match> offsets;
-  DOCID_T docid = _repository.index()->document(docID);
-  ParsedDocument *doc = _repository.collection()->retrieve(docid);
-  // list of term ids to derive positions
-  TermInfoList *dt = _repository.index()->termInfoListSeq(docid);
-  TermInfoList::iterator iter = dt->begin();
-  
-  greedy_vector<TermExtent> pos = doc->positions;  
-  unsigned int len = pos.size();
-  offsets.resize(len);
-  TermInfo term;
-  for (int i = 0; i < len; i++) {
-    offsets[i].start = pos[i].begin;
-    offsets[i].end = pos[i].end;
-    offsets[i].pos = i;
-    iter.seek((void *)i);
-    offsets[i].termid = (*iter).termID();
+  std::vector<int> ids = _repository.collection()->retrieveIDByMetadatum("docno", docID);
+  DOCID_T docid = ids[0];
+  indri::api::ParsedDocument *doc = _repository.collection()->retrieve(docid);
+  indri::collection::Repository::index_state indexes = _repository.indexes();
+  indri::index::Index* index = _indexWithDocument( indexes, docid );
+  if (index) {
+    indri::thread::ScopedLock lock( index->statisticsLock() );
+    const indri::index::TermList* termList = index->termList( docid );
+    const indri::utility::greedy_vector<int>& terms = termList->terms();
+    indri::utility::greedy_vector<indri::parse::TermExtent> pos = doc->positions;  
+    unsigned int len = pos.size();
+    offsets.resize(len);
+    for (int i = 0; i < len; i++) {
+      offsets[i].start = pos[i].begin;
+      offsets[i].end = pos[i].end;
+      offsets[i].pos = i;
+      offsets[i].termid = terms[i];
+    }
+    delete(termList);
   }
-  delete(doc);
-  delete(dt);
+  delete(doc);  
   return offsets;
 }

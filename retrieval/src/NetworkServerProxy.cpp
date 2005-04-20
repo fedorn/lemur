@@ -18,23 +18,34 @@
 
 #include "indri/NetworkServerProxy.hpp"
 #include "indri/ParsedDocument.hpp"
+#include "indri/ScopedLock.hpp"
 #include <iostream>
 
+namespace indri
+{
+  namespace server
+  {
+    
 //
 // NetworkServerProxyResponse
 //
-
 class NetworkServerProxyResponse : public QueryServerResponse {
 private:
-  QueryResponseUnpacker _unpacker;
+  indri::net::QueryResponseUnpacker _unpacker;
+  indri::net::NetworkMessageStream* _stream;
 
 public:
-  NetworkServerProxyResponse( NetworkMessageStream* stream ) :
-    _unpacker( stream )
+  NetworkServerProxyResponse( indri::net::NetworkMessageStream* stream ) :
+    _unpacker( stream ),
+    _stream( stream )
   {
   }
 
-  InferenceNetwork::MAllResults& getResults() {
+  ~NetworkServerProxyResponse() {
+    _stream->mutex().unlock();
+  }
+
+  indri::infnet::InferenceNetwork::MAllResults& getResults() {
     return _unpacker.getResults();
   }
 };
@@ -45,35 +56,39 @@ public:
 
 class NetworkServerProxyDocumentsResponse : public QueryServerDocumentsResponse {
 private:
-  NetworkMessageStream* _stream;
-  std::vector<ParsedDocument*> _documents;
+  indri::net::NetworkMessageStream* _stream;
+  std::vector<indri::api::ParsedDocument*> _documents;
 
 public:
-  NetworkServerProxyDocumentsResponse( NetworkMessageStream* stream ) :
+  NetworkServerProxyDocumentsResponse( indri::net::NetworkMessageStream* stream ) :
     _stream(stream)
   {
   }
 
+  ~NetworkServerProxyDocumentsResponse() {
+    _stream->mutex().unlock();
+  }
+
   // caller deletes the ParsedDocuments
-  std::vector<ParsedDocument*>& getResults() {
-    XMLReplyReceiver r;
+  std::vector<indri::api::ParsedDocument*>& getResults() {
+    indri::net::XMLReplyReceiver r;
     r.wait(_stream);
 
     if( r.getReply() ) {
-      XMLNode* reply = r.getReply();
+      indri::xml::XMLNode* reply = r.getReply();
       size_t numChildren = reply->getChildren().size();
 
       for( size_t i=0; i<numChildren; i++ ) {
-        Buffer buffer;
+        indri::utility::Buffer buffer;
         int textOffset = 0;
-        greedy_vector<int> metadataKeyOffset;
-        greedy_vector<int> metadataValueOffset;
+        indri::utility::greedy_vector<int> metadataKeyOffset;
+        indri::utility::greedy_vector<int> metadataValueOffset;
 
-        const XMLNode* child = reply->getChildren()[i];
-        const XMLNode* metadata = child->getChild( "metadata" );
+        const indri::xml::XMLNode* child = reply->getChildren()[i];
+        const indri::xml::XMLNode* metadata = child->getChild( "metadata" );
 
         // allocate room for the ParsedDocument
-        buffer.write( sizeof(ParsedDocument) );
+        buffer.write( sizeof(indri::api::ParsedDocument) );
 
         if( metadata ) {
           for( size_t j=0; j<metadata->getChildren().size(); j++ ) {
@@ -89,7 +104,7 @@ public:
           }
         }
 
-        const XMLNode* textNode = child->getChild("text");
+        const indri::xml::XMLNode* textNode = child->getChild("text");
         std::string text;
 
         if( textNode ) {
@@ -100,17 +115,17 @@ public:
         }
 
         // now all of our data is in the buffer, so we can allocate a return structure
-        new(buffer.front()) ParsedDocument;
-        ParsedDocument* parsedDocument = (ParsedDocument*) buffer.front();
+        new(buffer.front()) indri::api::ParsedDocument;
+        indri::api::ParsedDocument* parsedDocument = (indri::api::ParsedDocument*) buffer.front();
 
-        const XMLNode* positions = child->getChild( "positions" );
+        const indri::xml::XMLNode* positions = child->getChild( "positions" );
 
         if( positions ) {
-          const std::vector<XMLNode*>& children = positions->getChildren();
+          const std::vector<indri::xml::XMLNode*>& children = positions->getChildren();
           
  
           for( size_t j=0; j<children.size(); j++ ) {
-            TermExtent extent;
+            indri::parse::TermExtent extent;
             std::string begin = children[j]->getChildValue("begin");
             std::string end = children[j]->getChildValue("end");    
 
@@ -122,7 +137,7 @@ public:
         }
 
         for( size_t j=0; j<metadataKeyOffset.size(); j++ ) {
-          MetadataPair pair;
+          indri::parse::MetadataPair pair;
 
           pair.key = buffer.front() + metadataKeyOffset[j];
           pair.value = buffer.front() + metadataValueOffset[j];
@@ -154,24 +169,28 @@ public:
 class NetworkServerProxyMetadataResponse : public QueryServerMetadataResponse {
 private:
   std::vector<std::string> _metadata;
-  NetworkMessageStream* _stream;
+  indri::net::NetworkMessageStream* _stream;
 
 public:
-  NetworkServerProxyMetadataResponse( NetworkMessageStream* stream ) :
+  NetworkServerProxyMetadataResponse( indri::net::NetworkMessageStream* stream ) :
     _stream(stream)
   {
   }
 
+  ~NetworkServerProxyMetadataResponse() {
+    _stream->mutex().unlock();
+  }
+
   std::vector<std::string>& getResults() {
-    XMLReplyReceiver r;
+    indri::net::XMLReplyReceiver r;
     r.wait(_stream);
 
     // parse the result
-    XMLNode* reply = r.getReply();
-    Buffer metadataBuffer;
+    indri::xml::XMLNode* reply = r.getReply();
+    indri::utility::Buffer metadataBuffer;
 
     for( unsigned int i=0; i<reply->getChildren().size(); i++ ) {
-      const XMLNode* meta = reply->getChildren()[i];
+      const indri::xml::XMLNode* meta = reply->getChildren()[i];
       const std::string& input = meta->getValue();
 
       std::string value;
@@ -191,32 +210,36 @@ public:
 
 class NetworkServerProxyVectorsResponse : public QueryServerVectorsResponse {
 public:
-  std::vector<DocumentVector*> _vectors;
-  NetworkMessageStream* _stream;
+  std::vector<indri::api::DocumentVector*> _vectors;
+  indri::net::NetworkMessageStream* _stream;
   bool _readResponse;
 
 public:
-  NetworkServerProxyVectorsResponse( NetworkMessageStream* stream ) 
+  NetworkServerProxyVectorsResponse( indri::net::NetworkMessageStream* stream ) 
     :
     _stream(stream),
     _readResponse(false)
   {
   }
 
-  std::vector<DocumentVector*>& getResults() {
+  ~NetworkServerProxyVectorsResponse() {
+    _stream->mutex().unlock();
+  }
+
+  std::vector<indri::api::DocumentVector*>& getResults() {
     if( !_readResponse ) {
-      XMLReplyReceiver r;
+      indri::net::XMLReplyReceiver r;
       r.wait( _stream );
 
-      const XMLNode* reply = r.getReply();
-      const std::vector<XMLNode*>& children = reply->getChildren();
+      const indri::xml::XMLNode* reply = r.getReply();
+      const std::vector<indri::xml::XMLNode*>& children = reply->getChildren();
 
       for( size_t i=0; i<children.size(); i++ ) {
-        const XMLNode* stems = children[i]->getChild("stems");
-        const XMLNode* positions = children[i]->getChild("positions");
-        const XMLNode* fields = children[i]->getChild("fields");
+        const indri::xml::XMLNode* stems = children[i]->getChild("stems");
+        const indri::xml::XMLNode* positions = children[i]->getChild("positions");
+        const indri::xml::XMLNode* fields = children[i]->getChild("fields");
 
-        DocumentVector* result = new DocumentVector;
+        indri::api::DocumentVector* result = new indri::api::DocumentVector;
 
         for( unsigned int i=0; i<stems->getChildren().size(); i++ ) {
           // have to use base64 coding, in case the stem contains '<', '>', etc.
@@ -233,17 +256,17 @@ public:
           positionsVector.push_back( int(position) );
         }
 
-        std::vector<DocumentVector::Field>& fieldVector = result->fields();
+        std::vector<indri::api::DocumentVector::Field>& fieldVector = result->fields();
 
         for( unsigned int i=0; i<fields->getChildren().size(); i++ ) {
-          const XMLNode* field = fields->getChildren()[i];
+          const indri::xml::XMLNode* field = fields->getChildren()[i];
 
-          const XMLNode* nameField = field->getChild("name");
-          const XMLNode* numberField = field->getChild("number");
-          const XMLNode* beginField = field->getChild("begin");
-          const XMLNode* endField = field->getChild("end");
+          const indri::xml::XMLNode* nameField = field->getChild("name");
+          const indri::xml::XMLNode* numberField = field->getChild("number");
+          const indri::xml::XMLNode* beginField = field->getChild("begin");
+          const indri::xml::XMLNode* endField = field->getChild("end");
 
-          DocumentVector::Field f;
+          indri::api::DocumentVector::Field f;
 
           f.name = nameField->getValue();
           f.number = string_to_i64( numberField->getValue() );
@@ -264,181 +287,271 @@ public:
 };
 
 //
+// NetworkServerProxyDocumentIDsResponse
+//
+
+class NetworkServerProxyDocumentIDsResponse : public QueryServerDocumentIDsResponse {
+public:
+  std::vector<DOCID_T> _documentIDs;
+  indri::net::NetworkMessageStream* _stream;
+  bool _readResponse;
+
+public:
+  NetworkServerProxyDocumentIDsResponse( indri::net::NetworkMessageStream* stream ) 
+    :
+    _stream(stream),
+    _readResponse(false)
+  {
+  }
+
+  ~NetworkServerProxyDocumentIDsResponse() {
+    _stream->mutex().unlock();
+  }
+
+  std::vector<DOCID_T>& getResults() {
+    if( !_readResponse ) {
+      indri::net::XMLReplyReceiver r;
+      r.wait( _stream );
+
+      const indri::xml::XMLNode* reply = r.getReply();
+      const std::vector<indri::xml::XMLNode*>& children = reply->getChildren();
+      
+      for( size_t i=0; i<children.size(); i++ ) {
+        indri::xml::XMLNode* child = children[i];
+        _documentIDs.push_back( string_to_i64( child->getValue() ) );
+      }
+    }
+
+    return _documentIDs;
+  }
+};
+  }
+}
+
+//
 // NetworkServerProxy code
 //
 
 
-NetworkServerProxy::NetworkServerProxy( NetworkMessageStream* stream ) :
+indri::server::NetworkServerProxy::NetworkServerProxy( indri::net::NetworkMessageStream* stream ) :
   _stream(stream)
 {
 }
 
-QueryServerResponse* NetworkServerProxy::runQuery( std::vector<indri::lang::Node*>& roots, int resultsRequested, bool optimize ) {
+//
+// _numericRequest
+//
+// Sends a request for a numeric quantity; deletes the node
+// passed in as a parameter
+//
+
+INT64 indri::server::NetworkServerProxy::_numericRequest( indri::xml::XMLNode* node ) {
+  indri::thread::ScopedLock lock( _stream->mutex() );
+  _stream->request( node );
+  delete node;
+
+  indri::net::XMLReplyReceiver r;
+  r.wait( _stream );
+
+  indri::xml::XMLNode* reply = r.getReply();
+  return string_to_i64( reply->getValue() );
+}
+
+//
+// _stringRequest
+//
+// Sends a request for a string quantity; deletes the node
+// passed in as a parameter
+//
+
+std::string indri::server::NetworkServerProxy::_stringRequest( indri::xml::XMLNode* node ) {
+  indri::thread::ScopedLock lock( _stream->mutex() );
+  _stream->request( node );
+  delete node;
+
+  indri::net::XMLReplyReceiver r;
+  r.wait( _stream );
+
+  indri::xml::XMLNode* reply = r.getReply();
+  return reply->getValue();
+}
+
+//
+// runQuery
+//
+
+indri::server::QueryServerResponse* indri::server::NetworkServerProxy::runQuery( std::vector<indri::lang::Node*>& roots, int resultsRequested, bool optimize ) {
   indri::lang::Packer packer;
 
   for( unsigned int i=0; i<roots.size(); i++ ) {
     packer.pack( roots[i] );
   }
 
-  XMLNode* query = packer.xml();
+  indri::xml::XMLNode* query = packer.xml();
   query->addAttribute( "resultsRequested", i64_to_string(resultsRequested) );
   query->addAttribute( "optimize", optimize ? "1" : "0" );
+
+  _stream->mutex().lock();
   _stream->request( query );
 
-  return new NetworkServerProxyResponse( _stream );
+  return new indri::server::NetworkServerProxyResponse( _stream );
 }
 
-QueryServerMetadataResponse* NetworkServerProxy::documentMetadata( const std::vector<int>& documentIDs, const std::string& attributeName ) {
-  XMLNode* request = new XMLNode( "document-metadata" );
-  XMLNode* field = new XMLNode( "field", attributeName );
-  XMLNode* documents = new XMLNode( "documents" );
+//
+// documentMetadata
+//
+
+indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::documentMetadata( const std::vector<int>& documentIDs, const std::string& attributeName ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "document-metadata" );
+  indri::xml::XMLNode* field = new indri::xml::XMLNode( "field", attributeName );
+  indri::xml::XMLNode* documents = new indri::xml::XMLNode( "documents" );
 
   // build request
   for( unsigned int i=0; i<documentIDs.size(); i++ ) {
-    documents->addChild( new XMLNode( "document", i64_to_string( documentIDs[i] ) ) );
+    documents->addChild( new indri::xml::XMLNode( "document", i64_to_string( documentIDs[i] ) ) );
   }
   request->addChild( field );
   request->addChild( documents );
 
   // send request
+  _stream->mutex().lock();
   _stream->request( request );
   delete request;
 
-  return new NetworkServerProxyMetadataResponse( _stream );
+  return new indri::server::NetworkServerProxyMetadataResponse( _stream );
 }
 
-QueryServerDocumentsResponse* NetworkServerProxy::documents( const std::vector<int>& documentIDs ) {
-  XMLNode* docRequest = new XMLNode( "documents" );
+//
+// documents
+//
+
+indri::server::QueryServerDocumentsResponse* indri::server::NetworkServerProxy::documents( const std::vector<int>& documentIDs ) {
+  indri::xml::XMLNode* docRequest = new indri::xml::XMLNode( "documents" );
 
   for( unsigned int i=0; i<documentIDs.size(); i++ ) {
-    docRequest->addChild( new XMLNode("doc", i64_to_string(documentIDs[i])) );
+    docRequest->addChild( new indri::xml::XMLNode("doc", i64_to_string(documentIDs[i])) );
   }
+
+  _stream->mutex().lock();
   _stream->request( docRequest );
   delete docRequest;
 
-  return new NetworkServerProxyDocumentsResponse( _stream );
+  return new indri::server::NetworkServerProxyDocumentsResponse( _stream );
 }
 
-INT64 NetworkServerProxy::termCount() {
-  std::auto_ptr<XMLNode> request( new XMLNode( "term-count" ) );
-  _stream->request( request.get() );
+//
+// documentsFromMetadata
+//
 
-  XMLReplyReceiver r;
-  r.wait( _stream );
+indri::server::QueryServerDocumentsResponse* indri::server::NetworkServerProxy::documentsFromMetadata( const std::string& attributeName, const std::vector<std::string>& attributeValues ) {
+  indri::xml::XMLNode* docRequest = new indri::xml::XMLNode( "documents-from-metadata" );
 
-  XMLNode* reply = r.getReply();
-  return string_to_i64( reply->getValue() );
+  // store the attribute name
+  docRequest->addChild( new indri::xml::XMLNode( "attributeName", attributeName ) );
+
+  // serialize the attributeValues (in a tree called "attributeValues", with members called "attributeValue")
+  indri::xml::XMLNode* attributeValuesNode = new indri::xml::XMLNode( "attributeValues" );
+  for( unsigned int i=0; i<attributeValues.size(); i++ ) {
+    attributeValuesNode->addChild( new indri::xml::XMLNode( "attributeValue", attributeValues[i] ) );
+  }
+  docRequest->addChild( attributeValuesNode );
+
+  // request the documents
+  _stream->mutex().lock();
+  _stream->request( docRequest );
+  delete docRequest;
+
+  return new indri::server::NetworkServerProxyDocumentsResponse( _stream );
 }
 
-INT64 NetworkServerProxy::termCount( const std::string& term ) {
-  std::auto_ptr<XMLNode> request( new XMLNode( "term-count-text", term ) );
-  _stream->request( request.get() );
+//
+// documentIDsFromMetadata
+//
 
-  XMLReplyReceiver r;
-  r.wait( _stream );
+indri::server::QueryServerDocumentIDsResponse* indri::server::NetworkServerProxy::documentIDsFromMetadata( const std::string& attributeName, const std::vector<std::string>& attributeValues ) {
+  indri::xml::XMLNode* docRequest = new indri::xml::XMLNode( "docids-from-metadata" );
+ 
+  // store the attribute name
+  docRequest->addChild( new indri::xml::XMLNode( "attributeName", attributeName ) );
 
-  XMLNode* reply = r.getReply();
-  return string_to_i64( reply->getValue() );
+  // serialize the attributeValues (in a tree called "attributeValues", with members called "attributeValue")
+  indri::xml::XMLNode* attributeValuesNode = new indri::xml::XMLNode( "attributeValues" );
+  for( unsigned int i=0; i<attributeValues.size(); i++ ) {
+    attributeValuesNode->addChild( new indri::xml::XMLNode( "attributeValue", attributeValues[i] ) );
+  }
+  docRequest->addChild( attributeValuesNode );
+
+  // request the documents
+  _stream->mutex().lock();
+  _stream->request( docRequest );
+  delete docRequest;
+
+  return new indri::server::NetworkServerProxyDocumentIDsResponse( _stream );
 }
 
-INT64 NetworkServerProxy::stemCount( const std::string& term ) {
-  std::auto_ptr<XMLNode> request( new XMLNode( "stem-count-text", term ) );
-  _stream->request( request.get() );
+//
+// termCount
+//
 
-  XMLReplyReceiver r;
-  r.wait( _stream );
-
-  XMLNode* reply = r.getReply();
-  return string_to_i64( reply->getValue() );
+INT64 indri::server::NetworkServerProxy::termCount() {
+  std::auto_ptr<indri::xml::XMLNode> request( new indri::xml::XMLNode( "term-count" ) );
+  return _numericRequest( request.get() );
 }
 
-INT64 NetworkServerProxy::termCount( int term ) {
-  std::auto_ptr<XMLNode> request( new XMLNode( "term-count-id", i64_to_string(term) ) );
-  _stream->request( request.get() );
+//
+// termCount
+//
 
-  XMLReplyReceiver r;
-  r.wait( _stream );
-
-  XMLNode* reply = r.getReply();
-  return string_to_i64( reply->getValue() );
+INT64 indri::server::NetworkServerProxy::termCount( const std::string& term ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "term-count-text", term );
+  return _numericRequest( request );
 }
 
-std::string NetworkServerProxy::termName( int term ) {
-  std::auto_ptr<XMLNode> request( new XMLNode( "term-name", i64_to_string(term) ) );
-  _stream->request( request.get() );
-
-  XMLReplyReceiver r;
-  r.wait( _stream );
-
-  XMLNode* reply = r.getReply();
-  return reply->getValue();
+INT64 indri::server::NetworkServerProxy::stemCount( const std::string& term ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "stem-count-text", term );
+  return _numericRequest( request );
 }
 
-int NetworkServerProxy::termID( const std::string& term ) {
-  std::auto_ptr<XMLNode> request( new XMLNode( "term-id", term ) );
-  _stream->request( request.get() );
-
-  XMLReplyReceiver r;
-  r.wait( _stream );
-
-  XMLNode* reply = r.getReply();
-  return string_to_int(reply->getValue());
+std::string indri::server::NetworkServerProxy::termName( int term ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "term-name", i64_to_string(term) );
+  return _stringRequest( request );
 }
 
-INT64 NetworkServerProxy::termFieldCount( int term, const std::string& field ) {
-  std::auto_ptr<XMLNode> request( new XMLNode( "term-field-count" ) );
-  XMLNode* termNode = new XMLNode( "term-id", i64_to_string(term) );
-  XMLNode* fieldNode = new XMLNode( "field", field );
+int indri::server::NetworkServerProxy::termID( const std::string& term ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "term-id", term );
+  return _numericRequest( request );
+}
+
+INT64 indri::server::NetworkServerProxy::termFieldCount( const std::string& term, const std::string& field ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "term-field-count" );
+  indri::xml::XMLNode* termNode = new indri::xml::XMLNode( "term-text", term );
+  indri::xml::XMLNode* fieldNode = new indri::xml::XMLNode( "field", field );
   request->addChild( termNode );
   request->addChild( fieldNode );
-  _stream->request( request.get() );
-  
-  XMLReplyReceiver r;
-  r.wait( _stream );
 
-  XMLNode* reply = r.getReply();
-  return string_to_i64(reply->getValue());
+  return _numericRequest( request );
 }
 
-INT64 NetworkServerProxy::termFieldCount( const std::string& term, const std::string& field ) {
-  std::auto_ptr<XMLNode> request( new XMLNode( "term-field-count" ) );
-  XMLNode* termNode = new XMLNode( "term-text", term );
-  XMLNode* fieldNode = new XMLNode( "field", field );
-  request->addChild( termNode );
-  request->addChild( fieldNode );
-  _stream->request( request.get() );
-
-  XMLReplyReceiver r;
-  r.wait( _stream );
-
-  XMLNode* reply = r.getReply();
-  return string_to_i64(reply->getValue());
-}
-
-INT64 NetworkServerProxy::stemFieldCount( const std::string& stem, const std::string& field ) {
-  std::auto_ptr<XMLNode> request( new XMLNode( "stem-field-count" ) );
-  XMLNode* stemNode = new XMLNode( "stem-text", stem );
-  XMLNode* fieldNode = new XMLNode( "field", field );
+INT64 indri::server::NetworkServerProxy::stemFieldCount( const std::string& stem, const std::string& field ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "stem-field-count" );
+  indri::xml::XMLNode* stemNode = new indri::xml::XMLNode( "stem-text", stem );
+  indri::xml::XMLNode* fieldNode = new indri::xml::XMLNode( "field", field );
   request->addChild( stemNode );
   request->addChild( fieldNode );
-  _stream->request( request.get() );
 
-  XMLReplyReceiver r;
-  r.wait( _stream );
-
-  XMLNode* reply = r.getReply();
-  return string_to_i64(reply->getValue());
+  return _numericRequest( request );
 }
 
-std::vector<std::string> NetworkServerProxy::fieldList() {
-  std::auto_ptr<XMLNode> request( new XMLNode( "field-list" ) );
+std::vector<std::string> indri::server::NetworkServerProxy::fieldList() {
+  std::auto_ptr<indri::xml::XMLNode> request( new indri::xml::XMLNode( "field-list" ) );
+  indri::thread::ScopedLock( _stream->mutex() );
   _stream->request( request.get() );
 
-  XMLReplyReceiver r;
+  indri::net::XMLReplyReceiver r;
   r.wait( _stream );
 
-  XMLNode* reply = r.getReply();
-  const std::vector<XMLNode*>& children = reply->getChildren();
+  indri::xml::XMLNode* reply = r.getReply();
+  const std::vector<indri::xml::XMLNode*>& children = reply->getChildren();
   std::vector<std::string> result;
 
   for( size_t i=0; i<children.size(); i++ ) {
@@ -448,52 +561,32 @@ std::vector<std::string> NetworkServerProxy::fieldList() {
   return result;
 }
 
-int NetworkServerProxy::documentLength( int documentID ) {
-  XMLNode* request = new XMLNode( "document-length", i64_to_string(documentID) );
-  _stream->request( request );
-  delete request;
-
-  XMLReplyReceiver r;
-  r.wait( _stream );
-
-  XMLNode* reply = r.getReply();
-  return string_to_int(reply->getValue());
+int indri::server::NetworkServerProxy::documentLength( int documentID ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "document-length", i64_to_string(documentID) );
+  return (int) _numericRequest( request );
 }
 
-INT64 NetworkServerProxy::documentCount() {
-  XMLNode* request = new XMLNode( "document-count" );
-  _stream->request( request );
-  delete request;
-
-  XMLReplyReceiver r;
-  r.wait( _stream );
-
-  XMLNode* reply = r.getReply();
-  return string_to_int(reply->getValue());
+INT64 indri::server::NetworkServerProxy::documentCount() {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "document-count" );
+  return _numericRequest( request );
 }
 
-INT64 NetworkServerProxy::documentCount( const std::string& term ) {
-  XMLNode* request = new XMLNode( "document-term-count", term );
-  _stream->request( request );
-  delete request;
-
-  XMLReplyReceiver r;
-  r.wait( _stream );
-
-  XMLNode* reply = r.getReply();
-  return string_to_int(reply->getValue());
+INT64 indri::server::NetworkServerProxy::documentCount( const std::string& term ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "document-term-count", term );
+  return _numericRequest( request );
 }
 
-QueryServerVectorsResponse* NetworkServerProxy::documentVectors( const std::vector<int>& documentIDs ) {
-  XMLNode* request = new XMLNode( "document-vectors" );
+indri::server::QueryServerVectorsResponse* indri::server::NetworkServerProxy::documentVectors( const std::vector<int>& documentIDs ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "document-vectors" );
 
   for( size_t i=0; i<documentIDs.size(); i++ ) {
-    request->addChild( new XMLNode( "document", i64_to_string(documentIDs[i]) ) );
+    request->addChild( new indri::xml::XMLNode( "document", i64_to_string(documentIDs[i]) ) );
   }
 
+  _stream->mutex().lock();
   _stream->request( request );
   delete request;
 
-  return new NetworkServerProxyVectorsResponse( _stream );
+  return new indri::server::NetworkServerProxyVectorsResponse( _stream );
 }
 

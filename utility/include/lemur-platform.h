@@ -30,6 +30,8 @@
   typedef unsigned int UINT32;
   typedef signed short INT16;
   typedef unsigned short UINT16;
+  typedef unsigned char UINT8;
+  typedef signed char INT8;
   typedef off_t FILE_OFFSET;
   typedef int socket_t;
 
@@ -47,6 +49,7 @@
   #define LEMUR_POSTALIGN   __attribute__ ((aligned))
 #else
   #define NOGDI
+  #define _WIN32_WINNT 0x0400
   #define WIN32_LEAN_AND_MEAN
   #include <windows.h>
   #include <winsock.h>
@@ -58,6 +61,8 @@
   typedef signed short INT16;
   typedef signed char INT8;
   typedef unsigned int UINT32;
+  typedef unsigned char UINT8;
+  typedef signed char INT8;
   typedef int FILE_OFFSET;
   typedef SOCKET socket_t;
 
@@ -74,6 +79,8 @@
   #define LEMUR_POSTALIGN
 
   #define LEMUR_USING_FINDFIRST
+
+  typedef int socklen_t;
 #endif
 
 #define PTR_TO_SIZET(s)   ( (size_t) ( (void*) (s) ) )

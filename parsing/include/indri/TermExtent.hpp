@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -18,11 +18,16 @@
 
 #ifndef INDRI_TERMEXTENT_HPP
 #define INDRI_TERMEXTENT_HPP
-
-struct TermExtent {
-  int begin;
-  int end;
-};
+namespace indri
+{
+  namespace parse
+  {
+    struct TermExtent {
+      int begin;
+      int end;
+    };
+  }
+}
 
 #endif // INDRI_TERMEXTENT_HPP
 

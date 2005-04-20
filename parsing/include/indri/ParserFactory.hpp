@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // ParserFactory
@@ -22,20 +22,26 @@
 #include <map>
 #include <vector>
 #include "indri/IndriParser.hpp"
+namespace indri
+{
+  namespace parse
+  {
+    
+    class ParserFactory {
+    public:
+      ~ParserFactory();
 
-class ParserFactory {
-public:
-  ~ParserFactory();
-
-  static std::string preferredName( const std::string& name );
-  static indri::Parser* get( const std::string& name );
-  static indri::Parser* get( const std::string& name,
-                             const std::vector<std::string>& includeTags,
-                             const std::vector<std::string>& excludeTags,
-                             const std::vector<std::string>& indexTags,
-                             const std::vector<std::string>& metadataTags,
-                             const std::map<std::string, std::string>& conflations );
-};
+      static std::string preferredName( const std::string& name );
+      static indri::parse::Parser* get( const std::string& name );
+      static indri::parse::Parser* get( const std::string& name,
+                                        const std::vector<std::string>& includeTags,
+                                        const std::vector<std::string>& excludeTags,
+                                        const std::vector<std::string>& indexTags,
+                                        const std::vector<std::string>& metadataTags,
+                                        const std::map<std::string, std::string>& conflations );
+    };
+  }
+}
 
 #endif // INDRI_PARSERFACTORY_HPP
 

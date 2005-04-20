@@ -14,6 +14,13 @@
 #include "LemurIndriIndex.hpp"
 #include "TextQueryRep.hpp"
 #include "RetrievalMethod.hpp"
+namespace indri
+{
+  namespace api
+  {
+    class QueryEnvironment;
+  }
+}
 
 /// Query model representation for the indri query language
 class IndriQueryModel : public QueryRep {
@@ -49,7 +56,7 @@ public:
   /// clean up.
   virtual ~IndriRetMethod();
   /// set parameters
-  virtual void setParams(Parameters *parms);
+  virtual void setParams(indri::api::Parameters *parms);
   /// set stopword list
   virtual void setStopwords(const string& stopfile) ;
   /// score all of the documents in the collection
@@ -76,8 +83,8 @@ public:
   /// update the query
   virtual void updateQuery(QueryRep &qryRep, const DocIDSet &relDocs);
 private:
-  class QueryEnvironment *env;
-  Parameters *params;
+  indri::api::QueryEnvironment *env;
+  indri::api::Parameters *params;
 };
 
 #endif /* _INDRIRETMETHOD_HPP */

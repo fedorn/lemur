@@ -24,7 +24,7 @@
 #include <iostream>
 
 // static construction
-DirectoryIterator DirectoryIterator::_end;
+indri::file::DirectoryIterator indri::file::DirectoryIterator::_end;
 
 void* directoryiterator_init( const std::string& path );
 void directoryiterator_destroy(void* opaque);
@@ -47,7 +47,7 @@ struct win_iter_data {
 
 void* directoryiterator_init( const std::string& path ) {
   win_iter_data* d = new win_iter_data;
-  std::string searchPath = Path::combine( path, "*" );
+  std::string searchPath = indri::file::Path::combine( path, "*" );
 
   d->handle = ::FindFirstFile( searchPath.c_str(), &d->data );
   d->done = (d->handle == INVALID_HANDLE_VALUE);
@@ -134,7 +134,7 @@ void* directoryiterator_init( const std::string& path ) {
   unix_iter_data* d = new unix_iter_data;
   d->directory = opendir( path.c_str() );
   d->done = (d->directory == 0);
-  d->entry = (struct dirent*) malloc( sizeof(struct dirent) + PATH_MAX );
+  d->entry = (struct dirent*) malloc( sizeof(struct dirent) + PATH_MAX + 1);
 
   if( !d->done )
     directoryiterator_next(d);
@@ -166,21 +166,21 @@ bool directoryiterator_done( void* opaque ) {
 // Begin platform independent code
 //
 
-const DirectoryIterator& DirectoryIterator::end() {
+const indri::file::DirectoryIterator& indri::file::DirectoryIterator::end() {
   return _end;
 }
 
-void DirectoryIterator::_copyCurrent() {
+void indri::file::DirectoryIterator::_copyCurrent() {
   if( _relative ) {
-    _current = Path::combine( _path, directoryiterator_current( _platform ) );
+    _current = indri::file::Path::combine( _path, directoryiterator_current( _platform ) );
   } else {
     _current = directoryiterator_current( _platform );
   }
 
-  _current = Path::trim( _current );
+  _current = indri::file::Path::trim( _current );
 }
 
-void DirectoryIterator::_next() {
+void indri::file::DirectoryIterator::_next() {
   directoryiterator_next( _platform );
   _copyCurrent();
 
@@ -192,16 +192,16 @@ void DirectoryIterator::_next() {
   }
 }
 
-DirectoryIterator::DirectoryIterator() :
+indri::file::DirectoryIterator::DirectoryIterator() :
   _relative(false),
   _platform(0)
 {
 }
 
-DirectoryIterator::DirectoryIterator( const std::string& path, bool relative ) :
+indri::file::DirectoryIterator::DirectoryIterator( const std::string& path, bool relative ) :
   _relative(relative)
 {
-  _path = Path::trim( path );
+  _path = indri::file::Path::trim( path );
   _platform = directoryiterator_init( _path );
 
   std::string current = directoryiterator_current( _platform );
@@ -214,37 +214,37 @@ DirectoryIterator::DirectoryIterator( const std::string& path, bool relative ) :
   _copyCurrent();
 }
 
-DirectoryIterator::~DirectoryIterator() {
+indri::file::DirectoryIterator::~DirectoryIterator() {
   close();
 }
 
-const std::string& DirectoryIterator::base() const {
+const std::string& indri::file::DirectoryIterator::base() const {
   return _path;
 }
 
-void DirectoryIterator::close() {
+void indri::file::DirectoryIterator::close() {
   if( _platform ) {
     directoryiterator_destroy( _platform );
     _platform = 0;
   }
 }
 
-void DirectoryIterator::operator ++ () {
-	if( !directoryiterator_done( _platform ))
-		_next();
+void indri::file::DirectoryIterator::operator ++ () {
+  if( !directoryiterator_done( _platform ))
+    _next();
 }
 
-void DirectoryIterator::operator ++ (int) {
-	if( !directoryiterator_done( _platform ) )
-        _next();
+void indri::file::DirectoryIterator::operator ++ (int) {
+  if( !directoryiterator_done( _platform ))
+    _next();
 }
 
-bool DirectoryIterator::operator == ( const DirectoryIterator& other ) {
+bool indri::file::DirectoryIterator::operator == ( const DirectoryIterator& other ) {
   // this is a hack, but I think it's decent: we assume
   // the user is comparing against end() in an iteration sense
   return directoryiterator_done( _platform ) && &other == &_end;
 }
 
-const std::string& DirectoryIterator::operator * () {
+const std::string& indri::file::DirectoryIterator::operator * () {
   return _current;
 }

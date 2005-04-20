@@ -33,20 +33,20 @@ public:
     };
     return *_paramStackSingleton;
   };
-  Parameters *top() {
+  indri::api::Parameters *top() {
     if (params.empty())
       return NULL;
     else
       return params.top();
   }
 
-  void push(Parameters *p) {
+  void push(indri::api::Parameters *p) {
     params.push(p);
   };
 
   void pop() {
     if (!params.empty()) {
-      Parameters *p = NULL;
+      indri::api::Parameters *p = NULL;
       p = params.top();
       params.pop();
       delete(p);
@@ -76,7 +76,7 @@ private:
   ParamStack() {
   };
   static ParamStack* _paramStackSingleton;
-  std::stack<Parameters * >params;
+  std::stack<indri::api::Parameters * >params;
   // maintain a list of used keys (for ParamDisplay).
   std::set<std::string> keys;
 };
@@ -89,7 +89,7 @@ ParamStack* ParamStack::_paramStackSingleton = 0;
 int ParamGetBit(const String &s, int def)
   {
     ParamStack &ps = ParamStack::instance();
-    Parameters *p = ps.top();
+    indri::api::Parameters *p = ps.top();
     ps.addKey(s);
     bool retval= (def != 0) ? true : false;
     if (p) retval = p->get((std::string &) s, retval);
@@ -99,7 +99,7 @@ int ParamGetBit(const String &s, int def)
 int ParamGetInt(const String &s, int def)
   {
     ParamStack &ps = ParamStack::instance();
-    Parameters *p = ps.top();
+    indri::api::Parameters *p = ps.top();
     ps.addKey(s);
     int retval = def;
     if (p) retval = p->get((std::string &)s, def);
@@ -109,7 +109,7 @@ int ParamGetInt(const String &s, int def)
 INT64 ParamGetLongLong(const String &s, INT64 def)
   {
     ParamStack &ps = ParamStack::instance();
-    Parameters *p = ps.top();
+    indri::api::Parameters *p = ps.top();
     ps.addKey(s);
     INT64 retval = def;
     if (p) retval = p->get((std::string &)s, def);
@@ -119,7 +119,7 @@ INT64 ParamGetLongLong(const String &s, INT64 def)
 int ParamGet(const String &s, int &value)
   {
     ParamStack &ps = ParamStack::instance();
-    Parameters *p = ps.top();
+    indri::api::Parameters *p = ps.top();
     ps.addKey(s);
     bool retval = true;
     if (p && p->exists((std::string &)s)) {
@@ -145,7 +145,7 @@ int ParamGet(const String &s, int &value, const int &def)
 double ParamGetDouble(const String &s, double def)
   {
     ParamStack &ps = ParamStack::instance();
-    Parameters *p = ps.top();
+    indri::api::Parameters *p = ps.top();
     ps.addKey(s);
     double retval = def;
     if (p) retval = p->get((std::string &)s, def);
@@ -156,7 +156,7 @@ double ParamGetDouble(const String &s, double def)
 int ParamGet(const String &s, double &value)
   {
     ParamStack &ps = ParamStack::instance();
-    Parameters *p = ps.top();
+    indri::api::Parameters *p = ps.top();
     ps.addKey(s);
     bool retval = true;
     if (p && p->exists((std::string &)s)) {
@@ -212,7 +212,7 @@ int ParamGet(const String &s, float &value, const float &def)
 int ParamGet(const String &s, String &value) 
   {
     ParamStack &ps = ParamStack::instance();
-    Parameters *p = ps.top();
+    indri::api::Parameters *p = ps.top();
     ps.addKey(s);
     bool retval = true;
     if (p && p->exists((std::string &)s)) {
@@ -238,7 +238,7 @@ int ParamGet(const String &s, String &value, const String &def)
 String ParamGetString(const String &s, const String &def)
   {
     ParamStack &ps = ParamStack::instance();
-    Parameters *p = ps.top();
+    indri::api::Parameters *p = ps.top();
     ps.addKey(s);
     String retval;
     if (p) {
@@ -270,7 +270,7 @@ String ParamGetString(const String &s)
 int    ParamPushFile (const String &s) 
   {
     ParamStack &ps = ParamStack::instance();
-    Parameters *p = new Parameters();
+    indri::api::Parameters *p = new indri::api::Parameters();
     bool retval = true;
     try {
       p->loadFile(s);
@@ -288,7 +288,7 @@ String ParamPopFile (void)
     /*    ps.displayKeys();*/
     ps.pop();
     /*
-    Parameters *p = ps.top();
+      indri::api::Parameters *p = ps.top();
     if (p) {
       string s = p->get("index");
       std::cerr << p << ":" << s << std::endl;
@@ -307,11 +307,11 @@ void ParamDisplay() {
 
 void ParamSet(const String &key, const String &value) {
     ParamStack &ps = ParamStack::instance();
-    Parameters *p = ps.top();
+    indri::api::Parameters *p = ps.top();
     ps.addKey(key);
     if (!p) {
       // no Parameters on the stack. Make one.
-      p = new Parameters();
+      p = new indri::api::Parameters();
       ps.push(p);
     }
     p->set((std::string &)key, (std::string &)value);

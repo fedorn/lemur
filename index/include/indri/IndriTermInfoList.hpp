@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -27,13 +27,13 @@ namespace indri {
   namespace index {
     class BagList : public ::TermInfoList {
     private:
-      class TermListBuilder* _list;
+      const class TermList* _list;
       std::vector< std::pair<int, int> > _termCounts;
       TermInfo _info;
       int _position;
 
     public:
-      BagList( class TermListBuilder *list ) ;
+      BagList( const class TermList *list ) ;
       
       ~BagList() ;
 
@@ -68,12 +68,12 @@ namespace indri {
 
     class PositionList : public ::TermInfoList {
     private:
-      class TermListBuilder* _list;
+      const class TermList* _list;
       PositionInfo _info;
       int _position;
       
     public:
-      PositionList( class TermListBuilder* list ) ;
+      PositionList( const class TermList* list ) ;
       ~PositionList() ;
       
       TermInfo* newElement() ;

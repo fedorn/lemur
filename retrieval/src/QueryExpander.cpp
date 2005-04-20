@@ -17,17 +17,17 @@
 
 #include "indri/QueryExpander.hpp"
 
-QueryExpander::QueryExpander( QueryEnvironment * env , Parameters& param ) {
+indri::query::QueryExpander::QueryExpander( indri::api::QueryEnvironment * env , indri::api::Parameters& param ) {
   _env = env;
   _param = param;
 }
 
-std::vector<ScoredExtentResult> QueryExpander::runExpandedQuery( std::string originalQuery , int resultsRequested , bool verbose) {
+std::vector<indri::api::ScoredExtentResult> indri::query::QueryExpander::runExpandedQuery( std::string originalQuery , int resultsRequested , bool verbose) {
   if( verbose )
     std::cout << "Unexpanded query = " << originalQuery << std::endl;
 
   // run original query
-  std::vector<ScoredExtentResult> results = _env->runQuery( originalQuery , resultsRequested );
+  std::vector<indri::api::ScoredExtentResult> results = _env->runQuery( originalQuery , resultsRequested );
 
   // expand original query
   std::string expandedQuery = expand( originalQuery , results );
@@ -41,7 +41,7 @@ std::vector<ScoredExtentResult> QueryExpander::runExpandedQuery( std::string ori
   return results;
 }
 
-std::vector<DocumentVector*> QueryExpander::getDocumentVectors( std::vector<ScoredExtentResult>& results, int fbDocs ) {
+std::vector<indri::api::DocumentVector*> indri::query::QueryExpander::getDocumentVectors( std::vector<indri::api::ScoredExtentResult>& results, int fbDocs ) {
   // copy results documents into a doc ID vector
   std::vector<int> documentIDs;
   for( int doc = 0; doc < fbDocs && doc < results.size(); doc++ )
@@ -51,20 +51,20 @@ std::vector<DocumentVector*> QueryExpander::getDocumentVectors( std::vector<Scor
   return _env->documentVectors( documentIDs );
 }
 
-std::vector<std::string> * QueryExpander::getVocabulary( std::vector<ScoredExtentResult>& results, int fbDocs ) {
-  std::vector<DocumentVector*> docVectors = getDocumentVectors( results, fbDocs );
+std::vector<std::string> * indri::query::QueryExpander::getVocabulary( std::vector<indri::api::ScoredExtentResult>& results, int fbDocs ) {
+  std::vector<indri::api::DocumentVector*> docVectors = getDocumentVectors( results, fbDocs );
   std::vector<std::string> * strings;
   
   strings = getVocabulary( docVectors );
-  delete_vector_contents( docVectors );
+  indri::utility::delete_vector_contents( docVectors );
   return strings;
 }
 
-std::vector<std::string> * QueryExpander::getVocabulary( std::vector<DocumentVector*>& docVectors ) {
+std::vector<std::string> * indri::query::QueryExpander::getVocabulary( std::vector<indri::api::DocumentVector*>& docVectors ) {
   std::map<std::string, bool> terms;
 
   for( int doc = 0; doc < docVectors.size(); doc++ ) {
-    DocumentVector * docVec = docVectors[ doc ];
+    indri::api::DocumentVector * docVec = docVectors[ doc ];
     std::vector<int> term_positions = docVec->positions();
     std::vector<std::string> term_list = docVec->stems();
 
@@ -81,7 +81,7 @@ std::vector<std::string> * QueryExpander::getVocabulary( std::vector<DocumentVec
   return vocab;
 }
 
-UINT64 QueryExpander::getCF( const std::string& term ) {
+UINT64 indri::query::QueryExpander::getCF( const std::string& term ) {
   UINT64 cf = _cf_cache[ term ];
 
   if( cf == 0 ) {
@@ -93,7 +93,7 @@ UINT64 QueryExpander::getCF( const std::string& term ) {
   return cf;
 }
 
-std::string QueryExpander::buildQuery( const std::string& originalQuery, double originalWeight,
+std::string indri::query::QueryExpander::buildQuery( const std::string& originalQuery, double originalWeight,
                                        const std::vector< std::pair<std::string, double> >& expandedTerms,
                                        int termCount ) {
   std::stringstream ret;

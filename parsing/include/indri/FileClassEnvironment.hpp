@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // FileClassEnvironment
@@ -20,17 +20,23 @@
 
 #include "indri/IndriParser.hpp"
 #include "indri/DocumentIterator.hpp"
+namespace indri
+{
+  namespace parse
+  {
+    
+    struct FileClassEnvironment {
+      FileClassEnvironment() : parser(0), iterator(0) {}
+      ~FileClassEnvironment() {
+        delete parser;
+        delete iterator;
+      }
 
-struct FileClassEnvironment {
-  FileClassEnvironment() : parser(0), iterator(0) {}
-  ~FileClassEnvironment() {
-    delete parser;
-    delete iterator;
+      Parser* parser;
+      DocumentIterator* iterator;
+    };
   }
-
-  indri::Parser* parser;
-  DocumentIterator* iterator;
-};
+}
 
 #endif // INDRI_FILECLASSENVIRONMENT_HPP
 

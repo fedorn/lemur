@@ -24,94 +24,34 @@
 #include "indri/ParsedDocument.hpp"
 #include "Exception.hpp"
 
-NetworkServerStub::NetworkServerStub( QueryServer* server, NetworkMessageStream* stream ) :
+indri::net::NetworkServerStub::NetworkServerStub( indri::server::QueryServer* server, indri::net::NetworkMessageStream* stream ) :
   _server(server),
   _stream(stream)
 {
 }
 
-void NetworkServerStub::_handleQuery( XMLNode* request ) {
-  indri::lang::Unpacker unpacker(request);
-  std::vector<indri::lang::Node*> nodes = unpacker.unpack();
-  int resultsRequested = (int) string_to_i64( request->getAttribute( "resultsRequested" ) );
-  bool optimize = request->getAttribute("optimize") == "1";
+void indri::net::NetworkServerStub::_decodeMetadataRequest( const class indri::xml::XMLNode* request,
+                                               std::string& attributeName,
+                                               std::vector<std::string>& attributeValues )
+{
+  attributeName = request->getChildValue( "attributeName" );
+  const std::vector<indri::xml::XMLNode*>& attributeValueNodes = request->getChild( "attributeValues" )->getChildren();
 
-  QueryServerResponse* response = _server->runQuery( nodes, resultsRequested, optimize );
-  InferenceNetwork::MAllResults results = response->getResults();
-  delete response;
-
-  QueryResponsePacker packer( results );
-  packer.write( _stream );
+  for( size_t j=0; j<attributeValueNodes.size(); j++ ) {
+    attributeValues.push_back( attributeValueNodes[j]->getValue() );
+  }
 }
 
-void NetworkServerStub::_handleDocuments( XMLNode* request ) {
-  // rip out all the docIDs:
-  std::vector<int> documentIDs;
-  for( size_t i=0; i<request->getChildren().size(); i++ ) {
-    documentIDs.push_back( (int) string_to_i64( request->getChildren()[i]->getValue() ) );
-  }
-
-  // get the documents
-  QueryServerDocumentsResponse* docResponse = _server->documents( documentIDs );
-  std::vector<ParsedDocument*> documents = docResponse->getResults();
+void indri::net::NetworkServerStub::_sendDocumentsResponse( indri::server::QueryServerDocumentsResponse* docResponse ) {
+  std::vector<indri::api::ParsedDocument*> documents = docResponse->getResults();
   delete docResponse;
 
   // send them back
-  XMLNode* response = new XMLNode( "documents" );
+  indri::xml::XMLNode* response = new indri::xml::XMLNode( "documents" );
   for( unsigned int i=0; i<documents.size(); i++ ) {
-    XMLNode* docNode = new XMLNode( "document" );
-    ParsedDocument* document = documents[i];
-
-    XMLNode* metadata = 0; 
-    XMLNode* textNode = 0;
-    XMLNode* positions = 0;
-
-    if( documents[i]->metadata.size() ) {
-      metadata = new XMLNode( "metadata" );
-
-      for( size_t j=0; j<document->metadata.size(); j++ ) {
-        XMLNode* keyNode = new XMLNode( "key", document->metadata[j].key );
-        std::string value = base64_encode( document->metadata[j].value, document->metadata[j].valueLength );
-        XMLNode* valNode = new XMLNode( "value", value );
-
-        XMLNode* datum = new XMLNode( "datum" );
-        datum->addChild( keyNode );
-        datum->addChild( valNode );
-
-        metadata->addChild( datum );
-      }
-    }
-
-    if( documents[i]->text ) {
-      std::string text = base64_encode( documents[i]->text, documents[i]->textLength );
-      textNode = new XMLNode( "text", text );
-    }
-
-    if( documents[i]->positions.size() ) {
-      positions = new XMLNode( "positions" );
-
-      for( size_t j=0; j<document->positions.size(); j++ ) {
-        XMLNode* position = new XMLNode( "position" );
-        XMLNode* begin = new XMLNode( "begin", i64_to_string( document->positions[j].begin ) );
-        XMLNode* end = new XMLNode( "end", i64_to_string( document->positions[j].end ) );
-        
-        position->addChild( begin );
-        position->addChild( end );
-
-        positions->addChild( position );
-      }
-    }
-
-    if( metadata )
-      docNode->addChild( metadata );
-
-    if( textNode )
-      docNode->addChild( textNode );
-
-    if( positions )
-      docNode->addChild( positions );
-
+    indri::xml::XMLNode* docNode = _encodeDocument( documents[i] );
     response->addChild( docNode );
+    delete documents[i];
   }
 
   _stream->reply( response );
@@ -119,27 +59,147 @@ void NetworkServerStub::_handleDocuments( XMLNode* request ) {
   delete response;
 }
 
-void NetworkServerStub::_handleDocumentMetadata( XMLNode* request ) {
+void indri::net::NetworkServerStub::_sendNumericResponse( const char* responseName, UINT64 number ) {
+  indri::xml::XMLNode* response = new indri::xml::XMLNode( responseName, i64_to_string(number) );
+  _stream->reply( response );
+  _stream->replyDone();
+  delete response;
+}
+
+indri::xml::XMLNode* indri::net::NetworkServerStub::_encodeDocument( const struct indri::api::ParsedDocument* document ) {
+  indri::xml::XMLNode* docNode = new indri::xml::XMLNode( "document" );
+
+  indri::xml::XMLNode* metadata = 0; 
+  indri::xml::XMLNode* textNode = 0;
+  indri::xml::XMLNode* positions = 0;
+
+  if( document->metadata.size() ) {
+    metadata = new indri::xml::XMLNode( "metadata" );
+
+    for( size_t j=0; j<document->metadata.size(); j++ ) {
+      indri::xml::XMLNode* keyNode = new indri::xml::XMLNode( "key", document->metadata[j].key );
+      std::string value = base64_encode( document->metadata[j].value, document->metadata[j].valueLength );
+      indri::xml::XMLNode* valNode = new indri::xml::XMLNode( "value", value );
+
+      indri::xml::XMLNode* datum = new indri::xml::XMLNode( "datum" );
+      datum->addChild( keyNode );
+      datum->addChild( valNode );
+
+      metadata->addChild( datum );
+    }
+  }
+
+  if( document->text ) {
+    std::string text = base64_encode( document->text, document->textLength );
+    textNode = new indri::xml::XMLNode( "text", text );
+  }
+
+  if( document->positions.size() ) {
+    positions = new indri::xml::XMLNode( "positions" );
+
+    for( size_t j=0; j<document->positions.size(); j++ ) {
+      indri::xml::XMLNode* position = new indri::xml::XMLNode( "position" );
+      indri::xml::XMLNode* begin = new indri::xml::XMLNode( "begin", i64_to_string( document->positions[j].begin ) );
+      indri::xml::XMLNode* end = new indri::xml::XMLNode( "end", i64_to_string( document->positions[j].end ) );
+      
+      position->addChild( begin );
+      position->addChild( end );
+
+      positions->addChild( position );
+    }
+  }
+
+  if( metadata )
+    docNode->addChild( metadata );
+
+  if( textNode )
+    docNode->addChild( textNode );
+
+  if( positions )
+    docNode->addChild( positions );
+
+  return docNode;
+}
+
+void indri::net::NetworkServerStub::_handleQuery( indri::xml::XMLNode* request ) {
+  indri::lang::Unpacker unpacker(request);
+  std::vector<indri::lang::Node*> nodes = unpacker.unpack();
+  int resultsRequested = (int) string_to_i64( request->getAttribute( "resultsRequested" ) );
+  bool optimize = request->getAttribute("optimize") == "1";
+
+  indri::server::QueryServerResponse* response = _server->runQuery( nodes, resultsRequested, optimize );
+  indri::infnet::InferenceNetwork::MAllResults results = response->getResults();
+  delete response;
+
+  QueryResponsePacker packer( results );
+  packer.write( _stream );
+}
+
+void indri::net::NetworkServerStub::_handleDocuments( indri::xml::XMLNode* request ) {
+  // rip out all the docIDs:
+  std::vector<int> documentIDs;
+  for( size_t i=0; i<request->getChildren().size(); i++ ) {
+    documentIDs.push_back( (int) string_to_i64( request->getChildren()[i]->getValue() ) );
+  }
+
+  // get the documents
+  indri::server::QueryServerDocumentsResponse* docResponse = _server->documents( documentIDs );
+  _sendDocumentsResponse( docResponse );
+}
+
+void indri::net::NetworkServerStub::_handleDocumentsFromMetadata( indri::xml::XMLNode* request ) {
+  // decode the request
+  std::string attributeName;
+  std::vector<std::string> attributeValues;
+  indri::server::QueryServerDocumentsResponse* documents;
+
+  _decodeMetadataRequest( request, attributeName, attributeValues );
+  documents = _server->documentsFromMetadata( attributeName, attributeValues );
+  _sendDocumentsResponse( documents ); 
+}
+
+void indri::net::NetworkServerStub::_handleDocumentIDsFromMetadata( indri::xml::XMLNode* request ) {
+  // decode the request
+  std::string attributeName;
+  std::vector<std::string> attributeValues;
+  indri::server::QueryServerDocumentIDsResponse* documentIDresponse;
+
+  _decodeMetadataRequest( request, attributeName, attributeValues );
+  documentIDresponse = _server->documentIDsFromMetadata( attributeName, attributeValues );
+  const std::vector<DOCID_T>& documentIDs = documentIDresponse->getResults();
+  indri::xml::XMLNode* response = new indri::xml::XMLNode( "documentIDs" );
+
+  for( size_t i=0; i<documentIDs.size(); i++ ) {
+    response->addChild( new indri::xml::XMLNode( "documentID", i64_to_string( documentIDs[i] ) ) );
+  }
+  delete documentIDresponse;
+
+  _stream->reply( response );
+  _stream->replyDone();
+  delete response;
+}
+
+void indri::net::NetworkServerStub::_handleDocumentMetadata( indri::xml::XMLNode* request ) {
   std::vector<int> documentIDs;
   std::string fieldAttributeName = "field";
   std::string field = request->getChild( fieldAttributeName )->getValue();
 
-  const XMLNode* documents = request->getChild("documents");
+  const indri::xml::XMLNode* documents = request->getChild("documents");
 
   for( size_t i=0; i<documents->getChildren().size(); i++ ) {
     documentIDs.push_back( (int) string_to_i64( documents->getChildren()[i]->getValue() ) );
   }
 
   // get the documents
-  QueryServerMetadataResponse* metadataResponse = _server->documentMetadata( documentIDs, field );
+  indri::server::QueryServerMetadataResponse* metadataResponse = _server->documentMetadata( documentIDs, field );
   std::vector<std::string> metadata = metadataResponse->getResults();
   delete metadataResponse;
 
   // send them back
-  XMLNode* response = new XMLNode( "document-metadata" );
+  indri::xml::XMLNode* response = new indri::xml::XMLNode( "document-metadata" );
   for( unsigned int i=0; i<metadata.size(); i++ ) {
     std::string value = base64_encode( metadata[i].c_str(), metadata[i].length() );
-    XMLNode* datum = new XMLNode( "datum", value );
+    indri::xml::XMLNode* datum = new indri::xml::XMLNode( "datum", value );
     response->addChild(datum);
   }
 
@@ -148,9 +208,9 @@ void NetworkServerStub::_handleDocumentMetadata( XMLNode* request ) {
   delete response;
 }
 
-void NetworkServerStub::_handleDocumentVectors( XMLNode* request ) {
-  const std::vector<XMLNode*>& children = request->getChildren();
-  XMLNode* response = new XMLNode( "document-vector" );
+void indri::net::NetworkServerStub::_handleDocumentVectors( indri::xml::XMLNode* request ) {
+  const std::vector<indri::xml::XMLNode*>& children = request->getChildren();
+  indri::xml::XMLNode* response = new indri::xml::XMLNode( "document-vector" );
 
   // convert doc IDs into an array
   std::vector<int> documentIDs;
@@ -159,42 +219,42 @@ void NetworkServerStub::_handleDocumentVectors( XMLNode* request ) {
   }
 
   // get the document vectors from the index
-  QueryServerVectorsResponse* vectorsResponse = _server->documentVectors( documentIDs );
+  indri::server::QueryServerVectorsResponse* vectorsResponse = _server->documentVectors( documentIDs );
 
   for( size_t i=0; i<vectorsResponse->getResults().size(); i++ ) {
-    DocumentVector* docVector = vectorsResponse->getResults()[i];
+    indri::api::DocumentVector* docVector = vectorsResponse->getResults()[i];
 
-    XMLNode* docResponse = new XMLNode( "document" );
-    XMLNode* stems = new XMLNode( "stems" );
-    XMLNode* positions = new XMLNode( "positions" );
-    XMLNode* fields = new XMLNode( "fields" );
+    indri::xml::XMLNode* docResponse = new indri::xml::XMLNode( "document" );
+    indri::xml::XMLNode* stems = new indri::xml::XMLNode( "stems" );
+    indri::xml::XMLNode* positions = new indri::xml::XMLNode( "positions" );
+    indri::xml::XMLNode* fields = new indri::xml::XMLNode( "fields" );
 
     const std::vector<std::string>& stemsVector = docVector->stems();
 
     for( unsigned int i=0; i<stemsVector.size(); i++ ) {
       const std::string& stem = stemsVector[i];
       std::string encoded = base64_encode( stem.c_str(), stem.length() );
-      stems->addChild( new XMLNode( "stem", encoded ) );
+      stems->addChild( new indri::xml::XMLNode( "stem", encoded ) );
     }
 
     const std::vector<int>& positionsVector = docVector->positions();
 
     for( unsigned int i=0; i<docVector->positions().size(); i++ ) {
       int position = positionsVector[i];
-      positions->addChild( new XMLNode( "position", i64_to_string(position) ) );
+      positions->addChild( new indri::xml::XMLNode( "position", i64_to_string(position) ) );
     }
 
     for( unsigned int i=0; i<docVector->fields().size(); i++ ) {
-      XMLNode* field = new XMLNode( "field" );
+      indri::xml::XMLNode* field = new indri::xml::XMLNode( "field" );
 
       std::string number = i64_to_string( docVector->fields()[i].number );
       std::string begin = i64_to_string( docVector->fields()[i].begin );
       std::string end = i64_to_string( docVector->fields()[i].end );
 
-      field->addChild( new XMLNode( "name", docVector->fields()[i].name ) );
-      field->addChild( new XMLNode( "number", number ) );
-      field->addChild( new XMLNode( "begin", begin ) );
-      field->addChild( new XMLNode( "end", end ) );
+      field->addChild( new indri::xml::XMLNode( "name", docVector->fields()[i].name ) );
+      field->addChild( new indri::xml::XMLNode( "number", number ) );
+      field->addChild( new indri::xml::XMLNode( "begin", begin ) );
+      field->addChild( new indri::xml::XMLNode( "end", end ) );
 
       fields->addChild( field );
     }
@@ -215,80 +275,52 @@ void NetworkServerStub::_handleDocumentVectors( XMLNode* request ) {
   delete vectorsResponse;
 }
 
-void NetworkServerStub::_handleTermCount( XMLNode* request ) {
+void indri::net::NetworkServerStub::_handleTermCount( indri::xml::XMLNode* request ) {
   INT64 termCount = _server->termCount();
-  XMLNode* response = new XMLNode( "term-count", i64_to_string(termCount) );
-  _stream->reply( response );
-  _stream->replyDone();
-  delete response;
+  _sendNumericResponse( "term-count", termCount );
 }
 
-void NetworkServerStub::_handleStemCountText( XMLNode* request ) {
+void indri::net::NetworkServerStub::_handleStemCountText( indri::xml::XMLNode* request ) {
   INT64 termCount = _server->stemCount( request->getValue().c_str() );
-  XMLNode* response = new XMLNode( "stem-count-text", i64_to_string(termCount) );
-  _stream->reply( response );
-  _stream->replyDone();
-  delete response;
+  _sendNumericResponse( "stem-count-text", termCount );
 }
 
-void NetworkServerStub::_handleTermCountText( XMLNode* request ) {
+void indri::net::NetworkServerStub::_handleTermCountText( indri::xml::XMLNode* request ) {
   INT64 termCount = _server->termCount( request->getValue().c_str() );
-  XMLNode* response = new XMLNode( "term-count-text", i64_to_string(termCount) );
-  _stream->reply( response );
-  _stream->replyDone();
-  delete response;
+  _sendNumericResponse( "term-count-text", termCount );
 }
 
-void NetworkServerStub::_handleTermCountID( XMLNode* request ) {
-  INT64 termCount = _server->termCount( string_to_int(request->getValue()) );
-  XMLNode* response = new XMLNode( "term-count-id", i64_to_string(termCount) );
-  _stream->reply( response );
-  _stream->replyDone();
-  delete response;
-}
-
-void NetworkServerStub::_handleTermName( XMLNode* request ) {
+void indri::net::NetworkServerStub::_handleTermName( indri::xml::XMLNode* request ) {
   std::string name = _server->termName( string_to_int( request->getValue() ) );
-  XMLNode* response = new XMLNode( "term-name", name );
+  indri::xml::XMLNode* response = new indri::xml::XMLNode( "term-name", name );
   _stream->reply( response );
   _stream->replyDone();
   delete response;
 }
 
-void NetworkServerStub::_handleTermID( XMLNode* request ) {
+void indri::net::NetworkServerStub::_handleTermID( indri::xml::XMLNode* request ) {
   int termID = _server->termID( request->getValue().c_str() );
-  XMLNode* response = new XMLNode( "term-id", i64_to_string(termID) );
-  _stream->reply( response );
-  _stream->replyDone();
-  delete response;
+  _sendNumericResponse( "term-id", termID );
 }
 
-void NetworkServerStub::_handleTermFieldCount( XMLNode* request ) {
-  const XMLNode* termNode;
-  const XMLNode* fieldNode;
+void indri::net::NetworkServerStub::_handleTermFieldCount( indri::xml::XMLNode* request ) {
+  const indri::xml::XMLNode* termNode;
+  const indri::xml::XMLNode* fieldNode;
   INT64 count;
 
   fieldNode = request->getChild( "field" );
   const std::string& fieldName = request->getValue();
 
-  if( (termNode = request->getChild( "term-id" )) != 0 ) {
-    int termID = string_to_int( termNode->getValue() );
-    count = _server->termFieldCount( termID, fieldName );
-  } else {
-    termNode = request->getChild( "term-text" );
-    const std::string& termName = termNode->getValue();
-    count = _server->termFieldCount( termName, fieldName );
-  }
+  termNode = request->getChild( "term-text" );
+  const std::string& termName = termNode->getValue();
+  count = _server->termFieldCount( termName, fieldName );
 
-  XMLNode* response = new XMLNode( "term-field-count", i64_to_string(count) );
-  _stream->reply( response );
-  _stream->replyDone();
-  delete response;
+  _sendNumericResponse( "term-field-count", count );
 }
 
-void NetworkServerStub::_handleStemFieldCount( XMLNode* request ) {
-  const XMLNode* termNode;
-  const XMLNode* fieldNode;
+void indri::net::NetworkServerStub::_handleStemFieldCount( indri::xml::XMLNode* request ) {
+  const indri::xml::XMLNode* termNode;
+  const indri::xml::XMLNode* fieldNode;
   INT64 count;
 
   fieldNode = request->getChild( "field" );
@@ -298,18 +330,15 @@ void NetworkServerStub::_handleStemFieldCount( XMLNode* request ) {
   const std::string& termName = termNode->getValue();
   count = _server->stemFieldCount( termName, fieldName );
 
-  XMLNode* response = new XMLNode( "term-field-count", i64_to_string(count) );
-  _stream->reply( response );
-  _stream->replyDone();
-  delete response;
+  _sendNumericResponse( "term-field-count", count );
 }
 
-void NetworkServerStub::_handleFieldList( XMLNode* request ) {
-  XMLNode* response = new XMLNode( "field-list" );
+void indri::net::NetworkServerStub::_handleFieldList( indri::xml::XMLNode* request ) {
+  indri::xml::XMLNode* response = new indri::xml::XMLNode( "field-list" );
   std::vector<std::string> fieldList = _server->fieldList();
 
   for( size_t i=0; i<fieldList.size(); i++ ) {
-    response->addChild( new XMLNode( "field", fieldList[i] ) );
+    response->addChild( new indri::xml::XMLNode( "field", fieldList[i] ) );
   }
 
   _stream->reply( response );
@@ -317,38 +346,25 @@ void NetworkServerStub::_handleFieldList( XMLNode* request ) {
   delete response;
 }
 
-void NetworkServerStub::_handleDocumentLength( XMLNode* request ) {
+void indri::net::NetworkServerStub::_handleDocumentLength( indri::xml::XMLNode* request ) {
   int documentID = string_to_int( request->getValue() );
 
   INT64 length = _server->documentLength( documentID );
-  XMLNode* response = new XMLNode( "document-length", i64_to_string( length ) );
-
-  _stream->reply( response );
-  _stream->replyDone();
-  delete response;
+  _sendNumericResponse( "document-length", length );
 }
 
-void NetworkServerStub::_handleDocumentCount( XMLNode* request ) {
+void indri::net::NetworkServerStub::_handleDocumentCount( indri::xml::XMLNode* request ) {
   INT64 count = _server->documentCount();
-  XMLNode* response = new XMLNode( "document-count", i64_to_string( count ) );
-
-  _stream->reply( response );
-  _stream->replyDone();
-  delete response;
+  _sendNumericResponse( "document-count", count );
 }
 
-void NetworkServerStub::_handleDocumentTermCount( XMLNode* request ) {
+void indri::net::NetworkServerStub::_handleDocumentTermCount( indri::xml::XMLNode* request ) {
   const std::string& term = request->getValue();
-
   INT64 count = _server->documentCount( term );
-  XMLNode* response = new XMLNode( "document-term-count", i64_to_string( count ) );
-
-  _stream->reply( response );
-  _stream->replyDone();
-  delete response;
+  _sendNumericResponse( "document-term-count", count );
 }
 
-void NetworkServerStub::request( XMLNode* input ) {
+void indri::net::NetworkServerStub::request( indri::xml::XMLNode* input ) {
   try {
     const std::string& type = input->getName();
 
@@ -370,8 +386,6 @@ void NetworkServerStub::request( XMLNode* input ) {
       _handleTermName( input );
     } else if( type == "term-count" ) {
       _handleTermCount( input );
-    } else if( type == "term-count-id" ) {
-      _handleTermCountID( input );
     } else if( type == "term-count-text" ) {
       _handleTermCountText( input );
     } else if( type == "stem-count-text" ) {
@@ -384,6 +398,10 @@ void NetworkServerStub::request( XMLNode* input ) {
       _handleDocumentCount( input );
     } else if( type == "document-term-count" ) {
       _handleDocumentTermCount( input );
+    } else if( type == "docids-from-metadata" ) {
+      _handleDocumentIDsFromMetadata( input );
+    } else if( type == "documents-from-metadata" ) {
+      _handleDocumentsFromMetadata( input );
     } else {
       _stream->error( std::string() + "Unknown XML message type: " + input->getName() );
     }
@@ -394,24 +412,25 @@ void NetworkServerStub::request( XMLNode* input ) {
   }
 }
 
-void NetworkServerStub::reply( XMLNode* input ) {
+void indri::net::NetworkServerStub::reply( indri::xml::XMLNode* input ) {
   assert( false && "Shouldn't ever get a reply on the server" );
 }
 
-void NetworkServerStub::reply( const std::string& name, const void* buffer, unsigned int length ) {
+void indri::net::NetworkServerStub::reply( const std::string& name, const void* buffer, unsigned int length ) {
   assert( false && "Shouldn't ever get a reply on the server" );
 }
 
-void NetworkServerStub::replyDone() {
+void indri::net::NetworkServerStub::replyDone() {
   assert( false && "Shouldn't ever get a reply on the server" );
 }
 
-void NetworkServerStub::error( const std::string& error ) {
+void indri::net::NetworkServerStub::error( const std::string& error ) {
   // TODO: fix this to trap the error and propagate up the chain on the next request.
   std::cout << "Caught error message from client: " << error.c_str() << std::endl;
 }
 
-void NetworkServerStub::run() {
+void indri::net::NetworkServerStub::run() {
   while( _stream->alive() )
     _stream->read(*this);
+
 }

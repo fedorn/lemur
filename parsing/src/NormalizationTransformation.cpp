@@ -20,13 +20,13 @@
 #include "indri/Parameters.hpp"
 #include "string-set.h"
 
-NormalizationTransformation::NormalizationTransformation( Parameters* acronymList )
+indri::parse::NormalizationTransformation::NormalizationTransformation( indri::api::Parameters* acronymList )
   :
   _handler(0),
   _acronyms(0)
 {
   if( acronymList && acronymList->exists("word") ) {
-    Parameters words = (*acronymList)["word"];
+    indri::api::Parameters words = (*acronymList)["word"];
     _acronyms = string_set_create();
     
     for( int i=0; i<words.size(); i++ ) {
@@ -37,13 +37,13 @@ NormalizationTransformation::NormalizationTransformation( Parameters* acronymLis
   }
 }
 
-NormalizationTransformation::~NormalizationTransformation() {
+indri::parse::NormalizationTransformation::~NormalizationTransformation() {
   if(_acronyms)
     string_set_delete(_acronyms);
 }
 
-ParsedDocument* NormalizationTransformation::transform( ParsedDocument* document ) {
-  greedy_vector<char*>& terms = document->terms;
+indri::api::ParsedDocument* indri::parse::NormalizationTransformation::transform( indri::api::ParsedDocument* document ) {
+  indri::utility::greedy_vector<char*>& terms = document->terms;
   unsigned int i, j, k;
 
   for( i=0; i<terms.size(); i++ ) {
@@ -91,11 +91,11 @@ ParsedDocument* NormalizationTransformation::transform( ParsedDocument* document
   return document;
 }
 
-void NormalizationTransformation::handle( ParsedDocument* document ) {
+void indri::parse::NormalizationTransformation::handle( indri::api::ParsedDocument* document ) {
   _handler->handle( transform( document ) );
 }
 
-void NormalizationTransformation::setHandler( ObjectHandler<ParsedDocument>& handler ) {
+void indri::parse::NormalizationTransformation::setHandler( ObjectHandler<indri::api::ParsedDocument>& handler ) {
   _handler = &handler;
 }
 

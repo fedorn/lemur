@@ -9,7 +9,7 @@ BEGIN {
   print "#include \"Exception.hpp\"";
   print "";
 
-  print    "indri::lang::Node* indri::lang::Unpacker::_unpack( XMLNode* child ) {";
+  print    "indri::lang::Node* indri::lang::Unpacker::_unpack( indri::xml::XMLNode* child ) {";
   print    "  Node* result = 0;";
   print    "  std::string type = child->getAttribute( \"type\" );";
   print    "  std::string name = child->getAttribute( \"name\" );";

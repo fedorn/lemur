@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -23,26 +23,36 @@
 #include "indri/Extent.hpp"
 #include "indri/BeliefNode.hpp"
 #include "indri/ListIteratorNode.hpp"
+namespace indri 
+{
+  namespace infnet
+  {
+    
+    class FilterRejectNode : public BeliefNode {
+    private:
+      indri::utility::greedy_vector<indri::api::ScoredExtentResult> _extents;
+      indri::utility::greedy_vector<bool> _matches;
+      ListIteratorNode* _filter;
+      BeliefNode* _disallowed;
+      std::string _name;
 
-class FilterRejectNode : public BeliefNode {
-private:
-  greedy_vector<ScoredExtentResult> _extents;
-  ListIteratorNode* _filter;
-  BeliefNode* _disallowed;
-  std::string _name;
+    public:
+      FilterRejectNode( const std::string& name, ListIteratorNode* filter, 
+                        BeliefNode* disallowed );
 
-public:
-  FilterRejectNode( const std::string& name, ListIteratorNode* filter, 
-		    BeliefNode* disallowed );
+      double maximumBackgroundScore();
+      double maximumScore();
+      bool hasMatch( int documentID );
+      const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int start, int end, int documentLength );
+      int nextCandidateDocument();
+      void indexChanged( indri::index::Index& index );
 
-  double maximumBackgroundScore();
-  double maximumScore();
-  bool hasMatch( int documentID );
-  const greedy_vector<ScoredExtentResult>& score( int documentID, int start, int end, int documentLength );
-  int nextCandidateDocument();
-  const std::string& getName() const;
-  void annotate( class Annotator& annotator, int documentID, int begin, int end );
-};
+      const std::string& getName() const;
+      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+    };
+  }
+}
 
 #endif // INDRI_FILTERREJECTNODE_HPP
 

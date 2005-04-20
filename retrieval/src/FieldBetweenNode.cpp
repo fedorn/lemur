@@ -20,21 +20,21 @@
 #include "indri/Annotator.hpp"
 #include "indri/FieldIteratorNode.hpp"
 
-FieldBetweenNode::FieldBetweenNode( const std::string& name, FieldIteratorNode* iterator, INT64 low, INT64 high ) {
+indri::infnet::FieldBetweenNode::FieldBetweenNode( const std::string& name, FieldIteratorNode* iterator, INT64 low, INT64 high ) {
   _name = name;
   _field = iterator;
   _low = low;
   _high = high;
 }
 
-void FieldBetweenNode::prepare( int documentID ) {
+void indri::infnet::FieldBetweenNode::prepare( int documentID ) {
   _extents.clear();
   
   if( !_field )
     return;
 
-  const greedy_vector<INT64>& numbers = _field->numbers();
-  const greedy_vector<Extent>& extents = _field->extents();
+  const indri::utility::greedy_vector<INT64>& numbers = _field->numbers();
+  const indri::utility::greedy_vector<indri::index::Extent>& extents = _field->extents();
 
   for( unsigned int i=0; i<numbers.size(); i++ ) {
     if( numbers[i] >= _low && numbers[i] < _high ) {
@@ -43,20 +43,24 @@ void FieldBetweenNode::prepare( int documentID ) {
   }
 }
 
-greedy_vector<Extent>& FieldBetweenNode::extents() {
+indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::FieldBetweenNode::extents() {
   return _extents;
 }
 
-int FieldBetweenNode::nextCandidateDocument() {
+int indri::infnet::FieldBetweenNode::nextCandidateDocument() {
   return _field->nextCandidateDocument();
 }
 
-const std::string& FieldBetweenNode::getName() const { 
+const std::string& indri::infnet::FieldBetweenNode::getName() const { 
   return _name;
 }
 
-void FieldBetweenNode::annotate( class Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::FieldBetweenNode::annotate( class indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
   annotator.addMatches( _extents, this, documentID, begin, end );
+}
+
+void indri::infnet::FieldBetweenNode::indexChanged( indri::index::Index& index ) {
+  // do nothing
 }
 
 

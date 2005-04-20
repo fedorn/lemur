@@ -297,7 +297,7 @@ namespace InQueryParameter {
 namespace IndriParameter {
   /// @name Indri query language parameters
   /// Parameters object passed into the IndriRetMethod
-  static Parameters params;
+  static indri::api::Parameters params;
   /// For query time stopping.
   static string stopwords;
   /// get parameters.

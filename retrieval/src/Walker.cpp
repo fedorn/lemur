@@ -18,6 +18,8 @@ namespace indri {
    void Walker::after( class Field* n ) { defaultAfter( n ); }
    void Walker::before( class ExtentInside* n ) { defaultBefore( n ); }
    void Walker::after( class ExtentInside* n ) { defaultAfter( n ); }
+   void Walker::before( class WeightedExtentOr* n ) { defaultBefore( n ); }
+   void Walker::after( class WeightedExtentOr* n ) { defaultAfter( n ); }
    void Walker::before( class ExtentOr* n ) { defaultBefore( n ); }
    void Walker::after( class ExtentOr* n ) { defaultAfter( n ); }
    void Walker::before( class ExtentAnd* n ) { defaultBefore( n ); }
@@ -64,10 +66,14 @@ namespace indri {
    void Walker::after( class WeightNode* n ) { defaultAfter( n ); }
    void Walker::before( class ExtentRestriction* n ) { defaultBefore( n ); }
    void Walker::after( class ExtentRestriction* n ) { defaultAfter( n ); }
+   void Walker::before( class FixedPassage* n ) { defaultBefore( n ); }
+   void Walker::after( class FixedPassage* n ) { defaultAfter( n ); }
    void Walker::before( class FilterNode* n ) { defaultBefore( n ); }
    void Walker::after( class FilterNode* n ) { defaultAfter( n ); }
    void Walker::before( class ContextCounterNode* n ) { defaultBefore( n ); }
    void Walker::after( class ContextCounterNode* n ) { defaultAfter( n ); }
+   void Walker::before( class ContextSimpleCounterNode* n ) { defaultBefore( n ); }
+   void Walker::after( class ContextSimpleCounterNode* n ) { defaultAfter( n ); }
    void Walker::before( class ScoreAccumulatorNode* n ) { defaultBefore( n ); }
    void Walker::after( class ScoreAccumulatorNode* n ) { defaultAfter( n ); }
    void Walker::before( class AnnotatorNode* n ) { defaultBefore( n ); }

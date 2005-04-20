@@ -7,8 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
-
+ */
 
 //
 // InferenceNetwork
@@ -24,52 +23,71 @@
 #include "indri/ListIteratorNode.hpp"
 #include "indri/TermScoreFunction.hpp"
 #include "indri/Repository.hpp"
-#include "indri/FieldListIterator.hpp"
-#include "indri/DocListFrequencyIterator.hpp"
+#include "indri/Index.hpp"
+#include "indri/DeletedDocumentList.hpp"
 
-class InferenceNetwork {
-public:
-  typedef std::map< std::string, EvaluatorNode::MResults > MAllResults;
+namespace indri
+{
+  namespace infnet 
+  {
+    class InferenceNetwork {
+    public:
+      typedef std::map< std::string, EvaluatorNode::MResults > MAllResults;
 
-  //
-  // MAllResults stores results indexed first by node name, then second by the node's 
-  // result name.  For instance, to retrieve occurrence counts from a 
-  // ContextCountAccumulator named "bd45a", you'd type 'results["bd45a"]["occurrences"]'.
-  //
+      //
+      // MAllResults stores results indexed first by node name, then second by the node's 
+      // result name.  For instance, to retrieve occurrence counts from a 
+      // ContextCountAccumulator named "bd45a", you'd type 'results["bd45a"]["occurrences"]'.
+      //
 
-private:
-  std::vector<class indri::index::FieldListIterator*> _fieldIterators;
-  std::vector<class DocPositionInfoList*> _docIterators;
-  std::vector<class indri::index::DocListFrequencyIterator*> _freqIterators;
-  std::vector<ListIteratorNode*> _listIteratorNodes;
-  std::vector<BeliefNode*> _beliefNodes;
-  std::vector<EvaluatorNode*> _evaluators;
-  std::vector<EvaluatorNode*> _complexEvaluators;
-  std::vector<TermScoreFunction*> _scoreFunctions;
-  Repository& _repository;
-  MAllResults _results;
+    private:
+      std::vector<std::string> _termNames;
+      std::vector<std::string> _fieldNames;
 
-  void _moveToDocument( int candidate );
-  int _nextCandidateDocument();
-  void _evaluateDocument( int document );
+      std::vector<class indri::index::DocExtentListIterator*> _fieldIterators;
+      std::vector<class indri::index::DocListIterator*> _docIterators;
+      std::vector<ListIteratorNode*> _listIteratorNodes;
+      std::vector<BeliefNode*> _beliefNodes;
+      std::vector<EvaluatorNode*> _evaluators;
+      std::vector<EvaluatorNode*> _complexEvaluators;
+      std::vector<indri::query::TermScoreFunction*> _scoreFunctions;
 
-public:
-  InferenceNetwork( Repository& repository );
-  ~InferenceNetwork();
+      indri::utility::greedy_vector<class indri::index::DocListIterator*> _closeIterators;
+      int _closeIteratorBound;
 
-  const std::vector<EvaluatorNode*>& getEvaluators() const;
-  const EvaluatorNode* getFirstEvaluator() const;
+      indri::collection::Repository& _repository;
+      MAllResults _results;
 
-  void addDocIterator( DocPositionInfoList* posInfoList );
-  void addFieldIterator( indri::index::FieldListIterator* fieldIterator );
-  void addFrequencyIterator( indri::index::DocListFrequencyIterator* frequencyIterator );
-  void addListNode( ListIteratorNode* listNode );
-  void addBeliefNode( BeliefNode* beliefNode );
-  void addEvaluatorNode( EvaluatorNode* evaluatorNode );
-  void addComplexEvaluatorNode( EvaluatorNode* complexEvaluator );
-  void addScoreFunction( TermScoreFunction* scoreFunction );
-  const MAllResults& evaluate();
-};
+      void _indexChanged( indri::index::Index& index );
+      void _indexFinished( indri::index::Index& index );
+
+      void _moveToDocument( int candidate );
+      void _moveDocListIterators( int candidate );
+
+      int _nextCandidateDocument( indri::index::DeletedDocumentList::read_transaction* deleted );
+      void _evaluateDocument( indri::index::Index& index, int document );
+      void _evaluateIndex( indri::index::Index& index );
+
+    public:
+      InferenceNetwork( indri::collection::Repository& repository );
+      ~InferenceNetwork();
+
+      const std::vector<EvaluatorNode*>& getEvaluators() const;
+
+      indri::index::DocListIterator* getDocIterator( int index );
+      indri::index::DocExtentListIterator* getFieldIterator( int index );
+
+      int addDocIterator( const std::string& term );
+      int addFieldIterator( const std::string& field );
+      void addListNode( ListIteratorNode* listNode );
+      void addBeliefNode( BeliefNode* beliefNode );
+      void addEvaluatorNode( EvaluatorNode* evaluatorNode );
+      void addComplexEvaluatorNode( EvaluatorNode* complexEvaluator );
+      void addScoreFunction( indri::query::TermScoreFunction* scoreFunction );
+      const MAllResults& evaluate();
+    };
+  }
+}
 
 #endif // INDRI_INFERENCENETWORK_HPP
 

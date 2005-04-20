@@ -24,7 +24,7 @@
 namespace indri {
   namespace lang {
     Packer::Packer() {
-      _packedNodes = new XMLNode( "query" );
+      _packedNodes = new indri::xml::XMLNode( "query" );
     }
 
     Packer::node_element* Packer::_getElement( class indri::lang::Node* node ) {
@@ -35,11 +35,11 @@ namespace indri {
       return _elements[node];
     }
 
-    XMLNode* Packer::_getNodeReference( class indri::lang::Node* node, const ::std::string& name ) {
+    indri::xml::XMLNode* Packer::_getNodeReference( class indri::lang::Node* node, const ::std::string& name ) {
       if( !node )
         return 0;
 
-      XMLNode* reference = new XMLNode( name, node->nodeName() );
+      indri::xml::XMLNode* reference = new indri::xml::XMLNode( name, node->nodeName() );
 
       if( _getElement(node)->flushed == false ) {
         node->pack(*this);
@@ -132,13 +132,13 @@ namespace indri {
       node_element* element = _stack.top();
 
       if( !element->flushed ) { 
-        XMLNode* node = new XMLNode( name );
+        indri::xml::XMLNode* node = new indri::xml::XMLNode( name );
 
         for( unsigned int i=0; i<value.size(); i++ ) {
           ::std::stringstream intToString;
           intToString << value[i];
 
-          node->addChild( new XMLNode( "int", intToString.str() ) );
+          node->addChild( new indri::xml::XMLNode( "int", intToString.str() ) );
         }
 
         element->xmlNode->addChild( node );
@@ -150,13 +150,28 @@ namespace indri {
       node_element* element = _stack.top();
 
       if( !element->flushed ) { 
-        XMLNode* node = new XMLNode( name );
+        indri::xml::XMLNode* node = new indri::xml::XMLNode( name );
 
         for( unsigned int i=0; i<value.size(); i++ ) {
           ::std::stringstream doubleToString;
           doubleToString << value[i];
 
-          node->addChild( new XMLNode( "double", doubleToString.str() ) );
+          node->addChild( new indri::xml::XMLNode( "double", doubleToString.str() ) );
+        }
+
+        element->xmlNode->addChild( node );
+      }
+    }
+
+    void Packer::put( const char* name, const ::std::vector<std::string>& value ) {
+      assert( _stack.size() );
+      node_element* element = _stack.top();
+
+      if( !element->flushed ) { 
+        indri::xml::XMLNode* node = new indri::xml::XMLNode( name );
+
+        for( unsigned int i=0; i<value.size(); i++ ) {
+          node->addChild( new indri::xml::XMLNode( "string", value[i] ) );
         }
 
         element->xmlNode->addChild( node );
@@ -168,10 +183,10 @@ namespace indri {
       node_element* element = _stack.top();
 
       if( !element->flushed ) {
-        XMLNode* node = new XMLNode( name );
+        indri::xml::XMLNode* node = new indri::xml::XMLNode( name );
 
         for( unsigned int i=0; i<value.size(); i++ ) {
-          XMLNode* child = _getNodeReference( value[i], "noderef" );
+          indri::xml::XMLNode* child = _getNodeReference( value[i], "noderef" );
           node->addChild(child);
         }
 
@@ -184,10 +199,10 @@ namespace indri {
       node_element* element = _stack.top();
 
       if( !element->flushed ) {
-        XMLNode* node = new XMLNode( name );
+        indri::xml::XMLNode* node = new indri::xml::XMLNode( name );
 
         for( unsigned int i=0; i<value.size(); i++ ) {
-          XMLNode* child = _getNodeReference( value[i], "noderef" );
+          indri::xml::XMLNode* child = _getNodeReference( value[i], "noderef" );
           node->addChild(child);
         }
 
@@ -200,7 +215,7 @@ namespace indri {
       node_element* element = _stack.top();
 
       if( !element->flushed ) {
-        XMLNode* node = _getNodeReference( value, name );
+        indri::xml::XMLNode* node = _getNodeReference( value, name );
         if( node )
           element->xmlNode->addChild( node );
       }
@@ -208,12 +223,12 @@ namespace indri {
 
     std::string Packer::toString() {
       std::string output;
-      XMLWriter writer( _packedNodes );
+      indri::xml::XMLWriter writer( _packedNodes );
       writer.write( output );
       return output;
     }
 
-    XMLNode* Packer::xml() {
+    indri::xml::XMLNode* Packer::xml() {
       return _packedNodes;
     }
   }

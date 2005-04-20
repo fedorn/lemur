@@ -55,7 +55,7 @@ struct PonteTerm {
   double collection;
 };
 
-PonteExpander::PonteExpander( QueryEnvironment * env , Parameters& param ) : QueryExpander( env, param ) { }
+indri::query::PonteExpander::PonteExpander( indri::api::QueryEnvironment * env , indri::api::Parameters& param ) : indri::query::QueryExpander( env, param ) { }
 
 //
 // I'm trying to do something like Ponte expansion here, which ranks terms based on:
@@ -64,13 +64,13 @@ PonteExpander::PonteExpander( QueryEnvironment * env , Parameters& param ) : Que
 // Therefore, we use weights on the terms based on RM.
 //
 
-std::string PonteExpander::expand( std::string originalQuery , std::vector<ScoredExtentResult>& results ) {
+std::string indri::query::PonteExpander::expand( std::string originalQuery , std::vector<indri::api::ScoredExtentResult>& results ) {
   int fbDocs = _param.get( "fbDocs" , 10 );
   int fbTerms = _param.get( "fbTerms" , 10 );
   double fbOrigWt = _param.get( "fbOrigWeight", 0.5 );
   double mu = _param.get( "fbMu", 0 );
 
-  std::vector<DocumentVector*> docVectors = getDocumentVectors( results, fbDocs );
+  std::vector<indri::api::DocumentVector*> docVectors = getDocumentVectors( results, fbDocs );
   std::vector<std::string> * rm_vocab = getVocabulary( docVectors );
   size_t vocabSize = rm_vocab->size();
   UINT64 colLen = _env->termCount();
@@ -91,10 +91,10 @@ std::string PonteExpander::expand( std::string originalQuery , std::vector<Score
 
   // gather document vectors / statistics for top fbDocs ranked documents
   for( int doc = 0; doc < fbDocs && doc < results.size(); doc++ ) {
-    DocumentVector * docVec = docVectors[ doc ];
-    greedy_vector<int> positions = docVec->positions();
+    indri::api::DocumentVector * docVec = docVectors[ doc ];
+    indri::utility::greedy_vector<int> positions = docVec->positions();
     const std::vector<std::string>& stems = docVec->stems();
-    count_iterator<int> iter( positions.begin(), positions.end() );
+    indri::utility::count_iterator<int> iter( positions.begin(), positions.end() );
     int docLen = int(positions.size());
 
     // find probabiliy of each term in the document
@@ -111,7 +111,7 @@ std::string PonteExpander::expand( std::string originalQuery , std::vector<Score
       double logOdds = log( documentProbability / collectionProbability );
 
       // s(D) * P(w|D) [Lavrenko]
-      DirichletTermScoreFunction f( mu, collectionProbability );
+      indri::query::DirichletTermScoreFunction f( mu, collectionProbability );
       double relevance = exp( results[doc].score ) * exp( f.scoreOccurrence( (*iter).count, docLen ) );
 
       // update the PonteTerm structure with computed probabilities

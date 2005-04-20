@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -20,16 +20,22 @@
 #define INDRI_PORTERSTEMMERTRANSFORMATION_HPP
 
 #include "indri/Transformation.hpp"
+namespace indri
+{
+  namespace parse
+  {
+    
+    class PorterStemmerTransformation : public Transformation {
+    private:
+      ObjectHandler<indri::api::ParsedDocument>* _handler;
 
-class PorterStemmerTransformation : public Transformation {
-private:
-  ObjectHandler<ParsedDocument>* _handler;
+    public:
+      indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document );
 
-public:
-  ParsedDocument* transform( ParsedDocument* document );
-
-  void setHandler( ObjectHandler<ParsedDocument>& handler );
-  void handle( ParsedDocument* document );
-};
+      void setHandler( ObjectHandler<indri::api::ParsedDocument>& handler );
+      void handle( indri::api::ParsedDocument* document );
+    };
+  }
+}
 
 #endif // INDRI_PORTERSTEMMERTRANSFORMATION_HPP

@@ -19,7 +19,7 @@
 #include "indri/XMLReader.hpp"
 #include "Exception.hpp"
 
-int XMLReader::_tryFindChar( char ch, const char* buffer, int start, int finish ) {
+int indri::xml::XMLReader::_tryFindChar( char ch, const char* buffer, int start, int finish ) {
   int i;
 
   for( i=start; i<finish; i++ ) {
@@ -33,7 +33,7 @@ int XMLReader::_tryFindChar( char ch, const char* buffer, int start, int finish 
   return i;
 }
 
-int XMLReader::_findChar( char ch, const char* buffer, int start, int finish ) {
+int indri::xml::XMLReader::_findChar( char ch, const char* buffer, int start, int finish ) {
   int result = _tryFindChar( ch, buffer, start, finish );
 
   if( result == -1 )
@@ -42,11 +42,11 @@ int XMLReader::_findChar( char ch, const char* buffer, int start, int finish ) {
   return result;
 }
 
-int XMLReader::_tryFindBeginTag( const char* buffer, int start, int finish ) {
+int indri::xml::XMLReader::_tryFindBeginTag( const char* buffer, int start, int finish ) {
   return _tryFindChar( '<', buffer, start, finish );
 }
 
-int XMLReader::_findBeginTag( const char* buffer, int start, int finish ) {
+int indri::xml::XMLReader::_findBeginTag( const char* buffer, int start, int finish ) {
   int result = _tryFindBeginTag( buffer, start, finish );
 
   if( result == -1 )
@@ -55,11 +55,11 @@ int XMLReader::_findBeginTag( const char* buffer, int start, int finish ) {
   return result;
 }
 
-int XMLReader::_findEndTag( const char* buffer, int start, int finish ) {
+int indri::xml::XMLReader::_findEndTag( const char* buffer, int start, int finish ) {
   return _findChar( '>', buffer, start, finish );
 }
 
-int XMLReader::_tryFindText( const char* buffer, int start, int finish ) {
+int indri::xml::XMLReader::_tryFindText( const char* buffer, int start, int finish ) {
   int i;
 
   for( i=start; i<finish; i++ ) {
@@ -70,7 +70,7 @@ int XMLReader::_tryFindText( const char* buffer, int start, int finish ) {
   return i;
 }
 
-int XMLReader::_findText( const char* buffer, int start, int finish ) {
+int indri::xml::XMLReader::_findText( const char* buffer, int start, int finish ) {
   int result = _tryFindText( buffer, start, finish );
   if( result==finish )
     LEMUR_THROW( LEMUR_GENERIC_ERROR, "Was looking for text, but couldn't find any" );
@@ -78,7 +78,7 @@ int XMLReader::_findText( const char* buffer, int start, int finish ) {
   return result;
 }
 
-int XMLReader::_findNotName( const char* buffer, int start, int finish ) {
+int indri::xml::XMLReader::_findNotName( const char* buffer, int start, int finish ) {
   int i;
 
   for( i=start; i<finish; i++ ) {
@@ -113,7 +113,7 @@ int _findSpace( char* buffer, int start, int finish ) {
   return i;
 }
 
-int XMLReader::_readTag( const char* buffer, int bufferStart, int bufferEnd, std::string* tagName, std::map<std::string, std::string>* attributes, int* tagType ) {
+int indri::xml::XMLReader::_readTag( const char* buffer, int bufferStart, int bufferEnd, std::string* tagName, std::map<std::string, std::string>* attributes, int* tagType ) {
   // skip opening whitespace
   int startLocation = bufferStart;
   int endLocation = _findEndTag( buffer, startLocation, bufferEnd );
@@ -122,6 +122,7 @@ int XMLReader::_readTag( const char* buffer, int bufferStart, int bufferEnd, std
 
   if( endLocation - position < 1 ) 
     LEMUR_THROW( LEMUR_GENERIC_ERROR, "Found a tag with no body" );
+
   // is it an opening tag?
   if( buffer[position] == '/' ) {
     if( tagType )
@@ -180,7 +181,7 @@ int XMLReader::_readTag( const char* buffer, int bufferStart, int bufferEnd, std
   return trueEndLocation;
 }
 
-int XMLReader::_findClosingTag( const char* buffer, int start, int finish, std::string& openingTagName, bool* tagsBetween ) {
+int indri::xml::XMLReader::_findClosingTag( const char* buffer, int start, int finish, std::string& openingTagName, bool* tagsBetween ) {
   int openingTags = 0;
   int closingTags = 0;
   int position = start;
@@ -233,13 +234,13 @@ int XMLReader::_findClosingTag( const char* buffer, int start, int finish, std::
   }
 }
 
-void XMLReader::_read( XMLNode** parent, const char* buffer, int start, int end ) {
+void indri::xml::XMLReader::_read( indri::xml::XMLNode** parent, const char* buffer, int start, int end ) {
   int tagType;
 
   for( int current = _tryFindBeginTag( buffer, start, end );
     current >= 0;
     current = _tryFindBeginTag( buffer, current, end ) ) {
-      XMLNode* node;
+      indri::xml::XMLNode* node;
       std::string tagName;
       std::map<std::string, std::string> attributes;
       bool tagsBetween;
@@ -254,18 +255,18 @@ void XMLReader::_read( XMLNode** parent, const char* buffer, int start, int end 
         int closingTag = _findClosingTag( buffer, endTag, end, tagName, &tagsBetween );
 
         if( tagsBetween ) {
-          node = new XMLNode( tagName, attributes );
+          node = new indri::xml::XMLNode( tagName, attributes );
           _read( &node, buffer, endTag, closingTag );
         } else {
           std::string nodeValue;
           nodeValue.assign( &buffer[endTag], &buffer[closingTag] ); 
-          node = new XMLNode( tagName, attributes, nodeValue );
+          node = new indri::xml::XMLNode( tagName, attributes, nodeValue );
         }
 
         endLevel = _findEndTag( buffer, closingTag, end )+1;
       } else {
         assert( tagType == TAG_OPEN_CLOSE_TYPE );
-        node = new XMLNode( tagName, attributes );
+        node = new indri::xml::XMLNode( tagName, attributes );
         endLevel = endTag;
       }
 
@@ -280,8 +281,8 @@ void XMLReader::_read( XMLNode** parent, const char* buffer, int start, int end 
     }
 }
 
-XMLNode* XMLReader::read( const char* buffer, size_t length ) {
-  XMLNode* result = NULL;
+indri::xml::XMLNode* indri::xml::XMLReader::read( const char* buffer, size_t length ) {
+  indri::xml::XMLNode* result = NULL;
   std::string s = buffer;
   std::string::size_type commentstart = s.find("<!--",0);
   if (commentstart != std::string::npos) {
@@ -299,7 +300,7 @@ XMLNode* XMLReader::read( const char* buffer, size_t length ) {
   return result;
 }
 
-XMLNode* XMLReader::read( const std::string& str ) {
+indri::xml::XMLNode* indri::xml::XMLReader::read( const std::string& str ) {
   return read( str.c_str(), str.length() );
 }
 

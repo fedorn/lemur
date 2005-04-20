@@ -23,17 +23,33 @@
 #include <sys/time.h>
 #endif
 
-IndriTimer::IndriTimer()
+//
+// IndriTimer
+//
+
+indri::utility::IndriTimer::IndriTimer()
   :
-  _start(0)
+  _start(0),
+  _elapsed(0),
+  _stopped(true)
 {
 }
 
-UINT64 IndriTimer::currentTime() {
+//
+// currentTime
+//
+
+UINT64 indri::utility::IndriTimer::currentTime() {
 #ifdef WIN32
-  UINT64 ticks = ::GetTickCount();
-  UINT64 thousand = 1000;
-  return ticks * thousand;
+  FILETIME filetime;
+  ::GetSystemTimeAsFileTime( &filetime );
+
+  // this time is now in 100 nanosecond increments
+  UINT64 result = filetime.dwHighDateTime;
+  result <<= 32;
+  result += filetime.dwLowDateTime;
+
+  return result / 10;
 #else
   struct timeval tv;
   gettimeofday(&tv, 0);
@@ -45,15 +61,54 @@ UINT64 IndriTimer::currentTime() {
 #endif
 }
 
-void IndriTimer::start() {
+//
+// start
+//
+
+void indri::utility::IndriTimer::start() {
+  _stopped = false;
   _start = currentTime();
 }
 
-UINT64 IndriTimer::elapsedTime() const {
-  return currentTime() - _start;
+//
+// stop
+//
+
+void indri::utility::IndriTimer::stop() {
+  _elapsed += (currentTime() - _start);
+  _start = 0;
+  _stopped = true;
 }
 
-void IndriTimer::printElapsedMicroseconds( std::ostream& out ) const {
+//
+// reset
+//
+
+void indri::utility::IndriTimer::reset() {
+  _stopped = true;
+  _start = 0;
+  _elapsed = 0;
+}
+
+//
+// elapsedTime
+//
+
+UINT64 indri::utility::IndriTimer::elapsedTime() const {
+  UINT64 total = _elapsed;
+
+  if( !_stopped ) {
+    total += (currentTime() - _start);
+  }
+
+  return total;
+}
+
+//
+// printElapsedMicroseconds
+//
+
+void indri::utility::IndriTimer::printElapsedMicroseconds( std::ostream& out ) const {
   UINT64 elapsed = elapsedTime();
   const UINT64 million = 1000000;
 
@@ -70,7 +125,11 @@ void IndriTimer::printElapsedMicroseconds( std::ostream& out ) const {
       << microseconds;
 }
 
-void IndriTimer::printElapsedSeconds( std::ostream& out ) const {
+//
+// printElapsedSeconds
+//
+
+void indri::utility::IndriTimer::printElapsedSeconds( std::ostream& out ) const {
   UINT64 elapsed = elapsedTime();
   const UINT64 million = 1000000;
 

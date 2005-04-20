@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -23,26 +23,35 @@
 #include "indri/ScoredExtentResult.hpp"
 #include "indri/TermScoreFunction.hpp"
 #include "indri/BeliefNode.hpp"
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class NullScorerNode : public BeliefNode {
+    private:
+      indri::query::TermScoreFunction& _scoreFunction;
+      indri::utility::greedy_vector<indri::api::ScoredExtentResult> _scores;
+      indri::utility::greedy_vector<bool> _matches;
+      std::string _name;
+      double _maximumBackgroundScore;
+      double _maximumScore;
 
-class NullScorerNode : public BeliefNode {
-private:
-  TermScoreFunction& _scoreFunction;
-  greedy_vector<ScoredExtentResult> _scores;
-  std::string _name;
-  double _maximumBackgroundScore;
-  double _maximumScore;
+    public:
+      NullScorerNode( const std::string& name, indri::query::TermScoreFunction& scoreFunction );
 
-public:
-  NullScorerNode( const std::string& name, TermScoreFunction& scoreFunction );
-
-  int nextCandidateDocument();
-  double maximumScore();
-  double maximumBackgroundScore();
-  bool hasMatch( int documentID );
-  const greedy_vector<ScoredExtentResult>& score( int documentID, int begin, int end, int documentLength );
-  void annotate( class Annotator& annotator, int documentID, int begin, int end );
-  const std::string& getName() const;
-};
+      void indexChanged( indri::index::Index& index );
+      int nextCandidateDocument();
+      double maximumScore();
+      double maximumBackgroundScore();
+      bool hasMatch( int documentID );
+      const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int begin, int end, int documentLength );
+      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+      const std::string& getName() const;
+    };
+  }
+}
 
 #endif // INDRI_NULLSCORERNODE_HPP
 

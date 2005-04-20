@@ -481,14 +481,14 @@ GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
   int fd;
 
   if (ext) {
-#if HAVE_MKSTEMP
+#if HAVE_MKSTEMPS
     if ((s = getenv("TMPDIR"))) {
       *name = new GString(s);
     } else {
       *name = new GString("/tmp");
     }
-    (*name)->append(ext)->append("/XXXXXX");
-    fd = mkstemp((*name)->getCString());
+    (*name)->append("/XXXXXX")->append(ext);
+    fd = mkstemps((*name)->getCString(), strlen(ext));
 #else
     if (!(s = tmpnam(NULL))) {
       return gFalse;

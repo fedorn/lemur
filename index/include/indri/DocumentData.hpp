@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -19,15 +19,15 @@
 #ifndef INDRI_KEYFILEDOCUMENTDATA_HPP
 #define INDRI_KEYFILEDOCUMENTDATA_HPP
 
-#include "File.hpp"
+#include "indri/indri-platform.h"
 
 namespace indri {
   namespace index {
     struct DocumentData {
       DocumentData() : offset(0), byteLength(0), indexedLength(0), uniqueTermCount(0) {}
 
-      File::offset_type offset; // offset into the dt file where we'll find the KeyfileTermList 
-      int byteLength;       // length in bytes of the KeyfileTermList
+      UINT64 offset;        // offset into the dt file where we'll find the TermList 
+      int byteLength;       // length in bytes of the TermList
       int indexedLength;    // the length of the document without stopwords
       int uniqueTermCount;  // number of unique terms found in this document
     };

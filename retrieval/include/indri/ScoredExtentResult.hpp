@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -20,66 +20,72 @@
 #define INDRI_SCOREDEXTENTRESULT_HPP
 
 #include "lemur-platform.h"
-
-struct ScoredExtentResult {
-  struct score_greater {
-  public:
-    bool operator() ( const ScoredExtentResult& one, const ScoredExtentResult& two ) const {
-      return one.score > two.score;
-    }
-  };
-
-  ScoredExtentResult() :
-    score(0),
-    document(0),
-    begin(0),
-    end(0)
+namespace indri 
+{
+  namespace api 
   {
-  }
+    
+    struct ScoredExtentResult {
+      struct score_greater {
+      public:
+        bool operator() ( const ScoredExtentResult& one, const ScoredExtentResult& two ) const {
+          return one.score > two.score;
+        }
+      };
 
-  ScoredExtentResult( UINT64 s, int d )
-    :
-    score( double(s) ),
-    document(d),
-    begin(0),
-    end(0)
-  {
-  }
+      ScoredExtentResult() :
+        score(0),
+        document(0),
+        begin(0),
+        end(0)
+      {
+      }
 
-  ScoredExtentResult( double s, int d )
-    :
-    score(s),
-    document(d),
-    begin(0),
-    end(0)
-  {
-  }
+      ScoredExtentResult( UINT64 s, int d )
+        :
+        score( double(s) ),
+        document(d),
+        begin(0),
+        end(0)
+      {
+      }
 
-  ScoredExtentResult( double s, int d, int b, int e )
-    :
-    score(s),
-    document(d),
-    begin(b),
-    end(e)
-  {
-  }
+      ScoredExtentResult( double s, int d )
+        :
+        score(s),
+        document(d),
+        begin(0),
+        end(0)
+      {
+      }
 
-  ScoredExtentResult( const ScoredExtentResult& other ) {
-    score = other.score;
-    document = other.document;
-    begin = other.begin;
-    end = other.end;
-  }
+      ScoredExtentResult( double s, int d, int b, int e )
+        :
+        score(s),
+        document(d),
+        begin(b),
+        end(e)
+      {
+      }
 
-  bool operator< ( const ScoredExtentResult& other ) const {
-    return score > other.score;
-  }
+      ScoredExtentResult( const ScoredExtentResult& other ) {
+        score = other.score;
+        document = other.document;
+        begin = other.begin;
+        end = other.end;
+      }
 
-  double score;
-  int document;
-  int begin;
-  int end;
-};
+      bool operator< ( const ScoredExtentResult& other ) const {
+        return score > other.score;
+      }
+
+      double score;
+      int document;
+      int begin;
+      int end;
+    };
+  }
+}
 
 #endif // INDRI_SCOREDEXTENTRESULT_HPP
 

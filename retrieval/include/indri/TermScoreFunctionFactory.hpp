@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // TermScoreFunctionFactory
@@ -20,11 +20,16 @@
 
 #include "indri/TermScoreFunction.hpp"
 #include <string>
-
-class TermScoreFunctionFactory {
-public:
-  static TermScoreFunction* get( const std::string& spec, double collectionFrequency );
-};
+namespace indri
+{
+  namespace query
+  {
+    class TermScoreFunctionFactory {
+    public:
+      static TermScoreFunction* get( const std::string& spec, double collectionFrequency );
+    };
+  }
+}
 
 #endif // INDRI_TERMSCOREFUNCTIONFACTORY_HPP
 

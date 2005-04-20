@@ -26,7 +26,7 @@
 
 class IndriDocMgr : public DocumentManager {
 public:
-  IndriDocMgr(Repository &repository, string name="IndriDocMgr") : 
+  IndriDocMgr(indri::collection::Repository &repository, string name="IndriDocMgr") : 
     _repository(repository), _name(name) {}
   virtual ~IndriDocMgr() {}
   /// IndriDocMgr can only be opend by its enclosing Repository. 
@@ -54,7 +54,9 @@ public:
   virtual const string &getMyID() const {return _name; }  
 
 private:
-  Repository &_repository;
+  indri::index::Index* _indexWithDocument( indri::collection::Repository::index_state& indexes, int documentID ) const ;
+  
+  indri::collection::Repository &_repository;
   string _name;
 };
 

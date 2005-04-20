@@ -20,20 +20,20 @@
 #include "indri/Annotator.hpp"
 #include "indri/FieldIteratorNode.hpp"
 
-FieldGreaterNode::FieldGreaterNode( const std::string& name, FieldIteratorNode* iterator, INT64 constant ) {
+indri::infnet::FieldGreaterNode::FieldGreaterNode( const std::string& name, FieldIteratorNode* iterator, INT64 constant ) {
   _name = name;
   _field = iterator;
   _constant = constant;
 }
 
-void FieldGreaterNode::prepare( int documentID ) {
+void indri::infnet::FieldGreaterNode::prepare( int documentID ) {
   _extents.clear();
 
   if( !_field )
     return;
 
-  const greedy_vector<INT64>& numbers = _field->numbers();
-  const greedy_vector<Extent>& extents = _field->extents();
+  const indri::utility::greedy_vector<INT64>& numbers = _field->numbers();
+  const indri::utility::greedy_vector<indri::index::Extent>& extents = _field->extents();
 
   for( unsigned int i=0; i<numbers.size(); i++ ) {
     if( numbers[i] > _constant ) {
@@ -42,18 +42,23 @@ void FieldGreaterNode::prepare( int documentID ) {
   }
 }
 
-greedy_vector<Extent>& FieldGreaterNode::extents() {
+indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::FieldGreaterNode::extents() {
   return _extents;
 }
 
-int FieldGreaterNode::nextCandidateDocument() {
+int indri::infnet::FieldGreaterNode::nextCandidateDocument() {
   return _field->nextCandidateDocument();
 }
 
-const std::string& FieldGreaterNode::getName() const {
+const std::string& indri::infnet::FieldGreaterNode::getName() const {
   return _name;
 }
 
-void FieldGreaterNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::FieldGreaterNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
   annotator.addMatches( _extents, this, documentID, begin, end );
 }
+
+void indri::infnet::FieldGreaterNode::indexChanged( indri::index::Index& index ) {
+  // do nothing
+}
+

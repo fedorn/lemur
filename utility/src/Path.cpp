@@ -52,7 +52,7 @@ static int path_last_separator( const std::string& path ) {
   return i;
 }
 
-void Path::create( const std::string& path ) {
+void indri::file::Path::create( const std::string& path ) {
   if( lemur_compat::mkdir( path.c_str(), 0777 ) < 0 ) {
     if( errno == EACCES ) {
       LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't create directory: '" + path + "' because of inadequate permissions." );
@@ -64,23 +64,23 @@ void Path::create( const std::string& path ) {
   }
 }
 
-void Path::remove( const std::string& path ) {
-  std::stack<DirectoryIterator*> iterators;
-  StackDeleter<DirectoryIterator> sd( iterators );
-  iterators.push( new DirectoryIterator( path ) );
+void indri::file::Path::remove( const std::string& path ) {
+  std::stack<indri::file::DirectoryIterator*> iterators;
+  indri::utility::StackDeleter<indri::file::DirectoryIterator> sd( iterators );
+  iterators.push( new indri::file::DirectoryIterator( path ) );
 
   while( iterators.size() ) {
-    DirectoryIterator* top = iterators.top();
+    indri::file::DirectoryIterator* top = iterators.top();
     
     // all done, so go up a level
-    if( (*top) == DirectoryIterator::end() ) {
+    if( (*top) == indri::file::DirectoryIterator::end() ) {
       // release any search handles that may point
       // to this directory
       top->close();
 
       int result = rmdir( top->base().c_str() );
       if( result != 0 )
-        LEMUR_THROW( LEMUR_IO_ERROR, "Path::remove couldn't remove directory '" + top->base() + "'." );
+        LEMUR_THROW( LEMUR_IO_ERROR, "indri::file::Path::remove couldn't remove directory '" + top->base() + "'." );
 
       delete top;
       iterators.pop();
@@ -90,17 +90,17 @@ void Path::remove( const std::string& path ) {
     std::string path = **top;
     (*top)++;
 
-    if( Path::isFile( path ) ) {
+    if( indri::file::Path::isFile( path ) ) {
       int result = lemur_compat::remove( path.c_str() );
       if( result != 0 )
-        LEMUR_THROW( LEMUR_IO_ERROR, "Path::remove couldn't remove file '" + path + "'." );
+        LEMUR_THROW( LEMUR_IO_ERROR, "indri::file::Path::remove couldn't remove file '" + path + "'." );
     } else {
-      iterators.push( new DirectoryIterator( path ) );
+      iterators.push( new indri::file::DirectoryIterator( path ) );
     }
   }
 }
 
-std::string Path::trim( const std::string& path ) {
+std::string indri::file::Path::trim( const std::string& path ) {
   if( path.size() && path[path.length()-1] == PATH_SEPARATOR ) {
     return path.substr( 0, path.length()-1 );
   }
@@ -108,7 +108,7 @@ std::string Path::trim( const std::string& path ) {
   return path;
 }
 
-std::string Path::relative( const std::string& basePath, const std::string absolutePath ) {
+std::string indri::file::Path::relative( const std::string& basePath, const std::string absolutePath ) {
   std::string relativePath = absolutePath.substr( basePath.length() );
 
   while( relativePath.length() && relativePath[0] == PATH_SEPARATOR )
@@ -117,23 +117,23 @@ std::string Path::relative( const std::string& basePath, const std::string absol
   return relativePath;
 }
 
-void Path::make( const std::string& path ) {
-  if( !Path::isDirectory( path ) ) {
-    std::string parent = Path::directory( path );
+void indri::file::Path::make( const std::string& path ) {
+  if( !indri::file::Path::isDirectory( path ) ) {
+    std::string parent = indri::file::Path::directory( path );
     if( path == parent )
       return;
 
-    Path::make( parent );
+    indri::file::Path::make( parent );
   }
 
   lemur_compat::mkdir( path.c_str(), 0755 );
 }
 
-char Path::pathSeparator() {
+char indri::file::Path::pathSeparator() {
   return PATH_SEPARATOR;
 }
 
-bool Path::isDirectory( const std::string& path ) {
+bool indri::file::Path::isDirectory( const std::string& path ) {
   struct stat s;
   int result = stat( path.c_str(), &s );
   bool actualDirectory = (result >= 0) && (s.st_mode & S_IFDIR);
@@ -141,12 +141,12 @@ bool Path::isDirectory( const std::string& path ) {
   return actualDirectory;
 }
 
-bool Path::exists( const std::string& path ) {
+bool indri::file::Path::exists( const std::string& path ) {
   struct stat s;
   return stat( path.c_str(), &s ) >= 0;
 }
 
-bool Path::isFile( const std::string& path ) {
+bool indri::file::Path::isFile( const std::string& path ) {
   struct stat s;
   int result = stat( path.c_str(), &s );
   bool actualFile = (result >= 0) && (s.st_mode & S_IFREG);
@@ -154,7 +154,7 @@ bool Path::isFile( const std::string& path ) {
   return actualFile;
 }
 
-std::string Path::combine( const std::string& root, const std::string& addition ) {
+std::string indri::file::Path::combine( const std::string& root, const std::string& addition ) {
   if( !root.size() )
     return addition;
 
@@ -164,7 +164,7 @@ std::string Path::combine( const std::string& root, const std::string& addition 
   return root + PATH_SEPARATOR + addition;
 }
 
-std::string Path::directory( const std::string& path ) {
+std::string indri::file::Path::directory( const std::string& path ) {
   int last = path_last_separator( path );
   
   if( last > 0 ) {
@@ -174,7 +174,7 @@ std::string Path::directory( const std::string& path ) {
   return path;
 }
 
-std::string Path::filename( const std::string& path ) {
+std::string indri::file::Path::filename( const std::string& path ) {
   int last = path_last_separator( path );
 
   if( last != std::string::npos ) {
@@ -184,7 +184,7 @@ std::string Path::filename( const std::string& path ) {
   return path;
 }
 
-std::string Path::extension( const std::string& path ) {
+std::string indri::file::Path::extension( const std::string& path ) {
   int last = path_last_separator( path );
   std::string::size_type lastDot = path.find_last_of( '.' );
 
@@ -195,7 +195,7 @@ std::string Path::extension( const std::string& path ) {
   return std::string();
 }
 
-std::string Path::basename( const std::string& path ) {
+std::string indri::file::Path::basename( const std::string& path ) {
   int last = path_last_separator( path );
   std::string::size_type lastDot = path.find_last_of( '.' );
 

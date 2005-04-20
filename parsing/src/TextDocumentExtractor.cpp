@@ -19,7 +19,7 @@
 #include "indri/TextDocumentExtractor.hpp"
 #include "Exception.hpp"
 
-void TextDocumentExtractor::open( const std::string& filename ) {
+void indri::parse::TextDocumentExtractor::open( const std::string& filename ) {
   _in.clear();
   _in.open( filename.c_str() );
   _filename = filename;
@@ -28,7 +28,7 @@ void TextDocumentExtractor::open( const std::string& filename ) {
     LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't open file " + filename + "." );
 }
 
-UnparsedDocument* TextDocumentExtractor::nextDocument() {
+indri::parse::UnparsedDocument* indri::parse::TextDocumentExtractor::nextDocument() {
   _buffer.clear();
   _document.text = 0;
   _document.textLength = 0;
@@ -38,7 +38,7 @@ UnparsedDocument* TextDocumentExtractor::nextDocument() {
     return 0;
 
   // set up metadata
-  MetadataPair pair;
+  indri::parse::MetadataPair pair;
   pair.value = _filename.c_str();
   pair.valueLength = _filename.length()+1;
 
@@ -67,6 +67,6 @@ UnparsedDocument* TextDocumentExtractor::nextDocument() {
   return &_document;
 }
 
-void TextDocumentExtractor::close() {
+void indri::parse::TextDocumentExtractor::close() {
   _in.close();
 }

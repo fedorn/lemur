@@ -42,11 +42,11 @@ public:
 
 protected:
   /// The indexer.
-  IndexEnvironment env;
+  indri::api::IndexEnvironment env;
   /// Document properties object to be reused over repeated calls.
-  ParsedDocument document;
+  indri::api::ParsedDocument document;
   /// Handle the document id
-  MetadataPair docid;
+  indri::parse::MetadataPair docid;
   /// the current document id
   char* curdocno;
   /// Document buffer

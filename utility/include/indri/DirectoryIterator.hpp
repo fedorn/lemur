@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -20,34 +20,41 @@
 #define INDRI_DIRECTORYITERATOR_HPP
 
 #include <string>
-/*! Provides iteration over directory entries. 
- */
-class DirectoryIterator {
-private:
-  static DirectoryIterator _end;
+namespace indri
+{
+  namespace file
+  {
+    
+    /*! Provides iteration over directory entries. 
+     */
+    class DirectoryIterator {
+    private:
+      static DirectoryIterator _end;
 
-  bool _relative;
-  std::string _current;
-  void* _platform;
-  std::string _path;
+      bool _relative;
+      std::string _current;
+      void* _platform;
+      std::string _path;
 
-  void _copyCurrent();
-  void _next();
+      void _copyCurrent();
+      void _next();
   
-public:
-  DirectoryIterator();
-  DirectoryIterator( const std::string& path, bool relative = true );
-  ~DirectoryIterator();
+    public:
+      DirectoryIterator();
+      DirectoryIterator( const std::string& path, bool relative = true );
+      ~DirectoryIterator();
 
-  void operator ++ (int);
-  void operator ++ ();
-  bool operator == ( const DirectoryIterator& other );
-  const std::string& operator* ();
-  const std::string& base() const;
-  void close();
+      void operator ++ (int);
+      void operator ++ ();
+      bool operator == ( const DirectoryIterator& other );
+      const std::string& operator* ();
+      const std::string& base() const;
+      void close();
 
-  static const DirectoryIterator& end();
-};
+      static const DirectoryIterator& end();
+    };
+  }
+}
 
 #endif // INDRI_DIRECTORYITERATOR_HPP
 

@@ -23,8 +23,8 @@
 // in porter_stemmer.cpp: warning: this function is not thread safe
 extern int porter_stem(char * p, int i, int j);
 
-ParsedDocument* PorterStemmerTransformation::transform( ParsedDocument* document ) {
-  greedy_vector<char*>& terms = document->terms;
+indri::api::ParsedDocument* indri::parse::PorterStemmerTransformation::transform( indri::api::ParsedDocument* document ) {
+  indri::utility::greedy_vector<char*>& terms = document->terms;
 
   for( size_t i=0; i<terms.size(); i++ ) {
     char* term = terms[i];
@@ -41,10 +41,10 @@ ParsedDocument* PorterStemmerTransformation::transform( ParsedDocument* document
   return document;
 }
 
-void PorterStemmerTransformation::setHandler( ObjectHandler<ParsedDocument>& handler ) {
+void indri::parse::PorterStemmerTransformation::setHandler( ObjectHandler<indri::api::ParsedDocument>& handler ) {
   _handler = &handler;
 }
 
-void PorterStemmerTransformation::handle( ParsedDocument* document ) {
+void indri::parse::PorterStemmerTransformation::handle( indri::api::ParsedDocument* document ) {
   _handler->handle( transform( document ) );
 }

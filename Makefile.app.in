@@ -16,7 +16,7 @@ CFLAGS = @DEFS@ @CFLAGS@  -I$(INC)
 CXXFLAGS  = @DEFS@ @CXXFLAGS@ -I$(INC)
 
 
-CPPLDFLAGS  = @LDFLAGS@ -L$(LIBPATH) -l$(LIB) @LIBS@ -lm
+CPPLDFLAGS  = @LDFLAGS@ -L$(LIBPATH) -l$(LIB) @LIBS@ -lm -lpthread
 ## specify your object files here
 OBJS =
 ## specify your program here

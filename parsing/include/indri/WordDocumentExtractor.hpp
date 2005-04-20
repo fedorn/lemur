@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -29,24 +29,33 @@
 #include "indri/DocumentIterator.hpp"
 
 #ifdef WIN32
-class WordDocumentExtractor : public DocumentIterator {
-  void* _internal;
+namespace indri
+{
+  namespace parse
+  {
+    
+    class WordDocumentExtractor : public DocumentIterator {
+      void* _internal;
 
-  Buffer _documentTextBuffer;
-  UnparsedDocument _unparsedDocument;
-  std::string _documentPath;
-  bool _documentWaiting;
+      indri::utility::Buffer _documentTextBuffer;
+      UnparsedDocument _unparsedDocument;
+      std::string _documentPath;
+      bool _documentWaiting;
 
-  void initialize();
-  void uninitialize();
+      void initialize();
+      void uninitialize();
   
-public:
-  WordDocumentExtractor();
-  ~WordDocumentExtractor();
+    public:
+      WordDocumentExtractor();
+      ~WordDocumentExtractor();
 
-  void open( const std::string& filename );
-  UnparsedDocument* nextDocument( );
-  void close();
-};
+      void open( const std::string& filename );
+      UnparsedDocument* nextDocument( );
+      void quit();
+      void close();
+    };
+  }
+}
+
 #endif
 #endif // INDRI_WORDDOCUMENTEXTRACTOR_HPP

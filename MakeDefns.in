@@ -81,7 +81,7 @@ OBJ = $(CPPOBJ) $(COBJ)
 # C++ compiler and compiling/linking options
 CFLAGS = @DEFS@ @CFLAGS@ -shared -fPIC
 CXXFLAGS    = @DEFS@ @CXXFLAGS@ -shared -fPIC
-CPPLDFLAGS  = @LDFLAGS@ @LIBS@ -lm
+CPPLDFLAGS  = @LDFLAGS@ @LIBS@ -lm -lpthread
 
 ALLBIN = BuildDocMgr BuildIndex BuildPropIndex EstimateDirPrior GenL2Norm GenerateQueryModel GenerateSmoothSupport IncIndexer IncPassageIndexer ParseInQueryOp ParseQuery ParseToFile PassageIndexer QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval TwoStageRetEval RetQueryClarity XlingRetEval PDictManager  dumpDoc dumpTerm IndriBuildIndex IndriDaemon IndriRunQuery 
 

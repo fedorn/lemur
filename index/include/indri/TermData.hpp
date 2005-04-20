@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,8 +21,6 @@
 
 #include "indri/TermFieldStatistics.hpp"
 #include <indri/greedy_vector>
-#include "indri/DocListMemoryBuilder.hpp"
-#include "File.hpp"
 #include "lemur-compat.hpp"
 #include "indri/RVLCompressStream.hpp"
 #include "indri/RVLDecompressStream.hpp"
@@ -31,8 +29,6 @@
 // remove warning about zero-sized arrays
 #pragma warning ( disable: 4200 )
 #endif 
-
-#define INDRI_MAX_SEGMENTS (8)
 
 namespace indri {
   namespace index {
@@ -46,22 +42,23 @@ namespace indri {
 
     public:
       TermData() :
-          maxDocumentFrequency(0),
-          maxDocumentFraction(0),
-          minDocumentLength(MAX_INT32)
+        maxDocumentLength(0),
+        minDocumentLength(MAX_INT32)
       {
         term = 0;
-        
-        memset( segmentOffsets, 0xFF, sizeof segmentOffsets );
       }
+      
+      struct term_less {
+      public:
+        bool operator () ( const TermData* one, const TermData* two ) const {
+          return strcmp( one->term, two->term ) < 0;
+        }
+      };
 
-      File::offset_type segmentOffsets[INDRI_MAX_SEGMENTS];
       TermFieldStatistics corpus;
-      DocListMemoryBuilder list;
 
-      float maxDocumentFraction;         // argmax_documents of (termCount/docLength)
-      unsigned int maxDocumentFrequency; // maximum number of times this term appears in any given document
-      unsigned int minDocumentLength;    // minimum length of any document that contains this term
+      unsigned int maxDocumentLength;    // maximum length of any document containing this term
+      unsigned int minDocumentLength;    // minimum length of any document containing this term
 
       const char* term;                  // name of this term
 
@@ -70,10 +67,7 @@ namespace indri {
   }
 }
 
-inline indri::index::TermData* termdata_create( int fieldCount ) {
-  // allocate enough room for the term data, plus enough room for fields
-  void* buffer = malloc( sizeof(indri::index::TermData) + sizeof(indri::index::TermFieldStatistics)*fieldCount );
-  
+inline indri::index::TermData* termdata_construct( void* buffer, int fieldCount ) {
   // call the constructor in place
   new(buffer) indri::index::TermData();
 
@@ -87,88 +81,91 @@ inline indri::index::TermData* termdata_create( int fieldCount ) {
   return (indri::index::TermData*) buffer;
 }
 
-inline void termdata_delete( indri::index::TermData* termData, int fieldCount ) {
+inline indri::index::TermData* termdata_create( int fieldCount ) {
+  // allocate enough room for the term data, plus enough room for fields
+  void* buffer = malloc( sizeof(indri::index::TermData) + sizeof(indri::index::TermFieldStatistics)*fieldCount );
+  return termdata_construct( buffer, fieldCount );
+}
+
+inline void termdata_destruct( indri::index::TermData* termData, int fieldCount ) {
   if( termData ) {
     termData->~TermData();
 
     for( int i=0; i<fieldCount; i++ ) {
       termData->fields[i].~TermFieldStatistics();
     }
+  }
+}
 
+inline void termdata_delete( indri::index::TermData* termData, int fieldCount ) {
+  if( termData ) {
+    termdata_destruct( termData, fieldCount );
     free(termData);
   }
+}
+
+inline void termdata_clear( indri::index::TermData* termData, int fieldCount ) {
+  termData->corpus.documentCount = 0;
+  termData->corpus.totalCount = 0;
+  termData->corpus.lastCount = 0;
+  termData->corpus.lastDocument = 0;
+
+  for( int i=0; i<fieldCount; i++ ) {
+    indri::index::TermFieldStatistics& field = termData->fields[i];
+
+    field.documentCount = 0;
+    field.totalCount = 0;
+    field.lastCount = 0;
+    field.lastDocument = 0;
+  }
+
+  termData->minDocumentLength = MAX_INT32;
+  termData->maxDocumentLength = 0;
+}
+
+inline void termdata_merge( indri::index::TermData* termData, indri::index::TermData* merger, int fieldCount ) {
+  termData->corpus.documentCount += merger->corpus.documentCount;
+  termData->corpus.totalCount += merger->corpus.totalCount;
+
+  for( int i=0; i<fieldCount; i++ ) {
+    indri::index::TermFieldStatistics& field = termData->fields[i];
+    indri::index::TermFieldStatistics& mergeField = merger->fields[i];
+
+    field.documentCount += mergeField.documentCount;
+    field.totalCount += mergeField.totalCount;
+  }
+
+  termData->maxDocumentLength = lemur_compat::max( termData->maxDocumentLength, merger->maxDocumentLength );
+  termData->minDocumentLength = lemur_compat::min( termData->minDocumentLength, termData->minDocumentLength );
 }
 
 inline int termdata_size( int fieldCount ) {
   return sizeof(indri::index::TermData) + fieldCount * sizeof(indri::index::TermFieldStatistics);
 }
 
-inline int termdata_compress( char* buffer, int size, int fieldCount, indri::index::TermData* termData ) {
-  RVLCompressStream stream( buffer, size );
-
+inline void termdata_compress( indri::utility::RVLCompressStream& stream, indri::index::TermData* termData, int fieldCount ) {
   // corpus statistics
   stream << termData->corpus.totalCount
          << termData->corpus.documentCount;
 
   // max-score statistics
-  stream << termData->maxDocumentFrequency
-         << termData->minDocumentLength
-         << termData->maxDocumentFraction;
-
-  // segment information
-  
-  int numSegments = 0;
-
-  // count up the number of segments used here
-  for( size_t i=0; i<INDRI_MAX_SEGMENTS; i++ ) {
-    if( termData->segmentOffsets[i] != (INT64) (-1) )
-      numSegments++;
-  }
-
-  stream << numSegments;
-
-  // stream out only the segment offsets that are used
-  for( unsigned int i=0; i<INDRI_MAX_SEGMENTS; i++ ) {
-    if( termData->segmentOffsets[i] != (INT64) (-1) ) {
-      stream << i
-             << termData->segmentOffsets[i];
-    }
-  }
-
+  stream << termData->maxDocumentLength
+         << termData->minDocumentLength;
   // field statistics
   for( int i=0; i<fieldCount; i++ ) {
     stream << termData->fields[i].totalCount
-          << termData->fields[i].documentCount;
+           << termData->fields[i].documentCount;
   }
-
-  return stream.dataSize();
 }
 
-inline void termdata_decompress( const char* buffer, int size, int fieldCount, indri::index::TermData* termData ) {
-  RVLDecompressStream stream( buffer, size );
-  
+inline void termdata_decompress( indri::utility::RVLDecompressStream& stream, indri::index::TermData* termData, int fieldCount ) {
   // corpus statistics
   stream >> termData->corpus.totalCount
          >> termData->corpus.documentCount;
 
   // max-score statistics
-  stream >> termData->maxDocumentFrequency
-         >> termData->minDocumentLength
-         >> termData->maxDocumentFraction;
-
-  // segment information
-  int numSegments = 0;
-  stream >> numSegments;
-
-  for( int i=0; i<numSegments; i++ ) {
-    int segment;
-    File::offset_type offset;
-
-    stream >> segment
-           >> offset;
-
-    termData->segmentOffsets[segment] = offset;
-  }
+  stream >> termData->maxDocumentLength
+         >> termData->minDocumentLength;
 
   // field statistics
   for( int i=0; i<fieldCount; i++ ) {

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -48,8 +48,8 @@ namespace indri {
 
           if( extentCountSize > 1 ) {
             ::memmove( _extentCountSpot + extentCountSize,
-                      _extentCountSpot + 1,
-                      _data - _extentCountSpot - 1 );
+                       _extentCountSpot + 1,
+                       _data - _extentCountSpot - 1 );
             _data += extentCountSize - 1;
           }
 

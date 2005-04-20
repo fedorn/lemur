@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -25,27 +25,34 @@
 #include <map>
 #include "indri/QuerySpec.hpp"
 
-struct QueryAnnotationNode {
-  std::string name;
-  std::string type;
-  std::string queryText;
-  std::vector<QueryAnnotationNode*> children;
-};
+namespace indri
+{
+  namespace api 
+  {
 
-class QueryAnnotation {
-private:
-  QueryAnnotationNode* _queryTree;
-  EvaluatorNode::MResults _annotations;
-  std::vector<ScoredExtentResult> _results;
+    struct QueryAnnotationNode {
+      std::string name;
+      std::string type;
+      std::string queryText;
+      std::vector<QueryAnnotationNode*> children;
+    };
 
-public:
-  QueryAnnotation();
-  QueryAnnotation( indri::lang::Node* queryRoot, EvaluatorNode::MResults& annotations, std::vector<ScoredExtentResult>& results );
-  ~QueryAnnotation();
+    class QueryAnnotation {
+    private:
+      QueryAnnotationNode* _queryTree;
+      indri::infnet::EvaluatorNode::MResults _annotations;
+      std::vector<indri::api::ScoredExtentResult> _results;
 
-  const QueryAnnotationNode* getQueryTree() const;
-  const std::map< std::string, std::vector<ScoredExtentResult> >& getAnnotations() const;
-  const std::vector<ScoredExtentResult>& getResults() const;
-};
+    public:
+      QueryAnnotation();
+      QueryAnnotation( indri::lang::Node* queryRoot, indri::infnet::EvaluatorNode::MResults& annotations, std::vector<indri::api::ScoredExtentResult>& results );
+      ~QueryAnnotation();
+
+      const QueryAnnotationNode* getQueryTree() const;
+      const std::map< std::string, std::vector<indri::api::ScoredExtentResult> >& getAnnotations() const;
+      const std::vector<indri::api::ScoredExtentResult>& getResults() const;
+    };
+  }
+}
 
 #endif // INDRI_DOCUMENTANNOTATION_HPP

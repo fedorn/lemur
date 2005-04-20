@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -26,15 +26,22 @@
 
 #define INDRI_HUGE_SCORE  ( DBL_MAX )
 #define INDRI_TINY_SCORE  ( -DBL_MAX )
-
-class BeliefNode : public InferenceNetworkNode {
-public:
-  virtual double maximumBackgroundScore() = 0;
-  virtual double maximumScore() = 0;
-  virtual const greedy_vector<ScoredExtentResult>& score( int documentID, int start, int end, int documentLength ) = 0;
-  virtual bool hasMatch( int documentID ) = 0;
-  virtual void annotate( class Annotator& annotator, int documentID, int begin, int end ) = 0;
-};
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class BeliefNode : public InferenceNetworkNode {
+    public:
+      virtual double maximumBackgroundScore() = 0;
+      virtual double maximumScore() = 0;
+      virtual const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int start, int end, int documentLength ) = 0;
+      virtual bool hasMatch( int documentID ) = 0;
+      virtual const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) = 0;
+      virtual void annotate( class Annotator& annotator, int documentID, int begin, int end ) = 0;
+    };
+  }
+}
 
 #endif // INDRI_BELIEFNODE_HPP
 

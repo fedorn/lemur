@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // PonteExpander
@@ -25,13 +25,19 @@
 #include "indri/QueryExpander.hpp"
 #include "indri/QueryEnvironment.hpp"
 #include "indri/Parameters.hpp"
+namespace indri
+{
+  namespace query
+  {
+    
+    class PonteExpander : public QueryExpander  {
+    public:
+      PonteExpander( indri::api::QueryEnvironment * env , indri::api::Parameters& param );
 
-class PonteExpander : public QueryExpander  {
-public:
-  PonteExpander( QueryEnvironment * env , Parameters& param );
-
-  virtual std::string expand( std::string originalQuery, std::vector<ScoredExtentResult>& results );
-};
+      virtual std::string expand( std::string originalQuery, std::vector<indri::api::ScoredExtentResult>& results );
+    };
+  }
+}
 
 #endif // INDRI_PONTEEXPANDER_HPP
 

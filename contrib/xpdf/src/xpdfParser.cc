@@ -229,3 +229,7 @@ void xpdf::Parser::shift() {
   else
     lexer->getObj(&buf2);
 }
+
+Stream* xpdf::Parser::getStream() { return lexer->getStream(); }
+int xpdf::Parser::getPos() { return lexer->getPos(); }
+

@@ -25,15 +25,15 @@
 #include <fstream>
 #include "Exception.hpp"
 
-static Parameters* _parametersSingleton = 0;
+static indri::api::Parameters* _parametersSingleton = 0;
 
-Parameters& Parameters::instance() {
+indri::api::Parameters& indri::api::Parameters::instance() {
   if( !_parametersSingleton )
-    _parametersSingleton = new Parameters();
+    _parametersSingleton = new indri::api::Parameters();
   return *_parametersSingleton;
 }
 
-void Parameters::_parseNextSegment( std::string& segment, int& arrayIndex, int& endOffset, const std::string& path, int beginOffset ) {
+void indri::api::Parameters::_parseNextSegment( std::string& segment, int& arrayIndex, int& endOffset, const std::string& path, int beginOffset ) {
   endOffset = path.find( '.', beginOffset );
   arrayIndex = -1;
 
@@ -57,7 +57,7 @@ void Parameters::_parseNextSegment( std::string& segment, int& arrayIndex, int& 
   }
 }
 
-Parameters::parameter_value* Parameters::_getSegment( const std::string& segment, int arrayIndex, Parameters::parameter_value* from ) {
+indri::api::Parameters::parameter_value* indri::api::Parameters::_getSegment( const std::string& segment, int arrayIndex, indri::api::Parameters::parameter_value* from ) {
   parameter_value* current = 0;
 
   // if we're at an array node, move to array[0]
@@ -82,7 +82,7 @@ Parameters::parameter_value* Parameters::_getSegment( const std::string& segment
   return current;
 }
 
-Parameters::parameter_value* Parameters::_createPath( const std::string& path ) {
+indri::api::Parameters::parameter_value* indri::api::Parameters::_createPath( const std::string& path ) {
   int endOffset = 0;
   int arrayIndex = 0;
   std::string segment;
@@ -133,7 +133,7 @@ Parameters::parameter_value* Parameters::_createPath( const std::string& path ) 
   return last;
 }
 
-Parameters::parameter_value* Parameters::_getPath( const std::string& path, Parameters::parameter_value* last, int offset ) {
+indri::api::Parameters::parameter_value* indri::api::Parameters::_getPath( const std::string& path, indri::api::Parameters::parameter_value* last, int offset ) {
   int endOffset; 
   int arrayIndex = 0;
   std::string segment;
@@ -154,35 +154,35 @@ Parameters::parameter_value* Parameters::_getPath( const std::string& path, Para
   }
 }
 
-Parameters::parameter_value* Parameters::_getRoot() {
+indri::api::Parameters::parameter_value* indri::api::Parameters::_getRoot() {
   assert( _collection );
   return _collection;
 }
 
-Parameters::Parameters() :
+indri::api::Parameters::Parameters() :
   _collection(new parameter_value),
   _owned(true)
 {
 }
 
-Parameters::Parameters( const Parameters& other ) :
+indri::api::Parameters::Parameters( const Parameters& other ) :
   _collection(other._collection),
   _owned(false)
 {
 }
 
-Parameters::Parameters( parameter_value* value ) :
+indri::api::Parameters::Parameters( parameter_value* value ) :
   _collection(value),
   _owned(false)
 {
 }
 
-Parameters::~Parameters() {
+indri::api::Parameters::~Parameters() {
   if( _owned )
     delete _collection;
 }
 
-Parameters Parameters::get( int index ) {
+indri::api::Parameters indri::api::Parameters::get( int index ) {
   if( ! exists(index) )
     LEMUR_THROW( LEMUR_IO_ERROR, "Required index didn't exist." );
 
@@ -195,12 +195,12 @@ Parameters Parameters::get( int index ) {
     return Parameters( root );
 }
 
-Parameters Parameters::get( const char* name ) {
+indri::api::Parameters indri::api::Parameters::get( const char* name ) {
   std::string conversion = name;
   return get(conversion);
 }
 
-Parameters Parameters::get( const std::string& name ) {
+indri::api::Parameters indri::api::Parameters::get( const std::string& name ) {
   assert( exists(name) );
   if( ! exists(name) )
     LEMUR_THROW( LEMUR_IO_ERROR, "Required parameter '" + name + "' was not specified." );
@@ -208,24 +208,24 @@ Parameters Parameters::get( const std::string& name ) {
   parameter_value* root = _getRoot();
   parameter_value* current = _getPath(name, root);
 
-  return Parameters( current );
+  return indri::api::Parameters( current );
 }
 
-bool Parameters::get( const std::string& name, bool def ) {
+bool indri::api::Parameters::get( const std::string& name, bool def ) {
   if( !exists(name) )
     return def;
   else
     return bool(get(name));
 }
 
-int Parameters::get( const std::string& name, int def ) {
+int indri::api::Parameters::get( const std::string& name, int def ) {
   if( !exists(name) )
     return def;
   else
     return int(get(name));
 }
 
-INT64 Parameters::get( const std::string& name, INT64 def ) {
+INT64 indri::api::Parameters::get( const std::string& name, INT64 def ) {
   if( !exists(name) )
     return def;
   else
@@ -233,40 +233,45 @@ INT64 Parameters::get( const std::string& name, INT64 def ) {
 
 }
 
-double Parameters::get( const std::string& name, double def ) {
+double indri::api::Parameters::get( const std::string& name, double def ) {
   if( !exists(name) )
     return def;
   else
     return double(get(name));
 }
 
-std::string Parameters::get( const std::string& name, const char* def ) {
+std::string indri::api::Parameters::get( const std::string& name, const char* def ) {
   if( !exists(name) )
     return def;
   else
     return std::string(get(name));
 }
 
-std::string Parameters::get( const std::string& name, const std::string& def ) {
+std::string indri::api::Parameters::get( const std::string& name, const std::string& def ) {
   if( !exists(name) )
     return def;
   else
     return std::string(get(name));
 }
 
-Parameters Parameters::operator[] ( const std::string& path ) {
+indri::api::Parameters indri::api::Parameters::operator[] ( const std::string& path ) {
   return get(path);
 }
 
-Parameters Parameters::operator[] ( int index ) {
+indri::api::Parameters indri::api::Parameters::operator[] ( int index ) {
   return get(index);
 }
 
-Parameters Parameters::operator[] ( const char* path ) {
+indri::api::Parameters indri::api::Parameters::operator[] ( const char* path ) {
   return get(path);
 }
 
-Parameters Parameters::append( const std::string& path ) {
+void indri::api::Parameters::clear() {
+  parameter_value* root = _getRoot();
+  root->clear();
+}
+
+indri::api::Parameters indri::api::Parameters::append( const std::string& path ) {
   parameter_value* current = _createPath(path);
   parameter_value* slice = new parameter_value();
 
@@ -278,44 +283,44 @@ Parameters Parameters::append( const std::string& path ) {
   return Parameters( slice );
 }
 
-void Parameters::set( const std::string& key, bool value ) {
+void indri::api::Parameters::set( const std::string& key, bool value ) {
   std::string strValue = value ? "true" : "false";
   set( key, strValue );
 }
 
-void Parameters::set( const std::string& key, UINT64 value ) {
+void indri::api::Parameters::set( const std::string& key, UINT64 value ) {
   std::string v = i64_to_string(value);
   set( key, v );
 }
 
-void Parameters::set( const std::string& key, int value ) {
+void indri::api::Parameters::set( const std::string& key, int value ) {
   std::stringstream s;
   s << value;
   set( key, s.str() );
 }
 
-void Parameters::set( const std::string& key, double value ) {
+void indri::api::Parameters::set( const std::string& key, double value ) {
   std::stringstream s;
   s << value;
   set( key, s.str() );
 }
 
-void Parameters::set( const std::string& key, const char* value ) {
+void indri::api::Parameters::set( const std::string& key, const char* value ) {
   parameter_value* path = _createPath( key );
   path->value = value;
 }
 
-void Parameters::set( const std::string& key, const std::string& value ) {
+void indri::api::Parameters::set( const std::string& key, const std::string& value ) {
   parameter_value* path = _createPath( key );
   path->value = value;
 }
 
-void Parameters::set( const std::string& value ) {
+void indri::api::Parameters::set( const std::string& value ) {
   parameter_value* root = _getRoot();
   root->value = value;
 }
 
-void Parameters::remove( const std::string& path ) {
+void indri::api::Parameters::remove( const std::string& path ) {
   parameter_value* root = _getRoot();
   int lastDot = path.rfind('.');
   std::string parentPath;
@@ -349,7 +354,7 @@ void Parameters::remove( const std::string& path ) {
   }
 }
 
-size_t Parameters::size() {
+size_t indri::api::Parameters::size() {
   parameter_value* root = _getRoot();
 
   if( ! root )
@@ -367,29 +372,29 @@ size_t Parameters::size() {
   return 0;
 }
 
-bool Parameters::exists( int index ) {
+bool indri::api::Parameters::exists( int index ) {
   return size() > unsigned(index);
 }
 
-bool Parameters::exists( const std::string& name ) {
+bool indri::api::Parameters::exists( const std::string& name ) {
   parameter_value* root = _getRoot();
   parameter_value* value = _getPath( name, root );
 
   return value ? true : false;
 }
 
-void Parameters::_loadXML( XMLNode* node ) {
+void indri::api::Parameters::_loadXML( indri::xml::XMLNode* node ) {
   // this method should only be called on table nodes
   std::set<std::string> seen;
   std::set<std::string> arrays;
   std::set<std::string> appends;
-  XMLNode* current = 0;
+  indri::xml::XMLNode* current = 0;
 
   // find out which ones are in the XML file, and which ones appear multiple times
-  const std::vector<XMLNode*>& children = node->getChildren();
+  const std::vector<indri::xml::XMLNode*>& children = node->getChildren();
 
   for( size_t i=0; i<children.size(); i++ ) {
-    XMLNode* child = children[i];
+    indri::xml::XMLNode* child = children[i];
     std::string name = child->getName();
 
     if( seen.find(name) == seen.end() )
@@ -418,7 +423,7 @@ void Parameters::_loadXML( XMLNode* node ) {
 
   if( children.size() ) {
     for( size_t i=0; i<children.size(); i++ ) {
-      XMLNode* child = children[i];
+      indri::xml::XMLNode* child = children[i];
       std::string name = child->getName();
 
       if( appends.find(name) != appends.end() ) {
@@ -434,20 +439,20 @@ void Parameters::_loadXML( XMLNode* node ) {
   }
 }
 
-void Parameters::load( const std::string& text ) {
-  XMLReader reader;
+void indri::api::Parameters::load( const std::string& text ) {
+  indri::xml::XMLReader reader;
 
   try {
-    std::auto_ptr<XMLNode> result( reader.read( text ) );
+    std::auto_ptr<indri::xml::XMLNode> result( reader.read( text ) );
     _loadXML( result.get() );
   } catch( Exception& e ) {
     LEMUR_RETHROW( e, "Had trouble parsing parameter text" );
   }
 }
 
-void Parameters::loadFile( const std::string& filename ) {
+void indri::api::Parameters::loadFile( const std::string& filename ) {
   std::ifstream input;
-  XMLReader reader;
+  indri::xml::XMLReader reader;
   
   input.open( filename.c_str(), std::ifstream::in );
 
@@ -457,21 +462,22 @@ void Parameters::loadFile( const std::string& filename ) {
   input.seekg( 0, std::ios::end );
   size_t length = input.tellg();
   input.seekg( 0, std::ios::beg );
-  std::auto_ptr<char> buffer( new char[length] );
+  char* buffer = new char[length];
   
   try {
-    input.read( buffer.get(), length );
-    std::auto_ptr<XMLNode> result( reader.read( buffer.get(), length ) );
+    input.read( buffer, length );
+    std::auto_ptr<indri::xml::XMLNode> result( reader.read( buffer, length ) );
 
     _loadXML( result.get() );
   } catch( Exception& e ) {
     LEMUR_RETHROW( e, "Had trouble parsing parameter file '" + filename + "'" );
   }
 
+  delete[] buffer;
   input.close();
 }
 
-void Parameters::loadCommandLine( int argc, char** argv ) {
+void indri::api::Parameters::loadCommandLine( int argc, char** argv ) {
   Parameters current = *this;
 
   for( int i=1; i<argc; i++ ) {
@@ -489,7 +495,7 @@ void Parameters::loadCommandLine( int argc, char** argv ) {
   }
 }
 
-void Parameters::_fillXML( XMLNode* node ) {
+void indri::api::Parameters::_fillXML( indri::xml::XMLNode* node ) {
   parameter_value* root = _getRoot();
   std::map<std::string, parameter_value*>::iterator iter;
 
@@ -508,7 +514,7 @@ void Parameters::_fillXML( XMLNode* node ) {
         // in XML form, we're just going to add lots of children
         // with the same name (iter->first)
         for( size_t i=0; i<childparam->array.size(); i++ ) {
-          XMLNode* arrayChild = new XMLNode( iter->first );
+          indri::xml::XMLNode* arrayChild = new indri::xml::XMLNode( iter->first );
           Parameters childSlice( childparam->array[i] );
           childSlice._fillXML( arrayChild );
 
@@ -516,7 +522,7 @@ void Parameters::_fillXML( XMLNode* node ) {
         }
       } else {
         // this isn't an array
-        XMLNode* simpleChild = new XMLNode( iter->first );
+        indri::xml::XMLNode* simpleChild = new indri::xml::XMLNode( iter->first );
         Parameters childSlice( childparam );
         childSlice._fillXML( simpleChild );
 
@@ -526,19 +532,19 @@ void Parameters::_fillXML( XMLNode* node ) {
   }
 }
 
-XMLNode* Parameters::toXML() {
-  XMLNode* root = new XMLNode( "parameters" );
+indri::xml::XMLNode* indri::api::Parameters::toXML() {
+  indri::xml::XMLNode* root = new indri::xml::XMLNode( "parameters" );
   _fillXML( root );
   return root;
 }
 
-void Parameters::write( std::string& text ) {
-  std::auto_ptr<XMLNode> root( toXML() );
-  XMLWriter writer( root.get() );
+void indri::api::Parameters::write( std::string& text ) {
+  std::auto_ptr<indri::xml::XMLNode> root( toXML() );
+  indri::xml::XMLWriter writer( root.get() );
   writer.write( text );
 }
 
-void Parameters::writeFile( const std::string& filename ) {
+void indri::api::Parameters::writeFile( const std::string& filename ) {
   std::string text;
   write(text);
 

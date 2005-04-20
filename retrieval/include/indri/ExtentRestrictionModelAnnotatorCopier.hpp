@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -29,40 +29,46 @@
 #include <stack>
 #include <vector>
 #include "indri/QuerySpec.hpp"
+namespace indri
+{
+  namespace lang
+  {
+    
+    class ExtentRestrictionModelAnnotatorCopier : public indri::lang::Copier {
+    private:
+      std::vector<indri::lang::Node*> _nodes;
+      std::stack< indri::lang::ExtentRestriction* > _restrictions;
 
-class ExtentRestrictionModelAnnotatorCopier : public indri::lang::Copier {
-private:
-  std::vector<indri::lang::Node*> _nodes;
-  std::stack< indri::lang::ExtentRestriction* > _restrictions;
+    public:
+      ~ExtentRestrictionModelAnnotatorCopier() {
+        indri::utility::delete_vector_contents( _nodes );
+      }
 
-public:
-  ~ExtentRestrictionModelAnnotatorCopier() {
-    delete_vector_contents( _nodes );
-  }
+      indri::lang::Node* defaultAfter( indri::lang::Node* old, indri::lang::Node* newNode ) {
+        _nodes.push_back( newNode );
+        return newNode;
+      }
 
-  indri::lang::Node* defaultAfter( indri::lang::Node* old, indri::lang::Node* newNode ) {
-    _nodes.push_back( newNode );
-    return newNode;
-  }
+      void before( indri::lang::ExtentRestriction* old ) {
+        _restrictions.push( old );
+      }
 
-  void before( indri::lang::ExtentRestriction* old ) {
-    _restrictions.push( old );
-  }
-
-  indri::lang::Node* after( indri::lang::ExtentRestriction* oldNode, indri::lang::ExtentRestriction* newNode ) {
-    _restrictions.pop();
-    _nodes.push_back( newNode );
-    return newNode;
-  }
+      indri::lang::Node* after( indri::lang::ExtentRestriction* oldNode, indri::lang::ExtentRestriction* newNode ) {
+        _restrictions.pop();
+        _nodes.push_back( newNode );
+        return newNode;
+      }
   
-  indri::lang::Node* after( indri::lang::RawScorerNode* oldNode, indri::lang::RawScorerNode* newNode ) {
-    if( newNode->getContext() == 0 && _restrictions.size() ) {
-      newNode->setContext( _restrictions.top()->getField() );
-    }
-    _nodes.push_back( newNode ); // should track for free.
-    return newNode;
+      indri::lang::Node* after( indri::lang::RawScorerNode* oldNode, indri::lang::RawScorerNode* newNode ) {
+        if( newNode->getContext() == 0 && _restrictions.size() ) {
+          newNode->setContext( _restrictions.top()->getField() );
+        }
+        _nodes.push_back( newNode ); // should track for free.
+        return newNode;
+      }
+    };
   }
-};
+}
 
 #endif // INDRI_EXTENTRESTRICTIONMODELANNOTATORCOPIER_HPP
 

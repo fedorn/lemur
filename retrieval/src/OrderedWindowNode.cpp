@@ -19,7 +19,7 @@
 #include "indri/OrderedWindowNode.hpp"
 #include "indri/Annotator.hpp"
 
-OrderedWindowNode::OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children ) :
+indri::infnet::OrderedWindowNode::OrderedWindowNode( const std::string& name, const std::vector<indri::infnet::ListIteratorNode*>& children ) :
   _children(children),
   _windowSize(-1), // unlimited window size
   _name(name)
@@ -27,7 +27,7 @@ OrderedWindowNode::OrderedWindowNode( const std::string& name, const std::vector
   _pointers.resize(children.size());
 }
 
-OrderedWindowNode::OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children, int windowSize ) :
+indri::infnet::OrderedWindowNode::OrderedWindowNode( const std::string& name, const std::vector<indri::infnet::ListIteratorNode*>& children, int windowSize ) :
   _children(children),
   _windowSize(windowSize),
   _name(name)
@@ -35,7 +35,7 @@ OrderedWindowNode::OrderedWindowNode( const std::string& name, const std::vector
   _pointers.resize(children.size());
 }
 
-int OrderedWindowNode::nextCandidateDocument() {
+int indri::infnet::OrderedWindowNode::nextCandidateDocument() {
   int maxDocument = 0;
 
   for( unsigned int i=0; i<_children.size(); i++ ) {
@@ -47,7 +47,7 @@ int OrderedWindowNode::nextCandidateDocument() {
   return maxDocument;
 }
 
-void OrderedWindowNode::prepare( int documentID ) {
+void indri::infnet::OrderedWindowNode::prepare( int documentID ) {
   _extents.clear();
   assert( _children.size() >= 2 );
 
@@ -58,7 +58,7 @@ void OrderedWindowNode::prepare( int documentID ) {
 
   // initialize children indices
   for( unsigned int i=0; i<_children.size(); i++ ) {
-    const greedy_vector<Extent>& childPositions = _children[i]->extents();
+    const indri::utility::greedy_vector<indri::index::Extent>& childPositions = _children[i]->extents();
     _pointers[i].iter = childPositions.begin();
     _pointers[i].end = childPositions.end();
 
@@ -74,6 +74,7 @@ void OrderedWindowNode::prepare( int documentID ) {
   // while the inner loop iterates over the remaining words
   for( ; _pointers[0].iter != _pointers[0].end; (_pointers[0].iter)++ ) {
     bool match = true;
+    double weight = 1.0;
 
     for( unsigned int i=1; i<_pointers.size(); i++ ) {
       // try to find the first occurrence of this term that might
@@ -92,26 +93,28 @@ void OrderedWindowNode::prepare( int documentID ) {
         // word <i> appears too far from the last word
         match = false;
         break;
+      } else {
+        weight *= _pointers[i].iter->weight;
       }
     }
 
     if( match ) {
       // the match extent spans the beginning of the first term and the end of the
       // last term
-      _extents.push_back( Extent( _pointers.front().iter->begin, _pointers.back().iter->end ) );
+      _extents.push_back( indri::index::Extent( weight, _pointers.front().iter->begin, _pointers.back().iter->end ) );
     }
   }
 }
 
-const greedy_vector<Extent>& OrderedWindowNode::extents() {
+const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::OrderedWindowNode::extents() {
   return _extents;
 }
 
-const std::string& OrderedWindowNode::getName() const {
+const std::string& indri::infnet::OrderedWindowNode::getName() const {
   return _name;
 }
 
-void OrderedWindowNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::OrderedWindowNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
   annotator.addMatches( _extents, this, documentID, begin, end );
 
   for( size_t i=0; i<_extents.size(); i++ ) {
@@ -119,4 +122,8 @@ void OrderedWindowNode::annotate( Annotator& annotator, int documentID, int begi
       _children[j]->annotate( annotator, documentID, _extents[i].begin, _extents[i].end );
     }
   }
+}
+
+void indri::infnet::OrderedWindowNode::indexChanged( indri::index::Index& index ) {
+  // do nothing
 }

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -22,16 +22,22 @@
 #include "indri/ObjectHandler.hpp"
 #include "indri/UnparsedDocument.hpp"
 #include <string>
+namespace indri
+{
+  namespace parse
+  {
+    
+    class DocumentIterator {
+    public:
+      virtual ~DocumentIterator() {};
 
-class DocumentIterator {
-public:
-  virtual ~DocumentIterator() {};
+      virtual UnparsedDocument* nextDocument() = 0;
 
-  virtual UnparsedDocument* nextDocument() = 0;
-
-  virtual void open( const std::string& filename ) = 0;
-  virtual void close() = 0;
-};
+      virtual void open( const std::string& filename ) = 0;
+      virtual void close() = 0;
+    };
+  }
+}
 
 #endif // INDRI_DOCUMENTITERATOR_HPP
 

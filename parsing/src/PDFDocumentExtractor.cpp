@@ -33,7 +33,7 @@
 #include "GlobalParams.h"
 
 static void buffer_write( void* stream, char* text, int len ) {
-  Buffer* buffer = (Buffer*) stream;
+  indri::utility::Buffer* buffer = (indri::utility::Buffer*) stream;
 
   if( buffer->position() ) {
     buffer->unwrite(1);
@@ -44,25 +44,25 @@ static void buffer_write( void* stream, char* text, int len ) {
     *buffer->write(1) = 0;
 }
 
-PDFDocumentExtractor::PDFDocumentExtractor() {
+indri::parse::PDFDocumentExtractor::PDFDocumentExtractor() {
   globalParams = new GlobalParams(0);
 }
 
-PDFDocumentExtractor::~PDFDocumentExtractor() {
+indri::parse::PDFDocumentExtractor::~PDFDocumentExtractor() {
   delete globalParams;
   globalParams = 0;
 }
 
-void PDFDocumentExtractor::open( const std::string& filename ) {
+void indri::parse::PDFDocumentExtractor::open( const std::string& filename ) {
   _documentTextBuffer.clear();
   _documentPath = filename;
 }
 
-void PDFDocumentExtractor::close() {
+void indri::parse::PDFDocumentExtractor::close() {
   _documentPath = "";
 }
 
-UnparsedDocument* PDFDocumentExtractor::nextDocument() {
+indri::parse::UnparsedDocument* indri::parse::PDFDocumentExtractor::nextDocument() {
   if( !_documentPath.length() )
     return 0;
 
@@ -94,7 +94,7 @@ UnparsedDocument* PDFDocumentExtractor::nextDocument() {
   _unparsedDocument.text = _documentTextBuffer.front();
   _unparsedDocument.metadata.clear();
 
-  MetadataPair pair;
+  indri::parse::MetadataPair pair;
 
   pair.key = "path";
   pair.value = docnoPoint;

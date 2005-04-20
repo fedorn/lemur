@@ -18,17 +18,17 @@
 
 #include "indri/XMLWriter.hpp"
 
-void XMLWriter::_writeChar( char ch, std::string& output ) const {
+void indri::xml::XMLWriter::_writeChar( char ch, std::string& output ) const {
   output += ch;
 }
 
-void XMLWriter::_writeTabs( int tabs, std::string& output ) const {
+void indri::xml::XMLWriter::_writeTabs( int tabs, std::string& output ) const {
   for( int i=0; i<tabs; i++ ) {
     _writeChar( '\t', output );
   }
 }
 
-void XMLWriter::_writeTag( const std::string& tag, const XMLNode::MAttributes& attributes, std::string& output, bool opening ) const {
+void indri::xml::XMLWriter::_writeTag( const std::string& tag, const indri::xml::XMLNode::MAttributes& attributes, std::string& output, bool opening ) const {
   _writeChar( '<', output );
 
   if( !opening ) {
@@ -37,7 +37,7 @@ void XMLWriter::_writeTag( const std::string& tag, const XMLNode::MAttributes& a
   output += tag;
 
   if( opening ) {
-    XMLNode::MAttributes::const_iterator iter;
+    indri::xml::XMLNode::MAttributes::const_iterator iter;
     for( iter = attributes.begin(); iter != attributes.end(); iter++ ) {
       _writeChar( ' ', output );
       output += iter->first;
@@ -52,11 +52,11 @@ void XMLWriter::_writeTag( const std::string& tag, const XMLNode::MAttributes& a
   _writeChar( '>', output );
 }
 
-void XMLWriter::_writeEndOfLine( std::string& output ) const {
+void indri::xml::XMLWriter::_writeEndOfLine( std::string& output ) const {
   _writeChar( '\n', output );
 }
 
-void XMLWriter::_writeXML( int tabs, const XMLNode* node, std::string& output ) const {
+void indri::xml::XMLWriter::_writeXML( int tabs, const indri::xml::XMLNode* node, std::string& output ) const {
   // write opening tag
   _writeTabs( tabs, output );
   _writeTag( node->getName(), node->getAttributes(), output, true );
@@ -77,11 +77,11 @@ void XMLWriter::_writeXML( int tabs, const XMLNode* node, std::string& output ) 
   _writeEndOfLine( output );
 }
 
-XMLWriter::XMLWriter( XMLNode* node ) : _node(node)
+indri::xml::XMLWriter::XMLWriter( indri::xml::XMLNode* node ) : _node(node)
 {
 }
 
-void XMLWriter::write( std::string& output ) {
+void indri::xml::XMLWriter::write( std::string& output ) {
   _writeXML( 0, _node, output );
 }
 

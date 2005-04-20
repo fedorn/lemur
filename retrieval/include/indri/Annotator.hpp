@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -25,22 +25,32 @@
 #include "indri/BeliefNode.hpp"
 #include "indri/EvaluatorNode.hpp"
 #include "indri/Extent.hpp"
+namespace indri
+{
+  /*! Inference net and inference net node classes. */
+  namespace infnet 
+  {
+    
+    class Annotator : public EvaluatorNode {
+    private:
+      BeliefNode* _belief;
+      EvaluatorNode::MResults _annotations;
+      std::string _name;
 
-class Annotator : public EvaluatorNode {
-private:
-  BeliefNode* _belief;
-  EvaluatorNode::MResults _annotations;
-  std::string _name;
+    public:
+      Annotator( const std::string& name, BeliefNode* belief );
+      void add( InferenceNetworkNode* node, int documentID, int begin, int end );
+      void addMatches( indri::utility::greedy_vector<indri::index::Extent>& extents, InferenceNetworkNode* node, int documentID, int begin, int end );
+      void evaluate( int documentID, int documentLength );
+  
+      int nextCandidateDocument();
+      void indexChanged( indri::index::Index& index );
 
-public:
-  Annotator( const std::string& name, BeliefNode* belief );
-  void add( InferenceNetworkNode* node, int documentID, int begin, int end );
-  void addMatches( greedy_vector<Extent>& extents, InferenceNetworkNode* node, int documentID, int begin, int end );
-  void evaluate( int documentID, int documentLength );
-  int nextCandidateDocument();
-  EvaluatorNode::MResults& getResults();
-  const std::string& getName() const;
-  const EvaluatorNode::MResults& getResults() const;
-};
+      EvaluatorNode::MResults& getResults();
+      const std::string& getName() const;
+      const EvaluatorNode::MResults& getResults() const;
+    };
+  }
+}
 
 #endif // INDRI_ANNOTATOR_HPP

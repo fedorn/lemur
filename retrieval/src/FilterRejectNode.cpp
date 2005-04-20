@@ -23,16 +23,16 @@
 #include "indri/Extent.hpp"
 #include "indri/Annotator.hpp"
 
-FilterRejectNode::FilterRejectNode( const std::string& name, 
-				    ListIteratorNode* filter, 
-				    BeliefNode* disallowed ) {
+indri::infnet::FilterRejectNode::FilterRejectNode( const std::string& name, 
+                                    indri::infnet::ListIteratorNode* filter, 
+                                    indri::infnet::BeliefNode* disallowed ) {
   _name = name;
   _filter = filter;
   _disallowed = disallowed;
 }
 
 
-int FilterRejectNode::nextCandidateDocument() {
+int indri::infnet::FilterRejectNode::nextCandidateDocument() {
   // it'd be nice to use the information from _filter to 
   // skip documents in the case when _filter->nextCandidate..() == _disallowed->nextCandidate...()
   // but we don't know for sure that _filter will match: we only know that it might match.
@@ -40,39 +40,51 @@ int FilterRejectNode::nextCandidateDocument() {
   return _disallowed->nextCandidateDocument();
 }
 
-double FilterRejectNode::maximumBackgroundScore() {
+double indri::infnet::FilterRejectNode::maximumBackgroundScore() {
   // delegate to the query as if the filter were true
   return _disallowed->maximumBackgroundScore();
 }
 
-double FilterRejectNode::maximumScore() {
+double indri::infnet::FilterRejectNode::maximumScore() {
   return _disallowed->maximumScore();
 }
 
-bool FilterRejectNode::hasMatch( int documentID ) {
+bool indri::infnet::FilterRejectNode::hasMatch( int documentID ) {
   // delegate to the children.
   return (_filter->extents().size() == 0 &&
-	  _disallowed->hasMatch( documentID ));
+  _disallowed->hasMatch( documentID ));
 }
 
-const std::string& FilterRejectNode::getName() const {
+const indri::utility::greedy_vector<bool>& indri::infnet::FilterRejectNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+  if( _filter->extents().size() == 0 ) {
+    return _disallowed->hasMatch( documentID, extents );
+  }
+
+  _matches.resize( extents.size(), false );
+  return _matches;
+}
+
+const std::string& indri::infnet::FilterRejectNode::getName() const {
   return _name;
 }
 
-const greedy_vector<ScoredExtentResult>& FilterRejectNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FilterRejectNode::score( int documentID, int begin, int end, int documentLength ) {
   _extents.clear();
   // if the filter doesn't apply, return the child score.
-  if (_filter->extents().size() == 0 )
+  if ( _filter->extents().size() == 0 )
     return _disallowed->score( documentID, begin, end, documentLength );
   else
     return _extents;
 }
 
-void FilterRejectNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::FilterRejectNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
   _filter->annotate( annotator, documentID, begin, end );
   if( _filter->extents().size() == 0 ) {
     _disallowed->annotate( annotator, documentID, begin, end );
   }
 }
 
+void indri::infnet::FilterRejectNode::indexChanged( indri::index::Index& index ) {
+  // do nothing
+}
 

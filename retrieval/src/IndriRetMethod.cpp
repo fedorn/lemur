@@ -13,6 +13,8 @@
 #include "indri/QueryEnvironment.hpp"
 #include "indri/RMExpander.hpp"
 
+using namespace indri::api;
+
 IndriRetMethod::IndriRetMethod(const Index &dbIndex) : 
   RetrievalMethod(dbIndex) {
   // if it isn't an indri repository, die screaming now.
@@ -124,7 +126,7 @@ double IndriRetMethod::scoreDoc(const QueryRep &qry, DOCID_T docID) {
 // RM expand
 void IndriRetMethod::updateQuery(QueryRep &qryRep, const DocIDSet &relDocs) {
   /*
-    RMExpander rm;
+    indri::query::RMExpander rm;
     Convert DocIDSet to std::vector<ScoredExtentResult> (document & score).
     std::string expandedQuery = rm.expand( originalQuery , results );
 
@@ -133,7 +135,7 @@ void IndriRetMethod::updateQuery(QueryRep &qryRep, const DocIDSet &relDocs) {
     tq->updateQuery(expandedQuery);
    */
 
-  RMExpander rm(env, *params);
+  indri::query::RMExpander rm(env, *params);
 
   std::vector<ScoredExtentResult> results;
   //Convert DocIDSet (document & score).

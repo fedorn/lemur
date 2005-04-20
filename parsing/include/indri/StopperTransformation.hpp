@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -24,31 +24,37 @@
 #include <vector>
 #include "string-set.h"
 #include "indri/Parameters.hpp"
+namespace indri
+{
+  namespace parse
+  {
+    
+    class StopperTransformation : public Transformation {
+    private:
+      ObjectHandler<indri::api::ParsedDocument>* _handler;
+      String_set* _table;
 
-class StopperTransformation : public Transformation {
-private:
-  ObjectHandler<ParsedDocument>* _handler;
-  String_set* _table;
+    public:
+      StopperTransformation();
+      StopperTransformation( const std::vector<std::string>& stopwords );
+      StopperTransformation( const std::vector<const char*>& stopwords );
+      StopperTransformation( const std::vector<char*>& stopwords );
+      StopperTransformation( indri::api::Parameters& stopwords );
+      ~StopperTransformation();
 
-public:
-  StopperTransformation();
-  StopperTransformation( const std::vector<std::string>& stopwords );
-  StopperTransformation( const std::vector<const char*>& stopwords );
-  StopperTransformation( const std::vector<char*>& stopwords );
-  StopperTransformation( Parameters& stopwords );
-  ~StopperTransformation();
+      void read( const std::vector<std::string>& stopwords );
+      void read( const std::vector<const char*>& stopwords );
+      void read( const std::vector<char*>& stopwords );
+      void read( const std::string& filename );
+      void read( indri::api::Parameters& stopwords );
 
-  void read( const std::vector<std::string>& stopwords );
-  void read( const std::vector<const char*>& stopwords );
-  void read( const std::vector<char*>& stopwords );
-  void read( const std::string& filename );
-  void read( Parameters& stopwords );
+      indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document );
 
-  ParsedDocument* transform( ParsedDocument* document );
-
-  void handle( ParsedDocument* document );
-  void setHandler( ObjectHandler<ParsedDocument>& handler );
-};
+      void handle( indri::api::ParsedDocument* document );
+      void setHandler( ObjectHandler<indri::api::ParsedDocument>& handler );
+    };
+  }
+}
 
 #endif // INDRI_STOPPERTRANSFORMATION_HPP
 

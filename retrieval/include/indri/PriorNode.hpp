@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -22,26 +22,36 @@
 #include "indri/BeliefNode.hpp"
 #include "indri/FieldIteratorNode.hpp"
 #include "indri/QuerySpec.hpp"
+namespace indri
+{
+  namespace infnet
+  {
+    
+    class PriorNode : public BeliefNode {
+    private:
+      FieldIteratorNode* _field;
+      std::map<int, indri::lang::PriorNode::tuple_type> _table;
+      indri::utility::greedy_vector<bool> _matches;
+      indri::utility::greedy_vector<indri::api::ScoredExtentResult> _scores;
+      std::string _name;
 
-class PriorNode : public BeliefNode {
-private:
-  FieldIteratorNode* _field;
-  std::map<int, indri::lang::PriorNode::tuple_type> _table;
-  greedy_vector<ScoredExtentResult> _scores;
-  std::string _name;
+    public:
+      PriorNode( const std::string& name, FieldIteratorNode* field, const std::map<int, indri::lang::PriorNode::tuple_type>& table );
+      ~PriorNode();
 
-public:
-  PriorNode( const std::string& name, FieldIteratorNode* field, const std::map<int, indri::lang::PriorNode::tuple_type>& table );
-  ~PriorNode();
+      int nextCandidateDocument();
+      void indexChanged( indri::index::Index& index );
 
-  int nextCandidateDocument();
-  bool hasMatch( int documentID );
-  const greedy_vector<ScoredExtentResult>& score( int documentID, int begin, int end, int documentLength );
-  void annotate( class Annotator& annotator, int documentID, int begin, int end );
-  double maximumScore();
-  double maximumBackgroundScore();
-  const std::string& getName() const;
-};
+      bool hasMatch( int documentID );
+      const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int begin, int end, int documentLength );
+      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+      double maximumScore();
+      double maximumBackgroundScore();
+      const std::string& getName() const;
+    };
+  }
+}
 
 #endif // INDRI_PRIORNODE_HPP
 

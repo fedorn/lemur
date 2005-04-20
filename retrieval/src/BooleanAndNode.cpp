@@ -18,13 +18,13 @@
 #include "indri/BooleanAndNode.hpp"
 #include "indri/Annotator.hpp"
 
-BooleanAndNode::BooleanAndNode( const std::string& name, std::vector<ListIteratorNode*>& children ) :
+indri::infnet::BooleanAndNode::BooleanAndNode( const std::string& name, std::vector<indri::infnet::ListIteratorNode*>& children ) :
   _name(name),
   _lists(children)
 {
 }
 
-void BooleanAndNode::prepare( int documentID ) {
+void indri::infnet::BooleanAndNode::prepare( int documentID ) {
   _extents.clear();
 
   // check for and condition
@@ -34,14 +34,14 @@ void BooleanAndNode::prepare( int documentID ) {
   }
 
   // if all here, make a null extent
-  _extents.push_back( Extent( 0, 1 ) ); // breaks match highlighting.
+  _extents.push_back( indri::index::Extent( 0, 1 ) ); // breaks match highlighting.
 }
 
-greedy_vector<Extent>& BooleanAndNode::extents() {
+indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::BooleanAndNode::extents() {
   return _extents;
 }
 
-int BooleanAndNode::nextCandidateDocument() {
+int indri::infnet::BooleanAndNode::nextCandidateDocument() {
   int document = _lists[0]->nextCandidateDocument();
 
   for( int i=1; i<_lists.size(); i++ ) {
@@ -51,11 +51,11 @@ int BooleanAndNode::nextCandidateDocument() {
   return document;
 }
 
-const std::string& BooleanAndNode::getName() const {
+const std::string& indri::infnet::BooleanAndNode::getName() const {
   return _name;
 }
 
-void BooleanAndNode::annotate( class Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::BooleanAndNode::annotate( class indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
   annotator.addMatches( _extents, this, documentID, begin, end );
   /* Should have the same as ODN? Or just the inner loop like OrNode
      // _children are _lists in this context.
@@ -66,5 +66,9 @@ void BooleanAndNode::annotate( class Annotator& annotator, int documentID, int b
   }
 
    */
+}
+
+void indri::infnet::BooleanAndNode::indexChanged( indri::index::Index& index ) {
+  // do nothing
 }
 
