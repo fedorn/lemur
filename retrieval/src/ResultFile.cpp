@@ -22,7 +22,7 @@ void ResultFile::openForRead(istream &is, Index &index)
 void ResultFile::load(istream &is, Index &index)
 {
   int i;
-  static ResultEntry entry;
+  ResultEntry entry;
 
   // delete any old data
   for (i=0; i<resTable->size(); i++) {
@@ -53,7 +53,7 @@ void ResultFile::load(istream &is, Index &index)
 
 bool ResultFile::findResult(const string& queryID, IndexedRealVector *&res)
 {
-  static ResultEntry entry;
+  ResultEntry entry;
   entry.key = queryID;
   int qi = (*resTable)[entry];
   if (qi>=0) {

@@ -87,7 +87,7 @@ TFIDFRetMethod::TFIDFRetMethod(const Index &dbIndex, ScoreAccumulator &accumulat
 void TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, const DocIDSet &relDocs)
 {
   COUNT_T totalTerm=ind.termCountUnique();  
-  static float * centroidVector = new float[totalTerm+1]; // one extra for OOV
+  float * centroidVector = new float[totalTerm+1]; // one extra for OOV
 
   COUNT_T i;
   for (i=1;i<=totalTerm;i++) {
@@ -142,7 +142,7 @@ void TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, const DocIDSet &relDo
       (dynamic_cast<TFIDFQueryRep *>(&qryRep))->incCount((*j).ind, (*j).val*fbParam.posCoeff);
     }
   }
-
+  delete[] centroidVector;
 }
 
 

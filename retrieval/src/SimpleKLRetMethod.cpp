@@ -352,8 +352,8 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep,
 
   DocUnigramCounter *dCounter = new DocUnigramCounter(relDocs, ind);
 
-  static double *distQuery = new double[numTerms+1];
-  static double *distQueryEst = new double[numTerms+1];
+  double *distQuery = new double[numTerms+1];
+  double *distQueryEst = new double[numTerms+1];
 
   double noisePr;
 
@@ -426,6 +426,8 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep,
 			qryParam.fbPrSumTh, qryParam.fbPrTh);
   delete fblm;
   delete dCounter;
+  delete[] distQuery;
+  delete[] distQueryEst;
 }
 
 
@@ -548,7 +550,7 @@ void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep,
   // RelDocUnigramCounter computes SUM(D){P(w|D)*P(D|Q)} for each w
   RelDocUnigramCounter *dCounter = new RelDocUnigramCounter(relDocs, ind);
 
-  static double *distQuery = new double[numTerms+1];
+  double *distQuery = new double[numTerms+1];
   double expWeight = qryParam.fbCoeff;
 
   TERMID_T i;
@@ -581,6 +583,7 @@ void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep,
 			  qryParam.fbPrSumTh, 0.0);
   delete fblm;
   delete dCounter;
+  delete[] distQuery;
 }
 
 // out: w.weight = P(w|Q)
@@ -604,7 +607,7 @@ void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep,
   // P(w) = SUM_d P(w|d) p(d)
   RelDocUnigramCounter *dCounter = new RelDocUnigramCounter(relDocs, ind);
 
-  static double *distQuery = new double[numTerms+1];
+  double *distQuery = new double[numTerms+1];
   COUNT_T numDocs = ind.docCount();
   vector<termProb> **tProbs = new vector<termProb> *[numDocs + 1];
 
@@ -695,6 +698,7 @@ void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep,
     delete(tProbs[i]);
   }
   delete[](tProbs);
+  delete[] distQuery;
 }
 
 
