@@ -73,7 +73,7 @@ BasicDocStream::BasicDocStream (const string &inputFile)
 
 bool BasicDocStream::hasMore()
 {
-  bool moreDoc;
+  bool moreDoc = false;
   if (!nextTokenRead) {
     moreDoc = *ifs >> buf;
     nextTokenRead = true;
