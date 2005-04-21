@@ -162,31 +162,24 @@ void indri::collection::Repository::_remove( const std::string& indexPath ) {
 //
 
 void indri::collection::Repository::_openIndexes( indri::api::Parameters& params, const std::string& parentPath ) {
-  indri::api::Parameters indexes = params["indexes"]["index"];
-
-  //
-  // <!ELEMENT name (#PCDATA)> -- name of index
-  // <!ELEMENT prune (#PCDATA)> -- this index is junk and should be pruned
-  // <!ELEMENT index (name,deleteable)>
-  //
+  indri::api::Parameters container = params["indexes"];
 
   _active = new index_vector;
   _states.push_back( _active );
+  _indexCount = params.get( "indexCount", 0 );
 
-  for( int i=0; i<indexes.size(); i++ ) {
-    indri::api::Parameters indexSpec = indexes[i];
-    indri::index::DiskIndex* diskIndex = new indri::index::DiskIndex();
-    std::string indexName = (std::string) indexSpec;
+  if( container.exists( "index" ) ) {
+    indri::api::Parameters indexes = container["index"];
 
-    if( indexSpec.get("prune", 0) ) {
-      _remove( indexName );
-    } else {
+    for( int i=0; i<indexes.size(); i++ ) {
+      indri::api::Parameters indexSpec = indexes[i];
+      indri::index::DiskIndex* diskIndex = new indri::index::DiskIndex();
+      std::string indexName = (std::string) indexSpec;
+
       diskIndex->open( parentPath, indexName );
       _active->push_back( diskIndex );
     }
   }
-
-  _indexCount = params.get( "indexCount", 0 );
 }
 
 //
@@ -489,8 +482,13 @@ void indri::collection::Repository::_addMemoryIndex() {
   indri::thread::ScopedLock slock( _stateLock );
 
   // build a new memory index
-  indri::index::Index* activeIndex = _active->back();
-  int documentBase = activeIndex->documentBase() + activeIndex->documentCount();
+  int documentBase = 1;
+
+  if( _active->size() > 0 ) {
+    indri::index::Index* activeIndex = _active->back();
+    documentBase = activeIndex->documentBase() + activeIndex->documentCount();
+  }
+
   indri::index::MemoryIndex* newMemoryIndex = new indri::index::MemoryIndex( documentBase, _indexFields );
 
   // build a new state vector
@@ -883,8 +881,8 @@ void indri::collection::Repository::_merge( index_state& state ) {
     // release the previous state object
     state = 0;
 
-    _merge( first );
     _merge( second );
+    _merge( first );
 
     std::copy( first->begin(), first->end(), std::back_inserter( *result ) );
     std::copy( second->begin(), second->end(), std::back_inserter( *result ) );

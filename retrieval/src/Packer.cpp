@@ -20,11 +20,17 @@
 #include "indri/QuerySpec.hpp"
 #include <sstream>
 #include "indri/XMLWriter.hpp"
+#include "indri/delete_range.hpp"
 
 namespace indri {
   namespace lang {
     Packer::Packer() {
       _packedNodes = new indri::xml::XMLNode( "query" );
+    }
+
+    Packer::~Packer() {
+      delete _packedNodes;
+      indri::utility::delete_map_contents( _elements );
     }
 
     Packer::node_element* Packer::_getElement( class indri::lang::Node* node ) {

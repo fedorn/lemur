@@ -57,6 +57,7 @@ namespace indri {
 
     public:
       Packer();
+      ~Packer();
 
       void before( class Node* someNode );
       void after( class Node* someNode );
