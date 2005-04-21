@@ -27,7 +27,7 @@
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -67,7 +67,7 @@
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -112,6 +112,9 @@
 			</File>
 			<File
 				RelativePath=".\src\ContextCountAccumulator.cpp">
+			</File>
+			<File
+				RelativePath=".\src\ContextSimpleCountAccumulator.cpp">
 			</File>
 			<File
 				RelativePath=".\src\Copier.cpp">
@@ -160,6 +163,9 @@
 			</File>
 			<File
 				RelativePath=".\src\FilterRequireNode.cpp">
+			</File>
+			<File
+				RelativePath=".\src\FixedPassageNode.cpp">
 			</File>
 			<File
 				RelativePath=".\src\FreqVector.cpp">
@@ -309,6 +315,9 @@
 				RelativePath=".\src\WeightedAndNode.cpp">
 			</File>
 			<File
+				RelativePath=".\src\WeightedExtentOrNode.cpp">
+			</File>
+			<File
 				RelativePath=".\src\WeightedSumNode.cpp">
 			</File>
 			<File
@@ -342,6 +351,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\ContextCountGraphExtractor.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\ContextSimpleCountAccumulator.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\ContextSimpleCountCollectorCopier.hpp">
@@ -411,6 +423,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\FilterRequireNode.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\FixedPassageNode.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\FrequencyListCopier.hpp">
@@ -645,6 +660,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\WeightedAndNode.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\WeightedExtentOrNode.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\WeightedSumNode.hpp">

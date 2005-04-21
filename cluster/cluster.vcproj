@@ -27,7 +27,7 @@
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -67,7 +67,7 @@
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -145,6 +145,60 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath=".\include\AgglomCluster.hpp">
+			</File>
+			<File
+				RelativePath=".\include\CentroidCluster.hpp">
+			</File>
+			<File
+				RelativePath=".\include\Cluster.hpp">
+			</File>
+			<File
+				RelativePath=".\include\ClusterDB.hpp">
+			</File>
+			<File
+				RelativePath=".\include\ClusterFactory.hpp">
+			</File>
+			<File
+				RelativePath=".\include\ClusterMethods.hpp">
+			</File>
+			<File
+				RelativePath=".\include\ClusterParam.hpp">
+			</File>
+			<File
+				RelativePath=".\include\ClusterRep.hpp">
+			</File>
+			<File
+				RelativePath=".\include\CosSim.hpp">
+			</File>
+			<File
+				RelativePath=".\include\FlatFileClusterDB.hpp">
+			</File>
+			<File
+				RelativePath=".\include\FloatFreqVector.hpp">
+			</File>
+			<File
+				RelativePath=".\include\KeyfileClusterDB.hpp">
+			</File>
+			<File
+				RelativePath=".\include\OfflineCluster.hpp">
+			</File>
+			<File
+				RelativePath=".\include\PLSA.hpp">
+			</File>
+			<File
+				RelativePath=".\include\PLSAParam.hpp">
+			</File>
+			<File
+				RelativePath=".\include\SimFactory.hpp">
+			</File>
+			<File
+				RelativePath=".\include\SimilarityMethod.hpp">
+			</File>
+			<File
+				RelativePath=".\include\ThresholdFcn.hpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

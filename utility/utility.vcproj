@@ -27,7 +27,7 @@
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -66,8 +66,8 @@
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
+				WarningLevel="2"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -108,6 +108,9 @@
 				RelativePath=".\src\BasicDocStream.cpp">
 			</File>
 			<File
+				RelativePath=".\src\BulkTree.cpp">
+			</File>
+			<File
 				RelativePath=".\src\ByteHash.cpp">
 			</File>
 			<File
@@ -121,6 +124,9 @@
 			</File>
 			<File
 				RelativePath=".\src\FUtil.cpp">
+			</File>
+			<File
+				RelativePath=".\src\IndriFile.cpp">
 			</File>
 			<File
 				RelativePath=".\src\IndriTimer.cpp">
@@ -151,18 +157,6 @@
 			</File>
 			<File
 				RelativePath=".\src\Parameters.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/IndriParameters.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/IndriParameters.obj"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\src\Path.cpp">
@@ -192,6 +186,12 @@
 				RelativePath=".\src\TermCache.cpp">
 			</File>
 			<File
+				RelativePath=".\src\Thread.cpp">
+			</File>
+			<File
+				RelativePath=".\src\UtilityThread.cpp">
+			</File>
+			<File
 				RelativePath=".\src\WordSet.cpp">
 			</File>
 			<File
@@ -212,6 +212,9 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath=".\include\indri\atomic.hpp">
+			</File>
+			<File
 				RelativePath=".\include\BasicCollectionProps.hpp">
 			</File>
 			<File
@@ -221,6 +224,9 @@
 				RelativePath=".\include\indri\Buffer.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\BulkTree.hpp">
+			</File>
+			<File
 				RelativePath=".\include\ByteHash.hpp">
 			</File>
 			<File
@@ -228,6 +234,12 @@
 			</File>
 			<File
 				RelativePath=".\include\common_headers.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\ConditionVariable.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\count_iterator">
 			</File>
 			<File
 				RelativePath=".\include\Counter.hpp">
@@ -257,13 +269,13 @@
 				RelativePath=".\include\DocumentProps.hpp">
 			</File>
 			<File
-				RelativePath=".\include\error.h">
-			</File>
-			<File
 				RelativePath=".\include\Exception.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\Extent.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\File.hpp">
 			</File>
 			<File
 				RelativePath=".\include\File.hpp">
@@ -273,6 +285,9 @@
 			</File>
 			<File
 				RelativePath=".\include\FUtil.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\greedy_vector">
 			</File>
 			<File
 				RelativePath=".\include\indri\HashTable.hpp">
@@ -285,6 +300,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\IndriTimer.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\InternalFileBuffer.hpp">
 			</File>
 			<File
 				RelativePath=".\include\ISet.hpp">
@@ -323,6 +341,9 @@
 				RelativePath=".\include\LinkedPropertyList.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\Lockable.hpp">
+			</File>
+			<File
 				RelativePath=".\include\main.hpp">
 			</File>
 			<File
@@ -335,6 +356,9 @@
 				RelativePath=".\include\minmax.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\Mutex.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\NetworkListener.hpp">
 			</File>
 			<File
@@ -345,9 +369,6 @@
 			</File>
 			<File
 				RelativePath=".\include\Param.hpp">
-			</File>
-			<File
-				RelativePath=".\include\parameters.h">
 			</File>
 			<File
 				RelativePath=".\include\indri\Parameters.hpp">
@@ -377,6 +398,18 @@
 				RelativePath=".\include\ReadBuffer.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\ReaderLockable.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\ReadersWritersLock.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\ref_ptr.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\RegionAllocator.hpp">
+			</File>
+			<File
 				RelativePath=".\include\RVLCompress.hpp">
 			</File>
 			<File
@@ -384,6 +417,18 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\RVLDecompressStream.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\ScopedLock.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\ScopedMonitor.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\SequentialReadBuffer.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\SequentialWriteBuffer.hpp">
 			</File>
 			<File
 				RelativePath=".\include\string-set.h">
@@ -401,7 +446,10 @@
 				RelativePath=".\include\TermCache.hpp">
 			</File>
 			<File
-				RelativePath=".\include\util.h">
+				RelativePath=".\include\indri\Thread.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\UtilityThread.hpp">
 			</File>
 			<File
 				RelativePath=".\include\WeightedIDSet.hpp">
@@ -411,6 +459,9 @@
 			</File>
 			<File
 				RelativePath=".\include\WriteBuffer.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\WriterLockable.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\XMLNode.hpp">

@@ -27,7 +27,7 @@
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -67,7 +67,7 @@
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -102,19 +102,49 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\src\DocListDiskBuilder.cpp">
+				RelativePath=".\src\BasicIndexWithCat.cpp">
 			</File>
 			<File
-				RelativePath=".\src\DocListFileIterator.cpp">
+				RelativePath=".\src\CombinedVocabularyIterator.cpp">
 			</File>
 			<File
-				RelativePath=".\src\DocListFrequencyIterator.cpp">
+				RelativePath=".\src\DeletedDocumentList.cpp">
 			</File>
 			<File
-				RelativePath=".\src\DocListIterator.cpp">
+				RelativePath=".\src\DiskDocExtentListIterator.cpp">
+			</File>
+			<File
+				RelativePath=".\src\DiskDocListFileIterator.cpp">
+			</File>
+			<File
+				RelativePath=".\src\DiskDocListIterator.cpp">
+			</File>
+			<File
+				RelativePath=".\src\DiskDocumentDataIterator.cpp">
+			</File>
+			<File
+				RelativePath=".\src\DiskFrequentVocabularyIterator.cpp">
+			</File>
+			<File
+				RelativePath=".\src\DiskIndex.cpp">
+			</File>
+			<File
+				RelativePath=".\src\DiskKeyfileVocabularyIterator.cpp">
+			</File>
+			<File
+				RelativePath=".\src\DiskTermListFileIterator.cpp">
+			</File>
+			<File
+				RelativePath=".\src\DocExtentListMemoryBuilder.cpp">
+			</File>
+			<File
+				RelativePath=".\src\DocExtentListMemoryBuilderIterator.cpp">
 			</File>
 			<File
 				RelativePath=".\src\DocListMemoryBuilder.cpp">
+			</File>
+			<File
+				RelativePath=".\src\DocListMemoryBuilderIterator.cpp">
 			</File>
 			<File
 				RelativePath=".\src\IncFPPushIndex.cpp">
@@ -132,7 +162,7 @@
 				RelativePath=".\src\IndexManager.cpp">
 			</File>
 			<File
-				RelativePath=".\src\IndriIndex.cpp">
+				RelativePath=".\src\IndexWriter.cpp">
 			</File>
 			<File
 				RelativePath=".\src\IndriTermInfoList.cpp">
@@ -195,6 +225,15 @@
 				RelativePath=".\src\LemurIndriIndex.cpp">
 			</File>
 			<File
+				RelativePath=".\src\MemoryDocumentDataIterator.cpp">
+			</File>
+			<File
+				RelativePath=".\src\MemoryIndex.cpp">
+			</File>
+			<File
+				RelativePath=".\src\MemoryIndexTermListFileIterator.cpp">
+			</File>
+			<File
 				RelativePath=".\src\PropIndexTH.cpp">
 			</File>
 			<File
@@ -204,7 +243,10 @@
 				RelativePath=".\src\Repository.cpp">
 			</File>
 			<File
-				RelativePath=".\src\TopdocsIndex.cpp">
+				RelativePath=".\src\RepositoryLoadThread.cpp">
+			</File>
+			<File
+				RelativePath=".\src\RepositoryMaintenanceThread.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -212,28 +254,58 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath=".\include\BasicIndexWithCat.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\CombinedVocabularyIterator.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\CorpusStatistics.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DeletedDocumentList.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DenseVocabularyMap.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DiskDocExtentListIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DiskDocListFileIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DiskDocListIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DiskDocumentDataIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DiskFrequentVocabularyIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DiskIndex.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DiskKeyfileVocabularyIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DiskTermData.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DiskTermListFileIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DocExtentListIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DocExtentListMemoryBuilder.hpp">
 			</File>
 			<File
 				RelativePath=".\include\DocInfoList.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\DocListDiskBlockReader.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\DocListDiskBlockWriter.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\DocListDiskBuilder.hpp">
-			</File>
-			<File
 				RelativePath=".\include\indri\DocListFileIterator.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\DocListFrequencyIterator.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\DocListInfo.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\DocListIterator.hpp">
@@ -242,28 +314,16 @@
 				RelativePath=".\include\indri\DocListMemoryBuilder.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\DocPositionInfoList.hpp">
-			</File>
-			<File
 				RelativePath=".\include\indri\DocumentCount.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\DocumentData.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\FieldData.hpp">
+				RelativePath=".\include\indri\DocumentDataIterator.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\FieldExtent.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\FieldListDiskBlockReader.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\FieldListDiskBlockWriter.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\FieldListDiskBuilder.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\FieldListIterator.hpp">
@@ -287,6 +347,9 @@
 				RelativePath=".\include\Index.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\Index.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\IndexEnvironment.hpp">
 			</File>
 			<File
@@ -296,7 +359,7 @@
 				RelativePath=".\include\IndexWithCat.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\IndriIndex.hpp">
+				RelativePath=".\include\indri\IndexWriter.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\IndriTermInfoList.hpp">
@@ -374,6 +437,21 @@
 				RelativePath=".\include\LemurIndriIndex.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\MemoryDocumentDataIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\MemoryIndex.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\MemoryIndexDocListFileIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\MemoryIndexTermListFileIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\MemoryIndexVocabularyIterator.hpp">
+			</File>
+			<File
 				RelativePath=".\include\PropIndexTH.hpp">
 			</File>
 			<File
@@ -386,6 +464,18 @@
 				RelativePath=".\include\indri\Repository.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\RepositoryLoadThread.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\RepositoryMaintenanceThread.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\SparseVocabularyMap.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\TermBitmap.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\TermData.hpp">
 			</File>
 			<File
@@ -395,10 +485,22 @@
 				RelativePath=".\include\TermInfoList.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\TermListBuilder.hpp">
+				RelativePath=".\include\indri\TermList.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\TopdocsIndex.hpp">
+				RelativePath=".\include\indri\TermListFileIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\TermRecorder.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\TermTranslator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\VocabularyIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\VocabularyMap.hpp">
 			</File>
 		</Filter>
 		<Filter
