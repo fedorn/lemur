@@ -10,11 +10,14 @@
 */
 
 #include "BasicCollectionProps.hpp"
+#include <sstream>
 
 string BasicCollectionProps::getStringProperty(const string& name) const{
   const Property* p = this->getProperty(name);
   string value = "";
-
+  std::stringstream s;
+  int v;
+  double d;
   if (p) {
     Property::DataType type = p->getType();
     switch (type) {
@@ -25,10 +28,14 @@ string BasicCollectionProps::getStringProperty(const string& name) const{
       value = (char*)p->getValue();
       break;
     case (Property::INT):
-      value = *(int*)p->getValue();
+		v = *(int*)p->getValue();
+		s << v;
+		value = s.str();
       break;
-    case (Property::DOUBLE):
-      value = *(double*)p->getValue();
+    case (Property::DOUBLE):	
+		d = *(double*)p->getValue();
+		s << d;
+		value = s.str();
       break;
     }
   }

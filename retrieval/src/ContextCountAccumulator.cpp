@@ -66,8 +66,8 @@ const indri::infnet::ListIteratorNode* indri::infnet::ContextCountAccumulator::g
 }
 
 void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int documentLength ) {
-  double documentOccurrences; 
-  double documentContextSize;
+  double documentOccurrences = 0; 
+  double documentContextSize = 0;
 
    if( !_context ) {
      for( size_t i=0; i<_matches->extents().size(); i++ ) {

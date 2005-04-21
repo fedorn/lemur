@@ -108,7 +108,7 @@ void indri::infnet::TermFrequencyBeliefNode::indexChanged( indri::index::Index& 
 
     indri::index::TermData* termData = _list->termData();
 
-    UINT64 maxOccurrences = UINT64( ceil( double(termData->maxDocumentLength) * maximumFraction ) );
+    double maxOccurrences = ceil( double(termData->maxDocumentLength) * maximumFraction );
 
     _maximumScore = _function.scoreOccurrence( maxOccurrences, termData->maxDocumentLength );
     _maximumBackgroundScore = _function.scoreOccurrence( 0, termData->minDocumentLength );
