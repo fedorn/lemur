@@ -90,8 +90,8 @@ gb_dateline  [ ]新华社(..){1,5}{gb_ch_date}{2,3}[ ]|[ ]新华社(..){1,5}{gb_ch_dat
 "<DOC>"                             { CCpos += ChineseCharleng; return B_DOC; /*1*/}
 "</DOC>"                            { CCpos += ChineseCharleng; return E_DOC; /*2*/}
 "<DOCNO>"[^<]*"</DOCNO>"            { CCpos += ChineseCharleng; return F_DOCNO; /*3*/}
-"<TEXT>"                            { CCpos += ChineseCharleng; return B_TEXT; /*4*}
-"</TEXT>"                           { CCpos += ChineseCharleng; return E_TEXT; /*5*}
+"<TEXT>"                            { CCpos += ChineseCharleng; return B_TEXT; /*4*/}
+"</TEXT>"                           { CCpos += ChineseCharleng; return E_TEXT; /*5*/}
 "<HL>"                              { CCpos += ChineseCharleng; return B_TEXT;/*6*/}
 "</HL>"                             { CCpos += ChineseCharleng; return E_TEXT;/*7*/}
 "<HEAD>"                            { CCpos += ChineseCharleng; return B_TEXT;/*8*/}
