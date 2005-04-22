@@ -417,7 +417,7 @@ FreqCounter::getRandomMode() const {
 
 int 
 FreqCounter::getCtf(const char * word) const {
-  //we're not going to change w, but need it to work with map API
+  //we're not going to change w, but need it to work with map API
   char* w = const_cast<char*>(word);
   if (freqInfo.find(w) != freqInfo.end()) {
     const freqinfo_t fi = freqInfo[w];
@@ -428,7 +428,7 @@ FreqCounter::getCtf(const char * word) const {
 
 int
 FreqCounter::getDf(const char * word) const {
-  //we're not going to change w, but need it to work with map API
+  //we're not going to change w, but need it to work with map API
   char* w = const_cast<char*>(word);
   if (freqInfo.find(w) != freqInfo.end()) {
     const freqinfo_t fi = freqInfo[w];
@@ -440,7 +440,7 @@ FreqCounter::getDf(const char * word) const {
 // Return the average term frequency for a word
 double
 FreqCounter::getAveTf(const char * word) const {
-  //we're not going to change w, but need it to work with map API
+  //we're not going to change w, but need it to work with map API
   char* w = const_cast<char*>(word);
   if (freqInfo.find(w) != freqInfo.end()) {
     const freqinfo_t fi = freqInfo[w];
