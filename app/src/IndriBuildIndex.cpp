@@ -452,7 +452,7 @@ static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification
   }
   
   for (i1 = metadataForward.begin(); i1 != metadataForward.end(); i1++) {
-    if( std::find( spec->metadata.begin(), spec->metadata.end(), (*i1) ) == spec->index.end() ) {
+    if( std::find( spec->metadata.begin(), spec->metadata.end(), (*i1) ) == spec->metadata.end() ) {
       std::cerr << "Adding " << (*i1) << " to " << spec->name << " as a metadata field" << std::endl;
       spec->metadata.push_back(*i1);
       retval = true;
@@ -460,7 +460,7 @@ static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification
   }
 
   for (i1 = metadataBackward.begin(); i1 != metadataBackward.end(); i1++) {
-    if( std::find( spec->metadata.begin(), spec->metadata.end(), (*i1) ) == spec->index.end() ) {
+    if( std::find( spec->metadata.begin(), spec->metadata.end(), (*i1) ) == spec->metadata.end() ) {
       std::cerr << "Adding " << (*i1) << " to " << spec->name << " as a metadata field" << std::endl;
       spec->metadata.push_back(*i1);
       retval = true;
