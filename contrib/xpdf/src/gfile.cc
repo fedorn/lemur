@@ -26,6 +26,11 @@
 #  if defined(VMS) && (__DECCXX_VER < 50200000)
 #    include <unixlib.h>
 #  endif
+#  if HAVE_MKSTEMPS
+      extern "C" {
+        int mkstemps (char *, int);
+      }
+#  endif
 #endif // WIN32
 #include "GString.h"
 #include "gfile.h"

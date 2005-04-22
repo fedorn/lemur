@@ -32,6 +32,7 @@ case $host in
    *);;
 esac
 AC_CHECK_LIB(z, deflate)
+AC_CHECK_LIB(iberty, mkstemps)
 
 dnl Checks for header files.
 
@@ -41,7 +42,7 @@ AC_SYS_LARGEFILE
 
 dnl Checks for library functions.
 
-AC_CHECK_FUNCS(mkstemp mkstemps)
+AC_CHECK_FUNCS(mkstemp)
 
 dnl Finish up and output.
 AC_SUBST(MODULES)
