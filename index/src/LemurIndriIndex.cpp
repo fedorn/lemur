@@ -115,7 +115,6 @@ COUNT_T LemurIndriIndex::termCount() const {
 
 float LemurIndriIndex::docLengthAvg() const { 
   return (float)termCount()/(float)docCount(); 
-  return 0;
 }
 
 COUNT_T LemurIndriIndex::docCount(TERMID_T termID) const { 
