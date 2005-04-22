@@ -202,10 +202,14 @@ int indri::index::DiskIndex::documentBase() {
 // term
 //
 
-int indri::index::DiskIndex::term( const char* t ) {
+int indri::index::DiskIndex::term( const char* t ) 
+{
   indri::index::DiskTermData* diskTermData = _fetchTermData( t );
-  int termID = diskTermData->termID;
-  ::disktermdata_delete( diskTermData );
+  int termID = 0;
+  if( diskTermData ) {
+    termID = diskTermData->termID;
+    ::disktermdata_delete( diskTermData );
+  }
   return termID;
 }
 

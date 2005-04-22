@@ -20,6 +20,7 @@
 #include "IndriDocMgr.hpp"
 #include "indri/IndriTermInfoList.hpp"
 #include "indri/Index.hpp"
+#include "indri/Path.hpp"
 
 LemurIndriIndex::LemurIndriIndex() : _docMgr(NULL) {
   _repository = new indri::collection::Repository();
@@ -32,8 +33,11 @@ LemurIndriIndex::~LemurIndriIndex() {
 }
 
 bool LemurIndriIndex::open(const std::string& indexName) {
-  _repository->openRead( indexName, NULL );
-  _docMgr = new IndriDocMgr(*_repository, indexName);
+  // Have to remove the trailing ".ind" from the name.
+  //
+  std::string name = indri::file::Path::basename(indexName);
+  _repository->openRead( name, NULL );
+  _docMgr = new IndriDocMgr(*_repository, name);
   return true;
 }
 
