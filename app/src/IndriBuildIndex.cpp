@@ -422,49 +422,99 @@ static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, ind
   return true;
 }
 
+/*! Given a Specification and a field name, return a vector containing all
+ * of the field names that conflate to that name as well as the original
+ * name.
+ * @param spec The indri::parse::FileClassEnvironmentFactory::Specification to inspect.
+ * @param name The field name to look for.
+ * @return a vector containing all of the field names that conflate to that name as well as the original name.
+ */
+static std::vector<std::string> findConflations(indri::parse::FileClassEnvironmentFactory::Specification *spec, std::string & name) {
+  std::vector<std::string> retval;
+  // have to walk the map and add an entry for each
+  // conflation to a given name
+  std::map<std::string, std::string>::const_iterator iter;
+  for (iter = spec->conflations.begin(); 
+       iter != spec->conflations.end(); iter++) {
+    if( iter->second == name )
+      retval.push_back(iter->first);
+  }
+  // put the original into the list
+  retval.push_back(name);
+  return retval;
+}
+
+/*! Add a string to a vector if not already present.
+ * @return true if the string was added.
+ */
+static bool addNew(std::vector<std::string>& vec, string &name, 
+                   std::string &specName, const char *msg) {
+  bool retval = false;
+  if( std::find( vec.begin(), vec.end(), name ) == vec.end() ) {
+    std::cerr << "Adding " << name << " to " << specName << msg << std::endl;
+    vec.push_back(name);
+    retval = true;
+  }
+  return retval;
+}
+/*! Add field names to index or metadata for an existing file class 
+ * specification.
+ */
 static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification *spec,
-		                    std::vector<std::string>& fields,
-		                    std::vector<std::string>& metadataForward,
+                        std::vector<std::string>& fields,
+                        std::vector<std::string>& metadata,
+                        std::vector<std::string>& metadataForward,
                         std::vector<std::string>& metadataBackward ) {
   // add to index and metadata fields in spec if necessary. 
   // return true if a field is changed.
   bool retval = false;
-  
+  // input field names are potentially conflated names:
+  // eg headline for head, hl, or headline tags.
+  std::vector<std::string> conflations;
   std::vector<std::string>::iterator i1;
-  for (i1 = fields.begin(); i1 != fields.end(); i1++) {
-    // only add the field for indexing if it doesn't already exist
-    if( std::find( spec->index.begin(), spec->index.end(), (*i1) ) == spec->index.end() ) {
-      std::cerr << "Adding " << (*i1) << " to " << spec->name << " as an indexed field" << std::endl;
-      spec->index.push_back(*i1);
 
-      // added a field, make sure it is indexable
-      // only add include tags if there are some already.
-      // if it is empty, *all* tags are included.
-      if( !spec->include.empty() ) {
-        // only add the tag if it hasn't already been added
-        if( std::find( spec->include.begin(), spec->include.end(), (*i1) ) == spec->include.end() ) {
-          spec->include.push_back(*i1);
-          std::cerr << "Adding " << (*i1) << " to " << spec->name << " as an included tag" << std::endl;
+  for (i1 = fields.begin(); i1 != fields.end(); i1++) {
+    // find any conflated names
+    conflations = findConflations(spec, *i1);
+    for (int j = 0; j < conflations.size(); j++) {
+      // only add the field for indexing if it doesn't already exist
+      if (addNew(spec->index, conflations[j], 
+                 spec->name, " as an indexed field")) {
+        // added a field, make sure it is indexable
+        // only add include tags if there are some already.
+        // if it is empty, *all* tags are included.
+        if( !spec->include.empty() ) {
+          addNew(spec->include, conflations[j], spec->name,
+                 " as an included tag");
         }
+        retval = true;
       }
-      retval = true;
     }
   }
   
-  for (i1 = metadataForward.begin(); i1 != metadataForward.end(); i1++) {
-    if( std::find( spec->metadata.begin(), spec->metadata.end(), (*i1) ) == spec->metadata.end() ) {
-      std::cerr << "Adding " << (*i1) << " to " << spec->name << " as a metadata field" << std::endl;
-      spec->metadata.push_back(*i1);
-      retval = true;
-    }
+  // add fields that should be marked metadata for retrieval
+  for (i1 = metadata.begin(); i1 != metadata.end(); i1++) {
+    // find any conflated names
+    conflations = findConflations(spec, *i1);
+    for (int j = 0; j < conflations.size(); j++)
+      retval |= addNew(spec->metadata, conflations[j], spec->name,
+                       " as a metadata field");
   }
-
+  // add fields that should have a metadata forward lookup table.
+  for (i1 = metadataForward.begin(); i1 != metadataForward.end(); i1++) {
+    // find any conflated names
+    conflations = findConflations(spec, *i1);
+    for (int j = 0; j < conflations.size(); j++) 
+      retval |= addNew(spec->metadata, conflations[j], spec->name,
+                       " as a forward indexed metadata field");
+  }
+  // add fields that should have a metadata reverse lookup table.
   for (i1 = metadataBackward.begin(); i1 != metadataBackward.end(); i1++) {
-    if( std::find( spec->metadata.begin(), spec->metadata.end(), (*i1) ) == spec->metadata.end() ) {
-      std::cerr << "Adding " << (*i1) << " to " << spec->name << " as a metadata field" << std::endl;
-      spec->metadata.push_back(*i1);
-      retval = true;
-    }
+    // find any conflated names
+    conflations = findConflations(spec, *i1);
+    for (int j = 0; j < conflations.size(); j++) 
+      retval |= addNew(spec->metadata, conflations[j], spec->name,
+                       " as a forward indexed metadata field");
   }
 
   return retval;
@@ -502,13 +552,16 @@ int main(int argc, char * argv[]) {
     std::vector<std::string> stopwords;
     if( copy_parameters_to_string_vector( stopwords, parameters, "stopper.word" ) )
       env.setStopwords(stopwords);
-    
+    // fields to include as metadata (unindexed)
+    std::vector<std::string> metadata;
+    // metadata fields that should have a forward lookup table.
     std::vector<std::string> metadataForward;
+    // metadata fields that should have a backward lookup table.
     std::vector<std::string> metadataBackward;
-    
+    copy_parameters_to_string_vector( metadata, parameters, "metadata.field" ); 
     copy_parameters_to_string_vector( metadataForward, parameters, "metadata.forward" ); 
     copy_parameters_to_string_vector( metadataBackward, parameters, "metadata.backward" );
-      env.setMetadataIndexedFields( metadataForward, metadataBackward );
+    env.setMetadataIndexedFields( metadataForward, metadataBackward );
     
     std::vector<std::string> fields;
     std::string subName = "name";
@@ -536,7 +589,7 @@ int main(int argc, char * argv[]) {
         indri::parse::FileClassEnvironmentFactory::Specification *spec = env.getFileClassSpec(fileClass);
 	      if( spec ) {
           // add fields if necessary, only update if changed.
-          if( augmentSpec( spec, fields, metadataForward, metadataBackward ) ) 
+          if( augmentSpec( spec, fields, metadata, metadataForward, metadataBackward ) ) 
             env.addFileClass(*spec);
           delete(spec);
         }
