@@ -539,7 +539,8 @@ void indri::collection::CompressedCollection::addDocument( int documentID, indri
 
     metalookup = _reverseLookups.find( document->metadata[i].key );
 
-    if( metalookup ) {
+    // silently discard any value that is too long to be a key.
+    if( metalookup && document->metadata[i].valueLength < Keyfile::MAX_KEY_LENGTH ) {
       // there may be more than one reverse lookup here, so we fetch any old ones:
       indri::utility::greedy_vector<int> documentIDs;
       int dataSize = (*metalookup)->getSize( (const char*)document->metadata[i].value );
@@ -689,7 +690,9 @@ std::string indri::collection::CompressedCollection::retrieveMetadatum( int docu
   } else {
     l.unlock();
     indri::api::ParsedDocument* document = retrieve( documentID );
-
+    //This returns the first occurence, rather than the last
+    // one gets if a forward lookup table is used.
+    /*
     indri::utility::greedy_vector<indri::parse::MetadataPair>::iterator iter = std::find_if( document->metadata.begin(),
                                                               document->metadata.end(),
                                                               indri::parse::MetadataPair::key_equal( attributeName.c_str() ) );
@@ -697,7 +700,12 @@ std::string indri::collection::CompressedCollection::retrieveMetadatum( int docu
     if( iter != document->metadata.end() ) {
       result = (char*) iter->value;
     }
-
+    */
+    indri::utility::greedy_vector<indri::parse::MetadataPair>::iterator iter;
+    for( iter=document->metadata.begin(); iter !=  document->metadata.end();
+         iter++ ) 
+      if(!strcmp((*iter).key, attributeName.c_str() ) )
+        result = (char*) iter->value;
     delete document;
   }
 
