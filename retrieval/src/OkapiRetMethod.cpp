@@ -15,7 +15,7 @@
 
 
 // initial query constructor, no feedback docs assumed
-OkapiQueryRep::OkapiQueryRep(const TermQuery &qry, const Index &dbIndex, double paramK3): ArrayQueryRep(dbIndex.termCountUnique()+1, qry, dbIndex), k3(paramK3) {
+lemur::retrieval::OkapiQueryRep::OkapiQueryRep(const lemur::api::TermQuery &qry, const lemur::api::Index &dbIndex, double paramK3): ArrayQueryRep(dbIndex.termCountUnique()+1, qry, dbIndex), k3(paramK3) {
   pEst = new int[dbIndex.termCountUnique()+1];
   for (int i=0; i<=dbIndex.termCountUnique(); i++) {
     pEst[i] = 0;
@@ -25,10 +25,10 @@ OkapiQueryRep::OkapiQueryRep(const TermQuery &qry, const Index &dbIndex, double 
 
 
 
-double OkapiScoreFunc::matchedTermWeight(const QueryTerm *qTerm, 
-					 const TextQueryRep *qRep, 
-					 const DocInfo *info, 
-					 const DocumentRep *dRep) const
+double lemur::retrieval::OkapiScoreFunc::matchedTermWeight(const lemur::api::QueryTerm *qTerm, 
+					 const lemur::api::TextQueryRep *qRep, 
+					 const lemur::api::DocInfo *info, 
+					 const lemur::api::DocumentRep *dRep) const
 {
   const OkapiQueryTerm * qt;
   qt = dynamic_cast<const OkapiQueryTerm *> (qTerm);
@@ -44,8 +44,8 @@ double OkapiScoreFunc::matchedTermWeight(const QueryTerm *qTerm,
 }
 
 
-OkapiRetMethod::OkapiRetMethod(const Index &dbIndex, ScoreAccumulator &accumulator):
-  TextQueryRetMethod(dbIndex, accumulator)
+lemur::retrieval::OkapiRetMethod::OkapiRetMethod(const lemur::api::Index &dbIndex, lemur::api::ScoreAccumulator &accumulator):
+  lemur::api::TextQueryRetMethod(dbIndex, accumulator)
 {
   scFunc = new OkapiScoreFunc(dbIndex);
 
@@ -59,14 +59,14 @@ OkapiRetMethod::OkapiRetMethod(const Index &dbIndex, ScoreAccumulator &accumulat
 
 
 
-void OkapiRetMethod::updateTextQuery(TextQueryRep &origRep, const DocIDSet &relDocs)
+void lemur::retrieval::OkapiRetMethod::updateTextQuery(lemur::api::TextQueryRep &origRep, const lemur::api::DocIDSet &relDocs)
 {
   
-  COUNT_T totalTerm=ind.termCountUnique();  
+  lemur::api::COUNT_T totalTerm=ind.termCountUnique();  
   int * relCounts = new int[totalTerm+1];
 
 
-  TERMID_T i;
+  lemur::api::TERMID_T i;
   for (i=1;i<=totalTerm;i++) {
     relCounts[i]=0;
   }
@@ -79,16 +79,16 @@ void OkapiRetMethod::updateTextQuery(TextQueryRep &origRep, const DocIDSet &relD
     double relPr;
     relDocs.nextIDInfo(docID, relPr);
     actualDocs++;
-    TermInfoList *tList = ind.termInfoList(docID);
+    lemur::api::TermInfoList *tList = ind.termInfoList(docID);
     tList->startIteration();
     while (tList->hasMore()) {
-      TermInfo *info = tList->nextEntry();
+      lemur::api::TermInfo *info = tList->nextEntry();
       relCounts[info->termID()]++;
     }
     delete tList;
   }
 
-  IndexedRealVector weightedTerms(0);
+  lemur::api::IndexedRealVector weightedTerms(0);
   weightedTerms.clear();
 
   // adjust term weight for term selection
@@ -106,8 +106,8 @@ void OkapiRetMethod::updateTextQuery(TextQueryRep &origRep, const DocIDSet &relD
 
   qr->setPNormCount(actualDocs);
   weightedTerms.Sort();
-  IndexedRealVector::iterator j;
-  COUNT_T termCount=0;
+  lemur::api::IndexedRealVector::iterator j;
+  lemur::api::COUNT_T termCount=0;
   for (j= weightedTerms.begin();j!=weightedTerms.end();j++) {
     if (termCount++ >= fbParam.howManyTerms) {
       break;

@@ -11,7 +11,7 @@
 
 #include "IndriTextHandler.hpp"
 
-IndriTextHandler::IndriTextHandler(const string &name, int memory, const Parser* p): parser(p) {
+lemur::parse::IndriTextHandler::IndriTextHandler(const string &name, int memory, const lemur::api::Parser* p): parser(p) {
   bufsize = 0;
   char* docsource = NULL;
   env.setMemory(memory);
@@ -25,14 +25,14 @@ IndriTextHandler::IndriTextHandler(const string &name, int memory, const Parser*
   docid.key = DOCIDKEY;
 }
 
-IndriTextHandler::~IndriTextHandler() {
+lemur::parse::IndriTextHandler::~IndriTextHandler() {
   if (bufsize > 0)
     delete[]docsource;
   env.close();
   free(curdocno);
 }
 
-char* IndriTextHandler::handleDoc(char * docno) {
+char* lemur::parse::IndriTextHandler::handleDoc(char * docno) {
   docbegin = parser->getDocBytePos();
   // stuff document id
 
@@ -47,7 +47,7 @@ char* IndriTextHandler::handleDoc(char * docno) {
   return docno;
 }
 
-char * IndriTextHandler::handleWord(char * word, const char* original, PropertyList* list){
+char * lemur::parse::IndriTextHandler::handleWord(char * word, const char* original, PropertyList* list){
   if (word) {
     char* wordcopy = strdup(word);
     document.terms.push_back(wordcopy);
@@ -59,7 +59,7 @@ char * IndriTextHandler::handleWord(char * word, const char* original, PropertyL
   return word;
 }
 
-char* IndriTextHandler::handleBeginTag(char* tag, const char* orig, PropertyList* props){
+char* lemur::parse::IndriTextHandler::handleBeginTag(char* tag, const char* orig, PropertyList* props){
   const Property* prop = NULL;
   prop = props->getProperty("B_ELEM");
   if (prop) {
@@ -69,7 +69,7 @@ char* IndriTextHandler::handleBeginTag(char* tag, const char* orig, PropertyList
   return tag;
 }
 
-char* IndriTextHandler::handleEndTag(char* tag, const char* orig, PropertyList* props){
+char* lemur::parse::IndriTextHandler::handleEndTag(char* tag, const char* orig, PropertyList* props){
   const Property* prop = NULL;
   prop = props->getProperty("E_ELEM");
   if (prop) {
@@ -80,7 +80,7 @@ char* IndriTextHandler::handleEndTag(char* tag, const char* orig, PropertyList* 
   return tag;
 }
 
-void IndriTextHandler::handleEndDoc() {
+void lemur::parse::IndriTextHandler::handleEndDoc() {
   // make sure we have enough buffer room
   int textsize = parser->fileTell()-docbegin;
   if (bufsize < textsize+1) {

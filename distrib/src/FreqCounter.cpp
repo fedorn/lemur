@@ -1,5 +1,3 @@
-
-
 /*==========================================================================
  * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
@@ -24,9 +22,10 @@
 #endif
 #include <cctype>
 
+using namespace lemur::api;
 
 
-FreqCounter::FreqCounter(const Stopper * stopWords) {
+lemur::distrib::FreqCounter::FreqCounter(const Stopper * stopWords) {
   stopper = stopWords;
 
   // Set defaults
@@ -39,7 +38,7 @@ FreqCounter::FreqCounter(const Stopper * stopWords) {
   name = "";
 }
 
-FreqCounter::FreqCounter(const string &filename, const Stopper * stopWords) {
+lemur::distrib::FreqCounter::FreqCounter(const string &filename, const Stopper * stopWords) {
   stopper = stopWords;
 
   // Set defaults
@@ -55,7 +54,7 @@ FreqCounter::FreqCounter(const string &filename, const Stopper * stopWords) {
   input(filename);
 }
 
-FreqCounter::~FreqCounter() {
+lemur::distrib::FreqCounter::~FreqCounter() {
   // Free memory
   freqmap::iterator curr = freqInfo.begin();
   while (curr != freqInfo.end()) {
@@ -65,7 +64,7 @@ FreqCounter::~FreqCounter() {
 }
 
 void
-FreqCounter::clear() {
+lemur::distrib::FreqCounter::clear() {
 
   // Empty containers
   randdone.clear();
@@ -88,7 +87,7 @@ FreqCounter::clear() {
 }
 
 char * 
-FreqCounter::handleWord(char * word) {
+lemur::distrib::FreqCounter::handleWord(char * word) {
   char * oword = word;
   if (word != NULL) {
     if (stopper == NULL || !stopper->stopWord(word)) {
@@ -121,21 +120,21 @@ FreqCounter::handleWord(char * word) {
 }
 
 char * 
-FreqCounter::handleDoc(char * docno) {
+lemur::distrib::FreqCounter::handleDoc(char * docno) {
   endDoc();
   return docno;
 }
 
 void
-FreqCounter::endDoc() {
+lemur::distrib::FreqCounter::endDoc() {
   // Update the document frequencies.
 
   // Iterate over terms in the document.
   stringset::iterator curr = doc.begin();
   while (curr != doc.end()) {
-//      if (freqInfo.find(*curr) == freqInfo.end()) {
-//        cerr << "Word not found: " << *curr << endl;
-//      }
+    //      if (freqInfo.find(*curr) == freqInfo.end()) {
+    //        cerr << "Word not found: " << *curr << endl;
+    //      }
     // Up the document frequency for the word.
     freqInfo[*curr].df++;
     dfTot += 1;
@@ -151,7 +150,7 @@ FreqCounter::endDoc() {
 
 
 void 
-FreqCounter::input(const string &filename) {
+lemur::distrib::FreqCounter::input(const string &filename) {
   char word[5000];
   int ctfc;
   int dfc;
@@ -194,7 +193,7 @@ FreqCounter::input(const string &filename) {
 
 // Output counts to file.
 void
-FreqCounter::output(const string &filename) const {
+lemur::distrib::FreqCounter::output(const string &filename) const {
   ofstream outfile(filename.c_str());
   // Iterate over terms in the freqInfo map
   freqmap::const_iterator curr = freqInfo.begin();
@@ -214,7 +213,7 @@ FreqCounter::output(const string &filename) const {
 
 // Select a random word.
 char *
-FreqCounter::randomWord() {
+lemur::distrib::FreqCounter::randomWord() {
   char * w;
 
   // Find a random word given the random word selection mode.
@@ -241,7 +240,7 @@ FreqCounter::randomWord() {
 }
 
 char *
-FreqCounter::randomCtf() const {
+lemur::distrib::FreqCounter::randomCtf() const {
   // Random number from 1 to collection term frequencies total
   int n = (rand() % ctfTot) + 1;
   int i = 0;
@@ -257,7 +256,7 @@ FreqCounter::randomCtf() const {
 }
 
 char *
-FreqCounter::randomDf() const {
+lemur::distrib::FreqCounter::randomDf() const {
   // Random number from 1 to document frequencies total
   int n = (rand() % dfTot) + 1;
   int i = 0;
@@ -273,7 +272,7 @@ FreqCounter::randomDf() const {
 }
 
 char *
-FreqCounter::randomAveTf() const {
+lemur::distrib::FreqCounter::randomAveTf() const {
   if (atfValid == false) {
     // Recompute avetfTot
     avetfTot = 0;
@@ -301,7 +300,7 @@ FreqCounter::randomAveTf() const {
 }
 
 char *
-FreqCounter::randomUniform() const {
+lemur::distrib::FreqCounter::randomUniform() const {
   // Random number between 1 and number of unique words
   int n = (rand() % nWords) + 1;
   int i = 0;
@@ -319,7 +318,7 @@ FreqCounter::randomUniform() const {
 // Compute the collection term frequecy ratio of two LMs.
 // This model is the reference model.
 double
-FreqCounter::ctfRatio(FreqCounter & lm) const {
+lemur::distrib::FreqCounter::ctfRatio(FreqCounter & lm) const {
   double ctfSum = 0.0;
   double ctfTot2 = 0.0;
   freqmap::const_iterator curr = freqInfo.begin();
@@ -332,23 +331,29 @@ FreqCounter::ctfRatio(FreqCounter & lm) const {
   }
   return (ctfSum / (double) ctfTot2);
 }
-
-// Used by pruneBottomWords - stores a set ordered
-// by ctf then word.
-struct ltctf
+namespace lemur
 {
-  bool operator()(freqinfo_t f1, freqinfo_t f2) const{
-    if (f1.ctf == f2.ctf) 
-      return strcmp(f2.word, f1.word) < 0;
-    return (f1.ctf - f2.ctf) < 0;
+  namespace distrib
+  {
+    
+    // Used by pruneBottomWords - stores a set ordered
+    // by ctf then word.
+    struct ltctf
+    {
+      bool operator()(freqinfo_t f1, freqinfo_t f2) const{
+        if (f1.ctf == f2.ctf) 
+          return strcmp(f2.word, f1.word) < 0;
+        return (f1.ctf - f2.ctf) < 0;
+      }
+    };
+    typedef set<freqinfo_t, ltctf> ctfset;
   }
-};
-typedef set<freqinfo_t, ltctf> ctfset;
+}
 
 
 // Remove all but the most frequent numTopWords words.
 void
-FreqCounter::pruneBottomWords(int numTopWords) {
+lemur::distrib::FreqCounter::pruneBottomWords(int numTopWords) {
   freqmap::iterator curr = freqInfo.begin();
   int nw = 1;
   ctfset topWords;
@@ -387,23 +392,23 @@ FreqCounter::pruneBottomWords(int numTopWords) {
 //------ Get and set functions below. ------
  
 void
-FreqCounter::setName(const string &freqCounterName) {
+lemur::distrib::FreqCounter::setName(const string &freqCounterName) {
   name = freqCounterName;
 }
 
 const string &
-FreqCounter::getName() const {
+lemur::distrib::FreqCounter::getName() const {
   return name;
 }
 
 
-const freqmap *
-FreqCounter::getFreqInfo() const {
+const lemur::distrib::freqmap *
+lemur::distrib::FreqCounter::getFreqInfo() const {
   return &freqInfo;
 }
 
 void 
-FreqCounter::setRandomMode(int mode) {
+lemur::distrib::FreqCounter::setRandomMode(int mode) {
   // only change the mode if it is in the right range 
   if (mode <= R_UNIFORM && mode >= R_CTF) {
     randomMode = mode;
@@ -411,12 +416,12 @@ FreqCounter::setRandomMode(int mode) {
 }
 
 int
-FreqCounter::getRandomMode() const {
+lemur::distrib::FreqCounter::getRandomMode() const {
   return randomMode;
 }
 
 int 
-FreqCounter::getCtf(const char * word) const {
+lemur::distrib::FreqCounter::getCtf(const char * word) const {
   //we're not going to change w, but need it to work with map API
   char* w = const_cast<char*>(word);
   if (freqInfo.find(w) != freqInfo.end()) {
@@ -427,7 +432,7 @@ FreqCounter::getCtf(const char * word) const {
 }
 
 int
-FreqCounter::getDf(const char * word) const {
+lemur::distrib::FreqCounter::getDf(const char * word) const {
   //we're not going to change w, but need it to work with map API
   char* w = const_cast<char*>(word);
   if (freqInfo.find(w) != freqInfo.end()) {
@@ -439,7 +444,7 @@ FreqCounter::getDf(const char * word) const {
 
 // Return the average term frequency for a word
 double
-FreqCounter::getAveTf(const char * word) const {
+lemur::distrib::FreqCounter::getAveTf(const char * word) const {
   //we're not going to change w, but need it to work with map API
   char* w = const_cast<char*>(word);
   if (freqInfo.find(w) != freqInfo.end()) {
@@ -452,12 +457,12 @@ FreqCounter::getAveTf(const char * word) const {
 
 // Return number of unique words.
 int 
-FreqCounter::numWords() const {
+lemur::distrib::FreqCounter::numWords() const {
   return nWords;
 }
 
 // Return total count of words.
 int 
-FreqCounter::totWords() const {
+lemur::distrib::FreqCounter::totWords() const {
   return ctfTot;
 }

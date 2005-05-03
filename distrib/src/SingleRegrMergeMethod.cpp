@@ -15,17 +15,18 @@
 //typedef map<char *, double, ltstr> docsidmap;
 typedef map<string, double, less<string> > docsidmap;
 
+using namespace lemur::api;
 
-SingleRegrMergeMethod::SingleRegrMergeMethod(double constA, double constB) {
+lemur::distrib::SingleRegrMergeMethod::SingleRegrMergeMethod(double constA, double constB) {
   parama = constA;
   paramb = constB;
 }
 
-SingleRegrMergeMethod::~SingleRegrMergeMethod() {
+lemur::distrib::SingleRegrMergeMethod::~SingleRegrMergeMethod() {
 }
 
 /// Calculate the final comparable document score
-double SingleRegrMergeMethod::score(double dbscore, double docscore) const {
+double lemur::distrib::SingleRegrMergeMethod::score(double dbscore, double docscore) const {
   return parama * docscore + paramb * dbscore * docscore;
 }
 
@@ -33,7 +34,7 @@ double SingleRegrMergeMethod::score(double dbscore, double docscore) const {
 /// indexset are the database scores for selected databases
 /// centralsocres are the central documents scores retrieved by centralized sampling database
 /// scoresset are the distributed documents scores retrieved by individual databases
-void SingleRegrMergeMethod::calcRegrParams(const IndexedRealVector &indexset, 
+void lemur::distrib::SingleRegrMergeMethod::calcRegrParams(const IndexedRealVector &indexset, 
 					   const DocScoreVector* centralscores, 
 					   const DocScoreVector* const* scoresset) {
   const DocScoreVector* docscores;

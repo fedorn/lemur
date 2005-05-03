@@ -163,8 +163,8 @@ So, a rule that does not specify a field matches all fields.  This makes
 <dl>
 <dt>   method</dt><dd> smoothing method (text)</dd>
 <dt>   field</dt><dd> field to apply this rule to</dd>
-<dt>   operator&nbsp;</dt> <dd> type of item in query to apply to { term,
-window }</dd>
+<dt>   operator
+<dd> type of item in query to apply to { term, window }</dd>
 </dl>
 
 <p>Valid methods:
@@ -621,7 +621,7 @@ int main(int argc, char * argv[]) {
     buildindex_print_event( "Closing index" );
     env.close();
     buildindex_print_event( "Finished" );
-  } catch( Exception& e ) {
+  } catch( lemur::api::Exception& e ) {
     LEMUR_ABORT(e);
   }
 

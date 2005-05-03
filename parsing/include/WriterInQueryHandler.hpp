@@ -7,49 +7,55 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
+
+#ifndef _WRITERINQUERYHANDLER_HPP
+#define _WRITERINQUERYHANDLER_HPP
 #include "TextHandler.hpp"
 
 #include <fstream>
 #include "common_headers.hpp"
-
-#ifndef _WRITERINQUERYHANDLER_HPP
-#define _WRITERINQUERYHANDLER_HPP
-
-///
-///  Outputs structured query text in a format that can be used by 
-///  StructQueryEval.
-///  This class is a destination TextHandler.
-///
-///
-
-
-class WriterInQueryHandler : public TextHandler {
-
-public:
-
-  /// Create and set the file to write to.
-  WriterInQueryHandler(const string &filename);
-  ~WriterInQueryHandler();
-
-  /// Begin a doc.
-  char * handleDoc(char * docno);
-  /// Add a word to the doc.
-  char * handleWord(char * word);
-  /// Add a word to the doc.
-  char * handleSymbol(char * sym);
+namespace lemur 
+{
+  namespace parse 
+  {
+    
+    ///
+    ///  Outputs structured query text in a format that can be used by 
+    ///  StructQueryEval.
+    ///  This class is a destination TextHandler.
+    ///
+    ///
 
 
-private:
-  /// end a document
-  void endDoc();
+    class WriterInQueryHandler : public lemur::api::TextHandler {
 
-  /// First doc?
-  bool first;
+    public:
 
-  /// Output file.
-  ofstream * outfile;
-};
+      /// Create and set the file to write to.
+      WriterInQueryHandler(const string &filename);
+      ~WriterInQueryHandler();
+
+      /// Begin a doc.
+      char * handleDoc(char * docno);
+      /// Add a word to the doc.
+      char * handleWord(char * word);
+      /// Add a word to the doc.
+      char * handleSymbol(char * sym);
+
+
+    private:
+      /// end a document
+      void endDoc();
+
+      /// First doc?
+      bool first;
+
+      /// Output file.
+      ofstream * outfile;
+    };
+  }
+}
 
 #endif

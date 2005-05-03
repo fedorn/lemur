@@ -11,10 +11,10 @@
 #include "IndexedReal.hpp"
 #include <cmath>
 
-IndexedRealVector::IndexedRealAscending IndexedRealVector::ascendOrder;
-IndexedRealVector::IndexedRealDescending IndexedRealVector::descendOrder;
+lemur::api::IndexedRealVector::IndexedRealAscending lemur::api::IndexedRealVector::ascendOrder;
+lemur::api::IndexedRealVector::IndexedRealDescending lemur::api::IndexedRealVector::descendOrder;
 
-void IndexedRealVector::Sort(bool descending)
+void lemur::api::IndexedRealVector::Sort(bool descending)
 {
   if (descending) {
     sort(this->begin(), this->end(), descendOrder);
@@ -23,7 +23,7 @@ void IndexedRealVector::Sort(bool descending)
   }
 }
 
-void IndexedRealVector::NormalizeValues()
+void lemur::api::IndexedRealVector::NormalizeValues()
 {
   iterator it = begin();
   double sum=0;
@@ -38,7 +38,7 @@ void IndexedRealVector::NormalizeValues()
   }
 }
 
-void IndexedRealVector::LogToPosterior()
+void lemur::api::IndexedRealVector::LogToPosterior()
 {
 // In:  log(x1) log(x2) ... log(xN) 
 // Out: x1/sum, x2/sum, ... xN/sum
@@ -71,7 +71,7 @@ void IndexedRealVector::LogToPosterior()
 }
 
 
-IndexedRealVector::iterator IndexedRealVector::FindByIndex(int index)
+lemur::api::IndexedRealVector::iterator lemur::api::IndexedRealVector::FindByIndex(int index)
 {
   iterator it = begin();
   while (it != end() && (*it).ind != index) {
@@ -80,7 +80,7 @@ IndexedRealVector::iterator IndexedRealVector::FindByIndex(int index)
   return  it;
 }
 
-bool IndexedRealVector::IncreaseValueFor(int index, double value)
+bool lemur::api::IndexedRealVector::IncreaseValueFor(int index, double value)
 {
   iterator it = FindByIndex(index);
   if (it == end()) {
@@ -96,7 +96,7 @@ bool IndexedRealVector::IncreaseValueFor(int index, double value)
 }
 
 
-void IndexedRealVector::PushValue(int index, double value)
+void lemur::api::IndexedRealVector::PushValue(int index, double value)
 {
   IndexedReal entry;
   entry.ind = index;

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _ARABICSTEMMER_HPP
 #define _ARABICSTEMMER_HPP
@@ -18,39 +18,45 @@ namespace ArabicStemmerParameter {
   /// @name Arabic Stemmer parameters
   //@{ 
   /// stem function to use.
-  static String stemFunc;
+  static lemur::utility::String stemFunc;
   /// path to stemmer data files.
-  static String stemDir;
+  static lemur::utility::String stemDir;
   //@}
   /// default location of stemmer data files "/usr/local/lemur/arabic_stem_data"
-  static String defaultStemDir("/usr/local/lemur/arabic_stem_data");
+  static lemur::utility::String defaultStemDir("/usr/local/lemur/arabic_stem_data");
   /// default stem function to use "arabic_light10_stop"
-  static String defaultStemFunc("arabic_light10_stop");
+  static lemur::utility::String defaultStemFunc("arabic_light10_stop");
   /// get the parameters
   static void get()
   {
-    stemFunc = ParamGetString("arabicStemFunc", defaultStemFunc);
-    stemDir =  ParamGetString("arabicStemDir", defaultStemDir);
+    stemFunc = lemur::api::ParamGetString("arabicStemFunc", defaultStemFunc);
+    stemDir =  lemur::api::ParamGetString("arabicStemDir", defaultStemDir);
   }
 }
-  
-///  Provides a wrapper to the Arabic stemmer
-///  that supports the Stemmer interface, and by
-///  inheritance, the TextHandler interface.
-class ArabicStemmer : public Stemmer {
-public:
-  static const string identifier;
+namespace lemur
+{
+  namespace parse
+  {
+    
+    ///  Provides a wrapper to the Arabic stemmer
+    ///  that supports the Stemmer interface, and by
+    ///  inheritance, the TextHandler interface.
+    class ArabicStemmer : public lemur::api::Stemmer {
+    public:
+      static const string identifier;
 
-  ArabicStemmer(const string &stemDir=ArabicStemmerParameter::defaultStemDir, 
-		const string &stemmer=ArabicStemmerParameter::defaultStemFunc);
-  ~ArabicStemmer();
-  /// Stem a word using an Arabic stemmer.
-  char * stemWord(char * word);
-  void writePropertyList(PropertyList* list) const;
-private:
-  /// pointer to selected stemmer function.
-  void (*stem_fct)(char *, char *);
-  string stemfunc;
-};
+      ArabicStemmer(const string &stemDir=ArabicStemmerParameter::defaultStemDir, 
+                    const string &stemmer=ArabicStemmerParameter::defaultStemFunc);
+      ~ArabicStemmer();
+      /// Stem a word using an Arabic stemmer.
+      char * stemWord(char * word);
+      void writePropertyList(PropertyList* list) const;
+    private:
+      /// pointer to selected stemmer function.
+      void (*stem_fct)(char *, char *);
+      string stemfunc;
+    };
+  }
+}
 
 #endif

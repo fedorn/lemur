@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #ifndef _INQARABICPARSER_HPP
@@ -15,50 +15,56 @@
 #define NESTING_LIMIT 20
 #include "Parser.hpp"
 #include "TextHandler.hpp"
+namespace lemur 
+{
+  namespace parse 
+  {
+    
+    class InqArabicParser : public lemur::api::Parser {
 
-class InqArabicParser : public Parser {
+    public:
+      static const string identifier;
 
-public:
-  static const string identifier;
+      InqArabicParser();
 
-  InqArabicParser();
+      /// Parse a file.
+      void parseFile (const string &filename);
 
-  /// Parse a file.
-  void parseFile (const string &filename);
+      /// Parse a buffer of len length
+      void parseBuffer (char * buf, int len);
 
-  /// Parse a buffer of len length
-  void parseBuffer (char * buf, int len);
+      /// Gives current byte position offset into file being parsed.
+      /// Don't use with parseBuffer
+      long fileTell() const;
+      /// The workhorse.
+      void doParse();
+      /// parse nested query nodes until the next enclosing RIGHT_PAREN
+      void finishing_nesting_qnote(int top);
+      /// parse nested proximity query nodes until the next enclosing RIGHT_PAREN
+      void finishing_prox_qnote(int top);
+      /// begin parsing nested query nodes
+      void parseNestingOp(char *op);
+      /// parse proximity operator node
+      void parseProxOp(char *op, char *size);
+      /// parse passage operator node
+      void parsePassageOp(char *op, char *size);
+      /// parse synonym operator node
+      void parseSynOp(char *op);
+      /// parse property operator node
+      void parsePropOp(char *op);
+      /// parse term node
+      void parseTermOp(char *op);
+      /// parse query node
+      void parseQryNode(int tok);
+      /// parse proximity query node
+      void parseProxNode(int tok);
 
-  /// Gives current byte position offset into file being parsed.
-  /// Don't use with parseBuffer
-  long fileTell() const;
-  /// The workhorse.
-  void doParse();
-  /// parse nested query nodes until the next enclosing RIGHT_PAREN
-  void finishing_nesting_qnote(int top);
-  /// parse nested proximity query nodes until the next enclosing RIGHT_PAREN
-  void finishing_prox_qnote(int top);
-  /// begin parsing nested query nodes
-  void parseNestingOp(char *op);
-  /// parse proximity operator node
-  void parseProxOp(char *op, char *size);
-  /// parse passage operator node
-  void parsePassageOp(char *op, char *size);
-  /// parse synonym operator node
-  void parseSynOp(char *op);
-  /// parse property operator node
-  void parsePropOp(char *op);
-  /// parse term node
-  void parseTermOp(char *op);
-  /// parse query node
-  void parseQryNode(int tok);
-  /// parse proximity query node
-  void parseProxNode(int tok);
+    private:
 
-private:
-
-  /// The state of the parser.
-  int state;
-};
+      /// The state of the parser.
+      int state;
+    };
+  }
+}
 
 #endif

@@ -166,7 +166,7 @@ void indri::net::NetworkServerStub::_handleDocumentIDsFromMetadata( indri::xml::
 
   _decodeMetadataRequest( request, attributeName, attributeValues );
   documentIDresponse = _server->documentIDsFromMetadata( attributeName, attributeValues );
-  const std::vector<DOCID_T>& documentIDs = documentIDresponse->getResults();
+  const std::vector<lemur::api::DOCID_T>& documentIDs = documentIDresponse->getResults();
   indri::xml::XMLNode* response = new indri::xml::XMLNode( "documentIDs" );
 
   for( size_t i=0; i<documentIDs.size(); i++ ) {
@@ -405,7 +405,7 @@ void indri::net::NetworkServerStub::request( indri::xml::XMLNode* input ) {
     } else {
       _stream->error( std::string() + "Unknown XML message type: " + input->getName() );
     }
-  } catch( Exception& e ) {
+  } catch( lemur::api::Exception& e ) {
     _stream->error( e.what() );
   } catch( ... ) {
     _stream->error( "Caught unknown exception while processing request" );

@@ -123,16 +123,16 @@ gb_dateline  [ ]新华社(..){1,5}{gb_ch_date}{2,3}[ ]|[ ]新华社(..){1,5}{gb_ch_dat
 #define DOC 1
 #define TEXT 9
 
-ChineseCharParser::ChineseCharParser() {
+lemur::parse::ChineseCharParser::ChineseCharParser() {
   state = OUTER;
   iden = identifier;
 }
 
-long ChineseCharParser::fileTell() const {
+long lemur::parse::ChineseCharParser::fileTell() const {
   return CCpos;
 }
 
-void ChineseCharParser::parseFile(const string &filename) {  
+void lemur::parse::ChineseCharParser::parseFile(const string &filename) {  
   parsefile = filename;
   CCpos = 0;
   ChineseCharin = fopen(filename.c_str(), "rb");
@@ -140,7 +140,7 @@ void ChineseCharParser::parseFile(const string &filename) {
   fclose(ChineseCharin);
 }
 
-void ChineseCharParser::parseBuffer(char* buf, int len) {
+void lemur::parse::ChineseCharParser::parseBuffer(char* buf, int len) {
   int tpos = CCpos;
   CCpos = 0;
   YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
@@ -152,7 +152,7 @@ void ChineseCharParser::parseBuffer(char* buf, int len) {
 }
 
 
-void ChineseCharParser::doParse() {
+void lemur::parse::ChineseCharParser::doParse() {
   int tok;
   // The core loop of the parser.
   // The parser is state based.  Encountering a tag

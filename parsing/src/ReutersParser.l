@@ -74,19 +74,19 @@ long reuterspos;
 #define DOC 1
 #define TEXT 9
 
-ReutersParser::ReutersParser() {
+lemur::parse::ReutersParser::ReutersParser() {
   state = OUTER;
   iden = identifier;
 }
 
 
 
-long ReutersParser::fileTell() const {
+long lemur::parse::ReutersParser::fileTell() const {
   return reuterspos;
 }
 
 void 
-ReutersParser::parseFile(const string &filename) {
+lemur::parse::ReutersParser::parseFile(const string &filename) {
   parsefile = filename;
   reuterspos = 0;
   reutersin = fopen(filename.c_str(), "rb");
@@ -95,7 +95,7 @@ ReutersParser::parseFile(const string &filename) {
 
 }
 
-void ReutersParser::parseBuffer(char* buf, int len) {
+void lemur::parse::ReutersParser::parseBuffer(char* buf, int len) {
   int tpos = reuterspos;
   reuterspos = 0;
   YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
@@ -106,7 +106,7 @@ void ReutersParser::parseBuffer(char* buf, int len) {
   reuterspos = tpos;
 }
 
-void ReutersParser::doParse() {
+void lemur::parse::ReutersParser::doParse() {
   
   int tok;
   // The core loop of the parser.

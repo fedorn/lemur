@@ -7,47 +7,53 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
-#include "Parser.hpp"
-#include "TextHandler.hpp"
 
 #ifndef _REUTERSPARSER_HPP
 #define _REUTERSPARSER_HPP
+#include "Parser.hpp"
+#include "TextHandler.hpp"
+namespace lemur 
+{
+  namespace parse 
+  {
+    
+    ///
+    ///  Parses documents in TREC format.  Does case folding
+    ///  for words that are not in the acronym list.  Contraction suffixes 
+    ///  and possessive suffixes are stripped.  
+    ///
+    ///  U.S.A., USA's, and USAs are converted to USA.  Does not recognize
+    ///  acronyms with numbers.
+    ///
+    ///  The following fields are parsed: text, headline, title
+    ///  
+    ///
 
-///
-///  Parses documents in TREC format.  Does case folding
-///  for words that are not in the acronym list.  Contraction suffixes 
-///  and possessive suffixes are stripped.  
-///
-///  U.S.A., USA's, and USAs are converted to USA.  Does not recognize
-///  acronyms with numbers.
-///
-///  The following fields are parsed: text, headline, title
-///  
-///
+    // Source code in reutersparser.lex
 
-// Source code in reutersparser.lex
+    class ReutersParser : public lemur::api::Parser {
 
-class ReutersParser : public Parser {
+    public:
+      static const string identifier;
 
-public:
-  static const string identifier;
+      ReutersParser();
 
-  ReutersParser();
-
-  /// Parse a file.
-  void parseFile (const string &filename);
-  void parseBuffer (char * buf, int len);
-  long fileTell()const;
+      /// Parse a file.
+      void parseFile (const string &filename);
+      void parseBuffer (char * buf, int len);
+      long fileTell()const;
  
-private:
-  /// Actual parsing action flow
-  void doParse();
+    private:
+      /// Actual parsing action flow
+      void doParse();
 
-  /// The state of the parser.
-  int state;
+      /// The state of the parser.
+      int state;
 
-};
+    };
+  }
+}
 
 #endif

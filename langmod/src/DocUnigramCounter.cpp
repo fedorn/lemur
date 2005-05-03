@@ -13,27 +13,22 @@
 #include "DocUnigramCounter.hpp"
 
 
-DocUnigramCounter::DocUnigramCounter(DOCID_T docID, const Index &homeIndex)
-  : ind(homeIndex), ArrayCounter<int>(homeIndex.termCountUnique()+1) 
+lemur::langmod::DocUnigramCounter::DocUnigramCounter(lemur::api::DOCID_T docID, const lemur::api::Index &homeIndex)
+  : ind(homeIndex), lemur::utility::ArrayCounter<int>(homeIndex.termCountUnique()+1) 
 {
   countDocUnigram(docID);
 }
 
-DocUnigramCounter::DocUnigramCounter(const vector<DOCID_T> &docSet, const Index &homeIndex) 
-  : ind(homeIndex), ArrayCounter<int>(homeIndex.termCountUnique()+1) 
-{/*
-  vector<DOCID_T>::iterator it;
-  for (it=docSet.begin(); it!= docSet.end(); it++) {
-    countDocUnigram(*it);
-    }*/
+lemur::langmod::DocUnigramCounter::DocUnigramCounter(const vector<lemur::api::DOCID_T> &docSet, const lemur::api::Index &homeIndex) 
+  : ind(homeIndex), lemur::utility::ArrayCounter<int>(homeIndex.termCountUnique()+1) {
   for (int it=0;it<docSet.size();it++) {
     countDocUnigram(docSet[it]);
   }
 }
 
 
-DocUnigramCounter::DocUnigramCounter(const WeightedIDSet &docSet, const Index &homeIndex) 
-  : ind(homeIndex), ArrayCounter<int>(homeIndex.termCountUnique()+1) 
+lemur::langmod::DocUnigramCounter::DocUnigramCounter(const lemur::utility::WeightedIDSet &docSet, const lemur::api::Index &homeIndex) 
+  : ind(homeIndex), lemur::utility::ArrayCounter<int>(homeIndex.termCountUnique()+1) 
 {
   docSet.startIteration();
   while (docSet.hasMore()) {
@@ -45,19 +40,19 @@ DocUnigramCounter::DocUnigramCounter(const WeightedIDSet &docSet, const Index &h
 }
 
 
-DocUnigramCounter::DocUnigramCounter(const Index &collectionIndex)
-  : ind(collectionIndex), ArrayCounter<int>(collectionIndex.termCountUnique()+1) 
+lemur::langmod::DocUnigramCounter::DocUnigramCounter(const lemur::api::Index &collectionIndex)
+  : ind(collectionIndex), lemur::utility::ArrayCounter<int>(collectionIndex.termCountUnique()+1) 
 {
-  COUNT_T numTerms = ind.termCountUnique();
-  for (COUNT_T i=1; i<= numTerms; i++) {
+  lemur::api::COUNT_T numTerms = ind.termCountUnique();
+  for (lemur::api::COUNT_T i=1; i<= numTerms; i++) {
     incCount(i, ind.termCount(i));
   }
 }
 
-void DocUnigramCounter::countDocUnigram(DOCID_T docID, double weight)
+void lemur::langmod::DocUnigramCounter::countDocUnigram(lemur::api::DOCID_T docID, double weight)
 {
-  TermInfoList *tList = ind.termInfoList(docID);
-  const TermInfo *info;
+  lemur::api::TermInfoList *tList = ind.termInfoList(docID);
+  const lemur::api::TermInfo *info;
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();

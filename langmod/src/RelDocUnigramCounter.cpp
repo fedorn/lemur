@@ -14,14 +14,14 @@
 #include "RelDocUnigramCounter.hpp"
 
 
-RelDocUnigramCounter::RelDocUnigramCounter(DOCID_T docID, const Index &homeIndex)
-  : ind(homeIndex), ArrayCounter<double>(homeIndex.termCountUnique()+1) 
+lemur::langmod::RelDocUnigramCounter::RelDocUnigramCounter(lemur::api::DOCID_T docID, const lemur::api::Index &homeIndex)
+  : ind(homeIndex), lemur::utility::ArrayCounter<double>(homeIndex.termCountUnique()+1) 
 {
   countRelDocUnigram(docID);
 }
 
-RelDocUnigramCounter::RelDocUnigramCounter(const WeightedIDSet &docSet, const Index &homeIndex) 
-  : ind(homeIndex), ArrayCounter<double>(homeIndex.termCountUnique()+1) 
+lemur::langmod::RelDocUnigramCounter::RelDocUnigramCounter(const lemur::utility::WeightedIDSet &docSet, const lemur::api::Index &homeIndex) 
+  : ind(homeIndex), lemur::utility::ArrayCounter<double>(homeIndex.termCountUnique()+1) 
 {
   docSet.startIteration();
   while (docSet.hasMore()) {
@@ -32,11 +32,11 @@ RelDocUnigramCounter::RelDocUnigramCounter(const WeightedIDSet &docSet, const In
   }
 }
 
-void RelDocUnigramCounter::countRelDocUnigram(DOCID_T docID, double weight)
+void lemur::langmod::RelDocUnigramCounter::countRelDocUnigram(lemur::api::DOCID_T docID, double weight)
 {
   double dlength = (double)ind.docLength(docID);
-  TermInfoList *tList = ind.termInfoList(docID);
-  TermInfo *info;
+  lemur::api::TermInfoList *tList = ind.termInfoList(docID);
+  lemur::api::TermInfo *info;
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();

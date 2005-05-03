@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 
@@ -16,13 +16,17 @@
 #include "Index.hpp"
 // force parsing includes to get dependencies.
 #include "indri/Repository.hpp"
-/// A group of index management functions
-class IndexManager {
-public:
-  /// An utility function to open an index, automatically recognizing the indexer based on file extension. Caller must delete the Index instance when finishing using it.
+namespace lemur 
+{
+  namespace api
+  {
+    /// A group of index management functions
+    class IndexManager {
+    public:
+      /// An utility function to open an index, automatically recognizing the indexer based on file extension. Caller must delete the Index instance when finishing using it.
 
-  static Index *openIndex(const string &indexTOCFile);
-};
-
-
+      static Index *openIndex(const string &indexTOCFile);
+    };
+  }
+}
 #endif /* _INDEXMANAGER_HPP */

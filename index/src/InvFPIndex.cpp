@@ -19,17 +19,17 @@
  *
  *========================================================================*/
 
-InvFPIndex::InvFPIndex() : InvIndex() {
+lemur::index::InvFPIndex::InvFPIndex() : InvIndex() {
 }
 
-InvFPIndex::InvFPIndex(const string &indexName) : InvIndex(indexName) {
+lemur::index::InvFPIndex::InvFPIndex(const string &indexName) : InvIndex(indexName) {
 }
 
-InvFPIndex::~InvFPIndex() {
+lemur::index::InvFPIndex::~InvFPIndex() {
   // base class will take care of everything
 }
 
-DocInfoList* InvFPIndex::docInfoList(TERMID_T termID) const{
+lemur::api::DocInfoList* lemur::index::InvFPIndex::docInfoList(lemur::api::TERMID_T termID) const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS])) {
     *msgstream << "Error:  Trying to get docInfoList for invalid termID" << endl;    
     return NULL;
@@ -39,7 +39,7 @@ DocInfoList* InvFPIndex::docInfoList(TERMID_T termID) const{
     return NULL;
   ifstream *indexin = &(invfstreams[lookup[termID].fileid]);
   indexin->seekg(lookup[termID].offset, ios::beg);
-  DocInfoList* doclist;
+  lemur::api::DocInfoList* doclist;
   InvFPDocList* dlist = new InvFPDocList();
   bool success;
 
@@ -58,7 +58,7 @@ DocInfoList* InvFPIndex::docInfoList(TERMID_T termID) const{
   }
 }
 
-TermInfoList* InvFPIndex::termInfoList(DOCID_T docID) const{
+lemur::api::TermInfoList* lemur::index::InvFPIndex::termInfoList(lemur::api::DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream <<  "Error trying to get termInfoList for invalid docID.\n" << endl;
     return NULL;
@@ -69,7 +69,7 @@ TermInfoList* InvFPIndex::termInfoList(DOCID_T docID) const{
   bool success;
   ifstream *indexin = &(dtfstreams[dtlookup[docID].fileid]);
   indexin->seekg(dtlookup[docID].offset, ios::beg);
-  TermInfoList* termlist;
+  lemur::api::TermInfoList* termlist;
   InvFPTermList* tlist = new InvFPTermList();
   if (names[VERSION_NUM] >= "2.0.1")
     // version 2.0 is compressed and must be decompressed
@@ -87,7 +87,7 @@ TermInfoList* InvFPIndex::termInfoList(DOCID_T docID) const{
   return termlist;
 }
 
-TermInfoList* InvFPIndex::termInfoListSeq(DOCID_T docID) const{
+lemur::api::TermInfoList* lemur::index::InvFPIndex::termInfoListSeq(lemur::api::DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get termInfoList for invalid docID.\n"<< endl;
     return NULL;
@@ -98,7 +98,7 @@ TermInfoList* InvFPIndex::termInfoListSeq(DOCID_T docID) const{
   bool success;
   ifstream *indexin = &(dtfstreams[dtlookup[docID].fileid]);
   indexin->seekg(dtlookup[docID].offset, ios::beg);
-  TermInfoList* termlist;
+  lemur::api::TermInfoList* termlist;
   InvFPTermList* tlist = new InvFPTermList();
   if (names[VERSION_NUM] >= "2.0.1")
     // version 2.0 is compressed and must be decompressed
@@ -113,7 +113,7 @@ TermInfoList* InvFPIndex::termInfoListSeq(DOCID_T docID) const{
   return termlist;
 }
 
-COUNT_T InvFPIndex::docLengthCounted(DOCID_T docID)  const{
+lemur::api::COUNT_T lemur::index::InvFPIndex::docLengthCounted(lemur::api::DOCID_T docID)  const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get docLengthCounted for invalid docID."<< endl;
     return 0;
@@ -127,7 +127,7 @@ COUNT_T InvFPIndex::docLengthCounted(DOCID_T docID)  const{
   if (!tl)
     return 0;
 
-  COUNT_T count = tl->termCount();
+  lemur::api::COUNT_T count = tl->termCount();
   delete tl;
   return count;
 }

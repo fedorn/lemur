@@ -106,12 +106,12 @@ bool indri::index::DocExtentListMemoryBuilderIterator::nextEntry() {
     int deltaDocument;
     int extents;
     
-    _list = RVLCompress::decompress_int( _list, deltaDocument );
+    _list = lemur::utility::RVLCompress::decompress_int( _list, deltaDocument );
     _data.document += deltaDocument;
     _data.extents.clear();
     _data.numbers.clear();
 
-    _list = RVLCompress::decompress_int( _list, extents );
+    _list = lemur::utility::RVLCompress::decompress_int( _list, extents );
 
     int deltaPosition;
     Extent extent;
@@ -119,16 +119,16 @@ bool indri::index::DocExtentListMemoryBuilderIterator::nextEntry() {
     extent.end = 0;
 
     for( int i=0; i<extents; i++ ) {
-      _list = RVLCompress::decompress_int( _list, deltaPosition );
+      _list = lemur::utility::RVLCompress::decompress_int( _list, deltaPosition );
       extent.begin = extent.end + deltaPosition;
-      _list = RVLCompress::decompress_int( _list, deltaPosition );
+      _list = lemur::utility::RVLCompress::decompress_int( _list, deltaPosition );
       extent.end = extent.begin + deltaPosition;
 
       _data.extents.push_back( extent );
 
       if( _numeric ) {
         INT64 number;
-        _list = RVLCompress::decompress_signed_longlong( _list, number );
+        _list = lemur::utility::RVLCompress::decompress_signed_longlong( _list, number );
         _data.numbers.push_back( number );
       }
 

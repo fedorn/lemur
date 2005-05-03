@@ -10,28 +10,28 @@
 */
 #include "InvIndexMerge.hpp"
 #include <sstream>
-InvIndexMerge::InvIndexMerge(char* buffer, long size, long maxfilesize) {
+lemur::index::InvIndexMerge::InvIndexMerge(char* buffer, long size, long maxfilesize) {
   maxfile = maxfilesize;
   readbuffer = NULL;
   setBuffer(buffer, size);
 }
 
-InvIndexMerge::InvIndexMerge(long buffersize, long maxfilesize) {
+lemur::index::InvIndexMerge::InvIndexMerge(long buffersize, long maxfilesize) {
   maxfile = maxfilesize;
   readbuffer = (char*) malloc(buffersize);
   if (readbuffer)
     bufsize = buffersize;
   else {
     bufsize = 0;
-    throw Exception("InvIndexMerge","Error allocating buffer for IndexMerge\n");
+    throw lemur::api::Exception("InvIndexMerge","Error allocating buffer for IndexMerge\n");
   }
 }
 
 
-InvIndexMerge::~InvIndexMerge() {
+lemur::index::InvIndexMerge::~InvIndexMerge() {
 }
 
-int InvIndexMerge::merge(vector<string>* tf, const string &prefix) {
+int lemur::index::InvIndexMerge::merge(vector<string>* tf, const string &prefix) {
   if (bufsize < READBUFSIZE * 2) {
     fprintf(stderr, "merge:  Need a larger buffer size (at least %d).\n", 
 	    READBUFSIZE*2);
@@ -41,7 +41,7 @@ int InvIndexMerge::merge(vector<string>* tf, const string &prefix) {
   return this->hierMerge(tf, 0);
 }
 
-char* InvIndexMerge::setBuffer(char* buf, long size) {
+char* lemur::index::InvIndexMerge::setBuffer(char* buf, long size) {
   char* ret = NULL;
 
   if (readbuffer != NULL)
@@ -52,12 +52,12 @@ char* InvIndexMerge::setBuffer(char* buf, long size) {
   return ret;
 }
 
-void InvIndexMerge::setMaxFileSize(long size) {
+void lemur::index::InvIndexMerge::setMaxFileSize(long size) {
   if (size > 0) 
     maxfile = size;
 }
 
-int InvIndexMerge::hierMerge(vector<string>* files, int level) {  
+int lemur::index::InvIndexMerge::hierMerge(vector<string>* files, int level) {  
   fprintf(stderr, "%s: Begin hierchical merge level %d\n", name.c_str(), 
 	  level);
   int numfh = bufsize/READBUFSIZE;
@@ -88,7 +88,7 @@ int InvIndexMerge::hierMerge(vector<string>* files, int level) {
   }
 }
 
-int InvIndexMerge::mergeFiles(vector<string>* files, 
+int lemur::index::InvIndexMerge::mergeFiles(vector<string>* files, 
 			      vector<string>* intmed, int level) {
   fprintf(stderr, "%s: Merging Intermediate files\n", name.c_str());
 
@@ -130,11 +130,11 @@ int InvIndexMerge::mergeFiles(vector<string>* files,
   ofstream indexfile;
   indexfile.open(indexname.c_str(), ios::binary | ios::out);
 
-  vector<TERMID_T> working;  // list of least words
+  vector<lemur::api::TERMID_T> working;  // list of least words
   int offset;
   long filelen;
   InvDocList* list, *first;
-  vector<TERMID_T>::iterator iter;
+  vector<lemur::api::TERMID_T>::iterator iter;
 
   while (readers.size() > 1) {
     offset=0;
@@ -151,7 +151,7 @@ int InvIndexMerge::mergeFiles(vector<string>* files,
     // figure out if we need a new index file or if there's still room
     indexfile.flush();
     filelen = (long)indexfile.tellp();
-    if (filelen + ((first->length()+4) *sizeof(LOC_T)) > maxfile) {
+    if (filelen + ((first->length()+4) *sizeof(lemur::api::LOC_T)) > maxfile) {
       indexfile.close();
       std::stringstream nameStr;
       nameStr << name << level << "." << intmed->size();
@@ -189,7 +189,7 @@ int InvIndexMerge::mergeFiles(vector<string>* files,
     // check for file size
     indexfile.flush();
     filelen = (long)indexfile.tellp();
-    if (filelen + ((myreader->list->length()+4) *sizeof(LOC_T)) > maxfile) {
+    if (filelen + ((myreader->list->length()+4) *sizeof(lemur::api::LOC_T)) > maxfile) {
       indexfile.close();
       std::stringstream nameStr;
       nameStr << name << level << "." << intmed->size();
@@ -207,7 +207,7 @@ int InvIndexMerge::mergeFiles(vector<string>* files,
     while (myreader->list->binReadC(*(myreader->reader))) {
       indexfile.flush();
       filelen = (long)indexfile.tellp();
-      if (filelen + ((myreader->list->length()+4) *sizeof(LOC_T)) > maxfile) {
+      if (filelen + ((myreader->list->length()+4) *sizeof(lemur::api::LOC_T)) > maxfile) {
 	std::stringstream nameStr;
 	nameStr << name << level << "." << intmed->size();
 	string newindex = nameStr.str();
@@ -239,7 +239,7 @@ int InvIndexMerge::mergeFiles(vector<string>* files,
   return intmed->size();
 }
 
-int InvIndexMerge::finalMerge(vector<string>* files) {
+int lemur::index::InvIndexMerge::finalMerge(vector<string>* files) {
   fprintf(stderr, "%s: Final Merge of files\n", name.c_str());
   int i=0;
   vector<IndexReader*> readers;
@@ -258,7 +258,7 @@ int InvIndexMerge::finalMerge(vector<string>* files) {
     readers[i]->list->binReadC(*(readers[i]->reader));
   }
 
-  vector<TERMID_T> working;  // list of least words
+  vector<lemur::api::TERMID_T> working;  // list of least words
 
   std::stringstream nameStr;
   nameStr << name << INVINDEX << 0;
@@ -273,7 +273,7 @@ int InvIndexMerge::finalMerge(vector<string>* files) {
   int fid;
   int offset, ll, df;
   long filelen;
-  vector<TERMID_T>::iterator iter;
+  vector<lemur::api::TERMID_T>::iterator iter;
   InvDocList* list, *first;
 
   while (readers.size() > 1) {
@@ -300,7 +300,7 @@ int InvIndexMerge::finalMerge(vector<string>* files) {
     // the length of what we write out is the length of the inverted list
     // plus the tid, df, diff, len
     filelen = (long)indexfile.tellp();
-    if ((filelen + (ll+4) *sizeof(LOC_T)) > maxfile) {
+    if ((filelen + (ll+4) *sizeof(lemur::api::LOC_T)) > maxfile) {
       indexfile.close();
       std::stringstream nameStr;
       nameStr << name << INVINDEX << invfiles.size();
@@ -345,7 +345,7 @@ int InvIndexMerge::finalMerge(vector<string>* files) {
 
     indexfile.flush();
     filelen = (long)indexfile.tellp();
-    if (filelen + ((ll+4) *sizeof(LOC_T)) > maxfile) {
+    if (filelen + ((ll+4) *sizeof(lemur::api::LOC_T)) > maxfile) {
       indexfile.close();
       std::stringstream nameStr;
       nameStr << name << INVINDEX << invfiles.size();
@@ -369,7 +369,7 @@ int InvIndexMerge::finalMerge(vector<string>* files) {
 
       indexfile.flush();
       filelen = (long)indexfile.tellp();
-      if (filelen + ((ll+4) *sizeof(LOC_T)) > maxfile) {
+      if (filelen + ((ll+4) *sizeof(lemur::api::LOC_T)) > maxfile) {
         indexfile.close();
 	std::stringstream nameStr;
 	nameStr << name << INVINDEX << invfiles.size();
@@ -407,11 +407,11 @@ int InvIndexMerge::finalMerge(vector<string>* files) {
 }
 
 /*=====================PRIVATE METHODS =========================*/
-void InvIndexMerge::writeInvFIDs() {
+void lemur::index::InvIndexMerge::writeInvFIDs() {
   string fidmap = name + INVINDEX;
   FILE* write = fopen(fidmap.c_str(), "wb");
   if (!write) 
-    throw Exception("InvIndexMerge", "Couldn't create inverted index files to file ids map");
+    throw lemur::api::Exception("InvIndexMerge", "Couldn't create inverted index files to file ids map");
 
   for (int i=0;i<invfiles.size();i++) {
     fprintf(write, "%d %d %s ", i, invfiles[i].size(), invfiles[i].c_str());
@@ -419,10 +419,10 @@ void InvIndexMerge::writeInvFIDs() {
   fclose(write);
 }
 
-void InvIndexMerge::least(vector<IndexReader*>* r, vector<TERMID_T>* ret) {
+void lemur::index::InvIndexMerge::least(vector<IndexReader*>* r, vector<lemur::api::TERMID_T>* ret) {
   InvDocList* list;
 
-  TERMID_T lid, id;
+  lemur::api::TERMID_T lid, id;
   list = (*r)[0]->list;
   lid = list->termID();
   ret->push_back(0);
@@ -443,6 +443,6 @@ void InvIndexMerge::least(vector<IndexReader*>* r, vector<TERMID_T>* ret) {
 }	
 
 
-void InvIndexMerge::setbuf(ifstream* fs, char* bp, int bytes){
+void lemur::index::InvIndexMerge::setbuf(ifstream* fs, char* bp, int bytes){
   fs->rdbuf()->pubsetbuf(bp, bytes);
 }

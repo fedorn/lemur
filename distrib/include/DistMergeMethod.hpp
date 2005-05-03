@@ -7,18 +7,11 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _DISTMERGEMETHOD_HPP
 #define _DISTMERGEMETHOD_HPP
 
-/*! 
-    Abstract interface for distributed retrieval merging of scores.  
-    Merge scores from individual databases.
-    See RetrievalMethod for database ranking algorithms (CORIRetMethod).
-    See DistSearchMethod for multiple individual database retrieval.
-
- **/
 
 #include "Param.hpp"
 
@@ -34,7 +27,7 @@ namespace DistMergeMethodParameter {
   //@}
 
   static void get() {
-    mergeMethod=ParamGetInt("mergeMethod",0);
+    mergeMethod=lemur::api::ParamGetInt("mergeMethod",0);
   }
 };
 
@@ -42,19 +35,33 @@ namespace DistMergeMethodParameter {
 #include "common_headers.hpp"
 #include "IndexedReal.hpp"
 #include "DocScore.hpp"
+namespace lemur 
+{
+  namespace distrib
+  {
+    
+    /*! 
+      Abstract interface for distributed retrieval merging of scores.  
+      Merge scores from individual databases.
+      See RetrievalMethod for database ranking algorithms (CORIRetMethod).
+      See DistSearchMethod for multiple individual database retrieval.
 
-class DistMergeMethod {
-public:
-  virtual ~DistMergeMethod() {};
+    **/
 
-  /// merge a set of scores that were obtained from retrieval on the individual databases in the indexset.  return the merged results into a DocScoreVector.  The scores in scoreset should correlate with the indexes in indexset.  
-  virtual void mergeScoreSet(const IndexedRealVector &indexset, 
-			     const DocScoreVector* const* scoreset, 
-			     DocScoreVector &results);
+    class DistMergeMethod {
+    public:
+      virtual ~DistMergeMethod() {};
 
-protected:
-  /// create a score for the merge based on the index ranking score and the document score 
-  virtual double score(double dbscore, double docscore) const =0;
-};
+      /// merge a set of scores that were obtained from retrieval on the individual databases in the indexset.  return the merged results into a DocScoreVector.  The scores in scoreset should correlate with the indexes in indexset.  
+      virtual void mergeScoreSet(const lemur::api::IndexedRealVector &indexset, 
+                                 const DocScoreVector* const* scoreset, 
+                                 DocScoreVector &results);
+
+    protected:
+      /// create a score for the merge based on the index ranking score and the document score 
+      virtual double score(double dbscore, double docscore) const =0;
+    };
+  }
+}
 
 #endif

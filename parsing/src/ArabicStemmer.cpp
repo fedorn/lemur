@@ -19,7 +19,7 @@ extern char *arabic_stemdir;
 extern void *set_stemmer(char *);
 extern void freeWordSets();
 
-ArabicStemmer::ArabicStemmer(const string &stemDir, const string &stemmer) {
+lemur::parse::ArabicStemmer::ArabicStemmer(const string &stemDir, const string &stemmer) {
   arabic_stemdir = new char[stemDir.length() + 1];
   stemfunc = stemmer;
   strcpy(arabic_stemdir, stemDir.c_str());
@@ -28,12 +28,12 @@ ArabicStemmer::ArabicStemmer(const string &stemDir, const string &stemmer) {
   //  identifier = "arabic";
 }
 
-ArabicStemmer::~ArabicStemmer() {
+lemur::parse::ArabicStemmer::~ArabicStemmer() {
   freeWordSets();
   delete[](arabic_stemdir);
 }  
 
-char * ArabicStemmer::stemWord(char * word) {
+char * lemur::parse::ArabicStemmer::stemWord(char * word) {
   static char buffer[100];
   stem_fct(word, buffer);
   if (buffer[0])
@@ -42,8 +42,8 @@ char * ArabicStemmer::stemWord(char * word) {
     return NULL;
 }
 
-void ArabicStemmer::writePropertyList(PropertyList* list) const {
-  TextHandler::writePropertyList(list);
+void lemur::parse::ArabicStemmer::writePropertyList(lemur::parse::PropertyList* list) const {
+  lemur::api::TextHandler::writePropertyList(list);
   Property p("arabicStemFunc");
   p.setValue(stemfunc);
   list->setProperty(&p);

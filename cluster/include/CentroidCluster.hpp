@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 // David Fisher
 // init: 11/20/2002
@@ -15,42 +15,47 @@
 #ifndef _CENTROIDCLUSTER_HPP
 #define _CENTROIDCLUSTER_HPP
 #include "Cluster.hpp"
-
-/// Centroid clustering of documents (agglomerative mean). Trades space for speed.
-class CentroidCluster: public Cluster
+namespace lemur
 {
-public:
-  ///initialize
-  CentroidCluster(int cid, const Index &ind, const SimilarityMethod &sim);
-  /// clean up
-  virtual ~CentroidCluster() {
-    delete(centroid);
-    delete(weightedCentroid);
-  };
-  /// score a document against this cluster, given the rep.
-  virtual double score(const ClusterRep *rep) const;
-  /// add an element
-  virtual void add(const ClusterElt &elt);
-  /// add a list of document ids
-  virtual void add(const vector<DOCID_T> docids);
-  /// remove the element from this cluster
-  virtual void remove(const ClusterElt &elt);
-  /// read a cluster in from the cluster db file.
-  virtual bool read(ifstream &in);
+  namespace cluster 
+  {    
+    /// Centroid clustering of documents (agglomerative mean). Trades space for speed.
+    class CentroidCluster: public Cluster
+    {
+    public:
+      ///initialize
+      CentroidCluster(int cid, const lemur::api::Index &ind, const SimilarityMethod &sim);
+      /// clean up
+      virtual ~CentroidCluster() {
+        delete(centroid);
+        delete(weightedCentroid);
+      };
+      /// score a document against this cluster, given the rep.
+      virtual double score(const ClusterRep *rep) const;
+      /// add an element
+      virtual void add(const ClusterElt &elt);
+      /// add a list of document ids
+      virtual void add(const vector<lemur::api::DOCID_T> docids);
+      /// remove the element from this cluster
+      virtual void remove(const ClusterElt &elt);
+      /// read a cluster in from the cluster db file.
+      virtual bool read(ifstream &in);
 
-  /// \brief Get the ClusterRep for this Cluster for scoring.
-  /// The Rep will have been weighted by the SimilarityMethod.
-  /// Caller responsible for deleting.
-  virtual ClusterRep *getClusterRep() const;
+      /// \brief Get the ClusterRep for this Cluster for scoring.
+      /// The Rep will have been weighted by the SimilarityMethod.
+      /// Caller responsible for deleting.
+      virtual ClusterRep *getClusterRep() const;
 
-  /// Sum of squared values in the cluster's term vector.
-  virtual double sum2() const {return weightedCentroid->sum2(); }
+      /// Sum of squared values in the cluster's term vector.
+      virtual double sum2() const {return weightedCentroid->sum2(); }
   
-private:
-  FloatFreqVector *centroid;
-  ClusterRep *weightedCentroid;
-  FloatFreqVector* readCentroid();
-  void updateCentroid(FloatFreqVector *v, bool first);
-};
+    private:
+      lemur::utility::FloatFreqVector *centroid;
+      ClusterRep *weightedCentroid;
+      lemur::utility::FloatFreqVector* readCentroid();
+      void updateCentroid(lemur::utility::FloatFreqVector *v, bool first);
+    };
+  }
+}
 
 #endif

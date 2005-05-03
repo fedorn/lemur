@@ -14,12 +14,12 @@
 #include <cstring>
 #include <cstdlib>
 
-QueryTextHandler::QueryTextHandler() {
+lemur::parse::QueryTextHandler::QueryTextHandler() {
   index = NULL;
 }
 
 char * 
-QueryTextHandler::handleWord(char * word) {
+lemur::parse::QueryTextHandler::handleWord(char * word) {
   if (word != NULL) {
     int id = index->term(word);
 
@@ -40,6 +40,6 @@ QueryTextHandler::handleWord(char * word) {
 }
 
 void 
-QueryTextHandler::setIndex(const Index * ind) {
+lemur::parse::QueryTextHandler::setIndex(const lemur::api::Index * ind) {
   index = ind;
 }

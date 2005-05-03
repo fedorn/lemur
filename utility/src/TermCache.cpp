@@ -13,19 +13,19 @@
 #include "TermCache.hpp"
 #include <string.h>
 
-TermCache::TermCache() {
+lemur::utility::TermCache::TermCache() {
   clear();
 }
 
 //
-// TermCache::add
+// lemur::utility::TermCache::add
 //
 // The assumption here is that if a term has already been added, it's
 // probably more popular than this one, so there's no need to evict.
 // Associativity might be nice, but we'd have to show that it's fast.
 //
 
-void TermCache::add( const char* term, int termID ) {
+void lemur::utility::TermCache::add( const char* term, int termID ) {
   // don't cache terms longer than TERMCACHE_MAX_TERM_LENGTH
   if (term && (strlen(term) > TERMCACHE_MAX_TERM_LENGTH)) return;
 
@@ -40,10 +40,10 @@ void TermCache::add( const char* term, int termID ) {
 }
 
 //
-// TermCache::find
+// lemur::utility::TermCache::find
 //
 
-int TermCache::find( const char* term ) const {
+int lemur::utility::TermCache::find( const char* term ) const {
   int bucket = _hashFunction( term );
 
   if( _termCache[bucket].id != -1 ) {
@@ -56,18 +56,18 @@ int TermCache::find( const char* term ) const {
 }
 
 //
-// TermCache::clear()
+// lemur::utility::TermCache::clear()
 //
 
-void TermCache::clear() {
+void lemur::utility::TermCache::clear() {
   memset( _termCache, 0xff, sizeof _termCache );
 }
 
 //
-// TermCache::_hashFunction
+// lemur::utility::TermCache::_hashFunction
 //
 
-int TermCache::_hashFunction( const char* term ) const {
+int lemur::utility::TermCache::_hashFunction( const char* term ) const {
   int hash = 0;
   int index;
   

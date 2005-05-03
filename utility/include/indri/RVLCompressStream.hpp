@@ -53,7 +53,7 @@ namespace indri
       /// @param value the value to compress
       RVLCompressStream& operator<< ( int value ) {
         char* writePosition = _buffer.write(5);
-        char* endPosition = RVLCompress::compress_int( writePosition, value );
+        char* endPosition = lemur::utility::RVLCompress::compress_int( writePosition, value );
         _buffer.unwrite( 5 - (endPosition - writePosition) );
         return *this;
       }
@@ -62,7 +62,7 @@ namespace indri
       /// @param value the value to compress
       RVLCompressStream& operator<< ( unsigned int value ) {
         char* writePosition = _buffer.write(5);
-        char* endPosition = RVLCompress::compress_int( writePosition, value );
+        char* endPosition = lemur::utility::RVLCompress::compress_int( writePosition, value );
         _buffer.unwrite( 5 - (endPosition - writePosition) );
         return *this;
       }
@@ -71,7 +71,7 @@ namespace indri
       /// @param value the value to compress
       RVLCompressStream& operator<< ( INT64 value ) {
         char* writePosition = _buffer.write(10);
-        char* endPosition = RVLCompress::compress_longlong( writePosition, value );
+        char* endPosition = lemur::utility::RVLCompress::compress_longlong( writePosition, value );
         _buffer.unwrite( 10 - (endPosition - writePosition) );
         return *this;
       }

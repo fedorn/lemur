@@ -12,7 +12,7 @@
 
 #include "OneStepMarkovChain.hpp"
 
-OneStepMarkovChain::OneStepMarkovChain(const WeightedIDSet &docSet, const Index &homeIndex, double *wdNorm, double stopProb):
+lemur::langmod::OneStepMarkovChain::OneStepMarkovChain(const lemur::utility::WeightedIDSet &docSet, const lemur::api::Index &homeIndex, double *wdNorm, double stopProb):
   ind(homeIndex), alpha(stopProb),curToWord(0), norm(wdNorm)
 {
   dSet = new int[ind.docCount()+1];
@@ -52,24 +52,24 @@ OneStepMarkovChain::OneStepMarkovChain(const WeightedIDSet &docSet, const Index 
   }
 }
 
-OneStepMarkovChain::~OneStepMarkovChain()
+lemur::langmod::OneStepMarkovChain::~OneStepMarkovChain()
 {
   delete [] fromWordPr;
   //  delete [] norm;
   delete [] dSet;
 }
 
-void OneStepMarkovChain::computeFromWordProb(TERMID_T toWord) const 
+void lemur::langmod::OneStepMarkovChain::computeFromWordProb(lemur::api::TERMID_T toWord) const 
 {
-  COUNT_T i;
+  lemur::api::COUNT_T i;
   for (i=1; i<=ind.termCountUnique(); i++) {
     fromWordPr[i] = 0;
   }  
   
-  DocInfoList *dList = ind.docInfoList(toWord);
+  lemur::api::DocInfoList *dList = ind.docInfoList(toWord);
   dList->startIteration();
   while (dList->hasMore()) {
-    const DocInfo *dinfo = dList->nextEntry();
+    const lemur::api::DocInfo *dinfo = dList->nextEntry();
     if (dSet[dinfo->docID()]==0) {
       continue;
     }
@@ -77,8 +77,8 @@ void OneStepMarkovChain::computeFromWordProb(TERMID_T toWord) const
     // compute p(q_i|d)
     double p_qi_given_d = dinfo->termCount()/dLength;
    
-    TermInfoList *tList = ind.termInfoList(dinfo->docID());
-    const TermInfo *tinfo;
+    lemur::api::TermInfoList *tList = ind.termInfoList(dinfo->docID());
+    const lemur::api::TermInfo *tinfo;
     tList->startIteration();
     while (tList->hasMore()) {
       tinfo = tList->nextEntry();
@@ -106,7 +106,7 @@ void OneStepMarkovChain::computeFromWordProb(TERMID_T toWord) const
 
 }
 
-void OneStepMarkovChain::startFromWordIteration(TERMID_T toWord) const
+void lemur::langmod::OneStepMarkovChain::startFromWordIteration(lemur::api::TERMID_T toWord) const
 {
   if (toWord != curToWord) 
     computeFromWordProb(toWord);
@@ -114,7 +114,7 @@ void OneStepMarkovChain::startFromWordIteration(TERMID_T toWord) const
   itPos = 1;
 }
 
-void OneStepMarkovChain::nextFromWordProb(TERMID_T &fromWord, double &prob) const
+void lemur::langmod::OneStepMarkovChain::nextFromWordProb(lemur::api::TERMID_T &fromWord, double &prob) const
 {
   fromWord = itPos;
   prob = fromWordPr[itPos];

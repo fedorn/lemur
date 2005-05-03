@@ -12,8 +12,10 @@
 
 #include "TextQueryRep.hpp"
 
-ArrayQueryRep::ArrayQueryRep(int size, const TermQuery &qry, const Index &dbIndex):
-  ct(new ArrayCounter<double>(size)), scConst(0) 
+using namespace lemur::api;
+
+lemur::retrieval::ArrayQueryRep::ArrayQueryRep(int size, const TermQuery &qry, const Index &dbIndex):
+  ct(new lemur::utility::ArrayCounter<double>(size)), scConst(0) 
 {
   qry.startTermIteration();
   while (qry.hasMore()) {
@@ -27,8 +29,8 @@ ArrayQueryRep::ArrayQueryRep(int size, const TermQuery &qry, const Index &dbInde
   }
 }
 
-ArrayQueryRep::ArrayQueryRep(int size, const FreqVector &qryVec):
-  ct(new ArrayCounter<double>(size)), scConst(0) 
+lemur::retrieval::ArrayQueryRep::ArrayQueryRep(int size, const lemur::utility::FreqVector &qryVec):
+  ct(new lemur::utility::ArrayCounter<double>(size)), scConst(0) 
 {
   qryVec.startIteration();
   while (qryVec.hasMore()) {
@@ -40,7 +42,7 @@ ArrayQueryRep::ArrayQueryRep(int size, const FreqVector &qryVec):
 }
 
 
-QueryTerm *ArrayQueryRep::nextTerm() const 
+lemur::api::QueryTerm *lemur::retrieval::ArrayQueryRep::nextTerm() const 
 {
   int wdIndex;
   double wdCount;
@@ -50,7 +52,7 @@ QueryTerm *ArrayQueryRep::nextTerm() const
 
 
 
-bool PseudoFBDocs::hasMore() const 
+bool lemur::api::PseudoFBDocs::hasMore() const 
 {
   if (howMany>=0 && i >= howMany) {
     return false;
@@ -58,7 +60,7 @@ bool PseudoFBDocs::hasMore() const
   return (it != res->end());
 }
 
-void PseudoFBDocs::nextIDInfo(int &id, double &relProb) const 
+void lemur::api::PseudoFBDocs::nextIDInfo(int &id, double &relProb) const 
 {
   i++;
   id = (*it).ind;

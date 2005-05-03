@@ -329,7 +329,7 @@ void indri::collection::Repository::create( const std::string& path, indri::api:
     _collection->create( collectionPath, forwardFields, backwardFields );
 
     _startThreads();
-  } catch( Exception& e ) {
+  } catch( lemur::api::Exception& e ) {
     LEMUR_RETHROW( e, "Couldn't create a repository at '" + path + "' because:" );
   } catch( ... ) {
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Something unexpected happened while trying to create '" + path + "'" );

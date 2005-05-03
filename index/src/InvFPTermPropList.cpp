@@ -1,13 +1,13 @@
 #include "InvFPTermPropList.hpp"
 
-bool InvFPTermPropList::hasMoreTerm() const {
+bool lemur::index::InvFPTermPropList::hasMoreTerm() const {
   return (nextTermPos() != -1);
 }
-bool InvFPTermPropList::hasMoreTerm(InvFPTermPropList::iterator &it) const {
+bool lemur::index::InvFPTermPropList::hasMoreTerm(lemur::index::InvFPTermPropList::iterator &it) const {
   return (nextTermPos(it) != -1);
 }
 
-TermInfo* InvFPTermPropList::nextTerm()  const{
+lemur::api::TermInfo* lemur::index::InvFPTermPropList::nextTerm()  const{
   // we'll do this only for sequence of terms lists
   if (counts)
     return NULL;
@@ -29,7 +29,7 @@ TermInfo* InvFPTermPropList::nextTerm()  const{
   index++;
   return &entry;
 }
-TermInfo* InvFPTermPropList::nextTerm(InvFPTermPropList::iterator &it)  const{
+lemur::api::TermInfo* lemur::index::InvFPTermPropList::nextTerm(lemur::index::InvFPTermPropList::iterator &it)  const{
   // we'll do this only for sequence of terms lists
   if (counts)
     return NULL;
@@ -46,7 +46,7 @@ TermInfo* InvFPTermPropList::nextTerm(InvFPTermPropList::iterator &it)  const{
   return &(it.operator*());
 }
 
-void InvFPTermPropList::skipTo(int pos)  const{
+void lemur::index::InvFPTermPropList::skipTo(int pos)  const{
   // we'll do this only for sequence of terms lists
   if (counts)
     return;
@@ -59,7 +59,7 @@ void InvFPTermPropList::skipTo(int pos)  const{
     index++;
   }
 }
-void InvFPTermPropList::skipTo(InvFPTermPropList::iterator &it, int pos)  const{
+void lemur::index::InvFPTermPropList::skipTo(lemur::index::InvFPTermPropList::iterator &it, int pos)  const{
   // we'll do this only for sequence of terms lists
   if (counts)
     return;
@@ -73,14 +73,14 @@ void InvFPTermPropList::skipTo(InvFPTermPropList::iterator &it, int pos)  const{
   }
 }
 
-int InvFPTermPropList::nextEntryPos()  const{
+int lemur::index::InvFPTermPropList::nextEntryPos()  const{
   if (counts)
     return -1;
   if (index == listlen)
     return -1;
   return list[index].loc;
 }
-int InvFPTermPropList::nextEntryPos(InvFPTermPropList::iterator &it)  const{
+int lemur::index::InvFPTermPropList::nextEntryPos(lemur::index::InvFPTermPropList::iterator &it)  const{
   if (counts)
     return -1;
   if (it == end())
@@ -88,7 +88,7 @@ int InvFPTermPropList::nextEntryPos(InvFPTermPropList::iterator &it)  const{
   return (*it).position();
 }
 
-int InvFPTermPropList::nextTermPos()  const{
+int lemur::index::InvFPTermPropList::nextTermPos()  const{
   if (counts)
     return -1;
 
@@ -101,7 +101,7 @@ int InvFPTermPropList::nextTermPos()  const{
     return -1;
   return list[tracker].loc;
 }
-int InvFPTermPropList::nextTermPos(InvFPTermPropList::iterator &it)  const{
+int lemur::index::InvFPTermPropList::nextTermPos(lemur::index::InvFPTermPropList::iterator &it)  const{
   if (counts)
     return -1;
 

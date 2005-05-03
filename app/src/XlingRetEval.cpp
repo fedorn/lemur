@@ -115,6 +115,7 @@ constraints.
 #include "XLingRetMethod.hpp"
 #include "BasicDocStream.hpp"
 #include "ResultFile.hpp"
+using namespace lemur::api;
 
 /// cross lingual retrieval model parameters
 // might want to change and expand here.
@@ -147,15 +148,15 @@ void GetAppParam()
 
 int AppMain(int argc, char *argv[]) {
   Index *sInd, *tInd;
-  XLingRetMethod *model;
-  SimpleKLRetMethod *klModel;
-  PDict dict;
+  lemur::retrieval::XLingRetMethod *model;
+  lemur::retrieval::SimpleKLRetMethod *klModel;
+  lemur::dictionary::PDict dict;
   dict.open(XLingParameter::dictionary);
   sInd = IndexManager::openIndex(XLingParameter::sourceIndex.c_str());
   tInd = IndexManager::openIndex(XLingParameter::targetIndex.c_str());
   
-  ArrayAccumulator acc(tInd->docCount());
-  ArrayAccumulator klAcc(tInd->docCount());
+  lemur::retrieval::ArrayAccumulator acc(tInd->docCount());
+  lemur::retrieval::ArrayAccumulator klAcc(tInd->docCount());
 
   // Create the stopper if needed.
   Stopper * stopper = NULL;
@@ -165,22 +166,22 @@ int AppMain(int argc, char *argv[]) {
   Stemmer * stemmer = NULL;
   stemmer = TextHandlerManager::createStemmer();
 
-  model = new XLingRetMethod(*tInd, *sInd, dict, acc, 
-			     XLingParameter::lambda,
-			     XLingParameter::beta,
-			     RetrievalParameter::cacheDocReps,
-			     XLingParameter::sourceBackgroundModel,
-			     XLingParameter::targetBackgroundModel,
-			     stopper, stemmer);
+  model = new lemur::retrieval::XLingRetMethod(*tInd, *sInd, dict, acc, 
+                                               XLingParameter::lambda,
+                                               XLingParameter::beta,
+                                               RetrievalParameter::cacheDocReps,
+                                               XLingParameter::sourceBackgroundModel,
+                                               XLingParameter::targetBackgroundModel,
+                                               stopper, stemmer);
   bool ignoreWeights = false; // RM1 -- no ignore
 
-  ofstream result(RetrievalParameter::resultFile);
+  ofstream result(RetrievalParameter::resultFile.c_str());
   ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
   resFile.openForWrite(result, *tInd);
 
   IndexedRealVector results(tInd->docCount());
   DocStream *qryStream;
-  qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+  qryStream = new lemur::parse::BasicDocStream(RetrievalParameter::textQuerySet);
   qryStream->startDocIteration();
   TextQuery *q;
   IndexedRealVector::iterator j;
@@ -190,7 +191,7 @@ int AppMain(int argc, char *argv[]) {
   //  ofstream os("ExpQuery");
 
   if (RetrievalParameter::fbDocCount > 0) {
-    klModel = (SimpleKLRetMethod *) RetMethodManager::createModel(tInd, 
+    klModel = (lemur::retrieval::SimpleKLRetMethod *) RetMethodManager::createModel(tInd, 
 								  &klAcc, 
 								  retModel);
   } else {
@@ -210,7 +211,7 @@ int AppMain(int argc, char *argv[]) {
       if (results.size() > RetrievalParameter::fbDocCount)
 	results.erase(results.begin() + RetrievalParameter::fbDocCount,
 		      results.end());
-      int n = dynamic_cast<XLingQueryModel *>(qr)->getNumTerms();
+      int n = dynamic_cast<lemur::retrieval::XLingQueryModel *>(qr)->getNumTerms();
       double scale = 1.0/n;
       // weigh by 1/n to match lm
       for (j = results.begin(); j != results.end(); j++)

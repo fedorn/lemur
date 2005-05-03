@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 // David Fisher
 // init: 02/05/2003
@@ -15,20 +15,29 @@
 #define _CLUSTERFACTORY_HPP
 // Add new Cluster subclasses here.
 #include "ClusterMethods.hpp"
-/// Factory class for making Cluster instances.
-class ClusterFactory {
-public:
-  /// initialize the factory for the specific cluster type.
-  ClusterFactory(const Index &ind, const SimilarityMethod &simMethod,
-		 enum ClusterParam::clusterTypes clusterType = ClusterParam::CENTROID,
-		 enum ClusterParam::docModes docMode = ClusterParam::DMAX);
-  /// Make an instance of the appropriate cluster type.
-  Cluster *ClusterFactory::allocateCluster(int clusterID = 1);
+
+namespace lemur
+{
+  namespace cluster
+  {
+    /// Factory class for making Cluster instances.    
+    class ClusterFactory {
+    public:
+      /// initialize the factory for the specific cluster type.
+      ClusterFactory(const lemur::api::Index &ind, 
+                     const SimilarityMethod &simMethod,
+                     enum ClusterParam::clusterTypes clusterType = ClusterParam::CENTROID,
+                     enum ClusterParam::docModes docMode = ClusterParam::DMAX);
+      /// Make an instance of the appropriate cluster type.
+      Cluster *ClusterFactory::allocateCluster(int clusterID = 1);
   
-private:
-  const Index &index;
-  const SimilarityMethod &sim;
-  enum ClusterParam::clusterTypes cType;
-  enum ClusterParam::docModes dMode;
-};
+    private:
+      const lemur::api::Index &index;
+      const SimilarityMethod &sim;
+      enum ClusterParam::clusterTypes cType;
+      enum ClusterParam::docModes dMode;
+    };
+  }
+}
+
 #endif

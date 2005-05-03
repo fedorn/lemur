@@ -1074,7 +1074,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp = NULL, *yy_bp = NULL;
+	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
 #line 118 "../src/InqArabicParser.l"
@@ -1846,7 +1846,6 @@ register char *yy_bp;
 #endif	/* ifndef YY_NO_UNPUT */
 
 
-#ifndef YY_NO_INPUT
 #ifdef __cplusplus
 static int yyinput()
 #else
@@ -1918,7 +1917,7 @@ static int input()
 
 	return c;
 	}
-#endif /* YY_NO_INPUT */
+
 
 #ifdef YY_USE_PROTOS
 void yyrestart( FILE *input_file )
@@ -2029,6 +2028,11 @@ YY_BUFFER_STATE b;
 	}
 
 
+#ifndef YY_ALWAYS_INTERACTIVE
+#ifndef YY_NEVER_INTERACTIVE
+extern int isatty YY_PROTO(( int ));
+#endif
+#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -2349,12 +2353,12 @@ int main()
 #line 282 "../src/InqArabicParser.l"
 
 
-InqArabicParser::InqArabicParser() {
+lemur::parse::InqArabicParser::InqArabicParser() {
   state = 0;
   iden = identifier;
 }
 
-void InqArabicParser::finishing_nesting_qnote(int top) {
+void lemur::parse::InqArabicParser::finishing_nesting_qnote(int top) {
   int tok;
   while((tok=(int)InqArabiclex())) {
     if(tok == RIGHT_PAREN) {
@@ -2368,7 +2372,7 @@ void InqArabicParser::finishing_nesting_qnote(int top) {
 }
 
 
-void InqArabicParser::parseNestingOp(char *op) {
+void lemur::parse::InqArabicParser::parseNestingOp(char *op) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) textHandler->foundSymbol(op);
@@ -2382,7 +2386,7 @@ void InqArabicParser::parseNestingOp(char *op) {
   return;
 }
 
-void InqArabicParser::finishing_prox_qnote(int top) {
+void lemur::parse::InqArabicParser::finishing_prox_qnote(int top) {
   int tok;
   while((tok=(int)InqArabiclex())) {
     if(tok == RIGHT_PAREN) {
@@ -2395,7 +2399,7 @@ void InqArabicParser::finishing_prox_qnote(int top) {
   }
 }
 
-void InqArabicParser::parseProxOp(char *op, char *size) {
+void lemur::parse::InqArabicParser::parseProxOp(char *op, char *size) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) {
@@ -2412,7 +2416,7 @@ void InqArabicParser::parseProxOp(char *op, char *size) {
   return;
 }
 
-void InqArabicParser::parsePassageOp(char *op, char *size) {
+void lemur::parse::InqArabicParser::parsePassageOp(char *op, char *size) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) {
@@ -2429,7 +2433,7 @@ void InqArabicParser::parsePassageOp(char *op, char *size) {
   return;
 }
 
-void InqArabicParser::parseSynOp(char *op) {
+void lemur::parse::InqArabicParser::parseSynOp(char *op) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) {
@@ -2445,7 +2449,7 @@ void InqArabicParser::parseSynOp(char *op) {
   return;
 }
 
-void InqArabicParser::parsePropOp(char *op) {
+void lemur::parse::InqArabicParser::parsePropOp(char *op) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) {
@@ -2461,7 +2465,7 @@ void InqArabicParser::parsePropOp(char *op) {
   return;
 }
 
-void InqArabicParser::parseTermOp(char *op) {
+void lemur::parse::InqArabicParser::parseTermOp(char *op) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) textHandler->foundSymbol(op);
@@ -2492,7 +2496,7 @@ void InqArabicParser::parseTermOp(char *op) {
   return;
 }
 
-void InqArabicParser::parseProxNode(int tok) {
+void lemur::parse::InqArabicParser::parseProxNode(int tok) {
   int l;
   switch(tok) {
     case NUMBER:         
@@ -2527,7 +2531,7 @@ void InqArabicParser::parseProxNode(int tok) {
 }
 
 
-void InqArabicParser::parseQryNode(int tok) {
+void lemur::parse::InqArabicParser::parseQryNode(int tok) {
   int l;
   switch(tok) {
     case NUMBER:         
@@ -2656,7 +2660,7 @@ void InqArabicParser::parseQryNode(int tok) {
     }
 }
 
-long InqArabicParser::fileTell() const{
+long lemur::parse::InqArabicParser::fileTell() const{
   int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
   if (InqArabicin) {
     long begin = ftell(InqArabicin)-YY_CURRENT_BUFFER->yy_n_chars;
@@ -2666,19 +2670,19 @@ long InqArabicParser::fileTell() const{
 }
 
 
-void InqArabicParser::parseBuffer(char* buf, int len) {
+void lemur::parse::InqArabicParser::parseBuffer(char* buf, int len) {
   yy_scan_bytes(buf, len);
   doParse();
 }
 
-void InqArabicParser::parseFile(const string &filename) {
+void lemur::parse::InqArabicParser::parseFile(const string &filename) {
   parsefile = filename;
   InqArabicin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(InqArabicin);
 }
 
-void InqArabicParser::doParse() {
+void lemur::parse::InqArabicParser::doParse() {
   
   int tok;
   // The core loop of the parser.

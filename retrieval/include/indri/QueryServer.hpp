@@ -56,7 +56,7 @@ namespace indri
     class QueryServerDocumentIDsResponse {
     public:
       virtual ~QueryServerDocumentIDsResponse() {};
-      virtual std::vector<DOCID_T>& getResults() = 0;
+      virtual std::vector<lemur::api::DOCID_T>& getResults() = 0;
     };
 
 

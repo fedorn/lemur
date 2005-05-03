@@ -8,15 +8,18 @@
 
 #ifndef _DOCMGRMANAGER_HPP
 #define _DOCMGRMANAGER_HPP
+#include "DocumentManager.hpp"
 
+namespace lemur 
+{
+  namespace api
+  {
+    
 /*!
  * This is a convenience class with static methods for creating and opening
  * DocumentManagers. New DocumentManagers should be added here.
  *
  */
-
-#include "DocumentManager.hpp"
-
 class DocMgrManager {
 public:
   /// create a new DocumentManager object 
@@ -34,8 +37,11 @@ public:
   /// .bdm -- KeyfileDocMgr.
   /// elem -- ElemDocMgr.
   /// caller deletes
+  /// @param name the name of the document manager table of contents file.
   /// @param readOnly  open the manager in read only mode.
   static DocumentManager* openDocMgr(const string name, bool readOnly = true);
 };
+  }
+}
 
 #endif

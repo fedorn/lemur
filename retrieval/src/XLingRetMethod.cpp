@@ -14,9 +14,11 @@
 #include "SimpleKLRetMethod.hpp"
 #include <cmath>
 
-XLingRetMethod::XLingRetMethod(const Index &dbIndex,
-			       const Index &background,
-			       PDict &dict,
+using namespace lemur::api;
+
+lemur::retrieval::XLingRetMethod::XLingRetMethod(const Index &dbIndex,
+                                                 const Index &background,
+                                                 lemur::dictionary::PDict &dict,
 			       ScoreAccumulator &accumulator,
 			       double l, double b, 
 			       bool cacheDR,
@@ -53,7 +55,7 @@ XLingRetMethod::XLingRetMethod(const Index &dbIndex,
   termScores = new ArrayAccumulator(ind.docCount());
 }
 
-QueryRep *XLingRetMethod::computeTargetKLRep(const QueryRep *qry) {
+lemur::api::QueryRep *lemur::retrieval::XLingRetMethod::computeTargetKLRep(const QueryRep *qry) {
   // should not have to cast.
   const XLingQueryModel *qm = dynamic_cast<const XLingQueryModel *>(qry);
   SimpleKLQueryModel *qr = new SimpleKLQueryModel(ind);
@@ -62,9 +64,9 @@ QueryRep *XLingRetMethod::computeTargetKLRep(const QueryRep *qry) {
   while (qm->hasMore()) {
     const XLQueryTerm &qt = qm->nextTerm();
     double sourceWeight = qt.weight();
-    DictEntryVector *xlates = qt.getTranslations();
+    lemur::dictionary::DictEntryVector *xlates = qt.getTranslations();
     if (xlates != NULL) {
-      for (DictEntryVector::iterator it = xlates->begin(); 
+      for (lemur::dictionary::DictEntryVector::iterator it = xlates->begin(); 
 	   it != xlates->end(); it++) {
 	TERMID_T tid = ind.term((*it).target);
 	if (tid > 0) {
@@ -81,7 +83,7 @@ QueryRep *XLingRetMethod::computeTargetKLRep(const QueryRep *qry) {
 }
 
 
-XLingRetMethod::~XLingRetMethod() {
+lemur::retrieval::XLingRetMethod::~XLingRetMethod() {
   if (cacheDocReps) {
     for (DOCID_T i = 0; i < docRepsSize; i++) delete(docReps[i]);
     delete[](docReps);
@@ -89,12 +91,12 @@ XLingRetMethod::~XLingRetMethod() {
   delete(termScores);
 }
 
-DocumentRep *XLingRetMethod::computeDocRep(DOCID_T docID) {
+lemur::api::DocumentRep *lemur::retrieval::XLingRetMethod::computeDocRep(DOCID_T docID) {
   return( new XLingDocModel(docID, &ind, beta, numTarget, 
 			    docBasedTargetSmooth));
 }
 
-void XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
+void lemur::retrieval::XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
 					IndexedRealVector &scores, 
 					bool scoreAll) {
 
@@ -115,9 +117,9 @@ void XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep,
     double sourceWeight = qt.weight();
     // P(e|GE)
     double pge = qt.getP_s_GE();
-    DictEntryVector *xlates = qt.getTranslations();
+    lemur::dictionary::DictEntryVector *xlates = qt.getTranslations();
     if (xlates != NULL) {
-      for (DictEntryVector::iterator it = xlates->begin(); 
+      for (lemur::dictionary::DictEntryVector::iterator it = xlates->begin(); 
 	   it != xlates->end(); it++) {
 	TERMID_T tid = ind.term((*it).target);
 	if (tid > 0) {
@@ -183,13 +185,13 @@ void XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep,
   }
 }
 
-double XLingRetMethod::scoreDoc(const QueryRep &qry, DOCID_T docID) {
-  HashFreqVector docVector(ind,docID);
+double lemur::retrieval::XLingRetMethod::scoreDoc(const QueryRep &qry, DOCID_T docID) {
+  lemur::utility::HashFreqVector docVector(ind,docID);
   return (scoreDocVector(*((const XLingQueryModel *)(&qry)),docID,docVector));
 }
 
-double XLingRetMethod::scoreDocVector(const XLingQueryModel &qRep, DOCID_T docID, 
-				      FreqVector &docVector) {
+double lemur::retrieval::XLingRetMethod::scoreDocVector(const XLingQueryModel &qRep, DOCID_T docID, 
+				      lemur::utility::FreqVector &docVector) {
   double score = 0, termScore;
   qRep.startIteration();
   DocumentRep *dRep = computeDocRep(docID);
@@ -199,10 +201,10 @@ double XLingRetMethod::scoreDocVector(const XLingQueryModel &qRep, DOCID_T docID
     double sourceWeight = qt.weight();
     // P(e|GE)
     double pge = qt.getP_s_GE();
-    DictEntryVector *xlates = qt.getTranslations();
+    lemur::dictionary::DictEntryVector *xlates = qt.getTranslations();
     if (xlates != NULL) {
       termScore = 0;
-      for (DictEntryVector::iterator it = xlates->begin(); 
+      for (lemur::dictionary::DictEntryVector::iterator it = xlates->begin(); 
 	   it != xlates->end(); it++) {
 	TERMID_T tid = ind.term((*it).target);
 	if (tid > 0) {

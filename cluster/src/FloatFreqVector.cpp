@@ -11,11 +11,11 @@
 
 #include "FloatFreqVector.hpp"
 
-FloatFreqVector::FloatFreqVector(const Index &index, DOCID_T docID) 
+lemur::utility::FloatFreqVector::FloatFreqVector(const lemur::api::Index &index, lemur::api::DOCID_T docID) 
   : CSet<FloatFreqCounter, double>(1000)
 {
-  TermInfoList *tList = index.termInfoList(docID);
-  TermInfo *info;
+  lemur::api::TermInfoList *tList = index.termInfoList(docID);
+  lemur::api::TermInfo *info;
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
@@ -27,10 +27,10 @@ FloatFreqVector::FloatFreqVector(const Index &index, DOCID_T docID)
   s2 = 0;
 }
 
-FloatFreqVector::FloatFreqVector(const Index &index, TermInfoList *tList) 
+lemur::utility::FloatFreqVector::FloatFreqVector(const lemur::api::Index &index, lemur::api::TermInfoList *tList) 
   : CSet<FloatFreqCounter, double>(1000)
 {
-  TermInfo *info;
+  lemur::api::TermInfo *info;
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
@@ -41,13 +41,13 @@ FloatFreqVector::FloatFreqVector(const Index &index, TermInfoList *tList)
   s2 = 0;
 }
 
-FloatFreqVector::FloatFreqVector(const Index &index, vector<DOCID_T> &dids) 
+lemur::utility::FloatFreqVector::FloatFreqVector(const lemur::api::Index &index, vector<lemur::api::DOCID_T> &dids) 
   : CSet<FloatFreqCounter, double>(1000)
 {
   for (unsigned int j = 0; j < dids.size(); j++) {
-    DOCID_T did = dids[j];
-    TermInfoList *tList = index.termInfoList(did);
-    TermInfo *info;
+    lemur::api::DOCID_T did = dids[j];
+    lemur::api::TermInfoList *tList = index.termInfoList(did);
+    lemur::api::TermInfo *info;
     tList->startIteration();
     while (tList->hasMore()) {
       info = tList->nextEntry();
@@ -60,11 +60,11 @@ FloatFreqVector::FloatFreqVector(const Index &index, vector<DOCID_T> &dids)
   s2 = 0;
 }
 
-FloatFreqVector::FloatFreqVector(FloatFreqVector *v2) 
+lemur::utility::FloatFreqVector::FloatFreqVector(FloatFreqVector *v2) 
   : CSet<FloatFreqCounter, double>(1000)
 {
   double tmp;
-  TERMID_T idx;
+  lemur::api::TERMID_T idx;
   FloatFreqCounter c;
   v2->startIteration();
   while(v2->hasMore()) {
@@ -75,19 +75,19 @@ FloatFreqVector::FloatFreqVector(FloatFreqVector *v2)
   s2 = 0;
 }
 
-void FloatFreqVector::addVal(TERMID_T id, int cnt) {
+void lemur::utility::FloatFreqVector::addVal(lemur::api::TERMID_T id, int cnt) {
   FloatFreqCounter ct;
   ct.key = id;
   add(ct, cnt);
 }
 
-void FloatFreqVector::addVal(TERMID_T id, double freq) {
+void lemur::utility::FloatFreqVector::addVal(lemur::api::TERMID_T id, double freq) {
   FloatFreqCounter ct;
   ct.key = id;
   add(ct, freq);
 }
 
-bool FloatFreqVector::find(TERMID_T ind, double &freq) const
+bool lemur::utility::FloatFreqVector::find(lemur::api::TERMID_T ind, double &freq) const
 {
   FloatFreqCounter c;
   c.key = ind;
@@ -96,7 +96,7 @@ bool FloatFreqVector::find(TERMID_T ind, double &freq) const
   return true;
 }
 
-bool FloatFreqVector::find(TERMID_T ind, int &freq) const
+bool lemur::utility::FloatFreqVector::find(lemur::api::TERMID_T ind, int &freq) const
 {
   double tmp;
   bool ret = find(ind, tmp);
@@ -104,15 +104,15 @@ bool FloatFreqVector::find(TERMID_T ind, int &freq) const
   return ret;
 }
 
-void FloatFreqVector::nextFreq(TERMID_T &id, int &freq)  const {
+void lemur::utility::FloatFreqVector::nextFreq(lemur::api::TERMID_T &id, int &freq)  const {
   double tmp;
-  TERMID_T idx;
+  lemur::api::TERMID_T idx;
   nextFreq(idx, tmp);
   id = idx;
   freq = (int) tmp;
 }
 
-void FloatFreqVector::nextFreq(TERMID_T &id, double &freq) const
+void lemur::utility::FloatFreqVector::nextFreq(lemur::api::TERMID_T &id, double &freq) const
 {
   // get the i-th element
   FloatFreqCounter c;
@@ -122,9 +122,9 @@ void FloatFreqVector::nextFreq(TERMID_T &id, double &freq) const
   i++;
 }
 
-double FloatFreqVector::sum() const {
+double lemur::utility::FloatFreqVector::sum() const {
   double ret = 0, tmp;
-  TERMID_T idx;
+  lemur::api::TERMID_T idx;
   startIteration();
   while(hasMore()) {
     nextFreq(idx, tmp);
@@ -133,10 +133,10 @@ double FloatFreqVector::sum() const {
   return ret;
 }
 
-double FloatFreqVector::sum2() const {
+double lemur::utility::FloatFreqVector::sum2() const {
   if (s2 != 0) return s2;
   double ret = 0, tmp;
-  TERMID_T idx;
+  lemur::api::TERMID_T idx;
   startIteration();
   while(hasMore()) {
     nextFreq(idx, tmp);
@@ -146,9 +146,9 @@ double FloatFreqVector::sum2() const {
   return ret;
 }
 
-void FloatFreqVector::weigh(const double *vals) {
+void lemur::utility::FloatFreqVector::weigh(const double *vals) {
   double tmp;
-  TERMID_T idx;
+  lemur::api::TERMID_T idx;
   FloatFreqCounter c;
   startIteration();
   while(hasMore()) {
@@ -160,9 +160,9 @@ void FloatFreqVector::weigh(const double *vals) {
   s2 = 0;
 }
 
-void FloatFreqVector::weigh(double val) {
+void lemur::utility::FloatFreqVector::weigh(double val) {
   double tmp;
-  TERMID_T idx;
+  lemur::api::TERMID_T idx;
   FloatFreqCounter c;
   startIteration();
   while(hasMore()) {
@@ -174,9 +174,9 @@ void FloatFreqVector::weigh(double val) {
   s2 = 0;
 }
 
-void FloatFreqVector::addVec(const FloatFreqVector *v2) {
+void lemur::utility::FloatFreqVector::addVec(const FloatFreqVector *v2) {
   double tmp;
-  TERMID_T idx;
+  lemur::api::TERMID_T idx;
   FloatFreqCounter c;
   v2->startIteration();
   while(v2->hasMore()) {
@@ -187,9 +187,9 @@ void FloatFreqVector::addVec(const FloatFreqVector *v2) {
   s2 = 0;
 }
 
-void FloatFreqVector::subtract(const FloatFreqVector *v2) {
+void lemur::utility::FloatFreqVector::subtract(const FloatFreqVector *v2) {
   double tmp;
-  TERMID_T idx;
+  lemur::api::TERMID_T idx;
   FloatFreqCounter c;
   v2->startIteration();
   while(v2->hasMore()) {
@@ -200,9 +200,9 @@ void FloatFreqVector::subtract(const FloatFreqVector *v2) {
   s2 = 0;
 }
 
-double FloatFreqVector::dotProd(const FloatFreqVector *v2) {
+double lemur::utility::FloatFreqVector::dotProd(const FloatFreqVector *v2) {
   double tmp1, tmp2, ret = 0;  
-  TERMID_T idx;
+  lemur::api::TERMID_T idx;
   startIteration();
   while(hasMore()) {
     nextFreq(idx, tmp1);

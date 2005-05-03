@@ -1459,7 +1459,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp = NULL, *yy_bp = NULL;
+	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
 #line 118 "../src/InQueryOpParser.l"
@@ -2231,7 +2231,6 @@ register char *yy_bp;
 #endif	/* ifndef YY_NO_UNPUT */
 
 
-#ifndef YY_NO_INPUT
 #ifdef __cplusplus
 static int yyinput()
 #else
@@ -2303,7 +2302,7 @@ static int input()
 
 	return c;
 	}
-#endif /* YY_NO_INPUT */
+
 
 #ifdef YY_USE_PROTOS
 void yyrestart( FILE *input_file )
@@ -2414,6 +2413,11 @@ YY_BUFFER_STATE b;
 	}
 
 
+#ifndef YY_ALWAYS_INTERACTIVE
+#ifndef YY_NEVER_INTERACTIVE
+extern int isatty YY_PROTO(( int ));
+#endif
+#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -2734,12 +2738,12 @@ int main()
 #line 283 "../src/InQueryOpParser.l"
 
 
-InQueryOpParser::InQueryOpParser() {
+lemur::parse::InQueryOpParser::InQueryOpParser() {
   state = 0;
   iden = identifier;
 }
 
-void InQueryOpParser::finishing_nesting_qnote(int top) {
+void lemur::parse::InQueryOpParser::finishing_nesting_qnote(int top) {
   int tok;
   while((tok=(int)InQuerylex())) {
     if(tok == RIGHT_PAREN) {
@@ -2753,7 +2757,7 @@ void InQueryOpParser::finishing_nesting_qnote(int top) {
 }
 
 
-void InQueryOpParser::parseNestingOp(char *op) {
+void lemur::parse::InQueryOpParser::parseNestingOp(char *op) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) textHandler->foundSymbol(op);
@@ -2767,7 +2771,7 @@ void InQueryOpParser::parseNestingOp(char *op) {
   return;
 }
 
-void InQueryOpParser::finishing_prox_qnote(int top) {
+void lemur::parse::InQueryOpParser::finishing_prox_qnote(int top) {
   int tok;
   while((tok=(int)InQuerylex())) {
     if(tok == RIGHT_PAREN) {
@@ -2780,7 +2784,7 @@ void InQueryOpParser::finishing_prox_qnote(int top) {
   }
 }
 
-void InQueryOpParser::parseProxOp(char *op, char *size) {
+void lemur::parse::InQueryOpParser::parseProxOp(char *op, char *size) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) {
@@ -2797,7 +2801,7 @@ void InQueryOpParser::parseProxOp(char *op, char *size) {
   return;
 }
 
-void InQueryOpParser::parsePassageOp(char *op, char *size) {
+void lemur::parse::InQueryOpParser::parsePassageOp(char *op, char *size) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) {
@@ -2814,7 +2818,7 @@ void InQueryOpParser::parsePassageOp(char *op, char *size) {
   return;
 }
 
-void InQueryOpParser::parseSynOp(char *op) {
+void lemur::parse::InQueryOpParser::parseSynOp(char *op) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) {
@@ -2830,7 +2834,7 @@ void InQueryOpParser::parseSynOp(char *op) {
   return;
 }
 
-void InQueryOpParser::parsePropOp(char *op) {
+void lemur::parse::InQueryOpParser::parsePropOp(char *op) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) {
@@ -2846,7 +2850,7 @@ void InQueryOpParser::parsePropOp(char *op) {
   return;
 }
 
-void InQueryOpParser::parseTermOp(char *op) {
+void lemur::parse::InQueryOpParser::parseTermOp(char *op) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) textHandler->foundSymbol(op);
@@ -2877,7 +2881,7 @@ void InQueryOpParser::parseTermOp(char *op) {
   return;
 }
 
-void InQueryOpParser::parseProxNode(int tok) {
+void lemur::parse::InQueryOpParser::parseProxNode(int tok) {
   int l;
   switch(tok) {
     case NUMBER:         
@@ -2913,7 +2917,7 @@ void InQueryOpParser::parseProxNode(int tok) {
 }
 
 
-void InQueryOpParser::parseQryNode(int tok) {
+void lemur::parse::InQueryOpParser::parseQryNode(int tok) {
   int l;
   switch(tok) {
     case NUMBER:         
@@ -3042,7 +3046,7 @@ void InQueryOpParser::parseQryNode(int tok) {
     }
 }
 
-long InQueryOpParser::fileTell() const {
+long lemur::parse::InQueryOpParser::fileTell() const {
   int offset = yy_c_buf_p-YY_CURRENT_BUFFER->yy_ch_buf;
   if (InQueryin) {
     long begin = ftell(InQueryin)-YY_CURRENT_BUFFER->yy_n_chars;
@@ -3052,19 +3056,19 @@ long InQueryOpParser::fileTell() const {
 }
 
 
-void InQueryOpParser::parseBuffer(char* buf, int len) {
+void lemur::parse::InQueryOpParser::parseBuffer(char* buf, int len) {
   yy_scan_bytes(buf, len);
   doParse();
 }
 
-void InQueryOpParser::parseFile(const string &filename) {
+void lemur::parse::InQueryOpParser::parseFile(const string &filename) {
   parsefile=filename;
   InQueryin = fopen(filename.c_str(), "rb");
   doParse();
   fclose(InQueryin);
 }
 
-void InQueryOpParser::doParse() {
+void lemur::parse::InQueryOpParser::doParse() {
   
   int tok;
   // The core loop of the parser.

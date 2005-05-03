@@ -22,7 +22,7 @@
 // _indexWithDocument
 //
 
-indri::index::Index* IndriDocMgr::_indexWithDocument( indri::collection::Repository::index_state& indexes, int documentID ) const {
+indri::index::Index* lemur::parse::IndriDocMgr::_indexWithDocument( indri::collection::Repository::index_state& indexes, int documentID ) const {
   for( int i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
     int lowerBound = (*indexes)[i]->documentBase();
@@ -36,9 +36,9 @@ indri::index::Index* IndriDocMgr::_indexWithDocument( indri::collection::Reposit
 }
 
 // caller delete[]s
-char *IndriDocMgr::getDoc(const EXDOCID_T &docID) const {
+char *lemur::parse::IndriDocMgr::getDoc(const lemur::api::EXDOCID_T &docID) const {
   std::vector<int> ids = _repository.collection()->retrieveIDByMetadatum("docno", docID);
-  DOCID_T docid = ids[0];
+  lemur::api::DOCID_T docid = ids[0];
   indri::api::ParsedDocument *doc = _repository.collection()->retrieve(docid);
   const char *txt = doc->text;
   char *retval = new char[strlen(txt) + 1];
@@ -48,10 +48,10 @@ char *IndriDocMgr::getDoc(const EXDOCID_T &docID) const {
 }
 
 
-vector<Match> IndriDocMgr::getOffsets(const EXDOCID_T &docID) const {
+vector<lemur::parse::Match> lemur::parse::IndriDocMgr::getOffsets(const lemur::api::EXDOCID_T &docID) const {
   vector<Match> offsets;
   std::vector<int> ids = _repository.collection()->retrieveIDByMetadatum("docno", docID);
-  DOCID_T docid = ids[0];
+  lemur::api::DOCID_T docid = ids[0];
   indri::api::ParsedDocument *doc = _repository.collection()->retrieve(docid);
   indri::collection::Repository::index_state indexes = _repository.indexes();
   indri::index::Index* index = _indexWithDocument( indexes, docid );

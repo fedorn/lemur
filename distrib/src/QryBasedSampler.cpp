@@ -19,7 +19,7 @@
 #include <cstdio>
 
 
-QryBasedSampler::QryBasedSampler() {
+lemur::distrib::QryBasedSampler::QryBasedSampler() {
 
   // Set defaults
   numDocs = 300;
@@ -30,12 +30,12 @@ QryBasedSampler::QryBasedSampler() {
   docsPerQuery = 10; 
 }
 
-QryBasedSampler::~QryBasedSampler() {
+lemur::distrib::QryBasedSampler::~QryBasedSampler() {
 
 }
 
 bool
-QryBasedSampler::probe(const char * initQuery) {
+lemur::distrib::QryBasedSampler::probe(const char * initQuery) {
   // PRECONDITIONS:
   // language model manager has been set
   assert(freqCounter != NULL);
@@ -127,7 +127,7 @@ QryBasedSampler::probe(const char * initQuery) {
 	  delete doc;
 	  done++;	
 
-	} catch (Exception &ex) {
+	} catch (lemur::api::Exception &ex) {
 	  cerr << "Skipping doc " << id << endl;
 	  ex.writeMessage(cerr);
 
@@ -167,83 +167,83 @@ QryBasedSampler::probe(const char * initQuery) {
 //------- Get and set functions below. -------
 
 void 
-QryBasedSampler::setDBManager(const DBManager * database) {
+lemur::distrib::QryBasedSampler::setDBManager(const DBManager * database) {
   db = database;
 }
 
-const DBManager * 
-QryBasedSampler::getDBManager() const {
+const lemur::distrib::DBManager * 
+lemur::distrib::QryBasedSampler::getDBManager() const {
   return db;
 }   
 
 
 void 
-QryBasedSampler::setFreqCounter(FreqCounter * counter) {
+lemur::distrib::QryBasedSampler::setFreqCounter(FreqCounter * counter) {
   freqCounter = counter;
 }
 
-const FreqCounter * 
-QryBasedSampler::getFreqCounter() const {
+const lemur::distrib::FreqCounter * 
+lemur::distrib::QryBasedSampler::getFreqCounter() const {
   return freqCounter;
 }
 
 void
-QryBasedSampler::setOutputPrefix(const string &prefix) {
+lemur::distrib::QryBasedSampler::setOutputPrefix(const string &prefix) {
   outputPrefix = prefix;
 }
 
 const string &
-QryBasedSampler::getOutputPrefix() const {
+lemur::distrib::QryBasedSampler::getOutputPrefix() const {
   return outputPrefix;
 }
 
 void 
-QryBasedSampler::setNumDocs(int n) {
+lemur::distrib::QryBasedSampler::setNumDocs(int n) {
   numDocs = n;
 }
 
 int
-QryBasedSampler::getNumDocs() const {
+lemur::distrib::QryBasedSampler::getNumDocs() const {
   return numDocs;
 }
 
 void 
-QryBasedSampler::setDocsPerQuery(int n) {
+lemur::distrib::QryBasedSampler::setDocsPerQuery(int n) {
   docsPerQuery = n;
 }
 
 int
-QryBasedSampler::getDocsPerQuery() const {
+lemur::distrib::QryBasedSampler::getDocsPerQuery() const {
   return docsPerQuery;
 }
 
 void 
-QryBasedSampler::setNumWords(int n) {
+lemur::distrib::QryBasedSampler::setNumWords(int n) {
   numWords = n;
 }
 
 int
-QryBasedSampler::getNumWords() const {
+lemur::distrib::QryBasedSampler::getNumWords() const {
   return numWords;
 }
 
 void 
-QryBasedSampler::setNumQueries(int n) {
+lemur::distrib::QryBasedSampler::setNumQueries(int n) {
   numQueries = n;
 }
 
 int
-QryBasedSampler::getNumQueries() const {
+lemur::distrib::QryBasedSampler::getNumQueries() const {
   return numQueries;
 }
 
 
 void
-QryBasedSampler::setTermMode(int m) {
+lemur::distrib::QryBasedSampler::setTermMode(int m) {
   termMode = m;
 }
 
 int
-QryBasedSampler::getTermMode() const {
+lemur::distrib::QryBasedSampler::getTermMode() const {
   return termMode;
 }

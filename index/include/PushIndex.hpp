@@ -7,18 +7,11 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #ifndef _PUSHINDEX_HPP
 #define _PUSHINDEX_HPP
-
-//! Abstract Class for push method of building an index
-
-/*!
-
-  This is an abstract class that provides a uniform interface for building an indexed document collection where the index is unaware of the parser (docstream).
-*/
 
 /*
  * NAME DATE - COMMENTS
@@ -31,25 +24,40 @@
 #include "DocumentProps.hpp"
 #include "CollectionProps.hpp"
 
-class PushIndex {
-public:
-  virtual ~PushIndex() {};
+
+namespace lemur
+{
+  namespace index
+  {
+    
+    //! Abstract Class for push method of building an index
+
+    /*!
+
+    This is an abstract class that provides a uniform interface for building an indexed document collection where the index is unaware of the parser (docstream).
+    */
+    class PushIndex {
+    public:
+      virtual ~PushIndex() {};
  
-  /// the beginning of a new document, returns true if initiation was successful
-  virtual bool beginDoc(const DocumentProps* dp)=0;
+      /// the beginning of a new document, returns true if initiation was successful
+      virtual bool beginDoc(const lemur::parse::DocumentProps* dp)=0;
 
-  /// adding a term to the current document, returns true if term was added successfully.  
-  virtual bool addTerm(const Term& t)=0;
+      /// adding a term to the current document, returns true if term was added successfully.  
+      virtual bool addTerm(const lemur::api::Term& t)=0;
 
-  /// signify the end of current document
-  virtual void endDoc(const DocumentProps* dp)=0;
+      /// signify the end of current document
+      virtual void endDoc(const lemur::parse::DocumentProps* dp)=0;
 
-  /// signify the end of this collection.  properties passed at the beginning of a collection should be handled by the constructor.
-  virtual void endCollection(const CollectionProps* cp)=0;
+      /// signify the end of this collection.  properties passed at the beginning of a collection should be handled by the constructor.
+      virtual void endCollection(const lemur::parse::CollectionProps* cp)=0;
 
-  virtual void setDocManager(const string &mgrID)=0;
+      virtual void setDocManager(const string &mgrID)=0;
 
-private:
-};
+    private:
+    };
+  }
+}
+
 
 #endif

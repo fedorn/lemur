@@ -17,7 +17,7 @@
 
 
 
-void BasicTokenDoc::startTermIteration() const
+void lemur::parse::BasicTokenDoc::startTermIteration() const
 {
   // ensure the start position of the terms
   docStr->seekg(startPos);
@@ -26,7 +26,7 @@ void BasicTokenDoc::startTermIteration() const
   *docStr >> curWord;
 }
 
-void BasicTokenDoc::skipToEnd() const
+void lemur::parse::BasicTokenDoc::skipToEnd() const
 {
   startTermIteration();
   while (hasMore()) {
@@ -34,7 +34,7 @@ void BasicTokenDoc::skipToEnd() const
   }
 }
 
-const Term * BasicTokenDoc::nextTerm() const
+const lemur::api::Term * lemur::parse::BasicTokenDoc::nextTerm() const
 {
   //  static BasicTokenTerm t;
   t.spelling(curWord);
@@ -48,30 +48,30 @@ const Term * BasicTokenDoc::nextTerm() const
 }
 
 
-void BasicTokenDoc::readID()
+void lemur::parse::BasicTokenDoc::readID()
 {
   // get id
   *docStr >> id;
   int len= strlen(id);
   if (id[len-1]!='>') {
-    throw Exception("BasicTokenDoc","ill-formatted doc id, > expected");
+    throw lemur::api::Exception("BasicTokenDoc","ill-formatted doc id, > expected");
   }
   id[len-1]='\0';
   startPos = docStr->tellg(); // record the start position of terms
 }
 
 
-BasicDocStream::BasicDocStream (const string &inputFile)
+lemur::parse::BasicDocStream::BasicDocStream (const string &inputFile)
 {
   strcpy(file, inputFile.c_str());
   ifs = new ifstream(file, ios::in);
   if (ifs->fail() ) {
-    throw Exception("BasicDocStream", "can't open BasicDocStream source file");
+    throw lemur::api::Exception("BasicDocStream", "can't open BasicDocStream source file");
   }
 }
 
 
-bool BasicDocStream::hasMore()
+bool lemur::parse::BasicDocStream::hasMore()
 {
   bool moreDoc = false;
   if (!nextTokenRead) {
@@ -79,7 +79,7 @@ bool BasicDocStream::hasMore()
     nextTokenRead = true;
     if (moreDoc && strcmp(buf, "<DOC")) {
       cerr << " actual token seen: "<< buf << endl;
-      throw Exception("BasicDocStream", "begin doc marker expected");
+      throw lemur::api::Exception("BasicDocStream", "begin doc marker expected");
     }
   }
 
@@ -87,7 +87,7 @@ bool BasicDocStream::hasMore()
 }
 
 
-void BasicDocStream::startDocIteration()
+void lemur::parse::BasicDocStream::startDocIteration()
 {
   ifs->close();
   ifs->open(file);
@@ -96,7 +96,7 @@ void BasicDocStream::startDocIteration()
   nextTokenRead =false;
 }
 
-Document *BasicDocStream::nextDoc()
+lemur::api::Document *lemur::parse::BasicDocStream::nextDoc()
 {
   // fails to initialize properly, preventing reuse of a 
   // BasicDocStream (or opening more than one).

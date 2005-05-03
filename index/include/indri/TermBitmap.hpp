@@ -15,6 +15,15 @@
 // 12 January 2005 -- tds
 //
 
+
+#ifndef INDRI_TERMBITMAP_HPP
+#define INDRI_TERMBITMAP_HPP
+
+#include "indri/Buffer.hpp"
+#include "indri/delete_range.hpp"
+
+namespace indri {
+  namespace index {
 /*!
   TermBitmap is used to convert termIDs when many DiskIndexes are merged together.
   The add() function has very strict preconditions; both from and to must increase
@@ -48,14 +57,6 @@
   the TermBitmap uses 1.33 bits per pair.
 */
 
-#ifndef INDRI_TERMBITMAP_HPP
-#define INDRI_TERMBITMAP_HPP
-
-#include "indri/Buffer.hpp"
-#include "indri/delete_range.hpp"
-
-namespace indri {
-  namespace index {
     class TermBitmap {
     private:
       std::vector<indri::utility::Buffer*> _maps;

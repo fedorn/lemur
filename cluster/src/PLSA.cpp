@@ -19,8 +19,8 @@
 #endif
 
 // Probabilistic Latent Semantic Analysis
-PLSA::PLSA(const Index &dbIndex, int numCats, HashFreqVector **train, 
-	   HashFreqVector **validate, int numIter, 
+lemur::cluster::PLSA::PLSA(const lemur::api::Index &dbIndex, int numCats, lemur::utility::HashFreqVector **train, 
+	   lemur::utility::HashFreqVector **validate, int numIter, 
 	   int numRestarts, double betastart, 
 	   double betastop, double anneal, double betaMod) :
   ind(dbIndex), data(train), testData(validate), numberOfIterations(numIter),
@@ -31,17 +31,17 @@ PLSA::PLSA(const Index &dbIndex, int numCats, HashFreqVector **train,
   initR();  
 }
 
-void PLSA::initR() {
+void lemur::cluster::PLSA::initR() {
   // initialize R - total count
   // and w->d index
   // 1-based indexing
   invIndex = new set<int, less<int> > [sizeW];
   R = 0;  
   for(int i = 1; i < sizeD; i++) { // DOC
-    HashFreqVector *freqs = data[i];
+    lemur::utility::HashFreqVector *freqs = data[i];
     freqs->startIteration();
     while (freqs->hasMore()) { // TERM
-      TERMID_T termId;
+      lemur::api::TERMID_T termId;
       int freq;
       freqs->nextFreq(termId, freq);
       R += freq;
@@ -50,7 +50,7 @@ void PLSA::initR() {
   }
 }
 
-void PLSA::init() {
+void lemur::cluster::PLSA::init() {
   bestOnly = false;
   ownMem = false;
 
@@ -93,18 +93,18 @@ void PLSA::init() {
   }
 }
 
-void PLSA::selectTestTrain(int testPercentage) {
+void lemur::cluster::PLSA::selectTestTrain(int testPercentage) {
   // set up data and testData.
-  HashFreqVector **train = new HashFreqVector *[sizeD];
-  HashFreqVector **test = new HashFreqVector *[sizeD];
+  lemur::utility::HashFreqVector **train = new lemur::utility::HashFreqVector *[sizeD];
+  lemur::utility::HashFreqVector **test = new lemur::utility::HashFreqVector *[sizeD];
   train[0] = NULL;
   test[0] = NULL;
-  FreqCount ct;  
+  lemur::utility::FreqCount ct;  
   for(int i = 1; i < sizeD; i++) { // DOC
-    train[i] = new HashFreqVector;
-    test[i] = new HashFreqVector;
-    TermInfoList *tList = ind.termInfoList(i);
-    TermInfo *info;
+    train[i] = new lemur::utility::HashFreqVector;
+    test[i] = new lemur::utility::HashFreqVector;
+    lemur::api::TermInfoList *tList = ind.termInfoList(i);
+    lemur::api::TermInfo *info;
     tList->startIteration();
     while (tList->hasMore()) { // TERM
       info = tList->nextEntry();
@@ -123,7 +123,7 @@ void PLSA::selectTestTrain(int testPercentage) {
 }
 
 // Probabilistic Latent Semantic Analysis
-PLSA::PLSA(const Index &dbIndex, int testPercentage, int numCats, 
+lemur::cluster::PLSA::PLSA(const lemur::api::Index &dbIndex, int testPercentage, int numCats, 
 	   int numIter, 
 	   int numRestarts, double betastart, 
 	   double betastop, double anneal, double betaMod) :
@@ -137,7 +137,7 @@ PLSA::PLSA(const Index &dbIndex, int testPercentage, int numCats,
 }
 
 /// Make an empty one ready to read in precomputed probability tables.
-PLSA::PLSA(const Index &dbIndex) : 
+lemur::cluster::PLSA::PLSA(const lemur::api::Index &dbIndex) : 
   ind(dbIndex), data(NULL), testData(NULL), numberOfIterations(0),
   numberOfRestarts(0), startBeta(0), beta(0),
   betaMin(0), annealcue(0), betaModifier(0), sizeZ(0), sizeW(0),
@@ -158,7 +158,7 @@ PLSA::PLSA(const Index &dbIndex) :
   //  if (!readArrays()) cerr << "Failed to Read arrays." << endl;
 }
 
-PLSA::~PLSA() {
+lemur::cluster::PLSA::~PLSA() {
   if (! bestOnly) {
     // pass in a filestem
     writeArrays();
@@ -200,15 +200,15 @@ PLSA::~PLSA() {
 }
 
 // performs one EM iteration, returns log likelihood of training data
-double PLSA::interleavedIterationEM() {
+double lemur::cluster::PLSA::interleavedIterationEM() {
   int d, z, i, j;
-  TERMID_T w;
+  lemur::api::TERMID_T w;
   
   double* denominatorMaxStep = new double[sizeZ];
   double sum = 0.0, sum_pz = 0;
   for(z = 0; z < sizeZ; z++) { // CAT
     for(d = 1; d < sizeD; d++) {// DOC
-      HashFreqVector *freqs = data[d];
+      lemur::utility::HashFreqVector *freqs = data[d];
       freqs->startIteration();
       while (freqs->hasMore()) { // TERM
 	int freq;
@@ -229,7 +229,7 @@ double PLSA::interleavedIterationEM() {
       set<int, less<int> >::iterator it;
       for (it = invIndex[w].begin(); it != invIndex[w].end(); it++) {
 	d = *it;
-	HashFreqVector *freqs = data[d]; // DOC
+	lemur::utility::HashFreqVector *freqs = data[d]; // DOC
 	int freq;
 	freqs->find(w, freq);
 	// sum += tf(w) * p(z) * exp(p(d,z)*p(w,z), beta)/jointBeta(d,w)
@@ -245,7 +245,7 @@ double PLSA::interleavedIterationEM() {
   sum = 0.0;
   for(d = 1; d < sizeD; d++) // DOC
     for(z = 0; z < sizeZ; z++) { // CAT
-      HashFreqVector *freqs = data[d];
+      lemur::utility::HashFreqVector *freqs = data[d];
       freqs->startIteration();
       while (freqs->hasMore()) { // TERM
 	int freq;
@@ -290,7 +290,7 @@ double PLSA::interleavedIterationEM() {
   return logLikelihood();
 }
     
-void PLSA::setPrevToCurrent() {
+void lemur::cluster::PLSA::setPrevToCurrent() {
   int i, j;
   for(i = 0; i < sizeZ; i++)
     p_z_prev[i] = p_z_current[i];
@@ -302,7 +302,7 @@ void PLSA::setPrevToCurrent() {
       p_d_z_prev[i][j] = p_d_z_current[i][j];
 }
 
-void PLSA::setCurrentToBest() {
+void lemur::cluster::PLSA::setCurrentToBest() {
   int i, j;
   for(i = 0; i < sizeZ; i++)
     p_z_current[i] = p_z_best[i];
@@ -314,7 +314,7 @@ void PLSA::setCurrentToBest() {
       p_d_z_current[i][j] = p_d_z_best[i][j];
 }
 
-void PLSA::setBestToCurrent() {
+void lemur::cluster::PLSA::setBestToCurrent() {
   int i, j;
   for(i = 0; i < sizeZ; i++)
     p_z_best[i] = p_z_current[i];
@@ -326,7 +326,7 @@ void PLSA::setBestToCurrent() {
       p_d_z_best[i][j] = p_d_z_current[i][j];
 }
     
-void PLSA::setBestToPrev() {
+void lemur::cluster::PLSA::setBestToPrev() {
   int i, j;
   for(i = 0; i < sizeZ; i++)
     p_z_best[i]  =  p_z_prev[i];
@@ -338,7 +338,7 @@ void PLSA::setBestToPrev() {
       p_d_z_best[i][j] = p_d_z_prev[i][j];
 }
 
-void PLSA::setPrevToBest() {
+void lemur::cluster::PLSA::setPrevToBest() {
   int i, j;
   for(i = 0; i < sizeZ; i++)
     p_z_prev[i] = p_z_best[i];
@@ -351,13 +351,13 @@ void PLSA::setPrevToBest() {
 }
 
 // Calculate the average likelihood of an event
-double PLSA::getAverageLikelihood() {
+double lemur::cluster::PLSA::getAverageLikelihood() {
   double answer = 0.0;
   int d;
-  TERMID_T w;
+  lemur::api::TERMID_T w;
   int events = 0;
   for (d = 1; d < sizeD; d++) {
-    HashFreqVector *freqs = testData[d];
+    lemur::utility::HashFreqVector *freqs = testData[d];
     freqs->startIteration();
     while (freqs->hasMore()) { // TERM
       int freq;
@@ -371,13 +371,13 @@ double PLSA::getAverageLikelihood() {
 }
 
 // Calculate the average likelihood of an event using prev parameter values
-double PLSA::getAverageLikelihoodPrev() {
+double lemur::cluster::PLSA::getAverageLikelihoodPrev() {
   double answer = 0.0;
   int d;
-  TERMID_T w;
+  lemur::api::TERMID_T w;
   int events = 0;
   for (d = 1; d < sizeD; d++) {
-    HashFreqVector *freqs = testData[d];
+    lemur::utility::HashFreqVector *freqs = testData[d];
     freqs->startIteration();
     while (freqs->hasMore()) { // TERM
       int freq;
@@ -391,7 +391,7 @@ double PLSA::getAverageLikelihoodPrev() {
 }
     
 // Calculates likelihood using previous parameter estimates
-double PLSA::jointEstimate (int indexD, int indexW) {
+double lemur::cluster::PLSA::jointEstimate (int indexD, int indexW) {
   int z;
   double sum = 0.0;
   for(z = 0; z < sizeZ; z++)
@@ -400,7 +400,7 @@ double PLSA::jointEstimate (int indexD, int indexW) {
 }
 
 // Calculates likelihood using current parameter estimates
-double PLSA::jointEstimateCurrent (int indexD, int indexW) {
+double lemur::cluster::PLSA::jointEstimateCurrent (int indexD, int indexW) {
   int z;
   double sum = 0.0;
   for(z = 0; z < sizeZ; z++)
@@ -410,7 +410,7 @@ double PLSA::jointEstimateCurrent (int indexD, int indexW) {
 
 // Calculates likelihood using best parameter estimates found 
 // (over all restarts)
-double PLSA::jointEstimateBest(int indexD, int indexW) {
+double lemur::cluster::PLSA::jointEstimateBest(int indexD, int indexW) {
   int z;
   double sum = 0.0;
   for(z = 0; z < sizeZ; z++)
@@ -420,7 +420,7 @@ double PLSA::jointEstimateBest(int indexD, int indexW) {
 
 // jointestimateBeta is joint estimate where terms in summation 
 // were raised to power beta.
-double PLSA::jointEstimateBeta (int indexD, int indexW) {
+double lemur::cluster::PLSA::jointEstimateBeta (int indexD, int indexW) {
   int z;
   double sum = 0.0;
   for(z = 0; z < sizeZ; z++)
@@ -430,7 +430,7 @@ double PLSA::jointEstimateBeta (int indexD, int indexW) {
 
 
 // This routine gets the ball rolling
-void PLSA::iterateWithRestarts() {
+void lemur::cluster::PLSA::iterateWithRestarts() {
   iterate();
   cerr << "RESTART\tLogLikelihood\tTestDataLogLikelihood\n";
   cerr << 0 << "\t" << logLikelihood() << "\t" << validateDataLogLikelihood()
@@ -448,7 +448,7 @@ void PLSA::iterateWithRestarts() {
 }
 
 // This is the main routine of the model training
-void PLSA::iterate() {
+void lemur::cluster::PLSA::iterate() {
   double lastA;  // These two variables help check for
   double newA = 1;   // numerical errors due to overfitting
   int iterNum = 0;
@@ -499,7 +499,7 @@ void PLSA::iterate() {
   }
 }
 
-void PLSA::initializeParameters() {
+void lemur::cluster::PLSA::initializeParameters() {
   int i, j;
   double sum;
   // initializing prev
@@ -545,14 +545,14 @@ This technique of not using zero probability events in the log-likelihood is dan
 
 // Calculate the log likelihood of a given data set using the supplied
 // joint estimate method.
-double PLSA::doLogLikelihood(jointfuncType jointFunc, 
-			     HashFreqVector **&myData) {
+double lemur::cluster::PLSA::doLogLikelihood(jointfuncType jointFunc, 
+			     lemur::utility::HashFreqVector **&myData) {
   int d;
-  TERMID_T w;  
+  lemur::api::TERMID_T w;  
   double sum = 0.0;
   double logJoint = 0.0;
   for (d = 1; d < sizeD; d++) {
-    HashFreqVector *freqs = myData[d];
+    lemur::utility::HashFreqVector *freqs = myData[d];
     freqs->startIteration();
     while (freqs->hasMore()) { // TERM
       int freq;
@@ -567,41 +567,41 @@ double PLSA::doLogLikelihood(jointfuncType jointFunc,
 }
 
 // Calculate the training data log-likelihood using prev parameters
-double PLSA::logLikelihood() {
-  return doLogLikelihood(&PLSA::jointEstimate, data);
+double lemur::cluster::PLSA::logLikelihood() {
+  return doLogLikelihood(&lemur::cluster::PLSA::jointEstimate, data);
 }
 
 // Calculate the hold out data log-likelihood using prev parameters
-double PLSA::validateDataLogLikelihood() {
-  return doLogLikelihood(&PLSA::jointEstimate, testData);
+double lemur::cluster::PLSA::validateDataLogLikelihood() {
+  return doLogLikelihood(&lemur::cluster::PLSA::jointEstimate, testData);
 }
 
 // Calculate the held out data log-liklihood using current parameters
-double PLSA::validateCurrentLogLikelihood() {
-  return doLogLikelihood(&PLSA::jointEstimateCurrent, testData);
+double lemur::cluster::PLSA::validateCurrentLogLikelihood() {
+  return doLogLikelihood(&lemur::cluster::PLSA::jointEstimateCurrent, testData);
 }
 
 // Calculate the hold out data log-likelihood using the best parameters
-double PLSA::bestDataLogLikelihood() {
-  return doLogLikelihood(&PLSA::jointEstimateBest, testData);
+double lemur::cluster::PLSA::bestDataLogLikelihood() {
+  return doLogLikelihood(&lemur::cluster::PLSA::jointEstimateBest, testData);
 }
 
-bool PLSA::readArrays() {
+bool lemur::cluster::PLSA::readArrays() {
   /// filestem passed in!
   bool res = true;
   ifstream if1("p_z.bin");
   ifstream if2("p_w_z.bin");
   ifstream if3("p_d_z.bin");
-  res &= readArray(if1, PLSA::P_Z);
-  res &= readArray(if2, PLSA::P_W_Z);
-  res &= readArray(if3, PLSA::P_D_Z);  
+  res &= readArray(if1, lemur::cluster::PLSA::P_Z);
+  res &= readArray(if2, lemur::cluster::PLSA::P_W_Z);
+  res &= readArray(if3, lemur::cluster::PLSA::P_D_Z);  
   if1.close();
   if2.close();
   if3.close();
   return res;
 }
 
-bool PLSA::readArray(ifstream& infile, enum pType which) {
+bool lemur::cluster::PLSA::readArray(ifstream& infile, enum pType which) {
   bool retVal = true;
   // initialize contents of best
   int dim1, dim2;
@@ -675,20 +675,20 @@ bool PLSA::readArray(ifstream& infile, enum pType which) {
   return retVal;
 }
 
-void PLSA::writeArrays() {
+void lemur::cluster::PLSA::writeArrays() {
   // pass in a filestem
   ofstream of1("p_z.bin");
   ofstream of2("p_w_z.bin");
   ofstream of3("p_d_z.bin");
-  writeArray(of1, PLSA::P_Z);
-  writeArray(of2, PLSA::P_W_Z);
-  writeArray(of3, PLSA::P_D_Z);  
+  writeArray(of1, lemur::cluster::PLSA::P_Z);
+  writeArray(of2, lemur::cluster::PLSA::P_W_Z);
+  writeArray(of3, lemur::cluster::PLSA::P_D_Z);  
   of1.close();
   of2.close();
   of3.close();
 }
 
-void PLSA::writeArray(ofstream& ofile, enum pType which) {
+void lemur::cluster::PLSA::writeArray(ofstream& ofile, enum pType which) {
 	int w;
   switch (which) {
   case P_Z:
@@ -715,7 +715,7 @@ void PLSA::writeArray(ofstream& ofile, enum pType which) {
 }
 
 // getProb(int d, int w) calculates \Pr(d,w)
-double PLSA::getProb(int d, int w) const {
+double lemur::cluster::PLSA::getProb(int d, int w) const {
   double total = 0.0;
   for (int z = 0; z < sizeZ; z++) {
     total += p_z_best[z] * p_d_z_best[d][z] * p_w_z_best[w][z];

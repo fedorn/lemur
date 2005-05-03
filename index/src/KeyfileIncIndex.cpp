@@ -63,8 +63,8 @@
 #define COLPROPS ".cps"
 #define COLPROPS_PAR "COLLECTION_PROPS"
 
-KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesize, 
-				 DOCID_T startdocid) {
+lemur::index::KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesize, 
+				 lemur::api::DOCID_T startdocid) {
   ignoreDoc = false;
   listlengths = 0;
   cprops = NULL;
@@ -115,7 +115,7 @@ KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesize,
   }
 }
 
-KeyfileIncIndex::KeyfileIncIndex() {
+lemur::index::KeyfileIncIndex::KeyfileIncIndex() {
   ignoreDoc = false;
   listlengths = 0;
   curdocmgr = -1;
@@ -126,7 +126,7 @@ KeyfileIncIndex::KeyfileIncIndex() {
   cprops = NULL;
 }
 
-KeyfileIncIndex::~KeyfileIncIndex() {
+lemur::index::KeyfileIncIndex::~KeyfileIncIndex() {
   unsigned int i;
   for( i = 0; i< _segments.size(); i++ ) {
     _segments[i]->close();
@@ -149,7 +149,7 @@ KeyfileIncIndex::~KeyfileIncIndex() {
   delete[](counts);
 }
 
-void KeyfileIncIndex::_resetEstimatePoint() {
+void lemur::index::KeyfileIncIndex::_resetEstimatePoint() {
   // how many postings should we queue up before
   // trying to estimate a flush time?
   // pick the worst case--one unique term per document
@@ -159,7 +159,7 @@ void KeyfileIncIndex::_resetEstimatePoint() {
   _estimatePoint = _listsSize / (sizeof(InvFPDocList) + 16);
 }
 
-void KeyfileIncIndex::_computeMemoryBounds( int memorySize ) {
+void lemur::index::KeyfileIncIndex::_computeMemoryBounds( int memorySize ) {
   // The following is fixed allocation--in the future
   // we may want to try something parametric:
   _memorySize = memorySize;
@@ -172,10 +172,10 @@ void KeyfileIncIndex::_computeMemoryBounds( int memorySize ) {
   _resetEstimatePoint();
 }
 
-void KeyfileIncIndex::openSegments() {
+void lemur::index::KeyfileIncIndex::openSegments() {
   // open existing inverted list segments
   for( int i=0; i<KEYFILE_MAX_SEGMENTS; i++ ) {
-    File* in = new File();
+    lemur::file::File* in = new lemur::file::File();
     std::stringstream name;
     name << names[DOC_INDEX] << i;
 
@@ -190,7 +190,7 @@ void KeyfileIncIndex::openSegments() {
   }
 }
 
-void KeyfileIncIndex::openDBs() {
+void lemur::index::KeyfileIncIndex::openDBs() {
   if (_readOnly) {
     dtlookup.open( names[TERM_LOOKUP], std::ios::binary | std::ios::in );
   } else {
@@ -199,7 +199,7 @@ void KeyfileIncIndex::openDBs() {
     dtlookup.seekp( 0, std::ios::end );
   }
   dtlookup.seekg( 0, std::ios::beg );
-  dtlookupReadBuffer = new ReadBuffer( dtlookup, 10*1024*1024 );
+  dtlookupReadBuffer = new lemur::file::ReadBuffer( dtlookup, 10*1024*1024 );
   int cacheSize = 1024 * 1024;
   invlookup.open( names[DOC_LOOKUP], cacheSize, _readOnly );
   dIDs.open( names[DOC_IDS], cacheSize, _readOnly  );
@@ -208,13 +208,13 @@ void KeyfileIncIndex::openDBs() {
   tSTRs.open( names[TERM_IDSTRS], cacheSize, _readOnly  );
 }
 
-void KeyfileIncIndex::createDBs() {
+void lemur::index::KeyfileIncIndex::createDBs() {
   dtlookup.open( names[TERM_LOOKUP], 
 		 std::ios::binary | std::ios::out | std::ios::in ) ;
   dtlookup.seekg( 0, std::ios::beg );
   dtlookup.seekp( 0, std::ios::end );
 
-  dtlookupReadBuffer = new ReadBuffer( dtlookup, 10*1024*1024 );
+  dtlookupReadBuffer = new lemur::file::ReadBuffer( dtlookup, 10*1024*1024 );
   invlookup.create( names[DOC_LOOKUP] );
   dIDs.create( names[DOC_IDS] );
   dSTRs.create( names[DOC_IDSTRS] );
@@ -222,18 +222,18 @@ void KeyfileIncIndex::createDBs() {
   tSTRs.create( names[TERM_IDSTRS] );
 }
 
-bool KeyfileIncIndex::open(const string &indexName){
+bool lemur::index::KeyfileIncIndex::open(const string &indexName){
   // stupid
-  String streamSelect = ParamGetString("stream", "cerr");
+  lemur::utility::String streamSelect = lemur::api::ParamGetString("stream", "cerr");
   if (streamSelect == "cout") {
     setMesgStream(&cout);
   } else {
     setMesgStream(&cerr);
   }
 
-  counts = new COUNT_T[5]; // should not be here.
+  counts = new lemur::api::COUNT_T[5]; // should not be here.
   *msgstream << "Trying to open toc: " << indexName << endl;
-  if (! ParamPushFile(indexName)) {
+  if (! lemur::api::ParamPushFile(indexName)) {
     *msgstream << "Couldn't open toc file for reading" << endl;
     return false;
   }
@@ -256,7 +256,7 @@ bool KeyfileIncIndex::open(const string &indexName){
 		     ios::in | ios::out | ios::binary | ios::ate );
   writetlist.seekg( 0, std::ios::beg );
 
-  ParamPopFile();
+  lemur::api::ParamPopFile();
 
   if (!docMgrIDs())
     return false;
@@ -264,7 +264,7 @@ bool KeyfileIncIndex::open(const string &indexName){
   *msgstream << "Load index complete." << endl;
   return true;
 }
-TERMID_T KeyfileIncIndex::term(const TERM_T &inWord) const{
+lemur::api::TERMID_T lemur::index::KeyfileIncIndex::term(const lemur::api::TERM_T &inWord) const{
   const char* word = inWord.c_str();
 
   if (inWord.length() > (MAX_TERM_LENGTH - 1)) {
@@ -272,7 +272,7 @@ TERMID_T KeyfileIncIndex::term(const TERM_T &inWord) const{
     return 0;
   }
 
-  TERMID_T id = _cache.find( word );
+  lemur::api::TERMID_T id = _cache.find( word );
 
   if( id <= 0 ) {
     int actual = 0;
@@ -286,7 +286,7 @@ TERMID_T KeyfileIncIndex::term(const TERM_T &inWord) const{
   return id;
 }
 
-const TERM_T KeyfileIncIndex::term(TERMID_T termID)  const{
+const lemur::api::TERM_T lemur::index::KeyfileIncIndex::term(lemur::api::TERMID_T termID)  const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS]))
     return "";
   int actual = 0;
@@ -295,15 +295,15 @@ const TERM_T KeyfileIncIndex::term(TERMID_T termID)  const{
   return this->termKey;
 }
 
-DOCID_T KeyfileIncIndex::document(const EXDOCID_T &docID) const{
+lemur::api::DOCID_T lemur::index::KeyfileIncIndex::document(const lemur::api::EXDOCID_T &docID) const{
   int actual = 0;
-  DOCID_T documentID = 0;
+  lemur::api::DOCID_T documentID = 0;
 
   const char *did = docID.c_str();
 
   int len = docID.length();
   if (len > (MAX_DOCID_LENGTH - 1)) {
-    cerr << "KeyfileIncIndex::document: document id " << did 
+    cerr << "lemur::index::KeyfileIncIndex::document: document id " << did 
 	 << " is too long ("
 	 << len << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     strncpy(docKey, did, (MAX_DOCID_LENGTH - 1));
@@ -318,7 +318,7 @@ DOCID_T KeyfileIncIndex::document(const EXDOCID_T &docID) const{
   return documentID;
 }
 
-const EXDOCID_T KeyfileIncIndex::document(DOCID_T docID) const{
+const lemur::api::EXDOCID_T lemur::index::KeyfileIncIndex::document(lemur::api::DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS]))
     return "";
   int actual = 0;
@@ -327,7 +327,7 @@ const EXDOCID_T KeyfileIncIndex::document(DOCID_T docID) const{
   return this->docKey;
 }
 
-const DocumentManager * KeyfileIncIndex::docManager(DOCID_T docID) const{
+const lemur::api::DocumentManager * lemur::index::KeyfileIncIndex::docManager(lemur::api::DOCID_T docID) const{
   if ((docID <= 0) || (docID > counts[DOCS]))
     return NULL;
   record r = fetchDocumentRecord( docID );
@@ -339,19 +339,19 @@ const DocumentManager * KeyfileIncIndex::docManager(DOCID_T docID) const{
   return docMgrs[docManagerID]; 
 }
 
-const CollectionProps *KeyfileIncIndex::collectionProps() const {
+const lemur::parse::CollectionProps *lemur::index::KeyfileIncIndex::collectionProps() const {
   // if already loaded, return list
   if (cprops)
     return cprops;
 
   // if not loaded, try to load
-  Property p;
+  lemur::parse::Property p;
   string key, val;
   ifstream rf(names[PROPS_FILE].c_str());
   if (!rf.is_open()) 
     return NULL;
 
-  cprops = new BasicCollectionProps();
+  cprops = new lemur::parse::BasicCollectionProps();
   while (rf >> key >> val) {
     p.setName(key);
     p.setValue(val.c_str());
@@ -360,7 +360,7 @@ const CollectionProps *KeyfileIncIndex::collectionProps() const {
   return cprops;
 }
 
-COUNT_T KeyfileIncIndex::termCount(TERMID_T termID) const {
+lemur::api::COUNT_T lemur::index::KeyfileIncIndex::termCount(lemur::api::TERMID_T termID) const {
   if ((termID <= 0) || (termID > counts[UNIQUE_TERMS]))
     return 0;
 
@@ -376,11 +376,11 @@ COUNT_T KeyfileIncIndex::termCount(TERMID_T termID) const {
   }
 }
 
-float KeyfileIncIndex::docLengthAvg() const{
+float lemur::index::KeyfileIncIndex::docLengthAvg() const{
   return aveDocLen;
 }
 
-COUNT_T KeyfileIncIndex::docCount(TERMID_T termID) const {
+lemur::api::COUNT_T lemur::index::KeyfileIncIndex::docCount(lemur::api::TERMID_T termID) const {
   if ((termID <= 0) || (termID > counts[UNIQUE_TERMS]))
     return 0;
 
@@ -396,7 +396,7 @@ COUNT_T KeyfileIncIndex::docCount(TERMID_T termID) const {
   }
 }
 
-COUNT_T KeyfileIncIndex::docLength(DOCID_T docID) const {
+lemur::api::COUNT_T lemur::index::KeyfileIncIndex::docLength(lemur::api::DOCID_T docID) const {
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return 0;
   }
@@ -405,7 +405,7 @@ COUNT_T KeyfileIncIndex::docLength(DOCID_T docID) const {
   return r.len;
 }
 
-COUNT_T KeyfileIncIndex::totaldocLength(DOCID_T docID) const {
+lemur::api::COUNT_T lemur::index::KeyfileIncIndex::totaldocLength(lemur::api::DOCID_T docID) const {
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return 0;
   }
@@ -413,7 +413,7 @@ COUNT_T KeyfileIncIndex::totaldocLength(DOCID_T docID) const {
   return r.totalLen;
 }
 
-COUNT_T KeyfileIncIndex::docLengthCounted(DOCID_T docID) const {
+lemur::api::COUNT_T lemur::index::KeyfileIncIndex::docLengthCounted(lemur::api::DOCID_T docID) const {
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return 0;
   }
@@ -421,12 +421,12 @@ COUNT_T KeyfileIncIndex::docLengthCounted(DOCID_T docID) const {
   // if this fails for whatever reason
   if (!tl)
     return 0;
-  COUNT_T count = tl->termCount();
+  lemur::api::COUNT_T count = tl->termCount();
   delete tl;
   return count;
 }
 
-InvFPDocList* KeyfileIncIndex::internalDocInfoList(TERMID_T termID) const{
+lemur::index::InvFPDocList* lemur::index::KeyfileIncIndex::internalDocInfoList(lemur::api::TERMID_T termID) const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS]) ) {
     *msgstream << "Error:  Trying to get docInfoList for invalid termID" 
 	       << endl;
@@ -453,14 +453,14 @@ InvFPDocList* KeyfileIncIndex::internalDocInfoList(TERMID_T termID) const{
     for( i = 0; i < vectorSegments; i++ ) {
       char* buffer = new char[termData.segments[i].length];
 
-      File* segment = _segments[ termData.segments[i].segment ];
+      lemur::file::File* segment = _segments[ termData.segments[i].segment ];
       segment->seekg( termData.segments[i].offset, std::ifstream::beg );
       segment->read( buffer, termData.segments[i].length );
 
       if( !total ) {
-        total = new InvFPDocList( (LOC_T*) buffer );
+        total = new InvFPDocList( (lemur::api::LOC_T*) buffer );
       } else {
-        InvFPDocList* segmentList = new InvFPDocList( (LOC_T*) buffer );
+        InvFPDocList* segmentList = new InvFPDocList( (lemur::api::LOC_T*) buffer );
         total->append( segmentList );
         delete segmentList;
       }
@@ -479,22 +479,22 @@ InvFPDocList* KeyfileIncIndex::internalDocInfoList(TERMID_T termID) const{
   }
 }
 
-DocInfoList* KeyfileIncIndex::docInfoList(TERMID_T termID) const{
+lemur::api::DocInfoList* lemur::index::KeyfileIncIndex::docInfoList(lemur::api::TERMID_T termID) const{
   if ((termID <= 0) || (termID > counts[UNIQUE_TERMS]) ) {
     return NULL;
   }
 
-  DocInfoList* result = internalDocInfoList(termID);
+  lemur::api::DocInfoList* result = internalDocInfoList(termID);
   
   if( !result ) {
-    throw Exception( "KeyfileIncIndex::docInfoList", 
+    throw lemur::api::Exception( "lemur::index::KeyfileIncIndex::docInfoList", 
 		     "Failed to retrieve docInfoList" );
   }
 
   return result;
 }
 
-TermInfoList* KeyfileIncIndex::termInfoList(DOCID_T docID) const{
+lemur::api::TermInfoList* lemur::index::KeyfileIncIndex::termInfoList(lemur::api::DOCID_T docID) const{
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return NULL;
   }
@@ -504,7 +504,7 @@ TermInfoList* KeyfileIncIndex::termInfoList(DOCID_T docID) const{
   return tlist;
 }
 
-TermInfoList* KeyfileIncIndex::termInfoListSeq(DOCID_T docID) const{
+lemur::api::TermInfoList* lemur::index::KeyfileIncIndex::termInfoListSeq(lemur::api::DOCID_T docID) const{
   if ((docID <= 0) || (docID > counts[DOCS])) {
     return NULL;
   }
@@ -521,29 +521,29 @@ TermInfoList* KeyfileIncIndex::termInfoListSeq(DOCID_T docID) const{
 /*=======================================================================
  * PRIVATE METHODS 
  =======================================================================*/
-void KeyfileIncIndex::fullToc() {
-  counts[DOCS] = ParamGetInt(NUMDOCS_PAR, 0);
-  counts[TOTAL_TERMS] = ParamGetInt(NUMTERMS_PAR, 0);
-  counts[UNIQUE_TERMS] = ParamGetInt(NUMUTERMS_PAR, 0);
-  counts[DT_FILES] = ParamGetInt(NUMDT_PAR, 0);
+void lemur::index::KeyfileIncIndex::fullToc() {
+  counts[DOCS] = lemur::api::ParamGetInt(NUMDOCS_PAR, 0);
+  counts[TOTAL_TERMS] = lemur::api::ParamGetInt(NUMTERMS_PAR, 0);
+  counts[UNIQUE_TERMS] = lemur::api::ParamGetInt(NUMUTERMS_PAR, 0);
+  counts[DT_FILES] = lemur::api::ParamGetInt(NUMDT_PAR, 0);
 
   names.resize( NAMES_SIZE, std::string() );
-  names[DOC_INDEX] = ParamGetString(INVINDEX_PAR);
-  names[DOC_LOOKUP] = ParamGetString(INVLOOKUP_PAR);
-  names[TERM_INDEX] = ParamGetString(DTINDEX_PAR);
-  names[TERM_LOOKUP] = ParamGetString(DTLOOKUP_PAR);
-  names[TERM_IDS] = ParamGetString(TERMIDMAP_PAR);
-  names[DOC_IDS] = ParamGetString(DOCIDMAP_PAR);
-  names[DOCMGR_IDS] = ParamGetString(DOCMGR_PAR);
-  names[VERSION_NUM] = ParamGetString(VERSION_PAR);
-  names[TERM_IDSTRS] = ParamGetString(TERMIDSTRMAP_PAR);
-  names[DOC_IDSTRS] = ParamGetString(DOCIDSTRMAP_PAR);
-  names[PROPS_FILE] = ParamGetString(COLPROPS_PAR);
+  names[DOC_INDEX] = lemur::api::ParamGetString(INVINDEX_PAR);
+  names[DOC_LOOKUP] = lemur::api::ParamGetString(INVLOOKUP_PAR);
+  names[TERM_INDEX] = lemur::api::ParamGetString(DTINDEX_PAR);
+  names[TERM_LOOKUP] = lemur::api::ParamGetString(DTLOOKUP_PAR);
+  names[TERM_IDS] = lemur::api::ParamGetString(TERMIDMAP_PAR);
+  names[DOC_IDS] = lemur::api::ParamGetString(DOCIDMAP_PAR);
+  names[DOCMGR_IDS] = lemur::api::ParamGetString(DOCMGR_PAR);
+  names[VERSION_NUM] = lemur::api::ParamGetString(VERSION_PAR);
+  names[TERM_IDSTRS] = lemur::api::ParamGetString(TERMIDSTRMAP_PAR);
+  names[DOC_IDSTRS] = lemur::api::ParamGetString(DOCIDSTRMAP_PAR);
+  names[PROPS_FILE] = lemur::api::ParamGetString(COLPROPS_PAR);
   aveDocLen = counts[TOTAL_TERMS] / (float) counts[DOCS];
 }
 
 
-bool KeyfileIncIndex::docMgrIDs() {
+bool lemur::index::KeyfileIncIndex::docMgrIDs() {
   FILE* in = fopen(names[DOCMGR_IDS].c_str(), "r");
   *msgstream << "Trying to open doc manager ids file: " 
 	     << names[DOCMGR_IDS] << endl;
@@ -565,7 +565,7 @@ bool KeyfileIncIndex::docMgrIDs() {
       continue;
     }
     str[len] = '\0';
-    DocumentManager* dm = DocMgrManager::openDocMgr(str, _readOnly);
+    lemur::api::DocumentManager* dm = lemur::api::DocMgrManager::openDocMgr(str, _readOnly);
     docMgrs.push_back(dm);
     docmgrs.push_back(str);
   }
@@ -573,22 +573,22 @@ bool KeyfileIncIndex::docMgrIDs() {
   return true;
 }
 
-void KeyfileIncIndex::setMesgStream(ostream * lemStream) {
+void lemur::index::KeyfileIncIndex::setMesgStream(ostream * lemStream) {
   msgstream = lemStream;
 }
 
-void KeyfileIncIndex::setName(const string &prefix) {
+void lemur::index::KeyfileIncIndex::setName(const string &prefix) {
   name = prefix;
 }
 
-bool KeyfileIncIndex::beginDoc(const DocumentProps* dp){
+bool lemur::index::KeyfileIncIndex::beginDoc(const lemur::parse::DocumentProps* dp){
   if (dp == NULL)
     return false;
   const char *did = dp->stringID();
-  DOCID_T docID = document(did);
+  lemur::api::DOCID_T docID = document(did);
   if (docID > 0) {
     //already have seen this document's id.
-    cerr << "KeyfileIncIndex::beginDoc: duplicate document id " << did 
+    cerr << "lemur::index::KeyfileIncIndex::beginDoc: duplicate document id " << did 
 	 << ". Document will be ignored." << endl;
     ignoreDoc = true;
     return false;
@@ -596,7 +596,7 @@ bool KeyfileIncIndex::beginDoc(const DocumentProps* dp){
   
   int len = strlen(did);
   if (len > (MAX_DOCID_LENGTH - 1)) {
-    cerr << "KeyfileIncIndex::beginDoc: document id " << did 
+    cerr << "lemur::index::KeyfileIncIndex::beginDoc: document id " << did 
 	 << " is too long ("
 	 << len << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     strncpy(docKey, did, (MAX_DOCID_LENGTH - 1));
@@ -605,12 +605,12 @@ bool KeyfileIncIndex::beginDoc(const DocumentProps* dp){
     cerr << "truncating to " << docKey << endl;
   }
   counts[DOCS]++;
-  DOCID_T documentID = counts[DOCS];
+  lemur::api::DOCID_T documentID = counts[DOCS];
   addDocumentLookup( documentID, did);
   return true;
 }
 
-void KeyfileIncIndex::_updateTermlist( InvFPDocList* curlist, LOC_T position ) {
+void lemur::index::KeyfileIncIndex::_updateTermlist( InvFPDocList* curlist, lemur::api::LOC_T position ) {
   LocatedTerm lt;
   lt.loc = position;
   lt.term = curlist->termID();
@@ -618,7 +618,7 @@ void KeyfileIncIndex::_updateTermlist( InvFPDocList* curlist, LOC_T position ) {
   listlengths++;
 }
 
-void KeyfileIncIndex::addKnownTerm( TERMID_T termID, LOC_T position ) {
+void lemur::index::KeyfileIncIndex::addKnownTerm( lemur::api::TERMID_T termID, lemur::api::LOC_T position ) {
   InvFPDocList* curlist;
 
   curlist = invertlists[termID - 1];
@@ -632,10 +632,10 @@ void KeyfileIncIndex::addKnownTerm( TERMID_T termID, LOC_T position ) {
   _updateTermlist( curlist, position );
 }
 
-TERMID_T KeyfileIncIndex::addUnknownTerm( const InvFPTerm* term ) {
+lemur::api::TERMID_T lemur::index::KeyfileIncIndex::addUnknownTerm( const InvFPTerm* term ) {
   // update unique word counter
   counts[UNIQUE_TERMS]++;
-  TERMID_T termID = counts[UNIQUE_TERMS];
+  lemur::api::TERMID_T termID = counts[UNIQUE_TERMS];
 
   InvFPDocList* curlist = new InvFPDocList(termID, term->strLength());
   invertlists.push_back( curlist );  // term is added at index termID-1
@@ -647,8 +647,8 @@ TERMID_T KeyfileIncIndex::addUnknownTerm( const InvFPTerm* term ) {
   return termID;
 }
 
-TERMID_T KeyfileIncIndex::addUncachedTerm( const InvFPTerm* term ) {
-  TERMID_T tid;
+lemur::api::TERMID_T lemur::index::KeyfileIncIndex::addUncachedTerm( const InvFPTerm* term ) {
+  lemur::api::TERMID_T tid;
   int actual = 0;
     
   if( tIDs.get( term->spelling(), &tid, actual, sizeof tid ) ) {
@@ -660,7 +660,7 @@ TERMID_T KeyfileIncIndex::addUncachedTerm( const InvFPTerm* term ) {
   return tid;
 }
 
-bool KeyfileIncIndex::addTerm(const Term& t){
+bool lemur::index::KeyfileIncIndex::addTerm(const lemur::api::Term& t){
   if (ignoreDoc) return false; // skipping this document.
   const InvFPTerm* term = dynamic_cast< const InvFPTerm* >(&t);
   assert( term->strLength() > 0 );
@@ -668,13 +668,13 @@ bool KeyfileIncIndex::addTerm(const Term& t){
   int len = term->strLength();
   if (len > (MAX_TERM_LENGTH - 1)) {
     //term is too big to be a key.
-    cerr << "KeyfileIncIndex::addTerm: ignoring " << term->spelling()
+    cerr << "lemur::index::KeyfileIncIndex::addTerm: ignoring " << term->spelling()
 	 << " which is too long ("
 	 << len << " > " << (MAX_TERM_LENGTH - 1) << ")" << endl;
     return false;
   }
 
-  TERMID_T id = _cache.find( term->spelling() );
+  lemur::api::TERMID_T id = _cache.find( term->spelling() );
 
   if( id > 0 ) {
     addKnownTerm( id, term->position() );
@@ -686,17 +686,17 @@ bool KeyfileIncIndex::addTerm(const Term& t){
   return true;
 }
 
-void KeyfileIncIndex::endDoc(const DocumentProps* dp) {
+void lemur::index::KeyfileIncIndex::endDoc(const lemur::parse::DocumentProps* dp) {
   if (! ignoreDoc) doendDoc(dp, curdocmgr);
   ignoreDoc = false;
 }
 
-void KeyfileIncIndex::endDoc(const DocumentProps* dp, const string &mgr){
+void lemur::index::KeyfileIncIndex::endDoc(const lemur::parse::DocumentProps* dp, const string &mgr){
   if (! ignoreDoc) doendDoc(dp, docMgrID(mgr));
   ignoreDoc = false;
 }
 
-void KeyfileIncIndex::endCollection(const CollectionProps* cp){
+void lemur::index::KeyfileIncIndex::endCollection(const lemur::parse::CollectionProps* cp){
   // flush everything in the cache
   if (_readOnly) return;
   lastWriteCache();
@@ -706,21 +706,21 @@ void KeyfileIncIndex::endCollection(const CollectionProps* cp){
   writeTOC(cp);
 }
 
-void KeyfileIncIndex::setDocManager (const string &mgrID) {
+void lemur::index::KeyfileIncIndex::setDocManager (const string &mgrID) {
   curdocmgr = docMgrID(mgrID);
 }
 
 /*==========================================================================
  *  PRIVATE METHODS
  *==========================================================================*/
-bool KeyfileIncIndex::tryOpen() {
+bool lemur::index::KeyfileIncIndex::tryOpen() {
   // open an existing index and load up all of the data structures.
   std::string fname;
   fname = name + ".key"; // fix this.
   return open(fname);
 }
 
-void KeyfileIncIndex::writeTOC(const CollectionProps* cp) {
+void lemur::index::KeyfileIncIndex::writeTOC(const lemur::parse::CollectionProps* cp) {
   // change format to match indri parameters xml format
   std::string fname = name + ".key";
   *msgstream << "Writing out main stats table" << std::endl;
@@ -750,7 +750,7 @@ void KeyfileIncIndex::writeTOC(const CollectionProps* cp) {
   toc << "</parameters>\n";
   toc.close();
 
-  const BasicCollectionProps* props = dynamic_cast<const BasicCollectionProps*>(cp);
+  const lemur::parse::BasicCollectionProps* props = dynamic_cast<const lemur::parse::BasicCollectionProps*>(cp);
 
   if (props) {
     fname = name + COLPROPS;
@@ -761,14 +761,14 @@ void KeyfileIncIndex::writeTOC(const CollectionProps* cp) {
       return;
     }
     
-    const Property* p = NULL;
+    const lemur::parse::Property* p = NULL;
     string value;
     props->startIteration();
     while (props->hasMore()) {
       p = props->nextEntry();
-      if (p->getType() == Property::STDSTRING)
+      if (p->getType() == lemur::parse::Property::STDSTRING)
 	pf << p->getName() << "  " << *(string*)p->getValue() << endl;
-      else if (p->getType() == Property::STRING)
+      else if (p->getType() == lemur::parse::Property::STRING)
 	pf << p->getName() << "  " << (char*)p->getValue() << endl;
     }
     
@@ -776,7 +776,7 @@ void KeyfileIncIndex::writeTOC(const CollectionProps* cp) {
   }
 }
 
-void KeyfileIncIndex::writeDocMgrIDs() {
+void lemur::index::KeyfileIncIndex::writeDocMgrIDs() {
   std::string dmname = name + DOCMGRMAP;
   std::ofstream dmID;
 
@@ -795,7 +795,7 @@ void KeyfileIncIndex::writeDocMgrIDs() {
 //
 // -------------------------------------------------------------------------------------
 
-void KeyfileIncIndex::writeCache( bool finalRun ) {
+void lemur::index::KeyfileIncIndex::writeCache( bool finalRun ) {
   writeCacheSegment();
 
   if( _segments.size() >= KEYFILE_MAX_SEGMENTS || 
@@ -804,12 +804,12 @@ void KeyfileIncIndex::writeCache( bool finalRun ) {
   }
 }
 
-void KeyfileIncIndex::lastWriteCache() {
+void lemur::index::KeyfileIncIndex::lastWriteCache() {
   listlengths = -1;
   writeCache( true );
 }
 
-int KeyfileIncIndex::_cacheSize() {
+int lemur::index::KeyfileIncIndex::_cacheSize() {
   int totalSize = 0;
 
   for( unsigned int i=0; i<invertlists.size(); i++ ) {
@@ -823,9 +823,9 @@ int KeyfileIncIndex::_cacheSize() {
   return totalSize;
 }
 
-void KeyfileIncIndex::writeCacheSegment() {
+void lemur::index::KeyfileIncIndex::writeCacheSegment() {
   std::stringstream name;
-  File outFile;
+  lemur::file::File outFile;
 
   // name of the file is <indexName>.ivl<segmentNumber>
   name << names[DOC_INDEX] << _segments.size();
@@ -835,7 +835,7 @@ void KeyfileIncIndex::writeCacheSegment() {
   // faster with these very small writes (system call overhead?)
   outFile.open( name.str().c_str(), 
 		std::ofstream::out | std::ofstream::binary );
-  WriteBuffer out(outFile, KEYFILE_WRITEBUFFER_SIZE);
+  lemur::file::WriteBuffer out(outFile, KEYFILE_WRITEBUFFER_SIZE);
 
   int writes = 0;
   int totalSegments = _segments.size();
@@ -844,8 +844,8 @@ void KeyfileIncIndex::writeCacheSegment() {
     InvFPDocList* list = invertlists[i];
   
     if( list != NULL ) {
-      COUNT_T vecLen;
-      std::auto_ptr<LOC_T> byteVec( list->byteVec(vecLen) );
+      lemur::api::COUNT_T vecLen;
+      std::auto_ptr<lemur::api::LOC_T> byteVec( list->byteVec(vecLen) );
 
       TermData termData;
 
@@ -888,7 +888,7 @@ void KeyfileIncIndex::writeCacheSegment() {
   outFile.close();
 
   // reopen the output file as an input stream for queries:
-  File* in = new File();
+  lemur::file::File* in = new lemur::file::File();
   in->open( name.str().c_str(), std::ifstream::in | std::ifstream::binary );
   _segments.push_back( in );
 
@@ -899,13 +899,13 @@ void KeyfileIncIndex::writeCacheSegment() {
 
 class reader_less {
 public:
-  bool operator () ( const KeyfileDocListSegmentReader* one, 
-		     const KeyfileDocListSegmentReader* two ) {
+  bool operator () ( const lemur::file::KeyfileDocListSegmentReader* one, 
+		     const lemur::file::KeyfileDocListSegmentReader* two ) {
     return (*one) < (*two);
   }
 };
 
-void KeyfileIncIndex::mergeCacheSegments() {
+void lemur::index::KeyfileIncIndex::mergeCacheSegments() {
   unsigned int firstMergeSegment = 0;
 
   if( firstMergeSegment == 0 ) {
@@ -920,25 +920,25 @@ void KeyfileIncIndex::mergeCacheSegments() {
     invlookup.create( names[DOC_LOOKUP].c_str() );
   }
 
-  std::priority_queue<KeyfileDocListSegmentReader*,
-    std::vector<KeyfileDocListSegmentReader*>,reader_less> readers;
-  File outFile;
+  std::priority_queue<lemur::file::KeyfileDocListSegmentReader*,
+    std::vector<lemur::file::KeyfileDocListSegmentReader*>,reader_less> readers;
+  lemur::file::File outFile;
   std::vector<std::string> listNames;
 
   std::stringstream oldName;
   oldName << names[DOC_INDEX] << _segments.size();
   outFile.open( oldName.str(), std::ofstream::out | std::ofstream::binary );
-  WriteBuffer out(outFile, KEYFILE_WRITEBUFFER_SIZE);  
+  lemur::file::WriteBuffer out(outFile, KEYFILE_WRITEBUFFER_SIZE);  
 
   string nameToOpen(names[DOC_INDEX]);
-  File * fileToOpen;
+  lemur::file::File * fileToOpen;
   // open segments
   for( unsigned int i = firstMergeSegment; i < _segments.size(); i++ ) {
     //    g++ doesn't like this.
     //    KeyfileDocListSegmentReader* reader =  new KeyfileDocListSegmentReader( _segments[i], std::string(names[DOC_INDEX]), i, KEYFILE_DOCLISTREADER_SIZE );
     fileToOpen =  _segments[i];
-    KeyfileDocListSegmentReader* reader =  
-      new KeyfileDocListSegmentReader(fileToOpen, nameToOpen, i, 
+    lemur::file::KeyfileDocListSegmentReader* reader =  
+      new lemur::file::KeyfileDocListSegmentReader(fileToOpen, nameToOpen, i, 
 				      KEYFILE_DOCLISTREADER_SIZE );
     reader->pop(); // read the first list into memory
     // if it is empty, don't push it.
@@ -953,9 +953,9 @@ void KeyfileIncIndex::mergeCacheSegments() {
 
   while( readers.size() ) {
     // find the minimum term id
-    KeyfileDocListSegmentReader* reader = readers.top();
+    lemur::file::KeyfileDocListSegmentReader* reader = readers.top();
     InvFPDocList* list = reader->top();
-    TERMID_T termID = list->termID();
+    lemur::api::TERMID_T termID = list->termID();
 
     reader->pop();
     // reindex the reader
@@ -994,9 +994,9 @@ void KeyfileIncIndex::mergeCacheSegments() {
     termData.documentCount = list->docFreq();
 
     // now the list is complete, so write it out
-    COUNT_T listLength;
-    LOC_T* listBuffer = list->byteVec( listLength );
-    File::offset_type offset = out.tellp();
+    lemur::api::COUNT_T listLength;
+    lemur::api::LOC_T* listBuffer = list->byteVec( listLength );
+    lemur::file::File::offset_type offset = out.tellp();
     out.write( (char*) listBuffer, listLength );
     delete[](listBuffer);
     delete list;
@@ -1033,14 +1033,14 @@ void KeyfileIncIndex::mergeCacheSegments() {
   // merged segment to be segment <firstMergeSegment>.
   std::stringstream newName;
   newName << names[DOC_INDEX] << firstMergeSegment;
-  File::rename( oldName.str(), newName.str() );
+  lemur::file::File::rename( oldName.str(), newName.str() );
 
   // clear out the _segment vector (all the ifstreams have
   // already been deleted)
   _segments.erase( _segments.begin() + firstMergeSegment, _segments.end() );
   
   // open the final segment again for reading
-  File* in = new File();
+  lemur::file::File* in = new lemur::file::File();
   in->open( newName.str(), std::ifstream::in | std::ifstream::binary );
   _segments.push_back( in );
 }
@@ -1051,7 +1051,7 @@ void KeyfileIncIndex::mergeCacheSegments() {
 //
 // -----------------------------------------------------------------------------
 
-int KeyfileIncIndex::docMgrID(const string &mgrString) {
+int lemur::index::KeyfileIncIndex::docMgrID(const string &mgrString) {
   //  std::string mgrString( mgr );
   std::vector<std::string>::iterator iter;
 
@@ -1066,13 +1066,13 @@ int KeyfileIncIndex::docMgrID(const string &mgrString) {
     // type should come in as a parameter (or be parsed out of name...
     // or try open.
     // FIXME!!! dmf
-    DocumentManager *dm = DocMgrManager::createDocMgr("fixme", mgrString);
+    lemur::api::DocumentManager *dm = lemur::api::DocMgrManager::createDocMgr("fixme", mgrString);
     docMgrs.push_back(dm);
     return docmgrs.size()-1;
   }
 }
 
-void KeyfileIncIndex::doendDoc(const DocumentProps* dp, int mgrid){
+void lemur::index::KeyfileIncIndex::doendDoc(const lemur::parse::DocumentProps* dp, int mgrid){
   //flush list and write to lookup table
   if (dp != NULL) {
     int len = dp->length();
@@ -1091,7 +1091,7 @@ void KeyfileIncIndex::doendDoc(const DocumentProps* dp, int mgrid){
       rec.totalLen = 0;
     }
     
-    DOCID_T docID = counts[DOCS];
+    lemur::api::DOCID_T docID = counts[DOCS];
 
     dtlookup.write( (char*) &rec, sizeof rec );
 
@@ -1126,7 +1126,7 @@ void KeyfileIncIndex::doendDoc(const DocumentProps* dp, int mgrid){
 //
 // ----------------------------------------------------------------------------------
 
-KeyfileIncIndex::record KeyfileIncIndex::fetchDocumentRecord(DOCID_T key) const {
+lemur::index::KeyfileIncIndex::record lemur::index::KeyfileIncIndex::fetchDocumentRecord(lemur::api::DOCID_T key) const {
   if (key == 0)
     return record();
 
@@ -1138,18 +1138,18 @@ KeyfileIncIndex::record KeyfileIncIndex::fetchDocumentRecord(DOCID_T key) const 
   return rec;
 }
 
-void KeyfileIncIndex::addDocumentLookup( DOCID_T documentKey, 
+void lemur::index::KeyfileIncIndex::addDocumentLookup( lemur::api::DOCID_T documentKey, 
 					 const char* documentName ) {
   addGeneralLookup( dSTRs, dIDs, documentKey, documentName );
 }
 
-void KeyfileIncIndex::addTermLookup( TERMID_T termKey, const char* termSpelling ) {
+void lemur::index::KeyfileIncIndex::addTermLookup( lemur::api::TERMID_T termKey, const char* termSpelling ) {
   addGeneralLookup( tSTRs, tIDs, termKey, termSpelling );
 }
 
-void KeyfileIncIndex::addGeneralLookup( Keyfile& numberNameIndex, 
-					Keyfile& nameNumberIndex, 
-					TERMID_T number, const char* name ) {
+void lemur::index::KeyfileIncIndex::addGeneralLookup( lemur::file::Keyfile& numberNameIndex, 
+					lemur::file::Keyfile& nameNumberIndex, 
+					lemur::api::TERMID_T number, const char* name ) {
   numberNameIndex.put( number, (void*) name, strlen(name) );
   nameNumberIndex.put( name, &number, sizeof number );
 }

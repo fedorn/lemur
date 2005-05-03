@@ -12,11 +12,11 @@
 #include "StringQuery.hpp"
 #include <sstream>
 
-StringQuery::StringQuery() {
+lemur::parse::StringQuery::StringQuery() {
   iter=0;
 }
 
-StringQuery::StringQuery(const char* query, const char* id) {
+lemur::parse::StringQuery::StringQuery(const char* query, const char* id) {
   char* copy = strdup(query);
   char* tok = strtok(copy, " ");
   while (tok) {
@@ -29,7 +29,7 @@ StringQuery::StringQuery(const char* query, const char* id) {
     qid = id;
 }
 
-StringQuery::StringQuery(const string& query, const string& id) {
+lemur::parse::StringQuery::StringQuery(const string& query, const string& id) {
   istringstream ss(query);
   string tok;
   while (ss >> tok) {
@@ -39,10 +39,10 @@ StringQuery::StringQuery(const string& query, const string& id) {
     qid = id;
 }
 
-StringQuery::~StringQuery() {
+lemur::parse::StringQuery::~StringQuery() {
 }
 
-void StringQuery::parse(const string& query) {
+void lemur::parse::StringQuery::parse(const string& query) {
   istringstream ss(query);
   string tok;
   while (ss >> tok) {
@@ -53,27 +53,27 @@ void StringQuery::parse(const string& query) {
   }
 }
 
-const Term* StringQuery::nextTerm() const {
+const lemur::api::Term* lemur::parse::StringQuery::nextTerm() const {
   tt.spelling(tokens[iter]);
   iter++;
   return &tt;
 }
 
-void StringQuery::addTerm(const string& token) {
+void lemur::parse::StringQuery::addTerm(const string& token) {
   tokens.push_back(token);
 }
 
-void StringQuery::addTerm(const char* token) {
+void lemur::parse::StringQuery::addTerm(const char* token) {
   if (token)
     tokens.push_back(token);
 }
 
-char* StringQuery::handleWord(char* word) {
+char* lemur::parse::StringQuery::handleWord(char* word) {
   addTerm(word);
   return word;
 }
 
-char* StringQuery::handleSymbol(char* sym) {
+char* lemur::parse::StringQuery::handleSymbol(char* sym) {
   addTerm(sym);
   return sym;
 }

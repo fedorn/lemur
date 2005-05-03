@@ -6,7 +6,7 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _SIMPLEKLDOCMODEL_HPP
 #define _SIMPLEKLDOCMODEL_HPP
@@ -26,7 +26,7 @@ namespace SimpleKLParameter {
   enum QueryUpdateMethod {MIXTURE = 0, DIVMIN=1, MARKOVCHAIN=2, RM1=3, RM2=4};
 
   enum adjustedScoreMethods {QUERYLIKELIHOOD = 1, CROSSENTROPY = 2, 
-			       NEGATIVEKLD = 3};
+                             NEGATIVEKLD = 3};
 
   struct DocSmoothParam {
     /// smoothing method
@@ -78,253 +78,256 @@ namespace SimpleKLParameter {
   static double defaultQryNoise = 0; //maximum likelihood estimator
 };
 
+namespace lemur 
+{
+  namespace retrieval
+  {
+    
 
-/// Doc representation for simple KL divergence retrieval model
+    /// Doc representation for simple KL divergence retrieval model
 
-/*!
- abstract interface of doc representation for smoothed document unigram model
+    /*!
+      abstract interface of doc representation for smoothed document unigram model
  
- adapt a smoothed document language model interface to a DocumentRep interface
- <PRE>
- p(w|d) = q(w|d) if w seen
-        = a(d) * Pc(w)  if w unseen
-   where,  a(d) controls the probability mass allocated to all unseen words and     Pc(w) is the collection language model
-</PRE>
+      adapt a smoothed document language model interface to a DocumentRep interface
+      <PRE>
+      p(w|d) = q(w|d) if w seen
+      = a(d) * Pc(w)  if w unseen
+      where,  a(d) controls the probability mass allocated to all unseen words and     Pc(w) is the collection language model
+      </PRE>
 
-*/
-
-class SimpleKLDocModel : public DocumentRep {
-public:
-  SimpleKLDocModel(DOCID_T docID, const UnigramLM &collectLM, int dl = 1, 
-		   const double *prMass = NULL,
-		   SimpleKLParameter::SmoothStrategy strat = SimpleKLParameter::INTERPOLATE) : 
-    DocumentRep(docID, dl), 
-    refLM(collectLM), docPrMass(prMass), strategy(strat) {
-  };
-  
-  ~SimpleKLDocModel() {};
-
-  /// term weighting function, weight(w) = p_seen(w)/p_unseen(w)
-  virtual double termWeight(TERMID_T termID, const DocInfo *info) const {
-    double sp = seenProb(info->termCount(), termID);
-    double usp = unseenCoeff();
-    double ref = refLM.prob(termID);
-    double score = sp/(usp*ref);
-    /*
-    cerr << "TW:" << termID << " sp:" << sp << " usp:" << usp << " ref:" << ref << " s:" << score << endl;
     */
-    //    return (seenProb(info->termCount(), termID)/(unseenCoeff()* refLM.prob(termID)));
-    return score;
-  }
 
-  /// doc-specific constant term in the scoring formula
-  virtual double scoreConstant() const {
-    return unseenCoeff();
-  }
-
-  /// a(d)
-  virtual double unseenCoeff() const =0; // a(d)
-  /// p(w|d), w seen
-  virtual double seenProb(double termFreq, TERMID_T termID) const =0;
-
-protected:
-  const UnigramLM &refLM;
-  const double *docPrMass;
-  SimpleKLParameter::SmoothStrategy strategy;
-};
-
-
-
-/// Jelinek-Mercer interpolation 
-
-/*!
-
-<PRE>
- P(w|d) = (1-lambda)*Pml(w|d)+ lambda*Pc(w)
-</PRE>
-*/
-
-class JelinekMercerDocModel : public SimpleKLDocModel {
-public:
-  JelinekMercerDocModel(DOCID_T docID, 
-			int dl,
-			const UnigramLM &collectLM,
-			const double *docProbMass,
-			double collectLMWeight, 
-			SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
-    SimpleKLDocModel(docID, collectLM, dl, docProbMass, smthStrategy),
-    lambda(collectLMWeight) {
-  };
-
-  virtual ~JelinekMercerDocModel() {};
+    class SimpleKLDocModel : public lemur::api::DocumentRep {
+    public:
+      SimpleKLDocModel(lemur::api::DOCID_T docID, const lemur::langmod::UnigramLM &collectLM, 
+                       int dl = 1, 
+                       const double *prMass = NULL,
+                       SimpleKLParameter::SmoothStrategy strat = SimpleKLParameter::INTERPOLATE) : 
+        lemur::api::DocumentRep(docID, dl), 
+        refLM(collectLM), docPrMass(prMass), strategy(strat) {
+      };
   
-  virtual double unseenCoeff() const {
-    if (strategy == SimpleKLParameter::INTERPOLATE) {
-      return lambda;
-    } else if (strategy==SimpleKLParameter::BACKOFF) {
-      return lambda/(1-docPrMass[id]);
-    } else {
-      throw Exception("JelinekMercerDocModel", "Unknown smoothing strategy");
-    }
-  }
-  virtual double seenProb(double termFreq, TERMID_T termID) const {
-    if (strategy == SimpleKLParameter::INTERPOLATE) {
-      return ((1-lambda)*termFreq/(double)docLength +
-	      lambda*refLM.prob(termID));
-    } else if (strategy == SimpleKLParameter::BACKOFF) {
-      return ((1-lambda)*termFreq/(double)docLength);
-    } else {
-      throw Exception("JelinekMercerDocModel", "Unknown smoothing strategy");
-    }
-  }
-private:
-  double lambda;
-};
+      ~SimpleKLDocModel() {};
 
-/// Bayesian smoothing with Dirichlet prior
-/*!
-<PRE>
- P(w|d) = (c(w;d)+mu*Pc(w))/(|d|+mu)
-</PRE>
-*/
-class DirichletPriorDocModel : public SimpleKLDocModel {
-public:
-  DirichletPriorDocModel(DOCID_T docID,
-			 int dl,
-			 const UnigramLM &collectLM,
-			 const double *docProbMass,
-			 double priorWordCount,
-			 SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
-    SimpleKLDocModel(docID, collectLM, dl, docProbMass, smthStrategy),
-    mu(priorWordCount) {
-  };
+      /// term weighting function, weight(w) = p_seen(w)/p_unseen(w)
+      virtual double termWeight(lemur::api::TERMID_T termID, const lemur::api::DocInfo *info) const {
+        double sp = seenProb(info->termCount(), termID);
+        double usp = unseenCoeff();
+        double ref = refLM.prob(termID);
+        double score = sp/(usp*ref);
+        /*
+          cerr << "TW:" << termID << " sp:" << sp << " usp:" << usp << " ref:" << ref << " s:" << score << endl;
+        */
+        //    return (seenProb(info->termCount(), termID)/(unseenCoeff()* refLM.prob(termID)));
+        return score;
+      }
 
-  virtual ~DirichletPriorDocModel() {};
+      /// doc-specific constant term in the scoring formula
+      virtual double scoreConstant() const {
+        return unseenCoeff();
+      }
 
-  virtual double unseenCoeff() const {
+      /// a(d)
+      virtual double unseenCoeff() const =0; // a(d)
+      /// p(w|d), w seen
+      virtual double seenProb(double termFreq, lemur::api::TERMID_T termID) const =0;
 
-    if (strategy == SimpleKLParameter::INTERPOLATE) {
-      return mu/(mu+docLength);
-    } else if (strategy==SimpleKLParameter::BACKOFF) {
-      return (mu/((mu+docLength)*(1-docPrMass[id])));
-    } else {
-      throw Exception("DirichletPriorDocModel", "Unknown smoothing strategy");
-    }
-  }
+    protected:
+      const lemur::langmod::UnigramLM &refLM;
+      const double *docPrMass;
+      SimpleKLParameter::SmoothStrategy strategy;
+    };
 
-  virtual double seenProb(double termFreq, TERMID_T termID) const {
-    if (strategy == SimpleKLParameter::INTERPOLATE) {
-      return (termFreq+mu*refLM.prob(termID))/
-	(double)(docLength+mu);
-    } else if (strategy == SimpleKLParameter::BACKOFF) {
-      return (termFreq/(double)(docLength+mu));
-    } else {      
-      throw Exception("DirichletPriorDocModel", "Unknown smoothing strategy");
-    }
-  }
-private:
-  double mu;
-};
 
-/// Absolute discout smoothing
 
-/*!
- P(w|d) = (termFreq - delta)/|d|+ lambda*Pc(w)     if seen
+    /// Jelinek-Mercer interpolation 
+
+    /*!
+
+    <PRE>
+    P(w|d) = (1-lambda)*Pml(w|d)+ lambda*Pc(w)
+    </PRE>
+    */
+
+    class JelinekMercerDocModel : public SimpleKLDocModel {
+    public:
+      JelinekMercerDocModel(lemur::api::DOCID_T docID, 
+                            int dl,
+                            const lemur::langmod::UnigramLM &collectLM,
+                            const double *docProbMass,
+                            double collectLMWeight, 
+                            SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
+        SimpleKLDocModel(docID, collectLM, dl, docProbMass, smthStrategy),
+        lambda(collectLMWeight) {
+      };
+
+      virtual ~JelinekMercerDocModel() {};
+  
+      virtual double unseenCoeff() const {
+        if (strategy == SimpleKLParameter::INTERPOLATE) {
+          return lambda;
+        } else if (strategy==SimpleKLParameter::BACKOFF) {
+          return lambda/(1-docPrMass[id]);
+        } else {
+          throw lemur::api::Exception("JelinekMercerDocModel", "Unknown smoothing strategy");
+        }
+      }
+      virtual double seenProb(double termFreq, lemur::api::TERMID_T termID) const {
+        if (strategy == SimpleKLParameter::INTERPOLATE) {
+          return ((1-lambda)*termFreq/(double)docLength +
+                  lambda*refLM.prob(termID));
+        } else if (strategy == SimpleKLParameter::BACKOFF) {
+          return ((1-lambda)*termFreq/(double)docLength);
+        } else {
+          throw lemur::api::Exception("JelinekMercerDocModel", "Unknown smoothing strategy");
+        }
+      }
+    private:
+      double lambda;
+    };
+
+    /// Bayesian smoothing with Dirichlet prior
+    /*!
+      <PRE>
+      P(w|d) = (c(w;d)+mu*Pc(w))/(|d|+mu)
+      </PRE>
+    */
+    class DirichletPriorDocModel : public SimpleKLDocModel {
+    public:
+      DirichletPriorDocModel(lemur::api::DOCID_T docID,
+                             int dl,
+                             const lemur::langmod::UnigramLM &collectLM,
+                             const double *docProbMass,
+                             double priorWordCount,
+                             SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
+        SimpleKLDocModel(docID, collectLM, dl, docProbMass, smthStrategy),
+        mu(priorWordCount) {
+      };
+
+      virtual ~DirichletPriorDocModel() {};
+
+      virtual double unseenCoeff() const {
+
+        if (strategy == SimpleKLParameter::INTERPOLATE) {
+          return mu/(mu+docLength);
+        } else if (strategy==SimpleKLParameter::BACKOFF) {
+          return (mu/((mu+docLength)*(1-docPrMass[id])));
+        } else {
+          throw lemur::api::Exception("DirichletPriorDocModel", "Unknown smoothing strategy");
+        }
+      }
+
+      virtual double seenProb(double termFreq, lemur::api::TERMID_T termID) const {
+        if (strategy == SimpleKLParameter::INTERPOLATE) {
+          return (termFreq+mu*refLM.prob(termID))/
+            (double)(docLength+mu);
+        } else if (strategy == SimpleKLParameter::BACKOFF) {
+          return (termFreq/(double)(docLength+mu));
+        } else {      
+          throw lemur::api::Exception("DirichletPriorDocModel", "Unknown smoothing strategy");
+        }
+      }
+    private:
+      double mu;
+    };
+
+    /// Absolute discout smoothing
+
+    /*!
+      P(w|d) = (termFreq - delta)/|d|+ lambda*Pc(w)     if seen
       or = lambda*Pc(w) if unseen
- where, lambda =  unique-term-count-in-d*delta/|d|
-*/
+      where, lambda =  unique-term-count-in-d*delta/|d|
+    */
 
-class AbsoluteDiscountDocModel : public SimpleKLDocModel {
-public:
-  AbsoluteDiscountDocModel(DOCID_T docID,
-			   int dl,
-			   const UnigramLM &collectLM,
-			   const double *docProbMass,
-			   COUNT_T *uniqueTermCount,
-			   double discount,
-			   SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
-    SimpleKLDocModel(docID, collectLM, dl, docProbMass, smthStrategy),
-    uniqDocLen(uniqueTermCount),
-    delta(discount) {
-  };
+    class AbsoluteDiscountDocModel : public SimpleKLDocModel {
+    public:
+      AbsoluteDiscountDocModel(lemur::api::DOCID_T docID,
+                               int dl,
+                               const lemur::langmod::UnigramLM &collectLM,
+                               const double *docProbMass,
+                               lemur::api::COUNT_T *uniqueTermCount,
+                               double discount,
+                               SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
+        SimpleKLDocModel(docID, collectLM, dl, docProbMass, smthStrategy),
+        uniqDocLen(uniqueTermCount),
+        delta(discount) {
+      };
 
-  virtual ~AbsoluteDiscountDocModel() {};
+      virtual ~AbsoluteDiscountDocModel() {};
   
-  virtual double unseenCoeff() const {
+      virtual double unseenCoeff() const {
 
-    if (strategy == SimpleKLParameter::INTERPOLATE) {
-      return (delta*uniqDocLen[id]/(double)docLength);
-    } else if (strategy==SimpleKLParameter::BACKOFF) {
-      return (delta*uniqDocLen[id]/(docLength*(1-docPrMass[id])));
-    } else {
-      throw Exception("AbsoluteDiscountDocModel", "Unknown smoothing strategy");
-    }
+        if (strategy == SimpleKLParameter::INTERPOLATE) {
+          return (delta*uniqDocLen[id]/(double)docLength);
+        } else if (strategy==SimpleKLParameter::BACKOFF) {
+          return (delta*uniqDocLen[id]/(docLength*(1-docPrMass[id])));
+        } else {
+          throw lemur::api::Exception("AbsoluteDiscountDocModel", "Unknown smoothing strategy");
+        }
+      }
+      virtual double seenProb(double termFreq, lemur::api::TERMID_T termID) const {
+        if (strategy == SimpleKLParameter::INTERPOLATE) {
+          return ((termFreq-delta)/(double)docLength+
+                  delta*uniqDocLen[id]*refLM.prob(termID)/(double)docLength);
+        } else if (strategy == SimpleKLParameter::BACKOFF) {
+          return ((termFreq-delta)/(double)docLength);
+        } else {
+          throw lemur::api::Exception("AbsoluteDiscountDocModel", "Unknown smoothing strategy");
+        }
+      }
+    private:
+      double *collectPr;
+      lemur::api::COUNT_T *uniqDocLen;
+      double delta;
+    };
+
+
+    /// Two stage smoothing : JM + DirichletPrior
+    // alpha = (mu+lambda*dLength)/(dLength+mu)
+    // pseen(w) = [(1-lambda)*c(w;d)+ (mu+lambda*dLength)*Pc(w)]/(dLength + mu)
+    class TwoStageDocModel : public SimpleKLDocModel {
+    public:
+      TwoStageDocModel(lemur::api::DOCID_T docID,
+                       int dl,
+                       const lemur::langmod::UnigramLM &collectLM,
+                       const double *docProbMass,
+                       double firstStageMu, 
+                       double secondStageLambda, 
+                       SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
+        SimpleKLDocModel(docID, collectLM, dl, docProbMass, smthStrategy),
+        mu(firstStageMu),
+        lambda(secondStageLambda) {
+      };
+
+      virtual ~TwoStageDocModel() {};
+
+      virtual double unseenCoeff() const {
+
+        if (strategy == SimpleKLParameter::INTERPOLATE) {
+          return (mu+lambda*docLength)/(mu+docLength);
+        } else if (strategy == SimpleKLParameter::BACKOFF) {
+          return ((mu+lambda*docLength)/((mu+docLength)*(1-docPrMass[id])));
+        } else {
+          throw lemur::api::Exception("TwoStageDocModel", "Unknown smoothing strategy");
+        }
+      }
+
+      virtual double seenProb(double termFreq, lemur::api::TERMID_T termID) const {
+        if (strategy == SimpleKLParameter::INTERPOLATE) {      
+          return ((1-lambda)*(termFreq+mu*refLM.prob(termID))/
+                  (double)(docLength+mu) + lambda*refLM.prob(termID));
+        } else if (strategy == SimpleKLParameter::BACKOFF) {
+          return (termFreq*(1-lambda)/(double)(docLength+mu));
+        } else {
+          throw lemur::api::Exception("TwoStageDocModel", "Unknown smoothing strategy");
+        }
+      }
+    private:
+      double mu;
+      double lambda;
+    };
   }
-  virtual double seenProb(double termFreq, TERMID_T termID) const {
-    if (strategy == SimpleKLParameter::INTERPOLATE) {
-      return ((termFreq-delta)/(double)docLength+
-	      delta*uniqDocLen[id]*refLM.prob(termID)/(double)docLength);
-    } else if (strategy == SimpleKLParameter::BACKOFF) {
-      return ((termFreq-delta)/(double)docLength);
-    } else {
-            throw Exception("AbsoluteDiscountDocModel", "Unknown smoothing strategy");
-    }
-  }
-private:
-  double *collectPr;
-  COUNT_T *uniqDocLen;
-  double delta;
-};
-
-
-/// Two stage smoothing : JM + DirichletPrior
-// alpha = (mu+lambda*dLength)/(dLength+mu)
-// pseen(w) = [(1-lambda)*c(w;d)+ (mu+lambda*dLength)*Pc(w)]/(dLength + mu)
-class TwoStageDocModel : public SimpleKLDocModel {
-public:
-  TwoStageDocModel(DOCID_T docID,
-		   int dl,
-		   const UnigramLM &collectLM,
-		   const double *docProbMass,
-		   double firstStageMu, 
-		   double secondStageLambda, 
-		SimpleKLParameter::SmoothStrategy smthStrategy=SimpleKLParameter::INTERPOLATE): 
-    SimpleKLDocModel(docID, collectLM, dl, docProbMass, smthStrategy),
-    mu(firstStageMu),
-    lambda(secondStageLambda) {
-  };
-
-  virtual ~TwoStageDocModel() {};
-
-  virtual double unseenCoeff() const {
-
-    if (strategy == SimpleKLParameter::INTERPOLATE) {
-      return (mu+lambda*docLength)/(mu+docLength);
-    } else if (strategy == SimpleKLParameter::BACKOFF) {
-      return ((mu+lambda*docLength)/((mu+docLength)*(1-docPrMass[id])));
-    } else {
-            throw Exception("TwoStageDocModel", "Unknown smoothing strategy");
-    }
-  }
-
-  virtual double seenProb(double termFreq, TERMID_T termID) const {
-    if (strategy == SimpleKLParameter::INTERPOLATE) {      
-      return ((1-lambda)*(termFreq+mu*refLM.prob(termID))/
-	      (double)(docLength+mu) + lambda*refLM.prob(termID));
-    } else if (strategy == SimpleKLParameter::BACKOFF) {
-      return (termFreq*(1-lambda)/(double)(docLength+mu));
-    } else {
-            throw Exception("TwoStageDocModel", "Unknown smoothing strategy");
-    }
-  }
-private:
-  double mu;
-  double lambda;
-};
+}
 
 #endif /* _SIMPLEKLDOCMODEL_HPP */
-
-
-
-
-

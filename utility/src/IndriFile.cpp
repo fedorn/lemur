@@ -25,6 +25,7 @@
 #endif
 
 #include "Exception.hpp"
+
 #include "indri/ScopedLock.hpp"
 
 //

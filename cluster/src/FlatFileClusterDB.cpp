@@ -16,7 +16,7 @@
 
 
 // The ClusterDB.
-FlatFileClusterDB::FlatFileClusterDB(const Index *ind, 
+lemur::cluster::FlatFileClusterDB::FlatFileClusterDB(const lemur::api::Index *ind, 
 				     const string &name,
 				     double threshold,
 				     enum ClusterParam::simTypes simType,
@@ -26,7 +26,7 @@ FlatFileClusterDB::FlatFileClusterDB(const Index *ind,
   init(name);
 }
 
-void FlatFileClusterDB::init(const string &name) {
+void lemur::cluster::FlatFileClusterDB::init(const string &name) {
   // the clusters themselves.
   clusterDB = name + ".cl";
   doc2cluster = new int [numDocs + 1];
@@ -38,20 +38,20 @@ void FlatFileClusterDB::init(const string &name) {
   readClusterDB();
 }
 
-FlatFileClusterDB::~FlatFileClusterDB() {
+lemur::cluster::FlatFileClusterDB::~FlatFileClusterDB() {
   writeClusterDB();
   delete[](doc2cluster);
 }
 
 // May return NULL.
-Cluster* FlatFileClusterDB::getCluster(int clusterId) const {
+lemur::cluster::Cluster* lemur::cluster::FlatFileClusterDB::getCluster(int clusterId) const {
   if(clusters.size() <= clusterId) // id too big.
     return NULL;
   else
     return clusters[clusterId];
 }
 
-vector<Cluster*> FlatFileClusterDB::getDocCluster(DOCID_T docId) const {
+vector<lemur::cluster::Cluster*> lemur::cluster::FlatFileClusterDB::getDocCluster(lemur::api::DOCID_T docId) const {
     vector<Cluster*> v;
     if(doc2cluster[docId] > 0 && clusters[doc2cluster[docId]])
       v.push_back(clusters[doc2cluster[docId]]);
@@ -59,7 +59,7 @@ vector<Cluster*> FlatFileClusterDB::getDocCluster(DOCID_T docId) const {
 }
 
 
-Cluster* FlatFileClusterDB::newCluster() {
+lemur::cluster::Cluster* lemur::cluster::FlatFileClusterDB::newCluster() {
   int clusterID = clusterIdCounter++;
   clusterCount++;
   Cluster *newCluster = allocateCluster(clusterID);
@@ -68,20 +68,20 @@ Cluster* FlatFileClusterDB::newCluster() {
   return newCluster;
 }
 
-vector<int> FlatFileClusterDB::getDocClusterId(DOCID_T docId) const {
+vector<int> lemur::cluster::FlatFileClusterDB::getDocClusterId(lemur::api::DOCID_T docId) const {
     vector<int> v;
     if(doc2cluster[docId] > 0) 
       v.push_back(doc2cluster[docId]);
     return v;
 }
 
-int FlatFileClusterDB::addToCluster(DOCID_T docId, int clusterId, double score) {
+int lemur::cluster::FlatFileClusterDB::addToCluster(lemur::api::DOCID_T docId, int clusterId, double score) {
   Cluster *cluster = clusters[clusterId];
   addToCluster(docId, cluster, score);
   return clusterId;
 }
 
-int FlatFileClusterDB::addToCluster(DOCID_T docId, Cluster *cluster, double score)
+int lemur::cluster::FlatFileClusterDB::addToCluster(lemur::api::DOCID_T docId, lemur::cluster::Cluster *cluster, double score)
 {
   doc2cluster[docId] = cluster->getId();
   ClusterElt fred;
@@ -92,7 +92,7 @@ int FlatFileClusterDB::addToCluster(DOCID_T docId, Cluster *cluster, double scor
 }
 
 // remove doc from cluster
-int FlatFileClusterDB::removeFromCluster(DOCID_T docId, int clusterId) {
+int lemur::cluster::FlatFileClusterDB::removeFromCluster(lemur::api::DOCID_T docId, int clusterId) {
   Cluster *cluster = clusters[clusterId];
   ClusterElt fred;
   fred.id = docId;
@@ -103,7 +103,7 @@ int FlatFileClusterDB::removeFromCluster(DOCID_T docId, int clusterId) {
 }
 
 // split cluster
-vector<int> FlatFileClusterDB::splitCluster(int clusterId, int numParts) {
+vector<int> lemur::cluster::FlatFileClusterDB::splitCluster(int clusterId, int numParts) {
   vector<int> retval;
   Cluster *cluster = clusters[clusterId];
   vector<Cluster *> newClusters = cluster->split(numParts);
@@ -125,7 +125,7 @@ vector<int> FlatFileClusterDB::splitCluster(int clusterId, int numParts) {
     cluster->setId(newId);
     cluster->setName(myName);
     clusters[newId] = cluster;
-    vector <DOCID_T> docs = cluster->getDocIds();
+    vector <lemur::api::DOCID_T> docs = cluster->getDocIds();
     for (int j = 0; j < docs.size(); j++) {
       doc2cluster[docs[j]] = newId;
     }
@@ -136,12 +136,12 @@ vector<int> FlatFileClusterDB::splitCluster(int clusterId, int numParts) {
 }
 
 // delete a cluster
-int FlatFileClusterDB::deleteCluster (Cluster *target) {
+int lemur::cluster::FlatFileClusterDB::deleteCluster (lemur::cluster::Cluster *target) {
   return deleteCluster(target->getId());
 }
-int FlatFileClusterDB::deleteCluster(int clusterID) {
+int lemur::cluster::FlatFileClusterDB::deleteCluster(int clusterID) {
   Cluster *cl2 = clusters[clusterID];
-  vector <DOCID_T> docs = cl2->getDocIds();
+  vector <lemur::api::DOCID_T> docs = cl2->getDocIds();
   for (int i = 0; i < docs.size(); i++) {
     doc2cluster[docs[i]] = 0;
   }
@@ -152,11 +152,11 @@ int FlatFileClusterDB::deleteCluster(int clusterID) {
 }
 
 // merge clusters
-int FlatFileClusterDB::mergeClusters(int c1, int c2) {
+int lemur::cluster::FlatFileClusterDB::mergeClusters(int c1, int c2) {
   Cluster *cl1 = clusters[c1];
   Cluster *cl2 = clusters[c2];
   cl1->merge(cl2);  
-  vector <DOCID_T> docs = cl2->getDocIds();
+  vector <lemur::api::DOCID_T> docs = cl2->getDocIds();
   for (int i = 0; i < docs.size(); i++) {
     doc2cluster[docs[i]] = c1;
   }
@@ -166,7 +166,7 @@ int FlatFileClusterDB::mergeClusters(int c1, int c2) {
   return c1;
 }
 
-void FlatFileClusterDB::readClusterDB()
+void lemur::cluster::FlatFileClusterDB::readClusterDB()
 {
   ifstream in;
   int index;
@@ -190,7 +190,7 @@ void FlatFileClusterDB::readClusterDB()
     clusters[index] = cluster;
     clusterCount++;
     // update doc2cluster table.
-    vector <DOCID_T> docs = cluster->getDocIds();
+    vector <lemur::api::DOCID_T> docs = cluster->getDocIds();
     for (int i = 0; i < docs.size(); i++) {
       doc2cluster[docs[i]] = index;
     }
@@ -199,7 +199,7 @@ void FlatFileClusterDB::readClusterDB()
   clusterIdCounter = maxid + 1;
 }
 
-void FlatFileClusterDB::writeClusterDB(){
+void lemur::cluster::FlatFileClusterDB::writeClusterDB(){
   ofstream out;
   int i;
   Cluster *cl;

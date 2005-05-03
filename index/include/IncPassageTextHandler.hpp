@@ -15,6 +15,11 @@
 #include "IncFPTextHandler.hpp"
 #include "IncPassagePushIndex.hpp"
 
+namespace lemur
+{
+  namespace parse
+  {
+    
 ///
 ///  IncPassageTextHandler builds an InvFPIndex using IncPassagePushIndex.
 ///  This class is a destination TextHandler.  
@@ -28,9 +33,9 @@ public:
   IncPassageTextHandler(const string &filename, int psgSize, int bufferSize, 
 			bool countStopWords = false) {
     // create index and helper objects  
-    index = new IncPassagePushIndex(filename, psgSize, bufferSize);
+    index = new lemur::index::IncPassagePushIndex(filename, psgSize, bufferSize);
     dp = new DocumentProps();
-    term = new InvFPTerm();
+    term = new lemur::index::InvFPTerm();
     countStopWds = countStopWords;
     docLength = 0;
     pos = 1;
@@ -38,6 +43,8 @@ public:
     first = true;
   }
 };
+  }
+}
 
 #endif
 

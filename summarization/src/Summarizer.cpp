@@ -11,7 +11,7 @@
 
 #include "Summarizer.hpp"
 
-Summarizer::~Summarizer() 
+lemur::summarization::Summarizer::~Summarizer() 
 {
   // empty
 }

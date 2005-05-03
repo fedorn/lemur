@@ -21,13 +21,13 @@ int main(int argc, char *argv[])
   if (argc>=2 && strcmp(argv[1], "-help") &&
       strcmp(argv[1], "--help") &&
       strcmp(argv[1], "-h") ) {  // recognize parameter file as argument
-    ParamPushFile(argv[1]);
+    lemur::api::ParamPushFile(argv[1]);
   } else {
     
     // handle "-help", display parameters 
     GetAppParam(); // called only  to "register" parameters
     cerr << "Parameters for " <<  argv[0] << endl;
-    ParamDisplay();
+    lemur::api::ParamDisplay();
     exit(0);
   } 
   GetAppParam();
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   try {
     result = AppMain(argc,argv);
   } 
-  catch (Exception &ex) {
+  catch (lemur::api::Exception &ex) {
     ex.writeMessage();
     cerr << "Program aborted due to exception" << endl;;
     exit(1);

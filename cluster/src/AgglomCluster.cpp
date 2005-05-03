@@ -14,25 +14,25 @@
 // Agglomerative clustering algorithms.
 #include "AgglomCluster.hpp"
 
-ClusterRep *AgglomCluster::getClusterRep() const {
-  vector <DOCID_T> docids = getDocIds();
+lemur::cluster::ClusterRep *lemur::cluster::AgglomCluster::getClusterRep() const {
+  vector <lemur::api::DOCID_T> docids = getDocIds();
   ClusterRep *elt = new ClusterRep(docids, ind);
   elt->weigh(1.0/docids.size());
   similarity.weigh(elt);
   return elt;
 }
 
-double AgglomCluster::sum2() const {
+double lemur::cluster::AgglomCluster::sum2() const {
   ClusterRep *me = getClusterRep();
   double value = me->sum2();
   delete(me);
   return value;
 }
 
-double AgglomCluster::score_max(const ClusterRep *rep) const {
+double lemur::cluster::AgglomCluster::score_max(const ClusterRep *rep) const {
   ClusterRep *elt = NULL;
   double max_score = 0, s = 0;
-  vector <DOCID_T> docids = getDocIds();
+  vector <lemur::api::DOCID_T> docids = getDocIds();
   int sz = docids.size();
   for (int i = 0; i < sz; i++) {
     elt = new ClusterRep(docids[i], ind);
@@ -46,11 +46,11 @@ double AgglomCluster::score_max(const ClusterRep *rep) const {
   return max_score;
 }
 
-double AgglomCluster::score_min(const ClusterRep *rep) const {
+double lemur::cluster::AgglomCluster::score_min(const ClusterRep *rep) const {
   ClusterRep *elt = NULL;
   double min_score = 1.1, s = 0;
   if (size == 0) return s;
-  vector <DOCID_T> docids = getDocIds();
+  vector <lemur::api::DOCID_T> docids = getDocIds();
   for (int i = 0; i < docids.size(); i++) {
     elt = new ClusterRep(docids[i], ind);
     similarity.weigh(elt);
@@ -63,7 +63,7 @@ double AgglomCluster::score_min(const ClusterRep *rep) const {
   return min_score;
 }
 
-double AgglomCluster::score_mean(const ClusterRep *rep) const {
+double lemur::cluster::AgglomCluster::score_mean(const ClusterRep *rep) const {
   double s = 0;
   ClusterRep *elt = getClusterRep();
   s = similarity.similarity(rep, elt);
@@ -71,11 +71,11 @@ double AgglomCluster::score_mean(const ClusterRep *rep) const {
   return s;
 }
 
-double AgglomCluster::score_ave(const ClusterRep *rep) const {
+double lemur::cluster::AgglomCluster::score_ave(const ClusterRep *rep) const {
   ClusterRep *elt = NULL;
   double score = 0;
   if (size == 0) return score;
-  vector <DOCID_T> docids = getDocIds();
+  vector <lemur::api::DOCID_T> docids = getDocIds();
   for (int i = 0; i < docids.size(); i++) {
     elt = new ClusterRep(docids[i], ind);
     similarity.weigh(elt);
@@ -86,7 +86,7 @@ double AgglomCluster::score_ave(const ClusterRep *rep) const {
   return score/docids.size();
 }
 
-double AgglomCluster::score(const ClusterRep *rep) const {
+double lemur::cluster::AgglomCluster::score(const ClusterRep *rep) const {
   switch (docmode) {
   case ClusterParam::DMAX:
     return score_max(rep);

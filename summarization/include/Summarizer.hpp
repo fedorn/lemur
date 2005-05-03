@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _SUMMARIZER_HPP
 #define _SUMMARIZER_HPP
@@ -20,43 +20,50 @@
 using std::vector;
 using std::string;
 
-/*!
-  A <code>Summarizer</code> is created in conjunction with a specific <code>Passage</code> implementation.
+namespace lemur 
+{
+  namespace summarization 
+  {
+    
+    /*!
+      A <code>Summarizer</code> is created in conjunction with a specific <code>Passage</code> implementation.
 
-*/
+    */
 
-class Summarizer {
+    class Summarizer {
 
-public:
-  virtual ~Summarizer();
+    public:
+      virtual ~Summarizer();
 
-  /// General purpose function that does all summary computation as well as passage marking
-  virtual void summDocument(const string &docID, const int optLen, const string &qInfo) = 0;
+      /// General purpose function that does all summary computation as well as passage marking
+      virtual void summDocument(const string &docID, const int optLen, const string &qInfo) = 0;
 
-  /// Score ALL passages currently in this summarizer, optionally given query terms.
-  virtual void scorePassages(const string &qInfo) = 0;
+      /// Score ALL passages currently in this summarizer, optionally given query terms.
+      virtual void scorePassages(const string &qInfo) = 0;
 
-  /// Flag <code>optLen</code> passages for inclusion in summary
-  virtual void markPassages(int optLen, const string &qInfo) = 0;
+      /// Flag <code>optLen</code> passages for inclusion in summary
+      virtual void markPassages(int optLen, const string &qInfo) = 0;
 
-  /// Append a new passage to the list the summarizer will use to generate summary
-  virtual void addPassage(Passage &psg) = 0;
+      /// Append a new passage to the list the summarizer will use to generate summary
+      virtual void addPassage(Passage &psg) = 0;
 
-  /// Clear all scores and passages from the summarizer
-  virtual void clear(void) = 0;
+      /// Clear all scores and passages from the summarizer
+      virtual void clear(void) = 0;
 
-  /// Place marked passages into an array
-  virtual int fetchPassages(Passage* psgs, int optLen) const = 0;
+      /// Place marked passages into an array
+      virtual int fetchPassages(Passage* psgs, int optLen) const = 0;
 
-  /// Get the next passage in iterative manner
-  virtual int nextPassage(Passage* psg) const = 0;
+      /// Get the next passage in iterative manner
+      virtual int nextPassage(Passage* psg) const = 0;
 
-  /// Reset to the first summarized passage (in conjunction with <code>nextPassage</code>)
-  virtual void iterClear(void) const = 0;
+      /// Reset to the first summarized passage (in conjunction with <code>nextPassage</code>)
+      virtual void iterClear(void) const = 0;
 
-  /// General purpose "send summary to stdout" function
-  virtual void outputSumm(void) const = 0;
+      /// General purpose "send summary to stdout" function
+      virtual void outputSumm(void) const = 0;
 
-}; // Summarizer
+    }; // Summarizer
+  }
+}
 
 #endif

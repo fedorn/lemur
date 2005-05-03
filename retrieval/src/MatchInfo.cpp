@@ -23,14 +23,14 @@
 #include "KeyfileDocMgr.hpp"
 #include "IndriDocMgr.hpp"
 
-MatchInfo *MatchInfo::getMatches(const Index &ind, const Query &qry, 
+lemur::api::MatchInfo *lemur::api::MatchInfo::getMatches(const Index &ind, const Query &qry, 
 				 DOCID_T docID) {
   const DocumentManager *docMgr = ind.docManager(docID);    
     MatchInfo *matches = new MatchInfo();
-  vector<Match> offsets;
+  vector<lemur::parse::Match> offsets;
 
   if (docMgr != NULL) {
-    const IndriDocMgr *idm = dynamic_cast<const IndriDocMgr *>(docMgr);
+    const lemur::parse::IndriDocMgr *idm = dynamic_cast<const lemur::parse::IndriDocMgr *>(docMgr);
     if (idm != NULL) {
       // we have an indri repository, no need to parse anything.
       offsets = idm->getOffsets(ind.document(docID));
@@ -46,7 +46,7 @@ MatchInfo *MatchInfo::getMatches(const Index &ind, const Query &qry,
 	    termIDs.insert(tid);
 	  }
 	}
-	for (vector<Match>::iterator iter1 = offsets.begin();
+	for (vector<lemur::parse::Match>::iterator iter1 = offsets.begin();
 	     iter1 != offsets.end(); iter1++) {
 	  TERMID_T did = (*iter1).termid;
 	  for (set<TERMID_T, less<TERMID_T> >::iterator iter = termIDs.begin();
@@ -65,27 +65,27 @@ MatchInfo *MatchInfo::getMatches(const Index &ind, const Query &qry,
   }  // else we want an InvFP index.
 
     TermInfoList *dt = ind.termInfoList(docID);
-  InvFPTermList *docTerms;
-    docTerms = dynamic_cast<InvFPTermList *>(dt);
+    lemur::index::InvFPTermList *docTerms;
+    docTerms = dynamic_cast<lemur::index::InvFPTermList *>(dt);
     if (docTerms == NULL) {
       // not an InvFP index return an empty list
       delete(dt);
       return (matches);
     }
 
-  InvFPTerm *nextTerm;
+    lemur::index::InvFPTerm *nextTerm;
     if (docMgr != NULL) {
-      const KeyfileDocMgr *kdm = dynamic_cast<const KeyfileDocMgr *>(docMgr);
+      const lemur::parse::KeyfileDocMgr *kdm = dynamic_cast<const lemur::parse::KeyfileDocMgr *>(docMgr);
       if (kdm != NULL) {
 	// we have a KeyfileDocMgr, no need to parse anything.
 	offsets = kdm->getOffsets(ind.document(docID));
       } else {
 	char *rawDoc = NULL;
 	Parser *p = NULL;
-	DocOffsetParser *dp = NULL;
+	lemur::parse::DocOffsetParser *dp = NULL;
 	rawDoc = docMgr->getDoc(ind.document(docID));
 	p = docMgr->getParser();
-	dp = new DocOffsetParser(p);
+	dp = new lemur::parse::DocOffsetParser(p);
 	dp->parseString(rawDoc);
 	p->setTextHandler(NULL);
 	offsets = dp->getOffsets();
@@ -120,7 +120,7 @@ MatchInfo *MatchInfo::getMatches(const Index &ind, const Query &qry,
     }
     docTerms->startIteration();
     while (docTerms->hasMore()) {
-      nextTerm = dynamic_cast<InvFPTerm *>(docTerms->nextEntry());
+      nextTerm = dynamic_cast<lemur::index::InvFPTerm *>(docTerms->nextEntry());
     TERMID_T did = nextTerm->termID();
     for (set<TERMID_T, less<TERMID_T> >::iterator iter = termIDs.begin();
 	   iter != termIDs.end(); iter++) {

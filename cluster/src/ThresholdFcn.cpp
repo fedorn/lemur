@@ -7,13 +7,13 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 /*
   Author: dmf 11/2002
- */
+*/
 
 #include "ThresholdFcn.hpp"
-double ThresholdFcn::threshold(int size) { return thresh; }
-bool ThresholdFcn::threshold(double score, int size) { 
+double lemur::cluster::ThresholdFcn::threshold(int size) { return thresh; }
+bool lemur::cluster::ThresholdFcn::threshold(double score, int size) { 
   return score >= thresh; 
 }

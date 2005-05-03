@@ -62,8 +62,10 @@ The following are document model smoothing parameters:
 #include "RetParamManager.hpp"
 #include "ResultFile.hpp"
 
+using namespace lemur::api;
+
 namespace LocalParameter {
-  String queryModel;
+  std::string queryModel;
 
   void get() {
     queryModel = ParamGetString("queryModel","");
@@ -96,7 +98,7 @@ int AppMain(int argc, char *argv[]) {
   ifstream *workSetStr;
   ResultFile *docPool;
   if (RetrievalParameter::useWorkingSet) {
-    workSetStr = new ifstream(RetrievalParameter::workSetFile, ios::in);
+    workSetStr = new ifstream(RetrievalParameter::workSetFile.c_str(), ios::in);
     if (workSetStr->fail()) {
       throw Exception("RetEval", "can't open working set file");
     }
@@ -104,22 +106,22 @@ int AppMain(int argc, char *argv[]) {
     docPool->openForRead(*workSetStr, *ind);
   }
 
-  ifstream qmodel(LocalParameter::queryModel, ios::in);
+  ifstream qmodel(LocalParameter::queryModel.c_str(), ios::in);
 
-  ArrayAccumulator accumulator(ind->docCount());
+  lemur::retrieval::ArrayAccumulator accumulator(ind->docCount());
 
   if (qmodel.fail()) {
     throw Exception("QueryModelEval", 
 		    "can't open the query model file, check the value for parameter queryModel");
   }
   
-  ofstream result(RetrievalParameter::resultFile);
+  ofstream result(RetrievalParameter::resultFile.c_str());
 
   ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
 
   resFile.openForWrite(result, *ind);
 
-  SimpleKLRetMethod model(*ind, SimpleKLParameter::smoothSupportFile, 
+  lemur::retrieval::SimpleKLRetMethod model(*ind, SimpleKLParameter::smoothSupportFile, 
 			  accumulator);
   
   model.setDocSmoothParam(SimpleKLParameter::docPrm);
@@ -128,12 +130,12 @@ int AppMain(int argc, char *argv[]) {
   IndexedRealVector res;
   char qid[300];
 
-  SimpleKLQueryModel *q;
+  lemur::retrieval::SimpleKLQueryModel *q;
   IndexedRealVector workSetRes;
 
   while (qmodel >> qid) {
     cout << "Query "<< qid << endl;
-    q = new SimpleKLQueryModel(*ind);
+    q = new lemur::retrieval::SimpleKLQueryModel(*ind);
     q->load(qmodel);
     PseudoFBDocs *workSet;
     if (RetrievalParameter::useWorkingSet) {

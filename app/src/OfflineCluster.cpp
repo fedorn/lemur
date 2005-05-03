@@ -48,6 +48,9 @@ Default is 5.
   author: dmf
  */
 
+using namespace lemur::api;
+using namespace lemur::cluster;
+
 // get application parameters
 void GetAppParam() {
   ClusterParam::get();
@@ -68,7 +71,7 @@ int AppMain(int argc, char * argv[]) {
 		    "Can't open index, check parameter index");
   }
   // construct cluster method.
-  OfflineCluster* clusterDB = new OfflineCluster(*myIndex,
+  lemur::cluster::OfflineCluster* clusterDB = new lemur::cluster::OfflineCluster(*myIndex,
 						 ClusterParam::simType,
 						 ClusterParam::clusterType,
 						 ClusterParam::docMode);
@@ -81,7 +84,7 @@ int AppMain(int argc, char * argv[]) {
   }
 
   cout << "Using kmeans on " << numDocs << " documents..." << endl;
-  vector <Cluster *> *clusters = clusterDB->kMeans(toCluster, 
+  vector <lemur::cluster::Cluster *> *clusters = clusterDB->kMeans(toCluster, 
 						   ClusterParam::numParts,
 						   ClusterParam::maxIters);
 

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 // David Fisher
 // init: 02/05/2003
@@ -16,17 +16,25 @@
 // Add new similarity methods here.
 #include "CosSim.hpp"
 #include "ClusterParam.hpp"
-class SimFactory {
-public:
-static SimilarityMethod * makeSim(const Index &index,
-				  enum ClusterParam::simTypes simType = ClusterParam::COS) {
-  switch (simType) {
-  case ClusterParam::COS:
-    return new CosSim(index);
-  default:
-    cerr << "Unknown similarity method " << simType << endl;
-    return NULL;
+namespace lemur 
+{
+  namespace cluster
+  {
+    
+    class SimFactory {
+    public:
+      static SimilarityMethod * makeSim(const lemur::api::Index &index,
+                                        enum ClusterParam::simTypes simType = ClusterParam::COS) {
+        switch (simType) {
+        case ClusterParam::COS:
+          return new CosSim(index);
+        default:
+          cerr << "Unknown similarity method " << simType << endl;
+          return NULL;
+        }
+      }
+    };
   }
 }
-};
+
 #endif

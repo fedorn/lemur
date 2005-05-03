@@ -20,7 +20,7 @@
 #include "ReadBuffer.hpp"
 #include <sstream>
 
-KeyfileDocListSegmentReader::KeyfileDocListSegmentReader( File* stream, std::string& baseName, int segment, int readBufferSize ) :
+lemur::file::KeyfileDocListSegmentReader::KeyfileDocListSegmentReader( File* stream, std::string& baseName, int segment, int readBufferSize ) :
 _stream( stream ),
 _segment( segment )
 {
@@ -33,16 +33,16 @@ _segment( segment )
   _name = nameStream.str();
 }
 
-KeyfileDocListSegmentReader::~KeyfileDocListSegmentReader() {
+lemur::file::KeyfileDocListSegmentReader::~KeyfileDocListSegmentReader() {
   delete _top;
   delete _file;
 }
 
-File* KeyfileDocListSegmentReader::file() {
+lemur::file::File* lemur::file::KeyfileDocListSegmentReader::file() {
   return _stream;
 }
 
-InvFPDocList* KeyfileDocListSegmentReader::next() {
+lemur::index::InvFPDocList* lemur::file::KeyfileDocListSegmentReader::next() {
   if( (_file->rdstate() & std::fstream::eofbit) ) {
     // file is at end, no more streams left
     return 0;
@@ -67,16 +67,16 @@ InvFPDocList* KeyfileDocListSegmentReader::next() {
     _file->read((char *)listData, (sizeof(int)*4) + dataLength );
     // make a list from the data we read
     // dmf FIXME
-    InvFPDocList* list = new InvFPDocList( const_cast<LOC_T*>( (const LOC_T*) listData ) );
+    lemur::index::InvFPDocList* list = new lemur::index::InvFPDocList( const_cast<lemur::api::LOC_T*>( (const lemur::api::LOC_T*) listData ) );
     //clean up alignment data.
     delete[](listData);
     return list;
   }
 }
 
-bool KeyfileDocListSegmentReader::operator<( const KeyfileDocListSegmentReader& other ) const {
-  const InvFPDocList* otherTop = other.top();
-  const InvFPDocList* thisTop = top();
+bool lemur::file::KeyfileDocListSegmentReader::operator<( const KeyfileDocListSegmentReader& other ) const {
+  const lemur::index::InvFPDocList* otherTop = other.top();
+  const lemur::index::InvFPDocList* thisTop = top();
 
   // if neither object has data, the smaller segment
   // number is 'better'
@@ -88,8 +88,8 @@ bool KeyfileDocListSegmentReader::operator<( const KeyfileDocListSegmentReader& 
   if( !otherTop )
     return false;
 
-  int termID = const_cast<InvFPDocList*>(thisTop)->termID();
-  int otherTermID = const_cast<InvFPDocList*>(otherTop)->termID();
+  lemur::api::TERMID_T termID = const_cast<lemur::index::InvFPDocList*>(thisTop)->termID();
+  lemur::api::TERMID_T otherTermID = const_cast<lemur::index::InvFPDocList*>(otherTop)->termID();
 
   // if our term ids are the same, the smaller segment is 'better'
   if( termID == otherTermID ) {
@@ -100,22 +100,22 @@ bool KeyfileDocListSegmentReader::operator<( const KeyfileDocListSegmentReader& 
   return termID > otherTermID;
 }
 
-const InvFPDocList* KeyfileDocListSegmentReader::top() const {
+const lemur::index::InvFPDocList* lemur::file::KeyfileDocListSegmentReader::top() const {
   return _top;
 }
 
-InvFPDocList* KeyfileDocListSegmentReader::top() {
+lemur::index::InvFPDocList* lemur::file::KeyfileDocListSegmentReader::top() {
   return _top;
 }
 
-void KeyfileDocListSegmentReader::pop() {
+void lemur::file::KeyfileDocListSegmentReader::pop() {
   _top = next();
 }
 
-int KeyfileDocListSegmentReader::segment() const {
+int lemur::file::KeyfileDocListSegmentReader::segment() const {
   return _segment;
 }
 
-const std::string& KeyfileDocListSegmentReader::name() const {
+const std::string& lemur::file::KeyfileDocListSegmentReader::name() const {
   return _name;
 }

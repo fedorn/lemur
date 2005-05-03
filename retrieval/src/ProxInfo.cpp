@@ -13,12 +13,13 @@
 */
 #include "ProxInfo.hpp"
 #include "Exception.hpp"
+using namespace lemur::api;
 
-ProxInfo::ProxInfo(int num, int tf, const DocInfoList *dl) : nextPos(0), 
+lemur::retrieval::ProxInfo::ProxInfo(int num, int tf, const DocInfoList *dl) : nextPos(0), 
 						       posList(NULL),  
 						       size(0),
 						       listSize(tf) { 
-  dList = dynamic_cast<const InvFPDocList *>(dl);
+  dList = dynamic_cast<const lemur::index::InvFPDocList *>(dl);
   if (dList == NULL) {
     //    throw Exception("ProxInfo", "InvFPDocList required from index");
     //    cerr << "ProxInfo: InvFPDocList required from index for positions. "
@@ -33,12 +34,12 @@ ProxInfo::ProxInfo(int num, int tf, const DocInfoList *dl) : nextPos(0),
       *tmpList++ = cnt;
       for (int i = 0; i < cnt; i++) *tmpList++ = 0; 
     }
-    dList = new InvFPDocList(0, (2*num + tf), posList, 0, posList, 0);
+    dList = new lemur::index::InvFPDocList(0, (2*num + tf), posList, 0, posList, 0);
     delete(dl);
   }
 }
 
-ProxInfo::ProxInfo(int num, int tf, LOC_T *pl) : nextPos(0), 
+lemur::retrieval::ProxInfo::ProxInfo(int num, int tf, LOC_T *pl) : nextPos(0), 
 					       posList(pl),  
 					       size(0), 
 					       dList(NULL),
@@ -51,12 +52,12 @@ ProxInfo::ProxInfo(int num, int tf, LOC_T *pl) : nextPos(0),
   // fr -- df -- can be ignored, use 0
   // ldocId -- lastid can be pl
   // len -- strlength of term(termID) -- can be ignored, use 0.
-  dList = new InvFPDocList(0, (2*num + tf), pl, 0, pl, 0);
+  dList = new lemur::index::InvFPDocList(0, (2*num + tf), pl, 0, pl, 0);
 }
 
-bool ProxInfo::nextDoc() {
+bool lemur::retrieval::ProxInfo::nextDoc() {
   if (dList->hasMore()) {
-    currEntry = *(InvFPDocInfo *)dList->nextEntry();
+    currEntry = *(lemur::index::InvFPDocInfo *)dList->nextEntry();
     return true;
   } else {
     return false;
@@ -64,13 +65,13 @@ bool ProxInfo::nextDoc() {
 }
 
 
-bool ProxInfo::nextDoc(DOCID_T did) {
+bool lemur::retrieval::ProxInfo::nextDoc(DOCID_T did) {
   if (!dList) return false;
   while (did > id() && nextDoc()) {
   }
   return (did == id());
 }
 
-int ProxInfo::posSize() const{
+int lemur::retrieval::ProxInfo::posSize() const{
   return listSize;
 }

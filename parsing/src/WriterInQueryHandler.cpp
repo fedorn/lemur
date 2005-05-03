@@ -14,14 +14,14 @@
 #include <cctype>
 
 
-WriterInQueryHandler::WriterInQueryHandler(const string &filename) {
+lemur::parse::WriterInQueryHandler::WriterInQueryHandler(const string &filename) {
   // create the output file
   outfile = new ofstream(filename.c_str());
   // set state in first doc
   first = true;
 }
 
-WriterInQueryHandler::~WriterInQueryHandler() {
+lemur::parse::WriterInQueryHandler::~WriterInQueryHandler() {
   endDoc();
   // close the output file
   outfile->close();
@@ -30,7 +30,7 @@ WriterInQueryHandler::~WriterInQueryHandler() {
 
 
 char * 
-WriterInQueryHandler::handleDoc(char * docno) {
+lemur::parse::WriterInQueryHandler::handleDoc(char * docno) {
   // output the end doc tag if not the first doc
   if (first) {
     first = false;
@@ -43,7 +43,7 @@ WriterInQueryHandler::handleDoc(char * docno) {
 }
 
 char * 
-WriterInQueryHandler::handleWord(char * word) {
+lemur::parse::WriterInQueryHandler::handleWord(char * word) {
   // output the word
   if (word != NULL) {
     *outfile << word << endl;
@@ -52,7 +52,7 @@ WriterInQueryHandler::handleWord(char * word) {
 }
 
 char * 
-WriterInQueryHandler::handleSymbol(char * sym) {
+lemur::parse::WriterInQueryHandler::handleSymbol(char * sym) {
   // output the word
   if (sym != NULL) {
     *outfile << sym<< endl;
@@ -61,6 +61,6 @@ WriterInQueryHandler::handleSymbol(char * sym) {
 }
 
 void 
-WriterInQueryHandler::endDoc() {
+lemur::parse::WriterInQueryHandler::endDoc() {
   *outfile << "</DOC>" << endl;
 }

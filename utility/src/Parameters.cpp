@@ -445,7 +445,7 @@ void indri::api::Parameters::load( const std::string& text ) {
   try {
     std::auto_ptr<indri::xml::XMLNode> result( reader.read( text ) );
     _loadXML( result.get() );
-  } catch( Exception& e ) {
+  } catch( lemur::api::Exception& e ) {
     LEMUR_RETHROW( e, "Had trouble parsing parameter text" );
   }
 }
@@ -469,7 +469,7 @@ void indri::api::Parameters::loadFile( const std::string& filename ) {
     std::auto_ptr<indri::xml::XMLNode> result( reader.read( buffer, length ) );
 
     _loadXML( result.get() );
-  } catch( Exception& e ) {
+  } catch( lemur::api::Exception& e ) {
     LEMUR_RETHROW( e, "Had trouble parsing parameter file '" + filename + "'" );
   }
 

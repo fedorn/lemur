@@ -7,19 +7,24 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 /* type definitions for objects we will use */
 #ifndef _INVFPTYPES_H
 #define _INVFPTYPES_H
 
-#define IND_VERSION "3.1.2"
-
 #include "common_headers.hpp"
 #include "IndexTypes.hpp"
 
-// suffixes for filenames
+namespace lemur 
+{
+  namespace index
+  {
+    
+#define IND_VERSION "4.0"
+
+    // suffixes for filenames
 #define INVINDEX  ".invf"
 #define INVFPINDEX ".invfp"
 #define INVLOOKUP  ".invlookup"
@@ -33,10 +38,10 @@
 #define INVFPTOC ".ifp"
 #define DOCMGRMAP ".dm"
 
-// what to call out of vocabulary ids
+    // what to call out of vocabulary ids
 #define INVALID_STR "[OOV]"
 
-// name for parameters
+    // name for parameters
 #define VERSION_PAR "VERSION"
 #define NUMDOCS_PAR "NUM_DOCS"
 #define NUMTERMS_PAR "NUM_TERMS"
@@ -54,35 +59,37 @@
 #define NUMINV_PAR  "NUM_INVFILES"
 #define DOCMGR_PAR  "DOCMGR_IDS"
 
-struct LocatedTerm { // pair of term and its location
-  TERMID_T term;
-  LOC_T loc;
-};
+    struct LocatedTerm { // pair of term and its location
+      lemur::api::TERMID_T term;
+      lemur::api::LOC_T loc;
+    };
 
-struct LLTerm { // pair of term and list of locations
-  TERMID_T term;
-  vector<LOC_T> loc;
-};
+    struct LLTerm { // pair of term and list of locations
+      lemur::api::TERMID_T term;
+      vector<lemur::api::LOC_T> loc;
+    };
 
-struct dt_entry {   // an entry in the lookup table for docterm lists index
-  FILEID_T fileid;  // which file the word is in
-  long offset;        // what the offset into the file is
-  int length;         // the length of the inverted list
-  int docmgr;         // the docmgr id of manager for this doc
-};
+    struct dt_entry {   // an entry in the lookup table for docterm lists index
+      lemur::api::FILEID_T fileid;  // which file the word is in
+      long offset;        // what the offset into the file is
+      int length;         // the length of the inverted list
+      int docmgr;         // the docmgr id of manager for this doc
+    };
 
-struct inv_entry {   // an entry in the lookup table for docterm lists index
-  FILEID_T fileid;  // which file the word is in
-  long offset;        // what the offset into the file is
-  COUNT_T ctf;            // collection term freq
-  COUNT_T df;             // doc freq
-};
+    struct inv_entry {   // an entry in the lookup table for docterm lists index
+      lemur::api::FILEID_T fileid;  // which file the word is in
+      long offset;        // what the offset into the file is
+      lemur::api::COUNT_T ctf;            // collection term freq
+      lemur::api::COUNT_T df;             // doc freq
+    };
 
-struct ltstr
-{
-  bool operator()(char* s1, char* s2) const{
-    return strcmp(s1, s2) < 0;
+    struct ltstr
+    {
+      bool operator()(char* s1, char* s2) const{
+        return strcmp(s1, s2) < 0;
+      }
+    };
   }
-};
+}
 
 #endif

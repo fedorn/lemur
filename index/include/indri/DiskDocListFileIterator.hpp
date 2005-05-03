@@ -35,7 +35,7 @@ namespace indri {
       int _fieldCount;
       indri::utility::Buffer _header;
 
-      char _term[ Keyfile::MAX_KEY_LENGTH+1 ];
+      char _term[ lemur::file::Keyfile::MAX_KEY_LENGTH+1 ];
       TermData* _termData;
       DiskDocListIterator _iterator;
       DocListData _docListData;

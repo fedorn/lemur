@@ -112,15 +112,15 @@ public:
 
 class LocalQueryServerDocumentIDsResponse : public QueryServerDocumentIDsResponse {
 private:
-  std::vector<DOCID_T> _documentIDs;
+  std::vector<lemur::api::DOCID_T> _documentIDs;
 
 public:
-  LocalQueryServerDocumentIDsResponse( const std::vector<DOCID_T>& documents ) : 
+  LocalQueryServerDocumentIDsResponse( const std::vector<lemur::api::DOCID_T>& documents ) : 
     _documentIDs(documents)
   {
   }
 
-  std::vector<DOCID_T>& getResults() {
+  std::vector<lemur::api::DOCID_T>& getResults() {
     return _documentIDs;
   }
 };
@@ -213,10 +213,10 @@ indri::server::QueryServerDocumentsResponse* indri::server::LocalQueryServer::do
 
 indri::server::QueryServerDocumentIDsResponse* indri::server::LocalQueryServer::documentIDsFromMetadata( const std::string& attributeName, const std::vector<std::string>& attributeValues ) {
   indri::collection::CompressedCollection* collection = _repository.collection();
-  std::vector<DOCID_T> result;
+  std::vector<lemur::api::DOCID_T> result;
   
   for( unsigned int i=0; i<attributeValues.size(); i++ ) {
-    std::vector<DOCID_T> documents = collection->retrieveIDByMetadatum( attributeName, attributeValues[i] );
+    std::vector<lemur::api::DOCID_T> documents = collection->retrieveIDByMetadatum( attributeName, attributeValues[i] );
     std::copy( documents.begin(), documents.end(), std::back_inserter( documents ) );
   }
 

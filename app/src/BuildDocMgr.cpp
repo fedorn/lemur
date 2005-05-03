@@ -17,6 +17,8 @@
 #include "Param.hpp"
 #include "Exception.hpp"
 
+using namespace lemur::api;
+
 // Local parameters used by the indexer 
 namespace LocalParameter {
   int memory;
@@ -130,20 +132,20 @@ int AppMain(int argc, char * argv[]) {
     // Create the right type of indexer (DocMgrManager should handle this).
     // Need an abstract class to hang the setDocManager call on here...
     if (LocalParameter::indexType == "inv") {
-      indexer = new InvFPTextHandler(LocalParameter::index, 
+      indexer = new lemur::parse::InvFPTextHandler(LocalParameter::index, 
 				     LocalParameter::memory, 
 				     LocalParameter::countStopWords, 
 				     LocalParameter::position);
       // register document manager with PushIndex
-      ((InvFPTextHandler *)indexer)->setDocManager(docmgr->getMyID());
+      ((lemur::parse::InvFPTextHandler *)indexer)->setDocManager(docmgr->getMyID());
 
     } else if (LocalParameter::indexType == "key"){
-      ind = new KeyfileIncIndex(LocalParameter::index,
+      ind = new lemur::index::KeyfileIncIndex(LocalParameter::index,
 				LocalParameter::memory);
-      indexer = new KeyfileTextHandler((KeyfileIncIndex *)ind,
+      indexer = new lemur::parse::KeyfileTextHandler((lemur::index::KeyfileIncIndex *)ind,
 				       LocalParameter::countStopWords);
       // register document manager with PushIndex
-      ((KeyfileTextHandler *)indexer)->setDocManager(docmgr->getMyID());
+      ((lemur::parse::KeyfileTextHandler *)indexer)->setDocManager(docmgr->getMyID());
     } else {
     throw Exception ("BuildDocMgr", "Unknown index type");
     }

@@ -292,7 +292,7 @@ public:
 
 class NetworkServerProxyDocumentIDsResponse : public QueryServerDocumentIDsResponse {
 public:
-  std::vector<DOCID_T> _documentIDs;
+  std::vector<lemur::api::DOCID_T> _documentIDs;
   indri::net::NetworkMessageStream* _stream;
   bool _readResponse;
 
@@ -308,7 +308,7 @@ public:
     _stream->mutex().unlock();
   }
 
-  std::vector<DOCID_T>& getResults() {
+  std::vector<lemur::api::DOCID_T>& getResults() {
     if( !_readResponse ) {
       indri::net::XMLReplyReceiver r;
       r.wait( _stream );

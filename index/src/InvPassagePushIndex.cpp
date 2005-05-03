@@ -17,25 +17,25 @@
  * dmf 10/22/2002 -- Add writing of compressed TermInfoLists.
  *========================================================================*/
 
-InvPassagePushIndex::InvPassagePushIndex(const string &prefix, int psgSize,
+lemur::index::InvPassagePushIndex::InvPassagePushIndex(const string &prefix, int psgSize,
 					 int cachesize, long maxfilesize, 
-					 DOCID_T startdocid)
+					 lemur::api::DOCID_T startdocid)
   : InvFPPushIndex(prefix, cachesize, maxfilesize, startdocid),
     passageSize(psgSize), curDocName("") { 
   passageEnd = passageSize/2;
   if (passageSize%2 != 0) passageEnd++; // round up
 }
 
-InvPassagePushIndex::~InvPassagePushIndex() { 
+lemur::index::InvPassagePushIndex::~InvPassagePushIndex() { 
 }
 
-void InvPassagePushIndex::setPassageSize(int n) {
+void lemur::index::InvPassagePushIndex::setPassageSize(int n) {
   passageSize = n;
   passageEnd = passageSize/2;
   if (passageSize%2 != 0) passageEnd++; // round up
 }
 
-bool InvPassagePushIndex::beginDoc(const DocumentProps* dp){
+bool lemur::index::InvPassagePushIndex::beginDoc(const lemur::parse::DocumentProps* dp){
   if (dp == NULL)
     return false;
   //  curDoc = dp;
@@ -49,7 +49,7 @@ bool InvPassagePushIndex::beginDoc(const DocumentProps* dp){
   return true;
 }
 
-bool InvPassagePushIndex::addTerm(const Term& t){
+bool lemur::index::InvPassagePushIndex::addTerm(const lemur::api::Term& t){
   TABLE_T::iterator placehold;
   InvFPDocList* curlist;
   const InvFPTerm* term;
@@ -118,14 +118,14 @@ bool InvPassagePushIndex::addTerm(const Term& t){
   termlist.push_back(lt);
   if (termlist.size() == passageSize) {
     // flush a passage.
-    DOCID_T docid = docIDs.size();
-    COUNT_T tls = termlist.size();
+    lemur::api::DOCID_T docid = docIDs.size();
+    lemur::api::COUNT_T tls = termlist.size();
     // stop words will not be counted
-    COUNT_T len = tls;
+    lemur::api::COUNT_T len = tls;
     // make sure the ftell is correct
     writetlist.flush();
     long offset = (long)writetlist.tellp();
-    if (offset+(3*sizeof(LOC_T))+(tls*sizeof(LocatedTerm)) > maxfile) {
+    if (offset+(3*sizeof(lemur::api::LOC_T))+(tls*sizeof(LocatedTerm)) > maxfile) {
       writetlist.close();
       std::stringstream nameStr;
       nameStr << name << DTINDEX << dtfiles.size();
@@ -169,18 +169,18 @@ bool InvPassagePushIndex::addTerm(const Term& t){
   return true;
 }
 
-void InvPassagePushIndex::doendDoc(const DocumentProps* dp, int mgrid) {
+void lemur::index::InvPassagePushIndex::doendDoc(const lemur::parse::DocumentProps* dp, int mgrid) {
   //flush list and write to lookup table
   if (dp != NULL) {
-    DOCID_T docid = docIDs.size();
+    lemur::api::DOCID_T docid = docIDs.size();
     //    int len = dp->length(); // stop words will not be counted
-    COUNT_T tls = termlist.size();
-    COUNT_T len = tls;
+    lemur::api::COUNT_T tls = termlist.size();
+    lemur::api::COUNT_T len = tls;
     // make sure the ftell is correct
     writetlist.flush();
     long offset = (long)writetlist.tellp();
 
-    if (offset+(3*sizeof(LOC_T))+(tls*sizeof(LocatedTerm)) > maxfile) {
+    if (offset+(3*sizeof(lemur::api::LOC_T))+(tls*sizeof(LocatedTerm)) > maxfile) {
       writetlist.close();
       std::stringstream nameStr;
       nameStr << name << DTINDEX << dtfiles.size();

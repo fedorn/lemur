@@ -7,7 +7,9 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
+#ifndef _MMRPASSAGE_HPP
+#define _MMRPASSAGE_HPP
 
 #include <iomanip>
 #include "Passage.hpp"
@@ -15,49 +17,53 @@
 
 using std::vector;
 
-#ifndef _MMRPASSAGE_HPP
-#define _MMRPASSAGE_HPP
+namespace lemur 
+{
+  namespace summarization 
+  {
+    
+    /*!
+      An implementation of the abstract class <code>Passage</code> meant to work in conjunction with the MMR summarizer <code>MMRSumm</code>
 
-/*!
-  An implementation of the abstract class <code>Passage</code> meant to work in conjunction with the MMR summarizer <code>MMRSumm</code>
+    */
 
-*/
+    class MMRPassage : public Passage {
 
-class MMRPassage : public Passage {
+    public:
+      double wt;
+      double wtSim; 
+      double qSim;
+      double maxSim;
 
-public:
-  double wt;
-  double wtSim; 
-  double qSim;
-  double maxSim;
+      MMRPassage(const string &id) {
+        psg = new passageVec;
+        docID = id;
+        score = -1;
+        marked = 0;
+        wt = 1.0;
+        qSim = 0.0;
+        wtSim = 0.0;
+        maxSim = -1.0;
+      }
 
-  MMRPassage(const string &id) {
-    psg = new passageVec;
-    docID = id;
-    score = -1;
-    marked = 0;
-    wt = 1.0;
-    qSim = 0.0;
-    wtSim = 0.0;
-    maxSim = -1.0;
+      virtual void clear();
+
+      virtual void addTerm(termCount term);
+
+      virtual void addTerms(const passageVec pv);
+
+      virtual const passageVec* getAsVector(void) const;
+
+      virtual int operator<(const Passage &b) const;
+
+      virtual double computeMMR(double lambda) const;
+
+      virtual double dotProduct(MMRPassage b) const;
+
+      virtual void scale(double val) const;
+
+    };
   }
-
-  virtual void clear();
-
-  virtual void addTerm(termCount term);
-
-  virtual void addTerms(const passageVec pv);
-
-  virtual const passageVec* getAsVector(void) const;
-
-  virtual int operator<(const Passage &b) const;
-
-  virtual double computeMMR(double lambda) const;
-
-  virtual double dotProduct(MMRPassage b) const;
-
-  virtual void scale(double val) const;
-
-};
+}
 
 #endif

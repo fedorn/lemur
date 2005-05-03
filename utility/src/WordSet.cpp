@@ -20,22 +20,22 @@
 #define NULL 0
 #endif
 
-WordSet::WordSet() {
+lemur::utility::WordSet::WordSet() {
 }
 
-WordSet::WordSet(const string &filename) {
+lemur::utility::WordSet::WordSet(const string &filename) {
   load(filename);
   lastfile = filename;
 }
 
-WordSet::~WordSet() {
+lemur::utility::WordSet::~WordSet() {
   // free all of the words in the set
   clear();
 }
 
 
 void
-WordSet::load(const string &filename) {
+lemur::utility::WordSet::load(const string &filename) {
   lastfile = filename;
   ifstream ifstr(filename.c_str());
   // return if the file can't be opened
@@ -57,7 +57,7 @@ WordSet::load(const string &filename) {
 }
 
 void
-WordSet::add(const char * word) {
+lemur::utility::WordSet::add(const char * word) {
   // insert the word into the set if it isn't already there
   if (!contains(word)) {
     words.insert(strdup(word));
@@ -65,7 +65,7 @@ WordSet::add(const char * word) {
 }
 
 bool 
-WordSet::contains(const char * word) const{
+lemur::utility::WordSet::contains(const char * word) const{
   // check to see if the word is in the set
   // can't make this a set of const char* because we need to free it
   set<char *, lt_str>::const_iterator it = words.find((char*)word);
@@ -73,7 +73,7 @@ WordSet::contains(const char * word) const{
 }
 
 void 
-WordSet::clear() {
+lemur::utility::WordSet::clear() {
   // free memory and empty the set
   set<char *, lt_str>::iterator curr = words.begin();
   while (curr != words.end()) {

@@ -22,30 +22,30 @@
 #include "indri/Index.hpp"
 #include "indri/Path.hpp"
 
-LemurIndriIndex::LemurIndriIndex() : _docMgr(NULL) {
+lemur::index::LemurIndriIndex::LemurIndriIndex() : _docMgr(NULL) {
   _repository = new indri::collection::Repository();
 }
  
-LemurIndriIndex::~LemurIndriIndex() {
+lemur::index::LemurIndriIndex::~LemurIndriIndex() {
   close();
   delete(_repository);
   delete(_docMgr);
 }
 
-bool LemurIndriIndex::open(const std::string& indexName) {
+bool lemur::index::LemurIndriIndex::open(const std::string& indexName) {
   // Have to remove the trailing ".ind" from the name.
   //
   std::string name = indri::file::Path::basename(indexName);
   _repository->openRead( name, NULL );
-  _docMgr = new IndriDocMgr(*_repository, name);
+  _docMgr = new lemur::parse::IndriDocMgr(*_repository, name);
   return true;
 }
 
-void LemurIndriIndex::close() {
+void lemur::index::LemurIndriIndex::close() {
   _repository->close();
 }
 
-TERMID_T LemurIndriIndex::term(const TERM_T &word) const { 
+lemur::api::TERMID_T lemur::index::LemurIndriIndex::term(const lemur::api::TERM_T &word) const { 
   indri::collection::Repository::index_state indexes = _repository->indexes();
   indri::index::Index* index = (*indexes)[0];
   std::string processed = _repository->processTerm( word );
@@ -57,26 +57,26 @@ TERMID_T LemurIndriIndex::term(const TERM_T &word) const {
   }
 }
 
-const TERM_T LemurIndriIndex::term(TERMID_T termID) const { 
+const lemur::api::TERM_T lemur::index::LemurIndriIndex::term(lemur::api::TERMID_T termID) const { 
   indri::collection::Repository::index_state indexes = _repository->indexes();
   indri::index::Index* index = (*indexes)[0];
   indri::thread::ScopedLock lock( index->statisticsLock() );
   return index->term( termID );
 }
 
-DOCID_T LemurIndriIndex::document(const EXDOCID_T &docIDStr) const { 
+lemur::api::DOCID_T lemur::index::LemurIndriIndex::document(const lemur::api::EXDOCID_T &docIDStr) const { 
   std::vector<int> ids = _repository->collection()->retrieveIDByMetadatum("docno", docIDStr);
-  DOCID_T docid = ids[0];
+  lemur::api::DOCID_T docid = ids[0];
   return docid;
 };
 
-const EXDOCID_T LemurIndriIndex::document(DOCID_T docID) const { 
+const lemur::api::EXDOCID_T lemur::index::LemurIndriIndex::document(lemur::api::DOCID_T docID) const { 
   return _repository->collection()->retrieveMetadatum(docID, "docno");
 }
 
-COUNT_T LemurIndriIndex::docCount() const { 
+lemur::api::COUNT_T lemur::index::LemurIndriIndex::docCount() const { 
   indri::collection::Repository::index_state indexes = _repository->indexes();
-  COUNT_T total = 0;
+  lemur::api::COUNT_T total = 0;
   
   for( int i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
@@ -85,13 +85,13 @@ COUNT_T LemurIndriIndex::docCount() const {
   return total;
 }
 
-COUNT_T LemurIndriIndex::termCountUnique() const { 
+lemur::api::COUNT_T lemur::index::LemurIndriIndex::termCountUnique() const { 
   return _repository->indexes()->back()->uniqueTermCount(); 
 }
 
-COUNT_T LemurIndriIndex::termCount(TERMID_T termID) const { 
+lemur::api::COUNT_T lemur::index::LemurIndriIndex::termCount(lemur::api::TERMID_T termID) const { 
   indri::collection::Repository::index_state indexes = _repository->indexes();
-  COUNT_T total = 0;
+  lemur::api::COUNT_T total = 0;
   std::string word(term(termID));
   for( int i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
@@ -101,9 +101,9 @@ COUNT_T LemurIndriIndex::termCount(TERMID_T termID) const {
   return total;
 }
 
-COUNT_T LemurIndriIndex::termCount() const { 
+lemur::api::COUNT_T lemur::index::LemurIndriIndex::termCount() const { 
   indri::collection::Repository::index_state indexes = _repository->indexes();
-  COUNT_T total = 0;
+  lemur::api::COUNT_T total = 0;
 
   for( int i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
@@ -113,14 +113,14 @@ COUNT_T LemurIndriIndex::termCount() const {
   return total;
 }
 
-float LemurIndriIndex::docLengthAvg() const { 
+float lemur::index::LemurIndriIndex::docLengthAvg() const { 
   return (float)termCount()/(float)docCount(); 
 }
 
-COUNT_T LemurIndriIndex::docCount(TERMID_T termID) const { 
+lemur::api::COUNT_T lemur::index::LemurIndriIndex::docCount(lemur::api::TERMID_T termID) const { 
   std::string word(term(termID));
   indri::collection::Repository::index_state indexes = _repository->indexes();
-  COUNT_T total = 0;
+  lemur::api::COUNT_T total = 0;
   for( int i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
     total += (*indexes)[i]->documentCount( word );
@@ -128,7 +128,7 @@ COUNT_T LemurIndriIndex::docCount(TERMID_T termID) const {
   return total;
 }
 
-COUNT_T LemurIndriIndex::docLength( DOCID_T documentID ) const { 
+lemur::api::COUNT_T lemur::index::LemurIndriIndex::docLength( lemur::api::DOCID_T documentID ) const { 
   indri::collection::Repository::index_state indexes = _repository->indexes();
   indri::index::Index* index = _indexWithDocument( indexes, documentID );
 
@@ -139,7 +139,7 @@ COUNT_T LemurIndriIndex::docLength( DOCID_T documentID ) const {
   return 0;
 }
 
-DocInfoList* LemurIndriIndex::docInfoList(TERMID_T termID) const { 
+lemur::api::DocInfoList* lemur::index::LemurIndriIndex::docInfoList(lemur::api::TERMID_T termID) const { 
   // make a DocInfoList to copy the data into.
   // string length of term does not matter.
   InvFPDocList *newList = new InvFPDocList(termID, 0);
@@ -159,10 +159,10 @@ DocInfoList* LemurIndriIndex::docInfoList(TERMID_T termID) const {
   return newList;
 }
 
-TermInfoList* LemurIndriIndex::termInfoList(DOCID_T docID) const { 
+lemur::api::TermInfoList* lemur::index::LemurIndriIndex::termInfoList(lemur::api::DOCID_T docID) const { 
   indri::collection::Repository::index_state indexes = _repository->indexes();
   indri::index::Index* index = _indexWithDocument( indexes, docID );
-  TermInfoList *list = NULL;
+  lemur::api::TermInfoList *list = NULL;
   if( index ) {
     indri::thread::ScopedLock lock( index->statisticsLock() );
     const indri::index::TermList* termList = index->termList( docID );
@@ -171,10 +171,10 @@ TermInfoList* LemurIndriIndex::termInfoList(DOCID_T docID) const {
   return list;
 }
 
-TermInfoList* LemurIndriIndex::termInfoListSeq(DOCID_T docID) const { 
+lemur::api::TermInfoList* lemur::index::LemurIndriIndex::termInfoListSeq(lemur::api::DOCID_T docID) const { 
   indri::collection::Repository::index_state indexes = _repository->indexes();
   indri::index::Index* index = _indexWithDocument( indexes, docID );
-  TermInfoList *list = NULL;
+  lemur::api::TermInfoList *list = NULL;
   if( index ) {
     indri::thread::ScopedLock lock( index->statisticsLock() );
     const indri::index::TermList* termList = index->termList( docID );
@@ -183,7 +183,7 @@ TermInfoList* LemurIndriIndex::termInfoListSeq(DOCID_T docID) const {
   return list;
 }
 
-indri::index::Index* LemurIndriIndex::_indexWithDocument( indri::collection::Repository::index_state& indexes, int documentID ) const {
+indri::index::Index* lemur::index::LemurIndriIndex::_indexWithDocument( indri::collection::Repository::index_state& indexes, lemur::api::DOCID_T documentID ) const {
   for( int i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
     int lowerBound = (*indexes)[i]->documentBase();

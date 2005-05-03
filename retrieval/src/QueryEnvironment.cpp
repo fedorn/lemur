@@ -59,6 +59,8 @@
 
 #include "indri/Appliers.hpp"
 
+using namespace lemur::api;
+
 // debug code: should be gone soon
 #ifdef TIME_QUERIES
 #define INIT_TIMER      indri::utility::IndriTimer t; t.start();

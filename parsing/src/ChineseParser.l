@@ -92,16 +92,16 @@ gb_skip {gb_punct}|{gb_space}|{gb_skip_punct}|{gb_decpt}
 #define DOC 1
 #define TEXT 9
 
-ChineseParser::ChineseParser() {
+lemur::parse::ChineseParser::ChineseParser() {
   state = OUTER;
   iden = identifier;
 }
 
-long ChineseParser::fileTell() const {
+long lemur::parse::ChineseParser::fileTell() const {
   return chinesepos;
 }
 
-void ChineseParser::parseFile(const string &filename) {  
+void lemur::parse::ChineseParser::parseFile(const string &filename) {  
   parsefile = filename;
   chinesepos = 0;
   Chinesein = fopen(filename.c_str(), "rb");
@@ -109,7 +109,7 @@ void ChineseParser::parseFile(const string &filename) {
   fclose(Chinesein);
 }
 
-void ChineseParser::parseBuffer(char* buf, int len) {
+void lemur::parse::ChineseParser::parseBuffer(char* buf, int len) {
   int tpos = chinesepos;
   chinesepos = 0;
   YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
@@ -122,7 +122,7 @@ void ChineseParser::parseBuffer(char* buf, int len) {
 
 
 
-void ChineseParser::doParse() {
+void lemur::parse::ChineseParser::doParse() {
   int tok;
   // The core loop of the parser.
   // The parser is state based.  Encountering a tag

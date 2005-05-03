@@ -18,13 +18,15 @@
 #include "RelDocUnigramCounter.hpp"
 #include "OneStepMarkovChain.hpp"
 
-void SimpleKLQueryModel::interpolateWith(const UnigramLM &qModel, 
+using namespace lemur::api;
+
+void lemur::retrieval::SimpleKLQueryModel::interpolateWith(const lemur::langmod::UnigramLM &qModel, 
 					 double origModCoeff, 
 					 int howManyWord, 
 					 double prSumThresh, 
 					 double prThresh) {
   if (!qm) {
-    qm = new IndexedRealVector();
+    qm = new lemur::api::IndexedRealVector();
   } else {
     qm->clear();
   }
@@ -67,7 +69,7 @@ void SimpleKLQueryModel::interpolateWith(const UnigramLM &qModel,
   colKLComputed = false;
 }
 
-void SimpleKLQueryModel::load(istream &is)
+void lemur::retrieval::SimpleKLQueryModel::load(istream &is)
 {
   // clear existing counts
   startIteration();
@@ -91,7 +93,7 @@ void SimpleKLQueryModel::load(istream &is)
   colKLComputed = false;
 }
 
-void SimpleKLQueryModel::save(ostream &os)
+void lemur::retrieval::SimpleKLQueryModel::save(ostream &os)
 {
   int count = 0;
   startIteration();
@@ -110,7 +112,7 @@ void SimpleKLQueryModel::save(ostream &os)
   }
 }
 
-void SimpleKLQueryModel::clarity(ostream &os)
+void lemur::retrieval::SimpleKLQueryModel::clarity(ostream &os)
 {
   int count = 0;
   double sum=0, ln_Pr=0;
@@ -143,7 +145,7 @@ void SimpleKLQueryModel::clarity(ostream &os)
   }
 }
 
-double SimpleKLQueryModel::clarity() const
+double lemur::retrieval::SimpleKLQueryModel::clarity() const
 {
   int count = 0;
   double sum=0, ln_Pr=0;
@@ -167,7 +169,7 @@ double SimpleKLQueryModel::clarity() const
   return (ln_Pr/log(2.0));
 }
 
-SimpleKLRetMethod::SimpleKLRetMethod(const Index &dbIndex, 
+lemur::retrieval::SimpleKLRetMethod::SimpleKLRetMethod(const Index &dbIndex, 
 				     const string &supportFileName, 
 				     ScoreAccumulator &accumulator) : 
   TextQueryRetMethod(dbIndex, accumulator), supportFile(supportFileName) {
@@ -191,13 +193,13 @@ SimpleKLRetMethod::SimpleKLRetMethod(const Index &dbIndex,
   uniqueTermCount = NULL;
   mcNorm = NULL;
 
-  collectLMCounter = new DocUnigramCounter(ind);
-  collectLM = new MLUnigramLM(*collectLMCounter, ind.termLexiconID()); 
+  collectLMCounter = new lemur::langmod::DocUnigramCounter(ind);
+  collectLM = new lemur::langmod::MLUnigramLM(*collectLMCounter, ind.termLexiconID()); 
 
   scFunc = new SimpleKLScoreFunc();
 }
 
-SimpleKLRetMethod::~SimpleKLRetMethod() 
+lemur::retrieval::SimpleKLRetMethod::~SimpleKLRetMethod() 
 {
   delete [] docProbMass;
   delete [] uniqueTermCount;
@@ -207,7 +209,7 @@ SimpleKLRetMethod::~SimpleKLRetMethod()
   delete scFunc;
 }
 
-void SimpleKLRetMethod::loadSupportFile() {
+void lemur::retrieval::SimpleKLRetMethod::loadSupportFile() {
   ifstream ifs;
   int i;
 
@@ -218,12 +220,12 @@ void SimpleKLRetMethod::loadSupportFile() {
   if (docProbMass == NULL &&
       (docParam.smthMethod == SimpleKLParameter::ABSOLUTEDISCOUNT ||
        docParam.smthStrategy == SimpleKLParameter::BACKOFF)) {
-    cerr << "SimpleKLRetMethod::loadSupportFile loading "
+    cerr << "lemur::retrieval::SimpleKLRetMethod::loadSupportFile loading "
 	 << supportFile << endl;
       
     ifs.open(supportFile.c_str());
     if (ifs.fail()) {
-      throw  Exception("SimpleKLRetMethod::loadSupportFile", 
+      throw  Exception("lemur::retrieval::SimpleKLRetMethod::loadSupportFile", 
 		       "smoothing support file open failure");
     }
     COUNT_T numDocs = ind.docCount();
@@ -235,7 +237,7 @@ void SimpleKLRetMethod::loadSupportFile() {
       double prMass;
       ifs >> id >> uniqCount >> prMass;
       if (id != i) {
-      throw  Exception("SimpleKLRetMethod::loadSupportFile", 
+      throw  Exception("lemur::retrieval::SimpleKLRetMethod::loadSupportFile", 
 		       "alignment error in smooth support file, wrong id:");
       }
       docProbMass[i] = prMass;
@@ -249,11 +251,11 @@ void SimpleKLRetMethod::loadSupportFile() {
 
   if (mcNorm == NULL && qryParam.fbMethod == SimpleKLParameter::MARKOVCHAIN) {
     string mcSuppFN = supportFile + ".mc";
-    cerr << "SimpleKLRetMethod::loadSupportFile loading " << mcSuppFN << endl;
+    cerr << "lemur::retrieval::SimpleKLRetMethod::loadSupportFile loading " << mcSuppFN << endl;
 
     ifs.open(mcSuppFN.c_str());
     if (ifs.fail()) {
-      throw Exception("SimpleKLRetMethod::loadSupportFile", 
+      throw Exception("lemur::retrieval::SimpleKLRetMethod::loadSupportFile", 
 		      "Markov chain support file can't be opened");
     }
 
@@ -264,7 +266,7 @@ void SimpleKLRetMethod::loadSupportFile() {
       double norm;
       ifs >> id >> norm;
       if (id != i) {
-      throw Exception("SimpleKLRetMethod::loadSupportFile", 
+      throw Exception("lemur::retrieval::SimpleKLRetMethod::loadSupportFile", 
 		      "alignment error in Markov chain support file, wrong id:");
       }
       mcNorm[i] = norm;
@@ -272,7 +274,7 @@ void SimpleKLRetMethod::loadSupportFile() {
   }
 }
 
-DocumentRep *SimpleKLRetMethod::computeDocRep(DOCID_T docID)
+DocumentRep *lemur::retrieval::SimpleKLRetMethod::computeDocRep(DOCID_T docID)
 {
   switch (docParam.smthMethod) {
   case SimpleKLParameter::JELINEKMERCER:
@@ -315,7 +317,7 @@ DocumentRep *SimpleKLRetMethod::computeDocRep(DOCID_T docID)
 }
 
 
-void SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep, 
+void lemur::retrieval::SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep, 
 					const DocIDSet &relDocs)
 {
   SimpleKLQueryModel *qr;
@@ -345,12 +347,12 @@ void SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep,
 }
 
 
-void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, 
+void lemur::retrieval::SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, 
 					      const DocIDSet &relDocs)
 {
   COUNT_T numTerms = ind.termCountUnique();
 
-  DocUnigramCounter *dCounter = new DocUnigramCounter(relDocs, ind);
+  lemur::langmod::DocUnigramCounter *dCounter = new lemur::langmod::DocUnigramCounter(relDocs, ind);
 
   double *distQuery = new double[numTerms+1];
   double *distQueryEst = new double[numTerms+1];
@@ -415,13 +417,13 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep,
     }
   } while (itNum-- > 0);
   
-  ArrayCounter<double> lmCounter(numTerms+1);
+  lemur::utility::ArrayCounter<double> lmCounter(numTerms+1);
   for (i=1; i<=numTerms; i++) {
     if (distQuery[i] > 0) {
       lmCounter.incCount(i, distQuery[i]);
     }
   }
-  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind.termLexiconID());
+  lemur::langmod::MLUnigramLM *fblm = new lemur::langmod::MLUnigramLM(lmCounter, ind.termLexiconID());
   origRep.interpolateWith(*fblm, (1-qryParam.fbCoeff), qryParam.fbTermCount,
 			qryParam.fbPrSumTh, qryParam.fbPrTh);
   delete fblm;
@@ -431,7 +433,7 @@ void SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep,
 }
 
 
-void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, 
+void lemur::retrieval::SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, 
 					     const DocIDSet &relDocs)
 {
   COUNT_T numTerms = ind.termCountUnique();
@@ -468,7 +470,7 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep,
   }
   if (actualDocCount==0) return;
 
-  ArrayCounter<double> lmCounter(numTerms+1);
+  lemur::utility::ArrayCounter<double> lmCounter(numTerms+1);
   
   double norm = 1.0/(double)actualDocCount;
   for (i=1; i<=numTerms; i++) { 
@@ -480,19 +482,19 @@ void SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep,
   delete [] ct;
 
   
-  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind.termLexiconID());
+  lemur::langmod::MLUnigramLM *fblm = new lemur::langmod::MLUnigramLM(lmCounter, ind.termLexiconID());
   origRep.interpolateWith(*fblm, (1-qryParam.fbCoeff), qryParam.fbTermCount,
 			qryParam.fbPrSumTh, qryParam.fbPrTh);
   delete fblm;
 }
 
-void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, const DocIDSet &relDocs)
+void lemur::retrieval::SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, const DocIDSet &relDocs)
 {
   int stopWordCutoff =50;
 
-  ArrayCounter<double> *counter = new ArrayCounter<double>(ind.termCountUnique()+1);
+  lemur::utility::ArrayCounter<double> *counter = new lemur::utility::ArrayCounter<double>(ind.termCountUnique()+1);
 
-  OneStepMarkovChain * mc = new OneStepMarkovChain(relDocs, ind, mcNorm,
+  lemur::langmod::OneStepMarkovChain * mc = new lemur::langmod::OneStepMarkovChain(relDocs, ind, mcNorm,
 						   1-qryParam.fbMixtureNoise);
   origRep.startIteration();
   double summ;
@@ -534,7 +536,7 @@ void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, c
   }
   delete mc;
 
-  UnigramLM *fbLM = new MLUnigramLM(*counter, ind.termLexiconID());
+  lemur::langmod::UnigramLM *fbLM = new lemur::langmod::MLUnigramLM(*counter, ind.termLexiconID());
 
   origRep.interpolateWith(*fbLM, 1-qryParam.fbCoeff, qryParam.fbTermCount,
 			  qryParam.fbPrSumTh, qryParam.fbPrTh);
@@ -542,13 +544,13 @@ void SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQueryModel &origRep, c
   delete counter;
 }
 
-void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep, 
+void lemur::retrieval::SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep, 
 					  const DocIDSet &relDocs)
 {  
   COUNT_T numTerms = ind.termCountUnique();
 
   // RelDocUnigramCounter computes SUM(D){P(w|D)*P(D|Q)} for each w
-  RelDocUnigramCounter *dCounter = new RelDocUnigramCounter(relDocs, ind);
+  lemur::langmod::RelDocUnigramCounter *dCounter = new lemur::langmod::RelDocUnigramCounter(relDocs, ind);
 
   double *distQuery = new double[numTerms+1];
   double expWeight = qryParam.fbCoeff;
@@ -572,13 +574,13 @@ void SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep,
       (1-expWeight)*ind.termCount(i)/ind.termCount();
   }
 
-  ArrayCounter<double> lmCounter(numTerms+1);
+  lemur::utility::ArrayCounter<double> lmCounter(numTerms+1);
   for (i=1; i<=numTerms; i++) {
     if (distQuery[i] > 0) {
       lmCounter.incCount(i, distQuery[i]);
     }
   }
-  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind.termLexiconID());
+  lemur::langmod::MLUnigramLM *fblm = new lemur::langmod::MLUnigramLM(lmCounter, ind.termLexiconID());
   origRep.interpolateWith(*fblm, 0.0, qryParam.fbTermCount,
 			  qryParam.fbPrSumTh, 0.0);
   delete fblm;
@@ -597,7 +599,7 @@ struct termProb  {
   double prob; // a*tf(w,d)/|d| +(1-a)*tf(w,C)/|C|
 };
 
-void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep, 
+void lemur::retrieval::SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep, 
 					  const DocIDSet &relDocs) {  
   COUNT_T numTerms = ind.termCountUnique();
   COUNT_T termCount = ind.termCount();
@@ -605,7 +607,7 @@ void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep,
 
   // RelDocUnigramCounter computes P(w)=SUM(D){P(w|D)*P(D|Q)} for each w
   // P(w) = SUM_d P(w|d) p(d)
-  RelDocUnigramCounter *dCounter = new RelDocUnigramCounter(relDocs, ind);
+  lemur::langmod::RelDocUnigramCounter *dCounter = new lemur::langmod::RelDocUnigramCounter(relDocs, ind);
 
   double *distQuery = new double[numTerms+1];
   COUNT_T numDocs = ind.docCount();
@@ -683,13 +685,13 @@ void SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep,
     distQuery[wd] =P_w*P_Q_w;
   }
 
-  ArrayCounter<double> lmCounter(numTerms+1);
+  lemur::utility::ArrayCounter<double> lmCounter(numTerms+1);
   for (i=1; i<=numTerms; i++) {
     if (distQuery[i] > 0) {
       lmCounter.incCount(i, distQuery[i]);
     }
   }
-  MLUnigramLM *fblm = new MLUnigramLM(lmCounter, ind.termLexiconID());
+  lemur::langmod::MLUnigramLM *fblm = new lemur::langmod::MLUnigramLM(lmCounter, ind.termLexiconID());
   origRep.interpolateWith(*fblm, 0.0, qryParam.fbTermCount,
 			  qryParam.fbPrSumTh, 0.0);
   delete fblm;

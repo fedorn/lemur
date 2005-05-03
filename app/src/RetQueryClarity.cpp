@@ -104,13 +104,14 @@ by some hard-coded criterion. See the source code in
 #include "BasicDocStream.hpp"
 #include "RetParamManager.hpp"
 #include "ResultFile.hpp"
+using namespace lemur::api;
 
 
 namespace LocalParameter {
 
-  String expandedQuery;
-  String initQuery;
-  String feedbackDocuments;
+  std::string expandedQuery;
+  std::string initQuery;
+  std::string feedbackDocuments;
   void get() {
     expandedQuery = ParamGetString("expandedQuery");
   }
@@ -135,7 +136,7 @@ void QueryClarity(QueryRep *qr, const string& qid, IndexedRealVector *res,
 {
   bool ignoreWeights = false;
   cout << "query : "<< qid << endl;
-  SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
+  lemur::retrieval::SimpleKLQueryModel *qm = (lemur::retrieval::SimpleKLQueryModel *) qr;
   model->scoreCollection(*qr, *res);
   res->LogToPosterior();
   res->Sort();  
@@ -161,18 +162,18 @@ int AppMain(int argc, char *argv[]) {
 		    "Can't open index, check parameter index");
   }
 
-  ArrayAccumulator accumulator(ind->docCount());
+  lemur::retrieval::ArrayAccumulator accumulator(ind->docCount());
   IndexedRealVector res(ind->docCount());
-  ofstream os(LocalParameter::expandedQuery);
+  ofstream os(LocalParameter::expandedQuery.c_str());
 
-  SimpleKLRetMethod *model;
-  model =  new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, 
+  lemur::retrieval::SimpleKLRetMethod *model;
+  model =  new lemur::retrieval::SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, 
 				 accumulator);
   model->setDocSmoothParam(SimpleKLParameter::docPrm);
   model->setQueryModelParam(SimpleKLParameter::qryPrm);
   DocStream *qryStream;
   try {
-    qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+    qryStream = new lemur::parse::BasicDocStream(RetrievalParameter::textQuerySet);
   } catch (Exception &ex) {
     ex.writeMessage(cerr);
     throw Exception("QueryClarity", "Can't open query file");

@@ -10,17 +10,17 @@
 */
 #include "BrillPOSTokenizer.hpp"
 
-BrillPOSTokenizer::BrillPOSTokenizer() {
+lemur::parse::BrillPOSTokenizer::BrillPOSTokenizer() {
   splitter='/';
   pos.setName("POS");
 }
 
-BrillPOSTokenizer::BrillPOSTokenizer(char s) {
+lemur::parse::BrillPOSTokenizer::BrillPOSTokenizer(char s) {
   splitter = s;
   pos.setName("POS");
 }
 
-char* BrillPOSTokenizer::handleWord(char* word, const char* original, PropertyList* list){
+char* lemur::parse::BrillPOSTokenizer::handleWord(char* word, const char* original, PropertyList* list){
   char* term = strtok(word, &splitter);
   char* tag = strtok(NULL, &splitter);
   if (tag) {

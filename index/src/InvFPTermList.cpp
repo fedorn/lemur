@@ -16,7 +16,7 @@
 #include "InvFPTermList.hpp"
 #include "File.hpp"
 
-InvFPTermList::InvFPTermList() {
+lemur::index::InvFPTermList::InvFPTermList() {
   length = 0;
   index = 0;
   listlen = 0;
@@ -25,7 +25,7 @@ InvFPTermList::InvFPTermList() {
   counts = NULL;
 }
 
-InvFPTermList::InvFPTermList(DOCID_T did, int len, vector<LocatedTerm> &tls) {
+lemur::index::InvFPTermList::InvFPTermList(lemur::api::DOCID_T did, int len, vector<LocatedTerm> &tls) {
   length = len;
   index = 0;
   listlen = tls.size();
@@ -36,7 +36,7 @@ InvFPTermList::InvFPTermList(DOCID_T did, int len, vector<LocatedTerm> &tls) {
     list[i] = tls[i];
 }
 
-InvFPTermList::~InvFPTermList() {
+lemur::index::InvFPTermList::~InvFPTermList() {
   if (list != NULL)
     delete[](list);
   if (counts != NULL) {
@@ -45,15 +45,15 @@ InvFPTermList::~InvFPTermList() {
   }
 }
 
-void InvFPTermList::startIteration() const{
+void lemur::index::InvFPTermList::startIteration() const{
   index = 0;
 }
 
-bool InvFPTermList::hasMore() const{
+bool lemur::index::InvFPTermList::hasMore() const{
   return index != listlen;
 }
 
-TermInfo* InvFPTermList::nextEntry() const{
+lemur::api::TermInfo* lemur::index::InvFPTermList::nextEntry() const{
   if (counts) {
     entry.count(counts[index]);
     entry.positions(&(listcounted[index].loc));
@@ -75,7 +75,7 @@ TermInfo* InvFPTermList::nextEntry() const{
 }
 
 /// set element from position, returns pointer to the element
-TermInfo* InvFPTermList::getElement(TermInfo* elem, POS_T position) const {
+lemur::api::TermInfo* lemur::index::InvFPTermList::getElement(lemur::api::TermInfo* elem, lemur::api::POS_T position) const {
   InvFPTerm* e = dynamic_cast<InvFPTerm*>(elem);
   if (!e)
     LEMUR_THROW(LEMUR_RUNTIME_ERROR,"expected InvFPTerm");
@@ -100,24 +100,24 @@ TermInfo* InvFPTermList::getElement(TermInfo* elem, POS_T position) const {
   return e;
 }
 /// advance position
-POS_T InvFPTermList::nextPosition(POS_T position) const {
-  return (POS_T) (((int) position) + 1);
+lemur::api::POS_T lemur::index::InvFPTermList::nextPosition(lemur::api::POS_T position) const {
+  return (lemur::api::POS_T) (((int) position) + 1);
 }
 
-bool InvFPTermList::binRead(ifstream& infile){
+bool lemur::index::InvFPTermList::binRead(ifstream& infile){
   if (infile.eof())
     return false;
 
-  infile.read((char*) &uid, sizeof(DOCID_T));
-  if (!(infile.gcount() == sizeof(DOCID_T)))
+  infile.read((char*) &uid, sizeof(lemur::api::DOCID_T));
+  if (!(infile.gcount() == sizeof(lemur::api::DOCID_T)))
     return false;
 
-  infile.read((char*) &length, sizeof(COUNT_T));
-  if (!(infile.gcount() == sizeof(COUNT_T)))
+  infile.read((char*) &length, sizeof(lemur::api::COUNT_T));
+  if (!(infile.gcount() == sizeof(lemur::api::COUNT_T)))
     return false;
 
-  infile.read((char*) &listlen, sizeof(COUNT_T));
-  if (!(infile.gcount() == sizeof(COUNT_T)))
+  infile.read((char*) &listlen, sizeof(lemur::api::COUNT_T));
+  if (!(infile.gcount() == sizeof(lemur::api::COUNT_T)))
     return false;
 
   if (!(list == NULL))
@@ -137,13 +137,13 @@ bool InvFPTermList::binRead(ifstream& infile){
 // File-based functions
 //
 
-void InvFPTermList::binWriteC( File& of ) {
-  of.write((const char*) &uid, sizeof(DOCID_T));
-  of.write((const char*) &length, sizeof(COUNT_T));
+void lemur::index::InvFPTermList::binWriteC( lemur::file::File& of ) {
+  of.write((const char*) &uid, sizeof(lemur::api::DOCID_T));
+  of.write((const char*) &length, sizeof(lemur::api::COUNT_T));
   //  if (length == 0) {
   if (listlen == 0) {
-    COUNT_T zero = 0;
-    of.write((const char*) &zero, sizeof(COUNT_T));
+    lemur::api::COUNT_T zero = 0;
+    of.write((const char*) &zero, sizeof(lemur::api::COUNT_T));
     return;
   }
   
@@ -151,20 +151,20 @@ void InvFPTermList::binWriteC( File& of ) {
   // compress it
   // it's ok to make comp the same size.  the compressed will be smaller
   unsigned char* comp = new unsigned char[listlen * sizeof(LocatedTerm)];
-  COUNT_T compbyte = RVLCompress::compress_ints((int *)list, comp, 
+  lemur::api::COUNT_T compbyte = lemur::utility::RVLCompress::compress_ints((int *)list, comp, 
 					    listlen * 2);
-  of.write((const char*) &compbyte, sizeof(COUNT_T));
+  of.write((const char*) &compbyte, sizeof(lemur::api::COUNT_T));
   // write out the compressed bits
   of.write((const char*) comp, compbyte);
   delete[](comp);
 }
 
-bool InvFPTermList::binReadC( File& infile ){
-  COUNT_T size = 0;
+bool lemur::index::InvFPTermList::binReadC( lemur::file::File& infile ){
+  lemur::api::COUNT_T size = 0;
   
-  infile.read((char*) &uid, sizeof(DOCID_T));
-  infile.read((char*) &length, sizeof(COUNT_T));
-  infile.read((char*) &size, sizeof(COUNT_T));
+  infile.read((char*) &uid, sizeof(lemur::api::DOCID_T));
+  infile.read((char*) &length, sizeof(lemur::api::COUNT_T));
+  infile.read((char*) &size, sizeof(lemur::api::COUNT_T));
 
   if (size == 0) {
     list = new LocatedTerm[0];
@@ -180,7 +180,7 @@ bool InvFPTermList::binReadC( File& infile ){
 
   list = new LocatedTerm[size * 4];
   // decompress it
-  listlen = RVLCompress::decompress_ints(buffer, (int *)list, size)/2;
+  listlen = lemur::utility::RVLCompress::decompress_ints(buffer, (int *)list, size)/2;
   deltaDecode();
   delete[](buffer);
   return true;
@@ -190,13 +190,13 @@ bool InvFPTermList::binReadC( File& infile ){
 // Stream-based functions
 // 
 
-void InvFPTermList::binWriteC(ofstream& of){
-  of.write((const char*) &uid, sizeof(DOCID_T));
-  of.write((const char*) &length, sizeof(COUNT_T));
+void lemur::index::InvFPTermList::binWriteC(ofstream& of){
+  of.write((const char*) &uid, sizeof(lemur::api::DOCID_T));
+  of.write((const char*) &length, sizeof(lemur::api::COUNT_T));
   //  if (length == 0) {
   if (listlen == 0) {
-    COUNT_T zero = 0;
-    of.write((const char*) &zero, sizeof(COUNT_T));
+    lemur::api::COUNT_T zero = 0;
+    of.write((const char*) &zero, sizeof(lemur::api::COUNT_T));
     return;
   }
   
@@ -204,30 +204,30 @@ void InvFPTermList::binWriteC(ofstream& of){
   // compress it
   // it's ok to make comp the same size.  the compressed will be smaller
   unsigned char* comp = new unsigned char[listlen * sizeof(LocatedTerm)];
-  COUNT_T compbyte = RVLCompress::compress_ints((int *)list, comp, 
+  lemur::api::COUNT_T compbyte = lemur::utility::RVLCompress::compress_ints((int *)list, comp, 
 					    listlen * 2);
-  of.write((const char*) &compbyte, sizeof(COUNT_T));
+  of.write((const char*) &compbyte, sizeof(lemur::api::COUNT_T));
   // write out the compressed bits
   of.write((const char*) comp, compbyte);
   delete[](comp);
 }
 
-bool InvFPTermList::binReadC(ifstream& infile){
-  COUNT_T size;
+bool lemur::index::InvFPTermList::binReadC(ifstream& infile){
+  lemur::api::COUNT_T size;
   
   if (infile.eof())
     return false;
 
-  infile.read((char*) &uid, sizeof(DOCID_T));
-  if (!(infile.gcount() == sizeof(DOCID_T)))
+  infile.read((char*) &uid, sizeof(lemur::api::DOCID_T));
+  if (!(infile.gcount() == sizeof(lemur::api::DOCID_T)))
     return false;
 
-  infile.read((char*) &length, sizeof(COUNT_T));
-  if (!(infile.gcount() == sizeof(COUNT_T)))
+  infile.read((char*) &length, sizeof(lemur::api::COUNT_T));
+  if (!(infile.gcount() == sizeof(lemur::api::COUNT_T)))
     return false;
 
-  infile.read((char*) &size, sizeof(COUNT_T));
-  if (!(infile.gcount() == sizeof(COUNT_T)))
+  infile.read((char*) &size, sizeof(lemur::api::COUNT_T));
+  if (!(infile.gcount() == sizeof(lemur::api::COUNT_T)))
     return false;
   if (size == 0) {
     list = new LocatedTerm[0];
@@ -246,50 +246,50 @@ bool InvFPTermList::binReadC(ifstream& infile){
 
   list = new LocatedTerm[size * 4];
   // decompress it
-  listlen = RVLCompress::decompress_ints(buffer, (int *)list, size)/2;
+  listlen = lemur::utility::RVLCompress::decompress_ints(buffer, (int *)list, size)/2;
   deltaDecode();
   delete[](buffer);
   return true;
 }
 
 
-void InvFPTermList::deltaEncode() {
+void lemur::index::InvFPTermList::deltaEncode() {
   // we will encode in place
   // go backwards starting at the last docid
   // we're counting on two always being bigger than one
-  LOC_T* two = (LOC_T *)(list + listlen - 1);
-  LOC_T* one = two-2;
+  lemur::api::LOC_T* two = (lemur::api::LOC_T *)(list + listlen - 1);
+  lemur::api::LOC_T* one = two-2;
 
-  while (two != (LOC_T *)list) {
+  while (two != (lemur::api::LOC_T *)list) {
     *two = *two-*one;
     two = one;
     one -= 2;
   }
 }
 
-void InvFPTermList::deltaDecode() {
+void lemur::index::InvFPTermList::deltaDecode() {
   // we will decode in place
   // start at the begining
-  LOC_T* one = (LOC_T *)list;
-  LOC_T* two = one+2;
+  lemur::api::LOC_T* one = (lemur::api::LOC_T *)list;
+  lemur::api::LOC_T* two = one+2;
   
-  while (one != (LOC_T*)(list + listlen - 1)) {
+  while (one != (lemur::api::LOC_T*)(list + listlen - 1)) {
     *two = *two + *one;
     one = two;
     two += 2;
   }
 }
 
-void InvFPTermList::countTerms(){
+void lemur::index::InvFPTermList::countTerms(){
   //already been counted then we don't want to count again.
   if (counts || listlen == 0) // pathological case of 0 length list.
     return;
-  map<TERMID_T, COUNT_T> table;
-  map<TERMID_T, COUNT_T>::iterator place;
+  map<lemur::api::TERMID_T, lemur::api::COUNT_T> table;
+  map<lemur::api::TERMID_T, lemur::api::COUNT_T>::iterator place;
   int idx = 0;
   listcounted = new LLTerm[listlen];
   //  counts = (int*) malloc(sizeof(int) * listlen);
-  counts = new COUNT_T[listlen];
+  counts = new lemur::api::COUNT_T[listlen];
   // Reduce computations at the cost of wasting the end
   // of the two arrays, listcounted and counts
   int i;

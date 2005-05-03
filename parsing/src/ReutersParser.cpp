@@ -650,7 +650,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp = NULL, *yy_bp = NULL;
+	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
 #line 49 "../src/ReutersParser.l"
@@ -1221,7 +1221,6 @@ register char *yy_bp;
 #endif	/* ifndef YY_NO_UNPUT */
 
 
-#ifndef YY_NO_INPUT
 #ifdef __cplusplus
 static int yyinput()
 #else
@@ -1293,7 +1292,7 @@ static int input()
 
 	return c;
 	}
-#endif /* YY_NO_INPUT */
+
 
 #ifdef YY_USE_PROTOS
 void yyrestart( FILE *input_file )
@@ -1404,6 +1403,11 @@ YY_BUFFER_STATE b;
 	}
 
 
+#ifndef YY_ALWAYS_INTERACTIVE
+#ifndef YY_NEVER_INTERACTIVE
+extern int isatty YY_PROTO(( int ));
+#endif
+#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -1728,19 +1732,19 @@ int main()
 #define DOC 1
 #define TEXT 9
 
-ReutersParser::ReutersParser() {
+lemur::parse::ReutersParser::ReutersParser() {
   state = OUTER;
   iden = identifier;
 }
 
 
 
-long ReutersParser::fileTell() const {
+long lemur::parse::ReutersParser::fileTell() const {
   return reuterspos;
 }
 
 void 
-ReutersParser::parseFile(const string &filename) {
+lemur::parse::ReutersParser::parseFile(const string &filename) {
   parsefile = filename;
   reuterspos = 0;
   reutersin = fopen(filename.c_str(), "rb");
@@ -1749,7 +1753,7 @@ ReutersParser::parseFile(const string &filename) {
 
 }
 
-void ReutersParser::parseBuffer(char* buf, int len) {
+void lemur::parse::ReutersParser::parseBuffer(char* buf, int len) {
   int tpos = reuterspos;
   reuterspos = 0;
   YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
@@ -1760,7 +1764,7 @@ void ReutersParser::parseBuffer(char* buf, int len) {
   reuterspos = tpos;
 }
 
-void ReutersParser::doParse() {
+void lemur::parse::ReutersParser::doParse() {
   
   int tok;
   // The core loop of the parser.

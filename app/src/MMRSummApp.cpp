@@ -49,15 +49,17 @@ The following is an example of use:
 */
 
 #include "Param.hpp"
-#include "String.hpp"
 #include "MMRSumm.hpp"
 #include "InvFPIndex.hpp"
 #include <iostream>
 
+using namespace lemur::api;
+using namespace lemur::summarization;
+
 namespace LocalParameter{
-  String index;   
-  String docID;
-  String query;
+  std::string index;   
+  std::string docID;
+  std::string query;
   int summLength;   
   void get() {
     index  = ParamGetString("index");
@@ -76,12 +78,12 @@ void GetAppParam()
 
 int AppMain(int argc, char* argv[]) {
 
-  InvFPIndex idx(LocalParameter::index);
+  lemur::index::InvFPIndex idx(LocalParameter::index);
 
   // Create an MMR summarizer
-  MMRSumm* s = new MMRSumm(&idx);
+  lemur::summarization::MMRSumm* s = new lemur::summarization::MMRSumm(&idx);
 
-  if ( !(LocalParameter::query) ) {
+  if ( !(LocalParameter::query.empty()) ) {
     // generic summary
     s->summDocument(LocalParameter::docID, LocalParameter::summLength, NULL);
   } else {

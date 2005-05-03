@@ -684,7 +684,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp = NULL, *yy_bp = NULL;
+	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
 #line 51 "../src/ArabicParser.l"
@@ -1320,7 +1320,6 @@ register char *yy_bp;
 #endif	/* ifndef YY_NO_UNPUT */
 
 
-#ifndef YY_NO_INPUT
 #ifdef __cplusplus
 static int yyinput()
 #else
@@ -1392,7 +1391,7 @@ static int input()
 
 	return c;
 	}
-#endif /* YY_NO_INPUT */
+
 
 #ifdef YY_USE_PROTOS
 void yyrestart( FILE *input_file )
@@ -1503,6 +1502,11 @@ YY_BUFFER_STATE b;
 	}
 
 
+#ifndef YY_ALWAYS_INTERACTIVE
+#ifndef YY_NEVER_INTERACTIVE
+extern int isatty YY_PROTO(( int ));
+#endif
+#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -1827,16 +1831,16 @@ int main()
 #define DOC 1
 #define TEXT 9
 
-ArabicParser::ArabicParser() {
+lemur::parse::ArabicParser::ArabicParser() {
   state = OUTER;
   iden = identifier;
 }
 
-long ArabicParser::fileTell() const{
+long lemur::parse::ArabicParser::fileTell() const{
   return arabicpos;
 }
 
-void ArabicParser::parseFile(const string &filename) {  
+void lemur::parse::ArabicParser::parseFile(const string &filename) {  
   parsefile = filename;
   arabicpos = 0;
   Arabicin = fopen(filename.c_str(), "rb");
@@ -1844,7 +1848,7 @@ void ArabicParser::parseFile(const string &filename) {
   fclose(Arabicin);
 }
 
-void ArabicParser::parseBuffer(char* buf, int len) {
+void lemur::parse::ArabicParser::parseBuffer(char* buf, int len) {
   int tpos = arabicpos;
   arabicpos = 0;
   YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
@@ -1855,7 +1859,7 @@ void ArabicParser::parseBuffer(char* buf, int len) {
   arabicpos = tpos;
 }
 
-void ArabicParser::doParse() {
+void lemur::parse::ArabicParser::doParse() {
   int tok;
   // The core loop of the parser.
   // The parser is state based.  Encountering a tag

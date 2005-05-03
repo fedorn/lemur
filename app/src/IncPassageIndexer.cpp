@@ -67,8 +67,10 @@ The parameters are:
 #include "TextHandlerManager.hpp"
 #include "IncPassageTextHandler.hpp"
 #include "Param.hpp"
-#include "FUtil.hpp"
+#include "indri/Path.hpp"
 #include "TrecParser.hpp"
+
+using namespace lemur::api;
 
 // Local parameters used by the indexer 
 namespace LocalParameter {
@@ -157,7 +159,7 @@ int AppMain(int argc, char * argv[]) {
   // so and exit... dmf 01/2004. #include "TrecParser.hpp" can
   // be removed if this is.
   if (!parser)
-    parser = new TrecParser();
+    parser = new lemur::parse::TrecParser();
   
   // Create the stopper if needed.
   Stopper * stopper = NULL;
@@ -176,8 +178,8 @@ int AppMain(int argc, char * argv[]) {
   if (LocalParameter::index.empty()) {
     throw Exception("IncPassageIndexer", "index must be specified");
   }
-  IncPassageTextHandler* indexer;
-  indexer = new IncPassageTextHandler(LocalParameter::index,
+  lemur::parse::IncPassageTextHandler* indexer;
+  indexer = new lemur::parse::IncPassageTextHandler(LocalParameter::index,
 				      LocalParameter::psgSize,
 				      LocalParameter::memory);
 
@@ -199,7 +201,7 @@ int AppMain(int argc, char * argv[]) {
 
   // parse the data files
   if (!LocalParameter::dataFiles.empty()) {
-    if (!fileExist(LocalParameter::dataFiles)) {
+    if (!indri::file::Path::exists(LocalParameter::dataFiles)) {
       throw Exception("IncPassageIndexer", 
 		      "dataFiles specified does not exist");
     }
@@ -219,7 +221,7 @@ int AppMain(int argc, char * argv[]) {
     for (int i = 2; i < argc; i++) {
       cerr << "Parsing " << argv[i] << endl;
       string filename(argv[i]);
-    if (!fileExist(filename)) {
+    if (!indri::file::Path::exists(filename)) {
       throw Exception("IncIndexer", "datfile specified does not exist");
     }
       parser->parse(filename);

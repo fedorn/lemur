@@ -12,17 +12,17 @@
 #include "ResultFile.hpp"
 
 
-void ResultFile::openForRead(istream &is, Index &index)
+void lemur::api::ResultFile::openForRead(istream &is, Index &index)
 {
   inStr=&is;
   ind = &index;
   eof = !readLine();
 }
 
-void ResultFile::load(istream &is, Index &index)
+void lemur::api::ResultFile::load(istream &is, Index &index)
 {
   int i;
-  ResultEntry entry;
+  lemur::utility::ResultEntry entry;
 
   // delete any old data
   for (i=0; i<resTable->size(); i++) {
@@ -51,9 +51,9 @@ void ResultFile::load(istream &is, Index &index)
   }
 }
 
-bool ResultFile::findResult(const string& queryID, IndexedRealVector *&res)
+bool lemur::api::ResultFile::findResult(const string& queryID, IndexedRealVector *&res)
 {
-  ResultEntry entry;
+  lemur::utility::ResultEntry entry;
   entry.key = queryID;
   int qi = (*resTable)[entry];
   if (qi>=0) {
@@ -66,7 +66,7 @@ bool ResultFile::findResult(const string& queryID, IndexedRealVector *&res)
   }
 }
 
-void ResultFile::getResult(const string& expectedQID, IndexedRealVector &res)
+void lemur::api::ResultFile::getResult(const string& expectedQID, IndexedRealVector &res)
 {
   res.clear();
   //  if (eof || strcmp(curQID, expectedQID)) {
@@ -97,7 +97,7 @@ void ResultFile::getResult(const string& expectedQID, IndexedRealVector &res)
   } while (curQID == expectedQID);
 }
 
-void ResultFile::writeResults(const string& queryID, IndexedRealVector *results, int maxCountOfResult)
+void lemur::api::ResultFile::writeResults(const string& queryID, IndexedRealVector *results, int maxCountOfResult)
 {
   IndexedRealVector::iterator j;
   int count=0;
@@ -124,7 +124,7 @@ void ResultFile::writeResults(const string& queryID, IndexedRealVector *results,
 
 
 
-bool ResultFile::readLine()
+bool lemur::api::ResultFile::readLine()
 {
     char dummy1[100];
     char dummy2[100];

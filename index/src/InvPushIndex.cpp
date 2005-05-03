@@ -17,14 +17,14 @@
  *
  *========================================================================*/
 
-InvPushIndex::InvPushIndex(const string &prefix, int cachesize, 
-			   long maxfilesize, DOCID_T startdocid) {
+lemur::index::InvPushIndex::InvPushIndex(const string &prefix, int cachesize, 
+			   long maxfilesize, lemur::api::DOCID_T startdocid) {
   setName(prefix);
   fprintf(stderr, "building %s\n ", name.c_str());
 
   membuf = (int*) malloc(cachesize);
   membufsize = cachesize;
-  cache = new MemCache(membuf, membufsize);
+  cache = new lemur::utility::MemCache(membuf, membufsize);
   tcount = tidcount = 0;
   maxfile = maxfilesize;
   curdocmgr = -1;
@@ -39,7 +39,7 @@ InvPushIndex::InvPushIndex(const string &prefix, int cachesize,
   writetlookup = fopen(lfname.c_str(), "wb");
 }
 
-InvPushIndex::~InvPushIndex() {
+lemur::index::InvPushIndex::~InvPushIndex() {
   writetlist.close();
   fclose(writetlookup);
   if (cache)
@@ -47,11 +47,11 @@ InvPushIndex::~InvPushIndex() {
   free(membuf);
 }
 
-void InvPushIndex::setName(const string &prefix) {
+void lemur::index::InvPushIndex::setName(const string &prefix) {
   name = prefix;
 }
 
-bool InvPushIndex::beginDoc(const DocumentProps* dp){
+bool lemur::index::InvPushIndex::beginDoc(const lemur::parse::DocumentProps* dp){
   if (dp == NULL)
     return false;
   docIDs.push_back(dp->stringID());
@@ -59,7 +59,7 @@ bool InvPushIndex::beginDoc(const DocumentProps* dp){
   return true;
 }
 
-bool InvPushIndex::addTerm(const Term& t){
+bool lemur::index::InvPushIndex::addTerm(const lemur::api::Term& t){
   TABLE_T::iterator placehold;
   InvDocList* curlist;
   if (t.spelling() == NULL) {
@@ -125,15 +125,15 @@ bool InvPushIndex::addTerm(const Term& t){
   return true;
 }
 
-void InvPushIndex::endDoc(const DocumentProps* dp) {
+void lemur::index::InvPushIndex::endDoc(const lemur::parse::DocumentProps* dp) {
   doendDoc(dp, curdocmgr);
 }
 
-void InvPushIndex::endDoc(const DocumentProps* dp, const string &mgr){
+void lemur::index::InvPushIndex::endDoc(const lemur::parse::DocumentProps* dp, const string &mgr){
   doendDoc(dp, docMgrID(mgr));
 }
 
-void InvPushIndex::endCollection(const CollectionProps* cp){
+void lemur::index::InvPushIndex::endCollection(const lemur::parse::CollectionProps* cp){
   // flush last time
   // merge temp files
 
@@ -159,15 +159,15 @@ void InvPushIndex::endCollection(const CollectionProps* cp){
 
 }
 
-void InvPushIndex::setDocManager (const string &mgrID) {
+void lemur::index::InvPushIndex::setDocManager (const string &mgrID) {
   curdocmgr = docMgrID(mgrID);
 }
 
 /*==========================================================================
  *  PRIVATE METHODS
  *==========================================================================*/
-void InvPushIndex::writeTOC(int numinv, const CollectionProps* cp) {
-  const BasicCollectionProps* props = dynamic_cast<const BasicCollectionProps*>(cp);
+void lemur::index::InvPushIndex::writeTOC(int numinv, const lemur::parse::CollectionProps* cp) {
+  const lemur::parse::BasicCollectionProps* props = dynamic_cast<const lemur::parse::BasicCollectionProps*>(cp);
   string fname = name + MAINTOC;
   ofstream toc(fname.c_str());
   if (!toc.is_open()) {
@@ -190,14 +190,14 @@ void InvPushIndex::writeTOC(int numinv, const CollectionProps* cp) {
   toc << DOCMGR_PAR << "  " << name << DOCMGRMAP << endl;
 
   if (props) {
-    const Property* p = NULL;
+    const lemur::parse::Property* p = NULL;
     string value;
     props->startIteration();
     while (props->hasMore()) {
       p = props->nextEntry();
-      if (p->getType() == Property::STDSTRING)
+      if (p->getType() == lemur::parse::Property::STDSTRING)
 	toc << p->getName() << "  " << *(string*)p->getValue() << endl;
-      else if (p->getType() == Property::STRING)
+      else if (p->getType() == lemur::parse::Property::STRING)
 	toc << p->getName() << "  " << (char*)p->getValue() << endl;
     }
   }
@@ -205,18 +205,18 @@ void InvPushIndex::writeTOC(int numinv, const CollectionProps* cp) {
   toc.close();
 }
 
-void InvPushIndex::writeDocIDs() {
+void lemur::index::InvPushIndex::writeDocIDs() {
   string dname = name + DOCIDMAP;
   FILE* docid = fopen(dname.c_str(), "wb");
   // first write out the string value for an unknown docid
   fprintf(docid, "%d %d %s ", 0, strlen(INVALID_STR), INVALID_STR);
-  for (DOCID_T i=0;i<docIDs.size();i++) {
+  for (lemur::api::DOCID_T i=0;i<docIDs.size();i++) {
     fprintf(docid, "%d %d %s ", i+1, docIDs[i].size(), docIDs[i].c_str());
   }
   fclose(docid);
 }
 
-void InvPushIndex::writeDTIDs() {
+void lemur::index::InvPushIndex::writeDTIDs() {
   string dname = name + DTINDEX;
   FILE* dtid = fopen(dname.c_str(), "wb");
   for (int i=0;i<dtfiles.size();i++) {
@@ -225,7 +225,7 @@ void InvPushIndex::writeDTIDs() {
   fclose(dtid);
 }
 
-void InvPushIndex::writeDocMgrIDs() {
+void lemur::index::InvPushIndex::writeDocMgrIDs() {
   string dmname = name + DOCMGRMAP;
   FILE* dmid = fopen(dmname.c_str(), "wb");
   for (int i=0;i<docmgrs.size();i++) {
@@ -234,7 +234,7 @@ void InvPushIndex::writeDocMgrIDs() {
   fclose(dmid);
 }
 
-void InvPushIndex::writeCache() {
+void lemur::index::InvPushIndex::writeCache() {
   bool written = false;   // did we actually write anything?
 
   std::stringstream nameStr;
@@ -253,8 +253,8 @@ void InvPushIndex::writeCache() {
   TABLE_T::iterator finder;
   InvDocList* list;
   // write the file out in termid order
-  for (TERMID_T i=0;i<termIDs.size();i++) {
-    TERM_T &term = termIDs[i];
+  for (lemur::api::TERMID_T i=0;i<termIDs.size();i++) {
+    lemur::api::TERM_T &term = termIDs[i];
     finder = wordtable.find(term);
     if (finder == wordtable.end() ) {
       // this really shouldn't happen. means can't find term in table
@@ -283,7 +283,7 @@ void InvPushIndex::writeCache() {
   }
 }
 
-void InvPushIndex::lastWriteCache() {
+void lemur::index::InvPushIndex::lastWriteCache() {
   bool written = false;   // did we actually write anything?
   std::stringstream nameStr;
   nameStr << name << "temp" << tempfiles.size();
@@ -304,8 +304,8 @@ void InvPushIndex::lastWriteCache() {
   InvDocList* list;
 
   // write the file out in termid order
-  for (TERMID_T i=0;i<termIDs.size();i++) {
-    TERM_T &term = termIDs[i];
+  for (lemur::api::TERMID_T i=0;i<termIDs.size();i++) {
+    lemur::api::TERM_T &term = termIDs[i];
 
     finder = wordtable.find(term);
     if (finder == wordtable.end() ) {
@@ -340,7 +340,7 @@ void InvPushIndex::lastWriteCache() {
 }
 
 
-int InvPushIndex::docMgrID(const string &mgrString) {
+int lemur::index::InvPushIndex::docMgrID(const string &mgrString) {
   for(int i = 0; i < docmgrs.size(); i++) {
     if (mgrString == docmgrs[i]) {
       return i;
@@ -350,18 +350,18 @@ int InvPushIndex::docMgrID(const string &mgrString) {
   return docmgrs.size()-1;
 }
 
-void InvPushIndex::doendDoc(const DocumentProps* dp, int mgrid){
+void lemur::index::InvPushIndex::doendDoc(const lemur::parse::DocumentProps* dp, int mgrid){
   //flush list and write to lookup table
   if (dp != NULL) {
-    DOCID_T docid = docIDs.size();
-    COUNT_T len = dp->length();
-    COUNT_T tls = termlist.size() *2; // for each item we will write 2 ints
+    lemur::api::DOCID_T docid = docIDs.size();
+    lemur::api::COUNT_T len = dp->length();
+    lemur::api::COUNT_T tls = termlist.size() *2; // for each item we will write 2 ints
 
     // make sure the ftell is correct
     writetlist.flush();
     long offset = (long)writetlist.tellp();
 
-    if (offset+(3*sizeof(LOC_T))+(tls*sizeof(LOC_T)) > maxfile) {
+    if (offset+(3*sizeof(lemur::api::LOC_T))+(tls*sizeof(lemur::api::LOC_T)) > maxfile) {
       writetlist.close();
       std::stringstream nameStr;
       nameStr << name << DTINDEX << dtfiles.size();
@@ -373,14 +373,14 @@ void InvPushIndex::doendDoc(const DocumentProps* dp, int mgrid){
 
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset, len, mgrid);
 
-    writetlist.write((const char*)&docid, sizeof(DOCID_T));
-    writetlist.write((const char*)&len, sizeof(COUNT_T));
-    writetlist.write((const char*)&tls, sizeof(COUNT_T));
+    writetlist.write((const char*)&docid, sizeof(lemur::api::DOCID_T));
+    writetlist.write((const char*)&len, sizeof(lemur::api::COUNT_T));
+    writetlist.write((const char*)&tls, sizeof(lemur::api::COUNT_T));
 
     // write our termlist out.. buffering taken care of by os
-    for (map<TERMID_T, COUNT_T>::iterator look=termlist.begin();look!=termlist.end();look++) {
-      writetlist.write((const char*)&(look->first), sizeof(TERMID_T));
-      writetlist.write((const char*)&(look->second), sizeof(COUNT_T));
+    for (map<lemur::api::TERMID_T, lemur::api::COUNT_T>::iterator look=termlist.begin();look!=termlist.end();look++) {
+      writetlist.write((const char*)&(look->first), sizeof(lemur::api::TERMID_T));
+      writetlist.write((const char*)&(look->second), sizeof(lemur::api::COUNT_T));
     }
 
     tcount += len;

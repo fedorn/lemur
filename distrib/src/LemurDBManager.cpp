@@ -15,9 +15,11 @@
 
 #include "Param.hpp"
 
+using namespace lemur::api;
+
 // Open the database.
 void
-LemurDBManager::open(const string &dbname) {
+lemur::distrib::LemurDBManager::open(const string &dbname) {
   // Load the parameter file 
   ParamPushFile(dbname);
   RetrievalParameter::get();
@@ -27,30 +29,30 @@ LemurDBManager::open(const string &dbname) {
   // Create the parser -- DON'T CHANGE THIS 
   parser = new LemurMemParser(index);
   // Create the results list
-  accumulator = new ArrayAccumulator(index->docCount());
+  accumulator = new lemur::retrieval::ArrayAccumulator(index->docCount());
   results = new IndexedRealVector(index->docCount());
-  model = RetMethodManager::createModel(index, (ArrayAccumulator*)accumulator,
+  model = RetMethodManager::createModel(index, accumulator,
 					RetrievalParameter::retModel);
   ParamPopFile();
   outfile = NULL;
 }
 
 // Return the parser. -- DON'T CHANGE THIS
-MemParser *
-LemurDBManager::getParser() const {
+lemur::distrib::MemParser *
+lemur::distrib::LemurDBManager::getParser() const {
   return parser;
 }
 
 
 // Query the database.
-results_t *
-LemurDBManager::query(const char * query, int numdocs) const {
+lemur::distrib::results_t *
+lemur::distrib::LemurDBManager::query(const char * query, int numdocs) const {
   // Create the return value container.
   results_t * res = new results_t;
   res->ids = new docid_t[numdocs];
 
   // Create the query object.
-  StringQuery qry(query);
+  lemur::parse::StringQuery qry(query);
 
   // Create the query representation.
   QueryRep * qryRep = model->computeQueryRep(qry); 
@@ -81,8 +83,8 @@ LemurDBManager::query(const char * query, int numdocs) const {
 
 // Return a document given its id.  The doc part of the return value
 // structure is really an array of integer term ids.
-doc_t *
-LemurDBManager::getDoc(docid_t docid) const {
+lemur::distrib::doc_t *
+lemur::distrib::LemurDBManager::getDoc(docid_t docid) const {
   int lemurID = index->document(docid);
 
   // Create the return value.
@@ -117,7 +119,7 @@ LemurDBManager::getDoc(docid_t docid) const {
 }
 
 void
-LemurDBManager::setOutputFile(const string &filename) const {
+lemur::distrib::LemurDBManager::setOutputFile(const string &filename) const {
   if (outfile != NULL) {
     outfile->close();
     delete outfile;
@@ -127,7 +129,7 @@ LemurDBManager::setOutputFile(const string &filename) const {
 
 // Write a doc to the end of the file
 void
-LemurDBManager::output(const docid_t docid) const {
+lemur::distrib::LemurDBManager::output(const docid_t docid) const {
   int c = 0;
 
   int lemurID = index->document(docid);
@@ -152,7 +154,7 @@ LemurDBManager::output(const docid_t docid) const {
 
 // Close the database and free memory.
 void
-LemurDBManager::close() {
+lemur::distrib::LemurDBManager::close() {
   delete index;
   delete model;
   delete accumulator;

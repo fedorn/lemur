@@ -11,7 +11,7 @@
 
 #include "Passage.hpp"
 
-Passage::~Passage()
+lemur::summarization::Passage::~Passage()
 {
   //empty
 }

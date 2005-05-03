@@ -15,13 +15,13 @@
 
 #include "FlattextDocMgr.hpp"
 
-FlattextDocMgr::FlattextDocMgr(const string &name) {
+lemur::parse::FlattextDocMgr::FlattextDocMgr(const string &name) {
   myparser = NULL;
   entries = NULL;
   open(name);
 }
 
-FlattextDocMgr::FlattextDocMgr(string name, string mode, string source) {
+lemur::parse::FlattextDocMgr::FlattextDocMgr(string name, string mode, string source) {
   entries = NULL;
   numdocs = 0;
   readinSources(source);
@@ -29,21 +29,21 @@ FlattextDocMgr::FlattextDocMgr(string name, string mode, string source) {
   for (int i=0;i<mode.length();i++)
     mode[i] = tolower(mode[i]);
   parseMode = mode;
-  myparser = TextHandlerManager::createParser(mode);
+  myparser = lemur::api::TextHandlerManager::createParser(mode);
   IDname = name;
   // build mode doens't have extension on name
   IDnameext = IDname+FT_SUFFIX;
   prevpos = 0;
 }
 
-FlattextDocMgr::~FlattextDocMgr() {
+lemur::parse::FlattextDocMgr::~FlattextDocMgr() {
   if (myparser)
     delete myparser;
   if (entries)
     delete[]entries;
 }
 
-bool FlattextDocMgr::open(const string &manname) {
+bool lemur::parse::FlattextDocMgr::open(const string &manname) {
   // open mode has extension
   IDnameext = manname;
   // strip extension, but this doesn't really get used
@@ -51,7 +51,7 @@ bool FlattextDocMgr::open(const string &manname) {
   return loadTOC(manname);
 }
 
-void FlattextDocMgr::buildMgr() {
+void lemur::parse::FlattextDocMgr::buildMgr() {
   myparser->setTextHandler(this);
   string n = IDname+FT_LOOKUP;
   writefpos.open(n.c_str());
@@ -71,7 +71,7 @@ void FlattextDocMgr::buildMgr() {
   writeTOC();
 }
 
-char* FlattextDocMgr::handleDoc(char* docno) {
+char* lemur::parse::FlattextDocMgr::handleDoc(char* docno) {
   numdocs ++;
   int pos = myparser->getDocBytePos();
 
@@ -80,18 +80,18 @@ char* FlattextDocMgr::handleDoc(char* docno) {
   return docno;
 }
 
-void FlattextDocMgr::handleEndDoc() {
+void lemur::parse::FlattextDocMgr::handleEndDoc() {
   int end = myparser->fileTell();
 
   // write out number of bytes
   writefpos << end-prevpos << endl;
 }
 
-const string &FlattextDocMgr::getMyID() const{
+const string &lemur::parse::FlattextDocMgr::getMyID() const{
   return IDnameext;
 }
 
-char* FlattextDocMgr::getDoc(const string &docID) const{
+char* lemur::parse::FlattextDocMgr::getDoc(const string &docID) const{
   map<string , lookup_e*, less<string> >::iterator finder;
   finder = table.find(docID);
   if (finder == table.end()) {
@@ -116,7 +116,7 @@ char* FlattextDocMgr::getDoc(const string &docID) const{
 
 
 /*=================  PRIVATE  ==========================*/
-bool FlattextDocMgr::readinSources(const string &fn){
+bool lemur::parse::FlattextDocMgr::readinSources(const string &fn){
   ifstream files(fn.c_str());
   string file;
 
@@ -134,7 +134,7 @@ bool FlattextDocMgr::readinSources(const string &fn){
 }
 
 
-void FlattextDocMgr::writeTOC() {
+void lemur::parse::FlattextDocMgr::writeTOC() {
   string n = IDname+FT_SUFFIX;
   ofstream toc(n.c_str());
   toc << "FILE_LOOKUP  " << IDname << FT_LOOKUP << endl;
@@ -145,10 +145,10 @@ void FlattextDocMgr::writeTOC() {
   toc.close();
 }
 
-bool FlattextDocMgr::loadTOC(const string &fn) {
+bool lemur::parse::FlattextDocMgr::loadTOC(const string &fn) {
   ifstream toc(fn.c_str());
   if (!toc.is_open()) {
-    throw Exception ("FlattextDocMgr", "Cannot open TOC file for reading");
+    throw lemur::api::Exception ("FlattextDocMgr", "Cannot open TOC file for reading");
     return false;
   }
   string key, val;
@@ -173,15 +173,15 @@ bool FlattextDocMgr::loadTOC(const string &fn) {
   if (!loadFTFiles(files, num)) {
     return false;
   }
-  myparser = TextHandlerManager::createParser(parseMode);
+  myparser = lemur::api::TextHandlerManager::createParser(parseMode);
   toc.close();
   return true;
 }
 
-bool FlattextDocMgr::loadFTLookup(const string &fn) {
+bool lemur::parse::FlattextDocMgr::loadFTLookup(const string &fn) {
   ifstream lup (fn.c_str());
   if (!lup.is_open()) {
-    throw Exception ("FlattextDocMgr", "Cannot open list lookup file");
+    throw lemur::api::Exception ("FlattextDocMgr", "Cannot open list lookup file");
     return false;
   }
   string docid;
@@ -204,10 +204,10 @@ bool FlattextDocMgr::loadFTLookup(const string &fn) {
   return true;
 }
 
-bool FlattextDocMgr::loadFTFiles(const string &fn, int num) {
+bool lemur::parse::FlattextDocMgr::loadFTFiles(const string &fn, int num) {
   ifstream fns (fn.c_str());
   if (!fns.is_open()) {
-    throw Exception ("FlattextDocMgr", "Cannot open list of sources");
+    throw lemur::api::Exception ("FlattextDocMgr", "Cannot open list of sources");
     return false;
   }
 

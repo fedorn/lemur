@@ -109,11 +109,12 @@ In addition, the collection mixture model also recognizes the parameter
 #include "RetParamManager.hpp"
 #include "ResultFile.hpp"
 
+using namespace lemur::api;
 
 namespace LocalParameter {
-  String expandedQuery;
-  String initQuery;
-  String feedbackDocuments;
+  lemur::utility::String expandedQuery;
+  lemur::utility::String initQuery;
+  lemur::utility::String feedbackDocuments;
 
   void get() {
     expandedQuery = ParamGetString("expandedQuery");
@@ -136,7 +137,7 @@ void updateQueryModel(QueryRep *qr, const string& qid, ResultFile &resFile, Retr
   bool	ignoreWeights = true;  
   IndexedRealVector *res;
   cout << "query : "<< qid << endl;
-  SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
+  lemur::retrieval::SimpleKLQueryModel *qm = (lemur::retrieval::SimpleKLQueryModel *) qr;
   if (resFile.findResult(qid, res)) {
     res->Sort();
     
@@ -184,7 +185,7 @@ int AppMain(int argc, char *argv[]) {
   }
  
 
-  ArrayAccumulator accumulator(ind->docCount());
+  lemur::retrieval::ArrayAccumulator accumulator(ind->docCount());
 
   ifstream fbdoc(LocalParameter::feedbackDocuments, ios::in);
   if (fbdoc.fail()) {
@@ -195,7 +196,7 @@ int AppMain(int argc, char *argv[]) {
   
   ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
   resFile.load(fbdoc, *ind);
-  SimpleKLRetMethod *model =  new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, accumulator);
+  lemur::retrieval::SimpleKLRetMethod *model =  new lemur::retrieval::SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, accumulator);
   model->setDocSmoothParam(SimpleKLParameter::docPrm);
   model->setQueryModelParam(SimpleKLParameter::qryPrm);
 
@@ -209,7 +210,7 @@ int AppMain(int argc, char *argv[]) {
   if (useOrigQuery) {
     cerr << "### Expanding the original text query ...\n";
     try {
-      qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+      qryStream = new lemur::parse::BasicDocStream(RetrievalParameter::textQuerySet);
     } catch (Exception &ex) {
        ex.writeMessage(cerr);
        throw Exception("GenerateQueryModel", "Can't open query file, check parameter textQuery");
@@ -236,7 +237,7 @@ int AppMain(int argc, char *argv[]) {
   } else {
     string qid;
     while ( *initQIFS >> qid) {
-      SimpleKLQueryModel *qm = new SimpleKLQueryModel(*ind);
+      lemur::retrieval::SimpleKLQueryModel *qm = new lemur::retrieval::SimpleKLQueryModel(*ind);
       qm->load(*initQIFS);
       updateQueryModel(qm, qid,  resFile, model, os);      
     }

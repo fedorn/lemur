@@ -65,14 +65,14 @@ namespace indri
       std::vector<indri::server::QueryServerResponse*> _runServerQuery( std::vector<indri::lang::Node*>& roots, int resultsRequested );
       void _sumServerQuery( indri::infnet::InferenceNetwork::MAllResults& results, std::vector<indri::lang::Node*>& roots, int resultsRequested );
       void _mergeServerQuery( indri::infnet::InferenceNetwork::MAllResults& results, std::vector<indri::lang::Node*>& roots, int resultsRequested );
-      void _annotateQuery( indri::infnet::InferenceNetwork::MAllResults& results, const std::vector<DOCID_T>& documentIDs, std::string& annotatorName, indri::lang::Node* queryRoot );
+      void _annotateQuery( indri::infnet::InferenceNetwork::MAllResults& results, const std::vector<lemur::api::DOCID_T>& documentIDs, std::string& annotatorName, indri::lang::Node* queryRoot );
 
       std::vector<indri::api::ScoredExtentResult> _runQuery( indri::infnet::InferenceNetwork::MAllResults& results,
                                                              const std::string& q,
                                                              int resultsRequested,
-                                                             const std::vector<DOCID_T>* documentIDs,
+                                                             const std::vector<lemur::api::DOCID_T>* documentIDs,
                                                              QueryAnnotation** annotation );
-      void _scoredQuery( indri::infnet::InferenceNetwork::MAllResults& results, indri::lang::Node* queryRoot, std::string& accumulatorName, int resultsRequested, const std::vector<DOCID_T>* documentSet );
+      void _scoredQuery( indri::infnet::InferenceNetwork::MAllResults& results, indri::lang::Node* queryRoot, std::string& accumulatorName, int resultsRequested, const std::vector<lemur::api::DOCID_T>* documentSet );
 
       QueryEnvironment( QueryEnvironment& other ) {}
 
@@ -96,7 +96,7 @@ namespace indri
       void addIndex( const std::string& pathname );
       /// Add an IndexEnvironment object.  Unlike the other add calls, this one
       /// will not close the index when QueryEnvironment::close is called.
-      /// @param an IndexEnvironment instance
+      /// @param environment an IndexEnvironment instance
       void addIndex( class IndexEnvironment& environment );
       /// Close the QueryEnvironment.
       void close();
@@ -113,7 +113,7 @@ namespace indri
       /// @return the vector of ScoredExtentResults for the query
       std::vector<indri::api::ScoredExtentResult> runQuery( const std::string& query, int resultsRequested );
 
-      std::vector<indri::api::ScoredExtentResult> runQuery( const std::string& query, const std::vector<DOCID_T>& documentSet, int resultsRequested );
+      std::vector<indri::api::ScoredExtentResult> runQuery( const std::string& query, const std::vector<lemur::api::DOCID_T>& documentSet, int resultsRequested );
 
       /// \brief Run an Indri query language query. @see QueryAnnotation
       /// @param query the query to run
@@ -121,14 +121,14 @@ namespace indri
       /// @return pointer to QueryAnnotations for the query
       QueryAnnotation* runAnnotatedQuery( const std::string& query, int resultsRequested );  
 
-      QueryAnnotation* runAnnotatedQuery( const std::string& query, const std::vector<DOCID_T>& documentSet, int resultsRequested );
+      QueryAnnotation* runAnnotatedQuery( const std::string& query, const std::vector<lemur::api::DOCID_T>& documentSet, int resultsRequested );
 
 
       /// \brief Fetch the parsed documents for a given list of document ids.
       /// Caller is responsible for deleting the returned elements.
       /// @param documentIDs the list of ids
       /// @return the vector of ParsedDocument pointers.
-      std::vector<indri::api::ParsedDocument*> documents( const std::vector<DOCID_T>& documentIDs );
+      std::vector<indri::api::ParsedDocument*> documents( const std::vector<lemur::api::DOCID_T>& documentIDs );
       /// \brief Fetch the parsed documents for a given list of ScoredExtentResults
       /// Caller is responsible for deleting the returned elements.
       /// @param results the list of ScoredExtentResults
@@ -138,7 +138,7 @@ namespace indri
       /// @param documentIDs the list of ids
       /// @param attributeName the name of the metadata attribute
       /// @return the vector of string values for that attribute
-      std::vector<std::string> documentMetadata( const std::vector<DOCID_T>& documentIDs, const std::string& attributeName );
+      std::vector<std::string> documentMetadata( const std::vector<lemur::api::DOCID_T>& documentIDs, const std::string& attributeName );
       /// \brief Fetch the named metadata attribute for a list of ScoredExtentResults
       /// @param documentIDs the list of ScoredExtentResults
       /// @param attributeName the name of the metadata attribute
@@ -153,9 +153,9 @@ namespace indri
 
       /// \brief Return a list of document IDs where the document has a metadata key that matches attributeName, with a value matching one of the attributeValues.
       /// @param attributeName the name of the metadata attribute (e.g. 'url' or 'docno')
-      /// @param attributeValues values that the metadata attribute should match
+      /// @param attributeValue values that the metadata attribute should match
       /// @return a vector of ParsedDocuments that match the given metadata criteria
-      std::vector<DOCID_T> documentIDsFromMetadata( const std::string& attributeName, const std::vector<std::string>& attributeValue );
+      std::vector<lemur::api::DOCID_T> documentIDsFromMetadata( const std::string& attributeName, const std::vector<std::string>& attributeValue );
 
       /// \brief Return total number of terms.
       /// @return total number of terms in the aggregated collection
@@ -191,7 +191,7 @@ namespace indri
       /// Caller responsible for deleting the Vector.
       /// @param documentIDs the vector of document ids.
       /// @return DocumentVector pointer for the specified document.
-      std::vector<DocumentVector*> documentVectors( const std::vector<DOCID_T>& documentIDs );
+      std::vector<DocumentVector*> documentVectors( const std::vector<lemur::api::DOCID_T>& documentIDs );
     };
   }
 }

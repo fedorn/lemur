@@ -11,13 +11,15 @@
 
 #include "IncFPTextHandler.hpp"
 
-IncFPTextHandler::IncFPTextHandler(const string &filename, int bufferSize,
-				   bool countStopWords, int ind) {
-  index = new IncFPPushIndex(filename, bufferSize);
+lemur::parse::IncFPTextHandler::IncFPTextHandler(const std::string &filename, 
+                                                 int bufferSize,
+                                                 bool countStopWords, 
+                                                 int ind) {
+  index = new lemur::index::IncFPPushIndex(filename, bufferSize);
 
   //  dp = new DocumentProps();
   dp = NULL;  
-  term = new InvFPTerm();
+  term = new lemur::index::InvFPTerm();
   countStopWds = countStopWords;
   docLength = 0;
   pos = 0;

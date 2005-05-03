@@ -7,31 +7,35 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _KSTEMMER_HPP
 #define _KSTEMMER_HPP
 #include "Stemmer.hpp"
 #define MAX_FILENAME_LENGTH 125  /* including the full directory path */
+namespace lemur 
+{
+  namespace parse 
+  {
+    ///  Provides a wrapper to the Krovetz stemmer
+    ///  that supports the Stemmer interface, and by
+    ///  inheritance, the TextHandler interface.
 
+    class KStemmer : public lemur::api::Stemmer {
 
-///  Provides a wrapper to the Krovetz stemmer
-///  that supports the Stemmer interface, and by
-///  inheritance, the TextHandler interface.
+    public:
+      static const string identifier;
 
-class KStemmer : public Stemmer {
+      KStemmer(string &datadir);
 
-public:
-  static const string identifier;
-
-  KStemmer(string &datadir);
-
-  ~KStemmer();  
+      ~KStemmer();  
     
-  /// Stem a word using the Krovetz Stemmer.
-  char * stemWord(char * word);
+      /// Stem a word using the Krovetz Stemmer.
+      char * stemWord(char * word);
 
-  void writePropertyList(PropertyList* list) const;
-};
+      void writePropertyList(PropertyList* list) const;
+    };
+  }
+}
 
 #endif

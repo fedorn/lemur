@@ -14,22 +14,28 @@
 
 #include "MemParser.hpp"
 #include "Index.hpp"
-
-/*! "Parses" a Lemur document loaded into memory.  Provided as a wrapper
- * for the query-based sampling tools.  Uses an existing Lemur index
- * to read to previously parsed document.
- */
-class LemurMemParser : public MemParser {
+namespace lemur 
+{
+  namespace distrib 
+  {
+    
+    /*! "Parses" a Lemur document loaded into memory.  Provided as a wrapper
+     * for the query-based sampling tools.  Uses an existing Lemur index
+     * to read to previously parsed document.
+     */
+    class LemurMemParser : public MemParser {
  
-public:
-  LemurMemParser(const Index * ind);
+    public:
+      LemurMemParser(const lemur::api::Index * ind);
  
-  /// Parses a document in memory.
-  void parse (doc_t * doc);
+      /// Parses a document in memory.
+      void parse (doc_t * doc);
   
-private:
-  const Index * index;
+    private:
+      const lemur::api::Index * index;
 
-};
+    };
+  }
+}
 
 #endif

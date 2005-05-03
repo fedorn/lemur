@@ -51,6 +51,9 @@
 #include "PLSA.hpp"
 #include "PLSAParam.hpp"
 
+using namespace lemur::api;
+using namespace lemur::cluster;
+
 // get application parameters
 void GetAppParam() {
   PLSAParam::get();
@@ -59,7 +62,7 @@ void GetAppParam() {
 int AppMain(int argc, char * argv[]) {
   Index *myIndex;
   myIndex  = IndexManager::openIndex(PLSAParam::databaseIndex);
-  PLSA *plsa;
+  lemur::cluster::PLSA *plsa;
   int numDocs = myIndex->docCount() + 1;
   int numCats = PLSAParam::numCats;
   int numRestart = PLSAParam::numRestarts;
@@ -73,11 +76,12 @@ int AppMain(int argc, char * argv[]) {
   int i, d, w, z;  
 
   if (doTrain) {
-    plsa = new PLSA(*myIndex, testPercentage, numCats, numIter, numRestart, 
-		    beta, betaMin, annealcue, eta);
+    plsa = new lemur::cluster::PLSA(*myIndex, testPercentage, numCats, 
+                                    numIter, numRestart, 
+                                    beta, betaMin, annealcue, eta);
     plsa->iterateWithRestarts();
   } else {
-    plsa = new PLSA(*myIndex);
+    plsa = new lemur::cluster::PLSA(*myIndex);
     plsa->readArrays();
     int numTerms = plsa->numWords();
     numDocs = plsa->numDocs();

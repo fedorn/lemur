@@ -108,7 +108,7 @@ namespace indri
                          const std::string& iterator,
                          const std::string& parser,
                          const std::string& startDocTag,
-                         const std::string& endDogTag,
+                         const std::string& endDocTag,
                          const std::string& endMetadataTag,
                          const std::vector<std::string>& include,
                          const std::vector<std::string>& exclude,
@@ -139,7 +139,8 @@ namespace indri
       /// will be slower (the document has to be retrieved, decompressed and parsed to get the metadata back,
       /// instead of just a B-Tree lookup).  The backward indexed fields store a mapping of (metadataValue, documentID).
       /// If a field is not backward indexed, the documentIDsFromMetadata and documentFromMetadata calls will not work.
-      /// @param fieldNames the list of fields.
+      /// @param forwardFieldNames the list of fields to forward index.
+      /// @param backwardFieldNames the list of fields to backward index.
       void setMetadataIndexedFields( const std::vector<std::string>& forwardFieldNames, const std::vector<std::string>& backwardFieldNames );
       /// set the list of stopwords
       /// @param stopwords the list of stopwords

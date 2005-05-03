@@ -6,12 +6,12 @@
 
 #define MAXLINE 500
 
-Stopper::Stopper() {
+lemur::api::Stopper::Stopper() {
   cat = category;
   iden = identifier;
 }
 
-Stopper::Stopper(const string &filename) {
+lemur::api::Stopper::Stopper(const string &filename) {
   cat = category;
   iden = identifier;
   try {
@@ -23,13 +23,13 @@ Stopper::Stopper(const string &filename) {
 
 
 bool 
-Stopper::stopWord(const char * word) const {
+lemur::api::Stopper::stopWord(const char * word) const {
   // return true if the word is in the stopword list
   return contains(word);
 }
 
 char * 
-Stopper::handleWord(char * word) {
+lemur::api::Stopper::handleWord(char * word) {
   if (word != NULL && stopWord(word)) {
     word = NULL;
   }
@@ -37,9 +37,9 @@ Stopper::handleWord(char * word) {
 }
 
 void
-Stopper::writePropertyList(PropertyList* list) const{
+lemur::api::Stopper::writePropertyList(lemur::parse::PropertyList* list) const{
   TextHandler::writePropertyList(list);
-  Property p("stopwords");
+  lemur::parse::Property p("stopwords");
   p.setValue(lastfile);
   list->setProperty(&p);
 }

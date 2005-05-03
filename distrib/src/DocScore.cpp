@@ -11,10 +11,10 @@
 
 #include "DocScore.hpp"
 
-DocScoreVector::ScoreAscending DocScoreVector::ascendOrder;
-DocScoreVector::ScoreDescending DocScoreVector::descendOrder;
+lemur::distrib::DocScoreVector::ScoreAscending lemur::distrib::DocScoreVector::ascendOrder;
+lemur::distrib::DocScoreVector::ScoreDescending lemur::distrib::DocScoreVector::descendOrder;
 
-void DocScoreVector::Sort(bool descending)
+void lemur::distrib::DocScoreVector::Sort(bool descending)
 {
   if (descending) {
     sort(this->begin(), this->end(), descendOrder);
@@ -24,7 +24,7 @@ void DocScoreVector::Sort(bool descending)
 }
 
 
-void DocScoreVector::PushValue(const string &str, double value)
+void lemur::distrib::DocScoreVector::PushValue(const string &str, double value)
 {
   DocScore entry;
   entry.id = str;
@@ -32,7 +32,7 @@ void DocScoreVector::PushValue(const string &str, double value)
   push_back(entry);
 }
 
-DocScoreVector::~DocScoreVector() {
+lemur::distrib::DocScoreVector::~DocScoreVector() {
 #if 0
   // superceded by <string>
   //free memory from our strdup in PushValue

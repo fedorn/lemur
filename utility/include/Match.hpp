@@ -7,21 +7,29 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _MATCH_HPP
 #define _MATCH_HPP
 #include "IndexTypes.hpp"
-///  Byte offsets of a document term (first char to last char inclusive).
-class Match {
-public:
-  /// byte offset of first character of token
-  int start;
-  /// byte offset of last character of token
-  int end;
-  /// token position
-  LOC_T pos;
-  /// term ID
-  TERMID_T termid;
-};
+namespace lemur 
+{
+  namespace parse
+  {
+    
+    ///  Byte offsets of a document term (first char to last char inclusive).
+    class Match {
+    public:
+      /// byte offset of first character of token
+      int start;
+      /// byte offset of last character of token
+      int end;
+      /// token position
+      lemur::api::LOC_T pos;
+      /// term ID
+      lemur::api::TERMID_T termid;
+    };
+  }
+}
+
 #endif

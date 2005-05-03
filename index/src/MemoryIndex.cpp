@@ -488,7 +488,7 @@ int indri::index::MemoryIndex::addDocument( indri::api::ParsedDocument& document
 
     int wordLength = strlen(word);
 
-    if( wordLength >= Keyfile::MAX_KEY_LENGTH-1 ) {
+    if( wordLength >= lemur::file::Keyfile::MAX_KEY_LENGTH-1 ) {
       _termList.addTerm(0);     
       continue;
     }

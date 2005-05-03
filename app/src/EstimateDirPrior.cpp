@@ -37,11 +37,11 @@ It will print out the estimated parameter value to the standard output.
 #include <cmath>
 #include "IndexManager.hpp"
 #include "Param.hpp"
-#include "String.hpp"
 
+using namespace lemur::api;
 
 namespace LocalParameter {
-  static String index;
+  static std::string index;
   double initialMu;
   void get() {
     index = ParamGetString("index");

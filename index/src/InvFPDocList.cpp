@@ -17,42 +17,42 @@
  *========================================================================*/
 #include "InvFPDocList.hpp"
 
-InvFPDocList::InvFPDocList() : InvDocList() {
+lemur::index::InvFPDocList::InvFPDocList() : InvDocList() {
 }
 
 //  This hasn't been tested
-InvFPDocList::InvFPDocList(TERMID_T id, int len) : InvDocList(id, len) {
+lemur::index::InvFPDocList::InvFPDocList(lemur::api::TERMID_T id, int len) : InvDocList(id, len) {
 }
 
 
-InvFPDocList::InvFPDocList(TERMID_T id, int listlen, LOC_T* list, int fr, DOCID_T* ldocid, int len) : InvDocList(id, listlen, list, fr, ldocid, len) {
+lemur::index::InvFPDocList::InvFPDocList(lemur::api::TERMID_T id, int listlen, lemur::api::LOC_T* list, int fr, lemur::api::DOCID_T* ldocid, int len) : InvDocList(id, listlen, list, fr, ldocid, len) {
 }
 
-InvFPDocList::InvFPDocList(MemCache* mc, TERMID_T id, int len) : InvDocList(mc, id, len) {
+lemur::index::InvFPDocList::InvFPDocList(lemur::utility::MemCache* mc, lemur::api::TERMID_T id, int len) : InvDocList(mc, id, len) {
 }
 
-InvFPDocList::InvFPDocList(MemCache* mc, TERMID_T id, int len, DOCID_T docid, LOC_T location) : InvDocList(mc, id, len) {
+lemur::index::InvFPDocList::InvFPDocList(lemur::utility::MemCache* mc, lemur::api::TERMID_T id, int len, lemur::api::DOCID_T docid, lemur::api::LOC_T location) : InvDocList(mc, id, len) {
   if (begin)
     addLocation(docid, location);	
 }
 
-InvFPDocList::InvFPDocList(LOC_T *vec) {
+lemur::index::InvFPDocList::InvFPDocList(lemur::api::LOC_T *vec) {
   READ_ONLY = false;
   hascache = false;
-  LOC_Tsize = sizeof(LOC_T);
+  LOC_Tsize = sizeof(lemur::api::LOC_T);
   uid = vec[0];
   df = vec[1];
-  COUNT_T diff = vec[2];
-  COUNT_T vecLength = vec[3];
+  lemur::api::COUNT_T diff = vec[2];
+  lemur::api::COUNT_T vecLength = vec[3];
   size = vecLength * 4;
   unsigned char* buffer = (unsigned char *) (vec + 4);
   // this should be big enough
   //  begin = (LOC_T*) malloc(s);
   // use new/delete[] so an exception will be thrown if out of memory.
-  begin = new LOC_T[size/sizeof(LOC_T)];
+  begin = new lemur::api::LOC_T[size/sizeof(lemur::api::LOC_T)];
 
   // decompress it
-  int len = RVLCompress::decompress_ints(buffer, (int *)begin, vecLength);
+  int len = lemur::utility::RVLCompress::decompress_ints(buffer, (int *)begin, vecLength);
   
   lastid = begin + diff;
   end = begin + len;
@@ -61,10 +61,10 @@ InvFPDocList::InvFPDocList(LOC_T *vec) {
   deltaDecode();
 }
 
-InvFPDocList::~InvFPDocList() {
+lemur::index::InvFPDocList::~InvFPDocList() {
 }
 
-DocInfo* InvFPDocList::nextEntry() const{
+lemur::api::DocInfo* lemur::index::InvFPDocList::nextEntry() const{
   // info is stored in LOC_T* as docid freq pos1 pos2 ..
   entry.docID(*iter);
   iter++;
@@ -75,7 +75,7 @@ DocInfo* InvFPDocList::nextEntry() const{
   return &entry;
 }
 
-void InvFPDocList::nextEntry(InvFPDocInfo* info) const{
+void lemur::index::InvFPDocList::nextEntry(InvFPDocInfo* info) const{
   info->docID(*iter);
   iter++;
   info->termCount(*iter);
@@ -85,9 +85,9 @@ void InvFPDocList::nextEntry(InvFPDocInfo* info) const{
 }
 
 /// set element from position, returns pointer to the element
-DocInfo* InvFPDocList::getElement(DocInfo* elem, POS_T position) const {
+lemur::api::DocInfo* lemur::index::InvFPDocList::getElement(lemur::api::DocInfo* elem, lemur::api::POS_T position) const {
   //  InvFPDocInfo* e = dynamic_cast<InvFPDocInfo*>(elem);
-  LOC_T* ip = (LOC_T*) position;
+  lemur::api::LOC_T* ip = (lemur::api::LOC_T*) position;
   elem->docID(*ip);
   ip++;
   elem->termCount(*ip);
@@ -96,26 +96,26 @@ DocInfo* InvFPDocList::getElement(DocInfo* elem, POS_T position) const {
   return elem;
 }
 /// advance position
-POS_T InvFPDocList::nextPosition(POS_T position) const {
-  LOC_T* ip = (LOC_T*) position;
-  return (POS_T) (ip + *(ip+1) + 2);  // ip + termcount + 2
+lemur::api::POS_T lemur::index::InvFPDocList::nextPosition(lemur::api::POS_T position) const {
+  lemur::api::LOC_T* ip = (lemur::api::LOC_T*) position;
+  return (lemur::api::POS_T) (ip + *(ip+1) + 2);  // ip + termcount + 2
 }
 
-bool InvFPDocList::addTerm(DOCID_T docid) {
+bool lemur::index::InvFPDocList::addTerm(lemur::api::DOCID_T docid) {
   cerr << "InvFPDocList add term must have location.  Use addLocation(int, int)" << endl;
   return false;
 }
 
-bool InvFPDocList::append(InvDocList* par_tail) {
+bool lemur::index::InvFPDocList::append(InvDocList* par_tail) {
   if (READ_ONLY)
     return false;
   
   InvFPDocList* tail = (InvFPDocList*) par_tail;
   
   // we only want to append the actual content
-  LOC_T* ptr = tail->begin;
-  COUNT_T len = tail->length();
-  COUNT_T diff = tail->end - tail->lastid;
+  lemur::api::LOC_T* ptr = tail->begin;
+  lemur::api::COUNT_T len = tail->length();
+  lemur::api::COUNT_T diff = tail->end - tail->lastid;
 
   // check for memory
   while ((end-begin+len)*LOC_Tsize > size) {
@@ -130,7 +130,7 @@ bool InvFPDocList::append(InvDocList* par_tail) {
   // this method will mainly be used for merging lists from indexing
   // in that case, overlap of docids would only occur by 1
   if (*ptr == *lastid) {
-    COUNT_T tailtf = *(ptr+1);
+    lemur::api::COUNT_T tailtf = *(ptr+1);
     // add tfs together
     *freq += tailtf;
     // advance pointer to pos list
@@ -158,7 +158,7 @@ bool InvFPDocList::append(InvDocList* par_tail) {
   return true;
 }
 
-bool InvFPDocList::addLocation(DOCID_T docid, LOC_T location) {
+bool lemur::index::InvFPDocList::addLocation(lemur::api::DOCID_T docid, lemur::api::LOC_T location) {
   if (READ_ONLY)
     return false;
     // check that we can add at all
@@ -194,9 +194,9 @@ bool InvFPDocList::addLocation(DOCID_T docid, LOC_T location) {
   return true;
 }
 
-COUNT_T InvFPDocList::termCTF() const {
-  COUNT_T ctf = 0;
-  LOC_T *ptr = begin;
+lemur::api::COUNT_T lemur::index::InvFPDocList::termCTF() const {
+  lemur::api::COUNT_T ctf = 0;
+  lemur::api::LOC_T *ptr = begin;
   while (ptr != lastid) {
     ptr++;
     ctf += (*ptr);
@@ -206,21 +206,21 @@ COUNT_T InvFPDocList::termCTF() const {
   return ctf;
 }
 
-void InvFPDocList::deltaEncode() {
+void lemur::index::InvFPDocList::deltaEncode() {
   // we will encode in place
   // go backwards starting at the last docid
   // we're counting on two always being bigger than one
-  LOC_T* two = lastid;
+  lemur::api::LOC_T* two = lastid;
   // to keep track of encoding positions
-  LOC_T* posbeg = freq+1;
-  LOC_T* posone = end-2;
-  LOC_T* postwo = end-1;
+  lemur::api::LOC_T* posbeg = freq+1;
+  lemur::api::LOC_T* posone = end-2;
+  lemur::api::LOC_T* postwo = end-1;
   
   // our stack of ones so we can backtrack
-  vector<LOC_T*> onestack;
-  LOC_T* k = begin;
+  vector<lemur::api::LOC_T*> onestack;
+  lemur::api::LOC_T* k = begin;
   while (k!=lastid) {
-    LOC_T* j = k;
+    lemur::api::LOC_T* j = k;
     onestack.push_back(j);
     //advance to freq
     k++; 
@@ -228,7 +228,7 @@ void InvFPDocList::deltaEncode() {
     k += *k+1;
   }
   
-  LOC_T* one;
+  lemur::api::LOC_T* one;
   while (two != begin) {
     one = onestack.back();
     onestack.pop_back();
@@ -254,14 +254,14 @@ void InvFPDocList::deltaEncode() {
   }
 }
 
-void InvFPDocList::deltaDecode() {
+void lemur::index::InvFPDocList::deltaDecode() {
   // we will decode in place
   // start at the begining
-  LOC_T* one = begin;
-  LOC_T* two = one +*(begin+1)+2;
+  lemur::api::LOC_T* one = begin;
+  lemur::api::LOC_T* two = one +*(begin+1)+2;
   
-  LOC_T* posone = begin+2;
-  LOC_T* postwo = begin+3;
+  lemur::api::LOC_T* posone = begin+2;
+  lemur::api::LOC_T* postwo = begin+3;
 
   while (one != lastid) {
     // do the positions
@@ -284,15 +284,15 @@ void InvFPDocList::deltaDecode() {
   }
 }
 
-LOC_T *InvFPDocList::byteVec(COUNT_T &vecLength){
-  COUNT_T len= end-begin;
-  COUNT_T diff = lastid-begin;
+lemur::api::LOC_T *lemur::index::InvFPDocList::byteVec(lemur::api::COUNT_T &vecLength){
+  lemur::api::COUNT_T len= end-begin;
+  lemur::api::COUNT_T diff = lastid-begin;
   deltaEncode();
 
   unsigned char* comp = new unsigned char[(len+4)*LOC_Tsize];
-  vecLength = RVLCompress::compress_ints((int *)begin, comp + (4 * LOC_Tsize), len);
+  vecLength = lemur::utility::RVLCompress::compress_ints((int *)begin, comp + (4 * LOC_Tsize), len);
 
-  LOC_T *tmp = ((LOC_T *) comp);
+  lemur::api::LOC_T *tmp = ((lemur::api::LOC_T *) comp);
   tmp[0] = uid;
   tmp[1] = df;
   tmp[2] = diff;

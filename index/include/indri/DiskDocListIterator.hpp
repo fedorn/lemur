@@ -42,7 +42,7 @@ namespace indri {
       
       TermData* _termData;
       bool _ownTermData;
-      char _term[ Keyfile::MAX_KEY_LENGTH+1 ];
+      char _term[ lemur::file::Keyfile::MAX_KEY_LENGTH+1 ];
       int _fieldCount;
 
       void _readEntry();

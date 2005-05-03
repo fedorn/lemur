@@ -11,7 +11,7 @@
 #include "Property.hpp"
 #include "common_headers.hpp"
 
-Property::Property() {
+lemur::parse::Property::Property() {
   name = "";
   nullName = true;
 
@@ -22,7 +22,7 @@ Property::Property() {
   destructor = 0;
 }
 
-Property::Property(const string initName) {
+lemur::parse::Property::Property(const string initName) {
   name = initName;
   nullName = false;
 
@@ -33,7 +33,7 @@ Property::Property(const string initName) {
   destructor = 0;
 }
 
-Property::~Property() {
+lemur::parse::Property::~Property() {
   if (destructor) {
     (this->*destructor)( buffer );
     destructor = 0;
@@ -42,7 +42,7 @@ Property::~Property() {
   delete [] buffer;
 }
 
-void Property::setName(const string newName) {
+void lemur::parse::Property::setName(const string newName) {
   if (! newName.empty() ) {
     name = newName;
     nullName = false;
@@ -51,7 +51,7 @@ void Property::setName(const string newName) {
   }
 }
 
-void Property::copyValue(const Property * property) {
+void lemur::parse::Property::copyValue(const Property * property) {
   type = property->getType();
   dataSize = property->getSize();
   if (dataSize > bufferSize) {
@@ -64,22 +64,22 @@ void Property::copyValue(const Property * property) {
   }
 }
 
-const string Property::getName() const{
+const string lemur::parse::Property::getName() const{
   return (nullName ? NULL : name);
 }
 
-const void * Property::getValue() const{
+const void * lemur::parse::Property::getValue() const{
   if (dataSize > 0) {
     return buffer;
   } 
   return NULL;
 }
 
-int Property::getSize() const{
+int lemur::parse::Property::getSize() const{
   return dataSize;
 }
 
-int Property::getLength() const{
+int lemur::parse::Property::getLength() const{
   int length = 0;
   switch (type) {
   case INT:
@@ -92,11 +92,11 @@ int Property::getLength() const{
   return length;
 }
 
-Property::DataType Property::getType() const{
+lemur::parse::Property::DataType lemur::parse::Property::getType() const{
   return type;
 }
 
-void* Property::allocate( int size ) {
+void* lemur::parse::Property::allocate( int size ) {
   if( destructor ) {
     (this->*destructor)( buffer );
     destructor = 0;
@@ -110,11 +110,11 @@ void* Property::allocate( int size ) {
   return buffer;
 }
 
-void Property::setDestructor( void (Property::*destructor)(void* object) ) {
+void lemur::parse::Property::setDestructor( void (lemur::parse::Property::*destructor)(void* object) ) {
   this->destructor = destructor;
 }
 
-void Property::setType( DataType type ) {
+void lemur::parse::Property::setType( DataType type ) {
   this->type = type;
 }
 

@@ -16,36 +16,44 @@
 #define _AGGLOMCLUSTER_HPP
 #include "Cluster.hpp"
 
-/// K nearest neighbors clustering of documents.
-/// d_ave, d_min, d_max, d_mean scoring methods.
-class AgglomCluster: public Cluster
+namespace lemur
 {
-public:
-  ///initialize
-  AgglomCluster(int cid, const Index &ind, const SimilarityMethod &sim, 
-		enum ClusterParam::docModes mode): 
-    Cluster(cid, ind, sim), docmode(mode) {}
-  /// clean up
-  virtual ~AgglomCluster() {};
-  /// score a document against this cluster, given the rep.
-  virtual double score(const ClusterRep *rep) const;
-  /// \brief Get the ClusterRep for this Cluster for scoring.
-  /// The Rep will have been weighted by the SimilarityMethod.
-  /// Caller responsible for deleting.
-  virtual ClusterRep *getClusterRep() const;
-  /// Sum of squared values in the cluster's term vector.
-  virtual double sum2() const;
+  /// Document clustering components.
+  namespace cluster
+  {
+    
+    /// K nearest neighbors clustering of documents.
+    /// d_ave, d_min, d_max, d_mean scoring methods.
+    class AgglomCluster: public Cluster
+    {
+    public:
+      ///initialize
+      AgglomCluster(int cid, const lemur::api::Index &ind, const SimilarityMethod &sim, 
+                    enum ClusterParam::docModes mode): 
+        Cluster(cid, ind, sim), docmode(mode) {}
+      /// clean up
+      virtual ~AgglomCluster() {};
+      /// score a document against this cluster, given the rep.
+      virtual double score(const ClusterRep *rep) const;
+      /// \brief Get the ClusterRep for this Cluster for scoring.
+      /// The Rep will have been weighted by the SimilarityMethod.
+      /// Caller responsible for deleting.
+      virtual ClusterRep *getClusterRep() const;
+      /// Sum of squared values in the cluster's term vector.
+      virtual double sum2() const;
   
-private:
-  enum ClusterParam::docModes docmode;
-  /// Score the rep using min.
-  double score_min(const ClusterRep *rep) const;
-  /// Score the rep using max.
-  double score_max(const ClusterRep *rep) const;
-  /// Score the rep using mean.
-  double score_mean(const ClusterRep *rep) const;
-  /// Score the rep using average.
-  double score_ave(const ClusterRep *rep) const;
-};
+    private:
+      enum ClusterParam::docModes docmode;
+      /// Score the rep using min.
+      double score_min(const ClusterRep *rep) const;
+      /// Score the rep using max.
+      double score_max(const ClusterRep *rep) const;
+      /// Score the rep using mean.
+      double score_mean(const ClusterRep *rep) const;
+      /// Score the rep using average.
+      double score_ave(const ClusterRep *rep) const;
+    };
+  }
+}
 
 #endif

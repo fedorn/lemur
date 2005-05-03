@@ -15,13 +15,15 @@
 
 #include "StructQueryRep.hpp"
 
-QnList::~QnList() {
+using namespace lemur::api;
+
+lemur::retrieval::QnList::~QnList() {
   for(i = 0; i < qnList.size(); i++)
     delete qnList[i];
 }
 
 /// flatten children of a node into weighted prox entries.
-void QueryNode::transformPassageOps() {
+void lemur::retrieval::QueryNode::transformPassageOps() {
   double childWeight = 1.0/entries;
   QnList *cl = ch, *newList = new QnList(), *kidList;
   QueryNode *child, *kid;
@@ -57,7 +59,7 @@ void QueryNode::transformPassageOps() {
 
   /// weighted sum of prox children
   /// all belief operators have already been removed/flattened.
- double PassageQNode::passageScore(const StructQryDocRep *dRep) const{
+ double lemur::retrieval::PassageQNode::passageScore(const StructQryDocRep *dRep) const{
     const QueryNode *child;
     DOCID_T did = dRep->did;
     double score = 0;
@@ -93,7 +95,7 @@ void QueryNode::transformPassageOps() {
 // that there is only one docIdList for the root as the query
 // net done completely.
 
-void TermQnode::copyDocList(int listlen, int tf,
+void lemur::retrieval::TermQnode::copyDocList(int listlen, int tf,
 			    const DocInfoList *dl, int numDocs) {
   COUNT_T dc = numDocs + 1;
   COUNT_T nd = dc;
@@ -124,7 +126,7 @@ void TermQnode::copyDocList(int listlen, int tf,
   if (hasMoreProx()) nextProxItem(); // set pointer onto first entry
 }
 
-void QueryNode::unionDocList(int numDocs) {
+void lemur::retrieval::QueryNode::unionDocList(int numDocs) {
   // Consume the children's dLists
   COUNT_T dc = numDocs + 1;
   COUNT_T nd = dc;
@@ -182,7 +184,7 @@ void QueryNode::unionDocList(int numDocs) {
   proxList = NULL;
 }
 
-void QueryNode::intersectDocList(int numDocs) {
+void lemur::retrieval::QueryNode::intersectDocList(int numDocs) {
   // rewrite this to be cleaner/neater/quicker...
   // should not have to do the allocs.
   int all = entries;
@@ -234,7 +236,7 @@ void QueryNode::intersectDocList(int numDocs) {
   delete[](counts);
 }
 
-void SynQNode::synonymProxList() {
+void lemur::retrieval::SynQNode::synonymProxList() {
   // Called after child doclists have been unioned.
   // Have to union the proxinfos.
   // dCnt, dList, nextDoc all have been set.
@@ -308,7 +310,7 @@ void SynQNode::synonymProxList() {
 }
 
 
-bool OdnQNode::foundOrderedProx(int currPos, int wsize, 
+bool lemur::retrieval::OdnQNode::foundOrderedProx(int currPos, int wsize, 
 				      const QnList *cl,  int ith) {
   // recursively find the matched window in children order
   if(ith < cl->size()) {
@@ -336,7 +338,7 @@ bool OdnQNode::foundOrderedProx(int currPos, int wsize,
   }
 }
 
-void OdnQNode::orderedProxList(int numDocs) {
+void lemur::retrieval::OdnQNode::orderedProxList(int numDocs) {
   static int intsize = sizeof(int);
   const QueryNode *child;
   int i, j, cnt, df = 0;
@@ -423,7 +425,7 @@ void OdnQNode::orderedProxList(int numDocs) {
   ch = NULL;
 }
 
-bool UwnQNode::findUnorderedWin(const QueryNode *cqn, QnList *cl, 
+bool lemur::retrieval::UwnQNode::findUnorderedWin(const QueryNode *cqn, QnList *cl, 
 				      int winSize) {
   bool found = true;
   cl->startIteration();
@@ -438,7 +440,7 @@ bool UwnQNode::findUnorderedWin(const QueryNode *cqn, QnList *cl,
 
 
 
-void UwnQNode::unorderedProxList(int numDocs) {
+void lemur::retrieval::UwnQNode::unorderedProxList(int numDocs) {
   // should special case when there is but a single child.
   static int intsize = sizeof(int);
   QueryNode *child; 

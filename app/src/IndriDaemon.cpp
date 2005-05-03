@@ -208,7 +208,7 @@ int main( int argc, char* argv[] ) {
     repository->close();
     delete repository;
     return 0;
-  } catch( Exception& e ) {
+  } catch( lemur::api::Exception& e ) {
     LEMUR_ABORT(e);
   }
 }

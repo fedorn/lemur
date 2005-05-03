@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 /*
   author: fff
@@ -20,28 +20,34 @@
 #include "Counter.hpp"
 #include "Index.hpp"
 #include <cmath>
+namespace lemur 
+{
+  namespace langmod 
+  {
+    
+    /// \brief Unigram counter for documents with in document term probabilities.
+    /// Used by the relevance model feedback methods.
 
-/// Unigram counter for documents with in document term probabilities.
-/// Used by the relevance model feedback methods.
+    class RelDocUnigramCounter : public lemur::utility::ArrayCounter <double> {
+    public:
+      /// construct a counter for a doc
+      RelDocUnigramCounter(lemur::api::DOCID_T docID, const lemur::api::Index &homeIndex);
 
-class RelDocUnigramCounter : public ArrayCounter <double> {
-public:
-  /// construct a counter for a doc
-  RelDocUnigramCounter(DOCID_T docID, const Index &homeIndex);
+      /// construct a counter for a subset of weighted docs in a collection
+      RelDocUnigramCounter(const lemur::utility::WeightedIDSet &docSet, const lemur::api::Index &homeIndex);
 
-  /// construct a counter for a subset of weighted docs in a collection
-  RelDocUnigramCounter(const WeightedIDSet &docSet, const Index &homeIndex);
+      virtual ~RelDocUnigramCounter() {}
+      const string lexiconID() const { return (ind.termLexiconID());}
 
-  virtual ~RelDocUnigramCounter() {}
-  const string lexiconID() const { return (ind.termLexiconID());}
+    protected:
+      /// Fill in the counter values with the probability of each term in
+      /// in the document (count/length).
+      void countRelDocUnigram(lemur::api::DOCID_T docID, double weight=1);
 
-protected:
-  /// Fill in the counter values with the probability of each term in
-  /// in the document (count/length).
-  void countRelDocUnigram(DOCID_T docID, double weight=1);
-
-  const Index &ind;
-};
-
+      const lemur::api::Index &ind;
+    };
+ 
+  }
+}
 
 #endif /* _RELDOCUNIGRAMCOUNTER_HPP */

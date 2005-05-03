@@ -11,7 +11,7 @@
 
 #include "DistMergeMethod.hpp"
 
-void DistMergeMethod::mergeScoreSet(const IndexedRealVector &indexset, 
+void lemur::distrib::DistMergeMethod::mergeScoreSet(const lemur::api::IndexedRealVector &indexset, 
 				    const DocScoreVector* const* scoreset, 
 				    DocScoreVector &results) {
 

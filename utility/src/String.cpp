@@ -12,9 +12,9 @@
 
 #include "String.hpp"
 
-ostream &operator<<(ostream &os, const String &ts) 
+ostream &lemur::utility::operator<<(ostream &os, const lemur::utility::String &ts) 
 { os << ts.c_str(); return os; }
 
-istream &operator>>(istream &is, String &ts) 
+istream &lemur::utility::operator>>(istream &is, lemur::utility::String &ts) 
 { string tmp; is >> tmp; ts.assign(tmp); return is; }
 

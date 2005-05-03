@@ -11,8 +11,9 @@
 
 #include "BasicSumm.hpp"
 
+using namespace lemur::api;
 
-void BasicSumm::markPassages(int optLen, const string &qInfo) {
+void lemur::summarization::BasicSumm::markPassages(int optLen, const string &qInfo) {
   int oldLen = -1;
   if (optLen != -1) {
     oldLen = summLen;
@@ -36,12 +37,12 @@ void BasicSumm::markPassages(int optLen, const string &qInfo) {
   }    
 }
 
-void BasicSumm::addPassage(Passage &psg) {
+void lemur::summarization::BasicSumm::addPassage(Passage &psg) {
   BasicPassage* bPsg = dynamic_cast<BasicPassage*>(&psg);
   doc.push_back(*bPsg);
 }  
 
-int BasicSumm::fetchPassages(Passage* psgs, int optLen = -1) const {
+int lemur::summarization::BasicSumm::fetchPassages(Passage* psgs, int optLen = -1) const {
   int l, count=0;
   if (optLen >0) {
     l = optLen;
@@ -58,7 +59,7 @@ int BasicSumm::fetchPassages(Passage* psgs, int optLen = -1) const {
   return count;
 }
   
-void BasicSumm::summDocument(const string &docID, const int optLen, const string &qInfo) {
+void lemur::summarization::BasicSumm::summDocument(const string &docID, const int optLen, const string &qInfo) {
   int oldLen = -1;
   if (optLen != -1) {
     oldLen = summLen;
@@ -92,18 +93,18 @@ void BasicSumm::summDocument(const string &docID, const int optLen, const string
   
 } 
 
-void BasicSumm::scorePassages(const string &qInfo) {
+void lemur::summarization::BasicSumm::scorePassages(const string &qInfo) {
   for (int i=0; i < doc.size(); i++) {
     scorePassage(doc[i], qInfo);
   }    
 }
 
-void BasicSumm::clear(void) {
+void lemur::summarization::BasicSumm::clear(void) {
   doc.erase(doc.begin(), doc.end());
   iterCount = 1;
 }
 
-int BasicSumm::nextPassage(Passage* psg) const {
+int lemur::summarization::BasicSumm::nextPassage(Passage* psg) const {
   for (int i=0; i<doc.size(); i++) {
     if (doc[i].marked  == iterCount) {
       *psg = doc[i];
@@ -114,11 +115,11 @@ int BasicSumm::nextPassage(Passage* psg) const {
   return 0;
 }
 
-void BasicSumm::iterClear(void) const {
+void lemur::summarization::BasicSumm::iterClear(void) const {
   iterCount = 1;
 }
 
-void BasicSumm::outputSumm(void) const {
+void lemur::summarization::BasicSumm::outputSumm(void) const {
   showMarkedPassages();
 }
 

@@ -66,6 +66,8 @@ The following functionality will be implemented in the future.
 
 // includes TextHandlerManager
 #include "PDict.hpp"
+using namespace lemur::api;
+
 /// The command interpretor for interacting with a PDict.
 class CommandInterp {
   public:
@@ -195,7 +197,7 @@ class CommandInterp {
       }
       string dictName(argv[2]);
       string name(argv[3]);
-      dict = new PDict();
+      dict = new lemur::dictionary::PDict();
       if (! dict->open(dictName)) {
 	cerr << "Unable to open " << dictName << endl;
 	delete(dict);
@@ -213,7 +215,7 @@ class CommandInterp {
 	return;
       }
       string dictName(argv[2]);
-      dict = new PDict();
+      dict = new lemur::dictionary::PDict();
       if (! dict->open(dictName)) {
 	cerr << "Unable to open " << dictName << endl;
 	delete(dict);
@@ -233,7 +235,7 @@ class CommandInterp {
       string dictName(argv[2]);
       string name(argv[3]);
       string delim(argv[4]);
-      dict = new PDict();
+      dict = new lemur::dictionary::PDict();
       if (! dict->open(dictName)) {
 	cerr << "Unable to open " << dictName << endl;
 	delete(dict);
@@ -251,7 +253,7 @@ class CommandInterp {
 	return;
       }
       string dictName(argv[2]);
-      dict = new PDict();
+      dict = new lemur::dictionary::PDict();
       if (! dict->open(dictName)) {
 	cerr << "Unable to open " << dictName << endl;
 	delete(dict);
@@ -319,7 +321,7 @@ class CommandInterp {
   bool create(string &name, string &infile, string &delim) {
     // close any existing dict.
     delete(dict);
-    dict = new PDict();
+    dict = new lemur::dictionary::PDict();
     if (dict->open(name)) {
       cerr << "create: " << name << " exists. Specify a new name." << endl;
       delete(dict);
@@ -344,7 +346,7 @@ class CommandInterp {
   void open(string &name) {
     // close any existing dict.
     delete(dict);
-    dict = new PDict();
+    dict = new lemur::dictionary::PDict();
     if (!dict->open(name)) {
       cerr << "open: " << name << " failed." << endl;
       delete(dict);
@@ -355,7 +357,7 @@ class CommandInterp {
   void merge(string &firstname, string &secondname, string &newname) {
     // close any existing dict.
     delete(dict);
-    dict = new PDict();
+    dict = new lemur::dictionary::PDict();
     if (dict->open(newname)) {
       cerr << "merge: " << newname << " exists. Specify a new name." << endl;
       delete(dict);
@@ -364,18 +366,18 @@ class CommandInterp {
     }
 
     dict->create(newname);
-    PDict *first, *second;
-    first = new PDict();
+    lemur::dictionary::PDict *first, *second;
+    first = new lemur::dictionary::PDict();
     first->open(firstname);
-    second = new PDict();
+    second = new lemur::dictionary::PDict();
     second->open(secondname);
     // define the semantics of this -- need api call.
     string key;
-    DictEntryVector *entries;
+    lemur::dictionary::DictEntryVector *entries;
     first->startIteration();
     while((entries = first->nextTranslations(key))) {
       // iterate over entries and call add
-      for (DictEntryVector::iterator it = entries->begin();
+      for (lemur::dictionary::DictEntryVector::iterator it = entries->begin();
 	   it != entries->end(); it++) {
 	dict->add(key, *it);
       }
@@ -385,7 +387,7 @@ class CommandInterp {
     second->startIteration();
     while((entries = second->nextTranslations(key))) {
       // iterate over entries and call add
-      for (DictEntryVector::iterator it = entries->begin();
+      for (lemur::dictionary::DictEntryVector::iterator it = entries->begin();
 	   it != entries->end(); it++) {
 	dict->add(key, *it);
       }
@@ -400,16 +402,16 @@ class CommandInterp {
   }
 
   void subtract(string &name) {
-    PDict *subdict = new PDict();
+    lemur::dictionary::PDict *subdict = new lemur::dictionary::PDict();
     subdict->open(name);
     // define the semantics of this -- need api call.
     // probably ought to have an iterator for PDict.
     subdict->startIteration();
     string key;
-    DictEntryVector *entries;
+    lemur::dictionary::DictEntryVector *entries;
     while((entries = subdict->nextTranslations(key))) {
       // iterate over entries and call remove
-      for (DictEntryVector::iterator it = entries->begin();
+      for (lemur::dictionary::DictEntryVector::iterator it = entries->begin();
 	   it != entries->end(); it++) {
 	//	cerr << "removing " << key << endl;
 	dict->remove(key, *it);
@@ -445,10 +447,10 @@ class CommandInterp {
   }
 
   void lookup(string &term) {
-    DictEntryVector *xlates = dict->getTranslations(term);
+    lemur::dictionary::DictEntryVector *xlates = dict->getTranslations(term);
     if (xlates == NULL) return;
     string delim(";"); // this should be user specified.
-    for (DictEntryVector::iterator it = xlates->begin(); 
+    for (lemur::dictionary::DictEntryVector::iterator it = xlates->begin(); 
 	 it != xlates->end(); it++) {
       cout << term << delim << (*it).toString(delim) << endl;
     }
@@ -456,7 +458,7 @@ class CommandInterp {
   }
   
 private:  
-  PDict *dict;
+  lemur::dictionary::PDict *dict;
   Stemmer *sourceStemmer, *targetStemmer;
   Stopper *sourceStopper, *targetStopper;
   

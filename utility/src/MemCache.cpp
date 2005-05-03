@@ -12,7 +12,7 @@
 #include <math.h>
 #include "MemCache.hpp"
 
-MemCache::MemCache(int cachesize) {
+lemur::utility::MemCache::MemCache(int cachesize) {
   size = cachesize;
   begin = (int*) malloc(size);
   end = begin;
@@ -20,7 +20,7 @@ MemCache::MemCache(int cachesize) {
   ourmem = true;
 }
 
-MemCache::MemCache(int* cache, int cachesize) {
+lemur::utility::MemCache::MemCache(int* cache, int cachesize) {
   size = cachesize;
   begin = cache;
   end = begin;
@@ -28,16 +28,16 @@ MemCache::MemCache(int* cache, int cachesize) {
   ourmem = false;
 }
 
-MemCache::MemCache() {
+lemur::utility::MemCache::MemCache() {
   size = 0;
 }
 
-MemCache::~MemCache() {
+lemur::utility::MemCache::~MemCache() {
   if (ourmem)
     free(begin);
 }
 
-int* MemCache::getMem(int chunksize) {
+int* lemur::utility::MemCache::getMem(int chunksize) {
   int bytesize = (int) pow(2.0, chunksize);
   int s = bytesize/intsize;
   int *retval = NULL;
@@ -59,7 +59,7 @@ int* MemCache::getMem(int chunksize) {
   return retval;
 }
 
-int* MemCache::getMoreMem(int newsize, int* location, int oldsize) {
+int* lemur::utility::MemCache::getMoreMem(int newsize, int* location, int oldsize) {
   if (oldsize >= newsize)
     return NULL;
   
@@ -85,7 +85,7 @@ int* MemCache::getMoreMem(int newsize, int* location, int oldsize) {
   return retval;
 }
 
-void MemCache::freeMem(int* location, int memsize) {
+void lemur::utility::MemCache::freeMem(int* location, int memsize) {
   // add this memory location to the free list
   //*location = memsize;
   //freelist.push_back(location);
@@ -93,7 +93,7 @@ void MemCache::freeMem(int* location, int memsize) {
 }
 
 
-void MemCache::flushMem(){
+void lemur::utility::MemCache::flushMem(){
   //reinitialize
   end = begin;
 
@@ -103,16 +103,16 @@ void MemCache::flushMem(){
   }
 }
 
-const int* MemCache::getBegin() {
+const int* lemur::utility::MemCache::getBegin() {
   return begin;
 }
 
-const int* MemCache::getEnd() {
+const int* lemur::utility::MemCache::getEnd() {
   return end;
 }
 
 /** PRIVATE **/
-int* MemCache::getFromFree(int csize) {
+int* lemur::utility::MemCache::getFromFree(int csize) {
   if (freelist[csize-MINPOW].empty())
     return NULL;
 

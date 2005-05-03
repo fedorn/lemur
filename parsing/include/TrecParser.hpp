@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "Parser.hpp"
 #include "TextHandler.hpp"
@@ -15,52 +15,58 @@
 
 #ifndef _TRECPARSER_HPP
 #define _TRECPARSER_HPP
+namespace lemur 
+{
+  namespace parse 
+  {
+    
+    ///
+    ///  Parses documents in NIST's TREC format.  Does case folding
+    ///  for words that are not in the acronym list.  Contraction suffixes 
+    ///  and possessive suffixes are stripped.  
+    ///
+    ///  U.S.A., USA's, and USAs are converted to USA.  Does not recognize
+    ///  acronyms with numbers.
+    ///
+    ///  The following fields are parsed: TEXT, HL, HEAD, HEADLINE,
+    ///  LP, TTL
+    ///  
+    ///
 
-///
-///  Parses documents in NIST's TREC format.  Does case folding
-///  for words that are not in the acronym list.  Contraction suffixes 
-///  and possessive suffixes are stripped.  
-///
-///  U.S.A., USA's, and USAs are converted to USA.  Does not recognize
-///  acronyms with numbers.
-///
-///  The following fields are parsed: TEXT, HL, HEAD, HEADLINE,
-///  LP, TTL
-///  
-///
+    // Source code in trecparser.lex
 
-// Source code in trecparser.lex
-
-class TrecParser : public Parser {
+    class TrecParser : public lemur::api::Parser {
   
-public:
-  static const string identifier;
+    public:
+      static const string identifier;
 
-  TrecParser();
+      TrecParser();
 
-  /// Parse a file.
-  void parseFile(const string &filename);
+      /// Parse a file.
+      void parseFile(const string &filename);
 
-  /// Parse a buffer of len length
-  void parseBuffer(char * buf, int len);
+      /// Parse a buffer of len length
+      void parseBuffer(char * buf, int len);
 
-  /// Gives current byte position offset into file being parsed.
-  /// Don't use with parseBuffer
-  long fileTell() const;
+      /// Gives current byte position offset into file being parsed.
+      /// Don't use with parseBuffer
+      long fileTell() const;
 
-private:
-  /// Actual parsing action flow
-  void doParse();
+    private:
+      /// Actual parsing action flow
+      void doParse();
 
-  /// The state of the parser.
-  int state;
+      /// The state of the parser.
+      int state;
 
-  /// keep a property for being and end of elements
-  Property begelem;
-  Property endelem;
+      /// keep a property for being and end of elements
+      Property begelem;
+      Property endelem;
 
-  /// list
-  LinkedPropertyList proplist;
-};
+      /// list
+      LinkedPropertyList proplist;
+    };
+  }
+}
 
 #endif

@@ -13,14 +13,14 @@
 #include <cctype>
 
 
-WriterTextHandler::WriterTextHandler(const string &filename) {
+lemur::parse::WriterTextHandler::WriterTextHandler(const string &filename) {
   // create the output file
   outfile = new ofstream(filename.c_str());
   // set state in first doc
   first = true;
 }
 
-WriterTextHandler::~WriterTextHandler() {
+lemur::parse::WriterTextHandler::~WriterTextHandler() {
   endDoc();
   // close the output file
   outfile->close();
@@ -29,7 +29,7 @@ WriterTextHandler::~WriterTextHandler() {
 
 
 char * 
-WriterTextHandler::handleDoc(char * docno) {
+lemur::parse::WriterTextHandler::handleDoc(char * docno) {
   // output the end doc tag if not the first doc
   if (first) {
     first = false;
@@ -42,7 +42,7 @@ WriterTextHandler::handleDoc(char * docno) {
 }
 
 char * 
-WriterTextHandler::handleWord(char * word) {
+lemur::parse::WriterTextHandler::handleWord(char * word) {
   // output the word
   if (word != NULL) {
     *outfile << word << endl;
@@ -51,6 +51,6 @@ WriterTextHandler::handleWord(char * word) {
 }
 
 void 
-WriterTextHandler::endDoc() {
+lemur::parse::WriterTextHandler::endDoc() {
   *outfile << "</DOC>" << endl;
 }

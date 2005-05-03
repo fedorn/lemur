@@ -14,8 +14,9 @@
 #include "Param.hpp"
 #include <cmath>
 
+using namespace lemur::api;
 
-TFIDFQueryRep::TFIDFQueryRep(const TermQuery &qry, const Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param): ArrayQueryRep (dbIndex.termCountUnique()+1, qry, dbIndex), ind(dbIndex), idf(idfValue), prm(param)
+lemur::retrieval::TFIDFQueryRep::TFIDFQueryRep(const TermQuery &qry, const Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param): ArrayQueryRep (dbIndex.termCountUnique()+1, qry, dbIndex), ind(dbIndex), idf(idfValue), prm(param)
 {
   startIteration();
   while (hasMore()) {
@@ -25,7 +26,7 @@ TFIDFQueryRep::TFIDFQueryRep(const TermQuery &qry, const Index &dbIndex, double 
     delete qt;
   }
 }
-double TFIDFQueryRep::queryTFWeight(const double rawTF) const
+double lemur::retrieval::TFIDFQueryRep::queryTFWeight(const double rawTF) const
 {
   if (prm.tf == TFIDFParameter::RAWTF) {
     return (rawTF);
@@ -42,7 +43,7 @@ double TFIDFQueryRep::queryTFWeight(const double rawTF) const
 
 
 
-double TFIDFDocRep::docTFWeight(const double rawTF) const
+double lemur::retrieval::TFIDFDocRep::docTFWeight(const double rawTF) const
 {
   if (prm.tf == TFIDFParameter::RAWTF) {
     return (rawTF);
@@ -59,7 +60,7 @@ double TFIDFDocRep::docTFWeight(const double rawTF) const
 }
 
 
-TFIDFRetMethod::TFIDFRetMethod(const Index &dbIndex, ScoreAccumulator &accumulator) :TextQueryRetMethod(dbIndex, accumulator) 
+lemur::retrieval::TFIDFRetMethod::TFIDFRetMethod(const Index &dbIndex, ScoreAccumulator &accumulator) :TextQueryRetMethod(dbIndex, accumulator) 
 {
   // set default parameter value
   docTFParam.tf = TFIDFParameter::BM25;
@@ -84,7 +85,7 @@ TFIDFRetMethod::TFIDFRetMethod(const Index &dbIndex, ScoreAccumulator &accumulat
 
 
 
-void TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, const DocIDSet &relDocs)
+void lemur::retrieval::TFIDFRetMethod::updateTextQuery(TextQueryRep &qryRep, const DocIDSet &relDocs)
 {
   COUNT_T totalTerm=ind.termCountUnique();  
   float * centroidVector = new float[totalTerm+1]; // one extra for OOV

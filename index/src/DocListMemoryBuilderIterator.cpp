@@ -84,7 +84,7 @@ indri::index::DocListMemoryBuilderIterator::DocListMemoryBuilderIterator() {
 
 indri::index::DocListMemoryBuilderIterator::DocListMemoryBuilderIterator( class DocListMemoryBuilder& builder, TermData* termData )
 {
-  reset( builder, _termData );
+  reset( builder, termData );
 }
 
 //
@@ -110,17 +110,17 @@ bool indri::index::DocListMemoryBuilderIterator::nextEntry() {
     int deltaDocument;
     int extents;
     
-    _list = RVLCompress::decompress_int( _list, deltaDocument );
+    _list = lemur::utility::RVLCompress::decompress_int( _list, deltaDocument );
     _data.document += deltaDocument;
     _data.positions.clear();
 
-    _list = RVLCompress::decompress_int( _list, extents );
+    _list = lemur::utility::RVLCompress::decompress_int( _list, extents );
 
     int deltaPosition;
     int lastPosition = 0;
 
     for( int i=0; i<extents; i++ ) {
-      _list = RVLCompress::decompress_int( _list, deltaPosition );
+      _list = lemur::utility::RVLCompress::decompress_int( _list, deltaPosition );
       _data.positions.push_back( deltaPosition + lastPosition );
       lastPosition += deltaPosition;
     }

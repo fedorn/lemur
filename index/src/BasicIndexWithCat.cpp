@@ -11,14 +11,14 @@
 
 
 #include "BasicIndexWithCat.hpp"
-
-//const char BasicIndexWithCat::OOVSTRING[]="[OOV]";
-const string BasicIndexWithCat::OOVSTRING = "[OOV]"; 
-
 #include "Exception.hpp"
 #include <iostream>
 
-BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &categoryIndex, bool catIsTerm):
+//const char lemur::index::BasicIndexWithCat::OOVSTRING[]="[OOV]";
+const string lemur::index::BasicIndexWithCat::OOVSTRING = "[OOV]"; 
+
+
+lemur::index::BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &categoryIndex, bool catIsTerm):
     baseIndex(&wordIndex), catIndex(&categoryIndex), catAsTerm(catIsTerm) 
 { 
   // synchronize doc id lexicons
@@ -40,7 +40,7 @@ BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &categoryIndex, boo
   }
 
   if (catMax > baseMax) 
-    throw Exception("BasicIndexWithCat", "categor index has more doc ids than base index");
+    throw lemur::api::Exception("BasicIndexWithCat", "categor index has more doc ids than base index");
   cat2base = new int[catMax];
 
   for (i=0; i<catMax; i++) {
@@ -51,7 +51,7 @@ BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &categoryIndex, boo
   }
 }
 
-void BasicIndexWithCat::startCatIDIteration(int docID) const
+void lemur::index::BasicIndexWithCat::startCatIDIteration(int docID) const
 {
   if (catAsTerm) {
     if(base2cat[docID]==catIndex->term(OOVSTRING)){ tmInfoBuffer=NULL; return; }
@@ -65,7 +65,7 @@ void BasicIndexWithCat::startCatIDIteration(int docID) const
   
 }
 
-bool BasicIndexWithCat::hasMoreCatID() const
+bool lemur::index::BasicIndexWithCat::hasMoreCatID() const
 { 
   if (catAsTerm) {
     if(!tmInfoBuffer) return false;
@@ -77,7 +77,7 @@ bool BasicIndexWithCat::hasMoreCatID() const
 }
 
 
-int BasicIndexWithCat::nextCatID() const
+int lemur::index::BasicIndexWithCat::nextCatID() const
 {
   if (catAsTerm) {
     tmInfo = tmInfoBuffer->nextEntry();
@@ -91,7 +91,7 @@ int BasicIndexWithCat::nextCatID() const
 
 
 
-void BasicIndexWithCat::startDocIDIteration(int catID) const
+void lemur::index::BasicIndexWithCat::startDocIDIteration(int catID) const
 {
   if (!catAsTerm) { // i.e., cat is actually doc
     tmInfoBuffer = catIndex->termInfoList(catID);
@@ -103,7 +103,7 @@ void BasicIndexWithCat::startDocIDIteration(int catID) const
   
 }
 
-bool BasicIndexWithCat::hasMoreDocID() const
+bool lemur::index::BasicIndexWithCat::hasMoreDocID() const
 {
   if (!catAsTerm) {
     return (tmInfoBuffer->hasMore());
@@ -113,7 +113,7 @@ bool BasicIndexWithCat::hasMoreDocID() const
 }
 
 
-int BasicIndexWithCat::nextDocID() const
+int lemur::index::BasicIndexWithCat::nextDocID() const
 {
   if (!catAsTerm) {
     tmInfo = tmInfoBuffer->nextEntry();

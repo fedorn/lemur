@@ -46,7 +46,7 @@ namespace indri
       /// Decompress an INT64 from the buffer into value
       /// @param value reference to the container for the value.
       RVLDecompressStream& operator>> ( INT64& value ) {
-        _current = RVLCompress::decompress_longlong( _current, value );
+        _current = lemur::utility::RVLCompress::decompress_longlong( _current, value );
         assert( _current - _buffer <= _bufferSize );
         return *this;
       }
@@ -55,7 +55,7 @@ namespace indri
       /// @param value reference to the container for the value.
       RVLDecompressStream& operator>> ( UINT64& value ) {
         INT64 other;
-        _current = RVLCompress::decompress_longlong( _current, other );
+        _current = lemur::utility::RVLCompress::decompress_longlong( _current, other );
         assert( _current - _buffer <= _bufferSize );
         value = other;
         return *this;
@@ -64,7 +64,7 @@ namespace indri
       /// Decompress an int from the buffer into value
       /// @param value reference to the container for the value.
       RVLDecompressStream& operator>> ( int& value ) {
-        _current = RVLCompress::decompress_int( _current, value );
+        _current = lemur::utility::RVLCompress::decompress_int( _current, value );
         assert( _current - _buffer <= _bufferSize );    
         return *this;
       }
@@ -73,7 +73,7 @@ namespace indri
       /// @param value reference to the container for the value.
       RVLDecompressStream& operator>> ( unsigned int& value ) {
         int v;
-        _current = RVLCompress::decompress_int( _current, v );
+        _current = lemur::utility::RVLCompress::decompress_int( _current, v );
         value = (unsigned int) v;
         assert( _current - _buffer <= _bufferSize );    
         return *this;
@@ -92,7 +92,7 @@ namespace indri
       /// @param value pointer to a character buffer that will hold the decompressed value
       RVLDecompressStream& operator>> ( char* value ) {
         int length;
-        _current = RVLCompress::decompress_int( _current, length );
+        _current = lemur::utility::RVLCompress::decompress_int( _current, length );
         ::memcpy( value, _current, length );
         value[length] = 0;
         _current += length;

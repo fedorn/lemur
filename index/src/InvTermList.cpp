@@ -12,7 +12,7 @@
 
 #include "InvTermList.hpp"
 
-InvTermList::InvTermList() {
+lemur::index::InvTermList::InvTermList() {
   length = 0;
   iter = NULL;
   listlen = 0;
@@ -21,19 +21,19 @@ InvTermList::InvTermList() {
   end = NULL;
 }
 
-InvTermList::~InvTermList() {
+lemur::index::InvTermList::~InvTermList() {
   delete[](list);
 }
 
-void InvTermList::startIteration() const{
+void lemur::index::InvTermList::startIteration() const{
   iter = list;
 }
 
-bool InvTermList::hasMore() const{
+bool lemur::index::InvTermList::hasMore() const{
   return iter != end;
 }
 
-TermInfo* InvTermList::nextEntry() const{
+lemur::api::TermInfo* lemur::index::InvTermList::nextEntry() const{
   //  static InvFPTerm info;
 
   entry.termID(*iter);
@@ -45,34 +45,34 @@ TermInfo* InvTermList::nextEntry() const{
 }
 
 /// set element from position, returns pointer to the element
-TermInfo* InvTermList::getElement(TermInfo* elem, POS_T position) const {
+lemur::api::TermInfo* lemur::index::InvTermList::getElement(lemur::api::TermInfo* elem, lemur::api::POS_T position) const {
   // info is stored in LOC_T* as docid freq .. ..
-  LOC_T* ip = (LOC_T*) position;
+  lemur::api::LOC_T* ip = (lemur::api::LOC_T*) position;
   elem->termID(*ip);
   ip++;
   elem->count(*ip);
   return elem;
 }
 /// advance position
-POS_T InvTermList::nextPosition(POS_T position) const {
+lemur::api::POS_T lemur::index::InvTermList::nextPosition(lemur::api::POS_T position) const {
   // info is stored in LOC_T* as docid freq .. ..
-  return (POS_T) (((LOC_T*) position) + 2);
+  return (lemur::api::POS_T) (((lemur::api::LOC_T*) position) + 2);
 }
 
-bool InvTermList::binRead(ifstream& infile){
+bool lemur::index::InvTermList::binRead(ifstream& infile){
   if (infile.eof())
     return false;
 
-  infile.read((char*) &uid, sizeof(DOCID_T));
-  if (!(infile.gcount() == sizeof(DOCID_T)))
+  infile.read((char*) &uid, sizeof(lemur::api::DOCID_T));
+  if (!(infile.gcount() == sizeof(lemur::api::DOCID_T)))
     return false;
 
-  infile.read((char*) &length, sizeof(COUNT_T));
-  if (!(infile.gcount() == sizeof(COUNT_T)))
+  infile.read((char*) &length, sizeof(lemur::api::COUNT_T));
+  if (!(infile.gcount() == sizeof(lemur::api::COUNT_T)))
     return false;
 
-  infile.read((char*) &listlen, sizeof(COUNT_T));
-  if (!(infile.gcount() == sizeof(COUNT_T)))
+  infile.read((char*) &listlen, sizeof(lemur::api::COUNT_T));
+  if (!(infile.gcount() == sizeof(lemur::api::COUNT_T)))
     return false;
 
   //  if (list)
@@ -80,9 +80,9 @@ bool InvTermList::binRead(ifstream& infile){
   delete[](list);
   //  list = (int*) malloc(sizeof(int)*listlen);
   // use new/delete[] so an exception will be thrown if out of memory.
-  list = new LOC_T[listlen];
-  infile.read((char*) list, sizeof(LOC_T) * listlen);
-  if (!(infile.gcount() == (sizeof(LOC_T) * listlen))) {
+  list = new lemur::api::LOC_T[listlen];
+  infile.read((char*) list, sizeof(lemur::api::LOC_T) * listlen);
+  if (!(infile.gcount() == (sizeof(lemur::api::LOC_T) * listlen))) {
     //    free(list);
     delete[](list);
     list = NULL;

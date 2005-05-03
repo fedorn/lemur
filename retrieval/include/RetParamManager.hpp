@@ -29,13 +29,13 @@ namespace RetrievalParameter {
   /// @name Common retrieval parameters
   //@{ 
   /// database index
-  static String databaseIndex;
+  static lemur::utility::String databaseIndex;
   /// Retrieval method
-  static String retModel;
+  static lemur::utility::String retModel;
   /// text query set
-  static String textQuerySet;
+  static lemur::utility::String textQuerySet;
   /// result file name
-  static String resultFile;
+  static lemur::utility::String resultFile;
   /// result file format, one of true for trec, false for 3col.
   static bool TRECresultFileFormat;
   /// number of docs for feedback (0=no feedback)
@@ -47,12 +47,12 @@ namespace RetrievalParameter {
   /// Use a working set? Default is to score the whole collection;
   static bool useWorkingSet;
   /// working set file name
-  static String workSetFile;
+  static lemur::utility::String workSetFile;
 
   //@}
 
   static string getLower(char *parm, char *def) {
-    string tmpString = ParamGetString(parm, def);
+    std::string tmpString = lemur::api::ParamGetString(parm, def);
     // make it all lowercase
     for (int i = 0; i < tmpString.length(); i++)
       tmpString[i] = tolower(tmpString[i]);
@@ -60,7 +60,7 @@ namespace RetrievalParameter {
   }
 
   static void get() {
-    databaseIndex = ParamGetString("index","");
+    databaseIndex = lemur::api::ParamGetString("index","");
     retModel = getLower("retModel","kl");
     // backwards compatibility.
     if (retModel == "0") retModel = "tfidf";
@@ -78,17 +78,17 @@ namespace RetrievalParameter {
     tmp = getLower("useWorkingSet", "false"); 
     useWorkingSet = (tmp == "true" || tmp == "1");
     // working set file name
-    workSetFile = ParamGetString("workingSetFile",""); 
+    workSetFile = lemur::api::ParamGetString("workingSetFile",""); 
     
-    textQuerySet = ParamGetString("textQuery","");
-    resultFile = ParamGetString("resultFile","");
+    textQuerySet = lemur::api::ParamGetString("textQuery","");
+    resultFile = lemur::api::ParamGetString("resultFile","");
 
     tmp = getLower("resultFormat","trec");
     TRECresultFileFormat = (tmp == "trec" || tmp == "1");
 
     // default being no feedback
-    fbDocCount = ParamGetInt("feedbackDocCount",0); 
-    resultCount = ParamGetInt("resultCount", 1000); 
+    fbDocCount = lemur::api::ParamGetInt("feedbackDocCount",0); 
+    resultCount = lemur::api::ParamGetInt("resultCount", 1000); 
     
   }
 };
@@ -110,19 +110,19 @@ namespace TFIDFParameter {
     else if ((tfmethod == "logf") || (tfmethod == "1")) docTFPrm.tf = LOGTF;    
     else if ((tfmethod == "bm25") || (tfmethod == "2")) docTFPrm.tf = BM25;
 
-    docTFPrm.bm25K1 = ParamGetDouble("doc.bm25K1",defaultDocK1);
-    docTFPrm.bm25B = ParamGetDouble("doc.bm25B",defaultDocB);
+    docTFPrm.bm25K1 = lemur::api::ParamGetDouble("doc.bm25K1",defaultDocK1);
+    docTFPrm.bm25B = lemur::api::ParamGetDouble("doc.bm25B",defaultDocB);
 
     tfmethod = RetrievalParameter::getLower("query.tfMethod", "bm25");
     if ((tfmethod == "rawtf") || (tfmethod == "0")) qryTFPrm.tf = RAWTF;
     else if ((tfmethod == "logf") || (tfmethod == "1")) qryTFPrm.tf = LOGTF;    
     else if ((tfmethod == "bm25") || (tfmethod == "2")) qryTFPrm.tf = BM25;
 
-    qryTFPrm.bm25K1 = ParamGetDouble("query.bm25K1",defaultQryK1);
+    qryTFPrm.bm25K1 = lemur::api::ParamGetDouble("query.bm25K1",defaultQryK1);
     qryTFPrm.bm25B = defaultQryB;
     
-    fbPrm.howManyTerms = ParamGetInt("feedbackTermCount",defaultHowManyTerms);
-    fbPrm.posCoeff = ParamGetDouble("feedbackPosCoeff", defaultPosCoeff); 
+    fbPrm.howManyTerms = lemur::api::ParamGetInt("feedbackTermCount",defaultHowManyTerms);
+    fbPrm.posCoeff = lemur::api::ParamGetDouble("feedbackPosCoeff", defaultPosCoeff); 
   }
 };
 
@@ -137,11 +137,11 @@ namespace OkapiParameter {
 
   static void get()
   {
-    tfPrm.k1 = ParamGetDouble("BM25K1",defaultK1);
-    tfPrm.b =  ParamGetDouble("BM25B",defaultB);
-    tfPrm.k3 = ParamGetDouble("BM25K3", defaultK3);
-    fbPrm.expQTF = ParamGetDouble("BM25QTF", defaultExpQTF);
-    fbPrm.howManyTerms = ParamGetInt("feedbackTermCount",defaultHowManyTerms);
+    tfPrm.k1 = lemur::api::ParamGetDouble("BM25K1",defaultK1);
+    tfPrm.b =  lemur::api::ParamGetDouble("BM25B",defaultB);
+    tfPrm.k3 = lemur::api::ParamGetDouble("BM25K3", defaultK3);
+    fbPrm.expQTF = lemur::api::ParamGetDouble("BM25QTF", defaultExpQTF);
+    fbPrm.howManyTerms = lemur::api::ParamGetInt("feedbackTermCount",defaultHowManyTerms);
     
   }
 };
@@ -151,12 +151,12 @@ namespace SimpleKLParameter {
   //@{
   static SimpleKLParameter::DocSmoothParam docPrm;
   static SimpleKLParameter::QueryModelParam qryPrm;
-  static String smoothSupportFile;
+  static lemur::utility::String smoothSupportFile;
   //@}
     
   static void get()
   {
-    smoothSupportFile = ParamGetString("smoothSupportFile", "");
+    smoothSupportFile = lemur::api::ParamGetString("smoothSupportFile", "");
 
     string tmpString = RetrievalParameter::getLower("adjustedScoreMethod", 
 						    "negativekld");
@@ -203,9 +203,9 @@ namespace SimpleKLParameter {
     }
     
 
-    docPrm.ADDelta = ParamGetDouble("discountDelta",defaultADDelta);
-    docPrm.JMLambda = ParamGetDouble("JelinekMercerLambda",defaultJMLambda);
-    docPrm.DirPrior = ParamGetDouble("DirichletPrior",defaultDirPrior);
+    docPrm.ADDelta = lemur::api::ParamGetDouble("discountDelta",defaultADDelta);
+    docPrm.JMLambda = lemur::api::ParamGetDouble("JelinekMercerLambda",defaultJMLambda);
+    docPrm.DirPrior = lemur::api::ParamGetDouble("DirichletPrior",defaultDirPrior);
     
     tmpString = RetrievalParameter::getLower("queryUpdateMethod", "mixture");
 
@@ -230,30 +230,30 @@ namespace SimpleKLParameter {
     }
     
 
-    qryPrm.fbCoeff = ParamGetDouble("feedbackCoefficient", defaultFBCoeff);
-    qryPrm.fbPrTh = ParamGetDouble("feedbackProbThresh", defaultFBPrTh);
-    qryPrm.fbPrSumTh = ParamGetDouble("feedbackProbSumThresh",
+    qryPrm.fbCoeff = lemur::api::ParamGetDouble("feedbackCoefficient", defaultFBCoeff);
+    qryPrm.fbPrTh = lemur::api::ParamGetDouble("feedbackProbThresh", defaultFBPrTh);
+    qryPrm.fbPrSumTh = lemur::api::ParamGetDouble("feedbackProbSumThresh",
 				      defaultFBPrSumTh);
-    qryPrm.fbTermCount = ParamGetInt("feedbackTermCount", defaultFBTermCount);
-    qryPrm.fbMixtureNoise = ParamGetDouble("feedbackMixtureNoise",
+    qryPrm.fbTermCount = lemur::api::ParamGetInt("feedbackTermCount", defaultFBTermCount);
+    qryPrm.fbMixtureNoise = lemur::api::ParamGetDouble("feedbackMixtureNoise",
 					   defaultFBMixNoise);
-    qryPrm.emIterations = ParamGetInt("emIterations", defaultEMIterations);
+    qryPrm.emIterations = lemur::api::ParamGetInt("emIterations", defaultEMIterations);
 					      
   }
 };
 
 namespace CORIParameter {
-  static String collectionCounts;
+  static lemur::utility::String collectionCounts;
   static double cstffactor;
   static double cstfbaseline;
   static double doctffactor;
   static double doctfbaseline;
   static void get() {
-    collectionCounts = ParamGetString("collCounts", "USE_INDEX_COUNTS");
-    cstffactor = ParamGetDouble("CSCTF_factor", 150);
-    cstfbaseline = ParamGetDouble("CSCTF_baseline", 50);
-    doctffactor = ParamGetDouble("DOCCTF_factor", 1.5);
-    doctfbaseline = ParamGetDouble("DOCCTF_baseline", 0.5);
+    collectionCounts = lemur::api::ParamGetString("collCounts", "USE_INDEX_COUNTS");
+    cstffactor = lemur::api::ParamGetDouble("CSCTF_factor", 150);
+    cstfbaseline = lemur::api::ParamGetDouble("CSCTF_baseline", 50);
+    doctffactor = lemur::api::ParamGetDouble("DOCCTF_factor", 1.5);
+    doctfbaseline = lemur::api::ParamGetDouble("DOCCTF_baseline", 0.5);
   }
 };
 
@@ -262,14 +262,14 @@ namespace CosSimParameter {
   /// @name CosSim model parameters
   //@{
   static FeedbackParam fbPrm;
-  static String L2NormFile;
+  static lemur::utility::String L2NormFile;
   //@}
   
   static void get()
   {
-    fbPrm.howManyTerms = ParamGetInt("feedbackTermCount",defaultHowManyTerms);
-    fbPrm.posCoeff = ParamGetDouble("feedbackPosCoeff", defaultPosCoeff); 
-    L2NormFile = ParamGetString("L2File", defaultL2File);
+    fbPrm.howManyTerms = lemur::api::ParamGetInt("feedbackTermCount",defaultHowManyTerms);
+    fbPrm.posCoeff = lemur::api::ParamGetDouble("feedbackPosCoeff", defaultPosCoeff); 
+    L2NormFile = lemur::api::ParamGetString("L2File", defaultL2File);
   }
 };
 /// Parameters used in the InQuery structured query retrieval method
@@ -285,9 +285,9 @@ namespace InQueryParameter {
   static bool cacheIDF = false;
   static void get()
   {
-    defaultBelief = ParamGetDouble("defaultBelief", defaultBelief);
-    fbCoeff = ParamGetDouble("feedbackPosCoeff", fbCoeff);
-    fbTermCount = ParamGetInt("feedbackTermCount", fbTermCount);
+    defaultBelief = lemur::api::ParamGetDouble("defaultBelief", defaultBelief);
+    fbCoeff = lemur::api::ParamGetDouble("feedbackPosCoeff", fbCoeff);
+    fbTermCount = lemur::api::ParamGetInt("feedbackTermCount", fbTermCount);
     string tmpString = RetrievalParameter::getLower("cacheIDF", "true");
     cacheIDF = (tmpString == "true" || tmpString == "1");
   }
@@ -305,18 +305,18 @@ namespace IndriParameter {
   {
     RetrievalParameter::get();
     // stopwords
-    stopwords = ParamGetString("stopwords", "");
+    stopwords = lemur::api::ParamGetString("stopwords", "");
 
     // RM expansion parameters
-    int fbTerms = ParamGetInt("feedbackTermCount", 10);
-    double fbOrigWt = ParamGetDouble("fbOrigWt", 0.5);
-    double fbMu = ParamGetDouble("fbMu", 0);
+    int fbTerms = lemur::api::ParamGetInt("feedbackTermCount", 10);
+    double fbOrigWt = lemur::api::ParamGetDouble("fbOrigWt", 0.5);
+    double fbMu = lemur::api::ParamGetDouble("fbMu", 0);
     params.set( "fbDocs" , RetrievalParameter::fbDocCount);
     params.set( "fbTerms" , fbTerms );
     params.set( "fbOrigWt", fbOrigWt);
     params.set( "fbMu", fbMu );
     // set retrieval rules -- NB limit to one.
-    string rule = ParamGetString("rule", "method:dirichlet,mu:2500");
+    string rule = lemur::api::ParamGetString("rule", "method:dirichlet,mu:2500");
     params.set("rule", rule);
     // results count
     params.set( "count", RetrievalParameter::resultCount );

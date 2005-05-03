@@ -8,11 +8,11 @@
 
 #include "LinkedPropertyList.hpp"
 
-LinkedPropertyList::LinkedPropertyList(){
+lemur::parse::LinkedPropertyList::LinkedPropertyList(){
   iterator = properties.end();
 }
 
-LinkedPropertyList::~LinkedPropertyList() {
+lemur::parse::LinkedPropertyList::~LinkedPropertyList() {
   while (!properties.empty()) {
     Property * prop = properties.front();
     properties.pop_front();
@@ -28,8 +28,8 @@ LinkedPropertyList::~LinkedPropertyList() {
 /// Returns the property with a given name.  Returns
 /// NULL if there is no property in the list with that name.
 /// Do not deallocate the returned pointer.
-const Property * 
-LinkedPropertyList::getProperty(const string name) const{
+const lemur::parse::Property * 
+lemur::parse::LinkedPropertyList::getProperty(const string name) const{
   Property * prop = getPropertyInternal(name);
   if (prop != NULL) {
     returnProp.setName(prop->getName());
@@ -41,15 +41,15 @@ LinkedPropertyList::getProperty(const string name) const{
 
 /// Starts iteration over properties.
 void 
-LinkedPropertyList::startIteration() const{
+lemur::parse::LinkedPropertyList::startIteration() const{
   iterator = properties.begin();
 }
 
 
 /// Returns the next Property in the iteration.  Do not
 /// deallocate the returned pointer.
-const Property * 
-LinkedPropertyList::nextEntry() const{
+const lemur::parse::Property * 
+lemur::parse::LinkedPropertyList::nextEntry() const{
   Property * prop = NULL;
   if (hasMore()) {  
     prop = *iterator;
@@ -66,7 +66,7 @@ LinkedPropertyList::nextEntry() const{
 
 /// Tests to see whether there are more properties in the iteration.
 bool 
-LinkedPropertyList::hasMore() const{
+lemur::parse::LinkedPropertyList::hasMore() const{
   return (iterator != properties.end());
 }
 
@@ -77,7 +77,7 @@ LinkedPropertyList::hasMore() const{
 /// after calling this function to the property passed in
 /// will not affect the property in the list.
 void 
-LinkedPropertyList::setProperty(const Property * property) {
+lemur::parse::LinkedPropertyList::setProperty(const Property * property) {
   if ((property != NULL) && (!property->getName().empty())) {
     Property * prop = getPropertyInternal(property->getName());
     if (prop == NULL) {
@@ -93,7 +93,7 @@ LinkedPropertyList::setProperty(const Property * property) {
 /// passed in name.  If no property in the list has
 /// the name, the function fails silently.
 void 
-LinkedPropertyList::removeProperty(const string name) {
+lemur::parse::LinkedPropertyList::removeProperty(const string name) {
   Property * prop = getPropertyInternal(name);
   // if the property is there, move it to the cache
   if (prop != NULL) {
@@ -104,7 +104,7 @@ LinkedPropertyList::removeProperty(const string name) {
 
 /// Clears all properties from the list
 void 
-LinkedPropertyList::clear() {
+lemur::parse::LinkedPropertyList::clear() {
   // move items over to the cache
   while (!properties.empty()) {
     cache.push_front(properties.front());
@@ -115,8 +115,8 @@ LinkedPropertyList::clear() {
 // checks the cache for a property that 
 // can be reused, otherwise creates a new
 // property
-Property * 
-LinkedPropertyList::getAProperty() {
+lemur::parse::Property * 
+lemur::parse::LinkedPropertyList::getAProperty() {
   Property * prop = NULL;
   if (!cache.empty()) {
     prop = cache.front();
@@ -127,8 +127,8 @@ LinkedPropertyList::getAProperty() {
   return prop;
 }
 
-Property * 
-LinkedPropertyList::getPropertyInternal(const string name) const{
+lemur::parse::Property * 
+lemur::parse::LinkedPropertyList::getPropertyInternal(const string name) const{
   Property * prop = NULL;
   if (!name.empty()) {
     plist::iterator iter = properties.begin();

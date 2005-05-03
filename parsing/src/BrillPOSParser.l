@@ -87,7 +87,7 @@ long bposloc;
 #define SYMBOL 8
 #define STYLE 9
 
-BrillPOSParser::BrillPOSParser() {
+lemur::parse::BrillPOSParser::BrillPOSParser() {
   state = OUTER;
   poscount = 0;
   wordpos.setName("position");
@@ -95,12 +95,12 @@ BrillPOSParser::BrillPOSParser() {
   iden = identifier;
 }
 
-long BrillPOSParser::fileTell() const {
+long lemur::parse::BrillPOSParser::fileTell() const {
   return bposloc;
 }
 
 void 
-BrillPOSParser::parseFile(const string &filename) {
+lemur::parse::BrillPOSParser::parseFile(const string &filename) {
   parsefile = filename;
   bposloc = 0;
   bposin = fopen(filename.c_str(), "rb");
@@ -108,7 +108,7 @@ BrillPOSParser::parseFile(const string &filename) {
   fclose(bposin);
 }
 
-void BrillPOSParser::parseBuffer (char* buf, int len) {
+void lemur::parse::BrillPOSParser::parseBuffer (char* buf, int len) {
   int tpos = bposloc;
   bposloc = 0;
   YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
@@ -119,7 +119,7 @@ void BrillPOSParser::parseBuffer (char* buf, int len) {
   bposloc = tpos;
 }
 
-void BrillPOSParser::doParse() {
+void lemur::parse::BrillPOSParser::doParse() {
 
   int tok;
 

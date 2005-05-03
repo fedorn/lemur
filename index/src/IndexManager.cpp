@@ -16,7 +16,7 @@
 #include "KeyfileIncIndex.hpp"
 #include "LemurIndriIndex.hpp"
 
-Index *IndexManager::openIndex(const string &tocFile)
+lemur::api::Index *lemur::api::IndexManager::openIndex(const string &tocFile)
 {
   const char *indexTOCFile = tocFile.c_str(); // rewrite this to use the string.
    
@@ -31,16 +31,16 @@ Index *IndexManager::openIndex(const string &tocFile)
   if ( (!strcmp(extension, "IFP")) || 
        (!strcmp(extension, "ifp"))) {
     // InvFP
-    ind = new InvFPIndex();
+    ind = new lemur::index::InvFPIndex();
   } else if ((!strcmp(extension, "INV")) ||
 	     (!strcmp(extension, "inv"))) {
-    ind = new InvIndex();
+    ind = new lemur::index::InvIndex();
   } else if ((!strcmp(extension, "key")) ||
 	     (!strcmp(extension, "KEY"))) {
-    ind = new KeyfileIncIndex();
+    ind = new lemur::index::KeyfileIncIndex();
   } else if ((!strcmp(extension, "ind")) ||
 	     (!strcmp(extension, "IND"))) {
-    ind = new LemurIndriIndex();
+    ind = new lemur::index::LemurIndriIndex();
   } else {
     throw Exception("IndexManager", "unknown index file extension");
   }

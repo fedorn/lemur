@@ -13,10 +13,11 @@
 #include "IndexManager.hpp"
 #include "QueryTextHandler.hpp"
 #include "WriterTextHandler.hpp"
-#include "FUtil.hpp"
+#include "indri/Path.hpp"
 #include "Param.hpp"
 #include "TrecParser.hpp"
 
+using namespace lemur::api;
 
 // Local parameters used by the indexer 
 namespace LocalParameter {
@@ -98,7 +99,7 @@ int AppMain(int argc, char * argv[]) {
   // so and exit... dmf 01/2004. #include "TrecParser.hpp" can
   // be removed if this is.
   if (!parser)
-    parser = new TrecParser();
+    parser = new lemur::parse::TrecParser();
   
   // Create the stopper if needed.
   Stopper * stopper = NULL;
@@ -113,10 +114,10 @@ int AppMain(int argc, char * argv[]) {
   }
   Index * ind = IndexManager::openIndex(LocalParameter::index.c_str());
 
-  QueryTextHandler queryHandler;
+  lemur::parse::QueryTextHandler queryHandler;
   queryHandler.setIndex(ind);
   
-  WriterTextHandler writer(LocalParameter::qryOutFile);
+  lemur::parse::WriterTextHandler writer(LocalParameter::qryOutFile);
 
   // chain the parser/queryHandler/stopper/stemmer/writer
 
@@ -141,7 +142,7 @@ int AppMain(int argc, char * argv[]) {
   for (int i = 2; i < argc; i++) {
     cerr << "Parsing " << argv[i] << endl;
     string filename(argv[i]);
-    if (!fileExist(filename)) {
+    if (!indri::file::Path::exists(filename)) {
       throw Exception("ParseQuery", "datfile specified does not exist");
     }
     parser->parse(filename);

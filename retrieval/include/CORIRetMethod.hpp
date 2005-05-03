@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _CORIRETMETHOD_HPP
 #define _CORIRETMETHOD_HPP
@@ -26,125 +26,133 @@
 #define DOCTFBASELINE 0.5
 #define DOCTFFACTOR 1.5
 #define MINBELIEF 0.4
+namespace lemur 
+{
+  /// document retrieval components.
+  namespace retrieval
+  {
+    
+    class CORIQueryRep : public ArrayQueryRep {
+    public:
+      CORIQueryRep(const lemur::api::TermQuery & qry, const lemur::api::Index & dbIndex);
+      virtual ~CORIQueryRep() {}
 
-class CORIQueryRep : public ArrayQueryRep {
-public:
-  CORIQueryRep(const TermQuery & qry, const Index & dbIndex);
-  virtual ~CORIQueryRep() {}
+    protected:
+      const lemur::api::Index & ind;
+    };
 
-protected:
-  const Index & ind;
-};
+    class CORIDocRep : public lemur::api::DocumentRep {
+    public:
+      CORIDocRep(lemur::api::DOCID_T docID, const lemur::api::Index & dbIndex, double * cwRatio, 
+                 double TFfact = 150, double TFbase = 50, 
+                 const SimpleKLDocModel * smoother = NULL,
+                 const lemur::langmod::UnigramLM * collectLM = NULL);
+      virtual ~CORIDocRep() { }
+      virtual double termWeight(lemur::api::TERMID_T termID, const lemur::api::DocInfo * info) const ;
 
-class CORIDocRep : public DocumentRep {
-public:
-  CORIDocRep(DOCID_T docID, const Index & dbIndex, double * cwRatio, 
-	     double TFfact = 150, double TFbase = 50, 
-	     const SimpleKLDocModel * smoother = NULL,
-	     const UnigramLM * collectLM = NULL);
-  virtual ~CORIDocRep() { }
-  virtual double termWeight(TERMID_T termID, const DocInfo * info) const ;
+      virtual double scoreConstant() const { return 0; }
 
-  virtual double scoreConstant() const { return 0; }
+    private:
 
-private:
+      const lemur::api::Index & ind;
 
-  const Index & ind;
+      int * cwCounts;
 
-  int * cwCounts;
+      const SimpleKLDocModel * dfSmooth;
+      const lemur::langmod::UnigramLM * collLM;
 
-  const SimpleKLDocModel * dfSmooth;
-  const UnigramLM * collLM;
-
-  double c05;
-  double idiv;
-  double tnorm;
-};
+      double c05;
+      double idiv;
+      double tnorm;
+    };
 
 
 
-class CORIRetMethod : public TextQueryRetMethod {
-public:
+    class CORIRetMethod : public lemur::api::TextQueryRetMethod {
+    public:
 
-  CORIRetMethod(const Index & dbIndex, ScoreAccumulator &accumulator, 
-		   String cwName, int isCSIndex=0,
-		const SimpleKLDocModel ** smoothers = NULL, 
-		const UnigramLM * collectLM = NULL);
-  ~CORIRetMethod() { delete scFunc; delete [] cwRatio; }
+      CORIRetMethod(const lemur::api::Index & dbIndex, 
+                    lemur::api::ScoreAccumulator &accumulator, 
+                    lemur::utility::String cwName, int isCSIndex=0,
+                    const SimpleKLDocModel ** smoothers = NULL, 
+                    const lemur::langmod::UnigramLM * collectLM = NULL);
+      ~CORIRetMethod() { delete scFunc; delete [] cwRatio; }
 
-  virtual TextQueryRep * computeTextQueryRep(const TermQuery & qry) {
-    return new CORIQueryRep(qry, ind);
-  }
-  virtual DocumentRep * computeDocRep(DOCID_T docID) { 
-    if (dfSmooth != NULL) {
-      return new CORIDocRep(docID, ind, cwRatio, tffactor, tfbaseline, dfSmooth[docID], collLM);
-    }
-    return new CORIDocRep(docID, ind, cwRatio, tffactor, tfbaseline);
-  }
-  virtual ScoreFunction * scoreFunc() {
-    return scFunc;
-  }
-
-  virtual void scoreCollection(const QueryRep &qry, IndexedRealVector &results);
-
-  virtual void updateTextQuery(TextQueryRep &qryRep, const DocIDSet &relDocs) { }
-  
-  void setTFFactor(double tf) { tffactor = tf; }
-  void setTFBaseline(double tf) { tfbaseline = tf; }
-
-protected:
-
-  ScoreFunction * scFunc;
-  const SimpleKLDocModel ** dfSmooth;
-  const UnigramLM * collLM;
-
-  double * cwRatio;
-  double tffactor;
-  double tfbaseline;
-  
-};
-
-class CORIScoreFunc : public ScoreFunction {
-public:
-  CORIScoreFunc(const Index & index) : ind(index) {
-    rmax=0;
-    double dc = ind.docCount();
-    c05 = dc + 0.5;
-    idiv = log(dc + 1);
-    //    qr=NULL;
-    first=0;
-  }
-
-  virtual double adjustedScore(double origScore, const TextQueryRep * qRep,
-			       const DocumentRep * dRep) const {
-    /*
-    if (qr != qRep) {
-      qr = qRep;
-      
-      qRep->startIteration();
-      rmax = 0;
-      double qw = 0;
-      while (qRep->hasMore()) {
-	TERMID_T qtid = qRep->nextTerm()->id();
-	rmax += (1-MINBELIEF)*(log(c05 / ind.docCount(qtid)) / idiv);
+      virtual lemur::api::TextQueryRep * computeTextQueryRep(const lemur::api::TermQuery & qry) {
+        return new CORIQueryRep(qry, ind);
       }
-    }
-    if ((origScore/rmax)>=1){
-      cout<<"!!!!!!!!!"<<endl;
-      cout<<origScore<<" "<<rmax<<" "<<(origScore / rmax)<<endl;
-      }*/
-    //return (origScore / rmax);
-    return origScore;
-  }
+      virtual lemur::api::DocumentRep * computeDocRep(lemur::api::DOCID_T docID) { 
+        if (dfSmooth != NULL) {
+          return new CORIDocRep(docID, ind, cwRatio, tffactor, tfbaseline, dfSmooth[docID], collLM);
+        }
+        return new CORIDocRep(docID, ind, cwRatio, tffactor, tfbaseline);
+      }
+      virtual lemur::api::ScoreFunction * scoreFunc() {
+        return scFunc;
+      }
 
-private:
-  const Index & ind;
-  int first;
-  //TextQueryRep * qr;
-  double rmax;
-  double c05;
-  double idiv;
-};
+      virtual void scoreCollection(const lemur::api::QueryRep &qry, lemur::api::IndexedRealVector &results);
+
+      virtual void updateTextQuery(lemur::api::TextQueryRep &qryRep, const lemur::api::DocIDSet &relDocs) { }
+  
+      void setTFFactor(double tf) { tffactor = tf; }
+      void setTFBaseline(double tf) { tfbaseline = tf; }
+
+    protected:
+
+      lemur::api::ScoreFunction * scFunc;
+      const SimpleKLDocModel ** dfSmooth;
+      const lemur::langmod::UnigramLM * collLM;
+
+      double * cwRatio;
+      double tffactor;
+      double tfbaseline;
+  
+    };
+
+    class CORIScoreFunc : public lemur::api::ScoreFunction {
+    public:
+      CORIScoreFunc(const lemur::api::Index & index) : ind(index) {
+        rmax=0;
+        double dc = ind.docCount();
+        c05 = dc + 0.5;
+        idiv = log(dc + 1);
+        //    qr=NULL;
+        first=0;
+      }
+
+      virtual double adjustedScore(double origScore, const lemur::api::TextQueryRep * qRep,
+                                   const lemur::api::DocumentRep * dRep) const {
+        /*
+          if (qr != qRep) {
+          qr = qRep;
+      
+          qRep->startIteration();
+          rmax = 0;
+          double qw = 0;
+          while (qRep->hasMore()) {
+          lemur::api::TERMID_T qtid = qRep->nextTerm()->id();
+          rmax += (1-MINBELIEF)*(log(c05 / ind.docCount(qtid)) / idiv);
+          }
+          }
+          if ((origScore/rmax)>=1){
+          cout<<"!!!!!!!!!"<<endl;
+          cout<<origScore<<" "<<rmax<<" "<<(origScore / rmax)<<endl;
+          }*/
+        //return (origScore / rmax);
+        return origScore;
+      }
+
+    private:
+      const lemur::api::Index & ind;
+      int first;
+      //TextQueryRep * qr;
+      double rmax;
+      double c05;
+      double idiv;
+    };
+  }
+}
 
 
 #endif /* _CORIRETMETHOD_HPP */

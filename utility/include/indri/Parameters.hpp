@@ -285,7 +285,7 @@ namespace indri
       }
 
       /// Retrieve the n'th entry.
-      /// @param index, the index of the entry to retrieve.
+      /// @param index the index of the entry to retrieve.
       /// @return a Parameters object.
       Parameters get( int index );
       /// Retrieve the entry associated with name.

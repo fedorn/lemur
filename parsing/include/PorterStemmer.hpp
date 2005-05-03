@@ -6,29 +6,33 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 
 #include "Stemmer.hpp"
 
 #ifndef _PORTERSTEMMER_HPP
 #define _PORTERSTEMMER_HPP
+namespace lemur 
+{
+  namespace parse
+  {
+    ///
+    ///  Provides a wrapper to the Porter stemmer
+    ///  that supports the Stemmer interface, and by
+    ///  inheritance, the TextHandler interface.
 
+    class PorterStemmer : public lemur::api::Stemmer {
 
-///
-///  Provides a wrapper to the Porter stemmer
-///  that supports the Stemmer interface, and by
-///  inheritance, the TextHandler interface.
+    public:
+      static const string identifier;
 
-class PorterStemmer : public Stemmer {
+      PorterStemmer();
 
-public:
-  static const string identifier;
+      /// Stem a word using the Porter Stemmer.
+      char * stemWord(char * word);
 
-  PorterStemmer();
-
-  /// Stem a word using the Porter Stemmer.
-  char * stemWord(char * word);
-
-};
+    };
+  }
+}
 
 #endif

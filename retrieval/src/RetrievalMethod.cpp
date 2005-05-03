@@ -14,7 +14,7 @@
 
 
 // the most general, but probably also most inefficient implementation
-void RetrievalMethod::scoreCollection(const QueryRep &qry, IndexedRealVector &results)
+void lemur::api::RetrievalMethod::scoreCollection(const QueryRep &qry, IndexedRealVector &results)
 {
   results.clear();
   for (DOCID_T id=1; id<=ind.docCount();id++) {
@@ -23,7 +23,7 @@ void RetrievalMethod::scoreCollection(const QueryRep &qry, IndexedRealVector &re
 }
 
 /// Score a set of documents w.r.t. a query rep (e.g. for re-ranking)
-void RetrievalMethod::scoreDocSet(const QueryRep &qry, const DocIDSet &docSet, IndexedRealVector &results)
+void lemur::api::RetrievalMethod::scoreDocSet(const QueryRep &qry, const DocIDSet &docSet, IndexedRealVector &results)
 {
   results.clear();
   docSet.startIteration();

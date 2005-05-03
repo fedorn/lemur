@@ -45,6 +45,8 @@ based on "leave-one-out".
 #include "RetMethodManager.hpp"
 #include "ResultFile.hpp"
 
+using namespace lemur::api;
+
 void GetAppParam()
 {
   RetrievalParameter::get();
@@ -53,7 +55,7 @@ void GetAppParam()
 
 double estimateQueryNoise(QueryRep *qrep, Index *ind)
 {
-  SimpleKLQueryModel *qr = (SimpleKLQueryModel *)qrep;
+  lemur::retrieval::SimpleKLQueryModel *qr = (lemur::retrieval::SimpleKLQueryModel *)qrep;
 
 
   COUNT_T dMax = ind->docCount();
@@ -159,17 +161,17 @@ double estimateQueryNoise(QueryRep *qrep, Index *ind)
 int AppMain(int argc, char *argv[]) {
   
   Index  *ind = IndexManager::openIndex(RetrievalParameter::databaseIndex);
-  DocStream *qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+  DocStream *qryStream = new lemur::parse::BasicDocStream(RetrievalParameter::textQuerySet);
 
-  ofstream result(RetrievalParameter::resultFile);
+  ofstream result(RetrievalParameter::resultFile.c_str());
   ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
   resFile.openForWrite(result, *ind);
 
-  ifstream workSetStr(RetrievalParameter::workSetFile);
+  ifstream workSetStr(RetrievalParameter::workSetFile.c_str());
   ResultFile docPool(false); // working set is always simple format
   docPool.openForRead(workSetStr, *ind);
 
-  ArrayAccumulator accumulator(ind->docCount());
+  lemur::retrieval::ArrayAccumulator accumulator(ind->docCount());
 
   IndexedRealVector results(ind->docCount());
 
@@ -181,10 +183,10 @@ int AppMain(int argc, char *argv[]) {
   SimpleKLParameter::docPrm.smthMethod = SimpleKLParameter::TWOSTAGE;
   // force two-stage smoothing
 
-  model = new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, 
+  model = new lemur::retrieval::SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, 
 				accumulator);
-  ((SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
-  ((SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
+  ((lemur::retrieval::SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
+  ((lemur::retrieval::SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
 
 
   qryStream->startDocIteration();
@@ -208,7 +210,7 @@ int AppMain(int argc, char *argv[]) {
     cout << "### Final lambda for "<< q->id() << " = "<< qn << endl;
     
      SimpleKLParameter::docPrm.JMLambda =qn; 
-     ((SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
+     ((lemur::retrieval::SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
     PseudoFBDocs *workSet;
 
     if (RetrievalParameter::useWorkingSet) {

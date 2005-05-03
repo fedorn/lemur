@@ -170,9 +170,11 @@ contain a semicolon, as that will prematurely terminate the query.
 #include "WriterInQueryHandler.hpp"
 #include "InQueryOpParser.hpp"
 #include "InqArabicParser.hpp"
-#include "FUtil.hpp"
+#include "indri/Path.hpp"
 #include "Param.hpp"
 #include "Exception.hpp"
+
+using namespace lemur::api;
 
 // Local parameters used by the application
 namespace LocalParameter {
@@ -238,9 +240,9 @@ int AppMain(int argc, char * argv[]) {
   // Create the appropriate parser.
   Parser * parser;
   if (LocalParameter::docFormat == "arabic")
-    parser = new InqArabicParser();
+    parser = new lemur::parse::InqArabicParser();
   else
-    parser = new InQueryOpParser();
+    parser = new lemur::parse::InQueryOpParser();
 
   if (!LocalParameter::acronyms.empty()) {
     parser->setAcroList(LocalParameter::acronyms);
@@ -254,7 +256,7 @@ int AppMain(int argc, char * argv[]) {
   Stemmer * stemmer = NULL;
   stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
 
-  WriterInQueryHandler writer(LocalParameter::qryOutFile);
+  lemur::parse::WriterInQueryHandler writer(LocalParameter::qryOutFile);
 
   // chain the parser/queryHandler/stopper/stemmer/writer
 
@@ -276,7 +278,7 @@ int AppMain(int argc, char * argv[]) {
   for (int i = 2; i < argc; i++) {
     cerr << "Parsing " << argv[i] << endl;
     string filename(argv[i]);
-    if (!fileExist(filename)) {
+    if (!indri::file::Path::exists(filename)) {
       throw Exception("ParseInQuery", "datfile specified does not exist");
     }
     parser->parse(filename);

@@ -9,43 +9,43 @@
 #include "PropIndexTH.hpp"
 #include "KeyfileIncIndex.hpp"
 
-PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
+lemur::parse::PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
 			 bool countStopWords, int ind) {
   // create index and helper objects  
   if (ind == 1)
-    index = new InvFPPushIndex(filename, bufferSize);
+    index = new lemur::index::InvFPPushIndex(filename, bufferSize);
   // add support for future positional indexes here
   else 
-    throw Exception("PropIndexTH", "Unknown index type");
+    throw lemur::api::Exception("PropIndexTH", "Unknown index type");
 
   dp = NULL;
-  term = new InvFPTerm();
+  term = new lemur::index::InvFPTerm();
   countStopWds = countStopWords;
   docLength = 0;
   // set state that is on first doc
   first = true;
 }
 
-PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
+lemur::parse::PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
 			 bool countStopWords, string ind) {
   // create index and helper objects  
   if (ind == "inv")
-    index = new InvFPPushIndex(filename, bufferSize);
+    index = new lemur::index::InvFPPushIndex(filename, bufferSize);
   else if (ind == "key")
-    index = new KeyfileIncIndex(filename, bufferSize);
+    index = new lemur::index::KeyfileIncIndex(filename, bufferSize);
   // add support for future positional indexes here
   else 
-    throw Exception("PropIndexTH", "Unknown index type");
+    throw lemur::api::Exception("PropIndexTH", "Unknown index type");
 
   dp = NULL;
-  term = new InvFPTerm();
+  term = new lemur::index::InvFPTerm();
   countStopWds = countStopWords;
   docLength = 0;
   // set state that is on first doc
   first = true;
 }
 
-PropIndexTH::~PropIndexTH() {
+lemur::parse::PropIndexTH::~PropIndexTH() {
   // end the doc and close the collection
   if (!first) endDoc(); // if we haven't done any yet, don't bother.
   endCollection();
@@ -54,14 +54,14 @@ PropIndexTH::~PropIndexTH() {
   delete index;
 }
 
-void PropIndexTH::endDoc() {
+void lemur::parse::PropIndexTH::endDoc() {
   dp->length(docLength);
   index->endDoc(dp);
   dp->stringID(NULL);
 }
 
 void
-PropIndexTH::endCollection() {
+lemur::parse::PropIndexTH::endCollection() {
   // write out properties from chain, excluding this 
   BasicCollectionProps* props = new BasicCollectionProps();
   if (!props) {
@@ -69,7 +69,7 @@ PropIndexTH::endCollection() {
     return;
   }
   
-  TextHandler* temphandler = this->getPrevHandler();
+  lemur::api::TextHandler* temphandler = this->getPrevHandler();
   while (temphandler) {
     temphandler->writePropertyList(props);
     temphandler = temphandler->getPrevHandler();
@@ -79,7 +79,7 @@ PropIndexTH::endCollection() {
   delete (props);
 }
 
-char* PropIndexTH::handleDoc(char* docno) {
+char* lemur::parse::PropIndexTH::handleDoc(char* docno) {
   // finish the old doc  
   if (!first) {
     endDoc();
@@ -96,7 +96,7 @@ char* PropIndexTH::handleDoc(char* docno) {
   return docno;
 }
 
-char* PropIndexTH::handleWord(char* word, const char* original, PropertyList *list) {
+char* lemur::parse::PropIndexTH::handleWord(char* word, const char* original, PropertyList *list) {
   const Property* prop = NULL;
   int position = -1;
   char* tag = NULL;
@@ -107,7 +107,7 @@ char* PropIndexTH::handleWord(char* word, const char* original, PropertyList *li
       // get position first
       prop = list->getProperty("position");
       if (!prop)
-	throw Exception("PropIndexTH","missing \"position\" property in property list");
+	throw lemur::api::Exception("PropIndexTH","missing \"position\" property in property list");
       position = *((int*) prop->getValue());
       term->position(position);
       if (len > 0) {
@@ -153,7 +153,7 @@ char* PropIndexTH::handleWord(char* word, const char* original, PropertyList *li
 	// get position first
 	prop = list->getProperty("position");
 	if (!prop)
-	  throw Exception("PropIndexTH","missing \"position\" property in property list");
+	  throw lemur::api::Exception("PropIndexTH","missing \"position\" property in property list");
 	position = *((int*) prop->getValue());
 	term->position(position);
 	if (len > 0) {
@@ -198,6 +198,6 @@ char* PropIndexTH::handleWord(char* word, const char* original, PropertyList *li
 }
 
 
-void PropIndexTH::setDocManager(const string &mgrID) {
+void lemur::parse::PropIndexTH::setDocManager(const string &mgrID) {
   index->setDocManager(mgrID);
 }

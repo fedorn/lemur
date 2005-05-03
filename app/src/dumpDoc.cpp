@@ -16,6 +16,8 @@
 #include "IndexManager.hpp"
 #include "Index.hpp"
 
+using namespace lemur::api;
+
 int main(int argc, char *argv[]) {
   Index *ind;
   if (argc < 3) {

@@ -7,21 +7,11 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #ifndef _INVDOCINFO_HPP
 #define _INVDOCINFO_HPP
-
-//! Example Class for push method of building an index
-
-/*!
-
-  This class contains document information for a particular term
-  All methods are in reference to a particular term.  For information
-  about a document in whole, see the class DocumentProps.hpp
-*/
-
 /*
  * NAME DATE - COMMENTS
  * tnt 03/2002 - created
@@ -31,19 +21,32 @@
 #include "DocInfoList.hpp"
 #include "InvFPTypes.hpp"
 
-class InvDocInfo: public DocInfo {
-public: 
-  friend class InvDocList;
+namespace lemur 
+{
+  namespace index 
+  {
+    
+    /*!
 
-  InvDocInfo() {};
-  ~InvDocInfo() {}; 
+    This class contains document information for a particular term
+    All methods are in reference to a particular term.  For information
+    about a document in whole, see the class DocumentProps.hpp
+    */
+
+    class InvDocInfo: public lemur::api::DocInfo {
+    public: 
+      friend class InvDocList;
+
+      InvDocInfo() {};
+      ~InvDocInfo() {}; 
   
-  DOCID_T docID() const{ return id; };
-  COUNT_T termCount() const{ return count; };
+      lemur::api::DOCID_T docID() const{ return id; };
+      lemur::api::COUNT_T termCount() const{ return count; };
  
-protected:
-  DOCID_T id;    // id of this doc
-  COUNT_T count; // count of this term in this doc
-};
-
+    protected:
+      lemur::api::DOCID_T id;    // id of this doc
+      lemur::api::COUNT_T count; // count of this term in this doc
+    };
+  }
+}
 #endif

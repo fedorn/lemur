@@ -14,11 +14,13 @@
 
 #include <stdio.h>
 
-CORIDocRep::CORIDocRep(DOCID_T docID, const Index & dbIndex, double * cwRatio, 
-		       double TFfact, double TFbase, 
-		       const SimpleKLDocModel * smoother,
-		       const UnigramLM * collectLM) : 
-  DocumentRep(docID, dbIndex.docLength(docID)), ind(dbIndex) {
+lemur::retrieval::CORIDocRep::CORIDocRep(lemur::api::DOCID_T docID, 
+                                         const lemur::api::Index & dbIndex, 
+                                         double * cwRatio, 
+                                         double TFfact, double TFbase, 
+                                         const SimpleKLDocModel * smoother,
+                                         const lemur::langmod::UnigramLM * collectLM) : 
+  lemur::api::DocumentRep(docID, dbIndex.docLength(docID)), ind(dbIndex) {
    
   double c = ind.docCount();
   idiv = log (c + 1);    
@@ -31,7 +33,7 @@ CORIDocRep::CORIDocRep(DOCID_T docID, const Index & dbIndex, double * cwRatio,
 }
 
 double 
-CORIDocRep::termWeight(TERMID_T termID, const DocInfo * info) const { 
+lemur::retrieval::CORIDocRep::termWeight(lemur::api::TERMID_T termID, const lemur::api::DocInfo * info) const { 
   
   double cf = ind.docCount(termID);
   double df = info->termCount(); 
@@ -61,18 +63,18 @@ CORIDocRep::termWeight(TERMID_T termID, const DocInfo * info) const {
   return p;
 }
 
-CORIQueryRep::CORIQueryRep(const TermQuery &qry, const Index &dbIndex) : 
+lemur::retrieval::CORIQueryRep::CORIQueryRep(const lemur::api::TermQuery &qry, const lemur::api::Index &dbIndex) : 
   ArrayQueryRep (dbIndex.termCountUnique() + 1, qry, dbIndex), ind(dbIndex) {
 
   startIteration();
   while (hasMore()) {
-    QueryTerm *qt = nextTerm();
+    lemur::api::QueryTerm *qt = nextTerm();
     setCount(qt->id(), qt->weight());
   }
 }
 
-void CORIRetMethod::scoreCollection(const QueryRep &qry, 
-				    IndexedRealVector &results) {
+void lemur::retrieval::CORIRetMethod::scoreCollection(const lemur::api::QueryRep &qry, 
+				    lemur::api::IndexedRealVector &results) {
   scoreInvertedIndex(qry, results, false);
   //adjust the score;
 
@@ -82,12 +84,12 @@ void CORIRetMethod::scoreCollection(const QueryRep &qry,
   double rmax=0;
   double rmin=0;
 
-  TextQueryRep *textQry = (TextQueryRep *)(&qry);
+  lemur::api::TextQueryRep *textQry = (lemur::api::TextQueryRep *)(&qry);
   textQry->startIteration();
   rmax = 0;
   double qw = 0;
   while (textQry->hasMore()) {
-    TERMID_T qtid = textQry->nextTerm()->id();
+    lemur::api::TERMID_T qtid = textQry->nextTerm()->id();
     rmax += (1-MINBELIEF)*(log(c05 / ind.docCount(qtid)) / idiv);
   }
 
@@ -99,11 +101,11 @@ void CORIRetMethod::scoreCollection(const QueryRep &qry,
 
 
 
-CORIRetMethod::CORIRetMethod(const Index & dbIndex, ScoreAccumulator &accumulator, 
-				   String cwName, int isCSIndex,
+lemur::retrieval::CORIRetMethod::CORIRetMethod(const lemur::api::Index & dbIndex, lemur::api::ScoreAccumulator &accumulator, 
+				   lemur::utility::String cwName, int isCSIndex,
 			     const SimpleKLDocModel ** smoothers,
-			     const UnigramLM * collectLM) : 
-  TextQueryRetMethod (dbIndex, accumulator) {
+			     const lemur::langmod::UnigramLM * collectLM) : 
+  lemur::api::TextQueryRetMethod (dbIndex, accumulator) {
 
 
   scFunc = new CORIScoreFunc(dbIndex);
@@ -121,7 +123,7 @@ CORIRetMethod::CORIRetMethod(const Index & dbIndex, ScoreAccumulator &accumulato
   }
 
   //cout<<tffactor<<"  "<<tfbaseline<<endl;
-  COUNT_T dc = ind.docCount();
+  lemur::api::COUNT_T dc = ind.docCount();
 
   cwRatio = new double[dc];
 

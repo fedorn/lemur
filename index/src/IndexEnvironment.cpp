@@ -245,7 +245,7 @@ void indri::api::IndexEnvironment::addFile( const std::string& fileName, const s
       if( _callback ) (*_callback)( indri::api::IndexStatus::FileClose, fileName, _error, _documentsIndexed, _documentsSeen );
 
       iterator->close();
-    } catch( Exception& e ) {
+    } catch( lemur::api::Exception& e ) {
       if( iterator )
         iterator->close();
 

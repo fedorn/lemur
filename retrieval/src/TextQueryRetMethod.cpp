@@ -14,7 +14,7 @@
 #include "RetParamManager.hpp"
 #include "DocInfoList.hpp"
 
-TextQueryRetMethod::TextQueryRetMethod(const Index &ind, 
+lemur::api::TextQueryRetMethod::TextQueryRetMethod(const Index &ind, 
 				       ScoreAccumulator & accumulator)  : 
   RetrievalMethod(ind), scAcc(accumulator) {
   // have to fix this to be passed in.
@@ -29,19 +29,19 @@ TextQueryRetMethod::TextQueryRetMethod(const Index &ind,
   }
 }
 
-void TextQueryRetMethod::scoreCollection(DOCID_T docID, 
+void lemur::api::TextQueryRetMethod::scoreCollection(DOCID_T docID, 
 					 IndexedRealVector &results){
   QueryRep *rep = computeTextQueryRep(docID);
   scoreCollection(*rep, results);
   delete(rep);
 }
 //fix this to pass scoreAll down.
-void TextQueryRetMethod::scoreCollection(const QueryRep &qry, 
+void lemur::api::TextQueryRetMethod::scoreCollection(const QueryRep &qry, 
 					 IndexedRealVector &results) {
   scoreInvertedIndex(qry, results);
 }
 
-void TextQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
+void lemur::api::TextQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
 					    IndexedRealVector &scores, 
 					    bool scoreAll) {
 
@@ -102,13 +102,13 @@ void TextQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep,
   }
 }
 
-double TextQueryRetMethod::scoreDoc(const QueryRep &qry, DOCID_T docID) {
-  HashFreqVector docVector(ind,docID);
+double lemur::api::TextQueryRetMethod::scoreDoc(const QueryRep &qry, DOCID_T docID) {
+  lemur::utility::HashFreqVector docVector(ind,docID);
   return (scoreDocVector(*((TextQueryRep *)(&qry)),docID,docVector));
 }
 
-double TextQueryRetMethod::scoreDocVector(const TextQueryRep &qRep, DOCID_T docID, 
-					  FreqVector &docVector) {
+double lemur::api::TextQueryRetMethod::scoreDocVector(const TextQueryRep &qRep, DOCID_T docID, 
+                                                      lemur::utility::FreqVector &docVector) {
 
   qRep.startIteration();
   
@@ -135,24 +135,24 @@ double TextQueryRetMethod::scoreDocVector(const TextQueryRep &qRep, DOCID_T docI
 }
 
 #include <float.h> // for -DBL_MAX
-double TextQueryRetMethod::scoreDocPassages(const TermQuery &qry, DOCID_T docID, 
-					    PassageScoreVector &scores, 
+double lemur::api::TextQueryRetMethod::scoreDocPassages(const TermQuery &qry, DOCID_T docID, 
+                                                        lemur::retrieval::PassageScoreVector &scores, 
 					    int psgSize, int overlap) {
   double score = 0, maxScore = -DBL_MAX;
   MatchInfo *matches = MatchInfo::getMatches(ind, qry, docID);
   TextQueryRep *qRep = (TextQueryRep *) computeQueryRep(qry);
   DocumentRep *dRep = computeDocRep(docID);
-  PassageRep *pRep, *myRep;
+  lemur::retrieval::PassageRep *pRep, *myRep;
   // passage start + length needed for ret (alternate vector class).
   int pNum = 1;
   scores.clear();
-  myRep = new PassageRep(*dRep, ind.docLength(docID), psgSize, overlap);
+  myRep = new lemur::retrieval::PassageRep(*dRep, ind.docLength(docID), psgSize, overlap);
   
   // passage info here
   DocInfo *dInfo;
   //  pRep->startPassageIteration();
   //  while (pRep->hasMorePassage()) {
-  for (PassageRep::iterator iter = myRep->begin(), endIter = myRep->end();
+  for (lemur::retrieval::PassageRep::iterator iter = myRep->begin(), endIter = myRep->end();
        iter != endIter;
        iter++) {    
     score = 0;
@@ -167,7 +167,7 @@ double TextQueryRetMethod::scoreDocPassages(const TermQuery &qry, DOCID_T docID,
       delete qTerm;
     }
     score = scoreFunc()->adjustedScore(score, qRep,  pRep);
-    PassageScore s;
+    lemur::retrieval::PassageScore s;
     s.id = pNum++;
     s.start = pRep->getStart();
     s.end = pRep->getEnd();

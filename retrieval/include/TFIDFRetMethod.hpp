@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 
@@ -36,124 +36,124 @@ namespace TFIDFParameter {
   static int defaultHowManyTerms = 50;
   static double defaultPosCoeff = 0.5;
 };
+namespace lemur 
+{
+  namespace retrieval 
+  {
+    
+    /// Representation of a query (as a weighted vector) in the TFIDF method
+    class TFIDFQueryRep : public ArrayQueryRep {
+    public:
+      TFIDFQueryRep(const lemur::api::TermQuery &qry, const lemur::api::Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param);
 
-/// Representation of a query (as a weighted vector) in the TFIDF method
-class TFIDFQueryRep : public ArrayQueryRep {
-public:
-  TFIDFQueryRep(const TermQuery &qry, const Index &dbIndex, double *idfValue, TFIDFParameter::WeightParam &param);
+      virtual ~TFIDFQueryRep() {}
 
-  virtual ~TFIDFQueryRep() {}
+      double queryTFWeight(const double rawTF) const;
+    protected:
+      TFIDFParameter::WeightParam &prm;
+      double *idf;
+      const lemur::api::Index &ind;
+    };
 
-  double queryTFWeight(const double rawTF) const;
-protected:
-  TFIDFParameter::WeightParam &prm;
-  double *idf;
-  const Index &ind;
-};
+    /// Representation of a doc (as a weighted vector) in the TFIDF method
+    class TFIDFDocRep : public lemur::api::DocumentRep {
+    public:
+      TFIDFDocRep(lemur::api::DOCID_T docID, const lemur::api::Index &dbIndex, double *idfValue,
+                  TFIDFParameter::WeightParam &param) : 
+        lemur::api::DocumentRep(docID), ind(dbIndex), prm(param), idf(idfValue) {
+      }
+      virtual ~TFIDFDocRep() { }
+      virtual double termWeight(lemur::api::TERMID_T termID, const lemur::api::DocInfo *info) const{ 
+        return (idf[termID]*docTFWeight(info->termCount())); 
+      }
+      virtual double scoreConstant() const { return 0;}
 
-/// Representation of a doc (as a weighted vector) in the TFIDF method
-class TFIDFDocRep : public DocumentRep {
-public:
-  TFIDFDocRep(DOCID_T docID, const Index &dbIndex, double *idfValue,
-	      TFIDFParameter::WeightParam &param) : 
-    DocumentRep(docID), ind(dbIndex), prm(param), idf(idfValue) {
-  }
-  virtual ~TFIDFDocRep() { }
-  virtual double termWeight(TERMID_T termID, const DocInfo *info) const{ 
-    return (idf[termID]*docTFWeight(info->termCount())); 
-  }
-  virtual double scoreConstant() const { return 0;}
+      double docTFWeight(const double rawTF) const;
+    private:
 
-  double docTFWeight(const double rawTF) const;
-private:
-
-  const Index & ind;
-  TFIDFParameter::WeightParam &prm;
-  double *idf;
-};
-
-
-/// The TFIDF retrieval method with a few TF formula options
-
-class TFIDFRetMethod : public TextQueryRetMethod {
-public:
-
-  TFIDFRetMethod(const Index &dbIndex, ScoreAccumulator &accumulator);
-  virtual ~TFIDFRetMethod() {delete [] idfV; delete scFunc;}
-
-  virtual TextQueryRep *computeTextQueryRep(const TermQuery &qry) {
-    return (new TFIDFQueryRep(qry, ind, idfV, qryTFParam));
-  }
-
-  virtual DocumentRep *computeDocRep(DOCID_T docID) { 
-    return (new TFIDFDocRep(docID, ind, idfV, docTFParam));
-  }
-  virtual ScoreFunction *scoreFunc() {
-    return (scFunc);
-  }
+      const lemur::api::Index & ind;
+      TFIDFParameter::WeightParam &prm;
+      double *idf;
+    };
 
 
-  virtual void updateTextQuery(TextQueryRep &qryRep, const DocIDSet &relDocs);
+    /// The TFIDF retrieval method with a few TF formula options
 
-  void setDocTFParam(TFIDFParameter::WeightParam &docTFWeightParam);
+    class TFIDFRetMethod : public lemur::api::TextQueryRetMethod {
+    public:
 
-  void setQueryTFParam(TFIDFParameter::WeightParam &queryTFWeightParam);
+      TFIDFRetMethod(const lemur::api::Index &dbIndex, lemur::api::ScoreAccumulator &accumulator);
+      virtual ~TFIDFRetMethod() {delete [] idfV; delete scFunc;}
 
-  void setFeedbackParam(TFIDFParameter::FeedbackParam &feedbackParam);
+      virtual lemur::api::TextQueryRep *computeTextQueryRep(const lemur::api::TermQuery &qry) {
+        return (new TFIDFQueryRep(qry, ind, idfV, qryTFParam));
+      }
 
-  static double BM25TF(const double rawTF, const double k1, const double b, 
-		       const double docLen, const double avgDocLen);
+      virtual lemur::api::DocumentRep *computeDocRep(lemur::api::DOCID_T docID) { 
+        return (new TFIDFDocRep(docID, ind, idfV, docTFParam));
+      }
+      virtual lemur::api::ScoreFunction *scoreFunc() {
+        return (scFunc);
+      }
 
-protected:
-  double *idfV;
-  ScoreFunction *scFunc;
+
+      virtual void updateTextQuery(lemur::api::TextQueryRep &qryRep, 
+                                   const lemur::api::DocIDSet &relDocs);
+
+      void setDocTFParam(TFIDFParameter::WeightParam &docTFWeightParam);
+
+      void setQueryTFParam(TFIDFParameter::WeightParam &queryTFWeightParam);
+
+      void setFeedbackParam(TFIDFParameter::FeedbackParam &feedbackParam);
+
+      static double BM25TF(const double rawTF, const double k1, const double b, 
+                           const double docLen, const double avgDocLen);
+
+    protected:
+      double *idfV;
+      lemur::api::ScoreFunction *scFunc;
   
-  /// @name Parameters
-  //@{
+      /// @name Parameters
+      //@{
 
-  TFIDFParameter::WeightParam qryTFParam;
-  TFIDFParameter::WeightParam docTFParam;
-  TFIDFParameter::FeedbackParam fbParam;
+      TFIDFParameter::WeightParam qryTFParam;
+      TFIDFParameter::WeightParam docTFParam;
+      TFIDFParameter::FeedbackParam fbParam;
 
-  //@}
+      //@}
 
-};
+    };
 
 
-inline void TFIDFRetMethod::setDocTFParam(TFIDFParameter::WeightParam &docTFWeightParam)
-{
-  docTFParam = docTFWeightParam;
+    inline void TFIDFRetMethod::setDocTFParam(TFIDFParameter::WeightParam &docTFWeightParam)
+    {
+      docTFParam = docTFWeightParam;
+    }
+
+
+
+    inline void TFIDFRetMethod::setQueryTFParam(TFIDFParameter::WeightParam &queryTFWeightParam)
+    {
+      qryTFParam = queryTFWeightParam;
+    }
+
+
+    inline void TFIDFRetMethod::setFeedbackParam(TFIDFParameter::FeedbackParam &feedbackParam)
+    {
+      fbParam = feedbackParam;
+    }
+
+
+
+    inline double TFIDFRetMethod ::BM25TF(const double rawTF, const double k1, const double b, 
+                                          const double docLen, const  double avgDocLen)
+    {
+      double x= rawTF+k1*(1-b+b*docLen/avgDocLen);
+      return (k1*rawTF/x);
+    }
+ 
+  }
 }
-
-
-
-inline void TFIDFRetMethod::setQueryTFParam(TFIDFParameter::WeightParam &queryTFWeightParam)
-{
-  qryTFParam = queryTFWeightParam;
-}
-
-
-inline void TFIDFRetMethod::setFeedbackParam(TFIDFParameter::FeedbackParam &feedbackParam)
-{
-  fbParam = feedbackParam;
-}
-
-
-
-inline double TFIDFRetMethod ::BM25TF(const double rawTF, const double k1, const double b, 
-		     const double docLen, const  double avgDocLen)
-{
-  double x= rawTF+k1*(1-b+b*docLen/avgDocLen);
-  return (k1*rawTF/x);
-}
-
 
 
 #endif /* _TFIDFRETMETHOD_HPP */
-
-
-
-
-
-
-

@@ -9,25 +9,31 @@
 #ifndef _CTFINDEXER_HPP
 #define _CTFINDEXER_HPP
 
+namespace lemur 
+{
+  namespace distrib 
+  {
+    
+    class CtfIndexer : public lemur::api::TextHandler {
 
-class CtfIndexer : public TextHandler {
+    public:
+      CtfIndexer(const string &csName, int bufferSize, 
+                 bool countStopWords = false);
+      ~CtfIndexer();
 
-public:
-  CtfIndexer(const string &csName, int bufferSize, 
-	     bool countStopWords = false);
-  ~CtfIndexer();
+      char * handleWord(char * word);
 
-  char * handleWord(char * word);
+      void newDb(const string &name);
 
-  void newDb(const string &name);
-
-private:
-  int ctfCount;
-  bool first;
-  InvPushIndex * collsel;
-  DocumentProps * csdp;
-  InvFPTerm * term;
-  bool countStopWds;
-};
+    private:
+      int ctfCount;
+      bool first;
+      lemur::index::InvPushIndex * collsel;
+      lemur::parse::DocumentProps * csdp;
+      lemur::index::InvFPTerm * term;
+      bool countStopWds;
+    };
+  }
+}
 
 #endif

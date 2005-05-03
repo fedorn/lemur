@@ -1814,7 +1814,7 @@ int main()
 #define SYMBOL 8
 #define STYLE 9
 
-IdentifinderParser::IdentifinderParser() {
+lemur::parse::IdentifinderParser::IdentifinderParser() {
   state = OUTER;
   poscount = 0;
   wordpos.setName("position");
@@ -1827,12 +1827,12 @@ IdentifinderParser::IdentifinderParser() {
   iden = identifier;
 }
 
-long IdentifinderParser::fileTell() const {
+long lemur::parse::IdentifinderParser::fileTell() const {
   return idenloc;
 }
 
 void 
-IdentifinderParser::parseFile(const string &filename) {
+lemur::parse::IdentifinderParser::parseFile(const string &filename) {
   parsefile = filename;
   idenloc = 0;
   idenin = fopen(filename.c_str(), "rb");
@@ -1840,7 +1840,7 @@ IdentifinderParser::parseFile(const string &filename) {
   fclose(idenin);
 }
 
-void IdentifinderParser::parseBuffer (char* buf, int len) {
+void lemur::parse::IdentifinderParser::parseBuffer (char* buf, int len) {
   int tpos = idenloc;
   idenloc = 0;
   YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
@@ -1851,7 +1851,7 @@ void IdentifinderParser::parseBuffer (char* buf, int len) {
   idenloc = tpos;
 }
 
-void IdentifinderParser::doParse() {
+void lemur::parse::IdentifinderParser::doParse() {
 
   int tok;
 

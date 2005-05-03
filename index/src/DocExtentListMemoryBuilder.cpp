@@ -111,7 +111,7 @@ void indri::index::DocExtentListMemoryBuilder::_grow() {
 void indri::index::DocExtentListMemoryBuilder::_terminateDocument() {
   assert( _locationCountPointer );
   int locations = _extentFrequency - _lastExtentFrequency;
-  int locationsSize = RVLCompress::compressedSize( locations );
+  int locationsSize = lemur::utility::RVLCompress::compressedSize( locations );
 
   if( locationsSize > 1 ) {
     // have to move everything around to make room, because we need more than
@@ -129,7 +129,7 @@ void indri::index::DocExtentListMemoryBuilder::_terminateDocument() {
   }
 
   // we left one byte around for the location count for the common case
-  RVLCompress::compress_int( _locationCountPointer, locations );
+  lemur::utility::RVLCompress::compress_int( _locationCountPointer, locations );
   _documentFrequency++;
   _lastExtentFrequency = _extentFrequency;
   _locationCountPointer = 0;
@@ -158,7 +158,7 @@ void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( int documentID,
       _terminateDocument();
     
     _documentPointer = _list;
-    _list = RVLCompress::compress_int( _list, documentID - _lastDocument );
+    _list = lemur::utility::RVLCompress::compress_int( _list, documentID - _lastDocument );
     _locationCountPointer = _list;
 
     // leave a byte for location of extent count
@@ -168,13 +168,13 @@ void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( int documentID,
     _lastExtentFrequency = _extentFrequency;
   }
 
-  _list = RVLCompress::compress_int( _list, begin - _lastLocation );
-  _list = RVLCompress::compress_int( _list, end - begin );
+  _list = lemur::utility::RVLCompress::compress_int( _list, begin - _lastLocation );
+  _list = lemur::utility::RVLCompress::compress_int( _list, end - begin );
   _lastLocation = end;
   _extentFrequency++;
 
   if( _numeric )
-    _list = RVLCompress::compress_signed_longlong( _list, number );
+    _list = lemur::utility::RVLCompress::compress_signed_longlong( _list, number );
 
   assert( _locationCountPointer );
   assert( _listBegin < _locationCountPointer );
@@ -192,19 +192,19 @@ size_t indri::index::DocExtentListMemoryBuilder::_compressedSize( int documentID
   size_t size = 0;
 
   if( _lastDocument != documentID ) {
-    size += RVLCompress::compressedSize( documentID - _lastDocument ) + 1;
-    size += RVLCompress::compressedSize( begin );
-    size += RVLCompress::compressedSize( end - begin );
-    size += RVLCompress::compressedSize( _extentFrequency - _lastExtentFrequency ) - 1;
+    size += lemur::utility::RVLCompress::compressedSize( documentID - _lastDocument ) + 1;
+    size += lemur::utility::RVLCompress::compressedSize( begin );
+    size += lemur::utility::RVLCompress::compressedSize( end - begin );
+    size += lemur::utility::RVLCompress::compressedSize( _extentFrequency - _lastExtentFrequency ) - 1;
 
     if( _numeric )
-      size += RVLCompress::signedCompressedSize( number );
+      size += lemur::utility::RVLCompress::signedCompressedSize( number );
   } else {
-    size += RVLCompress::compressedSize( begin - _lastLocation );
-    size += RVLCompress::compressedSize( end - begin );
+    size += lemur::utility::RVLCompress::compressedSize( begin - _lastLocation );
+    size += lemur::utility::RVLCompress::compressedSize( end - begin );
 
     if( _numeric )
-      size += RVLCompress::signedCompressedSize( number );
+      size += lemur::utility::RVLCompress::signedCompressedSize( number );
   }
 
   return size;
@@ -217,7 +217,7 @@ size_t indri::index::DocExtentListMemoryBuilder::_compressedSize( int documentID
 void indri::index::DocExtentListMemoryBuilder::_growAddLocation( int documentID, int begin, int end, INT64 number, size_t newDataSize ) {
   // have to copy the last document if it's not complete, or if there's not enough room to complete it
   bool documentMismatch = (_lastDocument != documentID);
-  bool terminateSpace = (RVLCompress::compressedSize( _extentFrequency - _lastExtentFrequency ) - 1) <= _listEnd - _list;
+  bool terminateSpace = (lemur::utility::RVLCompress::compressedSize( _extentFrequency - _lastExtentFrequency ) - 1) <= _listEnd - _list;
 
   // by terminating the document now, we save a document copy and a bit of space
   if( _locationCountPointer && terminateSpace && documentID != _lastDocument )
@@ -263,7 +263,7 @@ void indri::index::DocExtentListMemoryBuilder::addLocation( int documentID, int 
 void indri::index::DocExtentListMemoryBuilder::flush() {
   if( _locationCountPointer ) {
     // need to terminate document
-    bool terminateSpace = (RVLCompress::compressedSize( _extentFrequency - _lastExtentFrequency ) - 1) <= _listEnd - _list;
+    bool terminateSpace = (lemur::utility::RVLCompress::compressedSize( _extentFrequency - _lastExtentFrequency ) - 1) <= _listEnd - _list;
 
     if( !terminateSpace )
       _grow();

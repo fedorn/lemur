@@ -11,15 +11,15 @@
 
 #include "CORIMergeMethod.hpp"
 
-CORIMergeMethod::CORIMergeMethod(double constA, double constB) {
+lemur::distrib::CORIMergeMethod::CORIMergeMethod(double constA, double constB) {
   A = constA;
   B = constB;
 }
 
-CORIMergeMethod::~CORIMergeMethod() {
+lemur::distrib::CORIMergeMethod::~CORIMergeMethod() {
 }
 
-double CORIMergeMethod::score(double dbscore, double docscore) const {
+double lemur::distrib::CORIMergeMethod::score(double dbscore, double docscore) const {
   return ( docscore + A*dbscore*docscore )/B;  
 }
 

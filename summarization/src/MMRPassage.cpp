@@ -12,36 +12,36 @@
 #include "MMRPassage.hpp"
 #include "Passage.hpp"
 
-void MMRPassage::clear() {
+void lemur::summarization::MMRPassage::clear() {
   psg->erase(psg->begin(), psg->end());
 }  
 
-int MMRPassage::operator<(const Passage &b) const{
+int lemur::summarization::MMRPassage::operator<(const Passage &b) const{
   const MMRPassage* mPsg = dynamic_cast<const MMRPassage*>(&b);
   return (score < mPsg->score);
 }
 
-void MMRPassage::addTerm(termCount term) {
+void lemur::summarization::MMRPassage::addTerm(termCount term) {
   // :TODO: set counts right
   psg->push_back(term);
 }
 
-void MMRPassage::addTerms(const passageVec pv) {
+void lemur::summarization::MMRPassage::addTerms(const passageVec pv) {
   // :TODO: set counts right
   for (int i=0; i<pv.size(); i++) {
     psg->push_back(pv[i]);
   }
 }
 
-const passageVec* MMRPassage::getAsVector(void) const {
+const lemur::summarization::passageVec* lemur::summarization::MMRPassage::getAsVector(void) const {
   return psg;
 }
 
-double MMRPassage::computeMMR(double lambda) const {
+double lemur::summarization::MMRPassage::computeMMR(double lambda) const {
   return lambda*wtSim - (1-lambda)*maxSim;
 }
 
-double MMRPassage::dotProduct(MMRPassage b) const {
+double lemur::summarization::MMRPassage::dotProduct(MMRPassage b) const {
   double retVal = 0.0;
   for(int i=0; i<psg->size(); i++) {
     for(int j=0; j<b.psg->size(); j++) {
@@ -56,7 +56,7 @@ double MMRPassage::dotProduct(MMRPassage b) const {
   return retVal;
 }
 
-void MMRPassage::scale(double val) const {
+void lemur::summarization::MMRPassage::scale(double val) const {
   passageVec::iterator it;
   it = psg->begin();
   while (it < psg->end()) {

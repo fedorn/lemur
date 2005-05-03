@@ -691,7 +691,7 @@ void IndexWriter::_writeInvertedLists( std::vector<WriterIndexContext*>& context
   UINT64 endOffset;
 
   // clear out the term buffer
-  char term[Keyfile::MAX_KEY_LENGTH+1];
+  char term[lemur::file::Keyfile::MAX_KEY_LENGTH+1];
   term[0] = 0;
 
   _documentBase = contexts[0]->index->documentBase();
@@ -704,7 +704,7 @@ void IndexWriter::_writeInvertedLists( std::vector<WriterIndexContext*>& context
 
   indri::utility::greedy_vector<WriterIndexContext*> current;
   indri::index::TermData* termData = ::termdata_create( _fields.size() );
-  char termBuffer[Keyfile::MAX_KEY_LENGTH+1] = {0};
+  char termBuffer[lemur::file::Keyfile::MAX_KEY_LENGTH+1] = {0};
   termData->term = termBuffer;
   _isFrequentCount = 0;
 

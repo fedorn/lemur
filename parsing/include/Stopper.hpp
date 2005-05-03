@@ -7,39 +7,44 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
-#include "TextHandler.hpp"
-#include "WordSet.hpp"
+ */
 
 #ifndef _STOPPER_HPP
 #define _STOPPER_HPP
+#include "TextHandler.hpp"
+#include "WordSet.hpp"
 
-///
-///  Provides a stopword list that can be chained with a Parser using
-///  the TextHandler class. 
-///
+namespace lemur 
+{
+  namespace api
+  {
+    ///
+    ///  Provides a stopword list that can be chained with a Parser using
+    ///  the TextHandler class. 
+    ///
 
-class Stopper : public WordSet, public TextHandler {
+    class Stopper : public lemur::utility::WordSet, public TextHandler {
 
-public:
-  static const string category;
-  static const string identifier;
+    public:
+      static const string category;
+      static const string identifier;
 
-  Stopper();
-  /// Create the stopword list, loading it from file.
-  /// One word per line.
-  Stopper(const string &filename);
+      Stopper();
+      /// Create the stopword list, loading it from file.
+      /// One word per line.
+      Stopper(const string &filename);
 
-  /// Checks to see if a word is a stopword.
-  bool stopWord(const char * word) const;
+      /// Checks to see if a word is a stopword.
+      bool stopWord(const char * word) const;
 
 
-  /// Will replace stopwords with a NULL pointer.
-  /// Words not in the stopword list
-  /// are passed on as is.
-  char *  handleWord(char * word);
+      /// Will replace stopwords with a NULL pointer.
+      /// Words not in the stopword list
+      /// are passed on as is.
+      char *  handleWord(char * word);
   
-  void writePropertyList(PropertyList* list) const;
-};
-
+      void writePropertyList(lemur::parse::PropertyList* list) const;
+    };
+  }
+}
 #endif

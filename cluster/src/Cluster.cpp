@@ -16,8 +16,9 @@
 #include "OfflineCluster.hpp"
 #include "IndexedReal.hpp"
 // The Cluster object.
+using namespace lemur::api;
 
-Cluster::Cluster(int cid, const Index &db, const SimilarityMethod &sim) :
+lemur::cluster::Cluster::Cluster(int cid, const lemur::api::Index &db, const SimilarityMethod &sim) :
 id(cid), ind(db), similarity(sim) {
   char myName[NAMESIZE];
   sprintf(myName, "%d", id);
@@ -25,25 +26,25 @@ id(cid), ind(db), similarity(sim) {
   size = 0;
 }
 
-Cluster::~Cluster() {
+lemur::cluster::Cluster::~Cluster() {
 }
 
-void Cluster::setId(int cid) {
+void lemur::cluster::Cluster::setId(int cid) {
   id = cid;
 }
-void Cluster::setName(const string &newName){
+void lemur::cluster::Cluster::setName(const string &newName){
   name = newName;
 }
 
-int Cluster::getId() const { return id; }
+int lemur::cluster::Cluster::getId() const { return id; }
 
-const string &Cluster::getName() const { 
+const string &lemur::cluster::Cluster::getName() const { 
   return (name); 
 }
    
-const vector <ClusterElt> *Cluster::getIds() const { return &ids; }
+const vector <lemur::cluster::ClusterElt> *lemur::cluster::Cluster::getIds() const { return &ids; }
 
-vector<DOCID_T> Cluster::getDocIds() const {
+vector<DOCID_T> lemur::cluster::Cluster::getDocIds() const {
   vector<DOCID_T> res;
   for (vector<ClusterElt>::const_iterator it = ids.begin();
        it != ids.end(); it++) 
@@ -52,12 +53,12 @@ vector<DOCID_T> Cluster::getDocIds() const {
   return res;
 }
 
-void Cluster::add(const ClusterElt &elt) {
+void lemur::cluster::Cluster::add(const ClusterElt &elt) {
   ids.push_back(elt);
   size++;
 }
 
-void Cluster::add(vector<DOCID_T> docids) {
+void lemur::cluster::Cluster::add(vector<lemur::api::DOCID_T> docids) {
   ClusterElt fred;
   for (int i = 0; i < docids.size(); i++) {
     fred.id = docids[i];
@@ -66,14 +67,14 @@ void Cluster::add(vector<DOCID_T> docids) {
   }
 }
 
-void Cluster::merge(const Cluster *c) {
+void lemur::cluster::Cluster::merge(const Cluster *c) {
   const vector <ClusterElt> *newIds = c->getIds();
   for (vector<ClusterElt>::const_iterator it = newIds->begin();
        it != newIds->end(); it++)
     add(*it);
 }
 
-vector<Cluster *> Cluster::split(int numParts) {
+vector<lemur::cluster::Cluster *> lemur::cluster::Cluster::split(int numParts) {
   vector<Cluster *> *clusters;
   // Need to pass in other parameters here.
   OfflineCluster *cdb = new OfflineCluster(ind);
@@ -84,7 +85,7 @@ vector<Cluster *> Cluster::split(int numParts) {
   return results;
 }
 
-void Cluster::remove(const ClusterElt &elt) {
+void lemur::cluster::Cluster::remove(const ClusterElt &elt) {
   vector<ClusterElt>::iterator it = ids.begin();
   while (it != ids.end() && 
 	 ((*it).myType != elt.myType || (*it).id != elt.id)) it++;
@@ -93,7 +94,7 @@ void Cluster::remove(const ClusterElt &elt) {
   size--;
 }
 
-bool Cluster::read(ifstream &in) {
+bool lemur::cluster::Cluster::read(ifstream &in) {
   if (in.eof())
     return false;
   int len, nameLen;
@@ -124,7 +125,7 @@ bool Cluster::read(ifstream &in) {
   return true;
 }
 
-void Cluster::write(ofstream &out){
+void lemur::cluster::Cluster::write(ofstream &out){
   int len = ids.size();
   int nameLen = name.size();
   out.write((char *) &id, sizeof(int));
@@ -136,7 +137,7 @@ void Cluster::write(ofstream &out){
     out.write((char *) &(*it), sizeof(ClusterElt));
 }
 
-void Cluster::print() const {
+void lemur::cluster::Cluster::print() const {
   cout << getName() << "(" << getId() << "): ";
   for (vector<ClusterElt>::const_iterator it = ids.begin();
        it != ids.end(); it++) {
@@ -148,7 +149,7 @@ void Cluster::print() const {
   cout << endl;
 }
 
-string Cluster::getKeyWords(int maxTerms) const {
+string lemur::cluster::Cluster::getKeyWords(int maxTerms) const {
   double maxtf = 0, df = 0;
   COUNT_T numTerms = ind.termCountUnique(); 
   IndexedRealVector results(numTerms); 

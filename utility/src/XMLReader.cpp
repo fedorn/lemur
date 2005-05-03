@@ -223,7 +223,7 @@ int indri::xml::XMLReader::_findClosingTag( const char* buffer, int start, int f
         done = true;
       }
     }
-  } catch( Exception& e ) {
+  } catch( lemur::api::Exception& e ) {
     LEMUR_RETHROW( e, std::string() + "Caught an error while looking for an end tag for '" + openingTagName + "'" );
   }
 

@@ -17,21 +17,21 @@
 
 /// Cosine similarity method.
 /// Precomputes the idf values for the collection.
-CosSim::CosSim(const Index &dbIndex) :ind(dbIndex) {
+lemur::cluster::CosSim::CosSim(const lemur::api::Index &dbIndex) :ind(dbIndex) {
   // pre-compute IDF values
   numTerms = dbIndex.termCountUnique();
   numDocs = dbIndex.docCount();
   idfV = new double[numTerms + 1];
-  for (COUNT_T i=1; i <= numTerms; i++) {
+  for (lemur::api::COUNT_T i=1; i <= numTerms; i++) {
     idfV[i] = log((numDocs + 1)/(0.5 + dbIndex.docCount(i)));
     }
   }
   
-CosSim::~CosSim() {
+lemur::cluster::CosSim::~CosSim() {
   delete[](idfV);
 }
 
-double CosSim::similarity(const ClusterRep *vec1, const ClusterRep *vec2) 
+double lemur::cluster::CosSim::similarity(const lemur::cluster::ClusterRep *vec1, const lemur::cluster::ClusterRep *vec2) 
   const {
   // Assume they are already idf weighted
   double norm = sqrt (vec1->sum2() * vec2->sum2());

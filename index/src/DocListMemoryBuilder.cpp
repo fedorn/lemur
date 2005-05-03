@@ -111,7 +111,7 @@ void indri::index::DocListMemoryBuilder::_grow() {
 inline void indri::index::DocListMemoryBuilder::_terminateDocument() {
   assert( _locationCountPointer );
   int locations = _termFrequency - _lastTermFrequency;
-  int locationsSize = RVLCompress::compressedSize( locations );
+  int locationsSize = lemur::utility::RVLCompress::compressedSize( locations );
 
   if( locationsSize > 1 ) {
     // have to move everything around to make room, because we need more than
@@ -129,7 +129,7 @@ inline void indri::index::DocListMemoryBuilder::_terminateDocument() {
   }
 
   // we left one byte around for the location count for the common case
-  RVLCompress::compress_int( _locationCountPointer, locations );
+  lemur::utility::RVLCompress::compress_int( _locationCountPointer, locations );
   _documentFrequency++;
   _lastTermFrequency = _termFrequency;
   _locationCountPointer = 0;
@@ -148,7 +148,7 @@ inline void indri::index::DocListMemoryBuilder::_safeAddLocation( int position )
   assert( !_locationCountPointer || _listEnd > _locationCountPointer );
   assert( !_locationCountPointer || _list > _locationCountPointer );
 
-  _list = RVLCompress::compress_int( _list, position - _lastLocation );
+  _list = lemur::utility::RVLCompress::compress_int( _list, position - _lastLocation );
   _lastLocation = position;
   _termFrequency++;
 
@@ -171,7 +171,7 @@ void indri::index::DocListMemoryBuilder::startDocument( int documentID ) {
     _grow();
 
   _documentPointer = _list;
-  _list = RVLCompress::compress_int( _list, documentID - _lastDocument );
+  _list = lemur::utility::RVLCompress::compress_int( _list, documentID - _lastDocument );
   _locationCountPointer = _list;    
   _list++;
   _lastDocument = documentID;
@@ -187,7 +187,7 @@ void indri::index::DocListMemoryBuilder::endDocument() {
 
   // comparison to constant saves some work in the common case
   if( remaining < TERMINATE_SPACE &&
-      remaining < ((size_t)RVLCompress::compressedSize( _termFrequency - _lastTermFrequency ) - 1) )
+      remaining < ((size_t)lemur::utility::RVLCompress::compressedSize( _termFrequency - _lastTermFrequency ) - 1) )
   {
     _grow();
   }
@@ -205,7 +205,7 @@ void indri::index::DocListMemoryBuilder::addLocation( int position ) {
   assert( remaining < (MIN_SIZE<<(GROW_TIMES+1)) );
 
   if( remaining < LOCATION_SPACE ) {
-    size_t size = RVLCompress::compressedSize( position - _lastLocation );
+    size_t size = lemur::utility::RVLCompress::compressedSize( position - _lastLocation );
 
     if( remaining < size ) {
       _grow();
@@ -225,7 +225,7 @@ void indri::index::DocListMemoryBuilder::addLocation( int position ) {
 void indri::index::DocListMemoryBuilder::flush() {
   if( _locationCountPointer ) {
     // need to terminate document
-    bool terminateSpace = (RVLCompress::compressedSize( _termFrequency - _lastTermFrequency ) - 1) <= _listEnd - _list;
+    bool terminateSpace = (lemur::utility::RVLCompress::compressedSize( _termFrequency - _lastTermFrequency ) - 1) <= _listEnd - _list;
 
     if( !terminateSpace )
       _grow();

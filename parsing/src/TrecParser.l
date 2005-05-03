@@ -97,7 +97,7 @@ long trecpos;
 #define DOC 1
 #define TEXT 9
 
-TrecParser::TrecParser() {
+lemur::parse::TrecParser::TrecParser() {
   state = OUTER;
 // tags for signaling the beginning and ending of an element
 // for ElemDocMgr, actual tag values don't matter as long as 
@@ -110,11 +110,11 @@ TrecParser::TrecParser() {
 }
 
 
-long TrecParser::fileTell() const {
+long lemur::parse::TrecParser::fileTell() const {
   return trecpos;
 }
 
-void TrecParser::parseFile(const string &filename) {  
+void lemur::parse::TrecParser::parseFile(const string &filename) {  
   parsefile = filename;
   trecpos = 0;
   trecin = fopen(filename.c_str(), "rb");
@@ -122,7 +122,7 @@ void TrecParser::parseFile(const string &filename) {
   fclose(trecin);
 }
 
-void TrecParser::parseBuffer(char* buf, int len) {
+void lemur::parse::TrecParser::parseBuffer(char* buf, int len) {
   int tpos = trecpos;
   trecpos = 0;
   YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
@@ -133,7 +133,7 @@ void TrecParser::parseBuffer(char* buf, int len) {
   trecpos = tpos;
 }
 
-void TrecParser::doParse() {
+void lemur::parse::TrecParser::doParse() {
   int tok;
   // The core loop of the parser.
   // The parser is state based.  Encountering a tag

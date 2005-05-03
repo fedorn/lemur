@@ -13,8 +13,9 @@
  */
 
 #include "StructQueryRep.hpp"
+using namespace lemur::api;
 
-QnList * StructQueryRep::getChildren(const TermQuery &qry, getFunc getFn, 
+lemur::retrieval::QnList * lemur::retrieval::StructQueryRep::getChildren(const TermQuery &qry, getFunc getFn, 
 					bool weigh) {
   const Term *tok;
   QueryNode *qn;
@@ -29,7 +30,7 @@ QnList * StructQueryRep::getChildren(const TermQuery &qry, getFunc getFn,
 	qParent->setEntries(cnt);
 	return chlist;
       } else {
-	cerr << "StructQueryRep::getChildren: Unmatched Parentheses" << endl;
+	cerr << "lemur::retrieval::StructQueryRep::getChildren: Unmatched Parentheses" << endl;
 	exit(1);
       }
     } else {
@@ -50,7 +51,7 @@ QnList * StructQueryRep::getChildren(const TermQuery &qry, getFunc getFn,
   return chlist;
 }
 
-QueryNode * StructQueryRep::getProxQryNode(const TermQuery &qry, const Term *tok, double w) {
+lemur::retrieval::QueryNode * lemur::retrieval::StructQueryRep::getProxQryNode(const TermQuery &qry, const Term *tok, double w) {
   // using a separate function for parsing proximity ops
   // because they allow only proximity children
   QueryNode *qn;
@@ -72,7 +73,7 @@ QueryNode * StructQueryRep::getProxQryNode(const TermQuery &qry, const Term *tok
     tok = qry.nextTerm();
     qn = new OdnQNode(size, 1.0, dw);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getProxQryNode));
     // get the list of doc's in which contain all query terms
     qn->updateDocList(numDocs);
     return qn;
@@ -85,7 +86,7 @@ QueryNode * StructQueryRep::getProxQryNode(const TermQuery &qry, const Term *tok
     tok = qry.nextTerm();
     qn = new UwnQNode(size, 1.0, dw);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getProxQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -95,7 +96,7 @@ QueryNode * StructQueryRep::getProxQryNode(const TermQuery &qry, const Term *tok
     tok = qry.nextTerm();
     qn = new SynQNode(1.0, dw);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getProxQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -105,7 +106,7 @@ QueryNode * StructQueryRep::getProxQryNode(const TermQuery &qry, const Term *tok
     tok = qry.nextTerm();
     qn = new PropQNode(w, dw);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getProxQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -118,7 +119,7 @@ QueryNode * StructQueryRep::getProxQryNode(const TermQuery &qry, const Term *tok
 }
 
 
-QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok, 
+lemur::retrieval::QueryNode * lemur::retrieval::StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok, 
 				       double w) {
 
   QueryNode *qn;
@@ -137,7 +138,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -146,7 +147,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -155,7 +156,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -164,7 +165,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getQryNode));
     // #NOT has to eval every document individually
     DOCID_T i, dc = numDocs + 1;
     bool *didList = new bool[dc];
@@ -181,7 +182,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -190,7 +191,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -199,7 +200,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -208,7 +209,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -217,7 +218,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     // skip the next token which must be LPAREN
     tok = qry.nextTerm();
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -226,7 +227,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     tok = qry.nextTerm();
     qn = new WsumQnode(w);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode, true));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getQryNode, true));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -238,7 +239,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     tok = qry.nextTerm();
     qn = new OdnQNode(size, w, dw);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getProxQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -250,7 +251,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     tok = qry.nextTerm();
     qn = new UwnQNode(size, w, dw);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getProxQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -263,7 +264,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     qn = new PassageQNode(size, w);
     qStack[topqStack++] = qn;
     // passage op allows any kind of children qnodes
-    qn->setChildren(getChildren(qry, &StructQueryRep::getQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -273,7 +274,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     tok = qry.nextTerm();
     qn = new SynQNode(w, dw);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getProxQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -283,7 +284,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
     tok = qry.nextTerm();
     qn = new PropQNode(w, dw);
     qStack[topqStack++] = qn;
-    qn->setChildren(getChildren(qry, &StructQueryRep::getProxQryNode));
+    qn->setChildren(getChildren(qry, &lemur::retrieval::StructQueryRep::getProxQryNode));
     qn->updateDocList(numDocs);
     return qn;
   }
@@ -294,7 +295,7 @@ QueryNode * StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok,
   }
 }
 
-StructQueryRep::StructQueryRep(const TermQuery &qry, const Index &dbIndex, 
+lemur::retrieval::StructQueryRep::StructQueryRep(const TermQuery &qry, const Index &dbIndex, 
 			       double dbelief):
   topqStack(0), dw(dbelief), ind(dbIndex) {
   for (int i = 0; i < 100; i++)

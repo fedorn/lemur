@@ -24,7 +24,7 @@
 #include "KeyfileIncIndex.hpp"
 #include <string>
 
-KeyfileTextHandler::KeyfileTextHandler( KeyfileIncIndex* index, 
+lemur::parse::KeyfileTextHandler::KeyfileTextHandler( lemur::index::KeyfileIncIndex* index, 
 					bool countStops) :
   _index( index ), countStopWds(countStops)
 {
@@ -34,7 +34,7 @@ KeyfileTextHandler::KeyfileTextHandler( KeyfileIncIndex* index,
   first = true;
 }
 
-KeyfileTextHandler::~KeyfileTextHandler() {
+lemur::parse::KeyfileTextHandler::~KeyfileTextHandler() {
   // end the doc and close the collection
   if (!first) {
     endDoc(); // if we haven't done any yet, don't bother.
@@ -45,14 +45,14 @@ KeyfileTextHandler::~KeyfileTextHandler() {
 }
 
 void
-KeyfileTextHandler::endDoc() {
+lemur::parse::KeyfileTextHandler::endDoc() {
   dp->length(docLength);
   _index->endDoc(dp);
   dp->stringID(NULL);
 }
 
 void
-KeyfileTextHandler::endCollection() {
+lemur::parse::KeyfileTextHandler::endCollection() {
   // write out properties from chain, excluding this 
   BasicCollectionProps* props = new BasicCollectionProps();
   if (!props) {
@@ -60,7 +60,7 @@ KeyfileTextHandler::endCollection() {
     return;
   }
   
-  TextHandler* temphandler = this->getPrevHandler();
+  lemur::api::TextHandler* temphandler = this->getPrevHandler();
   while (temphandler) {
     temphandler->writePropertyList(props);
     temphandler = temphandler->getPrevHandler();
@@ -71,7 +71,7 @@ KeyfileTextHandler::endCollection() {
 }
 
 char * 
-KeyfileTextHandler::handleDoc(char * docno) {
+lemur::parse::KeyfileTextHandler::handleDoc(char * docno) {
   // finish the old doc  
   if (!first) {
     endDoc();
@@ -92,8 +92,8 @@ KeyfileTextHandler::handleDoc(char * docno) {
 }
 
 char * 
-KeyfileTextHandler::handleWord(char * word) {
-  InvFPTerm term;
+lemur::parse::KeyfileTextHandler::handleWord(char * word) {
+  lemur::index::InvFPTerm term;
   bool success = false;
   if (word != NULL) {
     // don't ignore words based on length
@@ -111,6 +111,6 @@ KeyfileTextHandler::handleWord(char * word) {
   return word;
 }
 
-void KeyfileTextHandler::setDocManager(const string &mgrID) {
+void lemur::parse::KeyfileTextHandler::setDocManager(const string &mgrID) {
     _index->setDocManager(mgrID);
   }

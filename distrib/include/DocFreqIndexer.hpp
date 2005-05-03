@@ -1,3 +1,5 @@
+#ifndef _DOCFREQINDEXER_HPP
+#define _DOCFREQINDEXER_HPP
 
 #include "TextHandler.hpp"
 #include "InvPushIndex.hpp"
@@ -6,45 +8,49 @@
 
 #include <stdio.h>
 
-#ifndef _DOCFREQINDEXER_HPP
-#define _DOCFREQINDEXER_HPP
+
+namespace lemur 
+{
+  namespace distrib
+  {
+    
+    class DocFreqIndexer : public lemur::api::TextHandler {
+
+    public:
+      DocFreqIndexer(const string &csName, const string &cwName, 
+                     const string &ssName, int bufferSize, 
+                     bool countStopWords = false);
+      ~DocFreqIndexer();
+
+      char * handleDoc(char * docno);
+      char * handleWord(char * word);
+      void handleEndDoc();
+
+      void newDb(const string &name);
 
 
-class DocFreqIndexer : public TextHandler {
 
-public:
-  DocFreqIndexer(const string &csName, const string &cwName, 
-		 const string &ssName, int bufferSize, 
-		 bool countStopWords = false);
-  ~DocFreqIndexer();
-
-  char * handleDoc(char * docno);
-  char * handleWord(char * word);
-  void handleEndDoc();
-
-  void newDb(const string &name);
-
-
-
-private:
+    private:
   
-  int cw;
-  int dfCount;
-  bool first;
+      int cw;
+      int dfCount;
+      bool first;
 
-  InvPushIndex * collsel;
+      lemur::index::InvPushIndex * collsel;
 
-  DocumentProps * csdp;
-  InvFPTerm * term;
+      lemur::parse::DocumentProps * csdp;
+      lemur::index::InvFPTerm * term;
 
-  WordSet docWords;
+      lemur::utility::WordSet docWords;
 
-  FILE * collWords;
-  FILE * serverSizes;
-  int numDocs;
+      FILE * collWords;
+      FILE * serverSizes;
+      int numDocs;
   
-  bool countStopWds;
+      bool countStopWds;
 
-};
+    };
+  }
+}
 
 #endif

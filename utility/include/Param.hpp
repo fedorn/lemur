@@ -14,7 +14,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
  ** 02/2005 -- dmf Rework to use indri Parameters.
-*/
+ */
 
 #ifndef _ParamH_
 #define _ParamH_
@@ -23,33 +23,50 @@
 #include "String.hpp"
 
 // replace with #defines?
-//  Get routines:
-/////////////////////////////////////
-String ParamGetString(const String &s, const String &def);
-String ParamGetString(const String &s, String &value, const String &def);
-String ParamGetString(const String &s);
-int    ParamGet(const String &s, String &value);
-int    ParamGet(const String &s, String &value, const String &def);
-int    ParamGet(const String &s, int &value);
-int    ParamGet(const String &s, int &value, const int &def);
-int    ParamGet(const String &s, double &value);
-int    ParamGet(const String &s, double &value, const double &def);
-int    ParamGet(const String &s, float &value);
-int    ParamGet(const String &s, float &value, const float &def);
-int    ParamGetInt(const String &s, int def);
-int    ParamGetBit(const String &s, int def);
-double ParamGetDouble(const String &s, double def);
-float  ParamGetFloat(const String &s, float def);
-INT64  ParamGetLongLong(const String &s, INT64 def);
+namespace lemur 
+{
+  namespace api
+  {
+    //  Get routines:
+    ///
+    lemur::utility::String ParamGetString(const lemur::utility::String &s, 
+                                          const lemur::utility::String &def);
+    lemur::utility::String ParamGetString(const lemur::utility::String &s, 
+                                          lemur::utility::String &value, 
+                                          const lemur::utility::String &def);
+    lemur::utility::String ParamGetString(const lemur::utility::String &s);
+    int    ParamGet(const lemur::utility::String &s, 
+                    lemur::utility::String &value);
+    int    ParamGet(const lemur::utility::String &s, 
+                    lemur::utility::String &value, 
+                    const lemur::utility::String &def);
+    int    ParamGet(const lemur::utility::String &s, int &value);
+    int    ParamGet(const lemur::utility::String &s, int &value, 
+                    const int &def);
+    int    ParamGet(const lemur::utility::String &s, double &value);
+    int    ParamGet(const lemur::utility::String &s, double &value, 
+                    const double &def);
+    int    ParamGet(const lemur::utility::String &s, float &value);
+    int    ParamGet(const lemur::utility::String &s, float &value, 
+                    const float &def);
+    int    ParamGetInt(const lemur::utility::String &s, int def);
+    int    ParamGetBit(const lemur::utility::String &s, int def);
+    double ParamGetDouble(const lemur::utility::String &s, double def);
+    float  ParamGetFloat(const lemur::utility::String &s, float def);
+    INT64  ParamGetLongLong(const lemur::utility::String &s, INT64 def);
 
-//  Miscellaneous:
-/////////////////////////////////////
-int    ParamPushFile (const String &s);
-String ParamPopFile (void);
-void   ParamDisplay();
+    //  Miscellaneous:
+    ///
+    int    ParamPushFile (const lemur::utility::String &s);
+    lemur::utility::String ParamPopFile (void);
+    void   ParamDisplay();
 
-/// add a parameter value pair. If no parameter file has been pushed,
-/// a new empty Parameters object is put on the stack.
-void ParamSet(const String &key, const String &value);
+    /// \brief Add a parameter value pair. 
+    /// If no parameter file has been pushed,
+    /// a new empty Parameters object is put on the stack.
+    void ParamSet(const lemur::utility::String &key, 
+                  const lemur::utility::String &value);
+  }
+}
 
 #endif

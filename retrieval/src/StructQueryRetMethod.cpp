@@ -15,18 +15,18 @@
 #include "StructQueryRetMethod.hpp"
 #include "StructQryDocRep.hpp"
 
-void StructQueryRetMethod::scoreCollection(const QueryRep &qry, 
+void lemur::api::StructQueryRetMethod::scoreCollection(const QueryRep &qry, 
 					   IndexedRealVector &results) {
   scoreInvertedIndex(qry, results);
 }
 
 
-void StructQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
+void lemur::api::StructQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
 					      IndexedRealVector &scores, 
 					      bool scoreAll) {
   COUNT_T numDocs = ind.docCount();
   COUNT_T i;
-  QueryNode *queryRoot = ((StructQueryRep *)(&qRep))->topnode();
+  lemur::retrieval::QueryNode *queryRoot = ((lemur::retrieval::StructQueryRep *)(&qRep))->topnode();
   scores.clear();  
   // eval the query
   StructQueryScoreFunc * scorer = (StructQueryScoreFunc *)scoreFunc();
@@ -41,9 +41,9 @@ void StructQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep,
   }
 }
 
-double StructQueryRetMethod::scoreDoc(const QueryRep &qry, DOCID_T docID) {
+double lemur::api::StructQueryRetMethod::scoreDoc(const QueryRep &qry, DOCID_T docID) {
   double score = 0;
-  QueryNode *structQR = ((StructQueryRep &)qry).topnode();
+  lemur::retrieval::QueryNode *structQR = ((lemur::retrieval::StructQueryRep &)qry).topnode();
   DocumentRep *dRep = computeDocRep(docID);
   score = ((StructQueryScoreFunc *)scoreFunc())->evalQuery(structQR, dRep);
   delete dRep;

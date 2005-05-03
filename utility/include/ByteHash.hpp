@@ -12,7 +12,14 @@
 
 #ifndef _BYTEHASHH_
 #define _BYTEHASHH_
-
-unsigned int ByteHash(const char *, const int len, const int seed);
+namespace lemur
+{
+  /// Utility and general purpose components.
+  namespace utility
+  {
+    
+    unsigned int ByteHash(const char *, const int len, const int seed);
+  }
+}
 
 #endif

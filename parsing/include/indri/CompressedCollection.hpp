@@ -42,14 +42,14 @@ namespace indri
     private:
       indri::thread::Mutex _lock;
 
-      Keyfile _lookup;
+      lemur::file::Keyfile _lookup;
       indri::file::File _storage;
       indri::file::SequentialWriteBuffer* _output;
       indri::utility::Buffer _positionsBuffer;
       //  struct z_stream_s* _stream;
       z_stream_p _stream;
-      indri::utility::HashTable<const char*, Keyfile*> _reverseLookups;
-      indri::utility::HashTable<const char*, Keyfile*> _forwardLookups;
+      indri::utility::HashTable<const char*, lemur::file::Keyfile*> _reverseLookups;
+      indri::utility::HashTable<const char*, lemur::file::Keyfile*> _forwardLookups;
       String_set* _strings;
 
       void _writePositions( indri::api::ParsedDocument* document, int& keyLength, int& valueLength );

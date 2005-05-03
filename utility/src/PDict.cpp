@@ -22,7 +22,7 @@ struct dictRecord {
   /// length of data
   unsigned int length;
   /// file offset
-  File::offset_type offset;
+  lemur::file::File::offset_type offset;
   /// number of entries.
   int numEntries;
 };
@@ -31,16 +31,16 @@ struct dictRecord {
 // 4 MB per key file.
 #define KEY_CACHE_SIZE 1024 * 1024 * 4
 
-PDict::PDict() : name(""), currentTerm(""), currentVec(NULL), 
+lemur::dictionary::PDict::PDict() : name(""), currentTerm(""), currentVec(NULL), 
 		 usingCounts(false) {
 }
 
-PDict::~PDict() {
+lemur::dictionary::PDict::~PDict() {
   if (! name.empty())
     close();
 }
 
-void PDict::close() {
+void lemur::dictionary::PDict::close() {
   // flush any open list(s)
   flush();
   // flush new stats entry
@@ -51,7 +51,7 @@ void PDict::close() {
   name = "";
 }
 
-bool PDict::open(const string &dictName) {
+bool lemur::dictionary::PDict::open(const string &dictName) {
   bool result = false;
   ifstream tocStream;
   name = dictName;
@@ -90,7 +90,7 @@ bool PDict::open(const string &dictName) {
   return result;
 }
 
-bool PDict::create(const string &dictName) {
+bool lemur::dictionary::PDict::create(const string &dictName) {
   bool result = true;
   name = dictName;
   stats.dictSize = 0;
@@ -104,7 +104,7 @@ bool PDict::create(const string &dictName) {
   return result;
 }
 
-void PDict::writeTOC() const {
+void lemur::dictionary::PDict::writeTOC() const {
   string toc = name + ".dict";
   ofstream tocStream;
   tocStream.open(toc.c_str(), ios::out);
@@ -115,12 +115,12 @@ void PDict::writeTOC() const {
   tocStream.close();
 }
 
-bool PDict::contains(const string &term, Keyfile &keyfile) const {
+bool lemur::dictionary::PDict::contains(const string &term, lemur::file::Keyfile &keyfile) const {
   return (keyfile.getSize(term.c_str()) != -1);
 }
 
 
-DictEntryVector *PDict::getTranslations(const string &term, 
+lemur::dictionary::DictEntryVector *lemur::dictionary::PDict::getTranslations(const string &term, 
 					DictEntryFilter *filter) const {
 
   dictRecord record;
@@ -143,7 +143,7 @@ DictEntryVector *PDict::getTranslations(const string &term,
   return result;
 }
 
-int PDict::numTranslations(const string &term, DictEntryFilter *filter) const {
+int lemur::dictionary::PDict::numTranslations(const string &term, DictEntryFilter *filter) const {
   int result = 0;
   dictRecord record;
   int bitsSize;
@@ -170,20 +170,20 @@ int PDict::numTranslations(const string &term, DictEntryFilter *filter) const {
   return result;
 }
 
-int PDict::getSourceCount() const {
+int lemur::dictionary::PDict::getSourceCount() const {
   return stats.sourceSize;
 }
 
-int PDict::getNumPairs() const {
+int lemur::dictionary::PDict::getNumPairs() const {
   return stats.dictSize;
 }
 
-int PDict::getTargetCount() const { 
+int lemur::dictionary::PDict::getTargetCount() const { 
   // need a hash for target vocab
   return stats.targetSize;
 }
 
-void PDict::flush() {
+void lemur::dictionary::PDict::flush() {
   // store currentVec for currentTerm.
   if (currentVec != NULL && currentVec->numEntries() > 0) {
     // update keyfile record.numEntries
@@ -204,7 +204,7 @@ void PDict::flush() {
   return;
 }
 
-void PDict::add(const string &source, DictEntry &value, 
+void lemur::dictionary::PDict::add(const string &source, DictEntry &value, 
 		double (*compose)(double, double)) {
   // presume current term is cached in mem, flushed once at source change.
   // have to check if there is an existing list at source change,
@@ -245,7 +245,7 @@ void PDict::add(const string &source, DictEntry &value,
   return;
 }
 
-void PDict::remove(const string &source, DictEntry &value) {
+void lemur::dictionary::PDict::remove(const string &source, DictEntry &value) {
   // flush any open lists
   flush();
   currentTerm = "";
@@ -286,7 +286,7 @@ void PDict::remove(const string &source, DictEntry &value) {
   int count;
   found = targetIDs.get(value.target.c_str(), &count, bitsSize, sizeof(int));
   if (found) count--; 
-  else cerr << "PDict::remove: no target. bad things happening" << endl;
+  else cerr << "lemur::dictionary::PDict::remove: no target. bad things happening" << endl;
   if (count == 0) {
     // remove it
     targetIDs.remove(value.target.c_str());
@@ -300,7 +300,7 @@ void PDict::remove(const string &source, DictEntry &value) {
   return;
 }
 
-void PDict::remove(const string &source) {
+void lemur::dictionary::PDict::remove(const string &source) {
   // flush any open lists
   flush();
   currentTerm = "";
@@ -324,7 +324,7 @@ void PDict::remove(const string &source) {
     if (found) 
       count--; 
     else 
-      cerr << "PDict::remove: no target. bad things happening" << endl;
+      cerr << "lemur::dictionary::PDict::remove: no target. bad things happening" << endl;
     if (count == 0) {      
       // remove it
       targetIDs.remove(value.target.c_str());
@@ -345,7 +345,7 @@ void PDict::remove(const string &source) {
   return;
 }
 
-void PDict::write(const string &outputName, const string &delim) {
+void lemur::dictionary::PDict::write(const string &outputName, const string &delim) {
   // need to iterate over keys here.
   // need to cope with multi-char delimiter.
   // need to cope with escaped delimiters in fields.
@@ -389,7 +389,7 @@ void PDict::write(const string &outputName, const string &delim) {
   return;
 }
 
-bool PDict::read(const string &dictName, const string &delim, bool counts) {
+bool lemur::dictionary::PDict::read(const string &dictName, const string &delim, bool counts) {
   // need to cope with multi-char delimiter.
   // need to cope with escaped delimiters in fields.
   usingCounts = counts;
@@ -414,7 +414,7 @@ bool PDict::read(const string &dictName, const string &delim, bool counts) {
   return retval;
 }
 
-void PDict::normalize() {
+void lemur::dictionary::PDict::normalize() {
   // normalize each entry vector
   // update data file.
   // need to iterate over keys here.
@@ -455,7 +455,7 @@ void PDict::normalize() {
 }
 
 
-DictEntryVector *PDict::nextTranslations(string &term, 
+lemur::dictionary::DictEntryVector *lemur::dictionary::PDict::nextTranslations(string &term, 
 					 DictEntryFilter *filter) const {
 
   dictRecord record;
@@ -482,18 +482,18 @@ DictEntryVector *PDict::nextTranslations(string &term,
 }
 
 // DictEntryVector
-DictEntryVector::DictEntryVector(char *buffer, DictEntryFilter *filter) : 
+lemur::dictionary::DictEntryVector::DictEntryVector(char *buffer, DictEntryFilter *filter) : 
   vector<DictEntry>() {
   fromBytes(buffer, filter);  
 }
 
 static double sumFn(double d1, double d2) {return (d1 + d2);}
 
-bool DictEntryVector::addEntry(DictEntry &entry, double (*compose)(double, double)) {
+bool lemur::dictionary::DictEntryVector::addEntry(DictEntry &entry, double (*compose)(double, double)) {
   bool retval = false;
   if (compose == NULL) compose = sumFn;
 
-  DictEntryVector::iterator it = find(begin(), end(), entry);
+  lemur::dictionary::DictEntryVector::iterator it = find(begin(), end(), entry);
   if (it != end()) {
     // compose the prob values into the new entry then overwrite.
     entry.prob = compose((*it).prob, entry.prob);   
@@ -506,9 +506,9 @@ bool DictEntryVector::addEntry(DictEntry &entry, double (*compose)(double, doubl
   return retval;
 }
 
-bool DictEntryVector::removeEntry(DictEntry &entry) {
+bool lemur::dictionary::DictEntryVector::removeEntry(DictEntry &entry) {
   bool retval = false;
-  DictEntryVector::iterator it = find(begin(), end(), entry);
+  lemur::dictionary::DictEntryVector::iterator it = find(begin(), end(), entry);
   if (it != end()) {
     erase(it);
     retval = true;
@@ -516,9 +516,9 @@ bool DictEntryVector::removeEntry(DictEntry &entry) {
   return retval;
 }
 
-char *DictEntryVector::toBytes(int &numBytes) const{
+char *lemur::dictionary::DictEntryVector::toBytes(int &numBytes) const{
   numBytes = sizeof(unsigned int);
-  DictEntryVector::const_iterator it;
+  lemur::dictionary::DictEntryVector::const_iterator it;
   for (it = begin(); it != end(); it++)
     numBytes += (*it).numBytes();
   char *buffer = new char[numBytes];
@@ -526,8 +526,8 @@ char *DictEntryVector::toBytes(int &numBytes) const{
   return buffer;
 }
 
-void DictEntryVector::toBytes(char *buffer) const{
-  DictEntryVector::const_iterator it;
+void lemur::dictionary::DictEntryVector::toBytes(char *buffer) const{
+  lemur::dictionary::DictEntryVector::const_iterator it;
   int consumed;
   char *tmpBuffer = buffer + sizeof(int);
   unsigned int numEntries = 0;
@@ -536,13 +536,13 @@ void DictEntryVector::toBytes(char *buffer) const{
     tmpBuffer += consumed;
     numEntries++;
   }
-  memcpy(buffer, &numEntries, sizeof(unsigned int));
+  std::memcpy(buffer, &numEntries, sizeof(unsigned int));
 }
 
-void DictEntryVector::fromBytes(char *buffer, DictEntryFilter *filter){
+void lemur::dictionary::DictEntryVector::fromBytes(char *buffer, DictEntryFilter *filter){
   DictEntry entry;
   unsigned int numEntries;
-  memcpy(&numEntries, buffer, sizeof(unsigned int));
+  std::memcpy(&numEntries, buffer, sizeof(unsigned int));
   buffer += sizeof(unsigned int);
   for (int i = 0; i < numEntries; i++) {
     int consumed = entry.fromBytes(buffer);
@@ -553,12 +553,12 @@ void DictEntryVector::fromBytes(char *buffer, DictEntryFilter *filter){
   }
 }
 
-int DictEntryVector::numEntries() const {
+int lemur::dictionary::DictEntryVector::numEntries() const {
   return size();
 }
 
-void DictEntryVector::normalize(){
-  DictEntryVector::iterator it;
+void lemur::dictionary::DictEntryVector::normalize(){
+  lemur::dictionary::DictEntryVector::iterator it;
   double sum = 0.0;
   for (it = begin(); it != end(); it++)
     sum += (*it).prob;
@@ -568,11 +568,11 @@ void DictEntryVector::normalize(){
 }
 
 // DictEntry
-DictEntry::DictEntry() {
+lemur::dictionary::DictEntry::DictEntry() {
   prob = 0;
 }
 
-int DictEntry::toBytes(char *buffer) const {
+int lemur::dictionary::DictEntry::toBytes(char *buffer) const {
   char *start = buffer;
   // layout bit record as follows
   // target string size [sizeof(int)]
@@ -581,21 +581,21 @@ int DictEntry::toBytes(char *buffer) const {
   // type
   // prob               sizeof(double)
   int len = target.length();  
-  memcpy(buffer, &len, sizeof(int));
+  std::memcpy(buffer, &len, sizeof(int));
   buffer += sizeof(int);
-  memcpy(buffer, target.c_str(), len);
+  std::memcpy(buffer, target.c_str(), len);
   buffer += len;
   len = type.length();  
-  memcpy(buffer, &len, sizeof(int));
+  std::memcpy(buffer, &len, sizeof(int));
   buffer += sizeof(int);
-  memcpy(buffer, type.c_str(), len);
+  std::memcpy(buffer, type.c_str(), len);
   buffer += len;
-  memcpy(buffer, &prob, sizeof(double));
+  std::memcpy(buffer, &prob, sizeof(double));
   buffer += sizeof(double);
   return (buffer - start);
 }
 
-int DictEntry::numBytes() const {
+int lemur::dictionary::DictEntry::numBytes() const {
   // layout bit record as follows
   // target string size [sizeof(int)]
   // target string
@@ -607,7 +607,7 @@ int DictEntry::numBytes() const {
   return total;
 }
 
-int DictEntry::fromBytes(char *buffer){
+int lemur::dictionary::DictEntry::fromBytes(char *buffer){
   char *start = buffer;
   // layout bit record as follows
   // target string size [sizeof(int)]
@@ -617,24 +617,24 @@ int DictEntry::fromBytes(char *buffer){
   // prob               sizeof(double)
   char tmpString[MAX_TERM_LENGTH];
   int len;
-  memcpy(&len, buffer, sizeof(int));
+  std::memcpy(&len, buffer, sizeof(int));
   buffer += sizeof(int);
-  memcpy(tmpString, buffer, len);
+  std::memcpy(tmpString, buffer, len);
   tmpString[len] = '\0';
   target = tmpString;
   buffer += len;
-  memcpy(&len, buffer, sizeof(int));
+  std::memcpy(&len, buffer, sizeof(int));
   buffer += sizeof(int);
-  memcpy(tmpString, buffer, len);
+  std::memcpy(tmpString, buffer, len);
   tmpString[len] = '\0';
   type = tmpString;
   buffer += len;
-  memcpy(&prob, buffer, sizeof(double));
+  std::memcpy(&prob, buffer, sizeof(double));
   buffer += sizeof(double);
   return (buffer - start);
 }
 
-string DictEntry::toString(string delim) const {
+string lemur::dictionary::DictEntry::toString(string delim) const {
   std::ostringstream retval;
   retval << type << delim << target << delim << prob << delim;
   return retval.str();

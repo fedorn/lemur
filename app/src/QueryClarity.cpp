@@ -110,12 +110,13 @@ In addition, the collection mixture model also recognizes the parameter
 #include "RetParamManager.hpp"
 #include "ResultFile.hpp"
 
+using namespace lemur::api;
 
 namespace LocalParameter {
 
-  String expandedQuery;
-  String initQuery;
-  String feedbackDocuments;
+  string expandedQuery;
+  string initQuery;
+  string feedbackDocuments;
   void get() {
     expandedQuery = ParamGetString("expandedQuery");
     initQuery = ParamGetString("initQuery",""); 
@@ -137,7 +138,7 @@ void QueryClarity(QueryRep *qr, const string& qid, ResultFile &resFile,
   IndexedRealVector *res;
   bool ignoreWeights = true;
   cout << "query : "<< qid << endl;
-  SimpleKLQueryModel *qm = (SimpleKLQueryModel *) qr;
+  lemur::retrieval::SimpleKLQueryModel *qm = (lemur::retrieval::SimpleKLQueryModel *) qr;
 
   if (resFile.findResult(qid, res)) {
     res->Sort();
@@ -172,17 +173,17 @@ int AppMain(int argc, char *argv[]) {
 		    "Can't open index, check parameter index");
   }
 
-  ArrayAccumulator accumulator(ind->docCount());
-  ofstream os(LocalParameter::expandedQuery);
+  lemur::retrieval::ArrayAccumulator accumulator(ind->docCount());
+  ofstream os(LocalParameter::expandedQuery.c_str());
   ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
-  SimpleKLRetMethod *model;
-  model =  new SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, 
+  lemur::retrieval::SimpleKLRetMethod *model;
+  model =  new lemur::retrieval::SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, 
 				 accumulator);
   model->setDocSmoothParam(SimpleKLParameter::docPrm);
   model->setQueryModelParam(SimpleKLParameter::qryPrm);
 
   if(RetrievalParameter::fbDocCount > 0) {
-    ifstream fbdoc(LocalParameter::feedbackDocuments, ios::in);
+    ifstream fbdoc(LocalParameter::feedbackDocuments.c_str(), ios::in);
     if (fbdoc.fail()) {
       throw Exception("AppMain", "can't open the feedback doc file, check parameter value for feedbackDocuments");
     }
@@ -199,19 +200,19 @@ int AppMain(int argc, char *argv[]) {
   // LocalParameter::origQuery.
   DocStream *qryStream;
   ifstream *initQIFS;
-  bool useOrigQuery = (strlen(LocalParameter::initQuery)==0);
+  bool useOrigQuery = (LocalParameter::initQuery.length()==0);
   
   if (useOrigQuery) {
     cerr << "### Expanding the original text query ...\n";
     try {
-      qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+      qryStream = new lemur::parse::BasicDocStream(RetrievalParameter::textQuerySet);
     } catch (Exception &ex) {
        ex.writeMessage(cerr);
        throw Exception("QueryClarity", "Can't open query file, check parameter textQuery");
     }
   } else {
     cerr << "### Expanding the saved initial query ...\n";
-    initQIFS = new ifstream(LocalParameter::initQuery);
+    initQIFS = new ifstream(LocalParameter::initQuery.c_str());
     if (initQIFS->fail()) {
       throw Exception("QueryClarity", "Can't open initial query file");
     } 
@@ -231,7 +232,7 @@ int AppMain(int argc, char *argv[]) {
   } else {
     char qid[1024];
     while ( *initQIFS >> qid) {
-      SimpleKLQueryModel *qm = new SimpleKLQueryModel(*ind);
+      lemur::retrieval::SimpleKLQueryModel *qm = new lemur::retrieval::SimpleKLQueryModel(*ind);
       qm->load(*initQIFS);
       QueryClarity(qm, qid,  resFile, model, os);      
     }

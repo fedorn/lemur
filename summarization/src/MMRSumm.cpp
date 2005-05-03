@@ -11,7 +11,9 @@
 
 #include "MMRSumm.hpp"
 
-void MMRSumm::markPassages(int optLen, const string &qInfo) {
+using namespace lemur::api;
+
+void lemur::summarization::MMRSumm::markPassages(int optLen, const string &qInfo) {
   int oldLen = -1;
   if (optLen != -1) {
     oldLen = summLen;
@@ -34,12 +36,12 @@ void MMRSumm::markPassages(int optLen, const string &qInfo) {
   }    
 }
   
-void MMRSumm::addPassage(Passage &psg) {
+void lemur::summarization::MMRSumm::addPassage(Passage &psg) {
   MMRPassage* mPsg = (MMRPassage*)(&psg);
   doc.push_back(*mPsg);
 }  
 
-void MMRSumm::addDocument(const string &docID) {
+void lemur::summarization::MMRSumm::addDocument(const string &docID) {
 
   int eos = 0;
 
@@ -63,7 +65,7 @@ void MMRSumm::addDocument(const string &docID) {
 }
 
   
-int MMRSumm::fetchPassages(Passage* psgs, int optLen) const {
+int lemur::summarization::MMRSumm::fetchPassages(Passage* psgs, int optLen) const {
   int l, count=0;
   if (optLen >0) {
     l = optLen;
@@ -80,7 +82,7 @@ int MMRSumm::fetchPassages(Passage* psgs, int optLen) const {
   return count;
 }
   
-void MMRSumm::findNextPassage(MMRPassage &psg, const InvFPIndex* idx, 
+void lemur::summarization::MMRSumm::findNextPassage(MMRPassage &psg, const lemur::index::InvFPIndex* idx, 
 			      const TermInfoList* tList, int eos) {
   TermInfo* tEntry;
   psg.clear();
@@ -112,13 +114,13 @@ void MMRSumm::findNextPassage(MMRPassage &psg, const InvFPIndex* idx,
   return;
 }
   
-void MMRSumm::showPassage(const passageVec* psg, const InvFPIndex* idx) const {
+void lemur::summarization::MMRSumm::showPassage(const passageVec* psg, const lemur::index::InvFPIndex* idx) const {
   for (int i=0; i < psg->size(); i++) {
     cout << idx->term((*psg)[i].termID) << " ";
   }
 }
 
-void MMRSumm::showMarkedPassages() const {
+void lemur::summarization::MMRSumm::showMarkedPassages() const {
   for (int i=0; i<doc.size(); i++) {
     if (doc[i].marked > 0) {
       showPassage(doc[i].getAsVector(), idx);
@@ -127,7 +129,7 @@ void MMRSumm::showMarkedPassages() const {
   }
 }
 
-void MMRSumm::summDocument(const string &docID, const int optLen, const string &qInfo) {
+void lemur::summarization::MMRSumm::summDocument(const string &docID, const int optLen, const string &qInfo) {
   int oldLen = -1;
   queryPassage = new MMRPassage(docID);
   if (optLen != -1) {
@@ -168,7 +170,7 @@ void MMRSumm::summDocument(const string &docID, const int optLen, const string &
   
 }  
 
-void MMRSumm::scorePassages(const string &qInfo) {
+void lemur::summarization::MMRSumm::scorePassages(const string &qInfo) {
   // query similarities
   int saveScore = doc.size();
   vector<MMRPassage> docCopy(doc);
@@ -207,12 +209,12 @@ void MMRSumm::scorePassages(const string &qInfo) {
   
 }
 
-void MMRSumm::clear(void) {
+void lemur::summarization::MMRSumm::clear(void) {
   doc.erase(doc.begin(), doc.end());
   iterCount = 1;
 }
 
-int MMRSumm::nextPassage(Passage* psg) const {
+int lemur::summarization::MMRSumm::nextPassage(Passage* psg) const {
   for (int i=0; i<doc.size(); i++) {
     if (doc[i].marked  == iterCount) {
       *psg = doc[i];
@@ -223,11 +225,11 @@ int MMRSumm::nextPassage(Passage* psg) const {
   return 0;
 }
 
-void MMRSumm::iterClear(void) const {
+void lemur::summarization::MMRSumm::iterClear(void) const {
   iterCount = 1;
 }
 
-void MMRSumm::outputSumm(void) const {
+void lemur::summarization::MMRSumm::outputSumm(void) const {
   showMarkedPassages();
 }
 

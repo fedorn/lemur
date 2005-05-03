@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #ifndef _RESULTFILE_HPP
@@ -18,77 +18,76 @@
 #include "IndexedReal.hpp"
 #include "ISet.hpp"
 #include "String.hpp"
-
-/// Hash table entry for storing results
-struct ResultEntry {
-public:
-  String key;
-  unsigned int Hash() const { return key.Hash();}
-  unsigned int hash() const { return Hash();} 
-  bool operator==(const ResultEntry entry) { return (entry.key ==  this->key);}  IndexedRealVector *res;
-};
-
-/// representation of result file 
-
-class ResultFile {
-public:
-  ResultFile(bool TRECFormat = true) : trecFmt (TRECFormat), resTable(NULL) {
-    resTable = new ISet<ResultEntry>(50);
+namespace lemur 
+{
+  namespace utility
+  {
+    /// Hash table entry for storing results
+    struct ResultEntry {
+    public:
+      String key;
+      unsigned int Hash() const { return key.Hash();}
+      unsigned int hash() const { return Hash();} 
+      bool operator==(const ResultEntry entry) { return (entry.key ==  this->key);}
+      lemur::api::IndexedRealVector *res;
+    };
   }
-  
-  ~ResultFile() { delete resTable;}
+}
+namespace lemur 
+{
+  namespace api
+  {
+    /// representation of result file 
 
-  /// Open and associate an input stream for reading, e.g., with getResult function
-  void openForRead(istream &is, Index &index);
+    class ResultFile {
+    public:
+      ResultFile(bool TRECFormat = true) : trecFmt (TRECFormat), resTable(NULL) {
+        resTable = new lemur::utility::ISet<lemur::utility::ResultEntry>(50);
+      }
   
-  /// Load all the results into an internal hash table, so as to allow random access to any of the results.
-  void load(istream &is, Index &index);
+      ~ResultFile() { delete resTable;}
 
-  /// Read the results for a given query from the associated input stream into memory (stored in res), sequential reading, so appropriate order must be maintained and attempting to get the results for a query that has no results will fail.
-  void getResult(const string& expectedQID, IndexedRealVector &res);
-
-  /// Find the results for the given query id, the output variable res gets a pointer to the results, returns true iff found.
-  bool findResult(const string& queryID, IndexedRealVector *&res);
+      /// Open and associate an input stream for reading, e.g., with getResult function
+      void openForRead(istream &is, Index &index);
   
-  /// Associate an output stream for writing results
-  void openForWrite( ostream &os, Index &index) {
+      /// Load all the results into an internal hash table, so as to allow random access to any of the results.
+      void load(istream &is, Index &index);
+
+      /// Read the results for a given query from the associated input stream into memory (stored in res), sequential reading, so appropriate order must be maintained and attempting to get the results for a query that has no results will fail.
+      void getResult(const string& expectedQID, IndexedRealVector &res);
+
+      /// Find the results for the given query id, the output variable res gets a pointer to the results, returns true iff found.
+      bool findResult(const string& queryID, IndexedRealVector *&res);
+  
+      /// Associate an output stream for writing results
+      void openForWrite( ostream &os, Index &index) {
     
-    outStr = &os;
-    ind = &index;
-  }
+        outStr = &os;
+        ind = &index;
+      }
 
-  /// writing the results (stored in <tt> results</tt>) into the associated output stream, up to a maximum count.
+      /// writing the results (stored in <tt> results</tt>) into the associated output stream, up to a maximum count.
 
-  void writeResults(const string& queryID, IndexedRealVector *results, int maxCountOfResult);
+      void writeResults(const string& queryID, IndexedRealVector *results, int maxCountOfResult);
   
-private:
+    private:
 
-  bool readLine();
+      bool readLine();
 
-  bool trecFmt;
+      bool trecFmt;
 
-  //  char curQID[300];
-  string curQID;
-  char curDID[300];
-  double curSC;
-  Index *ind;
-  istream *inStr;
-  ostream *outStr;
-  bool eof;
+      //  char curQID[300];
+      string curQID;
+      char curDID[300];
+      double curSC;
+      Index *ind;
+      istream *inStr;
+      ostream *outStr;
+      bool eof;
 
-  ISet<ResultEntry> * resTable;
+      lemur::utility::ISet<lemur::utility::ResultEntry> * resTable;
 
-};
-
-
+    };
+  }
+}
 #endif /* _RESULTFILE_HPP */
-
-
-
-
-
-
-
-
-
-

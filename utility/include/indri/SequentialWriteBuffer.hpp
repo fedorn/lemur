@@ -98,6 +98,14 @@ namespace indri
         _current.filePosition += bytes;
         _eof = lemur_compat::max( _current.filePosition, _eof );
       }
+
+      void flushRegion( UINT64 start, UINT64 length ) {
+        if( (start+length) >= _current.filePosition &&
+            start <= _current.filePosition + _current.buffer.position() )
+        {
+          flush();
+        }
+      }
     };
   }
 }

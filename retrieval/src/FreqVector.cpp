@@ -11,11 +11,11 @@
 
 #include "FreqVector.hpp"
 
-HashFreqVector::HashFreqVector(const Index &index, DOCID_T docID) 
+lemur::utility::HashFreqVector::HashFreqVector(const lemur::api::Index &index, lemur::api::DOCID_T docID) 
   : CSet<FreqCount, int>(300)
 {
-  TermInfoList *tList = index.termInfoList(docID);
-  TermInfo *info;
+  lemur::api::TermInfoList *tList = index.termInfoList(docID);
+  lemur::api::TermInfo *info;
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
@@ -27,7 +27,7 @@ HashFreqVector::HashFreqVector(const Index &index, DOCID_T docID)
 }
 
 
-bool HashFreqVector::find(TERMID_T ind, int &freq) const 
+bool lemur::utility::HashFreqVector::find(lemur::api::TERMID_T ind, int &freq) const 
 {
   FreqCount c;
   c.key = ind;
@@ -37,7 +37,7 @@ bool HashFreqVector::find(TERMID_T ind, int &freq) const
 }
 
 
-void HashFreqVector::nextFreq(TERMID_T &id, int &freq) const 
+void lemur::utility::HashFreqVector::nextFreq(lemur::api::TERMID_T &id, int &freq) const 
 {
   // get the i-th element
   FreqCount c;

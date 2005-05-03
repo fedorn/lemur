@@ -13,15 +13,15 @@
 #include "WebParser.hpp"
 
 
-InvFPTextHandler::InvFPTextHandler(const string &filename, int bufferSize,
+lemur::parse::InvFPTextHandler::InvFPTextHandler(const string &filename, int bufferSize,
 				   bool countStopWords, int ind) {
   // create index and helper objects  
   if (ind == 0)
-    index = new InvPushIndex(filename, bufferSize);
-  else index = new InvFPPushIndex(filename, bufferSize);
+    index = new lemur::index::InvPushIndex(filename, bufferSize);
+  else index = new lemur::index::InvFPPushIndex(filename, bufferSize);
   //  dp = new DocumentProps();
   dp = NULL;
-  term = new InvFPTerm();
+  term = new lemur::index::InvFPTerm();
   countStopWds = countStopWords;
   docLength = 0;
   pos = 0;
@@ -29,7 +29,7 @@ InvFPTextHandler::InvFPTextHandler(const string &filename, int bufferSize,
   first = true;
 }
 
-InvFPTextHandler::~InvFPTextHandler() {
+lemur::parse::InvFPTextHandler::~InvFPTextHandler() {
   // end the doc and close the collection
   if (!first) endDoc(); // if we haven't done any yet, don't bother.
 
@@ -41,14 +41,14 @@ InvFPTextHandler::~InvFPTextHandler() {
 }
 
 void
-InvFPTextHandler::endDoc() {
+lemur::parse::InvFPTextHandler::endDoc() {
   dp->length(docLength);
   index->endDoc(dp);
   dp->stringID(NULL);
 }
 
 void
-InvFPTextHandler::endCollection() {
+lemur::parse::InvFPTextHandler::endCollection() {
   // write out properties from chain, excluding this 
   BasicCollectionProps* props = new BasicCollectionProps();
   if (!props) {
@@ -56,7 +56,7 @@ InvFPTextHandler::endCollection() {
     return;
   }
   
-  TextHandler* temphandler = this->getPrevHandler();
+  lemur::api::TextHandler* temphandler = this->getPrevHandler();
   while (temphandler) {
     temphandler->writePropertyList(props);
     temphandler = temphandler->getPrevHandler();
@@ -67,7 +67,7 @@ InvFPTextHandler::endCollection() {
 }
 
 char * 
-InvFPTextHandler::handleDoc(char * docno) {
+lemur::parse::InvFPTextHandler::handleDoc(char * docno) {
   // finish the old doc  
   if (!first) {
     endDoc();
@@ -86,7 +86,7 @@ InvFPTextHandler::handleDoc(char * docno) {
 }
 
 char * 
-InvFPTextHandler::handleWord(char * word) {
+lemur::parse::InvFPTextHandler::handleWord(char * word) {
   if (word != NULL) {
     // ignore words longer than 50 characters
     // this ignores junk in some web pages
@@ -108,6 +108,6 @@ InvFPTextHandler::handleWord(char * word) {
 }
 
 
-void InvFPTextHandler::setDocManager(const string &mgrID) {
+void lemur::parse::InvFPTextHandler::setDocManager(const string &mgrID) {
   index->setDocManager(mgrID);
 }

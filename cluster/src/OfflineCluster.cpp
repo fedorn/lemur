@@ -14,7 +14,7 @@
 // Offline clustering algorithms.
 #include "OfflineCluster.hpp"
 
-OfflineCluster::OfflineCluster(const Index &ind,
+lemur::cluster::OfflineCluster::OfflineCluster(const lemur::api::Index &ind,
 			       enum ClusterParam::simTypes simType,
 			       enum ClusterParam::clusterTypes clusterType,
 			       enum ClusterParam::docModes docMode)
@@ -24,12 +24,12 @@ OfflineCluster::OfflineCluster(const Index &ind,
   factory = new ClusterFactory(index, *sim, clusterType, docMode);
 }
 
-OfflineCluster::~OfflineCluster() {
+lemur::cluster::OfflineCluster::~OfflineCluster() {
   delete(sim);
   delete(factory);
 }
 
-Cluster *OfflineCluster::chooseSplit(vector<Cluster *> *working) {
+lemur::cluster::Cluster *lemur::cluster::OfflineCluster::chooseSplit(vector<Cluster *> *working) {
   int tmp, max = 0;
   Cluster *retval = NULL;
   vector<Cluster *>::iterator it, best;
@@ -45,7 +45,7 @@ Cluster *OfflineCluster::chooseSplit(vector<Cluster *> *working) {
   return retval;  
 }
 
-double OfflineCluster::scoreSet(vector<Cluster *> *working) {
+double lemur::cluster::OfflineCluster::scoreSet(vector<Cluster *> *working) {
   double retval = 0;
   if (working != NULL) {
     for (int i = 0; i < working->size(); i++) {
@@ -55,7 +55,7 @@ double OfflineCluster::scoreSet(vector<Cluster *> *working) {
   return retval;
 }
 
-vector<Cluster*> *OfflineCluster::bisecting_kMeans(vector<DOCID_T> docIds, 
+vector<lemur::cluster::Cluster*> *lemur::cluster::OfflineCluster::bisecting_kMeans(vector<lemur::api::DOCID_T> docIds, 
 						  int numParts,
 						  int numIters,
 						  int maxIters) {
@@ -122,12 +122,12 @@ vector<Cluster*> *OfflineCluster::bisecting_kMeans(vector<DOCID_T> docIds,
   return finalClusters;
 }
 
-vector<Cluster*> *OfflineCluster::kMeans(Cluster *cluster, int numParts,
+vector<lemur::cluster::Cluster*> *lemur::cluster::OfflineCluster::kMeans(Cluster *cluster, int numParts,
 					 int maxIters) {
   return kMeans(cluster->getDocIds(), numParts, maxIters);
 }
  
-vector<Cluster*> *OfflineCluster::kMeans(vector<DOCID_T> docIds, int numParts,
+vector<lemur::cluster::Cluster*> *lemur::cluster::OfflineCluster::kMeans(vector<lemur::api::DOCID_T> docIds, int numParts,
 					 int maxIters) {
   vector<Cluster*> *clusters = new vector<Cluster*>;
   // cluster elements
@@ -147,13 +147,13 @@ vector<Cluster*> *OfflineCluster::kMeans(vector<DOCID_T> docIds, int numParts,
   int i;
   for (i = 0; i < numDocs; i++) {
     int docId = docIds[i];
-    TermInfoList *tList = index.termInfoList(docId);
+    lemur::api::TermInfoList *tList = index.termInfoList(docId);
     docReps[i] = new ClusterRep(tList, index);
     sim->weigh(docReps[i]);
     delete(tList);
   }
   // Choose seeds
-  vector <DOCID_T> seeds = selectSeeds(docIds, numParts);  
+  vector <lemur::api::DOCID_T> seeds = selectSeeds(docIds, numParts);  
   for (i = 0; i < numParts; i++){
     // init first pass and second pass arrays.
     firstPass[i] = factory->allocateCluster(i + 1);
@@ -212,7 +212,7 @@ vector<Cluster*> *OfflineCluster::kMeans(vector<DOCID_T> docIds, int numParts,
   return clusters;
 }
 
-bool OfflineCluster::compareClusterSets(Cluster **first, Cluster **second, 
+bool lemur::cluster::OfflineCluster::compareClusterSets(Cluster **first, Cluster **second, 
 					int n) {
   bool match = true;
   for (int i = 0; i < n && match; i++) {
@@ -225,12 +225,12 @@ bool OfflineCluster::compareClusterSets(Cluster **first, Cluster **second,
   return match;
 }
 
-vector <DOCID_T> OfflineCluster::selectSeeds(vector<DOCID_T> docIds, int num) {
+vector <lemur::api::DOCID_T> lemur::cluster::OfflineCluster::selectSeeds(vector<lemur::api::DOCID_T> docIds, int num) {
   // Chose num random elements without duplicates from docIds
   int max = docIds.size() - 1;
   if (max < num) return docIds; // all of them have to go back.
-  vector <DOCID_T> results;
-  vector <DOCID_T> tmp = docIds;
+  vector <lemur::api::DOCID_T> results;
+  vector <lemur::api::DOCID_T> tmp = docIds;
   while (results.size() < num) {
     int idx = rand()%max;
     results.push_back(tmp[idx]);

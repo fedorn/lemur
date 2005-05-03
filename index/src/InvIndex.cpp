@@ -21,7 +21,7 @@
  *
  *========================================================================*/
 
-InvIndex::InvIndex() {
+lemur::index::InvIndex::InvIndex() {
   lookup = NULL;  
   dtlookup = NULL;
   dtfiles = NULL;
@@ -33,7 +33,7 @@ InvIndex::InvIndex() {
   aveDocLen = 0;
 }
 
-InvIndex::InvIndex(const string &indexName) {
+lemur::index::InvIndex::InvIndex(const string &indexName) {
   lookup = NULL;  
   dtlookup = NULL;
   dtfiles = NULL;
@@ -46,7 +46,7 @@ InvIndex::InvIndex(const string &indexName) {
   open(indexName);
 }
 
-InvIndex::~InvIndex() {
+lemur::index::InvIndex::~InvIndex() {
   int i;
   delete[](lookup);
   delete[](dtlookup);
@@ -77,13 +77,13 @@ InvIndex::~InvIndex() {
   delete[](counts);
 }
 
-bool InvIndex::open(const string &indexName){
-  counts = new COUNT_T[5];
+bool lemur::index::InvIndex::open(const string &indexName){
+  counts = new lemur::api::COUNT_T[5];
   names = new string[NAMES_SIZE];  
   names[VERSION_NUM] = "";
   names[DOCMGR_IDS] = "";
 
-  String streamSelect = ParamGetString("stream", "cerr");
+  lemur::utility::String streamSelect = lemur::api::ParamGetString("stream", "cerr");
   if (streamSelect == "cout") {
     setMesgStream(&cout);
   } else {
@@ -95,7 +95,7 @@ bool InvIndex::open(const string &indexName){
     return false;
   }
 
-  dtloaded = ParamGetInt("loadDT", 1);
+  dtloaded = lemur::api::ParamGetInt("loadDT", 1);
 
   if (!dtloaded) {
     *msgstream << "Parameter set to dtlist lookup not being loaded" << endl;
@@ -133,36 +133,36 @@ bool InvIndex::open(const string &indexName){
   return true;
 }
 
-TERMID_T InvIndex::term(const TERM_T &word) const{
-  map<TERM_T, TERMID_T, less<TERM_T> >::iterator point = termtable.find(word);
+lemur::api::TERMID_T lemur::index::InvIndex::term(const lemur::api::TERM_T &word) const{
+  map<lemur::api::TERM_T, lemur::api::TERMID_T, less<lemur::api::TERM_T> >::iterator point = termtable.find(word);
   if (point != termtable.end()) 
     return point->second;
 
   return 0;
 }
 
-const TERM_T InvIndex::term(TERMID_T termID) const {
+const lemur::api::TERM_T lemur::index::InvIndex::term(lemur::api::TERMID_T termID) const {
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS]))
     return "";
   return terms[termID];
 }
 
-DOCID_T InvIndex::document(const EXDOCID_T &docIDStr) const{
-  map<EXDOCID_T, DOCID_T, less<EXDOCID_T> >::iterator point = doctable.find(docIDStr);
+lemur::api::DOCID_T lemur::index::InvIndex::document(const lemur::api::EXDOCID_T &docIDStr) const{
+  map<lemur::api::EXDOCID_T, lemur::api::DOCID_T, less<lemur::api::EXDOCID_T> >::iterator point = doctable.find(docIDStr);
   if (point != doctable.end()) 
     return point->second;
 
   return 0;
 }
 
-const EXDOCID_T InvIndex::document(DOCID_T docID) const { 
+const lemur::api::EXDOCID_T lemur::index::InvIndex::document(lemur::api::DOCID_T docID) const { 
   if ((docID < 0) || (docID > counts[DOCS]))
     return "";
-  return docnames[docID]; 
+  return docnames[docID];
 }
 
-//const char* InvIndex::docManager(int docID) {
-const DocumentManager* InvIndex::docManager(DOCID_T docID) const{
+//const char* lemur::index::InvIndex::docManager(int docID) {
+const lemur::api::DocumentManager* lemur::index::InvIndex::docManager(lemur::api::DOCID_T docID) const{
   // no such thing previous to version 1.9
   if (names[VERSION_NUM].empty()) 
     return NULL;
@@ -183,7 +183,7 @@ const DocumentManager* InvIndex::docManager(DOCID_T docID) const{
   return docmgrs[dtlookup[docID].docmgr]; 
 }
 
-COUNT_T InvIndex::termCount(TERMID_T termID) const{
+lemur::api::COUNT_T lemur::index::InvIndex::termCount(lemur::api::TERMID_T termID) const{
   // the termCount is equal to the position counts
   // this is calculated by the length of the inverted list -(df*2) for each doc, 
   // there is the docid and the tf
@@ -199,11 +199,11 @@ COUNT_T InvIndex::termCount(TERMID_T termID) const{
   return lookup[termID].ctf;
 }
 
-float InvIndex::docLengthAvg() const{
+float lemur::index::InvIndex::docLengthAvg() const{
   return aveDocLen;
 }
 
-COUNT_T InvIndex::docCount(TERMID_T termID)  const{
+lemur::api::COUNT_T lemur::index::InvIndex::docCount(lemur::api::TERMID_T termID)  const{
   if ((termID <0) || (termID > counts[UNIQUE_TERMS])) {
     *msgstream << "Error:  Trying to get docCount for invalid termID" << endl;
     return 0;
@@ -216,7 +216,7 @@ COUNT_T InvIndex::docCount(TERMID_T termID)  const{
   return lookup[termID].df;
 }
 
-COUNT_T InvIndex::docLength(DOCID_T docID) const{
+lemur::api::COUNT_T lemur::index::InvIndex::docLength(lemur::api::DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get docLength for invalid docID." << endl;
     return 0;
@@ -233,7 +233,7 @@ COUNT_T InvIndex::docLength(DOCID_T docID) const{
   return dtlookup[docID].length;
 }
 
-COUNT_T InvIndex::docLengthCounted(DOCID_T docID) const{
+lemur::api::COUNT_T lemur::index::InvIndex::docLengthCounted(lemur::api::DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get docLengthCounted for invalid docID." << endl;
     return 0;
@@ -247,24 +247,24 @@ COUNT_T InvIndex::docLengthCounted(DOCID_T docID) const{
     return 0;
   }
 
-  COUNT_T dl;
-  DOCID_T id;
+  lemur::api::COUNT_T dl;
+  lemur::api::DOCID_T id;
   ifstream *look = &(dtfstreams[dtlookup[docID].fileid]);
   if (!look) {
     *msgstream << "Could not open term indexfile for reading." << endl;
     return 0;
   }
   look->seekg(dtlookup[docID].offset, ios::beg);
-  look->read((char*)&id, sizeof(DOCID_T));
-  look->read((char*)&dl, sizeof(COUNT_T));
-  look->read((char*)&dl, sizeof(COUNT_T));
-  if ( !(look->gcount() == sizeof(COUNT_T)) ) 
+  look->read((char*)&id, sizeof(lemur::api::DOCID_T));
+  look->read((char*)&dl, sizeof(lemur::api::COUNT_T));
+  look->read((char*)&dl, sizeof(lemur::api::COUNT_T));
+  if ( !(look->gcount() == sizeof(lemur::api::COUNT_T)) ) 
     return 0;
   
   return dl/2;
 }
 
-DocInfoList* InvIndex::docInfoList(TERMID_T termID) const{
+lemur::api::DocInfoList* lemur::index::InvIndex::docInfoList(lemur::api::TERMID_T termID) const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS])) {
     *msgstream << "Error:  Trying to get docInfoList for invalid termID" << endl;
     return NULL;
@@ -274,7 +274,7 @@ DocInfoList* InvIndex::docInfoList(TERMID_T termID) const{
     return NULL;
   ifstream *indexin = &(invfstreams[lookup[termID].fileid]);
   indexin->seekg(lookup[termID].offset, ios::beg);
-  DocInfoList* doclist;
+  lemur::api::DocInfoList* doclist;
   InvDocList* dlist = new InvDocList();
   bool success;
 
@@ -292,7 +292,7 @@ DocInfoList* InvIndex::docInfoList(TERMID_T termID) const{
   }
 }
 
-TermInfoList* InvIndex::termInfoList(DOCID_T docID) const{
+lemur::api::TermInfoList* lemur::index::InvIndex::termInfoList(lemur::api::DOCID_T docID) const{
   if ((docID < 0) || (docID > counts[DOCS])) {
     *msgstream << "Error trying to get termInfoList for invalid docID." << endl;
     return NULL;
@@ -307,7 +307,7 @@ TermInfoList* InvIndex::termInfoList(DOCID_T docID) const{
   }
   ifstream *indexin = &(dtfstreams[dtlookup[docID].fileid]);
   indexin->seekg(dtlookup[docID].offset, ios::beg);
-  TermInfoList* termlist;
+  lemur::api::TermInfoList* termlist;
   InvTermList* tlist = new InvTermList();
   if (!tlist->binRead(*indexin)) {
     return NULL;
@@ -319,7 +319,7 @@ TermInfoList* InvIndex::termInfoList(DOCID_T docID) const{
 /*=======================================================================
  * PRIVATE METHODS 
  =======================================================================*/
-bool InvIndex::fullToc(const string &fileName) {
+bool lemur::index::InvIndex::fullToc(const string &fileName) {
   ifstream in(fileName.c_str());
   *msgstream << "Trying to open toc: " << fileName << endl;
   if (!in.is_open()) {
@@ -327,7 +327,7 @@ bool InvIndex::fullToc(const string &fileName) {
     return false;
   }
 
-  Property p;
+  lemur::parse::Property p;
 
   string key,val;
 
@@ -371,7 +371,7 @@ bool InvIndex::fullToc(const string &fileName) {
   return true;
 }
 
-bool InvIndex::indexLookup() {
+bool lemur::index::InvIndex::indexLookup() {
   FILE* in = fopen(names[DOC_LOOKUP].c_str(), "rb");
   *msgstream << "Trying to open invlist lookup: " << names[DOC_LOOKUP] << endl;
   if (in == NULL) {
@@ -381,11 +381,11 @@ bool InvIndex::indexLookup() {
 
   lookup = new inv_entry[counts[UNIQUE_TERMS]+1];
   inv_entry* e;
-  TERMID_T tid =0;
-  FILEID_T fid =0;
+  lemur::api::TERMID_T tid =0;
+  lemur::api::FILEID_T fid =0;
   long off =0;
-  COUNT_T ctf = 0;
-  COUNT_T df = 0;
+  lemur::api::COUNT_T ctf = 0;
+  lemur::api::COUNT_T df = 0;
   // if COUNT_T changes, this needs to be changed...
   while (fscanf(in, "%d %d %d %d %d", &tid, &fid, &off, &ctf, &df) == 5) {
     e = &lookup[tid];
@@ -399,7 +399,7 @@ bool InvIndex::indexLookup() {
   return true;
 }
 
-bool InvIndex::dtLookup_ver1() {
+bool lemur::index::InvIndex::dtLookup_ver1() {
   FILE* in = fopen(names[TERM_LOOKUP].c_str(), "rb");
   *msgstream << "Trying to open dtlist lookup: " 
 	     << names[TERM_LOOKUP] << endl;
@@ -410,8 +410,8 @@ bool InvIndex::dtLookup_ver1() {
 
   dtlookup = new dt_entry[counts[DOCS]+1];
   dt_entry* e;
-  TERMID_T tid =0;
-  FILEID_T fid =0;
+  lemur::api::TERMID_T tid =0;
+  lemur::api::FILEID_T fid =0;
   long off =0;
   int len =0;
   while (fscanf(in, "%d %d %d %d", &tid, &fid, &off, &len) == 4) {
@@ -424,7 +424,7 @@ bool InvIndex::dtLookup_ver1() {
   return true;
 }
 
-bool InvIndex::dtLookup() {
+bool lemur::index::InvIndex::dtLookup() {
   *msgstream << "Trying to open dtlist lookup: " << names[TERM_LOOKUP] << endl;
 
   FILE* in = fopen(names[TERM_LOOKUP].c_str(), "rb");
@@ -436,8 +436,8 @@ bool InvIndex::dtLookup() {
 
   dtlookup = new dt_entry[counts[DOCS]+1];
   dt_entry* e;
-  TERMID_T tid =0;
-  FILEID_T fid =0;
+  lemur::api::TERMID_T tid =0;
+  lemur::api::FILEID_T fid =0;
   long off =0;
   int len =0;
   int mgr =0;
@@ -452,7 +452,7 @@ bool InvIndex::dtLookup() {
   return true;
 }
 
-bool InvIndex::dtFileIDs() {
+bool lemur::index::InvIndex::dtFileIDs() {
   FILE* in = fopen(names[TERM_INDEX].c_str(), "rb");
   *msgstream << "Trying to open term index filenames: " << names[TERM_INDEX] << endl;
   if (in == NULL) {
@@ -488,7 +488,7 @@ bool InvIndex::dtFileIDs() {
   return true;
 }
 
-bool InvIndex::docMgrIDs() {
+bool lemur::index::InvIndex::docMgrIDs() {
   FILE* in = fopen(names[DOCMGR_IDS].c_str(), "r");
   *msgstream << "Trying to open doc manager ids file: " << names[DOCMGR_IDS] << endl;
   if (in == NULL) {
@@ -509,7 +509,7 @@ bool InvIndex::docMgrIDs() {
       continue;
     }
     str[len] = '\0';
-    DocumentManager* dm = DocMgrManager::openDocMgr(str);
+    lemur::api::DocumentManager* dm = lemur::api::DocMgrManager::openDocMgr(str);
     docmgrs.push_back(dm);
     delete[]str;
   }
@@ -517,7 +517,7 @@ bool InvIndex::docMgrIDs() {
   return true;
 }
 
-bool InvIndex::invFileIDs() {
+bool lemur::index::InvIndex::invFileIDs() {
   FILE* in = fopen(names[DOC_INDEX].c_str(), "rb");
   *msgstream << "Trying to open inverted index filenames: " << names[DOC_INDEX] << endl;
   if (in == NULL) {
@@ -550,14 +550,14 @@ bool InvIndex::invFileIDs() {
   return true;
 }
 
-bool InvIndex::termIDs() {
+bool lemur::index::InvIndex::termIDs() {
   FILE* in = fopen(names[TERM_IDS].c_str(), "rb");
   *msgstream << "Trying to open term ids file: " << names[TERM_IDS] << endl;
   if (in == NULL) {
     *msgstream <<  "Error opening termfile" << endl;
     return false;
   }
-  terms = new TERM_T[counts[UNIQUE_TERMS]+1];
+  terms = new lemur::api::TERM_T[counts[UNIQUE_TERMS]+1];
 
   int index;
   int len;
@@ -587,14 +587,14 @@ bool InvIndex::termIDs() {
   return true;
 }
 
-bool InvIndex::docIDs() {
+bool lemur::index::InvIndex::docIDs() {
   FILE* in = fopen(names[DOC_IDS].c_str(), "rb");
    *msgstream<< "Trying to open doc ids file: " << names[DOC_IDS] << endl;
   if (in == NULL) {
     *msgstream << "Error opening docfile" << endl;
     return false;
   }
-  docnames = new EXDOCID_T[counts[DOCS]+1];
+  docnames = new lemur::api::EXDOCID_T[counts[DOCS]+1];
 
   int index;
   int len;
@@ -623,6 +623,6 @@ bool InvIndex::docIDs() {
   return true;
 }
 
-void InvIndex::setMesgStream(ostream * lemStream) {
+void lemur::index::InvIndex::setMesgStream(ostream * lemStream) {
   msgstream = lemStream;
 }

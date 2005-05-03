@@ -268,6 +268,8 @@ by some hard-coded criterion. See the source code in
 #include "RetMethodManager.hpp"
 #include "ResultFile.hpp"
 
+using namespace lemur::api;
+
 void GetAppParam()
 {
   RetrievalParameter::get();
@@ -291,7 +293,7 @@ int AppMain(int argc, char *argv[]) {
   
   DocStream *qryStream;
   try {
-    qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+    qryStream = new lemur::parse::BasicDocStream(RetrievalParameter::textQuerySet);
   } 
   catch (Exception &ex) {
     ex.writeMessage(cerr);
@@ -299,14 +301,14 @@ int AppMain(int argc, char *argv[]) {
 		    "Can't open query file, check parameter textQuery");
   }
 
-  ofstream result(RetrievalParameter::resultFile);
+  ofstream result(RetrievalParameter::resultFile.c_str());
   ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
   resFile.openForWrite(result, *ind);
 
   ifstream *workSetStr;
   ResultFile *docPool;
   if (RetrievalParameter::useWorkingSet) {
-    workSetStr = new ifstream(RetrievalParameter::workSetFile, ios::in);
+    workSetStr = new ifstream(RetrievalParameter::workSetFile.c_str(), ios::in);
     if (workSetStr->fail()) {
       throw Exception("RetEval", "can't open working set file");
     }
@@ -314,7 +316,7 @@ int AppMain(int argc, char *argv[]) {
     docPool->openForRead(*workSetStr, *ind);
   }
 
-  ArrayAccumulator accumulator(ind->docCount());
+  lemur::retrieval::ArrayAccumulator accumulator(ind->docCount());
   IndexedRealVector results(ind->docCount());
   RetrievalMethod *model = NULL;
   model = RetMethodManager::createModel(ind, &accumulator, 

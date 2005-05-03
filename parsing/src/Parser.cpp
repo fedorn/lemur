@@ -7,39 +7,39 @@
 */
 
 #include "Parser.hpp"
-#include "FUtil.hpp"
+#include "indri/Path.hpp"
 
-Parser::Parser() {
+lemur::api::Parser::Parser() {
   borrowedacros = NULL;
   myacros = NULL;
   cat = category;
   iden = identifier;
 }
 
-Parser::~Parser() {
+lemur::api::Parser::~Parser() {
   if (myacros)
     delete myacros;
 }
 
-void Parser::parse(const string &filename) {
+void lemur::api::Parser::parse(const string &filename) {
   parsefile = filename;
-  if (!fileExist(filename)) {
+  if (!indri::file::Path::exists(filename)) {
     LEMUR_THROW(LEMUR_IO_ERROR, "Cannot find file "+filename+" for parsing.");
   }
   parseFile(parsefile);
 }
 
-void Parser::setAcroList(const WordSet* acronyms) {
+void lemur::api::Parser::setAcroList(const lemur::utility::WordSet* acronyms) {
   clearAcros();
   borrowedacros = acronyms;
 }
 
-void Parser::setAcroList(string filename) {
+void lemur::api::Parser::setAcroList(string filename) {
   clearAcros();
-  myacros = new WordSet(filename);
+  myacros = new lemur::utility::WordSet(filename);
 }
 
-bool Parser::isAcronym(const char* word) {
+bool lemur::api::Parser::isAcronym(const char* word) {
   if (myacros) 
     return myacros->contains(word);
   if (borrowedacros)
@@ -47,7 +47,7 @@ bool Parser::isAcronym(const char* word) {
   return false;
 }
 
-void Parser::clearAcros() {
+void lemur::api::Parser::clearAcros() {
   if (myacros)
     delete myacros;
   borrowedacros = NULL;

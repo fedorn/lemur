@@ -37,12 +37,12 @@ This application is also a good example of using the doc index (i.e., doc->term 
 #include <cmath>
 #include "IndexManager.hpp"
 #include "Param.hpp"
-#include "String.hpp"
 
+using namespace lemur::api;
 
 namespace LocalParameter {
-  static String index;
-  static String L2File;
+  static std::string index;
+  static std::string L2File;
   
   void get() {
     index = ParamGetString("index");
@@ -72,7 +72,7 @@ int AppMain(int argc, char *argv[]) {
   for (i=1; i<=dbIndex->termCountUnique(); i++) {
     idfV[i] = log((dbIndex->docCount()+1)/(0.5+dbIndex->docCount(i)));
   }
-  ofs.open(LocalParameter::L2File, ios::out);
+  ofs.open(LocalParameter::L2File.c_str(), ios::out);
   for (i = 1; i <= dbIndex->docCount(); i++) {
     TermInfoList *qList = dbIndex->termInfoList(i);
     TermInfo *qInfo;

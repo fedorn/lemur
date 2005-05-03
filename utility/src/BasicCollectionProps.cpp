@@ -12,7 +12,7 @@
 #include "BasicCollectionProps.hpp"
 #include <sstream>
 
-string BasicCollectionProps::getStringProperty(const string& name) const{
+string lemur::parse::BasicCollectionProps::getStringProperty(const string& name) const{
   const Property* p = this->getProperty(name);
   string value = "";
   std::stringstream s;

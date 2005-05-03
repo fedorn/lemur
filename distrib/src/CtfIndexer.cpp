@@ -3,12 +3,12 @@
 
 
  
-CtfIndexer::CtfIndexer(const string &csName, int bufferSize, 
+lemur::distrib::CtfIndexer::CtfIndexer(const string &csName, int bufferSize, 
 		       bool countStopWords) {
-  collsel = new InvPushIndex(csName, bufferSize);
+  collsel = new lemur::index::InvPushIndex(csName, bufferSize);
 
-  csdp = new DocumentProps();
-  term = new InvFPTerm();
+  csdp = new lemur::parse::DocumentProps();
+  term = new lemur::index::InvFPTerm();
 
   countStopWds = countStopWords;
 
@@ -16,7 +16,7 @@ CtfIndexer::CtfIndexer(const string &csName, int bufferSize,
   first = true;
 }
 
-CtfIndexer::~CtfIndexer() {
+lemur::distrib::CtfIndexer::~CtfIndexer() {
 
 
   csdp->length(ctfCount);
@@ -31,7 +31,7 @@ CtfIndexer::~CtfIndexer() {
 
 
 char *
-CtfIndexer::handleWord(char * word) {
+lemur::distrib::CtfIndexer::handleWord(char * word) {
 
   if (word != NULL) {
 
@@ -53,7 +53,7 @@ CtfIndexer::handleWord(char * word) {
 
 
 void 
-CtfIndexer::newDb(const string &name) {
+lemur::distrib::CtfIndexer::newDb(const string &name) {
   
   if (!first) {
     cout << "coll term freq: " << ctfCount << endl;

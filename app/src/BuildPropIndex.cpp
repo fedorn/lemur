@@ -59,7 +59,9 @@ The parameters are:
 #include "BrillPOSParser.hpp"
 #include "PropIndexTH.hpp"
 #include "Param.hpp"
-#include "FUtil.hpp"
+#include "indri/Path.hpp"
+
+using namespace lemur::api;
 
 // Local parameters used by the indexer 
 namespace LocalParameter {
@@ -143,18 +145,18 @@ int AppMain(int argc, char * argv[]) {
   // Create the Parser
   Parser* parser = NULL;
   TextHandler* th;
-  BrillPOSTokenizer* tok = NULL;
+  lemur::parse::BrillPOSTokenizer* tok = NULL;
   parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
 					    LocalParameter::acronyms);
 
   if (!parser) {
-    parser = new BrillPOSParser();
-    tok = new BrillPOSTokenizer();
+    parser = new lemur::parse::BrillPOSParser();
+    tok = new lemur::parse::BrillPOSTokenizer();
     parser->setTextHandler(tok);
     th = tok;
   } else {
     if (LocalParameter::docFormat == "brill") {
-      tok = new BrillPOSTokenizer();
+      tok = new lemur::parse::BrillPOSTokenizer();
       parser->setTextHandler(tok);
       th = tok;
     } else {
@@ -175,7 +177,7 @@ int AppMain(int argc, char * argv[]) {
   // TextHandler class, so that it is compatible with my parser
   // architecture.  See the TextHandler and InvFPTextHandler classes
   // for more info.)
-  PropIndexTH indexer(LocalParameter::index, 
+  lemur::parse::PropIndexTH indexer(LocalParameter::index, 
 		      LocalParameter::memory, 
 		      LocalParameter::countStopWords, 
 		      LocalParameter::indexType);
@@ -195,7 +197,7 @@ int AppMain(int argc, char * argv[]) {
 
   // parse the data files
   if (!LocalParameter::dataFiles.empty()) {
-    if (!fileExist(LocalParameter::dataFiles)) {
+    if (!indri::file::Path::exists(LocalParameter::dataFiles)) {
       throw Exception("PushIndexer", "dataFiles specified does not exist");
     }
     ifstream source(LocalParameter::dataFiles.c_str());

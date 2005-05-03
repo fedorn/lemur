@@ -22,7 +22,11 @@
 #include "RetrievalMethod.hpp"
 #include "LemurMemParser.hpp"
 #include "RetMethodManager.hpp"
-
+namespace lemur 
+{
+  namespace distrib 
+  {
+    
 /*! Provides a simple wrapper to lemur databases for 
  * use with the query-based sampling code.
  */
@@ -53,13 +57,15 @@ public:
 
 private:
   
-  Index * index;
-  RetrievalMethod * model;
-  ScoreAccumulator * accumulator;
-  IndexedRealVector * results;
+  lemur::api::Index * index;
+  lemur::api::RetrievalMethod * model;
+  lemur::api::ScoreAccumulator * accumulator;
+  lemur::api::IndexedRealVector * results;
   LemurMemParser * parser;
   mutable ofstream * outfile;
 
 };
+  }
+}
 
 #endif

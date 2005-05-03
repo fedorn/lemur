@@ -232,8 +232,10 @@ In addition, the collection mixture model also recognizes the parameter
 #include "RetMethodManager.hpp"
 #include "ResultFile.hpp"
 
+using namespace lemur::api;
+
 namespace LocalParameter {
-  String feedbackDocuments;
+  std::string feedbackDocuments;
   void get() {
     // judgments file name
     feedbackDocuments = ParamGetString("feedbackDocuments",""); 
@@ -307,14 +309,14 @@ int AppMain(int argc, char *argv[]) {
     throw Exception("RelFBEval", "Can't open index, check parameter index");
   }
 
-  ofstream result(RetrievalParameter::resultFile);
+  ofstream result(RetrievalParameter::resultFile.c_str());
   ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
   resFile.openForWrite(result, *ind);
 
   ifstream *workSetStr;
   ResultFile *docPool;
   if (RetrievalParameter::useWorkingSet) {
-    workSetStr = new ifstream(RetrievalParameter::workSetFile, ios::in);
+    workSetStr = new ifstream(RetrievalParameter::workSetFile.c_str(), ios::in);
     if (workSetStr->fail()) {
       throw Exception("RelFBEval", "can't open working set file");
     }
@@ -326,14 +328,14 @@ int AppMain(int argc, char *argv[]) {
 
   ifstream *judgmentStr;
   ResultFile *judgments;
-  judgmentStr = new ifstream(LocalParameter::feedbackDocuments, ios::in);
+  judgmentStr = new ifstream(LocalParameter::feedbackDocuments.c_str(), ios::in);
   if (judgmentStr->fail()) {
       throw Exception("RelFBEval", "can't open judgment file");
   }
   judgments = new ResultFile(false); // judgment file is always simple format
   judgments->load(*judgmentStr, *ind);
 
-  ArrayAccumulator accumulator(ind->docCount());
+  lemur::retrieval::ArrayAccumulator accumulator(ind->docCount());
 
   IndexedRealVector results(ind->docCount());
 
@@ -343,7 +345,7 @@ int AppMain(int argc, char *argv[]) {
 
   DocStream *qryStream;
   try {
-    qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+    qryStream = new lemur::parse::BasicDocStream(RetrievalParameter::textQuerySet);
   } 
   catch (Exception &ex) {
     ex.writeMessage(cerr);

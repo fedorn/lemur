@@ -271,17 +271,17 @@ inline void indri::index::DiskDocListIterator::_readEntry() {
   _data.positions.clear();
   
   int deltaDocument;
-  _list = RVLCompress::decompress_int( _list, deltaDocument );
+  _list = lemur::utility::RVLCompress::decompress_int( _list, deltaDocument );
   _data.document += deltaDocument;
 
   int numPositions;
-  _list = RVLCompress::decompress_int( _list, numPositions );
+  _list = lemur::utility::RVLCompress::decompress_int( _list, numPositions );
 
   int lastPosition = 0;
   int deltaPosition;
   
   for( int i=0; i<numPositions; i++ ) {
-    _list = RVLCompress::decompress_int( _list, deltaPosition );
+    _list = lemur::utility::RVLCompress::decompress_int( _list, deltaPosition );
     _data.positions.push_back( deltaPosition + lastPosition );
     lastPosition += deltaPosition;
   }

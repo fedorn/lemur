@@ -18,7 +18,7 @@ extern char *kstem_stemmer(char *);
 extern char *stemdir;
 extern int read_dict_info();
 
-KStemmer::KStemmer(string &datadir) {
+lemur::parse::KStemmer::KStemmer(string &datadir) {
   stemdir = new char[datadir.length() + 1];
   strcpy(stemdir, datadir.c_str());
   if (read_dict_info()) {
@@ -28,11 +28,11 @@ KStemmer::KStemmer(string &datadir) {
   iden=identifier;
 }
 
-KStemmer::~KStemmer() {
+lemur::parse::KStemmer::~KStemmer() {
   delete[](stemdir);
 }
 
-char * KStemmer::stemWord(char * word) {
+char * lemur::parse::KStemmer::stemWord(char * word) {
   // only stem words that begin with a lowercase letter 
   // (don't stem acronyms or names)
   if (islower(*word)) {
@@ -41,7 +41,7 @@ char * KStemmer::stemWord(char * word) {
   return word;
 }
 
-void KStemmer::writePropertyList(PropertyList* list) const {
+void lemur::parse::KStemmer::writePropertyList(PropertyList* list) const {
   TextHandler::writePropertyList(list);
   Property p("KstemmerDir");
   p.setValue(stemdir);

@@ -11,12 +11,12 @@
 
 #include "QueryDocument.hpp"
 
-QueryDocument::QueryDocument() {
+lemur::api::QueryDocument::QueryDocument() {
   iter = 0;
   id = NULL;
 }
 
-QueryDocument::~QueryDocument() {
+lemur::api::QueryDocument::~QueryDocument() {
   while (!tokens.empty()){
     free(tokens.back()); 
     tokens.pop_back();
@@ -24,25 +24,25 @@ QueryDocument::~QueryDocument() {
   free(id);
 }
 
-const Term* QueryDocument::nextTerm() const{
+const lemur::api::Term* lemur::api::QueryDocument::nextTerm() const{
   tt.spelling(tokens[iter]);
   iter++;
   return &tt;
 }
 
-void QueryDocument::addTerm(const char* token) {
+void lemur::api::QueryDocument::addTerm(const char* token) {
   if (!token) 
     return; 
   tokens.push_back(strdup(token));
 }
 
-char* QueryDocument::handleWord(char *word) {
+char* lemur::api::QueryDocument::handleWord(char *word) {
   if (word) 
     addTerm(word); 
   return word;
 }
 
-char* QueryDocument::handleSymbol(char *sym) {
+char* lemur::api::QueryDocument::handleSymbol(char *sym) {
   addTerm(sym); 
   return sym;
 }

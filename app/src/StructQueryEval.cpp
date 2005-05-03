@@ -78,6 +78,8 @@ the expanded query.
 #include "ResultFile.hpp"
 #include "BasicDocStream.hpp"
 
+using namespace lemur::api;
+
 
 void GetAppParam() {
   RetrievalParameter::get();
@@ -90,12 +92,12 @@ int AppMain(int argc, char *argv[]) {
   try {
     ind  = IndexManager::openIndex(RetrievalParameter::databaseIndex);
     // Test that index returns InvFPDocList * from docInfoList.
-    InvFPDocList *dList;
+    lemur::index::InvFPDocList *dList;
     DocInfoList *dl;
     // use last term in vocab to make this a small read (hopefully).
     COUNT_T lastTerm = ind->termCountUnique();
     dl = ind->docInfoList(lastTerm);
-    dList = dynamic_cast<InvFPDocList *>(dl);
+    dList = dynamic_cast<lemur::index::InvFPDocList *>(dl);
     if (dList == NULL) {
       //  throw Exception("StructQueryEval", 
       //      "InvFPDocList required from index->docInfoList()");
@@ -113,19 +115,19 @@ int AppMain(int argc, char *argv[]) {
 
   DocStream *qryStream;
   try {
-    qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+    qryStream = new lemur::parse::BasicDocStream(RetrievalParameter::textQuerySet);
   } catch (Exception &ex) {
     ex.writeMessage(cerr);
     throw Exception("StructQueryEval", 
 		    "Can't open query file, check parameter textQuery");
   }
-  ofstream result(RetrievalParameter::resultFile);
+  ofstream result(RetrievalParameter::resultFile.c_str());
   ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
   resFile.openForWrite(result, *ind);
   ifstream *workSetStr;
   ResultFile *docPool;
   if (RetrievalParameter::useWorkingSet) {
-    workSetStr = new ifstream(RetrievalParameter::workSetFile, ios::in);
+    workSetStr = new ifstream(RetrievalParameter::workSetFile.c_str(), ios::in);
     if (workSetStr->fail()) {
       throw Exception("StructQueryEval", "can't open working set file");
     }
@@ -133,11 +135,12 @@ int AppMain(int argc, char *argv[]) {
     docPool->openForRead(*workSetStr, *ind);
   }
   IndexedRealVector results(ind->docCount());
-  InQueryRetMethod *model = 
-    new InQueryRetMethod(*ind, InQueryParameter::defaultBelief,
-			 InQueryParameter::fbTermCount,
-			 InQueryParameter::fbCoeff,
-			 InQueryParameter::cacheIDF);
+  lemur::retrieval::InQueryRetMethod *model = 
+    new lemur::retrieval::InQueryRetMethod(*ind, 
+                                           InQueryParameter::defaultBelief,
+                                           InQueryParameter::fbTermCount,
+                                           InQueryParameter::fbCoeff,
+                                           InQueryParameter::cacheIDF);
   qryStream->startDocIteration();
   TextQuery *q;
   IndexedRealVector workSetRes;

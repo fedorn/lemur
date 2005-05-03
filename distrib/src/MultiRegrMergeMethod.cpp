@@ -15,13 +15,14 @@
 //typedef map<char *, double, ltstr> docsidmap;
 typedef map<string, double, less<string> > docsidmap;
 
+using namespace lemur::api;
 
-MultiRegrMergeMethod::MultiRegrMergeMethod(double constA, double constB) {
+lemur::distrib::MultiRegrMergeMethod::MultiRegrMergeMethod(double constA, double constB) {
   defParamA = constA;
   defParamB = constB;
 }
 
-void MultiRegrMergeMethod::mergeScoreSet(const IndexedRealVector &indexset, 
+void lemur::distrib::MultiRegrMergeMethod::mergeScoreSet(const IndexedRealVector &indexset, 
 					 const DocScoreVector* const* scoreset,
 					 DocScoreVector &results) {
 
@@ -61,17 +62,17 @@ void MultiRegrMergeMethod::mergeScoreSet(const IndexedRealVector &indexset,
 }
 
 
-MultiRegrMergeMethod::~MultiRegrMergeMethod() {
+lemur::distrib::MultiRegrMergeMethod::~MultiRegrMergeMethod() {
 }
 
 /// Calculate the final comparable document score
-double MultiRegrMergeMethod::score(double dbscore, 
+double lemur::distrib::MultiRegrMergeMethod::score(double dbscore, 
 				   double docscore,int dbIndex) const {
   return parama[dbIndex]+ paramb[dbIndex]*docscore;
 }
 
 //only a dummy implementation of the virtual code
-double MultiRegrMergeMethod::score(double dbscore, double docscore) const {
+double lemur::distrib::MultiRegrMergeMethod::score(double dbscore, double docscore) const {
     return ( defParamA*docscore + defParamB*dbscore*docscore);
 }
 
@@ -79,7 +80,7 @@ double MultiRegrMergeMethod::score(double dbscore, double docscore) const {
 /// indexset are the database scores for selected databases
 /// centralsocres are the central documents scores retrieved by centralized sampling database
 /// scoresset are the distributed documents scores retrieved by individual databases
-void MultiRegrMergeMethod::calcRegrParams(const IndexedRealVector &indexset, 
+void lemur::distrib::MultiRegrMergeMethod::calcRegrParams(const IndexedRealVector &indexset, 
 					  const DocScoreVector* centralscores,
 					  const DocScoreVector*const * scoresset) {
   const DocScoreVector* docscores;

@@ -13,32 +13,32 @@
  */
 #include "ClusterRep.hpp"
 #include <cmath>
-ClusterRep::ClusterRep(DOCID_T did, const Index &ind) : index(ind) {
-  rep = new FloatFreqVector(ind, did);
+lemur::cluster::ClusterRep::ClusterRep(lemur::api::DOCID_T did, const lemur::api::Index &ind) : index(ind) {
+  rep = new lemur::utility::FloatFreqVector(ind, did);
 }
 
-ClusterRep::ClusterRep(TermInfoList *tList, const Index &ind) : index(ind) {
-  rep = new FloatFreqVector(ind, tList);
+lemur::cluster::ClusterRep::ClusterRep(lemur::api::TermInfoList *tList, const lemur::api::Index &ind) : index(ind) {
+  rep = new lemur::utility::FloatFreqVector(ind, tList);
 }
 
-ClusterRep::ClusterRep(vector<DOCID_T> &dids, const Index &ind) : index(ind) {
-  rep = new FloatFreqVector(ind, dids);
+lemur::cluster::ClusterRep::ClusterRep(vector<lemur::api::DOCID_T> &dids, const lemur::api::Index &ind) : index(ind) {
+  rep = new lemur::utility::FloatFreqVector(ind, dids);
 }
 
-ClusterRep::ClusterRep(FloatFreqVector *v, const Index &ind) : 
+lemur::cluster::ClusterRep::ClusterRep(lemur::utility::FloatFreqVector *v, const lemur::api::Index &ind) : 
 index(ind) {
-  rep = new FloatFreqVector(v);
+  rep = new lemur::utility::FloatFreqVector(v);
 }
 
-ClusterRep::ClusterRep(const ClusterRep *old): index(old->index) {
-  rep = new FloatFreqVector(old->rep);
+lemur::cluster::ClusterRep::ClusterRep(const ClusterRep *old): index(old->index) {
+  rep = new lemur::utility::FloatFreqVector(old->rep);
 }
 
-ClusterRep::~ClusterRep() {
+lemur::cluster::ClusterRep::~ClusterRep() {
   delete(rep);
 }
 
-void ClusterRep::normalize() {
+void lemur::cluster::ClusterRep::normalize() {
   double norm = sqrt(rep->sum2());
   rep->weigh(1/norm);
 }

@@ -35,13 +35,13 @@
 ///large file support.
 
 
-std::string File::segmentName( const std::string& fileName, int segment ) {
+std::string lemur::file::File::segmentName( const std::string& fileName, int segment ) {
   std::stringstream segName;
   segName << fileName << "$" << segment;
   return segName.str();
 }
 
-void File::_appendSegment() {
+void lemur::file::File::_appendSegment() {
   FileSegment* segment = new FileSegment();
   int number = (int)_segments.size();
   std::string name = segmentName( _fileName, number );
@@ -56,7 +56,7 @@ void File::_appendSegment() {
   _segments.push_back( segment );
 }
 
-File::offset_type File::_absolutePosition( offset_type relativePosition,
+lemur::file::File::offset_type lemur::file::File::_absolutePosition( offset_type relativePosition,
   offset_type currentPosition,
   std::fstream::seekdir direction ) const {
   offset_type newPosition;
@@ -81,7 +81,7 @@ File::offset_type File::_absolutePosition( offset_type relativePosition,
   return newPosition;
 }
 
-File::FileSegment* File::_segmentForPosition( offset_type absolutePosition, FileSegment* guess ) {
+lemur::file::File::FileSegment* lemur::file::File::_segmentForPosition( offset_type absolutePosition, FileSegment* guess ) {
   assert( absolutePosition <= size() );
   assert( absolutePosition >= 0 );
   assert( _segments.size() );
@@ -119,7 +119,7 @@ File::FileSegment* File::_segmentForPosition( offset_type absolutePosition, File
     return *low;
 }
 
-void File::_validateReadPointer() {
+void lemur::file::File::_validateReadPointer() {
   if( !_readPointerValid ) {
     _readSegment = _segmentForPosition( _readPosition, _readSegment );
     _readSegment->stream.seekg( library_offset_type(_readPosition - _readSegment->start), std::ios::beg );
@@ -133,7 +133,7 @@ void File::_validateReadPointer() {
   assert( _readPosition == ( library_offset_type(_readSegment->stream.tellg()) + _readSegment->start) );
 }
 
-void File::_validateWritePointer() {
+void lemur::file::File::_validateWritePointer() {
   if( !_writePointerValid ) {
     _writeSegment = _segmentForPosition( _writePosition, _writeSegment );
     _writeSegment->stream.seekg( library_offset_type(_writePosition - _writeSegment->start), std::ios::beg );
@@ -148,14 +148,14 @@ void File::_validateWritePointer() {
           _writePosition == 0 );
 }
 
-File::File() {
+lemur::file::File::File() {
 }
 
-File::~File() {
+lemur::file::File::~File() {
   close();
 }
 
-void File::open( const std::string& fileName, int mode ) {
+void lemur::file::File::open( const std::string& fileName, int mode ) {
   close();
   
   FileSegment* segment;
@@ -246,7 +246,7 @@ void File::open( const std::string& fileName, int mode ) {
   }
 }
 
-void File::close() {
+void lemur::file::File::close() {
   std::vector<FileSegment*>::iterator iter;
 
   for( iter = _segments.begin(); iter != _segments.end(); iter++ ) {
@@ -257,7 +257,7 @@ void File::close() {
   _segments.clear();
 }
 
-void File::read( void* buffer, offset_type count ) {
+void lemur::file::File::read( void* buffer, offset_type count ) {
   _validateReadPointer();
 
   offset_type readAmount;
@@ -285,7 +285,7 @@ void File::read( void* buffer, offset_type count ) {
   assert((int)_readSegment->stream.tellg() != -1 || size() == _readPosition );
 }
 
-void File::write( const void* buffer, offset_type count ) {
+void lemur::file::File::write( const void* buffer, offset_type count ) {
   offset_type bytesWritten = 0;
   offset_type writeAmount = 0;
   _validateWritePointer();
@@ -319,37 +319,37 @@ void File::write( const void* buffer, offset_type count ) {
   assert( (int)_writeSegment->stream.tellp() != -1 || _writePosition == size() );
 }
 
-void File::seekg( offset_type relativePosition, std::fstream::seekdir direction ) {
+void lemur::file::File::seekg( offset_type relativePosition, std::fstream::seekdir direction ) {
   _readPosition = _absolutePosition( relativePosition, _readPosition, direction );
   _readPointerValid = false;
 }
 
-void File::seekp( offset_type relativePosition, std::fstream::seekdir direction ) {
+void lemur::file::File::seekp( offset_type relativePosition, std::fstream::seekdir direction ) {
   _writePosition = _absolutePosition( relativePosition, _writePosition, direction );
   _writePointerValid = false;
 }
 
-File::offset_type File::tellg() {
+lemur::file::File::offset_type lemur::file::File::tellg() {
   return _readPosition;
 }
 
-File::offset_type File::tellp() {
+lemur::file::File::offset_type lemur::file::File::tellp() {
   return _writePosition;
 }
 
-File::offset_type File::gcount() {
+lemur::file::File::offset_type lemur::file::File::gcount() {
   return _readCount;
 }
 
 // only does eof right now
-int File::rdstate() {
+int lemur::file::File::rdstate() {
   if( size() == _readPosition )
     return _state | std::fstream::eofbit;
   else
     return _state;
 }
 
-File::offset_type File::size() const {
+lemur::file::File::offset_type lemur::file::File::size() const {
   if( _segments.size() == 0 ) {
     return 0;
   } else {
@@ -357,13 +357,13 @@ File::offset_type File::size() const {
   }
 }
 
-void File::unlink() {
+void lemur::file::File::unlink() {
   close();
-  File::unlink( _fileName );
+  lemur::file::File::unlink( _fileName );
   _fileName = "";
 }
 
-void File::unlink( const std::string& fileName ) {
+void lemur::file::File::unlink( const std::string& fileName ) {
   for( int i=0; ; i++ ) {
     std::string segment = segmentName( fileName, i );
 
@@ -373,7 +373,7 @@ void File::unlink( const std::string& fileName ) {
   }
 }
 
-void File::rename( const std::string& oldName, const std::string& newName ) {
+void lemur::file::File::rename( const std::string& oldName, const std::string& newName ) {
   for( int i=0; ; i++ ) {
     std::string oldSegment = segmentName( oldName, i );
     std::string newSegment = segmentName( newName, i );

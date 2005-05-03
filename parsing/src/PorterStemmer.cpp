@@ -23,12 +23,12 @@
 // the Porter stemmer is in C
 extern int porter_stem(char * p, int i, int j);
 
-PorterStemmer::PorterStemmer() : Stemmer() {
+lemur::parse::PorterStemmer::PorterStemmer() : Stemmer() {
   // use the same identifier as we do for the application parameters
   iden = identifier;
 }
 
-char * PorterStemmer::stemWord(char * word) {
+char * lemur::parse::PorterStemmer::stemWord(char * word) {
   // only stem words that begin with a lowercase letter 
   // (don't stem acronyms or names)
   if (islower(*word)) {

@@ -13,13 +13,13 @@
 
 
 // Create the Lemur memory "parser"
-LemurMemParser::LemurMemParser(const Index * ind) {
+lemur::distrib::LemurMemParser::LemurMemParser(const lemur::api::Index * ind) {
   index = ind;
 }
 
 // "Parse" the document
 void 
-LemurMemParser::parse(doc_t * doc) {
+lemur::distrib::LemurMemParser::parse(doc_t * doc) {
   // The doc is really an array if integer term ids.
   int * intdoc = (int *) doc->doc;
   int intlen = doc->len * sizeof(char) / sizeof(int);

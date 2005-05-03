@@ -7,12 +7,11 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #ifndef _MAIN_HPP
 #define _MAIN_HPP
-
 /*!
   This package defines a default Lemur main() which 
   calls the application's main function AppMain(), takes
@@ -36,5 +35,4 @@ extern void GetAppParam();
 
 /// User's application must define this function
 extern int AppMain(int argc, char *argv[]);
-
 #endif 

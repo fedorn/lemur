@@ -13,27 +13,28 @@
 // init: 11/18/2002
 #include "CentroidCluster.hpp"
 
-CentroidCluster::CentroidCluster(int cid, const Index &ind, 
+lemur::cluster::CentroidCluster::CentroidCluster(int cid, 
+                                                 const lemur::api::Index &ind, 
 				 const SimilarityMethod &sim) :
   Cluster(cid, ind, sim) {
   centroid = NULL;
   weightedCentroid = NULL;
 }
 
-double CentroidCluster::score(const ClusterRep *rep) const {
+double lemur::cluster::CentroidCluster::score(const ClusterRep *rep) const {
   // should not happen.
   if (size == 0) return 0; 
   double s = similarity.similarity(rep, weightedCentroid);
   return s;
 }
 
-ClusterRep *CentroidCluster::getClusterRep() const {
+lemur::cluster::ClusterRep *lemur::cluster::CentroidCluster::getClusterRep() const {
   return new ClusterRep(weightedCentroid);
 }
 
-void CentroidCluster::updateCentroid(FloatFreqVector *v, bool first) {
+void lemur::cluster::CentroidCluster::updateCentroid(lemur::utility::FloatFreqVector *v, bool first) {
   if (first) {
-    centroid = new FloatFreqVector(v);
+    centroid = new lemur::utility::FloatFreqVector(v);
   } else {
     delete(weightedCentroid);
     centroid->addVec(v);
@@ -43,7 +44,7 @@ void CentroidCluster::updateCentroid(FloatFreqVector *v, bool first) {
   similarity.weigh(weightedCentroid);
 }
 
-void CentroidCluster::add(const ClusterElt &elt) {  
+void lemur::cluster::CentroidCluster::add(const ClusterElt &elt) {  
   bool firstOne = (size == 0);
   Cluster::add(elt); 
   ClusterRep *rep = new ClusterRep(elt.id, ind);
@@ -52,7 +53,7 @@ void CentroidCluster::add(const ClusterElt &elt) {
   delete(rep);
 }
 
-void CentroidCluster::add(vector<DOCID_T> docids) {  
+void lemur::cluster::CentroidCluster::add(vector<lemur::api::DOCID_T> docids) {  
   bool firstOne = (size == 0);
   // don't use add for efficiency's sake (single update of centroid).
   ClusterElt fred;
@@ -69,7 +70,7 @@ void CentroidCluster::add(vector<DOCID_T> docids) {
 }
 
 
-void CentroidCluster::remove(const ClusterElt &elt) {
+void lemur::cluster::CentroidCluster::remove(const ClusterElt &elt) {
   vector<ClusterElt>::iterator it = ids.begin();
   while (it != ids.end() && 
 	 ((*it).myType != elt.myType || (*it).id != elt.id)) it++;
@@ -91,12 +92,12 @@ void CentroidCluster::remove(const ClusterElt &elt) {
   }
 }
 
-FloatFreqVector *CentroidCluster::readCentroid() {
-  vector <DOCID_T> dids = getDocIds();
-  return new FloatFreqVector(ind, dids);
+lemur::utility::FloatFreqVector *lemur::cluster::CentroidCluster::readCentroid() {
+  vector <lemur::api::DOCID_T> dids = getDocIds();
+  return new lemur::utility::FloatFreqVector(ind, dids);
 }
 
-bool CentroidCluster::read(ifstream &in) {
+bool lemur::cluster::CentroidCluster::read(ifstream &in) {
   // Augment the basic superclass read
   bool retval = Cluster::read(in);
   if (retval) {

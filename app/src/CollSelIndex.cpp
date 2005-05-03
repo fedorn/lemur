@@ -4,6 +4,8 @@
 #include "Param.hpp"
 #include "TrecParser.hpp"
 
+using namespace lemur::api;
+
 namespace LocalParameter {
   string df;
   string ctf;
@@ -58,7 +60,7 @@ int AppMain(int argc, char * argv[]) {
 					    LocalParameter::acronyms);
   // if failed to create parser, create a default
   if (!parser)
-    parser = new TrecParser();
+    parser = new lemur::parse::TrecParser();
   
   // Create the stopper if needed.
   Stopper * stopper = NULL;
@@ -68,13 +70,13 @@ int AppMain(int argc, char * argv[]) {
   Stemmer * stemmer = NULL;
   stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
 
-  DocFreqIndexer dfIndexer(LocalParameter::df,
+  lemur::distrib::DocFreqIndexer dfIndexer(LocalParameter::df,
 			   LocalParameter::dfCounts,
 			   LocalParameter::dfDocs,
 			   LocalParameter::memory,
 			   LocalParameter::countStopWds);
 
-  CtfIndexer ctfIndexer(LocalParameter::ctf,
+  lemur::distrib::CtfIndexer ctfIndexer(LocalParameter::ctf,
 			LocalParameter::memory,
 			LocalParameter::countStopWds);
 

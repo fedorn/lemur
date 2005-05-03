@@ -108,7 +108,7 @@ inline indri::index::DiskTermData* disktermdata_decompress( indri::utility::RVLD
 inline int disktermdata_size( int fieldCount ) {
   // how much space are we going to need?
   int termDataSize = ::termdata_size( fieldCount );
-  int totalSize = termDataSize + (Keyfile::MAX_KEY_LENGTH+2) + sizeof(indri::index::DiskTermData);
+  int totalSize = termDataSize + (lemur::file::Keyfile::MAX_KEY_LENGTH+2) + sizeof(indri::index::DiskTermData);
 
   return totalSize;
 }

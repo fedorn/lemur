@@ -21,13 +21,13 @@
  *
  *========================================================================*/
 
-InvFPPushIndex::InvFPPushIndex(const string &prefix, int cachesize, long maxfilesize, DOCID_T startdocid) : InvPushIndex(prefix, cachesize, maxfilesize, startdocid) {
+lemur::index::InvFPPushIndex::InvFPPushIndex(const string &prefix, int cachesize, long maxfilesize, lemur::api::DOCID_T startdocid) : InvPushIndex(prefix, cachesize, maxfilesize, startdocid) {
 }
 
-InvFPPushIndex::~InvFPPushIndex() {
+lemur::index::InvFPPushIndex::~InvFPPushIndex() {
 }
 
-bool InvFPPushIndex::addTerm(const Term& t){
+bool lemur::index::InvFPPushIndex::addTerm(const lemur::api::Term& t){
   TABLE_T::iterator placehold;
   InvFPDocList* curlist;
   const InvFPTerm* term;
@@ -72,7 +72,7 @@ bool InvFPPushIndex::addTerm(const Term& t){
     // update unique word counter
     tidcount++;
     //store new word in list of ids
-    TERM_T spell = term->spelling();
+    lemur::api::TERM_T spell = term->spelling();
     termIDs.push_back(spell);
 
     curlist = new InvFPDocList(cache, termIDs.size(), term->strLength(), docIDs.size(), term->position() );
@@ -98,7 +98,7 @@ bool InvFPPushIndex::addTerm(const Term& t){
   return true;
 }
 
-void InvFPPushIndex::endCollection(const CollectionProps* cp){
+void lemur::index::InvFPPushIndex::endCollection(const lemur::parse::CollectionProps* cp){
   // flush last time
   // merge temp files
 
@@ -127,8 +127,8 @@ void InvFPPushIndex::endCollection(const CollectionProps* cp){
 /*===============================================================================
  *  PRIVATE METHODS
  *=============================================================================*/
-void InvFPPushIndex::writeTOC(int numinv, const CollectionProps* cp) {
-  const BasicCollectionProps* props = dynamic_cast<const BasicCollectionProps*>(cp);
+void lemur::index::InvFPPushIndex::writeTOC(int numinv, const lemur::parse::CollectionProps* cp) {
+  const lemur::parse::BasicCollectionProps* props = dynamic_cast<const lemur::parse::BasicCollectionProps*>(cp);
   string fname = name + INVFPTOC;
   ofstream toc(fname.c_str());
   if (!toc.is_open()) {
@@ -152,14 +152,14 @@ void InvFPPushIndex::writeTOC(int numinv, const CollectionProps* cp) {
   toc << DOCMGR_PAR << "  " << name << DOCMGRMAP << endl;
 
   if (props) {
-    const Property* p = NULL;
+    const lemur::parse::Property* p = NULL;
     string value;
     props->startIteration();
     while (props->hasMore()) {
       p = props->nextEntry();
-      if (p->getType() == Property::STDSTRING)
+      if (p->getType() == lemur::parse::Property::STDSTRING)
       toc << p->getName() << "  " << *(string*)p->getValue() << endl;
-      else if (p->getType() == Property::STRING)
+      else if (p->getType() == lemur::parse::Property::STRING)
 	toc << p->getName() << "  " << (char*)p->getValue() << endl;
     }
   }
@@ -168,18 +168,18 @@ void InvFPPushIndex::writeTOC(int numinv, const CollectionProps* cp) {
 }
 
 
-void InvFPPushIndex::doendDoc(const DocumentProps* dp, int mgrid){
+void lemur::index::InvFPPushIndex::doendDoc(const lemur::parse::DocumentProps* dp, int mgrid){
   //flush list and write to lookup table
   if (dp != NULL) {
-    DOCID_T docid = docIDs.size();
-    COUNT_T len = dp->length();
-    COUNT_T tls = termlist.size();
+    lemur::api::DOCID_T docid = docIDs.size();
+    lemur::api::COUNT_T len = dp->length();
+    lemur::api::COUNT_T tls = termlist.size();
     
     // make sure the ftell is correct
     writetlist.flush();
     long offset = (long)writetlist.tellp();
 
-    if (offset+(3*sizeof(LOC_T))+(tls*sizeof(LocatedTerm)) > maxfile) {
+    if (offset+(3*sizeof(lemur::api::LOC_T))+(tls*sizeof(LocatedTerm)) > maxfile) {
       writetlist.close();
       std::stringstream nameStr;
       nameStr << name << DTINDEX << dtfiles.size();

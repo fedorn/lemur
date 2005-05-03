@@ -7,44 +7,51 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
-
-
-#ifndef _DOCUMENTPROPS_HPP
-#define _DOCUMENTPROPS_HPP
-
-//! Class for set of Document Properties
-
-/*! this is a supporting class for classes that want to pass one object
-around that would have access methods for properties that a document might
-have.  this class should be subclassed, adding access methods for the particular information needs for a particular index.
-
-*/
+ */
 
 /*
  * NAME DATE - COMMENTS
  * tnt 03/2001 - created
- ==========================================================================*/
-class DocumentProps {
-public:
-  DocumentProps() { len=0; sid=NULL;};
-  ~DocumentProps() {};
+ * ========================================================================
+ */
+
+#ifndef _DOCUMENTPROPS_HPP
+#define _DOCUMENTPROPS_HPP
+namespace lemur 
+{
+  namespace parse 
+  {
+    
+    //! \brief Class for set of Document Properties
+
+    /*! this is a supporting class for classes that want to pass one object
+      around that would have access methods for properties that a document might
+      have.  this class should be subclassed, adding access methods for the particular information needs for a particular index.
+
+    */
+
+    class DocumentProps {
+    public:
+      DocumentProps() { len=0; sid=NULL;};
+      ~DocumentProps() {};
   
-  /// set document length
-  void length(int dl) { len=dl; };
+      /// set document length
+      void length(int dl) { len=dl; };
 
-  /// get document length
-  int length() const { return len; };
+      /// get document length
+      int length() const { return len; };
 
-  /// set docID, we're not making a copy
-  void stringID(const char* did) { sid = did; };
+      /// set docID, we're not making a copy
+      void stringID(const char* did) { sid = did; };
 
-  /// get docID
-  const char* stringID() const { return sid; };
+      /// get docID
+      const char* stringID() const { return sid; };
 
-private:
-  int len;
-  const char* sid;
-};
+    private:
+      int len;
+      const char* sid;
+    };
+  }
+}
 
 #endif

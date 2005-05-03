@@ -17,7 +17,7 @@
 #include <cmath>
 
 /// Construct a query rep from a text query.
-CosSimQueryRep::CosSimQueryRep(const TermQuery &qry, const Index &dbIndex, 
+lemur::retrieval::CosSimQueryRep::CosSimQueryRep(const lemur::api::TermQuery &qry, const lemur::api::Index &dbIndex, 
 			       double *idfValue): 
   ArrayQueryRep (dbIndex.termCountUnique()+1, qry, dbIndex), 
   ind(dbIndex), idf(idfValue) {
@@ -25,7 +25,7 @@ CosSimQueryRep::CosSimQueryRep(const TermQuery &qry, const Index &dbIndex,
 
   startIteration();
   while (hasMore()) {
-    QueryTerm *qt = nextTerm();
+    lemur::api::QueryTerm *qt = nextTerm();
     tmpval = qt->weight()*idf[qt->id()];
     setCount(qt->id(), tmpval);
     qNorm += tmpval * tmpval;
@@ -34,23 +34,23 @@ CosSimQueryRep::CosSimQueryRep(const TermQuery &qry, const Index &dbIndex,
   qNorm = sqrt(qNorm);
   startIteration();
   while (hasMore()) {
-    QueryTerm *qt = nextTerm();
+    lemur::api::QueryTerm *qt = nextTerm();
     setCount(qt->id(), qt->weight()/qNorm);
     delete qt;
   }
 }
 
 /// Construct a query rep from an existing document (given document id).
-CosSimQueryRep::CosSimQueryRep(DOCID_T docId, const Index &dbIndex, 
+lemur::retrieval::CosSimQueryRep::CosSimQueryRep(lemur::api::DOCID_T docId, const lemur::api::Index &dbIndex, 
 			       double *idfValue): 
   ArrayQueryRep (dbIndex.termCountUnique() + 1), 
   ind(dbIndex), idf(idfValue) {
   double qNorm = 0;
   double tmpval;
-  COUNT_T cnt;
-  TERMID_T id;
-  TermInfoList *tList = dbIndex.termInfoList(docId);
-  TermInfo *info;
+  lemur::api::COUNT_T cnt;
+  lemur::api::TERMID_T id;
+  lemur::api::TermInfoList *tList = dbIndex.termInfoList(docId);
+  lemur::api::TermInfo *info;
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
@@ -64,46 +64,46 @@ CosSimQueryRep::CosSimQueryRep(DOCID_T docId, const Index &dbIndex,
   qNorm = sqrt(qNorm);
   startIteration();
   while (hasMore()) {
-    QueryTerm *qt = nextTerm();
+    lemur::api::QueryTerm *qt = nextTerm();
     setCount(qt->id(), qt->weight()/qNorm);
     delete qt;
   }
 }
 
-CosSimRetMethod::CosSimRetMethod(const Index &dbIndex, 
-				 ScoreAccumulator &accumulator) :
-  TextQueryRetMethod(dbIndex, accumulator), 
+lemur::retrieval::CosSimRetMethod::CosSimRetMethod(const lemur::api::Index &dbIndex, 
+				 lemur::api::ScoreAccumulator &accumulator) :
+  lemur::api::TextQueryRetMethod(dbIndex, accumulator), 
   L2FileName(CosSimParameter::defaultL2File) {
   fbParam.howManyTerms = CosSimParameter::defaultHowManyTerms;
   fbParam.posCoeff = CosSimParameter::defaultPosCoeff;
   // pre-compute IDF values
   idfV = new double[dbIndex.termCountUnique()+1];
-  for (TERMID_T i=1; i<=dbIndex.termCountUnique(); i++) {
+  for (lemur::api::TERMID_T i=1; i<=dbIndex.termCountUnique(); i++) {
     idfV[i] = log((dbIndex.docCount()+1)/(0.5+dbIndex.docCount(i)));
   }
   loadDocNorms();  
   scFunc = new CosSimScoreFunc(dbIndex);
 }
 
-CosSimRetMethod::CosSimRetMethod(const Index &dbIndex, const string &L2file,
-				 ScoreAccumulator &accumulator) :
-  TextQueryRetMethod(dbIndex, accumulator), L2FileName(L2file) {
+lemur::retrieval::CosSimRetMethod::CosSimRetMethod(const lemur::api::Index &dbIndex, const string &L2file,
+				 lemur::api::ScoreAccumulator &accumulator) :
+  lemur::api::TextQueryRetMethod(dbIndex, accumulator), L2FileName(L2file) {
   fbParam.howManyTerms = CosSimParameter::defaultHowManyTerms;
   fbParam.posCoeff = CosSimParameter::defaultPosCoeff;
 
   // pre-compute IDF values
   idfV = new double[dbIndex.termCountUnique()+1];
-  for (TERMID_T i=1; i<=dbIndex.termCountUnique(); i++) {
+  for (lemur::api::TERMID_T i=1; i<=dbIndex.termCountUnique(); i++) {
     idfV[i] = log((dbIndex.docCount()+1)/(0.5+dbIndex.docCount(i)));
   }
   loadDocNorms();  
   scFunc = new CosSimScoreFunc(dbIndex);
 }
 
-void CosSimRetMethod::loadDocNorms() {
-  COUNT_T  numDocs = ind.docCount();
+void lemur::retrieval::CosSimRetMethod::loadDocNorms() {
+  lemur::api::COUNT_T  numDocs = ind.docCount();
   docNorms = new double[numDocs + 1];
-  for (COUNT_T j = 0; j <= numDocs; j++) {
+  for (lemur::api::COUNT_T j = 0; j <= numDocs; j++) {
     docNorms[j] = 0;
   }
   ifstream ifs;
@@ -112,8 +112,8 @@ void CosSimRetMethod::loadDocNorms() {
     cerr << "open file, wrong name:" << L2FileName << endl; 
     return;
   }
-  for (COUNT_T i = 1; i <= numDocs; i++) {
-    DOCID_T id;
+  for (lemur::api::COUNT_T i = 1; i <= numDocs; i++) {
+    lemur::api::DOCID_T id;
     double norm;
     ifs >> id >> norm;
     if (id != i) {
@@ -126,20 +126,20 @@ void CosSimRetMethod::loadDocNorms() {
   ifs.close();
 }
 
-CosSimRetMethod::~CosSimRetMethod() {
+lemur::retrieval::CosSimRetMethod::~CosSimRetMethod() {
   delete[](idfV); 
   delete[](docNorms);  
   delete(scFunc);
 }
 
-double CosSimRetMethod::docNorm(DOCID_T docID) {
+double lemur::retrieval::CosSimRetMethod::docNorm(lemur::api::DOCID_T docID) {
   // cache norms for docs already seen once.
   if (docNorms[docID] == 0) {
-    TermInfoList *qList = ind.termInfoList(docID);
-    TermInfo *qInfo;
+    lemur::api::TermInfoList *qList = ind.termInfoList(docID);
+    lemur::api::TermInfo *qInfo;
     qList->startIteration();
-    TERMID_T idx;
-    COUNT_T dtf;
+    lemur::api::TERMID_T idx;
+    lemur::api::COUNT_T dtf;
     double norm = 0, tmp;
     while (qList->hasMore()) {
       qInfo = qList->nextEntry();
@@ -157,13 +157,13 @@ double CosSimRetMethod::docNorm(DOCID_T docID) {
 }
 
 /// Use same as TFIDFRetMethod
-void CosSimRetMethod::updateTextQuery(TextQueryRep &qryRep, 
-				      const DocIDSet &relDocs)
+void lemur::retrieval::CosSimRetMethod::updateTextQuery(lemur::api::TextQueryRep &qryRep, 
+				      const lemur::api::DocIDSet &relDocs)
 {
-  COUNT_T totalTerm=ind.termCountUnique();  
+  lemur::api::COUNT_T totalTerm=ind.termCountUnique();  
   float * centroidVector = new float[totalTerm+1]; // one extra for OOV
 
-  COUNT_T i;
+  lemur::api::COUNT_T i;
   for (i=1;i<=totalTerm;i++) {
     centroidVector[i]=0;
   }
@@ -176,10 +176,10 @@ void CosSimRetMethod::updateTextQuery(TextQueryRep &qryRep,
     relDocs.nextIDInfo(docID, relPr);
     actualDocs++;
 
-    TermInfoList *tList = ind.termInfoList(docID);
+    lemur::api::TermInfoList *tList = ind.termInfoList(docID);
     tList->startIteration();
     while (tList->hasMore()) {
-      TermInfo *info = tList->nextEntry();
+      lemur::api::TermInfo *info = tList->nextEntry();
       centroidVector[info->termID()] += info->count(); // raw TF
     }
     delete tList;
@@ -192,19 +192,19 @@ void CosSimRetMethod::updateTextQuery(TextQueryRep &qryRep,
     }
   }
 
-  IndexedRealVector centVector(0);
+  lemur::api::IndexedRealVector centVector(0);
   
   for (i=1; i< totalTerm; i++) {
     if (centroidVector[i]>0) {
-      IndexedReal entry;
+      lemur::api::IndexedReal entry;
       entry.ind = i;
       entry.val = centroidVector[i];
       centVector.push_back(entry);
     }
   }
   centVector.Sort();
-  IndexedRealVector::iterator j;
-  COUNT_T termCount=0;
+  lemur::api::IndexedRealVector::iterator j;
+  lemur::api::COUNT_T termCount=0;
   for (j= centVector.begin();j!=centVector.end();j++) {
     if (termCount++ >= fbParam.howManyTerms) {
       break;

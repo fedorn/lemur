@@ -65,7 +65,9 @@ The parameters are:
 #include "KeyfileTextHandler.hpp"
 #include "KeyfileIncIndex.hpp"
 #include "Param.hpp"
-#include "FUtil.hpp"
+#include "indri/Path.hpp"
+
+using namespace lemur::api;
 
 // Local parameters used by the indexer 
 namespace LocalParameter {
@@ -199,21 +201,21 @@ int AppMain(int argc, char * argv[]) {
   // architecture.  See the TextHandler and InvFPTextHandler classes
   // for more info.)
   TextHandler* indexer;
-  KeyfileIncIndex* index = NULL;
+  lemur::index::KeyfileIncIndex* index = NULL;
 
   if (LocalParameter::indexType == "indri") {
-    indexer = new IndriTextHandler(LocalParameter::index,
+    indexer = new lemur::parse::IndriTextHandler(LocalParameter::index,
 				   LocalParameter::memory,
 				   parser);
   } else if (LocalParameter::indexType == "inv") {
-    indexer = new InvFPTextHandler(LocalParameter::index, 
+    indexer = new lemur::parse::InvFPTextHandler(LocalParameter::index, 
 				   LocalParameter::memory, 
 				   LocalParameter::countStopWords, 
 				   LocalParameter::position);
   } else if (LocalParameter::indexType == "key") {
-    index = new KeyfileIncIndex(LocalParameter::index,
+    index = new lemur::index::KeyfileIncIndex(LocalParameter::index,
 				LocalParameter::memory);
-    indexer = new KeyfileTextHandler(index,
+    indexer = new lemur::parse::KeyfileTextHandler(index,
 				     LocalParameter::countStopWords);
   } else {
     LEMUR_THROW(LEMUR_BAD_PARAMETER_ERROR,"Please use a valid value for the required parameter \"IndexType\". \nValid values are \"inv\",\"key\", or \"indri\"See program usage or Lemur documentation for more information.");
@@ -236,7 +238,7 @@ int AppMain(int argc, char * argv[]) {
 
   // parse the data files
   if (!LocalParameter::dataFiles.empty()) {
-    if (!fileExist(LocalParameter::dataFiles)) {
+    if (!indri::file::Path::exists(LocalParameter::dataFiles)) {
       LEMUR_THROW(LEMUR_IO_ERROR, "\"dataFiles\" specified does not exist");
     }
     ifstream source(LocalParameter::dataFiles.c_str());

@@ -1843,7 +1843,7 @@ int main()
 #define SYMBOL 8
 #define STYLE 9
 
-WebParser::WebParser() {
+lemur::parse::WebParser::WebParser() {
   state = OUTER;
 // tags for signaling the beginning and ending of an element
 // for ElemDocMgr, actual tag values don't matter as long as 
@@ -1855,12 +1855,12 @@ WebParser::WebParser() {
   iden=identifier;
 }
 
-long WebParser::fileTell() const {
+long lemur::parse::WebParser::fileTell() const {
   return webloc;
 }
 
 void 
-WebParser::parseFile(const string &filename) {
+lemur::parse::WebParser::parseFile(const string &filename) {
   parsefile = filename;
   webloc = 0;
   webin = fopen(filename.c_str(), "rb");
@@ -1868,7 +1868,7 @@ WebParser::parseFile(const string &filename) {
   fclose(webin);
 }
 
-void WebParser::parseBuffer (char* buf, int len) {
+void lemur::parse::WebParser::parseBuffer (char* buf, int len) {
   int tpos = webloc;
   webloc = 0;
   YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
@@ -1879,7 +1879,7 @@ void WebParser::parseBuffer (char* buf, int len) {
   webloc = tpos;
 }
 
-void WebParser::doParse() {
+void lemur::parse::WebParser::doParse() {
 
   int tok;
 

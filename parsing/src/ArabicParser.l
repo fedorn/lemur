@@ -89,16 +89,16 @@ not_arabic_skip [^\r\t\n ~`!@#$%^&*()_\-+=[\]{}|\\:;"'<>,.?/¡÷×º¿]
 #define DOC 1
 #define TEXT 9
 
-ArabicParser::ArabicParser() {
+lemur::parse::ArabicParser::ArabicParser() {
   state = OUTER;
   iden = identifier;
 }
 
-long ArabicParser::fileTell() const{
+long lemur::parse::ArabicParser::fileTell() const{
   return arabicpos;
 }
 
-void ArabicParser::parseFile(const string &filename) {  
+void lemur::parse::ArabicParser::parseFile(const string &filename) {  
   parsefile = filename;
   arabicpos = 0;
   Arabicin = fopen(filename.c_str(), "rb");
@@ -106,7 +106,7 @@ void ArabicParser::parseFile(const string &filename) {
   fclose(Arabicin);
 }
 
-void ArabicParser::parseBuffer(char* buf, int len) {
+void lemur::parse::ArabicParser::parseBuffer(char* buf, int len) {
   int tpos = arabicpos;
   arabicpos = 0;
   YY_BUFFER_STATE oldBuf = YY_CURRENT_BUFFER;
@@ -117,7 +117,7 @@ void ArabicParser::parseBuffer(char* buf, int len) {
   arabicpos = tpos;
 }
 
-void ArabicParser::doParse() {
+void lemur::parse::ArabicParser::doParse() {
   int tok;
   // The core loop of the parser.
   // The parser is state based.  Encountering a tag

@@ -17,7 +17,11 @@
 #include "TextHandlerManager.hpp"
 #include "Match.hpp"
 #include "Keyfile.hpp"
-
+namespace lemur 
+{
+  namespace parse 
+  {
+    
 // array of byte offsets, indexed by token for each doc.
 #define BT_POSITIONS ".btp"
 // source file start, length
@@ -36,7 +40,7 @@
   interface for building the manager.
  */
 
-class KeyfileDocMgr : public DocumentManager, public TextHandler {
+class KeyfileDocMgr : public lemur::api::DocumentManager, public lemur::api::TextHandler {
 public:
   /// default constructor 
   KeyfileDocMgr() {  myDoc = NULL;  numdocs = 0; ignoreDoc = false; _readOnly = true;}
@@ -72,12 +76,12 @@ public:
     return word;
   }
   /// set myParser to p
-  virtual void setParser(Parser *p) {
+  virtual void setParser(lemur::api::Parser *p) {
     myparser = p;
   }
 
-  virtual Parser* getParser() const {
-    return (TextHandlerManager::createParser(pm));
+  virtual lemur::api::Parser* getParser() const {
+    return (lemur::api::TextHandlerManager::createParser(pm));
   }
 
   /// Build the document manager tables from the files previously provided
@@ -107,7 +111,7 @@ protected:
     long bytes;
   };
 
-  Parser *myparser;
+  lemur::api::Parser *myparser;
   virtual void writeTOC();
   virtual bool loadTOC();
   bool loadFTFiles(const string &fn, int num);
@@ -116,8 +120,8 @@ protected:
   int numdocs;              // how many docs we have
   string pm;  // parse mode
 
-  mutable Keyfile poslookup; // btree for lookup to positions list.
-  mutable Keyfile doclookup; // btree for lookup to doc start.
+  mutable lemur::file::Keyfile poslookup; // btree for lookup to positions list.
+  mutable lemur::file::Keyfile doclookup; // btree for lookup to doc start.
   int dbcache;
   
   btl docEntry;
@@ -134,5 +138,7 @@ protected:
   /// are we read only.
   bool _readOnly;
 };
+  }
+}
 
 #endif // _LEMUR_KEYFILE_DOCMGR_HPP

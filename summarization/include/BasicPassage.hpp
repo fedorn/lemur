@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _BASICPASSAGE_HPP
 #define _BASICPASSAGE_HPP
@@ -19,32 +19,39 @@
 using std::vector;
 using std::string;
 
+namespace lemur
+{
+  /// Document summarization components.
+  namespace summarization
+  {
+    
+    /*!
+      A simple implementation of the abstract class <code>Passage</code> meant to work in conjunction with the simple sentence selection summarizer <code>BasicSumm</code>
 
-/*!
-  A simple implementation of the abstract class <code>Passage</code> meant to work in conjunction with the simple sentence selection summarizer <code>BasicSumm</code>
+    */
 
-*/
+    class BasicPassage : public Passage {
 
-class BasicPassage : public Passage {
-
-public:
-  BasicPassage(const string &id) {
-    psg = new passageVec;
-    docID = id;
-    score = -1;
-    marked = 0;
-  } 
+    public:
+      BasicPassage(const string &id) {
+        psg = new passageVec;
+        docID = id;
+        score = -1;
+        marked = 0;
+      } 
  
-  virtual void clear() ;
+      virtual void clear() ;
 
-  virtual void addTerm(termCount term) ;
+      virtual void addTerm(termCount term) ;
 
-  virtual void addTerms(const passageVec pv) ;
+      virtual void addTerms(const passageVec pv) ;
 
-  virtual const passageVec* getAsVector(void) const ;
+      virtual const passageVec* getAsVector(void) const ;
 
-  virtual int operator<(const Passage &b) const ;
+      virtual int operator<(const Passage &b) const ;
 
-};
+    };
+  }
+}
 
 #endif

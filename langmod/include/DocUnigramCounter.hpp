@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #ifndef _DOCUNIGRAMCOUNTER_HPP
@@ -17,32 +17,39 @@
 #include "WeightedIDSet.hpp"
 #include "Counter.hpp"
 #include "Index.hpp"
+namespace lemur 
+{
+  /// Language model components.
+  namespace langmod
+  {
+    
+    /// Counter of unigrams in documents
 
-/// Counter of unigrams in documents
+    class DocUnigramCounter : public lemur::utility::ArrayCounter <int> {
+    public:
+      /// construct a counter for a doc
+      DocUnigramCounter(lemur::api::DOCID_T docID, const lemur::api::Index &homeIndex);
 
-class DocUnigramCounter : public ArrayCounter <int> {
-public:
-  /// construct a counter for a doc
-  DocUnigramCounter(DOCID_T docID, const Index &homeIndex);
+      /// construct a counter for a subset of docs in a collection
+      DocUnigramCounter(const vector<lemur::api::DOCID_T> &docSet, const lemur::api::Index &homeIndex);
 
-  /// construct a counter for a subset of docs in a collection
-  DocUnigramCounter(const vector<DOCID_T> &docSet, const Index &homeIndex);
+      /// construct a counter for a subset of weighted docs in a collection
+      DocUnigramCounter(const lemur::utility::WeightedIDSet &docSet, const lemur::api::Index &homeIndex);
 
-  /// construct a counter for a subset of weighted docs in a collection
-  DocUnigramCounter(const WeightedIDSet &docSet, const Index &homeIndex);
+      /// construct a counter for a whole collection of docs 
+      DocUnigramCounter(const lemur::api::Index &collectionIndex);
 
-  /// construct a counter for a whole collection of docs 
-  DocUnigramCounter(const Index &collectionIndex);
+      virtual ~DocUnigramCounter() {}
+      const string lexiconID() const { return (ind.termLexiconID());}
 
-  virtual ~DocUnigramCounter() {}
-  const string lexiconID() const { return (ind.termLexiconID());}
+    protected:
 
-protected:
+      void countDocUnigram(lemur::api::DOCID_T docID, double weight=1);
 
-  void countDocUnigram(DOCID_T docID, double weight=1);
-
-  const Index &ind;
-};
-
+      const lemur::api::Index &ind;
+    };
+ 
+  }
+}
 
 #endif /* _DOCUNIGRAMCOUNTER_HPP */

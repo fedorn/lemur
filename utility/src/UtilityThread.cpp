@@ -59,7 +59,7 @@ void indri::thread::UtilityThread::run() {
       work();
 
     deinitialize();
-  } catch( Exception& e ) {
+  } catch( lemur::api::Exception& e ) {
     std::cout << "UtilityThread exiting from exception " << e.what() << std::endl;
   }
 

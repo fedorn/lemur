@@ -2,15 +2,15 @@
 
 
 
-DocFreqIndexer::DocFreqIndexer(const string &csName, const string &cwName, 
+lemur::distrib::DocFreqIndexer::DocFreqIndexer(const string &csName, const string &cwName, 
 			       const string &ssName, int bufferSize, 
 			       bool countStopWords) {
-  collsel = new InvPushIndex(csName, bufferSize);
+  collsel = new lemur::index::InvPushIndex(csName, bufferSize);
   collWords = fopen(cwName.c_str(), "wb");
   serverSizes = fopen(ssName.c_str(), "wb");
 
-  csdp = new DocumentProps();
-  term = new InvFPTerm();
+  csdp = new lemur::parse::DocumentProps();
+  term = new lemur::index::InvFPTerm();
 
   countStopWds = countStopWords;
 
@@ -19,7 +19,7 @@ DocFreqIndexer::DocFreqIndexer(const string &csName, const string &cwName,
   first = true;
 }
 
-DocFreqIndexer::~DocFreqIndexer() {
+lemur::distrib::DocFreqIndexer::~DocFreqIndexer() {
 
 
   csdp->length(dfCount);
@@ -37,19 +37,19 @@ DocFreqIndexer::~DocFreqIndexer() {
 }
 
 char *
-DocFreqIndexer::handleDoc(char * docno) {
+lemur::distrib::DocFreqIndexer::handleDoc(char * docno) {
   handleEndDoc();
   numDocs++;
   return docno;
 }
 
 void
-DocFreqIndexer::handleEndDoc() {
+lemur::distrib::DocFreqIndexer::handleEndDoc() {
   docWords.clear();
 }
 
 char *
-DocFreqIndexer::handleWord(char * word) {
+lemur::distrib::DocFreqIndexer::handleWord(char * word) {
   if (word != NULL) {
 
     int len = strlen(word);
@@ -74,7 +74,7 @@ DocFreqIndexer::handleWord(char * word) {
 
 
 void 
-DocFreqIndexer::newDb(const string &name) {
+lemur::distrib::DocFreqIndexer::newDb(const string &name) {
   
   if (!first) {
     cout << "words in collection: " << cw << endl;

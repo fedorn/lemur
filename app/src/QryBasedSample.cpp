@@ -25,6 +25,8 @@
 
 
 #include "Param.hpp"
+using namespace lemur::api;
+using namespace lemur::distrib;
 
 
 /// Prints out useful usage information
@@ -99,7 +101,7 @@ namespace QBSParameter {
 
 
     // Look up random query selection mode
-    String rmode = ParamGetString("queryMode", "unif");
+    std::string rmode = ParamGetString("queryMode", "unif");
     if (rmode == "unif") qryMode = R_UNIFORM;
     else if (rmode == "avetf") qryMode = R_AVE_TF;
     else if (rmode == "df") qryMode = R_DF;
@@ -134,7 +136,7 @@ namespace QBSParameter {
 /// Application specific parameters
 namespace LocalParameter {
   /// database manager
-  String dbManager;
+  std::string dbManager;
   /// Filename for a list of databases to sample
   string listFile;
   /// Initial query selection model
@@ -164,19 +166,19 @@ void GetAppParam() {
 int AppMain (int argc, char * argv []) {
 
   // Keeps track of db stats during sampling
-  FreqCounter freqCounter;
+  lemur::distrib::FreqCounter freqCounter;
   freqCounter.setRandomMode(QBSParameter::qryMode);
 
   // Create the database manager
-  DBManager * dbm;
+  lemur::distrib::DBManager * dbm;
   if (LocalParameter::dbManager == "lemur") {
-    dbm = new LemurDBManager();
+    dbm = new lemur::distrib::LemurDBManager();
   } else {
     throw Exception("QryBasedSample", "Unknown dbManager specified.");
   }
 
   // Create and initialize the query-based sampler object
-  QryBasedSampler dbp;
+  lemur::distrib::QryBasedSampler dbp;
 
   dbp.setNumDocs(QBSParameter::numDocs);
   dbp.setNumWords(QBSParameter::numWords);
@@ -188,7 +190,7 @@ int AppMain (int argc, char * argv []) {
   dbp.setFreqCounter(&freqCounter);
 
   // Initial query terms are selected from this model.
-  FreqCounter initQueryModel(LocalParameter::initModel);
+  lemur::distrib::FreqCounter initQueryModel(LocalParameter::initModel);
   initQueryModel.setRandomMode(QBSParameter::qryMode);
   
   // Main processing loop - perform sampling on all databases.
@@ -215,7 +217,7 @@ int AppMain (int argc, char * argv []) {
       // Open the new database.
       dbm->open(dbn);
       // Get a parser for the database.
-      MemParser * dp = dbm->getParser();
+      lemur::distrib::MemParser * dp = dbm->getParser();
       // Tell the parser to pass info on to the model builder.
       dp->setTextHandler(&freqCounter);
       

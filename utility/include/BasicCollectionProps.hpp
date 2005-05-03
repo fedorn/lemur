@@ -7,30 +7,37 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _BASICCOLLECTIONPROPS_HPP
 #define _BASICCOLLECTIONPROPS_HPP
-
-/*! this is a supporting class for classes that want to pass one object
-around that would have access methods for properties that a collection might
-have.  
-*/
-
 #include "CollectionProps.hpp"
 #include "LinkedPropertyList.hpp"
 
-class BasicCollectionProps : public CollectionProps, public LinkedPropertyList {
+namespace lemur 
+{
+  namespace parse 
+  {
+    
+    /*! this is a supporting class for classes that want to pass one object
+      around that would have access methods for properties that a collection might
+      have.  
+    */
 
-public:
-  BasicCollectionProps() {};
-  virtual ~BasicCollectionProps() {};
 
-  /// get me the value for the property with this name
-  string getStringProperty(const string& name) const;
+    class BasicCollectionProps : public CollectionProps, public LinkedPropertyList {
 
-protected:
+    public:
+      BasicCollectionProps() {};
+      virtual ~BasicCollectionProps() {};
 
-};
+      /// get me the value for the property with this name
+      string getStringProperty(const string& name) const;
+
+    protected:
+
+    };
+  }
+}
 
 #endif

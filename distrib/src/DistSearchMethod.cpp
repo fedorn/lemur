@@ -10,8 +10,9 @@
 */
 
 #include "DistSearchMethod.hpp"
+using namespace lemur::api;
 
-void DistSearchMethod::scoreIndexSet(const Query &qry, 
+void lemur::distrib::DistSearchMethod::scoreIndexSet(const Query &qry, 
 				     const IndexedRealVector &indexset, 
 				     DocScoreVector** results) {
 
@@ -29,7 +30,7 @@ void DistSearchMethod::scoreIndexSet(const Query &qry,
   }
 }
 
-void DistSearchMethod::scoreIndexSet(const Query &qry, 
+void lemur::distrib::DistSearchMethod::scoreIndexSet(const Query &qry, 
 				     const vector<string> &indexset, 
 				     DocScoreVector** results) {
 
@@ -48,7 +49,7 @@ void DistSearchMethod::scoreIndexSet(const Query &qry,
 }
 
 
-void DistSearchMethod::indexToID(const Index* ind, 
+void lemur::distrib::DistSearchMethod::indexToID(const Index* ind, 
 				 const IndexedRealVector* ivec, 
 				 DocScoreVector* dvec) {
 
@@ -59,11 +60,11 @@ void DistSearchMethod::indexToID(const Index* ind,
 }
 
 /**********************  PRIVATE METHODS ****************************/
-void DistSearchMethod::doSingleRetr() {
+void lemur::distrib::DistSearchMethod::doSingleRetr() {
   // open the individual db
   Index* single = IndexManager::openIndex(ParamGetString("index"));
   int numdocs = single->docCount();
-  ArrayAccumulator* accum = new ArrayAccumulator(numdocs);
+  lemur::retrieval::ArrayAccumulator* accum = new lemur::retrieval::ArrayAccumulator(numdocs);
   // create the model according to parameter
   RetrievalMethod* model = RetMethodManager::createModel(single, accum, defrt);
   IndexedRealVector* res = new IndexedRealVector(numdocs);

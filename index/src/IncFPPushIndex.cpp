@@ -17,8 +17,8 @@
  *
  *========================================================================*/
 
-IncFPPushIndex::IncFPPushIndex(const string &prefix, int cachesize, 
-			       long maxfilesize, DOCID_T startdocid) {
+lemur::index::IncFPPushIndex::IncFPPushIndex(const std::string &prefix, int cachesize, 
+			       long maxfilesize, lemur::api::DOCID_T startdocid) {
   setName(prefix);
   fprintf(stderr, "building %s\n ", name.c_str());
   
@@ -27,7 +27,7 @@ IncFPPushIndex::IncFPPushIndex(const string &prefix, int cachesize,
   membuf = new int[cachesize/sizeof(int)];
   
   membufsize = cachesize;
-  cache = new MemCache(membuf, membufsize);
+  cache = new lemur::utility::MemCache(membuf, membufsize);
   tcount = tidcount = 0;
   maxfile = maxfilesize;
   curdocmgr = -1;
@@ -52,7 +52,7 @@ IncFPPushIndex::IncFPPushIndex(const string &prefix, int cachesize,
 }
 
 
-bool IncFPPushIndex::tryOpen(const string &name) {
+bool lemur::index::IncFPPushIndex::tryOpen(const string &name) {
   // Check if we have a TOC
   string fname = name + INVFPTOC;
   if (!readToc(fname)) {
@@ -82,7 +82,7 @@ bool IncFPPushIndex::tryOpen(const string &name) {
   return true;
 }
 
-bool IncFPPushIndex::readToc(const string &fileName) {
+bool lemur::index::IncFPPushIndex::readToc(const string &fileName) {
   FILE* in = fopen(fileName.c_str(), "rb");
   if (in == NULL) {
     return false;
@@ -111,7 +111,7 @@ bool IncFPPushIndex::readToc(const string &fileName) {
 }
 
 
-void IncFPPushIndex::readDtFileIDs() {
+void lemur::index::IncFPPushIndex::readDtFileIDs() {
   FILE* in = fopen(dtF.c_str(), "rb");
   int index;
   int len;
@@ -132,7 +132,7 @@ void IncFPPushIndex::readDtFileIDs() {
   fclose(in);
 }
 
-void IncFPPushIndex::readDocMgrIDs() {
+void lemur::index::IncFPPushIndex::readDocMgrIDs() {
   FILE* in = fopen(dmgrF.c_str(), "r");
 
   int ind, len;
@@ -154,7 +154,7 @@ void IncFPPushIndex::readDocMgrIDs() {
   fclose(in);
 }
 
-void IncFPPushIndex::readInvFileIDs() {
+void lemur::index::IncFPPushIndex::readInvFileIDs() {
   FILE* in = fopen(invfpF.c_str(), "rb");
   int index;
   int len;
@@ -183,7 +183,7 @@ void IncFPPushIndex::readInvFileIDs() {
   fclose(in);
 }
 
-void IncFPPushIndex::readTermIDs() {
+void lemur::index::IncFPPushIndex::readTermIDs() {
   FILE* in = fopen(tidF.c_str(), "rb");
   int index;
   int len;
@@ -216,7 +216,7 @@ void IncFPPushIndex::readTermIDs() {
   cache->flushMem(); // reset the cache to empty.
 }
 
-void IncFPPushIndex::readDocIDs() {
+void lemur::index::IncFPPushIndex::readDocIDs() {
   FILE* in = fopen(didF.c_str(), "rb");
   int index;
   int len;

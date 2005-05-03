@@ -24,7 +24,7 @@
 #define READBUFFER_PAGE_SIZE      (4096)
 #define READBUFFER_EXTENSION_SIZE (128*1024)
 
-ReadBuffer::ReadBuffer( File& file, size_t bufferSize, bool exclusiveAccess ) : _file( file ) {
+lemur::file::ReadBuffer::ReadBuffer( File& file, size_t bufferSize, bool exclusiveAccess ) : _file( file ) {
   _bufferPosition = 0;
   _filePosition = 0;
   // round up to the nearest multiple of pages
@@ -35,11 +35,11 @@ ReadBuffer::ReadBuffer( File& file, size_t bufferSize, bool exclusiveAccess ) : 
   _exclusiveAccess = exclusiveAccess;
 }
 
-ReadBuffer::~ReadBuffer() {
+lemur::file::ReadBuffer::~ReadBuffer() {
   free( _buffer );
 }
 
-void ReadBuffer::read( char* data, size_t length ) {
+void lemur::file::ReadBuffer::read( char* data, size_t length ) {
   // read at least as much as we have left in the buffer, first
   size_t bufferCopyLength = lemur_compat::min(_bufferDataLength - _bufferPosition, length );
   memcpy( data, _buffer + _bufferPosition, bufferCopyLength );
@@ -80,7 +80,7 @@ void ReadBuffer::read( char* data, size_t length ) {
   }
 }
 
-const char* ReadBuffer::peek( size_t length ) {
+const char* lemur::file::ReadBuffer::peek( size_t length ) {
   if( (_bufferPosition + length) <= _bufferDataLength ) {
     // the data is already in the buffer, so return the pointer
     return _buffer + _bufferPosition;
@@ -133,18 +133,18 @@ const char* ReadBuffer::peek( size_t length ) {
   }
 }
 
-const char* ReadBuffer::read( size_t length ) {
+const char* lemur::file::ReadBuffer::read( size_t length ) {
   const char* ptr = peek(length);
   _bufferPosition += length;
 
   return ptr;
 }
 
-File::offset_type ReadBuffer::tellg() {
+lemur::file::File::offset_type lemur::file::ReadBuffer::tellg() {
   return _filePosition + _bufferPosition;
 }
 
-void ReadBuffer::seekg( File::offset_type position, std::fstream::seekdir direction ) {
+void lemur::file::ReadBuffer::seekg( File::offset_type position, std::fstream::seekdir direction ) {
   File::offset_type absolutePosition;
 
   switch( direction ) {
@@ -176,13 +176,13 @@ void ReadBuffer::seekg( File::offset_type position, std::fstream::seekdir direct
   }
 }
 
-int ReadBuffer::rdstate() {
+int lemur::file::ReadBuffer::rdstate() {
   if( _bufferPosition < _bufferDataLength )
     return 0;
   else
     return _file.rdstate();
 }
 
-void ReadBuffer::invalidateg() {
+void lemur::file::ReadBuffer::invalidateg() {
   _gValid = false;
 }

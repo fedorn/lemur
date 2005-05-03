@@ -127,7 +127,7 @@ const int ArabicVowel[256] = {
 
 
 /******************** FILE DATA **************************************/
-WordSet *stop_words_ht;
+lemur::utility::WordSet *stop_words_ht;
 
 void freeWordSets() {
   delete(stop_words_ht);
@@ -179,7 +179,7 @@ void load_static_files (const char *path) {
 	char filename[150];
 	strcpy (filename, path);
 	strcat (filename, "/stopwords.txt");
-	stop_words_ht = new WordSet(filename);
+	stop_words_ht = new lemur::utility::WordSet(filename);
 }
 
 /***************************************************************************/

@@ -18,7 +18,11 @@
 #ifndef QUERYDOC_HPP
 #define QUERYDOC_HPP
 
-
+namespace lemur 
+{
+  namespace api 
+  {
+    
 /// A convenience class for dealing with "interactive" queries. Creates
 /// a Document object compatible with TextQuery and StructQuery. Also a
 /// TH so it can be chained at the end of stoppers, stemmers, InqueryOpParser,
@@ -47,5 +51,7 @@ private:
   mutable int iter;
   mutable Term tt;
 };
+  }
+}
 
 #endif

@@ -6,37 +6,41 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 
 #include "TextHandler.hpp"
 
 #ifndef _STEMMER_HPP
 #define _STEMMER_HPP
+namespace lemur 
+{
+  namespace api 
+  {
+    ///
+    ///  A generic interface for Stemmers.  They should
+    ///  support the TextHandler interface.
+    ///
 
+    class Stemmer : public TextHandler {
 
-///
-///  A generic interface for Stemmers.  They should
-///  support the TextHandler interface.
-///
+    public:
+      static const string category;
+      static const string identifier;
 
-class Stemmer : public TextHandler {
+      Stemmer() { cat=category; iden=identifier;}
 
-public:
-  static const string category;
-  static const string identifier;
+      virtual char * handleWord(char * word) {
+        if (word != NULL) {
+          return stemWord(word);
+        }
+        return word;
+      }
+      /// Stem a word.  May overwrite the char *
+      /// passed in.
+      virtual char *stemWord(char * word) = 0;
 
-  Stemmer() {}
-
-  virtual char * handleWord(char * word) {
-    if (word != NULL) {
-      return stemWord(word);
-    }
-    return word;
+    };
   }
-  /// Stem a word.  May overwrite the char *
-  /// passed in.
-  virtual char *stemWord(char * word) = 0;
-
-};
+}
 
 #endif

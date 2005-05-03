@@ -44,12 +44,12 @@ This application is also a good example of using the doc index (i.e., doc->term 
 
 #include "IndexManager.hpp"
 #include "Param.hpp"
-#include "String.hpp"
 
+using namespace lemur::api;
 
 namespace LocalParameter {
-  static String index;
-  static String smoothSupportFile;
+  static std::string index;
+  static std::string smoothSupportFile;
   
   void get() {
     index = ParamGetString("index");
@@ -79,11 +79,11 @@ int AppMain(int argc, char *argv[]) {
     throw Exception("GenerateSmoothSupport", "Can't open index, check parameter index");
   }
 
-  ofs.open(LocalParameter::smoothSupportFile);
+  ofs.open(LocalParameter::smoothSupportFile.c_str());
 
 
   char mcSuppFileName[500];
-  strcpy(mcSuppFileName, LocalParameter::smoothSupportFile);
+  strcpy(mcSuppFileName, LocalParameter::smoothSupportFile.c_str());
   strcat(mcSuppFileName, ".mc");
 
   ofstream mcOFS;

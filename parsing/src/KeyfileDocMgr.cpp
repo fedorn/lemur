@@ -19,7 +19,7 @@
 //keyref.h
 #define MAX_DOCID_LENGTH 512 
 
-KeyfileDocMgr::KeyfileDocMgr(const string &name, bool readOnly) {
+lemur::parse::KeyfileDocMgr::KeyfileDocMgr(const string &name, bool readOnly) {
   myDoc = NULL;
   _readOnly = readOnly;
   numdocs = 0;
@@ -36,13 +36,13 @@ KeyfileDocMgr::KeyfileDocMgr(const string &name, bool readOnly) {
     val = IDname + BT_POSITIONS;
     poslookup.create(val);
     pm = "trec"; /// bleah fix me
-    setParser(TextHandlerManager::createParser());
+    setParser(lemur::api::TextHandlerManager::createParser());
   }
   // how many have been parsed already.
   numOldSources = sources.size();
 }
 
-KeyfileDocMgr::KeyfileDocMgr(string name, string mode, string source) {
+lemur::parse::KeyfileDocMgr::KeyfileDocMgr(string name, string mode, string source) {
   myDoc = NULL;
   numdocs = 0;
   _readOnly = false;
@@ -52,7 +52,7 @@ KeyfileDocMgr::KeyfileDocMgr(string name, string mode, string source) {
   if (!loadTOC()) {
     // brand new. create
     pm = mode;
-    setParser(TextHandlerManager::createParser(mode));
+    setParser(lemur::api::TextHandlerManager::createParser(mode));
     string val = IDname + BT_LOOKUP;
     doclookup.create(val);
     val = IDname + BT_POSITIONS;
@@ -73,7 +73,7 @@ KeyfileDocMgr::KeyfileDocMgr(string name, string mode, string source) {
   }
 }
 
-KeyfileDocMgr::~KeyfileDocMgr() {
+lemur::parse::KeyfileDocMgr::~KeyfileDocMgr() {
   writeTOC();
   delete[](myDoc);
 
@@ -81,7 +81,7 @@ KeyfileDocMgr::~KeyfileDocMgr() {
   doclookup.close();
 }
 
-void KeyfileDocMgr::handleEndDoc() {
+void lemur::parse::KeyfileDocMgr::handleEndDoc() {
   if (!ignoreDoc) {
     int end = myparser->fileTell();
     docEntry.bytes = end - docEntry.offset;
@@ -102,7 +102,7 @@ void KeyfileDocMgr::handleEndDoc() {
     // compress it
     unsigned char* comp = new unsigned char[numOffs * sizeof(int) * 2];
     int datalen = (numOffs * 2);
-    int compbyte = RVLCompress::compress_ints(offs, comp, datalen);
+    int compbyte = lemur::utility::RVLCompress::compress_ints(offs, comp, datalen);
     
     poslookup.put( myDoc, comp, compbyte );
     offsets.clear();
@@ -112,7 +112,7 @@ void KeyfileDocMgr::handleEndDoc() {
   ignoreDoc = false;
 }
 
-char* KeyfileDocMgr::handleDoc(char* docno) {
+char* lemur::parse::KeyfileDocMgr::handleDoc(char* docno) {
   docEntry.offset = myparser->getDocBytePos();
   docEntry.fid = fileid;
   doclen = strlen(docno) + 1;
@@ -130,7 +130,7 @@ char* KeyfileDocMgr::handleDoc(char* docno) {
   int actual;
   if (doclookup.get( myDoc, &documentLocation, actual, sizeof(btl) )) {
     // duplicate document id.
-    cerr << "KeyfileDocMgr::handleDoc: duplicate document id " << myDoc 
+    cerr << "lemur::parse::KeyfileDocMgr::handleDoc: duplicate document id " << myDoc 
 	 << ". Document will be ignored." << endl;
     ignoreDoc = true;
   } else {
@@ -140,7 +140,7 @@ char* KeyfileDocMgr::handleDoc(char* docno) {
 }
 
 // caller delete[]s
-char *KeyfileDocMgr::getDoc(const string &docID) const{
+char *lemur::parse::KeyfileDocMgr::getDoc(const string &docID) const{
   int actual = 0;
   btl documentLocation;
   char tmpdoc[MAX_DOCID_LENGTH];
@@ -148,7 +148,7 @@ char *KeyfileDocMgr::getDoc(const string &docID) const{
   int doclen = strlen(docName) + 1;
   if (doclen > (MAX_DOCID_LENGTH - 1)) {
     doclen = MAX_DOCID_LENGTH;
-    cerr << "KeyfileDocMgr::getDoc: document id " << docName << " is too long ("
+    cerr << "lemur::parse::KeyfileDocMgr::getDoc: document id " << docName << " is too long ("
          << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     cerr << "truncating " << docName << endl;
     strncpy(tmpdoc, docID.c_str(), doclen - 1);
@@ -161,7 +161,7 @@ char *KeyfileDocMgr::getDoc(const string &docID) const{
   char *doc = new char[documentLocation.bytes + 1];
   ifstream read(sources[documentLocation.fid].c_str(), ios::binary);
   if (!read.is_open()) {
-    cerr << "KeyfileDocMgr::getDoc: Could not open file " 
+    cerr << "lemur::parse::KeyfileDocMgr::getDoc: Could not open file " 
 	 << sources[documentLocation.fid] << " to get document" << endl;
     return NULL;
   }
@@ -171,7 +171,7 @@ char *KeyfileDocMgr::getDoc(const string &docID) const{
   doc[documentLocation.bytes] = '\0';
   return doc;
 }
-vector<Match> KeyfileDocMgr::getOffsets(const string &docID) const{
+vector<lemur::parse::Match> lemur::parse::KeyfileDocMgr::getOffsets(const string &docID) const{
   // reset to empty
   offsets.clear();
   int size = 0;
@@ -181,7 +181,7 @@ vector<Match> KeyfileDocMgr::getOffsets(const string &docID) const{
   int doclen = strlen(docName) + 1;
   if (doclen > (MAX_DOCID_LENGTH - 1)) {
     doclen = MAX_DOCID_LENGTH;
-    cerr << "KeyfileDocMgr::getOffsets: document id " << docName 
+    cerr << "lemur::parse::KeyfileDocMgr::getOffsets: document id " << docName 
 	 << " is too long ("
          << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     cerr << "truncating " << docName << endl;
@@ -195,8 +195,7 @@ vector<Match> KeyfileDocMgr::getOffsets(const string &docID) const{
   int *buffer = new int[(size * 4)];
 
   // decompress it
-  // decompress it
-  int len = RVLCompress::decompress_ints(data, buffer, size);
+  int len = lemur::utility::RVLCompress::decompress_ints(data, buffer, size);
   offsets.resize(len/2);
   for (int i = 0, j = 0; i < len; i += 2, j++) {
     offsets[j].start = buffer[i];
@@ -207,7 +206,7 @@ vector<Match> KeyfileDocMgr::getOffsets(const string &docID) const{
   return offsets;
 }
 
-void KeyfileDocMgr::buildMgr() {
+void lemur::parse::KeyfileDocMgr::buildMgr() {
   _readOnly = false;
   myparser->setTextHandler(this);
   cerr << "Building " << IDname << endl;
@@ -219,7 +218,7 @@ void KeyfileDocMgr::buildMgr() {
   writeTOC();
 }
 
-void KeyfileDocMgr::writeTOC() {
+void lemur::parse::KeyfileDocMgr::writeTOC() {
   if (_readOnly) return;
   string n = IDname + BT_TOC;
   ofstream toc(n.c_str());
@@ -239,7 +238,7 @@ void KeyfileDocMgr::writeTOC() {
   fid.close();
 }
 
-bool KeyfileDocMgr::loadTOC() {
+bool lemur::parse::KeyfileDocMgr::loadTOC() {
   string n = IDname + BT_TOC;
   ifstream toc(n.c_str());
   if (!toc.is_open()) {
@@ -266,12 +265,12 @@ bool KeyfileDocMgr::loadTOC() {
   }
   toc.close();
   loadFTFiles(files, num);
-  setParser(TextHandlerManager::createParser(pm));
+  setParser(lemur::api::TextHandlerManager::createParser(pm));
   return true;
 }
 
 
-bool KeyfileDocMgr::loadFTFiles(const string &fn, int num) {
+bool lemur::parse::KeyfileDocMgr::loadFTFiles(const string &fn, int num) {
   ifstream fns (fn.c_str());
   if (!fns.is_open()) {
     return false;

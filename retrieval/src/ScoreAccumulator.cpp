@@ -12,7 +12,7 @@
 #include "common_headers.hpp"
 #include "ScoreAccumulator.hpp"
 
-void ArrayAccumulator::reset()
+void lemur::retrieval::ArrayAccumulator::reset()
 {
   for (int i=0; i<sz; i++) {
     acc[i]=0;
@@ -21,7 +21,7 @@ void ArrayAccumulator::reset()
   p=0;
 }
 
-bool ArrayAccumulator::findScore(int id, double &score) const
+bool lemur::retrieval::ArrayAccumulator::findScore(int id, double &score) const
 { 
   if (status[id-1]>0) {
     score = acc[id-1];
@@ -31,7 +31,7 @@ bool ArrayAccumulator::findScore(int id, double &score) const
   }
 }
 
-bool ArrayAccumulator::hasMore() const {
+bool lemur::retrieval::ArrayAccumulator::hasMore() const {
   if (!(p>=0 && p<=sz)) {
     cerr << "Illegal score" << endl;
     exit(0);
@@ -40,7 +40,7 @@ bool ArrayAccumulator::hasMore() const {
   return (p<sz);
 }
 
-void ArrayAccumulator::nextScore(int &id, double &score) const{
+void lemur::retrieval::ArrayAccumulator::nextScore(int &id, double &score) const{
   if (p<sz) id = p+1;
   score = acc[p];
   p++;

@@ -17,7 +17,7 @@
 
 #include "ElemDocMgr.hpp"
 
-ElemDocMgr::ElemDocMgr(const string &name, bool readOnly) {
+lemur::parse::ElemDocMgr::ElemDocMgr(const string &name, bool readOnly) {
   _readOnly = readOnly;
   IDnameext = name;
   // strip extension
@@ -31,7 +31,7 @@ ElemDocMgr::ElemDocMgr(const string &name, bool readOnly) {
     val = IDname + BT_POSITIONS;
     poslookup.create( val.c_str() );
     pm = "trec"; /// bleah fix me
-    setParser(TextHandlerManager::createParser());
+    setParser(lemur::api::TextHandlerManager::createParser());
 
     val = IDname + ELEM_ELS;
     elements.create( val.c_str());    
@@ -40,13 +40,13 @@ ElemDocMgr::ElemDocMgr(const string &name, bool readOnly) {
   numOldSources = sources.size();
 }
 
-ElemDocMgr::ElemDocMgr(string name, string mode, string source) {
+lemur::parse::ElemDocMgr::ElemDocMgr(string name, string mode, string source) {
   _readOnly = false;
   IDname = name;
   IDnameext = IDname+ELEM_TOC;
   if (! loadTOC()) {    
     pm = mode;
-    setParser(TextHandlerManager::createParser(mode));
+    setParser(lemur::api::TextHandlerManager::createParser(mode));
     string val = IDname + BT_LOOKUP;
     doclookup.create( val.c_str() );
     val = IDname + BT_POSITIONS;
@@ -68,11 +68,11 @@ ElemDocMgr::ElemDocMgr(string name, string mode, string source) {
   }
 }
 
-ElemDocMgr::~ElemDocMgr() {
+lemur::parse::ElemDocMgr::~ElemDocMgr() {
   elements.close();
 }
 
-char* ElemDocMgr::handleBeginTag(char* tag, const char* orig, PropertyList* props) {
+char* lemur::parse::ElemDocMgr::handleBeginTag(char* tag, const char* orig, PropertyList* props) {
   if (! ignoreDoc) {
     const Property* prop = NULL;
     prop = props->getProperty("B_ELEM");
@@ -93,7 +93,7 @@ char* ElemDocMgr::handleBeginTag(char* tag, const char* orig, PropertyList* prop
   return tag;
 }
 
-char* ElemDocMgr::handleEndTag(char* tag, const char* orig, PropertyList* props){
+char* lemur::parse::ElemDocMgr::handleEndTag(char* tag, const char* orig, PropertyList* props){
   if (!ignoreDoc) {
     // find the tag
     const Property* prop=NULL;
@@ -122,7 +122,7 @@ char* ElemDocMgr::handleEndTag(char* tag, const char* orig, PropertyList* props)
 }
 
 // caller delete[]
-char* ElemDocMgr::getElement(const char* docid, const char* element) const{
+char* lemur::parse::ElemDocMgr::getElement(const char* docid, const char* element) const{
   int actual=0;
   btl elemloc;
   char* key = new char[strlen(docid)+strlen(element)+1];
@@ -151,7 +151,7 @@ char* ElemDocMgr::getElement(const char* docid, const char* element) const{
   return elem;
 }
 
-void ElemDocMgr::writeTOC() {
+void lemur::parse::ElemDocMgr::writeTOC() {
   if (_readOnly) return;
   string n = IDname + ELEM_TOC;
   ofstream toc(n.c_str());
@@ -172,7 +172,7 @@ void ElemDocMgr::writeTOC() {
   fid.close();
 }
 
-bool ElemDocMgr::loadTOC() {
+bool lemur::parse::ElemDocMgr::loadTOC() {
   string n = IDname + ELEM_TOC;
   ifstream toc(n.c_str());
   if (!toc.is_open()) {
@@ -201,7 +201,7 @@ bool ElemDocMgr::loadTOC() {
   }
   toc.close();
   loadFTFiles(files, num);
-  setParser(TextHandlerManager::createParser(pm));
+  setParser(lemur::api::TextHandlerManager::createParser(pm));
   return true;
 }
 

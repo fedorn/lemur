@@ -17,17 +17,18 @@ extern "C" {
 #include <sstream>
 #include "Keyfile.hpp"
 #include "Exception.hpp"
+
 #include "lemur-platform.h"
 #include "lemur-compat.hpp"
 
-void Keyfile::_buildHandle( int cacheSize ) {
+void lemur::file::Keyfile::_buildHandle( int cacheSize ) {
 int blocks = lemur_compat::max( (cacheSize - min_fcb_lc) / buffer_lc, 0 );
   _handleSize = min_fcb_lc + blocks * buffer_lc;
   _handle = new char[ _handleSize ];
   memset( _handle, 0x00, _handleSize );
 }
 
-void Keyfile::open( const char* filename, int cacheSize, bool readOnly) {
+void lemur::file::Keyfile::open( const char* filename, int cacheSize, bool readOnly) {
   _buildHandle( cacheSize );
   
   int error = open_key( _handle, const_cast<char*>(filename), 
@@ -37,15 +38,15 @@ void Keyfile::open( const char* filename, int cacheSize, bool readOnly) {
     LEMUR_THROW(LEMUR_KEYFILE_IO_ERROR, "Unable to open '" + filename + "'");
 }
 
-void Keyfile::open(const std::string& filename, int cacheSize, bool readOnly){
+void lemur::file::Keyfile::open(const std::string& filename, int cacheSize, bool readOnly){
   open( filename.c_str(), cacheSize, readOnly );
 }
 
-void Keyfile::openRead( const std::string& filename, int cacheSize ) {
+void lemur::file::Keyfile::openRead( const std::string& filename, int cacheSize ) {
   open( filename, cacheSize, true );
 }
 
-void Keyfile::create( const char* filename, int cacheSize ) {
+void lemur::file::Keyfile::create( const char* filename, int cacheSize ) {
   _buildHandle( cacheSize );
   
   int error = create_key( _handle, const_cast<char*>(filename), 
@@ -55,18 +56,18 @@ void Keyfile::create( const char* filename, int cacheSize ) {
     LEMUR_THROW(LEMUR_KEYFILE_IO_ERROR, "Unable to create '" + filename + "'");
 }
 
-void Keyfile::create( const std::string& filename, int cacheSize ) {
+void lemur::file::Keyfile::create( const std::string& filename, int cacheSize ) {
   create( filename.c_str(), cacheSize );
 }
 
-void Keyfile::close() {
+void lemur::file::Keyfile::close() {
   // don't close an unopened key.
   if (_handle != NULL) close_key( _handle);
   delete[](_handle);
   _handle = NULL;
 }
 
-bool Keyfile::get( const char* key, char** value, int& actualSize ) const {
+bool lemur::file::Keyfile::get( const char* key, char** value, int& actualSize ) const {
   char *buffer; 
 
   // clear parameters in case of size <= 0
@@ -85,7 +86,7 @@ bool Keyfile::get( const char* key, char** value, int& actualSize ) const {
   return size > 0;
 }
 
-bool Keyfile::get( const char* key, void* value, int& actualSize, 
+bool lemur::file::Keyfile::get( const char* key, void* value, int& actualSize, 
 		      int maxSize ) const {
   assert( key && "key cannot be null" );
   assert( value && "value cannot be null" );
@@ -102,7 +103,7 @@ bool Keyfile::get( const char* key, void* value, int& actualSize,
   return error != getnokey_err;
 }
 
-void Keyfile::put( const char* key, const void* value, int valueSize ) {
+void lemur::file::Keyfile::put( const char* key, const void* value, int valueSize ) {
   assert( key && "key cannot be null" );
   assert( value && "value cannot be null" );
   int len = strlen(key); // fix for UTF-8
@@ -115,7 +116,7 @@ void Keyfile::put( const char* key, const void* value, int valueSize ) {
     LEMUR_THROW( LEMUR_KEYFILE_IO_ERROR, "Caught an internal error while putting record for key: " + key );
 }
 
-bool Keyfile::next( char* key, int& keyLength, char* value, int& valueLength ) {
+bool lemur::file::Keyfile::next( char* key, int& keyLength, char* value, int& valueLength ) {
   assert( key && "key cannot be null" );
   assert( value && "value cannot be null" );
 
@@ -133,7 +134,7 @@ bool Keyfile::next( char* key, int& keyLength, char* value, int& valueLength ) {
   return error != ateof_err;
 }
 
-bool Keyfile::previous( char* key, int& keyLength, char* value, int& valueLength ) {
+bool lemur::file::Keyfile::previous( char* key, int& keyLength, char* value, int& valueLength ) {
   assert( key && "key cannot be null" );
   assert( value && "value cannot be null" );
 
@@ -151,7 +152,7 @@ bool Keyfile::previous( char* key, int& keyLength, char* value, int& valueLength
   return error != ateof_err;
 }
 
-void Keyfile::remove( const char* key ) {
+void lemur::file::Keyfile::remove( const char* key ) {
   assert( key && "key cannot be null" );
   assert( _handle && "call open() or create() first" );
   int len = strlen(key); // fix for UTF-8
@@ -161,7 +162,7 @@ void Keyfile::remove( const char* key ) {
     LEMUR_THROW( LEMUR_KEYFILE_IO_ERROR, "Unable to delete record for key: " + key );
 }
 
-int Keyfile::getSize( const char* key ) const {
+int lemur::file::Keyfile::getSize( const char* key ) const {
   assert( key && "key cannot be null" );
   assert( _handle && "call open() or create() first" );
   char pointer[buffer_lc];
@@ -195,7 +196,7 @@ int Keyfile::getSize( const char* key ) const {
 #define KEYFILE_BUFFER_SHIFT(num,dig) (num >> ((5-dig)*6))
 #define KEYFILE_BUFFER_DIGIT(num,dig)  ( (KEYFILE_BUFFER_SHIFT(num,dig) | 1<<6) & ~(1<<7) )
 
-inline void Keyfile::_createKey( char* keyBuf, int number ) const {
+inline void lemur::file::Keyfile::_createKey( char* keyBuf, int number ) const {
    keyBuf[6] = 0;
    keyBuf[5] = KEYFILE_BUFFER_DIGIT( number, 5 );
    keyBuf[4] = KEYFILE_BUFFER_DIGIT( number, 4 );
@@ -205,7 +206,7 @@ inline void Keyfile::_createKey( char* keyBuf, int number ) const {
    keyBuf[0] = KEYFILE_BUFFER_DIGIT( number, 0 );
 }
 
-inline int Keyfile::_decodeKey( char* keyBuf ) const {
+inline int lemur::file::Keyfile::_decodeKey( char* keyBuf ) const {
   return ((keyBuf[5] & 0x3f) << 6*0) |
          ((keyBuf[4] & 0x3f) << 6*1) |
          ((keyBuf[3] & 0x3f) << 6*2) |
@@ -214,27 +215,27 @@ inline int Keyfile::_decodeKey( char* keyBuf ) const {
          ((keyBuf[0] & 0x3f) << 6*5);
 }
 
-void Keyfile::put( int key, const void* value, int valueLength ) {
+void lemur::file::Keyfile::put( int key, const void* value, int valueLength ) {
   // have to handle the 0 key. Bleah.
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   _createKey( keyBuf, key );
   put( keyBuf, value, valueLength );
 }
 
-bool Keyfile::get( int key, void* value, int& actualSize, int maxSize ) const {
+bool lemur::file::Keyfile::get( int key, void* value, int& actualSize, int maxSize ) const {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   _createKey( keyBuf, key );
   return get( keyBuf, value, actualSize, maxSize );
 }
 
 
-bool Keyfile::get( int key, char** value, int& actualSize ) const {
+bool lemur::file::Keyfile::get( int key, char** value, int& actualSize ) const {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   _createKey( keyBuf, key );
   return get( keyBuf, value, actualSize );
 }
 
-bool Keyfile::previous( int& key, char* value, int& valueLength ) {
+bool lemur::file::Keyfile::previous( int& key, char* value, int& valueLength ) {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   int keyLength = 6;
   bool result = previous( keyBuf, keyLength, value, valueLength ); 
@@ -243,7 +244,7 @@ bool Keyfile::previous( int& key, char* value, int& valueLength ) {
   return result;
 }
 
-bool Keyfile::next( int& key, char* value, int& valueLength ) {
+bool lemur::file::Keyfile::next( int& key, char* value, int& valueLength ) {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   int keyLength = KEYFILE_KEYBUF_SIZE;
   bool result = next( keyBuf, keyLength, value, valueLength ); 
@@ -252,23 +253,23 @@ bool Keyfile::next( int& key, char* value, int& valueLength ) {
   return result;
 }
 
-void Keyfile::remove( int key ) {
+void lemur::file::Keyfile::remove( int key ) {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   _createKey( keyBuf, key );
   remove( keyBuf );
 }
 
-int Keyfile::getSize( int key ) const {
+int lemur::file::Keyfile::getSize( int key ) const {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   _createKey( keyBuf, key );
   return getSize( keyBuf );
 }
 
-void Keyfile::setFirst() {
+void lemur::file::Keyfile::setFirst() {
   set_bof(_handle);
 }
 
-bool Keyfile::getNext( char* key, int maxKeySize, void* value, 
+bool lemur::file::Keyfile::getNext( char* key, int maxKeySize, void* value, 
 		       int& actualSize, int maxValueSize ) const {
   int len; // for key length
   int result = next_rec( _handle, key, &len, maxKeySize,
@@ -278,14 +279,14 @@ bool Keyfile::getNext( char* key, int maxKeySize, void* value,
   return !result;
 }
 
-bool Keyfile::getNext( char* key, int &len, int maxKeySize, void* value, 
+bool lemur::file::Keyfile::getNext( char* key, int &len, int maxKeySize, void* value, 
 		       int& actualSize, int maxValueSize ) const {
   int result = next_rec( _handle, key, &len, maxKeySize,
 			 value, &actualSize, maxValueSize );
   return !result;
 }
 
-bool Keyfile::getNext( int& key, void* value, int& actualSize, 
+bool lemur::file::Keyfile::getNext( int& key, void* value, int& actualSize, 
 		       int maxValueSize ) const {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   bool result = getNext( keyBuf, KEYFILE_KEYBUF_SIZE, 

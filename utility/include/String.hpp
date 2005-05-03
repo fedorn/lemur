@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #ifndef _STRINGH_
@@ -15,19 +15,25 @@
 
 #include "common_headers.hpp"
 #include "ByteHash.hpp"
+namespace lemur 
+{
+  namespace utility 
+  {
+    
+    class String : public string {
+    public:
+      String() : string() {}
+      String(const char * p) : string(p) {}
+      String(const string & s) : string(s) {}
+      String(unsigned int n, char c) : string(n, c) {}
 
-class String : public string {
-  public:
-    String() : string() {}
-    String(const char * p) : string(p) {}
-    String(const string & s) : string(s) {}
-    String(unsigned int n, char c) : string(n, c) {}
-
-    unsigned int Hash() const { return ByteHash(data(),length(),0); }
-    unsigned int hash() const { return Hash(); } 
-    operator const char *() const { return c_str(); }
-    friend ostream &operator<<(ostream &os, const String &ts);
-    friend istream &operator>>(istream &is, String &ts);
-};
+      unsigned int Hash() const { return ByteHash(data(),length(),0); }
+      unsigned int hash() const { return Hash(); } 
+      operator const char *() const { return c_str(); }
+      friend ostream &operator<<(ostream &os, const String &ts);
+      friend istream &operator>>(istream &is, String &ts);
+    };
+  }
+}
 
 #endif

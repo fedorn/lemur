@@ -12,6 +12,8 @@
 #include "FlatFileClusterDB.hpp"
 #include "KeyfileClusterDB.hpp"
 #include "ClusterParam.hpp"
+using namespace lemur::api;
+using namespace lemur::cluster;
 
 // Online Clustering
 
@@ -71,16 +73,16 @@ int AppMain(int argc, char * argv[]) {
   }
   try {
     // construct cluster method.
-    ClusterDB* clusterDB;
+    lemur::api::ClusterDB* clusterDB;
     if (ClusterParam::clusterDBType == "keyfile") {
-      clusterDB = new KeyfileClusterDB(myIndex, 
+      clusterDB = new lemur::cluster::KeyfileClusterDB(myIndex, 
 				       ClusterParam::clusterIndex,
 				       ClusterParam::threshold,
 				       ClusterParam::simType,
 				       ClusterParam::clusterType,
 				       ClusterParam::docMode);
     } else if (ClusterParam::clusterDBType == "flatfile") {
-      clusterDB = new FlatFileClusterDB(myIndex, 
+      clusterDB = new lemur::cluster::FlatFileClusterDB(myIndex, 
 					ClusterParam::clusterIndex,
 					ClusterParam::threshold,
 					ClusterParam::simType,
@@ -103,7 +105,7 @@ int AppMain(int argc, char * argv[]) {
       }
     }
     delete clusterDB;
-  } catch(ClusterDBError x) {
+  } catch(lemur::api::ClusterDBError x) {
     cout << "Problem with Clustering Database: " << x.what() << "\n";
   }
   delete myIndex;

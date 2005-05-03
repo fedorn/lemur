@@ -17,7 +17,7 @@
 #include "RVLCompress.hpp"
 
 // returns number of ints decompressed
-int RVLCompress::decompress_ints (unsigned char *data_ptr,
+int lemur::utility::RVLCompress::decompress_ints (unsigned char *data_ptr,
 				  int *out_ptr,
 				  int num_bytes)
 {
@@ -59,7 +59,7 @@ int RVLCompress::decompress_ints (unsigned char *data_ptr,
 }
 
 //return number of bytes in result
-int RVLCompress::compress_ints (int *data_ptr,
+int lemur::utility::RVLCompress::compress_ints (int *data_ptr,
 				unsigned char *out_ptr,
 				int size)
 {
@@ -113,7 +113,7 @@ int RVLCompress::compress_ints (int *data_ptr,
 // to be inlined without a lot of code bloat.
 //
 
-char* RVLCompress::_compress_bigger_int( char* dest, int data ) {
+char* lemur::utility::RVLCompress::_compress_bigger_int( char* dest, int data ) {
   if( data < (1<<21) ) {
     RVL_COMPRESS_BYTE( dest, data, 0 );
     RVL_COMPRESS_BYTE( dest, data, 1 );
@@ -140,7 +140,7 @@ char* RVLCompress::_compress_bigger_int( char* dest, int data ) {
 //
 //
 
-char* RVLCompress::_compress_bigger_longlong( char* dest, INT64 data ) {
+char* lemur::utility::RVLCompress::_compress_bigger_longlong( char* dest, INT64 data ) {
   if( data < (UINT64(1)<<21) ) {
     RVL_COMPRESS_BYTE( dest, data, 0 );
     RVL_COMPRESS_BYTE( dest, data, 1 );

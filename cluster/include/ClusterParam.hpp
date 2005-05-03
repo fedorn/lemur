@@ -12,7 +12,6 @@
 #ifndef _CLUSTERPARAMETER_HPP
 #define _CLUSTERPARAMETER_HPP
 
-/// A package of cluster parameter definitions and loading procedures
 #include "Param.hpp"
 /// General cluster-related parameters
 namespace ClusterParam {
@@ -23,11 +22,11 @@ namespace ClusterParam {
   /// @name Cluster parameters
   //@{ 
   /// database index
-  static String databaseIndex;
+  static std::string databaseIndex;
   /// cluster index
-  static String clusterIndex;
+  static std::string clusterIndex;
   /// cluster database file type.
-  static String clusterDBType;
+  static std::string clusterDBType;
   /// cluster type
   static enum clusterTypes clusterType;
   /// docmode
@@ -45,10 +44,10 @@ namespace ClusterParam {
   //@}
   /// get the parameters off of the stack.
   static void get() {
-    databaseIndex = ParamGetString("index","");
-    clusterIndex = ParamGetString("clusterIndex","");
-    clusterDBType = ParamGetString("clusterDBType","flatfile");
-    string clusterTypeString = ParamGetString("clusterType","centroid");
+    databaseIndex = lemur::api::ParamGetString("index","");
+    clusterIndex = lemur::api::ParamGetString("clusterIndex","");
+    clusterDBType = lemur::api::ParamGetString("clusterDBType","flatfile");
+    string clusterTypeString = lemur::api::ParamGetString("clusterType","centroid");
     if (clusterTypeString == "centroid") {
       clusterType = CENTROID;
     } else if (clusterTypeString == "agglomerative") {
@@ -58,7 +57,7 @@ namespace ClusterParam {
 	" using centroid." << endl;
       clusterType = CENTROID;
     }
-    string simTypeString = ParamGetString("simType","COS");
+    string simTypeString = lemur::api::ParamGetString("simType","COS");
     if (simTypeString == "COS" || simTypeString == "cos") {
       simType = COS;
     } else {
@@ -66,7 +65,7 @@ namespace ClusterParam {
 	   << endl;
       simType = COS;
     }
-    string docModeString = ParamGetString("docMode", "max");
+    string docModeString = lemur::api::ParamGetString("docMode", "max");
     if (docModeString == "max") {
       docMode = DMAX;
     } else if (docModeString == "mean") {
@@ -80,10 +79,10 @@ namespace ClusterParam {
 	   << endl;
       docMode = DMAX;
     }
-    threshold = ParamGetDouble("threshold", 0.25);
-    numParts = ParamGetInt("numParts", 2);
-    maxIters = ParamGetInt("maxIters", 100);
-    numIters = ParamGetInt("bkIters", 5);
+    threshold = lemur::api::ParamGetDouble("threshold", 0.25);
+    numParts = lemur::api::ParamGetInt("numParts", 2);
+    maxIters = lemur::api::ParamGetInt("maxIters", 100);
+    numIters = lemur::api::ParamGetInt("bkIters", 5);
   }
 };
 

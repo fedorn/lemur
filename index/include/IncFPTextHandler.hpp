@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 /*
   author: dmf
 */
@@ -17,18 +17,24 @@
 #include "InvFPTextHandler.hpp"
 #include "IncFPPushIndex.hpp"
 
-///  IncFPTextHandler builds an InvFPIndex using IncFPPushIndex.
-///  This class is a destination TextHandler.  
-///
+namespace lemur 
+{
+  namespace parse
+  {
+    ///  IncFPTextHandler builds an InvFPIndex using IncFPPushIndex.
+    ///  This class is a destination TextHandler.  
+    ///
 
-class IncFPTextHandler : public InvFPTextHandler {
-public:
-  IncFPTextHandler() { }
-  /// Create a IncFPTextHandler with index name filename 
-  /// (minus the .ifp extension) and specified buffer size.
-  IncFPTextHandler(const string &filename, int bufferSize, 
-		   bool countStopWds = false, int ind = 1);
-};
+    class IncFPTextHandler : public InvFPTextHandler {
+    public:
+      IncFPTextHandler() { }
+      /// Create a IncFPTextHandler with index name filename 
+      /// (minus the .ifp extension) and specified buffer size.
+      IncFPTextHandler(const string &filename, int bufferSize, 
+                       bool countStopWds = false, int ind = 1);
+    };
+  }
+}
 
 #endif
 

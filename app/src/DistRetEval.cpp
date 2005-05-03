@@ -69,6 +69,9 @@
 #include "IndexManager.hpp"
 #include "BasicDocStream.hpp"
 
+using namespace lemur::api;
+using namespace lemur::distrib;
+
 namespace LocalParameter {
   // the index cutoff for how many indexes to search
   static int cutoff;
@@ -93,9 +96,9 @@ int AppMain(int argc, char *argv[]) {
   Index *csindex;
   // the centralized sample database
   Index *csdbindex;
-  ArrayAccumulator *accumCsDb;
+  lemur::retrieval::ArrayAccumulator *accumCsDb;
   IndexedRealVector *rankingsCsDb;
-  CORIRetMethod *modelCsDb;
+  lemur::retrieval::CORIRetMethod *modelCsDb;
   try {
     csindex = IndexManager::openIndex(RetrievalParameter::databaseIndex);
   }
@@ -111,9 +114,9 @@ int AppMain(int argc, char *argv[]) {
       SingleRegrMergeMethodParameter::get();
       csdbindex = IndexManager::openIndex(SingleRegrMergeMethodParameter::csDbDataBaseIndex);
       int doccount = csdbindex->docCount();
-      accumCsDb=new ArrayAccumulator (doccount);
+      accumCsDb=new lemur::retrieval::ArrayAccumulator (doccount);
       rankingsCsDb=new IndexedRealVector(doccount);
-      modelCsDb=new   CORIRetMethod (*csdbindex,*accumCsDb,"USE_INDEX_COUNTS",0);
+      modelCsDb=new  lemur::retrieval::CORIRetMethod (*csdbindex,*accumCsDb,"USE_INDEX_COUNTS",0);
 
     }
     catch (Exception &ex) {
@@ -128,9 +131,9 @@ int AppMain(int argc, char *argv[]) {
       MultiRegrMergeMethodParameter::get();
       csdbindex = IndexManager::openIndex(MultiRegrMergeMethodParameter::csDbDataBaseIndex);
       int doccount = csdbindex->docCount();
-      accumCsDb=new ArrayAccumulator (doccount);
+      accumCsDb=new lemur::retrieval::ArrayAccumulator (doccount);
       rankingsCsDb=new IndexedRealVector(doccount);
-      modelCsDb=new   CORIRetMethod (*csdbindex,*accumCsDb,"USE_INDEX_COUNTS",0);
+      modelCsDb=new lemur::retrieval::CORIRetMethod (*csdbindex,*accumCsDb,"USE_INDEX_COUNTS",0);
 
     }
     catch (Exception &ex) {
@@ -143,7 +146,7 @@ int AppMain(int argc, char *argv[]) {
 
 
   try {
-    qryStream = new BasicDocStream(RetrievalParameter::textQuerySet);
+    qryStream = new lemur::parse::BasicDocStream(RetrievalParameter::textQuerySet);
   }
   catch (Exception &ex){
     ex.writeMessage(cerr);
@@ -154,15 +157,15 @@ int AppMain(int argc, char *argv[]) {
  
   //create the collection selection retrieval model
   int doccount = csindex->docCount();
-  ArrayAccumulator accum(csindex->docCount());
+  lemur::retrieval::ArrayAccumulator accum(csindex->docCount());
   IndexedRealVector rankings(doccount);
-  CORIRetMethod model(*csindex, accum, CORIParameter::collectionCounts,1);
-  DocScoreVector results;
+  lemur::retrieval::CORIRetMethod model(*csindex, accum, CORIParameter::collectionCounts,1);
+  lemur::distrib::DocScoreVector results;
 
   //Notice assume that collectionCounts i USE_INDEX_COUNT
-  DistSearchMethod search(csindex,RetMethodManager::INQUERY);
-  DocScoreVector** scoreset = new DocScoreVector*[LocalParameter::cutoff];
-  DocScoreVector resultsCsDb;
+  lemur::distrib::DistSearchMethod search(csindex,RetMethodManager::INQUERY);
+  lemur::distrib::DocScoreVector** scoreset = new lemur::distrib::DocScoreVector*[LocalParameter::cutoff];
+  lemur::distrib::DocScoreVector resultsCsDb;
 
   cout<<"Write Results File to "<<RetrievalParameter::resultFile<<endl;
   ofstream resfile(RetrievalParameter::resultFile);
@@ -221,14 +224,14 @@ int AppMain(int argc, char *argv[]) {
 
     // now merge the scores
     if (DistMergeMethodParameter::mergeMethod==CORI_MERGE){
-      CORIMergeMethod merger;
+      lemur::distrib::CORIMergeMethod merger;
       merger.mergeScoreSet(rankings, scoreset, results);
     }else if  (DistMergeMethodParameter::mergeMethod==SINGLETYPEREGR_MERGE){
-      SingleRegrMergeMethod singleRegrMerger;
+      lemur::distrib::SingleRegrMergeMethod singleRegrMerger;
       singleRegrMerger.calcRegrParams(rankings,&resultsCsDb,scoreset);
       singleRegrMerger.mergeScoreSet(rankings, scoreset, results);
     }else if  (DistMergeMethodParameter::mergeMethod==MULTITYPEREGR_MERGE){
-      MultiRegrMergeMethod multiRegrMerger;
+      lemur::distrib::MultiRegrMergeMethod multiRegrMerger;
       multiRegrMerger.calcRegrParams(rankings,&resultsCsDb,scoreset);
       multiRegrMerger.mergeScoreSet(rankings, scoreset, results);
     }

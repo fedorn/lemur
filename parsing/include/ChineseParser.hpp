@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _CHINESEPARSER_HPP
 #define _CHINESEPARSER_HPP
@@ -15,38 +15,44 @@
 #include "Parser.hpp"
 #include "TextHandler.hpp"
 
+namespace lemur 
+{
+  namespace parse 
+  {
+    
+    ///  Parses segmented (tokenized) Chinese documents in NIST's TREC format,  
+    ///  (GB encoding).
+    ///  The following fields are parsed: TEXT, HL, HEAD, HEADLINE,
+    ///  LP, TTL
 
-///  Parses segmented (tokenized) Chinese documents in NIST's TREC format,  
-///  (GB encoding).
-///  The following fields are parsed: TEXT, HL, HEAD, HEADLINE,
-///  LP, TTL
+    class ChineseParser : public lemur::api::Parser {
 
-class ChineseParser : public Parser {
+    public:
+      static const string identifier;
 
-public:
-  static const string identifier;
-
-  ChineseParser();
+      ChineseParser();
 
 
-  /// Parse a file.
-  void parseFile (const string &filename);
+      /// Parse a file.
+      void parseFile (const string &filename);
 
-  /// Parse a buffer of len length
-  void parseBuffer (char * buf, int len);
+      /// Parse a buffer of len length
+      void parseBuffer (char * buf, int len);
 
-  /// Gives current byte position offset into file being parsed.
-  /// Don't use with parseBuffer
-  long fileTell()const;
+      /// Gives current byte position offset into file being parsed.
+      /// Don't use with parseBuffer
+      long fileTell()const;
 
  
-private:
-  /// Actual parsing action flow
-  void doParse();
+    private:
+      /// Actual parsing action flow
+      void doParse();
 
-  /// The state of the parser.
-  int state;
+      /// The state of the parser.
+      int state;
 
-};
+    };
+  }
+}
 
 #endif
