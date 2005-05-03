@@ -123,9 +123,6 @@
 				RelativePath=".\src\FileTreeIterator.cpp">
 			</File>
 			<File
-				RelativePath=".\src\FUtil.cpp">
-			</File>
-			<File
 				RelativePath=".\src\IndriFile.cpp">
 			</File>
 			<File
@@ -282,9 +279,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\FileTreeIterator.hpp">
-			</File>
-			<File
-				RelativePath=".\include\FUtil.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\greedy_vector">
