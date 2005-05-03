@@ -313,7 +313,7 @@ void indri::parse::PowerPointDocumentExtractor::open( const std::string& filenam
         BSTR textResult = result.bstrVal;
 
         copy_bstr_to_buffer( _documentBuffer, textResult );
-      } catch( Exception& e ) {
+	  } catch( lemur::api::Exception& e ) {
         if( textResult )
           ::SysFreeString( textResult );
         if( textRangeDispatch )
