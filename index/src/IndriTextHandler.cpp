@@ -47,7 +47,7 @@ char* lemur::parse::IndriTextHandler::handleDoc(char * docno) {
   return docno;
 }
 
-char * lemur::parse::IndriTextHandler::handleWord(char * word, const char* original, PropertyList* list){
+char * lemur::parse::IndriTextHandler::handleWord(char * word, const char* original, PropertyList* lst){
   if (word) {
     char* wordcopy = strdup(word);
     document.terms.push_back(wordcopy);

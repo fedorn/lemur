@@ -96,7 +96,7 @@ char* lemur::parse::PropIndexTH::handleDoc(char* docno) {
   return docno;
 }
 
-char* lemur::parse::PropIndexTH::handleWord(char* word, const char* original, PropertyList *list) {
+char* lemur::parse::PropIndexTH::handleWord(char* word, const char* original, PropertyList *lst) {
   const Property* prop = NULL;
   int position = -1;
   char* tag = NULL;
@@ -105,7 +105,7 @@ char* lemur::parse::PropIndexTH::handleWord(char* word, const char* original, Pr
     int len = strlen(word);
     if (len <= MAX_WORD_LENGTH) {
       // get position first
-      prop = list->getProperty("position");
+      prop = lst->getProperty("position");
       if (!prop)
 	throw lemur::api::Exception("PropIndexTH","missing \"position\" property in property list");
       position = *((int*) prop->getValue());
@@ -119,9 +119,9 @@ char* lemur::parse::PropIndexTH::handleWord(char* word, const char* original, Pr
       }
 
       // index all STRING properties
-      list->startIteration();
-      while (list->hasMore()) {
-	prop = list->nextEntry();
+      lst->startIteration();
+      while (lst->hasMore()) {
+	prop = lst->nextEntry();
 	if (prop->getType() == Property::STRING) {
 	  tag = (char*) prop->getValue();
 	  if (tag) {
@@ -143,7 +143,7 @@ char* lemur::parse::PropIndexTH::handleWord(char* word, const char* original, Pr
     // when the word is null, it usually means it was a stopword
     // sometimes stop words have named entity tags, in this case we want to index it
     // check to see if it has a named entity tag
-    prop = list->getProperty("NE");
+    prop = lst->getProperty("NE");
     if ((prop) && (prop->getLength() > 1)) {
       // index the term
       // still ignore words longer than max characters
@@ -151,7 +151,7 @@ char* lemur::parse::PropIndexTH::handleWord(char* word, const char* original, Pr
       if (len <= MAX_WORD_LENGTH) {
 	//	tag = (char*) prop->getValue();
 	// get position first
-	prop = list->getProperty("position");
+	prop = lst->getProperty("position");
 	if (!prop)
 	  throw lemur::api::Exception("PropIndexTH","missing \"position\" property in property list");
 	position = *((int*) prop->getValue());
@@ -164,14 +164,14 @@ char* lemur::parse::PropIndexTH::handleWord(char* word, const char* original, Pr
 	}
 
 	// index the NE tag
-	prop = list->getProperty("NE");
+	prop = lst->getProperty("NE");
 	tag = (char*)prop->getValue();
 	term->strLength(strlen(tag));
 	term->spelling(tag);
 	index->addTerm(*term);
 
 	// index the B_NE tag if any
-	prop = list->getProperty("B_NE");
+	prop = lst->getProperty("B_NE");
 	if (prop) {
 	  tag = (char*)prop->getValue();
 	  term->strLength(strlen(tag));
@@ -182,7 +182,7 @@ char* lemur::parse::PropIndexTH::handleWord(char* word, const char* original, Pr
 	} // B_NE
 
 	// index the E_NE tag if any
-	prop = list->getProperty("E_NE");
+	prop = lst->getProperty("E_NE");
 	if (prop) {
 	  tag = (char*)prop->getValue();
 	  term->strLength(strlen(tag));
