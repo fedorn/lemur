@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -69,13 +69,13 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
   double documentOccurrences = 0; 
   double documentContextSize = 0;
 
-   if( !_context ) {
-     for( size_t i=0; i<_matches->extents().size(); i++ ) {
-       const indri::index::Extent& extent = _matches->extents()[i];
-       documentOccurrences += extent.weight;
-     }
-     _occurrences += documentOccurrences;
-   } else {
+  if( !_context ) {
+    for( size_t i=0; i<_matches->extents().size(); i++ ) {
+      const indri::index::Extent& extent = _matches->extents()[i];
+      documentOccurrences += extent.weight;
+    }
+    _occurrences += documentOccurrences;
+  } else {
 
     const indri::utility::greedy_vector<indri::index::Extent>& matches = _matches->extents();
     const indri::utility::greedy_vector<indri::index::Extent>& extents = _context->extents();
@@ -86,8 +86,8 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
         ex++;
 
       if( ex < extents.size() &&
-        matches[i].begin >= extents[ex].begin &&
-        matches[i].end <= extents[ex].end ) {
+          matches[i].begin >= extents[ex].begin &&
+          matches[i].end <= extents[ex].end ) {
         documentOccurrences += matches[i].weight;
       }
     }
@@ -98,7 +98,7 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
 
     _occurrences += documentOccurrences;
     _contextSize += documentContextSize;
-   }
+  }
 }
 
 

@@ -7,8 +7,8 @@
 //
 
 extern "C" {
-  #include "keyref.h"
-  #include "keyerr.h"
+#include "keyref.h"
+#include "keyerr.h"
 }
 
 #include <cassert>
@@ -22,7 +22,7 @@ extern "C" {
 #include "lemur-compat.hpp"
 
 void lemur::file::Keyfile::_buildHandle( int cacheSize ) {
-int blocks = lemur_compat::max( (cacheSize - min_fcb_lc) / buffer_lc, 0 );
+  int blocks = lemur_compat::max( (cacheSize - min_fcb_lc) / buffer_lc, 0 );
   _handleSize = min_fcb_lc + blocks * buffer_lc;
   _handle = new char[ _handleSize ];
   memset( _handle, 0x00, _handleSize );
@@ -32,7 +32,7 @@ void lemur::file::Keyfile::open( const char* filename, int cacheSize, bool readO
   _buildHandle( cacheSize );
   
   int error = open_key( _handle, const_cast<char*>(filename), 
-			_handleSize, readOnly ? 1 : 0);
+                        _handleSize, readOnly ? 1 : 0);
 
   if( error )
     LEMUR_THROW(LEMUR_KEYFILE_IO_ERROR, "Unable to open '" + filename + "'");
@@ -50,7 +50,7 @@ void lemur::file::Keyfile::create( const char* filename, int cacheSize ) {
   _buildHandle( cacheSize );
   
   int error = create_key( _handle, const_cast<char*>(filename), 
-			  _handleSize );
+                          _handleSize );
 
   if( error )
     LEMUR_THROW(LEMUR_KEYFILE_IO_ERROR, "Unable to create '" + filename + "'");
@@ -87,7 +87,7 @@ bool lemur::file::Keyfile::get( const char* key, char** value, int& actualSize )
 }
 
 bool lemur::file::Keyfile::get( const char* key, void* value, int& actualSize, 
-		      int maxSize ) const {
+                                int maxSize ) const {
   assert( key && "key cannot be null" );
   assert( value && "value cannot be null" );
   assert( _handle && "call open() or create() first" );
@@ -95,7 +95,7 @@ bool lemur::file::Keyfile::get( const char* key, void* value, int& actualSize,
   int len = strlen(key); // fix for UTF-8
   
   int error = get_rec( _handle, const_cast<char*>(key), len,
-		       (char*)value, &actualSize, maxSize );
+                       (char*)value, &actualSize, maxSize );
 
   if( error && error != getnokey_err )
     LEMUR_THROW( LEMUR_KEYFILE_IO_ERROR, "Caught an internal error while getting record for key: " + key );
@@ -177,7 +177,7 @@ int lemur::file::Keyfile::getSize( const char* key ) const {
       LEMUR_THROW( LEMUR_KEYFILE_IO_ERROR, "Encountered an error while trying to fetch record size for: " + key );
     }
   } else {
-      size = keyrec_lc( pointer );
+    size = keyrec_lc( pointer );
   }
 
   return size;
@@ -197,22 +197,22 @@ int lemur::file::Keyfile::getSize( const char* key ) const {
 #define KEYFILE_BUFFER_DIGIT(num,dig)  ( (KEYFILE_BUFFER_SHIFT(num,dig) | 1<<6) & ~(1<<7) )
 
 inline void lemur::file::Keyfile::_createKey( char* keyBuf, int number ) const {
-   keyBuf[6] = 0;
-   keyBuf[5] = KEYFILE_BUFFER_DIGIT( number, 5 );
-   keyBuf[4] = KEYFILE_BUFFER_DIGIT( number, 4 );
-   keyBuf[3] = KEYFILE_BUFFER_DIGIT( number, 3 );
-   keyBuf[2] = KEYFILE_BUFFER_DIGIT( number, 2 );
-   keyBuf[1] = KEYFILE_BUFFER_DIGIT( number, 1 );
-   keyBuf[0] = KEYFILE_BUFFER_DIGIT( number, 0 );
+  keyBuf[6] = 0;
+  keyBuf[5] = KEYFILE_BUFFER_DIGIT( number, 5 );
+  keyBuf[4] = KEYFILE_BUFFER_DIGIT( number, 4 );
+  keyBuf[3] = KEYFILE_BUFFER_DIGIT( number, 3 );
+  keyBuf[2] = KEYFILE_BUFFER_DIGIT( number, 2 );
+  keyBuf[1] = KEYFILE_BUFFER_DIGIT( number, 1 );
+  keyBuf[0] = KEYFILE_BUFFER_DIGIT( number, 0 );
 }
 
 inline int lemur::file::Keyfile::_decodeKey( char* keyBuf ) const {
   return ((keyBuf[5] & 0x3f) << 6*0) |
-         ((keyBuf[4] & 0x3f) << 6*1) |
-         ((keyBuf[3] & 0x3f) << 6*2) |
-         ((keyBuf[2] & 0x3f) << 6*3) |
-         ((keyBuf[1] & 0x3f) << 6*4) |
-         ((keyBuf[0] & 0x3f) << 6*5);
+    ((keyBuf[4] & 0x3f) << 6*1) |
+    ((keyBuf[3] & 0x3f) << 6*2) |
+    ((keyBuf[2] & 0x3f) << 6*3) |
+    ((keyBuf[1] & 0x3f) << 6*4) |
+    ((keyBuf[0] & 0x3f) << 6*5);
 }
 
 void lemur::file::Keyfile::put( int key, const void* value, int valueLength ) {
@@ -270,27 +270,27 @@ void lemur::file::Keyfile::setFirst() {
 }
 
 bool lemur::file::Keyfile::getNext( char* key, int maxKeySize, void* value, 
-		       int& actualSize, int maxValueSize ) const {
+                                    int& actualSize, int maxValueSize ) const {
   int len; // for key length
   int result = next_rec( _handle, key, &len, maxKeySize,
-			 value, &actualSize, maxValueSize );
+                         value, &actualSize, maxValueSize );
   // null terminate
   key[len] = '\0';
   return !result;
 }
 
 bool lemur::file::Keyfile::getNext( char* key, int &len, int maxKeySize, void* value, 
-		       int& actualSize, int maxValueSize ) const {
+                                    int& actualSize, int maxValueSize ) const {
   int result = next_rec( _handle, key, &len, maxKeySize,
-			 value, &actualSize, maxValueSize );
+                         value, &actualSize, maxValueSize );
   return !result;
 }
 
 bool lemur::file::Keyfile::getNext( int& key, void* value, int& actualSize, 
-		       int maxValueSize ) const {
+                                    int maxValueSize ) const {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   bool result = getNext( keyBuf, KEYFILE_KEYBUF_SIZE, 
-			 value, actualSize, maxValueSize );
+                         value, actualSize, maxValueSize );
   
   if( result )
     key = _decodeKey( keyBuf );

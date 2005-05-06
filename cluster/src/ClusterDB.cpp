@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 // David Fisher
 // init: 05/22/2002
@@ -16,15 +16,16 @@
 // The ClusterDB.
 
 
-lemur::api::ClusterDB::ClusterDB(const lemur::api::Index *ind, 	    
-		     double threshold,
-		     enum ClusterParam::simTypes simType,
-		     enum ClusterParam::clusterTypes clusterType,
-		     enum ClusterParam::docModes docMode)
+lemur::api::ClusterDB::ClusterDB(const lemur::api::Index *ind,      
+                                 double threshold,
+                                 enum ClusterParam::simTypes simType,
+                                 enum ClusterParam::clusterTypes clusterType,
+                                 enum ClusterParam::docModes docMode)
   : index(ind) {
   // Setup similarity method and cluster factories.
   sim = lemur::cluster::SimFactory::makeSim(*ind, simType);
-  factory = new lemur::cluster::ClusterFactory(*index, *sim, clusterType, docMode);
+  factory = new lemur::cluster::ClusterFactory(*index, *sim, clusterType, 
+                                               docMode);
   numTerms = index->termCountUnique();
   numDocs = index->docCount();
   // This needs a factory later (or forget it....).
@@ -54,12 +55,14 @@ int lemur::api::ClusterDB::cluster(lemur::api::DOCID_T docId) {
   return cluster(docId, score);
 }
 
-int lemur::api::ClusterDB::cluster(lemur::api::DOCID_T docId, double &finalScore) {
+int lemur::api::ClusterDB::cluster(lemur::api::DOCID_T docId, 
+                                   double &finalScore) {
   lemur::cluster::Cluster *cluster;
   int cid, myCluster;
   double score;
   TermInfoList *tList = index->termInfoList(docId);
-  lemur::cluster::ClusterRep *docRep = new lemur::cluster::ClusterRep(tList, *index);
+  lemur::cluster::ClusterRep *docRep = new lemur::cluster::ClusterRep(tList,
+                                                                      *index);
   sim->weigh(docRep);
   int numClusters = countClusters();
   int maxId = maxID();
@@ -98,13 +101,15 @@ int lemur::api::ClusterDB::addCluster(lemur::cluster::Cluster *oldCluster) {
   lemur::cluster::Cluster *cluster = newCluster(); 
   double score = 1.0;
   vector <lemur::api::DOCID_T> docs = oldCluster->getDocIds();
-  for (vector<lemur::api::DOCID_T>::iterator d = docs.begin(); d != docs.end(); d++) {
+  for (vector<lemur::api::DOCID_T>::iterator d = docs.begin(); 
+       d != docs.end(); d++) {
     addToCluster(*d, cluster, score);
   }
   return cluster->getId();
 }
 
-lemur::cluster::Cluster* lemur::api::ClusterDB::allocateCluster(int clusterID) const {
+lemur::cluster::Cluster* lemur::api::ClusterDB::allocateCluster(int clusterID)
+  const {
   return factory->allocateCluster(clusterID);
 }
 

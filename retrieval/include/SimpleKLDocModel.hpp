@@ -19,7 +19,7 @@
 /// Simple KL divergence retrieval model parameters
 namespace SimpleKLParameter {
   enum SmoothMethod  {JELINEKMERCER=0, DIRICHLETPRIOR=1, ABSOLUTEDISCOUNT=2, 
-		      TWOSTAGE=3};
+                      TWOSTAGE=3};
  
   enum SmoothStrategy  {INTERPOLATE=0, BACKOFF=1};
 

@@ -18,10 +18,12 @@
 //
 
 /*! \page IndriParameters Indri Parameter Files
-<P>The indri applications, IndriBuildIndex, IndriDaemon, and IndriRunQuery accept
-parameters from either the command line or from a file. The parameter
-file uses an XML format. The command line uses dotted path notation. The
-top level element in the parameters file is named <em>parameters</em>.
+
+<P>The indri applications, IndriBuildIndex, IndriDaemon, and
+IndriRunQuery accept parameters from either the command line or from a
+file. The parameter file uses an XML format. The command line uses
+dotted path notation. The top level element in the parameters file is
+named <em>parameters</em>.
 
 <H3> Repository construction parameters</h3>
 <dl>
@@ -60,7 +62,7 @@ line. The known classes are:
 <li>txt --  Plain text format.
 </ul>
 </dd>
-Combining each of these elements, the paramter file would contain:
+Combining each of these elements, the parameter file would contain:
 <br>
 &lt;corpus&gt;<br>
 &nbsp;&nbsp;&lt;path&gt;/path/to/file_or_directory&lt;/path&gt;<br>
@@ -68,17 +70,43 @@ Combining each of these elements, the paramter file would contain:
 &lt;/corpus&gt;
 </dd>
 </dl>
+
 <dt>metadata</dt>
-<dd>a complex element containing one or more <tt>field</tt> entry
-specifying the metadata fields to index, eg DOCNO. Specified as
-&lt;metadata&gt;&lt;field&gt;fieldname&lt;/field&gt;&lt;/metadata&gt; in
-the parameter file and as <tt>metadata.field=fieldname</tt> on the
-command line.</dd> 
+<dd>a complex element containing one or more entries
+specifying the metadata fields to index, eg title, headline.
+There are three options
+<ol>
+
+<li> <tt>field</tt> -- Make the named field available for retrieval as
+ metadata.  Specified as
+ &lt;metadata&gt;&lt;field&gt;fieldname&lt;/field&gt;&lt;/metadata&gt;
+ in the parameter file and as <tt>metadata.field=fieldname</tt> on the
+ command line.
+
+<li> <tt>forward</tt> -- Make the named field available for retrieval as
+ metadata and build a lookup table to make retrieving the value more
+ efficient.  Specified as
+ &lt;metadata&gt;&lt;forward&gt;fieldname&lt;/forward&gt;&lt;/metadata&gt;
+ in the parameter file and as <tt>metadata.forward=fieldname</tt> on the
+ command line.
+
+<li> <tt>backward</tt> -- Make the named field available for retrieval
+ as metadata and build a lookup table for inverse lookup of documents
+ based on the value of the field.  Specified as
+ &lt;metadata&gt;&lt;backward&gt;fieldname&lt;/backward&gt;&lt;/metadata&gt;
+ in the parameter file and as <tt>metadata.backward=fieldname</tt> on
+ the command line.
+
+</ol>
+</dd>
+
 <dt>field</dt>
+
 <dd>a complex element specifying the fields to index as data, eg
-TITLE. This parameter can appear multiple times in a parameter file. 
-<b>If provided on the command line, only the first field specified will 
-be indexed</b>. The subelements are:  
+TITLE. This parameter can appear multiple times in a parameter file.
+<b>If provided on the command line, only the first field specified will
+be indexed</b>. The subelements are:
+
 <dl>
 <dt>name</dt><dd>the field name, specified as
 &lt;field&gt;&lt;name&gt;fieldname&lt;/name&gt;&lt;/field&gt; in the
@@ -138,7 +166,11 @@ can be specified multiple times to combine servers.
 return for a given query. Specified as
 &lt;count&gt;number&lt;/count&gt; in the parameter file and
 as <tt>-count=number</tt> on the command line. </dd>
-<dt><a name="rule">rule</a></dt>
+<dt>query</dt>
+<dd>An indri query language query to run. This element can be specified
+multiple times.
+</dd>
+<dt>rule</dt>
 <dd>specifies the smoothing rule (TermScoreFunction) to apply. Format of
 the rule is:<br> 
 
@@ -188,8 +220,8 @@ optional parameter with the default of no stopping.</dd>
 <H4>Formatting Parameters</H4>
 <dl>
 <dt>queryOffset</dt>
-<dd>an integer value specifying one less than the starting query number, eg 150 for
-TREC formatted output. Specified as
+<dd>an integer value specifying one less than the starting query number,
+eg 150 for TREC formatted output. Specified as
 &lt;queryOffset&gt;number&lt;/queryOffset&gt; in the parameter file and
 as <tt>-queryOffset=number</tt> on the command line.</dd>
 <dt>runID</dt>
@@ -218,7 +250,7 @@ feedback. Specified as
 as <tt>-fbTerms=number</tt> on the command line.</dd>
 <dt>fbMu</dt>
 <dd>a floating point value specifying the value of mu to use for
-feedback. [NB: document the feedback formulae]. Specified as
+feedback. Specified as
 &lt;fbMu&gt;number&lt;/fbMu&gt; in the parameter file and
 as <tt>-fbMu=number</tt> on the command line.</dd>
 <dt>fbOrigWeight</dt>
@@ -258,18 +290,30 @@ as <tt>-index=/path/to/repository</tt> on the command line.
 <H3> Repository construction parameters</h3>
 <dl>
 <dt>memory</dt>
-<dd> an integer value specifying the number of bytes to use for the indexing process. The value can include a scaling factor by adding a suffix. Valid values are (case insensitive) K = 1000, M = 1000000, G = 1000000000. So 100M would be equivalent to 100000000. The value should contain only decimal digits and the optional suffix. Specified as &lt;memory&gt;100M&lt;/memory&gt; in the parameter file and as <tt>-memory=100M</tt> on the command line. </dd>
-<dt>index</dt>
-<dd> path to where to place the Indri Repository. Specified as
-&lt;index&gt;/path/to/repository&lt;/index&gt; in the parameter file and
-as <tt>-index=/path/to/repository</tt> on the command line.
+<dd> an integer value specifying the number of bytes to use for the
+indexing process. The value can include a scaling factor by adding a
+suffix. Valid values are (case insensitive) K = 1000, M = 1000000, G =
+1000000000. So 100M would be equivalent to 100000000. The value should
+contain only decimal digits and the optional suffix. Specified as
+&lt;memory&gt;100M&lt;/memory&gt; in the parameter file and as
+<tt>-memory=100M</tt> on the command line. </dd> 
 <dt>corpus</dt>
-<dd>a complex element containing parameters related to a corpus. This element can be specified multiple times. The parameters are
+<dd>a complex element containing parameters related to a corpus. This
+element can be specified multiple times. The parameters are 
 <dl>
 <dt>path</dt>
-<dd>The pathname of the file or directory containing documents to index. Specified as &lt;corpus&gt;&lt;path&gt;/path/to/file_or_directory&lt;/path&gt;&lt;/corpus&gt; in the parameter file and as <tt>-corpus.path=/path/to/file_or_directory</tt> on the command line.</dd>
+<dd>The pathname of the file or directory containing documents to
+index. Specified as
+&lt;corpus&gt;&lt;path&gt;/path/to/file_or_directory&lt;/path&gt;&lt;/corpus&gt;
+in the parameter file and as
+<tt>-corpus.path=/path/to/file_or_directory</tt> on the command
+line.</dd> 
 <dt>class</dt>
-<dd>The FileClassEnviroment of the file or directory containing documents to index. Specified as &lt;corpus&gt;&lt;class&gt;trecweb&lt;/class&gt;&lt;/corpus&gt; in the parameter file and as <tt>-corpus.class=trecweb</tt> on the command line. The known classes are:
+<dd>The FileClassEnviroment of the file or directory containing
+documents to index. Specified as
+&lt;corpus&gt;&lt;class&gt;trecweb&lt;/class&gt;&lt;/corpus&gt; in the
+parameter file and as <tt>-corpus.class=trecweb</tt> on the command
+line. The known classes are: 
 <ul>
 <li>html -- web page data.
 <li>trecweb -- TREC web format, eg terabyte track.
@@ -280,7 +324,7 @@ as <tt>-index=/path/to/repository</tt> on the command line.
 <li>txt --  Plain text format.
 </ul>
 </dd>
-Combining each of these elements, the paramter file would contain:
+Combining each of these elements, the parameter file would contain:
 <br>
 &lt;corpus&gt;<br>
 &nbsp;&nbsp;&lt;path&gt;/path/to/file_or_directory&lt;/path&gt;<br>
@@ -288,26 +332,54 @@ Combining each of these elements, the paramter file would contain:
 &lt;/corpus&gt;
 </dd>
 </dl>
+
 <dt>metadata</dt>
-<dd>a complex element containing one or more <tt>field</tt> entry
-specifying the metadata fields to index, eg DOCNO. Specified as
-&lt;metadata&gt;&lt;field&gt;fieldname&lt;/field&gt;&lt;/metadata&gt; in
-the parameter file and as <tt>metadata.field=fieldname</tt> on the
-command line.</dd> 
+<dd>a complex element containing one or more entries
+specifying the metadata fields to index, eg title, headline.
+There are three options
+<ol>
+
+<li> <tt>field</tt> -- Make the named field available for retrieval as
+ metadata.  Specified as
+ &lt;metadata&gt;&lt;field&gt;fieldname&lt;/field&gt;&lt;/metadata&gt;
+ in the parameter file and as <tt>metadata.field=fieldname</tt> on the
+ command line.
+
+<li> <tt>forward</tt> -- Make the named field available for retrieval as
+ metadata and build a lookup table to make retrieving the value more
+ efficient.  Specified as
+ &lt;metadata&gt;&lt;forward&gt;fieldname&lt;/forward&gt;&lt;/metadata&gt;
+ in the parameter file and as <tt>metadata.forward=fieldname</tt> on the
+ command line.
+
+<li> <tt>backward</tt> -- Make the named field available for retrieval
+ as metadata and build a lookup table for inverse lookup of documents
+ based on the value of the field.  Specified as
+ &lt;metadata&gt;&lt;backward&gt;fieldname&lt;/backward&gt;&lt;/metadata&gt;
+ in the parameter file and as <tt>metadata.backward=fieldname</tt> on
+ the command line.
+
+</ol>
+</dd>
+
 <dt>field</dt>
-<dd>a complex element specifying the fields to index as data, eg TITLE.
-This parameter can appear multiple times in a parameter file. 
-<b>If provided on the command line, only the first field specified will 
+
+<dd>a complex element specifying the fields to index as data, eg
+TITLE. This parameter can appear multiple times in a parameter file.
+<b>If provided on the command line, only the first field specified will
 be indexed</b>. The subelements are:
+
 <dl>
 <dt>name</dt><dd>the field name, specified as
 &lt;field&gt;&lt;name&gt;fieldname&lt;/name&gt;&lt;/field&gt; in the
-parameter file and as <tt>-field.name=fieldname</tt> on the command line.</dd>
-<dt>numeric</dt><dd>integer value of 1 if the field contains numeric
-data, otherwise 0, specified as
-&lt;field&gt;&lt;numeric&gt;0&lt;/numeric&gt;&lt;/field&gt; in the
-parameter file and as <tt>-field.numeric=0</tt> on the command
-line. This is an optional parameter, defaulting to 0.</dd>
+parameter file and as <tt>-field.name=fieldname</tt> on the command
+line.</dd> 
+<dt>numeric</dt><dd>the symbol <tt>true</tt> if the field contains
+numeric data, otherwise the symbol <tt>false</tt>, specified as
+&lt;field&gt;&lt;numeric&gt;true&lt;/numeric&gt;&lt;/field&gt; in the
+parameter file and as <tt>-field.numeric=true</tt> on the command
+line. This is an optional parameter, defaulting to false. Note that <tt>0</tt>
+can be used for false and <tt>1</tt> can be used for true. </dd>
 </dl> 
 </dd>
 <dt>stemmer</dt>
@@ -325,7 +397,6 @@ specifying the stopword list to use. Specified as
 as <tt>-stopper.word=stopword</tt> on the command line. This is an
 optional parameter with the default of no stopping.</dd>
 </dl>
-
 */
 
 #include "indri/Parameters.hpp"
@@ -587,7 +658,7 @@ int main(int argc, char * argv[]) {
       // augment field/metadata tags in the environment if needed.
       if( fileClass.length() ) {
         indri::parse::FileClassEnvironmentFactory::Specification *spec = env.getFileClassSpec(fileClass);
-	      if( spec ) {
+              if( spec ) {
           // add fields if necessary, only update if changed.
           if( augmentSpec( spec, fields, metadata, metadataForward, metadataBackward ) ) 
             env.addFileClass(*spec);

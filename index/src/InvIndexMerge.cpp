@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 #include "InvIndexMerge.hpp"
 #include <sstream>
 lemur::index::InvIndexMerge::InvIndexMerge(char* buffer, long size, long maxfilesize) {
@@ -34,7 +34,7 @@ lemur::index::InvIndexMerge::~InvIndexMerge() {
 int lemur::index::InvIndexMerge::merge(vector<string>* tf, const string &prefix) {
   if (bufsize < READBUFSIZE * 2) {
     fprintf(stderr, "merge:  Need a larger buffer size (at least %d).\n", 
-	    READBUFSIZE*2);
+            READBUFSIZE*2);
     return 0;
   }
   name = prefix;
@@ -59,7 +59,7 @@ void lemur::index::InvIndexMerge::setMaxFileSize(long size) {
 
 int lemur::index::InvIndexMerge::hierMerge(vector<string>* files, int level) {  
   fprintf(stderr, "%s: Begin hierchical merge level %d\n", name.c_str(), 
-	  level);
+          level);
   int numfh = bufsize/READBUFSIZE;
 
   if (numfh > NUM_FH_OPEN) {
@@ -74,7 +74,7 @@ int lemur::index::InvIndexMerge::hierMerge(vector<string>* files, int level) {
 
     for (begin=files->begin(); begin<files->end(); begin+=numfh) {
       if (begin+numfh < files->end())
-	end = begin+numfh;
+        end = begin+numfh;
       else end = files->end();
       subset.assign(begin, end);
       mergeFiles(&subset, &intmedfiles, level);
@@ -89,7 +89,7 @@ int lemur::index::InvIndexMerge::hierMerge(vector<string>* files, int level) {
 }
 
 int lemur::index::InvIndexMerge::mergeFiles(vector<string>* files, 
-			      vector<string>* intmed, int level) {
+                                            vector<string>* intmed, int level) {
   fprintf(stderr, "%s: Merging Intermediate files\n", name.c_str());
 
   vector<IndexReader*> readers;
@@ -174,8 +174,8 @@ int lemur::index::InvIndexMerge::mergeFiles(vector<string>* files,
         delete(ir->reader);
         delete(ir);
         readers.erase(readers.begin()+(*iter-offset));
-	      //update the other indices
-	      offset++;
+        //update the other indices
+        offset++;
       }
     }
 
@@ -208,9 +208,9 @@ int lemur::index::InvIndexMerge::mergeFiles(vector<string>* files,
       indexfile.flush();
       filelen = (long)indexfile.tellp();
       if (filelen + ((myreader->list->length()+4) *sizeof(lemur::api::LOC_T)) > maxfile) {
-	std::stringstream nameStr;
-	nameStr << name << level << "." << intmed->size();
-	string newindex = nameStr.str();
+        std::stringstream nameStr;
+        nameStr << name << level << "." << intmed->size();
+        string newindex = nameStr.str();
         intmed->push_back(newindex);
         indexfile.open(newindex.c_str(), ios::binary | ios::out);
         filelen=0;
@@ -224,7 +224,7 @@ int lemur::index::InvIndexMerge::mergeFiles(vector<string>* files,
     delete(myreader->list);
     delete(myreader->reader);
     delete(myreader);
-	
+        
     readers.clear();
   
   } // if still a file
@@ -328,8 +328,8 @@ int lemur::index::InvIndexMerge::finalMerge(vector<string>* files) {
         delete(ir->reader);
         delete(ir);
         readers.erase(readers.begin()+(*iter-offset));
-	      //update the other indices
-	      offset++;
+        //update the other indices
+        offset++;
       }
     }
 
@@ -371,11 +371,11 @@ int lemur::index::InvIndexMerge::finalMerge(vector<string>* files) {
       filelen = (long)indexfile.tellp();
       if (filelen + ((ll+4) *sizeof(lemur::api::LOC_T)) > maxfile) {
         indexfile.close();
-	std::stringstream nameStr;
-	nameStr << name << INVINDEX << invfiles.size();
-	string newindex = nameStr.str();
-	invfiles.push_back(newindex);
-	indexfile.open(newindex.c_str(), ios::binary | ios::out);
+        std::stringstream nameStr;
+        nameStr << name << INVINDEX << invfiles.size();
+        string newindex = nameStr.str();
+        invfiles.push_back(newindex);
+        indexfile.open(newindex.c_str(), ios::binary | ios::out);
         filelen=0;
       }
       fid = invfiles.size()-1;
@@ -440,7 +440,7 @@ void lemur::index::InvIndexMerge::least(vector<IndexReader*>* r, vector<lemur::a
       }
     } // if not NULL
   } // for each list
-}	
+}       
 
 
 void lemur::index::InvIndexMerge::setbuf(ifstream* fs, char* bp, int bytes){

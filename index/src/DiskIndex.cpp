@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // DiskIndex
@@ -101,7 +101,7 @@ void indri::index::DiskIndex::open( const std::string& base, const std::string& 
     fieldFilename << "field" << field;
     std::string fieldPath = indri::file::Path::combine( path, fieldFilename.str() );
 
-      indri::file::File* fieldFile = new indri::file::File();
+    indri::file::File* fieldFile = new indri::file::File();
     fieldFile->openRead( fieldPath );
 
     _fieldFiles.push_back( fieldFile );

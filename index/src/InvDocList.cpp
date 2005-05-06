@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 /*
@@ -81,14 +81,14 @@ lemur::index::InvDocList::InvDocList(lemur::utility::MemCache* mc, lemur::api::T
 }
 
 lemur::index::InvDocList::~InvDocList() {
-/*  if (hascache) {
-    int pow = logb2(size);
+  /*  if (hascache) {
+      int pow = logb2(size);
       cache->freeMem(begin, pow);      
-  } */
-/*
-  if ((begin != NULL) && (!hascache) && (!READ_ONLY))
+      } */
+  /*
+    if ((begin != NULL) && (!hascache) && (!READ_ONLY))
     free(begin);
-*/
+  */
   if ((!hascache) && (!READ_ONLY))
     delete[](begin);
 
@@ -96,20 +96,20 @@ lemur::index::InvDocList::~InvDocList() {
 
 void lemur::index::InvDocList::setList(lemur::api::TERMID_T id, int listlen, lemur::api::LOC_T* list, int fr, lemur::api::DOCID_T* ldocid, int len){
   READ_ONLY = true;
-/*
-  if (hascache) {
+  /*
+    if (hascache) {
     int pow = logb2(size);
     cache->freeMem(begin, pow);     
-  } else if (begin != NULL) {
+    } else if (begin != NULL) {
     free(begin);
-  }
+    }
   */
   size = listlen * LOC_Tsize;
   begin = list;
   end = begin + listlen;
   uid = id;
   strlength = len;
-	df = fr;
+  df = fr;
   hascache = false;
   lastid = ldocid;
   freq = lastid+1;
@@ -117,8 +117,8 @@ void lemur::index::InvDocList::setList(lemur::api::TERMID_T id, int listlen, lem
 
 void lemur::index::InvDocList::setListSafe(lemur::api::TERMID_T id, int listlen, lemur::api::LOC_T* list, int fr, lemur::api::DOCID_T* ldocid, int len){
   if (hascache) {
-/*    int pow = logb2(size);
-      cache->freeMem(begin, pow);
+    /*    int pow = logb2(size);
+          cache->freeMem(begin, pow);
     */
   }
   size = listlen * LOC_Tsize;
@@ -126,7 +126,7 @@ void lemur::index::InvDocList::setListSafe(lemur::api::TERMID_T id, int listlen,
   end = begin + listlen;
   uid = id;
   strlength = len;
-	df = fr;
+  df = fr;
   hascache = false;
   lastid = ldocid;
   freq = lastid+1;
@@ -200,7 +200,7 @@ bool lemur::index::InvDocList::allocMem() {
 bool lemur::index::InvDocList::addTerm(lemur::api::DOCID_T docid) {
   if (READ_ONLY)
     return false;
-    // check that we can add at all
+  // check that we can add at all
   if (size == 0)
     return false;
 
@@ -286,12 +286,12 @@ bool lemur::index::InvDocList::hasNoMem() {
 
 void lemur::index::InvDocList::reset() {
   /*
-  if (hascache) {
+    if (hascache) {
     int pow = logb2(size);
     cache->freeMem(begin, pow);
-  } else if (begin != NULL) {
+    } else if (begin != NULL) {
     free(begin);
-  } */
+    } */
   begin = NULL;
   end = begin;
   lastid = begin;
@@ -448,8 +448,8 @@ bool lemur::index::InvDocList::binReadC(ifstream& inf) {
 
 /** THE PRIVATE STUFF **/
 /** double our current mem size 
-  *
-  */
+ *
+ */
 void lemur::index::InvDocList::deltaEncode() {
   // we will encode in place
   // go backwards starting at the last docid

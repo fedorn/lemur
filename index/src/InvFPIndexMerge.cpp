@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 #include "InvFPIndexMerge.hpp"
 #include <sstream>
 
@@ -22,8 +22,8 @@ lemur::index::InvFPIndexMerge::~InvFPIndexMerge() {
 }
 
 int lemur::index::InvFPIndexMerge::mergeFiles(vector<string>* files, 
-				vector<string>* intmed, 
-				int level) {
+                                              vector<string>* intmed, 
+                                              int level) {
   fprintf(stderr, "%s: Merging Intermediate files\n", name.c_str());
 
   vector<InvFPIndexReader*> readers;
@@ -108,8 +108,8 @@ int lemur::index::InvFPIndexMerge::mergeFiles(vector<string>* files,
         delete(ir->reader);
         delete(ir);
         readers.erase(readers.begin()+(*iter-offset));
-	      //update the other indices
-	      offset++;
+        //update the other indices
+        offset++;
       }
     }
 
@@ -143,11 +143,11 @@ int lemur::index::InvFPIndexMerge::mergeFiles(vector<string>* files,
       filelen = (long)indexfile.tellp();
       if (filelen + ((myreader->list->length()+4) *sizeof(lemur::api::LOC_T)) > maxfile) {
         indexfile.close();
-	std::stringstream nameStr;
-	nameStr << name << level << "." << intmed->size();
-	string newindex = nameStr.str();
-	intmed->push_back(newindex);
-	indexfile.open(newindex.c_str(), ios::binary | ios::out);
+        std::stringstream nameStr;
+        nameStr << name << level << "." << intmed->size();
+        string newindex = nameStr.str();
+        intmed->push_back(newindex);
+        indexfile.open(newindex.c_str(), ios::binary | ios::out);
         filelen=0;
       }
       
@@ -159,7 +159,7 @@ int lemur::index::InvFPIndexMerge::mergeFiles(vector<string>* files,
     delete(myreader->list);
     delete(myreader->reader);
     delete(myreader);
-	
+        
     readers.clear();
   
   } // if still a file
@@ -263,8 +263,8 @@ int lemur::index::InvFPIndexMerge::finalMerge(vector<string>* files) {
         delete(ir->reader);
         delete(ir);
         readers.erase(readers.begin()+(*iter-offset));
-	      //update the other indices
-	      offset++;
+        //update the other indices
+        offset++;
       }
     }
 
@@ -306,11 +306,11 @@ int lemur::index::InvFPIndexMerge::finalMerge(vector<string>* files) {
       filelen = (long)indexfile.tellp();
       if (filelen + ((ll+4) *sizeof(int)) > maxfile) {
         indexfile.close();
-	std::stringstream nameStr;
-	nameStr << name << INVFPINDEX << invfiles.size();
-	string newindex = nameStr.str();
-	invfiles.push_back(newindex);
-	indexfile.open(newindex.c_str(), ios::binary | ios::out);
+        std::stringstream nameStr;
+        nameStr << name << INVFPINDEX << invfiles.size();
+        string newindex = nameStr.str();
+        invfiles.push_back(newindex);
+        indexfile.open(newindex.c_str(), ios::binary | ios::out);
         filelen=0;
       }
       fid = invfiles.size()-1;
@@ -346,7 +346,7 @@ void lemur::index::InvFPIndexMerge::writeInvFIDs() {
   FILE* write = fopen(fidmap.c_str(), "wb");
   if (!write) {
     cerr << "Error: Couldn't create inverted index files to file ids map" 
-	 << endl;
+         << endl;
     return;
   }
   for (int i=0;i<invfiles.size();i++) {

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 // David Fisher
 // init: 05/22/2002
@@ -18,8 +18,9 @@
 // The Cluster object.
 using namespace lemur::api;
 
-lemur::cluster::Cluster::Cluster(int cid, const lemur::api::Index &db, const SimilarityMethod &sim) :
-id(cid), ind(db), similarity(sim) {
+lemur::cluster::Cluster::Cluster(int cid, const lemur::api::Index &db, 
+                                 const SimilarityMethod &sim) :
+  id(cid), ind(db), similarity(sim) {
   char myName[NAMESIZE];
   sprintf(myName, "%d", id);
   name = myName;
@@ -42,7 +43,8 @@ const string &lemur::cluster::Cluster::getName() const {
   return (name); 
 }
    
-const vector <lemur::cluster::ClusterElt> *lemur::cluster::Cluster::getIds() const { return &ids; }
+const vector <lemur::cluster::ClusterElt> *lemur::cluster::Cluster::getIds() 
+  const { return &ids; }
 
 vector<DOCID_T> lemur::cluster::Cluster::getDocIds() const {
   vector<DOCID_T> res;
@@ -74,7 +76,7 @@ void lemur::cluster::Cluster::merge(const Cluster *c) {
     add(*it);
 }
 
-vector<lemur::cluster::Cluster *> lemur::cluster::Cluster::split(int numParts) {
+vector<lemur::cluster::Cluster *> lemur::cluster::Cluster::split(int numParts){
   vector<Cluster *> *clusters;
   // Need to pass in other parameters here.
   OfflineCluster *cdb = new OfflineCluster(ind);
@@ -88,7 +90,7 @@ vector<lemur::cluster::Cluster *> lemur::cluster::Cluster::split(int numParts) {
 void lemur::cluster::Cluster::remove(const ClusterElt &elt) {
   vector<ClusterElt>::iterator it = ids.begin();
   while (it != ids.end() && 
-	 ((*it).myType != elt.myType || (*it).id != elt.id)) it++;
+         ((*it).myType != elt.myType || (*it).id != elt.id)) it++;
   if (it != ids.end())
     ids.erase(it);
   size--;
@@ -163,23 +165,23 @@ string lemur::cluster::Cluster::getKeyWords(int maxTerms) const {
   maxtf = 0, df = 0;
   for (vector<ClusterElt>::const_iterator it = ids.begin(); 
        it != ids.end(); it++) {
-	  if ((*it).myType == DOC_ELT) {
-		DOCID_T docID = (*it).id;
-		TermInfoList *tlist = ind.termInfoList(docID);
-		TermInfo *info;
-		tlist->startIteration();
-		while (tlist->hasMore()) {
-			info = tlist->nextEntry();
-			TERMID_T id = info->termID();
-			COUNT_T freq = info->count();
-			tf[id] += freq;
-			if (tf[id] > maxtf)
-			maxtf = tf[id];
-			posts[id]++;
-		}
-		delete tlist;
-		df++;
-	}
+    if ((*it).myType == DOC_ELT) {
+      DOCID_T docID = (*it).id;
+      TermInfoList *tlist = ind.termInfoList(docID);
+      TermInfo *info;
+      tlist->startIteration();
+      while (tlist->hasMore()) {
+        info = tlist->nextEntry();
+        TERMID_T id = info->termID();
+        COUNT_T freq = info->count();
+        tf[id] += freq;
+        if (tf[id] > maxtf)
+          maxtf = tf[id];
+        posts[id]++;
+      }
+      delete tlist;
+      df++;
+    }
   }
   results.clear();
   double score;

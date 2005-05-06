@@ -21,16 +21,13 @@ namespace lemur
 {
   namespace cluster
   {
-    /*!
-      Writes one file, <i>name</i>.cl, the cluster
-      database. 
-    */
+    /// Writes one file, <i>name</i>.cl, the cluster database. 
     class FlatFileClusterDB : public lemur::api::ClusterDB {
 
     public:
       /// initialize
       FlatFileClusterDB(const lemur::api::Index *ind, 
-                        const string &name, 		   
+                        const string &name,                
                         double threshold = 0.25,
                         enum ClusterParam::simTypes simType = ClusterParam::COS,
                         enum ClusterParam::clusterTypes 
@@ -56,10 +53,12 @@ namespace lemur
       virtual vector<int> getDocClusterId(lemur::api::DOCID_T docId) const;
 
       /// Add a document id to a cluster, given the cluster id.
-      virtual int addToCluster(lemur::api::DOCID_T docId, int clusterId, double score);
+      virtual int addToCluster(lemur::api::DOCID_T docId, int clusterId, 
+                               double score);
 
       /// Add a document id to a cluster, given the cluster.
-      virtual int addToCluster(lemur::api::DOCID_T docId, Cluster *cluster, double score);
+      virtual int addToCluster(lemur::api::DOCID_T docId, Cluster *cluster, 
+                               double score);
 
       /// Remove a document id from a cluster, given the cluster id.
       virtual int removeFromCluster(lemur::api::DOCID_T docId, int clusterID);

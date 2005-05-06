@@ -22,15 +22,15 @@ namespace lemur
   namespace cluster
   {
     
-    /// K nearest neighbors clustering of documents.
-    /// d_ave, d_min, d_max, d_mean scoring methods.
+    /// K nearest neighbors clustering of documents. d_ave, d_min, d_max, d_mean scoring methods.
     class AgglomCluster: public Cluster
     {
     public:
       ///initialize
-      AgglomCluster(int cid, const lemur::api::Index &ind, const SimilarityMethod &sim, 
-                    enum ClusterParam::docModes mode): 
-        Cluster(cid, ind, sim), docmode(mode) {}
+      AgglomCluster(int cid, const lemur::api::Index &ind, 
+                    const SimilarityMethod &sim, 
+                    enum ClusterParam::docModes mode): Cluster(cid, ind, sim), 
+                                                       docmode(mode) {}
       /// clean up
       virtual ~AgglomCluster() {};
       /// score a document against this cluster, given the rep.
@@ -43,6 +43,7 @@ namespace lemur
       virtual double sum2() const;
   
     private:
+      /// Scoring mode to use.
       enum ClusterParam::docModes docmode;
       /// Score the rep using min.
       double score_min(const ClusterRep *rep) const;

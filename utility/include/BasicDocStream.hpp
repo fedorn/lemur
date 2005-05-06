@@ -33,12 +33,12 @@ namespace lemur
     the following format:
 
     <PRE>
-    <DOC unique_document_identifier>
+    &lt;DOC unique_document_identifier&gt;
     this
     is
     an
     example
-    </DOC>
+    &lt;/DOC&gt;
     </PRE>
 
 
@@ -109,7 +109,7 @@ namespace lemur
       virtual ~BasicDocStream() {  delete ifs;}
 
     public:
-	
+        
       bool hasMore(); 
 
       void startDocIteration();

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 // David Fisher, Peter Amstutz
 // init: 05/22/2002
@@ -17,11 +17,11 @@
 
 // The ClusterDB.
 lemur::cluster::FlatFileClusterDB::FlatFileClusterDB(const lemur::api::Index *ind, 
-				     const string &name,
-				     double threshold,
-				     enum ClusterParam::simTypes simType,
-				     enum ClusterParam::clusterTypes clusterType,
-				     enum ClusterParam::docModes docMode)
+                                                     const string &name,
+                                                     double threshold,
+                                                     enum ClusterParam::simTypes simType,
+                                                     enum ClusterParam::clusterTypes clusterType,
+                                                     enum ClusterParam::docModes docMode)
   : ClusterDB(ind, threshold, simType, clusterType, docMode) {
   init(name);
 }
@@ -52,10 +52,10 @@ lemur::cluster::Cluster* lemur::cluster::FlatFileClusterDB::getCluster(int clust
 }
 
 vector<lemur::cluster::Cluster*> lemur::cluster::FlatFileClusterDB::getDocCluster(lemur::api::DOCID_T docId) const {
-    vector<Cluster*> v;
-    if(doc2cluster[docId] > 0 && clusters[doc2cluster[docId]])
-      v.push_back(clusters[doc2cluster[docId]]);
-    return v;
+  vector<Cluster*> v;
+  if(doc2cluster[docId] > 0 && clusters[doc2cluster[docId]])
+    v.push_back(clusters[doc2cluster[docId]]);
+  return v;
 }
 
 
@@ -69,10 +69,10 @@ lemur::cluster::Cluster* lemur::cluster::FlatFileClusterDB::newCluster() {
 }
 
 vector<int> lemur::cluster::FlatFileClusterDB::getDocClusterId(lemur::api::DOCID_T docId) const {
-    vector<int> v;
-    if(doc2cluster[docId] > 0) 
-      v.push_back(doc2cluster[docId]);
-    return v;
+  vector<int> v;
+  if(doc2cluster[docId] > 0) 
+    v.push_back(doc2cluster[docId]);
+  return v;
 }
 
 int lemur::cluster::FlatFileClusterDB::addToCluster(lemur::api::DOCID_T docId, int clusterId, double score) {

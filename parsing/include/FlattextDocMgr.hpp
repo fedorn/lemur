@@ -88,7 +88,7 @@ namespace lemur
       string IDname;            // my name
       string IDnameext;         // my name with type extension
       vector<string> sources;   // list of all source files
-      int fileid;			    // fileid of current file being processed
+      int fileid;                           // fileid of current file being processed
       ofstream writefpos;       // stream for writing out file positions
       mutable map<string, lookup_e*, less<string> > table; 
       lookup_e* entries;        // array of lookup entries

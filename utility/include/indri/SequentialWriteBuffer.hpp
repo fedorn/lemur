@@ -102,9 +102,9 @@ namespace indri
       void flushRegion( UINT64 start, UINT64 length ) {
         if( (start+length) >= _current.filePosition &&
             start <= _current.filePosition + _current.buffer.position() )
-        {
-          flush();
-        }
+          {
+            flush();
+          }
       }
     };
   }

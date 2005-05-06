@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "InvPassagePushIndex.hpp"
 #include <sstream>
@@ -18,8 +18,8 @@
  *========================================================================*/
 
 lemur::index::InvPassagePushIndex::InvPassagePushIndex(const string &prefix, int psgSize,
-					 int cachesize, long maxfilesize, 
-					 lemur::api::DOCID_T startdocid)
+                                                       int cachesize, long maxfilesize, 
+                                                       lemur::api::DOCID_T startdocid)
   : InvFPPushIndex(prefix, cachesize, maxfilesize, startdocid),
     passageSize(psgSize), curDocName("") { 
   passageEnd = passageSize/2;
@@ -57,7 +57,7 @@ bool lemur::index::InvPassagePushIndex::addTerm(const lemur::api::Term& t){
   term = dynamic_cast< const InvFPTerm* >(&t);
   if (term->strLength() < 1) {
     cerr << "Trying to add term with length less than 1.  Term ignored." 
-	 << endl;
+         << endl;
     return false;
   }
   if (term->spelling() == NULL) {
@@ -97,7 +97,7 @@ bool lemur::index::InvPassagePushIndex::addTerm(const lemur::api::Term& t){
     termIDs.push_back(spell);
 
     curlist = new InvFPDocList(cache, termIDs.size(), term->strLength(), 
-			       docIDs.size(), pos);
+                               docIDs.size(), pos);
 
     if (curlist->hasNoMem()) {
       //we didn't allocate memory in the constructor!
@@ -135,7 +135,7 @@ bool lemur::index::InvPassagePushIndex::addTerm(const lemur::api::Term& t){
       offset = 0;
     }
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset,
-	    len, curdocmgr);
+            len, curdocmgr);
     InvFPTermList *tlist = new InvFPTermList(docid, len, termlist);
     tlist->binWriteC(writetlist);
     delete tlist;
@@ -150,19 +150,19 @@ bool lemur::index::InvPassagePushIndex::addTerm(const lemur::api::Term& t){
     //update positions.
     for (i = 0; i < termlist.size(); i++) {            
       termlist[i].loc = i + 1;
- // off by one for OOV
+      // off by one for OOV
       string &word = termIDs[termlist[i].term - 1];
       placehold = wordtable.find(word);
       // must be there.
       curlist = (InvFPDocList*)placehold->second;
       if (curlist->hasNoMem()) {
-	curlist->allocMem();
+        curlist->allocMem();
       }
       if (!curlist->addLocation(docIDs.size(), termlist[i].loc)) {
-	writeCache();
-	cache->flushMem();
-	curlist->allocMem();
-	curlist->addLocation(docIDs.size(), termlist[i].loc);
+        writeCache();
+        cache->flushMem();
+        curlist->allocMem();
+        curlist->addLocation(docIDs.size(), termlist[i].loc);
       }
     }
   }
@@ -191,7 +191,7 @@ void lemur::index::InvPassagePushIndex::doendDoc(const lemur::parse::DocumentPro
     }
 
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset, 
-      len, mgrid);
+            len, mgrid);
     InvFPTermList *tlist = new InvFPTermList(docid, len, termlist);
     tlist->binWriteC(writetlist);
     delete tlist;

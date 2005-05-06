@@ -30,7 +30,7 @@
 #include "indri/ListCache.hpp"
 namespace indri
 {
-  /*! Indri query server classes. */
+  /*! \brief Indri query server classes. */
   namespace server
   {
     

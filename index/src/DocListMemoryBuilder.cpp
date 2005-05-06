@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -188,9 +188,9 @@ void indri::index::DocListMemoryBuilder::endDocument() {
   // comparison to constant saves some work in the common case
   if( remaining < TERMINATE_SPACE &&
       remaining < ((size_t)lemur::utility::RVLCompress::compressedSize( _termFrequency - _lastTermFrequency ) - 1) )
-  {
-    _grow();
-  }
+    {
+      _grow();
+    }
 
   _terminateDocument();
 }

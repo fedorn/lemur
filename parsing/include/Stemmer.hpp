@@ -16,11 +16,10 @@ namespace lemur
 {
   namespace api 
   {
-    ///
-    ///  A generic interface for Stemmers.  They should
-    ///  support the TextHandler interface.
-    ///
 
+    ///  \brief A generic interface for Stemmers.
+    /*!  They must implement the TextHandler interface.
+     */
     class Stemmer : public TextHandler {
 
     public:

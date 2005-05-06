@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -84,13 +84,13 @@ int indri::xml::XMLReader::_findNotName( const char* buffer, int start, int fini
   for( i=start; i<finish; i++ ) {
     // this isn't unicode-safe, but it should be good for now
     if( !isalpha(buffer[i]) && 
-      !isdigit(buffer[i]) &&
-      buffer[i] != '-' &&
-      buffer[i] != '_' &&
-      buffer[i] != ':' &&
-      buffer[i] != '.' ) {
-        break;
-      }
+        !isdigit(buffer[i]) &&
+        buffer[i] != '-' &&
+        buffer[i] != '_' &&
+        buffer[i] != ':' &&
+        buffer[i] != '.' ) {
+      break;
+    }
   }
 
   if( i==finish )
@@ -238,47 +238,47 @@ void indri::xml::XMLReader::_read( indri::xml::XMLNode** parent, const char* buf
   int tagType;
 
   for( int current = _tryFindBeginTag( buffer, start, end );
-    current >= 0;
-    current = _tryFindBeginTag( buffer, current, end ) ) {
-      indri::xml::XMLNode* node;
-      std::string tagName;
-      std::map<std::string, std::string> attributes;
-      bool tagsBetween;
+       current >= 0;
+       current = _tryFindBeginTag( buffer, current, end ) ) {
+    indri::xml::XMLNode* node;
+    std::string tagName;
+    std::map<std::string, std::string> attributes;
+    bool tagsBetween;
 
-      int endLevel;
-      int endTag = _readTag( buffer, current, end, &tagName, &attributes, &tagType );
+    int endLevel;
+    int endTag = _readTag( buffer, current, end, &tagName, &attributes, &tagType );
 
-      if( tagType == TAG_CLOSE_TYPE )
-        LEMUR_THROW( LEMUR_GENERIC_ERROR, "Found a close tag for '" + tagName + "' while looking for an open tag." );
+    if( tagType == TAG_CLOSE_TYPE )
+      LEMUR_THROW( LEMUR_GENERIC_ERROR, "Found a close tag for '" + tagName + "' while looking for an open tag." );
 
-      if( tagType == TAG_OPEN_TYPE ) {
-        int closingTag = _findClosingTag( buffer, endTag, end, tagName, &tagsBetween );
+    if( tagType == TAG_OPEN_TYPE ) {
+      int closingTag = _findClosingTag( buffer, endTag, end, tagName, &tagsBetween );
 
-        if( tagsBetween ) {
-          node = new indri::xml::XMLNode( tagName, attributes );
-          _read( &node, buffer, endTag, closingTag );
-        } else {
-          std::string nodeValue;
-          nodeValue.assign( &buffer[endTag], &buffer[closingTag] ); 
-          node = new indri::xml::XMLNode( tagName, attributes, nodeValue );
-        }
-
-        endLevel = _findEndTag( buffer, closingTag, end )+1;
-      } else {
-        assert( tagType == TAG_OPEN_CLOSE_TYPE );
+      if( tagsBetween ) {
         node = new indri::xml::XMLNode( tagName, attributes );
-        endLevel = endTag;
-      }
-
-      if( *parent ) {
-        (*parent)->addChild( node );
+        _read( &node, buffer, endTag, closingTag );
       } else {
-        *parent = node;
-        break;
+        std::string nodeValue;
+        nodeValue.assign( &buffer[endTag], &buffer[closingTag] ); 
+        node = new indri::xml::XMLNode( tagName, attributes, nodeValue );
       }
 
-      current = endLevel;
+      endLevel = _findEndTag( buffer, closingTag, end )+1;
+    } else {
+      assert( tagType == TAG_OPEN_CLOSE_TYPE );
+      node = new indri::xml::XMLNode( tagName, attributes );
+      endLevel = endTag;
     }
+
+    if( *parent ) {
+      (*parent)->addChild( node );
+    } else {
+      *parent = node;
+      break;
+    }
+
+    current = endLevel;
+  }
 }
 
 indri::xml::XMLNode* indri::xml::XMLReader::read( const char* buffer, size_t length ) {

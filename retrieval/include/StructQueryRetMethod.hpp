@@ -28,21 +28,17 @@ namespace lemur
   namespace api
   {
     
-    //--------------------------------------------------------------------------
-    //      Abstract Interface for A Retrieval Method/Model for Structured Query
-    //--------------------------------------------------------------------------
-
+    /// \brief Abstract Interface for A Retrieval Method/Model for Structured Query
     /*!
       Given a query <tt>q = op(q<sub>1</sub>,q<sub>2</sub>,...,q<sub>N</sub>)</tt> 
       where q<sub>i</sub> can be an structured query node or a term node,
       and a document <tt>d</tt>, <tt>StructQueryRetMethod</tt> assumes the 
       following general scoring function:
 
-      <blockquote>
       <pre>
       s(q,d) = g(s(q<sub>1</sub>,d), ..., s(q<sub>N</sub>,d))
       </pre>
-      </blockquote>
+
       That is, the score of a document <tt>d</tt> against a query <tt>q</tt> is a 
       function <tt>g</tt> of the scores of each child query node in 
       <tt>q<sub>i</sub></tt>, where <tt>g</tt> is the composition function for 

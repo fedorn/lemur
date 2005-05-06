@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // Thread
@@ -40,11 +40,11 @@ indri::thread::Thread::Thread( void (*function)(void*), void* data ) {
   _function = function;
   _data = data;
 
-  #ifdef WIN32
-    _thread = _beginthreadex( 0, 0, win32_start, this, 0, &_id );
-  #else
-    pthread_create( &_thread, 0, pthread_start, this );
-  #endif
+#ifdef WIN32
+  _thread = _beginthreadex( 0, 0, win32_start, this, 0, &_id );
+#else
+  pthread_create( &_thread, 0, pthread_start, this );
+#endif
 }
 
 void indri::thread::Thread::execute() {
@@ -52,12 +52,12 @@ void indri::thread::Thread::execute() {
 }
 
 void indri::thread::Thread::join() {
-  #ifdef WIN32
-    WaitForSingleObject( (HANDLE) _thread, INFINITE );
-    CloseHandle( (HANDLE) _thread );
-  #else
-    pthread_join( _thread, 0 );
-  #endif
+#ifdef WIN32
+  WaitForSingleObject( (HANDLE) _thread, INFINITE );
+  CloseHandle( (HANDLE) _thread );
+#else
+  pthread_join( _thread, 0 );
+#endif
 }
 
 int indri::thread::Thread::id() {

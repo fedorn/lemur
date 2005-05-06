@@ -43,7 +43,7 @@ namespace lemur
       virtual void reset() { free(term); termptr=NULL; }
     protected:
       char* term;
-      const char* termptr;			
+      const char* termptr;                      
     };
   }
 }

@@ -27,7 +27,7 @@ namespace lemur
     class TMatch {
     public:
       TMatch(TERMID_T t, int s, int e, int p): tid(t), start(s), end(e), 
-                                                           position(p) { }
+                                               position(p) { }
       /// internal term id
       TERMID_T tid;
       /// byte offset of first letter of term in raw document
@@ -38,11 +38,13 @@ namespace lemur
       int position;
     };
 
-    /// Match information for a query within a document. Provides a list of 
-    /// match offsets (token based). Also provides byte offsets in source text 
-    /// when a DocumentManager is available to provide the raw document text.
-    /// If the DocumentManager is a KeyfileDocMgr, the raw document text is
-    /// not parsed, the offsets are retrieved directly.
+    /// \brief Match information for a query within a document. 
+    /*!  Provides a list of match offsets (token based). Also provides
+     byte offsets in source text when a DocumentManager is available to
+     provide the raw document text.  If the DocumentManager is a
+     KeyfileDocMgr, the raw document text is not parsed, the offsets are
+     retrieved directly.
+    */
     class MatchInfo : public vector<TMatch> {
     public: 
       /// clean up.

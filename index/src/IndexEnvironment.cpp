@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // IndexEnvironment
@@ -24,7 +24,7 @@
 
 void indri::api::IndexEnvironment::_getParsingContext( indri::parse::Parser** parser,
                                                        indri::parse::DocumentIterator** iterDoc,
-                                           const std::string& className ) {
+                                                       const std::string& className ) {
   std::string parserName;
   std::string iteratorName;
 
@@ -89,19 +89,19 @@ void indri::api::IndexEnvironment::setStemmer( const std::string& stemmer ) {
 }
 
 void indri::api::IndexEnvironment::addFileClass( const std::string& name, 
-                                     const std::string& iter,
-                                     const std::string& parser,
-                                     const std::string& startDocTag,
-                                     const std::string& endDocTag,
-                                     const std::string& endMetadataTag,
-                                     const std::vector<std::string>& include,
-                                     const std::vector<std::string>& exclude,
-                                     const std::vector<std::string>& index,
-                                     const std::vector<std::string>& metadata, 
-                                     const std::map<std::string,std::string>& conflations )
+                                                 const std::string& iter,
+                                                 const std::string& parser,
+                                                 const std::string& startDocTag,
+                                                 const std::string& endDocTag,
+                                                 const std::string& endMetadataTag,
+                                                 const std::vector<std::string>& include,
+                                                 const std::vector<std::string>& exclude,
+                                                 const std::vector<std::string>& index,
+                                                 const std::vector<std::string>& metadata, 
+                                                 const std::map<std::string,std::string>& conflations )
 {
   this->_fileClassFactory.addFileClass( name, iter, parser, startDocTag, endDocTag, endMetadataTag,
-                                              include, exclude, index, metadata, conflations );
+                                        include, exclude, index, metadata, conflations );
 
 }
 

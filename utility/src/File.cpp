@@ -57,22 +57,22 @@ void lemur::file::File::_appendSegment() {
 }
 
 lemur::file::File::offset_type lemur::file::File::_absolutePosition( offset_type relativePosition,
-  offset_type currentPosition,
-  std::fstream::seekdir direction ) const {
+                                                                     offset_type currentPosition,
+                                                                     std::fstream::seekdir direction ) const {
   offset_type newPosition;
 
   switch( direction ) {
-    case std::fstream::beg:
-      newPosition = relativePosition;
-      break;
+  case std::fstream::beg:
+    newPosition = relativePosition;
+    break;
 
-    case std::fstream::cur:
-      newPosition = currentPosition + relativePosition;
-      break;
+  case std::fstream::cur:
+    newPosition = currentPosition + relativePosition;
+    break;
 
-    case std::fstream::end:
-      newPosition = size() + relativePosition;
-      break;
+  case std::fstream::end:
+    newPosition = size() + relativePosition;
+    break;
   }
 
   // seeking off the end of a file is not currently implemented
@@ -264,7 +264,7 @@ void lemur::file::File::read( void* buffer, offset_type count ) {
   _readCount = 0;
 
   while( ((count - _readCount + _readPosition) >= _readSegment->end) &&
-          _readPosition != size() ) {
+         _readPosition != size() ) {
     readAmount = _readSegment->end - _readPosition;
     _readSegment->stream.read( (char*)buffer + _readCount, library_offset_type(readAmount) );
     

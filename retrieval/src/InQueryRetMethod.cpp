@@ -7,10 +7,10 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 /*
   Author: fff
- */
+*/
 
 
 #include "InQueryRetMethod.hpp"
@@ -18,12 +18,12 @@
 #include <cmath>
 
 lemur::retrieval::InQueryRetMethod::InQueryRetMethod(const lemur::api::Index &dbIndex, double belief,
-				   int fbTerms, double fbCoef, bool cacheIDF):
+                                                     int fbTerms, double fbCoef, bool cacheIDF):
   StructQueryRetMethod(dbIndex), fbCoeff(fbCoef), fbTermCount(fbTerms), 
   defaultBelief(belief) {
   docCount = dbIndex.docCount();
   docLengthAverage = dbIndex.docLengthAvg();
-    // pre-compute IDF values
+  // pre-compute IDF values
   if (cacheIDF) {
     lemur::api::COUNT_T termCount = dbIndex.termCountUnique();
     double denom = log(docCount + 1.0);
@@ -40,7 +40,7 @@ lemur::retrieval::InQueryRetMethod::InQueryRetMethod(const lemur::api::Index &db
 }
 
 void lemur::retrieval::InQueryRetMethod::updateStructQuery(StructQueryRep &qryRep, 
-					 const lemur::api::DocIDSet &relDocs) {
+                                                           const lemur::api::DocIDSet &relDocs) {
   // build a top query node of wsum, choose new terms as is done by
   // TFIDF
   lemur::api::COUNT_T totalTerm = ind.termCountUnique();  
@@ -65,9 +65,9 @@ void lemur::retrieval::InQueryRetMethod::updateStructQuery(StructQueryRep &qryRe
       lemur::api::TERMID_T tid = info->termID();
       double dtf = (double)info->count();
       if (idfV != NULL)
-	expandTerms[tid] += fbCoeff * (dr->beliefScore(dtf, idfV[tid]));
+        expandTerms[tid] += fbCoeff * (dr->beliefScore(dtf, idfV[tid]));
       else      
-	expandTerms[tid] += fbCoeff * (dr->beliefScore(dtf, log(numer/(double)ind.docCount(tid))/denom));
+        expandTerms[tid] += fbCoeff * (dr->beliefScore(dtf, log(numer/(double)ind.docCount(tid))/denom));
     }
     delete(dr);
     delete(tList);

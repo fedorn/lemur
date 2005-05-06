@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -26,47 +26,47 @@ namespace indri
 {
   namespace lang
   {
-class QueryNodeBuilder : public indri::lang::Walker {
-private:
-  indri::api::QueryAnnotationNode* _root;
-  std::map< indri::lang::Node*, indri::api::QueryAnnotationNode* > _nodes;
-  std::stack< indri::api::QueryAnnotationNode* > _stack;
+    class QueryNodeBuilder : public indri::lang::Walker {
+    private:
+      indri::api::QueryAnnotationNode* _root;
+      std::map< indri::lang::Node*, indri::api::QueryAnnotationNode* > _nodes;
+      std::stack< indri::api::QueryAnnotationNode* > _stack;
 
-public:
-  QueryNodeBuilder() : _root(0) {}
+    public:
+      QueryNodeBuilder() : _root(0) {}
 
-  void defaultBefore( indri::lang::Node* n ) {
-    std::map< indri::lang::Node*, indri::api::QueryAnnotationNode* >::iterator iter = _nodes.find(n);
-    indri::api::QueryAnnotationNode* next = 0;
+      void defaultBefore( indri::lang::Node* n ) {
+        std::map< indri::lang::Node*, indri::api::QueryAnnotationNode* >::iterator iter = _nodes.find(n);
+        indri::api::QueryAnnotationNode* next = 0;
 
-    if( iter != _nodes.end() ) {
-      next = iter->second;
-    } else {
-      next = new indri::api::QueryAnnotationNode;
-      next->name = n->nodeName();
-      next->queryText = n->queryText();
-      next->type = n->typeName();
-    }
+        if( iter != _nodes.end() ) {
+          next = iter->second;
+        } else {
+          next = new indri::api::QueryAnnotationNode;
+          next->name = n->nodeName();
+          next->queryText = n->queryText();
+          next->type = n->typeName();
+        }
 
-    if( _stack.size() ) {
-      _stack.top()->children.push_back( next );
-    }
+        if( _stack.size() ) {
+          _stack.top()->children.push_back( next );
+        }
 
-    _stack.push( next );
+        _stack.push( next );
 
-    if( !_root ) {
-      _root = next;
-    }
-  }
+        if( !_root ) {
+          _root = next;
+        }
+      }
 
-  void defaultAfter( indri::lang::Node* n ) {
-    _stack.pop();
-  }
+      void defaultAfter( indri::lang::Node* n ) {
+        _stack.pop();
+      }
 
-  indri::api::QueryAnnotationNode* getRoot() {
-    return _root;
-  }
-};
+      indri::api::QueryAnnotationNode* getRoot() {
+        return _root;
+      }
+    };
   }
 }
 

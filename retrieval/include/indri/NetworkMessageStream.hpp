@@ -25,6 +25,7 @@
 #include "indri/XMLNode.hpp"
 namespace indri
 {
+  /// indri network components
   namespace net
   {
     

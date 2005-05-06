@@ -7,7 +7,7 @@
  * http://www.cs.cmu.edu/~lemur/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #include "BasicIndexWithCat.hpp"
@@ -19,7 +19,7 @@ const string lemur::index::BasicIndexWithCat::OOVSTRING = "[OOV]";
 
 
 lemur::index::BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &categoryIndex, bool catIsTerm):
-    baseIndex(&wordIndex), catIndex(&categoryIndex), catAsTerm(catIsTerm) 
+  baseIndex(&wordIndex), catIndex(&categoryIndex), catAsTerm(catIsTerm) 
 { 
   // synchronize doc id lexicons
   base2cat = new int[baseIndex->docCount()];
@@ -45,7 +45,7 @@ lemur::index::BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &cate
 
   for (i=0; i<catMax; i++) {
     id = (catAsTerm? baseIndex->document(catIndex->document(i)):
-	  baseIndex->document(catIndex->term(i)));
+          baseIndex->document(catIndex->term(i)));
     base2cat[id]=i;
     cat2base[i] =id; 
   }

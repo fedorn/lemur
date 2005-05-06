@@ -8,34 +8,31 @@
  *
  *==========================================================================
 */
-
-
-/// Smoothing support file generator
-
 /*! \page GenerateSmoothSupport  GenerateSmoothSupport Application
 
- 
-
-This application (<tt> GenerateSmoothSupport.cpp </tt>) generates two support files
-for retrieval using the language modeling approach. Both files contain
-some pre-computed quantities that are needed to speed up the retrieval process.
-One file (name given by the parameter <tt>smoothSupportFile</tt>, see below) is needed by 
-retrieval using smoothed unigram language model based on BasicIndex. 
-Each entry in this support file corresponds to one document and records
-two pieces of information: (a) the count of unique terms in the document;
-(b) the sum of collection language model probabilities for the words in the document.
-The other file (with an extra suffix "<tt>.mc</tt>" is needed if you run feedback based on the Markov chain query model. Each line in this file contains a term and a sum of the probability of the word given all documents in the collection. (i.e., a sum of <tt>p(w|d)</tt> over all possible <tt>d</tt>'s.) 
+This application generates two support files for retrieval using the
+language modeling approach. Both files contain some pre-computed
+quantities that are needed to speed up the retrieval process.  One file
+(name given by the parameter <tt>smoothSupportFile</tt>, see below) is
+needed by retrieval using smoothed unigram language model. Each entry in
+this support file corresponds to one document and records two pieces of
+information: (a) the count of unique terms in the document; (b) the sum
+of collection language model probabilities for the words in the
+document.  The other file (with an extra suffix "<tt>.mc</tt>" is needed
+if you run feedback based on the Markov chain query model. Each line in
+this file contains a term and a sum of the probability of the word given
+all documents in the collection. (i.e., a sum of <tt>p(w|d)</tt> over
+all possible <tt>d</tt>'s.)
 
 To run the application, follow the general steps of running a lemur
 application and set the following variables in the parameter file:
+<ol>
 
-(1) <tt>index</tt>: the table-of-content (TOC) record file of the index (e.g., the <tt>.bsc</tt> file created by <tt>BuildBasicIndex</tt> or the <tt>.ifp</tt> file created by <tt> PushIndexer</tt>.  )
+<li><tt>index</tt>: the table-of-content (TOC) record file of the index.
 
-(2) <tt>smoothSupportFile</tt>: file path for the support file
+<li> <tt>smoothSupportFile</tt>: file path for the support file
 (e.g.,<tt> /usr0/mydata/index.supp</tt>)
-
-This application is also a good example of using the doc index (i.e., doc->term index).
-
+</ol>
 */
 
 
@@ -109,7 +106,7 @@ int AppMain(int argc, char *argv[]) {
       // compute Markov chain support
 
       prSum += ind->termCount(info->termID());
-	
+        
 
       // cout << i << "\t" <<  ind->termCount(info->id()) << "\t" << ind->term(info->id()) << endl;
 
@@ -131,7 +128,3 @@ int AppMain(int argc, char *argv[]) {
   return 0;
 
 }
-
-
-
-

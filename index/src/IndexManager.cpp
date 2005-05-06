@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "IndexManager.hpp"
 
@@ -33,13 +33,13 @@ lemur::api::Index *lemur::api::IndexManager::openIndex(const string &tocFile)
     // InvFP
     ind = new lemur::index::InvFPIndex();
   } else if ((!strcmp(extension, "INV")) ||
-	     (!strcmp(extension, "inv"))) {
+             (!strcmp(extension, "inv"))) {
     ind = new lemur::index::InvIndex();
   } else if ((!strcmp(extension, "key")) ||
-	     (!strcmp(extension, "KEY"))) {
+             (!strcmp(extension, "KEY"))) {
     ind = new lemur::index::KeyfileIncIndex();
   } else if ((!strcmp(extension, "ind")) ||
-	     (!strcmp(extension, "IND"))) {
+             (!strcmp(extension, "IND"))) {
     ind = new lemur::index::LemurIndriIndex();
   } else {
     throw Exception("IndexManager", "unknown index file extension");

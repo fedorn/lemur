@@ -15,7 +15,7 @@
 
 lemur::cluster::CentroidCluster::CentroidCluster(int cid, 
                                                  const lemur::api::Index &ind, 
-				 const SimilarityMethod &sim) :
+                                                 const SimilarityMethod &sim) :
   Cluster(cid, ind, sim) {
   centroid = NULL;
   weightedCentroid = NULL;
@@ -28,7 +28,8 @@ double lemur::cluster::CentroidCluster::score(const ClusterRep *rep) const {
   return s;
 }
 
-lemur::cluster::ClusterRep *lemur::cluster::CentroidCluster::getClusterRep() const {
+lemur::cluster::ClusterRep *lemur::cluster::CentroidCluster::getClusterRep() 
+  const {
   return new ClusterRep(weightedCentroid);
 }
 
@@ -53,7 +54,7 @@ void lemur::cluster::CentroidCluster::add(const ClusterElt &elt) {
   delete(rep);
 }
 
-void lemur::cluster::CentroidCluster::add(vector<lemur::api::DOCID_T> docids) {  
+void lemur::cluster::CentroidCluster::add(vector<lemur::api::DOCID_T> docids) {
   bool firstOne = (size == 0);
   // don't use add for efficiency's sake (single update of centroid).
   ClusterElt fred;
@@ -73,7 +74,7 @@ void lemur::cluster::CentroidCluster::add(vector<lemur::api::DOCID_T> docids) {
 void lemur::cluster::CentroidCluster::remove(const ClusterElt &elt) {
   vector<ClusterElt>::iterator it = ids.begin();
   while (it != ids.end() && 
-	 ((*it).myType != elt.myType || (*it).id != elt.id)) it++;
+         ((*it).myType != elt.myType || (*it).id != elt.id)) it++;
   if (it != ids.end()) {
     ClusterRep *rep = new ClusterRep((*it).id, ind);
     centroid->subtract(rep->getRep());

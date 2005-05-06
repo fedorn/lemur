@@ -7,10 +7,10 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 /*
   Author: dmf 11/2002
- */
+*/
 
 #include "CosSim.hpp"
 #include <cmath>
@@ -24,8 +24,8 @@ lemur::cluster::CosSim::CosSim(const lemur::api::Index &dbIndex) :ind(dbIndex) {
   idfV = new double[numTerms + 1];
   for (lemur::api::COUNT_T i=1; i <= numTerms; i++) {
     idfV[i] = log((numDocs + 1)/(0.5 + dbIndex.docCount(i)));
-    }
   }
+}
   
 lemur::cluster::CosSim::~CosSim() {
   delete[](idfV);

@@ -26,9 +26,10 @@ namespace lemur
     // forward declaration
     class QueryNode;
 
-    /// List of query nodes which constitute the one level of a structured
-    /// query parse tree. Provides iteration and random access of individual 
-    /// list elements by index.
+    /// \brief List of query nodes which constitute the one level of a structured query parse tree. 
+    /*! Provides iteration and random access of individual list elements 
+      by index.
+    */
     class QnList {
     public:
       QnList() {}
@@ -62,10 +63,12 @@ namespace lemur
     //------------------------------------------------------------
 
 
-    /// Base class for all structured query operators.
-    /// A query node is assumed to have a list of children, an id, a weight
-    /// (default 1) and an eval function which will be defined by its
-    /// subclasses
+    /// \brief Base class for all structured query operators.
+    /*!
+      A query node is assumed to have a list of children, an id, a weight
+      (default 1) and an eval function which will be defined by its
+      subclasses.
+    */
     class QueryNode {
     public:
       /// New QueryNode with given id and weight.
@@ -219,8 +222,8 @@ namespace lemur
     };
 
 
-    /// Implements the SUM query operator. Evaluates to the average of the
-    /// scores of its child nodes.
+    /// \brief Implements the SUM query operator. Evaluates to the 
+    /// average of the scores of its child nodes.
     class SumQnode : public BeliefNode {
     public:
       SumQnode(double wt) : BeliefNode(wt){}
@@ -242,8 +245,8 @@ namespace lemur
       }
     };
 
-    /// Implements the WSUM query operator. Evaluates to the average of the
-    /// weighted scores of its child nodes.
+    /// \brief Implements the WSUM query operator. 
+    /// Evaluates to the average of the weighted scores of its child nodes.
     class WsumQnode : public BeliefNode {
     public:
       WsumQnode(double w) : BeliefNode(w) {}
@@ -270,7 +273,8 @@ namespace lemur
     };
 
 
-    /// Implements the AND query operator. Evaluates to the product of the
+    /// \brief Implements the AND query operator. 
+    /// Evaluates to the product of the
     /// max of the default score and the score of each of its child nodes.
     class AndQnode : public BeliefNode {
     public:
@@ -296,7 +300,8 @@ namespace lemur
       }
     };
 
-    /// Implements the OR query operator. Evaluates to the 1 - the product
+    /// \brief Implements the OR query operator. 
+    /// Evaluates to the 1 - the product
     /// of (1 - score) for each of its child nodes whose score is greater
     /// than the default score.
     class OrQnode : public BeliefNode {
@@ -320,7 +325,8 @@ namespace lemur
       }
     };
 
-    /// Implements the NOT query operator. Evaluates to the 1 - the score 
+    /// \brief Implements the NOT query operator. 
+    /// Evaluates to the 1 - the score 
     /// of its child node.
     class NotQnode : public BeliefNode {
     public:
@@ -336,7 +342,7 @@ namespace lemur
       }
     };
 
-    /// Implements the MAX query operator. Evaluates to the maximum of
+    /// \brief Implements the MAX query operator. Evaluates to the maximum of
     /// the scores of its child nodes and the default score.
     class MaxQnode : public BeliefNode {
     public:
@@ -359,9 +365,10 @@ namespace lemur
       }
     };
 
-    /// Implements the BAND query operator. This is the Boolean AND operator.
-    /// Evaluates to the product of the scores of its child nodes if all of their
-    /// scores exceed the default score, otherwise 0.
+    /// \brief Implements the BAND query operator. 
+    /// This is the Boolean AND operator.
+    /// Evaluates to the product of the scores of its child nodes if all 
+    /// of their scores exceed the default score, otherwise 0.
     class BandQnode : public BeliefNode {
     public:
       BandQnode(double dbelief, double w) : BeliefNode(w, dbelief) {}
@@ -394,7 +401,8 @@ namespace lemur
       }
     };
 
-    /// Implements the BANDNOT query operator. This is the Boolean AND NOT 
+    /// \brief Implements the BANDNOT query operator. 
+    /// This is the Boolean AND NOT 
     /// operator. Evaluates to the score of its first child node if
     /// the score of its second child is less than or equal to the 
     /// default score, otherwise 0.
@@ -423,7 +431,7 @@ namespace lemur
     };
 
 
-    /// Implements the FILREJ query operator. This is the FILTER REJECT 
+    /// \brief Implements the FILREJ query operator. This is the FILTER REJECT 
     /// operator. Evaluates to the score of its first child node if
     /// the score of its second child is less than or equal to the 
     /// default score, otherwise the default score.
@@ -452,7 +460,7 @@ namespace lemur
       }
     };
 
-    /// Implements the FILREQ query operator. This is the FILTER REQUIRE
+    /// \brief Implements the FILREQ query operator. This is the FILTER REQUIRE
     /// operator. Evaluates to the score of its first child node if
     /// the scores of both children are greater than the 
     /// default score, otherwise the default score.
@@ -510,7 +518,7 @@ namespace lemur
       virtual void copyDocList(int len, int tf, const lemur::api::DocInfoList *dl, int dc);
     };
 
-    /// Implements the ODN operator. This is the ORDERED WINDOW operator.
+    /// \brief Implements the ODN operator. This is the ORDERED WINDOW operator.
     /// Evaluates to the proximityScore of the document.
     class OdnQNode : public ProxNode {
     public:
@@ -528,7 +536,7 @@ namespace lemur
       bool foundOrderedProx(int bpos, int wsize, const QnList *cl, int ith);
     };
 
-    /// Implements the UWN operator. This is the UNORDERED WINDOW operator.
+    /// \brief Implements the UWN operator. This is the UNORDERED WINDOW operator.
     /// Evaluates to the proximityScore of the document.
     class UwnQNode : public ProxNode {
     public:
@@ -546,9 +554,9 @@ namespace lemur
     };
 
 
-    /// Implements the PASSAGEN operator. 
+    /// \brief Implements the PASSAGEN operator. 
     // fix to be WPARSUMN 
-    // This is a prox operator with embedded belief operators spliced out.
+    /// This is a prox operator with embedded belief operators spliced out.
     /// Evaluates to the maximum of the passage scores for the document 
     /// normalized by the window size..
     class PassageQNode : public ProxNode {
@@ -585,7 +593,7 @@ namespace lemur
       double passageScore(const StructQryDocRep *dRep) const;
     };
 
-    /// Implements the SYN operator. Evaluates to the proximityScore 
+    /// \brief Implements the SYN operator. Evaluates to the proximityScore 
     /// for the conflated child terms within the document.
     class SynQNode : public ProxNode {
     public:
@@ -601,7 +609,8 @@ namespace lemur
       void synonymProxList();
     };
 
-    /// Implements the PROP operator. This implementation uses #0 to model
+    /// \brief Implements the PROP operator. 
+    /// This implementation uses #0 to model
     /// #prop(field proxnode). Implementation and inheritance may change.
     class PropQNode : public OdnQNode {
     public:

@@ -8,26 +8,24 @@
  *
  *==========================================================================
 */
-
-
-
-/// A simple summarizer
 /*! \page BasicSummApp Basic Summarization Application
 
-
-
-This application (BasicSummApp.cpp) builds a sentence selection based summary
-
+This application builds a sentence selection based
+summary.
 
 <P>
  This application generates a summary for a document with sentence selection.
 <P>
-To use it, follow the general steps of running a lemur application and set the following variables in the parameter file:
+To use it, follow the general steps of running a lemur application and
+set the following variables in the parameter file:
 <p>
 <ol>
-<li><tt>indexFile</tt>: the path to the index TOC.
-<li><tt>docID</tt>: the document to summarize.
-<li><tt>summLength</tt>: summary length.<br>
+
+<li><tt>indexFile</tt>: the path to the index TOC. The index must be an
+InvFPIndex (.ifp).
+
+<li><tt>docID</tt>: the external id of the document to summarize.
+<li><tt>summLength</tt>: summary length, default is 5 sentences.
 </ol>
 <p>
 The summary is sent to standard out.
@@ -36,14 +34,13 @@ The following is an example of use:
 <PRE> 
 
  % cat summparam
-   
-   indexFile = idx.invfp;
-   docID = WTX001-B01-1;
-
+&lt;parameters&gt;
+   &lt;indexFile&gt;idx.ifp&lt;/indexFile&gt;
+   &lt;docID&gt;WTX001-B01-1&lt;/docID&gt;
+&lt;/parameters&gt;
  % BasicSummApp summparam
  
  </PRE>
-
 
 */
 
@@ -55,7 +52,7 @@ The following is an example of use:
 using namespace lemur::api;
 using namespace lemur::summarization;
 
-namespace LocalParameter{
+namespace LocalParameter {
   std::string index;   
   std::string docID;
   int summLength;   
@@ -67,24 +64,17 @@ namespace LocalParameter{
   }    
 };
 
-void GetAppParam() 
-{
+void GetAppParam() {
   LocalParameter::get();
 }
 
 int AppMain(int argc, char* argv[]) {
-
   lemur::index::InvFPIndex idx(LocalParameter::index);
-
   // Create a basic summarizer
   lemur::summarization::BasicSumm* s = new lemur::summarization::BasicSumm(&idx);
-  
   // Generate a summary
   s->summDocument(LocalParameter::docID, LocalParameter::summLength, NULL);
-
   // Print to stdout
   s->outputSumm();
-
   return 0;
-
 }

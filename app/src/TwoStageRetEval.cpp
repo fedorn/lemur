@@ -9,24 +9,21 @@
  *==========================================================================
 */
 
-
-
-
-/// Retrieval Evaluation Using Two-stage Smoothing Method
-
-
-
 /*! \page TwoStageRetEval Two-stage Smoothing Retrieval Evaluation Application
-<p>
-This application (TwoStageRetEval.cpp) runs retrieval experiments (with/without feedback) in exactly the same way as the application <tt>RetEval.cpp</tt>, 
-except that it always uses the two-stage smoothing method for 
-the initial retrieval and the KL-divergence model for feedback. 
-It thus ignores the the parameter <tt>retModel</tt>. 
 
-<p>
-It recognizes all the parameters relevant to the KL-divergence retrieval model,
-except for the smoothing method parameter <tt>SmoothMethod</tt> which is
-forced to the "Two-stage Smoothing" (value of 3) and <tt>JelinekMercerLambda</tt>, which gets ignored, since it automatically estimates the value of <tt>JelinekMercerLambda</tt> using a mixture model. For details on all the parameters, see the documentation for <tt>RetEval.cpp</tt>. 
+<p> This application runs retrieval experiments (with/without feedback)
+in exactly the same way as the application <tt>RetEval</tt>, except
+that it always uses the two-stage smoothing method for the initial
+retrieval and the KL-divergence model for feedback.  It thus ignores the
+the parameter <tt>retModel</tt>.
+
+<p> It recognizes all the parameters relevant to the KL-divergence
+retrieval model, except for the smoothing method parameter
+<tt>SmoothMethod</tt> which is forced to the "Two-stage Smoothing"
+(value of 3) and <tt>JelinekMercerLambda</tt>, which gets ignored, since
+it automatically estimates the value of <tt>JelinekMercerLambda</tt>
+using a mixture model. For details on all the parameters, see the
+documentation for <tt>RetEval</tt>.
 
 <p> 
 To achieve the effect of 
@@ -37,7 +34,6 @@ which computes a Maximum Likelihood estimate of <tt>DirichletPrior</tt>
 based on "leave-one-out". 
 
  */
-
 
 
 #include "IndexManager.hpp"
@@ -108,22 +104,22 @@ double estimateQueryNoise(QueryRep *qrep, Index *ind)
 
       // default value when not matching the term
       for (d=1; d<=dMax; d++) {
-	COUNT_T docLen = ind->docLength(d);
-	z[d] += qfq*log(1+ (1-lambda)*mu/(lambda*(docLen+mu)));
-	lambdaEst[d] += qfq*(docLen+mu)*lambda/(lambda*docLen+mu);
+        COUNT_T docLen = ind->docLength(d);
+        z[d] += qfq*log(1+ (1-lambda)*mu/(lambda*(docLen+mu)));
+        lambdaEst[d] += qfq*(docLen+mu)*lambda/(lambda*docLen+mu);
       }
       
       DocInfoList *dList = ind->docInfoList(tid);
       dList->startIteration();
       while (dList->hasMore()) {
-	    
-	DocInfo *info = dList->nextEntry();
-	double dlen = ind->docLength(info->docID());
-	double dpr = (info->termCount()+mu*cpr)/(double)(dlen+mu);
-	z[info->docID()] += qfq*(log((1-lambda)*dpr/(lambda*cpr)+1)-
-	  log(1+ (1-lambda)*mu/(lambda*(dlen+mu))));
-	
-	lambdaEst[info->docID()] += qfq*(lambda*cpr/(lambda*cpr+(1-lambda)*dpr)-(dlen+mu)*lambda/(lambda*dlen+mu));
+            
+        DocInfo *info = dList->nextEntry();
+        double dlen = ind->docLength(info->docID());
+        double dpr = (info->termCount()+mu*cpr)/(double)(dlen+mu);
+        z[info->docID()] += qfq*(log((1-lambda)*dpr/(lambda*cpr)+1)-
+          log(1+ (1-lambda)*mu/(lambda*(dlen+mu))));
+        
+        lambdaEst[info->docID()] += qfq*(lambda*cpr/(lambda*cpr+(1-lambda)*dpr)-(dlen+mu)*lambda/(lambda*dlen+mu));
       
       }
       delete dList;
@@ -184,7 +180,7 @@ int AppMain(int argc, char *argv[]) {
   // force two-stage smoothing
 
   model = new lemur::retrieval::SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, 
-				accumulator);
+                                accumulator);
   ((lemur::retrieval::SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
   ((lemur::retrieval::SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
 
@@ -224,14 +220,14 @@ int AppMain(int argc, char *argv[]) {
     results.Sort();
     if (RetrievalParameter::fbDocCount>0) {
       PseudoFBDocs *topDoc = new PseudoFBDocs(results, 
-					      RetrievalParameter::fbDocCount,
-					      ignoreWeights);
+                                              RetrievalParameter::fbDocCount,
+                                              ignoreWeights);
       model->updateQuery(*qr, *topDoc);
      
       if (RetrievalParameter::useWorkingSet) {
-	model->scoreDocSet(*qr,*workSet,results);
+        model->scoreDocSet(*qr,*workSet,results);
       } else {
-	model->scoreCollection(*qr, results);
+        model->scoreCollection(*qr, results);
       } 
       results.Sort();
       delete topDoc;
@@ -252,5 +248,3 @@ int AppMain(int argc, char *argv[]) {
   return 0;
 
 }
-
-

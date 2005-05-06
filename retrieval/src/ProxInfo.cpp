@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 /*
   author: fff, dmf
 */
@@ -15,15 +15,10 @@
 #include "Exception.hpp"
 using namespace lemur::api;
 
-lemur::retrieval::ProxInfo::ProxInfo(int num, int tf, const DocInfoList *dl) : nextPos(0), 
-						       posList(NULL),  
-						       size(0),
-						       listSize(tf) { 
+lemur::retrieval::ProxInfo::ProxInfo(int num, int tf, const DocInfoList *dl) : 
+  nextPos(0), posList(NULL),  size(0), listSize(tf) { 
   dList = dynamic_cast<const lemur::index::InvFPDocList *>(dl);
   if (dList == NULL) {
-    //    throw Exception("ProxInfo", "InvFPDocList required from index");
-    //    cerr << "ProxInfo: InvFPDocList required from index for positions. "
-    //	 << "Setting all positions to 0." << endl;
     LOC_T *posList = new LOC_T[2*num + tf];
     LOC_T *tmpList = posList;
     for (DocInfoList::iterator iter = dl->begin(); iter != dl->end(); iter++){
@@ -39,11 +34,8 @@ lemur::retrieval::ProxInfo::ProxInfo(int num, int tf, const DocInfoList *dl) : n
   }
 }
 
-lemur::retrieval::ProxInfo::ProxInfo(int num, int tf, LOC_T *pl) : nextPos(0), 
-					       posList(pl),  
-					       size(0), 
-					       dList(NULL),
-					       listSize(tf) { 
+lemur::retrieval::ProxInfo::ProxInfo(int num, int tf, LOC_T *pl) : 
+  nextPos(0), posList(pl), size(0), dList(NULL), listSize(tf) { 
   //construct an InvFPDocList.
   //InvFPDocList(int id, int listlen, int* list, int fr, int* ldocid, int len)
   // id --  termID (can be bogus value, use 0)

@@ -9,7 +9,6 @@
  *==========================================================================
 */
 
-/// A Passage FP Indexer
 /*! \page PassageIndexer Passage FP Indexer
 <P>
  This application builds an FP passage index for a collection of documents.  
@@ -67,7 +66,6 @@ The parameters are:
 #include "InvPassageTextHandler.hpp"
 #include "Param.hpp"
 #include "indri/Path.hpp"
-#include "TrecParser.hpp"
 
 using namespace lemur::api;
 
@@ -152,13 +150,9 @@ int AppMain(int argc, char * argv[]) {
   // Create the appropriate parser and acronyms list if needed
   Parser * parser = NULL;
   parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
-					    LocalParameter::acronyms);
-  // if failed to create parser, create a default
-  // Should not do this, if no parser is created, app should say
-  // so and exit... dmf 01/2004. #include "TrecParser.hpp" can
-  // be removed if this is.
+                                            LocalParameter::acronyms);
   if (!parser)
-    parser = new lemur::parse::TrecParser();
+    throw Exception("PassageIndexer", "Unable to create parser for docFormat");
   
   // Create the stopper if needed.
   Stopper * stopper = NULL;
@@ -180,8 +174,8 @@ int AppMain(int argc, char * argv[]) {
 
   lemur::parse::InvPassageTextHandler* indexer;
   indexer = new lemur::parse::InvPassageTextHandler(LocalParameter::index,
-				      LocalParameter::psgSize,
-				      LocalParameter::memory);
+                                      LocalParameter::psgSize,
+                                      LocalParameter::memory);
 
   // chain the parser/stopper/stemmer/indexer
 
@@ -211,8 +205,8 @@ int AppMain(int argc, char * argv[]) {
     } else {
       string filename;
       while (getline(source, filename)) {
-	cerr << "Parsing " << filename <<endl;
-	parser->parse(filename);
+        cerr << "Parsing " << filename <<endl;
+        parser->parse(filename);
       }
     }
   } else {

@@ -21,7 +21,7 @@
 #include "indri/delete_range.hpp"
 namespace indri
 {
-  /*! Indri query language nodes and support classes. */
+  /*! \brief Indri query language nodes and support classes. */
   namespace lang
   {
     

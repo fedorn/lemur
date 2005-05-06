@@ -19,8 +19,7 @@ namespace lemur
   namespace api
   {
     ///
-    ///  Provides a stopword list that can be chained with a Parser using
-    ///  the TextHandler class. 
+    ///  \brief Provides a stopword list that can be chained with a Parser using the TextHandler class. 
     ///
 
     class Stopper : public lemur::utility::WordSet, public TextHandler {

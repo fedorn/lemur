@@ -42,7 +42,7 @@ namespace lemur
       virtual double matchedTermWeight(const QueryTerm *qTerm, const TextQueryRep *qRep, const DocInfo *info, const DocumentRep *dRep) const { 
         return (qTerm->weight()*dRep->termWeight(qTerm->id(),info));
       }
-	    
+            
       /// score adjustment (e.g., appropriate length normalization)
       virtual double adjustedScore(double origScore, const TextQueryRep *qRep, const DocumentRep *dRep) const {
         return origScore; 

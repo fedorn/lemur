@@ -39,7 +39,7 @@ as <tt>-index=/path/to/repository</tt> on the command line. This element
 can be specified multiple times to combine Repositories.
 </dd>
 <dt>server</dt>
-<dd> hostname of a host running an Indri server (Indrid). Specified as
+<dd> hostname of a host running an Indri server (IndriDaemon). Specified as
 &lt;server&gt;hostname&lt;/server&gt; in the parameter file and
 as <tt>-server=hostname</tt> on the command line. The hostname can
 include an optional port number to connect to, using the form
@@ -51,9 +51,13 @@ can be specified multiple times to combine servers.
 return for a given query. Specified as
 &lt;count&gt;number&lt;/count&gt; in the parameter file and
 as <tt>-count=number</tt> on the command line. </dd>
+<dt>query</dt>
+<dd>An indri query language query to run. This element can be specified
+multiple times.
+</dd>
 <dt>rule</dt>
 <dd>specifies the smoothing rule (TermScoreFunction) to apply. Format of
-the rule is:<br>
+the rule is:<br> 
 
 <tt>   ( key ":" value ) [ "," key ":" value ]* </tt>
 <p>
@@ -64,6 +68,7 @@ Here's an example rule in command line format:<br>
 <tt>
 &lt;rule&gt;method:linear,collectionLambda:0.2,field:title&lt;/rule&gt;
 </tt>
+
 <p>This corresponds to Jelinek-Mercer smoothing with background lambda
 equal to 0.2, only for items in a title field. 
 
@@ -75,7 +80,7 @@ So, a rule that does not specify a field matches all fields.  This makes
 <dl>
 <dt>   method</dt><dd> smoothing method (text)</dd>
 <dt>   field</dt><dd> field to apply this rule to</dd>
-<dt>   operator  
+<dt>   operator
 <dd> type of item in query to apply to { term, window }</dd>
 </dl>
 
@@ -100,8 +105,8 @@ optional parameter with the default of no stopping.</dd>
 <H4>Formatting Parameters</H4>
 <dl>
 <dt>queryOffset</dt>
-<dd>an integer value specifying one less than the starting query number, eg 150 for
-TREC formatted output. Specified as
+<dd>an integer value specifying one less than the starting query number,
+eg 150 for TREC formatted output. Specified as
 &lt;queryOffset&gt;number&lt;/queryOffset&gt; in the parameter file and
 as <tt>-queryOffset=number</tt> on the command line.</dd>
 <dt>runID</dt>
@@ -130,7 +135,7 @@ feedback. Specified as
 as <tt>-fbTerms=number</tt> on the command line.</dd>
 <dt>fbMu</dt>
 <dd>a floating point value specifying the value of mu to use for
-feedback. [NB: document the feedback formulae]. Specified as
+feedback. Specified as
 &lt;fbMu&gt;number&lt;/fbMu&gt; in the parameter file and
 as <tt>-fbMu=number</tt> on the command line.</dd>
 <dt>fbOrigWeight</dt>
@@ -140,6 +145,7 @@ for the original query in the expanded query. Specified as
 as <tt>-fbOrigWeight=number</tt> on the command line.</dd>
 </dl>
 */
+
 #include <time.h>
 #include "indri/QueryEnvironment.hpp"
 #include "indri/LocalQueryServer.hpp"

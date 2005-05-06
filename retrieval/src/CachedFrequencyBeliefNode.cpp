@@ -7,15 +7,15 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "indri/CachedFrequencyBeliefNode.hpp"
 
 indri::infnet::CachedFrequencyBeliefNode::CachedFrequencyBeliefNode( const std::string& name,
                                                                      indri::lang::ListCache::CachedList* list,
-                                                      indri::query::TermScoreFunction& scoreFunction,
-                                                      double maximumBackgroundScore,
-                                                      double maximumScore )
+                                                                     indri::query::TermScoreFunction& scoreFunction,
+                                                                     double maximumBackgroundScore,
+                                                                     double maximumScore )
   :
   _name(name),
   _list(list),

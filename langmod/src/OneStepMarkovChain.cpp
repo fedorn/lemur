@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #include "OneStepMarkovChain.hpp"
@@ -25,23 +25,23 @@ lemur::langmod::OneStepMarkovChain::OneStepMarkovChain(const lemur::utility::Wei
   }
 
   /*
-  for (i=1; i<=ind.termCountUnique(); i++) {
+    for (i=1; i<=ind.termCountUnique(); i++) {
     norm[i] = 0;
-  }
+    }
   */
 
   // compute normalizer for each word, not an efficient way.
   // In the future, they should be pre-computed, e.g., in GenerateSmoothSupport.
   /*
-  for (i=1; i<= ind.docCount(); i++) {
+    for (i=1; i<= ind.docCount(); i++) {
     TermInfoList *tList = ind.termInfoList(i);
     tList->startIteration();
     while (tList->hasMore()) {
-      TermInfo *info = tList->nextEntry();
-      norm[info->id()] += info->count()/(double)ind.docLength(i);
+    TermInfo *info = tList->nextEntry();
+    norm[info->id()] += info->count()/(double)ind.docLength(i);
     }
     delete tList;
-  }
+    }
   */
   docSet.startIteration();
   while (docSet.hasMore()) {
@@ -118,7 +118,7 @@ void lemur::langmod::OneStepMarkovChain::nextFromWordProb(lemur::api::TERMID_T &
 {
   fromWord = itPos;
   prob = fromWordPr[itPos];
-   itPos++;
+  itPos++;
 }
 
 

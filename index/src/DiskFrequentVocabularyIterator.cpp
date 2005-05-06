@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // DiskFrequentVocabularyIterator
@@ -51,8 +51,8 @@ void indri::index::DiskFrequentVocabularyIterator::startIteration() {
 bool indri::index::DiskFrequentVocabularyIterator::nextEntry() {
   if( !_stream.done() ) {
     _data = ::disktermdata_decompress( _stream, _dataBuffer, _fieldCount, indri::index::DiskTermData::WithOffsets |
-                                                                          indri::index::DiskTermData::WithTermID | 
-                                                                          indri::index::DiskTermData::WithString );
+                                       indri::index::DiskTermData::WithTermID | 
+                                       indri::index::DiskTermData::WithString );
     return true;
   } else {
     _finished = true;

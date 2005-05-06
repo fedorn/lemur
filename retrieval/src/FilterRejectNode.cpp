@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -24,8 +24,8 @@
 #include "indri/Annotator.hpp"
 
 indri::infnet::FilterRejectNode::FilterRejectNode( const std::string& name, 
-                                    indri::infnet::ListIteratorNode* filter, 
-                                    indri::infnet::BeliefNode* disallowed ) {
+                                                   indri::infnet::ListIteratorNode* filter, 
+                                                   indri::infnet::BeliefNode* disallowed ) {
   _name = name;
   _filter = filter;
   _disallowed = disallowed;
@@ -52,7 +52,7 @@ double indri::infnet::FilterRejectNode::maximumScore() {
 bool indri::infnet::FilterRejectNode::hasMatch( int documentID ) {
   // delegate to the children.
   return (_filter->extents().size() == 0 &&
-  _disallowed->hasMatch( documentID ));
+          _disallowed->hasMatch( documentID ));
 }
 
 const indri::utility::greedy_vector<bool>& indri::infnet::FilterRejectNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {

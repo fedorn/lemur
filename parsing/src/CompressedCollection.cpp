@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -697,13 +697,13 @@ std::string indri::collection::CompressedCollection::retrieveMetadatum( int docu
     //This returns the first occurence, rather than the last
     // one gets if a forward lookup table is used.
     /*
-    indri::utility::greedy_vector<indri::parse::MetadataPair>::iterator iter = std::find_if( document->metadata.begin(),
-                                                              document->metadata.end(),
-                                                              indri::parse::MetadataPair::key_equal( attributeName.c_str() ) );
+      indri::utility::greedy_vector<indri::parse::MetadataPair>::iterator iter = std::find_if( document->metadata.begin(),
+      document->metadata.end(),
+      indri::parse::MetadataPair::key_equal( attributeName.c_str() ) );
     
-    if( iter != document->metadata.end() ) {
+      if( iter != document->metadata.end() ) {
       result = (char*) iter->value;
-    }
+      }
     */
     indri::utility::greedy_vector<indri::parse::MetadataPair>::iterator iter;
     for( iter=document->metadata.begin(); iter !=  document->metadata.end();

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _CLUSTERPARAMETER_HPP
 #define _CLUSTERPARAMETER_HPP
@@ -15,8 +15,11 @@
 #include "Param.hpp"
 /// General cluster-related parameters
 namespace ClusterParam {
+  /// SimilarityMethod types.
   enum simTypes {COS=1};
+  /// Concrete Cluster types.
   enum clusterTypes {AGGLOM=1, CENTROID=2};
+  /// Scoring modes for AgglomerativeCluster
   enum docModes {DMAX=1, DMEAN=2, DAVE=3, DMIN=4};
   
   /// @name Cluster parameters
@@ -47,14 +50,15 @@ namespace ClusterParam {
     databaseIndex = lemur::api::ParamGetString("index","");
     clusterIndex = lemur::api::ParamGetString("clusterIndex","");
     clusterDBType = lemur::api::ParamGetString("clusterDBType","flatfile");
-    string clusterTypeString = lemur::api::ParamGetString("clusterType","centroid");
+    string clusterTypeString = lemur::api::ParamGetString("clusterType",
+                                                          "centroid");
     if (clusterTypeString == "centroid") {
       clusterType = CENTROID;
     } else if (clusterTypeString == "agglomerative") {
       clusterType = AGGLOM;
     } else {
       cerr << "Unknown clusterType " << clusterTypeString <<
-	" using centroid." << endl;
+        " using centroid." << endl;
       clusterType = CENTROID;
     }
     string simTypeString = lemur::api::ParamGetString("simType","COS");
@@ -62,7 +66,7 @@ namespace ClusterParam {
       simType = COS;
     } else {
       cerr << "Unrecognized simType " << simTypeString << " using cos." 
-	   << endl;
+           << endl;
       simType = COS;
     }
     string docModeString = lemur::api::ParamGetString("docMode", "max");
@@ -76,7 +80,7 @@ namespace ClusterParam {
       docMode = DAVE;
     } else {
       cerr << "Unrecognized docMode " << docModeString << " using max." 
-	   << endl;
+           << endl;
       docMode = DMAX;
     }
     threshold = lemur::api::ParamGetDouble("threshold", 0.25);

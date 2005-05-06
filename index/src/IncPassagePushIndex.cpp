@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "IncPassagePushIndex.hpp"
 #include <sstream>
@@ -21,7 +21,7 @@
  *========================================================================*/
 
 lemur::index::IncPassagePushIndex::IncPassagePushIndex(const string &prefix, int psgSize,
-					 int cachesize, long maxfilesize)
+                                                       int cachesize, long maxfilesize)
   : IncFPPushIndex(prefix, cachesize, maxfilesize),
     passageSize(psgSize), curDocName("") { 
   passageEnd = passageSize/2;
@@ -59,7 +59,7 @@ bool lemur::index::IncPassagePushIndex::addTerm(const lemur::api::Term& t){
   term = dynamic_cast< const InvFPTerm* >(&t);
   if (term->strLength() < 1) {
     cerr << "Trying to add term with length less than 1.  Term ignored." 
-	 << endl;
+         << endl;
     return false;
   }
   if (term->spelling() == NULL) {
@@ -99,7 +99,7 @@ bool lemur::index::IncPassagePushIndex::addTerm(const lemur::api::Term& t){
     termIDs.push_back(spell);
 
     curlist = new InvFPDocList(cache, termIDs.size(), term->strLength(), 
-			       docIDs.size(), pos);
+                               docIDs.size(), pos);
 
     if (curlist->hasNoMem()) {
       //we didn't allocate memory in the constructor!
@@ -137,7 +137,7 @@ bool lemur::index::IncPassagePushIndex::addTerm(const lemur::api::Term& t){
       offset = 0;
     }
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset,
-	    len, curdocmgr);
+            len, curdocmgr);
     InvFPTermList *tlist = new InvFPTermList(docid, len, termlist);
     tlist->binWriteC(writetlist);
     delete tlist;
@@ -158,13 +158,13 @@ bool lemur::index::IncPassagePushIndex::addTerm(const lemur::api::Term& t){
       // must be there.
       curlist = (InvFPDocList*)placehold->second;
       if (curlist->hasNoMem()) {
-	curlist->allocMem();
+        curlist->allocMem();
       }
       if (!curlist->addLocation(docIDs.size(), termlist[i].loc)) {
-	writeCache();
-	cache->flushMem();
-	curlist->allocMem();
-	curlist->addLocation(docIDs.size(), termlist[i].loc);
+        writeCache();
+        cache->flushMem();
+        curlist->allocMem();
+        curlist->addLocation(docIDs.size(), termlist[i].loc);
       }
     }
   }
@@ -193,7 +193,7 @@ void lemur::index::IncPassagePushIndex::doendDoc(const lemur::parse::DocumentPro
     }
 
     fprintf(writetlookup, "%d %d %d %d %d ", docid, dtfiles.size()-1, offset, 
-      len, mgrid);
+            len, mgrid);
     InvFPTermList *tlist = new InvFPTermList(docid, len, termlist);
     tlist->binWriteC(writetlist);
     delete tlist;

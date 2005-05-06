@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // ContextSimpleCountAccumulator
@@ -49,9 +49,9 @@ void indri::infnet::ContextSimpleCountAccumulator::_computeCounts( indri::index:
 }
 
 indri::infnet::ContextSimpleCountAccumulator::ContextSimpleCountAccumulator( const std::string& nodeName,
-                                                              const std::vector<std::string>& terms,
-                                                              const std::string& field,
-                                                              const std::string& context ) :
+                                                                             const std::vector<std::string>& terms,
+                                                                             const std::string& field,
+                                                                             const std::string& context ) :
   _name(nodeName),
   _terms(terms),
   _field(field),

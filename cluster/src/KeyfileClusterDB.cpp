@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 // David Fisher
 // init: 05/11/2004
@@ -19,11 +19,11 @@
 
 // The ClusterDB.
 lemur::cluster::KeyfileClusterDB::KeyfileClusterDB(const lemur::api::Index *ind, 
-				   const string &name,
-				   double threshold,
-				   enum ClusterParam::simTypes simType,
-				   enum ClusterParam::clusterTypes cType,
-				   enum ClusterParam::docModes docMode)
+                                                   const string &name,
+                                                   double threshold,
+                                                   enum ClusterParam::simTypes simType,
+                                                   enum ClusterParam::clusterTypes cType,
+                                                   enum ClusterParam::docModes docMode)
   : ClusterDB(ind, threshold, simType, cType, docMode) {
   init(name);
 }
@@ -83,7 +83,7 @@ lemur::cluster::Cluster* lemur::cluster::KeyfileClusterDB::getCluster(int cluste
       // easier just to add each doc into a fresh empty cluster.
       vector <lemur::api::DOCID_T> dids;
       for (int i = 0; i < actual/sizeof(lemur::api::DOCID_T) ; i++) {
-	dids.push_back(buffer[i]);
+        dids.push_back(buffer[i]);
       }
       retVal->add(dids);
     }
@@ -92,11 +92,11 @@ lemur::cluster::Cluster* lemur::cluster::KeyfileClusterDB::getCluster(int cluste
 }
 
 vector<lemur::cluster::Cluster*> lemur::cluster::KeyfileClusterDB::getDocCluster(lemur::api::DOCID_T docId) const {
-    vector<Cluster*> v;
-    vector<int> d2c = getDocClusterId(docId);
-    for (int i = 0; i < d2c.size(); i++)
-      v.push_back(getCluster(d2c[i]));
-    return v;
+  vector<Cluster*> v;
+  vector<int> d2c = getDocClusterId(docId);
+  for (int i = 0; i < d2c.size(); i++)
+    v.push_back(getCluster(d2c[i]));
+  return v;
 }
 
 

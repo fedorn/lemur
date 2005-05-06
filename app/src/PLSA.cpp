@@ -11,7 +11,7 @@
 /// Probabilistic Latent Semantic Analysis
 
 /*! \page PLSA Probabilistic Latent Semantic Analysis
-  This application (<tt>PLSA.cpp</tt>) will either perform PLSA on a 
+  This application will either perform PLSA on a 
   collection, building three probability tables: P(z), P(d|z), and P(w|z)
   where z in Z are the latent variables (categories), d in D are the 
   documents in the collection, and w in W are the terms in the vocabulary
@@ -91,8 +91,8 @@ int AppMain(int argc, char * argv[]) {
     for(d = 1; d < numDocs; d++) { // DOC
       cout << myIndex->document(d) << ": ";
       for (w = 1; w < numTerms; w++) {
-	double prob = plsa->getProb(d,w);
-	if (prob > lim) cout << myIndex->term(w) << "(" <<  prob << ") ";
+        double prob = plsa->getProb(d,w);
+        if (prob > lim) cout << myIndex->term(w) << "(" <<  prob << ") ";
       }
       cout << endl;
     }
@@ -103,7 +103,7 @@ int AppMain(int argc, char * argv[]) {
     for(w = 1; w < numTerms; w++) { // TERM
       cout << myIndex->term(w) << ": ";
       for (z = 0; z < numCats; z++) {
-	cout << z << "(" << p_w_z[w][z] << ") ";
+        cout << z << "(" << p_w_z[w][z] << ") ";
       }
       cout << endl;
     }
@@ -111,7 +111,7 @@ int AppMain(int argc, char * argv[]) {
     for(d = 1; d < numDocs; d++) { // DOC
       cout << myIndex->document(d) << ": ";
       for (z = 0; z < numCats; z++) {
-	cout << z << "(" << p_d_z[d][z] << ") ";
+        cout << z << "(" << p_d_z[d][z] << ") ";
       }
       cout << endl;
     }

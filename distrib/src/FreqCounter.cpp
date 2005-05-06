@@ -94,16 +94,16 @@ lemur::distrib::FreqCounter::handleWord(char * word) {
 
       freqmap::iterator curr = freqInfo.find(word);
       if (curr == freqInfo.end()) {    
-	// Create a new freqinfo_t structure
-	word = strdup(word);
-	freqinfo_t fi;
-	fi.word = word;
-	fi.ctf = 0;
-	fi.df = 0;
-	freqInfo[word] = fi;
-	nWords++;
+        // Create a new freqinfo_t structure
+        word = strdup(word);
+        freqinfo_t fi;
+        fi.word = word;
+        fi.ctf = 0;
+        fi.df = 0;
+        freqInfo[word] = fi;
+        nWords++;
       } else { 
-	word = curr->second.word;
+        word = curr->second.word;
       }
       // Increment counts
       freqInfo[word].ctf++;
@@ -365,16 +365,16 @@ lemur::distrib::FreqCounter::pruneBottomWords(int numTopWords) {
       // not enough words in topWords yet, add the next
       topWords.insert(fi);
       if (fi.ctf < min.ctf) {
-	min = fi;
+        min = fi;
       }
       nw++;
     } else {
       if (fi.ctf > min.ctf) {
-	topWords.erase(min);
-	free(min.word);
-	topWords.insert(fi);
-	ctfset::iterator tmp = topWords.begin();
-	min = *tmp;
+        topWords.erase(min);
+        free(min.word);
+        topWords.insert(fi);
+        ctfset::iterator tmp = topWords.begin();
+        min = *tmp;
 
       }
     }

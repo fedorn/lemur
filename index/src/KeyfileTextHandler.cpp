@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -25,7 +25,7 @@
 #include <string>
 
 lemur::parse::KeyfileTextHandler::KeyfileTextHandler( lemur::index::KeyfileIncIndex* index, 
-					bool countStops) :
+                                                      bool countStops) :
   _index( index ), countStopWds(countStops)
 {
   dp = NULL;
@@ -112,5 +112,5 @@ lemur::parse::KeyfileTextHandler::handleWord(char * word) {
 }
 
 void lemur::parse::KeyfileTextHandler::setDocManager(const string &mgrID) {
-    _index->setDocManager(mgrID);
-  }
+  _index->setDocManager(mgrID);
+}

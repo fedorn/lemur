@@ -24,7 +24,7 @@
 #include "indri/HashTable.hpp"
 namespace indri
 {
-  /*! Filesystem interaction and file-based storage classes.*/
+  /*! \brief Filesystem interaction and file-based storage classes.*/
   namespace file
   {
     

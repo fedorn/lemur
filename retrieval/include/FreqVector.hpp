@@ -30,7 +30,7 @@ namespace lemur
       bool operator==(const FreqCount count) { return count.key == this->key;} 
     };
   
-    /// Abstract class that represents a frequency vector accessible 
+    /// \brief Abstract class that represents a frequency vector accessible 
     /// through an integer key
 
     class FreqVector {

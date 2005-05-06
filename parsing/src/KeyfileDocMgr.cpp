@@ -64,7 +64,7 @@ lemur::parse::KeyfileDocMgr::KeyfileDocMgr(string name, string mode, string sour
   ifstream files(source.c_str());
   string file;
   if (files.is_open()) {
-      while (getline(files, file)) {
+    while (getline(files, file)) {
       sources.push_back(file);
     }
     files.close();
@@ -94,8 +94,8 @@ void lemur::parse::KeyfileDocMgr::handleEndDoc() {
     int *offs = new int[numOffs * 2];
     int i = 0;
     for (vector <Match>::iterator iter = offsets.begin();
-	 iter != offsets.end();
-	 iter++) {
+         iter != offsets.end();
+         iter++) {
       offs[i++] = (*iter).start;
       offs[i++] = (*iter).end - (*iter).start;
     }
@@ -120,7 +120,7 @@ char* lemur::parse::KeyfileDocMgr::handleDoc(char* docno) {
   if (doclen > (MAX_DOCID_LENGTH - 1)) {
     doclen = MAX_DOCID_LENGTH;
     cerr << "handleDoc: document id " << docno << " is too long ("
-	 << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
+         << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     cerr << "truncating " << docno << endl;
   }
   myDoc = new char[doclen];
@@ -131,7 +131,7 @@ char* lemur::parse::KeyfileDocMgr::handleDoc(char* docno) {
   if (doclookup.get( myDoc, &documentLocation, actual, sizeof(btl) )) {
     // duplicate document id.
     cerr << "lemur::parse::KeyfileDocMgr::handleDoc: duplicate document id " << myDoc 
-	 << ". Document will be ignored." << endl;
+         << ". Document will be ignored." << endl;
     ignoreDoc = true;
   } else {
     numdocs++;
@@ -162,7 +162,7 @@ char *lemur::parse::KeyfileDocMgr::getDoc(const string &docID) const{
   ifstream read(sources[documentLocation.fid].c_str(), ios::binary);
   if (!read.is_open()) {
     cerr << "lemur::parse::KeyfileDocMgr::getDoc: Could not open file " 
-	 << sources[documentLocation.fid] << " to get document" << endl;
+         << sources[documentLocation.fid] << " to get document" << endl;
     return NULL;
   }
   read.seekg(documentLocation.offset, ios::beg);
@@ -182,7 +182,7 @@ vector<lemur::parse::Match> lemur::parse::KeyfileDocMgr::getOffsets(const string
   if (doclen > (MAX_DOCID_LENGTH - 1)) {
     doclen = MAX_DOCID_LENGTH;
     cerr << "lemur::parse::KeyfileDocMgr::getOffsets: document id " << docName 
-	 << " is too long ("
+         << " is too long ("
          << doclen << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     cerr << "truncating " << docName << endl;
     strncpy(tmpdoc, docID.c_str(), doclen - 1);

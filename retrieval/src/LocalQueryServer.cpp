@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -45,85 +45,85 @@ namespace indri
   namespace server
   {
     
-class LocalQueryServerResponse : public QueryServerResponse {
-private:
-  indri::infnet::InferenceNetwork::MAllResults _results;
+    class LocalQueryServerResponse : public QueryServerResponse {
+    private:
+      indri::infnet::InferenceNetwork::MAllResults _results;
 
-public:
-  LocalQueryServerResponse( const indri::infnet::InferenceNetwork::MAllResults& results ) :
-    _results(results) {
-  }
+    public:
+      LocalQueryServerResponse( const indri::infnet::InferenceNetwork::MAllResults& results ) :
+        _results(results) {
+      }
   
-  indri::infnet::InferenceNetwork::MAllResults& getResults() {
-    return _results;
-  }
-};
+      indri::infnet::InferenceNetwork::MAllResults& getResults() {
+        return _results;
+      }
+    };
 
-class LocalQueryServerDocumentsResponse : public QueryServerDocumentsResponse {
-private:
-  std::vector<indri::api::ParsedDocument*> _documents;
+    class LocalQueryServerDocumentsResponse : public QueryServerDocumentsResponse {
+    private:
+      std::vector<indri::api::ParsedDocument*> _documents;
 
-public:
-  LocalQueryServerDocumentsResponse( const std::vector<indri::api::ParsedDocument*>& results )
-    :
-    _documents(results)
-  {
-  }
+    public:
+      LocalQueryServerDocumentsResponse( const std::vector<indri::api::ParsedDocument*>& results )
+        :
+        _documents(results)
+      {
+      }
 
-  // caller's responsibility to delete these results
-  std::vector<indri::api::ParsedDocument*>& getResults() {
-    return _documents;
-  }
-};
+      // caller's responsibility to delete these results
+      std::vector<indri::api::ParsedDocument*>& getResults() {
+        return _documents;
+      }
+    };
 
-class LocalQueryServerMetadataResponse : public QueryServerMetadataResponse {
-private:
-  std::vector<std::string> _metadata;
+    class LocalQueryServerMetadataResponse : public QueryServerMetadataResponse {
+    private:
+      std::vector<std::string> _metadata;
 
-public:
-  LocalQueryServerMetadataResponse( const std::vector<std::string>& metadata ) :
-    _metadata(metadata)
-  {
-  }
+    public:
+      LocalQueryServerMetadataResponse( const std::vector<std::string>& metadata ) :
+        _metadata(metadata)
+      {
+      }
 
-  std::vector<std::string>& getResults() {
-    return _metadata;
-  }
-};
+      std::vector<std::string>& getResults() {
+        return _metadata;
+      }
+    };
 
-class LocalQueryServerVectorsResponse : public QueryServerVectorsResponse {
-private:
-  std::vector<indri::api::DocumentVector*> _vectors;
+    class LocalQueryServerVectorsResponse : public QueryServerVectorsResponse {
+    private:
+      std::vector<indri::api::DocumentVector*> _vectors;
 
-public:
-  LocalQueryServerVectorsResponse( int vectorCount ) {
-    _vectors.reserve( vectorCount );
-  }
+    public:
+      LocalQueryServerVectorsResponse( int vectorCount ) {
+        _vectors.reserve( vectorCount );
+      }
 
-  void addVector( indri::api::DocumentVector* vec ) {
-    _vectors.push_back( vec );
-  }
+      void addVector( indri::api::DocumentVector* vec ) {
+        _vectors.push_back( vec );
+      }
 
-  // caller deletes indri::api::DocumentVector objects
-  std::vector<indri::api::DocumentVector*>& getResults() {
-    return _vectors;
-  }
-};
+      // caller deletes indri::api::DocumentVector objects
+      std::vector<indri::api::DocumentVector*>& getResults() {
+        return _vectors;
+      }
+    };
 
-class LocalQueryServerDocumentIDsResponse : public QueryServerDocumentIDsResponse {
-private:
-  std::vector<lemur::api::DOCID_T> _documentIDs;
+    class LocalQueryServerDocumentIDsResponse : public QueryServerDocumentIDsResponse {
+    private:
+      std::vector<lemur::api::DOCID_T> _documentIDs;
 
-public:
-  LocalQueryServerDocumentIDsResponse( const std::vector<lemur::api::DOCID_T>& documents ) : 
-    _documentIDs(documents)
-  {
-  }
+    public:
+      LocalQueryServerDocumentIDsResponse( const std::vector<lemur::api::DOCID_T>& documents ) : 
+        _documentIDs(documents)
+      {
+      }
 
-  std::vector<lemur::api::DOCID_T>& getResults() {
-    return _documentIDs;
-  }
-};
+      std::vector<lemur::api::DOCID_T>& getResults() {
+        return _documentIDs;
+      }
+    };
   }
 }
 

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -160,9 +160,9 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::FixedPassage* f
   if( _nodeMap.find( fpNode ) == _nodeMap.end() ) {
     indri::infnet::BeliefNode* childNode = dynamic_cast<indri::infnet::BeliefNode*>(_nodeMap[fpNode->getChild()]);
     indri::infnet::FixedPassageNode* fixedPassage = new indri::infnet::FixedPassageNode( fpNode->nodeName(),
-                                                           childNode,
-                                                           fpNode->getWindowSize(),
-                                                           fpNode->getIncrement() );
+                                                                                         childNode,
+                                                                                         fpNode->getWindowSize(),
+                                                                                         fpNode->getIncrement() );
 
     _network->addBeliefNode( fixedPassage );
     _nodeMap[fpNode] = fixedPassage;
@@ -219,9 +219,9 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::WeightedExtentO
 void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ExtentInside* extentInside ) {
   if( _nodeMap.find( extentInside ) == _nodeMap.end() ) {
     ExtentInsideNode* extentInsideNode = new ExtentInsideNode( 
-      extentInside->nodeName(),
-      dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
-      dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]) );
+                                                              extentInside->nodeName(),
+                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]) );
 
     _network->addListNode( extentInsideNode );
     _nodeMap[extentInside] = extentInsideNode;
@@ -464,8 +464,8 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::FilRejNode* fil
     if( untypedFilter ) {
       // normal case
       filterRejectNode = new FilterRejectNode( filRejNode->nodeName(),
-                                              dynamic_cast<ListIteratorNode*>(untypedFilter),
-                                              dynamic_cast<BeliefNode*>(untypedDisallowed) );
+                                               dynamic_cast<ListIteratorNode*>(untypedFilter),
+                                               dynamic_cast<BeliefNode*>(untypedDisallowed) );
       _network->addBeliefNode( filterRejectNode );
     } else {
       // the filter term doesn't exist in the collection, so therefore, it never matches
@@ -730,7 +730,7 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::WeightNode* wei
 
     for( unsigned int i=0; i<children.size(); i++ ) {
       wandNode->addChild( children[i].first / totalWeights,
-        dynamic_cast<BeliefNode*>( _nodeMap[children[i].second] ) );
+                          dynamic_cast<BeliefNode*>( _nodeMap[children[i].second] ) );
     }
 
     wandNode->doneAddingChildren();
@@ -752,7 +752,7 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::WSumNode* wsumN
 
     for( unsigned int i=0; i<children.size(); i++ ) {
       weightedSumNode->addChild( children[i].first / totalWeights,
-        dynamic_cast<BeliefNode*>( _nodeMap[children[i].second] ) );
+                                 dynamic_cast<BeliefNode*>( _nodeMap[children[i].second] ) );
     }
 
     _network->addBeliefNode( weightedSumNode );
@@ -772,7 +772,7 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::WAndNode* wandN
 
     for( unsigned int i=0; i<children.size(); i++ ) {
       weightedAndNode->addChild( children[i].first / totalWeights,
-        dynamic_cast<BeliefNode*>( _nodeMap[children[i].second] ) );
+                                 dynamic_cast<BeliefNode*>( _nodeMap[children[i].second] ) );
     }
 
     weightedAndNode->doneAddingChildren();

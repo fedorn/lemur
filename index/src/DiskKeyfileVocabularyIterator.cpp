@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // DiskKeyfileVocabularyIterator
@@ -74,10 +74,10 @@ void indri::index::DiskKeyfileVocabularyIterator::startIteration() {
     return;
 
   _diskTermData = ::disktermdata_decompress( stream,
-                                            _decompressedData.front(),
-                                            _fieldCount,
-                                            DiskTermData::WithOffsets |
-                                            DiskTermData::WithString );
+                                             _decompressedData.front(),
+                                             _fieldCount,
+                                             DiskTermData::WithOffsets |
+                                             DiskTermData::WithString );
   _diskTermData->termID = _baseID + 0;
 }
 
@@ -102,10 +102,10 @@ bool indri::index::DiskKeyfileVocabularyIterator::nextEntry() {
   }
 
   _diskTermData = ::disktermdata_decompress( stream,
-                                            _decompressedData.front(),
-                                            _fieldCount,
-                                            DiskTermData::WithOffsets |
-                                            DiskTermData::WithString );
+                                             _decompressedData.front(),
+                                             _fieldCount,
+                                             DiskTermData::WithOffsets |
+                                             DiskTermData::WithString );
   _diskTermData->termID = _baseID + key;
 
   return true;

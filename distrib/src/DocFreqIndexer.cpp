@@ -1,10 +1,21 @@
+/*==========================================================================
+ * Copyright (c) 2000-2004 Carnegie Mellon University.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+ */
+
 #include "DocFreqIndexer.hpp"
 
 
 
 lemur::distrib::DocFreqIndexer::DocFreqIndexer(const string &csName, const string &cwName, 
-			       const string &ssName, int bufferSize, 
-			       bool countStopWords) {
+                                               const string &ssName, int bufferSize, 
+                                               bool countStopWords) {
   collsel = new lemur::index::InvPushIndex(csName, bufferSize);
   collWords = fopen(cwName.c_str(), "wb");
   serverSizes = fopen(ssName.c_str(), "wb");
@@ -55,12 +66,12 @@ lemur::distrib::DocFreqIndexer::handleWord(char * word) {
     int len = strlen(word);
     if (len <= 20) {
       if (!docWords.contains(word)) {
-	term->strLength(len);
-	term->spelling(word);
-	term->position(dfCount);
-	collsel->addTerm(*term);
-	docWords.add(word);
-	dfCount++;
+        term->strLength(len);
+        term->spelling(word);
+        term->position(dfCount);
+        collsel->addTerm(*term);
+        docWords.add(word);
+        dfCount++;
       }
       cw++;
     }

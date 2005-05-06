@@ -6,7 +6,7 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 
 /** tnt 07/2002 - created
  *  dmf 09/2002 - added parser support

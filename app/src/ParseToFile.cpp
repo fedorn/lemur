@@ -13,7 +13,7 @@
 #include "Param.hpp"
 #include "indri/Path.hpp"
 #include "Exception.hpp"
-#include "TrecParser.hpp"
+
 using namespace lemur::api;
 
 // Local parameters used by the indexer 
@@ -88,13 +88,9 @@ int AppMain(int argc, char * argv[]) {
   // Create the appropriate parser and acronyms list if needed
   Parser * parser = NULL;
   parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
-					    LocalParameter::acronyms);
-  // if failed to create parser, create a default
-  // Should not do this, if no parser is created, app should say
-  // so and exit... dmf 01/2004. #include "TrecParser.hpp" can
-  // be removed if this is.
+                                            LocalParameter::acronyms);
   if (!parser)
-    parser = new lemur::parse::TrecParser();
+      throw Exception("ParseToFile", "Unable to create parser for docFormat");
   
   // Create the stopper if needed.
   Stopper * stopper = NULL;

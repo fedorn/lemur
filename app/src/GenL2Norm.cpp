@@ -8,26 +8,20 @@
  *
  *==========================================================================
 */
-/// L2 norm support file generator
 
-/*! \page L2Norm GenL2Norm
+/*! \page GenL2Norm
 
- 
-
-This application (<tt> GenL2Norm.cpp </tt>) generates a support file
-for retrieval using the cosine similarity. The file contains the L2 norms 
-for each  document, used to speed up the retrieval process.
+This application generates a support file for retrieval using the cosine
+similarity. The file contains the L2 norms for each document, used to
+speed up the retrieval process.
 
 To run the application, follow the general steps of running a lemur
 application and set the following variables in the parameter file:
-
-(1) <tt>index</tt>: the table-of-content (TOC) record file of the index (e.g., the <tt>.bsc</tt> file created by <tt>BuildBasicIndex</tt> or the <tt>.ifp</tt> file created by <tt> PushIndexer</tt>.  )
-
-(2) <tt>L2File</tt>: file path for the support file
+<ol>
+<li><tt>index</tt>: the table-of-content (TOC) record file of the index.
+<li><tt>L2File</tt>: filename for output of the support file
 (e.g.,<tt> /usr0/mydata/index.L2</tt>)
-
-This application is also a good example of using the doc index (i.e., doc->term index).
-
+</ol>
 */
 /*
   author: dmf

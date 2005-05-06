@@ -9,20 +9,19 @@
  *==========================================================================
 */
 
-/// A Incremental FP Indexer
 /*! \page IncIndexer Incremental FP Indexer
-<P>
- This application builds an FP index for a collection of documents. If the 
-index already exists, new documents are added to that index, otherwise a 
-new index is created.
-<P>
-To use it, follow the general steps of running a lemur application.
-<p>
-The parameters are:
-<p>
-<ol>
-<li> <tt>index</tt>: name of the index table-of-content file without the
-.ifp extension.
+
+<P> This application builds an FP index for a collection of
+ documents. If the index already exists, new documents are added to that
+ index, otherwise a new index is created.
+
+<P> To use it, follow the general steps of running a lemur application.
+
+<p> The parameters are:
+
+<ol> 
+<li> <tt>index</tt>: name of the index table-of-content file
+without the .ifp extension.
 <li> <tt>memory</tt>: memory (in bytes) of InvFPPushIndex (def = 96000000).
 <li> <tt>stopwords</tt>: name of file containing the stopword list.
 <li> <tt>acronyms</tt>: name of file containing the acronym list.
@@ -66,7 +65,6 @@ The parameters are:
 #include "IncFPTextHandler.hpp"
 #include "Param.hpp"
 #include "indri/Path.hpp"
-#include "TrecParser.hpp"
 
 using namespace lemur::api;
 
@@ -154,13 +152,9 @@ int AppMain(int argc, char * argv[]) {
   // Create the appropriate parser and acronyms list if needed
   Parser * parser = NULL;
   parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
-					    LocalParameter::acronyms);
-  // if failed to create parser, create a default
-  // Should not do this, if no parser is created, app should say
-  // so and exit... dmf 01/2004. #include "TrecParser.hpp" can
-  // be removed if this is.
+                                            LocalParameter::acronyms);
   if (!parser)
-    parser = new lemur::parse::TrecParser();
+    throw Exception("IncIndexer", "Unable to create parser for docFormat");
   
   // Create the stopper if needed.
   Stopper * stopper = NULL;
@@ -181,8 +175,8 @@ int AppMain(int argc, char * argv[]) {
   }
   lemur::parse::IncFPTextHandler* indexer = 
     new lemur::parse::IncFPTextHandler(LocalParameter::index, 
-			 LocalParameter::memory,
-			 LocalParameter::countStopWords);
+                         LocalParameter::memory,
+                         LocalParameter::countStopWords);
 
   // chain the parser/stopper/stemmer/indexer
 
@@ -212,8 +206,8 @@ int AppMain(int argc, char * argv[]) {
     } else {
       string filename;
       while (getline(source, filename)) {
-	cerr << "Parsing " << filename <<endl;
-	parser->parse(filename);
+        cerr << "Parsing " << filename <<endl;
+        parser->parse(filename);
       }
     }
   } else {

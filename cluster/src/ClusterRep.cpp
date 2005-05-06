@@ -7,10 +7,10 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 /*
   Author: dmf 11/2002
- */
+*/
 #include "ClusterRep.hpp"
 #include <cmath>
 lemur::cluster::ClusterRep::ClusterRep(lemur::api::DOCID_T did, const lemur::api::Index &ind) : index(ind) {
@@ -26,7 +26,7 @@ lemur::cluster::ClusterRep::ClusterRep(vector<lemur::api::DOCID_T> &dids, const 
 }
 
 lemur::cluster::ClusterRep::ClusterRep(lemur::utility::FloatFreqVector *v, const lemur::api::Index &ind) : 
-index(ind) {
+  index(ind) {
   rep = new lemur::utility::FloatFreqVector(v);
 }
 

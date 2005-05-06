@@ -27,44 +27,44 @@ namespace lemur
   namespace distrib 
   {
     
-/*! Provides a simple wrapper to lemur databases for 
- * use with the query-based sampling code.
- */
-class LemurDBManager : public DBManager {
+    /*! Provides a simple wrapper to lemur databases for 
+     * use with the query-based sampling code.
+     */
+    class LemurDBManager : public DBManager {
 
-public:
-  /// Open a Lemur database - The dbname is a parameter file
-  /// which specifies retrieval parameters as with RetEval.
-  void open(const string &dbname);
+    public:
+      /// Open a Lemur database - The dbname is a parameter file
+      /// which specifies retrieval parameters as with RetEval.
+      void open(const string &dbname);
 
-  /// Query the database.
-  results_t * query (const char * query, int numdocs) const;
+      /// Query the database.
+      results_t * query (const char * query, int numdocs) const;
 
-  /// Get the parser for the database. (This should always
-  /// return the same parser.)
-  MemParser * getParser() const;
+      /// Get the parser for the database. (This should always
+      /// return the same parser.)
+      MemParser * getParser() const;
 
-  /// Get a document given its document id.
-  doc_t * getDoc(const docid_t docid) const;
+      /// Get a document given its document id.
+      doc_t * getDoc(const docid_t docid) const;
 
-  /// Write a document to file.
-  void output(const docid_t docid) const;
-  /// Set output file name
-  void setOutputFile(const string &filename) const;
+      /// Write a document to file.
+      void output(const docid_t docid) const;
+      /// Set output file name
+      void setOutputFile(const string &filename) const;
 
-  /// Close the database.
-  void close();
+      /// Close the database.
+      void close();
 
-private:
+    private:
   
-  lemur::api::Index * index;
-  lemur::api::RetrievalMethod * model;
-  lemur::api::ScoreAccumulator * accumulator;
-  lemur::api::IndexedRealVector * results;
-  LemurMemParser * parser;
-  mutable ofstream * outfile;
+      lemur::api::Index * index;
+      lemur::api::RetrievalMethod * model;
+      lemur::api::ScoreAccumulator * accumulator;
+      lemur::api::IndexedRealVector * results;
+      LemurMemParser * parser;
+      mutable ofstream * outfile;
 
-};
+    };
   }
 }
 

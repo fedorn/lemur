@@ -21,7 +21,7 @@ namespace lemur
 {
   namespace api
   {
-    
+    /// Factory class for creating RetrievalMethod objects.
     class RetMethodManager {
     public:
       enum RetModel {UNKNOWN=-1, TFIDF=0, OKAPI=1, KL=2, INQUERY=3,CORI_CS=4,COS=5, INQ_STRUCT=6, INDRI=7};

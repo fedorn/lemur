@@ -32,7 +32,7 @@ lemur::distrib::LemurDBManager::open(const string &dbname) {
   accumulator = new lemur::retrieval::ArrayAccumulator(index->docCount());
   results = new IndexedRealVector(index->docCount());
   model = RetMethodManager::createModel(index, accumulator,
-					RetrievalParameter::retModel);
+                                        RetrievalParameter::retModel);
   ParamPopFile();
   outfile = NULL;
 }
@@ -143,7 +143,7 @@ lemur::distrib::LemurDBManager::output(const docid_t docid) const {
       if (c % 10 == 0) *outfile << "\n";
       *outfile << index->term(ti->termID()) << " ";
       c++;
-   }
+    }
   }
   delete til;
 

@@ -14,17 +14,18 @@
 
 
 #include "Param.hpp"
+#include "common_headers.hpp"
+#include "IndexedReal.hpp"
+#include "DocScore.hpp"
 
 #define  CORI_MERGE 0
 #define  SINGLETYPEREGR_MERGE 1
 #define  MULTITYPEREGR_MERGE 2
-
+/// Distributed retrieval merge method parameters.
 namespace DistMergeMethodParameter {
 
-  //@{ 
   /// the result merging method
   static int mergeMethod;
-  //@}
 
   static void get() {
     mergeMethod=lemur::api::ParamGetInt("mergeMethod",0);
@@ -32,16 +33,12 @@ namespace DistMergeMethodParameter {
 };
 
 
-#include "common_headers.hpp"
-#include "IndexedReal.hpp"
-#include "DocScore.hpp"
 namespace lemur 
 {
   namespace distrib
   {
-    
+    /// \brief Abstract interface for distributed retrieval merging of scores.
     /*! 
-      Abstract interface for distributed retrieval merging of scores.  
       Merge scores from individual databases.
       See RetrievalMethod for database ranking algorithms (CORIRetMethod).
       See DistSearchMethod for multiple individual database retrieval.

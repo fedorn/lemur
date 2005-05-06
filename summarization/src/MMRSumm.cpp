@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "MMRSumm.hpp"
 
@@ -83,7 +83,7 @@ int lemur::summarization::MMRSumm::fetchPassages(Passage* psgs, int optLen) cons
 }
   
 void lemur::summarization::MMRSumm::findNextPassage(MMRPassage &psg, const lemur::index::InvFPIndex* idx, 
-			      const TermInfoList* tList, int eos) {
+                                                    const TermInfoList* tList, int eos) {
   TermInfo* tEntry;
   psg.clear();
   termCount* storage;
@@ -100,14 +100,14 @@ void lemur::summarization::MMRSumm::findNextPassage(MMRPassage &psg, const lemur
   } else {
     for(int i=0; i < PSG_LEN; i++) {
       if (tList->hasMore()) {
-	tEntry = tList->nextEntry();
-	storage = new termCount;
-	storage->termID = tEntry->termID();
-	storage->tf = tEntry->count();
-	storage->val = tEntry->count();
-	psg.addTerm(*storage);
+        tEntry = tList->nextEntry();
+        storage = new termCount;
+        storage->termID = tEntry->termID();
+        storage->tf = tEntry->count();
+        storage->val = tEntry->count();
+        psg.addTerm(*storage);
       } else {
-	return;
+        return;
       }
     }
   }
@@ -190,14 +190,14 @@ void lemur::summarization::MMRSumm::scorePassages(const string &qInfo) {
     j++;
     while ((j < docCopy.end()) && ((*j).computeMMR(lambda) > maxMMR)) {
       for(k = docCopy.begin(); k<i; k++) {
-	double dP = (*j).dotProduct(*k);
-	if (dP > (*j).maxSim) {
-	  (*j).maxSim = dP;
-	}
+        double dP = (*j).dotProduct(*k);
+        if (dP > (*j).maxSim) {
+          (*j).maxSim = dP;
+        }
       }
       double s=(*j).computeMMR(lambda);
       if (s>maxMMR) {
-	maxMMR = s;
+        maxMMR = s;
       }
       j++;
     }

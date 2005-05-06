@@ -13,7 +13,7 @@
 #define _BASICCOLLECTIONPROPS_HPP
 #include "CollectionProps.hpp"
 #include "LinkedPropertyList.hpp"
-
+/// namespaces within the lemur system.
 namespace lemur 
 {
   namespace parse 

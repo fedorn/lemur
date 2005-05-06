@@ -232,7 +232,7 @@ namespace lemur
           */
           return s;
           //      return (origScore/qm->scoreConstant() + log(dm->scoreConstant())
-          //	      - qm->colDivergence());
+          //          - qm->colDivergence());
         default:
           cerr << "unknown adjusted score method" << endl;
           return origScore;

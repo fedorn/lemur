@@ -7,8 +7,8 @@
 
 /*
 
-	Copyright (c) 2001 UMASS CIIR All rights reserved.
-	Written by Nick Dufresne (nickd@cs.brandeis.edu)
+Copyright (c) 2001 UMASS CIIR All rights reserved.
+Written by Nick Dufresne (nickd@cs.brandeis.edu)
 	
 	
 */
@@ -39,9 +39,9 @@ void arabic_clean_up (void);
 /******* set_stemmer support **********/
 
 typedef struct {
-     char *option;
-     char *description;
-     void (*stem_fct)(char *, char *) ;
+  char *option;
+  char *description;
+  void (*stem_fct)(char *, char *) ;
 } stem_info_t;
 
 void show_stemmer_options() ;

@@ -50,7 +50,8 @@ namespace lemur
       };
       static PassageScoreDescending cmpFn;
     };
-    /*! Passage representation for a document. Supports iteration over passages
+    /// \brief Passage representation for a document. 
+    /*! Supports iteration over passages
       of fixed window size with an overlap of K terms for the window. 
       Encapsulates the DocumentRep for the whole document, modifying its 
       docLength attribute. Delegates calls to termWeight and 

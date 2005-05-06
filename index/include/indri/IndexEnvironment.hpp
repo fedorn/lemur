@@ -32,6 +32,7 @@
 #include <map>
 namespace indri 
 {
+  ///indri classes that provide services to applications programmers
   namespace api 
   {
     
@@ -51,8 +52,9 @@ namespace indri
       virtual void status( int code, const std::string& documentPath, const std::string& error, int documentsIndexed, int documentsSeen ) {};
     };
 
-    /*! Principal class for interacting with Indri indexes during index 
-      construction. Provides the API for opening or creating an index and its
+    /*! \brief Principal class for interacting with Indri indexes during index 
+      construction. 
+      Provides the API for opening or creating an index and its
       associated repository, setting indexing and text parsing parameters, and
       adding documents to the repository.
     */

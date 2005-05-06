@@ -9,7 +9,6 @@
  *==========================================================================
 */
 
-/// An Indexer
 /*! \page BuildIndex
 <P>
  This application builds an index for a collection of documents.
@@ -21,7 +20,7 @@ The parameters are:
 <ol>
 <li> <tt>index</tt>: name of the index table-of-content file without the
 .ifp extension.
-<li> <tt>indexType</tt>: the type of index, key (KeyfileIncIndex), inv (Inv(FP)Index), indri (IndriIndex)
+<li> <tt>indexType</tt>: the type of index, key (KeyfileIncIndex), inv (Inv(FP)Index), indri (LemurIndriIndex)
 <li> <tt>memory</tt>: memory (in bytes) of Inv(FP)PushIndex (def = 96000000).
 <li> <tt>position</tt>: store position information (def = 1), applicable only for inv indexes.
 <li> <tt>stopwords</tt>: name of file containing the stopword list.
@@ -171,7 +170,7 @@ int AppMain(int argc, char * argv[]) {
   // Create the appropriate parser and acronyms list if needed
   Parser * parser = NULL;
   parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
-					    LocalParameter::acronyms);
+                                            LocalParameter::acronyms);
   // if failed to create parser, abort
   if (!parser) {
     LEMUR_THROW(LEMUR_MISSING_PARAMETER_ERROR, "Please use a valid value for the required parameter \"docFormat\". Valid values are \"trec\", \"web\", \"reuters\",\"chinese\", \"chinesechar\", and \"arabic\". See program usage or Lemur documentation for more information.");
@@ -205,18 +204,18 @@ int AppMain(int argc, char * argv[]) {
 
   if (LocalParameter::indexType == "indri") {
     indexer = new lemur::parse::IndriTextHandler(LocalParameter::index,
-				   LocalParameter::memory,
-				   parser);
+                                   LocalParameter::memory,
+                                   parser);
   } else if (LocalParameter::indexType == "inv") {
     indexer = new lemur::parse::InvFPTextHandler(LocalParameter::index, 
-				   LocalParameter::memory, 
-				   LocalParameter::countStopWords, 
-				   LocalParameter::position);
+                                   LocalParameter::memory, 
+                                   LocalParameter::countStopWords, 
+                                   LocalParameter::position);
   } else if (LocalParameter::indexType == "key") {
     index = new lemur::index::KeyfileIncIndex(LocalParameter::index,
-				LocalParameter::memory);
+                                LocalParameter::memory);
     indexer = new lemur::parse::KeyfileTextHandler(index,
-				     LocalParameter::countStopWords);
+                                     LocalParameter::countStopWords);
   } else {
     LEMUR_THROW(LEMUR_BAD_PARAMETER_ERROR,"Please use a valid value for the required parameter \"IndexType\". \nValid values are \"inv\",\"key\", or \"indri\"See program usage or Lemur documentation for more information.");
   }
@@ -247,12 +246,12 @@ int AppMain(int argc, char * argv[]) {
     } else {
       string filename;
       while (getline(source, filename)) {
-	cerr << "Parsing file: " << filename <<endl;
-	try {
-	  parser->parse(filename);
-	} catch (Exception &ex) {
-	  LEMUR_RETHROW(ex,"Could not parse file");
-	}
+        cerr << "Parsing file: " << filename <<endl;
+        try {
+          parser->parse(filename);
+        } catch (Exception &ex) {
+          LEMUR_RETHROW(ex,"Could not parse file");
+        }
       }
     }
   } else {
@@ -260,9 +259,9 @@ int AppMain(int argc, char * argv[]) {
       cerr << "Parsing file: " << argv[i] << endl;
       string filename(argv[i]);
       try {
-	parser->parse(filename);
+        parser->parse(filename);
       } catch (Exception &ex) {
-	LEMUR_RETHROW(ex, "Could not parse file");
+        LEMUR_RETHROW(ex, "Could not parse file");
       }
     }
   }

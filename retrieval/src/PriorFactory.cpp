@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -32,7 +32,7 @@ void indri::query::PriorFactory::_readPriorFile( prior_data& data, const std::st
     std::string valString;
 
     in >> doc
-        >> valString;
+       >> valString;
 
     int begin;
     int end;

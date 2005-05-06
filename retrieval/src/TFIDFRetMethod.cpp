@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #include "TFIDFRetMethod.hpp"
@@ -34,7 +34,7 @@ double lemur::retrieval::TFIDFQueryRep::queryTFWeight(const double rawTF) const
     return (log(rawTF+1));
   } else if (prm.tf == TFIDFParameter::BM25) {
     return (TFIDFRetMethod::BM25TF(rawTF,prm.bm25K1,0,
-		   1, 1));  // no length normalization for query 
+                                   1, 1));  // no length normalization for query 
   } else {  // default to raw TF
     cerr << "Warning: unknown TF method, raw TF assumed\n";
     return rawTF;
@@ -52,7 +52,7 @@ double lemur::retrieval::TFIDFDocRep::docTFWeight(const double rawTF) const
   } else if (prm.tf == TFIDFParameter::BM25) {
     
     return (TFIDFRetMethod::BM25TF(rawTF, prm.bm25K1, prm.bm25B,
-		   docLength, ind.docLengthAvg()));
+                                   docLength, ind.docLengthAvg()));
   } else {  // default to raw TF
     cerr << "Warning: unknown TF method, raw TF assumed\n";
     return rawTF;

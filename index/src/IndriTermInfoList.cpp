@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -32,7 +32,7 @@ namespace indri {
       for( ; iter != termIDs.end(); ++iter ) {
         if ((*iter).object != 0)
           _termCounts.push_back( std::make_pair( (*iter).object, 
-                                 (*iter).count ) );
+                                                 (*iter).count ) );
       }
     }
       

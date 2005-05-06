@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 /*
@@ -33,7 +33,7 @@ lemur::index::InvFPDocList::InvFPDocList(lemur::utility::MemCache* mc, lemur::ap
 
 lemur::index::InvFPDocList::InvFPDocList(lemur::utility::MemCache* mc, lemur::api::TERMID_T id, int len, lemur::api::DOCID_T docid, lemur::api::LOC_T location) : InvDocList(mc, id, len) {
   if (begin)
-    addLocation(docid, location);	
+    addLocation(docid, location);       
 }
 
 lemur::index::InvFPDocList::InvFPDocList(lemur::api::LOC_T *vec) {
@@ -161,7 +161,7 @@ bool lemur::index::InvFPDocList::append(InvDocList* par_tail) {
 bool lemur::index::InvFPDocList::addLocation(lemur::api::DOCID_T docid, lemur::api::LOC_T location) {
   if (READ_ONLY)
     return false;
-    // check that we can add at all
+  // check that we can add at all
   if (size == 0)
     return false;
 
@@ -189,7 +189,7 @@ bool lemur::index::InvFPDocList::addLocation(lemur::api::DOCID_T docid, lemur::a
     *freq = 1;
     *(freq+1) = location;
     end = freq+2;
-		df++;
+    df++;
   }
   return true;
 }

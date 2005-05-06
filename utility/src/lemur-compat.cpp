@@ -22,19 +22,19 @@
 
 namespace lemur_compat {
   void initializeNetwork() {
-  #ifdef WIN32
+#ifdef WIN32
     WSADATA data;
     memset( &data, 0, sizeof data );
     ::WSAStartup( MAKEWORD(2,0), &data );
-  #endif
+#endif
   }
 
   void closesocket( socket_t s ) {
-  #ifdef WIN32
+#ifdef WIN32
     ::closesocket(s);
-  #else
+#else
     ::close(s);
-  #endif
+#endif
   }
 }
 

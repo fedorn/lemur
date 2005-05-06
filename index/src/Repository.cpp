@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // Repository
@@ -702,10 +702,10 @@ void indri::collection::Repository::_trim() {
     // break if we find an index more than 50% larger than the last one 
     if( documentCount > lastDocumentCount*1.5 && 
         documentCount > firstDocumentCount*4 )
-    {
-      position++;
-      break;
-    }
+      {
+        position++;
+        break;
+      }
 
     lastDocumentCount = documentCount;
   }
@@ -917,7 +917,7 @@ void indri::collection::Repository::_merge() {
 
   // no need to merge when there's only one index (or none)
   bool needsWrite = (mergers->size() > 1) ||
-                    (mergers->size() == 1 && dynamic_cast<indri::index::MemoryIndex*>((*mergers)[0]));
+    (mergers->size() == 1 && dynamic_cast<indri::index::MemoryIndex*>((*mergers)[0]));
 
   if( !needsWrite )
     return;
@@ -926,10 +926,10 @@ void indri::collection::Repository::_merge() {
 
   // merge all the indexes together
   while( needsWrite ) {
-  _merge( mergers );
+    _merge( mergers );
 
     needsWrite = (mergers->size() > 1) ||
-                 (mergers->size() == 1 && dynamic_cast<indri::index::MemoryIndex*>((*mergers)[0]));
+      (mergers->size() == 1 && dynamic_cast<indri::index::MemoryIndex*>((*mergers)[0]));
 
   }
 }

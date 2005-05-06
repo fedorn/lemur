@@ -47,6 +47,7 @@
 #undef min
 #endif
 
+/// the kinds of things that are stored in platform.h on Unix:
 namespace lemur_compat {
 /// same as std::max, but compatible with VC++ 6
 template<typename _Type>

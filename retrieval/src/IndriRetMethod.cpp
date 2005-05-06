@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "IndriRetMethod.hpp"
 #include "indri/QueryEnvironment.hpp"
@@ -22,7 +22,7 @@ lemur::retrieval::IndriRetMethod::IndriRetMethod(const Index &dbIndex) :
   const lemur::index::LemurIndriIndex *rep = dynamic_cast<const lemur::index::LemurIndriIndex *>(&ind);
   if (rep == NULL) {
     LEMUR_THROW(LEMUR_RUNTIME_ERROR, 
-		"IndriRetMethod requires a LemurIndriIndex.");
+                "IndriRetMethod requires a LemurIndriIndex.");
   }
 
   env = new QueryEnvironment();
@@ -35,14 +35,14 @@ lemur::retrieval::IndriRetMethod::~IndriRetMethod() {
 }
 
 void lemur::retrieval::IndriRetMethod::setParams(Parameters *parms) {
-    params = parms;
-    // update the smoothing rules.
-    std::vector<std::string> smoothingRules;
-    // RetParamManager only puts in one...
-    string rule = params->get("rule");
-    smoothingRules.push_back(rule);
-    env->setScoringRules( smoothingRules );
-  }
+  params = parms;
+  // update the smoothing rules.
+  std::vector<std::string> smoothingRules;
+  // RetParamManager only puts in one...
+  string rule = params->get("rule");
+  smoothingRules.push_back(rule);
+  env->setScoringRules( smoothingRules );
+}
 
 void lemur::retrieval::IndriRetMethod::setStopwords(const string &stopfile) {
   if (stopfile.empty()) return;
@@ -51,7 +51,7 @@ void lemur::retrieval::IndriRetMethod::setStopwords(const string &stopfile) {
   ifs.open(stopfile.c_str());
   if (ifs.fail()) {
     cerr << "lemur::retrieval::IndriRetMethod::setStopwords open file " << stopfile
-	 << " failed." << endl; 
+         << " failed." << endl; 
     return;
   }
   params->set("stopper","");
@@ -67,14 +67,14 @@ void lemur::retrieval::IndriRetMethod::setStopwords(const string &stopfile) {
 
   
 void lemur::retrieval::IndriRetMethod::scoreCollection(const QueryRep &qry, 
-			       IndexedRealVector &results) {
+                                                       IndexedRealVector &results) {
   const IndriQueryModel *tq = dynamic_cast<const IndriQueryModel *>(&qry);
   // should prune coming in.
   scoreCollection(tq->getQuery(), results );
 }
 
 void lemur::retrieval::IndriRetMethod::scoreCollection(const string &qry, 
-			       IndexedRealVector &results) {
+                                                       IndexedRealVector &results) {
   // should prune coming in.
   //  int resultsRequested = ind.docCount();
   int resultsRequested = params->get("count", 1000);
@@ -134,7 +134,7 @@ void lemur::retrieval::IndriRetMethod::updateQuery(QueryRep &qryRep, const DocID
     update Qry to hold expanded string
     const IndriQueryModel *tq = dynamic_cast<const IndriQueryModel *>(&qryRep);
     tq->updateQuery(expandedQuery);
-   */
+  */
 
   indri::query::RMExpander rm(env, *params);
 

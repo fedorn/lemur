@@ -6,7 +6,7 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 /*
  * NAME DATE - COMMENTS
  * tnt 01/2003 - created
@@ -64,7 +64,7 @@
 #define COLPROPS_PAR "COLLECTION_PROPS"
 
 lemur::index::KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesize, 
-				 lemur::api::DOCID_T startdocid) {
+                                               lemur::api::DOCID_T startdocid) {
   ignoreDoc = false;
   listlengths = 0;
   cprops = NULL;
@@ -74,8 +74,8 @@ lemur::index::KeyfileIncIndex::KeyfileIncIndex(const string &prefix, int cachesi
 
   if (!tryOpen()) {
     // brand new empty index
-	*msgstream << "Creating new index" << endl;    
-   names.resize( NAMES_SIZE );
+    *msgstream << "Creating new index" << endl;    
+    names.resize( NAMES_SIZE );
 
     counts[TOTAL_TERMS] = counts[UNIQUE_TERMS] = 0;
     counts[DOCS] = 0;
@@ -195,7 +195,7 @@ void lemur::index::KeyfileIncIndex::openDBs() {
     dtlookup.open( names[TERM_LOOKUP], std::ios::binary | std::ios::in );
   } else {
     dtlookup.open( names[TERM_LOOKUP], 
-		   std::ios::binary | std::ios::in | std::ios::out );
+                   std::ios::binary | std::ios::in | std::ios::out );
     dtlookup.seekp( 0, std::ios::end );
   }
   dtlookup.seekg( 0, std::ios::beg );
@@ -210,7 +210,7 @@ void lemur::index::KeyfileIncIndex::openDBs() {
 
 void lemur::index::KeyfileIncIndex::createDBs() {
   dtlookup.open( names[TERM_LOOKUP], 
-		 std::ios::binary | std::ios::out | std::ios::in ) ;
+                 std::ios::binary | std::ios::out | std::ios::in ) ;
   dtlookup.seekg( 0, std::ios::beg );
   dtlookup.seekp( 0, std::ios::end );
 
@@ -253,7 +253,7 @@ bool lemur::index::KeyfileIncIndex::open(const string &indexName){
     writetlist.open( docfname.str(), ios::in | ios::binary );
   else 
     writetlist.open( docfname.str(), 
-		     ios::in | ios::out | ios::binary | ios::ate );
+                     ios::in | ios::out | ios::binary | ios::ate );
   writetlist.seekg( 0, std::ios::beg );
 
   lemur::api::ParamPopFile();
@@ -304,8 +304,8 @@ lemur::api::DOCID_T lemur::index::KeyfileIncIndex::document(const lemur::api::EX
   int len = docID.length();
   if (len > (MAX_DOCID_LENGTH - 1)) {
     cerr << "lemur::index::KeyfileIncIndex::document: document id " << did 
-	 << " is too long ("
-	 << len << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
+         << " is too long ("
+         << len << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     strncpy(docKey, did, (MAX_DOCID_LENGTH - 1));
     docKey[(MAX_DOCID_LENGTH - 1)] = '\0';
     did = docKey;
@@ -367,7 +367,7 @@ lemur::api::COUNT_T lemur::index::KeyfileIncIndex::termCount(lemur::api::TERMID_
   TermData termData;
   int actual;
   bool success = invlookup.get( termID, (char*) &termData, actual, 
-				   sizeof termData );
+                                sizeof termData );
 
   if( success ) {
     return termData.totalCount;
@@ -387,7 +387,7 @@ lemur::api::COUNT_T lemur::index::KeyfileIncIndex::docCount(lemur::api::TERMID_T
   TermData termData;
   int actual;
   bool success = invlookup.get( termID, (char*) &termData, actual, 
-				   sizeof termData );
+                                sizeof termData );
 
   if( success ) {
     return termData.documentCount;
@@ -429,7 +429,7 @@ lemur::api::COUNT_T lemur::index::KeyfileIncIndex::docLengthCounted(lemur::api::
 lemur::index::InvFPDocList* lemur::index::KeyfileIncIndex::internalDocInfoList(lemur::api::TERMID_T termID) const{
   if ((termID < 0) || (termID > counts[UNIQUE_TERMS]) ) {
     *msgstream << "Error:  Trying to get docInfoList for invalid termID" 
-	       << endl;
+               << endl;
     *msgstream << "TermID: " << termID << endl;
     return NULL;
   }
@@ -441,7 +441,7 @@ lemur::index::InvFPDocList* lemur::index::KeyfileIncIndex::internalDocInfoList(l
   TermData termData;
 
   bool success = invlookup.get( termID, (char**) &termData, actual, 
-				   sizeof termData );
+                                sizeof termData );
   int i;
   
   if( success ) {
@@ -488,7 +488,7 @@ lemur::api::DocInfoList* lemur::index::KeyfileIncIndex::docInfoList(lemur::api::
   
   if( !result ) {
     throw lemur::api::Exception( "lemur::index::KeyfileIncIndex::docInfoList", 
-		     "Failed to retrieve docInfoList" );
+                                 "Failed to retrieve docInfoList" );
   }
 
   return result;
@@ -546,7 +546,7 @@ void lemur::index::KeyfileIncIndex::fullToc() {
 bool lemur::index::KeyfileIncIndex::docMgrIDs() {
   FILE* in = fopen(names[DOCMGR_IDS].c_str(), "r");
   *msgstream << "Trying to open doc manager ids file: " 
-	     << names[DOCMGR_IDS] << endl;
+             << names[DOCMGR_IDS] << endl;
   if (in == NULL) {
     fprintf(stderr, "Error opening doc manager ids \n");
     return false;
@@ -589,7 +589,7 @@ bool lemur::index::KeyfileIncIndex::beginDoc(const lemur::parse::DocumentProps* 
   if (docID > 0) {
     //already have seen this document's id.
     cerr << "lemur::index::KeyfileIncIndex::beginDoc: duplicate document id " << did 
-	 << ". Document will be ignored." << endl;
+         << ". Document will be ignored." << endl;
     ignoreDoc = true;
     return false;
   }
@@ -597,8 +597,8 @@ bool lemur::index::KeyfileIncIndex::beginDoc(const lemur::parse::DocumentProps* 
   int len = strlen(did);
   if (len > (MAX_DOCID_LENGTH - 1)) {
     cerr << "lemur::index::KeyfileIncIndex::beginDoc: document id " << did 
-	 << " is too long ("
-	 << len << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
+         << " is too long ("
+         << len << " > " << (MAX_DOCID_LENGTH - 1) << ")" << endl;
     strncpy(docKey, did, (MAX_DOCID_LENGTH - 1));
     docKey[(MAX_DOCID_LENGTH - 1)] = '\0';
     did = docKey;
@@ -669,8 +669,8 @@ bool lemur::index::KeyfileIncIndex::addTerm(const lemur::api::Term& t){
   if (len > (MAX_TERM_LENGTH - 1)) {
     //term is too big to be a key.
     cerr << "lemur::index::KeyfileIncIndex::addTerm: ignoring " << term->spelling()
-	 << " which is too long ("
-	 << len << " > " << (MAX_TERM_LENGTH - 1) << ")" << endl;
+         << " which is too long ("
+         << len << " > " << (MAX_TERM_LENGTH - 1) << ")" << endl;
     return false;
   }
 
@@ -767,9 +767,9 @@ void lemur::index::KeyfileIncIndex::writeTOC(const lemur::parse::CollectionProps
     while (props->hasMore()) {
       p = props->nextEntry();
       if (p->getType() == lemur::parse::Property::STDSTRING)
-	pf << p->getName() << "  " << *(string*)p->getValue() << endl;
+        pf << p->getName() << "  " << *(string*)p->getValue() << endl;
       else if (p->getType() == lemur::parse::Property::STRING)
-	pf << p->getName() << "  " << (char*)p->getValue() << endl;
+        pf << p->getName() << "  " << (char*)p->getValue() << endl;
     }
     
     pf.close();
@@ -834,7 +834,7 @@ void lemur::index::KeyfileIncIndex::writeCacheSegment() {
   // gives us a megabyte of output cache -- seems to make writing
   // faster with these very small writes (system call overhead?)
   outFile.open( name.str().c_str(), 
-		std::ofstream::out | std::ofstream::binary );
+                std::ofstream::out | std::ofstream::binary );
   lemur::file::WriteBuffer out(outFile, KEYFILE_WRITEBUFFER_SIZE);
 
   int writes = 0;
@@ -864,16 +864,16 @@ void lemur::index::KeyfileIncIndex::writeCacheSegment() {
 
       // we need to add the location of the new inverted list
       int missingSegments = _MINIM<unsigned>( (sizeof(TermData) - actual) / 
-						sizeof(SegmentOffset), 
-						KEYFILE_MAX_SEGMENTS);
+                                              sizeof(SegmentOffset), 
+                                              KEYFILE_MAX_SEGMENTS);
       int termSegments = KEYFILE_MAX_SEGMENTS - missingSegments;
 
       termData.segments[ termSegments ].segment = totalSegments;
       termData.segments[ termSegments ].offset = out.tellp();
       termData.segments[ termSegments ].length = vecLen;
       invlookup.put( list->termID(), &termData, 
-		     sizeof(TermData) - 
-		     sizeof(SegmentOffset)*(missingSegments-1) );
+                     sizeof(TermData) - 
+                     sizeof(SegmentOffset)*(missingSegments-1) );
       out.write( (char*) byteVec.get(), vecLen );
       
       delete list;
@@ -900,7 +900,7 @@ void lemur::index::KeyfileIncIndex::writeCacheSegment() {
 class reader_less {
 public:
   bool operator () ( const lemur::file::KeyfileDocListSegmentReader* one, 
-		     const lemur::file::KeyfileDocListSegmentReader* two ) {
+                     const lemur::file::KeyfileDocListSegmentReader* two ) {
     return (*one) < (*two);
   }
 };
@@ -911,7 +911,7 @@ void lemur::index::KeyfileIncIndex::mergeCacheSegments() {
   if( firstMergeSegment == 0 ) {
     invlookup.close();
     // g++ doesn't like this
-	// need to move this ifdef out of here
+    // need to move this ifdef out of here
 #ifdef WIN32
     ::unlink( names[DOC_LOOKUP].c_str() );
 #else
@@ -939,7 +939,7 @@ void lemur::index::KeyfileIncIndex::mergeCacheSegments() {
     fileToOpen =  _segments[i];
     lemur::file::KeyfileDocListSegmentReader* reader =  
       new lemur::file::KeyfileDocListSegmentReader(fileToOpen, nameToOpen, i, 
-				      KEYFILE_DOCLISTREADER_SIZE );
+                                                   KEYFILE_DOCLISTREADER_SIZE );
     reader->pop(); // read the first list into memory
     // if it is empty, don't push it.
     if( reader->top() ) {
@@ -1105,12 +1105,12 @@ void lemur::index::KeyfileIncIndex::doendDoc(const lemur::parse::DocumentProps* 
   bool shouldWriteCache = (listlengths == -1);
 
   if( listlengths > _estimatePoint ) {
-      int cacheSize = _cacheSize();
-      float bytesPerPosting = (float)cacheSize / (float)listlengths;
-      _estimatePoint = (int) (_listsSize / bytesPerPosting);
+    int cacheSize = _cacheSize();
+    float bytesPerPosting = (float)cacheSize / (float)listlengths;
+    _estimatePoint = (int) (_listsSize / bytesPerPosting);
 
-      // if we're within a few postings of an optimal flush point, just do it now
-      shouldWriteCache = _estimatePoint < (listlengths + KEYFILE_EPSILON_FLUSH_POSTINGS);
+    // if we're within a few postings of an optimal flush point, just do it now
+    shouldWriteCache = _estimatePoint < (listlengths + KEYFILE_EPSILON_FLUSH_POSTINGS);
   }
 
   if( shouldWriteCache ) {
@@ -1139,7 +1139,7 @@ lemur::index::KeyfileIncIndex::record lemur::index::KeyfileIncIndex::fetchDocume
 }
 
 void lemur::index::KeyfileIncIndex::addDocumentLookup( lemur::api::DOCID_T documentKey, 
-					 const char* documentName ) {
+                                                       const char* documentName ) {
   addGeneralLookup( dSTRs, dIDs, documentKey, documentName );
 }
 
@@ -1148,8 +1148,8 @@ void lemur::index::KeyfileIncIndex::addTermLookup( lemur::api::TERMID_T termKey,
 }
 
 void lemur::index::KeyfileIncIndex::addGeneralLookup( lemur::file::Keyfile& numberNameIndex, 
-					lemur::file::Keyfile& nameNumberIndex, 
-					lemur::api::TERMID_T number, const char* name ) {
+                                                      lemur::file::Keyfile& nameNumberIndex, 
+                                                      lemur::api::TERMID_T number, const char* name ) {
   numberNameIndex.put( number, (void*) name, strlen(name) );
   nameNumberIndex.put( name, &number, sizeof number );
 }

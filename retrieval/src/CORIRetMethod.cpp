@@ -45,7 +45,7 @@ lemur::retrieval::CORIDocRep::termWeight(lemur::api::TERMID_T termID, const lemu
       df = dfSmooth->seenProb(df, termID) * docLength;
     } else {
       //      df = dfSmooth->unseenCoeff() * collLM->prob(termID) * 
-      //	ind.docLength(info->docID());
+      //        ind.docLength(info->docID());
       df = dfSmooth->unseenCoeff() * collLM->prob(termID) * docLength;
     }
   }
@@ -57,7 +57,7 @@ lemur::retrieval::CORIDocRep::termWeight(lemur::api::TERMID_T termID, const lemu
   //  cout << ind.term(termID) << " " << ind.document(info->docID())
   //       << " " << df << " " << cf << endl;
   if (t>1){
-       cout << ind.term(termID) << " " << ind.document(info->docID())
+    cout << ind.term(termID) << " " << ind.document(info->docID())
          << " " << df << " " << cf << endl;
   }
   return p;
@@ -74,7 +74,7 @@ lemur::retrieval::CORIQueryRep::CORIQueryRep(const lemur::api::TermQuery &qry, c
 }
 
 void lemur::retrieval::CORIRetMethod::scoreCollection(const lemur::api::QueryRep &qry, 
-				    lemur::api::IndexedRealVector &results) {
+                                                      lemur::api::IndexedRealVector &results) {
   scoreInvertedIndex(qry, results, false);
   //adjust the score;
 
@@ -102,9 +102,9 @@ void lemur::retrieval::CORIRetMethod::scoreCollection(const lemur::api::QueryRep
 
 
 lemur::retrieval::CORIRetMethod::CORIRetMethod(const lemur::api::Index & dbIndex, lemur::api::ScoreAccumulator &accumulator, 
-				   lemur::utility::String cwName, int isCSIndex,
-			     const SimpleKLDocModel ** smoothers,
-			     const lemur::langmod::UnigramLM * collectLM) : 
+                                               lemur::utility::String cwName, int isCSIndex,
+                                               const SimpleKLDocModel ** smoothers,
+                                               const lemur::langmod::UnigramLM * collectLM) : 
   lemur::api::TextQueryRetMethod (dbIndex, accumulator) {
 
 

@@ -7,23 +7,23 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 /*
   Author: fff
- */
+*/
 
 #include "StructQueryRetMethod.hpp"
 #include "StructQryDocRep.hpp"
 
 void lemur::api::StructQueryRetMethod::scoreCollection(const QueryRep &qry, 
-					   IndexedRealVector &results) {
+                                                       IndexedRealVector &results) {
   scoreInvertedIndex(qry, results);
 }
 
 
 void lemur::api::StructQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
-					      IndexedRealVector &scores, 
-					      bool scoreAll) {
+                                                          IndexedRealVector &scores, 
+                                                          bool scoreAll) {
   COUNT_T numDocs = ind.docCount();
   COUNT_T i;
   lemur::retrieval::QueryNode *queryRoot = ((lemur::retrieval::StructQueryRep *)(&qRep))->topnode();

@@ -39,8 +39,8 @@ namespace lemur
 
       /// Cluster a set of documents into numParts partitions (default 2).
       /// k-means caller responsible for deleting contents of return vector.
-      vector<Cluster*> *kMeans(vector<lemur::api::DOCID_T> docIds, int numParts = 2, 
-                               int maxIters = 100);
+      vector<Cluster*> *kMeans(vector<lemur::api::DOCID_T> docIds, 
+                               int numParts = 2, int maxIters = 100);
 
       /// k-means caller responsible for deleting contents of  return vector.
       vector<Cluster*> *kMeans(Cluster *cluster, int numParts = 2, 
@@ -48,7 +48,8 @@ namespace lemur
 
       /// bisecting k-means caller responsible for deleting contents of
       /// return vector.
-      vector<Cluster*> *bisecting_kMeans(vector<lemur::api::DOCID_T> docIds, int numParts = 2, 
+      vector<Cluster*> *bisecting_kMeans(vector<lemur::api::DOCID_T> docIds, 
+                                         int numParts = 2, 
                                          int numIters = 5, int maxIters = 100);
 
     private:

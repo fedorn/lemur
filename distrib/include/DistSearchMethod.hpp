@@ -20,7 +20,8 @@ namespace lemur
   namespace distrib
   {
     
-    /*! \brief This class supports searching multiple indexes and getting a list of results for each of those indexes.  
+    /// \brief This class supports searching multiple indexes and getting a list of results for each of those indexes.  
+    /*! 
       Each index is expected to
       have a parameter file that tells where its located and which 
       retrieval method to use, similar to parameter files used for

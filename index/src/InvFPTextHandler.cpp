@@ -7,14 +7,12 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "InvFPTextHandler.hpp"
-#include "WebParser.hpp"
-
 
 lemur::parse::InvFPTextHandler::InvFPTextHandler(const string &filename, int bufferSize,
-				   bool countStopWords, int ind) {
+                                                 bool countStopWords, int ind) {
   // create index and helper objects  
   if (ind == 0)
     index = new lemur::index::InvPushIndex(filename, bufferSize);

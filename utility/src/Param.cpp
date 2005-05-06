@@ -30,24 +30,29 @@ namespace lemur
     /// to push/pop Parameters * onto.
     class ParamStack {
     public:
-      //
+      /// Obtain the singleton instance, instantiating if necessary.
       static ParamStack &instance() {
         if (!_paramStackSingleton) {
           _paramStackSingleton = new ParamStack();
         };
         return *_paramStackSingleton;
       };
+      /*!
+        @return the top of the parameter stack or NULL if the stack is empty.
+      */
       indri::api::Parameters *top() {
         if (params.empty())
           return NULL;
         else
           return params.top();
       }
-
+      /*!
+        @param p Parameters to push onto the stack.
+      */
       void push(indri::api::Parameters *p) {
         params.push(p);
       };
-
+      /// pop the parameter stack, deleting the popped element.
       void pop() {
         if (!params.empty()) {
           indri::api::Parameters *p = NULL;
@@ -56,18 +61,26 @@ namespace lemur
           delete(p);
         }
       };
-
+      /*!
+        Add a parameter name to the list of known parameters.
+        @param s the name to add.
+        @see displayKeys
+       */
       void addKey(const lemur::utility::String &s) {
         keys.insert(std::string(s));
       }
 
+      /*!
+        Write the list of known parameter names to cerr.
+        @see ParamDisplay
+       */
       void displayKeys(){
         std::set<std::string>::iterator iter;
         for (iter = keys.begin(); iter != keys.end(); iter++) {
           std::cerr << *iter << std::endl;
         }
       }
-  
+      /// clean up.
       ~ParamStack() {
         // clean up
         keys.clear();
@@ -77,11 +90,14 @@ namespace lemur
       };
   
     private:
+      /// private constructor to ensure singleton pattern.
       ParamStack() {
       };
+      /// the singleton instance.
       static ParamStack* _paramStackSingleton;
+      /// the stack of Parameters.
       std::stack<indri::api::Parameters * >params;
-      // maintain a list of used keys (for ParamDisplay).
+      /// maintain a list of used keys (for ParamDisplay).
       std::set<std::string> keys;
     };
     ParamStack* ParamStack::_paramStackSingleton = 0;
@@ -95,7 +111,6 @@ namespace lemur
   {
 
     //  Get routines:
-    /////////////////////////////////////
 
     int ParamGetBit(const lemur::utility::String &s, int def)
     {
@@ -296,16 +311,7 @@ namespace lemur
     lemur::utility::String ParamPopFile (void) 
     {
       lemur::utility::ParamStack &ps = lemur::utility::ParamStack::instance();
-      /*    ps.displayKeys();*/
       ps.pop();
-      /*
-        indri::api::Parameters *p = ps.top();
-        if (p) {
-        string s = p->get("index");
-        std::cerr << p << ":" << s << std::endl;
-        ps.displayKeys();
-        }
-      */
       lemur::utility::String retval = "";
       return retval;
     }

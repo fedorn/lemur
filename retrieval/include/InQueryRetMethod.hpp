@@ -30,7 +30,8 @@ namespace lemur
       virtual ~InQueryRep() {}
     };
 
-    /// The InQuery retrieval method for structured queries. Implements the
+    /*! \brief The InQuery retrieval method for structured queries. */
+    /// Implements the
     /// InQuery formulation of idf weighting and default belief value. Behavior
     /// can be modified by adjusting that value using the defaultBelief 
     /// parameter. Provides feedback support in the same fashion as the LEMUR 

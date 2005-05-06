@@ -22,7 +22,7 @@ namespace lemur
     
     ///
     ///  Parses documents in with similar document separation tags NIST's Web format.  
-    ///  <DOC></DOC> around documents and <DOCNO></DOCNO> around docids.
+    ///  &lt;DOC&gt;&lt;/DOC&gt; around documents and &lt;DOCNO&gt;&lt;/DOCNO&gt; around docids.
     ///  This parser recognizes named entity tags from the Identifinder tagger and
     ///  passed them along as properties. For each tag X, also adds in b_X and e_X 
     ///  to the first and last token of each entity.

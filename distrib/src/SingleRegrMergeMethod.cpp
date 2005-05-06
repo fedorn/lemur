@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "SingleRegrMergeMethod.hpp"
 #include <map>
@@ -35,8 +35,8 @@ double lemur::distrib::SingleRegrMergeMethod::score(double dbscore, double docsc
 /// centralsocres are the central documents scores retrieved by centralized sampling database
 /// scoresset are the distributed documents scores retrieved by individual databases
 void lemur::distrib::SingleRegrMergeMethod::calcRegrParams(const IndexedRealVector &indexset, 
-					   const DocScoreVector* centralscores, 
-					   const DocScoreVector* const* scoresset) {
+                                                           const DocScoreVector* centralscores, 
+                                                           const DocScoreVector* const* scoresset) {
   const DocScoreVector* docscores;
   DocScoreVector::const_iterator j;
   docsidmap centerScoreHash;
@@ -82,20 +82,20 @@ void lemur::distrib::SingleRegrMergeMethod::calcRegrParams(const IndexedRealVect
     for (j=docscores->begin(); j!= docscores->end();j++) {
       const string &docId = (*j).id;
       if  ((centerScoreHash[docId]!=0) && ((*j).val!=0) && (dbOverlapNum<GETTOPDOCSNUM)){
-	double y= centerScoreHash[docId];
-	double x1=(*j).val;
-	double x2=(*j).val*indexscore;
-	yVals[overlapNum]=y;
-	x1Vals[overlapNum]=x1;
-	dbVals[overlapNum]=indexscore;
-	x2Vals[overlapNum]=x2;
-	sum_x1_x1+=x1*x1;
-	sum_x2_x2+=x2*x2;
-	sum_x1_x2+=x1*x2;
-	sum_y_x1+=y*x1;
-	sum_y_x2+=y*x2;
-	dbOverlapNum++;
-	overlapNum++;
+        double y= centerScoreHash[docId];
+        double x1=(*j).val;
+        double x2=(*j).val*indexscore;
+        yVals[overlapNum]=y;
+        x1Vals[overlapNum]=x1;
+        dbVals[overlapNum]=indexscore;
+        x2Vals[overlapNum]=x2;
+        sum_x1_x1+=x1*x1;
+        sum_x2_x2+=x2*x2;
+        sum_x1_x2+=x1*x2;
+        sum_y_x1+=y*x1;
+        sum_y_x2+=y*x2;
+        dbOverlapNum++;
+        overlapNum++;
       }
     }
     if (dbOverlapNum<MINOVERLAPDOCNUM){

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -186,8 +186,8 @@ std::vector<indri::server::QueryServerResponse*> indri::api::QueryEnvironment::_
   
   // this ships out the requests to each server (doesn't necessarily block until they're done)
   for( unsigned int i=0; i<_servers.size(); i++ ) {
-      indri::server::QueryServerResponse* response = _servers[i]->runQuery( roots, resultsRequested, true );
-      responses.push_back( response );
+    indri::server::QueryServerResponse* response = _servers[i]->runQuery( roots, resultsRequested, true );
+    responses.push_back( response );
   }
 
   // this just goes through all the results, blocking on each one,
@@ -646,9 +646,9 @@ void indri::api::QueryEnvironment::_scoredQuery( indri::infnet::InferenceNetwork
 }
 
 void indri::api::QueryEnvironment::_annotateQuery( indri::infnet::InferenceNetwork::MAllResults& results,
-                                       const std::vector<DOCID_T>& documentSet,
-                                       std::string& annotatorName,
-                                       indri::lang::Node* queryRoot ) {
+                                                   const std::vector<DOCID_T>& documentSet,
+                                                   std::string& annotatorName,
+                                                   indri::lang::Node* queryRoot ) {
   // add a FilterNode, unique to each server
   // send off each query for evaluation
   std::vector< std::vector<DOCID_T> > docIDLists;
@@ -699,13 +699,13 @@ void indri::api::QueryEnvironment::_annotateQuery( indri::infnet::InferenceNetwo
 
 // run a query (Indri query language)
 std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQuery( indri::infnet::InferenceNetwork::MAllResults& results,
-                                                             const std::string& q,
-                                                             int resultsRequested,
-                                                             const std::vector<DOCID_T>* documentSet,
-                                                             indri::api::QueryAnnotation** annotation ) {
+                                                                                     const std::string& q,
+                                                                                     int resultsRequested,
+                                                                                     const std::vector<DOCID_T>* documentSet,
+                                                                                     indri::api::QueryAnnotation** annotation ) {
   INIT_TIMER
 
-  std::istringstream query(q);
+    std::istringstream query(q);
   indri::lang::QueryLexer lexer( query );
   indri::lang::QueryParser parser( lexer );
   

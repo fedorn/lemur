@@ -14,6 +14,10 @@
 #ifndef _MULTIREGRMERGEMETHOD_HPP
 #define _MULTIREGRMERGEMETHOD_HPP
 
+#include "Param.hpp"
+#include "DistMergeMethod.hpp"
+#include "InvFPTypes.hpp"
+
 /// The minimum number of overlap documents (training data points) for a single databases
 #define MINOVERLAPDOCNUM 3 
 /// The threshold of backing off to CORI results merging algorithm.
@@ -21,17 +25,11 @@
 /// Only use the top n documents retrieved from a database to build the regression model.
 #define MGETTOPDOCSNUM 10
 
-#include "Param.hpp"
-#include "DistMergeMethod.hpp"
-#include "InvFPTypes.hpp"
-
-
+/// Multiple regression merge method parameters
 namespace MultiRegrMergeMethodParameter {
 
-  //@{ 
   /// central database index
   static lemur::utility::String csDbDataBaseIndex;
-  //@}
 
   /// To get the filename of centralized sampling database
   static void get() {
@@ -43,9 +41,9 @@ namespace lemur
 {
   namespace distrib 
   {
-    
+    /// \brief Implementation of regression merging method for single database type case
     /*! 
-      Implementation of regression merging method for single database type case
+      
       (All the individual databases are using Inquery(CORI) retrieval algorithm.
       Build a single regression model for all the databases.
       When there is not enough training data, the algorithm backs off to CORI results merging algorithm.

@@ -14,12 +14,14 @@
 #define _DOCSTREAM_HPP
 
 #include "Document.hpp"
+#include "common_headers.hpp"
+
 namespace lemur 
 {
   namespace api 
   {
     
-    /// Abstract interface for a collection of documents
+    /// \brief Abstract interface for a collection of documents
 
     /*!
       DocStream is an abstract interface for a collection of documents.  A given
@@ -75,7 +77,7 @@ namespace lemur
       term->getPosition();
       term->spelling();
       ...
-	     
+             
       }
       }
       ... 
@@ -85,35 +87,11 @@ namespace lemur
 
     */
 
-#include "common_headers.hpp"
-
-
     class DocStream {
     public:
 
       virtual ~DocStream(){};
-
-      /*!
-        Typical usage: @see Document
-    
-        DocStream &myStream;\n
-        ...\n
-        myStream.startDocIteration();\n
-        Document *doc;\n
-        while (myStream.nextDoc(doc)) {\n
-        Term *term;\n
-        doc->startTermIteration();\n
-        while (doc->nextTerm(term)) {\n
-        ... process "term" ...\n
-        // YOU MUST NOT DELETE term, as it is a pointer to a local static memory
-        }\n
-        // YOU MUST NOT DELETE doc, as it is a pointer to a local static memory
-        }\n
-      */
-
  
-      //@{ @name Document Iteration
-
       /// start document iteration
       virtual void startDocIteration()=0;
 
@@ -121,10 +99,6 @@ namespace lemur
 
       /// return a pointer to next document (static memory, do not delete returned instance).  hasMore() should be called before calling nextDoc()
       virtual Document * nextDoc()=0;
-
-      //@}
-
-
     };
   }
 }

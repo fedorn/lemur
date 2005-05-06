@@ -7,14 +7,14 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "RetMethodManager.hpp"
 #include "BasicCollectionProps.hpp"
 
 lemur::api::RetrievalMethod* lemur::api::RetMethodManager::createModel (const Index* ind, 
-						ScoreAccumulator* accum, 
-						RetModel type) {
+                                                                        ScoreAccumulator* accum, 
+                                                                        RetModel type) {
   // type set externally as string.
   RetrievalMethod *model = NULL;
   switch (type) {
@@ -34,21 +34,21 @@ lemur::api::RetrievalMethod* lemur::api::RetMethodManager::createModel (const In
   case KL:
     SimpleKLParameter::get();
     model = new lemur::retrieval::SimpleKLRetMethod(*ind, SimpleKLParameter::smoothSupportFile, 
-				  *accum);
+                                                    *accum);
     ((lemur::retrieval::SimpleKLRetMethod *)model)->setDocSmoothParam(SimpleKLParameter::docPrm);
     ((lemur::retrieval::SimpleKLRetMethod *)model)->setQueryModelParam(SimpleKLParameter::qryPrm);
     break;
   case CORI_CS:
     CORIParameter::get();
     model = new lemur::retrieval::CORIRetMethod(*ind, *accum, CORIParameter::collectionCounts,
-			      1);
+                                                1);
     ((lemur::retrieval::CORIRetMethod*)model)->setTFFactor(CORIParameter::cstffactor);
     ((lemur::retrieval::CORIRetMethod*)model)->setTFBaseline(CORIParameter::cstfbaseline);
     break;
   case INQUERY:
     CORIParameter::get();
     model = new lemur::retrieval::CORIRetMethod(*ind, *accum, CORIParameter::collectionCounts,
-			      0);
+                                                0);
     ((lemur::retrieval::CORIRetMethod*)model)->setTFFactor(CORIParameter::doctffactor);
     ((lemur::retrieval::CORIRetMethod*)model)->setTFBaseline(CORIParameter::doctfbaseline);
     break;
@@ -60,9 +60,9 @@ lemur::api::RetrievalMethod* lemur::api::RetMethodManager::createModel (const In
   case INQ_STRUCT:
     InQueryParameter::get();
     model = new lemur::retrieval::InQueryRetMethod(*ind, InQueryParameter::defaultBelief,
-				 InQueryParameter::fbTermCount,
-				 InQueryParameter::fbCoeff,
-				 InQueryParameter::cacheIDF);
+                                                   InQueryParameter::fbTermCount,
+                                                   InQueryParameter::fbCoeff,
+                                                   InQueryParameter::cacheIDF);
     break;
   case INDRI:
     IndriParameter::get();
@@ -77,8 +77,8 @@ lemur::api::RetrievalMethod* lemur::api::RetMethodManager::createModel (const In
 }
 
 lemur::api::RetrievalMethod* lemur::api::RetMethodManager::createModel (const Index* ind, 
-						ScoreAccumulator* accum, 
-						string type) {
+                                                                        ScoreAccumulator* accum, 
+                                                                        string type) {
   RetrievalMethod *mod = NULL;
   if (type.empty()) {
     return mod; // nothing to make, give back NULL.
@@ -124,9 +124,9 @@ lemur::api::IndexedRealVector* lemur::api::RetMethodManager::runQuery(const stri
       const lemur::parse::Property* p = NULL;
       props->startIteration();
       while (props->hasMore()) {
-	p = props->nextEntry();
-	if (p->getType() == lemur::parse::Property::STRING) 
-	  ParamSet(p->getName(),(char*)p->getValue());
+        p = props->nextEntry();
+        if (p->getType() == lemur::parse::Property::STRING) 
+          ParamSet(p->getName(),(char*)p->getValue());
       }
     }
   }
@@ -151,11 +151,11 @@ lemur::api::IndexedRealVector* lemur::api::RetMethodManager::runQuery(const stri
 
 
 lemur::api::IndexedRealVector* lemur::api::RetMethodManager::runTextQuery(const string& query, 
-						  TextQueryRetMethod* model, 
-						  const string& stopfile, 
-						  const string& stemtype, 
-						  const string& datadir, 
-						  const string& func) {
+                                                                          TextQueryRetMethod* model, 
+                                                                          const string& stopfile, 
+                                                                          const string& stemtype, 
+                                                                          const string& datadir, 
+                                                                          const string& func) {
   Stopper* stopper = TextHandlerManager::createStopper(stopfile);
   Stemmer* stemmer = TextHandlerManager::createStemmer(stemtype, datadir, func);
   lemur::parse::StringQuery* parser = NULL;
@@ -201,11 +201,11 @@ lemur::api::IndexedRealVector* lemur::api::RetMethodManager::runTextQuery(const 
 }
 
 lemur::api::IndexedRealVector* lemur::api::RetMethodManager::runStructQuery(const string& query, 
-						    StructQueryRetMethod* model, 
-						    const string& stopfile, 
-						    const string& stemtype, 
-						    const string& datadir, 
-						    const string& func) {
+                                                                            StructQueryRetMethod* model, 
+                                                                            const string& stopfile, 
+                                                                            const string& stemtype, 
+                                                                            const string& datadir, 
+                                                                            const string& func) {
   Stopper* stopper = TextHandlerManager::createStopper(stopfile);
   Stemmer* stemmer = TextHandlerManager::createStemmer(stemtype, datadir, func);
 

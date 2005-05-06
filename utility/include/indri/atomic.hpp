@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // atomic
@@ -23,7 +23,7 @@
 #endif
 
 namespace indri {
-  /*! Atomic actions for thread support */
+  /*! \brief Atomic actions for thread support */
   namespace atomic {
 #ifdef WIN32
     typedef volatile LONG value_type;

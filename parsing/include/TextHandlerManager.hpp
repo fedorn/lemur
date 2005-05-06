@@ -17,8 +17,9 @@ namespace lemur
   namespace api 
   {
     
-    /** This TextHandlerManager offers static methods for creating known 
-        TextHandler objects. Object types will be created from the specified 
+    /// \brief Factory class for creating a Parser, Stemmer, or Stopper. 
+    /*!
+        Object types will be created from the specified 
         name. If no name is specified, will try to get name from parameter 
         stack.
         People adding new TH objects can do so here, and existing applications

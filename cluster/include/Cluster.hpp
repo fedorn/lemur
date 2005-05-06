@@ -42,7 +42,8 @@ namespace lemur
     class Cluster {
     public:
       ///create empty cluster with specific id.
-      Cluster(int cid, const lemur::api::Index &ind, const SimilarityMethod &sim);
+      Cluster(int cid, const lemur::api::Index &ind, 
+              const SimilarityMethod &sim);
       /// delete cluster
       virtual ~Cluster();
       /// set cluster id.
@@ -93,7 +94,9 @@ namespace lemur
       string name;
       /// vector of cluster elements in this cluster.
       vector<ClusterElt> ids;
+      /// The SimilarityMethod to use for weighting.
       const SimilarityMethod &similarity;
+      /// size of the cluster
       int size;
       double weight;
       const lemur::api::Index &ind;

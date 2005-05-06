@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // RepositoryMaintenanceThread
@@ -59,8 +59,8 @@ static bool maintenance_should_merge( indri::collection::Repository::index_state
   //   is all weighted by the number of indexes we have to merge.
 
   return couldUseMerge &&
-         hasntThrashedRecently &&
-         ((addRatio/50) < indexesToMerge && (significantQueryLoad || insignificantDocumentLoad));
+    hasntThrashedRecently &&
+    ((addRatio/50) < indexesToMerge && (significantQueryLoad || insignificantDocumentLoad));
 }
 
 //
@@ -174,7 +174,7 @@ UINT64 indri::collection::RepositoryMaintenanceThread::work() {
   if( memorySize > 0.75*_memory ) {
     return SHORT_TIME_DELAY;
   } else {
-  return TIME_DELAY;
+    return TIME_DELAY;
   }
 }
 

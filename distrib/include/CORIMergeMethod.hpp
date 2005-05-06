@@ -20,8 +20,9 @@ namespace lemur
   namespace distrib
   {
     
+
+    /// \brief Implementation of CORI merging  method. 
     /*! 
-      \brief Implementation of CORI merging  method. 
       Merge scores from individual 
       databases, assuming that the scores we receive have already been 
       normalized for this merge algorithm.

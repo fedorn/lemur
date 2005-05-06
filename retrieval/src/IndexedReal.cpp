@@ -6,7 +6,7 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 
 #include "IndexedReal.hpp"
 #include <cmath>
@@ -40,14 +40,14 @@ void lemur::api::IndexedRealVector::NormalizeValues()
 
 void lemur::api::IndexedRealVector::LogToPosterior()
 {
-// In:  log(x1) log(x2) ... log(xN) 
-// Out: x1/sum, x2/sum, ... xN/sum
-// 
-// Extra care is taken to make sure we don't overflow 
-// machine precision when taking exp (log x)
-// This is done by adding a constant K which cancels out
-// Right now K is set to maximally preserve the highest value
-// but could be altered to a min or average, or whatever...
+  // In:  log(x1) log(x2) ... log(xN) 
+  // Out: x1/sum, x2/sum, ... xN/sum
+  // 
+  // Extra care is taken to make sure we don't overflow 
+  // machine precision when taking exp (log x)
+  // This is done by adding a constant K which cancels out
+  // Right now K is set to maximally preserve the highest value
+  // but could be altered to a min or average, or whatever...
 
   iterator it = begin();
   double sum=0;

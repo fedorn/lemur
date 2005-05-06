@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -74,70 +74,70 @@ void indri::parse::HTMLParser::handleTag(char* token, long pos) {
     int i;
     for(i = 2; i < length && token[i] == ' '; i++);
     if(i + 3 < length &&
-      (token[i] == 'H' || token[i] == 'h') &&
-      (token[i+1] == 'R' || token[i+1] == 'r') &&
-      (token[i+2] == 'E' || token[i+2] == 'e') &&
-      (token[i+3] == 'F' || token[i+3] == 'f')) {
-        if(!_anchorTag && !_relativeUrlTag && !_absoluteUrlTag)
-          return;
+       (token[i] == 'H' || token[i] == 'h') &&
+       (token[i+1] == 'R' || token[i+1] == 'r') &&
+       (token[i+2] == 'E' || token[i+2] == 'e') &&
+       (token[i+3] == 'F' || token[i+3] == 'f')) {
+      if(!_anchorTag && !_relativeUrlTag && !_absoluteUrlTag)
+        return;
 
-        if(!extractURL(token))
-          return;
+      if(!extractURL(token))
+        return;
         
-        char tmp_buf[MAX_URL_LENGTH];
-        strncpy(tmp_buf, token, lemur_compat::min<int>(length,MAX_URL_LENGTH-1));
-        tmp_buf[MAX_URL_LENGTH-1] = 0;
+      char tmp_buf[MAX_URL_LENGTH];
+      strncpy(tmp_buf, token, lemur_compat::min<int>(length,MAX_URL_LENGTH-1));
+      tmp_buf[MAX_URL_LENGTH-1] = 0;
 
-        bool relative = normalizeURL(tmp_buf);
+      bool relative = normalizeURL(tmp_buf);
 
-        // if special url tags are requested, we'll
-        // store the url of the anchor text in the document itself
+      // if special url tags are requested, we'll
+      // store the url of the anchor text in the document itself
         
-        const TaggedTextParser::tag_properties* tagProps;
-        if( !relative ) {
-          tagProps = _absoluteUrlTag;
-        } else {
-          tagProps = _relativeUrlTag;
-        }
-
-        if( tagProps && !tagProps->exclude && !_exclude ) {
-          writeToken(tmp_buf);
-          addTag(tagProps->name, tagProps->conflation, pos);
-          endTag(tagProps->name, tagProps->conflation, pos+1);
-        }
-
-        tagProps = _anchorTag;
-        if( tagProps && !tagProps->exclude && !_exclude )
-          addTag(tagProps->name, tagProps->conflation, pos+1);
+      const TaggedTextParser::tag_properties* tagProps;
+      if( !relative ) {
+        tagProps = _absoluteUrlTag;
+      } else {
+        tagProps = _relativeUrlTag;
       }
+
+      if( tagProps && !tagProps->exclude && !_exclude ) {
+        writeToken(tmp_buf);
+        addTag(tagProps->name, tagProps->conflation, pos);
+        endTag(tagProps->name, tagProps->conflation, pos+1);
+      }
+
+      tagProps = _anchorTag;
+      if( tagProps && !tagProps->exclude && !_exclude )
+        addTag(tagProps->name, tagProps->conflation, pos+1);
+    }
     else
       indri::parse::TaggedTextParser::handleTag(token, pos);
   }
   // <BASE HREF ...> tag
   else if (length > 5 &&
-    (token[1] == 'B' || token[1] == 'b') &&
-    (token[2] == 'A' || token[2] == 'a') &&
-    (token[3] == 'S' || token[3] == 's') &&
-    (token[4] == 'E' || token[4] == 'e') &&
-    token[5] == ' ') {
-      int i;
-      for(i = 5; i < length && token[i] == ' '; i++);
-      if(i + 3 < length &&
-        (token[i] == 'H' || token[i] == 'h') &&
-        (token[i+1] == 'R' || token[i+1] == 'r') &&
-        (token[i+2] == 'E' || token[i+2] == 'e') &&
-        (token[i+3] == 'F' || token[i+3] == 'f')) {
-          char tmp_buf[MAX_URL_LENGTH];
-          strncpy( tmp_buf, token, lemur_compat::min<int>(length,MAX_URL_LENGTH-1) );
-          if(!extractURL(tmp_buf))
-            return;
-          normalizeURL(tmp_buf);
-          strncpy(base_url, tmp_buf, lemur_compat::min<int>(length,MAX_URL_LENGTH-1));
-          base_url[MAX_URL_LENGTH-1] = 0;
-        }
-      else
-        TaggedTextParser::handleTag(token, pos);
+           (token[1] == 'B' || token[1] == 'b') &&
+           (token[2] == 'A' || token[2] == 'a') &&
+           (token[3] == 'S' || token[3] == 's') &&
+           (token[4] == 'E' || token[4] == 'e') &&
+           token[5] == ' ') {
+    int i;
+    for(i = 5; i < length && token[i] == ' '; i++);
+    if(i + 3 < length &&
+       (token[i] == 'H' || token[i] == 'h') &&
+       (token[i+1] == 'R' || token[i+1] == 'r') &&
+       (token[i+2] == 'E' || token[i+2] == 'e') &&
+       (token[i+3] == 'F' || token[i+3] == 'f')) {
+      char tmp_buf[MAX_URL_LENGTH];
+      strncpy( tmp_buf, token, lemur_compat::min<int>(length,MAX_URL_LENGTH-1) );
+      if(!extractURL(tmp_buf))
+        return;
+      normalizeURL(tmp_buf);
+      strncpy(base_url, tmp_buf, lemur_compat::min<int>(length,MAX_URL_LENGTH-1));
+      base_url[MAX_URL_LENGTH-1] = 0;
     }
+    else
+      TaggedTextParser::handleTag(token, pos);
+  }
   // any other tag
   else {
     TaggedTextParser::handleTag(token, pos);
@@ -239,7 +239,7 @@ bool indri::parse::HTMLParser:: normalizeURL(char *s) {
         ch != '+' &&
         ch != '-' && 
         ch != '.' )
-        break;
+      break;
 
     scheme_len++;
   }

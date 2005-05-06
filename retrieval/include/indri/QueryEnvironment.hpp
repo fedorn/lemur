@@ -36,7 +36,7 @@ namespace indri
   namespace api 
   {
     
-    /*! <p>Principal class for interacting with Indri indexes during retrieval. 
+    /*! \brief Principal class for interacting with Indri indexes during retrieval. 
       Provides the API for opening one or more Repository servers, either local
       or remote. Provides the API for querying the servers with the Indri
       query language, and additionally requesting aggregate collection 

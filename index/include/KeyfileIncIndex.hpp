@@ -276,7 +276,7 @@ namespace lemur
       float aveDocLen; 
       /// list of document managers
       vector<std::string> docmgrs;
-      /// Lemur code messages stream		
+      /// Lemur code messages stream            
       ostream* msgstream;
 
       // All database handles are marked mutable since they sometimes

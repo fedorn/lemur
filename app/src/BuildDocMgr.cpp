@@ -8,6 +8,59 @@
  *
  *==========================================================================
 */
+/*! \page BuildDocMgr 
+<P> 
+This application builds a document
+manager. Builds an index at the end of chain if an index name is
+provided.
+
+<P>
+To use it, follow the general steps of running a lemur application.
+<p>
+The parameters are:
+<p>
+<ol>
+<li> <tt>manager</tt>: name of the document manager (without extension). Required. 
+<li> <tt>managerType</tt>: name of the document manager type, one of flat (FlatfileDocMgr) bdm (KeyfileDocMgr) or elem (ElemDocMgr). Required.
+<li> <tt>index</tt>: name of the index table-of-content file without the
+.ifp extension.
+<li> <tt>indexType</tt>: the type of index, key (KeyfileIncIndex) or inv (Inv(FP)Index).
+<li> <tt>memory</tt>: memory (in bytes) of Inv(FP)PushIndex (def = 96000000).
+<li> <tt>position</tt>: store position information (def = 1), applicable only for inv indexes.
+<li> <tt>stopwords</tt>: name of file containing the stopword list.
+<li> <tt>acronyms</tt>: name of file containing the acronym list.
+<li> <tt>countStopWords</tt>: If true, count stopwords in document length.
+<li> <tt>docFormat</tt>: 
+<ul>
+<li> "trec" for standard TREC formatted documents 
+<li> "web" for web TREC formatted documents
+<li> "chinese" for segmented Chinese text (TREC format, GB encoding)
+<li> "chinesechar" for unsegmented Chinese text (TREC format, GB encoding)
+<li> "arabic" for Arabic text (TREC format, Windows CP1256 encoding)
+</ul>
+<li> <tt>stemmer</tt>: 
+<ul>
+<li> "porter" Porter stemmer.
+<li> "krovetz" Krovetz stemmer, requires additional parameters
+<ol>
+<li> <tt>KstemmerDir</tt>: Path to directory of data files used by Krovetz's stemmer.
+</ol>
+<li> "arabic" arabic stemmer, requires additional parameters
+<ol>
+<li> <tt>arabicStemDir</tt>: Path to directory of data files used by the Arabic stemmers.
+<li> <tt>arabicStemFunc</tt>: Which stemming algorithm to apply, one of:
+<ul>
+<li> arabic_stop          : arabic_stop
+<li>  arabic_norm2         : table normalization
+<li>  arabic_norm2_stop    : table normalization with stopping
+<li>  arabic_light10       : light9 plus ll prefix
+<li>  arabic_light10_stop  : light10 and remove stop words
+</ul> 
+</ol>
+</ul>
+<li> <tt>dataFiles</tt>: name of file containing list of datafiles to build the document manager for. Required.
+</ol>
+*/
 
 #include "DocMgrManager.hpp"
 #include "TextHandlerManager.hpp"
@@ -56,7 +109,7 @@ void usage(int argc, char ** argv) {
   cerr << "Usage:" << endl
        << argv[0] << " paramfile " << endl
        << endl
-       << "BuildDocMgr builds a document manager. Builds an index at the end of chaing if an index name is provided."
+       << "BuildDocMgr builds a document manager. Builds an index at the end of chain if an index name is provided."
        << endl
        << "Summary of parameters:" << endl << endl
        << "\tmanager -  required name of the document manager (without extension)" << endl    
@@ -108,11 +161,11 @@ int AppMain(int argc, char * argv[]) {
 
   // Create DocumentManager with appropriate parse mode
   DocumentManager* docmgr;
-  // there's currently only two docmanagers
+
   docmgr = DocMgrManager::createDocMgr(LocalParameter::mgrType, 
-				       LocalParameter::manager, 
-				       LocalParameter::docFormat, 
-				       LocalParameter::dataFiles);
+                                       LocalParameter::manager, 
+                                       LocalParameter::docFormat, 
+                                       LocalParameter::dataFiles);
   if (!docmgr)
     throw Exception ("BuildDocMgr", "\nInsufficient parameters for creating document manager. Check manager, dataFiles, and docFormat");
 
@@ -133,17 +186,17 @@ int AppMain(int argc, char * argv[]) {
     // Need an abstract class to hang the setDocManager call on here...
     if (LocalParameter::indexType == "inv") {
       indexer = new lemur::parse::InvFPTextHandler(LocalParameter::index, 
-				     LocalParameter::memory, 
-				     LocalParameter::countStopWords, 
-				     LocalParameter::position);
+                                     LocalParameter::memory, 
+                                     LocalParameter::countStopWords, 
+                                     LocalParameter::position);
       // register document manager with PushIndex
       ((lemur::parse::InvFPTextHandler *)indexer)->setDocManager(docmgr->getMyID());
 
     } else if (LocalParameter::indexType == "key"){
       ind = new lemur::index::KeyfileIncIndex(LocalParameter::index,
-				LocalParameter::memory);
+                                LocalParameter::memory);
       indexer = new lemur::parse::KeyfileTextHandler((lemur::index::KeyfileIncIndex *)ind,
-				       LocalParameter::countStopWords);
+                                       LocalParameter::countStopWords);
       // register document manager with PushIndex
       ((lemur::parse::KeyfileTextHandler *)indexer)->setDocManager(docmgr->getMyID());
     } else {

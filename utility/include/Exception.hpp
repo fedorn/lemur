@@ -20,7 +20,7 @@ namespace lemur
 {
   namespace api 
   {
-   
+    /// Error codes.
     typedef unsigned long LemurErrorType; 
     /// Default Exception class
     /*!

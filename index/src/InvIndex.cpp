@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #include "InvIndex.hpp"
@@ -105,12 +105,12 @@ bool lemur::index::InvIndex::open(const string &indexName){
     // if it's new we call new load functions
     if (!names[VERSION_NUM].empty()) {
       if (!dtLookup())
-	return false;
-    if (!docMgrIDs())
-      return false;
+        return false;
+      if (!docMgrIDs())
+        return false;
     } else {
       if (!dtLookup_ver1())
-	return false;
+        return false;
     }
 
     if (!dtFileIDs())
@@ -402,7 +402,7 @@ bool lemur::index::InvIndex::indexLookup() {
 bool lemur::index::InvIndex::dtLookup_ver1() {
   FILE* in = fopen(names[TERM_LOOKUP].c_str(), "rb");
   *msgstream << "Trying to open dtlist lookup: " 
-	     << names[TERM_LOOKUP] << endl;
+             << names[TERM_LOOKUP] << endl;
   if (in == NULL) {
     *msgstream <<  "Couldn't open dt lookup table for reading" << endl;
     return false;
@@ -469,7 +469,7 @@ bool lemur::index::InvIndex::dtFileIDs() {
 
   while (!feof(in)) {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
-        continue;
+      continue;
 
     str = new char[len + 1];  // fixed PATH_MAX buffer here.
     if (fscanf(in, "%s", str) != 1) {
@@ -533,7 +533,7 @@ bool lemur::index::InvIndex::invFileIDs() {
 
   while (!feof(in)) {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
-        continue;
+      continue;
 
     str = new char[len + 1];  // fixed PATH_MAX buffer here
     if (fscanf(in, "%s", str) != 1) {
@@ -565,7 +565,7 @@ bool lemur::index::InvIndex::termIDs() {
 
   while (!feof(in)) {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
-        continue;
+      continue;
 
     str = new char[len + 1]; // fixed size MAX_TERM_LENGTH buffer here.
     if (fscanf(in, "%s", str) != 1) {
@@ -589,7 +589,7 @@ bool lemur::index::InvIndex::termIDs() {
 
 bool lemur::index::InvIndex::docIDs() {
   FILE* in = fopen(names[DOC_IDS].c_str(), "rb");
-   *msgstream<< "Trying to open doc ids file: " << names[DOC_IDS] << endl;
+  *msgstream<< "Trying to open doc ids file: " << names[DOC_IDS] << endl;
   if (in == NULL) {
     *msgstream << "Error opening docfile" << endl;
     return false;

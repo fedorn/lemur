@@ -38,7 +38,7 @@ namespace lemur
     <PRE>
 
 
-    Index &myIndex;
+    Index &amp;myIndex;
 
     myIndex.open("index-file");
 

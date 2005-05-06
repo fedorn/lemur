@@ -19,7 +19,7 @@ namespace lemur
   namespace retrieval
   {
     
-    /// Representation of a document for structured query retrieval method.
+    /// \brief Representation of a document for structured query retrieval method.
     /// Provides support for passage level operations on a document.
     class StructQryDocRep : public lemur::api::DocumentRep {
     public:

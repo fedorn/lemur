@@ -23,7 +23,7 @@
 #include "lemur-compat.hpp"
 namespace indri
 {
-  /*! Utility classes for indri components. */
+  /*! \brief Utility classes for indri components. */
   namespace utility
   {
     

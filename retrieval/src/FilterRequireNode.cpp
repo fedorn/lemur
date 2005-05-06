@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -22,8 +22,8 @@
 #include "indri/Annotator.hpp"
 
 indri::infnet::FilterRequireNode::FilterRequireNode( const std::string& name, 
-                                      ListIteratorNode* filter, 
-                                      BeliefNode* required ) {
+                                                     ListIteratorNode* filter, 
+                                                     BeliefNode* required ) {
   _name = name;
   _filter = filter;
   _required = required;

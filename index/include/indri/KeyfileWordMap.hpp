@@ -26,6 +26,7 @@
 #include "Keyfile.hpp"
 namespace indri
 {
+  /// filesystem interaction components
   namespace file
   {
     

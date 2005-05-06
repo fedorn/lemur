@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // BooleanAndNode
@@ -58,14 +58,14 @@ const std::string& indri::infnet::BooleanAndNode::getName() const {
 void indri::infnet::BooleanAndNode::annotate( class indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
   annotator.addMatches( _extents, this, documentID, begin, end );
   /* Should have the same as ODN? Or just the inner loop like OrNode
-     // _children are _lists in this context.
+  // _children are _lists in this context.
   for( size_t i=0; i<_extents.size(); i++ ) {
-    for( size_t j=0; j<_children.size(); j++ ) {
-      _children[j]->annotate( annotator, documentID, _extents[i].begin, _extents[i].end );
-    }
+  for( size_t j=0; j<_children.size(); j++ ) {
+  _children[j]->annotate( annotator, documentID, _extents[i].begin, _extents[i].end );
+  }
   }
 
-   */
+  */
 }
 
 void indri::infnet::BooleanAndNode::indexChanged( indri::index::Index& index ) {

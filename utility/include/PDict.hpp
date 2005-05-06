@@ -23,10 +23,11 @@
 #include "TextHandlerManager.hpp"
 namespace lemur 
 {
+  /// probabilistic dictionary components.
   namespace dictionary 
   {
     
-    /*! container for dictionary entries.
+    /*! \brief container for dictionary entries.
      */
     class DictEntry {
     public:

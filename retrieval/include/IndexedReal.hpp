@@ -42,7 +42,8 @@ namespace lemur
       double val;
     };
 
-
+    /// \brief A vector of IndexedReal.
+    /// 
     class IndexedRealVector : public vector<IndexedReal> {
     public:
   

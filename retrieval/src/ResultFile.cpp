@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "ResultFile.hpp"
 
@@ -108,13 +108,13 @@ void lemur::api::ResultFile::writeResults(const string& queryID, IndexedRealVect
       count++;
       *outStr << queryID;
       if (trecFmt)
-	*outStr << " Q0";
+        *outStr << " Q0";
       *outStr << " "  << ind->document((*j).ind) << " " ;
       if (trecFmt)
-	*outStr << count << " ";
+        *outStr << count << " ";
       *outStr << (*j).val;
       if (trecFmt)
-	*outStr << " Exp";
+        *outStr << " Exp";
       //      *outStr << endl; //flushes buffer each call.
       *outStr << "\n";
     }
@@ -126,15 +126,15 @@ void lemur::api::ResultFile::writeResults(const string& queryID, IndexedRealVect
 
 bool lemur::api::ResultFile::readLine()
 {
-    char dummy1[100];
-    char dummy2[100];
-    char dummy3[100];
+  char dummy1[100];
+  char dummy2[100];
+  char dummy3[100];
 
-    if (trecFmt) {
-      return (*inStr >> curQID >> dummy1 >> curDID >> dummy2 >> curSC >> dummy3);
-    } else {
-      return (*inStr >> curQID >> curDID >> curSC);
-    }
+  if (trecFmt) {
+    return (*inStr >> curQID >> dummy1 >> curDID >> dummy2 >> curSC >> dummy3);
+  } else {
+    return (*inStr >> curQID >> curDID >> curSC);
+  }
 }
 
 

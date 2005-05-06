@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "MMRPassage.hpp"
 #include "Passage.hpp"
@@ -47,8 +47,8 @@ double lemur::summarization::MMRPassage::dotProduct(MMRPassage b) const {
     for(int j=0; j<b.psg->size(); j++) {
       //      cout << (*psg)[i].termID << "==" << (*b.psg)[j].termID << "?";
       if ( (*psg)[i].termID == (*b.psg)[j].termID ) {
-	//cout << "DP HIT" << (*psg)[i].val << " " << (*b.psg)[j].val << endl;
-	retVal += (*psg)[i].val * (*b.psg)[j].val;
+        //cout << "DP HIT" << (*psg)[i].val << " " << (*b.psg)[j].val << endl;
+        retVal += (*psg)[i].val * (*b.psg)[j].val;
       }
     }
   } 

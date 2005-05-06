@@ -22,6 +22,7 @@
 #include <math.h>
 namespace indri
 {
+  /// indri query processing and scoring components.
   namespace query
   {
     

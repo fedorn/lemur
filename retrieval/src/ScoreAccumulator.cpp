@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "common_headers.hpp"
 #include "ScoreAccumulator.hpp"

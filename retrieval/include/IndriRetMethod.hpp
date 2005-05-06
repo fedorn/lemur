@@ -26,7 +26,7 @@ namespace lemur
   namespace retrieval 
   {
     
-    /// Query model representation for the indri query language
+    /// \brief Query model representation for the indri query language
     class IndriQueryModel : public lemur::api::QueryRep {
     public:
       IndriQueryModel(const lemur::api::TermQuery &qry) {
@@ -51,7 +51,7 @@ namespace lemur
     private:
       mutable string realQuery;
     };
-
+    /// \brief Indri structured query language retrieval method.
     class IndriRetMethod : public lemur::api::RetrievalMethod {
     public:
       // parameters? want to get the rules in certainly...

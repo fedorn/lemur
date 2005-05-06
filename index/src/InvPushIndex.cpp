@@ -6,7 +6,7 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 
 #include "InvPushIndex.hpp"
 #include <sstream>
@@ -18,7 +18,7 @@
  *========================================================================*/
 
 lemur::index::InvPushIndex::InvPushIndex(const string &prefix, int cachesize, 
-			   long maxfilesize, lemur::api::DOCID_T startdocid) {
+                                         long maxfilesize, lemur::api::DOCID_T startdocid) {
   setName(prefix);
   fprintf(stderr, "building %s\n ", name.c_str());
 
@@ -196,9 +196,9 @@ void lemur::index::InvPushIndex::writeTOC(int numinv, const lemur::parse::Collec
     while (props->hasMore()) {
       p = props->nextEntry();
       if (p->getType() == lemur::parse::Property::STDSTRING)
-	toc << p->getName() << "  " << *(string*)p->getValue() << endl;
+        toc << p->getName() << "  " << *(string*)p->getValue() << endl;
       else if (p->getType() == lemur::parse::Property::STRING)
-	toc << p->getName() << "  " << (char*)p->getValue() << endl;
+        toc << p->getName() << "  " << (char*)p->getValue() << endl;
     }
   }
 
@@ -243,7 +243,7 @@ void lemur::index::InvPushIndex::writeCache() {
   ofstream fout;
   fout.open(fname.c_str(), ios::binary | ios::out);
 
-   if (!fout) {
+  if (!fout) {
     fprintf(stderr, "Can't open file for writing. Cache not written.\n");
     return; 
   }
@@ -310,10 +310,10 @@ void lemur::index::InvPushIndex::lastWriteCache() {
     finder = wordtable.find(term);
     if (finder == wordtable.end() ) {
       // this really shouldn't happen. means can't find term in table
-	  // this does happen... stl table might be managing it in a way i don't fully understand.
-	  // despite the code entering here, it all works fine.
+      // this does happen... stl table might be managing it in a way i don't fully understand.
+      // despite the code entering here, it all works fine.
       // tends to enter here with a large data set and a small cache size   
-//      fprintf (stderr, "Weird things are happening.\n");
+      //      fprintf (stderr, "Weird things are happening.\n");
       continue;
     } else {
       list = finder->second;

@@ -4,7 +4,7 @@
  *  See copyright.cmu for details.
  *
  *==========================================================================
-*/
+ */
 
 #include "LinkedPropertyList.hpp"
 
@@ -134,8 +134,8 @@ lemur::parse::LinkedPropertyList::getPropertyInternal(const string name) const{
     plist::iterator iter = properties.begin();
     while (iter != properties.end()) {
       if ((*iter)->getName() == name) {
-	prop = *iter;
-	break;
+        prop = *iter;
+        break;
       }
       iter++;
     }

@@ -18,7 +18,7 @@ namespace lemur
   namespace file 
   {
     
-    /// Provides C++ interface to the keyfile b-tree package. Arbitrary data can
+    /// \brief Provides C++ interface to the keyfile b-tree package. Arbitrary data can
     /// be stored using either int or char * keys. 
     class Keyfile {
     public:

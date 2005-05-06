@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -148,18 +148,18 @@ void lemur::file::ReadBuffer::seekg( File::offset_type position, std::fstream::s
   File::offset_type absolutePosition;
 
   switch( direction ) {
-    default:
-    case std::fstream::beg:
-      absolutePosition = position;
-      break;
+  default:
+  case std::fstream::beg:
+    absolutePosition = position;
+    break;
 
-    case std::fstream::cur:
-      absolutePosition = _filePosition + position;
-      break;
+  case std::fstream::cur:
+    absolutePosition = _filePosition + position;
+    break;
 
-    case std::fstream::end:
-      absolutePosition = _file.size() + position;
-      break;
+  case std::fstream::end:
+    absolutePosition = _file.size() + position;
+    break;
   }
 
   assert( absolutePosition <= _file.size() );

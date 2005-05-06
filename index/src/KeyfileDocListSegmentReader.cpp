@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -21,8 +21,8 @@
 #include <sstream>
 
 lemur::file::KeyfileDocListSegmentReader::KeyfileDocListSegmentReader( File* stream, std::string& baseName, int segment, int readBufferSize ) :
-_stream( stream ),
-_segment( segment )
+  _stream( stream ),
+  _segment( segment )
 {
   _top = 0;
   _stream->seekg( 0, std::fstream::beg );

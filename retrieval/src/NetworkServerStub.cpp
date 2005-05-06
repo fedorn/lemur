@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -31,8 +31,8 @@ indri::net::NetworkServerStub::NetworkServerStub( indri::server::QueryServer* se
 }
 
 void indri::net::NetworkServerStub::_decodeMetadataRequest( const class indri::xml::XMLNode* request,
-                                               std::string& attributeName,
-                                               std::vector<std::string>& attributeValues )
+                                                            std::string& attributeName,
+                                                            std::vector<std::string>& attributeValues )
 {
   attributeName = request->getChildValue( "attributeName" );
   const std::vector<indri::xml::XMLNode*>& attributeValueNodes = request->getChild( "attributeValues" )->getChildren();

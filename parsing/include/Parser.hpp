@@ -19,12 +19,13 @@ namespace lemur
   namespace api
   {
     ///
-    ///  Provides a generic parser interface.  Assumes
-    ///  that the parser uses an acronym list.  If, when developing
-    ///  your parser, you do not use an acronym list, you can
-    ///  just provide an empty implementation of the setAcroList
-    ///  function.
-    ///
+    ///  \brief Provides a generic parser interface.
+    /*! 
+      Assumes that the parser uses an acronym list.  If, when developing
+      your parser, you do not use an acronym list, you can
+      just provide an empty implementation of the setAcroList
+      function.
+    */
 
     class Parser : public TextHandler {
     public:

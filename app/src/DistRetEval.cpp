@@ -12,7 +12,7 @@
 
 /** author: tnt, lsi */
 
-/*!
+/*! \page DistRetEval Distributed Retrieval
     This is a sample application that does distributed retrieval, using a
     resource selection index and individual indexes. resource selection is done
     using the CORI_CS  (the only resource selection implemented thus far).
@@ -30,9 +30,9 @@
     cutoff = maximum number of databases to search (default to 10)
     "dbids" = "db's param file" - required for each database in the collection selection index.  key should be the db's string id as it was named/indexed in the collection selection index,  and value should be name of file that has parameters for that database: 
             index = the individual database
-	    retModel = the retrieval model to use
-	    mergeMethod = the merging method to use
-	    "modelvals" - whatever parameters are required for that retModel
+            retModel = the retrieval model to use
+            mergeMethod = the merging method to use
+            "modelvals" - whatever parameters are required for that retModel
     CSTF_factor  The TFfactor parameter in the CORI_CS resource
     selection method.
 
@@ -46,13 +46,13 @@
 
          For CORI merging Method: None
     
-	 For  Single and Multiple regression merging methods:
+         For  Single and Multiple regression merging methods:
     
-	 1. csDbDataBaseIndex the centralized sampling database index
+         1. csDbDataBaseIndex the centralized sampling database index
 
          2. DOCTF_factor  The TFfactor parameter in the INQUERY retrieval
-	 method for the centralized sampling database.
-	 
+         method for the centralized sampling database.
+         
          3. DOCTF_baseline The TFbaseline parameter in the INQUERY retrieval method for the centralized sampling database.
 
 
@@ -186,12 +186,12 @@ int AppMain(int argc, char *argv[]) {
 
     //to calculate the centralized scores; 
     if (DistMergeMethodParameter::mergeMethod==SINGLETYPEREGR_MERGE ||
-	DistMergeMethodParameter::mergeMethod==MULTITYPEREGR_MERGE){
+        DistMergeMethodParameter::mergeMethod==MULTITYPEREGR_MERGE){
       QueryRep *qrCs = modelCsDb->computeQueryRep(*q);
       resultsCsDb.clear();
       modelCsDb->scoreCollection(*qrCs, *rankingsCsDb);    
       for (i=0;i<rankingsCsDb->size();i++) {
-	resultsCsDb.PushValue(csdbindex->document((*rankingsCsDb)[i].ind), (*rankingsCsDb)[i].val);
+        resultsCsDb.PushValue(csdbindex->document((*rankingsCsDb)[i].ind), (*rankingsCsDb)[i].val);
       }
       rankingsCsDb->clear();
       delete qrCs;
@@ -209,14 +209,14 @@ int AppMain(int argc, char *argv[]) {
     // write out the rankings for all databases if there was a file specified
     if (writeranks.is_open()) {
       for (i=0;i<doccount;i++) {
-	writeranks << q->id() << " Q0 " << csindex->document(rankings[i].ind) << " 0 " << rankings[i].val << " Exp" << endl;
+        writeranks << q->id() << " Q0 " << csindex->document(rankings[i].ind) << " 0 " << rankings[i].val << " Exp" << endl;
       }
     }
 
     // we want to search only so many databases
    if(rankings.size()>LocalParameter::cutoff)
      rankings.assign(rankings.begin(), 
-		     rankings.begin()+LocalParameter::cutoff);
+                     rankings.begin()+LocalParameter::cutoff);
     // set return document counts for each individual databases
     search.setReturnCount(RetrievalParameter::resultCount);
     // search those databases and put the scores into scoreset
@@ -241,7 +241,7 @@ int AppMain(int argc, char *argv[]) {
 
     //    for (i=0;i<LocalParameter::cutoff;i++) 
     for (i=0;i<rankings.size();i++) 
-	delete (scoreset[i]);
+        delete (scoreset[i]);
 
     rankings.clear();
     results.clear();

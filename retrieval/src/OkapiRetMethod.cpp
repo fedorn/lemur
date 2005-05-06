@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #include "OkapiRetMethod.hpp"
@@ -26,9 +26,9 @@ lemur::retrieval::OkapiQueryRep::OkapiQueryRep(const lemur::api::TermQuery &qry,
 
 
 double lemur::retrieval::OkapiScoreFunc::matchedTermWeight(const lemur::api::QueryTerm *qTerm, 
-					 const lemur::api::TextQueryRep *qRep, 
-					 const lemur::api::DocInfo *info, 
-					 const lemur::api::DocumentRep *dRep) const
+                                                           const lemur::api::TextQueryRep *qRep, 
+                                                           const lemur::api::DocInfo *info, 
+                                                           const lemur::api::DocumentRep *dRep) const
 {
   const OkapiQueryTerm * qt;
   qt = dynamic_cast<const OkapiQueryTerm *> (qTerm);
@@ -37,10 +37,10 @@ double lemur::retrieval::OkapiScoreFunc::matchedTermWeight(const lemur::api::Que
   qr = dynamic_cast<const OkapiQueryRep *> (qRep);
 
   return (OkapiRetMethod::RSJWeight(qt->pEstCount(), qr->pNormCount(), 
-		    ind.docCount(qt->id()),
-		    ind.docCount()) * 
-	  dRep->termWeight(qt->id(),info) * 
-	  qt->weight()); 
+                                    ind.docCount(qt->id()),
+                                    ind.docCount()) * 
+          dRep->termWeight(qt->id(),info) * 
+          qt->weight()); 
 }
 
 
@@ -95,9 +95,9 @@ void lemur::retrieval::OkapiRetMethod::updateTextQuery(lemur::api::TextQueryRep 
   for (i=1; i<= totalTerm; i++) {
     if (relCounts[i] >0 ) {
       weightedTerms.PushValue(i, relCounts[i]*
-			      RSJWeight(relCounts[i],actualDocs, 
-					ind.docCount(i),
-					ind.docCount()));
+                              RSJWeight(relCounts[i],actualDocs, 
+                                        ind.docCount(i),
+                                        ind.docCount()));
     }
   }
 
@@ -121,14 +121,3 @@ void lemur::retrieval::OkapiRetMethod::updateTextQuery(lemur::api::TextQueryRep 
   }
   delete [] relCounts;
 }
-
-
-
-
-
-
-
-
-
-
-

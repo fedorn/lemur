@@ -32,7 +32,7 @@ struct dictRecord {
 #define KEY_CACHE_SIZE 1024 * 1024 * 4
 
 lemur::dictionary::PDict::PDict() : name(""), currentTerm(""), currentVec(NULL), 
-		 usingCounts(false) {
+                                    usingCounts(false) {
 }
 
 lemur::dictionary::PDict::~PDict() {
@@ -66,13 +66,13 @@ bool lemur::dictionary::PDict::open(const string &dictName) {
     int num;
     while (tocStream >> item >> num) {
       if (item == "source")
-	stats.sourceSize = num;
+        stats.sourceSize = num;
       else if (item == "target")
-	stats.targetSize = num;
+        stats.targetSize = num;
       else if (item == "entries")
-	stats.dictSize = num;
+        stats.dictSize = num;
       else if (item == "counts")
-	usingCounts = (num == 1);
+        usingCounts = (num == 1);
     }
     tocStream.close();
     // open the keyfiles and invlist file
@@ -121,7 +121,7 @@ bool lemur::dictionary::PDict::contains(const string &term, lemur::file::Keyfile
 
 
 lemur::dictionary::DictEntryVector *lemur::dictionary::PDict::getTranslations(const string &term, 
-					DictEntryFilter *filter) const {
+                                                                              DictEntryFilter *filter) const {
 
   dictRecord record;
   int bitsSize;
@@ -205,7 +205,7 @@ void lemur::dictionary::PDict::flush() {
 }
 
 void lemur::dictionary::PDict::add(const string &source, DictEntry &value, 
-		double (*compose)(double, double)) {
+                                   double (*compose)(double, double)) {
   // presume current term is cached in mem, flushed once at source change.
   // have to check if there is an existing list at source change,
   // read in and replace. Final flush on dtor.
@@ -237,7 +237,7 @@ void lemur::dictionary::PDict::add(const string &source, DictEntry &value,
     int count = 0;
     int bitsSize;
     bool found = targetIDs.get(value.target.c_str(), 
-			       &count, bitsSize, sizeof(int));
+                               &count, bitsSize, sizeof(int));
     if (!found) stats.targetSize++;
     count++;
     targetIDs.put(value.target.c_str(), &count, sizeof(int));
@@ -320,7 +320,7 @@ void lemur::dictionary::PDict::remove(const string &source) {
     int count, bitsSize;
     DictEntry value = *it;
     bool found = targetIDs.get(value.target.c_str(), 
-			       &count, bitsSize, sizeof(int));
+                               &count, bitsSize, sizeof(int));
     if (found) 
       count--; 
     else 
@@ -365,7 +365,7 @@ void lemur::dictionary::PDict::write(const string &outputName, const string &del
   // make sure we're starting at the beginning.
   dict.setFirst();
   while (dict.getNext(key, sizeof(key), &record, bitsSize, 
-		      sizeof(dictRecord))) {
+                      sizeof(dictRecord))) {
     source = key; 
     // expand getXlate here?
     //    DictEntryVector *v = getTranslations(source);
@@ -429,7 +429,7 @@ void lemur::dictionary::PDict::normalize() {
   // make sure we're starting at the beginning.
   dict.setFirst();  
   while (dict.getNext(key, sizeof(key),
-		      &record, bitsSize, sizeof(dictRecord))) {
+                      &record, bitsSize, sizeof(dictRecord))) {
     DictEntryVector *v;
     AllDictEntryFilter nullFilter;
     // allocate buffer
@@ -456,13 +456,13 @@ void lemur::dictionary::PDict::normalize() {
 
 
 lemur::dictionary::DictEntryVector *lemur::dictionary::PDict::nextTranslations(string &term, 
-					 DictEntryFilter *filter) const {
+                                                                               DictEntryFilter *filter) const {
 
   dictRecord record;
   int bitsSize;
   char key[MAX_TERM_LENGTH]; // maxkey_lc
   bool found = dict.getNext(key, sizeof(key), &record, bitsSize, 
-			    sizeof(dictRecord));
+                            sizeof(dictRecord));
   DictEntryVector *result = NULL;
   if (found) {
     term = key;

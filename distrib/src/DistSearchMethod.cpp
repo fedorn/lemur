@@ -7,14 +7,14 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "DistSearchMethod.hpp"
 using namespace lemur::api;
 
 void lemur::distrib::DistSearchMethod::scoreIndexSet(const Query &qry, 
-				     const IndexedRealVector &indexset, 
-				     DocScoreVector** results) {
+                                                     const IndexedRealVector &indexset, 
+                                                     DocScoreVector** results) {
 
   query = &qry;
   allres = results;
@@ -31,8 +31,8 @@ void lemur::distrib::DistSearchMethod::scoreIndexSet(const Query &qry,
 }
 
 void lemur::distrib::DistSearchMethod::scoreIndexSet(const Query &qry, 
-				     const vector<string> &indexset, 
-				     DocScoreVector** results) {
+                                                     const vector<string> &indexset, 
+                                                     DocScoreVector** results) {
 
   query = &qry;
   allres = results;
@@ -50,8 +50,8 @@ void lemur::distrib::DistSearchMethod::scoreIndexSet(const Query &qry,
 
 
 void lemur::distrib::DistSearchMethod::indexToID(const Index* ind, 
-				 const IndexedRealVector* ivec, 
-				 DocScoreVector* dvec) {
+                                                 const IndexedRealVector* ivec, 
+                                                 DocScoreVector* dvec) {
 
   IndexedRealVector::const_iterator i;
   for (i=ivec->begin();i!= ivec->end(); i++) {
@@ -87,6 +87,3 @@ void lemur::distrib::DistSearchMethod::doSingleRetr() {
   delete model;
   delete single;
 }
-
-
-

@@ -20,7 +20,7 @@ namespace lemur
 {
   namespace cluster
   {
-    
+    /// \brief Factory for creating SimilarityMethod objects.
     class SimFactory {
     public:
       static SimilarityMethod * makeSim(const lemur::api::Index &index,

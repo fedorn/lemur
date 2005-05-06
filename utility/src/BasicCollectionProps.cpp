@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "BasicCollectionProps.hpp"
 #include <sstream>
@@ -28,14 +28,14 @@ string lemur::parse::BasicCollectionProps::getStringProperty(const string& name)
       value = (char*)p->getValue();
       break;
     case (Property::INT):
-		v = *(int*)p->getValue();
-		s << v;
-		value = s.str();
+      v = *(int*)p->getValue();
+      s << v;
+      value = s.str();
       break;
-    case (Property::DOUBLE):	
-		d = *(double*)p->getValue();
-		s << d;
-		value = s.str();
+    case (Property::DOUBLE):    
+      d = *(double*)p->getValue();
+      s << d;
+      value = s.str();
       break;
     }
   }

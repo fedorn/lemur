@@ -8,7 +8,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -112,8 +112,8 @@ void indri::net::NetworkMessageStream::read( MessageStreamHandler& handler ) {
       int bytesRead = _stream->blockingRead( _buffer.front() + _writePosition, length - _bufferLength() );
 
       if( bytesRead <= 0 ) {
-         _stream->close();
-         return;
+        _stream->close();
+        return;
       }
 
       _buffer.write(bytesRead);

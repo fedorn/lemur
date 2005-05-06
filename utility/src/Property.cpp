@@ -6,7 +6,7 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 
 #include "Property.hpp"
 #include "common_headers.hpp"

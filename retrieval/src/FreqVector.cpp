@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "FreqVector.hpp"
 
@@ -43,6 +43,6 @@ void lemur::utility::HashFreqVector::nextFreq(lemur::api::TERMID_T &id, int &fre
   FreqCount c;
   id = (ISet<FreqCount>::operator[](i)).key;
   c.key = id;
-  freq = count(c)    ;
+  freq = count(c);
   i++;
 }

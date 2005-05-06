@@ -18,18 +18,26 @@ namespace lemur
 {
   namespace api
   {
-    
+    /// internal file id for mapping.
     typedef int   FILEID_T;
     // All four of TERMID_T, DOCID_T, LOC_T, and COUNT_T need to be
     // the same size for the Inv(FP) and Keyfile indexes to work
     // without rewrite. 10/05/2004 -- dmf
+    /// internal term id encoding.
     typedef int TERMID_T;
+    /// term position
     typedef TERMID_T LOC_T;
+    /// internal document id encoding.
     typedef TERMID_T DOCID_T;
+    /// integral frequencies
     typedef TERMID_T COUNT_T;
+    /// floating point frequencies and/or scores.
     typedef float SCORE_T;
+    /// external term encoding
     typedef std::string TERM_T;
+    /// external document id encoding
     typedef std::string EXDOCID_T;
+    /// pointer into collection of term positions
     typedef void* POS_T;  // Used by DocLists and TermLists
   }
 }

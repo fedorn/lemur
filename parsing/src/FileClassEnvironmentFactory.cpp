@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // FileClassEnvironmentFactory
@@ -219,16 +219,16 @@ indri::parse::FileClassEnvironment* build_file_class_environment( const file_cla
 indri::parse::FileClassEnvironment* build_file_class_environment( const indri::parse::FileClassEnvironmentFactory::Specification * spec ) {
   indri::parse::FileClassEnvironment* env = new indri::parse::FileClassEnvironment;
   env->iterator = indri::parse::DocumentIteratorFactory::get( spec->iterator,
-                                                spec->startDocTag.c_str(),
-                                                spec->endDocTag.c_str(),
-                                                spec->endMetadataTag.c_str() );
+                                                              spec->startDocTag.c_str(),
+                                                              spec->endDocTag.c_str(),
+                                                              spec->endMetadataTag.c_str() );
 
   env->parser = indri::parse::ParserFactory::get( spec->parser,
-                                    spec->include,
-                                    spec->exclude,
-                                    spec->index,
-                                    spec->metadata,
-                                    spec->conflations );
+                                                  spec->include,
+                                                  spec->exclude,
+                                                  spec->index,
+                                                  spec->metadata,
+                                                  spec->conflations );
 
   return env;
 }
@@ -254,7 +254,7 @@ indri::parse::FileClassEnvironmentFactory::Specification* indri::parse::FileClas
   }
 
   if( spec ) {
-      indri::parse::FileClassEnvironmentFactory::Specification* newSpec = new indri::parse::FileClassEnvironmentFactory::Specification;
+    indri::parse::FileClassEnvironmentFactory::Specification* newSpec = new indri::parse::FileClassEnvironmentFactory::Specification;
 
 
     std::vector<std::string> includeTags;
@@ -311,17 +311,17 @@ indri::parse::FileClassEnvironment* indri::parse::FileClassEnvironmentFactory::g
 }
 
 void indri::parse::FileClassEnvironmentFactory::addFileClass( const std::string& name, 
-                                                const std::string& iterator,
-                                                const std::string& parser,
-                                                const std::string& startDocTag,
-                                                const std::string& endDocTag,
-                                                const std::string& endMetadataTag,
-                                                const std::vector<std::string>& include,
-                                                const std::vector<std::string>& exclude,
-                                                const std::vector<std::string>&
- index,
-                                                const std::vector<std::string>& metadata, 
-                                                const std::map<std::string,std::string>& conflations )
+                                                              const std::string& iterator,
+                                                              const std::string& parser,
+                                                              const std::string& startDocTag,
+                                                              const std::string& endDocTag,
+                                                              const std::string& endMetadataTag,
+                                                              const std::vector<std::string>& include,
+                                                              const std::vector<std::string>& exclude,
+                                                              const std::vector<std::string>&
+                                                              index,
+                                                              const std::vector<std::string>& metadata, 
+                                                              const std::map<std::string,std::string>& conflations )
 {
   indri::parse::FileClassEnvironmentFactory::Specification* spec = new indri::parse::FileClassEnvironmentFactory::Specification;
 

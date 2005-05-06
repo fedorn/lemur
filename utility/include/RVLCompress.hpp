@@ -29,7 +29,7 @@ namespace lemur
 #define RVL_COMPRESS_TERMINATE_BIT             (1<<7)
 #define RVL_COMPRESS_BYTE( d, in, b )          d[b] = (char) ((in >> 7*b) & ((1<<7)-1))
 #define RVL_COMPRESS_TERMINATE( d, in, b )     d[b] = (char) ((in >> 7*b) | (1<<7))
-
+    /// Provide RVL compression of arbitrary data.
     class RVLCompress {
     public:
       ///return number of bytes in result
@@ -38,7 +38,7 @@ namespace lemur
       /// returns number of ints decompressed
       static int decompress_ints(unsigned char *data_ptr, int *out_ptr, int num_bytes);
 
-      /// size of <data> when compressed with RVLCompress
+      /// size of data when compressed with RVLCompress
       static int compressedSize( INT64 data );
       static int signedCompressedSize( INT64 data );
 

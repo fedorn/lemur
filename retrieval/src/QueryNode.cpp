@@ -7,11 +7,11 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 /*
   Author: fff, dmf
   03/2003 -- pull larger fns out of StructQueryRep header file
- */
+*/
 
 #include "StructQueryRep.hpp"
 
@@ -43,9 +43,9 @@ void lemur::retrieval::QueryNode::transformPassageOps() {
       /// distribute element weight across kiddies
       kidList->startIteration();
       while (kidList->hasMore()) {
-	kid = kidList->popNode();
-	kid->setWeight(childWeight * kid->weight());
-	newList->push_back(kid);
+        kid = kidList->popNode();
+        kid->setWeight(childWeight * kid->weight());
+        newList->push_back(kid);
       }
       delete(kidList);
       child->ch = NULL;
@@ -57,38 +57,38 @@ void lemur::retrieval::QueryNode::transformPassageOps() {
   entries = newList->size();
 }
 
-  /// weighted sum of prox children
-  /// all belief operators have already been removed/flattened.
- double lemur::retrieval::PassageQNode::passageScore(const StructQryDocRep *dRep) const{
-    const QueryNode *child;
-    DOCID_T did = dRep->did;
-    double score = 0;
-    int tf;
-    double totalWeight = 0, weight, idf;
+/// weighted sum of prox children
+/// all belief operators have already been removed/flattened.
+double lemur::retrieval::PassageQNode::passageScore(const StructQryDocRep *dRep) const{
+  const QueryNode *child;
+  DOCID_T did = dRep->did;
+  double score = 0;
+  int tf;
+  double totalWeight = 0, weight, idf;
     
-    ch->startIteration();
-    while(ch->hasMore()) {
-      // all children are prox children.
-      child = ch->nextNode();
-      idf = dRep->computeIdfScore(child->dCnt);
-      weight = child->weight(); 
-      totalWeight += weight;
-      tf = 0;
-      if (child->nextProxItem(did)) {
-	// compute proximity score for a passage
-	int numPos = child->proxList->count();
-	for(int k = 0; k < numPos; k++) {
-	  LOC_T pos = child->proxList->position(k);
-	  if (pos >= dRep->start && pos < dRep->end)
-	    tf++;
-	}
+  ch->startIteration();
+  while(ch->hasMore()) {
+    // all children are prox children.
+    child = ch->nextNode();
+    idf = dRep->computeIdfScore(child->dCnt);
+    weight = child->weight(); 
+    totalWeight += weight;
+    tf = 0;
+    if (child->nextProxItem(did)) {
+      // compute proximity score for a passage
+      int numPos = child->proxList->count();
+      for(int k = 0; k < numPos; k++) {
+        LOC_T pos = child->proxList->position(k);
+        if (pos >= dRep->start && pos < dRep->end)
+          tf++;
       }
-      score += weight * dRep->beliefScore(tf, idf);
     }
-    if (totalWeight > 0) // normalized by the sum of the weights
-      score /= totalWeight;
-    return score;
+    score += weight * dRep->beliefScore(tf, idf);
   }
+  if (totalWeight > 0) // normalized by the sum of the weights
+    score /= totalWeight;
+  return score;
+}
 
 // every query node create a docId-list for its parent, and will
 // be deleted by its parent after the parent creates its own, so
@@ -96,7 +96,7 @@ void lemur::retrieval::QueryNode::transformPassageOps() {
 // net done completely.
 
 void lemur::retrieval::TermQnode::copyDocList(int listlen, int tf,
-			    const DocInfoList *dl, int numDocs) {
+                                              const DocInfoList *dl, int numDocs) {
   COUNT_T dc = numDocs + 1;
   COUNT_T nd = dc;
   int cnt = 0;
@@ -153,26 +153,26 @@ void lemur::retrieval::QueryNode::unionDocList(int numDocs) {
     child->startProxIteration();
     if (child->hasMoreProx()) {
       while (child->hasMoreProx()) {
-	child->nextProxItem();
-	i = child->proxList->id();
-	if(!didList[i]) {
-	  didList[i] = true;
-	  cnt++;
-	  if(i < nd)
-	    nd = i;
-	}
+        child->nextProxItem();
+        i = child->proxList->id();
+        if(!didList[i]) {
+          didList[i] = true;
+          cnt++;
+          if(i < nd)
+            nd = i;
+        }
       }
       child->startProxIteration(); // reset for eval
       if (child->hasMoreProx()) 
-	child->nextProxItem(); // set pointer onto first entry
+        child->nextProxItem(); // set pointer onto first entry
     } else {
       for(i = 1; i < dc; i++) {
-	if(!didList[i] && child->dList[i]) {
-	  didList[i] = child->dList[i];
-	  cnt++;
-	  if(i < nd) // find a min doc-id for nextDoc
-	    nd = i;
-	}
+        if(!didList[i] && child->dList[i]) {
+          didList[i] = child->dList[i];
+          cnt++;
+          if(i < nd) // find a min doc-id for nextDoc
+            nd = i;
+        }
       }
     }
     delete[](child->dList);
@@ -203,30 +203,30 @@ void lemur::retrieval::QueryNode::intersectDocList(int numDocs) {
     /// pairwise intersect (or clever).
     if (child->hasMoreProx()) {
       while (child->hasMoreProx()) {
-	child->nextProxItem();
-	i = child->proxList->id();
-	counts[i]++;
-	if(counts[i] == all) {
-	  didList[i] = true;
-	  cnt++;
-	  if(i < nd)
-	    nd=i;	  
-	}
+        child->nextProxItem();
+        i = child->proxList->id();
+        counts[i]++;
+        if(counts[i] == all) {
+          didList[i] = true;
+          cnt++;
+          if(i < nd)
+            nd=i;         
+        }
       }
       child->startProxIteration(); // reset for eval
       if (child->hasMoreProx()) 
-	child->nextProxItem(); // set pointer onto first entry
+        child->nextProxItem(); // set pointer onto first entry
     } else {
       for(i = 1; i < dc; i++)
-	if(child->dList[i]) {
-	  counts[i]++;
-	  if(counts[i] == all) {
-	    didList[i] = true;
-	    cnt++;
-	    if(i < nd)
-	      nd = i;
-	  }
-	}
+        if(child->dList[i]) {
+          counts[i]++;
+          if(counts[i] == all) {
+            didList[i] = true;
+            cnt++;
+            if(i < nd)
+              nd = i;
+          }
+        }
     }
   }
   dList = didList;
@@ -267,33 +267,33 @@ void lemur::retrieval::SynQNode::synonymProxList() {
       j++;
       df = 0;
       for (int k = 0; k < numChildren; k++) {
-	child = ch->getNode(k);
-	posIDX[k] = 0;
-	if (child->nextProxItem(i)){
-	  tmpDF[k] = child->proxList->count();
-	  df += tmpDF[k];
-	  tmpPos[k] = child->proxList->positions();
-	} else {
-	  tmpDF[k] = 0;
-	  tmpPos[k] = NULL;
-	}
+        child = ch->getNode(k);
+        posIDX[k] = 0;
+        if (child->nextProxItem(i)){
+          tmpDF[k] = child->proxList->count();
+          df += tmpDF[k];
+          tmpPos[k] = child->proxList->positions();
+        } else {
+          tmpDF[k] = 0;
+          tmpPos[k] = NULL;
+        }
       }
       newProx[newProxIDX++] = i; // docid
       newProx[newProxIDX++] = df; // df (total number of positions)
       /// merge arrays into posList
       for (nextPos = 0; nextPos < df; nextPos++) {
-	minIDX = 0;
-	minVal = INT_MAX;
-	// choose next minimum position entry.
-	for(int k = 0; k < numChildren; k++) {
-	  if (posIDX[k] < tmpDF[k])
-	    if (tmpPos[k][posIDX[k]] < minVal) {
-	      minVal = tmpPos[k][posIDX[k]];
-	      minIDX = k;
-	    }
-	}
-	newProx[newProxIDX++] = tmpPos[minIDX][posIDX[minIDX]]; // next pos
-	posIDX[minIDX]++; // advance the indicator
+        minIDX = 0;
+        minVal = INT_MAX;
+        // choose next minimum position entry.
+        for(int k = 0; k < numChildren; k++) {
+          if (posIDX[k] < tmpDF[k])
+            if (tmpPos[k][posIDX[k]] < minVal) {
+              minVal = tmpPos[k][posIDX[k]];
+              minIDX = k;
+            }
+        }
+        newProx[newProxIDX++] = tmpPos[minIDX][posIDX[minIDX]]; // next pos
+        posIDX[minIDX]++; // advance the indicator
       }
     }
   }
@@ -311,7 +311,7 @@ void lemur::retrieval::SynQNode::synonymProxList() {
 
 
 bool lemur::retrieval::OdnQNode::foundOrderedProx(int currPos, int wsize, 
-				      const QnList *cl,  int ith) {
+                                                  const QnList *cl,  int ith) {
   // recursively find the matched window in children order
   if(ith < cl->size()) {
     const QueryNode *nextChild = cl->getNode(ith);
@@ -321,11 +321,11 @@ bool lemur::retrieval::OdnQNode::foundOrderedProx(int currPos, int wsize,
     childPos = nextChild->proxList->position(nextChild->proxList->nextPos);
     if (childPos < currPos) {
       while (nextChild->proxList->nextPos < nextChild->proxList->count() &&
-	     ((childPos = nextChild->proxList->position(nextChild->proxList->nextPos)) < currPos)) {
-	nextChild->proxList->nextPos++;
+             ((childPos = nextChild->proxList->position(nextChild->proxList->nextPos)) < currPos)) {
+        nextChild->proxList->nextPos++;
       }
       if(nextChild->proxList->nextPos >= nextChild->proxList->count())
-	return false; // no more positions for this child
+        return false; // no more positions for this child
     }
     if((childPos - currPos - 1) < wsize)
       // matching the next child
@@ -365,10 +365,10 @@ void lemur::retrieval::OdnQNode::orderedProxList(int numDocs) {
       /// ensure everyone is on the same doc id
       ch->startIteration();
       while (ch->hasMore()) {
-	child = ch->nextNode();
-	child->nextProxItem(i);
-	// initialize the prox with the first occurring position 
-	child->proxList->nextPos = 0;
+        child = ch->nextNode();
+        child->nextProxItem(i);
+        // initialize the prox with the first occurring position 
+        child->proxList->nextPos = 0;
       }
       cnt = 0;
       // compute the prox info for current doc
@@ -377,34 +377,34 @@ void lemur::retrieval::OdnQNode::orderedProxList(int numDocs) {
       int numPos = child->proxList->count();
       const LOC_T *positions = child->proxList->positions();
       for(int k = 0; k < numPos; k++) {
-	// find the matched window from the rest of children
-	if(foundOrderedProx(positions[k], winSize, ch, 1)) {
-	  if (cnt == 0) { // first one.
-	    delete[](tmpPos);
-	    /// maximum number of matches.
-	    tmpPos = new LOC_T[numPos];
-	  }
-	  tmpPos[cnt++]= positions[k];
-	  // Advance each child to the next occurring position
-	  // consume the used position entries
-	  ch->startIteration();
-	  while (ch->hasMore()) {
-	    child = ch->nextNode();
-	    child->proxList->nextPos++;
-	  }
-	}
+        // find the matched window from the rest of children
+        if(foundOrderedProx(positions[k], winSize, ch, 1)) {
+          if (cnt == 0) { // first one.
+            delete[](tmpPos);
+            /// maximum number of matches.
+            tmpPos = new LOC_T[numPos];
+          }
+          tmpPos[cnt++]= positions[k];
+          // Advance each child to the next occurring position
+          // consume the used position entries
+          ch->startIteration();
+          while (ch->hasMore()) {
+            child = ch->nextNode();
+            child->proxList->nextPos++;
+          }
+        }
       }
       if(cnt > 0) {
-	newProx[newProxIDX++] = i; // docid
-	newProx[newProxIDX++] = cnt; // (total number of matched positions)
-	memcpy((void *)(newProx + newProxIDX), (void *) tmpPos, 
-	       cnt * sizeof(LOC_T));
-	totalTF += cnt;
-	newProxIDX += cnt;
-	df++;
-	if(i < nd) nd = i;
+        newProx[newProxIDX++] = i; // docid
+        newProx[newProxIDX++] = cnt; // (total number of matched positions)
+        memcpy((void *)(newProx + newProxIDX), (void *) tmpPos, 
+               cnt * sizeof(LOC_T));
+        totalTF += cnt;
+        newProxIDX += cnt;
+        df++;
+        if(i < nd) nd = i;
       } else {
-	dList[i]=false;
+        dList[i]=false;
       }
     }
   }
@@ -426,7 +426,7 @@ void lemur::retrieval::OdnQNode::orderedProxList(int numDocs) {
 }
 
 bool lemur::retrieval::UwnQNode::findUnorderedWin(const QueryNode *cqn, QnList *cl, 
-				      int winSize) {
+                                                  int winSize) {
   bool found = true;
   cl->startIteration();
   while (found && cl->hasMore()) {
@@ -468,10 +468,10 @@ void lemur::retrieval::UwnQNode::unorderedProxList(int numDocs) {
       /// ensure everyone is on the same doc id
       ch->startIteration();
       while (ch->hasMore()) {
-	child = ch->nextNode();
-	child->nextProxItem(i);
-	// initialize the prox with the first occurring position 
-	child->proxList->nextPos = 0;
+        child = ch->nextNode();
+        child->nextProxItem(i);
+        // initialize the prox with the first occurring position 
+        child->proxList->nextPos = 0;
       }
       // compute the prox info for current doc
       cnt = 0;
@@ -479,56 +479,56 @@ void lemur::retrieval::UwnQNode::unorderedProxList(int numDocs) {
       int startPos = INT_MAX;
       QueryNode *startChild = NULL;
       while (startPos > 0) {
-	// find the minimun occurring position
-	ch->startIteration();
-	while (ch->hasMore()) {
-	  child = ch->nextNode();
-	  LOC_T pos = child->proxList->position(child->proxList->nextPos);
-	  if(pos < startPos) {
-	    startPos = pos;
-	    startChild = child;
-	  }
-	}
-	// find the matched window from the rest of children
-	if(findUnorderedWin(startChild, ch, startPos + winSize)) {
-	  if (cnt == 0) { // first one.
-	    delete[](tmpPos);
-	    /// maximum number of matches.
-	    tmpPos = new LOC_T[startChild->proxList->count()];
-	  }
-	  tmpPos[cnt++]= startPos;
-	  // consume the used position entries
-	  ch->startIteration();
-	  // move the startPos to the next occurring position
-	  startPos = INT_MAX;
-	  while (ch->hasMore()) {
-	    child = ch->nextNode();
-	    child->proxList->nextPos++;
-	    if(child->proxList->nextPos >= child->proxList->count())
-	      startPos = 0; // no more of this child. break loop.
-	  }
-	} else {
-	  // move the startPos to the next occurring position
-	  // for the failed node
-	  startChild->proxList->nextPos++;
-	  if(startChild->proxList->nextPos < startChild->proxList->count())
-	    startPos = INT_MAX;
-	  else
-	    startPos = 0;  // no more of this child. break loop.
-	}
+        // find the minimun occurring position
+        ch->startIteration();
+        while (ch->hasMore()) {
+          child = ch->nextNode();
+          LOC_T pos = child->proxList->position(child->proxList->nextPos);
+          if(pos < startPos) {
+            startPos = pos;
+            startChild = child;
+          }
+        }
+        // find the matched window from the rest of children
+        if(findUnorderedWin(startChild, ch, startPos + winSize)) {
+          if (cnt == 0) { // first one.
+            delete[](tmpPos);
+            /// maximum number of matches.
+            tmpPos = new LOC_T[startChild->proxList->count()];
+          }
+          tmpPos[cnt++]= startPos;
+          // consume the used position entries
+          ch->startIteration();
+          // move the startPos to the next occurring position
+          startPos = INT_MAX;
+          while (ch->hasMore()) {
+            child = ch->nextNode();
+            child->proxList->nextPos++;
+            if(child->proxList->nextPos >= child->proxList->count())
+              startPos = 0; // no more of this child. break loop.
+          }
+        } else {
+          // move the startPos to the next occurring position
+          // for the failed node
+          startChild->proxList->nextPos++;
+          if(startChild->proxList->nextPos < startChild->proxList->count())
+            startPos = INT_MAX;
+          else
+            startPos = 0;  // no more of this child. break loop.
+        }
       }
       
       if(cnt > 0) {
-	newProx[newProxIDX++] = i; // docid
-	newProx[newProxIDX++] = cnt; // (total number of matched positions)
-	memcpy((void *)(newProx + newProxIDX), (void *) tmpPos, 
-	       cnt * sizeof(LOC_T));
-	totalTF += cnt;
-	newProxIDX += cnt;
-	df++;
-	if(i < nd) nd = i;
+        newProx[newProxIDX++] = i; // docid
+        newProx[newProxIDX++] = cnt; // (total number of matched positions)
+        memcpy((void *)(newProx + newProxIDX), (void *) tmpPos, 
+               cnt * sizeof(LOC_T));
+        totalTF += cnt;
+        newProxIDX += cnt;
+        df++;
+        if(i < nd) nd = i;
       } else {
-	dList[i] = false;
+        dList[i] = false;
       }
     }
   }

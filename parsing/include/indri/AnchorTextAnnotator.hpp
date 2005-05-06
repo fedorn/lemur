@@ -33,7 +33,7 @@
 /*! Top level namespace for all indri components. */
 namespace indri
 {
-  /*! File input, parsing, stemming, and stopping classes. */
+  /*! \brief File input, parsing, stemming, and stopping classes. */
   namespace parse
   {
     /*! Reads anchor text in from files created by the 

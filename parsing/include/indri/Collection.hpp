@@ -23,7 +23,6 @@
 #include "indri/ParsedDocument.hpp"
 namespace indri
 {
-  /*! Collection element classes */
   namespace collection
   {
     

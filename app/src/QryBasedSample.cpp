@@ -210,7 +210,7 @@ int AppMain (int argc, char * argv []) {
 
       // Output which database we're about to sample.
       cout << "Database: " << dbn << endl;
-	
+        
       // Tell the prober the new output prefix.
       dbp.setOutputPrefix(opre);      
 
@@ -224,8 +224,8 @@ int AppMain (int argc, char * argv []) {
       // Select a query term and sample the datbase.
       char * iq = initQueryModel.randomWord();
       while (dbp.probe(iq) == false) {
-	free (iq);
-	iq = initQueryModel.randomWord();
+        free (iq);
+        iq = initQueryModel.randomWord();
       }
    
       free (iq);

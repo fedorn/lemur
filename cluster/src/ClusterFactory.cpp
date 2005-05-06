@@ -7,28 +7,28 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 // David Fisher
 // init: 02/05/2003
 #include "ClusterFactory.hpp"
 
 lemur::cluster::ClusterFactory::ClusterFactory(const lemur::api::Index &ind, 
-			       const SimilarityMethod &simMethod,
-			       enum ClusterParam::clusterTypes clusterType,
-			       enum ClusterParam::docModes docMode) :
+                                               const SimilarityMethod &simMethod,
+                                               enum ClusterParam::clusterTypes clusterType,
+                                               enum ClusterParam::docModes docMode) :
   index(ind), sim(simMethod), cType(clusterType), dMode(docMode) {
 }
 
 lemur::cluster::Cluster *lemur::cluster::ClusterFactory::allocateCluster(int clusterID) {
-    switch (cType) {
-    case ClusterParam::CENTROID:
-        return new CentroidCluster(clusterID, index, sim);
-    case ClusterParam::AGGLOM:
-        return new AgglomCluster(clusterID, index, sim, dMode);
-    default:
-        cerr << "Unknown cluster type " << cType << endl;
-        return NULL;
-    }
+  switch (cType) {
+  case ClusterParam::CENTROID:
+    return new CentroidCluster(clusterID, index, sim);
+  case ClusterParam::AGGLOM:
+    return new AgglomCluster(clusterID, index, sim, dMode);
+  default:
+    cerr << "Unknown cluster type " << cType << endl;
+    return NULL;
+  }
 }
 

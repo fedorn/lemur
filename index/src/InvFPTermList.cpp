@@ -6,7 +6,7 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 /*
  * dmf 10/18/2002 -- Add binReadC, binWriteC, deletaEncode, deltaDecode
  * to enable compression of termInfoLists. Added constructor taking a
@@ -152,7 +152,7 @@ void lemur::index::InvFPTermList::binWriteC( lemur::file::File& of ) {
   // it's ok to make comp the same size.  the compressed will be smaller
   unsigned char* comp = new unsigned char[listlen * sizeof(LocatedTerm)];
   lemur::api::COUNT_T compbyte = lemur::utility::RVLCompress::compress_ints((int *)list, comp, 
-					    listlen * 2);
+                                                                            listlen * 2);
   of.write((const char*) &compbyte, sizeof(lemur::api::COUNT_T));
   // write out the compressed bits
   of.write((const char*) comp, compbyte);
@@ -205,7 +205,7 @@ void lemur::index::InvFPTermList::binWriteC(ofstream& of){
   // it's ok to make comp the same size.  the compressed will be smaller
   unsigned char* comp = new unsigned char[listlen * sizeof(LocatedTerm)];
   lemur::api::COUNT_T compbyte = lemur::utility::RVLCompress::compress_ints((int *)list, comp, 
-					    listlen * 2);
+                                                                            listlen * 2);
   of.write((const char*) &compbyte, sizeof(lemur::api::COUNT_T));
   // write out the compressed bits
   of.write((const char*) comp, compbyte);

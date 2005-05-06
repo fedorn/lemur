@@ -27,7 +27,7 @@
 #include "indri/Extent.hpp"
 namespace indri
 {
-  /*! Inference net and inference net node classes. */
+  /*! \brief Inference net and inference net node classes. */
   namespace infnet 
   {
     

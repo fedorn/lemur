@@ -29,35 +29,36 @@ namespace lemur
   namespace api
   {
     
-    ///  This class serves as an interface for classes working with the parsers.
-    ///  The setTextHandler function allows chaining of TextHandlers, so that 
-    ///  information is passed from one TextHandler to the next.  This is useful
-    ///  for chaining things like stopword lists and stemmers.
-    ///
-    ///  A source in the chain of TextHandlers does not need to do anything
-    ///  in the foundDoc and foundWord functions.  An example of a source is 
-    ///  a parser.  A destination in the chain of TextHandlers does not need
-    ///  to forward calls or store a when the setTextHandler function is
-    ///  called.  An example of a destination would be a class that pushes
-    ///  the words and documents into an InvFPPushIndex (InvFPTextHandler)
-    ///  or writes to file (WriterTextHandler).  Classes in the middle of a 
-    ///  chain, like Stopper or Stemmer, need to provide full functionality
-    ///  for all functions.  When their foundDoc or foundWord is called, they
-    ///  will possibly manipulate the data, then forward the info via
-    ///  calling the foundDoc/foundWord function of their TextHandler.
-    ///  The original should be preserved and passed on as is. 
-    ///  Properties can be associated with token using the PropertyList.
+    ///  \brief This class serves as an interface for classes working with the parsers.
+    /*! 
+      The setTextHandler function allows chaining of TextHandlers, so that 
+      information is passed from one TextHandler to the next.  This is useful
+      for chaining things like stopword lists and stemmers.
+
+      A source in the chain of TextHandlers does not need to do anything
+      in the foundDoc and foundWord functions.  An example of a source is 
+      a parser.  A destination in the chain of TextHandlers does not need
+      to forward calls or store a when the setTextHandler function is
+      called.  An example of a destination would be a class that pushes
+      the words and documents into an InvFPPushIndex (InvFPTextHandler)
+      or writes to file (WriterTextHandler).  Classes in the middle of a 
+      chain, like Stopper or Stemmer, need to provide full functionality
+      for all functions.  When their foundDoc or foundWord is called, they
+      will possibly manipulate the data, then forward the info via
+      calling the foundDoc/foundWord function of their TextHandler.
+      The original should be preserved and passed on as is. 
+      Properties can be associated with token using the PropertyList.
 
 
-    ///  TextHandlers have their own internal buffer for modification of
-    ///  the string.  The foundWord function copies the word into the buffer
-    ///  then calls handleWord with the copy.  The handleWord function may
-    ///  then modify the string and return the pointer to the string. 
-    ///  This process is also done for foundDoc/handleDoc.
+      TextHandlers have their own internal buffer for modification of
+      the string.  The foundWord function copies the word into the buffer
+      then calls handleWord with the copy.  The handleWord function may
+      then modify the string and return the pointer to the string. 
+      This process is also done for foundDoc/handleDoc.
 
     //  Might make more sense as TextSource and TextDestination with
     //  functions in the middle of the chain inheriting from both.
-
+    */
 
     class TextHandler {
 

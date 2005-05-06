@@ -13,8 +13,9 @@
  */
 
 /*! \page Xling Cross Lingual Retrieval Evaluation
-<p>
-This application (XlingRetEval.cpp) runs cross-lingual retrieval experiments.
+
+<p> This application runs cross-lingual retrieval
+experiments.
 
 Parameters are:
 
@@ -30,13 +31,20 @@ language collection. This is the collection that is searched.
 <li> <tt>XLlambda</tt>: The smoothing parameter for mixing P(t|D) and P(s|GS).
 <li> <tt>XLbeta</tt>: The Jelinik-Mercer lambda for estimating P(t|D).
 
-<li> <tt>sourceBackgroundModel</tt>: One of "term" or "doc". If term, background model for the source language is estimated as tf(s)/|V|. If doc, the background model for the source language is estimated as df(t)/sum_w_in_V df(w). Default is term.
-<li> <tt>targetBackgroundModel</tt>: One of "term" or "doc". If term, background model for the target language is estimated as tf(s)/|V|. If doc, the background model for the target language is estimated as df(t)/sum_w_in_V df(w). Default is term.
+<li> <tt>sourceBackgroundModel</tt>: One of "term" or "doc". If term,
+background model for the source language is estimated as tf(s)/|V|. If
+doc, the background model for the source language is estimated as
+df(t)/sum_w_in_V df(w). Default is term.
+
+<li> <tt>targetBackgroundModel</tt>: One of "term" or "doc". If term,
+background model for the target language is estimated as tf(s)/|V|. If
+doc, the background model for the target language is estimated as
+df(t)/sum_w_in_V df(w). Default is term.
 
 <li> <tt>resultFile</tt>: the result file
 <li> <tt>resultFormat</tt>: whether the result format should be of the 
 TREC format (i.e., six-column) or just a simple three-column format 
-<tt>&lt;queryID, docID, score&gt;<tt>. String value, either <tt>trec</tt>
+<tt>&lt;queryID, docID, score&gt;</tt>. String value, either <tt>trec</tt>
 for TREC format or <tt>3col</tt> for three column format. Default: TREC 
 format.
 <li> <tt>resultCount</tt>: the number of documents to return for each query 
@@ -83,7 +91,7 @@ absolute discounting method. Default 0.7.
 <li><tt>relevancemodel1</tt> or <tt>rm1</tt> for relevance model 1.
 <li><tt>relevancemodel2</tt> or <tt>rm2</tt> for relevance model 2.
 </ul>
-
+</ol>
 <ol>
 <li> <tt>feedbackCoefficient</tt>: the coefficient of the feedback model
 for interpolation. The value is in [0,1], with 0 meaning using only the
@@ -105,7 +113,7 @@ Parameters <tt>feedbackTermCount</tt>, <tt>feedbackProbThresh</tt>, and
 <tt>feedbackProbSumThresh</tt> work conjunctively to control the
 truncation, i.e., the truncated model must satisfy all the three
 constraints.  
-</ol>
+
  */
 
 #include "common_headers.hpp"
@@ -186,14 +194,11 @@ int AppMain(int argc, char *argv[]) {
   TextQuery *q;
   IndexedRealVector::iterator j;
   string retModel("kl"); // force kl
-  // trust user to provide appropriate parameters?
-  // dbg
-  //  ofstream os("ExpQuery");
 
   if (RetrievalParameter::fbDocCount > 0) {
     klModel = (lemur::retrieval::SimpleKLRetMethod *) RetMethodManager::createModel(tInd, 
-								  &klAcc, 
-								  retModel);
+                                                                  &klAcc, 
+                                                                  retModel);
   } else {
     klModel = NULL;
   }
@@ -209,20 +214,20 @@ int AppMain(int argc, char *argv[]) {
     if (RetrievalParameter::fbDocCount > 0) {
       // prune to number of feedback docs.
       if (results.size() > RetrievalParameter::fbDocCount)
-	results.erase(results.begin() + RetrievalParameter::fbDocCount,
-		      results.end());
+        results.erase(results.begin() + RetrievalParameter::fbDocCount,
+                      results.end());
       int n = dynamic_cast<lemur::retrieval::XLingQueryModel *>(qr)->getNumTerms();
       double scale = 1.0/n;
       // weigh by 1/n to match lm
       for (j = results.begin(); j != results.end(); j++)
-	(*j).val *= scale;
+        (*j).val *= scale;
       
       results.LogToPosterior();
       results.Sort();
       // RM1 or RM2  expansion and then monolingual kl
       PseudoFBDocs *topDoc = new PseudoFBDocs(results, 
-					      RetrievalParameter::fbDocCount, 
-					      ignoreWeights);
+                                              RetrievalParameter::fbDocCount, 
+                                              ignoreWeights);
       // get the translations
       QueryRep * klRep = model->computeTargetKLRep(qr); 
       klModel->updateQuery(*klRep, *topDoc);
@@ -238,8 +243,6 @@ int AppMain(int argc, char *argv[]) {
     delete(qr);
     delete(q);
   }
-  //dbg
-  //  os.close();
   dict.close();
   result.close();
   delete(qryStream);

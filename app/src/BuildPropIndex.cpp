@@ -9,11 +9,9 @@
  *==========================================================================
 */
 
-/// An InvFP Indexer
-/*! \page BuildPropIndex InvFP Indexer
+/*! \page BuildPropIndex
 <P>
- This application builds an InvFP index for a collection of documents with
-properties associated with terms.
+ This application builds an InvFPIndex or KeyfileIncIndex for a collection of documents with properties associated with terms.
 <P>
 To use it, follow the general steps of running a lemur application.
 <p>
@@ -147,7 +145,7 @@ int AppMain(int argc, char * argv[]) {
   TextHandler* th;
   lemur::parse::BrillPOSTokenizer* tok = NULL;
   parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
-					    LocalParameter::acronyms);
+                                            LocalParameter::acronyms);
 
   if (!parser) {
     parser = new lemur::parse::BrillPOSParser();
@@ -178,9 +176,9 @@ int AppMain(int argc, char * argv[]) {
   // architecture.  See the TextHandler and InvFPTextHandler classes
   // for more info.)
   lemur::parse::PropIndexTH indexer(LocalParameter::index, 
-		      LocalParameter::memory, 
-		      LocalParameter::countStopWords, 
-		      LocalParameter::indexType);
+                      LocalParameter::memory, 
+                      LocalParameter::countStopWords, 
+                      LocalParameter::indexType);
 
   // chain the parser/stopper/stemmer/indexer
   if (stopper) {
@@ -206,8 +204,8 @@ int AppMain(int argc, char * argv[]) {
     } else {
       string filename;
       while (getline(source, filename)) {
-	cerr << "Parsing " << filename <<endl;
-	parser->parse(filename);
+        cerr << "Parsing " << filename <<endl;
+        parser->parse(filename);
       }
     }
   } else {

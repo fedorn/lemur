@@ -25,10 +25,13 @@ namespace lemur
   namespace retrieval
   {
     
-    /// Structured query representation. Converts the textual representation of
-    /// the structured query into a tree structure of QueryNodes. Constructs the
-    /// proximity lists and DocInfoLists for the individual nodes, pruning
-    /// the set of documents that will actually need to be scored.
+    /// \brief Structured query representation. 
+
+    /*! Converts the textual representation of
+      the structured query into a tree structure of QueryNodes. Constructs the
+      proximity lists and DocInfoLists for the individual nodes, pruning
+      the set of documents that will actually need to be scored.
+    */
     class StructQueryRep : public lemur::api::QueryRep {
     public:
       /// Parse the text representation into a structured query rep  

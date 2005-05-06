@@ -165,7 +165,7 @@ namespace lemur
       // we make them mutable, but they don't actually get changed. this seems to be necessary for map::find method
       mutable map<lemur::api::TERM_T, lemur::api::TERMID_T, less<lemur::api::TERM_T> > termtable; // table of terms to termid
       mutable map<lemur::api::EXDOCID_T, lemur::api::DOCID_T, less<lemur::api::EXDOCID_T> > doctable; // table of exdocids to docid
-      ostream* msgstream; // Lemur code messages stream		
+      ostream* msgstream; // Lemur code messages stream         
       // hold collectionprops saved into TOC file during indexing
       lemur::parse::BasicCollectionProps colprops;
     };

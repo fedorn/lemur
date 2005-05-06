@@ -8,23 +8,18 @@
  *
  *==========================================================================
 */
+// Leave-one-out estimation of Dirichlet prior smoothing parameter for a collection
 
+/*! \page EstimateDirPrior
 
-/// Leave-one-out estimation of Dirichlet prior smoothing parameter for a collection
-
-/*! \page EstimateDirPrior  EstimateDirPrior Application
-
- 
-
-This application (EstimateDirPrior.cpp) uses the leave-one-out method to
+This application uses the leave-one-out method to
 estimate an optimal setting for the Dirichlet prior smoothing parameter
 (i.e., the "prior sample size").
 
 To run the application, follow the general steps of running a lemur
 application and set the following variables in the parameter file:
 
-(1) index: the table-of-content (TOC) record file of the index 
-(e.g., the .bsc file created by BuildBasicIndex)
+(1) index: the table-of-content (TOC) record file of the index. 
 
 (2) initValue: the initial value for the parameter in the Newton method.
 
@@ -78,18 +73,18 @@ int AppMain(int argc, char *argv[]) {
       TermInfoList *tList = ind->termInfoList(d);
       tList->startIteration();
       while (tList->hasMore()) {
-	TermInfo *info = tList->nextEntry();
-	double fq = info->count();
-	TERMID_T id = info->termID();
-	double colPr = (ind->termCount(id)+1)
-	  /(double)(ind->termCountUnique()+ind->termCount());
-	double tmp1 = fq-1+mu*colPr;
-	double tmp2 = dlen-1+mu;
-	double tmp3 = colPr*dlen-colPr-fq+1;
+        TermInfo *info = tList->nextEntry();
+        double fq = info->count();
+        TERMID_T id = info->termID();
+        double colPr = (ind->termCount(id)+1)
+          /(double)(ind->termCountUnique()+ind->termCount());
+        double tmp1 = fq-1+mu*colPr;
+        double tmp2 = dlen-1+mu;
+        double tmp3 = colPr*dlen-colPr-fq+1;
       
-	func += fq*tmp3/(tmp1*tmp2);
-	deriv += (-fq*tmp3*tmp3/(tmp1*tmp1*tmp2*tmp2));
-	LL += fq*log(tmp1/tmp2);
+        func += fq*tmp3/(tmp1*tmp2);
+        deriv += (-fq*tmp3*tmp3/(tmp1*tmp1*tmp2*tmp2));
+        LL += fq*log(tmp1/tmp2);
       }
       delete tList;
     }
@@ -98,15 +93,10 @@ int AppMain(int argc, char *argv[]) {
     mu -= func/deriv;
     meanFit = 0.5*meanFit+0.5*LL;
   } while ( (itCount < 50000) &&
-	    (fabs(func/deriv)>0.000001) && 
-	    (fabs((meanFit-LL)/meanFit)>0.00000001));
+            (fabs(func/deriv)>0.000001) && 
+            (fabs((meanFit-LL)/meanFit)>0.00000001));
   
   cout << endl;
   cout << "####### Final prior_sample_size = " << mu << " with log-likelihood = "<< LL << endl << endl;
   return 0;
-
 }
-
-
-
-

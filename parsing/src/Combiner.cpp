@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -258,8 +258,8 @@ void indri::parse::Combiner::hashToBuckets( std::ifstream& in, const std::string
     std::stringstream* docFile = _docBuckets[ docBucket ];
 
     (*docFile) << docno << std::endl
-                << docUrl << std::endl
-                << "CORPUSPATH=" << path.c_str() << std::endl;
+               << docUrl << std::endl
+               << "CORPUSPATH=" << path.c_str() << std::endl;
 
     int linkCount = atoi( linkCountText + sizeof "LINKS=" - 1 );
 

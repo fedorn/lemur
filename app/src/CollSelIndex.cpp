@@ -1,3 +1,13 @@
+/*==========================================================================
+ * Copyright (c) 2000-2004 Carnegie Mellon University.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 #include "TextHandlerManager.hpp"
 #include "DocFreqIndexer.hpp"
 #include "CtfIndexer.hpp"
@@ -31,7 +41,7 @@ namespace LocalParameter {
 
     stemmer = ParamGetString("stemmer");
     countStopWds = (ParamGetString("countStopWords", "false") == "true" 
-		    ? true : false);
+                    ? true : false);
 
   }
 };
@@ -57,7 +67,7 @@ int AppMain(int argc, char * argv[]) {
   // Create the appropriate parser and acronyms list if needed
   Parser * parser = NULL;
   parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
-					    LocalParameter::acronyms);
+                                            LocalParameter::acronyms);
   // if failed to create parser, create a default
   if (!parser)
     parser = new lemur::parse::TrecParser();
@@ -71,14 +81,14 @@ int AppMain(int argc, char * argv[]) {
   stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
 
   lemur::distrib::DocFreqIndexer dfIndexer(LocalParameter::df,
-			   LocalParameter::dfCounts,
-			   LocalParameter::dfDocs,
-			   LocalParameter::memory,
-			   LocalParameter::countStopWds);
+                           LocalParameter::dfCounts,
+                           LocalParameter::dfDocs,
+                           LocalParameter::memory,
+                           LocalParameter::countStopWds);
 
   lemur::distrib::CtfIndexer ctfIndexer(LocalParameter::ctf,
-			LocalParameter::memory,
-			LocalParameter::countStopWds);
+                        LocalParameter::memory,
+                        LocalParameter::countStopWds);
 
   // chain the parser/stopper/stemmer/indexer
 

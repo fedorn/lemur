@@ -1,5 +1,3 @@
-
-
 /*==========================================================================
  * Copyright (c) 2001 Carnegie Mellon University.  All Rights Reserved.
  *
@@ -62,10 +60,10 @@ lemur::distrib::QryBasedSampler::probe(const char * initQuery) {
   // Results returned by database manager.
   results_t * results; 
 
-   // Check termination conditions
+  // Check termination conditions
   while (!(((termMode & T_NDOCS) && (done >= numDocs)) ||
-	   ((termMode & T_NWORDS) && (freqCounter->numWords() >= numWords)) ||
-	   ((termMode & T_NQRYS) && (qcount >= numQueries)))) {
+           ((termMode & T_NWORDS) && (freqCounter->numWords() >= numWords)) ||
+           ((termMode & T_NQRYS) && (qcount >= numQueries)))) {
 
     // generate the query
     if (done == 0) {
@@ -92,53 +90,53 @@ lemur::distrib::QryBasedSampler::probe(const char * initQuery) {
     int i;
     // Check termination conditions
     for (i = 0; 
-	 (i < docsPerQuery) && 
-	   (i < numResults) &&
-	   (!(((termMode & T_NDOCS) && (done >= numDocs)) ||
-	      ((termMode & T_NWORDS)&&(freqCounter->numWords() >= numWords)) ) );
+         (i < docsPerQuery) && 
+           (i < numResults) &&
+           (!(((termMode & T_NDOCS) && (done >= numDocs)) ||
+              ((termMode & T_NWORDS)&&(freqCounter->numWords() >= numWords)) ) );
 
-	 i++) {
+         i++) {
 
       docid_t id = results->ids[i];
       
       // check to make sure we haven't already gotten this doc
       docidset::iterator it = seenDocs.find(id);
       if (it == seenDocs.end()) {
-	//	seenDocs.insert(strdup(id));
-	seenDocs.insert(id);
-	
-	doc_t * doc;
+        //      seenDocs.insert(strdup(id));
+        seenDocs.insert(id);
+        
+        doc_t * doc;
 
-	try {
-	  // get doc
-	  doc = db->getDoc(id);
+        try {
+          // get doc
+          doc = db->getDoc(id);
 
-	  // parse doc, which updates freqCounter
-	  parser->parse(doc);
-	
-	  // Output doc to file.
-	  db->output(id);
-	  
-	  // Free memory
-	  if (doc->doc) {
-	    delete [] doc->doc;
-	  }
-	  //	  free (doc->id);
-	  delete doc;
-	  done++;	
+          // parse doc, which updates freqCounter
+          parser->parse(doc);
+        
+          // Output doc to file.
+          db->output(id);
+          
+          // Free memory
+          if (doc->doc) {
+            delete [] doc->doc;
+          }
+          //      free (doc->id);
+          delete doc;
+          done++;       
 
-	} catch (lemur::api::Exception &ex) {
-	  cerr << "Skipping doc " << id << endl;
-	  ex.writeMessage(cerr);
+        } catch (lemur::api::Exception &ex) {
+          cerr << "Skipping doc " << id << endl;
+          ex.writeMessage(cerr);
 
-	  if (doc->doc) {
-	    delete [] doc->doc;
-	  }
-	  if (doc) {
-	    //	    free (doc->id);
-	    delete doc;
-	  }
-	}
+          if (doc->doc) {
+            delete [] doc->doc;
+          }
+          if (doc) {
+            //      free (doc->id);
+            delete doc;
+          }
+        }
 
       }
 

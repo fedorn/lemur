@@ -7,16 +7,16 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 /*
   Author: fff
- */
+*/
 
 #include "StructQueryRep.hpp"
 using namespace lemur::api;
 
 lemur::retrieval::QnList * lemur::retrieval::StructQueryRep::getChildren(const TermQuery &qry, getFunc getFn, 
-					bool weigh) {
+                                                                         bool weigh) {
   const Term *tok;
   QueryNode *qn;
   QueryNode *qParent = qStack[topqStack-1];
@@ -27,22 +27,22 @@ lemur::retrieval::QnList * lemur::retrieval::StructQueryRep::getChildren(const T
     tok = qry.nextTerm();
     if(!strcmp(tok->spelling(), "RPAREN")) {
       if(qParent == qStack[--topqStack]) {
-	qParent->setEntries(cnt);
-	return chlist;
+        qParent->setEntries(cnt);
+        return chlist;
       } else {
-	cerr << "lemur::retrieval::StructQueryRep::getChildren: Unmatched Parentheses" << endl;
-	exit(1);
+        cerr << "lemur::retrieval::StructQueryRep::getChildren: Unmatched Parentheses" << endl;
+        exit(1);
       }
     } else {
       if (weigh) {
-	// each child has to have a weight and a qnode
-	wt = (double)atof(tok->spelling());
-	tok = qry.nextTerm();
+        // each child has to have a weight and a qnode
+        wt = (double)atof(tok->spelling());
+        tok = qry.nextTerm();
       }
       qn = (this->*getFn)(qry, tok, wt);
       if (qn) { // OOV returns null node
-	chlist->push_back(qn);
-	//	cnt++; // need to count even if it is oov for #band
+        chlist->push_back(qn);
+        //      cnt++; // need to count even if it is oov for #band
       }
       cnt++; // need to count even if it is oov for #band
     }
@@ -120,7 +120,7 @@ lemur::retrieval::QueryNode * lemur::retrieval::StructQueryRep::getProxQryNode(c
 
 
 lemur::retrieval::QueryNode * lemur::retrieval::StructQueryRep::getQryNode(const TermQuery &qry, const Term *tok, 
-				       double w) {
+                                                                           double w) {
 
   QueryNode *qn;
   TERMID_T ti = ind.term(tok->spelling());
@@ -296,7 +296,7 @@ lemur::retrieval::QueryNode * lemur::retrieval::StructQueryRep::getQryNode(const
 }
 
 lemur::retrieval::StructQueryRep::StructQueryRep(const TermQuery &qry, const Index &dbIndex, 
-			       double dbelief):
+                                                 double dbelief):
   topqStack(0), dw(dbelief), ind(dbIndex) {
   for (int i = 0; i < 100; i++)
     qStack[i] = NULL; /// fix this size assumption.

@@ -32,7 +32,7 @@ namespace lemur
 {
   namespace retrieval 
   {
-    
+    /// Query term for cross-lingual retrieval queries. 
     class XLQueryTerm : public lemur::api::QueryTerm {
     public:
       XLQueryTerm(lemur::api::TERMID_T tid, double  wt, const char *term, double pge,
@@ -160,7 +160,7 @@ namespace lemur
               } else {
                 // OOV, use default pge
                 // perhaps this would be better estimated with:
-                //	  pge = 1/(numSource + 1);
+                //        pge = 1/(numSource + 1);
                 pge = (0.000001*0.000001);
               }
               XLQueryTerm newTerm(ti, 1, t->spelling(), pge, dict, stm);
@@ -201,7 +201,8 @@ namespace lemur
     // Should not really be a TextQueryRetMethod, as it does not score
     // in a like fashion. but does take advantage of the cached doc reps.
     //
-    /*! Cross lingual retrieval method.
+    /*! \brief Cross lingual retrieval method. */
+    /*!
       Translation dictionary based retrieval, scoring queries in the source
       language against documents in the target language using:<br>
       P(Q_s|D_t) = Prod_w_in_Q_s(lambda(Sum_t_in_D_t P(t|D_t)P(w|t) + (1-lambda)P(w|G_s)<br>

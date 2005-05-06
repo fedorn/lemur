@@ -8,27 +8,22 @@
  *
  *==========================================================================
 */
+/*! \page MMRSummApp
 
-
-
-/// A simple summarizer
-/*! \page BasicSummApp Application
-
-
-
-This application (MMRSummApp.cpp) builds an MMR based summary
-
+This application builds an MMR based summary.
 
 <P>
  This application generates a summary for a document with MMR.
-<P>
-To use it, follow the general steps of running a lemur application and set the following variables in the parameter file:
-<p>
+
+<P> To use it, follow the general steps of running a lemur application
+and set the following variables in the parameter file:
+
 <ol>
-<li><tt>indexFile</tt>: the path to the index TOC.
+<li><tt>indexFile</tt>: the path to the index TOC. The index must be an
+InvFPIndex (.ifp).
 <li><tt>docID</tt>: the document to summarize.
 <li><tt>query</tt>: A stemmed query to use for q-based summary
-<li><tt>summLength</tt>: summary length.<br>
+<li><tt>summLength</tt>: summary length. Default is 5 sentences.
 </ol>
 <p>
 The summary is sent to standard out.
@@ -37,15 +32,14 @@ The following is an example of use:
 <PRE> 
 
  % cat summparam
-   
-   indexFile = idx.invfp;
-   docID = WTX001-B01-1;
+&lt;parameters&gt;
+   &lt;indexFile&gt;idx.ifp&lt;/indexFile&gt;
+   &lt;docID&gt;WTX001-B01-1&lt;/docID&gt;
+&lt;/parameters&gt;
 
  % MMRSummApp summparam
  
  </PRE>
-
-
 */
 
 #include "Param.hpp"

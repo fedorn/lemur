@@ -18,7 +18,7 @@ using namespace lemur::cluster;
 // Online Clustering
 
 /*! \page Cluster Online Clustering
-  This application (<tt>Cluster.cpp</tt>) performs the basic online 
+  This application performs the basic online 
   clustering task.
   In conjunction with an incremental indexer (such as KeyfileIncIndex), 
   it could be used for TDT 
@@ -76,32 +76,32 @@ int AppMain(int argc, char * argv[]) {
     lemur::api::ClusterDB* clusterDB;
     if (ClusterParam::clusterDBType == "keyfile") {
       clusterDB = new lemur::cluster::KeyfileClusterDB(myIndex, 
-				       ClusterParam::clusterIndex,
-				       ClusterParam::threshold,
-				       ClusterParam::simType,
-				       ClusterParam::clusterType,
-				       ClusterParam::docMode);
+                                       ClusterParam::clusterIndex,
+                                       ClusterParam::threshold,
+                                       ClusterParam::simType,
+                                       ClusterParam::clusterType,
+                                       ClusterParam::docMode);
     } else if (ClusterParam::clusterDBType == "flatfile") {
       clusterDB = new lemur::cluster::FlatFileClusterDB(myIndex, 
-					ClusterParam::clusterIndex,
-					ClusterParam::threshold,
-					ClusterParam::simType,
-					ClusterParam::clusterType,
-					ClusterParam::docMode);
+                                        ClusterParam::clusterIndex,
+                                        ClusterParam::threshold,
+                                        ClusterParam::simType,
+                                        ClusterParam::clusterType,
+                                        ClusterParam::docMode);
     } else {      
       // add additional db types here. Convert to Factory usage.
-	cout << "Cluster database type '" << ClusterParam::clusterDBType
-	     << "' is not supported.\n";
-	exit(1);
+        cout << "Cluster database type '" << ClusterParam::clusterDBType
+             << "' is not supported.\n";
+        exit(1);
     }
     // crank through the collection
     double score;
     for (DOCID_T i = 1; i <= myIndex->docCount(); i++) {
       if (clusterDB->getDocClusterId(i).size() == 0) {
-	// Hasn't been clustered yet.
-	int myCluster = clusterDB->cluster(i, score);
-	cout << myIndex->document(i) << " " << myCluster << " " 
-	     << score << endl;
+        // Hasn't been clustered yet.
+        int myCluster = clusterDB->cluster(i, score);
+        cout << myIndex->document(i) << " " << myCluster << " " 
+             << score << endl;
       }
     }
     delete clusterDB;

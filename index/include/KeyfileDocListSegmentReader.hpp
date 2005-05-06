@@ -27,9 +27,7 @@ namespace lemur
   namespace file 
   {
     
-    /*!
-      Provides a reader for DocInfoLists from a give segment in a File.
-    */
+    /// Provides a reader for DocInfoLists from a give segment in a File.
     class KeyfileDocListSegmentReader {
     private:
       File* _stream;

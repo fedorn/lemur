@@ -79,13 +79,13 @@ char* lemur::parse::ElemDocMgr::handleBeginTag(char* tag, const char* orig, Prop
     if (prop) {
       map<char*, btl, abc>::iterator point = elemtable.find((char*)prop->getValue());
       if (point == elemtable.end()) {
-	// new one
-	btl entry;
-	entry.fid = fileid;
-	entry.offset = myparser->fileTell();
-	entry.bytes = 0;
-	// table should copy this value
-	elemtable[(char*)prop->getValue()] = entry;
+        // new one
+        btl entry;
+        entry.fid = fileid;
+        entry.offset = myparser->fileTell();
+        entry.bytes = 0;
+        // table should copy this value
+        elemtable[(char*)prop->getValue()] = entry;
       } 
       // else we already have a tag with the same name being created. ignore it.
     }
@@ -103,17 +103,17 @@ char* lemur::parse::ElemDocMgr::handleEndTag(char* tag, const char* orig, Proper
     
       map<char*, btl, abc>::iterator point = elemtable.find(elname);
       if (point != elemtable.end()) {    
-	// got it
-	// overwrites previous keys
-	char* key = new char[strlen(myDoc)+strlen(elname)+1];
-	strcpy(key, myDoc);
-	strcat(key, elname);
-	// fileTell gives us current file position, don't store actual end tag
-	(point->second).bytes = myparser->fileTell()-(point->second).offset-strlen(orig);
-	elements.put(key, &(point->second), sizeof(btl));
-	delete[]key;
-	// remove from table
-	elemtable.erase(point);
+        // got it
+        // overwrites previous keys
+        char* key = new char[strlen(myDoc)+strlen(elname)+1];
+        strcpy(key, myDoc);
+        strcat(key, elname);
+        // fileTell gives us current file position, don't store actual end tag
+        (point->second).bytes = myparser->fileTell()-(point->second).offset-strlen(orig);
+        elements.put(key, &(point->second), sizeof(btl));
+        delete[]key;
+        // remove from table
+        elemtable.erase(point);
       }
       // else we didn't get it, then there's nothing to do
     }
@@ -141,7 +141,7 @@ char* lemur::parse::ElemDocMgr::getElement(const char* docid, const char* elemen
   ifstream read(sources[elemloc.fid].c_str(), ios::binary);
   if (!read.is_open()) {
     cerr << "Could not open file " << sources[elemloc.fid] 
-	 << " to get document" << endl;
+         << " to get document" << endl;
     return NULL;
   }
   read.seekg(elemloc.offset, ios::beg);

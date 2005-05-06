@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _RETRIEVALPARAMETER_HPP
 #define _RETRIEVALPARAMETER_HPP
@@ -93,7 +93,7 @@ namespace RetrievalParameter {
   }
 };
 
-
+/// TFIDF retrieval method parameters.
 namespace TFIDFParameter {
 
   /// @name TFIDF model parameters
@@ -126,6 +126,7 @@ namespace TFIDFParameter {
   }
 };
 
+/// Okapi retrieval method parameters.
 namespace OkapiParameter {
 
   /// @name Okapi model parameters
@@ -145,7 +146,7 @@ namespace OkapiParameter {
     
   }
 };
-
+/// Simple KL retrieval method parameters.
 namespace SimpleKLParameter {
   /// @name Simple KL model parameters
   //@{
@@ -159,7 +160,7 @@ namespace SimpleKLParameter {
     smoothSupportFile = lemur::api::ParamGetString("smoothSupportFile", "");
 
     string tmpString = RetrievalParameter::getLower("adjustedScoreMethod", 
-						    "negativekld");
+                                                    "negativekld");
     if (tmpString == "querylikelihood" || tmpString == "ql") {
       qryPrm.adjScoreMethod = SimpleKLParameter::QUERYLIKELIHOOD;
     } else if (tmpString == "crossentropy" ||tmpString == "ce") {
@@ -168,25 +169,25 @@ namespace SimpleKLParameter {
       qryPrm.adjScoreMethod = SimpleKLParameter::NEGATIVEKLD;
     } else {
       cerr << "Unknown scoreMethod " << tmpString << ". Using NEGATIVEKLD" 
-	   << endl;
+           << endl;
       qryPrm.adjScoreMethod = SimpleKLParameter::NEGATIVEKLD;
     }
 
     tmpString = RetrievalParameter::getLower("smoothMethod", 
-					     "dirichletprior");
+                                             "dirichletprior");
     if (tmpString == "jelinikmercer" || tmpString == "jm" || tmpString == "0")
       docPrm.smthMethod = SimpleKLParameter::JELINEKMERCER;
     else if (tmpString == "dirichletprior" || tmpString == "dir" || 
-	     tmpString == "1")
+             tmpString == "1")
       docPrm.smthMethod = SimpleKLParameter::DIRICHLETPRIOR;
     else if (tmpString == "absolutediscount" || tmpString == "ad" || 
-	     tmpString == "2")
+             tmpString == "2")
       docPrm.smthMethod = SimpleKLParameter::ABSOLUTEDISCOUNT;
     else if (tmpString == "twostage" || tmpString == "2s" || tmpString == "3")
       docPrm.smthMethod = SimpleKLParameter::TWOSTAGE;
     else {
       cerr << "Unknown smoothMethod " << tmpString << ". Using DIRICHLET" 
-	   << endl;
+           << endl;
       docPrm.smthMethod = SimpleKLParameter::defaultSmoothMethod;
     }
     
@@ -198,7 +199,7 @@ namespace SimpleKLParameter {
       docPrm.smthStrategy= SimpleKLParameter::BACKOFF;
     else {
       cerr << "Unknown smoothStrategy " << tmpString << ". Using INTERPOLATE" 
-	   << endl;
+           << endl;
       docPrm.smthStrategy= SimpleKLParameter::defaultSmoothStrategy;
     }
     
@@ -214,18 +215,18 @@ namespace SimpleKLParameter {
     else if (tmpString == "divmin" || tmpString == "div" || tmpString == "1")
       qryPrm.fbMethod = SimpleKLParameter::DIVMIN;
     else if (tmpString == "markovchain" || tmpString == "mc" || 
-	     tmpString == "2")
+             tmpString == "2")
       qryPrm.fbMethod = SimpleKLParameter::MARKOVCHAIN;
     else if (tmpString == "relevancemodel1" || tmpString == "rm1" || 
-	     tmpString == "3")
+             tmpString == "3")
       qryPrm.fbMethod = SimpleKLParameter::RM1;
     else if (tmpString == "relevancemodel2" || tmpString == "rm2" || 
-	     tmpString == "4")
+             tmpString == "4")
       qryPrm.fbMethod = SimpleKLParameter::RM2;
     else {
       cerr << "Unknown queryUpdateMethod " << tmpString 
-	   << ". Using MIXTURE" 
-	   << endl;
+           << ". Using MIXTURE" 
+           << endl;
       qryPrm.fbMethod = SimpleKLParameter::MIXTURE;
     }
     
@@ -233,15 +234,15 @@ namespace SimpleKLParameter {
     qryPrm.fbCoeff = lemur::api::ParamGetDouble("feedbackCoefficient", defaultFBCoeff);
     qryPrm.fbPrTh = lemur::api::ParamGetDouble("feedbackProbThresh", defaultFBPrTh);
     qryPrm.fbPrSumTh = lemur::api::ParamGetDouble("feedbackProbSumThresh",
-				      defaultFBPrSumTh);
+                                                  defaultFBPrSumTh);
     qryPrm.fbTermCount = lemur::api::ParamGetInt("feedbackTermCount", defaultFBTermCount);
     qryPrm.fbMixtureNoise = lemur::api::ParamGetDouble("feedbackMixtureNoise",
-					   defaultFBMixNoise);
+                                                       defaultFBMixNoise);
     qryPrm.emIterations = lemur::api::ParamGetInt("emIterations", defaultEMIterations);
-					      
+                                              
   }
 };
-
+/// CORI retrieval method parameters.
 namespace CORIParameter {
   static lemur::utility::String collectionCounts;
   static double cstffactor;
@@ -256,7 +257,7 @@ namespace CORIParameter {
     doctfbaseline = lemur::api::ParamGetDouble("DOCCTF_baseline", 0.5);
   }
 };
-
+/// Cosine similarity retrieval method parameters.
 namespace CosSimParameter {
 
   /// @name CosSim model parameters

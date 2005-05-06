@@ -6,7 +6,7 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 
 
 
@@ -21,10 +21,10 @@
 using namespace lemur::api;
 
 void lemur::retrieval::SimpleKLQueryModel::interpolateWith(const lemur::langmod::UnigramLM &qModel, 
-					 double origModCoeff, 
-					 int howManyWord, 
-					 double prSumThresh, 
-					 double prThresh) {
+                                                           double origModCoeff, 
+                                                           int howManyWord, 
+                                                           double prSumThresh, 
+                                                           double prThresh) {
   if (!qm) {
     qm = new lemur::api::IndexedRealVector();
   } else {
@@ -56,7 +56,7 @@ void lemur::retrieval::SimpleKLQueryModel::interpolateWith(const lemur::langmod:
   IndexedRealVector::iterator it;
   it = qm->begin();
   while (it != qm->end() && prSum < prSumThresh && 
-	 wdCount < howManyWord && (*it).val >=prThresh) {
+         wdCount < howManyWord && (*it).val >=prThresh) {
     incCount((*it).ind, (*it).val*(1-origModCoeff));
     prSum += (*it).val;
     it++;
@@ -139,8 +139,8 @@ void lemur::retrieval::SimpleKLQueryModel::clarity(ostream &os)
     // clarity should be computed with log_2, so divide by log(2).
     os << ind.term(qt->id()) << " "
        << (qt->weight()*log(qt->weight()/
-			    ((double)ind.termCount(qt->id())/
-			     (double)ind.termCount())))/log(2.0) << endl;
+                            ((double)ind.termCount(qt->id())/
+                             (double)ind.termCount())))/log(2.0) << endl;
     delete qt;
   }
 }
@@ -170,8 +170,8 @@ double lemur::retrieval::SimpleKLQueryModel::clarity() const
 }
 
 lemur::retrieval::SimpleKLRetMethod::SimpleKLRetMethod(const Index &dbIndex, 
-				     const string &supportFileName, 
-				     ScoreAccumulator &accumulator) : 
+                                                       const string &supportFileName, 
+                                                       ScoreAccumulator &accumulator) : 
   TextQueryRetMethod(dbIndex, accumulator), supportFile(supportFileName) {
 
   docParam.smthMethod = SimpleKLParameter::defaultSmoothMethod;
@@ -221,12 +221,12 @@ void lemur::retrieval::SimpleKLRetMethod::loadSupportFile() {
       (docParam.smthMethod == SimpleKLParameter::ABSOLUTEDISCOUNT ||
        docParam.smthStrategy == SimpleKLParameter::BACKOFF)) {
     cerr << "lemur::retrieval::SimpleKLRetMethod::loadSupportFile loading "
-	 << supportFile << endl;
+         << supportFile << endl;
       
     ifs.open(supportFile.c_str());
     if (ifs.fail()) {
       throw  Exception("lemur::retrieval::SimpleKLRetMethod::loadSupportFile", 
-		       "smoothing support file open failure");
+                       "smoothing support file open failure");
     }
     COUNT_T numDocs = ind.docCount();
     docProbMass = new double[numDocs+1];
@@ -237,8 +237,8 @@ void lemur::retrieval::SimpleKLRetMethod::loadSupportFile() {
       double prMass;
       ifs >> id >> uniqCount >> prMass;
       if (id != i) {
-      throw  Exception("lemur::retrieval::SimpleKLRetMethod::loadSupportFile", 
-		       "alignment error in smooth support file, wrong id:");
+        throw  Exception("lemur::retrieval::SimpleKLRetMethod::loadSupportFile", 
+                         "alignment error in smooth support file, wrong id:");
       }
       docProbMass[i] = prMass;
       uniqueTermCount[i] = uniqCount;
@@ -256,7 +256,7 @@ void lemur::retrieval::SimpleKLRetMethod::loadSupportFile() {
     ifs.open(mcSuppFN.c_str());
     if (ifs.fail()) {
       throw Exception("lemur::retrieval::SimpleKLRetMethod::loadSupportFile", 
-		      "Markov chain support file can't be opened");
+                      "Markov chain support file can't be opened");
     }
 
     mcNorm = new double[ind.termCountUnique()+1];
@@ -266,8 +266,8 @@ void lemur::retrieval::SimpleKLRetMethod::loadSupportFile() {
       double norm;
       ifs >> id >> norm;
       if (id != i) {
-      throw Exception("lemur::retrieval::SimpleKLRetMethod::loadSupportFile", 
-		      "alignment error in Markov chain support file, wrong id:");
+        throw Exception("lemur::retrieval::SimpleKLRetMethod::loadSupportFile", 
+                        "alignment error in Markov chain support file, wrong id:");
       }
       mcNorm[i] = norm;
     }
@@ -279,34 +279,34 @@ DocumentRep *lemur::retrieval::SimpleKLRetMethod::computeDocRep(DOCID_T docID)
   switch (docParam.smthMethod) {
   case SimpleKLParameter::JELINEKMERCER:
     return( new JelinekMercerDocModel(docID,
-				      ind.docLength(docID),
-				      *collectLM,
-				      docProbMass,
-				      docParam.JMLambda,
-				      docParam.smthStrategy));
+                                      ind.docLength(docID),
+                                      *collectLM,
+                                      docProbMass,
+                                      docParam.JMLambda,
+                                      docParam.smthStrategy));
   case SimpleKLParameter::DIRICHLETPRIOR:
     return (new DirichletPriorDocModel(docID,
-				       ind.docLength(docID),
-				       *collectLM,
-				       docProbMass,  
-				       docParam.DirPrior,
-				       docParam.smthStrategy));
+                                       ind.docLength(docID),
+                                       *collectLM,
+                                       docProbMass,  
+                                       docParam.DirPrior,
+                                       docParam.smthStrategy));
   case SimpleKLParameter::ABSOLUTEDISCOUNT:
     return (new AbsoluteDiscountDocModel(docID,
-					 ind.docLength(docID),
-					 *collectLM,
-					 docProbMass,
-					 uniqueTermCount,
-					 docParam.ADDelta,
-					 docParam.smthStrategy));
+                                         ind.docLength(docID),
+                                         *collectLM,
+                                         docProbMass,
+                                         uniqueTermCount,
+                                         docParam.ADDelta,
+                                         docParam.smthStrategy));
   case SimpleKLParameter::TWOSTAGE:
     return (new TwoStageDocModel(docID,
-				 ind.docLength(docID),
-				 *collectLM,
-				 docProbMass,
-				 docParam.DirPrior, // 1st stage mu
-				 docParam.JMLambda, // 2nd stage lambda
-				 docParam.smthStrategy));
+                                 ind.docLength(docID),
+                                 *collectLM,
+                                 docProbMass,
+                                 docParam.DirPrior, // 1st stage mu
+                                 docParam.JMLambda, // 2nd stage lambda
+                                 docParam.smthStrategy));
     
     
   default:
@@ -318,7 +318,7 @@ DocumentRep *lemur::retrieval::SimpleKLRetMethod::computeDocRep(DOCID_T docID)
 
 
 void lemur::retrieval::SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep, 
-					const DocIDSet &relDocs)
+                                                          const DocIDSet &relDocs)
 {
   SimpleKLQueryModel *qr;
 
@@ -335,11 +335,11 @@ void lemur::retrieval::SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep,
     computeMarkovChainFBModel(*qr, relDocs);
     break;
   case SimpleKLParameter::RM1:
-   computeRM1FBModel(*qr, relDocs);
-   break;
+    computeRM1FBModel(*qr, relDocs);
+    break;
   case SimpleKLParameter::RM2:
-   computeRM2FBModel(*qr, relDocs);
-   break;   
+    computeRM2FBModel(*qr, relDocs);
+    break;   
   default:
     throw Exception("SimpleKLRetMethod", "unknown feedback method");
     break;
@@ -348,7 +348,7 @@ void lemur::retrieval::SimpleKLRetMethod::updateTextQuery(TextQueryRep &origRep,
 
 
 void lemur::retrieval::SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryModel &origRep, 
-					      const DocIDSet &relDocs)
+                                                                const DocIDSet &relDocs)
 {
   COUNT_T numTerms = ind.termCountUnique();
 
@@ -376,7 +376,7 @@ void lemur::retrieval::SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryMod
     double ll = 0;
 
     for (i=1; i<=numTerms;i++) {
-	
+        
       distQuery[i] = distQueryEst[i]/distQueryNorm;
       // cerr << "dist: "<< distQuery[i] << endl;
       distQueryEst[i] =0;
@@ -391,12 +391,12 @@ void lemur::retrieval::SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryMod
       double wdCt;
       dCounter->nextCount(wd, wdCt);
       ll += wdCt * log (noisePr*collectLM->prob(wd)  // Pc(w)
-			+ (1-noisePr)*distQuery[wd]); // Pq(w)
+                        + (1-noisePr)*distQuery[wd]); // Pq(w)
     }
     meanLL = 0.5*meanLL + 0.5*ll;
     if (fabs((meanLL-ll)/meanLL)< 0.0001) {
       cerr << "converged at "<< qryParam.emIterations - itNum+1 
-	   << " with likelihood= "<< ll << endl;
+           << " with likelihood= "<< ll << endl;
       break;
     } 
 
@@ -409,7 +409,7 @@ void lemur::retrieval::SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryMod
       dCounter->nextCount(wd, wdCt);
       
       double prTopic = (1-noisePr)*distQuery[wd]/
-	((1-noisePr)*distQuery[wd]+noisePr*collectLM->prob(wd));
+        ((1-noisePr)*distQuery[wd]+noisePr*collectLM->prob(wd));
 
       double incVal = wdCt*prTopic;
       distQueryEst[wd] += incVal;
@@ -425,7 +425,7 @@ void lemur::retrieval::SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryMod
   }
   lemur::langmod::MLUnigramLM *fblm = new lemur::langmod::MLUnigramLM(lmCounter, ind.termLexiconID());
   origRep.interpolateWith(*fblm, (1-qryParam.fbCoeff), qryParam.fbTermCount,
-			qryParam.fbPrSumTh, qryParam.fbPrTh);
+                          qryParam.fbPrSumTh, qryParam.fbPrTh);
   delete fblm;
   delete dCounter;
   delete[] distQuery;
@@ -434,7 +434,7 @@ void lemur::retrieval::SimpleKLRetMethod::computeMixtureFBModel(SimpleKLQueryMod
 
 
 void lemur::retrieval::SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryModel &origRep, 
-					     const DocIDSet &relDocs)
+                                                               const DocIDSet &relDocs)
 {
   COUNT_T numTerms = ind.termCountUnique();
 
@@ -463,7 +463,7 @@ void lemur::retrieval::SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryMode
     while (tList->hasMore()) {
       info = tList->nextEntry();
       ct[info->termID()] += log(dm->seenProb(info->count(), info->termID())/
-			    (dm->unseenCoeff()*collectLM->prob(info->termID())));
+                                (dm->unseenCoeff()*collectLM->prob(info->termID())));
     }
     delete tList;
     delete dm;
@@ -475,16 +475,16 @@ void lemur::retrieval::SimpleKLRetMethod::computeDivMinFBModel(SimpleKLQueryMode
   double norm = 1.0/(double)actualDocCount;
   for (i=1; i<=numTerms; i++) { 
     lmCounter.incCount(i, 
-		       exp((ct[i]*norm -
-			    qryParam.fbMixtureNoise*log(collectLM->prob(i)))
-			   / (1.0-qryParam.fbMixtureNoise)));
+                       exp((ct[i]*norm -
+                            qryParam.fbMixtureNoise*log(collectLM->prob(i)))
+                           / (1.0-qryParam.fbMixtureNoise)));
   }
   delete [] ct;
 
   
   lemur::langmod::MLUnigramLM *fblm = new lemur::langmod::MLUnigramLM(lmCounter, ind.termLexiconID());
   origRep.interpolateWith(*fblm, (1-qryParam.fbCoeff), qryParam.fbTermCount,
-			qryParam.fbPrSumTh, qryParam.fbPrTh);
+                          qryParam.fbPrSumTh, qryParam.fbPrTh);
   delete fblm;
 }
 
@@ -495,7 +495,7 @@ void lemur::retrieval::SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQuer
   lemur::utility::ArrayCounter<double> *counter = new lemur::utility::ArrayCounter<double>(ind.termCountUnique()+1);
 
   lemur::langmod::OneStepMarkovChain * mc = new lemur::langmod::OneStepMarkovChain(relDocs, ind, mcNorm,
-						   1-qryParam.fbMixtureNoise);
+                                                                                   1-qryParam.fbMixtureNoise);
   origRep.startIteration();
   double summ;
   while (origRep.hasMore()) {
@@ -510,7 +510,7 @@ void lemur::retrieval::SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQuer
     while (mc->hasMoreFromWord()) {
       mc->nextFromWordProb(fromWd, fromWdPr);
       if (fromWd <= stopWordCutoff) { // a stop word
-	continue;
+        continue;
       }
       summ += qt->weight()*fromWdPr*collectLM->prob(fromWd);
       // summ += qt->weight()*fromWdPr;
@@ -524,11 +524,11 @@ void lemur::retrieval::SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQuer
     while (mc->hasMoreFromWord()) {
       mc->nextFromWordProb(fromWd, fromWdPr);
       if (fromWd <= stopWordCutoff) { // a stop word
-	continue;
+        continue;
       }
 
       counter->incCount(fromWd, 
-			(qt->weight()*fromWdPr*collectLM->prob(fromWd)/summ));
+                        (qt->weight()*fromWdPr*collectLM->prob(fromWd)/summ));
       // counter->incCount(fromWd, (qt->weight()*fromWdPr/summ));
 
     }
@@ -539,13 +539,13 @@ void lemur::retrieval::SimpleKLRetMethod::computeMarkovChainFBModel(SimpleKLQuer
   lemur::langmod::UnigramLM *fbLM = new lemur::langmod::MLUnigramLM(*counter, ind.termLexiconID());
 
   origRep.interpolateWith(*fbLM, 1-qryParam.fbCoeff, qryParam.fbTermCount,
-			  qryParam.fbPrSumTh, qryParam.fbPrTh);
+                          qryParam.fbPrSumTh, qryParam.fbPrTh);
   delete fbLM;
   delete counter;
 }
 
 void lemur::retrieval::SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &origRep, 
-					  const DocIDSet &relDocs)
+                                                            const DocIDSet &relDocs)
 {  
   COUNT_T numTerms = ind.termCountUnique();
 
@@ -582,7 +582,7 @@ void lemur::retrieval::SimpleKLRetMethod::computeRM1FBModel(SimpleKLQueryModel &
   }
   lemur::langmod::MLUnigramLM *fblm = new lemur::langmod::MLUnigramLM(lmCounter, ind.termLexiconID());
   origRep.interpolateWith(*fblm, 0.0, qryParam.fbTermCount,
-			  qryParam.fbPrSumTh, 0.0);
+                          qryParam.fbPrSumTh, 0.0);
   delete fblm;
   delete dCounter;
   delete[] distQuery;
@@ -600,7 +600,7 @@ struct termProb  {
 };
 
 void lemur::retrieval::SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &origRep, 
-					  const DocIDSet &relDocs) {  
+                                                            const DocIDSet &relDocs) {  
   COUNT_T numTerms = ind.termCountUnique();
   COUNT_T termCount = ind.termCount();
   double expWeight = qryParam.fbCoeff;
@@ -642,41 +642,41 @@ void lemur::retrieval::SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &
       TERMID_T qtID = qTerms[j]; // TERM_ID
       relDocs.startIteration();
       while (relDocs.hasMore()) {
-	int docID;
-	double P_d, P_w_d, P_q_d;
-	double dlength;
-	relDocs.nextIDInfo(docID, P_d);
-	dlength  = (double)ind.docLength(docID);
-	if (tProbs[docID] == NULL) {
-	  vector<termProb> * pList = new vector<termProb>;
-	  TermInfoList *tList = ind.termInfoList(docID);
-	  TermInfo *t;
-	  tList->startIteration();
-	  while (tList->hasMore()) {
-	  t = tList->nextEntry();
-	  termProb prob;
-	  prob.id = t->termID();
-	  prob.prob = expWeight*t->count()/dlength+
-	    (1-expWeight)*ind.termCount(t->termID())/termCount;
-	  pList->push_back(prob);
-	  }
-	  delete(tList);
-	  tProbs[docID] = pList;
-	}
-	vector<termProb> * pList = tProbs[docID];	
-	P_w_d=0;
-	P_q_d=0;
-	for (int i = 0; i < pList->size(); i++) {	  
-	  // p(q|d)= a*tf(q,d)/|d|+(1-a)*tf(q,C)/|C|
-	  if((*pList)[i].id == qtID)
-	    P_q_d = (*pList)[i].prob;	  
-	  // p(w|d)= a*tf(w,d)/|d|+(1-a)*tf(w,C)/|C|
-	  if((*pList)[i].id == wd)
-	    P_w_d = (*pList)[i].prob;
-	  if(P_q_d && P_w_d)
-	    break;
-	}
-	P_qw += P_d*P_w_d*P_q_d;
+        int docID;
+        double P_d, P_w_d, P_q_d;
+        double dlength;
+        relDocs.nextIDInfo(docID, P_d);
+        dlength  = (double)ind.docLength(docID);
+        if (tProbs[docID] == NULL) {
+          vector<termProb> * pList = new vector<termProb>;
+          TermInfoList *tList = ind.termInfoList(docID);
+          TermInfo *t;
+          tList->startIteration();
+          while (tList->hasMore()) {
+            t = tList->nextEntry();
+            termProb prob;
+            prob.id = t->termID();
+            prob.prob = expWeight*t->count()/dlength+
+              (1-expWeight)*ind.termCount(t->termID())/termCount;
+            pList->push_back(prob);
+          }
+          delete(tList);
+          tProbs[docID] = pList;
+        }
+        vector<termProb> * pList = tProbs[docID];       
+        P_w_d=0;
+        P_q_d=0;
+        for (int i = 0; i < pList->size(); i++) {         
+          // p(q|d)= a*tf(q,d)/|d|+(1-a)*tf(q,C)/|C|
+          if((*pList)[i].id == qtID)
+            P_q_d = (*pList)[i].prob;     
+          // p(w|d)= a*tf(w,d)/|d|+(1-a)*tf(w,C)/|C|
+          if((*pList)[i].id == wd)
+            P_w_d = (*pList)[i].prob;
+          if(P_q_d && P_w_d)
+            break;
+        }
+        P_qw += P_d*P_w_d*P_q_d;
       }
       // P(Q|w) = PROD_q P(q|w) / p(w)
       P_Q_w *= P_qw/P_w;
@@ -693,7 +693,7 @@ void lemur::retrieval::SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &
   }
   lemur::langmod::MLUnigramLM *fblm = new lemur::langmod::MLUnigramLM(lmCounter, ind.termLexiconID());
   origRep.interpolateWith(*fblm, 0.0, qryParam.fbTermCount,
-			  qryParam.fbPrSumTh, 0.0);
+                          qryParam.fbPrSumTh, 0.0);
   delete fblm;
   delete dCounter;
   for (i = 1; i <= numDocs; i++) {

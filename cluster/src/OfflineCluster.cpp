@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 // David Fisher
 // init: 02/03/2003
@@ -15,9 +15,9 @@
 #include "OfflineCluster.hpp"
 
 lemur::cluster::OfflineCluster::OfflineCluster(const lemur::api::Index &ind,
-			       enum ClusterParam::simTypes simType,
-			       enum ClusterParam::clusterTypes clusterType,
-			       enum ClusterParam::docModes docMode)
+                                               enum ClusterParam::simTypes simType,
+                                               enum ClusterParam::clusterTypes clusterType,
+                                               enum ClusterParam::docModes docMode)
   : index(ind) {
   // Setup similarity method and cluster factories.
   sim = SimFactory::makeSim(index, simType);
@@ -56,9 +56,9 @@ double lemur::cluster::OfflineCluster::scoreSet(vector<Cluster *> *working) {
 }
 
 vector<lemur::cluster::Cluster*> *lemur::cluster::OfflineCluster::bisecting_kMeans(vector<lemur::api::DOCID_T> docIds, 
-						  int numParts,
-						  int numIters,
-						  int maxIters) {
+                                                                                   int numParts,
+                                                                                   int numIters,
+                                                                                   int maxIters) {
   vector<Cluster *> *finalClusters = new vector<Cluster*>;
   vector<Cluster *> *bestSplit = NULL, *split, 
     *working = new vector<Cluster*>;
@@ -67,7 +67,7 @@ vector<lemur::cluster::Cluster*> *lemur::cluster::OfflineCluster::bisecting_kMea
   //All docs into 1 cluster
   cluster->add(docIds);
   working->push_back(cluster);
-//repeat
+  //repeat
   do {
     //  Pick cluster to split (eg largest).
     // removes it from the vector.
@@ -81,20 +81,20 @@ vector<lemur::cluster::Cluster*> *lemur::cluster::OfflineCluster::bisecting_kMea
       double s1 = scoreSet(bestSplit);
       double s2 = scoreSet(split);
       if (s2 > s1) {
-	if (bestSplit != NULL) {
-	  // clean up
-	  for (int j = 0; j < bestSplit->size(); j++)
-	    delete((*bestSplit)[j]);
-	  delete(bestSplit);
-	}
-	bestSplit = split;
-	split = NULL;
+        if (bestSplit != NULL) {
+          // clean up
+          for (int j = 0; j < bestSplit->size(); j++)
+            delete((*bestSplit)[j]);
+          delete(bestSplit);
+        }
+        bestSplit = split;
+        split = NULL;
       } else {
-	// clean up
-	for (int j = 0; j < split->size(); j++)
-	  delete((*split)[j]);
-	delete(split);
-	split = NULL;
+        // clean up
+        for (int j = 0; j < split->size(); j++)
+          delete((*split)[j]);
+        delete(split);
+        split = NULL;
       }
     }
     // put best back into working.
@@ -123,12 +123,12 @@ vector<lemur::cluster::Cluster*> *lemur::cluster::OfflineCluster::bisecting_kMea
 }
 
 vector<lemur::cluster::Cluster*> *lemur::cluster::OfflineCluster::kMeans(Cluster *cluster, int numParts,
-					 int maxIters) {
+                                                                         int maxIters) {
   return kMeans(cluster->getDocIds(), numParts, maxIters);
 }
  
 vector<lemur::cluster::Cluster*> *lemur::cluster::OfflineCluster::kMeans(vector<lemur::api::DOCID_T> docIds, int numParts,
-					 int maxIters) {
+                                                                         int maxIters) {
   vector<Cluster*> *clusters = new vector<Cluster*>;
   // cluster elements
   bool done = false;
@@ -167,16 +167,16 @@ vector<lemur::cluster::Cluster*> *lemur::cluster::OfflineCluster::kMeans(vector<
   while (! done && numIters < maxIters) {
     numIters++;
     // assign all elts to closest
-	int i;
+    int i;
     for (i = 0; i < numDocs; i++) {
       double score = 0, maxScore = 0;
       int idx = 0;
       for (int j = 0; j < numParts; j++) {
-	score = firstPass[j]->score(docReps[i]);
-	if (score > maxScore) {
-	  maxScore = score;
-	  idx = j;
-	}
+        score = firstPass[j]->score(docReps[i]);
+        if (score > maxScore) {
+          maxScore = score;
+          idx = j;
+        }
       }
       ClusterElt fred;
       fred.id = docIds[i];
@@ -213,7 +213,7 @@ vector<lemur::cluster::Cluster*> *lemur::cluster::OfflineCluster::kMeans(vector<
 }
 
 bool lemur::cluster::OfflineCluster::compareClusterSets(Cluster **first, Cluster **second, 
-					int n) {
+                                                        int n) {
   bool match = true;
   for (int i = 0; i < n && match; i++) {
     vector<ClusterElt> fIds = *(first[i]->getIds());

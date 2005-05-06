@@ -7,10 +7,10 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 /*
   Author: dmf
- */
+*/
 
 #include "CosSimRetMethod.hpp"
 #include "Param.hpp"
@@ -18,7 +18,7 @@
 
 /// Construct a query rep from a text query.
 lemur::retrieval::CosSimQueryRep::CosSimQueryRep(const lemur::api::TermQuery &qry, const lemur::api::Index &dbIndex, 
-			       double *idfValue): 
+                                                 double *idfValue): 
   ArrayQueryRep (dbIndex.termCountUnique()+1, qry, dbIndex), 
   ind(dbIndex), idf(idfValue) {
   double qNorm = 0, tmpval;
@@ -42,7 +42,7 @@ lemur::retrieval::CosSimQueryRep::CosSimQueryRep(const lemur::api::TermQuery &qr
 
 /// Construct a query rep from an existing document (given document id).
 lemur::retrieval::CosSimQueryRep::CosSimQueryRep(lemur::api::DOCID_T docId, const lemur::api::Index &dbIndex, 
-			       double *idfValue): 
+                                                 double *idfValue): 
   ArrayQueryRep (dbIndex.termCountUnique() + 1), 
   ind(dbIndex), idf(idfValue) {
   double qNorm = 0;
@@ -71,7 +71,7 @@ lemur::retrieval::CosSimQueryRep::CosSimQueryRep(lemur::api::DOCID_T docId, cons
 }
 
 lemur::retrieval::CosSimRetMethod::CosSimRetMethod(const lemur::api::Index &dbIndex, 
-				 lemur::api::ScoreAccumulator &accumulator) :
+                                                   lemur::api::ScoreAccumulator &accumulator) :
   lemur::api::TextQueryRetMethod(dbIndex, accumulator), 
   L2FileName(CosSimParameter::defaultL2File) {
   fbParam.howManyTerms = CosSimParameter::defaultHowManyTerms;
@@ -86,7 +86,7 @@ lemur::retrieval::CosSimRetMethod::CosSimRetMethod(const lemur::api::Index &dbIn
 }
 
 lemur::retrieval::CosSimRetMethod::CosSimRetMethod(const lemur::api::Index &dbIndex, const string &L2file,
-				 lemur::api::ScoreAccumulator &accumulator) :
+                                                   lemur::api::ScoreAccumulator &accumulator) :
   lemur::api::TextQueryRetMethod(dbIndex, accumulator), L2FileName(L2file) {
   fbParam.howManyTerms = CosSimParameter::defaultHowManyTerms;
   fbParam.posCoeff = CosSimParameter::defaultPosCoeff;
@@ -158,7 +158,7 @@ double lemur::retrieval::CosSimRetMethod::docNorm(lemur::api::DOCID_T docID) {
 
 /// Use same as TFIDFRetMethod
 void lemur::retrieval::CosSimRetMethod::updateTextQuery(lemur::api::TextQueryRep &qryRep, 
-				      const lemur::api::DocIDSet &relDocs)
+                                                        const lemur::api::DocIDSet &relDocs)
 {
   lemur::api::COUNT_T totalTerm=ind.termCountUnique();  
   float * centroidVector = new float[totalTerm+1]; // one extra for OOV

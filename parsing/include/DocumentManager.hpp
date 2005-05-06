@@ -17,9 +17,9 @@ namespace lemur
 {
   namespace api 
   {
-    
+    /// \brief Abstract API for document manager interface.  
     /*!
-      Abstract API for document manager interface.  The document manager
+      The document manager
       should be able to retrieve a document given its external document id,
       it should also be able to provide a parser that can parse the raw
       document format.

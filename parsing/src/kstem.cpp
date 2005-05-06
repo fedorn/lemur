@@ -1,118 +1,118 @@
 /****************************************************************************\
-*	            Copyright (c) 1990-1995 by the                           *
-*    Applied Computing Systems Institute of Massachusetts, Inc. (ACSIOM)     *
-*			 All rights reserved.                                *
-*	       The INQUERY Software was provided by the                      *
-*	 Center for Intelligent Information Retrieval (CIIR),                *
-*       University of Massachusetts Computer Science Department,             *
-*		       Amherst, Massachusetts.                               *
-*	 For more information, contact ACSIOM at 413-545-6311                *
+ *                   Copyright (c) 1990-1995 by the                           *
+ *    Applied Computing Systems Institute of Massachusetts, Inc. (ACSIOM)     *
+ *                        All rights reserved.                                *
+ *              The INQUERY Software was provided by the                      *
+ *        Center for Intelligent Information Retrieval (CIIR),                *
+ *       University of Massachusetts Computer Science Department,             *
+ *                      Amherst, Massachusetts.                               *
+ *        For more information, contact ACSIOM at 413-545-6311                *
 \****************************************************************************/
 /*
-   This is a stemmer that handles inflectional morphology and the
-   most common forms of derivational morphology.  It first checks a 
-   word against the dictionary, and if it is found it leaves it alone.
-   If not, it handles inflectional endings (plurals into singular form,
-   and past tense and "ing" endings into present tense), and then
-   conflates the most common derivational variants.
+  This is a stemmer that handles inflectional morphology and the
+  most common forms of derivational morphology.  It first checks a 
+  word against the dictionary, and if it is found it leaves it alone.
+  If not, it handles inflectional endings (plurals into singular form,
+  and past tense and "ing" endings into present tense), and then
+  conflates the most common derivational variants.
    
-   Author: Bob Krovetz
+  Author: Bob Krovetz
    
-   Version 15 - This is the first distributable version.  The 
-   basic lexicon (using the Longman dictionary) was 
-   replaced by a modified  /usr/dict/words (a standard 
-   file on Unix systems), and hard-coded pathnames were 
-   replaced with environment variables.  The changes
-   made in version 14 were undone.
-   
-   
-   Version 14 - Even if variants are mentioned in the dictionary,
-   ignore them for certain endings (inflectional, 
-   -ion, -ment, and -ity).
-   
-   Note: this version was done as part of an effort
-   to conflated word forms that are in the dictionary.
-   This does make some correct conflations, but it
-   will also conflate state/station, depart/department.
-   It is not enough for a word to have the potential to
-   be a variant, there has to be evidence to relate them.
+  Version 15 - This is the first distributable version.  The 
+  basic lexicon (using the Longman dictionary) was 
+  replaced by a modified  /usr/dict/words (a standard 
+  file on Unix systems), and hard-coded pathnames were 
+  replaced with environment variables.  The changes
+  made in version 14 were undone.
    
    
-   Version 13 - Includes a supplemental dictionary, and three direct
-   mapping tables (one for run-ons,  another for
-   proper nouns such as `British->Britain', and
-   a third for simple sense-links between words in
-   the dictionary).  The supplemental dictionary is
-   used to allow conflations (by specifying a root),
-   or to prevent them (by specifying a variant).
-   For example, if `factorial' is not in the lexicon,
-   it would be converted to `factory' (analogous to
-   `matrimonial'/`matrimony').
+  Version 14 - Even if variants are mentioned in the dictionary,
+  ignore them for certain endings (inflectional, 
+  -ion, -ment, and -ity).
+   
+  Note: this version was done as part of an effort
+  to conflated word forms that are in the dictionary.
+  This does make some correct conflations, but it
+  will also conflate state/station, depart/department.
+  It is not enough for a word to have the potential to
+  be a variant, there has to be evidence to relate them.
    
    
-   Previous versions involved the basic inflectional morphology
-   (plurals, tensed verbs, and aspect), and tests of specific 
-   derivational endings.
+  Version 13 - Includes a supplemental dictionary, and three direct
+  mapping tables (one for run-ons,  another for
+  proper nouns such as `British->Britain', and
+  a third for simple sense-links between words in
+  the dictionary).  The supplemental dictionary is
+  used to allow conflations (by specifying a root),
+  or to prevent them (by specifying a variant).
+  For example, if `factorial' is not in the lexicon,
+  it would be converted to `factory' (analogous to
+  `matrimonial'/`matrimony').
    
    
-   Modification history:
-   8/26/92   Revised to use hash tables for dictionary look-up instead 
-   of an indexed sequential file
-   
-   12/13/92   Revised to also do some simple derivational conflation.
-   Initially this will be conservative, and not conflate
-   forms that are in the dictionary (most of them).  If
-   the form isn't in the dictionary, and the stem isn't
-   in the dictionary, we will attempt a reasonable guess
-   at the stem (for some endings), otherwise we will leave
-   it alone.
-   
-   7/26/93   Modified the structure of a hashtable entry.  We can now
-   include more complex structures.  This allows us to make
-   direct mappings between lexical items, which is necessary
-   for reducing `periodically->periodic', `Britain->British',
-   and various irregular variations.  This also gives us
-   much greater flexibility, since any word form can be reduced
-   to any other word form.  A supplemental dictionary is also
-   provided for.  This allows words to be left unstemmed, and
-   lets some stemming go through (since the stemmer wants the
-   root form to appear in the dictionary).
+  Previous versions involved the basic inflectional morphology
+  (plurals, tensed verbs, and aspect), and tests of specific 
+  derivational endings.
    
    
-   8/2/93    Revised to bypass the dictionary for certain endings
-   (inflected forms, -ion, -ment, and -ity).  That is, 
-   even if the dictionary contains words with these endings,
-   we will check to if there is a possible root which is
-   also in the dictionary, and use that if it is found.
-   This results in further conflations, but also causes
-   a number of errors (e.g., `appointment/appoint', but
-   `department/depart').  Feh!  
+  Modification history:
+  8/26/92   Revised to use hash tables for dictionary look-up instead 
+  of an indexed sequential file
    
-   8/3/93    The file was changed so that the dictionary is no longer
-   bypassed.
+  12/13/92   Revised to also do some simple derivational conflation.
+  Initially this will be conservative, and not conflate
+  forms that are in the dictionary (most of them).  If
+  the form isn't in the dictionary, and the stem isn't
+  in the dictionary, we will attempt a reasonable guess
+  at the stem (for some endings), otherwise we will leave
+  it alone.
    
-   5/25/94    Modified to use environment variables, and generally
-   changed to be made available for distribution.
+  7/26/93   Modified the structure of a hashtable entry.  We can now
+  include more complex structures.  This allows us to make
+  direct mappings between lexical items, which is necessary
+  for reducing `periodically->periodic', `Britain->British',
+  and various irregular variations.  This also gives us
+  much greater flexibility, since any word form can be reduced
+  to any other word form.  A supplemental dictionary is also
+  provided for.  This allows words to be left unstemmed, and
+  lets some stemming go through (since the stemmer wants the
+  root form to appear in the dictionary).
+   
+   
+  8/2/93    Revised to bypass the dictionary for certain endings
+  (inflected forms, -ion, -ment, and -ity).  That is, 
+  even if the dictionary contains words with these endings,
+  we will check to if there is a possible root which is
+  also in the dictionary, and use that if it is found.
+  This results in further conflations, but also causes
+  a number of errors (e.g., `appointment/appoint', but
+  `department/depart').  Feh!  
+   
+  8/3/93    The file was changed so that the dictionary is no longer
+  bypassed.
+   
+  5/25/94    Modified to use environment variables, and generally
+  changed to be made available for distribution.
 
-   12/3/94 (MIK) Removed all integer to pointer casts (which caused
-   segmentation faults on 64-bit machines).  A dynamic table is created
-   in memory to hold dictentry's for each direct conflation, proper noun
-   and exception word, plus one default entry to cover all the "normal"
-   words in the dictionary.  The hash dictionary now stores the index into
-   this table for each word in the dictionary.  A new call, getdep, was
-   added to get the actuall dictentry for a word.  Also, some code was
-   cleanned up. (using fprintf(stderr, instead of exit(), etc.)
+  12/3/94 (MIK) Removed all integer to pointer casts (which caused
+  segmentation faults on 64-bit machines).  A dynamic table is created
+  in memory to hold dictentry's for each direct conflation, proper noun
+  and exception word, plus one default entry to cover all the "normal"
+  words in the dictionary.  The hash dictionary now stores the index into
+  this table for each word in the dictionary.  A new call, getdep, was
+  added to get the actuall dictentry for a word.  Also, some code was
+  cleanned up. (using fprintf(stderr, instead of exit(), etc.)
 
-   12/8/94 (MIK) Added the unit testing code
+  12/8/94 (MIK) Added the unit testing code
 
-   3/20/95 (RJK) Fixed bug with -ble, -nce, -ncy.
+  3/20/95 (RJK) Fixed bug with -ble, -nce, -ncy.
 
-   6/16/04 (tds) Added kstem_allocate_memory, kstem_stem_to_buffer,
-                 and kstem_add_table_entry.  The kstem_allocate_memory/
-                 kstem_add_table_entry calls allow stemmer initialization
-                 without forcing the user to store stem dictionaries in
-                 flat files.
-   */
+  6/16/04 (tds) Added kstem_allocate_memory, kstem_stem_to_buffer,
+  and kstem_add_table_entry.  The kstem_allocate_memory/
+  kstem_add_table_entry calls allow stemmer initialization
+  without forcing the user to store stem dictionaries in
+  flat files.
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -139,11 +139,11 @@
 #define DIR_SEP_STRING "/"
 
 typedef struct {
- char flag;
- char word1[MAX_WORD_LENGTH];
- char stem1[MAX_WORD_LENGTH];
- char word2[MAX_WORD_LENGTH];
- char stem2[MAX_WORD_LENGTH];
+  char flag;
+  char word1[MAX_WORD_LENGTH];
+  char stem1[MAX_WORD_LENGTH];
+  char word2[MAX_WORD_LENGTH];
+  char stem2[MAX_WORD_LENGTH];
 } kstem_HSLOT;
 
 
@@ -173,24 +173,24 @@ static void stemht_init();
 
 
 typedef struct            /* hash table entry */
-    {
-    int id;             /* "value"; can be anything except FAIL (= -1) */
-    int string;         /* "key"; offset of string in string space */
-    } hte;
+{
+  int id;             /* "value"; can be anything except FAIL (= -1) */
+  int string;         /* "key"; offset of string in string space */
+} hte;
 
 typedef struct            /* hash table object: per-object variables */
-    {
-    int tblsize;        /* number of entries in hash table */
-    int used;           /* number of entries used */
-    int hashdvsr2;      /* divisor for second hash function */
-    int stringspcsize;  /* size of the string space */
-    int stringtop;      /* offs of next available location in string space */
-    int hvalue;         /* temp used by hash functions */
-    int lastkey;        /* key of an empty entry, from last lookup */
-    char *stringspc;      /* base of the string space */
-    hte *htable;          /* base of table, which is an array of htes */
-    char name[MAX_FILENAME_LENGTH]; /* filename of hashobj on disk */
-    } hashobj;
+{
+  int tblsize;        /* number of entries in hash table */
+  int used;           /* number of entries used */
+  int hashdvsr2;      /* divisor for second hash function */
+  int stringspcsize;  /* size of the string space */
+  int stringtop;      /* offs of next available location in string space */
+  int hvalue;         /* temp used by hash functions */
+  int lastkey;        /* key of an empty entry, from last lookup */
+  char *stringspc;      /* base of the string space */
+  hte *htable;          /* base of table, which is an array of htes */
+  char name[MAX_FILENAME_LENGTH]; /* filename of hashobj on disk */
+} hashobj;
 
 /* ------------------------- Function Declarations --------------------------*/
 #define MAX(A,B)  ((A) > (B) ? (A) : (B))
@@ -211,141 +211,141 @@ static int prime_gte(int) ;
 static int prime(int);
 
 /* ---------------------------------------------------------------------------
-get_hashobj() creates and initializes a hash table object, and returns a
-pointer to it.  The caller provides an estimated number of entries.  The
-hashobj created will be big enough to hold this number of entries before
-it expands either the hash table or the string space (this is not
-guaranteed for the string space).
+   get_hashobj() creates and initializes a hash table object, and returns a
+   pointer to it.  The caller provides an estimated number of entries.  The
+   hashobj created will be big enough to hold this number of entries before
+   it expands either the hash table or the string space (this is not
+   guaranteed for the string space).
 
-For best performance on small dictionaries, double the initial size.
+   For best performance on small dictionaries, double the initial size.
 */
 
 hashobj *get_hashobj(int entries)
 {
-    hashobj *t;       /* t stands for "this", the current object, as in c++ */
-    int j;
+  hashobj *t;       /* t stands for "this", the current object, as in c++ */
+  int j;
     
-    entries = (int)MAX(entries, MIN_ENTRIES); 
-    t = (hashobj *)calloc((size_t)1, (size_t)sizeof(hashobj));
-    if (t)
-	{
-	t->tblsize = prime_gte(entries);
-	t->hashdvsr2 = prime_lte(t->tblsize - 2);
-	t->stringspcsize = t->tblsize * AVG_STRINGSIZE;
-	t->stringspc = (char *)calloc((size_t)t->stringspcsize, (size_t)1);
-	t->htable = (hte *)malloc((size_t)(t->tblsize * sizeof(hte)));
-	}
-    if (t == 0 || t->stringspc == 0 || t->htable == 0)
-	{
-	fprintf(stderr,"Error allocating hash table memory");
-	return(NULL);
-	}
-    for (j = 0; j < t->tblsize; j++) {
-        t->htable[j].id = EMPTY;
-	t->htable[j].string = EMPTY;
-      }
+  entries = (int)MAX(entries, MIN_ENTRIES); 
+  t = (hashobj *)calloc((size_t)1, (size_t)sizeof(hashobj));
+  if (t)
+    {
+      t->tblsize = prime_gte(entries);
+      t->hashdvsr2 = prime_lte(t->tblsize - 2);
+      t->stringspcsize = t->tblsize * AVG_STRINGSIZE;
+      t->stringspc = (char *)calloc((size_t)t->stringspcsize, (size_t)1);
+      t->htable = (hte *)malloc((size_t)(t->tblsize * sizeof(hte)));
+    }
+  if (t == 0 || t->stringspc == 0 || t->htable == 0)
+    {
+      fprintf(stderr,"Error allocating hash table memory");
+      return(NULL);
+    }
+  for (j = 0; j < t->tblsize; j++) {
+    t->htable[j].id = EMPTY;
+    t->htable[j].string = EMPTY;
+  }
 
-    return(t);
+  return(t);
 }
 
 /* ---------------------------------------------------------------------------
-ho_lookup() returns FAIL if term not found, the term id otherwise .
+   ho_lookup() returns FAIL if term not found, the term id otherwise .
 */
 
 int ho_lookup(hashobj *t, const char *s)
 {
-    int index;
+  int index;
     
-    index = ho_find_ent(t, s);
-    if (index == FAIL)
-        return(FAIL);
-    return(t->htable[index].id);        /* success */
+  index = ho_find_ent(t, s);
+  if (index == FAIL)
+    return(FAIL);
+  return(t->htable[index].id);        /* success */
 }
 
 /* ---------------------------------------------------------------------------
-ho_find_ent() returns FAIL if term not found, the hash table index otherwise .
-If term is not found, it sets lastkey to point to the first empty entry
-found.
+   ho_find_ent() returns FAIL if term not found, the hash table index otherwise .
+   If term is not found, it sets lastkey to point to the first empty entry
+   found.
 */
 
 int ho_find_ent(hashobj *t, const char *s)
 {
-    int key, firstkey;
-    int probe_step = 0;
+  int key, firstkey;
+  int probe_step = 0;
     
-    for(firstkey = key = hash1(t, s); t->htable[key].string != EMPTY; )
-	{
-	if (MATCH(t->stringspc + t->htable[key].string, s))
-	{
-	    t->lastkey = key;
-	    return(key);                                   /* success */
-	}
-	if (probe_step == 0)
-	    probe_step = HASH2(t);
-	key = (key + probe_step) % t->tblsize;
-	if (key == firstkey)
-	    {
-	    fprintf(stderr,"Error in lookup: searched entire table unsuccessfully");
-	    return(FAIL);
-	    }
-	}
+  for(firstkey = key = hash1(t, s); t->htable[key].string != EMPTY; )
+    {
+      if (MATCH(t->stringspc + t->htable[key].string, s))
+        {
+          t->lastkey = key;
+          return(key);                                   /* success */
+        }
+      if (probe_step == 0)
+        probe_step = HASH2(t);
+      key = (key + probe_step) % t->tblsize;
+      if (key == firstkey)
+        {
+          fprintf(stderr,"Error in lookup: searched entire table unsuccessfully");
+          return(FAIL);
+        }
+    }
 
-    t->lastkey = key;
-    return(FAIL);
+  t->lastkey = key;
+  return(FAIL);
 }       
 
 /* ---------------------------------------------------------------------------
-ho_insert() returns key if successful, FAIL otherwise
+   ho_insert() returns key if successful, FAIL otherwise
 */
 
 int ho_insert(hashobj *t, const char *s, int id)
 {
-    hte e;
+  hte e;
     
-    if (id == FAIL)
-	{
-	fprintf(stderr,"Attempted to insert string %s with id = FAIL", s);
-	return(FAIL);
-	}
+  if (id == FAIL)
+    {
+      fprintf(stderr,"Attempted to insert string %s with id = FAIL", s);
+      return(FAIL);
+    }
 
-    if (((double)t->used / t->tblsize) > LOAD_FACTOR)
-	{ /* increase the size of the hashobj by EXP_FACTOR */
-	  if (set_size_hashobj(t, 1.0 / EXP_FACTOR * LOAD_FACTOR) == -2)
-	    return FAIL;   /* no memory */
-	  ho_lookup(t, s); /* must lookup again to set lastkey */
-	}
+  if (((double)t->used / t->tblsize) > LOAD_FACTOR)
+    { /* increase the size of the hashobj by EXP_FACTOR */
+      if (set_size_hashobj(t, 1.0 / EXP_FACTOR * LOAD_FACTOR) == -2)
+        return FAIL;   /* no memory */
+      ho_lookup(t, s); /* must lookup again to set lastkey */
+    }
     
-    if (t->htable[t->lastkey].string == EMPTY)
+  if (t->htable[t->lastkey].string == EMPTY)
     {
-	e.id = id;
-	e.string = stralloc(t, strlen(s)+1);
-	if (e.string == FAIL)
-	    return(FAIL);	/* no more string storage */
+      e.id = id;
+      e.string = stralloc(t, strlen(s)+1);
+      if (e.string == FAIL)
+        return(FAIL);       /* no more string storage */
    
-	strcpy(t->stringspc + e.string, s);
-	t->htable[t->lastkey] = e;
-	t->used++;
+      strcpy(t->stringspc + e.string, s);
+      t->htable[t->lastkey] = e;
+      t->used++;
     }
-    else                     /* pointing to the right entry? */
+  else                     /* pointing to the right entry? */
     {
-	if (!MATCH(t->stringspc + t->htable[t->lastkey].string, s))
-	{
-	    fprintf(stderr, "string insertion error in hashobj [%s vs %s]\n",
-		   t->stringspc + t->htable[t->lastkey].string, s);
-            return(FAIL);
-	}
-        else
-	{
-            t->htable[t->lastkey].id = id; /* change the existing entry */
-	}
+      if (!MATCH(t->stringspc + t->htable[t->lastkey].string, s))
+        {
+          fprintf(stderr, "string insertion error in hashobj [%s vs %s]\n",
+                  t->stringspc + t->htable[t->lastkey].string, s);
+          return(FAIL);
+        }
+      else
+        {
+          t->htable[t->lastkey].id = id; /* change the existing entry */
+        }
     }
     
-    return(t->lastkey);
+  return(t->lastkey);
 }
 
-	
+        
 /* ---------------------------------------------------------------------------
-free_hashobj() releases the hash object's storage.
+   free_hashobj() releases the hash object's storage.
 */
 
 void free_hashobj(hashobj *t)
@@ -360,167 +360,167 @@ void free_hashobj(hashobj *t)
 
 
 /* ---------------------------------------------------------------------------
-Set the size of the hash table.
+   Set the size of the hash table.
 
-load_factor is the load_factor you want the hashobj to be.  It can be
-in the range: 0 < load_factor <= LOAD_FACTOR.
+   load_factor is the load_factor you want the hashobj to be.  It can be
+   in the range: 0 < load_factor <= LOAD_FACTOR.
 
-return -1 if args are bad; -2 if can't allocate memory
+   return -1 if args are bad; -2 if can't allocate memory
 
 */
 int set_size_hashobj(hashobj *t, double load_factor)
 {
-    int j;
-    hashobj *newht;
-    hte *src, *dest;
-    int new_size;
+  int j;
+  hashobj *newht;
+  hte *src, *dest;
+  int new_size;
 
-    if (!t)
-      return -1;
-    if (load_factor > LOAD_FACTOR)
-      load_factor = LOAD_FACTOR;
-    if (load_factor <= 0)
-      return -1;
+  if (!t)
+    return -1;
+  if (load_factor > LOAD_FACTOR)
+    load_factor = LOAD_FACTOR;
+  if (load_factor <= 0)
+    return -1;
 
-    new_size = (int)(t->used / load_factor) + 1;
+  new_size = (int)(t->used / load_factor) + 1;
 
-    newht = get_hashobj(new_size);
-    if (!newht)
-      return -2;
+  newht = get_hashobj(new_size);
+  if (!newht)
+    return -2;
     
-    free(newht->stringspc);
-    newht->stringspc = t->stringspc;
+  free(newht->stringspc);
+  newht->stringspc = t->stringspc;
     
-    for (j = 0; j < t->tblsize; j++)
-	{
-	if (t->htable[j].string != EMPTY)
-	    {
-	    src = t->htable + j;
-	    ho_lookup(newht, t->stringspc + src->string);
-	    dest = newht->htable + newht->lastkey;
-	    dest->string = src->string;
-	    dest->id = src->id;
-	    }       
-	}
-    free(t->htable);
-    t->htable = newht->htable;
-    t->tblsize = newht->tblsize;
-    t->hashdvsr2 = newht->hashdvsr2;
-    free(newht);
+  for (j = 0; j < t->tblsize; j++)
+    {
+      if (t->htable[j].string != EMPTY)
+        {
+          src = t->htable + j;
+          ho_lookup(newht, t->stringspc + src->string);
+          dest = newht->htable + newht->lastkey;
+          dest->string = src->string;
+          dest->id = src->id;
+        }       
+    }
+  free(t->htable);
+  t->htable = newht->htable;
+  t->tblsize = newht->tblsize;
+  t->hashdvsr2 = newht->hashdvsr2;
+  free(newht);
 
-    return 0;
+  return 0;
 }
 
 /* ---------------------------------------------------------------------------
-This memory allocation scheme currently only grows.  It could be made more
-sophisticated if delete is implemented.  The reason for doing this, rather than
-calling malloc, is that malloc (on most systems) allocates a pointer for each
-block; thus it isn't efficient for allocating small (e.g., 10-byte) blocks.
-This allocator gets n bytes from the pool.  */
+   This memory allocation scheme currently only grows.  It could be made more
+   sophisticated if delete is implemented.  The reason for doing this, rather than
+   calling malloc, is that malloc (on most systems) allocates a pointer for each
+   block; thus it isn't efficient for allocating small (e.g., 10-byte) blocks.
+   This allocator gets n bytes from the pool.  */
 
 static int stralloc(hashobj *t, int n)
 {
-    int start = t->stringtop;
-    char *p;
+  int start = t->stringtop;
+  char *p;
     
-    while (t->stringtop + n >= t->stringspcsize)  /* will it fit? */
-	{
-	p = (char *)realloc((void *)t->stringspc, (size_t)(t->stringspcsize * 2));
-	if (p == (char *)NULL)
-	    {
-	    fprintf(stderr,"Ran out of string space");
-	    return(FAIL);
-	    }
-	t->stringspc = p;
-	t->stringspcsize *= 2;
-	}
+  while (t->stringtop + n >= t->stringspcsize)  /* will it fit? */
+    {
+      p = (char *)realloc((void *)t->stringspc, (size_t)(t->stringspcsize * 2));
+      if (p == (char *)NULL)
+        {
+          fprintf(stderr,"Ran out of string space");
+          return(FAIL);
+        }
+      t->stringspc = p;
+      t->stringspcsize *= 2;
+    }
 
-    t->stringtop += n;                    /* yes, advance top */
-    return(start);                        /* and return offset (old top) */
+  t->stringtop += n;                    /* yes, advance top */
+  return(start);                        /* and return offset (old top) */
 }
 
 /* ---------------------------------------------------------------------------
-Note that this algorithm is machine-dependent.  Big-endian machines must 
-define BIG_ENDIAN at compile time in order to compile the correct version
-of the function.
+   Note that this algorithm is machine-dependent.  Big-endian machines must 
+   define BIG_ENDIAN at compile time in order to compile the correct version
+   of the function.
 
-The second hash function is implemented as a macro, to minimize overhead.
-For reference, here it is:
+   The second hash function is implemented as a macro, to minimize overhead.
+   For reference, here it is:
 
-#define HASH2 (t->hashdvsr2 - (t->hvalue % t->hashdvsr2))
+   #define HASH2 (t->hashdvsr2 - (t->hvalue % t->hashdvsr2))
 
-Since this is used to compute the probe, it must be at least 1.  The second
-hash function should be sufficiently different from the first to avoid
-"secondary clustering".  The reason I subtract the second term from the
-first is simply to make hash2 large when hash1 is small.  
+   Since this is used to compute the probe, it must be at least 1.  The second
+   hash function should be sufficiently different from the first to avoid
+   "secondary clustering".  The reason I subtract the second term from the
+   first is simply to make hash2 large when hash1 is small.  
 
-How it works:
-	  ---------------------
-	  |    |    |    |    |
-	  ---------------------
-	    0    1    2    3
-Above is a picture of the 4 bytes of the integer named hvalue.  The
-characters of the string are successively xor'd into the bytes of the
-integer.  The fourth character goes into p[3], the fifth into p[0], and
-so on.  Bits are scrambled by the xor operation.  After all characters
-have been processed, the object is treated as an integer, of which we
-then take the remainder mod tablesize.
+   How it works:
+   ---------------------
+   |    |    |    |    |
+   ---------------------
+   0    1    2    3
+   Above is a picture of the 4 bytes of the integer named hvalue.  The
+   characters of the string are successively xor'd into the bytes of the
+   integer.  The fourth character goes into p[3], the fifth into p[0], and
+   so on.  Bits are scrambled by the xor operation.  After all characters
+   have been processed, the object is treated as an integer, of which we
+   then take the remainder mod tablesize.
 */
 
 static int hash1(hashobj *t, const char *s)
 {
-    int j;
-    char *p;
+  int j;
+  char *p;
     
-    t->hvalue = 0;
-    p = (char *)&t->hvalue;
+  t->hvalue = 0;
+  p = (char *)&t->hvalue;
     
 #if (MACHINE_ENDIAN == 'B')       /* don't mess with this */
 
-    for(j=0; *s; j &= 3)
-	p[3-j++] ^= *s++;
+  for(j=0; *s; j &= 3)
+    p[3-j++] ^= *s++;
 #else
 
-    for(j=0; *s; j &= 3)
-	p[j++] ^= *s++;
+  for(j=0; *s; j &= 3)
+    p[j++] ^= *s++;
     
 #endif
-/* Make sure that it's positive */
-    if(t->hvalue < 0)
-	t->hvalue = -(t->hvalue);
+  /* Make sure that it's positive */
+  if(t->hvalue < 0)
+    t->hvalue = -(t->hvalue);
 
-    return (t->hvalue % t->tblsize);
+  return (t->hvalue % t->tblsize);
 }
 
 /* ---------------------------------------------------------------------------
-This system requires that the size of the hash table is a prime number.  */
+   This system requires that the size of the hash table is a prime number.  */
 
 static int prime_lte(int n)       /* return the largest prime <= n */
 {
-    while(!prime(n))
-	n--;
-    return(n);
+  while(!prime(n))
+    n--;
+  return(n);
 }   
 
 static int prime_gte(int n)       /* return the largest prime >= n */
 {
-    while(!prime(n))
-	n++;
-    return(n);
+  while(!prime(n))
+    n++;
+  return(n);
 }   
 
 static int prime(int n)             /* return TRUE if n is prime */
 {
-    int j;
-    double root2;
+  int j;
+  double root2;
     
-    root2 = sqrt((double)n);
+  root2 = sqrt((double)n);
 
-    for(j=2; j <= root2; j++)
-	if (n % j == 0)
-	    return(FALSE);
+  for(j=2; j <= root2; j++)
+    if (n % j == 0)
+      return(FALSE);
 
-    return(TRUE);
+  return(TRUE);
 }
 
 double ho_load_factor()
@@ -561,10 +561,10 @@ static char *word;
 
 static int j;    /* INDEX of final letter in stem (within word) */
 static int k;    /* INDEX of final letter in word.
-		    You must add 1 to k to get the current length of word.  
-		    When you want the length of word, use the macro wordlength,
-		    which is #defined as (k+1).  Note that wordlength is only
-		    used for its value (never assigned to), so this is ok. */
+                    You must add 1 to k to get the current length of word.  
+                    When you want the length of word, use the macro wordlength,
+                    which is #defined as (k+1).  Note that wordlength is only
+                    used for its value (never assigned to), so this is ok. */
 
 static int dict_initialized_flag = FALSE;  /* ensure we load it before using it */
 
@@ -665,9 +665,9 @@ void kstem_add_table_entry( const char* variant, const char* word ) {
    hash table.  It also stores the other lexicon information
    required by the stemmer (proper noun information, supplemental
    dictionary files, direct mappings for irregular variants, etc.)
-   */
+*/
 
-  char *stemdir;                         /* the directory where all these files reside */
+char *stemdir;                         /* the directory where all these files reside */
 int read_dict_info() 
 {
   
@@ -681,11 +681,11 @@ int read_dict_info()
   
 
   char exc_file_name[MAX_FILENAME_LENGTH], 
-       dc_file_name[MAX_FILENAME_LENGTH], 
-       hw_file_name[MAX_FILENAME_LENGTH], 
-       cn_file_name[MAX_FILENAME_LENGTH], 
-       pn_file_name[MAX_FILENAME_LENGTH],
-       ds_file_name[MAX_FILENAME_LENGTH];
+    dc_file_name[MAX_FILENAME_LENGTH], 
+    hw_file_name[MAX_FILENAME_LENGTH], 
+    cn_file_name[MAX_FILENAME_LENGTH], 
+    pn_file_name[MAX_FILENAME_LENGTH],
+    ds_file_name[MAX_FILENAME_LENGTH];
   
   char word[MAX_WORD_LENGTH];
   char variant[MAX_WORD_LENGTH];
@@ -716,17 +716,17 @@ int read_dict_info()
     fprintf(stderr,"The directory path in the environment variable STEM_DIR is too long. \nThe limit is 70 characters.");
 
   add_file((char *)exc_file_name, (char *)stemdir, 
-	   (char *)"exception_words.txt");
+           (char *)"exception_words.txt");
   add_file((char *)dc_file_name,  (char *)stemdir, 
-	   (char *)"direct_conflations.txt");
+           (char *)"direct_conflations.txt");
   add_file((char *)ds_file_name,  (char *)stemdir, 
-	   (char *)"dict_supplement.txt");
+           (char *)"dict_supplement.txt");
   add_file((char *)hw_file_name,  (char *)stemdir, 
-	   (char *)"head_word_list.txt");
+           (char *)"head_word_list.txt");
   add_file((char *)cn_file_name,  (char *)stemdir, 
-	   (char *)"country_nationality.txt");
+           (char *)"country_nationality.txt");
   add_file((char *)pn_file_name,  (char *)stemdir, 
-	   (char *)"proper_nouns.txt");
+           (char *)"proper_nouns.txt");
 
   if ((num_deps = count_lines(exc_file_name)) < 0) {
     fprintf(stderr,"Couldn't open/read file: \"%s\"",exc_file_name);
@@ -763,7 +763,7 @@ int read_dict_info()
      (i.e., if a word can end with an `e', it does).  So, `automating' -> `automate' 
      according to the normal application of the rule, but `doing' shouldn't become 
      `doe'.  
-     */
+  */
   
   fscanf(exception_file, "%s", word);
   while (!feof(exception_file))  {
@@ -789,7 +789,7 @@ int read_dict_info()
   direct_conflation_file = fopen(dc_file_name, "r");
   if (!direct_conflation_file) {    
     fprintf(stderr,"Couldn't open file (%s) of conflation words for the dictionary.",dc_file_name);
-      return -1;
+    return -1;
   }
 
   fscanf(direct_conflation_file, "%s %s", variant, word);
@@ -844,7 +844,7 @@ int read_dict_info()
   dict_file = fopen(hw_file_name, "r");
   if (!dict_file) {    
     fprintf(stderr,"Couldn't open dictionary headword file (%s).",hw_file_name);
-      return -1;
+    return -1;
   }
 
   fscanf(dict_file, "%s", word);
@@ -867,7 +867,7 @@ int read_dict_info()
   dict_supplement_file = fopen(ds_file_name, "r");
   if (!dict_supplement_file) {    
     fprintf(stderr,"Couldn't open file (%s) of supplemental words to the dictionary.",ds_file_name);
-      return -1;
+    return -1;
   }
 
   fscanf(dict_supplement_file, "%s", word);
@@ -991,7 +991,7 @@ static int doublec (int i)
    section of this module) which takes str and determines its length at compile
    time.  Note that str must therefore no longer be padded with spaces in the calls 
    to ends_in (as it was in the original version of this code).
-   */
+*/
 
 static int ends(char *str, int sufflength)
 {
@@ -1024,45 +1024,45 @@ static void plural ()
       word[j+3] = '\0';
       k--;
       if (lookup(word) != FAIL)        /* ensure calories -> calorie */
-	return;
+        return;
       k++;
       word[j+3] = 's';             
       setsuffix("y"); 
     }
     else 
       if (ends_in("es")) {
-	/* try just removing the "s" */
-	word[j+2] = '\0';
-	k--;
-	
-	/* note: don't check for exceptions here.  So, `aides' -> `aide',
-	   but `aided' -> `aid'.  The exception for double s is used to prevent
-	   crosses -> crosse.  This is actually correct if crosses is a plural
-	   noun (a type of racket used in lacrosse), but the verb is much more
-	   common */
-	
-	if ((lookup(word) != FAIL)  && !((word[j] == 's') && (word[j-1] == 's')))
-	  return;
-	
-	/* try removing the "es" */
-	
-	word[j+1] = '\0';
-	k--;
-	if (lookup(word) != FAIL)
-	  return;
-	
-	/* the default is to retain the "e" */
-	word[j+1] = 'e';
-	word[j+2] = '\0';
-	k++;
-	return;
+        /* try just removing the "s" */
+        word[j+2] = '\0';
+        k--;
+        
+        /* note: don't check for exceptions here.  So, `aides' -> `aide',
+           but `aided' -> `aid'.  The exception for double s is used to prevent
+           crosses -> crosse.  This is actually correct if crosses is a plural
+           noun (a type of racket used in lacrosse), but the verb is much more
+           common */
+        
+        if ((lookup(word) != FAIL)  && !((word[j] == 's') && (word[j-1] == 's')))
+          return;
+        
+        /* try removing the "es" */
+        
+        word[j+1] = '\0';
+        k--;
+        if (lookup(word) != FAIL)
+          return;
+        
+        /* the default is to retain the "e" */
+        word[j+1] = 'e';
+        word[j+2] = '\0';
+        k++;
+        return;
       }
       else {
-	if (wordlength > 3 && penult_c != 's' && !ends_in("ous")) {
-	  /* unless the word ends in "ous" or a double "s", remove the final "s" */
-	  word[k] = '\0';
-	  k--; 
-	}
+        if (wordlength > 3 && penult_c != 's' && !ends_in("ous")) {
+          /* unless the word ends in "ous" or a double "s", remove the final "s" */
+          word[k] = '\0';
+          k--; 
+        }
       }
   }   
 }
@@ -1096,7 +1096,7 @@ static void past_tense ()
     
     if ((dep = getdep(word)) != (dictentry *)NULL)
       if (!(dep->exception))    /* if it's in the dictionary and not an exception */
-	return;
+        return;
     
     /* try removing the "ed" */
     word[j+1] = '\0';
@@ -1114,7 +1114,7 @@ static void past_tense ()
       word[k] = '\0';
       k--;
       if (lookup(word) != FAIL)
-	return;
+        return;
       word[k+1] = word[k];
       k++;
       return; 
@@ -1166,7 +1166,7 @@ static void aspect ()
     
     if ((dep = getdep(word)) != (dictentry *)NULL)
       if (!(dep->exception))    /* if it's in the dictionary and not an exception */
-	return;
+        return;
     
     /* adding on the `e' didn't work, so remove it */
     word[k] = '\0';
@@ -1180,7 +1180,7 @@ static void aspect ()
       k--;
       word[k+1] = '\0';
       if (lookup(word) != FAIL)
-	return;
+        return;
       word[k+1] = word[k];       /* restore the doubled consonant */
       
       /* the default is to leave the consonant doubled            */
@@ -1333,7 +1333,7 @@ static void er_and_or_endings ()
       word[j] = '\0';
       k = j - 1;
       if (lookup(word) != FAIL)
-	return;
+        return;
       word[j] = word[j-1];       /* restore the doubled consonant */
     }
     
@@ -1343,7 +1343,7 @@ static void er_and_or_endings ()
       word[j+1] = '\0';
       k = j;
       if (lookup(word) != FAIL)  /* yes, so check against the dictionary */
-	return;
+        return;
       word[j] = 'i';             /* restore the endings */ 
       word[j+1] = 'e';
     }   
@@ -1353,7 +1353,7 @@ static void er_and_or_endings ()
       word[j] = '\0';
       k = j - 1;
       if (lookup(word) != FAIL)
-	return;
+        return;
       word[j] = 'e';
     }
     
@@ -1412,7 +1412,7 @@ static void ly_endings ()
       word[j+1] = '\0';
       k = j;
       if (lookup(word) != FAIL)
-	return;
+        return;
       word[j] = 'i';
       word[j+1] = 'l';
       k = old_k;
@@ -1441,7 +1441,7 @@ static void al_endings()
       word[j] = '\0';
       k = j-1;
       if (lookup(word) != FAIL)
-	return;
+        return;
       word[j] = word[j-1];
     }
     
@@ -1466,13 +1466,13 @@ static void al_endings()
       word[j-1] = '\0';          /* try removing -ical  */
       k = j-2;
       if (lookup(word) != FAIL)
-	return;
+        return;
       
       word[j-1] = 'y';           /* try turning -ical to -y (e.g., bibliographical) */
       word[j] = '\0';
       k = j-1;
       if (lookup(word) != FAIL)
-	return;
+        return;
       
       word[j-1] = 'i';
       word[j] = 'c';
@@ -1485,7 +1485,7 @@ static void al_endings()
       word[j] = '\0';           /* (sometimes it gets turned into -y, but we */
       k = j-1;                  /* aren't dealing with that case for now) */
       if (lookup(word) != FAIL)
-	return;
+        return;
       word[j] = 'i';
       k = old_k;
     }
@@ -1520,10 +1520,10 @@ static void ive_endings()
       word[j] = '\0';        /* (e.g., determinative -> determine) */
       k = j-1;
       if (lookup(word) != FAIL)
-	return;
+        return;
       word[j-1] = '\0';     /* try just removing -ative */
       if (lookup(word) != FAIL)
-	return;
+        return;
       word[j-1] = 'a';
       word[j] = 't';
       k = old_k;
@@ -1559,7 +1559,7 @@ static void ize_endings()
       word[j] = '\0';
       k = j-1;
       if (lookup(word) != FAIL)
-	return;
+        return;
       word[j] = word[j-1];
     }
     
@@ -1675,7 +1675,7 @@ static void ble_endings()
       word[k] = '\0';
       k--;
       if (lookup(word) != FAIL)
-	return;
+        return;
       k++;
       word[k] = word[k-1];
     }
@@ -1832,8 +1832,8 @@ int kstem_stem_tobuffer( char* term, char* buffer ) {
     for (i=0; i<=k; i++) {
       // 8 bit characters can be a problem on windows
       if (!isalpha((unsigned char)term[i])) {
-	stem_it = FALSE;
-	break;
+        stem_it = FALSE;
+        break;
       }
     }
   }
@@ -1878,11 +1878,11 @@ int kstem_stem_tobuffer( char* term, char* buffer ) {
      and -ly endings must be checked before -ize.  The -ity ending must come
      before -al, and -ness must come before -ly and -ive.  Finally, -ncy must
      come before -nce (because -ncy is converted to -nce for some instances).
-   */
+  */
   
   /* This while loop will never repeat; it is only here to allow the
      break statement to be used to escape as soon as a word is recognized.
-     */
+  */
   while (1)
     {
       if ((dep = getdep(word)) != (dictentry *)NULL) break;
@@ -1925,7 +1925,7 @@ int kstem_stem_tobuffer( char* term, char* buffer ) {
   
   /* try for a direct mapping (allows for cases like `Italian'->`Italy' and
      `Italians'->`Italy')
-   */
+  */
   if (dep != (dictentry *)NULL && dep->root[0] != '\0')  {                 
     strcpy((char *)buffer, (char *)dep->root);   
   }
@@ -1951,7 +1951,7 @@ char * kstem_stemmer(char *term)
   int length = kstem_stem_tobuffer( term, stem );
 
   if( length )
-  return stem;
+    return stem;
   else
     return term;
 }
@@ -1959,31 +1959,31 @@ char * kstem_stemmer(char *term)
 static int buf_size = 0;
 static void stemht_init() 
 {
-    int i;
+  int i;
 
-    stemht_init_flag = 1;
-    stemhtsize = 30013;
-    stemht = (kstem_HSLOT *)malloc(stemhtsize * sizeof(kstem_HSLOT));
-    if (!stemht)
-      fprintf(stderr, "Failed to allocate kstem hash table");
+  stemht_init_flag = 1;
+  stemhtsize = 30013;
+  stemht = (kstem_HSLOT *)malloc(stemhtsize * sizeof(kstem_HSLOT));
+  if (!stemht)
+    fprintf(stderr, "Failed to allocate kstem hash table");
 
-    for (i = 0; i < stemhtsize; i++) 
+  for (i = 0; i < stemhtsize; i++) 
     {
       /* Set things up so that the first slot is used first */
-	stemht[i].flag = 2;
-	stemht[i].word1[0] = stemht[i].word2[0] = '\0';
-	stemht[i].stem1[0] = stemht[i].stem2[0] = '\0';
+      stemht[i].flag = 2;
+      stemht[i].word1[0] = stemht[i].word2[0] = '\0';
+      stemht[i].stem1[0] = stemht[i].stem2[0] = '\0';
     }
 }
 
 void kstem_release_memory()
 {
-dict_initialized_flag = FALSE;
-free_hashobj(dict_ht);
-free(main_deps);
+  dict_initialized_flag = FALSE;
+  free_hashobj(dict_ht);
+  free(main_deps);
 
-stemht_init_flag = FALSE;
-free(stemht);
+  stemht_init_flag = FALSE;
+  free(stemht);
 }
 
 #ifdef UNIT_TEST
@@ -1998,19 +1998,19 @@ free(stemht);
  */
 int main(int argc, char *argv[])
 {
-   char word[80];
-   char thestem[80];
+  char word[80];
+  char thestem[80];
 
-   do  {
-      gets(word);
-      if (*word == '\0') break;
+  do  {
+    gets(word);
+    if (*word == '\0') break;
 
-      stem(word, thestem);
+    stem(word, thestem);
 
-      printf("%s -> %s\n", word,thestem);
-   } while(!feof(stdin));
+    printf("%s -> %s\n", word,thestem);
+  } while(!feof(stdin));
 
-   return(0);
+  return(0);
 }
 
 #endif

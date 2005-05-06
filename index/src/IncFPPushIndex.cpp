@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "IncFPPushIndex.hpp"
 #include <sstream>
@@ -18,7 +18,7 @@
  *========================================================================*/
 
 lemur::index::IncFPPushIndex::IncFPPushIndex(const std::string &prefix, int cachesize, 
-			       long maxfilesize, lemur::api::DOCID_T startdocid) {
+                                             long maxfilesize, lemur::api::DOCID_T startdocid) {
   setName(prefix);
   fprintf(stderr, "building %s\n ", name.c_str());
   
@@ -119,12 +119,12 @@ void lemur::index::IncFPPushIndex::readDtFileIDs() {
 
   while (!feof(in)) {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
-        continue;
+      continue;
 
     str = new char[len + 1]; // change to fixed size buffer
     if (fscanf(in, "%s", str) != 1) {
       delete[](str);
-       continue;
+      continue;
     }
     dtfiles.push_back(str);
     delete[](str);
@@ -162,11 +162,11 @@ void lemur::index::IncFPPushIndex::readInvFileIDs() {
 
   while (!feof(in)) {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
-        continue;
+      continue;
     str = new char[len + 1];
     if (fscanf(in, "%s", str) != 1) {
       delete[](str);
-       continue;
+      continue;
     }
     // make a new temp name, rename file, push on tempfiles.
     std::stringstream nameStr;
@@ -191,7 +191,7 @@ void lemur::index::IncFPPushIndex::readTermIDs() {
 
   while (!feof(in)) {
     if (fscanf(in, "%d %d", &index, &len) != 2) 
-        continue;
+      continue;
     str = new char[(len+1)];
     if (fscanf(in, "%s", str) != 1) {
       delete[](str);

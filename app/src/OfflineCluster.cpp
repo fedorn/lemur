@@ -14,7 +14,7 @@
 // Offline Clustering
 
 /*! \page OffLineCluster Offline Clustering
-  This example application (<tt>OfflineCluster.cpp</tt>) demonstrates the 
+  This example application demonstrates the 
   basic offline clustering task. Provides k-means and bisecting k-means 
   partitional clustering. It will run each algorithm on the first 100 
   documents in the index (or all of them if less than 100) and print out 
@@ -68,13 +68,14 @@ int AppMain(int argc, char * argv[]) {
   } catch (Exception &ex) {
     ex.writeMessage();
     throw Exception("OfflineCluster", 
-		    "Can't open index, check parameter index");
+                    "Can't open index, check parameter index");
   }
   // construct cluster method.
-  lemur::cluster::OfflineCluster* clusterDB = new lemur::cluster::OfflineCluster(*myIndex,
-						 ClusterParam::simType,
-						 ClusterParam::clusterType,
-						 ClusterParam::docMode);
+  lemur::cluster::OfflineCluster* clusterDB;
+  clusterDB = new lemur::cluster::OfflineCluster(*myIndex,
+                                                 ClusterParam::simType,
+                                                 ClusterParam::clusterType,
+                                                 ClusterParam::docMode);
   // crank through the collection
   COUNT_T numDocs = myIndex->docCount();
   if (numDocs > 100) numDocs = 100;
@@ -84,9 +85,9 @@ int AppMain(int argc, char * argv[]) {
   }
 
   cout << "Using kmeans on " << numDocs << " documents..." << endl;
-  vector <lemur::cluster::Cluster *> *clusters = clusterDB->kMeans(toCluster, 
-						   ClusterParam::numParts,
-						   ClusterParam::maxIters);
+  vector <lemur::cluster::Cluster *> *clusters;
+  clusters = clusterDB->kMeans(toCluster, ClusterParam::numParts,
+                               ClusterParam::maxIters);
 
   for (i = 0; i < clusters->size(); i++) {
     (*clusters)[i]->print();
@@ -94,10 +95,9 @@ int AppMain(int argc, char * argv[]) {
   }
   delete(clusters);
   cout << "Using bisecting kmeans on " << numDocs << " documents..." << endl;
-  clusters = clusterDB->bisecting_kMeans(toCluster, 
-					 ClusterParam::numParts,
-					 ClusterParam::numIters,
-					 ClusterParam::maxIters);
+  clusters = clusterDB->bisecting_kMeans(toCluster, ClusterParam::numParts,
+                                         ClusterParam::numIters,
+                                         ClusterParam::maxIters);
   for (i = 0; i < clusters->size(); i++) {
     (*clusters)[i]->print();
     delete((*clusters)[i]);

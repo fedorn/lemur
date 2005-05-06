@@ -4,13 +4,13 @@
  *  See copyright.cmu for details.
  *
  *==========================================================================
-*/
+ */
 
 #include "PropIndexTH.hpp"
 #include "KeyfileIncIndex.hpp"
 
 lemur::parse::PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
-			 bool countStopWords, int ind) {
+                                       bool countStopWords, int ind) {
   // create index and helper objects  
   if (ind == 1)
     index = new lemur::index::InvFPPushIndex(filename, bufferSize);
@@ -27,7 +27,7 @@ lemur::parse::PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
 }
 
 lemur::parse::PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
-			 bool countStopWords, string ind) {
+                                       bool countStopWords, string ind) {
   // create index and helper objects  
   if (ind == "inv")
     index = new lemur::index::InvFPPushIndex(filename, bufferSize);
@@ -107,31 +107,31 @@ char* lemur::parse::PropIndexTH::handleWord(char* word, const char* original, Pr
       // get position first
       prop = lst->getProperty("position");
       if (!prop)
-	throw lemur::api::Exception("PropIndexTH","missing \"position\" property in property list");
+        throw lemur::api::Exception("PropIndexTH","missing \"position\" property in property list");
       position = *((int*) prop->getValue());
       term->position(position);
       if (len > 0) {
-	// index the word 
-	term->strLength(len);
-	term->spelling(word);
-	index->addTerm(*term);
-	docLength++;
+        // index the word 
+        term->strLength(len);
+        term->spelling(word);
+        index->addTerm(*term);
+        docLength++;
       }
 
       // index all STRING properties
       lst->startIteration();
       while (lst->hasMore()) {
-	prop = lst->nextEntry();
-	if (prop->getType() == Property::STRING) {
-	  tag = (char*) prop->getValue();
-	  if (tag) {
-	    term->strLength(strlen(tag));
-	    if (term->strLength() > 0) {
-	      term->spelling(tag);
-	      index->addTerm(*term);
-	    }
-	  } // if tag 
-	}// if prop is string
+        prop = lst->nextEntry();
+        if (prop->getType() == Property::STRING) {
+          tag = (char*) prop->getValue();
+          if (tag) {
+            term->strLength(strlen(tag));
+            if (term->strLength() > 0) {
+              term->spelling(tag);
+              index->addTerm(*term);
+            }
+          } // if tag 
+        }// if prop is string
       } // while more props
     }
   } else {
@@ -149,48 +149,48 @@ char* lemur::parse::PropIndexTH::handleWord(char* word, const char* original, Pr
       // still ignore words longer than max characters
       int len = strlen(original);
       if (len <= MAX_WORD_LENGTH) {
-	//	tag = (char*) prop->getValue();
-	// get position first
-	prop = lst->getProperty("position");
-	if (!prop)
-	  throw lemur::api::Exception("PropIndexTH","missing \"position\" property in property list");
-	position = *((int*) prop->getValue());
-	term->position(position);
-	if (len > 0) {
-	  // index the word 
-	  term->strLength(len);
-	  term->spelling(original);
-	  index->addTerm(*term);
-	}
+        //      tag = (char*) prop->getValue();
+        // get position first
+        prop = lst->getProperty("position");
+        if (!prop)
+          throw lemur::api::Exception("PropIndexTH","missing \"position\" property in property list");
+        position = *((int*) prop->getValue());
+        term->position(position);
+        if (len > 0) {
+          // index the word 
+          term->strLength(len);
+          term->spelling(original);
+          index->addTerm(*term);
+        }
 
-	// index the NE tag
-	prop = lst->getProperty("NE");
-	tag = (char*)prop->getValue();
-	term->strLength(strlen(tag));
-	term->spelling(tag);
-	index->addTerm(*term);
+        // index the NE tag
+        prop = lst->getProperty("NE");
+        tag = (char*)prop->getValue();
+        term->strLength(strlen(tag));
+        term->spelling(tag);
+        index->addTerm(*term);
 
-	// index the B_NE tag if any
-	prop = lst->getProperty("B_NE");
-	if (prop) {
-	  tag = (char*)prop->getValue();
-	  term->strLength(strlen(tag));
-	  if (term->strLength() > 0) {
-	    term->spelling(tag);
-	    index->addTerm(*term);
-	  }
-	} // B_NE
+        // index the B_NE tag if any
+        prop = lst->getProperty("B_NE");
+        if (prop) {
+          tag = (char*)prop->getValue();
+          term->strLength(strlen(tag));
+          if (term->strLength() > 0) {
+            term->spelling(tag);
+            index->addTerm(*term);
+          }
+        } // B_NE
 
-	// index the E_NE tag if any
-	prop = lst->getProperty("E_NE");
-	if (prop) {
-	  tag = (char*)prop->getValue();
-	  term->strLength(strlen(tag));
-	  if (term->strLength() > 0) {
-	    term->spelling(tag);
-	    index->addTerm(*term);
-	  }
-	} // E_NE
+        // index the E_NE tag if any
+        prop = lst->getProperty("E_NE");
+        if (prop) {
+          tag = (char*)prop->getValue();
+          term->strLength(strlen(tag));
+          if (term->strLength() > 0) {
+            term->spelling(tag);
+            index->addTerm(*term);
+          }
+        } // E_NE
       }     
     } // if NE
   } // else word is NULL

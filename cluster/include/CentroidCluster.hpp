@@ -24,7 +24,8 @@ namespace lemur
     {
     public:
       ///initialize
-      CentroidCluster(int cid, const lemur::api::Index &ind, const SimilarityMethod &sim);
+      CentroidCluster(int cid, const lemur::api::Index &ind, 
+                      const SimilarityMethod &sim);
       /// clean up
       virtual ~CentroidCluster() {
         delete(centroid);
@@ -50,9 +51,16 @@ namespace lemur
       virtual double sum2() const {return weightedCentroid->sum2(); }
   
     private:
+      /// The centroid vector of the cluster.
       lemur::utility::FloatFreqVector *centroid;
+      /// The weighted centroid vector of the cluster as a ClusterRep.
       ClusterRep *weightedCentroid;
+      /// Read the centroid vector of the cluster in from disk.
       lemur::utility::FloatFreqVector* readCentroid();
+      /*! \brief Add a vector to the centroid.
+        @param v the vector to add
+        @param first if true, initialize the centroid to v.
+      */
       void updateCentroid(lemur::utility::FloatFreqVector *v, bool first);
     };
   }

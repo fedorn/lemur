@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // QueryExpander
@@ -94,8 +94,8 @@ UINT64 indri::query::QueryExpander::getCF( const std::string& term ) {
 }
 
 std::string indri::query::QueryExpander::buildQuery( const std::string& originalQuery, double originalWeight,
-                                       const std::vector< std::pair<std::string, double> >& expandedTerms,
-                                       int termCount ) {
+                                                     const std::vector< std::pair<std::string, double> >& expandedTerms,
+                                                     int termCount ) {
   std::stringstream ret;
 
   ret.setf( std::ios_base::fixed );

@@ -64,7 +64,7 @@ namespace lemur
        * all the elements of the old location
        *
        * @return NULL if we can't get more memory, or if we are requesting a newsize that is not bigger than the oldsize
-       */	
+       */       
       int* getMoreMem(int newsize, int* location, int oldsize);
 
       /** "free" the memory at this pointer
@@ -91,11 +91,11 @@ namespace lemur
        */
       int* getFromFree(int csize);
 
-      int* begin;		/// point to the start of our cache
-      int  size;		/// the size of our cache	
-      int* end;	        /// index of where free memory begins
-      int  intsize;	        /// sizeof(int) value
-      //vector<int*> freelist;	/// a list of free memory holes
+      int* begin;               /// point to the start of our cache
+      int  size;                /// the size of our cache       
+      int* end;         /// index of where free memory begins
+      int  intsize;             /// sizeof(int) value
+      //vector<int*> freelist;  /// a list of free memory holes
       vector<int*> freelist[NLISTS]; /// array of lists of free memory 
       bool ourmem; /// whether we initialized mem and should free it
     };

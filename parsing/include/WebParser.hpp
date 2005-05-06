@@ -31,7 +31,7 @@ namespace lemur
     ///
     ///  The DOCHDR is ignored.
     ///
-    ///  Text in <script> tags is ignored.  Text in HTML <!-- --> comments 
+    ///  Text in &lt;script&gt; tags is ignored.  Text in HTML &lt;!-- --&gt; comments 
     ///  is ignored.
 
     // Source code in webparser.lex

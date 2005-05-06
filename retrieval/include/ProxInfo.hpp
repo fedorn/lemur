@@ -22,9 +22,12 @@ namespace lemur
   namespace retrieval 
   {
     
-    /// Proximity information for a term within a document. Provides support
-    /// for ordered and unordered window operators. Used to prune document
-    /// lists before scoring the documents.
+    /// \brief Proximity information for a term within a document. 
+    /*!
+      Provides support
+      for ordered and unordered window operators. Used to prune document
+      lists before scoring the documents.
+    */
     class ProxInfo {
     public: 
       /// Make an empty one.

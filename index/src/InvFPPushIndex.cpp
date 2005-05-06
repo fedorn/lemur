@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 #include "InvFPPushIndex.hpp"
@@ -158,9 +158,9 @@ void lemur::index::InvFPPushIndex::writeTOC(int numinv, const lemur::parse::Coll
     while (props->hasMore()) {
       p = props->nextEntry();
       if (p->getType() == lemur::parse::Property::STDSTRING)
-      toc << p->getName() << "  " << *(string*)p->getValue() << endl;
+        toc << p->getName() << "  " << *(string*)p->getValue() << endl;
       else if (p->getType() == lemur::parse::Property::STRING)
-	toc << p->getName() << "  " << (char*)p->getValue() << endl;
+        toc << p->getName() << "  " << (char*)p->getValue() << endl;
     }
   }
 

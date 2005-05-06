@@ -7,13 +7,13 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "DistMergeMethod.hpp"
 
 void lemur::distrib::DistMergeMethod::mergeScoreSet(const lemur::api::IndexedRealVector &indexset, 
-				    const DocScoreVector* const* scoreset, 
-				    DocScoreVector &results) {
+                                                    const DocScoreVector* const* scoreset, 
+                                                    DocScoreVector &results) {
 
   const DocScoreVector* docscores;
   DocScoreVector::const_iterator j;

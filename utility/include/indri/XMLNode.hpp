@@ -31,7 +31,7 @@
 #include "lemur-compat.hpp"
 namespace indri
 {
-  /*! XML support classes. */
+  /*! \brief XML support classes. */
   namespace xml
   {
     

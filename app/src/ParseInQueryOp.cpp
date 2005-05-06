@@ -9,14 +9,10 @@
  *==========================================================================
 */
 
-/// Structured Query Parser
+/*! \page ParseInQueryOp 
 
-/*! \page StructQuery ParseInQueryOp 
-
- 
-
-This application (<tt> ParseInquery.cpp </tt>) parses a file containing 
-structured queries into BasicDocStream format.
+This application parses a file containing structured queries into
+BasicDocStream format.
 
 The parameters are:
 <p>

@@ -142,16 +142,16 @@ namespace lemur
       virtual void deltaDecode();
 
       // Use LOC_T* for TERMID/DOCID/COUNT/LOC.
-      lemur::api::LOC_T* begin;		// pointer to the beginning of this list
-      lemur::api::LOC_T* lastid;	// pointer to the most recent DocID added
-      lemur::api::LOC_T* freq;		// pointer to the frequency of the last DocID
-      lemur::api::LOC_T * end;		  // pointer to the next free memory
+      lemur::api::LOC_T* begin;         // pointer to the beginning of this list
+      lemur::api::LOC_T* lastid;        // pointer to the most recent DocID added
+      lemur::api::LOC_T* freq;          // pointer to the frequency of the last DocID
+      lemur::api::LOC_T * end;            // pointer to the next free memory
       mutable lemur::api::LOC_T* iter;    // pointer tells us where we are in iteration
-      int  size;		// how big are we, increment in powers of 2, start at 16K
-      int  LOC_Tsize;	// sizeof(LOC_T) value
+      int  size;                // how big are we, increment in powers of 2, start at 16K
+      int  LOC_Tsize;   // sizeof(LOC_T) value
       int  strlength;       // the character length of our corresponding string
-      lemur::api::TERMID_T  uid;		          // a unique ID for our string
-      lemur::api::COUNT_T  df;		          // the document frequency for current term
+      lemur::api::TERMID_T  uid;                          // a unique ID for our string
+      lemur::api::COUNT_T  df;                    // the document frequency for current term
       lemur::utility::MemCache* cache;      // the cache to get memory from
       bool hascache;        // remember if we have our own cache
 

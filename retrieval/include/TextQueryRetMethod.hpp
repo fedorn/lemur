@@ -27,12 +27,10 @@ namespace lemur
   namespace api 
   {
     
-    //----------------------------------------------------------------------
-    //      Abstract Interface for A Retrieval Method/Model for Text Query
-    //----------------------------------------------------------------------
-
+    /// \brief Abstract Interface for A Retrieval Method/Model for Text Query
     /*!
-      A text query retrieval method is determined by specifying the following elements <BR>
+      A text query retrieval method is determined by specifying the 
+      following elements:
       <UL>
       <LI> A method to compute the query representation
       <LI> A method to compute the doc representation
@@ -45,11 +43,10 @@ namespace lemur
       and a document <tt>d=(d<sub>1</sub>,d<sub>2</sub>,...,d<sub>N</sub>)</tt>, 
       where <tt>q<sub>1</sub>,...,q<sub>N</sub></tt> and <tt>d<sub>1</sub>,...,d<sub>N</sub></tt> are terms, <tt>TextQueryRetMethod</tt> assumes the following general scoring function:
 
-      <blockquote>
       <pre>
       s(q,d) = g(w(q<sub>1</sub>,d<sub>1</sub>,q,d) + ... + w(q<sub>N</sub>,d<sub>N</sub>,q,d),q,d)
       </pre>
-      </blockquote>
+
       That is, the score of a document <tt>d</tt> against a query <tt>q</tt> is a 
       function <tt>g</tt> of the accumulated weight <tt>w</tt> for each matched term.
  

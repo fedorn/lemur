@@ -17,7 +17,7 @@
 
 namespace lemur
 {
-    /// Document index components.
+  /// Document index components.
   namespace index
   {
     

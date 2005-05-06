@@ -22,7 +22,7 @@ namespace lemur
     
     ///
     ///  Parses documents in with similar document separation tags NIST's Web format.  
-    ///  <DOC></DOC> around documents and <DOCNO></DOCNO> around docids.
+    ///  &lt;DOC&gt;&lt;/DOC&gt; around documents and &lt;DOCNO&gt;&lt;/DOCNO&gt; around docids.
     ///  recognizes tokens with "/" slashes in them, which is the default separator
     ///  for Brill's part of speech tagger. Use with BrillPOSTokenizer.
     ///  This parser also recognizes ./.  ?/. and !/. as end of sentence markers and

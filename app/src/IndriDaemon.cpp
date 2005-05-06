@@ -41,8 +41,8 @@ as <tt>-index=/path/to/repository</tt> on the command line.
 &lt;port&gt;number&lt;/port&gt; in the parameter file and as
 <tt>-port=number</tt> on the command line. </dd> 
 </dl>
-
  */
+
 #include "indri/indri-platform.h"
 #include "lemur-compat.hpp"
 #include "indri/LocalQueryServer.hpp"

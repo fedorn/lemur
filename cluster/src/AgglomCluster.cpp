@@ -7,14 +7,15 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 // David Fisher
 // init: 11/18/2002
 // Agglomerative clustering algorithms.
 #include "AgglomCluster.hpp"
 
-lemur::cluster::ClusterRep *lemur::cluster::AgglomCluster::getClusterRep() const {
+lemur::cluster::ClusterRep *lemur::cluster::AgglomCluster::getClusterRep() 
+  const {
   vector <lemur::api::DOCID_T> docids = getDocIds();
   ClusterRep *elt = new ClusterRep(docids, ind);
   elt->weigh(1.0/docids.size());

@@ -31,7 +31,7 @@
 #include "Mutex.hpp"
 namespace indri
 {
-  /*! Thread and threading support classes. */
+  /*! \brief Thread and threading support classes. */
   namespace thread
   {
     class ConditionVariable {

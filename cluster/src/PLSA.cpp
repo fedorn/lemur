@@ -7,10 +7,10 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 /*
   Author: dmf 2/2003
- */
+*/
 
 #include "PLSA.hpp"
 #include <float.h> // for -DBL_MAX
@@ -20,9 +20,9 @@
 
 // Probabilistic Latent Semantic Analysis
 lemur::cluster::PLSA::PLSA(const lemur::api::Index &dbIndex, int numCats, lemur::utility::HashFreqVector **train, 
-	   lemur::utility::HashFreqVector **validate, int numIter, 
-	   int numRestarts, double betastart, 
-	   double betastop, double anneal, double betaMod) :
+                           lemur::utility::HashFreqVector **validate, int numIter, 
+                           int numRestarts, double betastart, 
+                           double betastop, double anneal, double betaMod) :
   ind(dbIndex), data(train), testData(validate), numberOfIterations(numIter),
   numberOfRestarts(numRestarts), startBeta(betastart), beta(betastart),
   betaMin(betastop), annealcue(anneal), betaModifier(betaMod), 
@@ -111,9 +111,9 @@ void lemur::cluster::PLSA::selectTestTrain(int testPercentage) {
       ct.key = info->termID();
       // K % test
       if ((rand() % testPercentage) == 0)
-	test[i]->add(ct, info->count());
+        test[i]->add(ct, info->count());
       else
-	train[i]->add(ct, info->count());
+        train[i]->add(ct, info->count());
     }
     delete tList;
   }
@@ -124,9 +124,9 @@ void lemur::cluster::PLSA::selectTestTrain(int testPercentage) {
 
 // Probabilistic Latent Semantic Analysis
 lemur::cluster::PLSA::PLSA(const lemur::api::Index &dbIndex, int testPercentage, int numCats, 
-	   int numIter, 
-	   int numRestarts, double betastart, 
-	   double betastop, double anneal, double betaMod) :
+                           int numIter, 
+                           int numRestarts, double betastart, 
+                           double betastop, double anneal, double betaMod) :
   ind(dbIndex), numberOfIterations(numIter),
   numberOfRestarts(numRestarts), startBeta(betastart), beta(betastart),
   betaMin(betastop), annealcue(anneal), betaModifier(betaMod), 
@@ -211,12 +211,12 @@ double lemur::cluster::PLSA::interleavedIterationEM() {
       lemur::utility::HashFreqVector *freqs = data[d];
       freqs->startIteration();
       while (freqs->hasMore()) { // TERM
-	int freq;
-	freqs->nextFreq(w, freq);
-	// sum += tf(w) * p(z) * exp(p(d,z)*p(w,z), beta)/jointBeta(d,w)
-	sum += freq * p_z_prev[z] * 
-	  pow(p_d_z_prev[d][z] * p_w_z_prev[w][z], beta) / 
-	  jointEstimateBeta(d, w);
+        int freq;
+        freqs->nextFreq(w, freq);
+        // sum += tf(w) * p(z) * exp(p(d,z)*p(w,z), beta)/jointBeta(d,w)
+        sum += freq * p_z_prev[z] * 
+          pow(p_d_z_prev[d][z] * p_w_z_prev[w][z], beta) / 
+          jointEstimateBeta(d, w);
       }
     }
     denominatorMaxStep[z] = sum;
@@ -228,14 +228,14 @@ double lemur::cluster::PLSA::interleavedIterationEM() {
     for(z = 0; z < sizeZ; z++) { // CAT
       set<int, less<int> >::iterator it;
       for (it = invIndex[w].begin(); it != invIndex[w].end(); it++) {
-	d = *it;
-	lemur::utility::HashFreqVector *freqs = data[d]; // DOC
-	int freq;
-	freqs->find(w, freq);
-	// sum += tf(w) * p(z) * exp(p(d,z)*p(w,z), beta)/jointBeta(d,w)
-	sum += freq * p_z_prev[z] *
-	  pow(p_d_z_prev[d][z] * p_w_z_prev[w][z], beta) /
-	  jointEstimateBeta(d, w);
+        d = *it;
+        lemur::utility::HashFreqVector *freqs = data[d]; // DOC
+        int freq;
+        freqs->find(w, freq);
+        // sum += tf(w) * p(z) * exp(p(d,z)*p(w,z), beta)/jointBeta(d,w)
+        sum += freq * p_z_prev[z] *
+          pow(p_d_z_prev[d][z] * p_w_z_prev[w][z], beta) /
+          jointEstimateBeta(d, w);
       }
       p_w_z_current[w][z] = sum/denominatorMaxStep[z];
       sum = 0.0;
@@ -248,12 +248,12 @@ double lemur::cluster::PLSA::interleavedIterationEM() {
       lemur::utility::HashFreqVector *freqs = data[d];
       freqs->startIteration();
       while (freqs->hasMore()) { // TERM
-	int freq;
-	freqs->nextFreq(w, freq);
-	// sum += tf(w) * p(z) * exp(p(d,z)*p(w,z), beta)/jointBeta(d,w)
-	sum += freq * p_z_prev[z] * 
-	  pow(p_d_z_prev[d][z] * p_w_z_prev[w][z], beta) / 
-	  jointEstimateBeta(d, w);
+        int freq;
+        freqs->nextFreq(w, freq);
+        // sum += tf(w) * p(z) * exp(p(d,z)*p(w,z), beta)/jointBeta(d,w)
+        sum += freq * p_z_prev[z] * 
+          pow(p_d_z_prev[d][z] * p_w_z_prev[w][z], beta) / 
+          jointEstimateBeta(d, w);
       }
       p_d_z_current[d][z] =  sum/denominatorMaxStep[z];
       sum = 0.0;
@@ -439,9 +439,9 @@ void lemur::cluster::PLSA::iterateWithRestarts() {
     iterate();
     cerr << "RESTART\tLogLikelihood\tTestDataLogLikelihood\n";
     cerr << (count + 1) << "\t" << logLikelihood() << "\t" 
-	 << validateDataLogLikelihood() << endl;
+         << validateDataLogLikelihood() << endl;
   }
-  setPrevToBest();	
+  setPrevToBest();      
   setCurrentToBest();
   cerr << " FINAL LOG-LIKELIHOOD " << validateDataLogLikelihood() 
        << " Avg. Likelihood: " << getAverageLikelihood() << endl;
@@ -456,7 +456,7 @@ void lemur::cluster::PLSA::iterate() {
   beta = startBeta;
   lastA = getAverageLikelihoodPrev();
   cerr << "Starting average likelihood: " << lastA << endl;
-  cerr << "iteration\ttLL\ttestLL\tAvgLL" << endl;	
+  cerr << "iteration\ttLL\ttestLL\tAvgLL" << endl;      
   double LL = -DBL_MAX;
   double prevTestLL = validateDataLogLikelihood();
   double currentTestLL = -DBL_MAX;
@@ -467,7 +467,7 @@ void lemur::cluster::PLSA::iterate() {
     currentTestLL = validateCurrentLogLikelihood();
     newA = getAverageLikelihood();
     cerr << iterNum <<  "\t" << LL << "\t" <<  currentTestLL << "\t" 
-	 << newA << endl;
+         << newA << endl;
     if((currentTestLL - annealcue)  < prevTestLL || newA < lastA) {
       currentTestLL = prevTestLL;
       beta *= betaModifier;
@@ -491,10 +491,10 @@ void lemur::cluster::PLSA::iterate() {
   } else { 
     if (lastA > bestA) {
       if (prevTestLL    > bestTestLL ) {
-	bestTestLL = prevTestLL;
-	setBestToPrev();
-	bestA = lastA;
-      }	
+        bestTestLL = prevTestLL;
+        setBestToPrev();
+        bestA = lastA;
+      } 
     }
   }
 }
@@ -546,7 +546,7 @@ This technique of not using zero probability events in the log-likelihood is dan
 // Calculate the log likelihood of a given data set using the supplied
 // joint estimate method.
 double lemur::cluster::PLSA::doLogLikelihood(jointfuncType jointFunc, 
-			     lemur::utility::HashFreqVector **&myData) {
+                                             lemur::utility::HashFreqVector **&myData) {
   int d;
   lemur::api::TERMID_T w;  
   double sum = 0.0;
@@ -558,8 +558,8 @@ double lemur::cluster::PLSA::doLogLikelihood(jointfuncType jointFunc,
       int freq;
       freqs->nextFreq(w, freq);
       logJoint = log((this->*jointFunc)(d, w));
-      if (logJoint > -HUGE_VAL) {	
-	sum += freq * logJoint;
+      if (logJoint > -HUGE_VAL) {       
+        sum += freq * logJoint;
       }
     }
   }
@@ -636,11 +636,11 @@ bool lemur::cluster::PLSA::readArray(ifstream& infile, enum pType which) {
       p_w_z_best[w] = new double [dim2];
       infile.read((char*) p_w_z_best[w], sizeof(double) * dim2);
       if (!(infile.gcount() == (sizeof(double) * dim2))) {
-	for (j = 1; j <= w; j++)
-	  delete[](p_w_z_best[j]);
-	delete[](p_w_z_best);
-	p_w_z_best = NULL;
-	return false;
+        for (j = 1; j <= w; j++)
+          delete[](p_w_z_best[j]);
+        delete[](p_w_z_best);
+        p_w_z_best = NULL;
+        return false;
       }
     }
     break;
@@ -660,11 +660,11 @@ bool lemur::cluster::PLSA::readArray(ifstream& infile, enum pType which) {
       p_d_z_best[w] = new double [dim2];
       infile.read((char*) p_d_z_best[w], sizeof(double) * dim2);
       if (!(infile.gcount() == (sizeof(double) * dim2))) {
-	for (j = 1; j <= w; j++)
-	  delete[](p_d_z_best[j]);
-	delete[](p_d_z_best);
-	p_d_z_best = NULL;
-	return false;
+        for (j = 1; j <= w; j++)
+          delete[](p_d_z_best[j]);
+        delete[](p_d_z_best);
+        p_d_z_best = NULL;
+        return false;
       }
     }
     break;
@@ -689,7 +689,7 @@ void lemur::cluster::PLSA::writeArrays() {
 }
 
 void lemur::cluster::PLSA::writeArray(ofstream& ofile, enum pType which) {
-	int w;
+  int w;
   switch (which) {
   case P_Z:
     ofile.write((const char*) &sizeZ, sizeof(int));

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // MemoryIndex
@@ -365,10 +365,10 @@ void indri::index::MemoryIndex::_writeDocumentStatistics( UINT64 offset, int byt
 //
 
 void indri::index::MemoryIndex::_addOpenTags( indri::utility::greedy_vector<indri::index::FieldExtent>& indexedTags,
-                               indri::utility::greedy_vector<indri::index::FieldExtent>& openTags,
-                               const indri::utility::greedy_vector<indri::parse::TagExtent>& extents,
-                               unsigned int& extentIndex, 
-                               unsigned int position ) {
+                                              indri::utility::greedy_vector<indri::index::FieldExtent>& openTags,
+                                              const indri::utility::greedy_vector<indri::parse::TagExtent>& extents,
+                                              unsigned int& extentIndex, 
+                                              unsigned int position ) {
   for( ; extentIndex < extents.size(); extentIndex++ ) {
     const indri::parse::TagExtent* extent = &extents[extentIndex];
     
@@ -748,7 +748,7 @@ size_t indri::index::MemoryIndex::memorySize() {
   }
 
   return listDataSize +
-         documentDataSize +
-         termListsSize +
-         fieldListsSize;
+    documentDataSize +
+    termListsSize +
+    fieldListsSize;
 }

@@ -8,18 +8,18 @@
  *
  *==========================================================================
 */
-/// A Structured Query Retrieval Evaluation Program
 
 /*! \page StructuredQueryEvaluation Structured Query Evaluation
-<p>
-This application (StructQueryEval.cpp) runs retrieval experiments to 
-evaluate the performance of the structured query model using the inquery 
-retrieval method. StructQueryEval requires that its index parameter be a
+
+<p> This application runs retrieval experiments to evaluate the
+performance of the structured query model using the inquery retrieval
+method. StructQueryEval requires that its index parameter be a
 positional index (currently one of InvFPIndex or KeyfileIncIndex).
 
-<p>Feedback is implemented as a WSUM of the original query 
-combined with terms selected from the feedback documents based on belief 
-score. The expanded query has the form:
+<p>Feedback is implemented as a WSUM of the original query combined with
+terms selected from the feedback documents based on belief score. The
+expanded query has the form:
+
 <p>
 <pre>
 #wsum( (1 - a) &lt;original query&gt;
@@ -46,6 +46,7 @@ whole collection.
 The parameters are:
 <p>
 <ol>
+
 <li> <tt>index</tt>: The complete name of the index table-of-content file 
 for the database index. This must be a positional index (currently one
 of InvFPIndex or KeyfileIncIndex).
@@ -53,6 +54,7 @@ of InvFPIndex or KeyfileIncIndex).
 <li> <tt>textQuery</tt>: the query text stream parsed by ParseInQuery
 
 <li> <tt>resultFile</tt>: the result file
+
 <li> <tt>resultFormat</tt>: whether the result format should be of the 
 TREC format (i.e., six-column) or just a simple three-column format 
 <tt>&lt;queryID, docID, score&gt</tt>. String value, either <tt>trec</tt>
@@ -99,18 +101,16 @@ int AppMain(int argc, char *argv[]) {
     dl = ind->docInfoList(lastTerm);
     dList = dynamic_cast<lemur::index::InvFPDocList *>(dl);
     if (dList == NULL) {
-      //  throw Exception("StructQueryEval", 
-      //      "InvFPDocList required from index->docInfoList()");
       cerr << "WARNING: StructQueryEval: InvFPDocList required "
-	   << "from index for\nproximity operators. " 
-	   << "Setting all positions to 0." << endl;
+           << "from index for\nproximity operators. " 
+           << "Setting all positions to 0." << endl;
 
     }
     delete(dl);
   } catch (Exception &ex) {
     ex.writeMessage();
     throw Exception("StructQueryEval", 
-		    "Can't open index, check parameter index");
+                    "Can't open index, check parameter index");
   }
 
   DocStream *qryStream;
@@ -119,7 +119,7 @@ int AppMain(int argc, char *argv[]) {
   } catch (Exception &ex) {
     ex.writeMessage(cerr);
     throw Exception("StructQueryEval", 
-		    "Can't open query file, check parameter textQuery");
+                    "Can't open query file, check parameter textQuery");
   }
   ofstream result(RetrievalParameter::resultFile.c_str());
   ResultFile resFile(RetrievalParameter::TRECresultFileFormat);
@@ -160,12 +160,12 @@ int AppMain(int argc, char *argv[]) {
     results.Sort();
     if (RetrievalParameter::fbDocCount > 0) {
       PseudoFBDocs *topDoc = new PseudoFBDocs(results, 
-					      RetrievalParameter::fbDocCount);
+                                              RetrievalParameter::fbDocCount);
       model->updateQuery(*qr, *topDoc);
       if (RetrievalParameter::useWorkingSet) {
-	model->scoreDocSet(*qr, *workSet, results);
+        model->scoreDocSet(*qr, *workSet, results);
       } else {
-	model->scoreCollection(*qr, results);
+        model->scoreCollection(*qr, results);
       } 
       results.Sort();
       delete topDoc;

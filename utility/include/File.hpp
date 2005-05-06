@@ -31,7 +31,7 @@ namespace lemur
   namespace file
   {
     
-    ///Provide single file interface file date stored in multiple segment 
+    ///\brief Provide single file interface file date stored in multiple segment 
     ///files on disk. Keeps each segment size below 2GB for OSes without
     ///large file support.
 

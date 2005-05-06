@@ -27,14 +27,18 @@ namespace lemur
       unsigned int hash() const { return Hash(); }
       bool operator==(const FloatFreqCounter count) { return count.key == this->key;} 
     };
-
-    class FloatFreqVector : public FreqVector, public CSet<FloatFreqCounter, double> {
+    /// Vector of FloatFreqCounter elements.
+    class FloatFreqVector : public FreqVector, 
+                            public CSet<FloatFreqCounter, double> {
     public:
       FloatFreqVector() : CSet<FloatFreqCounter, double>(1000) {s2 = 0;}
       /// Construct a document frequency vector based on the counts stored in an index
-      FloatFreqVector(const lemur::api::Index &index, lemur::api::DOCID_T docID);
-      FloatFreqVector(const lemur::api::Index &index, lemur::api::TermInfoList *tList);
-      FloatFreqVector(const lemur::api::Index &index, vector<lemur::api::DOCID_T> &dids);
+      FloatFreqVector(const lemur::api::Index &index, 
+                      lemur::api::DOCID_T docID);
+      FloatFreqVector(const lemur::api::Index &index, 
+                      lemur::api::TermInfoList *tList);
+      FloatFreqVector(const lemur::api::Index &index, 
+                      vector<lemur::api::DOCID_T> &dids);
       FloatFreqVector(FloatFreqVector *old);
 
       virtual ~FloatFreqVector() {};

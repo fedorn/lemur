@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -99,35 +99,35 @@ struct unix_iter_data {
 };
 
 #ifdef HAS_READDIR_R 
-  void directoryiterator_dirent_init( unix_iter_data& d ) {
-    d.entry = (struct dirent*) malloc( sizeof(struct dirent) + PATH_MAX );
-  }
+void directoryiterator_dirent_init( unix_iter_data& d ) {
+  d.entry = (struct dirent*) malloc( sizeof(struct dirent) + PATH_MAX );
+}
 
-  void directoryiterator_dirent_destroy( unix_iter_data& d ) {
-    free( d.entry );
-  }
+void directoryiterator_dirent_destroy( unix_iter_data& d ) {
+  free( d.entry );
+}
 
-  bool directoryiterator_next( void* opaque ) {
-    unix_iter_data* d = (unix_iter_data*) opaque;
-    struct dirent* result = 0;
-    readdir_r( d->directory, d->entry, &result );  
-    d->done = ( result ? false : true );
-    return d->done;
-  }
+bool directoryiterator_next( void* opaque ) {
+  unix_iter_data* d = (unix_iter_data*) opaque;
+  struct dirent* result = 0;
+  readdir_r( d->directory, d->entry, &result );  
+  d->done = ( result ? false : true );
+  return d->done;
+}
 #else
-  void directoryiterator_dirent_init( unix_iter_data& d ) {
-    d.entry = 0;
-  }
+void directoryiterator_dirent_init( unix_iter_data& d ) {
+  d.entry = 0;
+}
 
-  void directoryiterator_dirent_destroy( unix_iter_data& d ) {
-  }
+void directoryiterator_dirent_destroy( unix_iter_data& d ) {
+}
 
-  bool directoryiterator_next( void* opaque ) {
-    unix_iter_data* d = (unix_iter_data*) opaque;
-    d->entry = readdir( d->directory );  
-    d->done = ( d->entry ? false : true );
-    return d->done;
-  }
+bool directoryiterator_next( void* opaque ) {
+  unix_iter_data* d = (unix_iter_data*) opaque;
+  d->entry = readdir( d->directory );  
+  d->done = ( d->entry ? false : true );
+  return d->done;
+}
 #endif // HAS_READDIR_R
 
 void* directoryiterator_init( const std::string& path ) {

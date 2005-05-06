@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -26,305 +26,305 @@ namespace indri
   namespace server
   {
     
-//
-// NetworkServerProxyResponse
-//
-class NetworkServerProxyResponse : public QueryServerResponse {
-private:
-  indri::net::QueryResponseUnpacker _unpacker;
-  indri::net::NetworkMessageStream* _stream;
+    //
+    // NetworkServerProxyResponse
+    //
+    class NetworkServerProxyResponse : public QueryServerResponse {
+    private:
+      indri::net::QueryResponseUnpacker _unpacker;
+      indri::net::NetworkMessageStream* _stream;
 
-public:
-  NetworkServerProxyResponse( indri::net::NetworkMessageStream* stream ) :
-    _unpacker( stream ),
-    _stream( stream )
-  {
-  }
+    public:
+      NetworkServerProxyResponse( indri::net::NetworkMessageStream* stream ) :
+        _unpacker( stream ),
+        _stream( stream )
+      {
+      }
 
-  ~NetworkServerProxyResponse() {
-    _stream->mutex().unlock();
-  }
+      ~NetworkServerProxyResponse() {
+        _stream->mutex().unlock();
+      }
 
-  indri::infnet::InferenceNetwork::MAllResults& getResults() {
-    return _unpacker.getResults();
-  }
-};
+      indri::infnet::InferenceNetwork::MAllResults& getResults() {
+        return _unpacker.getResults();
+      }
+    };
 
-//
-// NetworkServerProxyDocumentsResponse
-//
+    //
+    // NetworkServerProxyDocumentsResponse
+    //
 
-class NetworkServerProxyDocumentsResponse : public QueryServerDocumentsResponse {
-private:
-  indri::net::NetworkMessageStream* _stream;
-  std::vector<indri::api::ParsedDocument*> _documents;
+    class NetworkServerProxyDocumentsResponse : public QueryServerDocumentsResponse {
+    private:
+      indri::net::NetworkMessageStream* _stream;
+      std::vector<indri::api::ParsedDocument*> _documents;
 
-public:
-  NetworkServerProxyDocumentsResponse( indri::net::NetworkMessageStream* stream ) :
-    _stream(stream)
-  {
-  }
+    public:
+      NetworkServerProxyDocumentsResponse( indri::net::NetworkMessageStream* stream ) :
+        _stream(stream)
+      {
+      }
 
-  ~NetworkServerProxyDocumentsResponse() {
-    _stream->mutex().unlock();
-  }
+      ~NetworkServerProxyDocumentsResponse() {
+        _stream->mutex().unlock();
+      }
 
-  // caller deletes the ParsedDocuments
-  std::vector<indri::api::ParsedDocument*>& getResults() {
-    indri::net::XMLReplyReceiver r;
-    r.wait(_stream);
+      // caller deletes the ParsedDocuments
+      std::vector<indri::api::ParsedDocument*>& getResults() {
+        indri::net::XMLReplyReceiver r;
+        r.wait(_stream);
 
-    if( r.getReply() ) {
-      indri::xml::XMLNode* reply = r.getReply();
-      size_t numChildren = reply->getChildren().size();
+        if( r.getReply() ) {
+          indri::xml::XMLNode* reply = r.getReply();
+          size_t numChildren = reply->getChildren().size();
 
-      for( size_t i=0; i<numChildren; i++ ) {
-        indri::utility::Buffer buffer;
-        int textOffset = 0;
-        indri::utility::greedy_vector<int> metadataKeyOffset;
-        indri::utility::greedy_vector<int> metadataValueOffset;
+          for( size_t i=0; i<numChildren; i++ ) {
+            indri::utility::Buffer buffer;
+            int textOffset = 0;
+            indri::utility::greedy_vector<int> metadataKeyOffset;
+            indri::utility::greedy_vector<int> metadataValueOffset;
 
-        const indri::xml::XMLNode* child = reply->getChildren()[i];
-        const indri::xml::XMLNode* metadata = child->getChild( "metadata" );
+            const indri::xml::XMLNode* child = reply->getChildren()[i];
+            const indri::xml::XMLNode* metadata = child->getChild( "metadata" );
 
-        // allocate room for the ParsedDocument
-        buffer.write( sizeof(indri::api::ParsedDocument) );
+            // allocate room for the ParsedDocument
+            buffer.write( sizeof(indri::api::ParsedDocument) );
 
-        if( metadata ) {
-          for( size_t j=0; j<metadata->getChildren().size(); j++ ) {
-            std::string key = metadata->getChildren()[j]->getChildValue("key");
-            std::string value = metadata->getChildren()[j]->getChildValue("value");           
+            if( metadata ) {
+              for( size_t j=0; j<metadata->getChildren().size(); j++ ) {
+                std::string key = metadata->getChildren()[j]->getChildValue("key");
+                std::string value = metadata->getChildren()[j]->getChildValue("value");           
             
-            metadataKeyOffset.push_back( buffer.position() );
-            strcpy( buffer.write( key.size()+1 ), key.c_str() );
+                metadataKeyOffset.push_back( buffer.position() );
+                strcpy( buffer.write( key.size()+1 ), key.c_str() );
 
-            metadataValueOffset.push_back( buffer.position() );
-            int length = base64_decode( buffer.write( value.size() ), value.size(), value );
-            buffer.unwrite( value.size()-length );
-          }
-        }
+                metadataValueOffset.push_back( buffer.position() );
+                int length = base64_decode( buffer.write( value.size() ), value.size(), value );
+                buffer.unwrite( value.size()-length );
+              }
+            }
 
-        const indri::xml::XMLNode* textNode = child->getChild("text");
-        std::string text;
+            const indri::xml::XMLNode* textNode = child->getChild("text");
+            std::string text;
 
-        if( textNode ) {
-          text = textNode->getValue();
-          textOffset = buffer.position();
-          int length = base64_decode( buffer.write( text.size() ), text.size(), text );
-          buffer.unwrite( text.size()-length );
-        }
+            if( textNode ) {
+              text = textNode->getValue();
+              textOffset = buffer.position();
+              int length = base64_decode( buffer.write( text.size() ), text.size(), text );
+              buffer.unwrite( text.size()-length );
+            }
 
-        // now all of our data is in the buffer, so we can allocate a return structure
-        new(buffer.front()) indri::api::ParsedDocument;
-        indri::api::ParsedDocument* parsedDocument = (indri::api::ParsedDocument*) buffer.front();
+            // now all of our data is in the buffer, so we can allocate a return structure
+            new(buffer.front()) indri::api::ParsedDocument;
+            indri::api::ParsedDocument* parsedDocument = (indri::api::ParsedDocument*) buffer.front();
 
-        const indri::xml::XMLNode* positions = child->getChild( "positions" );
+            const indri::xml::XMLNode* positions = child->getChild( "positions" );
 
-        if( positions ) {
-          const std::vector<indri::xml::XMLNode*>& children = positions->getChildren();
+            if( positions ) {
+              const std::vector<indri::xml::XMLNode*>& children = positions->getChildren();
           
  
-          for( size_t j=0; j<children.size(); j++ ) {
-            indri::parse::TermExtent extent;
-            std::string begin = children[j]->getChildValue("begin");
-            std::string end = children[j]->getChildValue("end");    
+              for( size_t j=0; j<children.size(); j++ ) {
+                indri::parse::TermExtent extent;
+                std::string begin = children[j]->getChildValue("begin");
+                std::string end = children[j]->getChildValue("end");    
 
-            extent.begin = (int) string_to_i64( begin );
-            extent.end = (int) string_to_i64( end );
+                extent.begin = (int) string_to_i64( begin );
+                extent.end = (int) string_to_i64( end );
 
-            parsedDocument->positions.push_back( extent );
+                parsedDocument->positions.push_back( extent );
+              }
+            }
+
+            for( size_t j=0; j<metadataKeyOffset.size(); j++ ) {
+              indri::parse::MetadataPair pair;
+
+              pair.key = buffer.front() + metadataKeyOffset[j];
+              pair.value = buffer.front() + metadataValueOffset[j];
+
+              if( metadataKeyOffset.size() > j+1 )
+                pair.valueLength = metadataKeyOffset[j+1] - metadataValueOffset[j];
+              else
+                pair.valueLength = textOffset;
+
+              parsedDocument->metadata.push_back( pair );
+            }
+
+            parsedDocument->text = buffer.front() + textOffset;
+            parsedDocument->textLength = buffer.position() - textOffset;
+            buffer.detach();
+
+            _documents.push_back( parsedDocument );
+          }
+        }
+  
+        return _documents;
+      }
+    };
+
+    //
+    // NetworkServerProxyMetadataResponse
+    //
+
+    class NetworkServerProxyMetadataResponse : public QueryServerMetadataResponse {
+    private:
+      std::vector<std::string> _metadata;
+      indri::net::NetworkMessageStream* _stream;
+
+    public:
+      NetworkServerProxyMetadataResponse( indri::net::NetworkMessageStream* stream ) :
+        _stream(stream)
+      {
+      }
+
+      ~NetworkServerProxyMetadataResponse() {
+        _stream->mutex().unlock();
+      }
+
+      std::vector<std::string>& getResults() {
+        indri::net::XMLReplyReceiver r;
+        r.wait(_stream);
+
+        // parse the result
+        indri::xml::XMLNode* reply = r.getReply();
+        indri::utility::Buffer metadataBuffer;
+
+        for( unsigned int i=0; i<reply->getChildren().size(); i++ ) {
+          const indri::xml::XMLNode* meta = reply->getChildren()[i];
+          const std::string& input = meta->getValue();
+
+          std::string value;
+          base64_decode_string( value, input );
+          _metadata.push_back(value);
+
+          metadataBuffer.clear();
+        }
+
+        return _metadata;
+      }
+    };
+
+    //
+    // NetworkServerProxyVectorsResponse
+    //
+
+    class NetworkServerProxyVectorsResponse : public QueryServerVectorsResponse {
+    public:
+      std::vector<indri::api::DocumentVector*> _vectors;
+      indri::net::NetworkMessageStream* _stream;
+      bool _readResponse;
+
+    public:
+      NetworkServerProxyVectorsResponse( indri::net::NetworkMessageStream* stream ) 
+        :
+        _stream(stream),
+        _readResponse(false)
+      {
+      }
+
+      ~NetworkServerProxyVectorsResponse() {
+        _stream->mutex().unlock();
+      }
+
+      std::vector<indri::api::DocumentVector*>& getResults() {
+        if( !_readResponse ) {
+          indri::net::XMLReplyReceiver r;
+          r.wait( _stream );
+
+          const indri::xml::XMLNode* reply = r.getReply();
+          const std::vector<indri::xml::XMLNode*>& children = reply->getChildren();
+
+          for( size_t i=0; i<children.size(); i++ ) {
+            const indri::xml::XMLNode* stems = children[i]->getChild("stems");
+            const indri::xml::XMLNode* positions = children[i]->getChild("positions");
+            const indri::xml::XMLNode* fields = children[i]->getChild("fields");
+
+            indri::api::DocumentVector* result = new indri::api::DocumentVector;
+
+            for( unsigned int i=0; i<stems->getChildren().size(); i++ ) {
+              // have to use base64 coding, in case the stem contains '<', '>', etc.
+              std::string stem;
+              base64_decode_string(stem, stems->getChildren()[i]->getValue());
+              result->stems().push_back( stem );
+            }
+
+            std::vector<int>& positionsVector = result->positions();
+
+            for( unsigned int i=0; i<positions->getChildren().size(); i++ ) {
+              const std::string& stringText = positions->getChildren()[i]->getValue();
+              INT64 position = string_to_i64( stringText );
+              positionsVector.push_back( int(position) );
+            }
+
+            std::vector<indri::api::DocumentVector::Field>& fieldVector = result->fields();
+
+            for( unsigned int i=0; i<fields->getChildren().size(); i++ ) {
+              const indri::xml::XMLNode* field = fields->getChildren()[i];
+
+              const indri::xml::XMLNode* nameField = field->getChild("name");
+              const indri::xml::XMLNode* numberField = field->getChild("number");
+              const indri::xml::XMLNode* beginField = field->getChild("begin");
+              const indri::xml::XMLNode* endField = field->getChild("end");
+
+              indri::api::DocumentVector::Field f;
+
+              f.name = nameField->getValue();
+              f.number = string_to_i64( numberField->getValue() );
+              f.begin = int(string_to_i64( beginField->getValue() ));
+              f.end = int(string_to_i64( endField->getValue() ));
+
+              fieldVector.push_back(f);
+            }
+
+            _vectors.push_back(result);
+          }
+
+          _readResponse = true;
+        }
+
+        return _vectors;
+      }
+    };
+
+    //
+    // NetworkServerProxyDocumentIDsResponse
+    //
+
+    class NetworkServerProxyDocumentIDsResponse : public QueryServerDocumentIDsResponse {
+    public:
+      std::vector<lemur::api::DOCID_T> _documentIDs;
+      indri::net::NetworkMessageStream* _stream;
+      bool _readResponse;
+
+    public:
+      NetworkServerProxyDocumentIDsResponse( indri::net::NetworkMessageStream* stream ) 
+        :
+        _stream(stream),
+        _readResponse(false)
+      {
+      }
+
+      ~NetworkServerProxyDocumentIDsResponse() {
+        _stream->mutex().unlock();
+      }
+
+      std::vector<lemur::api::DOCID_T>& getResults() {
+        if( !_readResponse ) {
+          indri::net::XMLReplyReceiver r;
+          r.wait( _stream );
+
+          const indri::xml::XMLNode* reply = r.getReply();
+          const std::vector<indri::xml::XMLNode*>& children = reply->getChildren();
+      
+          for( size_t i=0; i<children.size(); i++ ) {
+            indri::xml::XMLNode* child = children[i];
+            _documentIDs.push_back( string_to_i64( child->getValue() ) );
           }
         }
 
-        for( size_t j=0; j<metadataKeyOffset.size(); j++ ) {
-          indri::parse::MetadataPair pair;
-
-          pair.key = buffer.front() + metadataKeyOffset[j];
-          pair.value = buffer.front() + metadataValueOffset[j];
-
-          if( metadataKeyOffset.size() > j+1 )
-            pair.valueLength = metadataKeyOffset[j+1] - metadataValueOffset[j];
-          else
-            pair.valueLength = textOffset;
-
-          parsedDocument->metadata.push_back( pair );
-        }
-
-        parsedDocument->text = buffer.front() + textOffset;
-        parsedDocument->textLength = buffer.position() - textOffset;
-        buffer.detach();
-
-        _documents.push_back( parsedDocument );
+        return _documentIDs;
       }
-    }
-  
-    return _documents;
-  }
-};
-
-//
-// NetworkServerProxyMetadataResponse
-//
-
-class NetworkServerProxyMetadataResponse : public QueryServerMetadataResponse {
-private:
-  std::vector<std::string> _metadata;
-  indri::net::NetworkMessageStream* _stream;
-
-public:
-  NetworkServerProxyMetadataResponse( indri::net::NetworkMessageStream* stream ) :
-    _stream(stream)
-  {
-  }
-
-  ~NetworkServerProxyMetadataResponse() {
-    _stream->mutex().unlock();
-  }
-
-  std::vector<std::string>& getResults() {
-    indri::net::XMLReplyReceiver r;
-    r.wait(_stream);
-
-    // parse the result
-    indri::xml::XMLNode* reply = r.getReply();
-    indri::utility::Buffer metadataBuffer;
-
-    for( unsigned int i=0; i<reply->getChildren().size(); i++ ) {
-      const indri::xml::XMLNode* meta = reply->getChildren()[i];
-      const std::string& input = meta->getValue();
-
-      std::string value;
-      base64_decode_string( value, input );
-      _metadata.push_back(value);
-
-      metadataBuffer.clear();
-    }
-
-    return _metadata;
-  }
-};
-
-//
-// NetworkServerProxyVectorsResponse
-//
-
-class NetworkServerProxyVectorsResponse : public QueryServerVectorsResponse {
-public:
-  std::vector<indri::api::DocumentVector*> _vectors;
-  indri::net::NetworkMessageStream* _stream;
-  bool _readResponse;
-
-public:
-  NetworkServerProxyVectorsResponse( indri::net::NetworkMessageStream* stream ) 
-    :
-    _stream(stream),
-    _readResponse(false)
-  {
-  }
-
-  ~NetworkServerProxyVectorsResponse() {
-    _stream->mutex().unlock();
-  }
-
-  std::vector<indri::api::DocumentVector*>& getResults() {
-    if( !_readResponse ) {
-      indri::net::XMLReplyReceiver r;
-      r.wait( _stream );
-
-      const indri::xml::XMLNode* reply = r.getReply();
-      const std::vector<indri::xml::XMLNode*>& children = reply->getChildren();
-
-      for( size_t i=0; i<children.size(); i++ ) {
-        const indri::xml::XMLNode* stems = children[i]->getChild("stems");
-        const indri::xml::XMLNode* positions = children[i]->getChild("positions");
-        const indri::xml::XMLNode* fields = children[i]->getChild("fields");
-
-        indri::api::DocumentVector* result = new indri::api::DocumentVector;
-
-        for( unsigned int i=0; i<stems->getChildren().size(); i++ ) {
-          // have to use base64 coding, in case the stem contains '<', '>', etc.
-          std::string stem;
-          base64_decode_string(stem, stems->getChildren()[i]->getValue());
-          result->stems().push_back( stem );
-        }
-
-        std::vector<int>& positionsVector = result->positions();
-
-        for( unsigned int i=0; i<positions->getChildren().size(); i++ ) {
-          const std::string& stringText = positions->getChildren()[i]->getValue();
-          INT64 position = string_to_i64( stringText );
-          positionsVector.push_back( int(position) );
-        }
-
-        std::vector<indri::api::DocumentVector::Field>& fieldVector = result->fields();
-
-        for( unsigned int i=0; i<fields->getChildren().size(); i++ ) {
-          const indri::xml::XMLNode* field = fields->getChildren()[i];
-
-          const indri::xml::XMLNode* nameField = field->getChild("name");
-          const indri::xml::XMLNode* numberField = field->getChild("number");
-          const indri::xml::XMLNode* beginField = field->getChild("begin");
-          const indri::xml::XMLNode* endField = field->getChild("end");
-
-          indri::api::DocumentVector::Field f;
-
-          f.name = nameField->getValue();
-          f.number = string_to_i64( numberField->getValue() );
-          f.begin = int(string_to_i64( beginField->getValue() ));
-          f.end = int(string_to_i64( endField->getValue() ));
-
-          fieldVector.push_back(f);
-        }
-
-        _vectors.push_back(result);
-      }
-
-      _readResponse = true;
-    }
-
-    return _vectors;
-  }
-};
-
-//
-// NetworkServerProxyDocumentIDsResponse
-//
-
-class NetworkServerProxyDocumentIDsResponse : public QueryServerDocumentIDsResponse {
-public:
-  std::vector<lemur::api::DOCID_T> _documentIDs;
-  indri::net::NetworkMessageStream* _stream;
-  bool _readResponse;
-
-public:
-  NetworkServerProxyDocumentIDsResponse( indri::net::NetworkMessageStream* stream ) 
-    :
-    _stream(stream),
-    _readResponse(false)
-  {
-  }
-
-  ~NetworkServerProxyDocumentIDsResponse() {
-    _stream->mutex().unlock();
-  }
-
-  std::vector<lemur::api::DOCID_T>& getResults() {
-    if( !_readResponse ) {
-      indri::net::XMLReplyReceiver r;
-      r.wait( _stream );
-
-      const indri::xml::XMLNode* reply = r.getReply();
-      const std::vector<indri::xml::XMLNode*>& children = reply->getChildren();
-      
-      for( size_t i=0; i<children.size(); i++ ) {
-        indri::xml::XMLNode* child = children[i];
-        _documentIDs.push_back( string_to_i64( child->getValue() ) );
-      }
-    }
-
-    return _documentIDs;
-  }
-};
+    };
   }
 }
 

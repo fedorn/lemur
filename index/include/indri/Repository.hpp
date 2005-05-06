@@ -29,6 +29,7 @@
 #include <string>
 namespace indri
 {
+  /// document manager and ancillary collection components.
   namespace collection
   {
     

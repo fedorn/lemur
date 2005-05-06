@@ -7,16 +7,16 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include "indri/TermFrequencyBeliefNode.hpp"
 #include "indri/InferenceNetwork.hpp"
 #include <math.h>
 
 indri::infnet::TermFrequencyBeliefNode::TermFrequencyBeliefNode( const std::string& name,
-                                                  class InferenceNetwork& network,
-                                                  int listID,
-                                                  indri::query::TermScoreFunction& scoreFunction )
+                                                                 class InferenceNetwork& network,
+                                                                 int listID,
+                                                                 indri::query::TermScoreFunction& scoreFunction )
   :
   _name(name),
   _network(network),

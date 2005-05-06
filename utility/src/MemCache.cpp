@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #include <math.h>
 #include "MemCache.hpp"
@@ -76,11 +76,11 @@ int* lemur::utility::MemCache::getMoreMem(int newsize, int* location, int oldsiz
 
   //do the copy
   memcpy(retval, location, (int) pow(2.0, oldsize));
-	
+        
   //store this free spot
-//  *location = oldsize;
-//  freelist.push_back(location);
-	freelist[oldsize-MINPOW].push_back(location);
+  //  *location = oldsize;
+  //  freelist.push_back(location);
+  freelist[oldsize-MINPOW].push_back(location);
 
   return retval;
 }
@@ -122,24 +122,24 @@ int* lemur::utility::MemCache::getFromFree(int csize) {
   return retval;
 
   /*
-  if (freelist.empty()) 
+    if (freelist.empty()) 
     return NULL;
   
-  for (vector<int*>::iterator i=freelist.begin(); i!=freelist.end(); i++) {
+    for (vector<int*>::iterator i=freelist.begin(); i!=freelist.end(); i++) {
     int avail = **i;
     if (avail == csize) {
-      int* retval = *i;
-      freelist.erase(i);
-      return retval;
+    int* retval = *i;
+    freelist.erase(i);
+    return retval;
     } else if (avail > csize) {
-      int* retval = *i;
-      int diff = avail-csize;
-      *i += csize/intsize;
-      **i = diff;
-      return retval;
+    int* retval = *i;
+    int diff = avail-csize;
+    *i += csize/intsize;
+    **i = diff;
+    return retval;
     }
-  }
+    }
   
-  return NULL;
+    return NULL;
   */
 }

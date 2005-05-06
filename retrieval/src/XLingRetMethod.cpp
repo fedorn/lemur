@@ -6,7 +6,7 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 
 
 #include "XLingRetMethod.hpp"
@@ -19,12 +19,12 @@ using namespace lemur::api;
 lemur::retrieval::XLingRetMethod::XLingRetMethod(const Index &dbIndex,
                                                  const Index &background,
                                                  lemur::dictionary::PDict &dict,
-			       ScoreAccumulator &accumulator,
-			       double l, double b, 
-			       bool cacheDR,
-			       string &sBM, string &tBM,
-			       const Stopper *stp, 
-			       Stemmer *stm) : 
+                                                 ScoreAccumulator &accumulator,
+                                                 double l, double b, 
+                                                 bool cacheDR,
+                                                 string &sBM, string &tBM,
+                                                 const Stopper *stp, 
+                                                 Stemmer *stm) : 
   RetrievalMethod(dbIndex), scAcc(accumulator), source(background),
   dictionary(dict), cacheDocReps(cacheDR), lambda(l), beta(b), 
   stopper(stp), stemmer(stm) {
@@ -67,12 +67,12 @@ lemur::api::QueryRep *lemur::retrieval::XLingRetMethod::computeTargetKLRep(const
     lemur::dictionary::DictEntryVector *xlates = qt.getTranslations();
     if (xlates != NULL) {
       for (lemur::dictionary::DictEntryVector::iterator it = xlates->begin(); 
-	   it != xlates->end(); it++) {
-	TERMID_T tid = ind.term((*it).target);
-	if (tid > 0) {
-	  double prob = (*it).prob;
-	  qr->incCount(tid, prob * sourceWeight);
-	}
+           it != xlates->end(); it++) {
+        TERMID_T tid = ind.term((*it).target);
+        if (tid > 0) {
+          double prob = (*it).prob;
+          qr->incCount(tid, prob * sourceWeight);
+        }
       }
       delete(xlates);
     }
@@ -93,12 +93,12 @@ lemur::retrieval::XLingRetMethod::~XLingRetMethod() {
 
 lemur::api::DocumentRep *lemur::retrieval::XLingRetMethod::computeDocRep(DOCID_T docID) {
   return( new XLingDocModel(docID, &ind, beta, numTarget, 
-			    docBasedTargetSmooth));
+                            docBasedTargetSmooth));
 }
 
 void lemur::retrieval::XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
-					IndexedRealVector &scores, 
-					bool scoreAll) {
+                                                          IndexedRealVector &scores, 
+                                                          bool scoreAll) {
 
   // for each e in Q
   //   for each a in translates(e)
@@ -120,32 +120,32 @@ void lemur::retrieval::XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep,
     lemur::dictionary::DictEntryVector *xlates = qt.getTranslations();
     if (xlates != NULL) {
       for (lemur::dictionary::DictEntryVector::iterator it = xlates->begin(); 
-	   it != xlates->end(); it++) {
-	TERMID_T tid = ind.term((*it).target);
-	if (tid > 0) {
-	  // P(e|a)
-	  double prob = (*it).prob;
-	  DocInfoList *dList = ind.docInfoList(tid);
-	  DocumentRep *dRep;
-	  dList->startIteration();
-	  while (dList->hasMore()) {
-	    const DocInfo *info = dList->nextEntry();
-	    DOCID_T id = info->docID();
-	    if (cacheDocReps) {
-	      if (docReps[id] == NULL)
-		docReps[id] = computeDocRep(id);      
-	      dRep = docReps[id];
-	    } else {
-	      dRep = computeDocRep(id);
-	    }
-	    // P(a|D)P(e|a)
-	    double myScore = matchedTermWeight(tid, prob, info, dRep);
-	    termScores->incScore(id, myScore);
-	    if (! cacheDocReps)
-	      delete(dRep);
-	  }
-	  delete dList;
-	}
+           it != xlates->end(); it++) {
+        TERMID_T tid = ind.term((*it).target);
+        if (tid > 0) {
+          // P(e|a)
+          double prob = (*it).prob;
+          DocInfoList *dList = ind.docInfoList(tid);
+          DocumentRep *dRep;
+          dList->startIteration();
+          while (dList->hasMore()) {
+            const DocInfo *info = dList->nextEntry();
+            DOCID_T id = info->docID();
+            if (cacheDocReps) {
+              if (docReps[id] == NULL)
+                docReps[id] = computeDocRep(id);      
+              dRep = docReps[id];
+            } else {
+              dRep = computeDocRep(id);
+            }
+            // P(a|D)P(e|a)
+            double myScore = matchedTermWeight(tid, prob, info, dRep);
+            termScores->incScore(id, myScore);
+            if (! cacheDocReps)
+              delete(dRep);
+          }
+          delete dList;
+        }
       }
       delete(xlates);
 
@@ -153,16 +153,16 @@ void lemur::retrieval::XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep,
       double nullScore = adjustedScore(0, pge);
       double finalScore;
       for (i = 1; i <= dc; i++) {
-	if (termScores->findScore(i, s)) {
-	  // log(lambda * Sum_a(P(a|D)P(e|a)) + (1 - lambda)P(e|GE))
-	  finalScore = adjustedScore(s, pge);
-	} else {
-	  // log((lambda * 0) + (1 - lambda)P(e|GE))
-	  finalScore = nullScore;
-	}
-	// f(e) * log(lambda * Sum_a(P(a|D)P(e|a)) + (1 - lambda)P(e|GE))
-	finalScore *= sourceWeight;
-	scAcc.incScore(i, finalScore);
+        if (termScores->findScore(i, s)) {
+          // log(lambda * Sum_a(P(a|D)P(e|a)) + (1 - lambda)P(e|GE))
+          finalScore = adjustedScore(s, pge);
+        } else {
+          // log((lambda * 0) + (1 - lambda)P(e|GE))
+          finalScore = nullScore;
+        }
+        // f(e) * log(lambda * Sum_a(P(a|D)P(e|a)) + (1 - lambda)P(e|GE))
+        finalScore *= sourceWeight;
+        scAcc.incScore(i, finalScore);
       }
       termScores->reset();
     } else {
@@ -170,7 +170,7 @@ void lemur::retrieval::XLingRetMethod::scoreInvertedIndex(const QueryRep &qRep,
       // f(e) * log((lambda * 0) + (1 - lambda)P(e|GE))
       double nullScore = adjustedScore(0, pge) * sourceWeight;
       for (i = 1; i <= dc; i++) {
-	scAcc.incScore(i, nullScore);
+        scAcc.incScore(i, nullScore);
       }
     }
   }
@@ -191,7 +191,7 @@ double lemur::retrieval::XLingRetMethod::scoreDoc(const QueryRep &qry, DOCID_T d
 }
 
 double lemur::retrieval::XLingRetMethod::scoreDocVector(const XLingQueryModel &qRep, DOCID_T docID, 
-				      lemur::utility::FreqVector &docVector) {
+                                                        lemur::utility::FreqVector &docVector) {
   double score = 0, termScore;
   qRep.startIteration();
   DocumentRep *dRep = computeDocRep(docID);
@@ -205,18 +205,18 @@ double lemur::retrieval::XLingRetMethod::scoreDocVector(const XLingQueryModel &q
     if (xlates != NULL) {
       termScore = 0;
       for (lemur::dictionary::DictEntryVector::iterator it = xlates->begin(); 
-	   it != xlates->end(); it++) {
-	TERMID_T tid = ind.term((*it).target);
-	if (tid > 0) {
-	  double prob = (*it).prob;
-	  int fq;
-	  if (docVector.find(tid,fq)) {
-	    dInfo = new DocInfo(docID, fq);
-	    // P(a|D)P(e|a)
-	    termScore += matchedTermWeight(tid, prob, dInfo, dRep);
-	    delete dInfo;
-	  }
-	}
+           it != xlates->end(); it++) {
+        TERMID_T tid = ind.term((*it).target);
+        if (tid > 0) {
+          double prob = (*it).prob;
+          int fq;
+          if (docVector.find(tid,fq)) {
+            dInfo = new DocInfo(docID, fq);
+            // P(a|D)P(e|a)
+            termScore += matchedTermWeight(tid, prob, dInfo, dRep);
+            delete dInfo;
+          }
+        }
       }
       delete(xlates);
       // f(e) * log(lambda * Sum_a(P(a|D)P(e|a)) + (1 - lambda)P(e|GE))

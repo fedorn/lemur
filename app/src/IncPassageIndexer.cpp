@@ -8,14 +8,14 @@
  *
  *==========================================================================
 */
-/// A Incremental FP Passage Indexer
 /*! \page IncPassageIndexer Incremental FP Passage Indexer
-<P>
- This application builds an FP passage index for a collection of documents. 
-If the index already exists, new documents are added to that index, 
-otherwise a new index is created. Documents are segmented into passages of 
-size <tt>passageSize</tt> with an overlap of <tt>passageSize/2</tt> terms 
-per passage. 
+
+<P> This application builds an FP passage index for a collection of
+ documents.  If the index already exists, new documents are added to
+ that index, otherwise a new index is created. Documents are segmented
+ into passages of size <tt>passageSize</tt> with an overlap of
+ <tt>passageSize/2</tt> terms per passage.
+
 <P>
 To use it, follow the general steps of running a lemur application.
 <p>
@@ -68,7 +68,6 @@ The parameters are:
 #include "IncPassageTextHandler.hpp"
 #include "Param.hpp"
 #include "indri/Path.hpp"
-#include "TrecParser.hpp"
 
 using namespace lemur::api;
 
@@ -153,13 +152,9 @@ int AppMain(int argc, char * argv[]) {
   // Create the appropriate parser and acronyms list if needed
   Parser * parser = NULL;
   parser = TextHandlerManager::createParser(LocalParameter::docFormat, 
-					    LocalParameter::acronyms);
-  // if failed to create parser, create a default
-  // Should not do this, if no parser is created, app should say
-  // so and exit... dmf 01/2004. #include "TrecParser.hpp" can
-  // be removed if this is.
+                                            LocalParameter::acronyms);
   if (!parser)
-    parser = new lemur::parse::TrecParser();
+    throw Exception("IncIndexer", "Unable to create parser for docFormat");
   
   // Create the stopper if needed.
   Stopper * stopper = NULL;
@@ -180,8 +175,8 @@ int AppMain(int argc, char * argv[]) {
   }
   lemur::parse::IncPassageTextHandler* indexer;
   indexer = new lemur::parse::IncPassageTextHandler(LocalParameter::index,
-				      LocalParameter::psgSize,
-				      LocalParameter::memory);
+                                      LocalParameter::psgSize,
+                                      LocalParameter::memory);
 
   // chain the parser/stopper/stemmer/indexer
 
@@ -203,18 +198,18 @@ int AppMain(int argc, char * argv[]) {
   if (!LocalParameter::dataFiles.empty()) {
     if (!indri::file::Path::exists(LocalParameter::dataFiles)) {
       throw Exception("IncPassageIndexer", 
-		      "dataFiles specified does not exist");
+                      "dataFiles specified does not exist");
     }
 
     ifstream source(LocalParameter::dataFiles.c_str());
     if (!source.is_open()) {
       throw Exception("IncPassageIndexer",
-		      "could not open dataFiles specified");
+                      "could not open dataFiles specified");
     } else {
       string filename;
       while (getline(source, filename)) {
-	cerr << "Parsing " << filename <<endl;
-	parser->parse(filename);
+        cerr << "Parsing " << filename <<endl;
+        parser->parse(filename);
       }
     }
   } else {

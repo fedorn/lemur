@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 #ifndef _PLSAPARAMETER_HPP
 #define _PLSAPARAMETER_HPP

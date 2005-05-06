@@ -6,7 +6,7 @@
  *  See copyright.umass for details.
  *
  *==========================================================================
-*/
+ */
 
 /** czhai */
 
@@ -15,7 +15,7 @@
 #include "DocInfoList.hpp"
 
 lemur::api::TextQueryRetMethod::TextQueryRetMethod(const Index &ind, 
-				       ScoreAccumulator & accumulator)  : 
+                                                   ScoreAccumulator & accumulator)  : 
   RetrievalMethod(ind), scAcc(accumulator) {
   // have to fix this to be passed in.
   RetrievalParameter::get();
@@ -30,20 +30,20 @@ lemur::api::TextQueryRetMethod::TextQueryRetMethod(const Index &ind,
 }
 
 void lemur::api::TextQueryRetMethod::scoreCollection(DOCID_T docID, 
-					 IndexedRealVector &results){
+                                                     IndexedRealVector &results){
   QueryRep *rep = computeTextQueryRep(docID);
   scoreCollection(*rep, results);
   delete(rep);
 }
 //fix this to pass scoreAll down.
 void lemur::api::TextQueryRetMethod::scoreCollection(const QueryRep &qry, 
-					 IndexedRealVector &results) {
+                                                     IndexedRealVector &results) {
   scoreInvertedIndex(qry, results);
 }
 
 void lemur::api::TextQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep, 
-					    IndexedRealVector &scores, 
-					    bool scoreAll) {
+                                                        IndexedRealVector &scores, 
+                                                        bool scoreAll) {
 
   scAcc.reset();
   int i;
@@ -59,16 +59,16 @@ void lemur::api::TextQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep,
       DocInfo *info = dList->nextEntry();
       DOCID_T id = info->docID();
       if (cacheDocReps) {
-	if (docReps[id] == NULL)
-	  docReps[id] = computeDocRep(id);      
-      dRep = docReps[id];
+        if (docReps[id] == NULL)
+          docReps[id] = computeDocRep(id);      
+        dRep = docReps[id];
       } else {
-	dRep = computeDocRep(id);
+        dRep = computeDocRep(id);
       }
       scAcc.incScore(id, scoreFunc()->matchedTermWeight(qTerm, textQR, info, 
-							dRep));
+                                                        dRep));
       if (! cacheDocReps)
-	delete(dRep);
+        delete(dRep);
     }
     delete dList;
     delete qTerm;
@@ -81,23 +81,23 @@ void lemur::api::TextQueryRetMethod::scoreInvertedIndex(const QueryRep &qRep,
     dr = NULL;
     if (scAcc.findScore(i,s)) {
       if (cacheDocReps)
-	dr = docReps[i]; // must be there if there is a score.
+        dr = docReps[i]; // must be there if there is a score.
       else
-	dr = computeDocRep(i);
+        dr = computeDocRep(i);
       scores.PushValue(i, scoreFunc()->adjustedScore(s, textQR, dr));
       if (! cacheDocReps)
-	delete(dr);
+        delete(dr);
     } else if (scoreAll) {
       if (cacheDocReps) {
-	if (docReps[i] == NULL)
-	  docReps[i] = computeDocRep(i);
-	dr = docReps[i]; // must be there.
+        if (docReps[i] == NULL)
+          docReps[i] = computeDocRep(i);
+        dr = docReps[i]; // must be there.
       } else {
-	dr = computeDocRep(i);
+        dr = computeDocRep(i);
       }
       scores.PushValue(i, scoreFunc()->adjustedScore(0, textQR, dr));
       if (! cacheDocReps)
-	delete(dr);
+        delete(dr);
     }
   }
 }
@@ -124,7 +124,7 @@ double lemur::api::TextQueryRetMethod::scoreDocVector(const TextQueryRep &qRep, 
     if (docVector.find(qTerm->id(),fq)) {
       dInfo = new DocInfo(docID, fq);
       score += scoreFunc()
-	->matchedTermWeight(qTerm, &qRep, dInfo, dRep);
+        ->matchedTermWeight(qTerm, &qRep, dInfo, dRep);
       delete dInfo;
     }
     delete qTerm;
@@ -137,7 +137,7 @@ double lemur::api::TextQueryRetMethod::scoreDocVector(const TextQueryRep &qRep, 
 #include <float.h> // for -DBL_MAX
 double lemur::api::TextQueryRetMethod::scoreDocPassages(const TermQuery &qry, DOCID_T docID, 
                                                         lemur::retrieval::PassageScoreVector &scores, 
-					    int psgSize, int overlap) {
+                                                        int psgSize, int overlap) {
   double score = 0, maxScore = -DBL_MAX;
   MatchInfo *matches = MatchInfo::getMatches(ind, qry, docID);
   TextQueryRep *qRep = (TextQueryRep *) computeQueryRep(qry);

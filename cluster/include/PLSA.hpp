@@ -30,10 +30,11 @@ namespace lemur
     class PLSA;
 
     // Needed to declare member function parameter (not sure why...).
+    /// Joint probability function pointer.
     typedef double (PLSA::*jointfuncType)(int, int);
 
 
-    /// Probabilistic Latent Semantic Analysis 
+    /// \brief Probabilistic Latent Semantic Analysis 
     /// Java Reference implementation from Andrew Schein and Alexandrin Popescul
     /// (Penn). PennAspect (GPL).
     // Need both transient and permanent versions (store model components).
@@ -193,12 +194,7 @@ namespace lemur
       void initR();
       /// read/write array options.
       enum pType {P_Z = 0, P_W_Z = 1, P_D_Z = 2};
-
-      /// alternatively with filestem and read write all three?
-      /// should these be public?
-      /// On ctor if not constructing.
-      //  bool readArrays();
-      /// On dtor if constructed.
+      /// write out all the arrays to file.
       void writeArrays();  
       /// Read a probability array (matrix) from a file
       bool readArray(ifstream& infile, enum pType which);
