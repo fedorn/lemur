@@ -16,6 +16,12 @@ lemur::parse::IndriTextHandler::IndriTextHandler(const string &name, int memory,
   // shadows attribute from Object.
   //  char* docsource = NULL;
   env.setMemory(memory);
+  // Have to force the IndexEnvironment to build a reverse lookup table for 
+  // the docno field to support the Index::document(external id) api call
+  std::vector<std::string> metadata;
+  metadata.push_back(DOCIDKEY);
+  // add forward and backward lookup tables for docno.
+  env.setMetadataIndexedFields( metadata, metadata );
   if (indri::collection::Repository::exists(name)) {
     env.open(name);
     cout << "Existing repository "<< name <<" found, documents will be added to existing index" << endl;
