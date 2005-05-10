@@ -11,9 +11,10 @@
 
 #include "IndriTextHandler.hpp"
 
-lemur::parse::IndriTextHandler::IndriTextHandler(const string &name, int memory, const lemur::api::Parser* p): parser(p) {
-  bufsize = 0;
-  char* docsource = NULL;
+lemur::parse::IndriTextHandler::IndriTextHandler(const string &name, int memory, const lemur::api::Parser* p): parser(p), bufsize(0), curdocno(NULL), docsource(NULL) {
+  //  bufsize = 0;
+  // shadows attribute from Object.
+  //  char* docsource = NULL;
   env.setMemory(memory);
   if (indri::collection::Repository::exists(name)) {
     env.open(name);
