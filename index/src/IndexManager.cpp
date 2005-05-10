@@ -10,23 +10,31 @@
  */
 
 #include "IndexManager.hpp"
-
 #include "InvFPIndex.hpp"
 #include "InvIndex.hpp"
 #include "KeyfileIncIndex.hpp"
 #include "LemurIndriIndex.hpp"
+#include "indri/Path.hpp"
 
 lemur::api::Index *lemur::api::IndexManager::openIndex(const string &tocFile)
 {
-  const char *indexTOCFile = tocFile.c_str(); // rewrite this to use the string.
-   
+  Index *ind;
+  if (indri::file::Path::isDirectory(tocFile)) {
+    //special case for indri repository
+    ind = new lemur::index::LemurIndriIndex();
+    if (!(ind->open(tocFile))) {
+      throw Exception("IndexManager", "open index failed");
+    }
+    return (ind);
+  }
+  //not an indri index, use the extension.
+  const char *indexTOCFile = tocFile.c_str();
   int len = strlen(indexTOCFile);
   if (!(len>4 && indexTOCFile[len-4]=='.')) {
     ; // it must have format .xxx 
     throw Exception ("IndexManager","Index file must have format .xxx");
   }
 
-  Index *ind;
   const char *extension = &(indexTOCFile[len-3]);
   if ( (!strcmp(extension, "IFP")) || 
        (!strcmp(extension, "ifp"))) {
@@ -38,9 +46,11 @@ lemur::api::Index *lemur::api::IndexManager::openIndex(const string &tocFile)
   } else if ((!strcmp(extension, "key")) ||
              (!strcmp(extension, "KEY"))) {
     ind = new lemur::index::KeyfileIncIndex();
+#if 0
   } else if ((!strcmp(extension, "ind")) ||
              (!strcmp(extension, "IND"))) {
     ind = new lemur::index::LemurIndriIndex();
+#endif
   } else {
     throw Exception("IndexManager", "unknown index file extension");
   }
