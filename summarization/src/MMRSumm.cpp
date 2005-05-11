@@ -13,7 +13,11 @@
 
 using namespace lemur::api;
 
-void lemur::summarization::MMRSumm::markPassages(int optLen, const string &qInfo) {
+const string lemur::summarization::MMRSumm::TITLE = "*title";
+const string lemur::summarization::MMRSumm::PRONOUN = "*pronoun";
+
+void lemur::summarization::MMRSumm::markPassages(int optLen, 
+                                                 const string &qInfo) {
   int oldLen = -1;
   if (optLen != -1) {
     oldLen = summLen;
@@ -52,20 +56,24 @@ void lemur::summarization::MMRSumm::addDocument(const string &docID) {
   if (eos) {
     cout << "EOS located in document" << endl;
   } else {
-    cout << "EOS not present; using default passage length " << summLen << endl;
+    cout << "EOS not present; using default passage length " 
+         << summLen << endl;
   }
   tList->startIteration();
   while (tList->hasMore()) {
     tempPsg = new MMRPassage(docID);
     findNextPassage(*tempPsg, idx, tList, eos);
     addPassage(*tempPsg);
+    // the vector makes a copy, delete this.
+    delete(tempPsg);
   }
   delete tList;
 
 }
 
   
-int lemur::summarization::MMRSumm::fetchPassages(Passage* psgs, int optLen) const {
+int lemur::summarization::MMRSumm::fetchPassages(Passage* psgs, 
+                                                 int optLen) const {
   int l, count=0;
   if (optLen >0) {
     l = optLen;
@@ -82,30 +90,41 @@ int lemur::summarization::MMRSumm::fetchPassages(Passage* psgs, int optLen) cons
   return count;
 }
   
-void lemur::summarization::MMRSumm::findNextPassage(MMRPassage &psg, const lemur::index::InvFPIndex* idx, 
+void lemur::summarization::MMRSumm::findNextPassage(MMRPassage &psg, 
+                                                    const lemur::index::InvFPIndex* idx, 
                                                     const TermInfoList* tList, int eos) {
   TermInfo* tEntry;
   psg.clear();
-  termCount* storage;
+  // The vector makes a copy, this leaks.
+  //  termCount* storage;
+  termCount storage;
   if (eos) {
     while (tList->hasMore()) {
       tEntry = tList->nextEntry();
       if ( isEOS(idx->term(tEntry->termID())) ) return;
-      storage = new termCount;
-      storage->termID = tEntry->termID();
-      storage->tf = tEntry->count();
-      storage->val = tEntry->count();
-      psg.addTerm(*storage);
+      //      storage = new termCount;
+      //      storage->termID = tEntry->termID();
+      //      storage->tf = tEntry->count();
+      //      storage->val = tEntry->count();
+      //      psg.addTerm(*storage);
+      storage.termID = tEntry->termID();
+      storage.tf = tEntry->count();
+      storage.val = tEntry->count();
+      psg.addTerm(storage);
     }
   } else {
     for(int i=0; i < PSG_LEN; i++) {
       if (tList->hasMore()) {
         tEntry = tList->nextEntry();
-        storage = new termCount;
-        storage->termID = tEntry->termID();
-        storage->tf = tEntry->count();
-        storage->val = tEntry->count();
-        psg.addTerm(*storage);
+        //        storage = new termCount;
+        //        storage->termID = tEntry->termID();
+        //        storage->tf = tEntry->count();
+        //        storage->val = tEntry->count();
+        //        psg.addTerm(*storage);
+        storage.termID = tEntry->termID();
+        storage.tf = tEntry->count();
+        storage.val = tEntry->count();
+        psg.addTerm(storage);
       } else {
         return;
       }
@@ -114,7 +133,8 @@ void lemur::summarization::MMRSumm::findNextPassage(MMRPassage &psg, const lemur
   return;
 }
   
-void lemur::summarization::MMRSumm::showPassage(const passageVec* psg, const lemur::index::InvFPIndex* idx) const {
+void lemur::summarization::MMRSumm::showPassage(const passageVec* psg, 
+                                                const lemur::index::InvFPIndex* idx) const {
   for (int i=0; i < psg->size(); i++) {
     cout << idx->term((*psg)[i].termID) << " ";
   }
@@ -129,7 +149,9 @@ void lemur::summarization::MMRSumm::showMarkedPassages() const {
   }
 }
 
-void lemur::summarization::MMRSumm::summDocument(const string &docID, const int optLen, const string &qInfo) {
+void lemur::summarization::MMRSumm::summDocument(const string &docID, 
+                                                 const int optLen, 
+                                                 const string &qInfo) {
   int oldLen = -1;
   queryPassage = new MMRPassage(docID);
   if (optLen != -1) {
@@ -151,18 +173,20 @@ void lemur::summarization::MMRSumm::summDocument(const string &docID, const int 
   if (eos) {
     cout << "EOS located in document" << endl;
   } else {
-    cout << "EOS not present; using default passage length " << summLen << endl;
+    cout << "EOS not present; using default passage length " 
+         << summLen << endl;
   }
   tList->startIteration();
   while (tList->hasMore()) {
     tempPsg = new MMRPassage(docID);
     findNextPassage(*tempPsg, idx, tList, eos);
     addPassage(*tempPsg);
+    delete(tempPsg);
   }
   delete tList;
   
   scorePassages(qInfo);
-  markPassages(-1, NULL);
+  markPassages(-1, "");
   
   if (oldLen != -1) {
     summLen = oldLen;

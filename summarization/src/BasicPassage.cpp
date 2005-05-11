@@ -13,21 +13,22 @@
 #include "Passage.hpp"
 
 void lemur::summarization::BasicPassage::clear() {
-  psg->erase(psg->begin(), psg->end());
+  psg.erase(psg.begin(), psg.end());
 }  
 
 void lemur::summarization::BasicPassage::addTerms(const passageVec pv) {
   for (int i=0; i<pv.size(); i++) {
-    psg->push_back(pv[i]);
+    psg.push_back(pv[i]);
   }
 }
 
 void lemur::summarization::BasicPassage::addTerm(termCount term) {
-  psg->push_back(term);
+  psg.push_back(term);
 }
   
-const lemur::summarization::passageVec* lemur::summarization::BasicPassage::getAsVector(void) const {
-  return psg;
+const lemur::summarization::passageVec* 
+lemur::summarization::BasicPassage::getAsVector(void) const {
+  return &psg;
 }
   
 int lemur::summarization::BasicPassage::operator<(const Passage &b) const {

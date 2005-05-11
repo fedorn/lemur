@@ -12,6 +12,7 @@
 #define _BASICSUMM_HPP
 
 #include <iomanip>
+#include "lemur-compat.hpp"
 #include "Summarizer.hpp"
 #include "Passage.hpp"
 #include "BasicPassage.hpp"
@@ -21,20 +22,10 @@
 
 using std::vector;
 
-#if (defined(WIN32) && !defined(min))
-#define min(x,y) __min(x,y)
-#endif
-
 namespace lemur 
 {
   namespace summarization 
   {
-    
-    //#define EOS      "*eos"
-    static const string EOS("*eos");
-
-#define PSG_LEN  15
-
     /*!
       A simple summarizer implementation that uses sentence selection to create summaries.  This example shows how a simple summarizer may look, and how to use the <code>Summarizer</code> abstract with the <code>Passage</code> abstract.  Note that this implementation is paired with an implementation of <code>Passage</code> called <code>BasicPassage</code>.
 
@@ -49,13 +40,11 @@ namespace lemur
 
     public:
       /// Constructor takes index information and an option default summary length
-      BasicSumm(const lemur::index::InvFPIndex* inIdx, int inSummLen = 5) {
-        idx = inIdx;
-        summLen = inSummLen;
-        iterCount = 1;
-      };
+      BasicSumm(const lemur::index::InvFPIndex* inIdx, int inSummLen = 5) :
+        idx(inIdx), summLen(inSummLen), iterCount(1) {};      
 
-      virtual void summDocument(const string &docID, const int optLen, const string &qInfo);
+      virtual void summDocument(const string &docID, const int optLen, 
+                                const string &qInfo);
 
       virtual void scorePassages(const string &qInfo);
 
@@ -75,12 +64,12 @@ namespace lemur
 
       /// Checks for EOS marker
       int isEOS(const string &check) {
-        //    return !strcmp(check, EOS);
         return (check  == EOS);
       }
 
       /// Determines if any EOS markers are present
-      int hasEOS(const lemur::index::InvFPIndex* idx, const lemur::api::TermInfoList* tList) {
+      int hasEOS(const lemur::index::InvFPIndex* idx, 
+                 const lemur::api::TermInfoList* tList) {
         tList->startIteration();
         lemur::api::TermInfo* tEntry;
         while (tList->hasMore()) {
@@ -104,7 +93,9 @@ namespace lemur
           avgDocLen = idx->docLengthAvg();
           tf = psgV[i].tf;
           Tf = tf / (tf + 0.5 + 1.5 * (docLen/avgDocLen) );
-          idf = min(M, log((double)idx->docCount()/(double)idx->docCount(psgV[i].termID))); 
+          idf = lemur_compat::min(M, 
+                                  log((double)idx->docCount()/
+                                      (double)idx->docCount(psgV[i].termID))); 
           endScore += (Tf * idf * P);
         }
         endScore = endScore / 1+psgLen;
@@ -113,28 +104,39 @@ namespace lemur
       }
 
       /// Locate the next passage in a document by searching for the next EOS or using a max length
-      void findNextPassage(BasicPassage &psg, const lemur::index::InvFPIndex* idx, 
+      void findNextPassage(BasicPassage &psg, 
+                           const lemur::index::InvFPIndex* idx, 
                            const lemur::api::TermInfoList* tList, int eos) {
         lemur::api::TermInfo* tEntry;
         psg.clear();
-        termCount* storage;
+        // allocating a new object each time leaks
+        // the vector makes a copy of the object.
+        // dmf 05/2005
+        //termCount* storage;
+        termCount storage;
         if (eos) {
           while (tList->hasMore()) {
             tEntry = tList->nextEntry();
             if ( isEOS(idx->term(tEntry->termID())) ) return;
-            storage = new termCount;
-            storage->termID = tEntry->termID();
-            storage->tf = tEntry->count();
-            psg.addTerm(*storage);
+            //            storage = new termCount;
+            //storage->termID = tEntry->termID();
+            //storage->tf = tEntry->count();
+            //psg.addTerm(*storage);
+            storage.termID = tEntry->termID();
+            storage.tf = tEntry->count();
+            psg.addTerm(storage);
           }
         } else {
           for(int i=0; i < PSG_LEN; i++) {
             if (tList->hasMore()) {
               tEntry = tList->nextEntry();
-              storage = new termCount;
-              storage->termID = tEntry->termID();
-              storage->tf = tEntry->count();
-              psg.addTerm(*storage);
+              //storage = new termCount;
+              //storage->termID = tEntry->termID();
+              //storage->tf = tEntry->count();
+              //psg.addTerm(*storage);
+              storage.termID = tEntry->termID();
+              storage.tf = tEntry->count();
+              psg.addTerm(storage);
             } else {
               return;
             }
@@ -144,7 +146,8 @@ namespace lemur
       }
  
       /// <code>BasicSumm</code>'s method to output a summary (to screen)
-      void showPassage(const passageVec* psg, const lemur::index::InvFPIndex* idx) const {
+      void showPassage(const passageVec* psg, 
+                       const lemur::index::InvFPIndex* idx) const {
         for (int i=0; i < psg->size(); i++) {
           cout << idx->term((*psg)[i].termID) << " ";
         }

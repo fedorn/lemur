@@ -10,6 +10,7 @@
 */
 
 #include "Summarizer.hpp"
+const std::string lemur::summarization::Summarizer::EOS = "*eos";
 
 lemur::summarization::Summarizer::~Summarizer() 
 {

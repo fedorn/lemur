@@ -13,7 +13,7 @@
 #include "Passage.hpp"
 
 void lemur::summarization::MMRPassage::clear() {
-  psg->erase(psg->begin(), psg->end());
+  psg.erase(psg.begin(), psg.end());
 }  
 
 int lemur::summarization::MMRPassage::operator<(const Passage &b) const{
@@ -23,18 +23,19 @@ int lemur::summarization::MMRPassage::operator<(const Passage &b) const{
 
 void lemur::summarization::MMRPassage::addTerm(termCount term) {
   // :TODO: set counts right
-  psg->push_back(term);
+  psg.push_back(term);
 }
 
 void lemur::summarization::MMRPassage::addTerms(const passageVec pv) {
   // :TODO: set counts right
   for (int i=0; i<pv.size(); i++) {
-    psg->push_back(pv[i]);
+    psg.push_back(pv[i]);
   }
 }
 
-const lemur::summarization::passageVec* lemur::summarization::MMRPassage::getAsVector(void) const {
-  return psg;
+const lemur::summarization::passageVec* 
+lemur::summarization::MMRPassage::getAsVector(void) const {
+  return &psg;
 }
 
 double lemur::summarization::MMRPassage::computeMMR(double lambda) const {
@@ -43,12 +44,10 @@ double lemur::summarization::MMRPassage::computeMMR(double lambda) const {
 
 double lemur::summarization::MMRPassage::dotProduct(MMRPassage b) const {
   double retVal = 0.0;
-  for(int i=0; i<psg->size(); i++) {
-    for(int j=0; j<b.psg->size(); j++) {
-      //      cout << (*psg)[i].termID << "==" << (*b.psg)[j].termID << "?";
-      if ( (*psg)[i].termID == (*b.psg)[j].termID ) {
-        //cout << "DP HIT" << (*psg)[i].val << " " << (*b.psg)[j].val << endl;
-        retVal += (*psg)[i].val * (*b.psg)[j].val;
+  for(int i=0; i<psg.size(); i++) {
+    for(int j=0; j<b.psg.size(); j++) {
+      if ( psg[i].termID == b.psg[j].termID ) {
+        retVal += psg[i].val * b.psg[j].val;
       }
     }
   } 
@@ -56,10 +55,12 @@ double lemur::summarization::MMRPassage::dotProduct(MMRPassage b) const {
   return retVal;
 }
 
-void lemur::summarization::MMRPassage::scale(double val) const {
+// This is NOT const, it modifies psg.
+//void lemur::summarization::MMRPassage::scale(double val) const {
+void lemur::summarization::MMRPassage::scale(double val)  {
   passageVec::iterator it;
-  it = psg->begin();
-  while (it < psg->end()) {
+  it = psg.begin();
+  while (it < psg.end()) {
     (*it).val = (*it).val * val;
   }
 }

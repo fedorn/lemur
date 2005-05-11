@@ -13,7 +13,8 @@
 
 using namespace lemur::api;
 
-void lemur::summarization::BasicSumm::markPassages(int optLen, const string &qInfo) {
+void lemur::summarization::BasicSumm::markPassages(int optLen, 
+                                                   const string &qInfo) {
   int oldLen = -1;
   if (optLen != -1) {
     oldLen = summLen;
@@ -42,7 +43,8 @@ void lemur::summarization::BasicSumm::addPassage(Passage &psg) {
   doc.push_back(*bPsg);
 }  
 
-int lemur::summarization::BasicSumm::fetchPassages(Passage* psgs, int optLen = -1) const {
+int lemur::summarization::BasicSumm::fetchPassages(Passage* psgs, 
+                                                   int optLen = -1) const {
   int l, count=0;
   if (optLen >0) {
     l = optLen;
@@ -59,7 +61,9 @@ int lemur::summarization::BasicSumm::fetchPassages(Passage* psgs, int optLen = -
   return count;
 }
   
-void lemur::summarization::BasicSumm::summDocument(const string &docID, const int optLen, const string &qInfo) {
+void lemur::summarization::BasicSumm::summDocument(const string &docID, 
+                                                   const int optLen, 
+                                                   const string &qInfo) {
   int oldLen = -1;
   if (optLen != -1) {
     oldLen = summLen;
@@ -74,18 +78,21 @@ void lemur::summarization::BasicSumm::summDocument(const string &docID, const in
   if (eos) {
     cout << "EOS located in document" << endl;
   } else {
-    cout << "EOS not present; using default passage length " << summLen << endl;
+    cout << "EOS not present; using default passage length " 
+         << summLen << endl;
   }
   tList->startIteration();
   while (tList->hasMore()) {
     tempPsg = new BasicPassage(docID);
     findNextPassage(*tempPsg, idx, tList, eos);
     addPassage(*tempPsg);
+    // the vector makes a copy, delete this
+    delete(tempPsg);
   }
   delete tList;
   
   scorePassages(qInfo);
-  markPassages(-1, NULL);
+  markPassages(-1, "");
   
   if (oldLen != -1) {
     summLen = oldLen;

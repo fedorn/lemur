@@ -34,12 +34,11 @@ namespace lemur
 
     public:
       BasicPassage(const string &id) {
-        psg = new passageVec;
         docID = id;
         score = -1;
         marked = 0;
       } 
- 
+      
       virtual void clear() ;
 
       virtual void addTerm(termCount term) ;

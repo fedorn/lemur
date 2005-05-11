@@ -36,7 +36,6 @@ namespace lemur
       double maxSim;
 
       MMRPassage(const string &id) {
-        psg = new passageVec;
         docID = id;
         score = -1;
         marked = 0;
@@ -45,7 +44,11 @@ namespace lemur
         wtSim = 0.0;
         maxSim = -1.0;
       }
-
+      // have to clean up
+      ~MMRPassage() {
+        //        delete psg;
+      }
+      
       virtual void clear();
 
       virtual void addTerm(termCount term);
@@ -60,7 +63,9 @@ namespace lemur
 
       virtual double dotProduct(MMRPassage b) const;
 
-      virtual void scale(double val) const;
+      // This is NOT const, it modifies psg.
+      //      virtual void scale(double val) const;
+      virtual void scale(double val) ;
 
     };
   }

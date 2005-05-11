@@ -27,13 +27,6 @@ namespace lemur
 {
   namespace summarization 
   {
-    
-    static const string EOS("*eos");
-    static const string TITLE("*title");
-    static const string PRONOUN("*pronoun");
-
-#define PSG_LEN  15
-
     /*!
       A summarizer implementation that uses MMR to create summaries.  This example shows how a slightly more complex summarizer may look, and how to use the <code>Summarizer</code> abstract with the <code>Passage</code> abstract.  Note that this implementation is paired with an implementation of <code>Passage</code> called <code>MMRPassage</code>.
 
@@ -53,7 +46,11 @@ namespace lemur
       int autoMMRQuery(void) {
         lemur::api::TermInfo* tEntry;
         lemur::api::TermInfoList* tList = idx->termInfoListSeq(idx->document(queryPassage->docID));
-        termCount* storage;
+        // allocating a new object each time leaks
+        // the vector makes a copy of the object.
+        // dmf 05/2005
+        // termCount* storage;
+        termCount storage;
         if (hasTITLE(idx, tList)) {
           // use title words
           tList->startIteration();
@@ -62,11 +59,15 @@ namespace lemur
             tEntry = tList->nextEntry();
             if ( isTITLE(idx->term(tEntry->termID())) ) {
               tEntry = tList->nextEntry(); // the actual word after title token
-              storage = new termCount;
-              storage->termID = tEntry->termID();
-              storage->tf = tEntry->count();
-              storage->val = tEntry->count();
-              queryPassage->addTerm(*storage);
+              //              storage = new termCount;
+              //              storage->termID = tEntry->termID();
+              //              storage->tf = tEntry->count();
+              //              storage->val = tEntry->count();
+              //              queryPassage->addTerm(*storage);
+              storage.termID = tEntry->termID();
+              storage.tf = tEntry->count();
+              storage.val = tEntry->count();
+              queryPassage->addTerm(storage);
             }
           }      
         } else {
@@ -74,11 +75,15 @@ namespace lemur
           for (int i=0; i<10; i++) {
             if (tList->hasMore()) {
               tEntry = tList->nextEntry();
-              storage = new termCount;
-              storage->termID = tEntry->termID();
-              storage->tf = tEntry->count();
-              storage->val = tEntry->count();
-              queryPassage->addTerm(*storage);
+              //              storage = new termCount;
+              //              storage->termID = tEntry->termID();
+              //              storage->tf = tEntry->count();
+              //              storage->val = tEntry->count();
+              //              queryPassage->addTerm(*storage);
+              storage.termID = tEntry->termID();
+              storage.tf = tEntry->count();
+              storage.val = tEntry->count();
+              queryPassage->addTerm(storage);
             }
           } 
         }
@@ -91,12 +96,20 @@ namespace lemur
 
       int setMMRQuery(const string &qInfo) {
         if (qInfo != "") {
-          termCount* storage;
-          storage = new termCount;
-          storage->termID = idx->term(qInfo);
-          storage->tf = 1;
-          storage->val = 1;
-          queryPassage->addTerm(*storage);
+        // allocating a new object each time leaks
+        // the vector makes a copy of the object.
+        // dmf 05/2005
+          //          termCount* storage;
+          //          storage = new termCount;
+          //          storage->termID = idx->term(qInfo);
+          //          storage->tf = 1;
+          //          storage->val = 1;
+          //          queryPassage->addTerm(*storage);
+          termCount storage;
+          storage.termID = idx->term(qInfo);
+          storage.tf = 1;
+          storage.val = 1;
+          queryPassage->addTerm(storage);
           return 1;
         }
         return autoMMRQuery();
@@ -104,14 +117,9 @@ namespace lemur
 
     public:
 
-      MMRSumm(const lemur::index::InvFPIndex* inIdx, int inSummLen = 5) {
-        idx = inIdx;
-        summLen = inSummLen;
-        iterCount = 1;
-        maxSims = -1.0;
-        queryPassage = NULL;
-        lambda = 1.0;
-      };
+      MMRSumm(const lemur::index::InvFPIndex* inIdx, int inSummLen = 5) :
+        idx(inIdx), summLen(inSummLen), iterCount(1), maxSims(-1.0),
+        queryPassage(NULL), lambda(1.0) {};
   
       virtual void markPassages(int optLen, const string &qInfo);
 
@@ -133,10 +141,12 @@ namespace lemur
 
       virtual void outputSumm(void) const;
 
-      void findNextPassage(MMRPassage &psg, const lemur::index::InvFPIndex* idx, 
+      void findNextPassage(MMRPassage &psg, 
+                           const lemur::index::InvFPIndex* idx, 
                            const lemur::api::TermInfoList* tList, int eos);
 
-      void showPassage(const passageVec* psg, const lemur::index::InvFPIndex* idx) const;
+      void showPassage(const passageVec* psg, 
+                       const lemur::index::InvFPIndex* idx) const;
   
       void showMarkedPassages() const ;
 
@@ -144,7 +154,8 @@ namespace lemur
         return (check == EOS);
       }
   
-      int hasEOS(const lemur::index::InvFPIndex* idx, const lemur::api::TermInfoList* tList) {
+      int hasEOS(const lemur::index::InvFPIndex* idx, 
+                 const lemur::api::TermInfoList* tList) {
         tList->startIteration();
         lemur::api::TermInfo* tEntry;
         while (tList->hasMore()) {
@@ -159,7 +170,8 @@ namespace lemur
         return (check == TITLE);
       }
   
-      int hasTITLE(const lemur::index::InvFPIndex* idx, const lemur::api::TermInfoList* tList) {
+      int hasTITLE(const lemur::index::InvFPIndex* idx, 
+                   const lemur::api::TermInfoList* tList) {
         tList->startIteration();
         lemur::api::TermInfo* tEntry;
         while (tList->hasMore()) {
@@ -180,7 +192,10 @@ namespace lemur
           return p1.computeMMR(lambda) > p2.computeMMR(lambda);
         }
       };
-  
+      /// title marker
+      static const string TITLE;
+      /// pronoun marker
+      static const string PRONOUN;
     }; // MMRSumm
   }
 }

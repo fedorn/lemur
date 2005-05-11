@@ -38,12 +38,12 @@ namespace lemur
     */
 
     class Passage {
-
+      
     public:
       double score;
       int marked;
       string docID;
-      passageVec* psg;
+      passageVec psg;
 
       virtual ~Passage();
 

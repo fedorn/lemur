@@ -24,7 +24,7 @@ namespace lemur
 {
   namespace summarization 
   {
-    
+#define PSG_LEN  15    
     /*!
       A <code>Summarizer</code> is created in conjunction with a specific <code>Passage</code> implementation.
 
@@ -62,6 +62,9 @@ namespace lemur
       /// General purpose "send summary to stdout" function
       virtual void outputSumm(void) const = 0;
 
+      /// End of sentence marker.
+      static const string EOS;
+      
     }; // Summarizer
   }
 }
