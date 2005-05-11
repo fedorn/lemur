@@ -40,6 +40,17 @@ lemur::distrib::QryBasedSampler::probe(const char * initQuery) {
   // database manager has been set and a database is open
   assert(db != NULL);
 
+  // if initQuery is NULL, probe is being fed from randomWord and will
+  // get no new inputs.
+  // emit no output and return true to allow termination of the probe
+  // loop in QryBasedSample.cpp
+  // dmf 05/2005
+  if (initQuery == NULL) {
+      cout << "No query to probe with." << endl;
+      return true;
+  }
+
+
   MemParser * parser = db->getParser();
 
   seenDocs.clear();
@@ -70,8 +81,18 @@ lemur::distrib::QryBasedSampler::probe(const char * initQuery) {
       query = strdup(initQuery);
     } else {
       query = freqCounter->randomWord();
+      // if there are no more unseen words, randomWord will return NULL
+      // dmf 05/2005
+      if (query == NULL) {
+        // done > 0, so at least one probe completed.
+        // emit the model
+        freqCounter->endDoc();
+        // output language model
+        string fname = outputPrefix + "model";
+        freqCounter->output(fname);
+        return true;
+      }
     }
-
 
     // send the query to the database
     //    fprintf(stderr, "#: %3d query: %s\n", qcount, query); 

@@ -212,6 +212,8 @@ lemur::distrib::FreqCounter::output(const string &filename) const {
 
 
 // Select a random word.
+// if no more unseen words are available, return NULL;
+// dmf 05/2005
 char *
 lemur::distrib::FreqCounter::randomWord() {
   char * w;
@@ -225,52 +227,70 @@ lemur::distrib::FreqCounter::randomWord() {
     w = randomUniform();
   else 
     w = randomCtf();
- 
+  // give up if no random word was selected.
+  if (w == NULL) return w;
+  
   // Check to see if this word has been selected before.
   stringset::iterator it = randdone.find(w);
   if (it != randdone.end()) {
     // Word was not unique, select another.
     free (w);
-    w = randomWord(); // recurses indefinitely if all terms have been used -LMY
+    // If every word in the map is now in randdone, we are finished.
+    if (freqInfo.size() == randdone.size()) 
+      w = NULL;
+    else // otherwise, recursively try getting a new word.
+      w = randomWord(); 
   }
-  randdone.insert(w);
+  // don't put NULL into the set
+  if (w != NULL)
+    randdone.insert(w);
 
   // Word was unique, return it.
   return w;
 }
-
+// fix the misuses of the iterators // dmf 05/2005
 char *
 lemur::distrib::FreqCounter::randomCtf() const {
   // Random number from 1 to collection term frequencies total
   int n = (rand() % ctfTot) + 1;
   int i = 0;
+  char *currString = NULL;
   // Iterate over terms until i (= sum of ctf for words seen so far)
-  // is at least n.
+  // is at least n or we have run out of words.
   freqmap::const_iterator curr = freqInfo.begin();
-  i += curr->second.ctf;
   while (curr != freqInfo.end() && i < n) {
-    curr++;
     i += curr->second.ctf;
+    currString = curr->first; // remember last word we saw
+    curr++;
   }
-  return strdup(curr->first);
+  // if there were no words, currString is NULL
+  if (currString == NULL)
+    return currString;
+  else
+    return strdup(currString);
 }
-
+// fix the misuses of the iterators // dmf 05/2005
 char *
 lemur::distrib::FreqCounter::randomDf() const {
   // Random number from 1 to document frequencies total
   int n = (rand() % dfTot) + 1;
   int i = 0;
+  char *currString = NULL;
   // Iterate over terms until i (= sum of df for words seen so far)
-  // is at least n.
+  // is at least n or we have run out of terms.
   freqmap::const_iterator curr = freqInfo.begin();
-  i += curr->second.df;
   while (curr != freqInfo.end() && i < n) {
-    curr++;
     i += curr->second.df;
+    currString = curr->first; // remember last word we saw
+    curr++;
   }
-  return strdup(curr->first);
+  // if there were no words, currString is NULL
+  if (currString == NULL)
+    return currString;
+  else
+    return strdup(currString);
 }
-
+// fix the misuses of the iterators // dmf 05/2005
 char *
 lemur::distrib::FreqCounter::randomAveTf() const {
   if (atfValid == false) {
@@ -284,35 +304,45 @@ lemur::distrib::FreqCounter::randomAveTf() const {
     atfValid = true;
   }
 
-
   // Random number between 0 and 1
   long double n = rand() / (long double) LONG_MAX;
   long double i = 0;
+  char *currString = NULL;
   // Iterate over terms until i (= sum of avetf/avetfTot for words seen so far)
-  // is at least n.
+  // is at least n or we have run out of words.
   freqmap::const_iterator curr = freqInfo.begin();
-  i += (curr->second.ctf / (long double) curr->second.df) / avetfTot;
   while (curr != freqInfo.end() && i < n) {
-    curr++;
     i += (curr->second.ctf / (long double) curr->second.df) / avetfTot;
-  }
-  return strdup(curr->first);
-}
+    currString = curr->first; // remember last word we saw
+    curr++;
 
+  }
+  // if there were no words, currString is NULL
+  if (currString == NULL)
+    return currString;
+  else
+    return strdup(currString);
+}
+// fix the misuses of the iterators // dmf 05/2005
 char *
 lemur::distrib::FreqCounter::randomUniform() const {
   // Random number between 1 and number of unique words
   int n = (rand() % nWords) + 1;
   int i = 0;
+  char *currString = NULL;
   // Iterate over terms until i (= number words seen so far)
-  // is at least n.
+  // is at least n or we have run out of terms.
   freqmap::const_iterator curr = freqInfo.begin();
-  i++; 
   while (curr != freqInfo.end() && i < n) {
+    currString = curr->first; // remember last word we saw
     curr++;
     i++;
   }
-  return strdup(curr->first);
+  // if there were no words, currString is NULL
+  if (currString == NULL)
+    return currString;
+  else
+    return strdup(currString);
 }
 
 // Compute the collection term frequecy ratio of two LMs.

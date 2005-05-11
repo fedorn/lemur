@@ -224,11 +224,14 @@ int AppMain (int argc, char * argv []) {
       // Select a query term and sample the datbase.
       char * iq = initQueryModel.randomWord();
       while (dbp.probe(iq) == false) {
-        free (iq);
+        // randomWord may return NULL
+        // dmf 05/2005
+        if (iq != NULL) free (iq);
         iq = initQueryModel.randomWord();
       }
-   
-      free (iq);
+      // randomWord may return NULL   
+      // dmf 05/2005
+      if (iq != NULL) free (iq);
       
       // Clear old counts.
       freqCounter.clear();
