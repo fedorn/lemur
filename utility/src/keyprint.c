@@ -94,7 +94,7 @@ void print_key_struct(FILE *list, struct key *k, char caption[])
 /** fcb print procedures **/
 
 
-static int print_freespace_chain(FILE *list, struct fcb *f)
+static void print_freespace_chain(FILE *list, struct fcb *f)
 {int err,lc,key_lc,rec_lc; long lc_entries=0,rec_entries=0,total_lc=0,total_rec=0;struct level0_pntr p0;
  unsigned char key[maxkey_lc];
 
@@ -274,7 +274,7 @@ void check_index(FILE *list,struct fcb *f, int index)
  }
 }
 
-static int print_freespace_summary(FILE *list, struct fcb *f)
+static void print_freespace_summary(FILE *list, struct fcb *f)
 {int i; long cnt=0,lc=0,entries=0; struct leveln_pntr p; block_type_t b;
 
  fprintf(list,"Freespace rec summary:");
