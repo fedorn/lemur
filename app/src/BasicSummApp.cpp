@@ -73,7 +73,9 @@ int AppMain(int argc, char* argv[]) {
   // Create a basic summarizer
   lemur::summarization::BasicSumm* s = new lemur::summarization::BasicSumm(&idx);
   // Generate a summary
-  s->summDocument(LocalParameter::docID, LocalParameter::summLength, NULL);
+  // NULL is not valid for an empty string
+  //  s->summDocument(LocalParameter::docID, LocalParameter::summLength, NULL);
+  s->summDocument(LocalParameter::docID, LocalParameter::summLength, "");
   // Print to stdout
   s->outputSumm();
   return 0;

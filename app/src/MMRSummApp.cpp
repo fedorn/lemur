@@ -79,7 +79,7 @@ int AppMain(int argc, char* argv[]) {
 
   if ( !(LocalParameter::query.empty()) ) {
     // generic summary
-    s->summDocument(LocalParameter::docID, LocalParameter::summLength, NULL);
+    s->summDocument(LocalParameter::docID, LocalParameter::summLength, "");
   } else {
     // query relevent summary
     s->summDocument(LocalParameter::docID, 15, LocalParameter::query);
