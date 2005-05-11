@@ -42,7 +42,9 @@ while (<T>) {
 	($q,$d,$v) = split;
     }
     $dict{$q ."=".$d} =$v;
-    if ($v == 1) {
+    # some qrel files use values >1 for rel
+#    if ($v == 1) {
+    if ($v != 0) {
 	$totalRels{$q} ++;
     }
 }
@@ -101,7 +103,8 @@ while (<stdin>) {
     }
     
     $rankCount++;
-
+# not sure if this does the right thing.
+#    if ($totalRels{$q}==0) { next; } # skip any query with no judgments
     if ($totalRels{$q}==0) { next; } # skip any query with no judgments
     $judge = $dict{$q ."=".$d};
     if ($judge) {
@@ -157,16 +160,30 @@ print STDOUT "Set breakeven precision = ", $setExactPr/$countQuery,"\n";
 
 
 sub PrintFigure {
+# have to increment the counter even if there were not judgements.
+    $countQuery ++;
+# not sure if this does the right thing.
+#    if ($totalRels{$curQ}==0) {
+#	print STDERR "Topic $curQ ignored: no judgments found\n";
+#	return;
+#    }
+
     if ($totalRels{$curQ}==0) {
 #	print STDERR "Topic $curQ ignored: no judgments found\n";
 	return;
     }
-    $countQuery ++;
+
     print STDOUT "Topic: $curQ\n";
     print STDOUT "Total number of relevant docs = ", $totalRels{$curQ},"\n";
     print STDOUT "Total number of retrieved relevant docs = ", $rel,"\n";
 	  
-    $p = $avgPr/$totalRels{$curQ};
+#    $p = $avgPr/$totalRels{$curQ};
+# need this if not returning due to no rels
+    if ($totalRels{$curQ}==0) {
+        $p = 0;
+    } else {
+        $p = $avgPr/$totalRels{$curQ};
+    }
     print STDOUT "Average (non-interpolated) precision = $p\n";
     print STDOUT "Interpolated precsion at recalls:\n";
     $setAvgPr += $p;
