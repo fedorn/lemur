@@ -39,9 +39,9 @@ namespace lemur
     } freqinfo_t;
 
     /// A map from words to frequency information.
-    typedef map<char *, freqinfo_t, lemur::index::ltstr> freqmap;
+    typedef map<std::string , freqinfo_t, less<std::string> > freqmap;
     /// A set of words.
-    typedef set<char *, lemur::index::ltstr> stringset;
+    typedef set<std::string , less<std::string> > stringset;
 
 
     /*!

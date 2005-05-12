@@ -56,11 +56,7 @@ lemur::distrib::FreqCounter::FreqCounter(const string &filename, const Stopper *
 
 lemur::distrib::FreqCounter::~FreqCounter() {
   // Free memory
-  freqmap::iterator curr = freqInfo.begin();
-  while (curr != freqInfo.end()) {
-    free (curr->first);
-    curr++;
-  }
+  clear();
 }
 
 void
@@ -91,8 +87,8 @@ lemur::distrib::FreqCounter::handleWord(char * word) {
   char * oword = word;
   if (word != NULL) {
     if (stopper == NULL || !stopper->stopWord(word)) {
-
-      freqmap::iterator curr = freqInfo.find(word);
+      std::string key(word);      
+      freqmap::iterator curr = freqInfo.find(key);
       if (curr == freqInfo.end()) {    
         // Create a new freqinfo_t structure
         word = strdup(word);
@@ -100,17 +96,17 @@ lemur::distrib::FreqCounter::handleWord(char * word) {
         fi.word = word;
         fi.ctf = 0;
         fi.df = 0;
-        freqInfo[word] = fi;
+        freqInfo[key] = fi;
         nWords++;
       } else { 
         word = curr->second.word;
       }
       // Increment counts
-      freqInfo[word].ctf++;
+      freqInfo[key].ctf++;
       ctfTot++;
 
       // Store this word in the doc set
-      doc.insert(word);
+      doc.insert(key);
 
       // Average term frequency sum is no longer valid.
       atfValid = false;
@@ -173,9 +169,9 @@ lemur::distrib::FreqCounter::input(const string &filename) {
       fi.word = w;
       fi.ctf = ctfc;
       fi.df = dfc;
-
+      std::string key(w);
       // Place structure in the map
-      freqInfo[w] = fi;
+      freqInfo[key] = fi;
 
       // Update totals
       ctfTot += ctfc;
@@ -216,35 +212,30 @@ lemur::distrib::FreqCounter::output(const string &filename) const {
 // dmf 05/2005
 char *
 lemur::distrib::FreqCounter::randomWord() {
-  char * w;
-
+  char * w = NULL;
   // Find a random word given the random word selection mode.
-  if (randomMode == R_AVE_TF)
-    w = randomAveTf();
-  else if (randomMode == R_DF) 
-    w = randomDf();
-  else if (randomMode == R_UNIFORM) 
-    w = randomUniform();
-  else 
-    w = randomCtf();
-  // give up if no random word was selected.
-  if (w == NULL) return w;
-  
-  // Check to see if this word has been selected before.
-  stringset::iterator it = randdone.find(w);
-  if (it != randdone.end()) {
-    // Word was not unique, select another.
-    free (w);
-    // If every word in the map is now in randdone, we are finished.
-    if (freqInfo.size() == randdone.size()) 
-      w = NULL;
-    else // otherwise, recursively try getting a new word.
-      w = randomWord(); 
+  while (freqInfo.size() > randdone.size()) {
+    if (randomMode == R_AVE_TF)
+      w = randomAveTf();
+    else if (randomMode == R_DF) 
+      w = randomDf();
+    else if (randomMode == R_UNIFORM) 
+      w = randomUniform();
+    else 
+      w = randomCtf();
+    // give up if no random word was selected.
+    if (w == NULL) break;
+    // Check to see if this word has been selected before.
+    stringset::iterator it = randdone.find(w);
+    if (it != randdone.end()) {
+      // Word was not unique, select another.
+      free (w);
+    } else {
+      randdone.insert(w);
+      break;
+    }
   }
-  // don't put NULL into the set
-  if (w != NULL)
-    randdone.insert(w);
-
+  // If every word in the map is now in randdone, we are finished.
   // Word was unique, return it.
   return w;
 }
@@ -260,7 +251,7 @@ lemur::distrib::FreqCounter::randomCtf() const {
   freqmap::const_iterator curr = freqInfo.begin();
   while (curr != freqInfo.end() && i < n) {
     i += curr->second.ctf;
-    currString = curr->first; // remember last word we saw
+    currString = curr->second.word; // remember last word we saw
     curr++;
   }
   // if there were no words, currString is NULL
@@ -281,7 +272,7 @@ lemur::distrib::FreqCounter::randomDf() const {
   freqmap::const_iterator curr = freqInfo.begin();
   while (curr != freqInfo.end() && i < n) {
     i += curr->second.df;
-    currString = curr->first; // remember last word we saw
+    currString = curr->second.word; // remember last word we saw
     curr++;
   }
   // if there were no words, currString is NULL
@@ -313,7 +304,7 @@ lemur::distrib::FreqCounter::randomAveTf() const {
   freqmap::const_iterator curr = freqInfo.begin();
   while (curr != freqInfo.end() && i < n) {
     i += (curr->second.ctf / (long double) curr->second.df) / avetfTot;
-    currString = curr->first; // remember last word we saw
+    currString = curr->second.word; // remember last word we saw
     curr++;
 
   }
@@ -334,7 +325,7 @@ lemur::distrib::FreqCounter::randomUniform() const {
   // is at least n or we have run out of terms.
   freqmap::const_iterator curr = freqInfo.begin();
   while (curr != freqInfo.end() && i < n) {
-    currString = curr->first; // remember last word we saw
+    currString = curr->second.word; // remember last word we saw
     curr++;
     i++;
   }
@@ -353,7 +344,7 @@ lemur::distrib::FreqCounter::ctfRatio(FreqCounter & lm) const {
   double ctfTot2 = 0.0;
   freqmap::const_iterator curr = freqInfo.begin();
   while (curr != freqInfo.end()) {
-    if (lm.getCtf(curr->first) > 0) {
+    if (lm.getCtf(curr->second.word) > 0) {
       ctfSum += curr->second.ctf;
     }
     ctfTot2 += curr->second.ctf;
