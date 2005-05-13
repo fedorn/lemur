@@ -13,14 +13,13 @@
 #define key_ptrs_per_block 1018 /*506*/       /* number of key_ptrs in index block */
 #define level_zero 0                 /* level of index leaves */
 #define level_one 1                  /* level immediately above leaves */
-#define long_lc   sizeof(long)       /* lc of a long int */
 #define min_disk_rec_lc 5            /* records this lc or longer are on disk */
 #define min_buffer_cnt 8             /* default number of buffers allocated */
 #define max_buffer_cnt 16384         /* max buffers allowed */
 #define buf_hash_load_factor 3       /* hash table is>=this times buffers alloc,*/
 #define max_level 32                 /* number of index block levels */
 /*#define max_segment_lc 4194304 */      /* 1024 blocks of 4096 each */
-#define max_segment_lc max_long      /* max length of a file segment */
+#define max_segment_lc (unsigned long) max_long      /* max length of a file segment */
 #define max_segments 1024            /* max number of file segments */
 #define max_files 10                 /* max number of open files */
 #define max_filename_lc 128          /* max length of a file name */
@@ -32,28 +31,33 @@
 #define free_lc_ix 2
 #define max_index 3
 
+typedef unsigned short int16;
+typedef unsigned long  segment_offset_t;
+typedef unsigned long  rec_lc_t;
+
 enum comparison {less,equal,greater};
 
 struct key {
   unsigned char
     text[maxkey_lc];
-  short
+  int16
     lc;
 };
 
 struct leveln_pntr{
-  int
+  unsigned
     segment;
-  unsigned long
+  segment_offset_t
     block;
 };
 #define leveln_lc sizeof(struct leveln_pntr)
 
 struct level0_pntr {
-  int
+  unsigned
     segment;
-  unsigned long
-    sc,
+  segment_offset_t
+    sc;
+  rec_lc_t
     lc;
 };
 #define level0_lc sizeof(struct level0_pntr)
@@ -61,7 +65,7 @@ struct level0_pntr {
 typedef struct level0_pntr keyfile_pointer; /* external name for Chiliad use */
 
 struct key_ptr_t {
-  short
+  int16
     sc,                         /* start character of key */
     lc;                         /* lc of key, does not include pointer */
 };
@@ -69,7 +73,7 @@ struct key_ptr_t {
 #define keyspace_lc (key_ptr_lc*key_ptrs_per_block)
 
 struct ix_block {                  /* block is the disk resident image of */
-  short                         /*   an index block */
+  int16                         /*   an index block */
     keys_in_block,
     chars_in_use;               /* chars in key/pointer pool, does not */
                                 /*   include length of key_ptr_t entries */
@@ -104,17 +108,6 @@ typedef union level0orn_pntr {
   struct level0_pntr     p0;
   struct leveln_pntr     pn;
 } levelx_pntr;
-
-/*typedef union int_or_byte {
-  int           as_int;
-  unsigned char as_byte[sizeof(int)];
-} int_alias;
-
-typedef union short_or_byte {
-  short         as_short;
-  unsigned char as_byte[sizeof(short)];
-} short_alias;
-*/
 
 /* Buffer handling.  Buffers contain the disk image of an index or    */
 /*   freespace block */
@@ -172,7 +165,7 @@ struct fcb {
     first_free_block[max_level][max_index],/* points to start of empty block chain */
     first_at_level[max_level][max_index],  /* block containing lowest key at level */
     last_pntr[max_level][max_index];       /* last pointer at each level */
-  long
+  segment_offset_t
     segment_length[max_segments];/* length in bytes of each segment     */
 
     /* start of temporary information */
