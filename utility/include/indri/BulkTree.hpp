@@ -85,8 +85,9 @@ namespace indri
 
     public:
       std::vector<BulkBlock*> _blocks;
-      SequentialWriteBuffer _write;
       File _file;
+      SequentialWriteBuffer _write;
+
 
       BulkTreeWriter();
       ~BulkTreeWriter();

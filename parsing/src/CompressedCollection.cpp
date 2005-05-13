@@ -273,8 +273,6 @@ void indri::collection::CompressedCollection::_readPositions( indri::api::Parsed
 //
 
 indri::collection::CompressedCollection::CompressedCollection() {
-  _output = new indri::file::SequentialWriteBuffer( _storage, 1024*1024 );
-
   _stream = new z_stream_s;
   _stream->zalloc = zlib_alloc;
   _stream->zfree = zlib_free;
@@ -284,6 +282,7 @@ indri::collection::CompressedCollection::CompressedCollection() {
   deflateInit( _stream, Z_BEST_SPEED );
 
   _strings = string_set_create();
+  _output = 0;
 }
 
 //
@@ -328,6 +327,7 @@ void indri::collection::CompressedCollection::create( const std::string& fileNam
 
   _storage.create( storageName );
   _lookup.create( lookupName );
+  _output = new indri::file::SequentialWriteBuffer( _storage, 1024*1024 );
 
   indri::api::Parameters manifest;
   indri::api::Parameters forwardParameters = manifest.append( "forward" );
@@ -377,6 +377,7 @@ void indri::collection::CompressedCollection::open( const std::string& fileName 
 
   _storage.open( storageName );
   _lookup.open( lookupName );
+  _output = new indri::file::SequentialWriteBuffer( _storage, 1024*1024 );
 
   if( manifest.exists("forward.field") ) {
     indri::api::Parameters forward = manifest["forward.field"];
