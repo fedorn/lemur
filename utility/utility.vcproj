@@ -323,9 +323,6 @@
 				RelativePath=".\include\keyref.h">
 			</File>
 			<File
-				RelativePath=".\include\kfversion.h">
-			</File>
-			<File
 				RelativePath=".\include\lemur-compat.hpp">
 			</File>
 			<File
