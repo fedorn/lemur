@@ -405,7 +405,7 @@ void IndexWriter::_addInvertedListData( indri::utility::greedy_vector<WriterInde
   const float topdocsFraction = 0.01f;
   bool hasTopdocs = termData->corpus.documentCount > TOPDOCS_DOCUMENT_COUNT;
   bool isFrequent = termData->corpus.totalCount > FREQUENT_TERM_COUNT;
-  int topdocsCount = hasTopdocs ? int(termData->corpus.totalCount * 0.01) : 0;
+  int topdocsCount = hasTopdocs ? int(termData->corpus.documentCount * 0.01) : 0;
   int topdocsSpace = hasTopdocs ? ((topdocsCount*3*sizeof(UINT32)) + sizeof(int)) : 0;
 
   // write a control byte
