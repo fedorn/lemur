@@ -123,6 +123,7 @@ lemur::distrib::LemurDBManager::setOutputFile(const string &filename) const {
   if (outfile != NULL) {
     outfile->close();
     delete outfile;
+    outfile = NULL;
   }
   outfile = new ofstream(filename.c_str());
 }
@@ -159,7 +160,8 @@ lemur::distrib::LemurDBManager::close() {
   delete model;
   delete accumulator;
   delete results;
-  //  delete parser;
+  // this should be deleted.
+  delete parser;
   outfile->close();
   delete outfile;
 }
