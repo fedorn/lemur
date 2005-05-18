@@ -103,6 +103,9 @@ lemur::distrib::QryBasedSampler::probe(const char * initQuery) {
     qcount++;
 
     if (done == 0 && (numResults == 0)) {
+      free(query);
+      delete[] (results->ids);
+      delete(results);
       cout << "No documents returned for initial query!" << endl;
       return false;
     }
