@@ -30,6 +30,12 @@ namespace lemur
     /// to push/pop Parameters * onto.
     class ParamStack {
     public:
+      /// Clean up
+      static void clear() {
+        delete (_paramStackSingleton);
+        _paramStackSingleton = NULL;
+      }
+      
       /// Obtain the singleton instance, instantiating if necessary.
       static ParamStack &instance() {
         if (!_paramStackSingleton) {
@@ -307,7 +313,12 @@ namespace lemur
       }
       return retval;
     }
-
+    /// Reset Parameter stack to empty and deallocate all memory.
+    void ParamClear() {
+      lemur::utility::ParamStack &ps = lemur::utility::ParamStack::instance();
+      ps.clear();
+    }
+    
     lemur::utility::String ParamPopFile (void) 
     {
       lemur::utility::ParamStack &ps = lemur::utility::ParamStack::instance();

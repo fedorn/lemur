@@ -41,5 +41,7 @@ int main(int argc, char *argv[])
     cerr << "Program aborted due to exception" << endl;;
     exit(1);
   } 
+  // clean up
+  lemur::api::ParamClear();
   return result;
 }

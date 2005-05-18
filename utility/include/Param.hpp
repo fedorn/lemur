@@ -183,6 +183,9 @@ namespace lemur
     /// prints the current parameter keys to cerr.
     void   ParamDisplay();
 
+    ///  Clear the parameter stack and deallocate all memory.
+    void   ParamClear();
+
     /// \brief Add a parameter value pair. 
     /*! If no parameter file has been pushed,
       a new empty Parameters object is put on the stack.
