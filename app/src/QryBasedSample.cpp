@@ -239,9 +239,8 @@ int AppMain (int argc, char * argv []) {
       dbm->close();
       
     }
-    delete(dbm);
-    
   }
+  delete(dbm);
   return 0;
 }
 
