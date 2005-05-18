@@ -26,6 +26,8 @@ namespace lemur
     /// Abstract Score Accumulator
     class ScoreAccumulator {
     public:
+      virtual ~ScoreAccumulator(){}
+      
       /// clear, reset
       virtual void reset()=0;
       /// Find the score value for an id
