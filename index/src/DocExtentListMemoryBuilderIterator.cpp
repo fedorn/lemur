@@ -128,7 +128,7 @@ bool indri::index::DocExtentListMemoryBuilderIterator::nextEntry() {
 
       if( _numeric ) {
         INT64 number;
-        _list = lemur::utility::RVLCompress::decompress_signed_longlong( _list, number );
+        _list = lemur::utility::RVLCompress::decompress_longlong( _list, number );
         _data.numbers.push_back( number );
       }
 

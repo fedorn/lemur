@@ -140,7 +140,7 @@ char* lemur::utility::RVLCompress::_compress_bigger_int( char* dest, int data ) 
 //
 //
 
-char* lemur::utility::RVLCompress::_compress_bigger_longlong( char* dest, INT64 data ) {
+char* lemur::utility::RVLCompress::_compress_bigger_longlong( char* dest, UINT64 data ) {
   if( data < (UINT64(1)<<21) ) {
     RVL_COMPRESS_BYTE( dest, data, 0 );
     RVL_COMPRESS_BYTE( dest, data, 1 );

@@ -636,9 +636,19 @@ int main(int argc, char * argv[]) {
     
     std::vector<std::string> fields;
     std::string subName = "name";
-    if( copy_parameters_to_string_vector( fields, parameters, "field", &subName ) )
+    if( copy_parameters_to_string_vector( fields, parameters, "field", &subName ) ) {
       env.setIndexedFields(fields);
-
+      // have to update any numeric fields.
+      std::string numName = "numeric";
+      indri::api::Parameters slice = parameters["field"];
+      for( int i=0; i<slice.size(); i++ ) {
+        bool isNumeric = slice[i].get(numName, false);
+        if( isNumeric ) {
+          env.setNumericField(slice[i][subName], isNumeric);
+        }
+      }
+    }
+    
     if( indri::collection::Repository::exists( repositoryPath ) ) {
       env.open( repositoryPath, &monitor );
       buildindex_print_event( std::string() + "Opened repository " + repositoryPath );

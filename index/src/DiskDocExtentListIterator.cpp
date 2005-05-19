@@ -167,7 +167,8 @@ void indri::index::DiskDocExtentListIterator::_readSkip() {
 
 void indri::index::DiskDocExtentListIterator::_readEntry() {
   _data.extents.clear();
-  
+  _data.numbers.clear();
+
   int deltaDocument;
   _list = lemur::utility::RVLCompress::decompress_int( _list, deltaDocument );
 
@@ -191,9 +192,8 @@ void indri::index::DiskDocExtentListIterator::_readEntry() {
     lastPosition = extent.end;
 
     _data.extents.push_back( extent );
-
     if( _numeric ) {
-      _list = lemur::utility::RVLCompress::decompress_signed_longlong( _list, number );
+      _list = lemur::utility::RVLCompress::decompress_longlong( _list, number );
       _data.numbers.push_back( number );
     }
   }

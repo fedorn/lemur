@@ -312,8 +312,8 @@ void IndexWriter::_writeFieldList( const std::string& fileName, int fieldIndex, 
   outputFile.create( fileName );
   indri::file::SequentialWriteBuffer output( outputFile, 1024*1024 );
   
-  // write a control byte
-  UINT8 control = 0;
+  // write a control byte -- numeric fields use 0x02 (DiskDocExtentListIterator)
+  UINT8 control = _fields[fieldIndex].numeric ? 0x02 : 0;
   output.write( &control, sizeof(UINT8) );
 
   indri::utility::Buffer dataBuffer;

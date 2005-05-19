@@ -37,7 +37,7 @@ indri::index::DocExtentListMemoryBuilder::DocExtentListMemoryBuilder( bool numer
   _lastExtentFrequency(0),
   _documentPointer(0),
   _locationCountPointer(0),
-  _numeric(false)
+  _numeric(numeric)
 {
 }
 
@@ -174,7 +174,7 @@ void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( int documentID,
   _extentFrequency++;
 
   if( _numeric )
-    _list = lemur::utility::RVLCompress::compress_signed_longlong( _list, number );
+    _list = lemur::utility::RVLCompress::compress_longlong( _list, number );
 
   assert( _locationCountPointer );
   assert( _listBegin < _locationCountPointer );
@@ -198,13 +198,13 @@ size_t indri::index::DocExtentListMemoryBuilder::_compressedSize( int documentID
     size += lemur::utility::RVLCompress::compressedSize( _extentFrequency - _lastExtentFrequency ) - 1;
 
     if( _numeric )
-      size += lemur::utility::RVLCompress::signedCompressedSize( number );
+      size += lemur::utility::RVLCompress::compressedSize( number );
   } else {
     size += lemur::utility::RVLCompress::compressedSize( begin - _lastLocation );
     size += lemur::utility::RVLCompress::compressedSize( end - begin );
 
     if( _numeric )
-      size += lemur::utility::RVLCompress::signedCompressedSize( number );
+      size += lemur::utility::RVLCompress::compressedSize( number );
   }
 
   return size;

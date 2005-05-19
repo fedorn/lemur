@@ -76,6 +76,15 @@ namespace indri
         return *this;
       }
 
+      /// Compress an UINT64 into the buffer
+      /// @param value the value to compress
+      RVLCompressStream& operator<< ( UINT64 value ) {
+        char* writePosition = _buffer.write(10);
+        char* endPosition = lemur::utility::RVLCompress::compress_longlong( writePosition, value );
+        _buffer.unwrite( 10 - (endPosition - writePosition) );
+        return *this;
+      }
+
       /// Compress a float into the buffer
       /// @param value the value to compress
       RVLCompressStream& operator << ( float value ) {

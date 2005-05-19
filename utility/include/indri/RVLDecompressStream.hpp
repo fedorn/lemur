@@ -54,10 +54,8 @@ namespace indri
       /// Decompress an UINT64 from the buffer into value
       /// @param value reference to the container for the value.
       RVLDecompressStream& operator>> ( UINT64& value ) {
-        INT64 other;
-        _current = lemur::utility::RVLCompress::decompress_longlong( _current, other );
+        _current = lemur::utility::RVLCompress::decompress_longlong( _current, value );
         assert( _current - _buffer <= _bufferSize );
-        value = other;
         return *this;
       }
 
