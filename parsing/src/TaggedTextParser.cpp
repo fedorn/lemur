@@ -302,12 +302,12 @@ static void yy_fatal_error YY_PROTO(( yyconst char msg[] ));
 	*yy_cp = '\0'; \
 	yy_c_buf_p = yy_cp;
 
-#define YY_NUM_RULES 6
-#define YY_END_OF_BUFFER 7
-static yyconst short int yy_accept[17] =
+#define YY_NUM_RULES 7
+#define YY_END_OF_BUFFER 8
+static yyconst short int yy_accept[21] =
     {   0,
-        0,    0,    7,    5,    4,    5,    3,    5,    0,    0,
-        3,    0,    1,    0,    2,    0
+        0,    0,    8,    6,    5,    6,    3,    6,    6,    0,
+        0,    3,    4,    0,    1,    0,    2,    0,    4,    0
     } ;
 
 static yyconst int yy_ec[256] =
@@ -316,16 +316,16 @@ static yyconst int yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    3,    1,    1,    4,    5,    1,
-        1,    1,    1,    1,    1,    5,    1,    6,    6,    6,
-        6,    6,    6,    6,    6,    6,    6,    1,    7,    8,
-        1,    9,    1,    1,   10,   10,   10,   10,   10,   10,
-       10,   10,   10,   10,   10,   10,   10,   10,   10,   10,
-       10,   10,   10,   10,   10,   10,   10,   10,   10,   10,
-        1,    1,    1,    1,    1,    1,   10,   10,   10,   10,
+        1,    1,    1,    1,    6,    7,    1,    8,    8,    8,
+        8,    8,    8,    8,    8,    8,    8,    1,    9,   10,
+        1,   11,    1,    1,   12,   12,   12,   12,   12,   12,
+       12,   12,   12,   12,   12,   12,   12,   12,   12,   12,
+       12,   12,   12,   12,   12,   12,   12,   12,   12,   12,
+        1,    1,    1,    1,    1,    1,   12,   12,   12,   12,
 
-       10,   10,   10,   10,   10,   10,   10,   10,   10,   10,
-       10,   10,   10,   10,   10,   10,   10,   10,   10,   10,
-       10,   10,    1,    1,    1,    1,    1,    5,    5,    5,
+       12,   12,   12,   12,   12,   12,   12,   12,   12,   12,
+       12,   12,   12,   12,   12,   12,   12,   12,   12,   12,
+       12,   12,    1,    1,    1,    1,    1,    5,    5,    5,
         5,    5,    5,    5,    5,    5,    5,    5,    5,    5,
         5,    5,    5,    5,    5,    5,    5,    5,    5,    5,
         5,    5,    5,    5,    5,    5,    5,    5,    5,    5,
@@ -342,37 +342,42 @@ static yyconst int yy_ec[256] =
         5,    5,    5,    5,    5
     } ;
 
-static yyconst int yy_meta[11] =
+static yyconst int yy_meta[13] =
     {   0,
-        1,    1,    1,    1,    2,    2,    1,    1,    1,    2
+        1,    1,    1,    1,    2,    1,    2,    2,    1,    1,
+        1,    2
     } ;
 
-static yyconst short int yy_base[19] =
+static yyconst short int yy_base[23] =
     {   0,
-        0,    0,   17,   25,   25,    8,    0,    7,    9,   12,
-        0,    5,   25,    6,   25,   25,   10,   22
+        0,    0,   24,   31,   31,   10,    0,   13,    9,   11,
+       14,    0,   20,    7,   31,    8,   31,    8,    7,   31,
+       12,   28
     } ;
 
-static yyconst short int yy_def[19] =
+static yyconst short int yy_def[23] =
     {   0,
-       16,    1,   16,   16,   16,   16,   17,   18,   16,   16,
-       17,   18,   16,   16,   16,    0,   16,   16
+       20,    1,   20,   20,   20,   20,   21,   20,   22,   20,
+       20,   21,   20,   22,   20,   20,   20,   20,   20,    0,
+       20,   20
     } ;
 
-static yyconst short int yy_nxt[36] =
+static yyconst short int yy_nxt[44] =
     {   0,
-        4,    5,    4,    6,    7,    7,    4,    8,    4,    7,
-        9,   11,   15,   13,   14,   13,   16,   10,   15,   16,
-       16,   10,   12,   12,    3,   16,   16,   16,   16,   16,
-       16,   16,   16,   16,   16
+        4,    5,    4,    6,    7,    8,    7,    7,    4,    9,
+        4,    7,   10,   12,   19,   19,   17,   15,   16,   15,
+       13,   11,   17,   20,   20,   11,   18,   13,   14,   14,
+        3,   20,   20,   20,   20,   20,   20,   20,   20,   20,
+       20,   20,   20
     } ;
 
-static yyconst short int yy_chk[36] =
+static yyconst short int yy_chk[44] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        6,   17,   14,   12,    9,    8,    3,    6,   10,    0,
-        0,   10,   18,   18,   16,   16,   16,   16,   16,   16,
-       16,   16,   16,   16,   16
+        1,    1,    6,   21,   19,   18,   16,   14,   10,    9,
+        8,    6,   11,    3,    0,   11,   13,   13,   22,   22,
+       20,   20,   20,   20,   20,   20,   20,   20,   20,   20,
+       20,   20,   20
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -400,7 +405,7 @@ char *yytext;
   
 static long byte_position;
   
-#line 405 "../src/TaggedTextParser.cpp"
+#line 410 "../src/TaggedTextParser.cpp"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -554,7 +559,7 @@ YY_DECL
 #line 18 "../src/TaggedTextParser.l"
 
 
-#line 559 "../src/TaggedTextParser.cpp"
+#line 564 "../src/TaggedTextParser.cpp"
 
 	if ( yy_init )
 		{
@@ -605,13 +610,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 17 )
+				if ( yy_current_state >= 21 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 25 );
+		while ( yy_base[yy_current_state] != 31 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -655,19 +660,24 @@ YY_RULE_SETUP
 case 4:
 YY_RULE_SETUP
 #line 23 "../src/TaggedTextParser.l"
-{ byte_position += parserleng; /* zap newline */ }
+{ byte_position += parserleng; return indri::parse::TaggedTextTokenType::word;  /*negative number*/}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 24 "../src/TaggedTextParser.l"
-{ byte_position += parserleng; return indri::parse::TaggedTextTokenType::unknown; }
+{ byte_position += parserleng; /* zap newline */ }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 26 "../src/TaggedTextParser.l"
+#line 25 "../src/TaggedTextParser.l"
+{ byte_position += parserleng; return indri::parse::TaggedTextTokenType::unknown; }
+	YY_BREAK
+case 7:
+YY_RULE_SETUP
+#line 27 "../src/TaggedTextParser.l"
 ECHO;
 	YY_BREAK
-#line 672 "../src/TaggedTextParser.cpp"
+#line 682 "../src/TaggedTextParser.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -959,7 +969,7 @@ static yy_state_type yy_get_previous_state()
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 17 )
+			if ( yy_current_state >= 21 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -994,11 +1004,11 @@ yy_state_type yy_current_state;
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 17 )
+		if ( yy_current_state >= 21 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 16);
+	yy_is_jam = (yy_current_state == 20);
 
 	return yy_is_jam ? 0 : yy_current_state;
 	}
@@ -1553,7 +1563,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 26 "../src/TaggedTextParser.l"
+#line 27 "../src/TaggedTextParser.l"
 
 
 indri::parse::TaggedTextParser::TaggedTextParser() :
