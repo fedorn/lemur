@@ -27,7 +27,7 @@ namespace indri {
       TermFieldStatistics() : totalCount(0), documentCount(0), lastDocument(0), lastCount(0) {}
 
       /// total number of times in the corpus that this term appears in this field
-      INT64 totalCount;
+      UINT64 totalCount;
 
       /// total number of times in the corpus that this term appears in this document
       unsigned int documentCount;

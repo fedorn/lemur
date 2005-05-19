@@ -33,8 +33,8 @@ namespace indri {
       TermData* termData;
       int termID;
 
-      INT64 startOffset;
-      INT64 length;
+      UINT64 startOffset;
+      UINT64 length;
     };
   }
 }
