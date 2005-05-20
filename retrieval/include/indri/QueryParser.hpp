@@ -14,14 +14,14 @@
 /* $ANTLR 2.7.4: "indrilang.g" -> "QueryParser.hpp"$ */
 #include <antlr/TokenStream.hpp>
 #include <antlr/TokenBuffer.hpp>
-#include "QueryLexerTokenTypes.hpp"
+#include "indri/QueryLexerTokenTypes.hpp"
 #include <antlr/LLkParser.hpp>
 
 ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API QueryParser : public ANTLR_USE_NAMESPACE(antlr)LLkParser, public QueryLexerTokenTypes
 {
-#line 152 "indrilang.g"
+#line 153 "indrilang.g"
 
 private:
   // storage for allocated nodes

@@ -130,6 +130,7 @@ TERM:     ( (DIGIT)+ SAFE_LETTER ) => TEXT_TERM |
           ( NUMBER DOT ) => FLOAT { $setType(FLOAT); } |
           ( DASH NUMBER DOT ) => NEGATIVE_NUMBER { $setType(NEGATIVE_NUMBER); } |
           ( NUMBER ) => NUMBER { $setType(NUMBER); } |
+          ( NEGATIVE_NUMBER ) => NEGATIVE_NUMBER { $setType(NEGATIVE_NUMBER); } |
           TEXT_TERM;
           
 protected ENCODED_QUOTED_TERM:    "#base64quote"! O_PAREN! (TAB! | SPACE!)* (BASESIXFOUR_CHAR)+ (TAB! | SPACE!)* C_PAREN!;
