@@ -644,7 +644,7 @@ int main(int argc, char * argv[]) {
       for( int i=0; i<slice.size(); i++ ) {
         bool isNumeric = slice[i].get(numName, false);
         if( isNumeric ) {
-          env.setNumericField(slice[i][subName], isNumeric);
+          env.setNumericField(slice[i][subName], isNumeric, "NumericFieldAnnotator");
         }
       }
     }
