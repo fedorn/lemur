@@ -39,7 +39,7 @@ namespace indri
         for( size_t i=0; i<document->tags.size(); i++ ) {
           TagExtent& extent = document->tags[i];
 
-          if( _field == extent.name ) {
+          if( _field == extent.name && extent.begin != extent.end ) {
             char* numberText = document->terms[ extent.begin ]; 
             INT64 value = string_to_i64( numberText );
             extent.number = value;
