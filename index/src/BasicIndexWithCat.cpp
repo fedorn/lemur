@@ -22,12 +22,12 @@ lemur::index::BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &cate
   baseIndex(&wordIndex), catIndex(&categoryIndex), catAsTerm(catIsTerm) 
 { 
   // synchronize doc id lexicons
-  base2cat = new int[baseIndex->docCount()];
+  base2cat = new int[baseIndex->docCount()+1];
   int i;
   int baseMax = baseIndex->docCount();
 
   // all index translation defaults to "OOV".
-  for (i=0; i<baseMax; i++) {
+  for (i=0; i<=baseMax; i++) {
     base2cat[i] = (catAsTerm? catIndex->term(OOVSTRING): catIndex->document(OOVSTRING));
   }
 
@@ -41,9 +41,9 @@ lemur::index::BasicIndexWithCat::BasicIndexWithCat(Index &wordIndex, Index &cate
 
   if (catMax > baseMax) 
     throw lemur::api::Exception("BasicIndexWithCat", "categor index has more doc ids than base index");
-  cat2base = new int[catMax];
+  cat2base = new int[catMax+1];
 
-  for (i=0; i<catMax; i++) {
+  for (i=0; i<=catMax; i++) {
     id = (catAsTerm? baseIndex->document(catIndex->document(i)):
           baseIndex->document(catIndex->term(i)));
     base2cat[id]=i;

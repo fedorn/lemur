@@ -180,7 +180,7 @@ namespace lemur
     inline int BasicIndexWithCat::catCount() const
     {
       if (catAsTerm) {
-        return (catIndex->termCountUnique()-1); // -1 because of [OOV]
+        return (catIndex->termCountUnique());
       } else {
         // docid as term, so cat as doc
         return (catIndex->docCount());
