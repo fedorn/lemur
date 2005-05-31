@@ -72,7 +72,8 @@ void indri::collection::Repository::_buildFields() {
 
       field.name = fields[i].get( "name", "" );
       field.numeric = fields[i].get( "numeric", false ) ? true : false;
-      field.parserName = fields[i].get( "parserName", field.numeric ? "NumericFieldAnnotator" : "" );
+      //      field.parserName = fields[i].get( "parserName", field.numeric ? "NumericFieldAnnotator" : "" );
+      field.parserName = fields[i].get( "parserName", "" );
       _fields.push_back(field);
     }
   }
