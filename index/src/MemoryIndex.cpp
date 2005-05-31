@@ -538,6 +538,9 @@ int indri::index::MemoryIndex::addDocument( indri::api::ParsedDocument& document
     indexedTerms++;
   }
 
+  _addOpenTags( indexedTags, openTags, document.tags, extentIndex, position );
+  _removeClosedTags( openTags, position );
+
   // go through the list of terms we've seen and update doc length counts
   term_entry* entry = entries;
 
