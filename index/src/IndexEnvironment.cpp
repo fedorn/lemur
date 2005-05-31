@@ -114,7 +114,7 @@ void indri::api::IndexEnvironment::setIndexedFields( const std::vector<std::stri
   }
 }
 
-void indri::api::IndexEnvironment::setNumericField( const std::string& fieldName, bool isNumeric ) {
+void indri::api::IndexEnvironment::setNumericField( const std::string& fieldName, bool isNumeric, const std::string & parserName ) {
   if( !_parameters.exists( "field" ) )
     _parameters.set( "field" );
 
@@ -125,6 +125,7 @@ void indri::api::IndexEnvironment::setNumericField( const std::string& fieldName
 
     if( parameterFieldName == fieldName ) {
       fields[i].set( "numeric", isNumeric );
+      fields[i].set( "parserName", parserName );
       return;
     }
   }
@@ -132,6 +133,7 @@ void indri::api::IndexEnvironment::setNumericField( const std::string& fieldName
   Parameters field = _parameters.append("field");
   field.set( "name", fieldName );
   field.set( "numeric", isNumeric );
+  field.set( "parserName", parserName );
 }
 
 //
