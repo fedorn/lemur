@@ -1057,6 +1057,7 @@ void indri::collection::Repository::close() {
     delete _collection;
     _collection = 0;
 
+    _parameters.clear(); // close/reopen will cause duplicated entries.
     _fields.clear();
     indri::utility::delete_vector_contents( _transformations );
   }
