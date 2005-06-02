@@ -262,12 +262,7 @@ UINT64 indri::index::MemoryIndex::fieldTermCount( const std::string& field, cons
 //
 
 UINT64 indri::index::MemoryIndex::termCount() {
-  term_entry** entry = _stringToTerm.find( term.c_str() );
-
-  if( !entry )
-    return 0;
-
-  return (*entry)->termData->corpus.totalCount;
+  return _corpusStatistics.totalTerms;
 }
 
 //
@@ -275,7 +270,12 @@ UINT64 indri::index::MemoryIndex::termCount() {
 //
 
 UINT64 indri::index::MemoryIndex::termCount( const std::string& term ) {
-  return _corpusStatistics.totalTerms;
+  term_entry** entry = _stringToTerm.find( term.c_str() );
+
+  if( !entry )
+    return 0;
+
+  return (*entry)->termData->corpus.totalCount;
 }
 
 //
