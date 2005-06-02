@@ -136,7 +136,7 @@ inline void termdata_merge( indri::index::TermData* termData, indri::index::Term
   }
 
   termData->maxDocumentLength = lemur_compat::max( termData->maxDocumentLength, merger->maxDocumentLength );
-  termData->minDocumentLength = lemur_compat::min( termData->minDocumentLength, termData->minDocumentLength );
+  termData->minDocumentLength = lemur_compat::min( termData->minDocumentLength, merger->minDocumentLength );
 }
 
 inline int termdata_size( int fieldCount ) {
