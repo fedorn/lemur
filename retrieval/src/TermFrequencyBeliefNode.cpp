@@ -65,6 +65,9 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
     double score = _function.scoreOccurrence( count, documentLength );
 
     _extents.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
+
+    assert( score < _maximumScore || _list->topDocuments().size() > 0 );
+    assert( score <= _maximumBackgroundScore || count != 0 );
   }
 
   return _extents;
@@ -111,7 +114,7 @@ void indri::infnet::TermFrequencyBeliefNode::indexChanged( indri::index::Index& 
     double maxOccurrences = ceil( double(termData->maxDocumentLength) * maximumFraction );
 
     _maximumScore = _function.scoreOccurrence( maxOccurrences, termData->maxDocumentLength );
-    _maximumBackgroundScore = _function.scoreOccurrence( 0, termData->minDocumentLength );
+    _maximumBackgroundScore = _function.scoreOccurrence( 0, 1);
   }
 }
 
