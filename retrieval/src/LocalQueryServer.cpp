@@ -352,7 +352,7 @@ indri::server::QueryServerResponse* indri::server::LocalQueryServer::runQuery( s
   indri::lang::ApplyCopiers<indri::lang::UnnecessaryNodeRemoverCopier> unnecessary( roots );
 
   // run the contextsimplecountcollectorcopier to gather easy stats
-  indri::lang::ApplyCopiers<indri::lang::ContextSimpleCountCollectorCopier> contexts( unnecessary.roots() );
+  indri::lang::ApplyCopiers<indri::lang::ContextSimpleCountCollectorCopier> contexts( unnecessary.roots(), _repository );
 
   // use frequency-only nodes where appropriate
   indri::lang::ApplyCopiers<indri::lang::FrequencyListCopier> frequency( contexts.roots(), _cache );

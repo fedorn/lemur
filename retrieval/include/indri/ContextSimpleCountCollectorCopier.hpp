@@ -40,10 +40,10 @@ namespace indri
 {
   namespace lang
   {
-    
     class ContextSimpleCountCollectorCopier : public indri::lang::Copier {
     private:
       std::vector<indri::lang::Node*> _newNodes;
+      indri::collection::Repository& _repository;
 
       class SubtreeWalker : public indri::lang::Walker {
       private:
@@ -129,7 +129,8 @@ namespace indri
       };
 
     public:
-      ContextSimpleCountCollectorCopier()
+      ContextSimpleCountCollectorCopier( indri::collection::Repository& repository ) :
+        _repository(repository)
       {
       }
 
@@ -152,7 +153,15 @@ namespace indri
           // terms
           std::vector<std::string> terms;
           for( int i=0; i<subtree.getTerms().size(); i++ ) {
-            terms.push_back( subtree.getTerms()[i]->getText() );
+            indri::lang::IndexTerm* indexTerm = subtree.getTerms()[i];
+            std::string term;
+            
+            if( indexTerm->getStemmed() == false )
+              term = _repository.processTerm( indexTerm->getText() );
+            else
+              term = indexTerm->getText();
+
+            terms.push_back( term );
           }
 
           std::string field;
