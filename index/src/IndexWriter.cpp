@@ -949,7 +949,7 @@ void IndexWriter::_writeDirectLists( WriterIndexContext* context,
     documentData.offset = directOutput->tell() + writeStart + sizeof(UINT32);
 
     dataOutput->write( &documentData, sizeof(DocumentData) );
-    int termLength = documentData.indexedLength;
+    int termLength = documentData.totalLength;
     assert( termLength >= 0 );
     lengthsOutput->write( &termLength, sizeof(UINT32) );
     

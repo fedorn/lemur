@@ -29,6 +29,7 @@ namespace indri {
       UINT64 offset;        // offset into the dt file where we'll find the TermList 
       int byteLength;       // length in bytes of the TermList
       int indexedLength;    // the length of the document without stopwords
+      int totalLength;      // the length of the document including stopwords (used for scoring)
       int uniqueTermCount;  // number of unique terms found in this document
     };
   }
