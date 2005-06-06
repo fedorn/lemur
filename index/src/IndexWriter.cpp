@@ -934,11 +934,6 @@ void IndexWriter::_writeDirectLists( WriterIndexContext* context,
     memcpy( outputBuffer.front() + writeStart, &length, sizeof(UINT32) );
     assert( dataIterator );
 
-    if( outputBuffer.position() > 128*1024 ) {
-      directOutput->write( outputBuffer.front(), outputBuffer.position() );
-      outputBuffer.clear();
-    }
-
     // get a copy of the document data
     assert( dataIterator );
     assert( !dataIterator->finished() );
@@ -947,6 +942,11 @@ void IndexWriter::_writeDirectLists( WriterIndexContext* context,
     // store offset information
     documentData.byteLength = length;
     documentData.offset = directOutput->tell() + writeStart + sizeof(UINT32);
+    // tell has to happen before write or the offset will be wrong.
+    if( outputBuffer.position() > 128*1024 ) {
+      directOutput->write( outputBuffer.front(), outputBuffer.position() );
+      outputBuffer.clear();
+    }
 
     dataOutput->write( &documentData, sizeof(DocumentData) );
     int termLength = documentData.totalLength;
