@@ -498,7 +498,7 @@ indri::file::BulkTreeReader::~BulkTreeReader() {
 
 void indri::file::BulkTreeReader::openRead( const std::string& filename ) {
   _file = new File;
-  _file->open( filename );
+  _file->openRead( filename );
   _fileLength = _file->size();
   _ownFile = true;
 }
