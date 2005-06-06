@@ -1107,8 +1107,12 @@ void indri::collection::Repository::_startThreads() {
     _maintenanceThread = 0;
   }
 
-  _loadThread = new RepositoryLoadThread( *this, _memory );
-  _loadThread->start();
+  if( !_readOnly ) {
+    _loadThread = new RepositoryLoadThread( *this, _memory );
+    _loadThread->start();
+  } else {
+    _loadThread = 0;
+  }
 }
 
 //
