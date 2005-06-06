@@ -109,7 +109,7 @@ bool indri::file::File::openRead( const std::string& filename ) {
 #ifdef WIN32
   _handle = ::CreateFile( filename.c_str(),
                           GENERIC_READ,
-                          0,
+                          FILE_SHARE_READ,
                           NULL,
                           OPEN_EXISTING,
                           FILE_ATTRIBUTE_NORMAL,
