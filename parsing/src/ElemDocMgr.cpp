@@ -59,8 +59,9 @@ lemur::parse::ElemDocMgr::ElemDocMgr(string name, string mode, string source) {
   ifstream files(source.c_str());
   string file;
   if (files.is_open()) {
-    while (files >> file) {
-      sources.push_back(file);
+      // filenames may have spaces.
+    while (getline(files, file)) {
+        sources.push_back(file);
     }
     files.close();
   } else {
