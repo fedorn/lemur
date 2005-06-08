@@ -352,11 +352,19 @@ const lemur::parse::CollectionProps *lemur::index::KeyfileIncIndex::collectionPr
     return NULL;
 
   cprops = new lemur::parse::BasicCollectionProps();
-  while (rf >> key >> val) {
-    p.setName(key);
-    p.setValue(val.c_str());
-    cprops->setProperty(&p);
+  std::string line;
+  while (getline(rf, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      key = line.substr(0, space);
+      val = line.substr(space + 1);
+      p.setName(key);
+      p.setValue(val.c_str());
+      cprops->setProperty(&p);
+    }
   }
+  rf.close();
   return cprops;
 }
 
@@ -544,32 +552,30 @@ void lemur::index::KeyfileIncIndex::fullToc() {
 
 
 bool lemur::index::KeyfileIncIndex::docMgrIDs() {
-  FILE* in = fopen(names[DOCMGR_IDS].c_str(), "r");
+  ifstream in (names[DOCMGR_IDS].c_str());
   *msgstream << "Trying to open doc manager ids file: " 
              << names[DOCMGR_IDS] << endl;
-  if (in == NULL) {
-    fprintf(stderr, "Error opening doc manager ids \n");
+  if (!in.is_open()) {
+    *msgstream << "Error opening doc manager ids" << std::endl;
     return false;
   }
-
-  int ind, len;
-  char* str;
-
-  while (!feof(in)) {
-    if (fscanf(in, "%d %d", &ind, &len) != 2)
-      continue;
-
-    str = new char[len + 1]; 
-    if (fscanf(in, "%s", str) != 1) {
-      delete[](str);
-      continue;
+  std::string line;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      //  numbers are ignored.
+      std::string num1 = line.substr(0, space);
+      std::string value = line.substr(space + 1);
+      std::string::size_type space1 = value.find(" ",0);
+      std::string num2 = value.substr(0, space1);
+      value = value.substr(space1 + 1);
+      lemur::api::DocumentManager* dm = lemur::api::DocMgrManager::openDocMgr(value, _readOnly);
+      docMgrs.push_back(dm);
+      docmgrs.push_back(value);
     }
-    str[len] = '\0';
-    lemur::api::DocumentManager* dm = lemur::api::DocMgrManager::openDocMgr(str, _readOnly);
-    docMgrs.push_back(dm);
-    docmgrs.push_back(str);
   }
-  fclose(in);
+  in.close();
   return true;
 }
 
@@ -767,9 +773,9 @@ void lemur::index::KeyfileIncIndex::writeTOC(const lemur::parse::CollectionProps
     while (props->hasMore()) {
       p = props->nextEntry();
       if (p->getType() == lemur::parse::Property::STDSTRING)
-        pf << p->getName() << "  " << *(string*)p->getValue() << endl;
+        pf << p->getName() << " " << *(string*)p->getValue() << endl;
       else if (p->getType() == lemur::parse::Property::STRING)
-        pf << p->getName() << "  " << (char*)p->getValue() << endl;
+        pf << p->getName() << " " << (char*)p->getValue() << endl;
     }
     
     pf.close();
@@ -784,7 +790,7 @@ void lemur::index::KeyfileIncIndex::writeDocMgrIDs() {
   for ( unsigned int i=0;i<docmgrs.size();i++ ) {
     dmID << i << " "
          << docmgrs[i].length() << " "
-         << docmgrs[i] << " ";
+         << docmgrs[i] << std::endl;
   }
   dmID.close();
 }

@@ -330,38 +330,44 @@ bool lemur::index::InvIndex::fullToc(const string &fileName) {
   lemur::parse::Property p;
 
   string key,val;
-
-  while (in >> key >> val) {
-    if (key.compare(NUMDOCS_PAR) == 0) {
-      counts[DOCS] = atoi(val.c_str());
-    } else if (key.compare(NUMTERMS_PAR) == 0) {
-      counts[TOTAL_TERMS] = atoi(val.c_str());
-    } else if (key.compare(NUMUTERMS_PAR) == 0) {
-      counts[UNIQUE_TERMS] = atoi(val.c_str());
-    } else if (key.compare(NUMDT_PAR) == 0) {
-      counts[DT_FILES] = atoi(val.c_str());
-    } else if (key.compare(NUMINV_PAR) == 0) {
-      counts[INV_FILES] = atoi(val.c_str());
-    } else if (key.compare(INVINDEX_PAR) == 0) {
-      names[DOC_INDEX] = val;
-    } else if (key.compare(INVLOOKUP_PAR) == 0) {
-      names[DOC_LOOKUP] = val;
-    } else if (key.compare(DTINDEX_PAR) == 0) {
-      names[TERM_INDEX] = val;
-    } else if (key.compare(DTLOOKUP_PAR) == 0) {
-      names[TERM_LOOKUP] = val;
-    } else if (key.compare(TERMIDMAP_PAR) == 0) {
-      names[TERM_IDS] = val;
-    } else if (key.compare(DOCIDMAP_PAR) == 0) {
-      names[DOC_IDS] = val;
-    } else if (key.compare(DOCMGR_PAR) == 0) {
-      names[DOCMGR_IDS] = val;
-    } else if (key.compare(VERSION_PAR) == 0) {
-      names[VERSION_NUM] = val;
-    } else {
-      p.setName(key);
-      p.setValue(val.c_str());
-      colprops.setProperty(&p);
+  std::string line;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      key = line.substr(0, space);
+      val = line.substr(space + 1);
+      if (key.compare(NUMDOCS_PAR) == 0) {
+        counts[DOCS] = atoi(val.c_str());
+      } else if (key.compare(NUMTERMS_PAR) == 0) {
+        counts[TOTAL_TERMS] = atoi(val.c_str());
+      } else if (key.compare(NUMUTERMS_PAR) == 0) {
+        counts[UNIQUE_TERMS] = atoi(val.c_str());
+      } else if (key.compare(NUMDT_PAR) == 0) {
+        counts[DT_FILES] = atoi(val.c_str());
+      } else if (key.compare(NUMINV_PAR) == 0) {
+        counts[INV_FILES] = atoi(val.c_str());
+      } else if (key.compare(INVINDEX_PAR) == 0) {
+        names[DOC_INDEX] = val;
+      } else if (key.compare(INVLOOKUP_PAR) == 0) {
+        names[DOC_LOOKUP] = val;
+      } else if (key.compare(DTINDEX_PAR) == 0) {
+        names[TERM_INDEX] = val;
+      } else if (key.compare(DTLOOKUP_PAR) == 0) {
+        names[TERM_LOOKUP] = val;
+      } else if (key.compare(TERMIDMAP_PAR) == 0) {
+        names[TERM_IDS] = val;
+      } else if (key.compare(DOCIDMAP_PAR) == 0) {
+        names[DOC_IDS] = val;
+      } else if (key.compare(DOCMGR_PAR) == 0) {
+        names[DOCMGR_IDS] = val;
+      } else if (key.compare(VERSION_PAR) == 0) {
+        names[VERSION_NUM] = val;
+      } else {
+        p.setName(key);
+        p.setValue(val.c_str());
+        colprops.setProperty(&p);
+      }
     }
   }    
 
@@ -453,169 +459,161 @@ bool lemur::index::InvIndex::dtLookup() {
 }
 
 bool lemur::index::InvIndex::dtFileIDs() {
-  FILE* in = fopen(names[TERM_INDEX].c_str(), "rb");
+  ifstream in (names[TERM_INDEX].c_str());
   *msgstream << "Trying to open term index filenames: " << names[TERM_INDEX] << endl;
-  if (in == NULL) {
+  if (!in.is_open()) {
     *msgstream << "Error opening term index filenames file" << endl;
     return false;
   }
 
-
   dtfiles = new string [counts[DT_FILES]];
   dtfstreams = new ifstream[counts[DT_FILES]];
+
+  std::string line;
   int index;
-  int len;
-  char* str;
 
-  while (!feof(in)) {
-    if (fscanf(in, "%d %d", &index, &len) != 2) 
-      continue;
-
-    str = new char[len + 1];  // fixed PATH_MAX buffer here.
-    if (fscanf(in, "%s", str) != 1) {
-      delete[](str);
-      continue;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      // second number is ignored.
+      std::string num1 = line.substr(0, space);
+      std::string value = line.substr(space + 1);
+      std::string::size_type space1 = value.find(" ",0);
+      std::string num2 = value.substr(0, space1);
+      index = atoi(num1.c_str());
+      value = value.substr(space1 + 1);
+      dtfiles[index] = value;
+      dtfstreams[index].open(dtfiles[index].c_str(), ios::in | ios::binary);
+      if (dtfstreams[index] == NULL)
+        cerr << "error opening: " << dtfiles[index] << endl;
     }
-    str[len] = '\0';
-    dtfiles[index] = str;
-    delete[](str);
-    dtfstreams[index].open(dtfiles[index].c_str(), ios::in | ios::binary);
-    if (dtfstreams[index] == NULL)
-      cerr << "error opening: " << dtfiles[index] << endl;
   }
-
-  fclose(in);
+  in.close();
   return true;
 }
 
 bool lemur::index::InvIndex::docMgrIDs() {
-  FILE* in = fopen(names[DOCMGR_IDS].c_str(), "r");
+  ifstream in (names[DOCMGR_IDS].c_str());
   *msgstream << "Trying to open doc manager ids file: " << names[DOCMGR_IDS] << endl;
-  if (in == NULL) {
-    fprintf(stderr, "Error opening doc manager ids \n");
+  if (!in.is_open()) {
+    *msgstream << "Error opening doc manager ids" << std::endl;
     return false;
   }
 
-  int ind, len;
-  char* str;
-
-  while (!feof(in)) {
-    if (fscanf(in, "%d %d", &ind, &len) != 2)
-      continue;
-
-    str = new char[len + 1]; 
-    if (fscanf(in, "%s", str) != 1) {
-      delete[](str);
-      continue;
+  std::string line;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      //  numbers are ignored.
+      std::string num1 = line.substr(0, space);
+      std::string value = line.substr(space + 1);
+      std::string::size_type space1 = value.find(" ",0);
+      std::string num2 = value.substr(0, space1);
+      value = value.substr(space1 + 1);
+      lemur::api::DocumentManager* dm = lemur::api::DocMgrManager::openDocMgr(value.c_str());
+      docmgrs.push_back(dm);
     }
-    str[len] = '\0';
-    lemur::api::DocumentManager* dm = lemur::api::DocMgrManager::openDocMgr(str);
-    docmgrs.push_back(dm);
-    delete[]str;
   }
-  fclose(in);
+  in.close();
   return true;
 }
 
 bool lemur::index::InvIndex::invFileIDs() {
-  FILE* in = fopen(names[DOC_INDEX].c_str(), "rb");
+  ifstream in (names[DOC_INDEX].c_str());
   *msgstream << "Trying to open inverted index filenames: " << names[DOC_INDEX] << endl;
-  if (in == NULL) {
+  if (!in.is_open()) {
     *msgstream <<  "Error opening inverted index filenames file"<< endl;
     return false;
   }
 
   invfiles = new string[counts[INV_FILES]];
   invfstreams = new ifstream[counts[INV_FILES]];
+
+  std::string line;
   int index;
-  int len;
-  char* str;
 
-  while (!feof(in)) {
-    if (fscanf(in, "%d %d", &index, &len) != 2) 
-      continue;
-
-    str = new char[len + 1];  // fixed PATH_MAX buffer here
-    if (fscanf(in, "%s", str) != 1) {
-      delete[](str); 
-      continue;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      // second number is ignored.
+      std::string num1 = line.substr(0, space);
+      std::string value = line.substr(space + 1);
+      std::string::size_type space1 = value.find(" ",0);
+      std::string num2 = value.substr(0, space1);
+      index = atoi(num1.c_str());
+      value = value.substr(space1 + 1);
+      invfiles[index] = value;
+      invfstreams[index].open(invfiles[index].c_str(), ios::in | ios::binary);
     }
-    str[len] = '\0';
-    invfiles[index] = str;
-    delete[](str);
-    invfstreams[index].open(invfiles[index].c_str(), ios::in | ios::binary);
   }
-
-  fclose(in);
+  in.close();
   return true;
 }
 
 bool lemur::index::InvIndex::termIDs() {
-  FILE* in = fopen(names[TERM_IDS].c_str(), "rb");
+  ifstream in (names[TERM_IDS].c_str());
   *msgstream << "Trying to open term ids file: " << names[TERM_IDS] << endl;
   if (in == NULL) {
     *msgstream <<  "Error opening termfile" << endl;
     return false;
   }
   terms = new lemur::api::TERM_T[counts[UNIQUE_TERMS]+1];
-
+  std::string line;
   int index;
-  int len;
-  char* str;
 
-  while (!feof(in)) {
-    if (fscanf(in, "%d %d", &index, &len) != 2) 
-      continue;
-
-    str = new char[len + 1]; // fixed size MAX_TERM_LENGTH buffer here.
-    if (fscanf(in, "%s", str) != 1) {
-      delete[](str);
-      continue;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      // second number is ignored.
+      std::string num1 = line.substr(0, space);
+      std::string value = line.substr(space + 1);
+      std::string::size_type space1 = value.find(" ",0);
+      std::string num2 = value.substr(0, space1);
+      index = atoi(num1.c_str());
+      value = value.substr(space1 + 1);
+      terms[index] = value;
+      termtable[terms[index]] = index;
     }
-    str[len] = '\0';
-    terms[index] = str;
-    delete[](str);
-    termtable[terms[index]] = index;
   }
-
-  fclose(in);
+  in.close();
   if (termtable.size() != counts[UNIQUE_TERMS]+1) {
     *msgstream << "Warning:Didn't read in as many terms as we were expecting." << endl;
     *msgstream << "could be corrupted file or duplicate terms in file" << endl;
   }
-
   return true;
 }
 
 bool lemur::index::InvIndex::docIDs() {
-  FILE* in = fopen(names[DOC_IDS].c_str(), "rb");
+  ifstream in (names[DOC_IDS].c_str());
   *msgstream<< "Trying to open doc ids file: " << names[DOC_IDS] << endl;
   if (in == NULL) {
     *msgstream << "Error opening docfile" << endl;
     return false;
   }
   docnames = new lemur::api::EXDOCID_T[counts[DOCS]+1];
-
+  std::string line;
   int index;
-  int len;
-  char* str;
 
-  while (!feof(in)) {
-    if (fscanf(in, "%d %d", &index, &len) != 2)
-      continue;
-
-    str = new char[len + 1]; // fixed size buffer here
-    if (fscanf(in, "%s", str) != 1) {
-      delete[](str);
-      continue;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      // second number is ignored.
+      std::string num1 = line.substr(0, space);
+      std::string value = line.substr(space + 1);
+      std::string::size_type space1 = value.find(" ",0);
+      std::string num2 = value.substr(0, space1);
+      index = atoi(num1.c_str());
+      value = value.substr(space1 + 1);
+      docnames[index] = value;
+      doctable[docnames[index]] = index;
     }
-    str[len] = '\0';
-    docnames[index] = str;
-    doctable[docnames[index]] = index;
-    delete[](str);
   }
-  fclose(in);
-
+  in.close();
   if (doctable.size() != counts[DOCS]+1) {
     *msgstream << "Warning:Didn't read in as many docids as we were expecting" << endl;
     *msgstream << "could be corrupted file or duplicate docids in file" << endl;

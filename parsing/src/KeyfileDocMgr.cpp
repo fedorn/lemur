@@ -222,12 +222,12 @@ void lemur::parse::KeyfileDocMgr::writeTOC() {
   if (_readOnly) return;
   string n = IDname + BT_TOC;
   ofstream toc(n.c_str());
-  toc << "FILE_LOOKUP  " << IDname << BT_LOOKUP << endl;
-  toc << "POS_LOOKUP  " << IDname << BT_POSITIONS << endl;
-  toc << "PARSE_MODE  " <<  pm << endl;
-  toc << "FILE_IDS  " << IDname << BT_FID << endl;
+  toc << "FILE_LOOKUP " << IDname << BT_LOOKUP << endl;
+  toc << "POS_LOOKUP " << IDname << BT_POSITIONS << endl;
+  toc << "PARSE_MODE " <<  pm << endl;
+  toc << "FILE_IDS " << IDname << BT_FID << endl;
   toc << "NUM_FILES " << sources.size() << endl;
-  toc << "NUM_DOCS  " << numdocs << endl;
+  toc << "NUM_DOCS " << numdocs << endl;
   toc.close();
 
   n = IDname + BT_FID;
@@ -249,19 +249,26 @@ bool lemur::parse::KeyfileDocMgr::loadTOC() {
   int num = 0;
   string files;
 
-  while (toc >> key >> val) {
-    if (key.compare("FILE_LOOKUP") == 0)
-      doclookup.open( val, cacheSize,  _readOnly );
-    else if (key.compare("POS_LOOKUP") == 0)
-      poslookup.open( val, cacheSize, _readOnly );
-    else if (key.compare("FILE_IDS") == 0)
-      files = val;    
-    else if (key.compare("NUM_DOCS") == 0)
-      numdocs = atoi(val.c_str());
-    else if (key.compare("NUM_FILES") == 0)
-      num = atoi(val.c_str());
-    else if (key.compare("PARSE_MODE") == 0) 
-      pm = val;    
+  std::string line;
+  while (getline(toc, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      key = line.substr(0, space);
+      val = line.substr(space + 1);
+      if (key.compare("FILE_LOOKUP") == 0)
+        doclookup.open( val, cacheSize,  _readOnly );
+      else if (key.compare("POS_LOOKUP") == 0)
+        poslookup.open( val, cacheSize, _readOnly );
+      else if (key.compare("FILE_IDS") == 0)
+        files = val;    
+      else if (key.compare("NUM_DOCS") == 0)
+        numdocs = atoi(val.c_str());
+      else if (key.compare("NUM_FILES") == 0)
+        num = atoi(val.c_str());
+      else if (key.compare("PARSE_MODE") == 0) 
+        pm = val;    
+    }
   }
   toc.close();
   loadFTFiles(files, num);
@@ -275,11 +282,18 @@ bool lemur::parse::KeyfileDocMgr::loadFTFiles(const string &fn, int num) {
   if (!fns.is_open()) {
     return false;
   }
-  string f;
+  string line, key, val;
   int id;
   sources.resize(num);
-  while (fns >> id >> f) {
-    sources[id]=f;
+  while (getline(fns, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      key = line.substr(0, space);
+      val = line.substr(space + 1);
+      id = atoi(key.c_str());
+      sources[id]=val;
+    }
   }
   fns.close();
   return true;

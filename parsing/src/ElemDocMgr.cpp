@@ -156,13 +156,13 @@ void lemur::parse::ElemDocMgr::writeTOC() {
   if (_readOnly) return;
   string n = IDname + ELEM_TOC;
   ofstream toc(n.c_str());
-  toc << "FILE_LOOKUP  " << IDname << BT_LOOKUP << endl;
-  toc << "POS_LOOKUP  " << IDname << BT_POSITIONS << endl;
-  toc << "DOC_ELEMENTS  " << IDname << ELEM_ELS << endl;
-  toc << "PARSE_MODE  " <<  pm << endl;
-  toc << "FILE_IDS  " << IDname << BT_FID << endl;
+  toc << "FILE_LOOKUP " << IDname << BT_LOOKUP << endl;
+  toc << "POS_LOOKUP " << IDname << BT_POSITIONS << endl;
+  toc << "DOC_ELEMENTS " << IDname << ELEM_ELS << endl;
+  toc << "PARSE_MODE " <<  pm << endl;
+  toc << "FILE_IDS " << IDname << BT_FID << endl;
   toc << "NUM_FILES " << sources.size() << endl;
-  toc << "NUM_DOCS  " << numdocs << endl;
+  toc << "NUM_DOCS " << numdocs << endl;
   toc.close();
 
   n = IDname + BT_FID;
@@ -184,21 +184,28 @@ bool lemur::parse::ElemDocMgr::loadTOC() {
   int num = 0;
   string files;
 
-  while (toc >> key >> val) {
-    if (key.compare("FILE_LOOKUP") == 0)
-      doclookup.open( val, cacheSize,  _readOnly );
-    else if (key.compare("POS_LOOKUP") == 0)
-      poslookup.open( val, cacheSize, _readOnly );
-    else if (key.compare("DOC_ELEMENTS") == 0)
-      elements.open( val, cacheSize, _readOnly );
-    else if (key.compare("FILE_IDS") == 0)
-      files = val;    
-    else if (key.compare("NUM_DOCS") == 0)
-      numdocs = atoi(val.c_str());
-    else if (key.compare("NUM_FILES") == 0)
-      num = atoi(val.c_str());
-    else if (key.compare("PARSE_MODE") == 0) 
-      pm = val;    
+  std::string line;
+  while (getline(toc, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      key = line.substr(0, space);
+      val = line.substr(space + 1);
+      if (key.compare("FILE_LOOKUP") == 0)
+        doclookup.open( val, cacheSize,  _readOnly );
+      else if (key.compare("POS_LOOKUP") == 0)
+        poslookup.open( val, cacheSize, _readOnly );
+      else if (key.compare("DOC_ELEMENTS") == 0)
+        elements.open( val, cacheSize, _readOnly );
+      else if (key.compare("FILE_IDS") == 0)
+        files = val;    
+      else if (key.compare("NUM_DOCS") == 0)
+        numdocs = atoi(val.c_str());
+      else if (key.compare("NUM_FILES") == 0)
+        num = atoi(val.c_str());
+      else if (key.compare("PARSE_MODE") == 0) 
+        pm = val;    
+    }
   }
   toc.close();
   loadFTFiles(files, num);

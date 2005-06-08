@@ -350,7 +350,7 @@ void lemur::index::InvFPIndexMerge::writeInvFIDs() {
     return;
   }
   for (int i=0;i<invfiles.size();i++) {
-    fprintf(write, "%d %d %s ", i, invfiles[i].size(), invfiles[i].c_str());
+    fprintf(write, "%d %d %s\n", i, invfiles[i].size(), invfiles[i].c_str());
   }
   fclose(write);
 }

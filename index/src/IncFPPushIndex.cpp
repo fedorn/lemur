@@ -83,161 +83,152 @@ bool lemur::index::IncFPPushIndex::tryOpen(const string &name) {
 }
 
 bool lemur::index::IncFPPushIndex::readToc(const string &fileName) {
-  FILE* in = fopen(fileName.c_str(), "rb");
-  if (in == NULL) {
+  ifstream toc(fileName.c_str());
+  if (!toc.is_open()) {
     return false;
   }
-  char key[128];
-  char val[128];
-  while (!feof(in)) {
-    if (fscanf(in, "%s %s", key, val) != 2) continue;
-    if (strcmp(key, INVINDEX_PAR) == 0) {
-      invfpF = val;
-    } else if (strcmp(key, NUMTERMS_PAR) == 0) {
-      tcount = atoi(val);
-    } else if (strcmp(key, NUMUTERMS_PAR) == 0) {
-      tidcount = atoi(val);
-    } else if (strcmp(key, DTINDEX_PAR) == 0) {
-      dtF = val;
-    } else if (strcmp(key, TERMIDMAP_PAR) == 0) {
-      tidF = val;
-    } else if (strcmp(key, DOCIDMAP_PAR) == 0) {
-      didF = val;
-    } else if (strcmp(key, DOCMGR_PAR) == 0) {
-      dmgrF = val;
-    } 
+  string key, val;
+  std::string line;
+  while (getline(toc, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      key = line.substr(0, space);
+      val = line.substr(space + 1);
+      if (key == INVINDEX_PAR) {
+        invfpF = val;
+      } else if (key == NUMTERMS_PAR) {
+        tcount = atoi(val.c_str());
+      } else if (key == NUMUTERMS_PAR) {
+        tidcount = atoi(val.c_str());
+      } else if (key == DTINDEX_PAR) {
+        dtF = val;
+      } else if (key == TERMIDMAP_PAR) {
+        tidF = val;
+      } else if (key == DOCIDMAP_PAR) {
+        didF = val;
+      } else if (key == DOCMGR_PAR) {
+        dmgrF = val;
+      } 
+    }
   }
   return true;
 }
 
 
 void lemur::index::IncFPPushIndex::readDtFileIDs() {
-  FILE* in = fopen(dtF.c_str(), "rb");
-  int index;
-  int len;
-  char* str;
-
-  while (!feof(in)) {
-    if (fscanf(in, "%d %d", &index, &len) != 2) 
-      continue;
-
-    str = new char[len + 1]; // change to fixed size buffer
-    if (fscanf(in, "%s", str) != 1) {
-      delete[](str);
-      continue;
+  ifstream in (dtF.c_str());
+  std::string line;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      // numbers are ignored.
+      std::string num1 = line.substr(0, space);
+      std::string value = line.substr(space + 1);
+      std::string::size_type space1 = value.find(" ",0);
+      std::string num2 = value.substr(0, space1);
+      value = value.substr(space1 + 1);
+      dtfiles.push_back(value);
     }
-    dtfiles.push_back(str);
-    delete[](str);
   }
-  fclose(in);
+  in.close();
 }
 
 void lemur::index::IncFPPushIndex::readDocMgrIDs() {
-  FILE* in = fopen(dmgrF.c_str(), "r");
-
-  int ind, len;
-  char* str;
-
-  while (!feof(in)) {
-    if (fscanf(in, "%d %d", &ind, &len) != 2)
-      continue;
-    // new docmgr ids are made w/ strdup, ugh, so malloc here.
-    str = new char[(len+1)]; // change to fixed size buffer
-    if (fscanf(in, "%s", str) != 1) {
-      delete[](str);
-      free(str);
-      continue;
+  ifstream in (dmgrF.c_str());
+  std::string line;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      // numbers are ignored.
+      std::string num1 = line.substr(0, space);
+      std::string value = line.substr(space + 1);
+      std::string::size_type space1 = value.find(" ",0);
+      std::string num2 = value.substr(0, space1);
+      value = value.substr(space1 + 1);
+      docmgrs.push_back(value);
     }
-    docmgrs.push_back(str);
-    delete[](str);
   }
-  fclose(in);
+  in.close();
 }
 
 void lemur::index::IncFPPushIndex::readInvFileIDs() {
-  FILE* in = fopen(invfpF.c_str(), "rb");
-  int index;
-  int len;
-  char* str;
-
-  while (!feof(in)) {
-    if (fscanf(in, "%d %d", &index, &len) != 2) 
-      continue;
-    str = new char[len + 1];
-    if (fscanf(in, "%s", str) != 1) {
-      delete[](str);
-      continue;
+  ifstream in (invfpF.c_str());
+  std::string line;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      // numbers are ignored.
+      std::string num1 = line.substr(0, space);
+      std::string value = line.substr(space + 1);
+      std::string::size_type space1 = value.find(" ",0);
+      std::string num2 = value.substr(0, space1);
+      value = value.substr(space1 + 1);
+      // make a new temp name, rename file, push on tempfiles.
+      std::stringstream nameStr;
+      nameStr << name << "temp" << tempfiles.size();
+      string fname = nameStr.str();
+      if (rename(value.c_str(), fname.c_str())) {
+        cerr << "unable to rename: " << value << " to " << fname << endl;
+        return;
+      }
+      tempfiles.push_back(fname);
     }
-    // make a new temp name, rename file, push on tempfiles.
-    std::stringstream nameStr;
-    nameStr << name << "temp" << tempfiles.size();
-    string fname = nameStr.str();
-    if (rename(str, fname.c_str())){
-      cerr << "unable to rename: " << str << " to " << fname << endl;
-      delete[](str);
-      return;
-    }
-    tempfiles.push_back(fname);
-    delete[](str);
   }
-  fclose(in);
+  in.close();
 }
 
 void lemur::index::IncFPPushIndex::readTermIDs() {
-  FILE* in = fopen(tidF.c_str(), "rb");
-  int index;
-  int len;
-  char* str;
+  ifstream in (tidF.c_str());
+  std::string line;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      // first number is ignored.
+      std::string num1 = line.substr(0, space);
+      std::string value = line.substr(space + 1);
+      std::string::size_type space1 = value.find(" ",0);
+      std::string num2 = value.substr(0, space1);
+      value = value.substr(space1 + 1);
+      int len = atoi(num2.c_str());
 
-  while (!feof(in)) {
-    if (fscanf(in, "%d %d", &index, &len) != 2) 
-      continue;
-    str = new char[(len+1)];
-    if (fscanf(in, "%s", str) != 1) {
-      delete[](str);
-      continue;
+      // skip OOV entry
+      if (value == "[OOV]") continue;
+      termIDs.push_back(value);
+      InvFPDocList* newlist; // set up an empty list for each term.
+      newlist = new InvFPDocList(cache, termIDs.size(), len);
+      // have to waste the first alloc by invoking a reset();
+      // update to add a method to resetFree without zapping term id.
+      newlist->reset();
+      wordtable[value] = newlist;
     }
-    // skip OOV entry
-    if (!strcmp(str, "[OOV]")) {
-      delete[](str);
-      continue;
-    }
-    
-    termIDs.push_back(str);
-    InvFPDocList* newlist; // set up an empty list for each term.
-    newlist = new InvFPDocList(cache, termIDs.size(), len);
-    // have to waste the first alloc by invoking a reset();
-    // update to add a method to resetFree without zapping term id.
-    newlist->reset();
-    wordtable[str] = newlist;
-    delete[](str);
   }
-  fclose(in);
-  cache->flushMem(); // reset the cache to empty.
+  in.close();
+  cache->flushMem(); // reset the cache to empty.    
 }
 
 void lemur::index::IncFPPushIndex::readDocIDs() {
-  FILE* in = fopen(didF.c_str(), "rb");
-  int index;
-  int len;
-  char* str;
-
-  while (!feof(in)) {
-    if (fscanf(in, "%d %d", &index, &len) != 2)
-      continue;
-    str = new char[(len+1)];
-    if (fscanf(in, "%s", str) != 1) {
-      delete[](str);
-      continue;
+  ifstream in (didF.c_str());
+  std::string line;
+  while (getline(in, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      // numbers are ignored.
+      std::string num1 = line.substr(0, space);
+      std::string value = line.substr(space + 1);
+      std::string::size_type space1 = value.find(" ",0);
+      std::string num2 = value.substr(0, space1);
+      value = value.substr(space1 + 1);
+      // skip OOV entry
+      if (value == "[OOV]") continue;
+      docIDs.push_back(value);
     }
-    // skip OOV entry
-    if (!strcmp(str, "[OOV]")) {
-      delete[](str);
-      continue;
-    }
-    docIDs.push_back(str);
-    delete[](str);
   }
-  fclose(in);
+  in.close();
 }
 

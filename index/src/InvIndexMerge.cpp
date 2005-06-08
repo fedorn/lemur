@@ -414,7 +414,7 @@ void lemur::index::InvIndexMerge::writeInvFIDs() {
     throw lemur::api::Exception("InvIndexMerge", "Couldn't create inverted index files to file ids map");
 
   for (int i=0;i<invfiles.size();i++) {
-    fprintf(write, "%d %d %s ", i, invfiles[i].size(), invfiles[i].c_str());
+    fprintf(write, "%d %d %s\n", i, invfiles[i].size(), invfiles[i].c_str());
   }
   fclose(write);
 }

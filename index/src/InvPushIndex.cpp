@@ -174,20 +174,20 @@ void lemur::index::InvPushIndex::writeTOC(int numinv, const lemur::parse::Collec
     fprintf(stderr, "Could not open .toc file for writing.\n");
     return;
   }
-  toc << VERSION_PAR << "  " << IND_VERSION << endl;
-  toc << NUMDOCS_PAR << "  " << docIDs.size() << endl;
-  toc << NUMTERMS_PAR << "  " << tcount << endl;
-  toc << NUMUTERMS_PAR << "  " << tidcount << endl;
-  toc << AVEDOCLEN_PAR << "  " << tcount/docIDs.size() << endl;
-  toc << INVINDEX_PAR << "  " << name << INVINDEX << endl;
-  toc << NUMINV_PAR << "  " << numinv << endl; 
-  toc << INVLOOKUP_PAR << "  " << name << INVLOOKUP << endl;
-  toc << DTINDEX_PAR << "  " << name <<  DTINDEX << endl;
-  toc << NUMDT_PAR << "  " << dtfiles.size() << endl;
-  toc << DTLOOKUP_PAR << "  " << name <<  DTLOOKUP << endl;
-  toc << DOCIDMAP_PAR << "  " << name << DOCIDMAP << endl;
-  toc << TERMIDMAP_PAR << "  " << name << TERMIDMAP << endl;
-  toc << DOCMGR_PAR << "  " << name << DOCMGRMAP << endl;
+  toc << VERSION_PAR << " " << IND_VERSION << endl;
+  toc << NUMDOCS_PAR << " " << docIDs.size() << endl;
+  toc << NUMTERMS_PAR << " " << tcount << endl;
+  toc << NUMUTERMS_PAR << " " << tidcount << endl;
+  toc << AVEDOCLEN_PAR << " " << tcount/docIDs.size() << endl;
+  toc << INVINDEX_PAR << " " << name << INVINDEX << endl;
+  toc << NUMINV_PAR << " " << numinv << endl; 
+  toc << INVLOOKUP_PAR << " " << name << INVLOOKUP << endl;
+  toc << DTINDEX_PAR << " " << name <<  DTINDEX << endl;
+  toc << NUMDT_PAR << " " << dtfiles.size() << endl;
+  toc << DTLOOKUP_PAR << " " << name <<  DTLOOKUP << endl;
+  toc << DOCIDMAP_PAR << " " << name << DOCIDMAP << endl;
+  toc << TERMIDMAP_PAR << " " << name << TERMIDMAP << endl;
+  toc << DOCMGR_PAR << " " << name << DOCMGRMAP << endl;
 
   if (props) {
     const lemur::parse::Property* p = NULL;
@@ -196,9 +196,9 @@ void lemur::index::InvPushIndex::writeTOC(int numinv, const lemur::parse::Collec
     while (props->hasMore()) {
       p = props->nextEntry();
       if (p->getType() == lemur::parse::Property::STDSTRING)
-        toc << p->getName() << "  " << *(string*)p->getValue() << endl;
+        toc << p->getName() << " " << *(string*)p->getValue() << endl;
       else if (p->getType() == lemur::parse::Property::STRING)
-        toc << p->getName() << "  " << (char*)p->getValue() << endl;
+        toc << p->getName() << " " << (char*)p->getValue() << endl;
     }
   }
 
@@ -209,9 +209,9 @@ void lemur::index::InvPushIndex::writeDocIDs() {
   string dname = name + DOCIDMAP;
   FILE* docid = fopen(dname.c_str(), "wb");
   // first write out the string value for an unknown docid
-  fprintf(docid, "%d %d %s ", 0, strlen(INVALID_STR), INVALID_STR);
+  fprintf(docid, "%d %d %s\n", 0, strlen(INVALID_STR), INVALID_STR);
   for (lemur::api::DOCID_T i=0;i<docIDs.size();i++) {
-    fprintf(docid, "%d %d %s ", i+1, docIDs[i].size(), docIDs[i].c_str());
+    fprintf(docid, "%d %d %s\n", i+1, docIDs[i].size(), docIDs[i].c_str());
   }
   fclose(docid);
 }
@@ -220,7 +220,7 @@ void lemur::index::InvPushIndex::writeDTIDs() {
   string dname = name + DTINDEX;
   FILE* dtid = fopen(dname.c_str(), "wb");
   for (int i=0;i<dtfiles.size();i++) {
-    fprintf(dtid, "%d %d %s ", i, dtfiles[i].size(), dtfiles[i].c_str());
+    fprintf(dtid, "%d %d %s\n", i, dtfiles[i].size(), dtfiles[i].c_str());
   }
   fclose(dtid);
 }
@@ -229,7 +229,7 @@ void lemur::index::InvPushIndex::writeDocMgrIDs() {
   string dmname = name + DOCMGRMAP;
   FILE* dmid = fopen(dmname.c_str(), "wb");
   for (int i=0;i<docmgrs.size();i++) {
-    fprintf(dmid, "%d %d %s ", i, docmgrs[i].size(), docmgrs[i].c_str());
+    fprintf(dmid, "%d %d %s\n", i, docmgrs[i].size(), docmgrs[i].c_str());
   }
   fclose(dmid);
 }
@@ -299,7 +299,7 @@ void lemur::index::InvPushIndex::lastWriteCache() {
   
   string tidname = name + TERMIDMAP;
   FILE* tid = fopen(tidname.c_str(), "wb");
-  fprintf(tid, "%d %d %s ", 0, strlen(INVALID_STR), INVALID_STR);
+  fprintf(tid, "%d %d %s\n", 0, strlen(INVALID_STR), INVALID_STR);
   TABLE_T::iterator finder;
   InvDocList* list;
 
@@ -319,7 +319,7 @@ void lemur::index::InvPushIndex::lastWriteCache() {
       list = finder->second;
     }
     //write out word to term id table
-    fprintf(tid, "%d %d %s ", i+1, list->termLen(), term.c_str());
+    fprintf(tid, "%d %d %s\n", i+1, list->termLen(), term.c_str());
 
     // check to see that there is a list that requires flushing
     if (!list->hasNoMem()) {

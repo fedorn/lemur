@@ -136,20 +136,20 @@ void lemur::index::InvFPPushIndex::writeTOC(int numinv, const lemur::parse::Coll
     return;
   }
 
-  toc << VERSION_PAR << "  " << IND_VERSION << endl;
-  toc << NUMDOCS_PAR << "  " << docIDs.size() << endl;
-  toc << NUMTERMS_PAR << "  " << tcount << endl;
-  toc << NUMUTERMS_PAR << "  " << tidcount << endl;
-  toc << AVEDOCLEN_PAR << "  " << tcount/docIDs.size() << endl;
-  toc << INVINDEX_PAR << "  " << name << INVFPINDEX << endl;
-  toc << NUMINV_PAR << "  " << numinv << endl; 
-  toc << INVLOOKUP_PAR << "  " << name << INVLOOKUP << endl;
-  toc << DTINDEX_PAR << "  " << name <<  DTINDEX << endl;
-  toc << NUMDT_PAR << "  " << dtfiles.size() << endl;
-  toc << DTLOOKUP_PAR << "  " << name <<  DTLOOKUP << endl;
-  toc << DOCIDMAP_PAR << "  " << name << DOCIDMAP << endl;
-  toc << TERMIDMAP_PAR << "  " << name << TERMIDMAP << endl;
-  toc << DOCMGR_PAR << "  " << name << DOCMGRMAP << endl;
+  toc << VERSION_PAR << " " << IND_VERSION << endl;
+  toc << NUMDOCS_PAR << " " << docIDs.size() << endl;
+  toc << NUMTERMS_PAR << " " << tcount << endl;
+  toc << NUMUTERMS_PAR << " " << tidcount << endl;
+  toc << AVEDOCLEN_PAR << " " << tcount/docIDs.size() << endl;
+  toc << INVINDEX_PAR << " " << name << INVFPINDEX << endl;
+  toc << NUMINV_PAR << " " << numinv << endl; 
+  toc << INVLOOKUP_PAR << " " << name << INVLOOKUP << endl;
+  toc << DTINDEX_PAR << " " << name <<  DTINDEX << endl;
+  toc << NUMDT_PAR << " " << dtfiles.size() << endl;
+  toc << DTLOOKUP_PAR << " " << name <<  DTLOOKUP << endl;
+  toc << DOCIDMAP_PAR << " " << name << DOCIDMAP << endl;
+  toc << TERMIDMAP_PAR << " " << name << TERMIDMAP << endl;
+  toc << DOCMGR_PAR << " " << name << DOCMGRMAP << endl;
 
   if (props) {
     const lemur::parse::Property* p = NULL;
@@ -158,9 +158,9 @@ void lemur::index::InvFPPushIndex::writeTOC(int numinv, const lemur::parse::Coll
     while (props->hasMore()) {
       p = props->nextEntry();
       if (p->getType() == lemur::parse::Property::STDSTRING)
-        toc << p->getName() << "  " << *(string*)p->getValue() << endl;
+        toc << p->getName() << " " << *(string*)p->getValue() << endl;
       else if (p->getType() == lemur::parse::Property::STRING)
-        toc << p->getName() << "  " << (char*)p->getValue() << endl;
+        toc << p->getName() << " " << (char*)p->getValue() << endl;
     }
   }
 

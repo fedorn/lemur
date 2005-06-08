@@ -11,6 +11,7 @@
 /** tnt 07/2002 - created
  *  dmf 09/2002 - added parser support
  *  dmf 03/2005 - fix spurious entries in fpos file output at end of input.
+ *  dmf 06/2005 - fix handling of filenames with spaces.
  */
 
 #include "FlattextDocMgr.hpp"
@@ -137,11 +138,11 @@ bool lemur::parse::FlattextDocMgr::readinSources(const string &fn){
 void lemur::parse::FlattextDocMgr::writeTOC() {
   string n = IDname+FT_SUFFIX;
   ofstream toc(n.c_str());
-  toc << "FILE_LOOKUP  " << IDname << FT_LOOKUP << endl;
-  toc << "FILE_IDS  " << IDname << FT_FID << endl;
+  toc << "FILE_LOOKUP " << IDname << FT_LOOKUP << endl;
+  toc << "FILE_IDS " << IDname << FT_FID << endl;
   toc << "NUM_FILES " << sources.size() << endl;
-  toc << "NUM_DOCS  " << numdocs << endl;
-  toc << "PARSE_MODE  " << parseMode << endl;
+  toc << "NUM_DOCS " << numdocs << endl;
+  toc << "PARSE_MODE " << parseMode << endl;
   toc.close();
 }
 
@@ -155,17 +156,25 @@ bool lemur::parse::FlattextDocMgr::loadTOC(const string &fn) {
   int num = 0;
   string files;
   string lookup;
-  while (toc >> key >> val) {
-    if (key.compare("FILE_LOOKUP") == 0) 
-      lookup = val;
-    else if (key.compare("FILE_IDS") == 0)
-      files = val;
-    else if (key.compare("NUM_DOCS") == 0)
-      numdocs = atoi(val.c_str());
-    else if (key.compare("NUM_FILES") == 0)
-      num = atoi(val.c_str());
-    else if (key.compare("PARSE_MODE") == 0) 
-      parseMode = val;
+
+  std::string line;
+  while (getline(toc, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      key = line.substr(0, space);
+      val = line.substr(space + 1);
+      if (key.compare("FILE_LOOKUP") == 0) 
+        lookup = val;
+      else if (key.compare("FILE_IDS") == 0)
+        files = val;
+      else if (key.compare("NUM_DOCS") == 0)
+        numdocs = atoi(val.c_str());
+      else if (key.compare("NUM_FILES") == 0)
+        num = atoi(val.c_str());
+      else if (key.compare("PARSE_MODE") == 0) 
+        parseMode = val;
+    }
   }
   if (!loadFTLookup(lookup)) {
     return false;
@@ -211,14 +220,19 @@ bool lemur::parse::FlattextDocMgr::loadFTFiles(const string &fn, int num) {
     return false;
   }
 
-  string f;
+  string line, key, val;
   int id;
   sources.resize(num);
-  while (fns >> id >> f) {
-    //  arr[id] = f;
-    sources[id]=f;
+  while (getline(fns, line)) {
+    std::string::size_type space = line.find(" ",0);
+    // if the line does not have a space, something is bad here.
+    if (space !=  std::string::npos) {
+      key = line.substr(0, space);
+      val = line.substr(space + 1);
+      id = atoi(key.c_str());
+      sources[id]=val;
+    }
   }
-
   fns.close();
   return true;
 }
