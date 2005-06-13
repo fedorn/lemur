@@ -144,6 +144,7 @@ void indri::index::DeletedDocumentList::read( const std::string& filename ) {
     LEMUR_THROW( LEMUR_IO_ERROR, "Unable to open file: " + filename );
 
   UINT64 fileSize = file.size();
+  _bitmap.clear();
   file.read( _bitmap.write( fileSize ), 0, fileSize );
   file.close();
 }
