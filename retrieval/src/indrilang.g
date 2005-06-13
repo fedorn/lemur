@@ -112,7 +112,7 @@ protected DIGIT:             ('0'..'9');
 protected ASCII_LETTER:      ('a'..'z' | 'A'..'Z');
 protected SAFE_LETTER:       ('a'..'z' | 'A'..'Z' | '-' | '_');
 protected SAFE_CHAR:         ('a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_');
-protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/');
+protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/' | '=');
 
 //
 // Within the ASCII range, we only accept a restricted
