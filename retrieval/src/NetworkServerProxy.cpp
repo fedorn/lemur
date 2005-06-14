@@ -494,8 +494,9 @@ indri::server::QueryServerDocumentIDsResponse* indri::server::NetworkServerProxy
 //
 
 INT64 indri::server::NetworkServerProxy::termCount() {
-  std::auto_ptr<indri::xml::XMLNode> request( new indri::xml::XMLNode( "term-count" ) );
-  return _numericRequest( request.get() );
+  //  std::auto_ptr<indri::xml::XMLNode> request( new indri::xml::XMLNode( "term-count" ) );
+  indri::xml::XMLNode *request = new indri::xml::XMLNode( "term-count" ) ;
+  return _numericRequest( request );
 }
 
 //

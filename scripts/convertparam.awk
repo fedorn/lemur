@@ -9,7 +9,7 @@
 #==========================================================================
 # Usage:
 # gawk -f convertparam.awk paramfile > newparamfile
-# converts lemur parameter files from pre 3.2 to the xml format used by 3.2
+# converts lemur parameter files from pre 4.0 to the xml format used by 4.0
 
 BEGIN {
 # split on param = value;
