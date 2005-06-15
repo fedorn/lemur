@@ -38,6 +38,7 @@ namespace indri {
 
     public:
       Unpacker( indri::xml::XMLNode* root );
+      ~Unpacker( );
       std::vector<Node*> unpack();
       std::string getString( const char* stringName ) ;
       UINT64 getInteger( const char* name );

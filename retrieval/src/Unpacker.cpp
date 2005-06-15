@@ -20,7 +20,7 @@
 #include "indri/QuerySpec.hpp"
 #include "indri/XMLNode.hpp"
 #include "Exception.hpp"
-
+#include "indri/delete_range.hpp"
 namespace indri {
   namespace lang {
     // Note: _unpack is automatically generated in UnpackerInternal.cpp
@@ -28,6 +28,10 @@ namespace indri {
     Unpacker::Unpacker( indri::xml::XMLNode* root ) :
       _root(root)
     {
+    }
+
+    Unpacker::~Unpacker( ) {
+      indri::utility::delete_map_contents<std::string, indri::lang::Node>(_nodes);
     }
 
     std::vector<indri::lang::Node*> Unpacker::unpack() {
