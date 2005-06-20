@@ -44,6 +44,8 @@ namespace indri
       indri::api::QueryEnvironment * _env;
       indri::api::Parameters _param;
 
+      std::map< std::string, bool > _stopwords;
+
       std::vector<indri::api::DocumentVector*> getDocumentVectors( std::vector<indri::api::ScoredExtentResult>& results, int rmDocs );
       std::vector<std::string> * getVocabulary( std::vector<indri::api::ScoredExtentResult>& results, int rmDocs );
       std::vector<std::string> * getVocabulary( std::vector<indri::api::DocumentVector*>& docVectors );

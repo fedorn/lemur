@@ -20,6 +20,12 @@
 indri::query::QueryExpander::QueryExpander( indri::api::QueryEnvironment * env , indri::api::Parameters& param ) {
   _env = env;
   _param = param;
+
+  if( _param.exists( "stopper.word" ) ) {
+    indri::api::Parameters words = _param[ "stopper.word" ];
+    for( int i = 0; i < words.size(); i++ )
+      _stopwords[ words[i] ] = true;
+  }
 }
 
 std::vector<indri::api::ScoredExtentResult> indri::query::QueryExpander::runExpandedQuery( std::string originalQuery , int resultsRequested , bool verbose) {
@@ -118,7 +124,7 @@ std::string indri::query::QueryExpander::buildQuery( const std::string& original
        ++iter ) {
     std::string term = iter->first;
     // skip out of vocabulary term and those terms assigned 0 probability in the query model
-    if( term != "[OOV]" && iter->second != 0.0 ) {
+    if( term != "[OOV]" && _stopwords.find( term ) == _stopwords.end() && iter->second != 0.0 ) {
       ret << " " 
           << iter->second
           << " \""
