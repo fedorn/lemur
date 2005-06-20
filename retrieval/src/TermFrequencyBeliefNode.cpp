@@ -23,6 +23,8 @@ indri::infnet::TermFrequencyBeliefNode::TermFrequencyBeliefNode( const std::stri
   _listID(listID),
   _function(scoreFunction)
 {
+  _maximumBackgroundScore = INDRI_HUGE_SCORE;
+  _maximumScore = INDRI_HUGE_SCORE;
 }
 
 indri::infnet::TermFrequencyBeliefNode::~TermFrequencyBeliefNode() {
