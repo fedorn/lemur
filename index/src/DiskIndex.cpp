@@ -500,7 +500,7 @@ const indri::index::TermList* indri::index::DiskIndex::termList( int documentID 
   _directFile.read( buffer, documentData.offset, documentData.byteLength );
   termList->read( buffer, documentData.byteLength );
 
-  delete buffer;
+  delete[] buffer;
   return termList;
 }
 
