@@ -365,6 +365,7 @@ void indri::index::MemoryIndex::_writeDocumentStatistics( UINT64 offset, int byt
   
   data.offset = offset;
   data.byteLength = byteLength;
+  data.totalLength = totalLength;
   data.indexedLength = indexedLength;
   data.totalLength = totalLength;
   data.uniqueTermCount = uniqueTerms;
@@ -546,10 +547,12 @@ int indri::index::MemoryIndex::addDocument( indri::api::ParsedDocument& document
     }
 
     _removeClosedTags( openTags, position );
-    _corpusStatistics.totalTerms++;
     indexedTerms++;
   }
 
+  _corpusStatistics.totalTerms += words.size();
+
+  // need to add any tags that contain no text at the end of a document
   _addOpenTags( indexedTags, openTags, document.tags, extentIndex, position );
   _removeClosedTags( openTags, position );
 
