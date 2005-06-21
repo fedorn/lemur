@@ -266,9 +266,6 @@
 				RelativePath=".\include\indri\DeletedDocumentList.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\DenseVocabularyMap.hpp">
-			</File>
-			<File
 				RelativePath=".\include\indri\DiskDocExtentListIterator.hpp">
 			</File>
 			<File
@@ -470,9 +467,6 @@
 				RelativePath=".\include\indri\RepositoryMaintenanceThread.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\SparseVocabularyMap.hpp">
-			</File>
-			<File
 				RelativePath=".\include\indri\TermBitmap.hpp">
 			</File>
 			<File
@@ -498,9 +492,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\VocabularyIterator.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\VocabularyMap.hpp">
 			</File>
 		</Filter>
 		<Filter

@@ -23,7 +23,6 @@
 #include <vector>
 #include <queue>
 #include "indri/greedy_vector"
-#include "indri/VocabularyMap.hpp"
 #include "indri/Path.hpp"
 #include "indri/Parameters.hpp"
 #include "indri/DiskTermData.hpp"

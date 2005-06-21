@@ -28,7 +28,6 @@
 #include "indri/TermData.hpp"
 #include "Keyfile.hpp"
 #include "indri/Index.hpp"
-#include "indri/VocabularyMap.hpp"
 #include "indri/DocListFileIterator.hpp"
 #include "indri/File.hpp"
 #include "indri/SequentialWriteBuffer.hpp"
