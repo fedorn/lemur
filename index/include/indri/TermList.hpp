@@ -76,8 +76,12 @@ namespace indri {
         for( int i=0; i<termCount; i++ ) {
           int termID;
           stream >> termID;
+
+          assert( termID >= 0 );
           _terms.push_back( termID ); 
         }
+        
+        int lastPosition = 0;
         
         for( int i=0; i<fieldCount; i++ ) {
           FieldExtent extent;
@@ -87,6 +91,14 @@ namespace indri {
                  >> extent.end
                  >> extent.number;
           
+          extent.begin += lastPosition;
+          extent.end += extent.begin;
+          lastPosition = extent.end;
+          
+          assert( extent.id >= 0 );
+          assert( extent.begin >= 0 );
+          assert( extent.end >= extent.begin );
+
           _fields.push_back( extent );
         }
       }
@@ -98,27 +110,39 @@ namespace indri {
         //   termID * termCount (compressed)
         //   ( fieldID, begin, (delta begin) end, number ) * fieldCount
         
-        int length = 10 + 5 * _terms.size() + 2 * sizeof(FieldExtent) * _fields.size();
-        char* begin = buffer.write( length );
-        char* out = begin;
+        indri::utility::RVLCompressStream out( buffer );
         
         // write count of terms and fields in the document first
-        out = lemur::utility::RVLCompress::compress_int( out, _terms.size() );
-        out = lemur::utility::RVLCompress::compress_int( out, _fields.size() );
+        int termCount = _terms.size();
+        int fieldCount = _fields.size();
+
+        out << termCount
+            << fieldCount;
         
         // write out terms
-        int termsSize = lemur::utility::RVLCompress::compress_ints( &_terms.front(), (unsigned char*) out, _terms.size() );
-        out += termsSize;
+        for( int i=0; i<_terms.size(); i++ ) {
+          assert( _terms[i] >= 0 );
+          out << _terms[i];
+        }
+
+        int lastPosition = 0;
         
         // write out fields
         for( unsigned int i=0; i<_fields.size(); i++ ) {
-          out = lemur::utility::RVLCompress::compress_int( out, _fields[i].id );
-          out = lemur::utility::RVLCompress::compress_int( out, _fields[i].begin );
-          out = lemur::utility::RVLCompress::compress_int( out, _fields[i].end );
-          out = lemur::utility::RVLCompress::compress_longlong( out, _fields[i].number );
-        }
+          int begin = _fields[i].begin;
+          int end = _fields[i].end;
         
-        buffer.unwrite( length - (out - begin) );
+          end -= begin;
+          begin -= lastPosition;
+          lastPosition = _fields[i].end;
+
+          assert( _fields[i].id >= 0 );
+
+          out << _fields[i].id
+              << begin
+              << end
+              << _fields[i].number;
+        }
       }
     };
   }
