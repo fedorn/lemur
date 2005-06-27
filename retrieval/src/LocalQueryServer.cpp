@@ -205,7 +205,7 @@ indri::server::QueryServerDocumentsResponse* indri::server::LocalQueryServer::do
   
   for( unsigned int i=0; i<attributeValues.size(); i++ ) {
     std::vector<indri::api::ParsedDocument*> documents = collection->retrieveByMetadatum( attributeName, attributeValues[i] );
-    std::copy( documents.begin(), documents.end(), std::back_inserter( documents ) );
+    std::copy( documents.begin(), documents.end(), std::back_inserter( result ) );
   }
 
   return new indri::server::LocalQueryServerDocumentsResponse( result );
@@ -217,7 +217,7 @@ indri::server::QueryServerDocumentIDsResponse* indri::server::LocalQueryServer::
   
   for( unsigned int i=0; i<attributeValues.size(); i++ ) {
     std::vector<lemur::api::DOCID_T> documents = collection->retrieveIDByMetadatum( attributeName, attributeValues[i] );
-    std::copy( documents.begin(), documents.end(), std::back_inserter( documents ) );
+    std::copy( documents.begin(), documents.end(), std::back_inserter( result ) );
   }
 
   return new indri::server::LocalQueryServerDocumentIDsResponse( result );
