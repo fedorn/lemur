@@ -17,6 +17,7 @@
 extern char *kstem_stemmer(char *);
 extern char *stemdir;
 extern int read_dict_info();
+extern void kstem_release_memory();
 
 lemur::parse::KStemmer::KStemmer(string &datadir) {
   stemdir = new char[datadir.length() + 1];
@@ -30,6 +31,7 @@ lemur::parse::KStemmer::KStemmer(string &datadir) {
 
 lemur::parse::KStemmer::~KStemmer() {
   delete[](stemdir);
+  kstem_release_memory();
 }
 
 char * lemur::parse::KStemmer::stemWord(char * word) {
