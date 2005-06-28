@@ -70,7 +70,7 @@ indri::parse::KrovetzStemmerTransformation::KrovetzStemmerTransformation( indri:
 
 indri::parse::KrovetzStemmerTransformation::~KrovetzStemmerTransformation() {
   delete[] _stemBuffer;
-  kstem_release_memory();
+  //  kstem_release_memory(); // don't do this, multiple instances.
 }
 
 char* indri::parse::KrovetzStemmerTransformation::_growBuffer( size_t length, char* oldEnd ) {
