@@ -5,9 +5,6 @@
       <class>trectext</class>
    </corpus>
    <memory>500m</memory>
-   <collection>
-       <field>docno</field>
-   </collection>
    <stemmer>
       <name>krovetz</name>
    </stemmer>
