@@ -81,8 +81,6 @@ namespace indri {
           _terms.push_back( termID ); 
         }
         
-        int lastPosition = 0;
-        
         for( int i=0; i<fieldCount; i++ ) {
           FieldExtent extent;
           
@@ -90,10 +88,6 @@ namespace indri {
                  >> extent.begin
                  >> extent.end
                  >> extent.number;
-          
-          extent.begin += lastPosition;
-          extent.end += extent.begin;
-          lastPosition = extent.end;
           
           assert( extent.id >= 0 );
           assert( extent.begin >= 0 );
@@ -108,7 +102,7 @@ namespace indri {
         //   term count
         //   field count
         //   termID * termCount (compressed)
-        //   ( fieldID, begin, (delta begin) end, number ) * fieldCount
+        //   ( fieldID, begin, end, number ) * fieldCount
         
         indri::utility::RVLCompressStream out( buffer );
         
@@ -125,22 +119,14 @@ namespace indri {
           out << _terms[i];
         }
 
-        int lastPosition = 0;
-        
         // write out fields
         for( unsigned int i=0; i<_fields.size(); i++ ) {
-          int begin = _fields[i].begin;
-          int end = _fields[i].end;
-        
-          end -= begin;
-          begin -= lastPosition;
-          lastPosition = _fields[i].end;
 
           assert( _fields[i].id >= 0 );
 
           out << _fields[i].id
-              << begin
-              << end
+              << _fields[i].begin
+              << _fields[i].end
               << _fields[i].number;
         }
       }
