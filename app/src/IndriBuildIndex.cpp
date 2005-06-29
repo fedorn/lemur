@@ -88,14 +88,16 @@ There are three options
  efficient.  Specified as
  &lt;metadata&gt;&lt;forward&gt;fieldname&lt;/forward&gt;&lt;/metadata&gt;
  in the parameter file and as <tt>metadata.forward=fieldname</tt> on the
- command line.
+ command line. The external document id field "docno" is automatically 
+ added as a forward metadata field.
 
 <li> <tt>backward</tt> -- Make the named field available for retrieval
  as metadata and build a lookup table for inverse lookup of documents
  based on the value of the field.  Specified as
  &lt;metadata&gt;&lt;backward&gt;fieldname&lt;/backward&gt;&lt;/metadata&gt;
  in the parameter file and as <tt>metadata.backward=fieldname</tt> on
- the command line.
+ the command line. The external document id field "docno" is automatically 
+ added as a backward metadata field.
 
 </ol>
 </dd>
@@ -632,6 +634,17 @@ int main(int argc, char * argv[]) {
     copy_parameters_to_string_vector( metadata, parameters, "metadata.field" ); 
     copy_parameters_to_string_vector( metadataForward, parameters, "metadata.forward" ); 
     copy_parameters_to_string_vector( metadataBackward, parameters, "metadata.backward" );
+    // docno is a special field, automagically add it as forward and backward.
+    std::string docno = "docno";
+    if( std::find( metadataForward.begin(), 
+                   metadataForward.end(), 
+                   docno ) == metadataForward.end() )
+      metadataForward.push_back(docno);
+    if( std::find( metadataBackward.begin(), 
+                   metadataBackward.end(), 
+                   docno ) == metadataBackward.end() )
+      metadataBackward.push_back(docno);
+
     env.setMetadataIndexedFields( metadataForward, metadataBackward );
     
     std::vector<std::string> fields;
