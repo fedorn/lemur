@@ -235,7 +235,6 @@ int main(int argc, char * argv[]) {
     indri::api::Parameters queries = param[ "query" ];
 
     indri::api::QueryEnvironment env;
-    open_indexes( param, env );
 
     env.setMemory( param.get("memory", 100*1024*1024) );
 
@@ -246,6 +245,8 @@ int main(int argc, char * argv[]) {
     std::vector<std::string> smoothingRules;
     if( copy_parameters_to_string_vector( smoothingRules, param, "rule" ) )
       env.setScoringRules( smoothingRules );
+    // open the indexes after the query environment parameters have been set.
+    open_indexes( param, env );
 
     indri::query::QueryExpander * qe = NULL;
 
