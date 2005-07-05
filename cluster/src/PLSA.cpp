@@ -589,9 +589,9 @@ double lemur::cluster::PLSA::bestDataLogLikelihood() {
 bool lemur::cluster::PLSA::readArrays() {
   /// filestem passed in!
   bool res = true;
-  ifstream if1("p_z.bin");
-  ifstream if2("p_w_z.bin");
-  ifstream if3("p_d_z.bin");
+  ifstream if1("p_z.bin", ios_base::in | ios_base::binary);
+  ifstream if2("p_w_z.bin", ios_base::in | ios_base::binary);
+  ifstream if3("p_d_z.bin", ios_base::in | ios_base::binary);
   res &= readArray(if1, lemur::cluster::PLSA::P_Z);
   res &= readArray(if2, lemur::cluster::PLSA::P_W_Z);
   res &= readArray(if3, lemur::cluster::PLSA::P_D_Z);  
@@ -677,9 +677,9 @@ bool lemur::cluster::PLSA::readArray(ifstream& infile, enum pType which) {
 
 void lemur::cluster::PLSA::writeArrays() {
   // pass in a filestem
-  ofstream of1("p_z.bin");
-  ofstream of2("p_w_z.bin");
-  ofstream of3("p_d_z.bin");
+  ofstream of1("p_z.bin", ios_base::out | ios_base::binary);
+  ofstream of2("p_w_z.bin", ios_base::out | ios_base::binary);
+  ofstream of3("p_d_z.bin", ios_base::out | ios_base::binary);
   writeArray(of1, lemur::cluster::PLSA::P_Z);
   writeArray(of2, lemur::cluster::PLSA::P_W_Z);
   writeArray(of3, lemur::cluster::PLSA::P_D_Z);  
