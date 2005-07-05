@@ -82,7 +82,10 @@ int AppMain(int argc, char * argv[]) {
     plsa->iterateWithRestarts();
   } else {
     plsa = new lemur::cluster::PLSA(*myIndex);
-    plsa->readArrays();
+    if (!plsa->readArrays()) {
+      std::cerr << "Failed to load probability tables." << std::endl;
+      exit (1);
+    }
     int numTerms = plsa->numWords();
     numDocs = plsa->numDocs();
     numCats = plsa->numCats();
