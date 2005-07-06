@@ -308,6 +308,7 @@ namespace lemur
         p->loadFile(s);
         ps.push(p);
       } catch (Exception &e) {
+        e.writeMessage();
         delete(p);
         retval = false;
       }
