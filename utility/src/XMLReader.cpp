@@ -253,6 +253,8 @@ void indri::xml::XMLReader::_read( indri::xml::XMLNode** parent, const char* buf
 
     if( tagType == TAG_OPEN_TYPE ) {
       int closingTag = _findClosingTag( buffer, endTag, end, tagName, &tagsBetween );
+      if( closingTag == -1 )
+        LEMUR_THROW( LEMUR_GENERIC_ERROR, "Could not find a close tag for '" + tagName + "'");
 
       if( tagsBetween ) {
         node = new indri::xml::XMLNode( tagName, attributes );
