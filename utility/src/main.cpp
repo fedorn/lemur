@@ -21,7 +21,11 @@ int main(int argc, char *argv[])
   if (argc>=2 && strcmp(argv[1], "-help") &&
       strcmp(argv[1], "--help") &&
       strcmp(argv[1], "-h") ) {  // recognize parameter file as argument
-    lemur::api::ParamPushFile(argv[1]);
+    if (!lemur::api::ParamPushFile(argv[1])) 
+      {
+        cerr << "Unable to load parameter file: " << argv[1] << endl;;
+        exit(1);
+      } 
   } else {
     
     // handle "-help", display parameters 
