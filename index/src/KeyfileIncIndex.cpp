@@ -20,7 +20,7 @@
 #include "WriteBuffer.hpp"
 #include "DocMgrManager.hpp"
 #include "minmax.hpp"
-
+#include "indri/Path.hpp"
 #include <assert.h>
 #include <functional>
 #include <algorithm>
@@ -233,7 +233,7 @@ bool lemur::index::KeyfileIncIndex::open(const string &indexName){
 
   counts = new lemur::api::COUNT_T[5]; // should not be here.
   *msgstream << "Trying to open toc: " << indexName << endl;
-  if (! lemur::api::ParamPushFile(indexName)) {
+  if (! indri::file::Path::exists(indexName) || ! lemur::api::ParamPushFile(indexName)) {
     *msgstream << "Couldn't open toc file for reading" << endl;
     return false;
   }
