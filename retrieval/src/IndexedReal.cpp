@@ -17,9 +17,9 @@ lemur::api::IndexedRealVector::IndexedRealDescending lemur::api::IndexedRealVect
 void lemur::api::IndexedRealVector::Sort(bool descending)
 {
   if (descending) {
-    sort(this->begin(), this->end(), descendOrder);
+    stable_sort(this->begin(), this->end(), descendOrder);
   } else {
-    sort(this->begin(), this->end(), ascendOrder);
+    stable_sort(this->begin(), this->end(), ascendOrder);
   }
 }
 
