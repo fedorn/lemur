@@ -33,7 +33,7 @@ static long byte_position;
 
 [&][a-zA-Z]+[;]                                { byte_position += textparserleng; /* zap symbols */ }
 [&][#][0-9]*[;]                                { byte_position += textparserleng; /* zap symbols */ } 
-[a-zA-Z0-9]+                                   { byte_position += textparserleng; return 1; }
+[a-zA-Z0-9€-ÿ]+                                   { byte_position += textparserleng; return 1; }
 "-"[0-9]+("."[0-9]+)?                          { byte_position += textparserleng; return 1; /*negative number*/}
 [A-Z][A-Z]+((\')?[s])?                         { byte_position += textparserleng; return 1; }
 [a-zA-Z0-9]+\'[a-zA-Z]+                        { byte_position += textparserleng; return 1;}
