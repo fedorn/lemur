@@ -61,25 +61,6 @@ namespace indri
       // in a hash table somewhere, and we can just point to that
       // name copy.
       void addTag(const char *name, const char* conflation, int begin) {
-        // because of conflations, all kinds of messy stuff
-        // happens if there's already an open tag with the same
-        // conflation as this one.  Therefore, we have to go looking
-        // for all open tags with this conflation; if there are any,
-        // this tag doesn't get added.
-        int list = _openList;
-
-        while( list >= 0 ) {
-          tag_entry& entry = _tags[list];
-
-          if( !strcmp( entry.conflation, conflation ) ) {
-            // we already have one of these
-            return;
-          }
-   
-          list = entry.next;
-        }
-
-        // all clear now to add the tag:
         tag_entry t;
         t.name = name;
         t.conflation = conflation;
@@ -93,7 +74,7 @@ namespace indri
       void endTag(const char *name, const char* conflation, int end) {
         int list = _openList;
         int prev = -1;
-
+        // finds the most recent open tag of this name
         while( list >= 0 ) {
           tag_entry& entry = _tags[list];
 
