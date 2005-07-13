@@ -177,7 +177,7 @@ void indri::index::DiskDocExtentListIterator::_readEntry() {
   int numPositions;
   _list = lemur::utility::RVLCompress::decompress_int( _list, numPositions );
 
-  int lastPosition = 0;
+  int lastStart = 0;
   INT64 number;
   
   for( int i=0; i<numPositions; i++ ) {
@@ -186,10 +186,11 @@ void indri::index::DiskDocExtentListIterator::_readEntry() {
     _list = lemur::utility::RVLCompress::decompress_int( _list, extent.begin );
     _list = lemur::utility::RVLCompress::decompress_int( _list, extent.end );
 
-    // delta-dencode
-    extent.begin += lastPosition;
+    // delta-decode with respect to previous extent begin
+    extent.begin += lastStart;
+    lastStart = extent.begin;
+    // delta decode with respect to begin.
     extent.end += extent.begin;
-    lastPosition = extent.end;
 
     _data.extents.push_back( extent );
     if( _numeric ) {

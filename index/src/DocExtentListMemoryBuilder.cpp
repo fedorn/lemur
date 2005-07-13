@@ -170,7 +170,7 @@ void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( int documentID,
 
   _list = lemur::utility::RVLCompress::compress_int( _list, begin - _lastLocation );
   _list = lemur::utility::RVLCompress::compress_int( _list, end - begin );
-  _lastLocation = end;
+  _lastLocation = begin;
   _extentFrequency++;
 
   if( _numeric )

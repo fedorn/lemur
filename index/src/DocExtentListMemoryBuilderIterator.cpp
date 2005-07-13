@@ -120,8 +120,10 @@ bool indri::index::DocExtentListMemoryBuilderIterator::nextEntry() {
 
     for( int i=0; i<extents; i++ ) {
       _list = lemur::utility::RVLCompress::decompress_int( _list, deltaPosition );
-      extent.begin = extent.end + deltaPosition;
+      // delta encode with respect to previous extent's begin
+      extent.begin = extent.begin + deltaPosition;
       _list = lemur::utility::RVLCompress::decompress_int( _list, deltaPosition );
+      // delta encode end with respect to begin
       extent.end = extent.begin + deltaPosition;
 
       _data.extents.push_back( extent );

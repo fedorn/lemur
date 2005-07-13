@@ -350,23 +350,22 @@ void IndexWriter::_writeFieldList( const std::string& fileName, int fieldIndex, 
       stream << count;
 
       // extents and numbers
-      int lastPosition = 0;
+      int lastStart = 0;
+
       for( int j=0; j<count; j++ ) {
         Extent& extent = entry->extents[j];
 
-        assert( extent.begin - lastPosition >= 0 );
+        assert( extent.begin - lastStart >= 0 );
         assert( extent.end - extent.begin >= 0 );
 
-        stream << (extent.begin - lastPosition);
-        lastPosition = extent.begin;
-        stream << (extent.end - lastPosition);
-        lastPosition = extent.end;
+        stream << (extent.begin - lastStart);
+        lastStart = extent.begin;
+        stream << (extent.end - extent.begin);
         terms += (extent.end - extent.begin);
 
         if( entry->numbers.size() )
           stream << entry->numbers[j];
       }
-
 
       iterator->nextEntry();
       documents++;
