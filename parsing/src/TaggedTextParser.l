@@ -20,7 +20,7 @@ static long byte_position;
 \<[^\>]*\>                                    { byte_position +=parserleng; return indri::parse::TaggedTextTokenType::tag; }
 [&]([a-zA-Z]+|[#][0-9])[;]                     { byte_position += parserleng; /* zap symbols */ }
 [a-zA-Z0-9'\.€-ÿ]+                   { byte_position += parserleng; return indri::parse::TaggedTextTokenType::word; }
-"-"[0-9]+("."[0-9]+)?                   { byte_position += parserleng; return indri::parse::TaggedTextTokenType::word;  /*negative number*/}
+"-"[0-9]+(\.[0-9]+)?                   { byte_position += parserleng; return indri::parse::TaggedTextTokenType::word;  /*negative number*/}
 [\n]                                           { byte_position += parserleng; /* zap newline */ }
 .                                              { byte_position += parserleng; return indri::parse::TaggedTextTokenType::unknown; }
 
