@@ -26,6 +26,8 @@
 #include "indri/Unpacker.hpp"
 
 #include "Exception.hpp"
+#include "indri/HashTable.hpp"
+#include "indri/ref_ptr.hpp"
 
 template<class T>
 bool equal( const std::vector<T>& one, const std::vector<T>& two ) {
@@ -108,7 +110,8 @@ namespace indri {
       virtual bool operator== ( Node& other ) {
         return &other == this; 
       }
-      
+
+      virtual UINT64 hashCode() const = 0;
       virtual void pack( Packer& packer ) = 0;
       virtual void walk( Walker& walker ) = 0;
       virtual Node* copy( Copier& copier ) = 0;
@@ -171,6 +174,16 @@ namespace indri {
         return _stemmed;
       }
 
+      UINT64 hashCode() const {
+        int accumulator = 1;
+
+        if( _stemmed )
+          accumulator += 3;
+
+        indri::utility::GenericHash<const char*> hash;
+        return accumulator + hash( _text.c_str() );
+      }
+
       void pack( Packer& packer ) {
         packer.before(this);
         packer.put( "termName", _text );
@@ -211,6 +224,11 @@ namespace indri {
 
       std::string queryText() const {
         return _fieldName;
+      }
+
+      UINT64 hashCode() const {
+        indri::utility::GenericHash<const char*> hash;
+        return 5 + hash( _fieldName.c_str() );
       }
 
       void pack( Packer& packer ) {
@@ -267,6 +285,10 @@ namespace indri {
       
       std::string typeName() const {
         return "ExtentInside";
+      }
+
+      UINT64 hashCode() const {
+        return 7 + _inner->hashCode() + (_inner->hashCode() * 7);
       }
 
       std::string queryText() const {
@@ -345,6 +367,16 @@ namespace indri {
 
         qtext << " )";
         return qtext.str();
+      }
+
+      UINT64 hashCode() const {
+        UINT64 hash = 11;
+
+        for( size_t i=0; i<_children.size(); i++ ) {
+          hash += (UINT64) (_weights[i] * 1000) + _children[i]->hashCode();
+        }
+        
+        return hash;
       }
 
       void addChild( double weight, RawExtentNode* child ) {
@@ -428,6 +460,16 @@ namespace indri {
         return qtext.str();
       }
 
+      UINT64 hashCode() const {
+        UINT64 hash = 13;
+
+        for( size_t i=0; i<_children.size(); i++ ) {
+          hash += _children[i]->hashCode();
+        }
+        
+        return hash;
+      }
+
       void addChild( RawExtentNode* node ) {
         _children.push_back(node);
       }
@@ -506,6 +548,16 @@ namespace indri {
         return qtext.str();
       }
 
+      UINT64 hashCode() const {
+        UINT64 hash = 15;
+
+        for( size_t i=0; i<_children.size(); i++ ) {
+          hash += _children[i]->hashCode();
+        }
+        
+        return hash;
+      }
+
       void addChild( RawExtentNode* node ) {
         _children.push_back(node);
       }
@@ -579,6 +631,16 @@ namespace indri {
 
         return qtext.str();
       } 
+
+      UINT64 hashCode() const {
+        UINT64 hash = 17;
+
+        for( size_t i=0; i<_children.size(); i++ ) {
+          hash += _children[i]->hashCode();
+        }
+        
+        return hash;
+      }
 
       const std::vector<RawExtentNode*>& getChildren() const {
         return _children;
@@ -655,6 +717,17 @@ namespace indri {
         }
         qtext << ")";
         return qtext.str();
+      }
+
+      UINT64 hashCode() const {
+        UINT64 hash = 19;
+        hash += _windowSize;
+
+        for( size_t i=0; i<_children.size(); i++ ) {
+          hash += _children[i]->hashCode();
+        }
+        
+        return hash;
       }
 
       void setWindowSize( int windowSize ) {
@@ -763,6 +836,18 @@ namespace indri {
         return qtext.str();
       }
 
+      UINT64 hashCode() const {
+        UINT64 hash = 23;
+        hash += _windowSize;
+
+        for( size_t i=0; i<_children.size(); i++ ) {
+          hash *= 7;
+          hash += _children[i]->hashCode();
+        }
+        
+        return hash;
+      }
+
       const std::vector<RawExtentNode*>& getChildren() const {
         return _children;
       }
@@ -850,6 +935,12 @@ namespace indri {
         return "FilReqNode";
       }
 
+      UINT64 hashCode() const {
+        return 27 +
+               _filter->hashCode() * 3 +
+               _required->hashCode();
+      }
+
       std::string queryText() const {
         std::stringstream qtext;
 
@@ -934,6 +1025,12 @@ namespace indri {
         return qtext.str();
       }
 
+      UINT64 hashCode() const {
+        return 29 +
+               _filter->hashCode() * 3 +
+               _disallowed->hashCode();
+      }
+
       RawExtentNode* getFilter() {
         return _filter;
       }
@@ -1001,6 +1098,12 @@ namespace indri {
         return qtext.str();
       }
 
+      UINT64 hashCode() const {
+        return 31 +
+               _constant +
+               _field->hashCode();
+      }
+
       INT64 getConstant() const {
         return _constant;
       }
@@ -1062,6 +1165,12 @@ namespace indri {
         std::stringstream qtext;
         qtext << "#greater(" << _field->queryText() << " " << _constant << ")";
         return qtext.str();
+      }
+
+      UINT64 hashCode() const {
+        return 33 +
+               _constant +
+               _field->hashCode();
       }
 
       INT64 getConstant() const {
@@ -1128,6 +1237,13 @@ namespace indri {
         std::stringstream qtext;
         qtext << "#between(" << _field->queryText() << " " << _low << " " << _high << ")";
         return qtext.str();
+      }
+
+      UINT64 hashCode() const {
+        return 37 +
+               _low * 3 +
+               _high +
+               _field->hashCode();
       }
 
       INT64 getLow() const {
@@ -1197,6 +1313,12 @@ namespace indri {
         std::stringstream qtext;
         qtext << "#equals(" << _field->queryText() << " " << _constant << ")";
         return qtext.str();
+      }
+
+      UINT64 hashCode() const {
+        return 41 +
+               _constant +
+               _field->hashCode();
       }
 
       INT64 getConstant() const {
@@ -1283,6 +1405,22 @@ namespace indri {
         }
 
         return qtext.str();
+      }
+
+      UINT64 hashCode() const {
+        UINT64 hash = 0;
+
+        hash += 43;
+        hash += _raw->hashCode();
+
+        if( _context ) {
+          hash += _context->hashCode();
+        }
+
+        indri::utility::GenericHash<const char*> gh;
+        hash += gh( _smoothing.c_str() );
+
+        return hash;
       }
 
       double getOccurrences() const {
@@ -1404,6 +1542,16 @@ namespace indri {
         return qtext.str();
       }
 
+      UINT64 hashCode() const {
+        int accumulator = 47;
+
+        if( _stemmed )
+          accumulator += 3;
+
+        indri::utility::GenericHash<const char*> hash;
+        return accumulator + hash( _text.c_str() ) * 7 + hash( _smoothing.c_str() );
+      }
+
       double getOccurrences() const {
         return _occurrences;
       }
@@ -1499,6 +1647,15 @@ namespace indri {
         }
 
         return qtext.str();
+      }
+
+      UINT64 hashCode() const {
+        UINT64 accumulator = 53;
+
+        indri::utility::GenericHash<const char*> hash;
+        return _raw->hashCode() * 7 + 
+               _context->hashCode() + 
+               hash( _smoothing.c_str() );
       }
 
       void setSmoothing( const std::string& smoothing ) {
@@ -1616,6 +1773,10 @@ namespace indri {
         return "PriorNode";
       }
       
+      UINT64 hashCode() const {
+        return 0;
+      }
+
       const std::map<int,tuple_type>& getTable() const {
         return _table;
       }
@@ -1677,6 +1838,16 @@ namespace indri {
         _children = unpacker.getScoredExtentVector( "children" );
       }
 
+      unsigned int _hashCode() const {
+        UINT64 accumulator = 0;
+
+        for( int i=0; i<_children.size(); i++ ) {
+          accumulator += _children[i]->hashCode();
+        }
+
+        return accumulator;
+      }
+
       template<class _ThisType>
       void _walk( _ThisType* ptr, Walker& walker ) {
         walker.before(ptr);
@@ -1735,6 +1906,16 @@ namespace indri {
         for( unsigned int i=0; i<weights.size(); i++ ) {
           _children.push_back( std::make_pair( weights[i], nodes[i] ) );
         }
+      }
+
+      UINT64 _hashCode() const {
+        UINT64 accumulator = 0;
+
+        for( size_t i=0; i<_children.size(); i++ ) {
+          accumulator += (UINT64) (_children[i].first * 1000) + _children[i].second->hashCode();
+        }
+
+        return accumulator;
       }
 
       template<class _ThisType>
@@ -1820,6 +2001,10 @@ namespace indri {
         return qtext.str();
       } 
 
+      UINT64 hashCode() const {
+        return 55 + _hashCode();
+      }
+
       void walk( Walker& walker ) {
         _walk( this, walker );
       }
@@ -1867,6 +2052,10 @@ namespace indri {
         return qtext.str();
       } 
 
+      UINT64 hashCode() const {
+        return 101 + _child->hashCode();
+      }
+
       void walk( Walker& walker ) {
         walker.before(this);
         _child->walk(walker);
@@ -1908,6 +2097,9 @@ namespace indri {
         return qtext.str();
       } 
 
+      UINT64 hashCode() const {
+        return 57 + _hashCode();
+      }
 
       void walk( Walker& walker ) {
         _walk(this, walker);
@@ -1938,6 +2130,10 @@ namespace indri {
         return qtext.str();
       } 
 
+      UINT64 hashCode() const {
+        return 59 + _hashCode();
+      }
+
       void walk( Walker& walker ) {
         _walk( this, walker );
       }
@@ -1966,6 +2162,10 @@ namespace indri {
 
         return qtext.str();
       } 
+
+      UINT64 hashCode() const {
+        return 61 + _hashCode();
+      }
 
       void walk( Walker& walker ) {
         _walk( this, walker );
@@ -1996,6 +2196,10 @@ namespace indri {
         return qtext.str();
       } 
 
+      UINT64 hashCode() const {
+        return 67 + _hashCode();
+      }
+
       void walk( Walker& walker ) {
         _walk( this, walker );
       }
@@ -2023,7 +2227,11 @@ namespace indri {
         qtext << ")";
 
         return qtext.str();
-      } 
+      }
+
+      UINT64 hashCode() const {
+        return 71 + _hashCode();
+      }
 
       void walk( Walker& walker ) {
         _walk( this, walker );
@@ -2079,7 +2287,11 @@ namespace indri {
         }
 
         return qtext.str();
-      } 
+      }
+
+      UINT64 hashCode() const {
+        return 79 + _child->hashCode() * 7 + _field->hashCode();
+      }
 
       ScoredExtentNode* getChild() {
         return _child;
@@ -2176,6 +2388,10 @@ namespace indri {
 
         return qtext.str();
       } 
+
+      UINT64 hashCode() const {
+        return 83 + _child->hashCode() + _windowSize * 3 + _increment;
+      }
 
       ScoredExtentNode* getChild() {
         return _child;
@@ -2276,6 +2492,16 @@ namespace indri {
         return _child->queryText();
       }
 
+      UINT64 hashCode() const {
+        UINT64 documentSum = 0;
+
+        for( size_t i=0; i<_documents.size(); i++ ) {
+          documentSum += _documents[i];
+        }
+
+        return 87 + _child->hashCode() + documentSum;
+      }
+
       Node* copy( Copier& copier ) {
         copier.before(this);
 
@@ -2337,6 +2563,11 @@ namespace indri {
         }
 
         return qtext.str();
+      }
+
+      UINT64 hashCode() const {
+        // we don't use hashCodes for accumulatorNodes
+        return 0;
       }
 
       RawExtentNode* getContext() {
@@ -2457,6 +2688,11 @@ namespace indri {
         return std::string();
       }
 
+      UINT64 hashCode() const {
+        // we don't use hashCodes for accumulatorNodes
+        return 0;
+      }
+
       void pack( Packer& packer ) {
         packer.before(this);
         packer.put( "occurrences", _occurrences );
@@ -2546,6 +2782,11 @@ namespace indri {
         return _scoredNode->queryText();
       }
 
+      UINT64 hashCode() const {
+        // we don't use hashCodes for accumulatorNodes
+        return 0;
+      }
+
       ScoredExtentNode* getChild() {
         return _scoredNode;
       }
@@ -2591,6 +2832,11 @@ namespace indri {
 
       std::string queryText() const {
         return _scoredNode->queryText();
+      }
+
+      UINT64 hashCode() const {
+        // we don't use hashCodes for accumulatorNodes
+        return 0;
       }
 
       ScoredExtentNode* getChild() {
