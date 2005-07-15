@@ -105,12 +105,12 @@ namespace indri
       void after( indri::lang::RawScorerNode* scorer ) {
         indri::lang::Node* context = scorer->getContext();
         indri::lang::Field* contextField = dynamic_cast<indri::lang::Field*>(context);
-        indri::lang::ExtentAnd* contextExtAnd = dynamic_cast<indri::lang::ExtentAnd*>(context);
+        indri::lang::ExtentOr* contextExtOr = dynamic_cast<indri::lang::ExtentOr*>(context);
         std::string fieldName;
 
-        // there may be an ExtentAnd around the field, so descend into it if necessary
-        if( contextExtAnd && contextExtAnd->getChildren().size() == 1 ) {
-          contextField = dynamic_cast<indri::lang::Field*>(contextExtAnd->getChildren()[0]);
+        // there may be an ExtentOr around the field, so descend into it if necessary
+        if( contextExtOr && contextExtOr->getChildren().size() == 1 ) {
+          contextField = dynamic_cast<indri::lang::Field*>(contextExtOr->getChildren()[0]);
         }
 
         // if there's a field here, record its name
