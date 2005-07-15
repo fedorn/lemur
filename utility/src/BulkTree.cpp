@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
- */
+*/
 
 //
 // BulkTree
@@ -546,3 +546,69 @@ bool indri::file::BulkTreeReader::get( UINT32 key, char* value, int& actual, int
   key = htonl( key );
   return get( (const char*) &key, sizeof(key), value, actual, valueLength );
 }
+
+indri::file::BulkTreeIterator* indri::file::BulkTreeReader::iterator() {
+  return new BulkTreeIterator( *_file );
+}
+
+// ================
+// BulkTreeIterator
+// ----------------
+
+indri::file::BulkTreeIterator::BulkTreeIterator( File& file ) :
+  _file(file)
+{
+  _pairIndex = -1;
+  _blockIndex = 0;
+  _fileLength = 0;
+}
+
+void indri::file::BulkTreeIterator::startIteration() {
+  _pairIndex = -1;
+  _blockIndex = 0;
+  _fileLength = _file.size();
+
+  nextEntry();
+}
+
+bool indri::file::BulkTreeIterator::finished() {
+  // if we're pointing past the last block in the file, we're done
+  return _blockIndex == (_fileLength / indri::file::BulkBlock::dataSize());
+}
+
+void indri::file::BulkTreeIterator::nextEntry() {
+  if( finished() )
+    return;
+  
+  // pairIndex is less than zero when we're just starting out
+  // pairIndex == _block.count() - 1 at the last entry in the block
+  if( _pairIndex < 0 || _pairIndex >= _block.count()-1 ) {
+    do {
+      // look for a suitable leaf
+      if( _pairIndex >= 0 )
+        _blockIndex++;
+      _pairIndex = 0;
+      _file.read( _block.data(), _blockIndex*indri::file::BulkBlock::dataSize(), indri::file::BulkBlock::dataSize() );
+    } while( !finished() && _block.leaf() == false );
+  } else {
+    _pairIndex++;
+  }
+}
+
+bool indri::file::BulkTreeIterator::get( char* key, int keyLength, int& keyActual, char* value, int valueLength, int& valueActual ) {
+  if( finished() )
+    return false;
+  return _block.getIndex( _pairIndex, key, keyLength, keyActual, value, valueLength, valueActual );
+}
+
+bool indri::file::BulkTreeIterator::get( UINT32& key, char* value, int valueLength, int& valueActual ) {
+  if( finished() )
+    return false;
+
+  key = 0;
+  int keyActual;
+  bool result = _block.getIndex( _pairIndex, (char*) &key, keyActual, sizeof key, value, valueActual, valueLength );
+  key = ntohl( key );
+  return result;
+}
+
