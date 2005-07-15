@@ -124,11 +124,10 @@ protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/' | '=');
 protected TEXT_TERM:        ( HIGH_CHAR | SAFE_CHAR )+;
 protected NUMBER:           ( '0'..'9' )+;
 protected NEGATIVE_NUMBER:  DASH ( '0'..'9' )+;
-protected FLOAT:            ( '0'..'9' )+ DOT ( '0'..'9' )*;
+protected FLOAT:            (DASH)? ( '0'..'9' )+ DOT ( '0'..'9' )+;
 
 TERM:     ( (DIGIT)+ SAFE_LETTER ) => TEXT_TERM |
-          ( NUMBER DOT ) => FLOAT { $setType(FLOAT); } |
-          ( DASH NUMBER DOT ) => NEGATIVE_NUMBER { $setType(NEGATIVE_NUMBER); } |
+          ( FLOAT ) => FLOAT { $setType(FLOAT); } |
           ( NUMBER ) => NUMBER { $setType(NUMBER); } |
           ( NEGATIVE_NUMBER ) => NEGATIVE_NUMBER { $setType(NEGATIVE_NUMBER); } |
           TEXT_TERM;
@@ -212,7 +211,7 @@ scoredRaw returns [ indri::lang::ScoredExtentNode* sn ]
     RawExtentNode* contexts = 0;
     sn = 0;
   } :
-    ( qualifiedTerm context_list ) => raw=qualifiedTerm contexts=context_list
+    ( qualifiedTerm DOT ) => raw=qualifiedTerm DOT contexts=context_list
   {
     sn = new indri::lang::RawScorerNode( raw, contexts );
     _nodes.push_back(sn);
@@ -464,7 +463,7 @@ anyField returns [ indri::lang::Field* f ]
     f = new Field(t->getText());
     _nodes.push_back(f);
   };
- 
+
 unscoredTerm returns [ RawExtentNode* t ]
   {
     t = 0;
@@ -483,6 +482,7 @@ qualifiedTerm returns [ RawExtentNode* t ]
     if( fields ) {
       t = new indri::lang::ExtentInside( synonyms, fields );
       _nodes.push_back(t);
+      synonyms = t;
     } else {
       t = synonyms;
     }
