@@ -29,7 +29,13 @@ namespace indri
       struct score_greater {
       public:
         bool operator() ( const ScoredExtentResult& one, const ScoredExtentResult& two ) const {
-          return one.score > two.score;
+          if( one.score != two.score )
+            return one.score > two.score;
+
+          if( one.document != two.document )
+            return one.document > two.document;
+
+          return one.begin > two.begin;
         }
       };
 
