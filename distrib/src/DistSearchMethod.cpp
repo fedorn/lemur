@@ -81,7 +81,7 @@ void lemur::distrib::DistSearchMethod::doSingleRetr() {
   
   allres[reslen] = dscore;
   reslen++;
-
+  delete (qr);
   delete res;
   delete accum;
   delete model;

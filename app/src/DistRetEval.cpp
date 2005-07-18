@@ -201,6 +201,9 @@ int AppMain(int argc, char *argv[]) {
     model.scoreCollection(*qr, rankings);
     if(rankings.size() == 0) {
       cerr << "No database selected for query " << q->id() << endl;
+      // clean up.
+      delete q;
+      delete qr;
       continue;
     }
 
