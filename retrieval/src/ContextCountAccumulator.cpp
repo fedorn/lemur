@@ -82,8 +82,27 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
     unsigned int ex = 0;
     
     for( unsigned int i=0; i<matches.size() && ex < extents.size(); i++ ) {
-      while( ex < extents.size() && matches[i].begin < extents[ex].begin )
+      // find a context extent that might possibly contain this match
+      // here we're relying on the following invariants: 
+      //    both arrays are sorted by beginning position
+      //    the extents array may have some that are inside others, like:
+      //      [1, 10] and [4, 6], or even [1,10] and [1,4]
+      //      but it will never have overlapping extents, such as:
+      //      [1, 10] and [5, 15]
+      //    also, in the event that two inner extents start at the
+      //      same position, the largest end position comes first
+      //      (e.g. [1,10] comes before [1,4])
+      // Therefore, if a match [a,b] is in any extent, it will be
+      //   in the first one [c,d] such that d>=a.
+      // Proof is by contradiction: if the match is in a context extent,
+      //   but it's not the first one such that d>=a, then that context
+      //   extent must overlap the first extent such that d>=a (which
+      //   is not allowed).
+      while( extents[ex].end < matches[i].begin ) {
         ex++;
+
+        if( ex >= extents.size() ) break;
+      }
 
       if( ex < extents.size() &&
           matches[i].begin >= extents[ex].begin &&
