@@ -21,6 +21,7 @@
 
 #include <map>
 #include <vector>
+#include <algorithm>
 #include "indri/InferenceNetworkNode.hpp"
 #include "indri/BeliefNode.hpp"
 #include "indri/EvaluatorNode.hpp"
