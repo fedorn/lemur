@@ -37,7 +37,12 @@ void indri::infnet::Annotator::add( InferenceNetworkNode* node, int documentID, 
 }
 
 void indri::infnet::Annotator::addMatches( indri::utility::greedy_vector<indri::index::Extent>& extents, InferenceNetworkNode* node, int documentID, int begin, int end ) {
-  for( size_t i=0; i<extents.size(); i++ ) {
+  indri::index::Extent range( begin, end );
+
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+  iter = std::lower_bound( extents.begin(), extents.end(), range, indri::index::Extent::begins_before_less() );
+
+  for( size_t i = iter - extents.begin(); i<extents.size(); i++ ) {
     if( begin > extents[i].begin )
       continue;
 

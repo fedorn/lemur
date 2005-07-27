@@ -65,8 +65,12 @@ const std::string& indri::infnet::ExtentInsideNode::getName() const {
 
 void indri::infnet::ExtentInsideNode::annotate( class Annotator& annotator, int documentID, int begin, int end ) {
   annotator.addMatches( _extents, this, documentID, begin, end );
+
+  indri::index::Extent range( begin, end );
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+  iter = std::lower_bound( _extents.begin(), _extents.end(), range, indri::index::Extent::begins_before_less() );
   
-  for( unsigned int i=0; i<_extents.size(); i++ ) {
+  for( unsigned int i = iter-_extents.begin(); i<_extents.size() && _extents[i].begin <= end; i++ ) {
     _inner->annotate( annotator, documentID, _extents[i].begin, _extents[i].end );
     _outer->annotate( annotator, documentID, _extents[i].begin, _extents[i].end );
   }

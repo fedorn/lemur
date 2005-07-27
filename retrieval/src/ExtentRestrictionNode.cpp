@@ -78,13 +78,22 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
 }
 
 void indri::infnet::ExtentRestrictionNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
+  const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, _field->extents() );
+  assert( matches.size() == _field->extents().size() );
+
   annotator.add(this, documentID, begin, end);
   // we're going to run through the field list, etc.
-  indri::utility::greedy_vector<indri::index::Extent>::const_iterator fieldEnd = _field->extents().end();
-  indri::utility::greedy_vector<indri::index::Extent>::const_iterator fieldBegin = _field->extents().begin();
+
+  const indri::utility::greedy_vector<indri::index::Extent>& extents = _field->extents(); 
+  int fieldCount = extents.size();
   indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
 
-  for( iter = fieldBegin; iter != fieldEnd; iter++ ) {
+  for( int i=0; i<fieldCount; i++ ) {
+    if( !matches[i] )
+      continue;
+
+    iter = &extents[i];
+  
     if( iter->end < begin )
       continue; // this one isn't relevant to our cause
 
