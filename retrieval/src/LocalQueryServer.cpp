@@ -37,6 +37,8 @@
 #include "indri/Appliers.hpp"
 #include "indri/ScopedLock.hpp"
 
+#include "indri/TreePrinterWalker.hpp"
+
 //
 // Response objects
 //
@@ -134,6 +136,8 @@ namespace indri
 indri::server::LocalQueryServer::LocalQueryServer( indri::collection::Repository& repository ) :
   _repository(repository)
 {
+  // if supplied and false, turn off optimization for all queries.
+  _optimizeParameter = indri::api::Parameters::instance().get( "optimize", 1 );
 }
 
 //
@@ -364,14 +368,18 @@ indri::server::QueryServerResponse* indri::server::LocalQueryServer::runQuery( s
   indri::lang::ApplySingleCopier<indri::lang::DagCopier> dag( weight.roots(), _repository );
 
   std::vector<indri::lang::Node*>& networkRoots = dag.roots();
-
-  if( !optimize ) {
+  // turn off optimization if called with optimize == false
+  // turn off optimization if called the Parameter optimize == false
+  if( !optimize || !_optimizeParameter ) {
     // we may be asked not to perform optimizations that might
     // drastically change the structure of the tree; for instance,
     // annotation queries may ask for this
     networkRoots = contexts.roots();
   }
-
+  /*
+  indri::lang::TreePrinterWalker printer;
+  indri::lang::ApplyWalker<indri::lang::TreePrinterWalker> printTree(networkRoots, &printer);
+  */
   // build an inference network
   indri::infnet::InferenceNetworkBuilder builder( _repository, _cache, resultsRequested );
   indri::lang::ApplyWalker<indri::infnet::InferenceNetworkBuilder> buildWalker( networkRoots, &builder );

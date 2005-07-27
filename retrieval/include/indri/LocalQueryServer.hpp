@@ -36,6 +36,10 @@ namespace indri
     
     class LocalQueryServer : public QueryServer {
     private:
+      // hold the value of the Parameter optimize, so only one call to
+      // get is required. Globally disable query optimization if
+      // the parameter is false.
+      bool _optimizeParameter;
       indri::collection::Repository& _repository;
       indri::lang::ListCache _cache;
 
