@@ -72,7 +72,6 @@ void indri::collection::Repository::_buildFields() {
 
       field.name = fields[i].get( "name", "" );
       field.numeric = fields[i].get( "numeric", false ) ? true : false;
-      //      field.parserName = fields[i].get( "parserName", field.numeric ? "NumericFieldAnnotator" : "" );
       field.parserName = fields[i].get( "parserName", "" );
       _fields.push_back(field);
     }
@@ -162,6 +161,7 @@ void indri::collection::Repository::_remove( const std::string& indexPath ) {
 //
 
 void indri::collection::Repository::_openIndexes( indri::api::Parameters& params, const std::string& parentPath ) {
+  try {
   indri::api::Parameters container = params["indexes"];
 
   _active = new index_vector;
@@ -179,6 +179,9 @@ void indri::collection::Repository::_openIndexes( indri::api::Parameters& params
       diskIndex->open( parentPath, indexName );
       _active->push_back( diskIndex );
     }
+  }
+  } catch( lemur::api::Exception& e ) {
+    LEMUR_RETHROW( e, "_openIndexes: Couldn't open DiskIndexes because:" );
   }
 }
 
@@ -341,6 +344,7 @@ void indri::collection::Repository::create( const std::string& path, indri::api:
 //
 
 void indri::collection::Repository::openRead( const std::string& path, indri::api::Parameters* options ) {
+  try {
   _path = path;
   _readOnly = true;
 
@@ -372,6 +376,11 @@ void indri::collection::Repository::openRead( const std::string& path, indri::ap
   _deletedList.read( deletedName );
 
   _startThreads();
+  } catch( lemur::api::Exception& e ) {
+    LEMUR_RETHROW( e, "Couldn't open a repository in read-only mode at '" + path + "' because:" );
+  } catch( ... ) {
+    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Something unexpected happened while trying to create '" + path + "'" );
+  }
 }
 
 //
@@ -379,6 +388,7 @@ void indri::collection::Repository::openRead( const std::string& path, indri::ap
 //
 
 void indri::collection::Repository::open( const std::string& path, indri::api::Parameters* options ) {
+  try {
   _path = path;
   _readOnly = false;
 
@@ -418,6 +428,11 @@ void indri::collection::Repository::open( const std::string& path, indri::api::P
   _deletedList.read( deletedName );
 
   _startThreads();
+  } catch( lemur::api::Exception& e ) {
+    LEMUR_RETHROW( e, "Couldn't open a repository at '" + path + "' because:" );
+  } catch( ... ) {
+    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Something unexpected happened while trying to create '" + path + "'" );
+  }
 }
 
 //
