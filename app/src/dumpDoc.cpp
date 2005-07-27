@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
   tList->startIteration();
   while (tList->hasMore()) {
     info = tList->nextEntry();
-    cout << ind->term(info->termID()) << ": " << info->count() << endl;
+    cout << info->termID() << ":" << ind->term(info->termID()) << ": " << info->count() << endl;
   }
   delete tList;
   delete(ind);
