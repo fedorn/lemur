@@ -420,8 +420,8 @@ void IndexWriter::_addInvertedListData( indri::utility::greedy_vector<WriterInde
   // maintain a list of top documents
   std::priority_queue<DocListIterator::TopDocument,
     std::vector<DocListIterator::TopDocument>,
-    DocListIterator::TopDocument::less> topdocs;
-  DocListIterator::TopDocument::less docLess;
+    DocListIterator::TopDocument::greater> topdocs;
+
   double threshold = 0;
 
   int lastDocument = 0;
@@ -450,22 +450,24 @@ void IndexWriter::_addInvertedListData( indri::utility::greedy_vector<WriterInde
         int length = index->documentLength( documentData->document );
         int count = documentData->positions.size();
 
-        if( int(length * threshold) < positions || topdocs.size() < topdocsCount ) {
+        // compute DocListIterator::TopDocument::greater (current, top())
+        // if false, no reason to insert this entry.
+        // note that the test is inverted. 
+        //  int(length * threshold) <= count is equivalent to
+        // count/length > topdocs.top().count/topdocs.top().length
+        if( int(length * threshold) <= count || topdocs.size() < topdocsCount ) {
           // form a topdocs entry for this document
           DocListIterator::TopDocument topDocument( documentData->document,
                                                     count,
                                                     length );
-
-          if( topdocs.size() < topdocsCount || docLess(topDocument, topdocs.top()) ) {
             topdocs.push( topDocument );
             while( topdocs.size() > topdocsCount )
               topdocs.pop();
-          }
 
           threshold = topdocs.top().count / double(topdocs.top().length);
         }
       }
-
+      
       if( listBuffer.position() > minimumSkip ) {
         // time to write in a skip
         _writeBatch( _invertedOutput, documentData->document, listBuffer.position(), listBuffer );
@@ -514,13 +516,12 @@ void IndexWriter::_addInvertedListData( indri::utility::greedy_vector<WriterInde
     // where fraction = c(w;D)/|D|
     while( topdocs.size() ) {
       DocListIterator::TopDocument topDocument = topdocs.top();
-      
       _invertedOutput->write( &topDocument.document, sizeof(int) );
       _invertedOutput->write( &topDocument.count, sizeof(int) );
       _invertedOutput->write( &topDocument.length, sizeof(int) );
       topdocs.pop();
     }
-
+    
     assert( (_invertedOutput->tell() - initialPosition) == topdocsSpace );
     _invertedOutput->seek( finalPosition );
   }
@@ -940,11 +941,12 @@ void IndexWriter::_writeDirectLists( WriterIndexContext* context,
     // store offset information
     documentData.byteLength = length;
     documentData.offset = directOutput->tell() + writeStart + sizeof(UINT32);
-    // tell has to happen before write or the offset will be wrong.
+    // tell has to happen before a write or the offset will be wrong.
     if( outputBuffer.position() > 128*1024 ) {
       directOutput->write( outputBuffer.front(), outputBuffer.position() );
       outputBuffer.clear();
     }
+
 
     dataOutput->write( &documentData, sizeof(DocumentData) );
     int termLength = documentData.totalLength;

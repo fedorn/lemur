@@ -40,6 +40,14 @@ namespace indri {
           }
         };
 
+        struct greater {
+          bool operator() ( const TopDocument& one, const TopDocument& two ) const {
+            // trying to avoid fdiv here: would do oneFrac > twoFrac, but that's slower
+            double oneFrac = double(one.count) / double(one.length);
+            return (oneFrac * two.length) > two.count;
+          }
+        };
+
         struct docid_less {
           bool operator() ( const TopDocument& one, const TopDocument& two ) const {
             return one.document < two.document;
