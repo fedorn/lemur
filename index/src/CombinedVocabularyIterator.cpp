@@ -48,12 +48,15 @@ void indri::index::CombinedVocabularyIterator::startIteration() {
   _finished = false;
 
   _first->startIteration();
-  if (_first->finished()) {
-    // empty list
+
+  if( _first->finished() ) {
     _usingSecond = true;
     _second->startIteration();
+  
+    if( _second->finished() ) {
+      _finished = true;
+    }
   }
-
 }
 
 //
