@@ -22,12 +22,8 @@ case $host in
    *-*-solaris*) 
      AC_CHECK_LIB(nsl, gethostbyname)
      AC_CHECK_LIB(socket, socket)
-     HOST_OS=solaris
-     AC_DEFINE(HOST_OS, solaris, [osname for jni build])
      ;;
    *linux*) 
-     HOST_OS=linux
-     AC_DEFINE(HOST_OS, linux, [osname for jni build])
      ;;
    *);;
 esac
@@ -38,6 +34,7 @@ dnl Checks for header files.
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 
+AC_C_BIGENDIAN
 AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
 
