@@ -108,6 +108,20 @@ static file_class_environment_spec environments[] = {
     trec_conflations      // conflations
   },
 
+  {
+    "mbox",               // name
+    "text",               // parser
+    "mbox",               // iterator
+    NULL,                 // startDocTag
+    NULL,                 // endDocTag
+    NULL,                 // endMetadataTag
+    NULL,                 // includeTags
+    NULL,                 // excludeTags
+    NULL,                 // indexTags
+    NULL,                 // metadataTags
+    NULL                  // conflations
+  },
+
 #ifdef WIN32
   {
     "doc",                // name

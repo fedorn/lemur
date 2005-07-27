@@ -21,6 +21,7 @@
 #include "indri/PDFDocumentExtractor.hpp"
 #include "indri/TaggedDocumentIterator.hpp"
 #include "indri/TextDocumentExtractor.hpp"
+#include "indri/MboxDocumentIterator.hpp"
 
 #ifdef WIN32
 // put in indri or indri/win?
@@ -36,6 +37,7 @@
 #define TYPE_PDF      ( "Adobe PDF" )
 #define TYPE_WORD     ( "Microsoft Word" )
 #define TYPE_PPT      ( "Microsoft PowerPoint" )
+#define TYPE_MBOX     ( "Mailbox" )
 #define TYPE_TEXT     ( "Text" )
 
 
@@ -51,8 +53,9 @@ indri::parse::DocumentIterator* indri::parse::DocumentIteratorFactory::get( cons
     result = new indri::parse::PDFDocumentExtractor();
   } else if( preferred == TYPE_TEXT ) {
     result = new indri::parse::TextDocumentExtractor();
+  } else if( preferred == TYPE_MBOX ) {
+    result = new indri::parse::MboxDocumentIterator();
   }
-  
 #ifdef WIN32
   else if( preferred == TYPE_WORD ) {
     result = new indri::parse::WordDocumentExtractor();
@@ -82,6 +85,8 @@ std::string indri::parse::DocumentIteratorFactory::preferredName( const std::str
     return TYPE_PPT;
   } else if( type == "txt" || type == "text" || type == TYPE_TEXT ) {
     return TYPE_TEXT;
+  } else if( type == "email" || type == "mbox" || type == "mailbox" || type == TYPE_MBOX ) {
+    return TYPE_MBOX;
   }
 
   return "";
