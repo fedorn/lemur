@@ -47,6 +47,7 @@ namespace indri {
 
       void startIteration();
       bool nextEntry();
+      bool nextEntry( int documentID );
       bool finished();
       TermList* currentEntry();
     };

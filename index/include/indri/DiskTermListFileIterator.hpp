@@ -31,6 +31,7 @@ namespace indri {
       indri::file::SequentialReadBuffer _buffer;
       UINT64 _fileSize;
       bool _finished;
+      int _currentDocument;
 
     public:
       DiskTermListFileIterator( indri::file::File& termListFile );
@@ -38,6 +39,7 @@ namespace indri {
       void startIteration();
       TermList* currentEntry();
       bool nextEntry();
+      bool nextEntry( int documentID );
       bool finished();
     };
   }

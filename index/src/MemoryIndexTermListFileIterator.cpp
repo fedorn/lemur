@@ -35,6 +35,8 @@ void indri::index::MemoryIndexTermListFileIterator::startIteration() {
   nextEntry();
 }
 
+
+
 bool indri::index::MemoryIndexTermListFileIterator::nextEntry() {
   _index++;
 
@@ -58,6 +60,21 @@ bool indri::index::MemoryIndexTermListFileIterator::nextEntry() {
   // read the term list from there
   _list.read( (*_buffersIterator)->front() + offset, data.byteLength );
   return true;
+}
+
+bool indri::index::MemoryIndexTermListFileIterator::nextEntry( int documentID ) {
+  if( documentID >= _data.size() ) {
+    _finished = true;
+    return false;
+  }
+
+  if( _index >= documentID ) {
+    return true;
+  }
+
+  // set position to one document before the requested document
+  _index = documentID - 1;
+  return nextEntry();
 }
 
 indri::index::TermList* indri::index::MemoryIndexTermListFileIterator::currentEntry() {

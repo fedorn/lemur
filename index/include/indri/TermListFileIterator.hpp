@@ -28,6 +28,7 @@ namespace indri {
       
       virtual void startIteration() = 0;
       virtual bool nextEntry() = 0;
+      virtual bool nextEntry( int documentID ) = 0;
       virtual bool finished() = 0;
       virtual TermList* currentEntry() = 0;
     };

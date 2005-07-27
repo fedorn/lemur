@@ -25,7 +25,8 @@ indri::index::DiskTermListFileIterator::DiskTermListFileIterator( indri::file::F
   _termListFile(termListFile),
   _buffer(_termListFile, 1024*1024),
   _fileSize(termListFile.size()),
-  _finished(false)
+  _finished(false),
+  _currentDocument(0)
 {
 }
 
@@ -58,11 +59,33 @@ bool indri::index::DiskTermListFileIterator::nextEntry() {
     UINT32 length;
     _buffer.read( &length, sizeof(UINT32) );
     _termList.read( (const char*) _buffer.read( length ), length );
+    _currentDocument++;
     return true;
   }
 
   _finished = true;
   return false;
+}
+
+//
+// nextEntry
+//
+
+bool indri::index::DiskTermListFileIterator::nextEntry( int documentID ) {
+  UINT32 length;
+
+  while( _currentDocument < documentID ) {
+    if( _buffer.position() < _fileSize ) {
+      _buffer.read( &length, sizeof(UINT32) );
+      _currentDocument++;
+    } else {
+      _finished = true;
+      return false;
+    }
+  }
+
+  _termList.read( (const char*) _buffer.read( length ), length );
+  return true;
 }
 
 //
