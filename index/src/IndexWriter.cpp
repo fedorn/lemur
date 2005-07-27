@@ -455,7 +455,9 @@ void IndexWriter::_addInvertedListData( indri::utility::greedy_vector<WriterInde
         // note that the test is inverted. 
         //  int(length * threshold) <= count is equivalent to
         // count/length > topdocs.top().count/topdocs.top().length
-        if( int(length * threshold) <= count || topdocs.size() < topdocsCount ) {
+        // but we use < to force breaking a tie in favor of keeping
+        // the first seen document.
+        if( int(length * threshold) < count || topdocs.size() < topdocsCount ) {
           // form a topdocs entry for this document
           DocListIterator::TopDocument topDocument( documentData->document,
                                                     count,
