@@ -160,7 +160,8 @@ void indri::api::QueryEnvironment::setStopwords( const std::vector<std::string>&
   _parameters.set("stopper","");
   Parameters p = _parameters.get("stopper");
   for( unsigned int i=0; i<stopwords.size(); i++ ) {
-    // use the stopper slice
+    //    _parameters.append("word").set(stopwords[i]);
+    // should be the slice.
     p.append("word").set(stopwords[i]);
   }
 }
@@ -698,6 +699,49 @@ void indri::api::QueryEnvironment::_annotateQuery( indri::infnet::InferenceNetwo
     annotatorName = annotatorNodes[0]->nodeName();
 }
 
+//
+// expressionCount
+//
+
+double indri::api::QueryEnvironment::expressionCount( const std::string& expression ) {
+  std::istringstream query(expression);
+  indri::lang::QueryLexer lexer( query );
+  indri::lang::QueryParser parser( lexer );
+  
+  // this step is required to initialize some internal
+  // parser variables, since ANTLR grammars can't add things
+  // to the constructor
+  parser.init( &_priorFactory, &lexer );
+  lexer.init();
+
+  indri::lang::ScoredExtentNode* rootNode;
+
+  try {
+    rootNode = parser.query();
+  } catch( antlr::ANTLRException e ) {
+    LEMUR_THROW( LEMUR_PARSE_ERROR, "Couldn't understand this query: " + e.getMessage() );
+  }
+
+  indri::lang::RawScorerNode* rootScorer = dynamic_cast<indri::lang::RawScorerNode*>(rootNode);
+  
+  if( rootScorer == 0 ) {
+    LEMUR_THROW( LEMUR_PARSE_ERROR, "This query does not appear to be a proximity expression" );
+  }
+
+  // replace the raw scorer node with a context counter node
+  indri::lang::ContextCounterNode* contextCounter = new indri::lang::ContextCounterNode( rootScorer->getRawExtent(),
+                                                                                         rootScorer->getContext() );
+  contextCounter->setNodeName( rootScorer->nodeName() );
+  
+  std::vector<indri::lang::Node*> roots;
+  roots.push_back( contextCounter );
+
+  indri::infnet::InferenceNetwork::MAllResults statisticsResults;
+  _sumServerQuery( statisticsResults, roots, 1000 );
+  
+  std::vector<ScoredExtentResult>& occurrencesList = statisticsResults[ contextCounter->nodeName() ][ "occurrences" ];
+  return occurrencesList[0].score;
+}
 
 // run a query (Indri query language)
 std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQuery( indri::infnet::InferenceNetwork::MAllResults& results,
@@ -759,8 +803,7 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
   std::string accumulatorName;
   _scoredQuery( results, rootNode, accumulatorName, resultsRequested, documentSet );
   std::vector<indri::api::ScoredExtentResult> queryResults = results[accumulatorName]["scores"];
-  // use stable sort to minimize differences across platforms.
-  std::stable_sort( queryResults.begin(), queryResults.end() );
+  std::stable_sort( queryResults.begin(), queryResults.end(), indri::api::ScoredExtentResult::score_greater() );
   if( queryResults.size() > resultsRequested )
     queryResults.resize( resultsRequested );
 

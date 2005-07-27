@@ -180,6 +180,9 @@ namespace indri
       /// @return total frequency of this stem within this field in the 
       /// aggregated collection
       INT64 stemFieldCount( const std::string& term, const std::string& field );
+      /// \brief Return the total number of times this expression appears in the collection.
+      /// @param expression The expression to evaluate, probably an ordered or unordered window expression
+      double expressionCount( const std::string& expression );
       /// \brief Return the list of fields.
       /// @return vector of field names.
       std::vector<std::string> fieldList();
