@@ -112,7 +112,7 @@ namespace lemur
       /// Iterator class, used for all subclass lists
       class iterator : std::iterator<std::input_iterator_tag, TermInfo> {
       public:
-        iterator() : list(NULL), position(NULL), current(NULL) {}
+        iterator() : list(NULL), position(0), current(NULL) {}
         iterator(const iterator& other) {
           list = other.list;
           position = other.position;

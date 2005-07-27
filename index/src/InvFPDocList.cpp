@@ -87,7 +87,7 @@ void lemur::index::InvFPDocList::nextEntry(InvFPDocInfo* info) const{
 /// set element from position, returns pointer to the element
 lemur::api::DocInfo* lemur::index::InvFPDocList::getElement(lemur::api::DocInfo* elem, lemur::api::POS_T position) const {
   //  InvFPDocInfo* e = dynamic_cast<InvFPDocInfo*>(elem);
-  lemur::api::LOC_T* ip = (lemur::api::LOC_T*) position;
+  lemur::api::LOC_T* ip = begin + position;
   elem->docID(*ip);
   ip++;
   elem->termCount(*ip);
@@ -97,8 +97,8 @@ lemur::api::DocInfo* lemur::index::InvFPDocList::getElement(lemur::api::DocInfo*
 }
 /// advance position
 lemur::api::POS_T lemur::index::InvFPDocList::nextPosition(lemur::api::POS_T position) const {
-  lemur::api::LOC_T* ip = (lemur::api::LOC_T*) position;
-  return (lemur::api::POS_T) (ip + *(ip+1) + 2);  // ip + termcount + 2
+  lemur::api::LOC_T* ip = begin + position;
+  return (lemur::api::POS_T) (position + *(ip+1) + 2);  // ip + termcount + 2
 }
 
 bool lemur::index::InvFPDocList::addTerm(lemur::api::DOCID_T docid) {

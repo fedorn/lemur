@@ -161,7 +161,7 @@ void lemur::index::InvDocList::nextEntry(lemur::api::DocInfo* info) const{
 /// set element from position, returns pointer to the element
 lemur::api::DocInfo* lemur::index::InvDocList::getElement(lemur::api::DocInfo* elem, lemur::api::POS_T position) const {
   // info is stored in LOC_T* as docid freq .. ..
-  lemur::api::LOC_T* ip = (lemur::api::LOC_T*) position;
+  lemur::api::LOC_T* ip = begin + position;
   elem->docID(*ip);
   ip++;
   elem->termCount(*ip);
@@ -170,7 +170,7 @@ lemur::api::DocInfo* lemur::index::InvDocList::getElement(lemur::api::DocInfo* e
 /// advance position
 lemur::api::POS_T lemur::index::InvDocList::nextPosition(lemur::api::POS_T position) const {
   // info is stored in LOC_T* as docid freq .. ..
-  return (lemur::api::POS_T) (((lemur::api::LOC_T*) position) + 2);
+  return (position + 2);
 }
 
 bool lemur::index::InvDocList::allocMem() {

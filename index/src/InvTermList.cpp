@@ -47,7 +47,7 @@ lemur::api::TermInfo* lemur::index::InvTermList::nextEntry() const{
 /// set element from position, returns pointer to the element
 lemur::api::TermInfo* lemur::index::InvTermList::getElement(lemur::api::TermInfo* elem, lemur::api::POS_T position) const {
   // info is stored in LOC_T* as docid freq .. ..
-  lemur::api::LOC_T* ip = (lemur::api::LOC_T*) position;
+  lemur::api::LOC_T* ip = list + position;
   elem->termID(*ip);
   ip++;
   elem->count(*ip);
@@ -56,7 +56,7 @@ lemur::api::TermInfo* lemur::index::InvTermList::getElement(lemur::api::TermInfo
 /// advance position
 lemur::api::POS_T lemur::index::InvTermList::nextPosition(lemur::api::POS_T position) const {
   // info is stored in LOC_T* as docid freq .. ..
-  return (lemur::api::POS_T) (((lemur::api::LOC_T*) position) + 2);
+  return (position + 2);
 }
 
 bool lemur::index::InvTermList::binRead(ifstream& infile){

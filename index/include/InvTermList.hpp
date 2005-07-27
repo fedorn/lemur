@@ -60,9 +60,9 @@ namespace lemur
       /// set element from position, returns pointer to the element
       virtual lemur::api::TermInfo* getElement(lemur::api::TermInfo* elem, lemur::api::POS_T position) const;
       /// position at beginning of list
-      virtual lemur::api::POS_T beginPosition() const { return (lemur::api::POS_T) list; }
+      virtual lemur::api::POS_T beginPosition() const { return (lemur::api::POS_T) 0; }
       /// position at end of list
-      virtual lemur::api::POS_T endPosition() const { return (lemur::api::POS_T) end; }
+      virtual lemur::api::POS_T endPosition() const { return (lemur::api::POS_T) (end - list); }
       /// advance position
       virtual lemur::api::POS_T nextPosition(lemur::api::POS_T position) const;
 

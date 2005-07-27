@@ -38,7 +38,7 @@ namespace lemur
     /// external document id encoding
     typedef std::string EXDOCID_T;
     /// pointer into collection of term positions
-    typedef void* POS_T;  // Used by DocLists and TermLists
+    typedef int POS_T;  // Used by DocLists and TermLists
   }
 }
 

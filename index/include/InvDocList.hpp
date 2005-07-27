@@ -121,9 +121,9 @@ namespace lemur
       virtual lemur::api::DocInfo* getElement(lemur::api::DocInfo* elem, 
                                               lemur::api::POS_T position) const;
       /// position at beginning of list
-      virtual lemur::api::POS_T beginPosition() const { return (lemur::api::POS_T) begin; }
+      virtual lemur::api::POS_T beginPosition() const { return (lemur::api::POS_T) 0; }
       /// position at end of list
-      virtual lemur::api::POS_T endPosition() const { return (lemur::api::POS_T) end; }
+      virtual lemur::api::POS_T endPosition() const { return (lemur::api::POS_T) (end - begin); }
       /// advance position
       virtual lemur::api::POS_T nextPosition(lemur::api::POS_T position) const;
 
