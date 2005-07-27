@@ -29,12 +29,6 @@
   #include <sys/types.h>
   #include <sys/stat.h>
   #define LEMUR_USES_ENUM_OPENMODE
-  #ifdef HOST_OS
-    #if HOST_OS == solaris
-      #define	BIG_ENDIAN	4321
-      #define BYTE_ORDER BIG_ENDIAN
-    #endif
-  #endif
 #endif
 
 #include <stdio.h>
@@ -171,7 +165,7 @@ inline int strncasecmp( const char* one, const char* two, int length ) {
 }
 #endif
 
-#if defined(BIG_ENDIAN) && (BYTE_ORDER == BIG_ENDIAN)
+#if defined(WORDS_BIGENDIAN)
 inline double htond( double native ) {
   return native;
 }
@@ -189,7 +183,7 @@ inline double ntohd( double native ) {
 }
 #endif 
 
-#if defined(BIG_ENDIAN) && (BYTE_ORDER == BIG_ENDIAN)
+#if defined(WORDS_BIGENDIAN)
 inline UINT64 htonll( UINT64 native ) {
   return native;
 }

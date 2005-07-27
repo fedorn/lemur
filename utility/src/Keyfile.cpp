@@ -6,11 +6,6 @@
 // 30 March 2004 - dmf -- update to new 8 bit clean keyfile api.
 //
 
-extern "C" {
-#include "keyref.h"
-#include "keyerr.h"
-}
-
 #include <cassert>
 #include <memory>
 #include <string>
@@ -21,8 +16,15 @@ extern "C" {
 #include "lemur-platform.h"
 #include "lemur-compat.hpp"
 
+extern "C" {
+#include "keyref.h"
+#include "keydef.h"
+#include "keyerr.h"
+}
+
 void lemur::file::Keyfile::_buildHandle( int cacheSize ) {
-  int blocks = lemur_compat::max( (cacheSize - min_fcb_lc) / buffer_lc, 0 );
+  int blocks = lemur_compat::max( int((cacheSize - min_fcb_lc) / buffer_lc),
+                                  int(0) );
   _handleSize = min_fcb_lc + blocks * buffer_lc;
   _handle = new char[ _handleSize ];
   memset( _handle, 0x00, _handleSize );

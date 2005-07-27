@@ -1,3 +1,4 @@
+
 /*                                                               */
 /* Copyright 1984,1985,1986,1988,1989,1990,2003,2004,2005 by     */
 /*   Howard Turtle                                               */
@@ -7,26 +8,30 @@
 #define false 0
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stddef.h>
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 #include "keyerr.h"
 #include "keydef.h"
 #include "keyprint.h"
 #include "keyfile.h"
-
-#define size_t unsigned
-#define maxint 32767
+#include "fileio.h"
+#ifdef min
+#undef min
+#endif
+/* #define maxint 32767*/
 #define show_errors true
 #define trace_io false
 
 
-/*int
+int
   get_buffer_cnt=0,
   replace_buffer_cnt=0,
   get_index_cnt=0,
-  hash_chain_cnt=0;*/
+  hash_chain_cnt=0;
 
 int
   read_cnt=0,
@@ -66,7 +71,7 @@ static int min(int i, int j)
   else return(j);
 }
 
-#define mvc(t1,sc1,t2,sc2,lc) memmove((unsigned char *)t2+sc2,(unsigned char *)t1+sc1,lc);
+#define mvc(t1,sc1,t2,sc2,lc) memmove((unsigned char *)t2+sc2,(unsigned char *)t1+sc1,(size_t)lc);
 
 /*void mvc(t1,sc1,t2,sc2,lc)
 unsigned char t1[],t2[]; int sc1,sc2,lc;
@@ -75,8 +80,23 @@ unsigned char t1[],t2[]; int sc1,sc2,lc;
 }*/
 
 
+static void print_leveln_pntr(char caption[], struct leveln_pntr *pn)
+{
+  printf("%s%u/",caption,pn->segment);
+  printf(UINT64_format,pn->block);
+  printf(" ");
+}
+
+static void print_level0_pntr(char caption[], struct level0_pntr *p0)
+{
+  printf("%s%u/",caption,p0->segment);
+  printf(UINT64_format,p0->sc);
+  printf("/%u ",p0->lc);
+}
+
 /* compressed_int_lc returns the length of a compressed integer */
-/*   without actually uncompressing it.                         */
+/*   without actually uncompressing it.  Note that it doesn't   */
+/*   care what the size of the uncompressed int would be.       */
 
 static int compressed_int_lc(char buf[], unsigned offset)
 {int i=0;
@@ -85,12 +105,12 @@ static int compressed_int_lc(char buf[], unsigned offset)
   return(i+1);
 }
 
-/* uncompress_int uncompresses an integer compressed in array p */
-/*   and returns the number of bytes consumed to decompress     */
-/*   the int.  */
+/* uncompress_UINT16 uncompresses an integer compressed in      */
+/*    array p and returns the number of bytes consumed to       */
+/*    decompress the int.                                       */
 
 
-static int uncompress_int(unsigned long *i, unsigned char p[])
+static int uncompress_UINT16(UINT16 *i, unsigned char p[])
 {int j=0; boolean done=false;
 
   *i = 0;
@@ -105,13 +125,52 @@ static int uncompress_int(unsigned long *i, unsigned char p[])
   return(j+1);
 }
 
-/* compress_int compresses integer i into a byte string and       */
+/* uncompress_UINT32 uncompresses an integer compressed in      */
+/*    array p and returns the number of bytes consumed to       */
+/*    decompress the int.                                       */
+
+
+static int uncompress_UINT32(UINT32 *i, unsigned char p[])
+{int j=0; boolean done=false;
+
+  *i = 0;
+  do {
+    *i = *i | (p[j] & 127);
+    if ( (p[j] & 128)!=0 ) {
+      *i = *i << 7;
+      j++;
+    }
+    else done = true;
+  } while ( !done );
+  return(j+1);
+}
+
+/* uncompress_UINT64 uncompresses an integer compressed in      */
+/*    array p and returns the number of bytes consumed to       */
+/*    decompress the int.                                       */
+
+static int uncompress_UINT64(UINT64 *i, unsigned char p[])
+{int j=0; boolean done=false;
+
+  *i = 0;
+  do {
+    *i = *i | (p[j] & 127);
+    if ( (p[j] & 128)!=0 ) {
+      *i = *i << 7;
+      j++;
+    }
+    else done = true;
+  } while ( !done );
+  return(j+1);
+}
+
+/* compress_UINT32 compresses UINT32 i into a byte string and     */
 /*   returns the length of the compressed string. Note that ptr   */
 /*   points to the rightmost character in the compressed string,  */
 /*   i.e. the int is compressed from ptr to the left.             */
 
 
-static int compress_int(unsigned long i, unsigned char *ptr)
+static int compress_UINT32(UINT32 i, unsigned char *ptr)
 {unsigned char *p;
 
   p = ptr;
@@ -121,10 +180,32 @@ static int compress_int(unsigned long i, unsigned char *ptr)
     i = i>>7;
   } while ( i>0 );
   *ptr = *ptr & 127; /* high bit off */
-  return(ptr-p);
+  return((int)(ptr-p));
 }
 
-static int int_lc_if_compressed(unsigned long i)
+/* compress_UINT64 compresses UINT64 i into a byte string and     */
+/*   returns the length of the compressed string. Note that ptr   */
+/*   points to the rightmost character in the compressed string,  */
+/*   i.e. the int is compressed from ptr to the left.             */
+
+
+static int compress_UINT64(UINT64 i, unsigned char *ptr)
+{unsigned char *p;
+
+  p = ptr;
+  do {
+    *p = (i & 127) | 128;
+    p--;
+    i = i>>7;
+  } while ( i>0 );
+  *ptr = *ptr & 127; /* high bit off */
+  return((int)(ptr-p));
+}
+
+/* UINT32_lc_if_compressed returns the length that UINT32 i      */
+/*   will occupy once compressed.                                */
+
+static int UINT32_lc_if_compressed(UINT32 i)
 {
   if      ( i<128    )    return(1);
   else if ( i<16384  )    return(2);
@@ -133,15 +214,32 @@ static int int_lc_if_compressed(unsigned long i)
   else return(5);
 }
 
-static unsigned allocation_lc(int lc, int unit)
+/* UINT64_lc_if_compressed returns the length that UINT64 i      */
+/*   will occupy once compressed.                                */
+
+static int UINT64_lc_if_compressed(UINT64 i)
 {
-  if ( lc<=0 ) return(0);
+  if      ( i<                UINT64_C(128) ) return(1);
+  else if ( i<              UINT64_C(16384) ) return(2);
+  else if ( i<            UINT64_C(2097152) ) return(3);
+  else if ( i<          UINT64_C(268435456) ) return(4);
+  else if ( i<        UINT64_C(34359738368) ) return(5);
+  else if ( i<      UINT64_C(4398046511104) ) return(6);
+  else if ( i<    UINT64_C(562949953421312) ) return(7);
+  else if ( i<  UINT64_C(72057594037927936) ) return(8);
+  else if ( i<UINT64_C(9223372036854775808) ) return(9);
+  else return(10);
+}
+
+static unsigned allocation_lc(unsigned lc, unsigned unit)
+{
+  if ( lc==0 ) return(0);
   else return(((lc-1) / unit + 1) * unit);
 }
 
-static unsigned rec_allocation_lc(int lc)
+static unsigned rec_allocation_lc(unsigned lc)
 {
-  if ( lc<=0 ) return(0);
+  if ( lc==0 ) return(0);
   else return(((lc-1) / rec_allocation_unit + 1) * rec_allocation_unit);
 }
 
@@ -227,7 +325,7 @@ static boolean set_up(struct fcb *f, unsigned char key[], int key_lc, struct key
   if ( !check_fcb(f) ) return(false);
   k->lc = key_lc;
   if ( k->lc>0 && k->lc<maxkey_lc ) {
-    memcpy(k->text,key,(unsigned)key_lc); return(true);
+    memcpy(k->text,key,(size_t)key_lc); return(true);
   }
   else {
     f->error_code = badkey_err; k->lc = 0;
@@ -254,10 +352,10 @@ static boolean gt_pntr(struct leveln_pntr p1, struct leveln_pntr p2)
 static int compress0_pntr(struct level0_pntr *p, unsigned char *cp)
 {int lc,lc1,lc2;
 
-  lc = compress_int(p->lc,cp);
-  lc1 = compress_int(p->sc,cp-lc);
+  lc = compress_UINT32(p->lc,cp);
+  lc1 = compress_UINT64(p->sc,cp-lc);
   /*  memcpy((char *)cp-lc-sizeof(int)+1,&(p->sc),sizeof(int));*/
-  lc2 = compress_int(p->segment,cp-lc-lc1);
+  lc2 = compress_UINT32(p->segment,cp-lc-lc1);
   return( lc+lc1+lc2 );
 }
 
@@ -266,11 +364,11 @@ static int compress0_pntr(struct level0_pntr *p, unsigned char *cp)
 static int level0_pntr_lc(struct level0_pntr *p)
 {/*int lc,lc1,lc2;
 
-  lc =  int_lc_if_compressed(p->lc);
-  lc1 = int_lc_if_compressed(p->sc);
-  lc2 = int_lc_if_compressed(p->segment);
+  lc =  UINT32_lc_if_compressed(p->lc);
+  lc1 = UINT32_lc_if_compressed(p->sc);
+  lc2 = UINT32_lc_if_compressed(p->segment);
   return( lc+lc1+lc2);*/
-  return( int_lc_if_compressed(p->lc) + int_lc_if_compressed(p->sc) + int_lc_if_compressed(p->segment) );
+  return( UINT32_lc_if_compressed(p->lc) + UINT64_lc_if_compressed(p->sc) + UINT32_lc_if_compressed(p->segment) );
 }
 
 /* uncompress0_pntr uncompresses a level0 pointer.  Note   */
@@ -280,10 +378,10 @@ static int level0_pntr_lc(struct level0_pntr *p)
 static int uncompress0_pntr(struct level0_pntr *p, unsigned char *cp)
 {int lc,lc1,lc2;
 
-  lc = uncompress_int((unsigned long *)&(p->segment),cp);
-  lc1 = uncompress_int((unsigned long *)&(p->sc),cp+lc);
+  lc = uncompress_UINT16(&(p->segment),cp);
+  lc1 = uncompress_UINT64(&(p->sc),cp+lc);
   /*  memcpy(&(p->sc),cp+lc,sizeof(int));*/
-  lc2 = uncompress_int(&(p->lc),cp+lc+lc1);
+  lc2 = uncompress_UINT32(&(p->lc),cp+lc+lc1);
   return( lc+lc1+lc2 );
 }
 
@@ -294,8 +392,8 @@ static int uncompress0_pntr(struct level0_pntr *p, unsigned char *cp)
 static int compressn_pntr(struct leveln_pntr *p, unsigned char *cp)
 {int lc,lc1;
 
-  lc = compress_int(p->block,cp);
-  lc1 = compress_int(p->segment,cp-lc);
+  lc = compress_UINT64(p->block,cp);
+  lc1 = compress_UINT32(p->segment,cp-lc);
   return( lc+lc1 );
 }
 
@@ -304,10 +402,10 @@ static int compressn_pntr(struct leveln_pntr *p, unsigned char *cp)
 static int leveln_pntr_lc(struct leveln_pntr *p)
 {/*int lc,lc1;
 
-  lc = int_lc_if_compressed(p->block);
-  lc1 = int_lc_if_compressed(p->segment);
+  lc = UINT32_lc_if_compressed(p->block);
+  lc1 = UINT32_lc_if_compressed(p->segment);
   return( lc+lc1 );*/
-  return( int_lc_if_compressed(p->block) + int_lc_if_compressed(p->segment) );
+  return( UINT64_lc_if_compressed(p->block) + UINT32_lc_if_compressed(p->segment) );
 }
 
 /*static*/ int pntr_lc(levelx_pntr *p, int level)
@@ -323,8 +421,8 @@ static int leveln_pntr_lc(struct leveln_pntr *p)
 static int uncompressn_pntr(struct leveln_pntr *p, unsigned char *cp)
 {int lc,lc1;
 
-  lc = uncompress_int((unsigned long *)&(p->segment),cp);
-  lc1 = uncompress_int(&(p->block),cp+lc);
+  lc = uncompress_UINT16(&(p->segment),cp);
+  lc1 = uncompress_UINT64(&(p->block),cp+lc);
   /*  memcpy(&(p->block),cp+lc,sizeof(int));*/
   return( lc+lc1 );
 }
@@ -366,7 +464,7 @@ int unpackx_ptr(struct ix_block *b, int ix, levelx_pntr *p)
 }
 
 static int copy_ptr(struct ix_block *b, int ix, struct ix_block *b1)
-{unsigned sc; size_t lc;
+{unsigned sc,lc;
 
   sc = b->keys[ix].sc + b->keys[ix].lc;
   lc = compressed_int_lc((char *) b->keys,sc);
@@ -390,14 +488,16 @@ static void print_lc_key(struct key *k, char caption[])
 {struct level0_pntr p;
 
   unpack_lc_key(k->text,&p);
-  printf("%s(free_lc)%lu, %d/%lu",caption,p.lc,p.segment,p.sc);
+  printf("%s(free_lc)%u, %u/",caption,p.lc,p.segment);
+  printf(UINT64_format,p.sc);
 }
 
 static void print_rec_key(struct key *k, char caption[])
 {struct level0_pntr p;
 
   unpack_rec_key(k->text,&p);
-  printf("%s(free_rec)%d/%lu",caption,p.segment,p.sc);
+  printf("%s(free_rec)%u/",caption,p.segment);
+  printf(UINT64_format,p.sc);
 }
 
 static void print_user_key(struct key *k, char caption[])
@@ -442,13 +542,13 @@ enum comparison compare_key(struct key *k, struct ix_block *b, int ix)
 {int r; unsigned lc1,lc2;
 
   if ( k->lc<b->prefix_lc ) {
-    r = memcmp(k->text,(char *) b->keys+keyspace_lc-b->prefix_lc,k->lc );
+    r = memcmp(k->text,(char *) b->keys+keyspace_lc-b->prefix_lc,(size_t)k->lc );
     if ( r<0 ) return(less);
     else if (r>0) return(greater);
     else return(less);
   }
   else {
-    r = memcmp(k->text,(char *) b->keys+keyspace_lc-b->prefix_lc,b->prefix_lc );
+    r = memcmp(k->text,(char *) b->keys+keyspace_lc-b->prefix_lc,(size_t)b->prefix_lc );
     if (r<0) return(less);
     else if (r>0) return(greater);
     else {
@@ -456,14 +556,14 @@ enum comparison compare_key(struct key *k, struct ix_block *b, int ix)
       lc1 = k->lc - b->prefix_lc;
       lc2 = b->keys[ix].lc;
       if ( lc1<=lc2 ) {
-        r = memcmp(k->text+b->prefix_lc,(char *) b->keys+b->keys[ix].sc,lc1 );
+        r = memcmp(k->text+b->prefix_lc,(char *) b->keys+b->keys[ix].sc,(size_t)lc1 );
         if (r<0) return(less);
         else if (r>0) return(greater);
         else if ( lc1==lc2 ) return(equal);
         else return(less);
       }
       else {
-        r = memcmp(k->text+b->prefix_lc,(char *) b->keys+b->keys[ix].sc,lc2 );
+        r = memcmp(k->text+b->prefix_lc,(char *) b->keys+b->keys[ix].sc,(size_t)lc2 );
         if (r<0) return(less);
         else if (r>0) return(greater);
         else if ( lc1==lc2 ) return(equal);
@@ -565,7 +665,7 @@ void get_max_key(struct ix_block *b, struct key *k)
 static void init_file_name(struct fcb *f, char id[])
 {int i; unsigned name_lc, f_lc, ext_lc = 0;
 
-  name_lc = strlen(id);
+  name_lc = (unsigned) strlen(id);
   if (name_lc > max_filename_lc + max_extension_lc)
     fatal_error(f,bad_name_err); /* whole thing too long */
   i = name_lc - 1;
@@ -581,12 +681,12 @@ static void init_file_name(struct fcb *f, char id[])
   }
   if (f_lc >= max_filename_lc) fatal_error(f,bad_name_err);
   else {
-    strncpy(f->file_name, id, f_lc);
+    strncpy(f->file_name, id, (size_t)f_lc);
     f->file_name[f_lc] = '\0';
   }
   if ( ext_lc >= max_extension_lc ) fatal_error(f,bad_name_err);
   else {
-    strncpy(f->file_extension, id + i, ext_lc);
+    strncpy(f->file_extension, id + i, (size_t)ext_lc);
     f->file_extension[ext_lc] = '\0';
   }
 }
@@ -595,7 +695,7 @@ static void init_file_name(struct fcb *f, char id[])
 /*   number to the file name and then appending any extension.       */
 
 static void build_segment_name(struct fcb *f, unsigned segment, char name[])
-{int name_lc,suffix_lc;
+{int suffix_lc; size_t name_lc;
 
   strcpy(name,f->file_name);
   if (segment>0) {
@@ -606,7 +706,18 @@ static void build_segment_name(struct fcb *f, unsigned segment, char name[])
   strcat(name,f->file_extension);
 }
 
-static void byte_swap_int(unsigned char n[])
+static void byte_swap_UINT16s(unsigned char s[], int cnt)
+{unsigned int i=0; unsigned char ch;
+
+  while ( i<cnt*sizeof(UINT16) ) {
+    ch = s[i];
+    s[i] = s[i+1];
+    s[i+1] = ch;
+    i = i + sizeof(UINT16);
+  }
+}
+
+static void byte_swap_UINT32(unsigned char n[])
 {unsigned char ch;
 
 /*  printf("int %d after swapping is",n); */
@@ -620,6 +731,26 @@ static void byte_swap_int(unsigned char n[])
  /*  printf("int %d after swapping is %d\n",n.as_int,n1.as_int);*/
 }
 
+static void byte_swap_UINT64(unsigned char n[])
+{unsigned char ch;
+
+/*  printf("int %d after swapping is",n); */
+  ch = n[0];
+  n[0] = n[7];
+  n[7] = ch;
+  ch = n[1];
+  n[1] = n[6];
+  n[6] = ch;
+  ch = n[2];
+  n[2] = n[5];
+  n[5] = ch;
+  ch = n[3];
+  n[3] = n[4];
+  n[4] = ch;
+/*  printf(" %d\n",n); */
+ /*  printf("int %d after swapping is %d\n",n.as_int,n1.as_int);*/
+}
+
 static unsigned char read_byte(struct fcb *f, FILE *file)
 {unsigned char ch=0;
 
@@ -629,12 +760,12 @@ static unsigned char read_byte(struct fcb *f, FILE *file)
 }
 
 
-static int16 read_int16(struct fcb *f, FILE *file)
-{int16 n; unsigned char ch;
+static UINT16 read_UINT16(struct fcb *f, FILE *file)
+{UINT16 n; unsigned char ch;
  unsigned char *p = (unsigned char *)&n;
 
-  if ( fread(&n,sizeof(int16),(size_t)1,file)!=1 ) {
-    set_error(f,read_err,"read_int16 failed\n");
+  if ( fread(&n,sizeof(UINT16),(size_t)1,file)!=1 ) {
+    set_error(f,read_err,"read_UINT16 failed\n");
     return(0);
   }
   if ( f->byte_swapping_required ) {
@@ -645,79 +776,72 @@ static int16 read_int16(struct fcb *f, FILE *file)
   return(n);
 }
 
-static void byte_swap_int16s(unsigned char s[], int cnt)
-{unsigned int i=0; unsigned char ch;
 
-  while ( i<cnt*sizeof(int16) ) {
-    ch = s[i];
-    s[i] = s[i+1];
-    s[i+1] = ch;
-    i = i + sizeof(int16);
-  }
-}
+static UINT32 read_UINT32(struct fcb *f, FILE *file)
+{UINT32 n;
 
-static int read_int(struct fcb *f, FILE *file)
-{int n;
-
-  if ( fread(&n,sizeof(int),(size_t)1,file)!=1 ) {
-    set_error(f,read_err,"read_int failed\n");
+  if ( fread(&n,sizeof(UINT32),(size_t)1,file)!=1 ) {
+    set_error(f,read_err,"read_UINT32 failed\n");
     return(0);
   }
-  if ( f->byte_swapping_required ) byte_swap_int((unsigned char *) &n);
+  if ( f->byte_swapping_required ) byte_swap_UINT32((unsigned char *) &n);
+  return(n);
+}
+
+static UINT64 read_UINT64(struct fcb *f, FILE *file)
+{UINT64 n;
+
+  if ( fread(&n,sizeof(UINT64),(size_t)1,file)!=1 ) {
+    set_error(f,read_err,"read_UINT64 failed\n");
+    return(0);
+  }
+  if ( f->byte_swapping_required ) byte_swap_UINT64((unsigned char *) &n);
   return(n);
 }
 
 static boolean read_fib(struct fcb *f,char id[], boolean byte_swapping_required,
   boolean read_only)
-{int i,j; long position; FILE *file;
+{int i,j; FILE_OFFSET position; FILE *file;
 
   file = fopen(id,"rb");
   if ( file==NULL ) f->error_code = badopen_err;
-  else if ( fseek(file,(long) 0,0)!=0 ) f->error_code = badopen_err;
+  else if ( fseeko(file,(FILE_OFFSET) 0,0)!=0 ) f->error_code = badopen_err;
   else {
     f->byte_swapping_required = byte_swapping_required;
     f->read_only = read_only;
 
-    f->error_code = read_int(f,file);
-    f->version = read_int(f,file);
-    f->segment_cnt = read_int(f,file);
-    for ( i=0; i<max_index; i++) f->primary_level[i] = read_int(f,file);
-    f->marker = read_int(f,file);
-    f->file_ok = read_int(f,file);
+    f->error_code = read_UINT32(f,file);
+    f->version = read_UINT32(f,file);
+    f->segment_cnt = read_UINT32(f,file);
+    for ( i=0; i<max_index; i++) f->primary_level[i] = read_UINT32(f,file);
+    f->marker = read_UINT32(f,file);
+    f->file_ok = read_UINT32(f,file);
     for (i=0; i<max_level; i++)
       for (j=0; j<max_index; j++) {
-        f->first_free_block[i][j].segment = read_int(f,file);
-        f->first_free_block[i][j].block = read_int(f,file);
+        f->first_free_block[i][j].segment = read_UINT16(f,file);
+        f->first_free_block[i][j].block = read_UINT64(f,file);
       }
     for (i=0; i<max_level; i++)
       for (j=0; j<max_index; j++) {
-        f->first_at_level[i][j].segment = read_int(f,file);
-        f->first_at_level[i][j].block = read_int(f,file);
+        f->first_at_level[i][j].segment = read_UINT16(f,file);
+        f->first_at_level[i][j].block = read_UINT64(f,file);
       }
     for (i=0; i<max_level; i++)
       for (j=0; j<max_index; j++) {
-        f->last_pntr[i][j].segment = read_int(f,file);
-        f->last_pntr[i][j].block = read_int(f,file);
+        f->last_pntr[i][j].segment = read_UINT16(f,file);
+        f->last_pntr[i][j].block = read_UINT64(f,file);
       }
-    for (i=0; i<max_segments; i++) f->segment_length[i] = read_int(f,file);
-    position = ftell(file);
-    if ( position!=fib_lc ) set_error(f,badopen_err,"**Unable to read fib\n");
+    f->max_file_lc = read_UINT64(f,file);
+    for (i=0; i<max_segments; i++) f->segment_length[i] = read_UINT64(f,file);
+    position = ftello(file);
+    if ( position!=fib_lc ) set_error1(f,badopen_err,"**Unable to read fib, position=",(int)position);
     fclose(file);
   }
   return(f->error_code==no_err);
 }
 
-static void write_int(struct fcb *f, FILE *file, int i)
-{int n;
-
-  n = i;
-  if ( f->byte_swapping_required ) byte_swap_int((unsigned char *) &n);
-  if ( fwrite(&n,sizeof(int),(size_t)1,file)!= 1 )
-    set_error(f,write_err,"write failed in write_int\n");
-}
-
-static void write_int16(struct fcb *f, FILE *file, int16 *i)
-{int16 n; unsigned char ch;
+static void write_UINT16(struct fcb *f, FILE *file, UINT16 *i)
+{UINT16 n; unsigned char ch;
  unsigned char *p = (unsigned char *)&n;
 
   n = *i;
@@ -726,131 +850,159 @@ static void write_int16(struct fcb *f, FILE *file, int16 *i)
     p[0] = p[1];
     p[1] = ch;
   }
-  if ( fwrite(&n,sizeof(int16),(size_t)1,file)!=1 )
-    set_error(f,write_err,"write failed in write_int16\n");
+  if ( fwrite(&n,sizeof(UINT16),(size_t)1,file)!=1 )
+    set_error(f,write_err,"write failed in write_UINT16\n");
 }
 
-static void write_int16s(struct fcb *f, FILE *file, unsigned char s[], unsigned int cnt)
+static void write_UINT16s(struct fcb *f, FILE *file, unsigned char s[], unsigned int cnt)
 {unsigned int i; unsigned char swapped[keyspace_lc];
 
   if ( f->byte_swapping_required ) {
     i = 0;
-    while ( i<cnt*sizeof(int16) ) {
+    while ( i<cnt*sizeof(UINT16) ) {
       swapped[i] = s[i+1];
       swapped[i+1] = s[i];
-      i = i + sizeof(int16);
+      i = i + sizeof(UINT16);
     }
-    if ( fwrite(swapped,sizeof(int16),(size_t)cnt,file)!=cnt )
-    set_error(f,write_err,"write_int16s failed\n");
+    if ( fwrite(swapped,sizeof(UINT16),(size_t)cnt,file)!=cnt )
+    set_error(f,write_err,"write_UINT16s failed\n");
   }
   else {
-    if ( fwrite(s,sizeof(int16),(size_t)cnt,file)!=cnt )
-      set_error(f,write_err,"write_int16s failed\n");
+    if ( fwrite(s,sizeof(UINT16),(size_t)cnt,file)!=cnt )
+      set_error(f,write_err,"write_UINT16s failed\n");
   }
 }
 
+static void write_UINT32(struct fcb *f, FILE *file, UINT32 i)
+{UINT32 n;
+
+  n = i;
+  if ( f->byte_swapping_required ) byte_swap_UINT32((unsigned char *) &n);
+  if ( fwrite(&n,sizeof(UINT32),(size_t)1,file)!= 1 )
+    set_error(f,write_err,"write failed in write_UINT32\n");
+}
+
+static void write_UINT64(struct fcb *f, FILE *file, UINT64 i)
+{UINT64 n;
+
+  n = i;
+  if ( f->byte_swapping_required ) byte_swap_UINT64((unsigned char *) &n);
+  if ( fwrite(&n,sizeof(UINT64),(size_t)1,file)!= 1 )
+    set_error(f,write_err,"write failed in write_UINT64\n");
+}
+
 static void write_fib(struct fcb *f)
-{int i,j,fill_cnt; long position; FILE *file;
+{int i,j,fill_cnt; FILE_OFFSET position; FILE *file;
 
   if ( f->error_code!=no_err ) return;
   else if ( f->read_only ) return;
   else {
     file = file_index(f,0);
     if ( file==NULL ) set_error(f,bad_close_err,"**Bad file in write_fib\n");
-    else if ( fseek(file,(long) 0,0)!=0 ) set_error(f,bad_close_err,"**Couldn't seek to fib\n");
+    else if ( fseeko(file,(FILE_OFFSET) 0,0)!=0 ) set_error(f,bad_close_err,"**Couldn't seek to fib\n");
     else {
       /*      f->byte_swapping_required = false;*/
 
-      write_int(f,file,f->error_code);
-      write_int(f,file,f->version);
-      write_int(f,file,f->segment_cnt);
-      for ( i=0; i<max_index; i++) write_int(f,file,f->primary_level[i]);
-      write_int(f,file,f->marker);
-      write_int(f,file,f->file_ok);
+      write_UINT32(f,file,f->error_code);
+      write_UINT32(f,file,f->version);
+      write_UINT32(f,file,f->segment_cnt);
+      for ( i=0; i<max_index; i++) write_UINT32(f,file,f->primary_level[i]);
+      write_UINT32(f,file,f->marker);
+      write_UINT32(f,file,f->file_ok);
       for (i=0; i<max_level; i++)
         for (j=0; j<max_index; j++) {
-          write_int(f,file,(int)f->first_free_block[i][j].segment);
-          write_int(f,file,(int)f->first_free_block[i][j].block);
+          write_UINT16(f,file,&(f->first_free_block[i][j].segment));
+          write_UINT64(f,file,f->first_free_block[i][j].block);
         }
       for (i=0; i<max_level; i++)
         for (j=0; j<max_index; j++) {
-          write_int(f,file,(int)f->first_at_level[i][j].segment);
-          write_int(f,file,(int)f->first_at_level[i][j].block);
+          write_UINT16(f,file,&(f->first_at_level[i][j].segment));
+          write_UINT64(f,file,f->first_at_level[i][j].block);
         }
       for (i=0; i<max_level; i++)
         for (j=0; j<max_index; j++) {
-          write_int(f,file,(int)f->last_pntr[i][j].segment);
-          write_int(f,file,(int)f->last_pntr[i][j].block);
+          write_UINT16(f,file,&(f->last_pntr[i][j].segment));
+          write_UINT64(f,file,f->last_pntr[i][j].block);
         }
-      for (i=0; i<max_segments; i++) write_int(f,file,(int)f->segment_length[i]);
-      position = ftell(file);
+      write_UINT64(f,file,f->max_file_lc);
+      for (i=0; i<max_segments; i++) write_UINT64(f,file,f->segment_length[i]);
+      position = ftello(file);
       if ( position!=fib_lc ) set_error(f,bad_close_err,"**Wrong fib length on close\n");
+
+      /*      printf("**fib_lc=%d, position=%u\n",(int)fib_lc,(int)position);*/
+
       fill_cnt = ((fib_blocks * block_lc) - fib_lc) / sizeof(int);
-      for (i=0; i<fill_cnt; i++) write_int(f,file,0);
+      for (i=0; i<fill_cnt; i++) write_UINT32(f,file,0);
     }
   }
 }
 
 void read_page(struct fcb *f, struct leveln_pntr p, block_type_t *buf)
-{FILE *file; long offset;
+{FILE *file; FILE_OFFSET offset;
 
  read_cnt++;
-  if ( f->trace ) printf("reading page %d/%ld\n",p.segment,p.block);
+  if ( f->trace ) {
+    print_leveln_pntr("reading page ",&p);
+    printf("\n");
+  }
   file = file_index(f,p.segment);
   offset = (p.block) << f->block_shift;
   if ( file==NULL ) set_error(f,read_err,"**Bad file in read_page\n");
-  else if ( fseek(file,offset,0)!=0 )
+  else if ( fseeko(file,offset,0)!=0 )
     set_error(f,seek_err,"**Seek failed in read_page\n");
   else {
-    buf->ix.keys_in_block = read_int16(f,file);
-    buf->ix.chars_in_use = read_int16(f,file);
+    buf->ix.keys_in_block = read_UINT16(f,file);
+    buf->ix.chars_in_use = read_UINT16(f,file);
     buf->ix.index_type = read_byte(f,file);
     buf->ix.prefix_lc = read_byte(f,file);
-    buf->ix.free_block_cnt = read_byte(f,file);
+    buf->ix.unused = read_byte(f,file);
     buf->ix.level = read_byte(f,file);
-    buf->ix.next.segment = read_int(f,file);
-    buf->ix.next.block = read_int(f,file);
-    buf->ix.prev.segment = read_int(f,file);
-    buf->ix.prev.block = read_int(f,file);
+    buf->ix.next.segment = read_UINT16(f,file);
+    buf->ix.next.block = read_UINT64(f,file);
+    buf->ix.prev.segment = read_UINT16(f,file);
+    buf->ix.prev.block = read_UINT64(f,file);
     fread(buf->ix.keys,(size_t) 1, (size_t) keyspace_lc,file);
-    if ( ftell(file)!=(long)(offset+block_lc) )
-      set_error(f,read_err,"**I/O failure in read_page\n");
+    if ( ftello(file)!=(FILE_OFFSET)(offset+block_lc) )
+      set_error1(f,read_err,"**I/O failure in read_page, bytes read=",(int)(ftello(file)-offset));
     if ( f->byte_swapping_required )
-      byte_swap_int16s((char *)buf->ix.keys,buf->ix.keys_in_block*2);
+      byte_swap_UINT16s((char *)buf->ix.keys,buf->ix.keys_in_block*2);
   }
 }
 
 static void write_page(struct fcb *f, struct leveln_pntr p, block_type_t *buf)
-{int pntr_lc,remaining; FILE *file; long offset;
+{int pntr_lc,remaining; FILE *file; FILE_OFFSET offset;
 
   write_cnt++;
   if ( f->read_only ) {
     f->error_code = read_only_err;
     return;
   }
-  if ( f->trace ) printf("writing page %d/%ld\n",p.segment,p.block);
+  if ( f->trace ) {
+    print_leveln_pntr("writing page ",&p);
+    printf("\n");
+  }
   file = file_index(f,p.segment);
   offset = (p.block) << f->block_shift;
   if ( file==NULL ) set_error(f,write_err,"**Bad file in write_page\n");
-  else if ( fseek(file,offset,0)!=0 )
+  else if ( fseeko(file,offset,0)!=0 )
     set_error(f,seek_err,"**Seek error in write_page\n");
   else {
-    write_int16(f,file,&(buf->ix.keys_in_block));
-    write_int16(f,file,&(buf->ix.chars_in_use));
+    write_UINT16(f,file,&(buf->ix.keys_in_block));
+    write_UINT16(f,file,&(buf->ix.chars_in_use));
     if ( fwrite(&(buf->ix.index_type),sizeof(char),(size_t)1,file)!=1 ) set_error(f,write_err,"write byte failed\n");
     if ( fwrite(&(buf->ix.prefix_lc), sizeof(char),(size_t)1,file)!=1 ) set_error(f,write_err,"write byte failed\n");
-    if ( fwrite(&(buf->ix.free_block_cnt),sizeof(char),(size_t)1,file)!=1 ) set_error(f,write_err,"write byte failed\n");
+    if ( fwrite(&(buf->ix.unused),sizeof(char),(size_t)1,file)!=1 ) set_error(f,write_err,"write byte failed\n");
     if ( fwrite(&(buf->ix.level),     sizeof(char),(size_t)1,file)!=1 ) set_error(f,write_err,"write byte failed\n");
-    write_int(f,file,(int)buf->ix.next.segment);
-    write_int(f,file,(int)buf->ix.next.block);
-    write_int(f,file,(int)buf->ix.prev.segment);
-    write_int(f,file,(int)buf->ix.prev.block);
-    write_int16s(f,file,(char *)buf->ix.keys,(unsigned)buf->ix.keys_in_block*2);
+    write_UINT16(f,file,&(buf->ix.next.segment));
+    write_UINT64(f,file,buf->ix.next.block);
+    write_UINT16(f,file,&(buf->ix.prev.segment));
+    write_UINT64(f,file,buf->ix.prev.block);
+    write_UINT16s(f,file,(char *)buf->ix.keys,(unsigned)buf->ix.keys_in_block*2);
     pntr_lc = buf->ix.keys_in_block * key_ptr_lc;
     remaining = keyspace_lc - pntr_lc;
     fwrite(buf->ix.keys+buf->ix.keys_in_block,(size_t) 1, (size_t) remaining,file);
-    if ( ftell(file)!=(long)(offset+block_lc) )
-      set_error(f,write_err,"**I/O failure in write_page\n");
+    if ( ftello(file)!=(FILE_OFFSET)(offset+block_lc) )
+      set_error1(f,read_err,"**I/O failure in write_page, bytes written=",(int)(ftello(file)-offset));
   }
 }
 
@@ -964,7 +1116,7 @@ static int file_ix(struct fcb *f, unsigned segment)
 static FILE *file_index(struct fcb *f, unsigned segment)
 {int ix;
 
-  if ( segment>=0 && segment<max_segments ) {
+  if ( segment<max_segments ) {
     ix = file_ix(f,segment);
     return(f->open_file[ix]);
   }
@@ -979,13 +1131,14 @@ static void set_position(struct fcb *f, int index, struct leveln_pntr b, int ix)
 
 /* Buffer handling */
 
-/* reset_ages is called when f->current_age reaches maxint.     */
-/*   The age of all open files is set to 0 and  */
+/* reset_ages is called when f->current_age reaches INT_MAX.    */
+/*   The age of all open files is set to 0 and                  */
 /*   f->current_age is set to 0.                                */
 
 static void reset_ages(struct fcb *f)
 {int i;
 
+/*  printf("**Resetting ages\n");*/
   for (i=0; i<f->open_file_cnt; i++) f->file_age[i] = 0;
   f->current_age = 0;
 }
@@ -998,7 +1151,7 @@ static void reset_ages(struct fcb *f)
   return(k);
 } */
 
-#define hash_value(b,limit)  (((b.block) + b.segment) % limit)
+#define hash_value(b,limit)  ((((int)b.block) + b.segment) % limit)
 
 
 static int search_hash_chain(struct fcb *f, struct leveln_pntr block)
@@ -1050,8 +1203,9 @@ static void hash_chain_insert(struct fcb *f, int bufix)
     }
   }
   if ( f->trace ) {
-    printf("  inserted buffer %d (%d/%lu) into hash chain %d\n",
-      bufix,block.segment,block.block,k);
+    printf("  inserted buffer %d (",bufix);
+    print_leveln_pntr("",&block);
+    printf(") into hash chain %d\n",k);
     print_hash_chain(stdout,f,k);
   }
 }
@@ -1162,9 +1316,14 @@ static int vacate_oldest_buffer(struct fcb *f)
     if ( f->buffer[oldest].modified ) {
       write_page(f,f->buffer[oldest].contents,&(f->buffer[oldest].b));
 
+      /*      printf("  wrote block %u/%u ",f->buffer[oldest].contents.segment,f->buffer[oldest].contents.block);
+      print_buffer_caption(stdout,f,oldest);
+      printf(" from buffer %d\n",oldest);*/
+
+
       /*      i = write_page_and_flush(f,f->buffer[oldest].contents,&(f->buffer[oldest].b));*/
       if ( trace_io ) {
-        printf("  wrote block %d/%lu ",f->buffer[oldest].contents.segment,f->buffer[oldest].contents.block);
+        print_leveln_pntr("  wrote block ",&(f->buffer[oldest].contents));
         print_buffer_caption(stdout,f,oldest);
         printf(" from buffer %d, %d others in window\n",oldest,i);
       }
@@ -1178,16 +1337,16 @@ static int vacate_oldest_buffer(struct fcb *f)
 static int get_buffer(struct fcb *f, struct leveln_pntr block, boolean *not_found)
 {int bufix;
 
-/*  get_buffer_cnt++; */
+/*  get_buffer_cnt++;*/
 
   f->current_age++;
-  if ( f->current_age==maxint ) reset_ages(f);
+  if ( f->current_age==INT_MAX ) reset_ages(f);
   bufix = search_hash_chain(f,block);
   *not_found = bufix<0 ;
 
   if ( *not_found ) {
 
-    /*    replace_buffer_cnt++; */
+    /*    replace_buffer_cnt++;*/
 
     bufix = vacate_oldest_buffer(f);
     f->buffer[bufix].contents = block;
@@ -1205,13 +1364,12 @@ static void set_empty_block_prefix(struct ix_block *b, struct key *prefix, unsig
   b->prefix_lc = prefix_lc;
 }
 
-static void initialize_index_block(struct ix_block *b, int index, int lvl,
+static void initialize_index_block(struct ix_block *b, int index, unsigned lvl,
   struct key *prefix, unsigned prefix_lc)
 {
   set_empty_block_prefix(b,prefix,prefix_lc);
   b->keys_in_block = 0;
   b->index_type = index;
-  b->free_block_cnt = 0;
   b->level = lvl;
   b->next = nulln_ptr;
   b->prev = nulln_ptr;
@@ -1225,7 +1383,7 @@ static int get_index(struct fcb *f, struct leveln_pntr b)
   if ( not_found ) {
     read_page(f,b,&(f->buffer[bufix].b));
     if ( trace_io ) {
-      printf("  read block %d/%lu ",b.segment,b.block);
+      print_leveln_pntr("  read block ",&b);
       print_buffer_caption(stdout,f,bufix);
       printf(" into buffer %d\n",bufix);
     }
@@ -1403,10 +1561,9 @@ static int search_block(struct fcb *f, int bufix, struct key *k, boolean *found,
   }
   /* now ix points to first entry>=k or keys_in_block */
   if ( f->trace ) {
-    printf("(%s)searched level %d block %d/%lu for k=",caller,
-      f->buffer[bufix].b.ix.level,f->buffer[bufix].contents.segment,
-      f->buffer[bufix].contents.block);
-    print_key(f->buffer[bufix].b.ix.index_type,k,"");
+    printf("(%s)searched level %d ",caller,f->buffer[bufix].b.ix.level);
+    print_leveln_pntr("block",&(f->buffer[bufix].contents));
+    print_key(f->buffer[bufix].b.ix.index_type,k,"for k=");
     if (ix>=b->keys_in_block) printf(" its larger that any in block\n");
     else if ( *found ) printf(" found it, ix=%d\n",ix);
     else printf(" not found, ix=%d\n",ix);
@@ -1423,7 +1580,7 @@ static int search_block(struct fcb *f, int bufix, struct key *k, boolean *found,
  *   the last_pntr pointer is the returned.
  */
 
-static struct leveln_pntr search_index(struct fcb *f, int index, int stop_lvl,
+static struct leveln_pntr search_index(struct fcb *f, int index, UINT32 stop_lvl,
   struct key *k)
 {struct leveln_pntr child; int ix,bufix; boolean done=false,found;
 
@@ -1561,19 +1718,19 @@ static void init_key(struct fcb *f, char id[], int lc)
 
 /* record moving */
 
-int copy_rec(struct fcb *f,struct level0_pntr *p, unsigned char rec[], int *rec_lc ,int max_rec_lc)
+int copy_rec(struct fcb *f,struct level0_pntr *p, unsigned char rec[], int *rec_lc ,unsigned max_rec_lc)
 {size_t size; FILE *file;
 
   if ( check_fcb(f) ) {
     *rec_lc = p->lc;
-    if ( *rec_lc>max_rec_lc ) {
+    if ( (unsigned)*rec_lc>max_rec_lc ) {
       f->error_code = longrec_err; *rec_lc = max_rec_lc;
     }
     if ( *rec_lc<min_disk_rec_lc ) memcpy(rec,&p->sc,(size_t) *rec_lc);
     else {
       file = file_index(f,p->segment);
       if ( f->error_code!=no_err ) return(f->error_code);
-      if ( fseek(file,(long)p->sc,0)!=0 ) {
+      if ( fseeko(file,(FILE_OFFSET)p->sc,0)!=0 ) {
         f->error_code = seek_err; return(f->error_code);
       }
       size = fread(rec,(size_t) 1,(size_t) *rec_lc,file);
@@ -1632,7 +1789,7 @@ static boolean extend_file(struct fcb *f, unsigned lc, struct leveln_pntr *p)
 {int current,ix;
 
   current = f->segment_cnt - 1;
-  if ( (max_segment_lc - f->segment_length[current]) < lc ) { /* segment full */
+  if ( (f->max_file_lc - f->segment_length[current]) < lc ) { /* segment full */
     if ( f->segment_cnt>=(max_segments-1) ) {
       set_error1(f,nospace_err,"  extend_file failed, segment=",current);
     }
@@ -1644,8 +1801,10 @@ static boolean extend_file(struct fcb *f, unsigned lc, struct leveln_pntr *p)
   p->block = f->segment_length[current] >> f->block_shift;
   /*  p->block = f->segment_length[current];*/
   f->segment_length[current] = f->segment_length[current] + lc;
-  if ( f->trace )
-    printf("  extended file, seg=%d, block=%ld, lc=%d\n",p->segment,p->block,lc);
+  if ( f->trace ) {
+    print_leveln_pntr("  extended file,",p);
+    printf("lc=%d\n",lc);
+  }
   return(f->error_code!=nospace_err);
 }
 
@@ -1661,13 +1820,16 @@ static void deallocate_block(struct fcb *f, int bufix)
   level = f->buffer[bufix].b.ix.level;
   p = f->buffer[bufix].contents;
 
-  if ( f->trace_freespace ) printf("deallocating block %d/%lu\n",p.segment,p.block);
+  if ( f->trace_freespace ) {
+    print_leveln_pntr("deallocating block",&p);
+    printf("\n");
+  }
   f->buffer[bufix].b.ix.next = f->first_free_block[level][index_type];
   f->first_free_block[level][index_type] = p;
 
 }
 
-static int allocate_index_block(struct fcb *f, int index, struct leveln_pntr *b, int lvl,
+static int allocate_index_block(struct fcb *f, int index, struct leveln_pntr *b, unsigned lvl,
   struct key *prefix, unsigned prefix_lc)
 {int bufix;
 /* printf("  allocating index block at level %d\n",lvl); */
@@ -1724,7 +1886,7 @@ static void remove_primary(struct fcb *f, int index_type)
 {int old_primary_level,bufix; struct leveln_pntr b;
 
   if ( f->trace )
-    printf("  removing primary block at level %d, index_type=%d\n",
+    printf("  removing primary block at level %u, index_type=%d\n",
       f->primary_level[index_type],index_type);
   old_primary_level = f->primary_level[index_type];
   if ( old_primary_level>0 ) {
@@ -1799,7 +1961,7 @@ struct key max; struct level0_pntr dummy;
 /*   and p is set to null.                                            */
 
 static void index_delete(struct fcb *f, int index_type, struct key k,
-  struct level0_pntr *p, int level)
+  struct level0_pntr *p, UINT32 level)
 {int bufix,ix; boolean found,at_end,update_parent; struct key old_max_key,new_separator;
  struct leveln_pntr b;
 
@@ -1812,8 +1974,9 @@ static void index_delete(struct fcb *f, int index_type, struct key k,
   ix = search_block(f,bufix,&k,&found,"ix_delete");
   if ( f->trace ) {
     print_key(index_type,&k,"deleting key=");
-    printf(" from block %d/%lu, keys_in_block(before)=%d, found=%d, ix=%d\n",
-      b.segment,b.block,f->buffer[bufix].b.ix.keys_in_block,found,ix);
+    print_leveln_pntr(" from block",&b);
+    printf("keys_in_block(before)=%d, found=%d, ix=%d\n",
+      f->buffer[bufix].b.ix.keys_in_block,found,ix);
   }
   if ( !found ) f->error_code = dltnokey_err;
   else {
@@ -2100,12 +2263,12 @@ static boolean prefix_simple_insert(struct ix_block *b, int ix, struct key *k, l
 /*   ignore the request if the old and new keys are identical.              */
 
 static void replace_max_key(struct fcb *f, int index, struct key *old_key, struct key *new_key,
-  struct leveln_pntr child, int level)
+  struct leveln_pntr child, unsigned level)
 {int ix,bufix,new_prefix_lc; unsigned new_lc;
 boolean found=false,propagate; struct leveln_pntr p; struct key k; levelx_pntr px,childx;
 
   if ( level>f->primary_level[index] ){
-    set_error1(f,repl_max_key_err,"**trying to replace_max_key in level above primary=",level);
+    set_error1(f,repl_max_key_err,"**trying to replace_max_key in level above primary=",(int) level);
   }
   else if ( !eq_key(old_key,new_key) ) {
     p = search_index(f,index,level+1,old_key);
@@ -2118,19 +2281,23 @@ boolean found=false,propagate; struct leveln_pntr p; struct key k; levelx_pntr p
       printf("  replacing max_key\n");
       print_key(index,old_key,"    old="); printf("\n");
       print_key(index,new_key,"    new=");
-      printf("\n    level=%d, child=%d/%lu, propagate=%d\n",level,child.segment,child.block,propagate);
+      printf("\n    level=%u,",level);
+      print_leveln_pntr("child=",&child);
+      printf("propagate=%d\n",propagate);
     }
     if ( !found || !eq_pntr(child,px.pn) ) {
       if ( ix==f->buffer[bufix].b.ix.keys_in_block && null_pntr(f->buffer[bufix].b.ix.next) ) {/* ok */}
       else {
         f->error_code = ix_struct_err;
         if ( show_errors ) {  
-          printf("**Uh oh. Couldn't find entry in replace_max_key, found=%d, level=%d\n",found,level);
+          printf("**Uh oh. Couldn't find entry in replace_max_key, found=%d, level=%u\n",found,level);
           print_key(index,old_key,"  old key=");
           print_key(index,new_key,", new key=");
-          printf(" child=%d/%lu, px=%d/%lu\n",child.segment,child.block,px.pn.segment,px.pn.block);
-          printf(" ix=%d, keys_in_block=%d, next_ptr=%d/%lu\n",ix,f->buffer[bufix].b.ix.keys_in_block,
-            f->buffer[bufix].b.ix.next.segment,f->buffer[bufix].b.ix.next.block);
+          print_leveln_pntr(" child=",&child);
+          print_leveln_pntr("px=",&(px.pn));
+          printf("\n ix=%d, keys_in_block=%d, ",ix,f->buffer[bufix].b.ix.keys_in_block);
+          print_leveln_pntr("next_ptr=",&(f->buffer[bufix].b.ix.next));
+          printf("\n");
 	}
       }
     }
@@ -2158,12 +2325,12 @@ boolean found=false,propagate; struct leveln_pntr p; struct key k; levelx_pntr p
 /*   old_key==new_key and that it is only the key that is propagated upward. */
 
 static boolean replace_max_key_and_pntr(struct fcb *f, int index, struct key *old_key, struct key *new_key,
-  struct leveln_pntr old_child, struct leveln_pntr new_child, int level)
+  struct leveln_pntr old_child, struct leveln_pntr new_child, unsigned level)
 {int ix,bufix,new_prefix_lc; unsigned new_lc;
 boolean found=false,propagate,split=false; struct leveln_pntr p; struct key k; levelx_pntr px,childx;
 
   if ( level>f->primary_level[index] ){
-    set_error1(f,repl_max_key_err,"**trying to replace_max_key_and_pntr in level above primary=",level);
+    set_error1(f,repl_max_key_err,"**trying to replace_max_key_and_pntr in level above primary=",(int)level);
   }
   else {
     p = search_index(f,index,level+1,old_key);
@@ -2177,16 +2344,21 @@ boolean found=false,propagate,split=false; struct leveln_pntr p; struct key k; l
       print_key(index,old_key,"    old=");
       printf("\n");
       print_key(index,new_key,"    new=");
-      printf("\n    level=%d, old_child=%d/%lu, new_child=%d/%lu, propagate=%d\n",
-        level,old_child.segment,old_child.block,new_child.segment,new_child.block,propagate);
+      printf("\n    level=%d, ",level);
+      print_leveln_pntr("old_child=",&old_child);
+      print_leveln_pntr("new_child=",&new_child);
+      printf("propagate=%d\n",propagate);
     }
     if ( !found || !eq_pntr(old_child,px.pn) ) {
       if ( ix==f->buffer[bufix].b.ix.keys_in_block && null_pntr(f->buffer[bufix].b.ix.next) ) {
         if ( !eq_pntr(f->last_pntr[level][index],old_child) ) {
           f->error_code = ix_struct_err;
-          if ( show_errors )
-            printf("**last_pntr[%d][%d]=%d/%lu doesn't match old_child=%d/%lu\n",level,index,
-	      f->last_pntr[level][index].segment,f->last_pntr[level][index].block,old_child.segment,old_child.block);
+          if ( show_errors ) {
+            printf("**last_pntr[%d][%d]",level,index);
+            print_leveln_pntr("=",&(f->last_pntr[level][index]));
+            print_leveln_pntr("doesn't match old_child=",&old_child);
+            printf("\n");
+	  }
 	}
         f->last_pntr[level][index] = new_child;
       }
@@ -2196,7 +2368,9 @@ boolean found=false,propagate,split=false; struct leveln_pntr p; struct key k; l
           printf("**Uh oh. Couldn't find entry in replace_max_key_and_pntr, found=%d, level=%d\n",found,level);
           print_key(index,old_key,"  old key=");
           print_key(index,new_key,", new key=");
-          printf(" old_child=%d/%lu, px=%d/%lu\n",old_child.segment,old_child.block,px.pn.segment,px.pn.block);
+          print_leveln_pntr(" old_child=",&old_child);
+          print_leveln_pntr("px=",&(px.pn));
+          printf("\n");
 	}
       }
     }
@@ -2572,7 +2746,8 @@ struct ix_block *rt, struct key *k, levelx_pntr *new_p, int ix, boolean insert)
 }
 
 static boolean shuffle_keys(struct fcb *f, int mid_ix, struct key *k, levelx_pntr *p, int ix, boolean insert)
-{int lt_ix,rt_ix,level,index_type; boolean shuffled=false; struct key lt_sep,old_lt_sep,mid_sep,old_mid_sep;
+{int lt_ix,rt_ix,index_type; unsigned level;
+ boolean shuffled=false; struct key lt_sep,old_lt_sep,mid_sep,old_mid_sep;
 
   lock_buffer(f,mid_ix);
   get_max_key(&(f->buffer[mid_ix].b.ix),&old_mid_sep);
@@ -2596,9 +2771,9 @@ static boolean shuffle_keys(struct fcb *f, int mid_ix, struct key *k, levelx_pnt
       shuffled = true;
       if ( level<f->primary_level[index_type] ) {
         get_max_key(&(f->buffer[lt_ix].b.ix),&lt_sep);
-        replace_max_key(f,index_type,&old_lt_sep,&lt_sep,f->buffer[lt_ix].contents,f->buffer[lt_ix].b.ix.level+1);
+        replace_max_key(f,index_type,&old_lt_sep,&lt_sep,f->buffer[lt_ix].contents,(unsigned)f->buffer[lt_ix].b.ix.level+1);
         get_max_key(&(f->buffer[mid_ix].b.ix),&mid_sep);
-        replace_max_key(f,index_type,&old_mid_sep,&mid_sep,f->buffer[mid_ix].contents,f->buffer[mid_ix].b.ix.level+1);
+        replace_max_key(f,index_type,&old_mid_sep,&mid_sep,f->buffer[mid_ix].contents,(unsigned)f->buffer[mid_ix].b.ix.level+1);
       }
       mark_modified(f,lt_ix);
       mark_modified(f,rt_ix);
@@ -2637,7 +2812,7 @@ static void create_new_primary(struct fcb *f, int index, struct leveln_pntr b, s
     f->last_pntr[f->primary_level[index]][index] = newb;
 
     if ( f->trace )
-      printf("  creating new %s primary, levels are %s=%d,%s=%d,%s=%d\n",index_caption[index],
+      printf("  creating new %s primary, levels are %s=%u,%s=%u,%s=%u\n",index_caption[index],
 	   index_caption[user_ix],f->primary_level[user_ix],
 	   index_caption[free_rec_ix],f->primary_level[free_rec_ix],
 	   index_caption[free_lc_ix],f->primary_level[free_lc_ix]);
@@ -2660,9 +2835,9 @@ static void create_new_primary(struct fcb *f, int index, struct leveln_pntr b, s
 /*   splits result in a new primary.                                */
 
 static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, int ix, boolean insert)
-{int new_ix,parent_level,i,index_type,new_prefix_lc,
+{int new_ix,i,index_type,new_prefix_lc,
   old_block_lc,cnt,new_block_lc;
- unsigned old_block_prefix_lc,new_block_prefix_lc,target;
+ unsigned parent_level,old_block_prefix_lc,new_block_prefix_lc,target;
  boolean split,seq,new_on_right,moved_new_key;
  struct leveln_pntr parent,oldb,newb,save_next,leftb,rightb;
  struct key left_max,right_max,original_max_key,old_max,new_max,temp; levelx_pntr leftbx;
@@ -2685,8 +2860,9 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, 
   new_block = &(f->buffer[new_ix].b.ix);
 
   if ( f->trace ) {
-    printf("splitting block %d/%lu, new block is %d/%lu, insert=%d, target=%d, seq=%d, ix=%d\n",
-      oldb.segment,oldb.block,newb.segment,newb.block,insert,target,seq,ix);
+    print_leveln_pntr("splitting block ",&oldb);
+    print_leveln_pntr("new block is ",&newb);
+    printf("insert=%d, target=%d, seq=%d, ix=%d\n",insert,target,seq,ix);
     print_key(index_type,k,"  ins/rep key=");
     printf("\n");
     print_key(index_type,&original_max_key,"  orig_max_key=");
@@ -2783,7 +2959,10 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, 
       split = replace_max_key_and_pntr(f,index_type,&original_max_key,&right_max,oldb,rightb,parent_level);
       if ( split ) {
         parent = search_index(f,index_type,parent_level+1,&left_max);
-        if ( f->trace ) printf("  parent after replace_max split is %d/%lu\n",parent.segment,parent.block);
+        if ( f->trace ) {
+          print_leveln_pntr("  parent after replace_max split is ",&parent);
+          printf("\n");
+	}
       }
       update_index(f,&left_max,parent,leftbx);
     }
@@ -2796,8 +2975,8 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, 
 /*   return              */  
 
 static void update_index1(struct fcb *f, struct key *k, levelx_pntr p, int bufix, int ix, boolean insert)
-{int level,index_type,update_type,new_prefix_lc;
- unsigned new_lc;
+{int index_type,update_type,new_prefix_lc;
+ unsigned level,new_lc;
  boolean at_end,update_parent=false;
  struct key old_max_key; struct leveln_pntr b;
 
@@ -2810,8 +2989,8 @@ static void update_index1(struct fcb *f, struct key *k, levelx_pntr p, int bufix
   }
   if ( f->trace ) {
     b = f->buffer[bufix].contents;
-    printf("  updating block %d/%lu with key=",b.segment,b.block);
-    print_key(index_type,k,""); printf(", ");
+    print_leveln_pntr("  updating block ",&b);
+    print_key(index_type,k,"with key="); printf(", ");
   }
   if ( insert )
     new_lc = ix_pool_lc_after_insert(&(f->buffer[bufix].b.ix),k,&p,ix,&new_prefix_lc,false);
@@ -2822,7 +3001,7 @@ static void update_index1(struct fcb *f, struct key *k, levelx_pntr p, int bufix
     update_type = 0;
     if ( f->trace ) printf("simple insert\n");
     if ( update_parent )
-      replace_max_key(f,index_type,&old_max_key,k,f->buffer[bufix].contents,level+1);
+      replace_max_key(f,index_type,&old_max_key,k,f->buffer[bufix].contents,(unsigned)level+1);
   }
   else if ( shuffle_keys(f,bufix,k,&p,ix,insert) ) {
     update_type = 1;
@@ -2907,7 +3086,7 @@ struct key old_max_key;
   unlock_buffer(f,bufix);
 }*/
 
-/* record moving -- if the record is so short that it fits in a long */
+/* record moving -- if the record is so short that it fits in a UINT32 */
 /*   then it is kept in the sc field of the pointer, otherwise the   */
 /*   record is written to disk     */
 
@@ -2919,7 +3098,7 @@ static void move_from_rec(struct fcb *f, char r[], struct level0_pntr *p)
   else {
     file = file_index(f,p->segment);
     if ( f->error_code!=no_err ) return;
-    if ( fseek(file,(long)p->sc,0)!=0 ) {
+    if ( fseeko(file,(FILE_OFFSET)p->sc,0)!=0 ) {
       f->error_code = seek_err; return;
     }
     lc = p->lc;
@@ -2942,9 +3121,10 @@ static void extract_next(struct fcb *f, int index, int bufix, char t[], int *key
     t[0] = '\0'; *key_lc = 0; *p = null0_ptr;
     if ( null_pntr(f->buffer[bufix].b.ix.next) ) f->error_code = ateof_err;
     else if ( show_errors ) {
-      printf("**Uh Oh.  Error in extract_next, block=%d/%lu, index=%d, position=%d, keys=%d, next=%d/%lu\n",
-        f->buffer[bufix].contents.segment,f->buffer[bufix].contents.block,index,f->position_ix[index],
-        f->buffer[bufix].b.ix.keys_in_block,f->buffer[bufix].b.ix.next.segment,f->buffer[bufix].b.ix.next.block);
+      print_leveln_pntr("**Uh Oh.  Error in extract_next, block=",&(f->buffer[bufix].contents));
+      printf("index=%d, position=%d, keys=%d, ",index,f->position_ix[index],f->buffer[bufix].b.ix.keys_in_block);
+      print_leveln_pntr("next",&(f->buffer[bufix].b.ix.next));
+      printf("\n");
     }
   }
   else {
@@ -2984,11 +3164,11 @@ int kf_next_ptr(struct fcb *f, int index, unsigned char key[], int *key_lc, int 
 }
 
 int kf_next_rec(struct fcb *f, int index, unsigned char t[], int *key_lc, int max_key_lc,
-   char r[],int *rlc,int max_lc)
+   char r[],int *rlc, int max_lc)
 {struct level0_pntr p;
 
   kf_next_ptr(f,index,t,key_lc,max_key_lc,&p);
-  if ( f->error_code==no_err ) copy_rec(f,&p,r,rlc,max_lc);
+  if ( f->error_code==no_err ) copy_rec(f,&p,r,rlc,(unsigned)max_lc);
   else *rlc = 0;
   return(f->error_code);
 }
@@ -3029,7 +3209,7 @@ static int kf_prev_ptr(struct fcb *f, int index, unsigned char t[], int *key_lc,
 }
 
 static int kf_prev_rec(struct fcb *f, int index, char t[], int *key_lc, int max_key_lc,
-   char r[],int *rlc,int max_lc)
+   char r[],int *rlc, unsigned max_lc)
 {struct level0_pntr p;
 
   kf_prev_ptr(f,index,t,key_lc,max_key_lc,&p);
@@ -3056,11 +3236,11 @@ char t1[maxkey_lc];
   return(f->error_code);
 }
 
-static int kf_get_rec(struct fcb *f,int index, unsigned char t[],int key_lc, unsigned char r[],int *rlc,int max_lc)
+static int kf_get_rec(struct fcb *f,int index, unsigned char t[],int key_lc, unsigned char r[], unsigned *rlc,int max_lc)
 {struct level0_pntr p;
 
   kf_get_ptr(f,index,t,key_lc,&p);
-  if ( f->error_code==no_err ) copy_rec(f,&p,r,rlc,max_lc);
+  if ( f->error_code==no_err ) copy_rec(f,&p,r,rlc,(unsigned)max_lc);
   else *rlc = 0;
   return(f->error_code);
 }
@@ -3095,7 +3275,7 @@ static int kf_delete_ptr(struct fcb *f, int index, char t[], int key_lc)
   return(f->error_code);
 }
 
-static int kf_put_rec(struct fcb *f,int index, unsigned char t[], int key_lc, char r[], int rlc)
+static int kf_put_rec(struct fcb *f,int index, unsigned char t[], int key_lc, char r[], unsigned rlc)
 {int ix,bufix,lc; boolean have_space=false,found; char t1[maxkey_lc];
  struct key k; struct leveln_pntr b; struct level0_pntr p; levelx_pntr px;
 
@@ -3115,17 +3295,17 @@ static int kf_put_rec(struct fcb *f,int index, unsigned char t[], int key_lc, ch
           have_space = true; p = dummy_ptr; p.lc = rlc;
         }
         else { /* new rec goes on disk */
-          if ( p.lc>=min_disk_rec_lc && (rec_allocation_lc(rlc)==rec_allocation_lc((int)p.lc)) ) {
+          if ( p.lc>=min_disk_rec_lc && (rec_allocation_lc(rlc)==rec_allocation_lc(p.lc)) ) {
             have_space = true; p.lc = rlc;
           }
           else {
             if ( p.lc>=min_disk_rec_lc ) deallocate_rec(f,p);
-            have_space =  allocate_rec(f,(long)rlc,&p);
+            have_space =  allocate_rec(f,rlc,&p);
           }
         }
       }
       else {
-        have_space = allocate_rec(f,(long)rlc,&p);
+        have_space = allocate_rec(f,rlc,&p);
       }
       if ( have_space ) {
         move_from_rec(f,r,&p); 
@@ -3172,11 +3352,11 @@ static boolean contiguous(struct level0_pntr p1, struct level0_pntr p2)
 /*   allocated.  One is returned and the rest are initialized,       */
 /*   and placed on the free block chain for this level.     */
 
-static int allocate_block(struct fcb *f, int index_type, int level)
+static int allocate_block(struct fcb *f, int index_type, unsigned level)
 {int i,bufix=0,temp; struct leveln_pntr p,p1; block_type_t b; struct key k;
 
   if ( null_pntr(f->first_free_block[level][index_type]) ) {
-    if ( extend_file(f,(unsigned)block_allocation_unit*block_lc,&p) ) {
+    if ( extend_file(f,(unsigned)(block_allocation_unit*block_lc),&p) ) {
       /* add blocks after the first to a free_block chain */
       p1.segment = p.segment;
       p1.block = p.block+1;
@@ -3209,60 +3389,81 @@ static int allocate_block(struct fcb *f, int index_type, int level)
     bufix = get_index_update(f,p);
     f->first_free_block[level][index_type] = f->buffer[bufix].b.ix.next;
   }
-  if ( f->trace_freespace )
-    printf("  just allocated block in buf=%d, seg=%d, block=%ld, seg_cnt=%d\n",
-      bufix,p.segment,p.block,f->segment_cnt);
+  if ( f->trace_freespace ) {
+    print_leveln_pntr("  just allocated block ",&p);
+    printf("in buf=%d, seg_cnt=%u\n",bufix,f->segment_cnt);
+  }
   return(bufix);
 }
 
-static int unpack_int(unsigned char key[], unsigned long *n)
+static int unpack_16bit(unsigned char key[], UINT16 *n)
 {unsigned i;
 
   *n = 0;
-  for (i=0; i<sizeof(unsigned long); i++) {
+  for (i=0; i<sizeof(UINT16); i++) {
     *n = (*n << 8) + key[i];
   }
-  return(sizeof(unsigned long));
+  return(sizeof(UINT16));
 }
 
-static int unpack_int16(unsigned char key[], unsigned int *n)
+static int unpack_32bit(unsigned char key[], UINT32 *n)
 {unsigned i;
 
   *n = 0;
-  for (i=0; i<sizeof(int16); i++) {
+  for (i=0; i<sizeof(UINT32); i++) {
     *n = (*n << 8) + key[i];
   }
-  return(sizeof(int16));
+  return(sizeof(UINT32));
 }
 
-static int pack_int(unsigned char key[], unsigned long n)
+static int unpack_64bit(unsigned char key[], UINT64 *n)
+{unsigned i;
+
+  *n = 0;
+  for (i=0; i<sizeof(UINT64); i++) {
+    *n = (*n << 8) + key[i];
+  }
+  return(sizeof(UINT64));
+}
+
+static int pack_16bit(unsigned char key[], UINT32 n)
 {int i;
 
-  for (i=sizeof(unsigned long)-1; i>=0 ; i--) {
+  for (i=1; i>=0 ; i--) {
     key[i] = n & 255;
     n = n >> 8;
   }
-  return(sizeof(unsigned long));
+  return((int)sizeof(UINT16));
 }
 
-static int pack_int16(unsigned char key[], unsigned int n)
+static int pack_32bit(unsigned char key[], UINT32 n)
 {int i;
 
-  for (i=sizeof(int16)-1; i>=0 ; i--) {
+  for (i=sizeof(UINT32)-1; i>=0 ; i--) {
     key[i] = n & 255;
     n = n >> 8;
   }
-  return(sizeof(int16));
+  return((int)sizeof(UINT32));
+}
+
+static int pack_64bit(unsigned char key[], UINT64 n)
+{int i;
+
+  for (i=sizeof(UINT64)-1; i>=0 ; i--) {
+    key[i] = n & 255;
+    n = n >> 8;
+  }
+  return((int)sizeof(UINT64));
 }
 
 int unpack_lc_key(unsigned char key[], struct level0_pntr *p)
-{int lc,segment; segment_offset_t sc; rec_lc_t plc;
+{int lc; UINT16 segment; UINT32 plc; UINT64 sc;
 
-  lc = unpack_int(key,&plc);
+  lc = unpack_32bit(key,&plc);
   p->lc = plc;
-  lc = lc + unpack_int16(key+lc,&segment);
+  lc = lc + unpack_16bit(key+lc,&segment);
   p->segment = segment;
-  lc = lc + unpack_int(key+lc,&sc);
+  lc = lc + unpack_64bit(key+lc,&sc);
   p->sc = sc;
   /*  printf("unpacked lc key %d/%d/%d, lc=%d\n",p->lc,p->segment,p->sc,lc);*/
   return(lc);
@@ -3271,18 +3472,18 @@ int unpack_lc_key(unsigned char key[], struct level0_pntr *p)
 static int pack_lc_key(unsigned char key[], struct level0_pntr p)
 {int lc;
 
-  lc = pack_int(key,p.lc);
-  lc = lc + pack_int16(key+lc,p.segment);
-  lc = lc + pack_int(key+lc,p.sc);
+  lc = pack_32bit(key,p.lc);
+  lc = lc + pack_16bit(key+lc,p.segment);
+  lc = lc + pack_64bit(key+lc,p.sc);
   return(lc);
 }
 
 int unpack_rec_key(unsigned char key[], struct level0_pntr *p)
-{int lc,segment; segment_offset_t sc;
+{int lc; UINT16 segment; UINT64 sc;
 
-  lc = unpack_int16(key,&segment);
+  lc = unpack_16bit(key,&segment);
   p->segment = segment;
-  lc = lc + unpack_int(key+lc,&sc);
+  lc = lc + unpack_64bit(key+lc,&sc);
   p->sc = sc;
   /* printf("unpacked rec key %d/%d, lc=%d\n",p->segment,p->sc,lc);*/
   return(lc);
@@ -3291,17 +3492,20 @@ int unpack_rec_key(unsigned char key[], struct level0_pntr *p)
 static int pack_rec_key(unsigned char key[], struct level0_pntr p)
 {int lc;
 
-  lc = pack_int16(key,p.segment);
-  lc = lc + pack_int(key+lc,p.sc);
+  lc = pack_16bit(key,p.segment);
+  lc = lc + pack_64bit(key+lc,p.sc);
   return(lc);
 }
 
 static void insert_freespace_entry(struct fcb *f, struct level0_pntr *p0)
 {int err,key_lc; unsigned char key[maxkey_lc]; struct level0_pntr p;
 
-  if ( f->trace_freespace ) printf("inserting freespace entry %d/%lu/%lu\n",p0->segment,p0->sc,p0->lc);
+  if ( f->trace_freespace ) {
+    print_level0_pntr("inserting freespace entry ",p0);
+    printf("\n");
+  }
   p = *p0;
-  p.lc = rec_allocation_lc((int)p0->lc);
+  p.lc = rec_allocation_lc(p0->lc);
   key_lc = pack_lc_key(key,p);
   err = kf_put_ptr(f,free_lc_ix,key,key_lc,dummy_ptr);
   if ( err!=no_err ) {
@@ -3309,7 +3513,7 @@ static void insert_freespace_entry(struct fcb *f, struct level0_pntr *p0)
   }
   else {
     key_lc = pack_rec_key(key,p);
-    err = kf_put_rec(f,free_rec_ix,key,key_lc,(char *) &(p.lc),sizeof(int));
+    err = kf_put_rec(f,free_rec_ix,key,key_lc,(char *) &(p.lc),(unsigned)sizeof(int));
     if ( err!=no_err ) {
       set_error1(f,free_insrt_err,"**Couldn't insert free_rec entry, err=",err);
     }
@@ -3319,32 +3523,40 @@ static void insert_freespace_entry(struct fcb *f, struct level0_pntr *p0)
 static void delete_freespace_entry(struct fcb *f, struct level0_pntr *p0)
 {int err,key_lc; unsigned char key[maxkey_lc]; struct level0_pntr p;
 
-  if ( f->trace_freespace ) printf("deleting freespace entry %d/%lu/%lu\n",p0->segment,p0->sc,p0->lc);
+  if ( f->trace_freespace ) {
+    print_level0_pntr("deleting freespace entry ",p0);
+    printf("\n");
+  }
   p = *p0;
-  p.lc = rec_allocation_lc((int)p0->lc);
+  p.lc = rec_allocation_lc(p0->lc);
   key_lc = pack_lc_key(key,p);
   err = kf_delete_ptr(f,free_lc_ix,key,key_lc);
   if ( err!=no_err ) {
     f->error_code = free_dlt_err;
-    if ( show_errors ) printf("**Couldn't delete free_lc entry %lu/%d/%lu, err=%d\n",p.lc,p.segment,p.sc,err);
+    if ( show_errors ) {
+      print_level0_pntr("**Couldn't delete free_lc entry ",&p);
+      printf("err=%d\n",err);
+    }
   }
   else {
     key_lc = pack_rec_key(key,p);
     err = kf_delete_rec(f,free_rec_ix,key,key_lc);
     if ( err!=no_err ) {
       f->error_code = free_dlt_err;
-      if ( show_errors )
-        printf("**Couldn't delete free_rec entry %d/%lu, err=%d, free_rec_ix=%d\n",p.segment,p.sc,err,free_rec_ix);
+      if ( show_errors ) {
+        print_level0_pntr("**Couldn't delete free_rec entry ",&p);
+        printf("err=%d, free_rec_ix=%d\n",err,free_rec_ix);
+      }
     }
   }
 }
 
-static boolean allocate_rec(struct fcb *f, long lc, struct level0_pntr *p)
+static boolean allocate_rec(struct fcb *f, unsigned lc, struct level0_pntr *p)
 {int err,key_lc; unsigned block_allocate_lc,rec_allocate_lc; boolean have_space=false;
  unsigned char key[maxkey_lc];
  struct level0_pntr p0,p1; struct leveln_pntr pn;
 
-  if ( f->trace_freespace ) printf("allocating rec lc=%lu\n",lc);
+  if ( f->trace_freespace ) printf("allocating rec lc=%u\n",lc);
   p->segment = 0; p->sc = 0; p->lc = lc;
   if ( lc<min_disk_rec_lc ) have_space = true;
   else {
@@ -3357,7 +3569,7 @@ static boolean allocate_rec(struct fcb *f, long lc, struct level0_pntr *p)
       if ( err!=no_err ) {
         set_error1(f,alloc_rec_err,"**Couldn't get free_lc entry, err=",err);
       }
-      if ( key_lc!=10 ) set_error(f,alloc_rec_err,"**Uh Oh. free_lc_key is wrong size\n");
+      if ( key_lc!=freespace_lc_key_lc ) set_error1(f,alloc_rec_err,"**Uh Oh. Expected free_lc_key to be 14, is=",key_lc);
       unpack_lc_key(key,&p0);
       if ( p0.lc>=rec_allocate_lc ) {
         have_space = true;
@@ -3370,7 +3582,7 @@ static boolean allocate_rec(struct fcb *f, long lc, struct level0_pntr *p)
       }
     }
     if ( !have_space ) {
-      block_allocate_lc = allocation_lc(lc,16*block_lc);
+      block_allocate_lc = allocation_lc(lc,(unsigned)(16*block_lc));
       have_space = extend_file(f,block_allocate_lc,&pn);
       p->segment = pn.segment;
       p->sc = pn.block << f->block_shift;
@@ -3401,17 +3613,23 @@ static boolean allocate_rec(struct fcb *f, long lc, struct level0_pntr *p)
 static void deallocate_rec(struct fcb *f, struct level0_pntr p)
 {int err,key_lc,start_key_lc,lc,rec_lc; struct level0_pntr p0,p1; char start_key[maxkey_lc],key[maxkey_lc];
 
-  if ( f->trace_freespace ) printf("deallocating rec %d/%lu/%lu\n",p.segment,p.sc,p.lc);
+  if ( f->trace_freespace ) {
+    print_level0_pntr("deallocating rec ",&p);
+    printf("\n");
+  }
   if ( p.lc >= min_disk_rec_lc ) { /* a real disk record */
     p0 = p;
-    p0.lc = rec_allocation_lc((int)p.lc);
+    p0.lc = rec_allocation_lc(p.lc);
     start_key_lc = pack_rec_key(start_key,p0);
-    err = kf_get_rec(f,free_rec_ix,start_key,start_key_lc,(char *) &lc,&rec_lc,sizeof(int));
+    err = kf_get_rec(f,free_rec_ix,start_key,start_key_lc,(char *) &lc,&rec_lc,(unsigned)sizeof(int));
     if ( err==no_err ) {
       f->error_code = dealloc_rec_err;
-      if ( show_errors ) printf("**Uh Oh. Trying to deallocate entry allready in free list %d/%lu\n",p0.segment,p0.sc);
+      if ( show_errors ) {
+        print_level0_pntr("**Uh Oh. Trying to deallocate entry allready in free list ",&p0);
+        printf("\n");
+      }
     }
-    err = kf_prev_rec(f,free_rec_ix,key,&key_lc,maxkey_lc,(char *) &lc,&rec_lc,sizeof(int));
+    err = kf_prev_rec(f,free_rec_ix,key,&key_lc,maxkey_lc,(char *) &lc,&rec_lc,(unsigned)sizeof(int));
     if ( err==atbof_err ) /* nothing to merge */ { if ( f->trace_freespace ) printf("prev is bof\n"); }
     else if ( err!=no_err ) {
       set_error1(f,dealloc_rec_err,"**couldn't get prev rec in deallocate_rec, err=",err);
@@ -3419,18 +3637,18 @@ static void deallocate_rec(struct fcb *f, struct level0_pntr p)
     else {
       key_lc = unpack_rec_key(key,&p1);
       p1.lc = lc;
-      if ( f->trace_freespace ) printf("prev rec is %d/%lu/%lu",p1.segment,p1.sc,p1.lc);
+      if ( f->trace_freespace ) print_level0_pntr("prev rec is ",&p1);
       if ( contiguous(p1,p0) ) {
         delete_freespace_entry(f,&p1);
         p0.sc = p1.sc;
         p0.lc = p0.lc + p1.lc;
-        if ( f->trace_freespace ) printf(" contiguous, merged entry is %d/%lu/%lu",p0.segment,p0.sc,p0.lc);
-        err = kf_get_rec(f,free_rec_ix,start_key,start_key_lc,(char *) &lc,&rec_lc,sizeof(int));
+        if ( f->trace_freespace ) print_level0_pntr("contiguous, merged entry is ",&p0);
+        err = kf_get_rec(f,free_rec_ix,start_key,start_key_lc,(char *) &lc,&rec_lc,(unsigned)sizeof(int));
       }
       else err = kf_next_ptr(f,free_rec_ix,key,&key_lc,maxkey_lc,&p1 /*get past current entry*/);
       if ( f->trace_freespace ) printf("\n");
     }
-    err = kf_next_rec(f,free_rec_ix,key,&key_lc,maxkey_lc,(char *) &lc,&rec_lc,sizeof(int));
+    err = kf_next_rec(f,free_rec_ix,key,&key_lc,maxkey_lc,(char *) &lc,&rec_lc,(int)sizeof(int));
     if ( err==ateof_err ) /* nothing to merge */ { if ( f->trace_freespace ) printf("next is eof\n"); }
     else if ( err!=no_err ) {
       set_error1(f,dealloc_rec_err,"**couldn't get next rec in deallocate_rec, err=",err);
@@ -3438,11 +3656,11 @@ static void deallocate_rec(struct fcb *f, struct level0_pntr p)
     else {
       key_lc = unpack_rec_key(key,&p1);
       p1.lc = lc;
-      if ( f->trace_freespace ) printf("next rec is %d/%lu/%lu",p1.segment,p1.sc,p1.lc);
+      if ( f->trace_freespace ) print_level0_pntr("next rec is ",&p1);
       if ( contiguous(p0,p1) ) {
         delete_freespace_entry(f,&p1);
         p0.lc = p0.lc + p1.lc;
-        if ( f->trace_freespace ) printf(" contiguous, merged entry is %d/%lu/%lu",p0.segment,p0.sc,p0.lc);
+        if ( f->trace_freespace ) print_level0_pntr(" contiguous, merged entry is ",&p0);
       }
       if ( f->trace_freespace ) printf("\n");
     }
@@ -3499,7 +3717,7 @@ int open_key(struct fcb *f, char id[], int lc, int read_only)
 }
 
 int close_key(struct fcb *f)
-{int i; long lc; FILE *temp;
+{int i; FILE *temp;
 
 /* printf("  get_buffer_cnt=%d, replace_buffer_cnt=%d\n",get_buffer_cnt,replace_buffer_cnt);*/
 /* printf("  get_index_cnt=%d\n",get_index_cnt); */
@@ -3514,7 +3732,7 @@ int close_key(struct fcb *f)
       if (f->buffer[i].modified){
         write_page(f,f->buffer[i].contents,&(f->buffer[i].b) );
         if ( trace_io ) {
-          printf("  wrote block %d/%lu ",f->buffer[i].contents.segment,f->buffer[i].contents.block);
+          print_leveln_pntr("  wrote block ",&(f->buffer[i].contents));
           print_buffer_caption(stdout,f,i);
           printf(" from buffer %d\n",i);
         }
@@ -3525,11 +3743,8 @@ int close_key(struct fcb *f)
     }
     write_fib(f);
     for (i=0; i<f->open_file_cnt; i++) {
-      lc = f->segment_length[f->open_segment[i]];
-      if (f->trace) printf("  closing segment %d, length=%ld\n",
-        f->open_segment[i],lc);
+      if (f->trace) printf("  closing segment %d\n",f->open_segment[i]);
       temp = f->open_file[i];
-      /*      fseek(temp,lc,0); fputc(' ',temp);*/
       fclose(temp);
     }
     f->marker = 0;
@@ -3552,6 +3767,9 @@ int create_key(struct fcb *f, char id[], int lc)
       f->last_pntr[j][i] = nulln_ptr;
     }
   }
+  f->max_file_lc = 1;
+  for (i=0; i<file_lc_bits; i++) f->max_file_lc = f->max_file_lc * 2;
+  f->max_file_lc = f->max_file_lc - 1;
   for (i=0; i<max_segments; i++) f->segment_length[i] = 0;
 
   if ( f->error_code==no_err ) {
@@ -3605,7 +3823,7 @@ int next_rec(struct fcb *f, char t[], int *key_lc, int max_key_lc,
 int prev_rec(struct fcb *f, char t[], int *key_lc, int max_key_lc,
    char r[],int *rlc,int max_lc)
 {
-  return( kf_prev_rec(f,user_ix,t,key_lc,max_key_lc,r,rlc,max_lc) );
+  return( kf_prev_rec(f,user_ix,t,key_lc,max_key_lc,r,rlc,(unsigned)max_lc) );
 }
 
 int put_ptr(struct fcb *f, char t[], int key_lc, struct level0_pntr *p)
@@ -3620,7 +3838,7 @@ int delete_ptr(struct fcb *f, char t[], int key_lc)
 
 int put_rec(struct fcb *f,char t[], int key_lc, char r[], int rlc)
 {
-  return( kf_put_rec(f,user_ix,t,key_lc,r,rlc) );
+  return( kf_put_rec(f,user_ix,t,key_lc,r,(unsigned)rlc) );
 }
 
 int delete_rec(struct fcb *f, unsigned char key[], int key_lc)
@@ -3666,7 +3884,7 @@ int get_subrec(
     else {
       file = file_index(f,p->segment);
       if ( f->error_code!=no_err ) return(f->error_code);
-      if ( fseek(file,(long)p->sc+offset,0)!=0 ) {
+      if ( fseeko(file,(FILE_OFFSET)p->sc+offset,0)!=0 ) {
         f->error_code = seek_err; return(f->error_code);
       }
       size = fread(rec,(size_t) 1,(size_t) *bytes_actually_read,file);

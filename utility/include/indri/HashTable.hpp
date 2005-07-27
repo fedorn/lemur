@@ -92,10 +92,10 @@ namespace indri
     };
 
     //
-    // HashTableIterator<_Key, _Value, _Comparator>
+    // HashTableIterator<_Key, _Value>
     //
 
-    template<class _Key, class _Value, class _Comparator>
+    template<class _Key, class _Value>
     class HashTableIterator {
     private:
       typedef HashBucket<_Key, _Value> bucket_type;
@@ -179,14 +179,14 @@ namespace indri
     template<class _Key, class _Value, class _HashFunction = GenericHash<_Key>, class _Comparator = GenericComparator<_Key> >
     class HashTable {
     public:
-      friend class HashTableIterator<_Key, _Value, _Comparator>;
+      friend class HashTableIterator<_Key, _Value>;
 
       typedef HashBucket<_Key, _Value> bucket_type;
       typedef _Key key_type;
       typedef _Value value_type;
       typedef _HashFunction hash_type;
       typedef _Comparator compare_type;
-      typedef class HashTableIterator<_Key, _Value, _Comparator> iterator;
+      typedef class HashTableIterator<_Key, _Value> iterator;
 
     private:
       indri::utility::RegionAllocator* _allocator;

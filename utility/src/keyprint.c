@@ -33,11 +33,25 @@ static struct leveln_pntr
 
 #define eq_pntr(p1,p2) ((p1.block==p2.block) && (p1.segment==p2.segment))
 #define null_pntr(p) ((p.segment==max_segments) && (p.block==0))
-#define mvc(t1,sc1,t2,sc2,lc) memmove((unsigned char *)t2+sc2,(unsigned char *)t1+sc1,lc);
+#define mvc(t1,sc1,t2,sc2,lc) memmove((unsigned char *)t2+sc2,(unsigned char *)t1+sc1,(size_t)lc);
 
 void toggle_trace(struct fcb *f)
 {
   f->trace = ! f->trace;
+}
+
+static void print_leveln_pntr(FILE *list, char caption[], struct leveln_pntr *pn)
+{
+  fprintf(list,"%s%u/",caption,pn->segment);
+  fprintf(list,UINT64_format,pn->block);
+  fprintf(list," ");
+}
+
+static void print_level0_pntr(FILE *list, char caption[], struct level0_pntr *p0)
+{
+  fprintf(list,"%s%u/",caption,p0->segment);
+  fprintf(list,UINT64_format,p0->sc);
+  fprintf(list,"/%u ",p0->lc);
 }
 
 static boolean is_primary(struct fcb *f, int bufix)
@@ -123,7 +137,9 @@ static void print_freespace_chain(FILE *list, struct fcb *f)
     while ( err==no_err ) {
       lc_entries++;
       unpack_lc_key(key,&p0);
-      fprintf(list,"%5ld  lc=%10ld, %4d/%10ld\n",lc_entries,p0.lc,p0.segment,p0.sc);
+      fprintf(list,"%5ld  lc=%10u, %4u/",lc_entries,p0.lc,p0.segment);
+      fprintf(list,UINT64_format,p0.sc);
+      fprintf(list,"\n");
       total_lc = total_lc + p0.lc;
       err = kf_next_ptr(f,free_lc_ix,key,&key_lc,maxkey_lc,&p0);
     }
@@ -133,7 +149,9 @@ static void print_freespace_chain(FILE *list, struct fcb *f)
     while ( err==no_err ) {
       rec_entries++;
       unpack_rec_key(key,&p0);
-      fprintf(list,"%5ld  %4d/%10lu, lc=%d\n",rec_entries,p0.segment,p0.sc,lc);
+      fprintf(list,"%5ld  ",rec_entries);
+      print_level0_pntr(list,"",&p0);
+      fprintf(list,"\n");
       total_rec = total_rec + lc;
       err = kf_next_rec(f,free_rec_ix,key,&key_lc,maxkey_lc,&lc,&rec_lc,sizeof(int));
     }
@@ -168,7 +186,7 @@ static boolean block_is_sorted(struct ix_block *b)
   for (i=0; i<b->keys_in_block-1; i++) {
     lc = b->keys[i].lc;  lc1 = b->keys[i+1].lc;
     if ( lc<lc1 ) min = lc; else min = lc1;
-    r = memcmp( (char *)b->keys+b->keys[i].sc, (char *)b->keys+b->keys[i+1].sc,(unsigned)min);
+    r = memcmp( (char *)b->keys+b->keys[i].sc, (char *)b->keys+b->keys[i+1].sc,(size_t)min);
     if ( r>0 ) sorted = false;
     else if ( r==0 && lc>=lc1 ) sorted = false;
   }
@@ -195,7 +213,8 @@ static int uncompressed_key_length(struct ix_block *b)
 
 static void check_index_chain(FILE *list, struct fcb *f, struct leveln_pntr head, struct leveln_pntr parent_head)
 {int block_cnt=0,key_cnt=0,min_cnt=32767,max_cnt=0,lc=0,load,key_lc=0,uncompressed_key_lc=0,empty_block_cnt=0,
-  singleton_block_cnt=0,parent_ix=0,level,index_type;
+  singleton_block_cnt=0,parent_ix=0,index_type;
+ unsigned level;
 struct leveln_pntr p,parent; levelx_pntr px; block_type_t b,parent_block; struct key max,last_max,min,parent_key;
 
   last_max.lc = 0; last_max.text[0] = '\0';
@@ -226,7 +245,8 @@ struct leveln_pntr p,parent; levelx_pntr px; block_type_t b,parent_block; struct
     if ( b.ix.keys_in_block>max_cnt ) max_cnt = b.ix.keys_in_block;
     if ( b.ix.keys_in_block<min_cnt ) min_cnt = b.ix.keys_in_block;
     if ( !block_is_sorted(&(b.ix)) ) {
-      fprintf(list,"  Block %d/%lu is not sorted\n",p.segment,p.block);
+      print_leveln_pntr(list,"  Block ",&p);
+      fprintf(list,"is not sorted\n");
       print_index_block(list,&(b.ix));
     }
     if ( null_pntr(parent)  ) { /* we're checking the primary or at end of chain*/
@@ -234,8 +254,11 @@ struct leveln_pntr p,parent; levelx_pntr px; block_type_t b,parent_block; struct
       index_type = b.ix.index_type;
       if ( level==f->primary_level[index_type] ) /* ok */;
       else if ( null_pntr(b.ix.next) && eq_pntr(f->last_pntr[level+1][index_type],p) ) /* ok */;
-      else fprintf(list,"  End of parent chain, last_pntr=%d/%lu doesn't match current block=%d/%lu\n",
-        f->last_pntr[level+1][index_type].segment,f->last_pntr[level+1][index_type].block,p.segment,p.block);
+      else {
+        print_leveln_pntr(list,"  End of parent chain, last_pntr=",&(f->last_pntr[level+1][index_type]));
+        print_leveln_pntr(list,"doesn't match current block=",&p);
+        fprintf(list,"\n");
+      }
     }
     else {
       get_nth_key_and_pntr(&(parent_block.ix),&parent_key,parent_ix,&px);
@@ -245,13 +268,17 @@ struct leveln_pntr p,parent; levelx_pntr px; block_type_t b,parent_block; struct
       print_key_struct(list,&max," max_key=");
       fprintf(list,"\n");*/
       if ( !eq_key(&parent_key,&max) ) {
-        fprintf(list,"  Parent key from %d/%lu doesn't match max_key in %d/%lu\n",parent.segment,parent.block,p.segment,p.block);
+        print_leveln_pntr(list,"  Parent key from ",&parent);
+        print_leveln_pntr(list,"doesn't match max_key in ",&p);
+        fprintf(list,"\n");
         print_key_struct(list,&parent_key,"    parent_key=");
         print_key_struct(list,&max," max_key=");
         fprintf(list,"\n");
       }
       if ( !eq_pntr(px.pn,p) ) {
-        fprintf(list,"  Parent pointer=%d/%lu doesn't match current block=%d/%lu\n",px.pn.segment,px.pn.block,p.segment,p.block);
+        print_leveln_pntr(list,"  Parent pointer=",&(px.pn));
+        print_leveln_pntr(list,"doesn't match current block=",&p);
+        fprintf(list,"\n");
       }
       if ( parent_ix>=parent_block.ix.keys_in_block ) {
         parent = parent_block.ix.next;
@@ -304,8 +331,9 @@ int print_hash_chain(FILE *list,struct fcb *f, int ix)
   next = f->buf_hash_table[ix];
   while ( next>=0 ) {
     if ( is_primary(f,next) ) fprintf(list,"**");
-    fprintf(list," %d(%d/%lu)(%d)",next,f->buffer[next].contents.segment,
-      f->buffer[next].contents.block,f->buffer[next].b.ix.level);
+    fprintf(list," %d(",next);
+    print_leveln_pntr(list,"",&(f->buffer[next].contents));
+    fprintf(list,")(%d)",f->buffer[next].b.ix.level);
     if ( is_primary(f,next) ) fprintf(list,"**");
     cnt++;
     next = f->buffer[next].hash_next;
@@ -379,15 +407,18 @@ void print_buffer_summary(FILE *list, struct fcb *f)
     
 
 static void print_segments(FILE *list, struct fcb *f)
-{int i;
+{unsigned i;
 
-  fprintf(list,"Segment directory, segment_cnt=%d, max_segments=%d, max_segment_lc=%lu\n",
-    f->segment_cnt,max_segments,max_segment_lc);
+  fprintf(list,"Segment directory, segment_cnt=%u, max_segments=%d, ",
+    f->segment_cnt,max_segments);
+  fprintf(list,UINT64_format,f->max_file_lc);
+  fprintf(list,"\n");
   if ( f->segment_cnt>0 ) {
     fprintf(list,
       "    segment    length  open on    segment    length  open on    segment    length  open on\n");
     for (i=0; i<f->segment_cnt; i++) {
-      fprintf(list,"     %6d %10lu",i,f->segment_length[i]);
+      fprintf(list,"     %6d ",i);
+      fprintf(list,UINT64_format,f->segment_length[i]);
       if ( f->segment_ix[i]>=max_files ) fprintf(list,"  closed");
       else fprintf(list,"   %3d  ",f->segment_ix[i]);
       if ( i%3==2 ) fprintf(list,"\n");
@@ -398,7 +429,7 @@ static void print_segments(FILE *list, struct fcb *f)
 }
 
 static void print_files(FILE *list, struct fcb *f)
-{int i,j;
+{int i; unsigned j;
 
   fprintf(list,"File directory, files open=%d, max_files=%d\n",
     f->open_file_cnt,max_files);
@@ -423,11 +454,13 @@ static void print_ix_block_entry(FILE *list, struct ix_block *b, int i)
   print_key_struct(list,&k,"");
   if ( b->level>0 ) {
     temp = unpackn_ptr(b,i,&pn);
-    fprintf(list," - %d %ld (lc=%d)\n",pn.segment,pn.block,temp);
+    print_leveln_pntr(list," - ",&pn);
+    fprintf(list,"(lc=%d)\n",temp);
   }
   else {
     temp = unpack0_ptr(b,i,&p0);
-    fprintf(list," - %d %ld %ld (lc=%d)\n",p0.segment,p0.sc,p0.lc,temp);
+    print_level0_pntr(list," - ",&p0);
+    fprintf(list,"(lc=%d)\n",temp);
   }
 }
 
@@ -449,8 +482,9 @@ void print_index_block(FILE *list, struct ix_block *b)
       else fprintf(list,"%2x ",t[i]);
     fprintf(list,"\n");
   }
-  fprintf(list,"   next=%d,%ld, prev=%d,%ld\n",b->next.segment,
-    b->next.block,b->prev.segment,b->prev.block);
+  print_leveln_pntr(list,"   next=",&(b->next));
+  print_leveln_pntr(list,"prev=",&(b->prev));
+  fprintf(list,"\n");
   if ( b->keys_in_block<50 ) {
     for (i=0; i<b->keys_in_block; i++) print_ix_block_entry(list,b,i);
   }
@@ -474,44 +508,54 @@ void print_index(FILE *list, struct fcb *f, int index_type)
     fprintf(list,"**Start of level %d\n",i);
     next = f->first_at_level[i][index_type];
     while ( !null_pntr(next) ) {
-      fprintf(list,"block number %d/%ld\n",next.segment,next.block);
+      print_leveln_pntr(list,"block number ",&next);
+      fprintf(list,"\n");
       get_page(f,next,&buf);
       print_index_block(list,&buf.ix);
       next = buf.ix.next;
     }
   }
 }
+static void print_level_line(FILE *list, struct leveln_pntr mru, struct leveln_pntr first,
+  struct leveln_pntr last, struct leveln_pntr first_free)
+{
+
+  print_leveln_pntr(list," ",&mru);
+  print_leveln_pntr(list," ",&first);
+  print_leveln_pntr(list," ",&last);
+  print_leveln_pntr(list," ",&first_free);
+}
 
 static void print_levels(FILE *list, struct fcb *f)
-{int i;
+{unsigned i;
 
-  fprintf(list,"Level pointers\n lvl");
-  fprintf(list," user MRU     user first   user last  free_block\n");
+  fprintf(list,"Level pointers\n");
+  fprintf(list," lvl user MRU     user first   user last    free_block\n");
   for (i=0; i<=f->primary_level[user_ix]; i++) {
-    fprintf(list,"  %2d ",i);
-    fprintf(list,"%4d/%-7ld %4d/%-7ld %4d/%-7ld %4d/%-7ld\n",
-      f->mru_at_level[i][user_ix].segment,f->mru_at_level[i][user_ix].block,
-      f->first_at_level[i][user_ix].segment,f->first_at_level[i][user_ix].block,
-      f->last_pntr[i][user_ix].segment,f->last_pntr[i][user_ix].block,
-      f->first_free_block[i][user_ix].segment,f->first_free_block[i][user_ix].block);
+    fprintf(list,"  %2d",i);
+    print_level_line(list,
+      f->mru_at_level[i][user_ix],
+      f->first_at_level[i][user_ix],
+      f->last_pntr[i][user_ix],
+      f->first_free_block[i][user_ix]);
   }
-  fprintf(list," lvl frec MRU     frec first   frec last  free_block\n");
+  fprintf(list," lvl frec MRU     frec first   frec last    free_block\n");
   for (i=0; i<=f->primary_level[free_rec_ix]; i++) {
-    fprintf(list,"  %2d ",i);
-    fprintf(list,"%4d/%-7ld %4d/%-7ld %4d/%-7ld %4d/%-7ld\n",
-      f->mru_at_level[i][free_rec_ix].segment,f->mru_at_level[i][free_rec_ix].block,
-      f->first_at_level[i][free_rec_ix].segment,f->first_at_level[i][free_rec_ix].block,
-      f->last_pntr[i][free_rec_ix].segment,f->last_pntr[i][free_rec_ix].block,
-      f->first_free_block[i][free_rec_ix].segment,f->first_free_block[i][free_rec_ix].block);
+    fprintf(list,"  %2d",i);
+    print_level_line(list,
+      f->mru_at_level[i][free_rec_ix],
+      f->first_at_level[i][free_rec_ix],
+      f->last_pntr[i][free_rec_ix],
+      f->first_free_block[i][free_rec_ix]);
   }
-  fprintf(list," lvl f_lc MRU     f_lc first   f_lc last  free_block\n");
+  fprintf(list," lvl f_lc MRU     f_lc first   f_lc last    free_block\n");
   for (i=0; i<=f->primary_level[free_lc_ix]; i++) {
-    fprintf(list,"  %2d ",i);
-    fprintf(list,"%4d/%-7ld %4d/%-7ld %4d/%-7ld %4d/%-7ld\n",
-      f->mru_at_level[i][free_lc_ix].segment,f->mru_at_level[i][free_lc_ix].block,
-      f->first_at_level[i][free_lc_ix].segment,f->first_at_level[i][free_lc_ix].block,
-      f->last_pntr[i][free_lc_ix].segment,f->last_pntr[i][free_lc_ix].block,
-      f->first_free_block[i][free_lc_ix].segment,f->first_free_block[i][free_lc_ix].block);
+    fprintf(list,"  %2d",i);
+    print_level_line(list,
+      f->mru_at_level[i][free_lc_ix],
+      f->first_at_level[i][free_lc_ix],
+      f->last_pntr[i][free_lc_ix],
+      f->first_free_block[i][free_lc_ix]);
   }
   fprintf(list,"\n");
 }
@@ -524,23 +568,23 @@ void print_fib(FILE *list, struct fcb *f)
   fprintf(list,"  status is ");
   if ( f->file_ok ) fprintf(list,"ok");
     else fprintf(list,"damaged");
-  fprintf(list,", error_code=%d",f->error_code);
-  fprintf(list,", version=%d",f->version);
-  fprintf(list,", marker=%d",f->marker);
-  fprintf(list,", current_age=%d, block_lc=%d\n",f->current_age,block_lc);
+  fprintf(list,", error_code=%u",f->error_code);
+  fprintf(list,", version=%u",f->version);
+  fprintf(list,", marker=%u",f->marker);
+  fprintf(list,", current_age=%d, block_lc=%d\n",f->current_age,(int)block_lc);
   fprintf(list,"  block_shift=%d, swapping_required=%d, read_only=%d\n",
     f->block_shift,f->byte_swapping_required,f->read_only);
-  fprintf(list,"  primary level[user    ]=%d,",f->primary_level[user_ix]);
-  fprintf(list," position[user    ]=%d/%ld %d\n",f->position[user_ix].segment,
-    f->position[user_ix].block,f->position_ix[user_ix]);
-  fprintf(list,"  primary level[free_rec]=%d,",f->primary_level[free_rec_ix]);
-  fprintf(list," position[free_rec]=%d/%ld %d\n",f->position[free_rec_ix].segment,
-    f->position[free_rec_ix].block,f->position_ix[free_rec_ix]);
-  fprintf(list,"  primary level[free_lc ]=%d,",f->primary_level[free_lc_ix]);
-  fprintf(list," position[free_lc ]=%d/%ld %d\n",f->position[free_lc_ix].segment,
-    f->position[free_lc_ix].block,f->position_ix[free_lc_ix]);
+  fprintf(list,"  primary level[user    ]=%u,",f->primary_level[user_ix]);
+  print_leveln_pntr(list," position[user    ]=",&(f->position[user_ix]));
+  fprintf(list,"%d\n",f->position_ix[user_ix]);
+  fprintf(list,"  primary level[free_rec]=%u,",f->primary_level[free_rec_ix]);
+  print_leveln_pntr(list," position[free_rec]=",&(f->position[free_rec_ix]));
+  fprintf(list,"%d\n",f->position_ix[free_rec_ix]);
+  fprintf(list,"  primary level[free_lc ]=%u,",f->primary_level[free_lc_ix]);
+  print_leveln_pntr(list," position[free_lc ]=",&(f->position[free_lc_ix]));
+  fprintf(list,"%d\n",f->position_ix[free_lc_ix]);
   fprintf(list,"  buf_hash_entries=%d, hash_entries_per_buf=%d\n",
-    f->buf_hash_entries,hash_entries_per_buf);
+    f->buf_hash_entries,(int)hash_entries_per_buf);
   print_segments(list,f);
   print_files(list,f);
   print_levels(list,f);
@@ -554,17 +598,24 @@ void print_fcb(FILE *list, struct fcb *f)
 {int i;
   print_fib(list,f);
   fprintf(list,"**buffer directory\n");
-  fprintf(list,"         contnt        lock?   mod?   next   type\n");
+  fprintf(list,"       lock?   mod?   next   type\n");
   for (i=0; i<f->buffers_in_use; i++) {
-    fprintf(list,"%5d %4d/%10ld   %3d  ",i,f->buffer[i].contents.segment,f->buffer[i].contents.block,f->buffer[i].lock_cnt);
+    fprintf(list,"%5d   %3d  ",i,f->buffer[i].lock_cnt);
     if ( f->buffer[i].modified    ) fprintf(list,"  true");
       else fprintf(list," false");
     fprintf(list," %6d ",f->buffer[i].hash_next);
-    fprintf(list," index, level=%d\n",f->buffer[i].b.ix.level);
+    if ( f->buffer[i].b.ix.index_type==user_ix ) fprintf(list," user ");
+    else if ( f->buffer[i].b.ix.index_type==free_rec_ix ) fprintf(list," frec ");
+    else if ( f->buffer[i].b.ix.index_type==free_lc_ix ) fprintf(list," f_lc ");
+    else fprintf(list," undef");
+    fprintf(list,", level=%d ",f->buffer[i].b.ix.level);
+    print_leveln_pntr(list,"",&(f->buffer[i].contents));
+    fprintf(list,"\n");
   }
   for (i=0; i<f->buffers_in_use; i++) {
-    fprintf(list,"**buffer %d (%d/%lu)",i,f->buffer[i].contents.segment,f->buffer[i].contents.block);
-    fprintf(list,"index block\n");
+    fprintf(list,"**buffer %d ",i);
+    print_leveln_pntr(list,"contains index block ",&(f->buffer[i].contents));
+    fprintf(list,"\n");
     print_index_block1(list,f,i);
   }
 }
