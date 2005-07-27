@@ -22,8 +22,8 @@
 indri::infnet::NullScorerNode::NullScorerNode( const std::string& name, indri::query::TermScoreFunction& scoreFunction ) :
   _name(name),
   _scoreFunction(scoreFunction),
-  _maximumBackgroundScore(scoreFunction.scoreOccurrence(0,100)),
-  _maximumScore(scoreFunction.scoreOccurrence(0,100))
+  _maximumBackgroundScore(0),
+  _maximumScore(0)
 {
 }
 
