@@ -172,6 +172,9 @@
 				RelativePath=".\src\KStemmer.cpp">
 			</File>
 			<File
+				RelativePath=".\src\MboxDocumentIterator.cpp">
+			</File>
+			<File
 				RelativePath=".\src\NormalizationTransformation.cpp">
 			</File>
 			<File
@@ -328,6 +331,9 @@
 			</File>
 			<File
 				RelativePath=".\include\KStemmer.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\MboxDocumentIterator.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\MetadataPair.hpp">

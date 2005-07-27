@@ -120,6 +120,9 @@
 				RelativePath=".\src\File.cpp">
 			</File>
 			<File
+				RelativePath=".\src\fileio.c">
+			</File>
+			<File
 				RelativePath=".\src\FileTreeIterator.cpp">
 			</File>
 			<File
@@ -272,10 +275,13 @@
 				RelativePath=".\include\indri\Extent.hpp">
 			</File>
 			<File
+				RelativePath=".\include\File.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\File.hpp">
 			</File>
 			<File
-				RelativePath=".\include\File.hpp">
+				RelativePath=".\include\fileio.h">
 			</File>
 			<File
 				RelativePath=".\include\indri\FileTreeIterator.hpp">
@@ -300,9 +306,6 @@
 			</File>
 			<File
 				RelativePath=".\include\ISet.hpp">
-			</File>
-			<File
-				RelativePath=".\include\keyconst.h">
 			</File>
 			<File
 				RelativePath=".\include\keydef.h">

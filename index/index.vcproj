@@ -219,9 +219,6 @@
 				RelativePath=".\src\KeyfileTextHandler.cpp">
 			</File>
 			<File
-				RelativePath=".\src\KeyfileWordMap.cpp">
-			</File>
-			<File
 				RelativePath=".\src\LemurIndriIndex.cpp">
 			</File>
 			<File
@@ -426,9 +423,6 @@
 			</File>
 			<File
 				RelativePath=".\include\KeyfileTextHandler.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\KeyfileWordMap.hpp">
 			</File>
 			<File
 				RelativePath=".\include\LemurIndriIndex.hpp">

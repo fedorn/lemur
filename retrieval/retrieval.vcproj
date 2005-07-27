@@ -255,6 +255,9 @@
 				RelativePath=".\src\QueryParser.cpp">
 			</File>
 			<File
+				RelativePath=".\src\RelevanceModel.cpp">
+			</File>
+			<File
 				RelativePath=".\src\ResultFile.cpp">
 			</File>
 			<File
@@ -555,6 +558,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\RawScorerNodeExtractor.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\RelevanceModel.hpp">
 			</File>
 			<File
 				RelativePath=".\include\ResultFile.hpp">
