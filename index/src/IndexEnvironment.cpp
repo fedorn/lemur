@@ -80,7 +80,7 @@ void indri::api::IndexEnvironment::setStopwords( const std::vector<std::string>&
   _parameters.set("stopper","");
   Parameters p = _parameters.get("stopper");
   for( unsigned int i=0; i<stopwords.size(); i++ ) {
-    _parameters.append("stopper.word").set(stopwords[i]);
+    p.append("word").set(stopwords[i]);
   }
 }
 
