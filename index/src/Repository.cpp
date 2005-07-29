@@ -95,7 +95,7 @@ void indri::collection::Repository::_buildTransientChain( indri::api::Parameters
 // _buildChain
 //
 
-void indri::collection::Repository::_buildChain( indri::api::Parameters& parameters ) {
+void indri::collection::Repository::_buildChain( indri::api::Parameters& parameters, indri::api::Parameters *options  ) {
   bool dontNormalize = parameters.exists( "normalize" ) && ( false == (bool) parameters["normalize"] );
 
   if( dontNormalize == false ) {
@@ -111,6 +111,13 @@ void indri::collection::Repository::_buildChain( indri::api::Parameters& paramet
   if( _parameters.exists("stopper.word") ) {
     indri::api::Parameters stop = _parameters["stopper.word"];
     _transformations.push_back( new indri::parse::StopperTransformation( stop ) );
+  }
+  // the transient chain, needs to precede the stemmer.
+  if (options) {
+    if( options->exists("stopper.word") ) {
+      indri::api::Parameters stop = (*options)["stopper.word"];
+      _transformations.push_back( new indri::parse::StopperTransformation( stop ) );
+    }
   }
 
   if( _parameters.exists("stemmer.name") ) {
@@ -290,7 +297,7 @@ void indri::collection::Repository::create( const std::string& path, indri::api:
       _copyParameters( *options );
 
     _buildFields();
-    _buildChain( _parameters );
+    _buildChain( _parameters, 0 );
 
     std::string indexPath = indri::file::Path::combine( path, "index" );
     std::string collectionPath = indri::file::Path::combine( path, "collection" );
@@ -359,11 +366,11 @@ void indri::collection::Repository::openRead( const std::string& path, indri::ap
   _parameters.loadFile( indri::file::Path::combine( path, "manifest" ) );
 
   _buildFields();
-  _buildChain( _parameters );
-
+  _buildChain( _parameters, options );
+  /*
   if( options )
     _buildTransientChain( *options );
-
+  */
   std::string indexPath = indri::file::Path::combine( path, "index" );
   std::string collectionPath = indri::file::Path::combine( path, "collection" );
   std::string indexName = indri::file::Path::combine( indexPath, "index" );
@@ -407,11 +414,11 @@ void indri::collection::Repository::open( const std::string& path, indri::api::P
   _parameters.loadFile( indri::file::Path::combine( path, "manifest" ) );
 
   _buildFields();
-  _buildChain( _parameters );
-
+  _buildChain( _parameters, options );
+  /*
   if( options )
     _buildTransientChain( *options );
-
+  */
   // open all indexes, add a memory index
   _openIndexes( _parameters, indexPath );
   _addMemoryIndex();

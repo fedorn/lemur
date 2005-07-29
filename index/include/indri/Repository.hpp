@@ -103,7 +103,8 @@ namespace indri
       Load _computeLoad( indri::atomic::value_type* loadArray );
 
       void _buildFields();
-      void _buildChain( indri::api::Parameters& parameters );
+      void _buildChain( indri::api::Parameters& parameters,
+                        indri::api::Parameters *options );
       void _buildTransientChain( indri::api::Parameters& parameters );
 
       void _copyParameters( indri::api::Parameters& options );
