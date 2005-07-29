@@ -36,6 +36,8 @@
 #include "indri/QuerySpec.hpp"
 #include "indri/Copier.hpp"
 #include "indri/delete_range.hpp"
+#include "indri/Repository.hpp"
+
 namespace indri
 {
   namespace lang
