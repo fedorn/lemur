@@ -13,6 +13,7 @@
 #include "ArabicStemmer.hpp"
 
 lemur::parse::ArabicStemmer::ArabicStemmer(const string &stemFunc) {
+  stemfunc = stemFunc;
   stemmer = new Arabic_Stemmer(stemFunc);
 }
 
@@ -27,4 +28,11 @@ char * lemur::parse::ArabicStemmer::stemWord(char * word) {
     return stem;
   else
     return NULL;
+}
+
+void lemur::parse::ArabicStemmer::writePropertyList(lemur::parse::PropertyList* list) const {
+  lemur::api::TextHandler::writePropertyList(list);
+  Property p("arabicStemFunc");
+  p.setValue(stemfunc);
+  list->setProperty(&p);
 }

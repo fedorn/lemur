@@ -40,10 +40,12 @@ namespace lemur
     class ArabicStemmer : public lemur::api::Stemmer {
     public:
       static const string identifier;
+      std::string stemfunc;
       ArabicStemmer(const string &stemFunc=ArabicStemmerParameter::defaultStemFunc);
       ~ArabicStemmer();
       /// Stem a word using an Arabic stemmer.
       char * stemWord(char * word);
+      void writePropertyList(PropertyList* list) const;
     private:
       Arabic_Stemmer *stemmer;
       // may be returned by stemWord.
