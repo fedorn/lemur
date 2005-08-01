@@ -21,6 +21,7 @@
 
 #include "indri/Transformation.hpp"
 #include "indri/Parameters.hpp"
+#include "indri/KrovetzStemmer.hpp"
 namespace indri
 {
   namespace parse
@@ -28,6 +29,7 @@ namespace indri
 
     class KrovetzStemmerTransformation : public Transformation {
     private:
+      KrovetzStemmer *stemmer;
       char* _stemBuffer;
       int _stemBufferSize;
       ObjectHandler<indri::api::ParsedDocument>* _handler;

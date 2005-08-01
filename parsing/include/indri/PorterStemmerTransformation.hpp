@@ -20,6 +20,7 @@
 #define INDRI_PORTERSTEMMERTRANSFORMATION_HPP
 
 #include "indri/Transformation.hpp"
+#include "indri/Porter_Stemmer.hpp"
 namespace indri
 {
   namespace parse
@@ -28,8 +29,10 @@ namespace indri
     class PorterStemmerTransformation : public Transformation {
     private:
       ObjectHandler<indri::api::ParsedDocument>* _handler;
-
+      Porter_Stemmer *stemmer;
     public:
+      PorterStemmerTransformation();
+      ~PorterStemmerTransformation();
       indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document );
 
       void setHandler( ObjectHandler<indri::api::ParsedDocument>& handler );

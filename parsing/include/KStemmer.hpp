@@ -12,6 +12,7 @@
 #ifndef _KSTEMMER_HPP
 #define _KSTEMMER_HPP
 #include "Stemmer.hpp"
+#include "indri/KrovetzStemmer.hpp"
 #define MAX_FILENAME_LENGTH 125  /* including the full directory path */
 namespace lemur 
 {
@@ -22,18 +23,17 @@ namespace lemur
     ///  inheritance, the TextHandler interface.
 
     class KStemmer : public lemur::api::Stemmer {
-
+    private:
+      indri::parse::KrovetzStemmer *stemmer;
     public:
       static const string identifier;
 
-      KStemmer(string &datadir);
+      KStemmer();
 
       ~KStemmer();  
     
       /// Stem a word using the Krovetz Stemmer.
       char * stemWord(char * word);
-
-      void writePropertyList(PropertyList* list) const;
     };
   }
 }

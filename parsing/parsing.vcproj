@@ -103,7 +103,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\src\arabic_stem.cpp">
+				RelativePath=".\src\Arabic_Stemmer.cpp">
 			</File>
 			<File
 				RelativePath=".\src\ArabicParser.cpp">
@@ -166,7 +166,7 @@
 				RelativePath=".\src\KrovetzStemmerTransformation.cpp">
 			</File>
 			<File
-				RelativePath=".\src\kstem.cpp">
+				RelativePath=".\src\KrovetzStemmer.cpp">
 			</File>
 			<File
 				RelativePath=".\src\KStemmer.cpp">
@@ -187,7 +187,7 @@
 				RelativePath=".\src\PDFDocumentExtractor.cpp">
 			</File>
 			<File
-				RelativePath=".\src\porter_stemmer.cpp">
+				RelativePath=".\src\Porter_Stemmer.cpp">
 			</File>
 			<File
 				RelativePath=".\src\PorterStemmer.cpp">
@@ -252,7 +252,7 @@
 				RelativePath=".\include\indri\AnchorTextWriter.hpp">
 			</File>
 			<File
-				RelativePath=".\include\arabic_stemmer.h">
+				RelativePath=".\include\Arabic_Stemmer.hpp">
 			</File>
 			<File
 				RelativePath=".\include\ArabicParser.hpp">
@@ -330,6 +330,9 @@
 				RelativePath=".\include\indri\KrovetzStemmerTransformation.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\KrovetzStemmer.hpp">
+			</File>
+			<File
 				RelativePath=".\include\KStemmer.hpp">
 			</File>
 			<File
@@ -361,6 +364,9 @@
 			</File>
 			<File
 				RelativePath=".\include\PorterStemmer.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\Porter_Stemmer.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\PorterStemmerTransformation.hpp">

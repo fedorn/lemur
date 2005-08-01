@@ -20,8 +20,13 @@
 
 #include "indri/PorterStemmerTransformation.hpp"
 
-// in porter_stemmer.cpp: warning: this function is not thread safe
-extern int porter_stem(char * p, int i, int j);
+indri::parse::PorterStemmerTransformation::PorterStemmerTransformation() {
+  stemmer = new Porter_Stemmer();
+}
+
+indri::parse::PorterStemmerTransformation::~PorterStemmerTransformation() {
+  delete stemmer;
+}
 
 indri::api::ParsedDocument* indri::parse::PorterStemmerTransformation::transform( indri::api::ParsedDocument* document ) {
   indri::utility::greedy_vector<char*>& terms = document->terms;
@@ -33,7 +38,7 @@ indri::api::ParsedDocument* indri::parse::PorterStemmerTransformation::transform
       continue;
 
     int length = strlen( term );
-    int newLength = porter_stem( term, 0, int(length)-1 );
+    int newLength = stemmer->porter_stem( term, 0, int(length)-1 );
     assert( newLength <= length );
     term[newLength+1] = 0;
   }

@@ -72,8 +72,6 @@ void usage(int argc, char ** argv) {
        << "\t          \"krovetz\" to use Krovetz's stemmer (kstemmer). " << endl  
        << "\t          \"arabic\" to use an Arabic stemmer. " << endl  
        << "\t          (def = no stemmer)" << endl
-       << "\tKstemmerDir - pathname to data files used by kstemmer. " << endl
-       << "\tarabicStemDir - pathname to data files used by the Arabic stemmers. " << endl
        << "\tarabicStemFunc - which Arabic stemmer algorithm. " << endl;
 }
 

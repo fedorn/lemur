@@ -9,7 +9,7 @@
  */
 
 #include "Stemmer.hpp"
-
+#include "indri/Porter_Stemmer.hpp"
 #ifndef _PORTERSTEMMER_HPP
 #define _PORTERSTEMMER_HPP
 namespace lemur 
@@ -22,11 +22,13 @@ namespace lemur
     ///  inheritance, the TextHandler interface.
 
     class PorterStemmer : public lemur::api::Stemmer {
-
+    private:
+      indri::parse::Porter_Stemmer *stemmer;
     public:
       static const string identifier;
 
       PorterStemmer();
+      ~PorterStemmer();
 
       /// Stem a word using the Porter Stemmer.
       char * stemWord(char * word);

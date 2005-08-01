@@ -39,13 +39,9 @@ The parameters are:
 <li> <tt>stemmer</tt>: 
 <ul>
 <li> "porter" Porter stemmer.
-<li> "krovetz" Krovetz stemmer, requires additional parameters
-<ol>
-<li> <tt>KstemmerDir</tt>: Path to directory of data files used by Krovetz's stemmer.
-</ol>
+<li> "krovetz" Krovetz stemmer.
 <li> "arabic" arabic stemmer, requires additional parameters
 <ol>
-<li> <tt>arabicStemDir</tt>: Path to directory of data files used by the Arabic stemmers.
 <li> <tt>arabicStemFunc</tt>: Which stemming algorithm to apply, one of:
 <ul>
 <li> arabic_stop          : arabic_stop
@@ -129,8 +125,6 @@ void usage(int argc, char ** argv) {
        << "\t          \"krovetz\" to use Krovetz's stemmer (kstemmer). " << endl  
        << "\t          \"arabic\" to use an Arabic stemmer. " << endl  
        << "\t          (def = no stemmer)" << endl
-       << "\tKstemmerDir - pathname to data files used by kstemmer. " << endl
-       << "\tarabicStemDir - pathname to data files used by the Arabic stemmers. " << endl
        << "\tarabicStemFunc - which Arabic stemmer algorithm. " << endl
        << "\tdataFiles - name of file containing list of datafiles. " << endl
        << "\t              (one line per datafile name) " << endl

@@ -124,19 +124,15 @@ lemur::api::Stemmer* lemur::api::TextHandlerManager::createStemmer(string type, 
 
   try {
     if (type == lemur::parse::KStemmer::identifier) {
-      if (datadir.compare("") == 0) {
-	datadir = ParamGetString("KstemmerDir");
-      }
-      stemmer = new lemur::parse::KStemmer(datadir);
+      stemmer = new lemur::parse::KStemmer();
       //      cerr << "created Kstemmer" << endl;
     } else if (type == lemur::parse::ArabicStemmer::identifier){
-      if ((datadir.empty()) || (func.empty())) {
+      if (func.empty()) {
 	ArabicStemmerParameter::get();
 	// param get has defaults so it'll always get back values
-	stemmer = new lemur::parse::ArabicStemmer(ArabicStemmerParameter::stemDir, 
-				    ArabicStemmerParameter::stemFunc); 
+	stemmer = new lemur::parse::ArabicStemmer(ArabicStemmerParameter::stemFunc); 
       } else {
-	stemmer = new lemur::parse::ArabicStemmer((char*)datadir.c_str(),(char*)func.c_str());    
+	stemmer = new lemur::parse::ArabicStemmer((char*)func.c_str());    
       }
       //cerr << "created arabic stemmer" << endl;
     } else if (type == lemur::parse::PorterStemmer::identifier) {

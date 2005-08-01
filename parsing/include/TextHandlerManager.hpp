@@ -37,7 +37,7 @@ namespace lemur
       /// current known types are proter, krovetz, and arabic
       /// if nothing is passed in and nothing is on param stack, return NULL
       /// checks for "stemmer" parameter for type 
-      /// "KstemmerDir" or "arabicStemDir" for datadir
+      /// "arabicStemDir" for datadir
       /// "arabicStemFunc" for func
       static Stemmer* createStemmer(string type="", string datadir="", string func="");
 

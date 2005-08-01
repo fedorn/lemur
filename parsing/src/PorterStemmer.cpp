@@ -20,12 +20,15 @@
 #include <cctype>
 #include "common_headers.hpp"
 
-// the Porter stemmer is in C
-extern int porter_stem(char * p, int i, int j);
 
 lemur::parse::PorterStemmer::PorterStemmer() : Stemmer() {
   // use the same identifier as we do for the application parameters
   iden = identifier;
+  stemmer = new indri::parse::Porter_Stemmer();
+}
+
+lemur::parse::PorterStemmer::~PorterStemmer() {
+  delete(stemmer);
 }
 
 char * lemur::parse::PorterStemmer::stemWord(char * word) {
@@ -33,7 +36,7 @@ char * lemur::parse::PorterStemmer::stemWord(char * word) {
   // (don't stem acronyms or names)
   if (islower(*word)) {
     int len = strlen(word);
-    len = porter_stem(word, 0, len - 1) + 1;
+    len = stemmer->porter_stem(word, 0, len - 1) + 1;
     word[len] = '\0';
   }
   return word;
