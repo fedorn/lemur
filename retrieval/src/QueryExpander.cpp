@@ -135,7 +135,13 @@ std::string indri::query::QueryExpander::buildQuery( const std::string& original
   }
 
   ret << " ) ) ";
-
-  return ret.str();
+  // If no terms were added to the query, return the original
+  // rather than a malformed
+  //# expanded: #weight( 0.50000000000000000000000000000000 #combine(
+  // poliomyeliti ) 0.50000000000000000000000000000000 #weight(  ) )
+  if (num_added == 0) 
+    return originalQuery;
+  else
+    return ret.str();
 }
 
