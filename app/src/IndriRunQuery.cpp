@@ -213,6 +213,7 @@ struct query_t {
 class QueryThread : public indri::thread::UtilityThread {
 private:
   indri::thread::Lockable& _queueLock;
+  indri::thread::ConditionVariable& _queueEvent;
   std::queue< query_t* >& _queries;
   std::priority_queue< query_t*, std::vector< query_t* >, query_t::greater >& _output;
 
@@ -316,10 +317,12 @@ public:
   QueryThread( std::queue< query_t* >& queries,
                std::priority_queue< query_t*, std::vector< query_t* >, query_t::greater >& output,
                indri::thread::Lockable& queueLock,
+               indri::thread::ConditionVariable& queueEvent,
                indri::api::Parameters& params ) :
     _queries(queries),
     _output(output),
     _queueLock(queueLock),
+    _queueEvent(queueEvent),
     _parameters(params),
     _expander(0)
   {
@@ -396,7 +399,11 @@ public:
     }
 
     // run the query
-    _runQuery( output, query->text );
+    try {
+      _runQuery( output, query->text );
+    } catch( lemur::api::Exception& e ) {
+      output << "# EXCEPTION in query " << query->number << ": " << e.what() << std::endl;
+    }
 
     // print the results to the output stream
     _printResults( output, query->number );
@@ -405,6 +412,7 @@ public:
     {
       indri::thread::ScopedLock sl( &_queueLock );
       _output.push( new query_t( query->index, query->number, output.str() ) );
+      _queueEvent.notifyAll();
     }
 
     delete query;
@@ -451,6 +459,7 @@ int main(int argc, char * argv[]) {
     std::priority_queue< query_t*, std::vector< query_t* >, query_t::greater > output;
     std::vector< QueryThread* > threads;
     indri::thread::Mutex queueLock;
+    indri::thread::ConditionVariable queueEvent;
 
     // push all queries onto a queue
     indri::api::Parameters parameterQueries = param[ "query" ];
@@ -460,7 +469,7 @@ int main(int argc, char * argv[]) {
 
     // launch threads
     for( int i=0; i<threadCount; i++ ) {
-      threads.push_back( new QueryThread( queries, output, queueLock, param ) );
+      threads.push_back( new QueryThread( queries, output, queueLock, queueEvent, param ) );
       threads.back()->start();
     }
 
@@ -469,23 +478,24 @@ int main(int argc, char * argv[]) {
     // process output as it appears on the queue
     while( query < queryCount ) {
       query_t* result = NULL;
-      
-      {
-        indri::thread::ScopedLock sl( queueLock );
-          
-        if( output.size() && output.top()->index == query ) {
-          result = output.top();
-          output.pop();
-        }
-      }
 
-      if( result ) {
+      // wait for something to happen
+      queueEvent.wait( queueLock );
+      
+      while ( output.size() && output.top()->index == query ) {
+        result = output.top();
+        output.pop();
+
+        queueLock.unlock();
+
         std::cout << result->text;
         delete result;
         query++;
-      } else {
-        indri::thread::Thread::yield();
+
+        queueLock.lock();
       }
+      
+      queueLock.unlock();
     }
 
     // join all the threads
