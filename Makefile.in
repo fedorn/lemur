@@ -11,12 +11,11 @@ DIRS = $(LIBDIRS) $(APPDIRS)
 OBJDIRS = $(DIRS:%=%/obj)
 DEPENDDIRS = $(DIRS:%=%/depend)
 
-DDIRS = $(prefix)/kstem_data $(prefix)/arabic_stem_data
-INSTALLDIRS = $(bindir) $(includedir) $(includedir)/indri $(libdir) $(DDIRS)
+INSTALLDIRS = $(bindir) $(includedir) $(includedir)/indri $(libdir)
 
 MF = ../src/Makefile
 
-.PHONY: all lib clean install install-bin install-lib install-data $(DIRS) $(INSTALLDIRS) $(DDIRS)
+.PHONY: all lib clean install install-bin install-lib install-data $(DIRS) $(INSTALLDIRS)
 
 all: $(DIRS) 
 
@@ -33,14 +32,9 @@ clean:
 
 install: install-lib install-bin
 
-#both bin and lib installs require that the data files be installed.
-install-data: $(INSTALLDIRS)
-	$(INSTALL_DATA) data/kstem_data/*.txt $(prefix)/kstem_data 
-	$(INSTALL_DATA) data/arabic_stem_data/*.txt $(prefix)/arabic_stem_data
-
-install-bin: $(INSTALLDIRS) install-data
+install-bin: $(INSTALLDIRS)
 	for dir in $(APPDIRS) ; do $(MAKE) -C $$dir/obj -f $(MF) install; done
 
-install-lib: $(INSTALLDIRS) install-data
+install-lib: $(INSTALLDIRS)
 	rm -f $(libdir)/$(LEMURLIB)
 	for dir in $(LIBDIRS) ; do $(MAKE) -C $$dir/obj -f $(MF) install; done
