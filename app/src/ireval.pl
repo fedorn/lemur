@@ -10,13 +10,17 @@ sub Usage{
   my $message = shift;
 
   print STDERR $message, "\n" if $message;
-  print STDERR "\nUsage: $0 -j(udgments) qrel-file -trec < result \n";
+  print STDERR "\nUsage: $0 -q -j(udgments) qrel-file -trec -N num < result \n";
 
   print STDERR <<'EOM';
 	  -j(udgements) filename    Judgment file
 
 	  -t(rec)    TREC format, i.e., four column qrel and six column results
 	             other wise, three column qrel and three column results
+
+	  -N num     top number of documents per query (default 1000).
+
+          -q         print information for each query.
 
           -h(elp) 	: display this message
 
@@ -26,12 +30,12 @@ EOM
 
 }
 
-if (! &GetOptions("help","trec", "judgments=s") or
+if (! &GetOptions("help","trec", "judgments=s", "N:i", "q") or
     $opt_help) {
   &Usage();
 }
 
-
+if ($opt_N == 0) { $opt_N = 1000; }
 
 open(T,"$opt_judgments") ||  die "can't open judgment file: $opt_judgments\n";
 
@@ -69,8 +73,9 @@ $countQuery = 0;
 $setAvgPr = 0;
 $setExactPr = 0;
 $setTotalRel = 0;
+$setTotalRet = 0;
 $setRel = 0;
-
+$retCount = 0;
 $rel = 0;
 $avgPr = 0;
 $exactPr = 0;
@@ -85,9 +90,35 @@ while (<stdin>) {
     if ($q ne $curQ) { # new query
 	$setTotalRel += $totalRels{$q};
 	if ($curQ ne "") {
-	    &PrintFigure;
+            # fill in values for any short list.
+            if ($totalRels{$q} != 0) {
+                $setTotalRet += $rankCount;
+                $retCount = $rankCount;
+                while ($rankCount < $opt_N) {
+                    $rankCount++;
+                    $thisPr = $rel/$rankCount;
+                    if ($rankCount == $totalRels{$curQ}) {
+                        $exactPr = $thisPr;
+                    }
+                    for ($i=0; $i<=$#docLevel; $i++) {
+                        if ($rankCount == $docLevel[$i]) {
+                            $precDoc[$i] = $thisPr;
+                        }
+                    }
+                }
+                ## update any missing levels
+                if ($opt_N < 1000) {
+                    for ($i=0; $i<=$#docLevel; $i++) {
+                        if ($rankCount < $docLevel[$i]) {
+                            ## need an entry for this value
+                            $thisPr = $rel/$docLevel[$i];
+                            $precDoc[$i] = $thisPr;
+                        }
+                    }
+                }
+            }
+            &PrintFigure;
 	} 
-
 	$curQ=$q;
 	$avgPr = 0;
 	$rankCount=0;
@@ -101,8 +132,11 @@ while (<stdin>) {
 	    $precDoc[$i] = 0;
 	}
     }
-    
+    if ($rankCount == $opt_N) { 
+        next ;  ## don't do more than opt_N
+    }
     $rankCount++;
+
 # not sure if this does the right thing.
 #    if ($totalRels{$q}==0) { next; } # skip any query with no judgments
     if ($totalRels{$q}==0) { next; } # skip any query with no judgments
@@ -136,32 +170,48 @@ while (<stdin>) {
 }
 
 if ($curQ ne "") {
-
-
+    # fill in values for any short list.
+    if ($totalRels{$curQ} != 0) { # skip any query with no judgments
+        $setTotalRet += $rankCount;
+        $retCount = $rankCount;
+        while ($rankCount < $opt_N) {
+            $rankCount++;
+            $thisPr = $rel/$rankCount;
+            if ($rankCount == $totalRels{$curQ}) {
+                $exactPr = $thisPr;
+            }
+            for ($i=0; $i<=$#docLevel; $i++) {
+                if ($rankCount == $docLevel[$i]) {
+                    $precDoc[$i] = $thisPr;
+                }
+            }
+        }
+    }
     &PrintFigure;
 } 
 
 print STDOUT "Set average over $countQuery topics\n";
-print STDOUT "Set average (non-interpolated) precision = ", $setAvgPr/$countQuery, "\n";
-print STDOUT "Set total number of relevant docs = $setTotalRel\n";
-print STDOUT "Set total number of retrieved relevant docs = $setRel\n";
-print STDOUT "Set average interpolated precision at recalls:\n";
-
+print STDOUT "Total number of documents over all queries\n";
+printf( STDOUT "      Retrieved: %7d\n", $setTotalRet);
+printf( STDOUT "      Relevant:  %7d\n", $setTotalRel);
+printf( STDOUT "      Rel_ret:   %7d\n", $setRel);
+print STDOUT "Interpolated Recall - Precision\n";
 
 for ($i=0; $i<=$#recLevel; $i++) {
-    print STDOUT " avg prec at $recLevel[$i] = ",$avgPrecRec[$i]/$countQuery,"\n";
+    printf( STDOUT "      at %4.2f\t| %.4f\n", $recLevel[$i], $avgPrecRec[$i]/$countQuery);
 }
-print STDOUT "Set non-interpolated precsion at docs:\n";
+printf( STDOUT "Average precision (non-interpolated) over all rel docs\n\t\t| %.4f\n", $setAvgPr/$countQuery);
+
+print STDOUT "Precision:\n";
 
 for ($i=0; $i<=$#docLevel; $i++) {
-    print STDOUT " avg prec at $docLevel[$i] = ",$avgPrecDoc[$i]/$countQuery,"\n";
+    printf( STDOUT "  At %4d docs:\t| %.4f\n", $docLevel[$i], $avgPrecDoc[$i]/$countQuery);
 }
-print STDOUT "Set breakeven precision = ", $setExactPr/$countQuery,"\n";
+print STDOUT "R-Precision (precision after R (= num_rel for a query) docs retrieved):\n";
+printf( STDOUT "Exact:\t\t| %.4f\n",$setExactPr/$countQuery);
 
 
 sub PrintFigure {
-# have to increment the counter even if there were not judgements.
-    $countQuery ++;
 # not sure if this does the right thing.
 #    if ($totalRels{$curQ}==0) {
 #	print STDERR "Topic $curQ ignored: no judgments found\n";
@@ -172,11 +222,16 @@ sub PrintFigure {
 #	print STDERR "Topic $curQ ignored: no judgments found\n";
 	return;
     }
+# have to increment the counter only if there judgements.to match trec_eval.
+    $countQuery ++;
 
-    print STDOUT "Topic: $curQ\n";
-    print STDOUT "Total number of relevant docs = ", $totalRels{$curQ},"\n";
-    print STDOUT "Total number of retrieved relevant docs = ", $rel,"\n";
-	  
+    if ($opt_q) {
+        print STDOUT "Topic:\t\t$curQ\n";
+        print STDOUT "Total number of documents\n";
+        printf( STDOUT "      Retrieved: %7d\n", $retCount);
+        printf( STDOUT "      Relevant:  %7d\n", $totalRels{$curQ});
+        printf( STDOUT "      Rel_ret:   %7d\n", $rel);
+    }  
 #    $p = $avgPr/$totalRels{$curQ};
 # need this if not returning due to no rels
     if ($totalRels{$curQ}==0) {
@@ -184,23 +239,35 @@ sub PrintFigure {
     } else {
         $p = $avgPr/$totalRels{$curQ};
     }
-    print STDOUT "Average (non-interpolated) precision = $p\n";
-    print STDOUT "Interpolated precsion at recalls:\n";
+
+    if ($opt_q) { print STDOUT "Interpolated Recall - Precision\n";}
     $setAvgPr += $p;
     for ($i=0; $i<=$#recLevel; $i++) {
-	print STDOUT "  prec at ", $recLevel[$i], " = $precRec[$i]\n";
+        if ($opt_q) {
+            printf( STDOUT "      at %4.2f\t| %.4f\n", $recLevel[$i], 
+                    $precRec[$i]);
+        }
         $avgPrecRec[$i]+= $precRec[$i];
     }
-    print STDOUT "Non-interpolated precsion at docs:\n";
+    if ($opt_q) {
+        printf( STDOUT "Average precision (non-interpolated) over all rel docs\n\t\t| %.4f\n", $p);
+    print STDOUT "Precision:\n";
+    }
 
     for ($i=0; $i<=$#docLevel; $i++) {
-	print STDOUT "  prec at ", $docLevel[$i], " = $precDoc[$i]\n";
+	if ($opt_q) {
+            printf( STDOUT "  At %4d docs:\t| %.4f\n", $docLevel[$i], 
+                    $precDoc[$i]);
+        }
 	$avgPrecDoc[$i]+= $precDoc[$i];
     }
-    print STDOUT "Breakeven Precision: $exactPr\n";
+    if ($opt_q) {
+        print STDOUT "R-Precision (precision after R (= num_rel for a query) docs retrieved):\n";
+        printf( STDOUT "Exact:\t\t| %.4f\n", $exactPr);
+        print STDOUT "\n";
+    }
     $setExactPr += $exactPr;
     $setRel += $rel;
-    print STDOUT "\n";
     return;
 }
 
