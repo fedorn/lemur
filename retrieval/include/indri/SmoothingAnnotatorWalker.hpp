@@ -124,11 +124,13 @@ namespace indri
         indri::lang::Node* rawTerm = dynamic_cast<indri::lang::IndexTerm*>(raw);
         indri::lang::Node* rawODNode = dynamic_cast<indri::lang::ODNode*>(raw);
         indri::lang::Node* rawUWNode = dynamic_cast<indri::lang::UWNode*>(raw);
+        indri::lang::Node* rawWeightedExtentOr = dynamic_cast<indri::lang::WeightedExtentOr*>(raw);
+
         std::string op;
 
         if( rawODNode || rawUWNode ) {
           op = "window";
-        } else if( rawTerm ) {
+        } else if( rawTerm || rawWeightedExtentOr ) {
           op = "term";
         } else {
           op = "?";
