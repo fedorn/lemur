@@ -294,7 +294,7 @@ namespace indri
         iterator out;
 
         // move what's left
-        for( in = start, out=finish; in != finish && out != end(); in++, out++ ) {
+        for( in = start, out=finish; out != end(); in++, out++ ) {
           in->~_Type();
           new(in) _Type(*out);
         }
