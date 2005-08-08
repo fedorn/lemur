@@ -214,7 +214,7 @@ UINT64 indri::index::MemoryIndex::fieldDocumentCount( const std::string& field, 
   if( !entry || id == 0 )
     return 0;
 
-  return (*entry)->termData->fields[id].documentCount;
+  return (*entry)->termData->fields[id-1].documentCount;
 }
 
 //
@@ -227,7 +227,7 @@ UINT64 indri::index::MemoryIndex::fieldDocumentCount( const std::string& field )
   if( id == 0 )
     return 0;
 
-  return _fieldData[id].documentCount;
+  return _fieldData[id-1].documentCount;
 }
 
 //
@@ -240,7 +240,7 @@ UINT64 indri::index::MemoryIndex::fieldTermCount( const std::string& field ) {
   if( id == 0 )
     return 0;
 
-  return _fieldData[id].totalCount;
+  return _fieldData[id-1].totalCount;
 }
 
 //
@@ -254,7 +254,7 @@ UINT64 indri::index::MemoryIndex::fieldTermCount( const std::string& field, cons
   if( !entry || id == 0 )
     return 0;
 
-  return (*entry)->termData->fields[id].totalCount;
+  return (*entry)->termData->fields[id-1].totalCount;
 }
 
 //
@@ -536,6 +536,7 @@ int indri::index::MemoryIndex::addDocument( indri::api::ParsedDocument& document
 
     // update our open tag knowledge
     _addOpenTags( indexedTags, openTags, document.tags, extentIndex, position );
+    _removeClosedTags( openTags, position );
 
     // for every open tag, we want to record that we've seen the 
     for( indri::utility::greedy_vector<indri::index::FieldExtent>::iterator tag = openTags.begin(); tag != openTags.end(); tag++ ) {
@@ -546,7 +547,6 @@ int indri::index::MemoryIndex::addDocument( indri::api::ParsedDocument& document
       field->addOccurrence( documentID );
     }
 
-    _removeClosedTags( openTags, position );
     indexedTerms++;
   }
 
