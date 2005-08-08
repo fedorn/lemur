@@ -93,12 +93,14 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
       //      same position, the largest end position comes first
       //      (e.g. [1,10] comes before [1,4])
       // Therefore, if a match [a,b] is in any extent, it will be
-      //   in the first one [c,d] such that d>=a.
+      //   in the first one [c,d] such that d>a.or d=a if a=b.
       // Proof is by contradiction: if the match is in a context extent,
       //   but it's not the first one such that d>=a, then that context
       //   extent must overlap the first extent such that d>=a (which
       //   is not allowed).
-      while( extents[ex].end < matches[i].begin ) {
+      while( extents[ex].end < matches[i].begin
+             || ( extents[ex].end == matches[i].begin && 
+                  matches[i].end > matches[i].begin ) ) {
         ex++;
 
         if( ex >= extents.size() ) break;
