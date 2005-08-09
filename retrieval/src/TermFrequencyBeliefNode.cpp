@@ -68,7 +68,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
 
     _extents.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
 
-    assert( score < _maximumScore || _list->topDocuments().size() > 0 );
+    assert( score <= _maximumScore || _list->topDocuments().size() > 0 );
     assert( score <= _maximumBackgroundScore || count != 0 );
   }
 
