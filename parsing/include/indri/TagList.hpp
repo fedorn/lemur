@@ -106,7 +106,7 @@ namespace indri
         for( unsigned int i=0; i<_tags.size(); i++ ) {
           tag_entry& entry = _tags[i];
 
-          if( entry.end > 0 ) {
+          if( entry.end >= 0 ) {// data field might be empty at head of doc
             TagExtent extent;
             extent.begin = entry.begin;
             extent.end = entry.end;
