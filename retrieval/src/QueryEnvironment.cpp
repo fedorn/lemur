@@ -160,8 +160,6 @@ void indri::api::QueryEnvironment::setStopwords( const std::vector<std::string>&
   _parameters.set("stopper","");
   Parameters p = _parameters.get("stopper");
   for( unsigned int i=0; i<stopwords.size(); i++ ) {
-    //    _parameters.append("word").set(stopwords[i]);
-    // should be the slice.
     p.append("word").set(stopwords[i]);
   }
 }

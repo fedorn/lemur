@@ -26,7 +26,7 @@ namespace indri
   namespace file
   {
     
-    /*! Provides iteration over a directory tree.
+    /*! Provides iteration over the files in a directory tree.
      */
     class FileTreeIterator {
     private:
@@ -42,12 +42,25 @@ namespace indri
       FileTreeIterator( const std::string& path );
       ~FileTreeIterator();
 
+      /// Moves to the next file within the directory tree.
       void operator ++ (int);
+      
+      /// Moves to the next file within the directory tree.
       void operator ++ ();
+      
+      /// Used only for comparison with FileTreeIterator::end.  If false, the
+      /// iteration is complete.
       bool operator == ( const FileTreeIterator& other ) const;
+      
+      /// Used only for comparison with FileTreeIterator::end.  If true, the
+      /// iteration is complete.
       bool operator != ( const FileTreeIterator& other ) const;
+      
+      /// Returns the full path to a file within the directory tree.
       const std::string& operator* ();
 
+      /// Placeholder object that indicates a finished iteration.
+      /// Use this with operator != to tell when iteration is finished.
       static const FileTreeIterator& end();
     };
   }
