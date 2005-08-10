@@ -133,6 +133,22 @@ bool indri::file::File::openRead( const std::string& filename ) {
 #endif
 }
 
+bool indri::file::File::openTemporary( std::string& fileName ) {
+#ifdef HAVE_MKSTEMP
+  char name[] = "/tmp/indriXXXXXX";
+  _handle = ::mkstemp( name );
+  fileName = name;
+
+  if( _handle < 0 )
+    LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't create temporary file." );
+#else
+  fileName = tmpnam();
+  open( filename );
+#endif
+
+  return true;
+}
+
 size_t indri::file::File::read( void* buffer, UINT64 position, size_t length ) {
 #ifdef WIN32
   assert( _handle != INVALID_HANDLE_VALUE );

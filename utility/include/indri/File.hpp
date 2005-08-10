@@ -32,6 +32,7 @@ namespace indri
       bool create( const std::string& filename );
       bool open( const std::string& filename );
       bool openRead( const std::string& filename );
+      bool openTemporary( std::string& filename );
 
       void close();
 
