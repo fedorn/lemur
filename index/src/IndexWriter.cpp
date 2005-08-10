@@ -92,9 +92,9 @@ void IndexWriter::_writeManifest( const std::string& path ) {
   manifest.set( "corpus", "" );
   indri::api::Parameters corpus = manifest["corpus"];
 
-  corpus.set("total-documents", _corpus.totalDocuments);
+  corpus.set("total-documents", (UINT64) _corpus.totalDocuments);
   corpus.set("total-terms", (UINT64) _corpus.totalTerms);
-  corpus.set("unique-terms", _corpus.uniqueTerms);
+  corpus.set("unique-terms", (UINT64) _corpus.uniqueTerms);
   corpus.set("document-base", _documentBase);
   corpus.set("frequent-terms", _topTermsCount);
 
@@ -107,7 +107,7 @@ void IndexWriter::_writeManifest( const std::string& path ) {
 
     field[i].set("isNumeric", _fields[i].numeric);
     field[i].set("name", _fields[i].name);
-    field[i].set("total-documents", _fieldData[i].documentCount);
+    field[i].set("total-documents", (UINT64) _fieldData[i].documentCount);
     field[i].set("total-terms", (UINT64) _fieldData[i].totalCount);
   }
 
@@ -294,8 +294,6 @@ void IndexWriter::_writeStatistics( indri::utility::greedy_vector<WriterIndexCon
   int dataSize = stream.dataSize();
   _invertedOutput->write( &dataSize, sizeof(UINT32) );
   _invertedOutput->write( stream.data(), stream.dataSize() );
-
-  _corpus.totalTerms += termData->corpus.totalCount;
 }
 
 //
@@ -320,7 +318,7 @@ void IndexWriter::_writeFieldList( const std::string& fileName, int fieldIndex, 
   int lastDocument = 0;
 
   int documents = 0;
-  int terms = 0;
+  UINT64 terms = 0;
 
   for( int i=0; i<iterators.size(); i++ ) {
     DocExtentListIterator* iterator = iterators[i];
@@ -700,6 +698,7 @@ void IndexWriter::_writeInvertedLists( std::vector<WriterIndexContext*>& context
   for( int i=0; i<contexts.size(); i++ ) {
     if( !contexts[i]->iterator->finished() )
       invertedLists.push( contexts[i] );
+    _corpus.totalTerms += contexts[i]->index->termCount();
     _corpus.totalDocuments += contexts[i]->index->documentCount();
   }
 

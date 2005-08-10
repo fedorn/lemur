@@ -23,10 +23,10 @@ namespace indri {
   namespace index {
     struct CorpusStatistics {
       CorpusStatistics() : totalTerms(0), totalDocuments(0), uniqueTerms(0), maximumDocumentLength(0) {}
-      INT64 totalTerms;
-      int totalDocuments;
-      int uniqueTerms;
-      INT64 maximumDocumentLength;
+      UINT64 totalTerms;
+      unsigned int totalDocuments;
+      unsigned int uniqueTerms;
+      UINT64 maximumDocumentLength;
     };
   }
 }

@@ -33,7 +33,7 @@ namespace indri {
       {
       }
 
-      FieldStatistics( const std::string& _name, bool numeric, UINT64 _totalCount, int _documentCount )
+      FieldStatistics( const std::string& _name, bool numeric, UINT64 _totalCount, unsigned int _documentCount )
         :
         name(_name),
         isNumeric(numeric),
@@ -57,7 +57,7 @@ namespace indri {
       std::string name;
       bool isNumeric;
       UINT64 totalCount;
-      int documentCount;
+      unsigned int documentCount;
 
       int lastDocument;
       int lastCount;
