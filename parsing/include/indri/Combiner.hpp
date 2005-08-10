@@ -97,6 +97,11 @@ namespace indri
       url_entry* _newUrlEntry( char* url, char* corpusPath, char* docNo );
       void _deleteUrlEntry( void* buffer );
   
+      void _readLinks( UrlEntryTable& urlTable, std::ifstream& linkIn );
+      void _readRedirects( UrlEntryTable& urlTable, const std::string& redirectPath, int number );
+      void _writeCorpusTable( UrlEntryVectorTable& corpusTable, const std::string& outputPath );
+      void _hashToCorpusTable( UrlEntryVectorTable& corpusTable, UrlEntryTable& urlTable );
+      
       void _openWriteBuckets( std::vector<std::stringstream*>& buffers, std::vector<std::ofstream*>& buckets, const std::string& path, int bins );
       void _flushWriteBuffer( std::vector<std::stringstream*>& buffers, std::vector<std::ofstream*>& buckets, bool force, int i );
       void _flushWriteBuffers( std::vector<std::stringstream*>& buffers, std::vector<std::ofstream*>& buckets, bool force );

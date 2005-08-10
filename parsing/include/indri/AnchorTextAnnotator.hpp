@@ -63,19 +63,6 @@ namespace indri
       }
 
       void _fetchText( indri::utility::greedy_vector<TagExtent>& tags, indri::utility::greedy_vector<char*>& terms ) {
-        // first, surround current text with a mainbody tag
-        TagExtent mainbody;
-        mainbody.begin = 0;
-        mainbody.end = terms.size();
-        mainbody.name = "mainbody";
-        mainbody.number = 0;
-
-        indri::utility::greedy_vector<TagExtent> oldTags;
-        oldTags = tags;
-        tags.clear();
-        tags.push_back( mainbody );
-        tags.append( oldTags.begin(), oldTags.end() );
-
         // now, fetch the additional terms
         char line[65536];
         _buffer.clear();
@@ -84,12 +71,15 @@ namespace indri
           // LINK
           _in.getline( line, sizeof line-1 );
 
+	  // LINKDOCNO 
+          _in.getline( line, sizeof line-1 );
+	  
           // TEXT=
           _in.getline( line, sizeof line-1 );
           int textLen = strlen(line+6);
           strcpy( _buffer.write(textLen+1), line+6 );
           _buffer.unwrite(1);
-
+	  
           assert( *(_buffer.front()+_buffer.position()-1) == '\"' && "Last character should be a quote" );
         }
         *(_buffer.write(1)) = 0;
@@ -108,9 +98,9 @@ namespace indri
             if(!beginIndex)
               beginIndex = terms.size();
           } else if( isspace(buffer[i]) ) {
+            buffer[i] = 0;
             if( beginWord )
               terms.push_back( beginWord );
-            buffer[i] = 0;
             beginWord = 0;
           } else if( buffer[i] == '\"' ) {
             buffer[i] = 0;
@@ -126,12 +116,18 @@ namespace indri
 
             assert( extent.begin <= extent.end );
 
-            if( beginIndex )
+            if( beginIndex ) {
               tags.push_back(extent);
+	      if( terms.size() > 125000 )
+		break;
+	    }
+
 
             beginIndex = 0;
           }
+
         }
+
       }
 
       bool _matchingDocno( indri::api::ParsedDocument* document ) {
@@ -170,6 +166,20 @@ namespace indri
       }
 
       indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document ) {
+
+	// surround current text with a mainbody tag
+        TagExtent mainbody;
+        mainbody.begin = 0;
+        mainbody.end = document->terms.size();
+        mainbody.name = "mainbody";
+        mainbody.number = 0;
+
+        indri::utility::greedy_vector<TagExtent> oldTags;
+        oldTags = document->tags;
+        document->tags.clear();
+        document->tags.push_back( mainbody );
+        document->tags.append( oldTags.begin(), oldTags.end() );
+	
         if( _matchingDocno( document ) ) {
           _fetchText( document->tags, document->terms );
           _readDocumentHeader();

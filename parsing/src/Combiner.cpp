@@ -239,6 +239,10 @@ void indri::parse::Combiner::combineRedirectDestinationBuckets( const std::strin
   }
 }
 
+//
+// hashToBuckets
+//
+
 void indri::parse::Combiner::hashToBuckets( std::ifstream& in, const std::string& path ) {
   char docno[512];
   char docUrl[4096];
@@ -287,6 +291,10 @@ void indri::parse::Combiner::hashToBuckets( std::ifstream& in, const std::string
 
   in.close();
 }
+
+//
+// createBuckets
+//
 
 void indri::parse::Combiner::createBuckets( const std::string& tmpPath ) {
   std::string docPath = indri::file::Path::combine( tmpPath, "doc" );
@@ -340,102 +348,13 @@ void indri::parse::Combiner::closeBuckets() {
   _linkBucketFiles.clear();
 }
 
+//
+// _hashToCorpusTable
+//
 
-void indri::parse::Combiner::combineBucket( const std::string& outputPath, const std::string& tmpPath, int bucket ) {
-  UrlEntryTable urlTable( 5*1024*1024 );
-  std::string number = i64_to_string(bucket);
-
-  // read document information into the hash table
-  std::string docPath = indri::file::Path::combine( tmpPath, "doc" );
-  std::string docBucketPath = indri::file::Path::combine( docPath, number );
-  std::ifstream docIn;
-
-  std::cout << "  reading documents" << std::endl;
-  docIn.open( docBucketPath.c_str(), std::ios::in );
-  _readDocBucket( urlTable, docIn );
-  docIn.close();
-
-  // update the hash table based on redirect information
-  std::string redirectPath = indri::file::Path::combine( tmpPath, "redirect" );
-  std::string redirectBucketPath = indri::file::Path::combine( redirectPath, number );
-  std::ifstream redirectIn;
-  redirectIn.open( redirectBucketPath.c_str(), std::ios::in );
-
-  char docurl[65536];
-  char aliasurl[65536];
-  char pathline[4096];
-  char docnoline[256];
-
-  std::cout << "  reading redirects" << std::endl;
-
-  while( !redirectIn.eof() && redirectIn.good() ) {
-    redirectIn.getline( docurl, sizeof docurl );
-    redirectIn.getline( aliasurl, sizeof aliasurl );
-    redirectIn.getline( pathline, sizeof pathline );
-    redirectIn.getline( docnoline, sizeof docnoline );
-    
-    if( strcmp( "ALIAS=", aliasurl ) )
-      break;
-
-    // look for the aliasurl in the hash table
-    url_entry** entry = urlTable.find( aliasurl + sizeof "ALIAS=" - 1 );
-    url_entry* new_entry = _newUrlEntry( aliasurl + sizeof "ALIAS=" - 1,
-                                         docnoline + sizeof "DOCNO=" - 1,
-                                         pathline + sizeof "PATH=" - 1);
-
-    if( entry ) {
-      _deleteUrlEntry( *entry );
-      urlTable.remove( aliasurl + sizeof "ALIAS=" - 1 );
-    }
-
-    urlTable.insert( aliasurl + sizeof "ALIAS=" - 1, new_entry );
-  }
-  redirectIn.close();
-
-  std::cout << "  reading links" << std::endl;
-
-  // open link file
-  std::string linkPath = indri::file::Path::combine( tmpPath, "link" );
-  std::string linkBucketPath = indri::file::Path::combine( linkPath, number );
-  std::ifstream linkIn;
-
-  linkIn.open( linkBucketPath.c_str(), std::ios::in );
-
-  char docno[65536];
-  char linkurl[65536];
-  char linktext[65536];
-  int linkCount = 0;
-
-  // read the incoming link information and match it with document information
-  while( !linkIn.eof() && linkIn.good() ) {
-    linkIn.getline( docno, sizeof docno-1 );
-    linkIn.getline( docurl, sizeof docurl-1 );
-    linkIn.getline( linkurl, sizeof linkurl-1 );
-    linkIn.getline( linktext, sizeof linktext-1 );
-
-    char* url = linkurl + sizeof "LINKURL=" - 1;
-    url_entry** entry = urlTable.find( url );
-
-    // entry exists, so this is a link match
-    if( entry ) {
-      (*entry)->addLink( docno + sizeof "DOCNO=" - 1,
-                         docurl + sizeof "DOCURL=" - 1,
-                         linktext + sizeof "TEXT=" - 1 );
-    }
-  }
-
-  if( !linkIn.good() && !linkIn.eof() ) {
-    std::cout << "links not good at " << linkBucketPath.c_str() << std::endl;
-    std::cout << "cur doc url is " << docurl << std::endl;
-  }
-
-  linkIn.close();
-
-  std::cout << "  hashing to file buckets" << std::endl;
-  // hash all the data into file buckets
-  UrlEntryVectorTable corpusTable;
+void indri::parse::Combiner::_hashToCorpusTable( UrlEntryVectorTable& corpusTable, UrlEntryTable& urlTable ) {
   UrlEntryTable::iterator iter;
-
+  
   for( iter = urlTable.begin(); iter != urlTable.end(); iter++ ) {
     url_entry* entry = (*iter->second);
 
@@ -451,10 +370,15 @@ void indri::parse::Combiner::combineBucket( const std::string& outputPath, const
 
     entryVec->push_back(entry);
   }
+}
 
-  // open each file in turn and write this additional data, then close
-  // delete all url_entry data
-  std::cout << "  writing data out to files" << std::endl;
+//
+// _writeCorpusTable
+//
+
+void indri::parse::Combiner::_writeCorpusTable( UrlEntryVectorTable& corpusTable,
+                                                const std::string& outputPath )
+{
   UrlEntryVectorTable::iterator citer;
 
   for( citer = corpusTable.begin(); citer != corpusTable.end(); citer++ ) {
@@ -493,6 +417,132 @@ void indri::parse::Combiner::combineBucket( const std::string& outputPath, const
 
     out.close();
   }
+}
+
+//
+// _readRedirects
+//
+
+void indri::parse::Combiner::_readRedirects( UrlEntryTable& urlTable, const std::string& redirectPath, int number ) {
+  std::string redirectBucketPath = indri::file::Path::combine( redirectPath, i64_to_string(number) );
+  std::ifstream redirectIn;
+  redirectIn.open( redirectBucketPath.c_str(), std::ios::in );
+  
+  char docurl[65536];
+  char aliasurl[65536];
+  char pathline[4096];
+  char docnoline[256];
+
+  while( !redirectIn.eof() && redirectIn.good() ) {
+    redirectIn.getline( docurl, sizeof docurl );
+    redirectIn.getline( aliasurl, sizeof aliasurl );
+    redirectIn.getline( pathline, sizeof pathline );
+    redirectIn.getline( docnoline, sizeof docnoline );
+    
+    if( strcmp( "ALIAS=", aliasurl ) )
+      break;
+
+    // look for the aliasurl in the hash table
+    url_entry** entry = urlTable.find( aliasurl + sizeof "ALIAS=" - 1 );
+    url_entry* new_entry = _newUrlEntry( aliasurl + sizeof "ALIAS=" - 1,
+                                         docnoline + sizeof "DOCNO=" - 1,
+                                         pathline + sizeof "PATH=" - 1);
+
+    if( entry ) {
+      _deleteUrlEntry( *entry );
+      urlTable.remove( aliasurl + sizeof "ALIAS=" - 1 );
+    }
+
+    urlTable.insert( aliasurl + sizeof "ALIAS=" - 1, new_entry );
+  }
+  redirectIn.close();
+}
+
+//
+// _readLinks
+//
+
+void indri::parse::Combiner::_readLinks( UrlEntryTable& urlTable, std::ifstream& linkIn ) {
+  char docno[65536];
+  char linkurl[65536];
+  char docurl[65536];
+  char linktext[65536];
+  int linkCount = 0;
+  
+  // read the incoming link information and match it with document information
+  while( !linkIn.eof() && linkIn.good() && linkCount < 250000 ) {
+    linkIn.getline( docno, sizeof docno-1 );
+    linkIn.getline( docurl, sizeof docurl-1 );
+    linkIn.getline( linkurl, sizeof linkurl-1 );
+    linkIn.getline( linktext, sizeof linktext-1 );
+
+    char* url = linkurl + sizeof "LINKURL=" - 1;
+    url_entry** entry = urlTable.find( url );
+
+    // entry exists, so this is a link match
+    if( entry ) {
+      (*entry)->addLink( docno + sizeof "DOCNO=" - 1,
+                         docurl + sizeof "DOCURL=" - 1,
+                         linktext + sizeof "TEXT=" - 1 );
+    }
+    
+    linkCount++;
+  }
+
+  if( !linkIn.good() && !linkIn.eof() ) {
+    std::cout << "WARNING: link file error: " << docurl << std::endl;
+  }
+}
+
+//
+// combineBucket
+//
+
+void indri::parse::Combiner::combineBucket( const std::string& outputPath, const std::string& tmpPath, int bucket ) {
+  std::string number = i64_to_string(bucket);
+
+  // open link file
+  std::string linkPath = indri::file::Path::combine( tmpPath, "link" );
+  std::string linkBucketPath = indri::file::Path::combine( linkPath, number );
+  std::ifstream linkIn;
+
+  linkIn.open( linkBucketPath.c_str(), std::ios::in );
+
+  do {  
+    UrlEntryTable urlTable( 5*1024*1024 );
+    
+    // read document information into the hash table
+    std::string docPath = indri::file::Path::combine( tmpPath, "doc" );
+    std::string docBucketPath = indri::file::Path::combine( docPath, number );
+    std::ifstream docIn;
+
+    std::cout << "  reading documents" << std::endl;
+    docIn.open( docBucketPath.c_str(), std::ios::in );
+    _readDocBucket( urlTable, docIn );
+    docIn.close();
+  
+    // update the hash table based on redirect information
+    std::string redirectPath = indri::file::Path::combine( tmpPath, "redirect" );
+  
+    std::cout << "  reading redirects" << std::endl;
+    _readRedirects( urlTable, redirectPath, bucket );
+  
+    // read some of the links
+    std::cout << "  reading links" << std::endl;
+    _readLinks( urlTable, linkIn );
+  
+    std::cout << "  hashing to file buckets" << std::endl;
+    // hash all the data into file buckets
+    UrlEntryVectorTable corpusTable;
+    _hashToCorpusTable( corpusTable, urlTable );
+    
+    // open each file in turn and write this additional data, then close
+    std::cout << "  writing data out to files" << std::endl;
+    _writeCorpusTable( corpusTable, outputPath );  
+  }
+  while( !linkIn.eof() );
+      
+  linkIn.close();
 }
 
 void indri::parse::Combiner::combineBuckets( const std::string& outputPath, const std::string& tmpPath ) {
@@ -574,7 +624,7 @@ void indri::parse::Combiner::sortCorpusFiles( const std::string& outputPath, con
           e->linkinfo.unwrite(1); // remove trailing 0
         e->linkCount += linkCount;
       } else {
-        e = _newUrlEntry( docUrl, "", docno );
+        e = _newUrlEntry( docUrl + sizeof "DOCURL=" - 1, "", docno + sizeof "DOCNO=" - 1 );
         e->linkCount = linkCount;
         urlTable.insert( e->docNo, e );
         insertCount++;
@@ -638,7 +688,7 @@ void indri::parse::Combiner::sortCorpusFiles( const std::string& outputPath, con
         continue;
 
       totalDocuments++;
-      url_entry** e = urlTable.find( docno );
+      url_entry** e = urlTable.find( docno + sizeof "DOCNO=" - 1 );
 
       if( !e )
         continue;
