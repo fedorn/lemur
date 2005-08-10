@@ -70,9 +70,14 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
   double documentContextSize = 0;
 
   if( !_context ) {
+    int lastEnd = 0;
     for( size_t i=0; i<_matches->extents().size(); i++ ) {
       const indri::index::Extent& extent = _matches->extents()[i];
-      documentOccurrences += extent.weight;
+      if( extent.begin >= lastEnd ) {
+        // if this isn't a duplicate
+        documentOccurrences += extent.weight;
+        lastEnd = extent.end;
+      }
     }
     _occurrences += documentOccurrences;
   } else {
@@ -80,7 +85,7 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
     const indri::utility::greedy_vector<indri::index::Extent>& matches = _matches->extents();
     const indri::utility::greedy_vector<indri::index::Extent>& extents = _context->extents();
     unsigned int ex = 0;
-    
+    int lastEnd = 0;
     for( unsigned int i=0; i<matches.size() && ex < extents.size(); i++ ) {
       // find a context extent that might possibly contain this match
       // here we're relying on the following invariants: 
@@ -98,9 +103,12 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
       //   but it's not the first one such that d>=a, then that context
       //   extent must overlap the first extent such that d>=a (which
       //   is not allowed).
+
       while( extents[ex].end < matches[i].begin
+             // addresses don's issue in bugzilla #38
              || ( extents[ex].end == matches[i].begin && 
                   matches[i].end > matches[i].begin ) ) {
+
         ex++;
 
         if( ex >= extents.size() ) break;
@@ -108,8 +116,10 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
 
       if( ex < extents.size() &&
           matches[i].begin >= extents[ex].begin &&
-          matches[i].end <= extents[ex].end ) {
+          matches[i].end <= extents[ex].end &&
+          matches[i].begin >= lastEnd) { // filter duplicates
         documentOccurrences += matches[i].weight;
+        lastEnd = matches[i].end;
       }
     }
 
