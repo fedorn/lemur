@@ -43,9 +43,6 @@ void indri::parse::HTMLParser::initialize( UnparsedDocument* unparsed, indri::ap
     }
   }
 
-  // set url
-  normalizeURL(url);
-
   // set base_url
   normalizeURL(base_url);
 
