@@ -142,8 +142,8 @@ bool indri::file::File::openTemporary( std::string& fileName ) {
   if( _handle < 0 )
     LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't create temporary file." );
 #else
-  fileName = tmpnam();
-  open( filename );
+  fileName = tmpnam( NULL );
+  open( fileName );
 #endif
 
   return true;
