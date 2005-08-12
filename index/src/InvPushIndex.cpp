@@ -324,7 +324,8 @@ void lemur::index::InvPushIndex::lastWriteCache() {
     // check to see that there is a list that requires flushing
     if (!list->hasNoMem()) {
       list->binWriteC(fout);
-      list->reset();
+      // done with this list forever, delete it.
+      delete(list);
       written = true;      
     } // if needs flushing   
   } // for each term
