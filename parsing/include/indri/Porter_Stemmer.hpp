@@ -60,7 +60,7 @@ namespace indri
     class Porter_Stemmer 
     {
     private:
-      indri::thread::Mutex _stemLock; /// protects stem calls
+      indri::thread::Mutex _stemLock;
       char * b;       /* buffer for word to be stemmed */
       int k,k0,j;     /* j is a general offset into the string */
 
@@ -168,6 +168,16 @@ namespace indri
          into a module, declare 'stem' as extern, and delete the remainder of this
          file.
       */
+      /*!
+        \brief stem a term using the Porter algorithm. 
+        Performs case normalization on its input argument. 
+        @param p the term to stem
+        @param i the starting index to stem from (typically 0).
+        @param j the ending index (inclusive) to stem to 
+        (typically the last character of the string).
+        @return the new end point of the string.
+       */
+
       int porter_stem(char * p, int i, int j);
     };
   }

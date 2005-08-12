@@ -24,8 +24,6 @@ using namespace __gnu_cxx;
 #include "indri/Mutex.hpp"
 #include "indri/ScopedLock.hpp"
 
-// fix this
-#define MAX_WORD_LENGTH 25
 namespace indri
 {
   namespace parse 
@@ -35,29 +33,66 @@ namespace indri
     public:
       KrovetzStemmer();
       ~KrovetzStemmer();
-      
-      // const ness...
+      /// maximum number of characters in a word to be stemmed.
+      static const int MAX_WORD_LENGTH=25;
+      /*!
+        \brief stem a term using the Krovetz algorithm. 
+        The stem returned may be longer than the input term.
+        May return a pointer
+        to the private attribute stem. Performs case normalization on its
+        input argument. Return values should be copied before
+        calling the method again.
+        @param term the term to stem
+        @return the stemmed term or the original term if no stemming was 
+        performed.
+       */
       char * kstem_stemmer(char *term);
+      /*!
+        \brief stem a term using the Krovetz algorithm into the specified
+        buffer.
+        The stem returned may be longer than the input term.
+        Performs case normalization on its input argument. 
+        @param term the term to stem
+        @param buffer the buffer to hold the stemmed term. The buffer should
+        be at MAX_WORD_LENGTH or larger.
+        @return the number of characters written to the buffer, including
+        the terminating '\0'. If 0, the caller should use the value in term.
+       */
       int kstem_stem_tobuffer(char *term, char *buffer);
-      // indri's KrovetzStemmerTransformation may use this
+      /*!
+        \brief Add an entry to the stemmer's dictionary table.
+        @param variant the spelling for the entry.
+        @param word the stem to use for the variant. If "", the variant
+        stems to itself.
+        @param exc Is the word an exception to the spelling rules.
+       */
       void kstem_add_table_entry(const char* variant, const char* word, 
                                  bool exc=false);
     private:
-      indri::thread::Mutex _stemLock; /// protects stem calls
+       /// lock for protecting stem calls 
+      indri::thread::Mutex _stemLock;
+      /// Dictionary table entry
       typedef struct dictEntry {
-        bool exception;      /* is the word an exception to stemming rules? */
-        const char *root; /* used for direct lookup (e.g. irregular variants) */
+        /// is the word an exception to stemming rules?
+        bool exception;      
+        /// stem to use for this entry.
+        const char *root;
       } dictEntry;
-      // this allows two terms to hash to an entry.
+      /// Two term hashtable entry for caching across calls
       typedef struct cacheEntry {
-        char flag; // first or second last used.
+        /// flag for first or second entry most recently used.
+        char flag; 
+        /// first entry variant
         char word1[MAX_WORD_LENGTH];
+        /// first entry stem
         char stem1[MAX_WORD_LENGTH];
+        /// second entry variant
         char word2[MAX_WORD_LENGTH];
+        /// second entry stem
         char stem2[MAX_WORD_LENGTH];
       } cacheEntry;
 
-      // operatoes on atribute word.
+      // operates on atribute word.
       bool ends(const char *s, int sufflen);
       void setsuff(const char *str, int length);
       dictEntry *getdep(char *word);

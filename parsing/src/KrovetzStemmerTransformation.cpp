@@ -18,7 +18,7 @@
 
 #include "indri/KrovetzStemmerTransformation.hpp"
 
-#define KSTEM_MAX_WORD_LENGTH (25+15)  // add extra space here in case kstem goes over its 25 byte window
+#define KSTEM_MAX_WORD_LENGTH (indri::parse::KrovetzStemmer::MAX_WORD_LENGTH+15)  // add extra space here in case kstem goes over its 25 byte window
 #define KSTEM_EXTRA_SPACE     (256)
 
 

@@ -52,16 +52,13 @@ namespace indri
 #define stemlength (j + 1)     /* length of stem within word (not an lvalue) */
 #define final_c    (word[k])   /* the last character of word */
 #define penult_c   (word[k-1]) /* the penultimate character of word */
-
-    /* These 2 macro used "sizeof(s)-1", then someone changed it to use
-       "strlen(s)-1", and forgot to remove the "-1". -- RCC 3/8/96 */
-#define ends_in(s) ends(s, (int)strlen(s))      /* s must be a string constant */
+#define ends_in(s) ends(s, (int)strlen(s))  /* s must be a string constant */
 #define setsuffix(s) setsuff(s, (int)strlen(s)) /* s must be a string constant */
 
     /* --- Hashing in a fixed sized table. */
 #define  stemhash(word, hval){ unsigned short int ptr[6]; strncpy((char *)ptr, word, 12); hval = ((ptr[0]<<4)^ptr[1]^ptr[2]^ptr[3]^ptr[4]^ptr[5]) % stemhtsize; }
 
-    /* ------------------------------ Definitions -------------------------------*/
+    /* ------------------------- Definitions -------------------------------*/
 
     KrovetzStemmer::KrovetzStemmer( ) : stemhtsize (30013), k(0), j(0), word(0)
     {
@@ -1001,7 +998,6 @@ namespace indri
       bool stem_it = true;
       int hval;
       dictEntry *dep = 0;
-      //      std::cout << "Stemming: " << term << std::endl;
       
       k = (int)strlen(term) - 1;
       /* if the word is too long or too short, or not entirely
@@ -1107,12 +1103,6 @@ namespace indri
       if (dep != (dictEntry *)NULL && dep->root[0] != '\0')  {                 
         strcpy((char *)buffer, (char *)dep->root);   
       }
-      // cost of cache may outweigh its value.
-      //      return strlen(buffer) + 1;
-      /*
-      std::cout << "Stem " << term 
-                << " to " << buffer << std::endl;
-      */
       /* Enter into cache, at the place not used by the last cache hit */
       if (stemCache[hval].flag == 2) {
         strcpy(stemCache[hval].word1, term);
