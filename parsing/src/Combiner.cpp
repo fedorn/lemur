@@ -28,7 +28,7 @@
 #include "indri/FileTreeIterator.hpp"
 #include "indri/IndriTimer.hpp"
 
-#define COMBINER_WRITE_BUFFER_SIZE (5*1024*1024)
+#define COMBINER_WRITE_BUFFER_SIZE (1*1024*1024)
 
 indri::parse::Combiner::url_entry* indri::parse::Combiner::_newUrlEntry( char* url, char* corpusPath, char* docNo ) {
   int urlLen = strlen(url) + 1;
