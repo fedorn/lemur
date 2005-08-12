@@ -851,7 +851,7 @@ void lemur::index::KeyfileIncIndex::writeCacheSegment() {
   
     if( list != NULL ) {
       lemur::api::COUNT_T vecLen;
-      std::auto_ptr<lemur::api::LOC_T> byteVec( list->byteVec(vecLen) );
+      lemur::api::LOC_T *byteVec = list->byteVec(vecLen) ;
 
       TermData termData;
 
@@ -880,8 +880,8 @@ void lemur::index::KeyfileIncIndex::writeCacheSegment() {
       invlookup.put( list->termID(), &termData, 
                      sizeof(TermData) - 
                      sizeof(SegmentOffset)*(missingSegments-1) );
-      out.write( (char*) byteVec.get(), vecLen );
-      
+      out.write( (char*) byteVec, vecLen );
+      delete[](byteVec);
       delete list;
       invertlists[i] = NULL;
 
