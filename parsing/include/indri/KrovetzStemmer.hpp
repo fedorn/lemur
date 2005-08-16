@@ -56,7 +56,7 @@ namespace indri
         @param buffer the buffer to hold the stemmed term. The buffer should
         be at MAX_WORD_LENGTH or larger.
         @return the number of characters written to the buffer, including
-        the terminating '\0'. If 0, the caller should use the value in term.
+        the terminating '\\0'. If 0, the caller should use the value in term.
        */
       int kstem_stem_tobuffer(char *term, char *buffer);
       /*!
