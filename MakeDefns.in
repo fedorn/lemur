@@ -44,8 +44,8 @@ WITH_SUMMARIZATION = @WITH_SUMMARIZATION@
 WITH_CLUSTER = @WITH_CLUSTER@
 WITH_SWIG = @WITH_SWIG@
 
-ALLMODULES=cluster summarization distrib retrieval langmod index parsing utility contrib/antlr contrib/xpdf 
-
+ALLMODULES=cluster summarization distrib retrieval langmod index parsing utility
+CONTMODULES=$(ALLMODULES) contrib/antlr contrib/xpdf
 # C++ source files
 CPPSRC1 = $(notdir $(wildcard ../src/*.cpp))
 CPPSRC2 = $(notdir $(wildcard ../src/*.cc))
@@ -67,7 +67,7 @@ ALLHEADER = $(CPPHEADER) $(CHEADER)
 INDRIHEADER = $(wildcard ../include/indri/*.h*)
 # Include path
 INCPATH = -I../include $(patsubst %, -I../../%/include, $(MODULES))
-ALLINCPATH = -I../include $(patsubst %, -I../../%/include, $(ALLMODULES))
+ALLINCPATH = -I../include $(patsubst %, -I../../%/include, $(CONTMODULES))
 
 # C++ objects
 CPPOBJ = $(CPPSRC:.cpp=.o) $(CPPSRC2:.cc=.o) $(CPPSRC3:.C=.o)
