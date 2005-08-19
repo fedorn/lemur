@@ -6,10 +6,9 @@
   #include "indri/QuerySpec.hpp"
   #include "indri/DateParse.hpp"
   #include "indri/delete_range.hpp"
-  #include "indri/PriorFactory.hpp"
   #include "indri/QueryLexer.hpp"
 
-#line 13 "QueryLexer.hpp"
+#line 12 "QueryLexer.hpp"
 #include <antlr/config.hpp>
 /* $ANTLR 2.7.4: "indrilang.g" -> "QueryLexer.hpp"$ */
 #include <antlr/CommonToken.hpp>
@@ -21,7 +20,7 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API QueryLexer : public ANTLR_USE_NAMESPACE(antlr)CharScanner, public QueryLexerTokenTypes
 {
-#line 74 "indrilang.g"
+#line 73 "indrilang.g"
 
 private:
   bool _numbers;
@@ -34,7 +33,7 @@ public:
   void setNumbers(bool f) {
     _numbers = f;
   } 
-#line 24 "QueryLexer.hpp"
+#line 23 "QueryLexer.hpp"
 private:
 	void initLiterals();
 public:

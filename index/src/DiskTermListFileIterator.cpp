@@ -74,6 +74,9 @@ bool indri::index::DiskTermListFileIterator::nextEntry() {
 bool indri::index::DiskTermListFileIterator::nextEntry( int documentID ) {
   UINT32 length;
 
+  if( _currentDocument >= documentID )
+    return true;
+  
   while( _currentDocument < documentID ) {
     if( _buffer.position() < _fileSize ) {
       _buffer.read( &length, sizeof(UINT32) );

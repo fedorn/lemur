@@ -228,20 +228,25 @@ private:
 
   std::string _runID;
   bool _trecFormat;
-    
+
   indri::query::QueryExpander* _expander;
   std::vector<indri::api::ScoredExtentResult> _results;
 
   // Runs the query, expanding it if necessary.  Will print output as well if verbose is on.
   void _runQuery( std::stringstream& output, const std::string& query ) {
-    if( _printQuery ) output << "# query: " << query << std::endl;
+    try {
+      if( _printQuery ) output << "# query: " << query << std::endl;
 
-    _results = _environment.runQuery( query, _initialRequested );
+      _results = _environment.runQuery( query, _initialRequested );
 
-    if( _expander ) {
-      std::string expandedQuery = _expander->expand( query, _results );
-      if( _printQuery ) output << "# expanded: " << expandedQuery << std::endl;
-      _results = _environment.runQuery( expandedQuery, _requested );
+      if( _expander ) {
+        std::string expandedQuery = _expander->expand( query, _results );
+        if( _printQuery ) output << "# expanded: " << expandedQuery << std::endl;
+        _results = _environment.runQuery( expandedQuery, _requested );
+      }
+    }
+    catch( lemur::api::Exception& e )
+    {
     }
   }
 
@@ -260,8 +265,8 @@ private:
         std::string documentName;
 
         indri::utility::greedy_vector<indri::parse::MetadataPair>::iterator iter = std::find_if( documents[i]->metadata.begin(),
-                                                                                                 documents[i]->metadata.end(),
-                                                                                                 indri::parse::MetadataPair::key_equal( "docno" ) );
+          documents[i]->metadata.end(),
+          indri::parse::MetadataPair::key_equal( "docno" ) );
 
         if( iter != documents[i]->metadata.end() )
           documentName = (char*) iter->value;
@@ -273,7 +278,7 @@ private:
       // We only want document names, so the documentMetadata call may be faster
       documentNames = _environment.documentMetadata( _results, "docno" );
     }
-
+    
     // Print results
     for( unsigned int i=0; i < _results.size(); i++ ) {
       int rank = i+1;
@@ -282,18 +287,18 @@ private:
       if( _trecFormat ) {
         // TREC formatted output: queryNumber, Q0, documentName, rank, score, runID
         output << queryNumber << " "
-               << "Q0 "
-               << documentNames[i] << " "
-               << rank << " "
-               << _results[ i ].score << " "
-               << _runID << std::endl;
+                << "Q0 "
+                << documentNames[i] << " "
+                << rank << " "
+                << _results[ i ].score << " "
+                << _runID << std::endl;
       }
       else {
         // score, documentName, firstWord, lastWord
         output << _results[i].score << "\t"
-               << documentNames[i] << "\t"
-               << _results[i].begin << "\t"
-               << _results[i].end << std::endl;
+                << documentNames[i] << "\t"
+                << _results[i].begin << "\t"
+                << _results[i].end << std::endl;
       }
 
       if( _printDocuments ) {
@@ -342,7 +347,7 @@ public:
     if( copy_parameters_to_string_vector( smoothingRules, _parameters, "rule" ) )
       _environment.setScoringRules( smoothingRules );
 
-    if( _parameters.exists( "index" ) ) {
+   if( _parameters.exists( "index" ) ) {
       indri::api::Parameters indexes = _parameters["index"];
 
       for( unsigned int i=0; i < indexes.size(); i++ ) {
@@ -478,23 +483,23 @@ int main(int argc, char * argv[]) {
     // process output as it appears on the queue
     while( query < queryCount ) {
       query_t* result = NULL;
-
+      
       // wait for something to happen
       queueEvent.wait( queueLock );
-      
-      while ( output.size() && output.top()->index == query ) {
+          
+      while( output.size() && output.top()->index == query ) {
         result = output.top();
         output.pop();
 
         queueLock.unlock();
-
+          
         std::cout << result->text;
         delete result;
         query++;
 
         queueLock.lock();
       }
-      
+ 
       queueLock.unlock();
     }
 
@@ -513,3 +518,4 @@ int main(int argc, char * argv[]) {
 
   return 0;
 }
+

@@ -25,7 +25,6 @@
 #include "indri/NetworkStream.hpp"
 #include "indri/NetworkMessageStream.hpp"
 #include "indri/Parameters.hpp"
-#include "indri/PriorFactory.hpp"
 #include "indri/ParsedDocument.hpp"
 #include "indri/Repository.hpp"
 #include "indri/QueryAnnotation.hpp"
@@ -57,7 +56,6 @@ namespace indri
       std::vector<indri::net::NetworkMessageStream*> _messageStreams;
 
       Parameters _parameters;
-      indri::query::PriorFactory _priorFactory;
 
       void _mergeQueryResults( indri::infnet::InferenceNetwork::MAllResults& results, std::vector<indri::server::QueryServerResponse*>& responses );
       void _copyStatistics( std::vector<indri::lang::RawScorerNode*>& scorerNodes, indri::infnet::InferenceNetwork::MAllResults& statisticsResults );

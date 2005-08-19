@@ -6,10 +6,9 @@
   #include "indri/QuerySpec.hpp"
   #include "indri/DateParse.hpp"
   #include "indri/delete_range.hpp"
-  #include "indri/PriorFactory.hpp"
   #include "indri/QueryLexer.hpp"
 
-#line 13 "QueryParser.hpp"
+#line 12 "QueryParser.hpp"
 #include <antlr/config.hpp>
 /* $ANTLR 2.7.4: "indrilang.g" -> "QueryParser.hpp"$ */
 #include <antlr/TokenStream.hpp>
@@ -21,22 +20,19 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API QueryParser : public ANTLR_USE_NAMESPACE(antlr)LLkParser, public QueryLexerTokenTypes
 {
-#line 152 "indrilang.g"
+#line 151 "indrilang.g"
 
 private:
   // storage for allocated nodes
   std::vector<indri::lang::Node*> _nodes;
   // makes sure nodes go away when parser goes away
   indri::utility::VectorDeleter<indri::lang::Node*> _deleter;
-  // gives us access to named priors
-    indri::query::PriorFactory* _priorFactory;
   
 public:
-  void init( indri::query::PriorFactory* factory, QueryLexer* lexer ) {
-    _priorFactory = factory;
+  void init( QueryLexer* lexer ) {
     _deleter.setVector( _nodes );
   }
-#line 24 "QueryParser.hpp"
+#line 23 "QueryParser.hpp"
 public:
 	void initializeASTFactory( ANTLR_USE_NAMESPACE(antlr)ASTFactory& factory );
 protected:

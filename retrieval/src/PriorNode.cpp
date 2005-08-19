@@ -20,11 +20,15 @@
 #include "indri/greedy_vector"
 #include <math.h>
 #include "indri/Annotator.hpp"
+#include "indri/InferenceNetwork.hpp"
 
-indri::infnet::PriorNode::PriorNode( const std::string& name, FieldIteratorNode* field, const std::map<int, indri::lang::PriorNode::tuple_type>& table ) :
-  _field(field),
-  _table(table),
-  _name(name)
+indri::infnet::PriorNode::PriorNode( const std::string& name,
+                                     class InferenceNetwork& network,
+                                     int listID ) :
+  _name(name),
+  _listID(listID),
+  _network(network),
+  _iterator(0)
 {
 }
 
@@ -32,7 +36,7 @@ indri::infnet::PriorNode::~PriorNode() {
 }
 
 int indri::infnet::PriorNode::nextCandidateDocument() {
-  return _field->nextCandidateDocument();
+  return MAX_INT32;
 }
 
 bool indri::infnet::PriorNode::hasMatch( int documentID ) {
@@ -47,38 +51,12 @@ const indri::utility::greedy_vector<bool>& indri::infnet::PriorNode::hasMatch( i
 
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::PriorNode::score( int documentID, int begin, int end, int documentLength ) {
   int key;
-  double score;
-
-  _scores.clear();
-
-  if( _field ) {
-    if( _field->numbers().size() ) {
-      // use the first number in this document as our key
-      key = _field->numbers()[0];
-    } else {
-      // no match, return 0 probability
-      score = -DBL_MAX;
-      _scores.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
-      return _scores;
-    }
-  } else {
-    // use the document ID as the key
-    key = documentID;
-  }
+  double score = -1e100;
   
-  std::map<int, indri::lang::PriorNode::tuple_type>::iterator iter;
-  iter = _table.lower_bound( key );
-
-  // check to see if the key is within the range of this object
-  if( iter != _table.end() &&
-      (*iter).second.begin <= key &&
-      (*iter).second.end >= key ) {
-    score = log( (*iter).second.score );
-  } else {
-    // if it didn't match, return 0 probability
-    score = -DBL_MAX;
-  }
-
+  if( _iterator && !_iterator->finished() )
+    score = _iterator->currentEntry()->score;
+  
+  _scores.clear();
   _scores.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
   return _scores;
 }
@@ -96,7 +74,7 @@ double indri::infnet::PriorNode::maximumScore() {
 }
 
 double indri::infnet::PriorNode::maximumBackgroundScore() {
-  return INDRI_TINY_SCORE;
+  return INDRI_HUGE_SCORE;
 }
 
 const std::string& indri::infnet::PriorNode::getName() const {
@@ -104,6 +82,6 @@ const std::string& indri::infnet::PriorNode::getName() const {
 }
 
 void indri::infnet::PriorNode::indexChanged( indri::index::Index& index ) {
-  // do nothing
+  _iterator = _network.getPriorIterator( _listID );
 }
 

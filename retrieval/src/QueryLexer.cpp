@@ -1060,7 +1060,7 @@ void QueryLexer::mTERM(bool _createToken) {
 	if ( synPredMatched52 ) {
 		mFLOAT(false);
 		if ( inputState->guessing==0 ) {
-#line 130 "indrilang.g"
+#line 129 "indrilang.g"
 			_ttype = FLOAT;
 #line 1064 "QueryLexer.cpp"
 		}
@@ -1085,7 +1085,7 @@ void QueryLexer::mTERM(bool _createToken) {
 		if ( synPredMatched56 ) {
 			mNEGATIVE_NUMBER(false);
 			if ( inputState->guessing==0 ) {
-#line 132 "indrilang.g"
+#line 131 "indrilang.g"
 				_ttype = NEGATIVE_NUMBER;
 #line 1089 "QueryLexer.cpp"
 			}
@@ -1144,7 +1144,7 @@ void QueryLexer::mTERM(bool _createToken) {
 				if ( synPredMatched54 ) {
 					mNUMBER(false);
 					if ( inputState->guessing==0 ) {
-#line 131 "indrilang.g"
+#line 130 "indrilang.g"
 						_ttype = NUMBER;
 #line 1148 "QueryLexer.cpp"
 					}
@@ -1360,7 +1360,7 @@ void QueryLexer::mOPERATOR(bool _createToken) {
 	if ( synPredMatched73 ) {
 		mENCODED_QUOTED_TERM(false);
 		if ( inputState->guessing==0 ) {
-#line 140 "indrilang.g"
+#line 139 "indrilang.g"
 			_ttype = ENCODED_QUOTED_TERM;
 #line 1364 "QueryLexer.cpp"
 		}
@@ -1385,7 +1385,7 @@ void QueryLexer::mOPERATOR(bool _createToken) {
 		if ( synPredMatched75 ) {
 			mENCODED_TERM(false);
 			if ( inputState->guessing==0 ) {
-#line 141 "indrilang.g"
+#line 140 "indrilang.g"
 				_ttype = ENCODED_TERM;
 #line 1389 "QueryLexer.cpp"
 			}
@@ -1452,7 +1452,7 @@ void QueryLexer::mJUNK(bool _createToken) {
 	}
 	}
 	if ( inputState->guessing==0 ) {
-#line 145 "indrilang.g"
+#line 144 "indrilang.g"
 		_ttype = antlr::Token::SKIP;
 #line 1456 "QueryLexer.cpp"
 	}

@@ -19,7 +19,6 @@ header "pre_include_hpp" {
   #include "indri/QuerySpec.hpp"
   #include "indri/DateParse.hpp"
   #include "indri/delete_range.hpp"
-  #include "indri/PriorFactory.hpp"
   #include "indri/QueryLexer.hpp"
 }
 
@@ -155,12 +154,9 @@ private:
   std::vector<indri::lang::Node*> _nodes;
   // makes sure nodes go away when parser goes away
   indri::utility::VectorDeleter<indri::lang::Node*> _deleter;
-  // gives us access to named priors
-    indri::query::PriorFactory* _priorFactory;
   
 public:
-  void init( indri::query::PriorFactory* factory, QueryLexer* lexer ) {
-    _priorFactory = factory;
+  void init( QueryLexer* lexer ) {
     _deleter.setVector( _nodes );
   }
 }
@@ -349,14 +345,7 @@ priorNode returns [ indri::lang::PriorNode* p ]
     p = 0;
   } :
   PRIOR O_PAREN name:TERM C_PAREN {
-    p = _priorFactory->create( name->getText() );
-    
-    if( p->getFieldName().length() ) {
-      field = new Field( p->getFieldName() );
-      p->setField( field );
-      _nodes.push_back(field);
-    }
-
+    p = new indri::lang::PriorNode( name->getText() );
     _nodes.push_back(p);
   };
   

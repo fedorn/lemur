@@ -25,6 +25,7 @@
 #include "indri/Repository.hpp"
 #include "indri/Index.hpp"
 #include "indri/DeletedDocumentList.hpp"
+#include "indri/PriorListIterator.hpp"
 
 namespace indri
 {
@@ -43,9 +44,11 @@ namespace indri
     private:
       std::vector<std::string> _termNames;
       std::vector<std::string> _fieldNames;
+      std::vector<std::string> _priorNames;
 
       std::vector<class indri::index::DocExtentListIterator*> _fieldIterators;
       std::vector<class indri::index::DocListIterator*> _docIterators;
+      std::vector<class indri::collection::PriorListIterator*> _priorIterators;
       std::vector<ListIteratorNode*> _listIteratorNodes;
       std::vector<BeliefNode*> _beliefNodes;
       std::vector<EvaluatorNode*> _evaluators;
@@ -76,9 +79,12 @@ namespace indri
 
       indri::index::DocListIterator* getDocIterator( int index );
       indri::index::DocExtentListIterator* getFieldIterator( int index );
+      indri::collection::PriorListIterator* getPriorIterator( int index );
 
       int addDocIterator( const std::string& term );
       int addFieldIterator( const std::string& field );
+      int addPriorIterator( const std::string& prior );
+      
       void addListNode( ListIteratorNode* listNode );
       void addBeliefNode( BeliefNode* beliefNode );
       void addEvaluatorNode( EvaluatorNode* evaluatorNode );

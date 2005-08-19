@@ -25,20 +25,11 @@ namespace indri
 {
   namespace query
   {
-    
+    // TODO: this class is likely to be deleted soon
     class PriorFactory {
     private:
-      struct prior_data {
-        std::string field;
-        std::map<int, indri::lang::PriorNode::tuple_type> tuples;
-      };
 
-      indri::api::Parameters _parameters;
-      std::map<std::string, prior_data> _data;
-
-      void _readPriorFile( prior_data& data, const std::string& fileName );
-      void _readParamValues( prior_data& data, class indri::api::Parameters& range );
-
+    
     public:
       PriorFactory();
       PriorFactory( indri::api::Parameters& parameters );

@@ -9,7 +9,6 @@
  *==========================================================================
  */
 
-
 //
 // PriorNode
 //
@@ -20,23 +19,28 @@
 #define INDRI_PRIORNODE_HPP
 
 #include "indri/BeliefNode.hpp"
-#include "indri/FieldIteratorNode.hpp"
 #include "indri/QuerySpec.hpp"
+#include "indri/PriorListIterator.hpp"
+
 namespace indri
 {
   namespace infnet
   {
-    
     class PriorNode : public BeliefNode {
     private:
-      FieldIteratorNode* _field;
-      std::map<int, indri::lang::PriorNode::tuple_type> _table;
       indri::utility::greedy_vector<bool> _matches;
       indri::utility::greedy_vector<indri::api::ScoredExtentResult> _scores;
       std::string _name;
 
+      class InferenceNetwork& _network;
+      int _listID;
+      
+      indri::collection::PriorListIterator* _iterator;
+      
     public:
-      PriorNode( const std::string& name, FieldIteratorNode* field, const std::map<int, indri::lang::PriorNode::tuple_type>& table );
+      PriorNode( const std::string& name,
+                 class InferenceNetwork& network,
+                 int listID );
       ~PriorNode();
 
       int nextCandidateDocument();

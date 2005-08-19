@@ -1710,122 +1710,53 @@ namespace indri {
     };
 
     class PriorNode : public ScoredExtentNode {
-    public:
-      struct tuple_type {
-        int begin;
-        int end;
-        double score;
-      };
-
     private:
-      std::map<int,tuple_type> _table;
-      Field* _field;
-      std::string _fieldName;
+      std::string _priorName;
 
     public:
-      PriorNode() :
-        _field(0)
+      PriorNode( const std::string& priorName ) :
+        _priorName( priorName )
       {
-      }
-
-      PriorNode( indri::lang::Field* field, const std::map<int, tuple_type>& table ) :
-        _table(table),
-        _field(field)
-      {
-        _fieldName = _field->getFieldName();  
-      }
-
-      PriorNode( std::string& fieldName, const std::map<int, tuple_type>& table ) :
-        _fieldName(fieldName),
-        _field(0),
-        _table(table)
-      {
-      }
-
+      } 
+      
       std::string queryText() const {
         std::stringstream qtext;
-        // with the definition of priors somewhat in flux, it's
-        // hard to know what would be good to put here.
-        qtext << "#prior(" << _fieldName << ")";
+        qtext << "#prior(" << _priorName << ")";
         return qtext.str();
       }
 
       PriorNode( Unpacker& unpacker ) {
-        std::vector<int> beginList = unpacker.getIntVector( "begin" );
-        std::vector<int> endList = unpacker.getIntVector( "end" );
-        std::vector<double> scoreList = unpacker.getDoubleVector( "score" );
-        assert( beginList.size() == endList.size() );
-        assert( scoreList.size() == endList.size() );
-
-        for( size_t i=0; i<beginList.size(); i++ ) {
-          tuple_type t;
-          t.begin = beginList[i];
-          t.end = endList[i];
-          t.score = scoreList[i];
-
-          _table[ beginList[i] ] = t;
-        }
- 
-        _field = dynamic_cast<Field*>(unpacker.getRawExtentNode( "field" ));
+        _priorName = unpacker.getString( "priorName" );
       }
 
-      std::string nodeType() {
+      std::string typeName() const {
         return "PriorNode";
       }
       
       UINT64 hashCode() const {
-        return 0;
+        indri::utility::GenericHash<const char*> hash;
+        return hash( _priorName.c_str() ) + 9;
       }
-
-      const std::map<int,tuple_type>& getTable() const {
-        return _table;
-      }
-
-      const std::string& getFieldName() const {
-        return _fieldName;
-      }
-
-      indri::lang::Field* getField() const {
-        return _field;
-      }
-
-      void setField( indri::lang::Field* field ) {
-        _field = field;
+      
+      const std::string& getPriorName() const {
+        return _priorName;
       }
 
       void walk( Walker& walker ) {
         walker.before(this);
-        _field->walk(walker);
         walker.after(this);
       }
 
       indri::lang::Node* copy( Copier& copier ) {
         copier.before(this);
-        Field* duplicateField = dynamic_cast<Field*>(_field->copy(copier));
-        PriorNode* duplicate = new PriorNode( duplicateField, getTable() );
+        PriorNode* duplicate = new PriorNode( this->_priorName );
+        duplicate->setNodeName( nodeName() );
         return copier.after(this, duplicate);
       }
 
       void pack( Packer& packer ) {
         packer.before(this);
-
-        std::vector<int> beginList;
-        std::vector<int> endList;
-        std::vector<double> scoreList;
-
-        for( std::map<int,tuple_type>::iterator iter;
-             iter != _table.end();
-             iter++ )
-          {
-            beginList.push_back( (*iter).second.begin );
-            endList.push_back( (*iter).second.end );
-            scoreList.push_back( (*iter).second.score );
-          }
-
-        packer.put( "begin", beginList );
-        packer.put( "end", endList );
-        packer.put( "score", scoreList );
-        packer.put( "field", _field );
+        packer.put( "priorName", _priorName );
         packer.after(this);
       }
     };

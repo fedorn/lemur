@@ -289,7 +289,6 @@ void indri::api::QueryEnvironment::_mergeServerQuery( indri::infnet::InferenceNe
   for( nodeIter = results.begin(); nodeIter != results.end(); nodeIter++ ) {
     for( listIter = nodeIter->second.begin(); listIter != nodeIter->second.end(); listIter++ ) {
       std::vector<indri::api::ScoredExtentResult>& listResults = listIter->second;
-      // use stable sort to minimize differences across platforms.
       std::stable_sort( listResults.begin(), listResults.end(), indri::api::ScoredExtentResult::score_greater() );
 
       if( int(listResults.size()) > resultsRequested )
@@ -709,7 +708,7 @@ double indri::api::QueryEnvironment::expressionCount( const std::string& express
   // this step is required to initialize some internal
   // parser variables, since ANTLR grammars can't add things
   // to the constructor
-  parser.init( &_priorFactory, &lexer );
+  parser.init( &lexer );
   lexer.init();
 
   indri::lang::ScoredExtentNode* rootNode;
@@ -749,14 +748,14 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
                                                                                      indri::api::QueryAnnotation** annotation ) {
   INIT_TIMER
 
-    std::istringstream query(q);
+  std::istringstream query(q);
   indri::lang::QueryLexer lexer( query );
   indri::lang::QueryParser parser( lexer );
   
   // this step is required to initialize some internal
   // parser variables, since ANTLR grammars can't add things
   // to the constructor
-  parser.init( &_priorFactory, &lexer );
+  parser.init( &lexer );
   lexer.init();
 
   PRINT_TIMER( "Initialization complete" );

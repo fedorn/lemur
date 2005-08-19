@@ -72,12 +72,20 @@ void indri::infnet::InferenceNetwork::_moveToDocument( int candidate ) {
     if( *fiter )
       (*fiter)->nextEntry( candidate );
   }
+    
+  // prepare all priors
+  std::vector<indri::collection::PriorListIterator*>::iterator piter;
+  for( piter = _priorIterators.begin(); piter != _priorIterators.end(); piter++ ) {
+    if( *piter )
+      (*piter)->nextEntry( candidate );
+  }
 
   // prepare all extent iterator nodes
   std::vector<ListIteratorNode*>::iterator diter;
   for( diter = _listIteratorNodes.begin(); diter != _listIteratorNodes.end(); diter++ ) {
     (*diter)->prepare( candidate );
   }
+  
 }
 
 //
@@ -90,6 +98,9 @@ void indri::infnet::InferenceNetwork::_indexFinished( indri::index::Index& index
 
   // field iterators
   indri::utility::delete_vector_contents<indri::index::DocExtentListIterator*>( _fieldIterators );
+  
+  // prior iterators
+  indri::utility::delete_vector_contents<indri::collection::PriorListIterator*>( _priorIterators );
 }
 
 //
@@ -116,6 +127,17 @@ void indri::infnet::InferenceNetwork::_indexChanged( indri::index::Index& index 
       iterator->startIteration();
 
     _fieldIterators.push_back( iterator );
+  }
+  
+  // prior iterators
+  for( int i=0; i<_priorNames.size(); i++ ) {
+    // TODO: this is wasteful, since the prior is associated with the whole collection,
+    // there's no need to fetch it for each index.  but, it's just easier to code it like this for now
+    indri::collection::PriorListIterator* iterator = _repository.priorListIterator( _priorNames[i] );
+    if( iterator )
+      iterator->startIteration();
+      
+    _priorIterators.push_back( iterator );
   }
 
   // extent iterator nodes
@@ -180,6 +202,7 @@ indri::infnet::InferenceNetwork::InferenceNetwork( indri::collection::Repository
 indri::infnet::InferenceNetwork::~InferenceNetwork() {
   indri::utility::delete_vector_contents<indri::index::DocExtentListIterator*>( _fieldIterators );
   indri::utility::delete_vector_contents<indri::index::DocListIterator*>( _docIterators );
+  indri::utility::delete_vector_contents<indri::collection::PriorListIterator*>( _priorIterators );
   indri::utility::delete_vector_contents<indri::infnet::ListIteratorNode*>( _listIteratorNodes );
   indri::utility::delete_vector_contents<indri::infnet::BeliefNode*>( _beliefNodes );
   indri::utility::delete_vector_contents<indri::query::TermScoreFunction*>( _scoreFunctions );
@@ -194,6 +217,10 @@ indri::index::DocExtentListIterator* indri::infnet::InferenceNetwork::getFieldIt
   return _fieldIterators[index];
 }
 
+indri::collection::PriorListIterator* indri::infnet::InferenceNetwork::getPriorIterator( int index ) {
+  return _priorIterators[index];
+}
+
 int indri::infnet::InferenceNetwork::addDocIterator( const std::string& termName ) {
   _termNames.push_back( termName );
   return _termNames.size()-1;
@@ -202,6 +229,11 @@ int indri::infnet::InferenceNetwork::addDocIterator( const std::string& termName
 int indri::infnet::InferenceNetwork::addFieldIterator( const std::string& fieldName ) {
   _fieldNames.push_back( fieldName );
   return _fieldNames.size()-1;
+}
+
+int indri::infnet::InferenceNetwork::addPriorIterator( const std::string& priorName ) {
+  _priorNames.push_back( priorName );
+  return _priorNames.size()-1;
 }
 
 void indri::infnet::InferenceNetwork::addListNode( indri::infnet::ListIteratorNode* listNode ) {

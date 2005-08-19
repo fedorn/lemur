@@ -231,6 +231,9 @@
 				RelativePath=".\src\MemoryIndexTermListFileIterator.cpp">
 			</File>
 			<File
+				RelativePath=".\src\PriorListIterator.cpp">
+			</File>
+			<File
 				RelativePath=".\src\PropIndexTH.cpp">
 			</File>
 			<File
@@ -441,6 +444,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\MemoryIndexVocabularyIterator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\PriorListIterator.hpp">
 			</File>
 			<File
 				RelativePath=".\include\PropIndexTH.hpp">

@@ -710,9 +710,8 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::RawScorerNode* 
 
 void indri::infnet::InferenceNetworkBuilder::after( indri::lang::PriorNode* pNode ) {
   if( _nodeMap.find( pNode ) == _nodeMap.end() ) {
-    FieldIteratorNode* field = dynamic_cast<FieldIteratorNode*>(_nodeMap[pNode->getField()]);
-    PriorNode* priorNode = new PriorNode( pNode->nodeName(), field, pNode->getTable() );
-
+    PriorNode* priorNode = new PriorNode( pNode->nodeName(), *_network, _network->addPriorIterator( pNode->getPriorName() ) );
+    
     _network->addBeliefNode( priorNode );
     _nodeMap[pNode] = priorNode;
   }
