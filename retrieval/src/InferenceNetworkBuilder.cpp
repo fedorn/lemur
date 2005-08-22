@@ -710,6 +710,10 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::RawScorerNode* 
 
 void indri::infnet::InferenceNetworkBuilder::after( indri::lang::PriorNode* pNode ) {
   if( _nodeMap.find( pNode ) == _nodeMap.end() ) {
+    // if the named prior doesn't exist in the Repository, throw an Exception
+    if (! _repository.priorExists(pNode->getPriorName())) {
+      LEMUR_THROW( LEMUR_RUNTIME_ERROR, "named prior: " + pNode->getPriorName() + " not found in Repository. Unable to process query." );
+    }
     PriorNode* priorNode = new PriorNode( pNode->nodeName(), *_network, _network->addPriorIterator( pNode->getPriorName() ) );
     
     _network->addBeliefNode( priorNode );
