@@ -2,7 +2,7 @@
 ## Edit this to point to your version of trec_eval
 ## if not found, it will be set to echo
 TREC_EVAL=/usr/mel0/tmp1/dfisher/trec_eval/trec_eval
-if ! test -x $TREC_EVAL ; then
+if test ! -x $TREC_EVAL ; then
   TREC_EVAL="echo not found: $TREC_EVAL"
 fi
 
