@@ -247,6 +247,7 @@ private:
     }
     catch( lemur::api::Exception& e )
     {
+      LEMUR_RETHROW(e, "QueryThread::_runQuery Exception");
     }
   }
 
