@@ -1002,6 +1002,20 @@ void indri::collection::Repository::_merge() {
 }
 
 //
+// priors
+//
+
+std::vector<std::string> indri::collection::Repository::priors() const {
+  std::vector<std::string> t;
+  std::map< std::string, indri::file::File* >::const_iterator iter;
+  
+  for( iter = _priorFiles.begin(); iter != _priorFiles.end(); iter++ ) {
+    t.push_back(iter->first);
+  }
+  return t;
+}
+
+//
 // fields
 //
 
