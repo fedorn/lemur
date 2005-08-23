@@ -160,11 +160,6 @@ namespace indri
       const std::vector<Field>& fields() const;
       /// @return the tags for this collection
       std::vector<std::string> tags() const;
-      /// @param priorName the named prior to check for.
-      /// @return true if the named prior exists in the Repository
-      bool priorExists(const std::string &priorName) const {
-        return  _priorFiles.find( priorName ) != _priorFiles.end();
-      }
       /// @return the named priors list for this collection
       std::vector<std::string> priors() const;
       /// Process, possibly transforming, the given term
