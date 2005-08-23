@@ -283,11 +283,14 @@ namespace lemur
       void write(const string &outputName, const string &delim);
 
       /// \brief Input a dictionary from plain text, separator delimited values.
+      /// The input file must contain 4 columns. The columns are:<br>
+      /// sourceterm;type;targetterm;probability;<br>
+      /// where type is an arbitrary symbol, such as a part of speech tag.
       /// @param dictName the file to read
       /// @param delim the delimiter to use.
       /// @param counts true if the input file contains frequencies. Default is false.
       /// @return true if created successfully. Otherwise false.
-      /// NB single char delimiter ? Escape in source/target.
+      /// 
       bool read(const string &dictName, const string &delim, bool counts = false);
 
       /// \brief Open an existing probabilistic dictionary.

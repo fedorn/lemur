@@ -15,6 +15,9 @@
   dictionaries (PDict objects). It supports the following activities:
   <ul>
   <li> Create a new dictionary from one or more token delimited input files.
+  The input file must contain 4 columns. The columns are:<br>
+  sourceterm;type;targetterm;probability;<br>
+  where type is an arbitrary symbol, such as a part of speech tag.
   <li> Merge two existing dictionaries into a new dictionary.
   <li> Subtract an existing dictionary (prune) from a dictionary.
   <li> Normalize probabilities for all entries
@@ -37,6 +40,9 @@
     <li> look &lt;term&gt; -- lookup term in the dictionary.
     <li> normalize -- Normalize probabilities for all entries.
     <li> create &lt;dictName&gt; &lt;inputFile&gt; &lt;delimiter&gt; -- create a new dictionary from an input file.
+  The input file must contain 4 columns. The columns are:<br>
+  sourceterm;type;targetterm;probability;<br>
+  where type is an arbitrary symbol, such as a part of speech tag.
     <li> merge &lt;firstDict&gt; &lt;secondDict&gt; &lt;newName&gt; -- merge firstDict and secondDict into a new dictionary named newName.
     <li> subtract &lt;dictName&gt; -- Remove all entries in dictName from the current dictionary. Destructively modifies the current dictionary.
  </ul>
@@ -47,7 +53,10 @@
     <li> -dump &lt;inputDict&gt; &lt;outputFile&gt; &lt;delimiter&gt; -- dump the dictionary inputDict to outputFile, using delimiter as the separator.
     <li> -look &lt;inputDict&gt; &lt;term&gt; -- lookup term in the dictionary.
     <li> -normalize &lt;inputDict&gt; -- Normalize probabilities of all entries
-    <li> -create &lt;dictName&gt; &lt;inputFile&gt; &lt;delimiter&gt; -- create a new dictionary from an input file.
+    <li> -create &lt;dictName&gt; &lt;inputFile&gt; &lt;delimiter&gt; -- create a new dictionary from an input file. 
+  The input file must contain 4 columns. The columns are:<br>
+  sourceterm;type;targetterm;probability;<br>
+  where type is an arbitrary symbol, such as a part of speech tag.
     <li> -merge &lt;firstDict&gt; &lt;secondDict&gt; &lt;newName&gt; -- merge firstDict and secondDict into a new dictionary named newName
     <li> -subtract firstDict secondDict -- Remove all entries in secondDict from firstDict. Destructively modifies firstDict
 </ul>
