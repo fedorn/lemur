@@ -24,6 +24,7 @@
 
 #include "indri/ScopedLock.hpp"
 #include "indri/Thread.hpp"
+#include "Exception.hpp"
 
 const static int CLOSE_ITERATOR_RANGE = 5000;
 
@@ -136,7 +137,11 @@ void indri::infnet::InferenceNetwork::_indexChanged( indri::index::Index& index 
     indri::collection::PriorListIterator* iterator = _repository.priorListIterator( _priorNames[i] );
     if( iterator )
       iterator->startIteration();
-      
+    else {
+      // if the named prior doesn't exist in the Repository, throw an Exception
+      LEMUR_THROW( LEMUR_RUNTIME_ERROR, "named prior: " + _priorNames[i] + " not found in Repository. Unable to process query." );
+    }
+
     _priorIterators.push_back( iterator );
   }
 
