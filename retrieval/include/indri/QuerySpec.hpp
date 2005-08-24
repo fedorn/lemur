@@ -1769,7 +1769,7 @@ namespace indri {
         _children = unpacker.getScoredExtentVector( "children" );
       }
 
-      unsigned int _hashCode() const {
+      UINT64 _hashCode() const {
         UINT64 accumulator = 0;
 
         for( int i=0; i<_children.size(); i++ ) {
