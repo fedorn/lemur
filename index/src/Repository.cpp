@@ -845,8 +845,8 @@ unsigned int indri::collection::Repository::_mergeFiles( const std::vector<indri
   // collection 5 + metadata files
   // repository 2
   // index/n/ 10 + num fields
-  // so call it 20 + num fields * number of indexes.+ 1
-  unsigned int totalFiles = 20 + ( _indexFields.size() * (indexes.size() + 1));
+  // so call it (20 + num fields) * (number of indexes.+ 1)
+  unsigned int totalFiles = (20 +  _indexFields.size()) * (indexes.size() + 1);
   return totalFiles;
 }
 
