@@ -121,6 +121,7 @@ namespace indri
       void _merge( index_state& state );
       indri::index::Index* _mergeStage( index_state& state );
       UINT64 _mergeMemory( const std::vector<indri::index::Index*>& indexes );
+      unsigned int _mergeFiles( const std::vector<indri::index::Index*>& indexes );
 
       // these methods should only be called by the maintenance thread
       /// merge all known indexes together

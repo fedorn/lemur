@@ -40,6 +40,7 @@
 #include <string>
 #include <algorithm>
 
+#define MERGE_FILE_LIMIT 512
 const static int defaultMemory = 100*1024*1024;
 
 //
@@ -834,6 +835,21 @@ UINT64 indri::collection::Repository::_mergeMemory( const std::vector<indri::ind
   return newlyFrequent * 500 + expectedBitmapSize * indexes.size();
 }
 
+// _mergeFiles
+//
+// Calculate the expected number of open files used while merging
+// this set of indexes,
+// 
+
+unsigned int indri::collection::Repository::_mergeFiles( const std::vector<indri::index::Index*>& indexes ) {
+  // collection 5 + metadata files
+  // repository 2
+  // index/n/ 10 + num fields
+  // so call it 20 + num fields * number of indexes.
+  unsigned int totalFiles = (20 + _indexFields.size()) * indexes.size();
+  return totalFiles;
+}
+
 //
 // _mergeStage
 //
@@ -934,7 +950,9 @@ void indri::collection::Repository::_merge( index_state& state ) {
   size_t memoryBound = (size_t) (0.75 * _memory);
   std::vector<indri::index::Index*>* result = new std::vector<indri::index::Index*>;
 
-  if( state->size() <= 2 || _mergeMemory( *state ) < memoryBound ) {
+  if( state->size() <= 2 || 
+      ( _mergeMemory( *state ) < memoryBound && 
+        _mergeFiles(*state) < MERGE_FILE_LIMIT ) ) {
     indri::index::Index* index = _mergeStage( state );
     result->push_back( index );
   } else {
