@@ -123,6 +123,14 @@ int indri::xml::XMLReader::_readTag( const char* buffer, int bufferStart, int bu
   if( endLocation - position < 1 ) 
     LEMUR_THROW( LEMUR_GENERIC_ERROR, "Found a tag with no body" );
 
+  // is it a <!CDATA[ tag?
+  // expand this test for completeness
+  if ( buffer[position] == '!' && buffer[position + 1] == 'C' ) {
+    if( tagType )
+      *tagType = TAG_CDATA_TYPE;
+    trueEndLocation = position + 7;
+    return trueEndLocation;
+  }
   // is it an opening tag?
   if( buffer[position] == '/' ) {
     if( tagType )
@@ -197,7 +205,11 @@ int indri::xml::XMLReader::_findClosingTag( const char* buffer, int start, int f
       position = _findBeginTag( buffer, position, finish );
       int end = _readTag( buffer, position, finish, &tagName, NULL, &tagType );
 
-      if( tagType != TAG_CLOSE_TYPE ) {
+      if( tagType == TAG_CDATA_TYPE ) {
+        std::string cdata = &buffer[end];
+        std::string::size_type dataEnd = cdata.find("]]>");
+        position = end + dataEnd + 1;
+      } else if( tagType != TAG_CLOSE_TYPE ) {
         if( tagsBetween )
           *tagsBetween = true;
 
@@ -212,7 +224,11 @@ int indri::xml::XMLReader::_findClosingTag( const char* buffer, int start, int f
           end = _readTag( buffer, position, finish, NULL, NULL, &tagType );
           position = end;
 
-          if( tagType == TAG_OPEN_TYPE ) {
+          if( tagType == TAG_CDATA_TYPE ) {
+            std::string cdata = &buffer[end];
+            std::string::size_type dataEnd = cdata.find("]]>");
+            position = end + dataEnd + 1;
+          } else if( tagType == TAG_OPEN_TYPE ) {
             openingTags++;
           } else if( tagType == TAG_CLOSE_TYPE ) {
             closingTags++;
@@ -262,6 +278,16 @@ void indri::xml::XMLReader::_read( indri::xml::XMLNode** parent, const char* buf
       } else {
         std::string nodeValue;
         nodeValue.assign( &buffer[endTag], &buffer[closingTag] ); 
+        std::string::size_type dataStart = nodeValue.find("<!CDATA[");
+        while (dataStart != std::string::npos) {          
+          // munch any CDATA tags in the element's value.
+          nodeValue.erase(dataStart, 8);
+          std::string::size_type dataEnd = nodeValue.find("]]>");
+          if (dataEnd != std::string::npos) 
+            nodeValue.erase(dataEnd, 3);
+          // else bad things here, should throw.
+          dataStart = nodeValue.find("<!CDATA[");
+        }
         node = new indri::xml::XMLNode( tagName, attributes, nodeValue );
       }
 

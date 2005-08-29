@@ -31,7 +31,8 @@ namespace indri
       enum {
         TAG_OPEN_TYPE,
         TAG_CLOSE_TYPE,
-        TAG_OPEN_CLOSE_TYPE
+        TAG_OPEN_CLOSE_TYPE,
+        TAG_CDATA_TYPE
       };
 
       int _tryFindChar( char ch, const char* buffer, int start, int finish );
