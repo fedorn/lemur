@@ -69,7 +69,8 @@ namespace indri
                                                              const std::string& q,
                                                              int resultsRequested,
                                                              const std::vector<lemur::api::DOCID_T>* documentIDs,
-                                                             QueryAnnotation** annotation );
+                                                             QueryAnnotation** annotation,
+                                                             const std::string &queryType = "indri"  );
       void _scoredQuery( indri::infnet::InferenceNetwork::MAllResults& results, indri::lang::Node* queryRoot, std::string& accumulatorName, int resultsRequested, const std::vector<lemur::api::DOCID_T>* documentSet );
 
       QueryEnvironment( QueryEnvironment& other ) {}
@@ -109,17 +110,17 @@ namespace indri
       /// @param query the query to run
       /// @param resultsRequested maximum number of results to return
       /// @return the vector of ScoredExtentResults for the query
-      std::vector<indri::api::ScoredExtentResult> runQuery( const std::string& query, int resultsRequested );
+      std::vector<indri::api::ScoredExtentResult> runQuery( const std::string& query, int resultsRequested, const std::string &queryType = "indri" );
 
-      std::vector<indri::api::ScoredExtentResult> runQuery( const std::string& query, const std::vector<lemur::api::DOCID_T>& documentSet, int resultsRequested );
+      std::vector<indri::api::ScoredExtentResult> runQuery( const std::string& query, const std::vector<lemur::api::DOCID_T>& documentSet, int resultsRequested, const std::string &queryType = "indri" );
 
       /// \brief Run an Indri query language query. @see QueryAnnotation
       /// @param query the query to run
       /// @param resultsRequested maximum number of results to return
       /// @return pointer to QueryAnnotations for the query
-      QueryAnnotation* runAnnotatedQuery( const std::string& query, int resultsRequested );  
+      QueryAnnotation* runAnnotatedQuery( const std::string& query, int resultsRequested, const std::string &queryType = "indri" );  
 
-      QueryAnnotation* runAnnotatedQuery( const std::string& query, const std::vector<lemur::api::DOCID_T>& documentSet, int resultsRequested );
+      QueryAnnotation* runAnnotatedQuery( const std::string& query, const std::vector<lemur::api::DOCID_T>& documentSet, int resultsRequested, const std::string &queryType = "indri" );
 
 
       /// \brief Fetch the parsed documents for a given list of document ids.
@@ -180,7 +181,8 @@ namespace indri
       INT64 stemFieldCount( const std::string& term, const std::string& field );
       /// \brief Return the total number of times this expression appears in the collection.
       /// @param expression The expression to evaluate, probably an ordered or unordered window expression
-      double expressionCount( const std::string& expression );
+      double expressionCount( const std::string& expression,
+                              const std::string &queryType = "indri" );
       /// \brief Return the list of fields.
       /// @return vector of field names.
       std::vector<std::string> fieldList();
