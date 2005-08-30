@@ -198,6 +198,13 @@ struct query_t {
     }
   };
 
+  query_t( int _index, int _number, const std::string& _text, const std::string &queryType ) :
+    index( _index ),
+    number( _number ),
+    text( _text ), qType(queryType)
+  {
+  }
+
   query_t( int _index, int _number, const std::string& _text ) :
     index( _index ),
     number( _number ),
@@ -208,6 +215,7 @@ struct query_t {
   int number;
   int index;
   std::string text;
+  std::string qType;
 };
 
 class QueryThread : public indri::thread::UtilityThread {
@@ -233,16 +241,17 @@ private:
   std::vector<indri::api::ScoredExtentResult> _results;
 
   // Runs the query, expanding it if necessary.  Will print output as well if verbose is on.
-  void _runQuery( std::stringstream& output, const std::string& query ) {
+  void _runQuery( std::stringstream& output, const std::string& query,
+                  const std::string &queryType ) {
     try {
       if( _printQuery ) output << "# query: " << query << std::endl;
 
-      _results = _environment.runQuery( query, _initialRequested );
+      _results = _environment.runQuery( query, _initialRequested, queryType );
 
       if( _expander ) {
         std::string expandedQuery = _expander->expand( query, _results );
         if( _printQuery ) output << "# expanded: " << expandedQuery << std::endl;
-        _results = _environment.runQuery( expandedQuery, _requested );
+        _results = _environment.runQuery( expandedQuery, _requested, queryType );
       }
     }
     catch( lemur::api::Exception& e )
@@ -406,7 +415,7 @@ public:
 
     // run the query
     try {
-      _runQuery( output, query->text );
+      _runQuery( output, query->text, query->qType );
     } catch( lemur::api::Exception& e ) {
       output << "# EXCEPTION in query " << query->number << ": " << e.what() << std::endl;
     }
@@ -432,6 +441,9 @@ void push_queue( std::queue< query_t* >& q, indri::api::Parameters& queries,
   for( int i=0; i<queries.size(); i++ ) {
     int queryNumber;
     std::string queryText;
+    std::string queryType = "indri";
+    if( queries[i].exists( "type" ) )
+      queryType = (std::string) queries[i]["type"];
 
     if( queries[i].exists( "number" ) ) {
       queryText = (std::string) queries[i]["text"];
@@ -440,8 +452,7 @@ void push_queue( std::queue< query_t* >& q, indri::api::Parameters& queries,
       queryText = (std::string) queries[i];
       queryNumber = queryOffset + i;
     }
-    
-    q.push( new query_t( i, queryNumber, queryText ) );
+    q.push( new query_t( i, queryNumber, queryText, queryType ) );
   }
 }
 
