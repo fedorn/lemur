@@ -84,6 +84,10 @@ namespace indri {
    void Walker::after( class NestedExtentInside* n ) { defaultAfter( n ); }
    void Walker::before( class NestedRawScorerNode* n ) { defaultBefore( n ); }
    void Walker::after( class NestedRawScorerNode* n ) { defaultAfter( n ); }
+   void Walker::before( class ExtentEnforcement* n ) { defaultBefore( n ); }
+   void Walker::after( class ExtentEnforcement* n ) { defaultAfter( n ); }
+   void Walker::before( class ContextInclusionNode* n ) { defaultBefore( n ); }
+   void Walker::after( class ContextInclusionNode* n ) { defaultAfter( n ); }
  };
 };
 

@@ -6,12 +6,11 @@
   #include "indri/QuerySpec.hpp"
   #include "indri/DateParse.hpp"
   #include "indri/delete_range.hpp"
-  #include "indri/PriorFactory.hpp"
   #include "indri/NexiLexer.hpp"
   #include <algorithm>
   #include <cctype>
 
-#line 15 "NexiParser.hpp"
+#line 14 "NexiParser.hpp"
 #include <antlr/config.hpp>
 /* $ANTLR 2.7.4: "nexilang.g" -> "NexiParser.hpp"$ */
 #include <antlr/TokenStream.hpp>
@@ -23,21 +22,19 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API NexiParser : public ANTLR_USE_NAMESPACE(antlr)LLkParser, public NexiLexerTokenTypes
 {
-#line 126 "nexilang.g"
+#line 125 "nexilang.g"
 
 private:
   // storage for allocated nodes
   std::vector<indri::lang::Node*> _nodes;
   // makes sure nodes go away when parser goes away
   indri::utility::VectorDeleter<indri::lang::Node*> _deleter;
-  // gives us access to named priors
-  indri::query::PriorFactory* _priorFactory;
   
 public:
   void init( NexiLexer* lexer ) {
     _deleter.setVector( _nodes );
   }
-#line 26 "NexiParser.hpp"
+#line 25 "NexiParser.hpp"
 public:
 	void initializeASTFactory( ANTLR_USE_NAMESPACE(antlr)ASTFactory& factory );
 protected:

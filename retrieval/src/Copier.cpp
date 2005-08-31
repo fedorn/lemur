@@ -84,6 +84,10 @@ namespace indri {
     Node* Copier::after( class NestedExtentInside* oldNode, class NestedExtentInside* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class NestedRawScorerNode* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class NestedRawScorerNode* oldNode, class NestedRawScorerNode* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class ExtentEnforcement* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class ExtentEnforcement* oldNode, class ExtentEnforcement* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class ContextInclusionNode* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class ContextInclusionNode* oldNode, class ContextInclusionNode* newNode ) { return defaultAfter( oldNode, newNode ); }
  };
 };
 

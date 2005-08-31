@@ -62,7 +62,7 @@ namespace indri
       void after( indri::lang::Field* field );
       void after( indri::lang::ExtentAnd* extentAnd );
       void after( indri::lang::ExtentOr* extentOr );
-  void after( indri::lang::WeightedExtentOr* weightedExtentOr );
+      void after( indri::lang::WeightedExtentOr* weightedExtentOr );
       void after( indri::lang::ExtentInside* extentInside );
       void after( indri::lang::BAndNode* uwNode );
       void after( indri::lang::ODNode* odNode );
@@ -94,6 +94,8 @@ namespace indri
       void after( indri::lang::FieldWildcard* fieldWildcard );
       void after( indri::lang::NestedExtentInside* extentInside );
       void after( indri::lang::NestedRawScorerNode* rawScorerNode );
+      void after( indri::lang::ExtentEnforcement * eeNode );
+      void after( indri::lang::ContextInclusionNode* contextInclusionNode );
     };
   }
 }

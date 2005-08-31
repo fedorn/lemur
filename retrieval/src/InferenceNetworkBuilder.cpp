@@ -56,6 +56,8 @@
 #include "indri/FieldWildcardNode.hpp"
 #include "indri/NestedExtentInsideNode.hpp"
 #include "indri/NestedListBeliefNode.hpp"
+#include "indri/ExtentEnforcementNode.hpp"
+#include "indri/ContextInclusionAndNode.hpp"
 
 #include <stdexcept>
 
@@ -906,5 +908,48 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::NestedRawScorer
     _network->addScoreFunction( function );
     _network->addBeliefNode( belief );
     _nodeMap[rawScorerNode] = belief;
+  }
+}
+
+//
+// ExtentEnforcement
+//
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ExtentEnforcement* eeNode ) {
+  if( _nodeMap.find( eeNode ) == _nodeMap.end() ) {
+    indri::infnet::BeliefNode* childNode = dynamic_cast<indri::infnet::BeliefNode*>(_nodeMap[eeNode->getChild()]);
+    indri::infnet::ListIteratorNode* fieldNode = dynamic_cast<indri::infnet::ListIteratorNode*>(_nodeMap[eeNode->getField()]);
+    indri::infnet::ExtentEnforcementNode* extentEnforcement = new indri::infnet::ExtentEnforcementNode( eeNode->nodeName(), childNode, fieldNode );
+
+    _network->addBeliefNode( extentEnforcement );    
+    _nodeMap[eeNode] = extentEnforcement;
+  }
+}
+
+//
+// ContextInclusion
+//
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ContextInclusionNode* contextInclusionNode ) {
+  if( _nodeMap.find( contextInclusionNode ) == _nodeMap.end() ) {
+    const std::vector<indri::lang::ScoredExtentNode*>& children = contextInclusionNode->getChildren();
+    double weight = 1. / double(children.size());
+
+    std::vector<BeliefNode*> translation = _translate<BeliefNode,indri::lang::ScoredExtentNode>( children );
+    indri::infnet::ContextInclusionAndNode* ciaNode = new indri::infnet::ContextInclusionAndNode( contextInclusionNode->nodeName() );
+
+    indri::lang::ScoredExtentNode* preserveExtentsChild = contextInclusionNode->getPreserveExtentsChild();
+    for( unsigned int i=0; i<children.size(); i++ ) {
+      bool preserveExtents = false;
+      if (children[i] == preserveExtentsChild) {
+	preserveExtents = true;
+      }
+      ciaNode->addChild( weight, translation[i], preserveExtents );
+    }
+
+    ciaNode->doneAddingChildren();
+
+    _network->addBeliefNode( ciaNode );
+    _nodeMap[contextInclusionNode] = ciaNode;
   }
 }

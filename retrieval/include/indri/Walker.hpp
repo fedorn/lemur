@@ -85,6 +85,10 @@ namespace indri {
       virtual void after( class NestedExtentInside* n );
       virtual void before( class NestedRawScorerNode* n );
       virtual void after( class NestedRawScorerNode* n );
+      virtual void before( class ExtentEnforcement* n );
+      virtual void after( class ExtentEnforcement* n );
+      virtual void before( class ContextInclusionNode* n );
+      virtual void after( class ContextInclusionNode* n );
    };
  };
 };

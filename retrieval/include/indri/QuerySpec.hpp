@@ -2839,7 +2839,7 @@ namespace indri {
       }
 
       UINT64 hashCode() const {
-        return 0;//???????????????
+        return 103;//???????????????
       }
 
       Node* copy( Copier& copier ) {
@@ -2878,7 +2878,7 @@ namespace indri {
       }
 
       UINT64 hashCode() const {
-        return 0;//???????????????
+        return 107 + _inner->hashCode() + (_inner->hashCode() * 7);//???????????????
       }
 
       Node* copy( Copier& copier ) {
@@ -2911,7 +2911,19 @@ namespace indri {
       }
 
       UINT64 hashCode() const {
-        return 0;//??????????
+	UINT64 hash = 0;
+
+        hash += 105;
+        hash += _raw->hashCode();
+
+        if( _context ) {
+          hash += _context->hashCode();
+        }
+
+        indri::utility::GenericHash<const char*> gh;
+        hash += gh( _smoothing.c_str() );
+
+        return hash;
       }
 
       Node* copy( Copier& copier ) {
@@ -2927,6 +2939,213 @@ namespace indri {
       }
     };
    
+
+    class ExtentEnforcement : public ScoredExtentNode {
+    protected:
+      ScoredExtentNode* _child;
+      RawExtentNode* _field;
+
+    public:
+      ExtentEnforcement( Unpacker& unpacker ) {
+        _child = unpacker.getScoredExtentNode("child");
+        _field = unpacker.getRawExtentNode("field");
+      }
+
+      ExtentEnforcement( ScoredExtentNode* child, RawExtentNode* field ) :
+        _child(child),
+        _field(field)
+      {
+      }
+
+      virtual std::string typeName() const {
+        return "ExtentEnforcement";
+      }
+
+      std::string queryText() const {
+        std::stringstream qtext;
+	// As there is no equivalent to ExtentEnforcement in the indri query language,
+	// we will use the ExtentRestriction notation.
+        
+        std::string childText = _child->queryText();
+        std::string::size_type pos = childText.find( '(' );
+
+        if( pos != std::string::npos ) {
+          qtext << childText.substr(0,pos) 
+                << "["
+                << _field->queryText()
+                << "]"
+                << childText.substr(pos);
+        } else {
+          // couldn't find a parenthesis, so we'll tack the [field] on the front
+          qtext << "["
+                << _field->queryText()
+                << "]"
+                << childText;
+        }
+
+        return qtext.str();
+      }
+
+      virtual UINT64 hashCode() const {
+        return 109 + _child->hashCode() * 7 + _field->hashCode();//??????????????
+      }
+
+      ScoredExtentNode* getChild() {
+        return _child;
+      }
+
+      RawExtentNode* getField() {
+        return _field;
+      }
+
+      void setChild( ScoredExtentNode* child ) {
+        _child = child;
+      }
+
+      void setField( RawExtentNode* field ) {
+        _field = field;
+      }
+      
+      void pack( Packer& packer ) {
+        packer.before(this);
+        packer.put("child", _child);
+        packer.put("field", _field);
+        packer.after(this);
+      }
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+        _child->walk(walker);
+        _field->walk(walker);
+        walker.after(this);
+      }
+
+      virtual Node* copy( Copier& copier ) {
+        copier.before(this);
+
+        ScoredExtentNode* duplicateChild = dynamic_cast<indri::lang::ScoredExtentNode*>(_child->copy(copier));
+        RawExtentNode* duplicateField = dynamic_cast<indri::lang::RawExtentNode*>(_field->copy(copier));
+        ExtentEnforcement* duplicate = new ExtentEnforcement( duplicateChild, duplicateField );
+        duplicate->setNodeName( nodeName() );
+        
+        return copier.after(this, duplicate);
+      }
+    };
+
+    class ContextInclusionNode : public ScoredExtentNode {
+    protected:
+      std::vector<ScoredExtentNode*> _children;
+      ScoredExtentNode* _preserveExtentsChild;
+
+      void _unpack( Unpacker& unpacker ) {
+        _children = unpacker.getScoredExtentVector( "children" );
+	_preserveExtentsChild = unpacker.getScoredExtentNode( "preserveExtentsChild" );
+      }
+
+      UINT64 _hashCode() const {
+        UINT64 accumulator = 0;
+
+        for( int i=0; i<_children.size(); i++ ) {
+          accumulator += _children[i]->hashCode();
+        }
+
+        return accumulator;
+      }
+
+      template<class _ThisType>
+      void _walk( _ThisType* ptr, Walker& walker ) {
+        walker.before(ptr);
+
+        for( unsigned int i=0; i<_children.size(); i++ ) {
+          _children[i]->walk(walker);
+        }
+        
+        walker.after(ptr);
+      }
+
+      template<class _ThisType>
+      Node* _copy( _ThisType* ptr, Copier& copier ) {
+        copier.before(ptr);
+        
+        _ThisType* duplicate = new _ThisType();
+        duplicate->setNodeName( nodeName() );
+        for( unsigned int i=0; i<_children.size(); i++ ) {
+	  bool preserveExtents = false;
+	  if ( _preserveExtentsChild == _children[i] ) {
+            preserveExtents = true;
+          }
+          duplicate->addChild( dynamic_cast<ScoredExtentNode*>(_children[i]->copy(copier)), preserveExtents );
+        } 
+
+        return copier.after(ptr, duplicate);
+      }
+
+      void _childText( std::stringstream& qtext ) const {
+	if ( _preserveExtentsChild != 0 ) {
+	  qtext << _preserveExtentsChild->queryText() << " ";
+	}
+        for( unsigned int i=0; i<_children.size(); i++ ) {
+	  if ( _children[i] != _preserveExtentsChild ) {
+	    if(i>0) qtext << " ";
+	    qtext << _children[i]->queryText();
+	  }
+        }
+      }
+
+    public:
+      ContextInclusionNode( ) { }
+      ContextInclusionNode( Unpacker & unpacker ) {
+	_unpack( unpacker );
+      }
+
+      const std::vector<ScoredExtentNode*>& getChildren() {
+        return _children;
+      }
+      
+      ScoredExtentNode * getPreserveExtentsChild() {
+	return _preserveExtentsChild;
+      }
+
+      void addChild( ScoredExtentNode* scoredNode, bool preserveExtents = false ) {
+	if (preserveExtents == true) {
+          _preserveExtentsChild = scoredNode;
+        }	
+        _children.push_back( scoredNode );
+      }
+
+      std::string typeName() const {
+        return "ContextInclusionNode";
+      }
+
+      std::string queryText() const {
+        std::stringstream qtext;
+        qtext << "#context(";
+        _childText(qtext);
+        qtext << ")";
+
+        return qtext.str();
+      } 
+
+      virtual UINT64 hashCode() const {
+        return 111 + _hashCode();//?????????????
+      }
+
+      void pack( Packer& packer ) {
+        packer.before(this);
+        packer.put( "children", _children );
+	packer.put( "preserveExtentsChild", _preserveExtentsChild);
+        packer.after(this);
+      }
+
+      void walk( Walker& walker ) {
+	_walk( this, walker );
+      }
+      
+      Node* copy( Copier& copier ) {
+        return _copy( this, copier );
+      }
+    };
+
   }
 }
 

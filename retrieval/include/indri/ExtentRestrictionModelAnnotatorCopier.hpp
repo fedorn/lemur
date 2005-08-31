@@ -66,6 +66,11 @@ namespace indri
         _nodes.push_back( newNode ); // should track for free.
         return newNode;
       }
+
+      indri::lang::Node*  after( indri::lang::NestedRawScorerNode* oldNode, indri::lang::NestedRawScorerNode* newNode  ) {
+	return after( (indri::lang::RawScorerNode *) oldNode, (indri::lang::RawScorerNode *) newNode );	
+      }
+
     };
   }
 }

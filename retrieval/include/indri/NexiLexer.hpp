@@ -6,12 +6,11 @@
   #include "indri/QuerySpec.hpp"
   #include "indri/DateParse.hpp"
   #include "indri/delete_range.hpp"
-  #include "indri/PriorFactory.hpp"
   #include "indri/NexiLexer.hpp"
   #include <algorithm>
   #include <cctype>
 
-#line 15 "NexiLexer.hpp"
+#line 14 "NexiLexer.hpp"
 #include <antlr/config.hpp>
 /* $ANTLR 2.7.4: "nexilang.g" -> "NexiLexer.hpp"$ */
 #include <antlr/CommonToken.hpp>
@@ -23,7 +22,7 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API NexiLexer : public ANTLR_USE_NAMESPACE(antlr)CharScanner, public NexiLexerTokenTypes
 {
-#line 63 "nexilang.g"
+#line 62 "nexilang.g"
 
 private:
   bool _numbers;
@@ -36,7 +35,7 @@ public:
   void setNumbers(bool f) {
     _numbers = f;
   } 
-#line 26 "NexiLexer.hpp"
+#line 25 "NexiLexer.hpp"
 private:
 	void initLiterals();
 public:

@@ -30,11 +30,7 @@ indri::infnet::FieldWildcardNode::FieldWildcardNode( const std::string& name ) :
 }
 
 indri::infnet::FieldWildcardNode::~FieldWildcardNode() {
-
-  if ( _docIter != 0 ) {
-    delete _docIter;
-  }
-
+  delete _docIter;
 }
 
 void indri::infnet::FieldWildcardNode::prepare( int documentID ) {

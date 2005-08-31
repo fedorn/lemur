@@ -19,7 +19,6 @@ header "pre_include_hpp" {
   #include "indri/QuerySpec.hpp"
   #include "indri/DateParse.hpp"
   #include "indri/delete_range.hpp"
-  #include "indri/PriorFactory.hpp"
   #include "indri/NexiLexer.hpp"
   #include <algorithm>
   #include <cctype>
@@ -129,8 +128,6 @@ private:
   std::vector<indri::lang::Node*> _nodes;
   // makes sure nodes go away when parser goes away
   indri::utility::VectorDeleter<indri::lang::Node*> _deleter;
-  // gives us access to named priors
-  indri::query::PriorFactory* _priorFactory;
   
 public:
   void init( NexiLexer* lexer ) {
@@ -146,9 +143,10 @@ query returns [ indri::lang::ScoredExtentNode* q ] {
     indri::lang::ScoredExtentNode * c2 = 0;
     indri::lang::NestedExtentInside * p2 = 0;
     indri::lang::RawExtentNode * f2 = 0;
-    indri::lang::ExtentRestriction * r = 0;
   } :
   (p=path f=field O_SQUARE c=clause C_SQUARE {
+
+    indri::lang::ExtentRestriction * r = 0;
 
     // finish the path with a field as the inner for the last extent inside
     if (p != 0) {
@@ -163,10 +161,12 @@ query returns [ indri::lang::ScoredExtentNode* q ] {
       r = new indri::lang::ExtentRestriction(c, f);
     }
     _nodes.push_back(r);
-
     q=r;
   } 
   ( p2=path f2=field O_SQUARE c2=clause C_SQUARE { 
+    // pop the extent restriction, we'll need an ExtentEnforcement instead
+    _nodes.pop_back();
+    
     // finish the path with a field as the inner for the last extent inside
     indri::lang::ExtentRestriction * r2;
     if (p2 != 0) {
@@ -182,15 +182,15 @@ query returns [ indri::lang::ScoredExtentNode* q ] {
     }
     _nodes.push_back(r2);
  
-    indri::lang::CombineNode * combine = new indri::lang::CombineNode;
+    indri::lang::ContextInclusionNode * combine = new indri::lang::ContextInclusionNode;
     _nodes.push_back(combine);
 
-                
     combine->addChild(c);
-    combine->addChild(r2);
-//    combine->addChild(r2, true);
+    combine->addChild(r2, true);
 
-    r->setChild(combine);
+    indri::lang::ExtentEnforcement * enf = new indri::lang::ExtentEnforcement(combine, f);
+    _nodes.push_back(enf);
+    q=enf;
 
   } 
 )? EOF {
@@ -198,12 +198,12 @@ query returns [ indri::lang::ScoredExtentNode* q ] {
 //    indri::lang::LengthPrior * prior = new indri::lang::LengthPrior(r, 0);
 //    _nodes.push_back(prior);
 //    q=prior;
-    q=r;               
+
 } ) 
 | ( c=termList EOF {
     indri::lang::FieldWildcard * wild = new indri::lang::FieldWildcard;
     _nodes.push_back(wild);
-    r = new indri::lang::ExtentRestriction(c, wild);
+    indri::lang::ExtentRestriction * r = new indri::lang::ExtentRestriction(c, wild);
     _nodes.push_back(r);
 
 
