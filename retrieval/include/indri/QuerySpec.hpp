@@ -2940,87 +2940,29 @@ namespace indri {
     };
    
 
-    class ExtentEnforcement : public ScoredExtentNode {
-    protected:
-      ScoredExtentNode* _child;
-      RawExtentNode* _field;
+    class ExtentEnforcement : public ExtentRestriction {
 
     public:
-      ExtentEnforcement( Unpacker& unpacker ) {
-        _child = unpacker.getScoredExtentNode("child");
-        _field = unpacker.getRawExtentNode("field");
+      ExtentEnforcement( Unpacker& unpacker ) :
+	ExtentRestriction( unpacker ) {
       }
 
       ExtentEnforcement( ScoredExtentNode* child, RawExtentNode* field ) :
-        _child(child),
-        _field(field)
+	ExtentRestriction( child, field )
       {
       }
 
-      virtual std::string typeName() const {
+      std::string typeName() const {
         return "ExtentEnforcement";
       }
 
-      std::string queryText() const {
-        std::stringstream qtext;
-	// As there is no equivalent to ExtentEnforcement in the indri query language,
-	// we will use the ExtentRestriction notation.
-        
-        std::string childText = _child->queryText();
-        std::string::size_type pos = childText.find( '(' );
-
-        if( pos != std::string::npos ) {
-          qtext << childText.substr(0,pos) 
-                << "["
-                << _field->queryText()
-                << "]"
-                << childText.substr(pos);
-        } else {
-          // couldn't find a parenthesis, so we'll tack the [field] on the front
-          qtext << "["
-                << _field->queryText()
-                << "]"
-                << childText;
-        }
-
-        return qtext.str();
-      }
-
-      virtual UINT64 hashCode() const {
-        return 109 + _child->hashCode() * 7 + _field->hashCode();//??????????????
-      }
-
-      ScoredExtentNode* getChild() {
-        return _child;
-      }
-
-      RawExtentNode* getField() {
-        return _field;
-      }
-
-      void setChild( ScoredExtentNode* child ) {
-        _child = child;
-      }
-
-      void setField( RawExtentNode* field ) {
-        _field = field;
-      }
       
-      void pack( Packer& packer ) {
-        packer.before(this);
-        packer.put("child", _child);
-        packer.put("field", _field);
-        packer.after(this);
+      UINT64 hashCode() const {
+	return 109 + _child->hashCode() * 7 + _field->hashCode();//??????????????
       }
 
-      void walk( Walker& walker ) {
-        walker.before(this);
-        _child->walk(walker);
-        _field->walk(walker);
-        walker.after(this);
-      }
 
-      virtual Node* copy( Copier& copier ) {
+      Node* copy( Copier& copier ) {
         copier.before(this);
 
         ScoredExtentNode* duplicateChild = dynamic_cast<indri::lang::ScoredExtentNode*>(_child->copy(copier));

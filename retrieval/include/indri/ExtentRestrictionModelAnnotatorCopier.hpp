@@ -53,10 +53,18 @@ namespace indri
         _restrictions.push( old );
       }
 
+      void before( indri::lang::ExtentEnforcement* old ) {
+	before( (indri::lang::ExtentRestriction*) old );
+      }
+
       indri::lang::Node* after( indri::lang::ExtentRestriction* oldNode, indri::lang::ExtentRestriction* newNode ) {
         _restrictions.pop();
         _nodes.push_back( newNode );
         return newNode;
+      }
+
+      indri::lang::Node* after( indri::lang::ExtentEnforcement* oldNode, indri::lang::ExtentEnforcement* newNode ) {
+        return after( (indri::lang::ExtentRestriction*) oldNode, (indri::lang::ExtentRestriction*) newNode );
       }
   
       indri::lang::Node* after( indri::lang::RawScorerNode* oldNode, indri::lang::RawScorerNode* newNode ) {
