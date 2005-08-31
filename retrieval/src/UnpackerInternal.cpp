@@ -77,6 +77,12 @@ indri::lang::Node* indri::lang::Unpacker::_unpack( indri::xml::XMLNode* child ) 
     result = new ScoreAccumulatorNode(*this);
   } else if( type == "AnnotatorNode" ) {
     result = new AnnotatorNode(*this);
+  } else if( type == "FieldWildcard" ) {
+    result = new FieldWildcard(*this);
+  } else if( type == "NestedExtentInside" ) {
+    result = new NestedExtentInside(*this);
+  } else if( type == "NestedRawScorerNode" ) {
+    result = new NestedRawScorerNode(*this);
   } else {
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Unknown node type '" + type + "' found during unpacking." );
   }

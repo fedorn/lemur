@@ -79,6 +79,12 @@ namespace indri {
       virtual void after( class ScoreAccumulatorNode* n );
       virtual void before( class AnnotatorNode* n );
       virtual void after( class AnnotatorNode* n );
+      virtual void before( class FieldWildcard* n );
+      virtual void after( class FieldWildcard* n );
+      virtual void before( class NestedExtentInside* n );
+      virtual void after( class NestedExtentInside* n );
+      virtual void before( class NestedRawScorerNode* n );
+      virtual void after( class NestedRawScorerNode* n );
    };
  };
 };

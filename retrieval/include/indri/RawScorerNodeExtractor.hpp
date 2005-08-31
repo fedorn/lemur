@@ -51,6 +51,15 @@ namespace indri
         _insideCount--;
       }
 
+      void before( indri::lang::NestedRawScorerNode* node ) {
+	before( (indri::lang::RawScorerNode *) node );
+      }
+
+      void after( indri::lang::NestedRawScorerNode* node ) {
+	after( (indri::lang::RawScorerNode *) node );
+      }
+
+
       std::vector<indri::lang::RawScorerNode*>& getScorerNodes() {
         return _scorerNodes;
       }

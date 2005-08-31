@@ -259,7 +259,7 @@ namespace indri {
     };
 
     class ExtentInside : public RawExtentNode {
-    private:
+    protected:
       RawExtentNode* _inner;
       RawExtentNode* _outer;
 
@@ -275,7 +275,7 @@ namespace indri {
         _outer = unpacker.getRawExtentNode( "outer" );
       }
 
-      bool operator== ( Node& o ) {
+      virtual bool operator== ( Node& o ) {
         ExtentInside* other = dynamic_cast<ExtentInside*>(&o);
   
         return other &&
@@ -283,11 +283,11 @@ namespace indri {
           *_outer == *other->_outer;
       }
       
-      std::string typeName() const {
+      virtual std::string typeName() const {
         return "ExtentInside";
       }
 
-      UINT64 hashCode() const {
+      virtual UINT64 hashCode() const {
         return 7 + _inner->hashCode() + (_inner->hashCode() * 7);
       }
 
@@ -298,6 +298,10 @@ namespace indri {
               << _outer->queryText();
 
         return qtext.str();
+      }
+
+      void setInner( RawExtentNode * inner ) {
+	_inner = inner;
       }
 
       RawExtentNode* getInner() {
@@ -322,7 +326,7 @@ namespace indri {
         walker.after(this);
       }
 
-      Node* copy( Copier& copier ) {
+      virtual Node* copy( Copier& copier ) {
         copier.before(this);
         
         RawExtentNode* newInner = dynamic_cast<RawExtentNode*>(_inner->copy(copier));
@@ -1359,7 +1363,7 @@ namespace indri {
     };
 
     class RawScorerNode : public ScoredExtentNode {
-    private:
+    protected:
       double _occurrences; // number of occurrences within this context
       double _contextSize; // number of terms that occur within this context
       double _maximumContextFraction;
@@ -1387,7 +1391,7 @@ namespace indri {
         _smoothing = unpacker.getString( "smoothing" );
       }
 
-      std::string typeName() const {
+      virtual std::string typeName() const {
         return "RawScorerNode";
       }
 
@@ -1407,7 +1411,7 @@ namespace indri {
         return qtext.str();
       }
 
-      UINT64 hashCode() const {
+      virtual UINT64 hashCode() const {
         UINT64 hash = 0;
 
         hash += 43;
@@ -1480,7 +1484,7 @@ namespace indri {
         walker.after(this);
       }
 
-      Node* copy( Copier& copier ) {
+      virtual Node* copy( Copier& copier ) {
         copier.before(this);
 
         RawExtentNode* duplicateContext = _context ? dynamic_cast<RawExtentNode*>(_context->copy(copier)) : 0;
@@ -2174,7 +2178,7 @@ namespace indri {
     };
 
     class ExtentRestriction : public ScoredExtentNode {
-    private:
+    protected:
       ScoredExtentNode* _child;
       RawExtentNode* _field;
 
@@ -2190,7 +2194,7 @@ namespace indri {
       {
       }
 
-      std::string typeName() const {
+      virtual std::string typeName() const {
         return "ExtentRestriction";
       }
 
@@ -2220,7 +2224,7 @@ namespace indri {
         return qtext.str();
       }
 
-      UINT64 hashCode() const {
+      virtual UINT64 hashCode() const {
         return 79 + _child->hashCode() * 7 + _field->hashCode();
       }
 
@@ -2254,7 +2258,7 @@ namespace indri {
         walker.after(this);
       }
 
-      Node* copy( Copier& copier ) {
+      virtual Node* copy( Copier& copier ) {
         copier.before(this);
 
         ScoredExtentNode* duplicateChild = dynamic_cast<indri::lang::ScoredExtentNode*>(_child->copy(copier));
@@ -2794,6 +2798,135 @@ namespace indri {
         return copier.after(this, duplicate);
       }
     };
+
+    
+    class FieldWildcard : public RawExtentNode {
+    private:
+
+    public:
+      FieldWildcard(  )
+      {
+      }
+
+      FieldWildcard( Unpacker& unpacker ) {
+      }
+
+      bool operator== ( Node& o ) {
+        FieldWildcard* other = dynamic_cast<FieldWildcard*>(&o);
+        return other;
+      }
+
+      std::string typeName() const {
+        return "FieldWildcard";
+      }
+
+      std::string queryText() const {
+        std::stringstream qtext;
+        qtext << "*";
+
+        return qtext.str();
+      }
+
+
+      void pack( Packer& packer ) {
+        packer.before(this);
+        packer.after(this);
+      }
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+        walker.after(this);
+      }
+
+      UINT64 hashCode() const {
+        return 0;//???????????????
+      }
+
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+
+        FieldWildcard* fieldWildcardCopy = new FieldWildcard;
+        fieldWildcardCopy->setNodeName( nodeName() );
+
+        return copier.after(this, fieldWildcardCopy);
+      }
+    };
+
+    class NestedExtentInside : public ExtentInside {
+
+    public:
+      NestedExtentInside( RawExtentNode* inner, RawExtentNode* outer ) :
+        ExtentInside( inner, outer )
+      {
+      }
+
+      NestedExtentInside( Unpacker& unpacker ):
+	ExtentInside( unpacker ) 
+      { 
+      }
+
+      bool operator== ( Node& o ) {
+        NestedExtentInside* other = dynamic_cast<NestedExtentInside*>(&o);
+  
+        return other &&
+          *_inner == *other->_inner &&
+          *_outer == *other->_outer;
+      }
+      
+      std::string typeName() const {
+        return "NestedExtentInside";
+      }
+
+      UINT64 hashCode() const {
+        return 0;//???????????????
+      }
+
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+        
+        RawExtentNode* newInner = dynamic_cast<RawExtentNode*>(_inner->copy(copier));
+        RawExtentNode* newOuter = dynamic_cast<RawExtentNode*>(_outer->copy(copier));
+        NestedExtentInside* extentInsideCopy = new NestedExtentInside( newInner, newOuter );
+        extentInsideCopy->setNodeName( nodeName() );
+
+        return copier.after(this, extentInsideCopy);
+      }
+    };
+
+    class NestedRawScorerNode : public RawScorerNode {
+
+    public:
+      NestedRawScorerNode( RawExtentNode* raw, RawExtentNode* context, std::string smoothing = "method:dirichlet,mu:2500" ) :
+	RawScorerNode( raw, context, smoothing )
+      {
+      }
+
+      NestedRawScorerNode( Unpacker& unpacker ) :
+	RawScorerNode( unpacker )
+      {
+      }
+
+      std::string typeName() const {
+        return "NestedRawScorerNode";
+      }
+
+      UINT64 hashCode() const {
+        return 0;//??????????
+      }
+
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+
+        RawExtentNode* duplicateContext = _context ? dynamic_cast<RawExtentNode*>(_context->copy(copier)) : 0;
+        RawExtentNode* duplicateRaw = _raw ? dynamic_cast<RawExtentNode*>(_raw->copy(copier)) : 0;
+        NestedRawScorerNode* duplicate = new NestedRawScorerNode(*this);
+        duplicate->setRawExtent( duplicateRaw );
+        duplicate->setContext( duplicateContext );
+
+        return copier.after(this, duplicate);
+      }
+    };
+   
   }
 }
 

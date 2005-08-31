@@ -78,6 +78,12 @@ namespace indri {
     Node* Copier::after( class ScoreAccumulatorNode* oldNode, class ScoreAccumulatorNode* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class AnnotatorNode* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class AnnotatorNode* oldNode, class AnnotatorNode* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class FieldWildcard* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class FieldWildcard* oldNode, class FieldWildcard* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class NestedExtentInside* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class NestedExtentInside* oldNode, class NestedExtentInside* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class NestedRawScorerNode* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class NestedRawScorerNode* oldNode, class NestedRawScorerNode* newNode ) { return defaultAfter( oldNode, newNode ); }
  };
 };
 

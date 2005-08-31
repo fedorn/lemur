@@ -91,6 +91,9 @@ namespace indri
       void after( indri::lang::FieldBetweenNode* fbNode );
       void after( indri::lang::FieldEqualsNode* fbNode );
       void after( indri::lang::FilterNode* filterNode );
+      void after( indri::lang::FieldWildcard* fieldWildcard );
+      void after( indri::lang::NestedExtentInside* extentInside );
+      void after( indri::lang::NestedRawScorerNode* rawScorerNode );
     };
   }
 }

@@ -78,6 +78,12 @@ namespace indri {
    void Walker::after( class ScoreAccumulatorNode* n ) { defaultAfter( n ); }
    void Walker::before( class AnnotatorNode* n ) { defaultBefore( n ); }
    void Walker::after( class AnnotatorNode* n ) { defaultAfter( n ); }
+   void Walker::before( class FieldWildcard* n ) { defaultBefore( n ); }
+   void Walker::after( class FieldWildcard* n ) { defaultAfter( n ); }
+   void Walker::before( class NestedExtentInside* n ) { defaultBefore( n ); }
+   void Walker::after( class NestedExtentInside* n ) { defaultAfter( n ); }
+   void Walker::before( class NestedRawScorerNode* n ) { defaultBefore( n ); }
+   void Walker::after( class NestedRawScorerNode* n ) { defaultAfter( n ); }
  };
 };
 

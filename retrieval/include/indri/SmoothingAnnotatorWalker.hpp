@@ -138,6 +138,12 @@ namespace indri
 
         scorer->setSmoothing( _matchSmoothingRule( fieldName, op ) );
       }
+
+      void after( indri::lang::NestedRawScorerNode* scorer ) {
+	after( (indri::lang::RawScorerNode *) scorer );
+      }
+
+
     };
   }
 }

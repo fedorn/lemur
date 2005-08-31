@@ -53,6 +53,9 @@
 #include "indri/TermFrequencyBeliefNode.hpp"
 #include "indri/CachedFrequencyBeliefNode.hpp"
 #include "indri/BooleanAndNode.hpp"
+#include "indri/FieldWildcardNode.hpp"
+#include "indri/NestedExtentInsideNode.hpp"
+#include "indri/NestedListBeliefNode.hpp"
 
 #include <stdexcept>
 
@@ -827,5 +830,81 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::CombineNode* co
 
     _network->addBeliefNode( wandNode );
     _nodeMap[combineNode] = wandNode;
+  }
+}
+
+
+//
+// FieldWildcard
+//
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::FieldWildcard* fieldWildcard ) {
+  if( _nodeMap.find( fieldWildcard ) == _nodeMap.end() ) {
+    indri::infnet::FieldWildcardNode* fieldWildcardNode = 
+      new indri::infnet::FieldWildcardNode( fieldWildcard->nodeName() );
+
+    _network->addListNode( fieldWildcardNode );
+    _nodeMap[fieldWildcard] = fieldWildcardNode;
+  }
+}
+
+
+//
+// NestedExtentInside
+//
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::NestedExtentInside* extentInside ) {
+  if( _nodeMap.find( extentInside ) == _nodeMap.end() ) {
+    NestedExtentInsideNode* extentInsideNode = new NestedExtentInsideNode( 
+                                                              extentInside->nodeName(),
+                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]) );
+
+    _network->addListNode( extentInsideNode );
+    _nodeMap[extentInside] = extentInsideNode;
+  }
+}
+
+
+//
+// NestedRawScorer
+//
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::NestedRawScorerNode* rawScorerNode ) {
+  if( _nodeMap.find( rawScorerNode ) == _nodeMap.end() ) {
+    BeliefNode* belief;
+    InferenceNetworkNode* untypedRawExtentNode = _nodeMap[rawScorerNode->getRawExtent()];
+    InferenceNetworkNode* untypedContextNode = _nodeMap[rawScorerNode->getContext()];
+    ListIteratorNode* iterator = dynamic_cast<ListIteratorNode*>(untypedRawExtentNode);
+
+    indri::query::TermScoreFunction* function = 0;
+
+    function = _buildTermScoreFunction( rawScorerNode->getSmoothing(),
+                                        rawScorerNode->getOccurrences(),
+                                        rawScorerNode->getContextSize() );
+
+    if( rawScorerNode->getOccurrences() > 0 && iterator != 0 ) {
+      ListIteratorNode* rawIterator = 0;
+      ListIteratorNode* context = dynamic_cast<ListIteratorNode*>(untypedContextNode);
+
+      if( context ) {
+        rawIterator = iterator;
+        iterator = new ExtentInsideNode( "", rawIterator, context );
+        _network->addListNode( iterator );
+      }
+      
+      // this is here to turn max-score off for this term
+      // only frequency lists are "max-scored"
+      double maximumScore = INDRI_HUGE_SCORE;
+      double maximumBackgroundScore = INDRI_HUGE_SCORE;
+      
+      belief = new NestedListBeliefNode( rawScorerNode->nodeName(), *iterator, context, rawIterator, *function, maximumBackgroundScore, maximumScore );
+    } else {
+      belief = new NullScorerNode( rawScorerNode->nodeName(), *function );
+    }
+
+    _network->addScoreFunction( function );
+    _network->addBeliefNode( belief );
+    _nodeMap[rawScorerNode] = belief;
   }
 }
