@@ -89,6 +89,8 @@ namespace indri {
       virtual void after( class ExtentEnforcement* n );
       virtual void before( class ContextInclusionNode* n );
       virtual void after( class ContextInclusionNode* n );
+      virtual void before( class LengthPrior* n );
+      virtual void after( class LengthPrior* n );
    };
  };
 };

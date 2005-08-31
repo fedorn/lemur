@@ -58,6 +58,7 @@
 #include "indri/NestedListBeliefNode.hpp"
 #include "indri/ExtentEnforcementNode.hpp"
 #include "indri/ContextInclusionAndNode.hpp"
+#include "indri/LengthPriorNode.hpp"
 
 #include <stdexcept>
 
@@ -951,5 +952,22 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ContextInclusio
 
     _network->addBeliefNode( ciaNode );
     _nodeMap[contextInclusionNode] = ciaNode;
+  }
+}
+
+//
+// LengthPrior
+//
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::LengthPrior* lengthPrior ) {
+  if( _nodeMap.find( lengthPrior ) == _nodeMap.end() ) {
+
+    BeliefNode * child = dynamic_cast<BeliefNode*>(_nodeMap[lengthPrior->getChild()]);
+
+    indri::infnet::LengthPriorNode * lengthPriorNode = 
+      new indri::infnet::LengthPriorNode( lengthPrior->nodeName(), child, lengthPrior->getExponent() );
+
+    _network->addBeliefNode( lengthPriorNode );
+    _nodeMap[lengthPrior] = lengthPriorNode;
   }
 }

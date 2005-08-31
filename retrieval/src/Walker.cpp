@@ -88,6 +88,8 @@ namespace indri {
    void Walker::after( class ExtentEnforcement* n ) { defaultAfter( n ); }
    void Walker::before( class ContextInclusionNode* n ) { defaultBefore( n ); }
    void Walker::after( class ContextInclusionNode* n ) { defaultAfter( n ); }
+   void Walker::before( class LengthPrior* n ) { defaultBefore( n ); }
+   void Walker::after( class LengthPrior* n ) { defaultAfter( n ); }
  };
 };
 

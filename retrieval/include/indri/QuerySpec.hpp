@@ -3088,6 +3088,75 @@ namespace indri {
       }
     };
 
+    class LengthPrior : public ScoredExtentNode {
+    private:
+      double _exponent;
+      ScoredExtentNode * _child;
+
+    public:
+      LengthPrior(ScoredExtentNode * child, double exponent) :
+	_child(child), 
+	_exponent(exponent)
+      {
+	
+      }
+
+      LengthPrior( Unpacker& unpacker ) {
+        _exponent = unpacker.getDouble( "exponent" );
+	_child = unpacker.getScoredExtentNode( "child" );
+      }
+
+      std::string queryText() const {
+        std::stringstream qtext;
+        // with the definition of priors somewhat in flux, it's
+        // hard to know what would be good to put here.  It's also
+	// a little hard when there realy isn't a way to 
+	// specify this in either of the indri/nexi query languages.
+        qtext <<  "#lengthprior(" << _exponent << ")";
+        return qtext.str();
+      }
+
+      std::string nodeType() {
+        return "LengthPrior";
+      }
+
+      void setExponent( double exponent ) {
+	_exponent = exponent;
+      }
+
+      double getExponent() {
+	return _exponent;
+      }
+
+      ScoredExtentNode* getChild() {
+	return _child;
+      }
+      
+      virtual UINT64 hashCode() const {
+        return 115; //?????????
+      }
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+	_child->walk(walker);
+        walker.after(this);
+      }
+
+      indri::lang::Node* copy( Copier& copier ) {
+        copier.before(this);
+	ScoredExtentNode * childCopy = dynamic_cast<ScoredExtentNode*> (_child->copy( copier ) );
+        LengthPrior* duplicate = new LengthPrior( childCopy, _exponent );
+        return copier.after(this, duplicate);
+      }
+
+      void pack( Packer& packer ) {
+        packer.before(this);
+        packer.put( "exponent", _exponent );
+	packer.put( "child", _child );
+        packer.after(this);
+      }
+    };
+
   }
 }
 

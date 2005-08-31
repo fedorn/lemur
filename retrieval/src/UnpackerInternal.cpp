@@ -87,6 +87,8 @@ indri::lang::Node* indri::lang::Unpacker::_unpack( indri::xml::XMLNode* child ) 
     result = new ExtentEnforcement(*this);
   } else if( type == "ContextInclusionNode" ) {
     result = new ContextInclusionNode(*this);
+  } else if( type == "LengthPrior" ) {
+    result = new LengthPrior(*this);
   } else {
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Unknown node type '" + type + "' found during unpacking." );
   }

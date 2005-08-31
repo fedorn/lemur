@@ -88,6 +88,8 @@ namespace indri {
     Node* Copier::after( class ExtentEnforcement* oldNode, class ExtentEnforcement* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class ContextInclusionNode* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class ContextInclusionNode* oldNode, class ContextInclusionNode* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class LengthPrior* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class LengthPrior* oldNode, class LengthPrior* newNode ) { return defaultAfter( oldNode, newNode ); }
  };
 };
 

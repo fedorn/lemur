@@ -96,6 +96,7 @@ namespace indri
       void after( indri::lang::NestedRawScorerNode* rawScorerNode );
       void after( indri::lang::ExtentEnforcement * eeNode );
       void after( indri::lang::ContextInclusionNode* contextInclusionNode );
+      void after( indri::lang::LengthPrior* lengthPrior );
     };
   }
 }

@@ -118,6 +118,18 @@ namespace indri
           return newUW;
         }
       }
+
+      indri::lang::Node* after( indri::lang::LengthPrior * oldLP, indri::lang::LengthPrior * newLP ) {
+	if ( oldLP->getExponent() == 0 ) {
+	  indri::lang::Node* child = newLP->getChild();
+	  delete newLP;	 
+	  return child;
+	} else {
+	  _nodes.push_back( newLP );
+	  return newLP;
+	}
+      }
+
     };
   }
 }

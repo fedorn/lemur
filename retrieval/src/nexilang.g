@@ -195,9 +195,9 @@ query returns [ indri::lang::ScoredExtentNode* q ] {
   } 
 )? EOF {
 
-//    indri::lang::LengthPrior * prior = new indri::lang::LengthPrior(r, 0);
-//    _nodes.push_back(prior);
-//    q=prior;
+    indri::lang::LengthPrior * prior = new indri::lang::LengthPrior(q, 0);
+    _nodes.push_back(prior);
+    q=prior;
 
 } ) 
 | ( c=termList EOF {
@@ -207,10 +207,9 @@ query returns [ indri::lang::ScoredExtentNode* q ] {
     _nodes.push_back(r);
 
 
-//    indri::lang::LengthPrior * prior = new indri::lang::LengthPrior(r, 0);
-//    _nodes.push_back(prior);
-//    q=prior;
-   q=r;
+    indri::lang::LengthPrior * prior = new indri::lang::LengthPrior(r, 0);
+    _nodes.push_back(prior);
+    q=prior;
 
   } )
 ;
