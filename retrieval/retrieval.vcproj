@@ -114,6 +114,9 @@
 				RelativePath=".\src\ContextCountAccumulator.cpp">
 			</File>
 			<File
+				RelativePath=".\src\ContextInclusionAndNode.cpp">
+			</File>
+			<File
 				RelativePath=".\src\ContextSimpleCountAccumulator.cpp">
 			</File>
 			<File
@@ -133,6 +136,9 @@
 			</File>
 			<File
 				RelativePath=".\src\ExtentAndNode.cpp">
+			</File>
+			<File
+				RelativePath=".\src\ExtentEnforcementNode.cpp">
 			</File>
 			<File
 				RelativePath=".\src\ExtentInsideNode.cpp">
@@ -157,6 +163,9 @@
 			</File>
 			<File
 				RelativePath=".\src\FieldLessNode.cpp">
+			</File>
+			<File
+				RelativePath=".\src\FieldWildcardNode.cpp">
 			</File>
 			<File
 				RelativePath=".\src\FilterRejectNode.cpp">
@@ -186,6 +195,9 @@
 				RelativePath=".\src\InQueryRetMethod.cpp">
 			</File>
 			<File
+				RelativePath=".\src\LengthPriorNode.cpp">
+			</File>
+			<File
 				RelativePath=".\src\ListBeliefNode.cpp">
 			</File>
 			<File
@@ -195,6 +207,12 @@
 				RelativePath=".\src\MatchInfo.cpp">
 			</File>
 			<File
+				RelativePath=".\src\NestedExtentInsideNode.cpp">
+			</File>
+			<File
+				RelativePath=".\src\NestedListBeliefNode.cpp">
+			</File>
+			<File
 				RelativePath=".\src\NetworkMessageStream.cpp">
 			</File>
 			<File
@@ -202,6 +220,12 @@
 			</File>
 			<File
 				RelativePath=".\src\NetworkServerStub.cpp">
+			</File>
+			<File
+				RelativePath=".\src\NexiLexer.cpp">
+			</File>
+			<File
+				RelativePath=".\src\NexiParser.cpp">
 			</File>
 			<File
 				RelativePath=".\src\NotNode.cpp">
@@ -253,6 +277,9 @@
 			</File>
 			<File
 				RelativePath=".\src\QueryParser.cpp">
+			</File>
+			<File
+				RelativePath=".\src\QueryParserFactory.cpp">
 			</File>
 			<File
 				RelativePath=".\src\RelevanceModel.cpp">
@@ -356,6 +383,9 @@
 				RelativePath=".\include\indri\ContextCountGraphExtractor.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\ContextInclusionAndNode.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\ContextSimpleCountAccumulator.hpp">
 			</File>
 			<File
@@ -392,6 +422,9 @@
 				RelativePath=".\include\indri\ExtentAndNode.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\ExtentEnforcementNode.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\ExtentInsideNode.hpp">
 			</File>
 			<File
@@ -417,6 +450,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\FieldLessNode.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\FieldWildcardNode.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\FilterNode.hpp">
@@ -458,6 +494,9 @@
 				RelativePath=".\include\indri\JelinekMercerTermScoreFunction.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\LengthPriorNode.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\ListBeliefNode.hpp">
 			</File>
 			<File
@@ -476,6 +515,12 @@
 				RelativePath=".\include\indri\MaxNode.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\NestedExtentInsideNode.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\NestedListBeliefNode.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\NetworkMessageStream.hpp">
 			</File>
 			<File
@@ -483,6 +528,15 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\NetworkServerStub.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\NexiLexer.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\NexiLexerTokenTypes.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\NexiParser.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\NotNode.hpp">
@@ -543,6 +597,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\QueryParser.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\QueryParserFactory.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\QueryResponsePacker.hpp">
