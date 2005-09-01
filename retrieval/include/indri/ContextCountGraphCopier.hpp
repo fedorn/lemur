@@ -52,7 +52,7 @@ namespace indri
       }
 
       indri::lang::Node* after( indri::lang::NestedRawScorerNode* oldNode, indri::lang::NestedRawScorerNode* newNode ) {
-	after( (indri::lang::RawScorerNode *) oldNode, (indri::lang::RawScorerNode *) newNode);
+	return after( (indri::lang::RawScorerNode *) oldNode, (indri::lang::RawScorerNode *) newNode);
       }
 
       std::vector<indri::lang::Node*>& getNodes() {
