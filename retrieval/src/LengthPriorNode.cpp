@@ -37,7 +37,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
     double score = childResults[j].score ;
     int b = childResults[j].begin;
     int e = childResults[j].end;
-    int length = e - b;
+    double length = e - b;
 
     //    std::cout << documentID << " " 
     //	      << b << ":" 
