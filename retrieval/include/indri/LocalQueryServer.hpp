@@ -62,6 +62,8 @@ namespace indri
       QueryServerDocumentsResponse* documents( const std::vector<int>& documentIDs );
       QueryServerMetadataResponse* documentMetadata( const std::vector<int>& documentIDs, const std::string& attributeName );
 
+      QueryServerMetadataResponse* pathNames( const std::vector<int>& documentIDs, const std::vector<int>& pathBegins, const std::vector<int>& pathEnds );
+
       // terms
       INT64 termCount();
       INT64 termCount( const std::string& term );

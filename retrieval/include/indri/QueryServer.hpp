@@ -68,6 +68,7 @@ namespace indri
       virtual QueryServerMetadataResponse* documentMetadata( const std::vector<int>& documentIDs, const std::string& attributeName ) = 0;
       virtual QueryServerDocumentsResponse* documentsFromMetadata( const std::string& attributeName, const std::vector<std::string>& attributeValues ) = 0;
       virtual QueryServerDocumentIDsResponse* documentIDsFromMetadata( const std::string& attributeName, const std::vector<std::string>& attributeValues ) = 0;
+      virtual QueryServerMetadataResponse* pathNames( const std::vector<int>& documentIDs, const std::vector<int>& pathBegins, const std::vector<int>& pathEnds ) = 0;
 
       // terms
       virtual INT64 termCount() = 0;

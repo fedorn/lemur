@@ -144,6 +144,12 @@ namespace indri
       /// @return the vector of string values for that attribute
       std::vector<std::string> documentMetadata( const std::vector<indri::api::ScoredExtentResult>& documentIDs, const std::string& attributeName );
 
+      /// \brief Fetch the XPath names of extents for a list of ScoredExtentResults
+      /// @param results the list of ScoredExtentResults
+      /// @return the vector of string XPath names for the extents
+      std::vector<std::string> pathNames( const std::vector<indri::api::ScoredExtentResult>& results );
+
+
       /// \brief Fetch all documents with a metadata key that matches attributeName, with a value matching one of the attributeValues.
       /// @param attributeName the name of the metadata attribute (e.g. 'url' or 'docno')
       /// @param attributeValues values that the metadata attribute should match

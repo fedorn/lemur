@@ -457,6 +457,63 @@ std::vector<std::string> indri::api::QueryEnvironment::documentMetadata( const s
   return results;
 }
 
+std::vector<std::string> indri::api::QueryEnvironment::pathNames( const std::vector<indri::api::ScoredExtentResult>& results ) {
+  std::vector<DOCID_T> documentIDs;
+  documentIDs.reserve(results.size());
+  std::vector<int> pathBegins;
+  pathBegins.reserve(results.size());
+  std::vector<int> pathEnds;
+  pathEnds.reserve(results.size());
+
+  for( unsigned int i=0; i<results.size(); i++ ) {
+    documentIDs.push_back( results[i].document );
+    pathBegins.push_back( results[i].begin );
+    pathEnds.push_back( results[i].end );
+  }
+
+
+  std::vector< std::vector<DOCID_T> > docIDLists;
+  std::vector< std::vector<int> > beginLists;
+  std::vector< std::vector<int> > endLists;
+  docIDLists.resize( _servers.size() );
+  beginLists.resize( _servers.size() );
+  endLists.resize( _servers.size() );
+  std::vector< std::vector<DOCID_T> > docIDPositions;
+  docIDPositions.resize( _servers.size() );
+  std::vector< std::string > paths;
+  paths.resize( documentIDs.size() );
+  
+  // split document numbers into lists for each query server
+  qenv_scatter_document_ids( documentIDs, docIDLists, docIDPositions, _servers.size() );
+
+  // copy begins and ends over given the document scattering
+  for( unsigned int i=0; i<docIDLists.size(); i++ ) {
+    if( docIDLists[i].size() ) {      
+      for( unsigned int j=0; j<docIDLists[i].size(); j++ ) {
+        int resultIndex = docIDPositions[i][j];
+        beginLists[i].push_back( pathBegins[ resultIndex ] );
+        endLists[i].push_back( pathEnds[ resultIndex ] );
+      }
+    }
+  }
+
+  indri::utility::greedy_vector<indri::server::QueryServerMetadataResponse*> responses;
+  // send out requests for execution
+  for( unsigned int i=0; i<docIDLists.size(); i++ ) {
+    indri::server::QueryServerMetadataResponse* response = 0;
+    
+    if( docIDLists[i].size() )
+      response = _servers[i]->pathNames( docIDLists[i], beginLists[i], endLists[i] );
+    
+    responses.push_back(response);
+  }
+
+  // fold the results back into one master list (this method will delete the responses)
+  qenv_gather_document_results( docIDLists, docIDPositions, responses, paths );
+
+  return paths;
+}
+
 std::vector<std::string> indri::api::QueryEnvironment::documentMetadata( const std::vector<indri::api::ScoredExtentResult>& results, const std::string& attributeName ) {
   // copy into an int vector
   std::vector<DOCID_T> documentIDs;

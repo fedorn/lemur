@@ -364,6 +364,39 @@ void indri::net::NetworkServerStub::_handleDocumentTermCount( indri::xml::XMLNod
   _sendNumericResponse( "document-term-count", count );
 }
 
+void indri::net::NetworkServerStub::_handlePathNames( indri::xml::XMLNode* request ) {
+  std::vector<int> documentIDs;
+  std::vector<int> begins;
+  std::vector<int> ends;
+
+  // decode request
+  const indri::xml::XMLNode* paths = request->getChild("paths");
+
+  for( size_t i=0; i<paths->getChildren().size(); i++ ) {
+    const indri::xml::XMLNode * path = paths->getChildren()[i];
+    documentIDs.push_back( (int) string_to_i64( path->getChild("document")->getValue() ) );
+    begins.push_back( (int) string_to_i64( path->getChild("begin")->getValue() ) );
+    ends.push_back( (int) string_to_i64( path->getChild("end")->getValue() ) );    
+  }
+
+  // get the paths
+  indri::server::QueryServerMetadataResponse* pathNameResponse = _server->pathNames( documentIDs, begins, ends );
+  std::vector<std::string> pathName = pathNameResponse->getResults();
+  delete pathNameResponse;
+
+  // send them back
+  indri::xml::XMLNode* response = new indri::xml::XMLNode( "path-names" );
+  for( unsigned int i=0; i<pathName.size(); i++ ) {
+    std::string value = base64_encode( pathName[i].c_str(), pathName[i].length() );
+    indri::xml::XMLNode* datum = new indri::xml::XMLNode( "name", value );
+    response->addChild(datum);
+  } 
+
+  _stream->reply( response );
+  _stream->replyDone();
+  delete response;
+}
+
 void indri::net::NetworkServerStub::request( indri::xml::XMLNode* input ) {
   try {
     const std::string& type = input->getName();
@@ -402,6 +435,8 @@ void indri::net::NetworkServerStub::request( indri::xml::XMLNode* input ) {
       _handleDocumentIDsFromMetadata( input );
     } else if( type == "documents-from-metadata" ) {
       _handleDocumentsFromMetadata( input );
+    } else if( type == "path-names" ) {
+      _handlePathNames( input );
     } else {
       _stream->error( std::string() + "Unknown XML message type: " + input->getName() );
     }

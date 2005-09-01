@@ -422,6 +422,30 @@ indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::d
 }
 
 //
+// pathNames
+//
+
+indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::pathNames( const std::vector<int>& documentIDs, const std::vector<int>& begins, const std::vector<int>& ends ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "path-names" );
+  indri::xml::XMLNode* documents = new indri::xml::XMLNode( "paths" );
+
+  // build request
+  for( unsigned int i=0; i<documentIDs.size(); i++ ) {
+    documents->addChild( new indri::xml::XMLNode( "document", i64_to_string( documentIDs[i] ) ) );
+    documents->addChild( new indri::xml::XMLNode( "begin", i64_to_string( begins[i] ) ) );
+    documents->addChild( new indri::xml::XMLNode( "end", i64_to_string( ends[i] ) ) );
+  }
+  request->addChild( documents );
+
+  // send request
+  _stream->mutex().lock();
+  _stream->request( request );
+  delete request;
+
+  return new indri::server::NetworkServerProxyMetadataResponse( _stream );
+}
+
+//
 // documents
 //
 

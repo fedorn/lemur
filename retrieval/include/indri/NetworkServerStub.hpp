@@ -63,6 +63,8 @@ namespace indri
       void _handleDocumentLength( indri::xml::XMLNode* request );
       void _handleFieldList( indri::xml::XMLNode* request );
 
+      void _handlePathNames( indri::xml::XMLNode* request );
+
     public:
       NetworkServerStub( indri::server::QueryServer* server, NetworkMessageStream* stream );
       void request( indri::xml::XMLNode* input );
