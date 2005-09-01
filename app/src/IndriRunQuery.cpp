@@ -120,6 +120,31 @@ the symbol <tt>false</tt>. Specified as
 &lt;trecFormat&gt;true&lt;/trecFormat&gt; in the parameter file and
 as <tt>-trecFormat=true</tt> on the command line.  Note that <tt>0</tt>
 can be used for false, and <tt>1</tt> can be used for true.</dd>
+<dt>inex participant-id</dt>
+<dd>triggers output of results in INEX format and specifies the participant-id attribute used in submissions.
+Specified as &lt;inex&gt;&lt;particpantID&gt;someID&lt;/participantID&gt;&lt;inex&gt; in the parameter file and as
+<tt>-inex.participantID=someID</tt> on the command line.
+</dd>
+<dt>inex task</dt>
+<dd>triggers output of results in INEX format and specifies the task attribute (default CO.Thorough).
+Specified as &lt;inex&gt;&lt;task&gt;someTask&lt;/task&gt;&lt;inex&gt; in the parameter file and as
+<tt>-inex.task=someTask</tt> on the command line.
+</dd>
+<dt>inex query</dt>
+<dd>triggers output of results in INEX format and specifies the query attribute (default automatic).
+Specified as &lt;inex&gt;&lt;query&gt;someQueryType&lt;/query&gt;&lt;inex&gt; in the parameter file and as
+<tt>-inex.query=someQueryType</tt> on the command line.
+</dd>
+<dt>inex topic-part</dt>
+<dd>triggers output of results in INEX format and specifies the topic-part attribute (default T).
+Specified as &lt;inex&gt;&lt;topicPart&gt;someTopicPart&lt;/topicPart&gt;&lt;inex&gt; in the parameter file and as
+<tt>-inex.topicPart=someTopicPart</tt> on the command line.
+</dd>
+<dt>inex description</dt>
+<dd>triggers output of results in INEX format and specifies the contents of the description tag.
+Specified as &lt;inex&gt;&lt;description&gt;some description&lt;/description&gt;&lt;inex&gt; in the parameter file and as
+<tt>-inex.description="some description"</tt> on the command line.
+</dd>
 </dl>
 <H4>Pseudo-Relevance Feedback Parameters</H4>
 <dl>
@@ -236,6 +261,7 @@ private:
 
   std::string _runID;
   bool _trecFormat;
+  bool _inexFormat;
 
   indri::query::QueryExpander* _expander;
   std::vector<indri::api::ScoredExtentResult> _results;
@@ -290,6 +316,18 @@ private:
       documentNames = _environment.documentMetadata( _results, "docno" );
     }
     
+    std::vector<std::string> pathNames;
+    if ( _inexFormat ) {
+      // output topic header
+      output << "  <topic topic-id=\"" << queryIndex << "\">" << std::endl
+	     << "    <collections>" << std::endl
+	     << "      <collection>ieee</collection>" << std::endl
+	     << "    </collections>" << std::endl;
+
+      // retrieve path names
+      pathNames = _environment.pathNames( _results );
+    }
+    
     // Print results
     for( unsigned int i=0; i < _results.size(); i++ ) {
       int rank = i+1;
@@ -303,6 +341,13 @@ private:
                 << rank << " "
                 << _results[ i ].score << " "
                 << _runID << std::endl;
+      } else if( _inexFormat ) {
+
+	output << "    <result>" << std::endl 
+	       << "      <file>" << documentNames[i] << "</file>" << std::endl 
+	       << "      <path>" << pathNames[i] << "</path>" << std::endl 
+	       << "      <rsv>" << _results[i].score << "</rsv>"  << std::endl 
+	       << "    </result>" << std::endl;
       }
       else {
         // score, documentName, firstWord, lastWord
@@ -326,6 +371,9 @@ private:
 
       if( documents.size() )
         delete documents[i];
+    }
+    if( _inexFormat ) {
+      output << "  </topic>" << std::endl;
     }
   }
 
@@ -378,10 +426,11 @@ public:
     _initialRequested = _parameters.get( "fbDocs", _requested );
     _runID = _parameters.get( "runID", "indri" );
     _trecFormat = _parameters.get( "trecFormat" , false );
+    _inexFormat = _parameters.exists( "inex" );
+
     _printQuery = _parameters.get( "printQuery", false );
     _printDocuments = _parameters.get( "printDocuments", false );
     _printPassages = _parameters.get( "printPassages", false );
-
     if( _parameters.get( "fbDocs", 0 ) != 0 ) {
       _expander = new indri::query::RMExpander( &_environment, _parameters );
     }
@@ -493,6 +542,26 @@ int main(int argc, char * argv[]) {
 
     int query = 0;
 
+    bool inexFormat = param.exists( "inex" );
+    if( inexFormat ) {
+      std::string participantID = param.get( "inex.participantID", "1");
+      std::string runID = param.get( "runID", "indri" );
+      std::string inexTask = param.get( "inex.task", "CO.Thorough" );     
+      std::string inexTopicPart = param.get( "inex.topicPart", "T" );
+      std::string description = param.get( "inex.description", "" );
+      std::string queryType = param.get("inex.query", "automatic");
+      std::cout << "<inex-submission participant-id=\"" << participantID 
+		<< "\" run-id=\"" << runID 
+		<< "\" task=\"" << inexTask 
+		<< "\" query=\"" << queryType 
+		<< "\" topic-part=\"" << inexTopicPart 
+		<< "\">" << std::endl
+		<< "  <description>" << std::endl << description 
+		<< std::endl << "  </description>" << std::endl;
+    }
+
+
+
     // process output as it appears on the queue
     while( query < queryCount ) {
       query_t* result = NULL;
@@ -514,6 +583,10 @@ int main(int argc, char * argv[]) {
       }
  
       queueLock.unlock();
+    }
+
+    if( inexFormat ) {
+      std::cout << "</inex-submission>" << std::endl;
     }
 
     // join all the threads
