@@ -35,17 +35,13 @@ options {
   k=2;
   charVocabulary = '\u0001'..'\u00ff'; // UTF-8 format
 //  testLiterals = false;
+  defaultErrorHandler = false;
+
 }
 
 tokens {
   // NEXI operators
 
-  // numerics
-  LESS = "<";
-  GREATER = ">";
-  LESSEQ = "<=";
-  GREATEREQ = ">=";
-  EQUALS = "=";
   ABOUT = "about";
   AND = "AND";
   OR = "OR";
@@ -117,10 +113,20 @@ TERM:     ( (DIGIT)+ SAFE_LETTER ) => TEXT_TERM |
 
 OPERATORS: '#' TERM;
 
+//numeric operators
+LESS:      "<";
+GREATER:   ">";
+LESSEQ:    "<=";
+GREATEREQ: ">=";
+EQUALS:    "=";
+
 JUNK:      ( TAB | CR | LF | SPACE )
            { $setType(antlr::Token::SKIP); };
      
 class NexiParser extends Parser;
+options {
+  defaultErrorHandler = false;
+}
 
 {
 private:
@@ -386,26 +392,26 @@ arithmeticClause returns [ indri::lang::RawExtentNode * s]
     f = new indri::lang::Field(field->getText());
     _nodes.push_back(f);
   }
-  (( LESS n=number {
+  ( LESS n=number {
     c = new indri::lang::FieldLessNode(f, n);
     _nodes.push_back(c);
-  })
-  |( LESSEQ n=number {
+  }
+  | LESSEQ n=number {
     c = new indri::lang::FieldLessNode(f, n + 1);
     _nodes.push_back(c);
-  })
-  |( EQUALS n=number {
+  }
+  | EQUALS n=number {
     c = new indri::lang::FieldEqualsNode(f, n);
     _nodes.push_back(c);
-  })
-  |( GREATER n=number {
+  }
+  | GREATER n=number {
     c = new indri::lang::FieldGreaterNode(f, n);
     _nodes.push_back(c);
-  })
-  |( GREATEREQ n=number {
+  }
+  | GREATEREQ n=number {
     c = new indri::lang::FieldGreaterNode(f, n - 1);
     _nodes.push_back(c);
-  })) {
+  }) {
     if (p != 0) {
       indri::lang::NestedExtentInside * pt = p;
       while (pt->getInner() != NULL) {

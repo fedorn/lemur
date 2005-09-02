@@ -22,7 +22,7 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API NexiLexer : public ANTLR_USE_NAMESPACE(antlr)CharScanner, public NexiLexerTokenTypes
 {
-#line 62 "nexilang.g"
+#line 58 "nexilang.g"
 
 private:
   bool _numbers;
@@ -74,6 +74,11 @@ public:
 	protected: void mFLOAT(bool _createToken);
 	public: void mTERM(bool _createToken);
 	public: void mOPERATORS(bool _createToken);
+	public: void mLESS(bool _createToken);
+	public: void mGREATER(bool _createToken);
+	public: void mLESSEQ(bool _createToken);
+	public: void mGREATEREQ(bool _createToken);
+	public: void mEQUALS(bool _createToken);
 	public: void mJUNK(bool _createToken);
 private:
 	

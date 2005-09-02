@@ -22,7 +22,7 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API NexiParser : public ANTLR_USE_NAMESPACE(antlr)LLkParser, public NexiLexerTokenTypes
 {
-#line 125 "nexilang.g"
+#line 131 "nexilang.g"
 
 private:
   // storage for allocated nodes
@@ -94,24 +94,6 @@ private:
 	
 	static const unsigned long _tokenSet_0_data_[];
 	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_0;
-	static const unsigned long _tokenSet_1_data_[];
-	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_1;
-	static const unsigned long _tokenSet_2_data_[];
-	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_2;
-	static const unsigned long _tokenSet_3_data_[];
-	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_3;
-	static const unsigned long _tokenSet_4_data_[];
-	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_4;
-	static const unsigned long _tokenSet_5_data_[];
-	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_5;
-	static const unsigned long _tokenSet_6_data_[];
-	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_6;
-	static const unsigned long _tokenSet_7_data_[];
-	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_7;
-	static const unsigned long _tokenSet_8_data_[];
-	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_8;
-	static const unsigned long _tokenSet_9_data_[];
-	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_9;
 };
 
 ANTLR_END_NAMESPACE

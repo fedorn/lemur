@@ -32,18 +32,13 @@ NexiLexer::NexiLexer(const ANTLR_USE_NAMESPACE(antlr)LexerSharedInputState& stat
 
 void NexiLexer::initLiterals()
 {
-	literals["<"] = 4;
+	literals["about"] = 4;
 	literals["|"] = 41;
 	literals[","] = 43;
-	literals[">"] = 5;
-	literals[">="] = 7;
 	literals["."] = 42;
-	literals["OR"] = 11;
-	literals["<="] = 6;
-	literals["AND"] = 10;
-	literals["="] = 8;
-	literals["about"] = 9;
-	literals["*"] = 12;
+	literals["OR"] = 6;
+	literals["AND"] = 5;
+	literals["*"] = 7;
 }
 
 ANTLR_USE_NAMESPACE(antlr)RefToken NexiLexer::nextToken()
@@ -133,6 +128,12 @@ ANTLR_USE_NAMESPACE(antlr)RefToken NexiLexer::nextToken()
 				theRetToken=_returnToken;
 				break;
 			}
+			case 0x3d /* '=' */ :
+			{
+				mEQUALS(true);
+				theRetToken=_returnToken;
+				break;
+			}
 			case 0x9 /* '\t' */ :
 			case 0xa /* '\n' */ :
 			case 0xd /* '\r' */ :
@@ -143,8 +144,24 @@ ANTLR_USE_NAMESPACE(antlr)RefToken NexiLexer::nextToken()
 				break;
 			}
 			default:
-				if ((_tokenSet_0.member(LA(1)))) {
+				if ((LA(1) == 0x3c /* '<' */ ) && (LA(2) == 0x3d /* '=' */ )) {
+					mLESSEQ(true);
+					theRetToken=_returnToken;
+				}
+				else if ((LA(1) == 0x3e /* '>' */ ) && (LA(2) == 0x3d /* '=' */ )) {
+					mGREATEREQ(true);
+					theRetToken=_returnToken;
+				}
+				else if ((_tokenSet_0.member(LA(1)))) {
 					mTERM(true);
+					theRetToken=_returnToken;
+				}
+				else if ((LA(1) == 0x3c /* '<' */ ) && (true)) {
+					mLESS(true);
+					theRetToken=_returnToken;
+				}
+				else if ((LA(1) == 0x3e /* '>' */ ) && (true)) {
+					mGREATER(true);
 					theRetToken=_returnToken;
 				}
 			else {
@@ -909,9 +926,9 @@ void NexiLexer::mTERM(bool _createToken) {
 	if ( synPredMatched44 ) {
 		mFLOAT(false);
 		if ( inputState->guessing==0 ) {
-#line 114 "nexilang.g"
+#line 110 "nexilang.g"
 			_ttype = FLOAT;
-#line 913 "NexiLexer.cpp"
+#line 930 "NexiLexer.cpp"
 		}
 	}
 	else {
@@ -968,9 +985,9 @@ void NexiLexer::mTERM(bool _createToken) {
 			if ( synPredMatched46 ) {
 				mNUMBER(false);
 				if ( inputState->guessing==0 ) {
-#line 115 "nexilang.g"
+#line 111 "nexilang.g"
 					_ttype = NUMBER;
-#line 972 "NexiLexer.cpp"
+#line 989 "NexiLexer.cpp"
 				}
 			}
 			else if ((_tokenSet_0.member(LA(1))) && (true)) {
@@ -995,6 +1012,76 @@ void NexiLexer::mOPERATORS(bool _createToken) {
 	
 	match('#');
 	mTERM(false);
+	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
+	   _token = makeToken(_ttype);
+	   _token->setText(text.substr(_begin, text.length()-_begin));
+	}
+	_returnToken = _token;
+	_saveIndex=0;
+}
+
+void NexiLexer::mLESS(bool _createToken) {
+	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
+	_ttype = LESS;
+	int _saveIndex;
+	
+	match("<");
+	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
+	   _token = makeToken(_ttype);
+	   _token->setText(text.substr(_begin, text.length()-_begin));
+	}
+	_returnToken = _token;
+	_saveIndex=0;
+}
+
+void NexiLexer::mGREATER(bool _createToken) {
+	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
+	_ttype = GREATER;
+	int _saveIndex;
+	
+	match(">");
+	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
+	   _token = makeToken(_ttype);
+	   _token->setText(text.substr(_begin, text.length()-_begin));
+	}
+	_returnToken = _token;
+	_saveIndex=0;
+}
+
+void NexiLexer::mLESSEQ(bool _createToken) {
+	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
+	_ttype = LESSEQ;
+	int _saveIndex;
+	
+	match("<=");
+	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
+	   _token = makeToken(_ttype);
+	   _token->setText(text.substr(_begin, text.length()-_begin));
+	}
+	_returnToken = _token;
+	_saveIndex=0;
+}
+
+void NexiLexer::mGREATEREQ(bool _createToken) {
+	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
+	_ttype = GREATEREQ;
+	int _saveIndex;
+	
+	match(">=");
+	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
+	   _token = makeToken(_ttype);
+	   _token->setText(text.substr(_begin, text.length()-_begin));
+	}
+	_returnToken = _token;
+	_saveIndex=0;
+}
+
+void NexiLexer::mEQUALS(bool _createToken) {
+	int _ttype; ANTLR_USE_NAMESPACE(antlr)RefToken _token; int _begin=text.length();
+	_ttype = EQUALS;
+	int _saveIndex;
+	
+	match("=");
 	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
 	   _token = makeToken(_ttype);
 	   _token->setText(text.substr(_begin, text.length()-_begin));
@@ -1037,9 +1124,9 @@ void NexiLexer::mJUNK(bool _createToken) {
 	}
 	}
 	if ( inputState->guessing==0 ) {
-#line 121 "nexilang.g"
+#line 124 "nexilang.g"
 		_ttype = antlr::Token::SKIP;
-#line 1041 "NexiLexer.cpp"
+#line 1128 "NexiLexer.cpp"
 	}
 	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
 	   _token = makeToken(_ttype);
