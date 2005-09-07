@@ -148,7 +148,10 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::Field* field ) 
 //
 
 void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ExtentRestriction* erNode ) {
-  if( _nodeMap.find( erNode ) == _nodeMap.end() ) {
+  indri::lang::ExtentEnforcement* eeNode = dynamic_cast<indri::lang::ExtentEnforcement*>(erNode);
+  if( eeNode ) {
+    _after( eeNode );
+  } else if( _nodeMap.find( erNode ) == _nodeMap.end() ) {
     indri::infnet::BeliefNode* childNode = dynamic_cast<indri::infnet::BeliefNode*>(_nodeMap[erNode->getChild()]);
     indri::infnet::ListIteratorNode* fieldNode = dynamic_cast<indri::infnet::ListIteratorNode*>(_nodeMap[erNode->getField()]);
     indri::infnet::ExtentRestrictionNode* extentRestriction = new indri::infnet::ExtentRestrictionNode( erNode->nodeName(), childNode, fieldNode );
@@ -223,7 +226,10 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::WeightedExtentO
 //
 
 void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ExtentInside* extentInside ) {
-  if( _nodeMap.find( extentInside ) == _nodeMap.end() ) {
+  indri::lang::NestedExtentInside* nestedExtentInside = dynamic_cast<indri::lang::NestedExtentInside*>(extentInside);
+  if( nestedExtentInside ) {
+    _after( nestedExtentInside );
+  } else if( _nodeMap.find( extentInside ) == _nodeMap.end() ) {
     ExtentInsideNode* extentInsideNode = new ExtentInsideNode( 
                                                               extentInside->nodeName(),
                                                               dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
@@ -676,7 +682,10 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::TermFrequencySc
 }
 
 void indri::infnet::InferenceNetworkBuilder::after( indri::lang::RawScorerNode* rawScorerNode ) {
-  if( _nodeMap.find( rawScorerNode ) == _nodeMap.end() ) {
+  indri::lang::NestedRawScorerNode * nested = dynamic_cast<indri::lang::NestedRawScorerNode*>(rawScorerNode);
+  if ( nested ) {
+    _after( nested );
+  } else if( _nodeMap.find( rawScorerNode ) == _nodeMap.end() ) {
     BeliefNode* belief;
     InferenceNetworkNode* untypedRawExtentNode = _nodeMap[rawScorerNode->getRawExtent()];
     InferenceNetworkNode* untypedContextNode = _nodeMap[rawScorerNode->getContext()];
@@ -856,7 +865,7 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::FieldWildcard* 
 // NestedExtentInside
 //
 
-void indri::infnet::InferenceNetworkBuilder::after( indri::lang::NestedExtentInside* extentInside ) {
+void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::NestedExtentInside* extentInside ) {
   if( _nodeMap.find( extentInside ) == _nodeMap.end() ) {
     NestedExtentInsideNode* extentInsideNode = new NestedExtentInsideNode( 
                                                               extentInside->nodeName(),
@@ -873,7 +882,7 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::NestedExtentIns
 // NestedRawScorer
 //
 
-void indri::infnet::InferenceNetworkBuilder::after( indri::lang::NestedRawScorerNode* rawScorerNode ) {
+void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::NestedRawScorerNode* rawScorerNode ) {
   if( _nodeMap.find( rawScorerNode ) == _nodeMap.end() ) {
     BeliefNode* belief;
     InferenceNetworkNode* untypedRawExtentNode = _nodeMap[rawScorerNode->getRawExtent()];
@@ -916,12 +925,11 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::NestedRawScorer
 // ExtentEnforcement
 //
 
-void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ExtentEnforcement* eeNode ) {
+void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ExtentEnforcement* eeNode ) {
   if( _nodeMap.find( eeNode ) == _nodeMap.end() ) {
     indri::infnet::BeliefNode* childNode = dynamic_cast<indri::infnet::BeliefNode*>(_nodeMap[eeNode->getChild()]);
     indri::infnet::ListIteratorNode* fieldNode = dynamic_cast<indri::infnet::ListIteratorNode*>(_nodeMap[eeNode->getField()]);
     indri::infnet::ExtentEnforcementNode* extentEnforcement = new indri::infnet::ExtentEnforcementNode( eeNode->nodeName(), childNode, fieldNode );
-
     _network->addBeliefNode( extentEnforcement );    
     _nodeMap[eeNode] = extentEnforcement;
   }

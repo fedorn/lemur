@@ -166,7 +166,6 @@ namespace indri
 	  if( key == "exponent" ) {
 	    exponent = atof( value.c_str() );	    
 	  } 
-
 	  if( nextComma > 0 )
 	    location = nextComma+1;
 	  else

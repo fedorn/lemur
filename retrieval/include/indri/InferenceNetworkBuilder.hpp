@@ -51,6 +51,10 @@ namespace indri
 
       indri::query::TermScoreFunction* _buildTermScoreFunction( const std::string& smoothing, double occurrences, double contextSize ) const;
 
+      void _after( indri::lang::NestedExtentInside* extentInside );
+      void _after( indri::lang::NestedRawScorerNode* rawScorerNode );
+      void _after( indri::lang::ExtentEnforcement * eeNode );
+
     public:
       InferenceNetworkBuilder( indri::collection::Repository& repository, indri::lang::ListCache& cache, int resultsRequested );
       ~InferenceNetworkBuilder();
@@ -92,9 +96,6 @@ namespace indri
       void after( indri::lang::FieldEqualsNode* fbNode );
       void after( indri::lang::FilterNode* filterNode );
       void after( indri::lang::FieldWildcard* fieldWildcard );
-      void after( indri::lang::NestedExtentInside* extentInside );
-      void after( indri::lang::NestedRawScorerNode* rawScorerNode );
-      void after( indri::lang::ExtentEnforcement * eeNode );
       void after( indri::lang::ContextInclusionNode* contextInclusionNode );
       void after( indri::lang::LengthPrior* lengthPrior );
     };

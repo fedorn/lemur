@@ -37,7 +37,6 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
   _scores.clear();
 
-
   for( size_t i = 0; i < matches.size(); i++ ) {
     if( !matches[i] )
       continue;

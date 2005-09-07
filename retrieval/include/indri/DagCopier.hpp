@@ -87,10 +87,14 @@ namespace indri
         return _findReplacement<indri::lang::ExtentAnd>( _extentAnds, newExtentAnd );
       }
 
-      indri::lang::Node* after( indri::lang::ExtentInside* oldExtentInside, indri::lang::ExtentInside* newExtentInside ) {
+      indri::lang::Node* after( indri::lang::ExtentInside* oldExtentInside, indri::lang::ExtentInside* newExtentInside ) {	
         return _findReplacement<indri::lang::ExtentInside>( _extentInsides, newExtentInside );
       }
 
+      indri::lang::Node* after( indri::lang::NestedExtentInside* oldExtentInside, indri::lang::NestedExtentInside* newExtentInside ) {	
+        return after((indri::lang::ExtentInside*) oldExtentInside, (indri::lang::ExtentInside*) newExtentInside );
+      }
+ 
       indri::lang::Node* after( indri::lang::ODNode* oldODNode, indri::lang::ODNode* newODNode ) {
         return _findReplacement<indri::lang::ODNode>( _odNodes, newODNode );
       }

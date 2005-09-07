@@ -353,6 +353,9 @@ INT64 indri::server::LocalQueryServer::documentCount( const std::string& term ) 
 }
 
 indri::server::QueryServerResponse* indri::server::LocalQueryServer::runQuery( std::vector<indri::lang::Node*>& roots, int resultsRequested, bool optimize ) {
+
+  indri::lang::TreePrinterWalker printer;
+
   // use UnnecessaryNodeRemover to get rid of window nodes, ExtentAnd nodes and ExtentOr nodes
   // that only have one child and LengthPrior nodes where the exponent is zero
   indri::lang::ApplyCopiers<indri::lang::UnnecessaryNodeRemoverCopier> unnecessary( roots );

@@ -63,6 +63,10 @@ namespace indri
         _disqualifiedTree = true;
       }
 
+      void before( indri::lang::NestedExtentInside* nestExInside ) {
+        _disqualifiedTree = true;
+      }
+
       void before( indri::lang::ExtentRestriction* exRestrict ) {
         _disqualifiers.push(exRestrict);
       }
@@ -106,6 +110,7 @@ namespace indri
         _lastTerm = 0;
         _disqualifiedTree = false;
       }
+
 
       void before( indri::lang::NestedRawScorerNode* oldNode, indri::lang::NestedRawScorerNode* newNode ) {
 	before( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );

@@ -196,6 +196,7 @@ query returns [ indri::lang::ScoredExtentNode* q ] {
 
     indri::lang::ExtentEnforcement * enf = new indri::lang::ExtentEnforcement(combine, f);
     _nodes.push_back(enf);
+    delete q;
     q=enf;
 
   } 
