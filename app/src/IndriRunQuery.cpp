@@ -560,7 +560,8 @@ int main(int argc, char * argv[]) {
 		<< std::endl << "  </description>" << std::endl;
     }
 
-
+    // acquire the lock.
+    queueLock.lock();
 
     // process output as it appears on the queue
     while( query < queryCount ) {
@@ -581,9 +582,8 @@ int main(int argc, char * argv[]) {
 
         queueLock.lock();
       }
- 
-      queueLock.unlock();
     }
+    queueLock.unlock();
 
     if( inexFormat ) {
       std::cout << "</inex-submission>" << std::endl;
