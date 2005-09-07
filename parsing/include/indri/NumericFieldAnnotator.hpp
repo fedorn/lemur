@@ -27,12 +27,23 @@ namespace indri
     private:
       ObjectHandler<indri::api::ParsedDocument>* _handler;
       std::string& _field;
-
+      bool _foundNonNumeric;
+      // a buffer for copying the number
+      int _numberCopyLength;
+      char * _numberCopy;
+      
     public:
       NumericFieldAnnotator( std::string& field ) :
         _handler(0),
-        _field(field)
+        _field(field),
+	_foundNonNumeric(false),
+	_numberCopyLength(1024) // should be large enough
       {
+	_numberCopy = new char[ _numberCopyLength + 1 ];
+      }
+      
+      ~NumericFieldAnnotator() {
+	delete [] _numberCopy;
       }
 
       indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document ) {
@@ -41,7 +52,48 @@ namespace indri
 
           if( _field == extent.name && extent.begin != extent.end ) {
             char* numberText = document->terms[ extent.begin ]; 
-            INT64 value = string_to_i64( numberText );
+	    // check for non-numeric characters
+	    char * begin = numberText;
+	    char * end = numberText;
+	    // find the first acceptable character 
+	    for ( begin = numberText; *begin != '\0'; begin++ ) {
+	      if ( *begin == '-' ||
+		   (*begin >= '0' && *begin <= '9') ) {
+		break;
+	      } else {
+		if ( _foundNonNumeric == false ) {
+		  _foundNonNumeric = true;
+		  std::cerr << "Warning: non-numeric text encountered in " 
+			    <<  _field << " field. Trying to extract first number"
+			    << " from field text; extraction errors may occur." << std::endl;
+		}
+	      }
+	    }
+	    // find the last acceptable numeric character
+	    for ( end = begin; *end != '\0'; end++ ) {
+	      if (! ( *end == '-' ||
+		      // *end == '.' || // for now, the recognizer only handles integers
+		      (*end >= '0' && *end <= '9') 
+		    ) ) {
+		break;
+	      }
+	    }
+	    INT64 value = 0;
+	    int len = end - begin;
+	    if ( len > 0 ) {
+	      // make a copy
+	      if ( len > _numberCopyLength ) {
+		std::cerr << "Warning: NumericFieldAnnotator found a very long number of " << len 
+			  << " characters in " << _field 
+			  << ".  Truncating to " << _numberCopyLength  << " characters."
+			  << std::endl;
+		len = _numberCopyLength;
+	      }
+	      _numberCopy[ len ] = '\0';
+	      strncpy( begin, _numberCopy, len );
+	      // convert the number
+	      value = string_to_i64( _numberCopy );
+	    }
             extent.number = value;
           }
         }
