@@ -147,6 +147,9 @@
 				RelativePath=".\src\DocListMemoryBuilderIterator.cpp">
 			</File>
 			<File
+				RelativePath=".\src\DocumentStructure.cpp">
+			</File>
+			<File
 				RelativePath=".\src\IncFPPushIndex.cpp">
 			</File>
 			<File
@@ -320,6 +323,9 @@
 				RelativePath=".\include\indri\DocumentDataIterator.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\DocumentStructure.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\FieldExtent.hpp">
 			</File>
 			<File
@@ -341,10 +347,10 @@
 				RelativePath=".\include\IncPassageTextHandler.hpp">
 			</File>
 			<File
-				RelativePath=".\include\Index.hpp">
+				RelativePath=".\include\indri\Index.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\Index.hpp">
+				RelativePath=".\include\Index.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\IndexEnvironment.hpp">
