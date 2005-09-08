@@ -64,7 +64,7 @@ indri::net::NetworkMessageStream::NetworkMessageStream( indri::net::NetworkStrea
 
   // give the buffer some space so we don't thrash around
   // allocating in little chunks
-  _buffer.grow( 65536 ); 
+  _buffer.grow( 65536 );
 }
 
 bool indri::net::NetworkMessageStream::alive() {
@@ -208,7 +208,7 @@ void indri::net::NetworkMessageStream::request( indri::xml::XMLNode* messageNode
   header += "\n";
 
   _stream->write( header.c_str(), header.length() );
-  _stream->write( body.c_str(), body.length() );
+  _stream->blockingWrite( body.c_str(), body.length() );
 }
 
 void indri::net::NetworkMessageStream::reply( indri::xml::XMLNode* replyNode ) {
@@ -221,7 +221,7 @@ void indri::net::NetworkMessageStream::reply( indri::xml::XMLNode* replyNode ) {
   header += "\n";
 
   _stream->write( header.c_str(), header.size() );
-  _stream->write( body.c_str(), body.length() );
+  _stream->blockingWrite( body.c_str(), body.length() );
 }
 
 void indri::net::NetworkMessageStream::reply( const std::string& name, const void* buffer, unsigned int size ) {
@@ -232,7 +232,7 @@ void indri::net::NetworkMessageStream::reply( const std::string& name, const voi
   header += "\n";
 
   _stream->write( header.c_str(), header.length() );
-  _stream->write( buffer, size );
+  _stream->blockingWrite( buffer, size );
 }
 
 void indri::net::NetworkMessageStream::replyDone() {
