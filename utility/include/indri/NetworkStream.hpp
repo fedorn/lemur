@@ -33,7 +33,7 @@ namespace indri
       socket_t _socket;
 
       struct sockaddr_in _getSockaddr( const char* name, unsigned int port ) {
-        long address;
+        long address = 0;
 
         if( name && isdigit(name[0]) ) {
           address = inet_addr(name);
