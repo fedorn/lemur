@@ -11,10 +11,9 @@
 
 #include "IndriTextHandler.hpp"
 
-lemur::parse::IndriTextHandler::IndriTextHandler(const string &name, int memory, const lemur::api::Parser* p): parser(p), bufsize(0), curdocno(NULL), docsource(NULL) {
-  //  bufsize = 0;
+lemur::parse::IndriTextHandler::IndriTextHandler(const string &name, int memory, const lemur::api::Parser* p): parser(p),  curdocno(NULL) {
+
   // shadows attribute from Object.
-  //  char* docsource = NULL;
   env.setMemory(memory);
   // Have to force the IndexEnvironment to build a reverse lookup table for 
   // the docno field to support the Index::document(external id) api call
@@ -33,8 +32,6 @@ lemur::parse::IndriTextHandler::IndriTextHandler(const string &name, int memory,
 }
 
 lemur::parse::IndriTextHandler::~IndriTextHandler() {
-  if (bufsize > 0)
-    delete[]docsource;
   env.close();
   free(curdocno);
 }
@@ -90,10 +87,8 @@ char* lemur::parse::IndriTextHandler::handleEndTag(char* tag, const char* orig, 
 void lemur::parse::IndriTextHandler::handleEndDoc() {
   // make sure we have enough buffer room
   int textsize = parser->fileTell()-docbegin;
-  if (bufsize < textsize+1) {
-    if (bufsize > 0) delete[]docsource;
-    docsource = new char[textsize+1];
-  }
+  char *docsource = new char[textsize+1];
+
   // grab original text
   ifstream read(parser->getParseFile().c_str(), ios::binary);
   if (!read.is_open()) {
@@ -103,7 +98,7 @@ void lemur::parse::IndriTextHandler::handleEndDoc() {
   read.read(docsource, textsize);
   read.close();
   // null terminate it
-  docsource[textsize] = '\n';
+  docsource[textsize] = '\0';
   document.text = docsource;
   document.textLength = textsize;
 
@@ -113,6 +108,7 @@ void lemur::parse::IndriTextHandler::handleEndDoc() {
   env.addParsedDocument(&document);
 
   // clear old doc info
+  delete[](docsource);
   for (int i=0; i<document.terms.size(); i++) 
     free(document.terms[i]);
   document.terms.clear();

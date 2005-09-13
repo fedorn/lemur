@@ -55,10 +55,6 @@ namespace lemur
       indri::parse::MetadataPair docid;
       /// the current document id
       char* curdocno;
-      /// Document buffer
-      char* docsource;
-      /// buffer size;
-      int bufsize;
       /// the beginning byte offset into file of this documents
       int docbegin;
       /// We need a handle to the parser to get file byte locations
