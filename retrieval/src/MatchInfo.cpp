@@ -53,7 +53,7 @@ lemur::api::MatchInfo *lemur::api::MatchInfo::getMatches(const Index &ind, const
                iter != termIDs.end(); iter++) {
             TERMID_T tid = *iter;
             if (tid == did) {
-              matches->add(tid, (*iter1).pos, (*iter1).start, (*iter1).end);
+              matches->add(tid, (*iter1).pos, (*iter1).start, (*iter1).end - 1);
             }
           }
         }
