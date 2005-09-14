@@ -170,8 +170,6 @@ query returns [ indri::lang::ScoredExtentNode* q ] {
     q=r;
   } 
   ( p2=path f2=field O_SQUARE c2=clause C_SQUARE { 
-    // pop the extent restriction, we'll need an ExtentEnforcement instead
-    _nodes.pop_back();
     
     // finish the path with a field as the inner for the last extent inside
     indri::lang::ExtentRestriction * r2;
@@ -196,7 +194,6 @@ query returns [ indri::lang::ScoredExtentNode* q ] {
 
     indri::lang::ExtentEnforcement * enf = new indri::lang::ExtentEnforcement(combine, f);
     _nodes.push_back(enf);
-    delete q;
     q=enf;
 
   } 
