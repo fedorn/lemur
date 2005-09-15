@@ -56,7 +56,7 @@ void indri::infnet::FieldWildcardNode::prepare( int documentID ) {
     while( innerIter != inExtents.end() ) {
       innerExtent.begin = innerIter->begin;
       innerExtent.end = innerIter->end;
-      if ( lastBegin != innerExtent.begin && lastEnd != innerExtent.end ) {
+      if ( lastBegin != innerExtent.begin || lastEnd != innerExtent.end ) {
 	_extents.push_back( innerExtent );
 	lastBegin = innerExtent.begin;
 	lastEnd = innerExtent.end;
