@@ -125,7 +125,7 @@ protected NUMBER:           ( '0'..'9' )+;
 protected NEGATIVE_NUMBER:  DASH ( '0'..'9' )+;
 protected FLOAT:            (DASH)? ( '0'..'9' )+ DOT ( '0'..'9' )+;
 
-TERM:     ( (DIGIT)+ SAFE_LETTER ) => TEXT_TERM |
+TERM:     ( (DIGIT)+ (SAFE_LETTER | HIGH_CHAR) ) => TEXT_TERM |
           ( FLOAT ) => FLOAT { $setType(FLOAT); } |
           ( NUMBER ) => NUMBER { $setType(NUMBER); } |
           ( NEGATIVE_NUMBER ) => NEGATIVE_NUMBER { $setType(NEGATIVE_NUMBER); } |

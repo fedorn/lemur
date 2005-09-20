@@ -106,11 +106,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				}
 			}
 			else {
-				goto _loop83;
+				goto _loop84;
 			}
 			
 		}
-		_loop83:;
+		_loop84:;
 		} // ( ... )*
 		break;
 	}
@@ -453,10 +453,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	
 #line 453 "QueryParser.cpp"
 	
-	bool synPredMatched107 = false;
+	bool synPredMatched108 = false;
 	if (((_tokenSet_1.member(LA(1))))) {
-		int _m107 = mark();
-		synPredMatched107 = true;
+		int _m108 = mark();
+		synPredMatched108 = true;
 		inputState->guessing++;
 		try {
 			{
@@ -465,12 +465,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-			synPredMatched107 = false;
+			synPredMatched108 = false;
 		}
-		rewind(_m107);
+		rewind(_m108);
 		inputState->guessing--;
 	}
-	if ( synPredMatched107 ) {
+	if ( synPredMatched108 ) {
 		raw=qualifiedTerm();
 		match(DOT);
 		contexts=context_list();
@@ -484,10 +484,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		}
 	}
 	else {
-		bool synPredMatched109 = false;
+		bool synPredMatched110 = false;
 		if (((_tokenSet_1.member(LA(1))))) {
-			int _m109 = mark();
-			synPredMatched109 = true;
+			int _m110 = mark();
+			synPredMatched110 = true;
 			inputState->guessing++;
 			try {
 				{
@@ -495,12 +495,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				}
 			}
 			catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-				synPredMatched109 = false;
+				synPredMatched110 = false;
 			}
-			rewind(_m109);
+			rewind(_m110);
 			inputState->guessing--;
 		}
-		if ( synPredMatched109 ) {
+		if ( synPredMatched110 ) {
 			raw=qualifiedTerm();
 			if ( inputState->guessing==0 ) {
 #line 216 "indrilang.g"
@@ -512,10 +512,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			bool synPredMatched111 = false;
+			bool synPredMatched112 = false;
 			if (((_tokenSet_1.member(LA(1))))) {
-				int _m111 = mark();
-				synPredMatched111 = true;
+				int _m112 = mark();
+				synPredMatched112 = true;
 				inputState->guessing++;
 				try {
 					{
@@ -524,12 +524,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 					}
 				}
 				catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-					synPredMatched111 = false;
+					synPredMatched112 = false;
 				}
-				rewind(_m111);
+				rewind(_m112);
 				inputState->guessing--;
 			}
-			if ( synPredMatched111 ) {
+			if ( synPredMatched112 ) {
 				raw=unqualifiedTerm();
 				match(DOT);
 				contexts=context_list();
@@ -633,11 +633,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			goto _loop214;
+			goto _loop215;
 		}
 		
 	}
-	_loop214:;
+	_loop215:;
 	} // ( ... )*
 	match(C_PAREN);
 	return contexts ;
@@ -777,7 +777,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	}
 	match(O_PAREN);
 	{ // ( ... )+
-	int _cnt115=0;
+	int _cnt116=0;
 	for (;;) {
 		if ((LA(1) == NUMBER || LA(1) == FLOAT)) {
 			w=floating();
@@ -789,12 +789,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			if ( _cnt115>=1 ) { goto _loop115; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+			if ( _cnt116>=1 ) { goto _loop116; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 		}
 		
-		_cnt115++;
+		_cnt116++;
 	}
-	_loop115:;
+	_loop116:;
 	}  // ( ... )+
 	match(C_PAREN);
 	return sr ;
@@ -816,10 +816,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	
 #line 816 "QueryParser.cpp"
 	
-	bool synPredMatched199 = false;
+	bool synPredMatched200 = false;
 	if (((LA(1) == O_SQUARE))) {
-		int _m199 = mark();
-		synPredMatched199 = true;
+		int _m200 = mark();
+		synPredMatched200 = true;
 		inputState->guessing++;
 		try {
 			{
@@ -829,12 +829,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-			synPredMatched199 = false;
+			synPredMatched200 = false;
 		}
-		rewind(_m199);
+		rewind(_m200);
 		inputState->guessing--;
 	}
-	if ( synPredMatched199 ) {
+	if ( synPredMatched200 ) {
 		match(O_SQUARE);
 		passageWindowSize = LT(1);
 		match(TERM);
@@ -963,7 +963,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	}
 	match(O_PAREN);
 	{ // ( ... )+
-	int _cnt119=0;
+	int _cnt120=0;
 	for (;;) {
 		if ((_tokenSet_0.member(LA(1)))) {
 			n=scoredExtentNode();
@@ -974,12 +974,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			if ( _cnt119>=1 ) { goto _loop119; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+			if ( _cnt120>=1 ) { goto _loop120; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 		}
 		
-		_cnt119++;
+		_cnt120++;
 	}
-	_loop119:;
+	_loop120:;
 	}  // ( ... )+
 	match(C_PAREN);
 	return sr ;
@@ -1017,7 +1017,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	}
 	match(O_PAREN);
 	{ // ( ... )+
-	int _cnt123=0;
+	int _cnt124=0;
 	for (;;) {
 		if ((_tokenSet_0.member(LA(1)))) {
 			n=scoredExtentNode();
@@ -1028,12 +1028,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			if ( _cnt123>=1 ) { goto _loop123; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+			if ( _cnt124>=1 ) { goto _loop124; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 		}
 		
-		_cnt123++;
+		_cnt124++;
 	}
-	_loop123:;
+	_loop124:;
 	}  // ( ... )+
 	match(C_PAREN);
 	return sr ;
@@ -1072,7 +1072,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	match(WSYN);
 	match(O_PAREN);
 	{ // ( ... )+
-	int _cnt136=0;
+	int _cnt137=0;
 	for (;;) {
 		if ((LA(1) == NUMBER || LA(1) == FLOAT)) {
 			w=floating();
@@ -1084,12 +1084,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			if ( _cnt136>=1 ) { goto _loop136; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+			if ( _cnt137>=1 ) { goto _loop137; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 		}
 		
-		_cnt136++;
+		_cnt137++;
 	}
-	_loop136:;
+	_loop137:;
 	}  // ( ... )+
 	match(C_PAREN);
 	return ws ;
@@ -1105,10 +1105,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	
 #line 1105 "QueryParser.cpp"
 	
-	bool synPredMatched164 = false;
+	bool synPredMatched165 = false;
 	if (((_tokenSet_1.member(LA(1))))) {
-		int _m164 = mark();
-		synPredMatched164 = true;
+		int _m165 = mark();
+		synPredMatched165 = true;
 		inputState->guessing++;
 		try {
 			{
@@ -1116,12 +1116,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-			synPredMatched164 = false;
+			synPredMatched165 = false;
 		}
-		rewind(_m164);
+		rewind(_m165);
 		inputState->guessing--;
 	}
-	if ( synPredMatched164 ) {
+	if ( synPredMatched165 ) {
 		t=qualifiedTerm();
 	}
 	else if ((_tokenSet_1.member(LA(1)))) {
@@ -1149,10 +1149,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 #line 1148 "QueryParser.cpp"
 	
 	{
-	bool synPredMatched140 = false;
+	bool synPredMatched141 = false;
 	if (((LA(1) == OD))) {
-		int _m140 = mark();
-		synPredMatched140 = true;
+		int _m141 = mark();
+		synPredMatched141 = true;
 		inputState->guessing++;
 		try {
 			{
@@ -1161,12 +1161,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-			synPredMatched140 = false;
+			synPredMatched141 = false;
 		}
-		rewind(_m140);
+		rewind(_m141);
 		inputState->guessing--;
 	}
-	if ( synPredMatched140 ) {
+	if ( synPredMatched141 ) {
 		{
 		match(OD);
 		n1 = LT(1);
@@ -1179,10 +1179,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		}
 	}
 	else {
-		bool synPredMatched143 = false;
+		bool synPredMatched144 = false;
 		if (((LA(1) == OD))) {
-			int _m143 = mark();
-			synPredMatched143 = true;
+			int _m144 = mark();
+			synPredMatched144 = true;
 			inputState->guessing++;
 			try {
 				{
@@ -1190,12 +1190,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				}
 			}
 			catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-				synPredMatched143 = false;
+				synPredMatched144 = false;
 			}
-			rewind(_m143);
+			rewind(_m144);
 			inputState->guessing--;
 		}
-		if ( synPredMatched143 ) {
+		if ( synPredMatched144 ) {
 			{
 			match(OD);
 			}
@@ -1219,7 +1219,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	}
 	match(O_PAREN);
 	{ // ( ... )+
-	int _cnt147=0;
+	int _cnt148=0;
 	for (;;) {
 		if ((_tokenSet_1.member(LA(1)))) {
 			rn=unscoredTerm();
@@ -1230,12 +1230,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			if ( _cnt147>=1 ) { goto _loop147; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+			if ( _cnt148>=1 ) { goto _loop148; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 		}
 		
-		_cnt147++;
+		_cnt148++;
 	}
-	_loop147:;
+	_loop148:;
 	}  // ( ... )+
 	match(C_PAREN);
 	return od ;
@@ -1255,10 +1255,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 #line 1254 "QueryParser.cpp"
 	
 	{
-	bool synPredMatched151 = false;
+	bool synPredMatched152 = false;
 	if (((LA(1) == UW))) {
-		int _m151 = mark();
-		synPredMatched151 = true;
+		int _m152 = mark();
+		synPredMatched152 = true;
 		inputState->guessing++;
 		try {
 			{
@@ -1267,12 +1267,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-			synPredMatched151 = false;
+			synPredMatched152 = false;
 		}
-		rewind(_m151);
+		rewind(_m152);
 		inputState->guessing--;
 	}
-	if ( synPredMatched151 ) {
+	if ( synPredMatched152 ) {
 		{
 		match(UW);
 		n = LT(1);
@@ -1296,7 +1296,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	}
 	match(O_PAREN);
 	{ // ( ... )+
-	int _cnt155=0;
+	int _cnt156=0;
 	for (;;) {
 		if ((_tokenSet_1.member(LA(1)))) {
 			rn=unscoredTerm();
@@ -1307,12 +1307,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			if ( _cnt155>=1 ) { goto _loop155; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+			if ( _cnt156>=1 ) { goto _loop156; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 		}
 		
-		_cnt155++;
+		_cnt156++;
 	}
-	_loop155:;
+	_loop156:;
 	}  // ( ... )+
 	match(C_PAREN);
 	return uw ;
@@ -1333,7 +1333,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	match(BAND);
 	match(O_PAREN);
 	{ // ( ... )+
-	int _cnt158=0;
+	int _cnt159=0;
 	for (;;) {
 		if ((_tokenSet_1.member(LA(1)))) {
 			rn=unscoredTerm();
@@ -1344,12 +1344,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			if ( _cnt158>=1 ) { goto _loop158; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+			if ( _cnt159>=1 ) { goto _loop159; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 		}
 		
-		_cnt158++;
+		_cnt159++;
 	}
-	_loop158:;
+	_loop159:;
 	}  // ( ... )+
 	match(C_PAREN);
 	return b ;
@@ -1422,11 +1422,11 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			goto _loop211;
+			goto _loop212;
 		}
 		
 	}
-	_loop211:;
+	_loop212:;
 	} // ( ... )*
 	return fields ;
 }
@@ -1535,7 +1535,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	
 	match(O_ANGLE);
 	{ // ( ... )+
-	int _cnt202=0;
+	int _cnt203=0;
 	for (;;) {
 		if ((_tokenSet_1.member(LA(1)))) {
 			term=unscoredTerm();
@@ -1546,12 +1546,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			if ( _cnt202>=1 ) { goto _loop202; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+			if ( _cnt203>=1 ) { goto _loop203; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 		}
 		
-		_cnt202++;
+		_cnt203++;
 	}
-	_loop202:;
+	_loop203:;
 	}  // ( ... )+
 	match(C_ANGLE);
 	return s ;
@@ -1571,7 +1571,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	
 	match(O_BRACE);
 	{ // ( ... )+
-	int _cnt205=0;
+	int _cnt206=0;
 	for (;;) {
 		if ((_tokenSet_1.member(LA(1)))) {
 			term=unscoredTerm();
@@ -1582,12 +1582,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			if ( _cnt205>=1 ) { goto _loop205; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+			if ( _cnt206>=1 ) { goto _loop206; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 		}
 		
-		_cnt205++;
+		_cnt206++;
 	}
-	_loop205:;
+	_loop206:;
 	}  // ( ... )+
 	match(C_BRACE);
 	return s ;
@@ -1609,7 +1609,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	match(SYN);
 	match(O_PAREN);
 	{ // ( ... )+
-	int _cnt208=0;
+	int _cnt209=0;
 	for (;;) {
 		if ((_tokenSet_1.member(LA(1)))) {
 			term=unscoredTerm();
@@ -1620,12 +1620,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		else {
-			if ( _cnt208>=1 ) { goto _loop208; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
+			if ( _cnt209>=1 ) { goto _loop209; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltException(LT(1), getFilename());}
 		}
 		
-		_cnt208++;
+		_cnt209++;
 	}
-	_loop208:;
+	_loop209:;
 	}  // ( ... )+
 	match(C_PAREN);
 	return s ;
@@ -1916,10 +1916,10 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 	 UINT64 d ;
 #line 1916 "QueryParser.cpp"
 	
-	bool synPredMatched221 = false;
+	bool synPredMatched222 = false;
 	if (((LA(1) == NUMBER))) {
-		int _m221 = mark();
-		synPredMatched221 = true;
+		int _m222 = mark();
+		synPredMatched222 = true;
 		inputState->guessing++;
 		try {
 			{
@@ -1928,19 +1928,19 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			}
 		}
 		catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-			synPredMatched221 = false;
+			synPredMatched222 = false;
 		}
-		rewind(_m221);
+		rewind(_m222);
 		inputState->guessing--;
 	}
-	if ( synPredMatched221 ) {
+	if ( synPredMatched222 ) {
 		d=slashDate();
 	}
 	else {
-		bool synPredMatched223 = false;
+		bool synPredMatched224 = false;
 		if (((LA(1) == NUMBER))) {
-			int _m223 = mark();
-			synPredMatched223 = true;
+			int _m224 = mark();
+			synPredMatched224 = true;
 			inputState->guessing++;
 			try {
 				{
@@ -1948,12 +1948,12 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 				}
 			}
 			catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
-				synPredMatched223 = false;
+				synPredMatched224 = false;
 			}
-			rewind(_m223);
+			rewind(_m224);
 			inputState->guessing--;
 		}
-		if ( synPredMatched223 ) {
+		if ( synPredMatched224 ) {
 			d=spaceDate();
 		}
 		else if ((LA(1) == TERM)) {
