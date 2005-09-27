@@ -44,13 +44,21 @@ struct file_class_environment_spec {
 // Preconfigured environments
 //
 
+// For the conflations arrays, the format is groups of four: tag name,
+// attribute name and value to match, followed by name of the tag to
+// conflate to.  NULL is used as a wildcard in the conflations arrays.
+
+// All tag names and attribute names entered here must be in lower
+// case.  Values specified here can be in mixed case, since values are
+// matched in a case-sensitive manner.
+
 static const char* html_index_tags[] = { "title", "h1", "h2", "h3", "h4", 0 };
 static const char* html_metadata_tags[] = { "title", 0 };
-static const char* html_conflations[] = { "h1", "heading", "h2", "heading", "h3", "heading", "h4", "heading", 0, 0 };
+static const char* html_conflations[] = { "h1", NULL, NULL, "heading", "h2", NULL, NULL, "heading", "h3", NULL, NULL, "heading", "h4", NULL, NULL, "heading", 0, 0, 0, 0 };
 
 static const char* trec_include_tags[] = { "text", "hl", "head", "headline", "title", "ttl", "dd", "date", "lp", "leadpara", 0 };
 static const char* trec_metadata_tags[] = { "docno", "title", 0 };
-static const char* trec_conflations[] = { "hl", "headline", "head", "headline", "ttl", "title", "dd", "date", 0, 0 };
+static const char* trec_conflations[] = { "hl", NULL, NULL, "headline", "head", NULL, NULL, "headline", "ttl", NULL, NULL, "title", "dd", NULL, NULL, "date", 0, 0, 0, 0 };
 static const char* trec_index_tags[] = { "hl", "head", "headline", "title", "ttl", "dd", "date", 0 };
 
 static file_class_environment_spec environments[] = {
@@ -192,15 +200,39 @@ static void copy_strings_to_vector( std::vector<std::string>& vec, const char** 
   }
 }
 
-static void copy_string_pairs_to_map( std::map< std::string, std::string >& m, const char** array ) {
-  if( array ) {
-    for( unsigned int i=0; array[i] && array[i+1]; i+=2 ) {
-      std::string key = array[i];
-      std::string value = array[i+1];
-      m[key] = value;
-    }
-  }
+static void copy_string_tuples_to_map( std::map<indri::parse::ConflationPattern*,std::string>& m, const char** array ) {
+
+  if ( array ) {
+    for ( unsigned int i = 0; array[i] && array[i + 3]; i += 4 ) {
+
+      // The strings in the array are assumed to be in appropriate
+      // case: for tag name and attribute name to match, as well as
+      // the name of the tag to conflate to, this means lowercase.
+      // Attribute value to match may be in mixed case.  Attribute
+      // name and value can be NULL, which stands for a "don't care"
+      // value.
+
+      indri::parse::ConflationPattern* key =
+        new indri::parse::ConflationPattern;
+      
+      key->tag_name = array[i];
+      key->attribute_name = array[i + 1];
+      key->value = array[i + 2];
+
+      std::string value = array[i + 3];
+       m[key] = value;
+     }
+   }
+ }
+ 
+static void cleanup_conflations_map( std::map<indri::parse::ConflationPattern*,std::string>& 
+				     conflations ) {
+
+  for ( std::map<indri::parse::ConflationPattern*,std::string>::iterator i =
+	  conflations.begin(); i != conflations.end(); i++ )
+    delete (*i).first;
 }
+
 
 indri::parse::FileClassEnvironmentFactory::~FileClassEnvironmentFactory() { 
   std::map<std::string, indri::parse::FileClassEnvironmentFactory::Specification*>::iterator iter;
@@ -218,15 +250,17 @@ indri::parse::FileClassEnvironment* build_file_class_environment( const file_cla
   std::vector<std::string> excludeTags;
   std::vector<std::string> indexTags;
   std::vector<std::string> metadataTags;
-  std::map<std::string, std::string> conflations;
+  std::map<indri::parse::ConflationPattern*, std::string> conflations;
 
   copy_strings_to_vector( includeTags, spec->includeTags );
   copy_strings_to_vector( excludeTags, spec->excludeTags );
   copy_strings_to_vector( indexTags, spec->indexTags );
   copy_strings_to_vector( metadataTags, spec->metadataTags );
-  copy_string_pairs_to_map( conflations, spec->conflations );
+  copy_string_tuples_to_map( conflations, spec->conflations );
 
   env->parser = indri::parse::ParserFactory::get( spec->parser, includeTags, excludeTags, indexTags, metadataTags, conflations );
+  env->conflater = new indri::parse::Conflater( conflations );
+  cleanup_conflations_map( conflations );
   return env;
 }
 
@@ -243,7 +277,7 @@ indri::parse::FileClassEnvironment* build_file_class_environment( const indri::p
                                                   spec->index,
                                                   spec->metadata,
                                                   spec->conflations );
-
+  env->conflater = new indri::parse::Conflater( spec->conflations );
   return env;
 }
 
@@ -275,11 +309,11 @@ indri::parse::FileClassEnvironmentFactory::Specification* indri::parse::FileClas
     std::vector<std::string> excludeTags;
     std::vector<std::string> indexTags;
     std::vector<std::string> metadataTags;
-    std::map<std::string, std::string> conflations;
+    std::map<indri::parse::ConflationPattern*, std::string> conflations;
 
     copy_strings_to_vector( includeTags, spec->includeTags );
     copy_strings_to_vector( excludeTags, spec->excludeTags );
-    copy_string_pairs_to_map( conflations, spec->conflations );
+    copy_string_tuples_to_map( conflations, spec->conflations );
     copy_strings_to_vector(indexTags, spec->indexTags);
     copy_strings_to_vector(metadataTags, spec->metadataTags);
 
@@ -335,7 +369,7 @@ void indri::parse::FileClassEnvironmentFactory::addFileClass( const std::string&
                                                               const std::vector<std::string>&
                                                               index,
                                                               const std::vector<std::string>& metadata, 
-                                                              const std::map<std::string,std::string>& conflations )
+                                                              const std::map<indri::parse::ConflationPattern*,std::string>& conflations )
 {
   indri::parse::FileClassEnvironmentFactory::Specification* spec = new indri::parse::FileClassEnvironmentFactory::Specification;
 

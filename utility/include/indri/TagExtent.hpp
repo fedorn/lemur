@@ -18,6 +18,7 @@
 
 #ifndef INDRI_TAGEXTENT_HPP
 #define INDRI_TAGEXTENT_HPP
+#include "indri/AttributeValuePair.hpp"
 namespace indri
 {
   namespace parse
@@ -28,6 +29,9 @@ namespace indri
       unsigned int begin;
       unsigned int end;
       INT64 number;
+      TagExtent *parent;
+      // explicit initial count of two elements.
+      indri::utility::greedy_vector<AttributeValuePair, 2> attributes;
     };
   }
 }

@@ -22,10 +22,12 @@
 #include <string>
 #include "indri/Parameters.hpp"
 #include "indri/HTMLParser.hpp"
+#include "indri/ConflationPattern.hpp"
 #include "indri/Repository.hpp"
 #include "indri/IndriParser.hpp"
 #include "indri/DocumentIterator.hpp"
 #include "indri/AnchorTextAnnotator.hpp"
+#include "indri/OffsetAnnotationAnnotator.hpp"
 #include "indri/DocumentIteratorFactory.hpp"
 #include "indri/ParserFactory.hpp"
 #include "indri/FileClassEnvironmentFactory.hpp"
@@ -68,6 +70,7 @@ namespace indri
       int _documents;
       std::string _error;
 
+      std::string _offsetAnnotationsFile;
       std::string _anchorTextRoot;
       std::string _documentRoot;
 
@@ -82,6 +85,7 @@ namespace indri
 
       void _getParsingContext( indri::parse::Parser** parser,
                                indri::parse::DocumentIterator** iterator,
+                               indri::parse::Conflater** conflater,
                                const std::string& extension );
 
     public:
@@ -89,6 +93,10 @@ namespace indri
 
       IndexEnvironment();
       ~IndexEnvironment();
+
+      /// Set offset annotations fle path.
+      /// @param offsetAnnotationsFile path to offset annotations file.
+      void setOffsetAnnotationsFile( const std::string& offsetAnnotationsFile );
       /// Set document root path and anchor text root path.
       /// @param documentRoot path to document root.
       /// @param anchorTextRoot path to anchor text root.
@@ -116,7 +124,7 @@ namespace indri
                          const std::vector<std::string>& exclude,
                          const std::vector<std::string>& index,
                          const std::vector<std::string>& metadata, 
-                         const std::map<std::string,std::string>& conflations );
+                         const std::map<indri::parse::ConflationPattern*,std::string>& conflations );
       /// Get a named file class.
       /// @param name The name of the file class to retrieve.
       indri::parse::FileClassEnvironmentFactory::Specification *getFileClassSpec( const std::string& name) {

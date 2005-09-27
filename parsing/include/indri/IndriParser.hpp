@@ -22,6 +22,7 @@
 #include "indri/ObjectHandler.hpp"
 #include "indri/UnparsedDocument.hpp"
 #include "indri/ParsedDocument.hpp"
+#include "indri/ConflationPattern.hpp"
 #include <map>
 #include <vector>
 
@@ -38,7 +39,7 @@ namespace indri {
                             const std::vector<std::string>& exclude,
                             const std::vector<std::string>& index,
                             const std::vector<std::string>& metadata,
-                            const std::map<std::string, std::string>& conflations ) = 0;
+                            const std::map<ConflationPattern*, std::string>& conflations ) = 0;
 
       virtual void handle( UnparsedDocument* document ) = 0;
       virtual void setHandler( ObjectHandler<indri::api::ParsedDocument>& handler ) = 0;

@@ -89,7 +89,7 @@ void indri::parse::HTMLParser::handleTag(char* token, long pos) {
 
       // if special url tags are requested, we'll
       // store the url of the anchor text in the document itself
-        
+
       const TaggedTextParser::tag_properties* tagProps;
       if( !relative ) {
         tagProps = _absoluteUrlTag;

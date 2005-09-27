@@ -20,20 +20,23 @@
 
 #include "indri/IndriParser.hpp"
 #include "indri/DocumentIterator.hpp"
+#include "indri/Conflater.hpp"
 namespace indri
 {
   namespace parse
   {
     
     struct FileClassEnvironment {
-      FileClassEnvironment() : parser(0), iterator(0) {}
+      FileClassEnvironment() : parser(0), iterator(0), conflater(0) {}
       ~FileClassEnvironment() {
         delete parser;
         delete iterator;
+        delete conflater;
       }
 
       Parser* parser;
       DocumentIterator* iterator;
+      Conflater* conflater;
     };
   }
 }

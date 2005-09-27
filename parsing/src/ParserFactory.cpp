@@ -53,7 +53,7 @@ std::string indri::parse::ParserFactory::preferredName( const std::string& name 
 
 indri::parse::Parser* indri::parse::ParserFactory::get( const std::string& name ) {
   std::vector<std::string> empty;
-  std::map<std::string,std::string> mempty;
+  std::map<ConflationPattern*,std::string> mempty;
 
   return get( name, empty, empty, empty, empty, mempty );
 }
@@ -63,7 +63,7 @@ indri::parse::Parser* indri::parse::ParserFactory::get( const std::string& name,
                                    const std::vector<std::string>& excludeTags,
                                    const std::vector<std::string>& indexTags,
                                    const std::vector<std::string>& metadataTags,
-                                   const std::map<std::string, std::string>& conflations )
+                                                        const std::map<ConflationPattern*, std::string>& conflations )
 {
   indri::parse::Parser* parser;
   std::string preferred = preferredName( name );

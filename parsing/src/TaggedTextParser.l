@@ -30,14 +30,15 @@ indri::parse::TaggedTextParser::TaggedTextParser() :
   tl(new TagList()),
   _metaList(new TagList()),
   _tagTable(1024),
-  _handler(0)
+  _handler(0),
+  _p_conflate(0)
 {
 }
 
 indri::parse::TaggedTextParser::~TaggedTextParser() {
   delete tl;
   delete _metaList;
-
+  delete _p_conflate;
   indri::utility::HashTable<const char*, tag_properties*>::iterator iter;
   for( iter = _tagTable.begin(); iter != _tagTable.end(); iter++ ) {
     free( *iter->second );
@@ -68,19 +69,13 @@ indri::parse::TaggedTextParser::tag_properties* indri::parse::TaggedTextParser::
     return *result;
 }
 
-indri::parse::TaggedTextParser::tag_properties* indri::parse::TaggedTextParser::_buildTag( const std::string& name, const std::map<std::string, std::string>& conflations ) {
+indri::parse::TaggedTextParser::tag_properties* indri::parse::TaggedTextParser::_buildTag( const std::string& name ) {
   tag_properties* result = 0;
 
   if( result = _findTag(name.c_str()) )
     return result;
 
-  std::string conflation = name;
-  std::map<std::string, std::string>::const_iterator iter;
-
-  iter = conflations.find(name);
-
-  if( iter != conflations.end() )
-    conflation = iter->second;
+  std::string conflation = _p_conflate->conflate( name.c_str() );
 
   result = (tag_properties*) malloc( sizeof(tag_properties) + name.length()+1 + conflation.length()+1 );
   result->index = false;
@@ -101,27 +96,28 @@ void indri::parse::TaggedTextParser::setTags( const std::vector<std::string>& in
                                 const std::vector<std::string>& exclude,
                                 const std::vector<std::string>& index,
                                 const std::vector<std::string>& metadata, 
-                                const std::map<std::string,std::string>& conflations ) {
+                                const std::map<ConflationPattern*,std::string>& conflations ) {
   _defaultInclude = true;
-
+  delete _p_conflate;
+  _p_conflate = new Conflater(conflations);
   for( size_t i=0; i<include.size(); i++ ) {
-    tag_properties* result = _buildTag(include[i], conflations);
+    tag_properties* result = _buildTag( include[i] );
     result->include = true;
     _defaultInclude = false;
   }
 
   for( size_t i=0; i<exclude.size(); i++ ) {
-    tag_properties* result = _buildTag(exclude[i], conflations);
+    tag_properties* result = _buildTag( exclude[i] );
     result->exclude = true;
   }
 
   for( size_t i=0; i<index.size(); i++ ) {
-    tag_properties* result = _buildTag(index[i], conflations);
+    tag_properties* result = _buildTag( index[i] );
     result->index = true;
   }
 
   for( size_t i=0; i<metadata.size(); i++ ) {
-    tag_properties* result = _buildTag(metadata[i], conflations);
+    tag_properties* result = _buildTag( metadata[i] );
     result->metadata = true;
   }
 }

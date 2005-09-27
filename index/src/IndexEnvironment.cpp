@@ -24,12 +24,14 @@
 
 void indri::api::IndexEnvironment::_getParsingContext( indri::parse::Parser** parser,
                                                        indri::parse::DocumentIterator** iterDoc,
+                                                       indri::parse::Conflater** conflater,
                                                        const std::string& className ) {
   std::string parserName;
   std::string iteratorName;
 
   *parser = 0;
   *iterDoc = 0;
+  *conflater = 0;
 
   // look for an already-built environment
   std::map<std::string, indri::parse::FileClassEnvironment*>::iterator iter;
@@ -38,6 +40,7 @@ void indri::api::IndexEnvironment::_getParsingContext( indri::parse::Parser** pa
   if( iter != _environments.end() ) {
     *parser = iter->second->parser;
     *iterDoc = iter->second->iterator;
+    *conflater = iter->second->conflater;
     return;
   }
 
@@ -47,6 +50,7 @@ void indri::api::IndexEnvironment::_getParsingContext( indri::parse::Parser** pa
     _environments[className] = fce;
     *parser = fce->parser;
     *iterDoc = fce->iterator;
+    *conflater = fce->conflater;
   }
 }
 
@@ -70,6 +74,11 @@ void indri::api::IndexEnvironment::setNormalization( bool flag ) {
 void indri::api::IndexEnvironment::setMemory( UINT64 memory ) {
   _parameters.set("memory", memory);
 }
+
+void indri::api::IndexEnvironment::setOffsetAnnotationsFile( const std::string& offsetAnnotationsFile ) {
+  _offsetAnnotationsFile = offsetAnnotationsFile;
+}
+
 
 void indri::api::IndexEnvironment::setAnchorTextPath( const std::string& documentRoot, const std::string& anchorTextRoot ) {
   _documentRoot = documentRoot;
@@ -98,7 +107,7 @@ void indri::api::IndexEnvironment::addFileClass( const std::string& name,
                                                  const std::vector<std::string>& exclude,
                                                  const std::vector<std::string>& index,
                                                  const std::vector<std::string>& metadata, 
-                                                 const std::map<std::string,std::string>& conflations )
+                                                 const std::map<indri::parse::ConflationPattern*,std::string>& conflations )
 {
   this->_fileClassFactory.addFileClass( name, iter, parser, startDocTag, endDocTag, endMetadataTag,
                                         include, exclude, index, metadata, conflations );
@@ -203,8 +212,10 @@ void indri::api::IndexEnvironment::addFile( const std::string& fileName, const s
   indri::parse::Parser* parser = 0;
   indri::parse::DocumentIterator* iterator = 0;
   indri::parse::AnchorTextAnnotator* annotator = 0;
+  indri::parse::OffsetAnnotationAnnotator* oa_annotator = 0;
+  indri::parse::Conflater* conflater = 0;
   
-  _getParsingContext( &parser, &iterator, fileClass );
+  _getParsingContext( &parser, &iterator, &conflater, fileClass );
 
   if( !parser || !iterator ) {
     _documentsSeen++;
@@ -228,6 +239,12 @@ void indri::api::IndexEnvironment::addFile( const std::string& fileName, const s
         annotator = &_annotator;
       }
 
+      if ( _offsetAnnotationsFile.length() ) {
+	// If the user specified an offset annotations file, we'll use it.
+	oa_annotator = new indri::parse::OffsetAnnotationAnnotator( conflater );
+	oa_annotator->open( _offsetAnnotationsFile );
+      }
+
       // notify caller that the file was successfully parsed
       if( _callback ) (*_callback)( indri::api::IndexStatus::FileOpen, fileName, _error, _documentsIndexed, _documentsSeen );
 
@@ -237,6 +254,9 @@ void indri::api::IndexEnvironment::addFile( const std::string& fileName, const s
         parsed = parser->parse( document );
         if( annotator )
           parsed = annotator->transform( parsed );
+	if ( oa_annotator )
+	  parsed = oa_annotator->transform( parsed );
+
         _repository.addDocument( parsed );
 
         _documentsIndexed++;
@@ -265,6 +285,7 @@ int indri::api::IndexEnvironment::addString( const std::string& documentString, 
   indri::parse::UnparsedDocument document;
   indri::parse::Parser* parser;
   indri::parse::DocumentIterator* iterator;
+  indri::parse::Conflater* conflater;
   std::string nothing;
 
   _documentsSeen++;
@@ -273,7 +294,7 @@ int indri::api::IndexEnvironment::addString( const std::string& documentString, 
   document.textLength = documentString.length();
   document.metadata = metadata;
 
-  _getParsingContext( &parser, &iterator, fileClass );
+  _getParsingContext( &parser, &iterator, &conflater, fileClass );
 
   if( parser == 0 ) {
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "File class '" + fileClass + "' wasn't recognized." );

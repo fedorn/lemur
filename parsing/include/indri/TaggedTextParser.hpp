@@ -28,6 +28,7 @@
 #include "indri/HashTable.hpp"
 #include "indri/TagList.hpp"
 #include "indri/IndriParser.hpp"
+#include "indri/Conflater.hpp"
 #include "indri/Buffer.hpp"
 #include "string-set.h"
 
@@ -64,7 +65,7 @@ namespace indri
                     const std::vector<std::string>& exclude,
                     const std::vector<std::string>& index,
                     const std::vector<std::string>& metadata, 
-                    const std::map<std::string,std::string>& conflations );
+                    const std::map<ConflationPattern*, std::string>& conflations );
 
       indri::api::ParsedDocument* parse( UnparsedDocument* document );
 
@@ -99,8 +100,9 @@ namespace indri
         bool include;
         bool metadata;
       };
+      Conflater *_p_conflate;
       tag_properties* _findTag(const char* name);
-      tag_properties* _buildTag( const std::string& name, const std::map<std::string,std::string>& conflations );
+      tag_properties* _buildTag( const std::string& name );
       indri::utility::HashTable<const char*, tag_properties*> _tagTable;
       virtual void handleTag(char* token, long pos);
 

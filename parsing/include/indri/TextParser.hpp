@@ -46,7 +46,7 @@ namespace indri
                     const std::vector<std::string>& exclude,
                     const std::vector<std::string>& index,
                     const std::vector<std::string>& metadata, 
-                    const std::map<std::string, std::string>& conflations );
+                    const std::map<ConflationPattern*, std::string>& conflations );
 
     protected:
       void writeToken(char* token);

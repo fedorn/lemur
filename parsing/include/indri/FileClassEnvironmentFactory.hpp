@@ -55,7 +55,7 @@ namespace indri
         std::vector<std::string> metadata;
         /// \brief tags that should be conflated. 
         /// The map is the of the form tag => conflated tag, eg h1 => heading.
-        std::map<std::string,std::string> conflations;
+        std::map<indri::parse::ConflationPattern*,std::string> conflations;
       };
 
       ~FileClassEnvironmentFactory();
@@ -105,7 +105,7 @@ namespace indri
                          const std::vector<std::string>& exclude,
                          const std::vector<std::string>& index,
                          const std::vector<std::string>& metadata, 
-                         const std::map<std::string,std::string>& conflations );
+                         const std::map<indri::parse::ConflationPattern*,std::string>& conflations );
     private:
       std::map<std::string, struct FileClassEnvironmentFactory::Specification*> _userTable;
 
