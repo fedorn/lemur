@@ -76,7 +76,7 @@ namespace indri
         _allocate( _space * 2 );
       }
 
-      void _grow( size_t newSize, _Type& prototype ) {
+      void _grow( size_t newSize, const _Type& prototype ) {
         assert( newSize >= _size );
 
         while( _space < newSize )
@@ -164,7 +164,7 @@ namespace indri
           _allocate( space );
       }
 
-      void resize( size_t newSize, _Type prototype ) {
+      void resize( size_t newSize, const _Type &prototype ) {
         if( newSize >= _size ) {
           _grow(newSize, prototype);
         } else {
