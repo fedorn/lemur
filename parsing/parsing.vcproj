@@ -160,13 +160,16 @@
 				RelativePath=".\src\InQueryOpParser.cpp">
 			</File>
 			<File
+				RelativePath=".\src\IntervalTree.cpp">
+			</File>
+			<File
 				RelativePath=".\src\KeyfileDocMgr.cpp">
 			</File>
 			<File
-				RelativePath=".\src\KrovetzStemmerTransformation.cpp">
+				RelativePath=".\src\KrovetzStemmer.cpp">
 			</File>
 			<File
-				RelativePath=".\src\KrovetzStemmer.cpp">
+				RelativePath=".\src\KrovetzStemmerTransformation.cpp">
 			</File>
 			<File
 				RelativePath=".\src\KStemmer.cpp">
@@ -176,6 +179,9 @@
 			</File>
 			<File
 				RelativePath=".\src\NormalizationTransformation.cpp">
+			</File>
+			<File
+				RelativePath=".\src\OffsetAnnotationAnnotator.cpp">
 			</File>
 			<File
 				RelativePath=".\src\Parser.cpp">
@@ -261,6 +267,9 @@
 				RelativePath=".\include\ArabicStemmer.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\AttributeValuePair.hpp">
+			</File>
+			<File
 				RelativePath=".\include\BrillPOSParser.hpp">
 			</File>
 			<File
@@ -280,6 +289,12 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\CompressedCollection.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\Conflater.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\ConflationPattern.hpp">
 			</File>
 			<File
 				RelativePath=".\include\DocMgrManager.hpp">
@@ -324,13 +339,16 @@
 				RelativePath=".\include\InQueryOpParser.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\IntervalTree.hpp">
+			</File>
+			<File
 				RelativePath=".\include\KeyfileDocMgr.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\KrovetzStemmerTransformation.hpp">
+				RelativePath=".\include\indri\KrovetzStemmer.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\KrovetzStemmer.hpp">
+				RelativePath=".\include\indri\KrovetzStemmerTransformation.hpp">
 			</File>
 			<File
 				RelativePath=".\include\KStemmer.hpp">
@@ -351,6 +369,9 @@
 				RelativePath=".\include\indri\ObjectHandler.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\OffsetAnnotationAnnotator.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\ParsedDocument.hpp">
 			</File>
 			<File
@@ -363,10 +384,10 @@
 				RelativePath=".\include\indri\PDFDocumentExtractor.hpp">
 			</File>
 			<File
-				RelativePath=".\include\PorterStemmer.hpp">
+				RelativePath=".\include\indri\Porter_Stemmer.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\Porter_Stemmer.hpp">
+				RelativePath=".\include\PorterStemmer.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\PorterStemmerTransformation.hpp">
