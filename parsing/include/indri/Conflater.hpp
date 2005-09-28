@@ -114,6 +114,7 @@ namespace indri {
 
 	  return p_tag_pattern->conflation;
 	}
+        return NULL;
       }
 
     public:
