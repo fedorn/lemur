@@ -62,7 +62,15 @@ line. The known classes are:
 <li>txt --  Plain text format.
 </ul>
 </dd>
-Combining each of these elements, the parameter file would contain:
+<dt>annotations</dt>
+<dd>The pathname of the file containing offset annotations for the documents 
+specified in <tt>path</tt>. Specified as
+&lt;corpus&gt;&lt;annotations&gt;/path/to/file&lt;/annotations&gt;&lt;/corpus&gt;
+in the parameter file and as
+<tt>-corpus.annotations=/path/to/file</tt> on the command
+line.</dd> 
+
+Combining the first two of these elements, the parameter file would contain:
 <br>
 &lt;corpus&gt;<br>
 &nbsp;&nbsp;&lt;path&gt;/path/to/file_or_directory&lt;/path&gt;<br>
@@ -326,7 +334,15 @@ line. The known classes are:
 <li>txt --  Plain text format.
 </ul>
 </dd>
-Combining each of these elements, the parameter file would contain:
+<dt>annotations</dt>
+<dd>The pathname of the file containing offset annotations for the documents 
+specified in <tt>path</tt>. Specified as
+&lt;corpus&gt;&lt;annotations&gt;/path/to/file&lt;/annotations&gt;&lt;/corpus&gt;
+in the parameter file and as
+<tt>-corpus.annotations=/path/to/file</tt> on the command
+line.</dd> 
+
+Combining the first two of these elements, the parameter file would contain:
 <br>
 &lt;corpus&gt;<br>
 &nbsp;&nbsp;&lt;path&gt;/path/to/file_or_directory&lt;/path&gt;<br>
