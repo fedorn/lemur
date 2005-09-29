@@ -79,8 +79,8 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
   if ( ! _first_open ) {
 
     _cleanup();
-    _first_open = false;
   }
+  _first_open = false;
 
   // Load file, and check consistency.  Ensure that there are no
   // undefined parent ids.
@@ -118,7 +118,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
     int len = 0;
 
-    for ( char *c = buf + fieldStart; *c != '\0' && fieldCount < 7 && 
+    for ( char *c = buf + fieldStart; *c != '\0' && fieldCount < 8 && 
 	    fieldOffset < sizeof(field); 
 	  c++, fieldOffset++ ) {
 
@@ -145,6 +145,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 	    std::cerr << "WARN: Could not understand type specification '" 
 		      << field << "' on line " << line 
 		      << "; ignoring line." << std::endl;
+	    line++;
 	    continue;
 	  }
 	  break;
@@ -202,6 +203,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
       std::cerr << "WARN: id and parent id are equal on line " << line 
 		<< "; ignoring line." << std::endl;
+      line++;
       continue;
     }
 
@@ -209,7 +211,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
     if ( type == 1 ) {
 	    
-      if ( ! _is_unique_id( id, line ) ) continue;
+      if ( ! _is_unique_id( id, line ) ) { line++; continue; }
 
       // Check that parent id is defined
 
@@ -225,6 +227,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 		    << "' used on line " << line 
 		    << "; ignoring line" << std::endl;
 
+	  line++;
 	  continue;
 
 	}
@@ -272,6 +275,10 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 	  std::cerr << "Overlapping tag ( id=" << id 
 		    << ", name='" << te->name 
 		    << "' ) detected; skipping..." << std::endl;
+	  
+	  itree->walk_tree( std::cerr );
+
+	  //exit(-1); // DEBUG
 	}
       } else {
 
@@ -281,13 +288,14 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
       // Add attribute to existing TAG
 
-      TagExtent* p_te = _getTag( id );
+      TagExtent* p_te = _getTag( parent );
 
       if ( p_te == NULL ) {
 
-	std::cerr << "WARN: Attribute for undefined tag id '" << id 
+	std::cerr << "WARN: Attribute for undefined tag id '" << parent
 		  << "' appears on line " << line
 		  << "; ignoring line" << std::endl;
+	line++;
 	continue;
       }
 

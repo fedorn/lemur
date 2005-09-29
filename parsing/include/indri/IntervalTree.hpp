@@ -62,11 +62,13 @@ namespace indri {
     private:
       IntervalTreeNode* root;
       bool _insert( int begin, int end, IntervalTreeNode* node );
+      void _walk_tree( std::ostream& s, IntervalTreeNode* node, int indent );
 
     public:
       IntervalTree() { root = NULL; }
       ~IntervalTree() { if ( root ) delete root; }
 
+      void walk_tree( std::ostream& s );
       bool insert( int begin, int end );
 
     };

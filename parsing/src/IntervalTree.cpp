@@ -60,6 +60,7 @@
 // the way up to the root of the tree.
 
 #include <iostream>
+#include <string>
 #include "indri/IntervalTree.hpp"
 
 namespace indri {
@@ -88,16 +89,14 @@ namespace indri {
 
       // Check for enclosure
 
-      if ( begin <= node->begin && end >= node->end ) {
+      if ( begin <= node->begin && end >= node->max_child_end ) {
 	
-	if ( ! node->left_child && ! node->right_child ) {
-
-	  // If node has no children, we can insert this interval
-	  // in its place, then reinsert the node as a child of this interval.
+	// This interval encloses the entire subtree rooted at this
+	// node.
 
 	  IntervalTreeNode *a = new IntervalTreeNode( begin, end );
 	  
-	  if ( node->begin <= begin ) { // left insertion
+	if ( node->begin < end ) { // left insertion
 
 	    a->left_child = node;
 
@@ -114,6 +113,10 @@ namespace indri {
 	  a->parent = node->parent;
 	  node->parent = a;
 
+	// Properly attach children
+	a->left_child = node->left_child;
+	a->right_child = node->right_child;
+
 	  int mce = a->max_child_end > node->max_child_end ?
 	    a->max_child_end : node->max_child_end;
 
@@ -126,12 +129,6 @@ namespace indri {
 	    par = par->parent;
 	  }
 	  return true;
-
-	} else {
-
-	  std::cout << "Enclosure detected; couldn't resolve." << std::endl;
-	  return false;
-	}
       }
 
       // Check for overlap
@@ -145,11 +142,12 @@ namespace indri {
 
       // No overlap at this node so recurse:
       
-      if ( begin <= node->begin ) { // left recursion
+      if ( begin < node->end ) { // left recursion
 
 	if ( node->left_child ) {
 
-	  if ( node->left_child->max_child_end <= end ) return false;
+// 	  if ( node->left_child->max_child_end <= end ) return false;
+ 	  if ( end > node->end ) return false;
 	  else return _insert( begin, end, node->left_child );
 
 	} else {
@@ -174,7 +172,7 @@ namespace indri {
 
 	if ( node->right_child ) {
 
-	  // No check against max_child_end here.
+	  // No max_child_end check here
 	  return _insert( begin, end, node->right_child );
 
 	} else {
@@ -198,6 +196,36 @@ namespace indri {
       }
 
       return false;
+    }
+
+    void IntervalTree::walk_tree( std::ostream& s ) {
+
+      _walk_tree( s, root, 0 );
+    }
+
+    void IntervalTree::_walk_tree( std::ostream& s, IntervalTreeNode* node, 
+				   int indent ) {
+      
+      std::string ind( indent, ' ' );
+      bool children = false;
+
+      s << ind << "[<" << node->begin << ", " << node->end << ", " 
+	<< node->max_child_end << ">";
+
+      if ( node->left_child ) {
+	s << std::endl << ind << "left" << std::endl;
+	_walk_tree( s, node->left_child, indent + 2 );
+	children = true;
+      }
+      
+      if ( node->right_child ) {
+	s <<  std::endl << ind << "right" << std::endl;
+	_walk_tree( s, node->right_child, indent + 2 );
+	children = true;
+      }
+
+      if ( children ) s << std::endl << ind;
+      s << "]" << std::endl;
     }
   }
 }
