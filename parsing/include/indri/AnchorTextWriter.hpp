@@ -79,15 +79,16 @@ namespace indri
           TagExtent& extent = document->tags[i];
 
           // we only extract absolute urls
-          if( !strcmp( extent.name, "absolute-url" ) ) {
+          if( !strcmp( extent.name, "absolute-url" ) ||
+	      !strcmp( extent.name, "relative-url" ) ) {
             url = document->terms[ extent.begin ];
             urlEnd = extent.end;
 
             // if it has the same domain, throw it out
-            if( url && page && !lemur_compat::strncasecmp( url, page, domainLength ) ) {
-              url = 0;
-              urlEnd = -1;
-            }
+            //if( url && page && !lemur_compat::strncasecmp( url, page, domainLength ) ) {
+            //  url = 0;
+            //  urlEnd = -1;
+            //}
           } else if( !strcmp( extent.name, "a" ) &&  // this is anchor text
                      url &&                          // we've seen a url
                      urlEnd == extent.begin &&       // this text is associated with an absolute-url
@@ -108,15 +109,16 @@ namespace indri
         for( unsigned int i=0; i<document->tags.size(); i++ ) {
           TagExtent& extent = document->tags[i];
 
-          if( !strcmp( extent.name, "absolute-url" ) ) {  // this is an absolute url
+          if( !strcmp( extent.name, "absolute-url" ) ||
+	      !strcmp( extent.name, "relative-url" ) ) {  // this is an absolute url
             url = document->terms[ extent.begin ];
             urlEnd = extent.end;
 
             // if it has the same domain, throw it out
-            if( url && page && !lemur_compat::strncasecmp( url, page, domainLength ) ) {
-              url = 0;
-              urlEnd = -1;
-            }
+            //if( url && page && !lemur_compat::strncasecmp( url, page, domainLength ) ) {
+            //  url = 0;
+            //  urlEnd = -1;
+            //}
           } else if( !strcmp( extent.name, "a" ) &&  // this is anchor text
                      url &&                          // we've seen a url
                      urlEnd == extent.begin &&       // this text is associated with an absolute-url
