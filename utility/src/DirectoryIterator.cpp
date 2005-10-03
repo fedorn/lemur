@@ -144,7 +144,7 @@ void* directoryiterator_init( const std::string& path ) {
 
 void directoryiterator_destroy( void* opaque ) {
   unix_iter_data* d = (unix_iter_data*) opaque;
-  closedir( d->directory );
+  if (d->directory) closedir( d->directory );
   free( d->entry );
   delete d;
 }
