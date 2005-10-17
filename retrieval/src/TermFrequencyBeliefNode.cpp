@@ -61,16 +61,19 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   assert( begin == 0 && end == documentLength ); // FrequencyListCopier ensures this condition
   _extents.clear();
 
+  double score = 0;
+  
   if( _list ) {
     const indri::index::DocListIterator::DocumentData* entry = _list->currentEntry();
     int count = ( entry && entry->document == documentID ) ? entry->positions.size() : 0;
-    double score = _function.scoreOccurrence( count, documentLength );
-
-    _extents.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
+    score = _function.scoreOccurrence( count, documentLength );
 
     assert( score <= _maximumScore || _list->topDocuments().size() > 0 );
     assert( score <= _maximumBackgroundScore || count != 0 );
+  } else {
+    score = _function.scoreOccurrence( 0, documentLength );
   }
+    _extents.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
 
   return _extents;
 }
