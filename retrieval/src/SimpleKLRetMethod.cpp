@@ -197,6 +197,7 @@ lemur::retrieval::SimpleKLRetMethod::SimpleKLRetMethod(const Index &dbIndex,
   collectLM = new lemur::langmod::MLUnigramLM(*collectLMCounter, ind.termLexiconID()); 
 
   scFunc = new SimpleKLScoreFunc();
+  scFunc->setScoreMethod(qryParam.adjScoreMethod);
 }
 
 lemur::retrieval::SimpleKLRetMethod::~SimpleKLRetMethod() 
