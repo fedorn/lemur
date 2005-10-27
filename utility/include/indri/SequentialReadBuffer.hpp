@@ -77,7 +77,7 @@ namespace indri
         if( _position < _current.filePosition || (_position + length) > _current.filePosition + _current.buffer.position() ) {
           // data isn't in the current buffer
           // this isn't necessarily the most efficient way to do this, but it should work
-          cache( _position, _current.buffer.size() );
+          cache( _position, std::max( length, _current.buffer.size() ) );
           assert( _current.buffer.position() + _current.filePosition >= _position + length );
         }
 
