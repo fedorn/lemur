@@ -55,6 +55,8 @@ namespace indri
       void _writePositions( indri::api::ParsedDocument* document, int& keyLength, int& valueLength );
       void _writeMetadataItem( indri::api::ParsedDocument* document, int i, int& keyLength, int& valueLength );
       void _writeText( indri::api::ParsedDocument* document, int& keyLength, int& valueLength );
+      void _writeContent( indri::api::ParsedDocument* document, int& keyLength, int& valueLength );
+      void _writeContentLength( indri::api::ParsedDocument* document, int& keyLength, int& valueLength );
 
       void _readPositions( indri::api::ParsedDocument* document, const void* positionData, int positionDataLength );
 

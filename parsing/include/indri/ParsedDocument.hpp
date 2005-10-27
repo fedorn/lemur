@@ -32,6 +32,13 @@ namespace indri
       const char* text;
       size_t textLength;
 
+      const char* content;
+      size_t contentLength;
+
+      std::string getContent() {
+        return std::string (content, contentLength);
+      }
+      
       indri::utility::greedy_vector<char*> terms;
       indri::utility::greedy_vector<indri::parse::TagExtent> tags;
       indri::utility::greedy_vector<indri::parse::TermExtent> positions;

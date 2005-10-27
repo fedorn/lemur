@@ -132,11 +132,12 @@ indri::api::ParsedDocument* indri::parse::TaggedTextParser::parse( indri::parse:
   _document.metadata = document->metadata;
   _document.text = document->text;
   _document.textLength = document->textLength;
-  
-  byte_position = 0;
+  _document.content = document->content;
+  _document.contentLength = document->contentLength;
+  byte_position = document->content - document->text; // byte offset
   initialize(document, &_document);
-  int len = document->textLength;
-  parser_scan_bytes(document->text, len);
+  int len = document->contentLength;
+  parser_scan_bytes(document->content, len);
   doParse();
   cleanup(document, &_document);
   parser_delete_buffer(yy_current_buffer);

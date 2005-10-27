@@ -35,6 +35,8 @@ const int INPUT_BUFFER_SIZE = 1024;
 const int OUTPUT_BUFFER_SIZE = 128*1024;
 const char POSITIONS_KEY[] = "#POSITIONS#";
 const char TEXT_KEY[] = "#TEXT#";
+const char CONTENT_KEY[] = "#CONTENT#";
+const char CONTENTLENGTH_KEY[] = "#CONTENTLENGTH#";
 
 //
 // zlib_alloc
@@ -240,9 +242,39 @@ void indri::collection::CompressedCollection::_writeText( indri::api::ParsedDocu
   _stream->next_in = (Bytef*) TEXT_KEY;
   _stream->avail_in = keyLength;
   zlib_deflate( *_stream, _output );
-  
+  valueLength = document->textLength;
   _stream->next_in = (Bytef*) document->text;
   _stream->avail_in = document->textLength;
+  zlib_deflate( *_stream, _output );
+}
+
+//
+// _writeContent
+//
+void indri::collection::CompressedCollection::_writeContent( indri::api::ParsedDocument* document, int& keyLength, int& valueLength ) {
+  // content (content - text)
+  keyLength = sizeof CONTENT_KEY;
+  _stream->next_in = (Bytef*) CONTENT_KEY;
+  _stream->avail_in = keyLength;
+  zlib_deflate( *_stream, _output );
+  int diff = document->content - document->text;
+  valueLength = sizeof diff;
+  _stream->next_in = (Bytef*) &diff;
+  _stream->avail_in = sizeof diff;
+  zlib_deflate( *_stream, _output );
+}
+
+
+void indri::collection::CompressedCollection::_writeContentLength( indri::api::ParsedDocument* document, int& keyLength, int& valueLength ) {
+  // contentLength
+  keyLength = sizeof CONTENTLENGTH_KEY;
+  _stream->next_in = (Bytef*) CONTENTLENGTH_KEY;
+  _stream->avail_in = keyLength;
+  zlib_deflate( *_stream, _output );
+  int diff = document->contentLength;
+  valueLength = sizeof diff;
+  _stream->next_in = (Bytef*) &diff;
+  _stream->avail_in = sizeof diff;
   zlib_deflate( *_stream, _output );
 }
 
@@ -581,6 +613,18 @@ void indri::collection::CompressedCollection::addDocument( int documentID, indri
   recordOffsets.push_back( recordOffset + keyLength );
   recordOffset += (keyLength + valueLength);
 
+  // then, write the content offset out
+  _writeContent( document, keyLength, valueLength );
+  recordOffsets.push_back( recordOffset );
+  recordOffsets.push_back( recordOffset + keyLength );
+  recordOffset += (keyLength + valueLength);
+
+  // then, write the content length out
+  _writeContentLength( document, keyLength, valueLength );
+  recordOffsets.push_back( recordOffset );
+  recordOffsets.push_back( recordOffset + keyLength );
+  recordOffset += (keyLength + valueLength);
+
   // finally, we have to write out the keys and values
   recordOffsets.push_back( recordOffsets.size()/2 );
   _stream->next_in = (Bytef*) &recordOffsets.front();
@@ -623,6 +667,8 @@ indri::api::ParsedDocument* indri::collection::CompressedCollection::retrieve( i
 
   document->text = 0;
   document->textLength = 0;
+  document->content = 0;
+  document->contentLength = 0;
 
   // get the number of fields (it's the last byte)
   char* dataStart = output.front() + sizeof(indri::api::ParsedDocument);
@@ -654,6 +700,16 @@ indri::api::ParsedDocument* indri::collection::CompressedCollection::retrieve( i
     if( !strcmp( pair.key, TEXT_KEY ) ) {
       document->text = (char*) pair.value;
       document->textLength = pair.valueLength;
+    }
+
+    // extract content
+    if( !strcmp( pair.key, CONTENT_KEY ) ) {
+      document->content = document->text + copy_quad( (char*) pair.value );
+    }
+
+    // extract content length
+    if( !strcmp( pair.key, CONTENTLENGTH_KEY ) ) {
+      document->contentLength = copy_quad( (char *)pair.value );
     }
 
     if( !strcmp( pair.key, POSITIONS_KEY ) ) {

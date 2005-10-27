@@ -291,9 +291,11 @@ int indri::api::IndexEnvironment::addString( const std::string& documentString, 
   _documentsSeen++;
 
   document.text = documentString.c_str();
-  document.textLength = documentString.length();
+  document.textLength = documentString.length() + 1; // for the null
   document.metadata = metadata;
-
+  document.content = document.text;
+  document.contentLength = document.textLength;
+  
   _getParsingContext( &parser, &iterator, &conflater, fileClass );
 
   if( parser == 0 ) {

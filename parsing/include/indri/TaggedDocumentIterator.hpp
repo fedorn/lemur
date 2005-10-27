@@ -34,6 +34,7 @@ namespace indri
       UnparsedDocument _document;
       FILE* _in;
       indri::utility::Buffer _buffer;
+      indri::utility::Buffer _metaBuffer;
       std::string _lastMetadataTag;
       std::string _fileName;
 

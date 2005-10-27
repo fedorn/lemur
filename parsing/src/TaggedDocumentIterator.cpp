@@ -113,6 +113,7 @@ bool indri::parse::TaggedDocumentIterator::_readLine( char*& beginLine, size_t& 
 indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocument() {
   _document.metadata.clear();
   _buffer.clear();
+  _metaBuffer.clear();
 
   char* beginLine;
   size_t lineLength;  
@@ -129,7 +130,9 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
     // didn't find a begin tag, so we're done
     return 0;
   }
-
+  // copy whatever we've read so far into the _metaBuffer.
+  memcpy( _metaBuffer.write(_buffer.position()), _buffer.front(), _buffer.position() * sizeof(char));
+  
   // read metadata tags
   bool openTag = false;
   int doclines = 0;
@@ -141,7 +144,9 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
       if( !result ) {
         return 0;
       }
-
+      // copy to the metadata buffer
+      memcpy( _metaBuffer.write(lineLength), beginLine, lineLength * sizeof(char) );
+      beginLine = _metaBuffer.front() + _metaBuffer.position() - lineLength;
       //
       // the beginning of the line is either:
       //    an open tag
@@ -152,14 +157,14 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
         if( openTag ) {
           // we've already seen an open tag, so we're only interesting in
           // a matching close tag
-          const char* openTagText = metadata.back().beginTag + _buffer.front();
+          const char* openTagText = metadata.back().beginTag + _metaBuffer.front();
           int openTagLength = metadata.back().endTag - metadata.back().beginTag;
           
           if( beginLine[1] == '/' && !strncmp( openTagText, beginLine+2, openTagLength ) ) {
             // this is a close tag and it matches the open tag,
             // so tie up loose ends in the previous open tag metadata structure
             *beginLine = 0;
-            metadata.back().endText = _buffer.position() - lineLength;
+            metadata.back().endText = _metaBuffer.position() - lineLength;
             openTag = false;
           }
         } else {
@@ -168,23 +173,22 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
           char* endTag = strchr( beginLine, '>' );
           if( endTag ) {
             *endTag = 0;
-
             metadata_range range;
-            range.beginTag = beginLine + 1 - _buffer.front();
-            range.endTag = endTag - _buffer.front();
+            range.beginTag = beginLine + 1 - _metaBuffer.front();
+            range.endTag = endTag - _metaBuffer.front();
 
             char* endText = strchr( endTag + 1, '<' );
 
             if( (endTag - beginLine) < lineLength/2 && endText ) {
               // the end tag is also on this line
-              range.beginText = endTag + 1 - _buffer.front();
-              range.endText = endText - _buffer.front();
+              range.beginText = endTag + 1 - _metaBuffer.front();
+              range.endText = endText - _metaBuffer.front();
               *endText = 0;
               openTag = false;
             } else {
               // no more text on this line
               openTag = true;
-              range.beginText = _buffer.position() - 1;
+              range.beginText = _metaBuffer.position();
             }
 
             metadata.push_back( range );
@@ -217,9 +221,14 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
 
     if( lineLength >= _endDocTagLength &&
         !strncmp( beginLine+lineLength-_endDocTagLength, _endDocTag, _endDocTagLength - 1 ) ) {
-      beginLine[lineLength-_endDocTagLength] = 0;
-      _document.text = _buffer.front() + startDocument;
-      _document.textLength = _buffer.position() - startDocument - _endDocTagLength;
+      //      beginLine[lineLength-_endDocTagLength] = 0;
+      _document.content = _buffer.front() + startDocument;
+      _document.contentLength = _buffer.position() - startDocument - _endDocTagLength - 1;
+      // don't prune the DOC/metadata tags.
+      beginLine[lineLength] = 0;
+      _document.text = _buffer.front();
+      _document.textLength = _buffer.position();
+
       // terminate document
       break;
     }
@@ -228,10 +237,10 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
   // parse metadata
   for( size_t i=0; i<metadata.size(); i++ ) {
     indri::parse::MetadataPair pair;
-    char* key = _buffer.front() + metadata[i].beginTag;
+    char* key = _metaBuffer.front() + metadata[i].beginTag;
     
-    pair.key = _buffer.front() + metadata[i].beginTag;
-    pair.value = _buffer.front() + metadata[i].beginText;
+    pair.key = _metaBuffer.front() + metadata[i].beginTag;
+    pair.value = _metaBuffer.front() + metadata[i].beginText;
     pair.valueLength = metadata[i].endText - metadata[i].beginText + 1;
 
     // convert metadata key to lowercase
@@ -240,7 +249,7 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
         *c += ('a' - 'A');
       }
     }
-
+    
     // special handling for docno -- remove value spaces
     if( !strcmp( pair.key, "docno" ) ) {
       pair.stripValue();

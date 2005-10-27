@@ -29,6 +29,8 @@ namespace indri
     struct UnparsedDocument {
       const char* text;
       size_t textLength;
+      const char* content;
+      size_t contentLength;
 
       indri::utility::greedy_vector<MetadataPair> metadata;
     };

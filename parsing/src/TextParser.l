@@ -69,10 +69,12 @@ indri::api::ParsedDocument* indri::parse::TextParser::parse( indri::parse::Unpar
   _document.metadata = document->metadata;
   _document.text = document->text;
   _document.textLength = document->textLength;
-  
-  byte_position = 0;
-  int len = document->textLength;
-  textparser_scan_bytes(document->text, len);
+  _document.content = document->content;
+  _document.contentLength = document->contentLength;
+  byte_position = document->content - document->text; // byte offset
+
+  int len = document->contentLength;
+  textparser_scan_bytes(document->content, len);
 
   while( textparserlex() )
     writeToken( textparsertext );
