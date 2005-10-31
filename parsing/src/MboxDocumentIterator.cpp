@@ -89,6 +89,8 @@ indri::parse::UnparsedDocument* indri::parse::MboxDocumentIterator::nextDocument
   _buffer.clear();
   _document.text = 0;
   _document.textLength = 0;
+  _document.content = 0;
+  _document.contentLength = 0;
   _document.metadata.clear();
 
   if( _in.eof() )
@@ -214,6 +216,8 @@ indri::parse::UnparsedDocument* indri::parse::MboxDocumentIterator::nextDocument
 
   _document.text = _buffer.front();
   _document.textLength = _buffer.position();
+  _document.content = _buffer.front();
+  _document.contentLength = _buffer.position();
 
   return &_document;
 }

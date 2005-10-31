@@ -263,6 +263,8 @@ void indri::parse::WordDocumentExtractor::open( const std::string& filename ) {
 
   _unparsedDocument.text = _documentTextBuffer.front();
   _unparsedDocument.textLength = _documentTextBuffer.position();
+  _unparsedDocument.content = _documentTextBuffer.front();
+  _unparsedDocument.contentLength = _documentTextBuffer.position();
 
   // do something with this string here
   ::SysFreeString( textResult );

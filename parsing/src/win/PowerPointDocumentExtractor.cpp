@@ -355,6 +355,8 @@ void indri::parse::PowerPointDocumentExtractor::open( const std::string& filenam
 
   _unparsedDocument.text = _documentBuffer.front();
   _unparsedDocument.textLength = _documentBuffer.position();
+  _unparsedDocument.content = _documentBuffer.front();
+  _unparsedDocument.contentLength = _documentBuffer.position();
 
   // close the document
   com_method_execute( &result, documentDispatch, L"Close" );

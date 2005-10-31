@@ -89,9 +89,11 @@ indri::parse::UnparsedDocument* indri::parse::PDFDocumentExtractor::nextDocument
   delete doc;
 
   _unparsedDocument.textLength = _documentTextBuffer.position();
+  _unparsedDocument.contentLength = _documentTextBuffer.position();
   char* docnoPoint = _documentTextBuffer.write( _documentPath.length()+1 );
   strcpy( docnoPoint, _documentPath.c_str() );
   _unparsedDocument.text = _documentTextBuffer.front();
+  _unparsedDocument.content = _documentTextBuffer.front();
   _unparsedDocument.metadata.clear();
 
   indri::parse::MetadataPair pair;
