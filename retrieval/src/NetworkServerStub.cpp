@@ -71,6 +71,8 @@ indri::xml::XMLNode* indri::net::NetworkServerStub::_encodeDocument( const struc
 
   indri::xml::XMLNode* metadata = 0; 
   indri::xml::XMLNode* textNode = 0;
+  indri::xml::XMLNode* contentNode = 0;
+  indri::xml::XMLNode* contentLengthNode = 0;
   indri::xml::XMLNode* positions = 0;
 
   if( document->metadata.size() ) {
@@ -94,6 +96,12 @@ indri::xml::XMLNode* indri::net::NetworkServerStub::_encodeDocument( const struc
     textNode = new indri::xml::XMLNode( "text", text );
   }
 
+  if( document->content && document->text ) {
+    INT64 contentOffset = document->content - document->text;
+    contentNode = new indri::xml::XMLNode( "content", i64_to_string(contentOffset) );
+    contentLengthNode = new indri::xml::XMLNode( "contentLength", i64_to_string(document->contentLength) );
+  }
+
   if( document->positions.size() ) {
     positions = new indri::xml::XMLNode( "positions" );
 
@@ -114,6 +122,11 @@ indri::xml::XMLNode* indri::net::NetworkServerStub::_encodeDocument( const struc
 
   if( textNode )
     docNode->addChild( textNode );
+
+  if( contentNode ) {
+    docNode->addChild( contentNode );
+    docNode->addChild( contentLengthNode );
+  }
 
   if( positions )
     docNode->addChild( positions );

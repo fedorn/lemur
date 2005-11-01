@@ -114,6 +114,17 @@ namespace indri
               buffer.unwrite( text.size()-length );
             }
 
+            INT64 contentOffset = 0;
+            INT64 contentLength = 0;
+            const indri::xml::XMLNode* contentNode = child->getChild("content");
+            if (contentNode) {
+              contentOffset = string_to_i64(contentNode->getValue());
+            }
+            const indri::xml::XMLNode* contentLengthNode = child->getChild("contentLength");
+            if (contentLengthNode) {
+              contentLength = string_to_i64(contentLengthNode->getValue());
+            }
+            
             // now all of our data is in the buffer, so we can allocate a return structure
             new(buffer.front()) indri::api::ParsedDocument;
             indri::api::ParsedDocument* parsedDocument = (indri::api::ParsedDocument*) buffer.front();
@@ -152,6 +163,8 @@ namespace indri
 
             parsedDocument->text = buffer.front() + textOffset;
             parsedDocument->textLength = buffer.position() - textOffset;
+            parsedDocument->content = parsedDocument->text + contentOffset;
+            parsedDocument->contentLength = contentLength;
             buffer.detach();
 
             _documents.push_back( parsedDocument );
