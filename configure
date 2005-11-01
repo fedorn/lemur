@@ -274,7 +274,7 @@ PACKAGE_STRING='Lemur 4.1'
 PACKAGE_BUGREPORT='project@lemurproject.org'
 
 ac_unique_file="app/src/RetEval.cpp"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX LEX LEXLIB LEX_OUTPUT_ROOT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AR MODULES WITH_SUMMARIZATION WITH_DISTRIB WITH_CLUSTER HOST_OS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX LEX LEXLIB LEX_OUTPUT_ROOT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AR SHARED MODULES WITH_SUMMARIZATION WITH_DISTRIB WITH_CLUSTER HOST_OS LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3192,6 +3192,7 @@ _ACEOF
 
 fi
 
+
 case $host in
    *-*-solaris*)
 
@@ -3342,8 +3343,13 @@ _ACEOF
 
 fi
 
+     SHARED="-shared -fPIC"
      ;;
    *linux*)
+     SHARED="-shared -fPIC"
+     ;;
+   *-*-darwin*)
+     SHARED=
      ;;
    *);;
 esac
@@ -5229,6 +5235,7 @@ s,@INSTALL_PROGRAM@,$INSTALL_PROGRAM,;t t
 s,@INSTALL_SCRIPT@,$INSTALL_SCRIPT,;t t
 s,@INSTALL_DATA@,$INSTALL_DATA,;t t
 s,@AR@,$AR,;t t
+s,@SHARED@,$SHARED,;t t
 s,@MODULES@,$MODULES,;t t
 s,@WITH_SUMMARIZATION@,$WITH_SUMMARIZATION,;t t
 s,@WITH_DISTRIB@,$WITH_DISTRIB,;t t

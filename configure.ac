@@ -18,12 +18,18 @@ AC_CHECK_PROGS(AR, ar gar)
 dnl Checks for libraries.
 AC_CHECK_LIB(m, log)
 AC_CHECK_LIB(pthread, pthread_create)
+AC_SUBST(SHARED)
 case $host in
    *-*-solaris*) 
      AC_CHECK_LIB(nsl, gethostbyname)
      AC_CHECK_LIB(socket, socket)
+     SHARED="-shared -fPIC"
      ;;
    *linux*) 
+     SHARED="-shared -fPIC"
+     ;;
+   *-*-darwin*)
+     SHARED=
      ;;
    *);;
 esac
