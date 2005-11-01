@@ -26,6 +26,15 @@ class GfxFont;
 class GfxState;
 class UnicodeMap;
 
+class TextWord;
+class TextPool;
+class TextLine;
+class TextLineFrag;
+class TextBlock;
+class TextFlow;
+class TextWordList;
+class TextPage;
+
 //------------------------------------------------------------------------
 
 typedef void (*TextOutputFunc)(void *stream, char *text, int len);
