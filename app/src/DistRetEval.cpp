@@ -211,7 +211,7 @@ int AppMain(int argc, char *argv[]) {
 
     // write out the rankings for all databases if there was a file specified
     if (writeranks.is_open()) {
-      for (i=0;i<doccount;i++) {
+      for (i=0;i<rankings.size();i++) {
         writeranks << q->id() << " Q0 " << csindex->document(rankings[i].ind) << " 0 " << rankings[i].val << " Exp" << endl;
       }
     }
