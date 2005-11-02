@@ -83,6 +83,7 @@ long webloc;
 [&][#][0-9]*[;]                         {webloc += webleng; /* zap symbols */ } 
 [A-Z][A-Z]+                             {webloc += webleng; return UPWORD; }
 [a-zA-Z0-9]+                            {webloc += webleng; return WORD; }
+"\*eos"                        { webloc += webleng; return WORD; /* *eos token for summarization module */}
 [A-Z][A-Z]+((\')?[s])?                  {webloc += webleng; return ACRONYM2; }
 [a-zA-Z0-9]+\'[a-zA-Z]+                 {webloc += webleng; return CONTRACTION;}
 [A-Z]\.([A-Z]\.)+                       {webloc += webleng; return ACRONYM; }

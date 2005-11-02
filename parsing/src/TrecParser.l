@@ -85,6 +85,7 @@ long trecpos;
 [&][#][0-9]*[;]                    { trecpos += trecleng; /* zap symbols */ } 
 [A-Z][A-Z]+                         { trecpos += trecleng; return UPWORD; }
 [a-zA-Z0-9]+                        { trecpos += trecleng; return WORD; }
+"\*eos"                        { trecpos += trecleng; return WORD; /* *eos token for summarization module */}
 [A-Z][A-Z]+((\')?[s])?              { trecpos += trecleng; return ACRONYM2; }
 [a-zA-Z0-9]+\'[a-zA-Z]+            { trecpos += trecleng; return CONTRACTION;}
 [A-Z]\.([A-Z]\.)+                   { trecpos += trecleng; return ACRONYM; }

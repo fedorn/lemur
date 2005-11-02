@@ -62,6 +62,7 @@ long reuterspos;
 [&][#][0-9]*[;]                     { reuterspos += reutersleng; /* zap symbols */ } 
 [A-Z][A-Z]+                         { reuterspos += reutersleng; return UPWORD; }
 [a-zA-Z0-9]+                        { reuterspos += reutersleng; return WORD; }
+"\*eos"                        { reuterspos += reutersleng; return WORD; /* *eos token for summarization module */}
 [A-Z][A-Z]+((\')?[s])?              { reuterspos += reutersleng; return ACRONYM2; }
 [a-zA-Z0-9]+\'[a-zA-Z]+             { reuterspos += reutersleng; return CONTRACTION;}
 [A-Z]\.([A-Z]\.)+                   { reuterspos += reutersleng; return ACRONYM; }

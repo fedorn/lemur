@@ -76,6 +76,7 @@ not_arabic_skip [^\r\t\n ~`!@#$%^&*()_\-+=[\]{}|\\:;"'<>,.?/¡÷×º¿]
 {arabic_skip}                       { arabicpos += Arabicleng; /* zap Arabic punctution */ } 
 [A-Z][A-Z]+                         { arabicpos += Arabicleng; return UPWORD; }
 [a-zA-Z0-9]+                        { arabicpos += Arabicleng; return WORD; }
+"\*eos"                        { arabicpos += Arabicleng; return WORD; /* *eos token for summarization module */}
 [A-Z][A-Z]+((\')?[s])?              { arabicpos += Arabicleng; return ACRONYM2; }
 [a-zA-Z0-9]+\'[a-zA-Z]+             { arabicpos += Arabicleng; return CONTRACTION;}
 [A-Z]\.([A-Z]\.)+                   { arabicpos += Arabicleng; return ACRONYM; }
