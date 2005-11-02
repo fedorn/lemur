@@ -48,6 +48,7 @@ size_t file_write( void* buffer, size_t size,
 #define fwrite file_write
 #define FILE F_HANDLE
 #else
+// needed on OS/X gcc 4.0
 #include <unistd.h>
 typedef off_t FILE_OFFSET;
 #endif
