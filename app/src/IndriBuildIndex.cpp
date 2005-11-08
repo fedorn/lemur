@@ -69,6 +69,13 @@ specified in <tt>path</tt>. Specified as
 in the parameter file and as
 <tt>-corpus.annotations=/path/to/file</tt> on the command
 line.</dd> 
+<dt>metadata</dt>
+<dd>The pathname of the file or directory containing offset metadata for the 
+documents specified in <tt>path</tt>. Specified as
+&lt;corpus&gt;&lt;metadata&gt;/path/to/file&lt;/metadata&gt;&lt;/corpus&gt;
+in the parameter file and as
+<tt>-corpus.metadata=/path/to/file</tt> on the command
+line.</dd>
 
 Combining the first two of these elements, the parameter file would contain:
 <br>
@@ -341,6 +348,13 @@ specified in <tt>path</tt>. Specified as
 in the parameter file and as
 <tt>-corpus.annotations=/path/to/file</tt> on the command
 line.</dd> 
+<dt>metadata</dt>
+<dd>The pathname of the file or directory containing offset metadata for the
+documents specified in <tt>path</tt>. Specified as
+&lt;corpus&gt;&lt;metadata&gt;/path/to/file&lt;/metadata&gt;&lt;/corpus&gt;
+in the parameter file and as
+<tt>-corpus.metadata=/path/to/file</tt> on the command
+line.</dd>
 
 Combining the first two of these elements, the parameter file would contain:
 <br>
@@ -715,6 +729,10 @@ int main(int argc, char * argv[]) {
       // Support for an offset annotations file
       std::string offsetAnnotationsFile = thisCorpus.get( "annotations", "" );
       env.setOffsetAnnotationsFile( offsetAnnotationsFile );
+
+      // Support for an offset metadata file or directory
+      std::string offsetMetadataPath = thisCorpus.get( "metadata", "" );
+      env.setOffsetMetadataPath( offsetMetadataPath );
 
       if( isDirectory ) {
         indri::file::FileTreeIterator files( corpusPath );

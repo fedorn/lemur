@@ -28,6 +28,8 @@
 #include "indri/DocumentIterator.hpp"
 #include "indri/AnchorTextAnnotator.hpp"
 #include "indri/OffsetAnnotationAnnotator.hpp"
+#include "indri/OffsetMetadataAnnotator.hpp"
+#include "indri/Transformation.hpp"
 #include "indri/DocumentIteratorFactory.hpp"
 #include "indri/ParserFactory.hpp"
 #include "indri/FileClassEnvironmentFactory.hpp"
@@ -71,6 +73,7 @@ namespace indri
       std::string _error;
 
       std::string _offsetAnnotationsFile;
+      std::string _offsetMetadataPath;
       std::string _anchorTextRoot;
       std::string _documentRoot;
 
@@ -78,6 +81,8 @@ namespace indri
       indri::parse::FileClassEnvironmentFactory _fileClassFactory;
 
       indri::parse::AnchorTextAnnotator _annotator;
+      indri::parse::OffsetMetadataAnnotator _om_annotator;
+
       std::map<std::string, indri::parse::FileClassEnvironment*> _environments;
 
       int _documentsIndexed;
@@ -88,6 +93,13 @@ namespace indri
                                indri::parse::Conflater** conflater,
                                const std::string& extension );
 
+      std::vector<indri::parse::Transformation*> _createAnnotators( const std::string& fileName, 
+                                                                    const std::string& fileClass, 
+                                                                    indri::parse::Conflater** conflater);
+
+      ParsedDocument* _applyAnnotators( std::vector<indri::parse::Transformation*>& annotators, 
+                                        ParsedDocument* parsed ); 
+
     public:
       friend class QueryEnvironment;
 
@@ -97,10 +109,16 @@ namespace indri
       /// Set offset annotations fle path.
       /// @param offsetAnnotationsFile path to offset annotations file.
       void setOffsetAnnotationsFile( const std::string& offsetAnnotationsFile );
+
+      /// Set offset metadata fle or directory path.
+      /// @param offsetMetadataPath path to offset metadata file or directory.
+      void setOffsetMetadataPath( const std::string& offsetMetadataPath );
+
       /// Set document root path and anchor text root path.
       /// @param documentRoot path to document root.
       /// @param anchorTextRoot path to anchor text root.
       void setAnchorTextPath( const std::string& documentRoot, const std::string& anchorTextRoot );
+
       /// Add parsing information for a file class. Data for these parameters
       /// is passed into the FileClassEnvironmentFactory
       /// @param name name of this file class, eg trecweb
@@ -125,11 +143,13 @@ namespace indri
                          const std::vector<std::string>& index,
                          const std::vector<std::string>& metadata, 
                          const std::map<indri::parse::ConflationPattern*,std::string>& conflations );
+
       /// Get a named file class.
       /// @param name The name of the file class to retrieve.
       indri::parse::FileClassEnvironmentFactory::Specification *getFileClassSpec( const std::string& name) {
         return _fileClassFactory.getFileClassSpec(name);
       }
+
       /// Add a file class.
       /// @param spec The file class to add.
       void addFileClass( const indri::parse::FileClassEnvironmentFactory::Specification &spec ){
@@ -142,12 +162,14 @@ namespace indri
       /// @see addFileClass
       /// @param fieldNames the list of fields.
       void setIndexedFields( const std::vector<std::string>& fieldNames );
+
       /// Set the numeric property of a field. 
       /// @param fieldName the field.
       /// @param isNumeric true if the field is a numeric field, false if not.
       /// @param parserName The name of the Transformation to use to compute the numeric value of the field. Repository currently recognizes the name NumericFieldAnnotator.
       void setNumericField( const std::string& fieldName, bool isNumeric,
                             const std::string &parserName = "");
+
       /// Set names of metadata fields to be indexed for fast retrieval.
       /// The forward fields are indexed in a B-Tree mapping (documentID, metadataValue).
       /// If a field is not forward indexed, the documentMetadata calls will still work, but they
@@ -157,26 +179,33 @@ namespace indri
       /// @param forwardFieldNames the list of fields to forward index.
       /// @param backwardFieldNames the list of fields to backward index.
       void setMetadataIndexedFields( const std::vector<std::string>& forwardFieldNames, const std::vector<std::string>& backwardFieldNames );
+
       /// set the list of stopwords
       /// @param stopwords the list of stopwords
       void setStopwords( const std::vector<std::string>& stopwords );
+
       /// set the stemmer to use
       /// @param stemmer the stemmer to use. One of krovetz, porter
       void setStemmer( const std::string& stemmer );
+
       /// set the amount of memory to use for internal structures
       /// @param memory the number of bytes to use.
       void setMemory( UINT64 memory );
+
       /// set normalization of case and some punctuation; default is true (normalize during indexing and at query time)
       /// @param flag True, if text should be normalized, false otherwise.
       void setNormalization( bool flag );
+
       /// create a new index and repository
       /// @param repositoryPath the path to the repository
       /// @param callback IndexStatus object to be notified of indexing progress.
       void create( const std::string& repositoryPath, IndexStatus* callback = 0 );
+
       /// open an existing index and repository
       /// @param repositoryPath the path to the repository
       /// @param callback IndexStatus object to be notified of indexing progress.
       void open( const std::string& repositoryPath, IndexStatus* callback = 0 );
+
       /// close the index and repository
       void close();
   
