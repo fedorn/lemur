@@ -184,6 +184,9 @@
 				RelativePath=".\src\OffsetAnnotationAnnotator.cpp">
 			</File>
 			<File
+				RelativePath=".\src\OffsetMetadataAnnotator.cpp">
+			</File>
+			<File
 				RelativePath=".\src\Parser.cpp">
 			</File>
 			<File
@@ -370,6 +373,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\OffsetAnnotationAnnotator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\OffsetMetadataAnnotator.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\ParsedDocument.hpp">
