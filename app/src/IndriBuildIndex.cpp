@@ -489,6 +489,9 @@ class StatusMonitor : public indri::api::IndexStatus {
 
       case indri::api::IndexStatus::FileClose:
         buildindex_print_status( "Documents: ", documentsParsed );
+        buildindex_print_event( "" );
+        event << "Closed " << documentFile;
+        buildindex_print_event( event.str() ); 
         break;
 
       case indri::api::IndexStatus::FileSkip:
@@ -754,7 +757,6 @@ int main(int argc, char * argv[]) {
       }
     }
 
-    buildindex_print_event( "" );
     buildindex_print_event( "Closing index" );
     env.close();
     buildindex_print_event( "Finished" );
