@@ -485,6 +485,9 @@ class StatusMonitor : public indri::api::IndexStatus {
       case indri::api::IndexStatus::FileOpen:
         event << "Opened " << documentFile;
         buildindex_print_event( event.str() ); 
+        break;
+
+      case indri::api::IndexStatus::FileClose:
         buildindex_print_status( "Documents: ", documentsParsed );
         break;
 
