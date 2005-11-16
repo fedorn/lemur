@@ -2841,8 +2841,7 @@ static void create_new_primary(struct fcb *f, int index, struct leveln_pntr b, s
 /*   splits result in a new primary.                                */
 
 static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, int ix, boolean insert)
-{int new_ix,i,index_type,new_prefix_lc,
-  old_block_lc,cnt,new_block_lc;
+{int new_ix,i,index_type,old_block_lc,cnt,new_block_lc;
  unsigned parent_level,old_block_prefix_lc,new_block_prefix_lc,target;
  boolean split,seq,new_on_right,moved_new_key;
  struct leveln_pntr parent,oldb,newb,save_next,leftb,rightb;
@@ -2854,7 +2853,8 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, 
   oldb = f->buffer[bufix].contents;
   old_block = &(f->buffer[bufix].b.ix);
   get_max_key(&(f->buffer[bufix].b.ix),&original_max_key);
-  target = ix_pool_lc_after_change(&(f->buffer[bufix].b.ix),k,&p,ix,&new_prefix_lc,insert,false) / 2;
+  old_block_lc = ix_pool_lc_after_change(&(f->buffer[bufix].b.ix),k,&p,ix,&old_block_prefix_lc,insert,false);
+  target = old_block_lc / 2;
 
   seq = insert && null_pntr(f->buffer[bufix].b.ix.next) && ix==f->buffer[bufix].b.ix.keys_in_block;
   seq = seq && (index_type==user_ix);
@@ -2887,8 +2887,8 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, 
       f->buffer[i].b.ix.next = newb;
     }
     old_block->prev = newb;
-    old_block_lc = ix_pool_lc(old_block);
-    old_block_prefix_lc = old_block->prefix_lc;
+    /*          old_block_lc = ix_pool_lc(old_block);
+		old_block_prefix_lc = old_block->prefix_lc;*/
     cnt = choose_left_move_cnt(f,new_block,old_block,k,&p,ix,insert,
       old_block->keys_in_block,&old_block_lc,&old_block_prefix_lc,&new_block_lc,&new_block_prefix_lc);
     get_nth_key(old_block,&temp,0);
@@ -2974,6 +2974,7 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, 
     }
   }
 }
+
 
 /* update_index1 inserts key k and pointer p into entry ix in the  */
 /*   index block in buffer[bufix].  It assumes that the buffer has */
