@@ -72,8 +72,8 @@ namespace indri
       int _documents;
       std::string _error;
 
-      std::string _offsetAnnotationsFile;
-      std::string _offsetMetadataPath;
+      std::string _offsetAnnotationsRoot;
+      std::string _offsetMetadataRoot;
       std::string _anchorTextRoot;
       std::string _documentRoot;
 
@@ -106,18 +106,21 @@ namespace indri
       IndexEnvironment();
       ~IndexEnvironment();
 
-      /// Set offset annotations fle path.
-      /// @param offsetAnnotationsFile path to offset annotations file.
-      void setOffsetAnnotationsFile( const std::string& offsetAnnotationsFile );
+      /// Set offset annotations root path.
+      /// @param offsetAnnotationsRoot path to offset annotations root.
+      void setOffsetAnnotationsPath( const std::string& offsetAnnotationsRoot );
 
-      /// Set offset metadata fle or directory path.
-      /// @param offsetMetadataPath path to offset metadata file or directory.
-      void setOffsetMetadataPath( const std::string& offsetMetadataPath );
+      /// Set offset metadata root path.
+      /// @param offsetMetadataRoot path to offset metadata root.
+      void setOffsetMetadataPath( const std::string& offsetMetadataRoot );
 
-      /// Set document root path and anchor text root path.
-      /// @param documentRoot path to document root.
+      /// Set anchor text root path.
       /// @param anchorTextRoot path to anchor text root.
-      void setAnchorTextPath( const std::string& documentRoot, const std::string& anchorTextRoot );
+      void setAnchorTextPath( const std::string& anchorTextRoot );
+
+      /// Set the document root path
+      /// @param documentRoot path to document root.
+      void setDocumentRoot( const std::string& documentRoot );
 
       /// Add parsing information for a file class. Data for these parameters
       /// is passed into the FileClassEnvironmentFactory

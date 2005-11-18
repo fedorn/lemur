@@ -63,9 +63,11 @@ std::vector<indri::parse::Transformation*> indri::api::IndexEnvironment::_create
 
   std::vector<indri::parse::Transformation*> annotators;
 
+  // get the path to the filename relative to the document root
+  std::string relativePath = indri::file::Path::relative( _documentRoot, fileName );
+
   if( _anchorTextRoot.length() ) {
     // if the user specified some anchor text, we'll add it in
-    std::string relativePath = indri::file::Path::relative( _documentRoot, fileName );
     std::string anchorTextPath;
     if( relativePath.length() > 0 )
       anchorTextPath = indri::file::Path::combine( _anchorTextRoot, relativePath );
@@ -76,16 +78,26 @@ std::vector<indri::parse::Transformation*> indri::api::IndexEnvironment::_create
     annotators.push_back( annotator ); 
   }
 
-  if( _offsetAnnotationsFile.length() ) {
+  if( _offsetAnnotationsRoot.length() ) {
     // If the user specified an offset annotations file, we'll use it.
+    std::string offsetAnnotationsPath;
+    if( relativePath.length() > 0 )
+      offsetAnnotationsPath = indri::file::Path::combine( _offsetAnnotationsRoot, relativePath );
+    else
+      offsetAnnotationsPath = _offsetAnnotationsRoot;
     oa_annotator = new indri::parse::OffsetAnnotationAnnotator( *conflater );
-    oa_annotator->open( _offsetAnnotationsFile );
+    oa_annotator->open( offsetAnnotationsPath );
     annotators.push_back( oa_annotator );
   }
 
-  if( _offsetMetadataPath.length() ) {
+  if( _offsetMetadataRoot.length() ) {
     // If the user specified an offset metadata path, we'll use it.
-    _om_annotator.open( _offsetMetadataPath );
+    std::string offsetMetadataPath;
+    if( relativePath.length() > 0 ) 
+      offsetMetadataPath = indri::file::Path::combine( _offsetMetadataRoot, relativePath );
+    else 
+      offsetMetadataPath = _offsetMetadataRoot;
+    _om_annotator.open( offsetMetadataPath );
     om_annotator = &_om_annotator;
     annotators.push_back( om_annotator );
   }
@@ -125,17 +137,20 @@ void indri::api::IndexEnvironment::setMemory( UINT64 memory ) {
   _parameters.set("memory", memory);
 }
 
-void indri::api::IndexEnvironment::setOffsetAnnotationsFile( const std::string& offsetAnnotationsFile ) {
-  _offsetAnnotationsFile = offsetAnnotationsFile;
+void indri::api::IndexEnvironment::setOffsetAnnotationsPath( const std::string& offsetAnnotationsRoot ) {
+  _offsetAnnotationsRoot = offsetAnnotationsRoot;
 }
 
-void indri::api::IndexEnvironment::setOffsetMetadataPath( const std::string& offsetMetadataPath ) {
-  _offsetMetadataPath = offsetMetadataPath;
+void indri::api::IndexEnvironment::setOffsetMetadataPath( const std::string& offsetMetadataRoot ) {
+  _offsetMetadataRoot = offsetMetadataRoot;
 }
 
-void indri::api::IndexEnvironment::setAnchorTextPath( const std::string& documentRoot, const std::string& anchorTextRoot ) {
-  _documentRoot = documentRoot;
+void indri::api::IndexEnvironment::setAnchorTextPath( const std::string& anchorTextRoot ) {
   _anchorTextRoot = anchorTextRoot;
+}
+
+void indri::api::IndexEnvironment::setDocumentRoot( const std::string& documentRoot ) {
+  _documentRoot = documentRoot;
 }
 
 void indri::api::IndexEnvironment::setStopwords( const std::vector<std::string>& stopwords ) {

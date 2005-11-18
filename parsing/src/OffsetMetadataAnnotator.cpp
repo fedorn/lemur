@@ -15,7 +15,7 @@
 //
 // 3 November 2005 -- jcb
 //
-// Reads supplied offset metadata file(s) and adds the metadata to
+// Reads supplied offset metadata file and adds the metadata to
 // the parsed document.
 //
 
@@ -46,14 +46,14 @@
 #include <string.h>
 #include <string>
 
-void indri::parse::OffsetMetadataAnnotator::open( const std::string& offsetMetadataPath ) {
+void indri::parse::OffsetMetadataAnnotator::open( const std::string& offsetMetadataFile ) {
   //Only re-load this data if the new file is *different* from the old
-  if ( _offsetMetadataPath.compare( offsetMetadataPath ) == 0 )
+  if ( _offsetMetadataFile.compare( offsetMetadataFile ) == 0 )
     return;
 
-  _offsetMetadataPath = offsetMetadataPath;
+  _offsetMetadataFile = offsetMetadataFile;
 
-  std::cerr << "Loading offset metadata file/dir: " << _offsetMetadataPath << std::endl;
+  std::cerr << "Loading offset metadata file: " << _offsetMetadataFile << std::endl;
 
   //If this isn't the first time open was called, cleanup first
   if( !_first_open ) {
@@ -63,127 +63,108 @@ void indri::parse::OffsetMetadataAnnotator::open( const std::string& offsetMetad
   //Mark this as opened
   _first_open = false;
 
-  //Get the list of files to load in
-  std::vector<std::string> dataFiles;
-
-  //If the path is to a file, it is just that file
-  //Otherwise, everything in that dir should be loaded
-  if( indri::file::Path::isDirectory( _offsetMetadataPath ) ) {
-    indri::file::DirectoryIterator files( _offsetMetadataPath, false );
-    for( ; !(files == indri::file::DirectoryIterator::end()); files++ ) {
-      std::string fileName = *files;
-      std::string filePath = indri::file::Path::combine( _offsetMetadataPath, fileName );
-      if( fileName != "." && fileName != ".." ) {
-        dataFiles.push_back( filePath );
-      }
-    }
-  }
-  else if( indri::file::Path::isFile( _offsetMetadataPath ) ) {
-    dataFiles.push_back( _offsetMetadataPath );
-  }
-  else {
-    std::cerr << "No offset metadata file or directory at: " << _offsetMetadataPath << std::endl; 
+  //Check if the file exists
+  if( ! indri::file::Path::isFile( _offsetMetadataFile ) ) {
+    std::cerr << "No offset metadata file at: " << _offsetMetadataFile << std::endl; 
+    return;
   }
 
-  //Load files(s) 
-  for( unsigned int i=0; i<dataFiles.size(); i++ ) {
-    std::string thisFile = dataFiles[i];
+  //Load file
+  std::string thisFile = _offsetMetadataFile;
 
-    char buf[65536];
-    char field[256];
+  char buf[65536];
+  char field[256];
 
-    std::ifstream in;
-    in.open( thisFile.c_str() );
+  std::ifstream in;
+  in.open( thisFile.c_str() );
 
-    int line = 1;
+  int line = 1;
 
-    //Primary parsing loop:
-    while ( in.good() || ! in.eof() ) {
+  //Primary parsing loop:
+  while ( in.good() || ! in.eof() ) {
 
-      in.getline( buf, sizeof(buf) - 1 );
+    in.getline( buf, sizeof(buf) - 1 );
 
-      if ( buf[0] == '\0' ) break;
+    if ( buf[0] == '\0' ) break;
 
-      int fieldStart = 0;
-      int fieldCount = 0;
-      int fieldOffset = 0;
+    int fieldStart = 0;
+    int fieldCount = 0;
+    int fieldOffset = 0;
 	
-      char* docno = NULL;
-      char* key = NULL;
-      char* value = NULL;
+    char* docno = NULL;
+    char* key = NULL;
+    char* value = NULL;
 
-      int len = 0;
+    int len = 0;
 
-      //Read in the three params
-      for( char *c = buf + fieldStart; fieldCount < 3 && fieldOffset < sizeof(field);
-             c++, fieldOffset++ ) {
-        if( *c == '\t' || *c == '\0' ) { 
-	  field[fieldOffset] = '\0';
+    //Read in the three params
+    for( char *c = buf + fieldStart; fieldCount < 3 && fieldOffset < sizeof(field);
+           c++, fieldOffset++ ) {
+      if( *c == '\t' || *c == '\0' ) { 
+        field[fieldOffset] = '\0';
 	      
-	  switch( fieldCount ) {
-            case 0: //DOCNO (string)
-              len = strlen( field );
-              docno = new char[len + 1];
-              strncpy( docno, field, len);
-              docno[len] = '\0';
-              _buffers_allocated.push_back( docno );
-              break;
-            case 1: //KEY (string)
-              len = strlen( field );
-              key = new char[len + 1];
-              strncpy( key, field, len );
-              key[len] = '\0';
-              //key should be case normalized to lower case.
-              for( char *c = key; *c; c++ ) *c = tolower( *c );
-              _buffers_allocated.push_back( key );
-              break;
-            case 2: //VALUE (string)
-              len = strlen( field );
-              value = new char[len + 1];
-              strncpy( value, field, len );
-              value[len] = '\0';
-              _buffers_allocated.push_back( value );
-              break;
-          }
-
-          fieldCount++;
-          fieldStart += ( fieldOffset + 1 );
-          fieldOffset = -1;
-        } 
-        else {
-          field[fieldOffset] = *c;
+        switch( fieldCount ) {
+          case 0: //DOCNO (string)
+            len = strlen( field );
+            docno = new char[len + 1];
+            strncpy( docno, field, len);
+            docno[len] = '\0';
+            _buffers_allocated.push_back( docno );
+            break;
+          case 1: //KEY (string)
+            len = strlen( field );
+            key = new char[len + 1];
+            strncpy( key, field, len );
+            key[len] = '\0';
+            //key should be case normalized to lower case.
+            for( char *c = key; *c; c++ ) *c = tolower( *c );
+            _buffers_allocated.push_back( key );
+            break;
+          case 2: //VALUE (string)
+            len = strlen( field );
+            value = new char[len + 1];
+            strncpy( value, field, len );
+            value[len] = '\0';
+            _buffers_allocated.push_back( value );
+            break;
         }
 
-        if( *c == '\0' ) break;
+        fieldCount++;
+        fieldStart += ( fieldOffset + 1 );
+        fieldOffset = -1;
+      } 
+      else {
+        field[fieldOffset] = *c;
       }
 
-      //Create the greedy_vector to insert the MetadataPair elements into
-      //  unless we already have one for this docno
-      indri::utility::greedy_vector<indri::parse::MetadataPair*>** p = 
-        _annotations.find( docno );
-      indri::utility::greedy_vector<indri::parse::MetadataPair*>* metadata = 
-        p ? *p : NULL;
-      if( !metadata ) {
-        metadata = new indri::utility::greedy_vector<indri::parse::MetadataPair*>;
-        _annotations.insert( docno, metadata );
-      }
+      if( *c == '\0' ) break;
+    }
 
-      //Create a MetadataPair for this line, 
-      // to enter into the metadata vector
-      MetadataPair* pair = new MetadataPair;
-      pair->key = key;
-      pair->value = value;
-      pair->valueLength = strlen(value)+1;
+    //Create the greedy_vector to insert the MetadataPair elements into
+    //  unless we already have one for this docno
+    indri::utility::greedy_vector<indri::parse::MetadataPair*>** p = 
+      _annotations.find( docno );
+    indri::utility::greedy_vector<indri::parse::MetadataPair*>* metadata = 
+      p ? *p : NULL;
+    if( !metadata ) {
+      metadata = new indri::utility::greedy_vector<indri::parse::MetadataPair*>;
+      _annotations.insert( docno, metadata );
+    }
 
-      metadata->push_back( pair );
+    //Create a MetadataPair for this line, 
+    // to enter into the metadata vector
+    MetadataPair* pair = new MetadataPair;
+    pair->key = key;
+    pair->value = value;
+    pair->valueLength = strlen(value)+1;
 
-      line++;
+    metadata->push_back( pair );
 
-    } //end while
+    line++;
 
-    in.close();
+  } //end while
 
-  }  //end for
+  in.close();
 
 } //end method
 
@@ -219,6 +200,8 @@ indri::api::ParsedDocument* indri::parse::OffsetMetadataAnnotator::transform( in
                 << docno << "'.  Skipping..." << std::endl;
     }
     else {
+      //std::cout << "Metadata element '" << newKey << "' added for docno '"
+      //          << docno << "'." << std::endl;
       document->metadata.push_back( *newPair );
     }
   }

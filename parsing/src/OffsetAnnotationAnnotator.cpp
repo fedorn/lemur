@@ -76,6 +76,8 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
   _offsetAnnotationsFile = offsetAnnotationsFile;
 
+  std::cerr << "Loading offset annotations file: " << _offsetAnnotationsFile << std::endl;
+
   if ( ! _first_open ) {
 
     _cleanup();

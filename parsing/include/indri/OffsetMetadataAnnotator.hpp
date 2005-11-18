@@ -15,7 +15,7 @@
 //
 // 3 November 2005 -- jcb 
 //
-// Reads supplied offset metadata file(s) and adds the metadata to
+// Reads supplied offset metadata file and adds the metadata to
 // the parsed document.
 //
 
@@ -52,7 +52,7 @@ namespace indri {
     class OffsetMetadataAnnotator : public Transformation {
 
     private:
-      std::string _offsetMetadataPath;
+      std::string _offsetMetadataFile;
 
       indri::utility::HashTable<const char *,indri::utility::greedy_vector<MetadataPair*>*> _annotations;
       std::vector<char *> _buffers_allocated;
@@ -108,7 +108,7 @@ namespace indri {
       }
 
       // Defined in OffsetMetadataAnnotator.cpp
-      void open( const std::string& offsetMetadataPath );
+      void open( const std::string& offsetMetadataFile );
       indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document );
 
     };
