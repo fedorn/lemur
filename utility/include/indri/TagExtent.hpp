@@ -18,13 +18,30 @@
 
 #ifndef INDRI_TAGEXTENT_HPP
 #define INDRI_TAGEXTENT_HPP
+
 #include "indri/AttributeValuePair.hpp"
+#include <string.h>
+
 namespace indri
 {
   namespace parse
   {
     
     struct TagExtent {
+
+      // A comparator that sorts by end value, lowest first
+      struct lowest_end_first {
+
+	bool operator() ( const indri::parse::TagExtent* x,
+			  const indri::parse::TagExtent* y ) const {
+
+	  // returns true if x < y; false otherwise
+
+	  if ( x->end > y->end ) return true;
+	  else return false;
+	}
+      };
+
       const char* name;
       unsigned int begin;
       unsigned int end;
@@ -34,6 +51,36 @@ namespace indri
       indri::utility::greedy_vector<AttributeValuePair, 2> attributes;
     };
   }
+}
+
+namespace std {
+
+  // An STL comparator that implements first-and-longest ordering
+  template<>
+  struct less<indri::parse::TagExtent*> {
+
+    bool operator() ( const indri::parse::TagExtent* x,
+		      const indri::parse::TagExtent* y ) const {
+
+      // returns true if x < y; false otherwise
+
+      if ( x->begin < y->begin ) return true;
+      else if ( x->begin > y->begin ) return false;
+      else {
+
+	if ( ( x->end - x->begin ) > ( y->end - y->begin ) ) return true;
+	else if ( ( x->end - x->begin ) < ( y->end - y->begin ) ) return false;
+	else {
+
+	  // Two TagExtents must have same begin and end and name to be
+	  // considered equal.
+
+	  if ( strcmp( x->name, y->name ) < 0 ) return true;
+	  else return false;
+	}	
+      }
+    }
+  };
 }
 
 #endif // INDRI_TAGEXTENT_HPP
