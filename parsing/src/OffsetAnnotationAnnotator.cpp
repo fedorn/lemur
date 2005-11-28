@@ -65,6 +65,7 @@
 #include <vector>
 #include <string.h>
 #include <string>
+#include <queue>
 
 void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnnotationsFile ) {
   
@@ -136,8 +137,6 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 	  strncpy( docno, field, len);
 	  docno[len] = '\0';
 	  _buffers_allocated.push_back( docno );
-	  // Prepare this document's IntervalTree
-	  _itree.insert( docno, new IntervalTree );
 	  break;
 
 	case 1: // TYPE (flag)
@@ -168,10 +167,24 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
 	case 4: // START (int)
 	  if ( type == 1 ) start = atoi( field );
+	  if ( start < 0 ) {
+	    std::cerr << "WARN: tag named '" << name 
+		      << "' starting at negative byte offest on line " 
+		      << line << "; ignoring line." << std::endl;
+	    line++;
+	    continue;
+	  }
 	  break;
 
 	case 5: // LENGTH (int)
 	  if ( type == 1 ) length = atoi( field );
+	  if ( length <= 0 ) {
+	    std::cerr << "WARN: tag named '" << name 
+		      << "' with zero or negative byte length on line " 
+		      << line << "; ignoring line." << std::endl;
+	    line++;
+	    continue;
+	  }
 	  break;
 
 	case 6: // VALUE (UINT64 or string)
@@ -237,55 +250,37 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
       // Create new TAG
 
-      indri::utility::greedy_vector<indri::parse::TagExtent*>** p =
-	_annotations.find( docno );
+      std::set<indri::parse::TagExtent*>** p = _annotations.find( docno );
 
-      indri::utility::greedy_vector<indri::parse::TagExtent*>* tags =
-	p ? *p : NULL;
+      std::set<indri::parse::TagExtent*>* tags = p ? *p : NULL;
 
       if ( ! tags ) { 
 
-	tags = new indri::utility::greedy_vector<indri::parse::TagExtent*>;
+	tags = new std::set<indri::parse::TagExtent*>;
 	_annotations.insert( docno, tags );
       }
 
       TagExtent* te = new TagExtent;
       te->name = name;
-      te->begin = start;
-      te->end = start + length;
       te->number = i_value;
       te->parent = p_parent;
 
-      // Overlapping tag check:
+      // Note that this is an abuse of the TagExtent's semantics.  The
+      // begin and end fields are intended to be filled with token
+      // positions, but here we are inserting byte positions.  In the
+      // transform function, all of the annotations for a particular
+      // document will be converted to token extents, en masse.  The
+      // positions vector from the ParsedDocument is required to make
+      // this conversion.
+      te->begin = start;
+      te->end = start + length;
 
-      IntervalTree** q = _itree.find( docno );
-      IntervalTree* itree = q ? *q : NULL;
-
-      if ( itree ) {
-
-	if ( itree->insert( te->begin, te->end ) ) {
-
-	  // Conflate tag if necessary
-	  if ( _p_conflater )
-	    _p_conflater->conflate( te );
+      // Conflate tag if necessary
+      if ( _p_conflater ) _p_conflater->conflate( te );
 	  
-	  tags->push_back( te );
-	  _tag_id_map.insert( id, te );
+      tags->insert( te );
+      _tag_id_map.insert( id, te );
 
-	} else {
-
-	  std::cerr << "Overlapping tag ( id=" << id 
-		    << ", name='" << te->name 
-		    << "' ) detected; skipping..." << std::endl;
-	  
-	  itree->walk_tree( std::cerr );
-
-	  //exit(-1); // DEBUG
-	}
-      } else {
-
-	std::cerr << "IntervalTree is null!" << std::endl;
-      }
     } else if ( type == 2 ) {
 
       // Add attribute to existing TAG
@@ -318,17 +313,53 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
 indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( indri::api::ParsedDocument* document ) {
 
-  // Check that we have any annotations for this document (lookup by docno)
-
   const char *docno = _getDocno( document ); 
+  std::set<indri::parse::TagExtent*>** p;
 
-  indri::utility::greedy_vector<indri::parse::TagExtent*>** p =
-    _annotations.find( docno );
+  // Debug:
 
-  indri::utility::greedy_vector<indri::parse::TagExtent*>* tags =
-    p ? *p : NULL;
+  indri::utility::greedy_vector<char*>::iterator i =
+    document->terms.begin();
+  indri::utility::greedy_vector<indri::parse::TermExtent>::iterator j = 
+    document->positions.begin();
 
-  if ( ! tags || tags->size() == 0 ) return document;
+  while ( i != document->terms.end() && j != document->positions.end() ) {
+
+    std::cerr << "Token " << (*i) << " [" << (*j).begin << ", "
+	      << (*j).end << "]" << std::endl;
+    i++; j++;
+  }
+
+  // First, check if the annotations for this document have already been
+  // converted to use token extents.
+
+  p = _converted_annotations.find( docno );
+  std::set<indri::parse::TagExtent*>* converted_tags = p ? *p : NULL;
+
+  if ( ! converted_tags ) {
+
+    // We must do the conversion, then.
+
+    converted_tags = new std::set<indri::parse::TagExtent*>;
+
+    // Check if we have any annotations for this document
+
+    p = _annotations.find( docno );
+    std::set<indri::parse::TagExtent*>* raw_tags = p ? *p : NULL;
+
+    if ( raw_tags && ! raw_tags->empty() ) {
+
+      // Do the conversion.
+      convert_annotations( raw_tags, converted_tags, document );
+
+    }
+
+    // Store newly converted tags back to the converted annotations table. 
+    _converted_annotations.insert( docno, converted_tags );
+  }
+
+  // Return right away if there are no annotations for this document.
+  if ( converted_tags->empty() ) return document;
 
   IntervalTree itree;
 
@@ -336,6 +367,9 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
 	
   for ( indri::utility::greedy_vector<TagExtent>::iterator i = 
 	  document->tags.begin(); i != document->tags.end(); i++ ) {
+
+//     std::cerr << "Inserting existing tag: " << (*i).name << " [" 
+// 	      << (*i).begin << ", " << (*i).end << "]" << std::endl;
 	  
     if ( ! itree.insert( (*i).begin, (*i).end ) ) {
 
@@ -352,9 +386,12 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
   // annotations.  If they don't, add them to the ParsedDocument
   // rep.
 
-  for ( indri::utility::greedy_vector<TagExtent*>::iterator i = 
-	  tags->begin(); i != tags->end(); i++ ) {
+  for ( std::set<TagExtent*>::iterator i = converted_tags->begin(); 
+	i != converted_tags->end(); i++ ) {
 	  
+//     std::cerr << "Inserting new tag: " << (*i)->name << " [" 
+// 	      << (*i)->begin << ", " << (*i)->end << "]" << std::endl;
+
     if ( ! itree.insert( (*i)->begin, (*i)->end ) ) {
 
       std::cerr << "Tag '" << (*i)->name << "' [" << (*i)->begin << ", "
@@ -364,11 +401,162 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
 
     } else {
 
-      // std::cout << "Inserted tag" << std::endl; 
-
       document->tags.push_back( *(*i) );
     }
   }
 
   return document;
+}
+
+void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indri::parse::TagExtent*>* raw_tags,
+								   std::set<indri::parse::TagExtent*>* converted_tags, 
+								   indri::api::ParsedDocument* document ) {
+
+  // At the top of this priority queue will be the tag that closes first.
+  std::priority_queue<indri::parse::TagExtent*,std::vector<indri::parse::TagExtent*>,indri::parse::TagExtent::lowest_end_first> active_tags;
+
+  std::set<indri::parse::TagExtent*>::iterator curr_raw_tag = raw_tags->begin();
+
+  long tok_pos = 0;
+
+  for ( indri::utility::greedy_vector<indri::parse::TermExtent>::iterator 
+	  token = document->positions.begin(); 
+	token != document->positions.end();
+	token++, tok_pos++ ) {
+
+    // Check to see if there are any active tags that can be closed.
+    // The top element on active_tags will always be the tag that
+    // closes first.
+
+    while ( ! active_tags.empty() &&
+	    active_tags.top()->end <= (*token).end ) {
+
+      // Tag on top of queue closes before the end of the current
+      // token.
+
+      TagExtent *te = active_tags.top();
+    
+      // If the current active tag ends before the beginning of this
+      // token:
+
+      if ( te->end <= (*token).begin ) {
+
+	te->end = tok_pos;
+
+// 	std::cerr << "Closing tag named " << te->name
+// 		  << " at tok_pos " << te->end
+// 		  << " because tag end at " << te->end
+// 		  << " is before token [" << (*token).begin << ", "
+// 		  << (*token).end << "]" << std::endl;
+
+      } else { 
+
+	// Current tag ends inside the current token.
+
+	if ( te->end <= (*token).begin + ( (*token).end - (*token).begin )/2 ) {
+
+	  te->end = tok_pos; // Round down to previous token boundary.
+
+	} else {
+	  
+	  te->end = tok_pos + 1; // Round up to next token boundary.
+	  
+	}
+
+// 	std::cerr << "Closing tag named " << te->name
+// 		  << " at tok_pos " << te->end
+// 		  << " because tag end at " << te->end
+// 		  << " is inside token [" << (*token).begin << ", "
+// 		  << (*token).end << "]" << std::endl;
+
+      }
+
+
+//       std::cerr << "Closed Tag named " << te->name 
+// 	        << " at tok_pos " << te->end << std::endl;
+
+      converted_tags->insert( te );
+      active_tags.pop();
+    }
+
+    // Now check to see if there are any tags that can be activated at
+    // this token position.  Tags in raw_tags are sorted in first
+    // and longest order.  To be able to activate a tag here, that tag
+    // must begin before the current token ends.  Said in another way,
+    // the tag must begin before the token begins or inside the token
+    // to be activated here.
+
+    while ( curr_raw_tag != raw_tags->end() && (*curr_raw_tag)->begin < (*token).end ) {
+
+      // Tags that begin AND end before the current token are zero
+      // token-length tags and must be skipped.
+      if ( (*curr_raw_tag)->end <= (*token).begin ) {
+
+// 	std::cerr << "Tag named " << (*curr_raw_tag)->name 
+// 		  << " beginning at byte offset " << (*curr_raw_tag)->begin
+// 		  << " and ending at byte offset " << (*curr_raw_tag)->end
+// 		  << " encloses no tokens and will be ignored."
+// 		  << std::endl;
+
+	curr_raw_tag++;
+	continue;
+      }
+
+      // To activate a tag, create a copy of it and insert that copy
+      // into active_tags
+
+      TagExtent* te = new TagExtent();
+      te->name = (*curr_raw_tag)->name;
+      te->number = (*curr_raw_tag)->number;
+      te->parent = (*curr_raw_tag)->parent;
+      te->attributes = (*curr_raw_tag)->attributes;
+
+      // When the tag begins in the middle of the token, we need to
+      // decide whether to round up (activate the tag at this token
+      // position) or round down (activate the tag at tok_pos + 1).
+
+      if ( (*curr_raw_tag)->begin <= (*token).begin + ( (*token).end - (*token).begin )/2 ) {
+
+	// Tag either begins before the token, or is closer to begin
+	// than to the end of the token, so we are rounding up.  Begin
+	// value will be be set to the current token position.
+	te->begin = tok_pos;
+
+      } else {
+
+	// Tag begins closer to where the token ends, so we'll round down.
+	te->begin = tok_pos + 1;
+
+      }
+
+      // End value must be filled in when the tag is closed; for now,
+      // we just store the byte offset of the end of the tag.
+      te->end = (*curr_raw_tag)->end;
+     
+      active_tags.push( te );
+
+//       std::cerr << "Activated Tag named " << (*curr_raw_tag)->name << " with byte range [" 
+// 		<< (*curr_raw_tag)->begin << ", " << (*curr_raw_tag)->end 
+// 		<< "] activated at tok_pos " << te->begin << std::endl;
+
+      // Move onto the next tag
+      curr_raw_tag++;
+
+    }
+  }
+
+  // Close any tags that remain on the active_tags list.
+
+  while ( ! active_tags.empty() ) {
+
+    TagExtent *te = active_tags.top();
+    te->end = tok_pos;
+
+//     std::cerr << "Closed Tag named " << te->name 
+// 	      << " at tok_pos " << te->end << std::endl;
+
+    converted_tags->insert( te );
+    active_tags.pop();
+    
+  }
 }

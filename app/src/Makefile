@@ -2,7 +2,7 @@ include ../../MakeDefns
 MYSRC = $(patsubst %, %.cpp, $(ALLBIN))
 
 .PHONY: all clean install
-all: $(ALLBIN)
+all: IndriBuildIndex # $(ALLBIN)
 
 clean:
 	rm -f *.o; rm -f ../depend/*.d; rm -f $(ALLBIN)

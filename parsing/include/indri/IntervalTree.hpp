@@ -71,6 +71,12 @@ namespace indri {
       void walk_tree( std::ostream& s );
       bool insert( int begin, int end );
 
+      void clear() {
+
+	if ( root ) delete root;
+	root = NULL;
+      }
+
     };
 
   }

@@ -81,19 +81,21 @@ namespace indri {
     private:
       std::string _offsetAnnotationsFile;
 
-      indri::utility::HashTable<const char *,indri::utility::greedy_vector<TagExtent*>*> _annotations;
+      // Before the actual ParsedDocument is read in, we can not
+      // convert byte extents from the .oa file to token extents.  The
+      // TagExtents in this table have their begin and end values
+      // expressed as byte extents, not token extents.
+      indri::utility::HashTable<const char *,std::set<TagExtent*>*> _annotations;
+
+      // After a document's set of annotations has been converted
+      // to token extents, we store the result in this table in case
+      // someone asks for that same document's annotations again.
+      indri::utility::HashTable<const char *,std::set<TagExtent*>*> _converted_annotations;
+
       indri::utility::HashTable<UINT64,TagExtent*> _tag_id_map;
       indri::utility::HashTable<UINT64,AttributeValuePair*> _attribute_id_map;
       std::vector<char *> _buffers_allocated;
       bool _first_open;
-
-      // IntervalTrees for checking tag overlapping.  These are
-      // cleared every time the open() method is called.  Tags read
-      // from the offset annotations file are checked in the open()
-      // method, and tags present in the ParsedDocument fed to the
-      // transform() method are checked in that method.
-
-      indri::utility::HashTable<const char*,IntervalTree*> _itree;
 
       ObjectHandler<indri::api::ParsedDocument>* _handler;
       Conflater* _p_conflater;
@@ -170,22 +172,36 @@ namespace indri {
 
       void _cleanup() {
 	
-	// Cleanup _annotations, _tag_id_map, _attribute_id_map and
-	// _itree in preparation for object destruction, or for an
-	// open call on a new offset annotations file.
+	// Cleanup _annotations, _converted_annotations, _tag_id_map,
+	// and _attribute_id_map in preparation for object
+	// destruction, or for an open call on a new offset
+	// annotations file.
 
-	for ( indri::utility::HashTable<const char *,indri::utility::greedy_vector<TagExtent*>*>::iterator i = _annotations.begin(); i != _annotations.end(); i++ ) {
+	for ( indri::utility::HashTable<const char *,std::set<TagExtent*>*>::iterator i = _annotations.begin(); i != _annotations.end(); i++ ) {
 
-	  indri::utility::greedy_vector<TagExtent*>* p_vec = *(*i).second;
+	  std::set<TagExtent*>* p_set = *(*i).second;
 
-	  for ( indri::utility::greedy_vector<TagExtent*>::iterator j = 
-		  p_vec->begin(); j != p_vec->end(); j++ ) {
+	  for ( std::set<TagExtent*>::iterator j = p_set->begin(); 
+		j != p_set->end(); j++ ) {
 
 	    delete (*j); // TagExtent
 	  }
 	}
 
 	_annotations.clear();
+
+	for ( indri::utility::HashTable<const char *,std::set<TagExtent*>*>::iterator i = _converted_annotations.begin(); i != _converted_annotations.end(); i++ ) {
+
+	  std::set<TagExtent*>* p_set = *(*i).second;
+
+	  for ( std::set<TagExtent*>::iterator j = p_set->begin(); 
+		j != p_set->end(); j++ ) {
+
+	    delete (*j); // TagExtent
+	  }
+	}
+
+	_converted_annotations.clear();
 
 	// Note: every TagExtent pointed to by an element of the
 	// _tag_id_map, and every AttributeValuePair pointed to by an
@@ -195,15 +211,11 @@ namespace indri {
 	_tag_id_map.clear();
 	_attribute_id_map.clear();
 
-	// Clean up IntervalTrees 
-
-	for ( indri::utility::HashTable<const char*,IntervalTree*>::iterator i =
-		_itree.begin(); i != _itree.end(); i++ ) {
-
-	  delete (*i).second; // IntervalTree
-	}
-
       }
+
+      void convert_annotations( std::set<indri::parse::TagExtent*>* raw_tags,
+				std::set<indri::parse::TagExtent*>* converted_tags, 
+				indri::api::ParsedDocument* document );
 
     public:
       OffsetAnnotationAnnotator( Conflater* p_conflater ) { 
