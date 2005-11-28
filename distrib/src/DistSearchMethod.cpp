@@ -66,7 +66,9 @@ void lemur::distrib::DistSearchMethod::doSingleRetr() {
   int numdocs = single->docCount();
   lemur::retrieval::ArrayAccumulator* accum = new lemur::retrieval::ArrayAccumulator(numdocs);
   // create the model according to parameter
-  RetrievalMethod* model = RetMethodManager::createModel(single, accum, defrt);
+  std::string ret = ParamGetString("retModel", "inquery");
+  //  RetrievalMethod* model = RetMethodManager::createModel(single, accum, defrt);
+  RetrievalMethod* model = RetMethodManager::createModel(single, accum, ret);
   IndexedRealVector* res = new IndexedRealVector(numdocs);
   QueryRep* qr = model->computeQueryRep(*query);
   model->scoreCollection(*qr, *res);
