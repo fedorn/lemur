@@ -1,5 +1,5 @@
 /*==========================================================================
- * Copyright (c) 2003-2004 University of Massachusetts.  All Rights Reserved.
+ * Copyright (c) 2005 University of Massachusetts.  All Rights Reserved.
  *
  * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
  * is subject to the terms of the software license set forth in the LICENSE
@@ -13,7 +13,7 @@
 //
 // TaggedTextParser
 //
-// March 2004 -- metzler
+// 15 September 2005 -- revised by mwb
 //
 
 #ifndef INDRI_TAGGEDTEXTPARSER_HPP
@@ -28,29 +28,15 @@
 #include "indri/HashTable.hpp"
 #include "indri/TagList.hpp"
 #include "indri/IndriParser.hpp"
-#include "indri/Conflater.hpp"
 #include "indri/Buffer.hpp"
+#include "indri/TokenizedDocument.hpp"
 #include "string-set.h"
+#include "indri/ConflationPattern.hpp"
+#include "indri/Conflater.hpp"
 
 #define MAX_DOCNO_LENGTH 128
 #define PARSER_MAX_BUF_SIZE 1024
 
-class StringHash {
-public:
-  int operator() (const std::string key) const {
-    int hash = 0;
-    for(unsigned int i = 0; i < key.length(); i++)
-      hash += (unsigned char)key[i];
-    return hash;
-  }
-};
-
-class StringComparator {
-public:
-  int operator() (const std::string one, const std::string two) const {
-    return one.compare(two);
-  }
-};
 namespace indri
 {
   namespace parse
@@ -65,19 +51,19 @@ namespace indri
                     const std::vector<std::string>& exclude,
                     const std::vector<std::string>& index,
                     const std::vector<std::string>& metadata, 
-                    const std::map<ConflationPattern*, std::string>& conflations );
+                    const std::map<indri::parse::ConflationPattern*,std::string>& conflations );
 
-      indri::api::ParsedDocument* parse( UnparsedDocument* document );
+      indri::api::ParsedDocument* parse( TokenizedDocument* document );
 
-      void handle( UnparsedDocument* document );
+      void handle( TokenizedDocument* document );
       void setHandler( ObjectHandler<indri::api::ParsedDocument>& h );
 
     protected:
-      typedef indri::utility::HashTable<std::string, std::string, StringHash, StringComparator> StrHashTable;
+      typedef indri::utility::HashTable<std::string, std::string> StrHashTable;
 
-      virtual void handleToken(char *token, int type, long pos);
-      virtual void initialize( UnparsedDocument* unparsed, indri::api::ParsedDocument* parsed );
-      virtual void cleanup( UnparsedDocument* unparsed, indri::api::ParsedDocument* parsed );
+
+      virtual void initialize( TokenizedDocument* document, indri::api::ParsedDocument* parsed );
+      virtual void cleanup( TokenizedDocument* document, indri::api::ParsedDocument* parsed );
 
       void addTag(const char *s, const char* c, int pos) { tl->addTag(s, c, pos); }
       void endTag(const char *s, const char* c, int pos) { tl->endTag(s, c, pos); }
@@ -85,26 +71,27 @@ namespace indri
       void addMetadataTag(const char* s, const char* c, int pos) { _metaList->addTag(s, c, pos); }
       void endMetadataTag(const char* s, const char* c, int pos) { _metaList->endTag(s, c, pos); }
 
+      Conflater* _p_conflater;
+
       // tag list
       TagList* tl;
       TagList* _metaList;
       indri::utility::Buffer _termBuffer;
 
-      void writeToken(char *token);
-
       struct tag_properties {
         const char* name;
-        const char* conflation;
         bool index;
         bool exclude;
         bool include;
         bool metadata;
       };
-      Conflater *_p_conflate;
-      tag_properties* _findTag(const char* name);
-      tag_properties* _buildTag( const std::string& name );
-      indri::utility::HashTable<const char*, tag_properties*> _tagTable;
-      virtual void handleTag(char* token, long pos);
+
+      tag_properties* _findTag( std::string name );
+      tag_properties* _buildTag( std::string name );
+
+      indri::utility::HashTable<const char*,tag_properties*> _tagTable;
+
+      virtual void handleTag( TagEvent* te );
 
       const tag_properties* _startExcludeRegion;
       const tag_properties* _startIncludeRegion;
@@ -113,31 +100,17 @@ namespace indri
       bool _include;
       bool _defaultInclude;
   
+      unsigned int token_pos;
+      unsigned int tokens_excluded;
+
+      indri::api::ParsedDocument _document;
+  
     private:
       ObjectHandler<indri::api::ParsedDocument>* _handler;
-      indri::api::ParsedDocument _document;
 
-      void doParse();
-      void writeToken(char *token, int start, int end);
-      char start_tag[PARSER_MAX_BUF_SIZE];
-      char end_tag[PARSER_MAX_BUF_SIZE];
     };
 
-    namespace TaggedTextTokenType {
-      const int tag = 1;
-      const int upword = 2;
-      const int word = 3;
-      const int contraction = 4;
-      const int acronym = 5;
-      const int acronym2 = 6;
-      const int unknown = 7;
-    };
   }
 }
 
 #endif // INDRI_TAGGEDTEXTPARSER_HPP
-
-
-
-
-

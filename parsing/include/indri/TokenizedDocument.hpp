@@ -1,5 +1,5 @@
 /*==========================================================================
- * Copyright (c) 2003-2004 University of Massachusetts.  All Rights Reserved.
+ * Copyright (c) 2003-2005 University of Massachusetts.  All Rights Reserved.
  *
  * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
  * is subject to the terms of the software license set forth in the LICENSE
@@ -11,42 +11,37 @@
 
 
 //
-// ParsedDocument
+// TokenizedDocument
 //
-// 12 May 2004 -- tds
+// 15 September 2005 -- mwb
 //
 
-#ifndef INDRI_PARSEDDOCUMENT_HPP
-#define INDRI_PARSEDDOCUMENT_HPP
+#ifndef INDRI_TOKENIZEDDOCUMENT_HPP
+#define INDRI_TOKENIZEDDOCUMENT_HPP
 
 #include "indri/greedy_vector"
-#include "indri/TagExtent.hpp"
+#include "indri/TagEvent.hpp"
 #include "indri/TermExtent.hpp"
 #include "indri/MetadataPair.hpp"
-#include <string>
-namespace indri
-{
-  namespace api 
-  {
+
+namespace indri {
+  namespace parse {
     
-    struct ParsedDocument {  
+    struct TokenizedDocument {
+
       const char* text;
       size_t textLength;
 
       const char* content;
       size_t contentLength;
 
-      std::string getContent() {
-        return std::string (content, contentLength);
-      }
-      
       indri::utility::greedy_vector<char*> terms;
-      indri::utility::greedy_vector<indri::parse::TagExtent> tags;
-      indri::utility::greedy_vector<indri::parse::TermExtent> positions;
-      indri::utility::greedy_vector<indri::parse::MetadataPair> metadata;
+      indri::utility::greedy_vector<TagEvent> tags;
+      indri::utility::greedy_vector<TermExtent> positions;
+      indri::utility::greedy_vector<MetadataPair> metadata;
     };
   }
 }
 
-#endif // INDRI_PARSEDDOCUMENT_HPP
+#endif // INDRI_TOKENIZEDDOCUMENT_HPP
 

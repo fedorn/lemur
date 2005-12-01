@@ -1,5 +1,5 @@
 /*==========================================================================
- * Copyright (c) 2005 University of Massachusetts.  All Rights Reserved.
+ * Copyright (c) 2003-2005 University of Massachusetts.  All Rights Reserved.
  *
  * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
  * is subject to the terms of the software license set forth in the LICENSE
@@ -10,27 +10,32 @@
  */
 
 //
-// AttributeValuePair
+// TokenizerFactory
 //
 // 15 September 2005 -- mwb
 //
 
-#ifndef INDRI_ATTRIBUTEVALUEPAIR_HPP
-#define INDRI_ATTRIBUTEVALUEPAIR_HPP
+#ifndef INDRI_TOKENIZERFACTORY_HPP
+#define INDRI_TOKENIZERFACTORY_HPP
+
+#include <string>
+#include <map>
+
+#include "indri/IndriTokenizer.hpp"
+
 namespace indri {
   namespace parse {
     
-    struct AttributeValuePair {
-      char* attribute;
-      char* value;
+    class TokenizerFactory {
+    public:
+      ~TokenizerFactory();
 
-      // byte extent of the value string w/r/t original text; values
-      // set within TextTokenizer.
-      unsigned int begin;
-      unsigned int end;
+      static std::string preferredName( const std::string& name );
+      static indri::parse::Tokenizer* get( const std::string& name );
+
     };
-
   }
 }
 
-#endif // INDRI_ATTRIBUTEVALUEPAIR_HPP
+#endif // INDRI_TOKENIZERFACTORY_HPP
+

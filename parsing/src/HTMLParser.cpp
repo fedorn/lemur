@@ -19,19 +19,23 @@
 #include "indri/HTMLParser.hpp"
 #include <ctype.h>
 #include "lemur-compat.hpp"
+#include "indri/TagEvent.hpp"
 
-void indri::parse::HTMLParser::initialize( UnparsedDocument* unparsed, indri::api::ParsedDocument* parsed ) {
-  indri::parse::TaggedTextParser::initialize( unparsed, parsed );
+void indri::parse::HTMLParser::initialize( TokenizedDocument* tokenized, indri::api::ParsedDocument* parsed ) {
+  indri::parse::TaggedTextParser::initialize( tokenized, parsed );
 
   // clear URL
   url[0] = 0;
   base_url[0] = 0;
 
+  bool have_URL = false;
+
   // find the DOCHDR tag, so we can yank out the URL
-  for( unsigned int i=0; i<unparsed->metadata.size(); i++ ) {
-    if( !strcmp(unparsed->metadata[i].key, "dochdr") ) {
-      char* beginURL = (char*) unparsed->metadata[i].value;
-      char* endURL = beginURL + strcspn( (char*) unparsed->metadata[i].value, " \t\r\n" );
+  for( unsigned int i=0; i<tokenized->metadata.size(); i++ ) {
+    if( !strcmp(tokenized->metadata[i].key, "url") ) have_URL = true;
+    if( !strcmp(tokenized->metadata[i].key, "dochdr") ) {
+      char* beginURL = (char*) tokenized->metadata[i].value;
+      char* endURL = beginURL + strcspn( (char*) tokenized->metadata[i].value, " \t\r\n" );
       int length = lemur_compat::min<int>( endURL-beginURL, sizeof url-1 );
       memcpy( url, beginURL, length );
       url[length] = 0;
@@ -55,122 +59,155 @@ void indri::parse::HTMLParser::initialize( UnparsedDocument* unparsed, indri::ap
   _anchorTag = _findTag("a");
 
   // add URL to metadata
-  indri::parse::MetadataPair pair;
-  pair.key = "url";
-  pair.value = url;
-  pair.valueLength = strlen(url)+1;
-  parsed->metadata.push_back( pair );
+  if ( ! have_URL ) {
+    indri::parse::MetadataPair pair;
+    pair.key = "url";
+    pair.value = url;
+    pair.valueLength = strlen(url)+1;
+    parsed->metadata.push_back( pair );
+  }
+
+  _urlBuffer.clear();
+  _urlBuffer.grow( parsed->textLength );
 }
 
-void indri::parse::HTMLParser::cleanup( indri::parse::UnparsedDocument* unparsed, indri::api::ParsedDocument* parsed ) {
-  indri::parse::TaggedTextParser::cleanup( unparsed, parsed );
+void indri::parse::HTMLParser::cleanup( indri::parse::TokenizedDocument* tokenized, indri::api::ParsedDocument* parsed ) {
+  indri::parse::TaggedTextParser::cleanup( tokenized, parsed );
 }
 
-void indri::parse::HTMLParser::handleTag(char* token, long pos) {
-  // <A HREF ...> tag
-  int length = strlen(token);
+void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
 
-  if(length > 2 && (token[1] == 'A' || token[1] == 'a') && token[2] == ' ') {
-    int i;
-    for(i = 2; i < length && token[i] == ' '; i++);
-    if(i + 3 < length &&
-       (token[i] == 'H' || token[i] == 'h') &&
-       (token[i+1] == 'R' || token[i+1] == 'r') &&
-       (token[i+2] == 'E' || token[i+2] == 'e') &&
-       (token[i+3] == 'F' || token[i+3] == 'f')) {
-      if(!_anchorTag && !_relativeUrlTag && !_absoluteUrlTag)
-        return;
+  // All tag names and attribute names will have been case folded by
+  // the Tokenizer.
 
-      if(!extractURL(token))
-        return;
+  if ( ! strcmp( te->name, "a" ) ) {  // <A HREF ...> tag
+
+    bool handled_tag = false;
+
+    // Check for an "href" attribute:
+
+    for ( indri::utility::greedy_vector<indri::parse::AttributeValuePair>::iterator
+	    i = te->attributes.begin(); i != te->attributes.end(); i++ ) {
+	    
+      if ( ! strcmp( (*i).attribute, "href" ) ) {
+
+	if ( ! _anchorTag && ! _relativeUrlTag && ! _absoluteUrlTag )
+	  return;
+
+	// URL has already been extracted and is stored in (*i).value
         
-      char tmp_buf[MAX_URL_LENGTH];
-      strncpy(tmp_buf, token, lemur_compat::min<int>(length,MAX_URL_LENGTH-1));
-      tmp_buf[MAX_URL_LENGTH-1] = 0;
+        prepURL( (*i).value );
 
-      bool relative = normalizeURL(tmp_buf);
+	char tmp_buf[MAX_URL_LENGTH];
+	strncpy( tmp_buf, (*i).value, lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 ) );
+	tmp_buf[lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 )] = '\0';
 
-      // if special url tags are requested, we'll
-      // store the url of the anchor text in the document itself
+	bool relative = normalizeURL( tmp_buf );
 
-      const TaggedTextParser::tag_properties* tagProps;
-      if( !relative ) {
-        tagProps = _absoluteUrlTag;
-      } else {
-        tagProps = _relativeUrlTag;
+	// if special url tags are requested, we'll
+	// store the url of the anchor text in the document itself
+        
+	const TaggedTextParser::tag_properties* tagProps;
+	if( !relative ) {
+	  tagProps = _absoluteUrlTag;
+	} else {
+	  tagProps = _relativeUrlTag;
+	}
+	
+	_p_conflater->conflate( te );
+
+	if( tagProps && !tagProps->exclude && !_exclude ) {
+
+	  // Original flag check from TaggedTextParser::writeToken
+	  if ( ! ( _exclude || ! _include ) ) {
+
+	    // A HREF attribute value needs to be inserted at the
+	    // current position in the terms vector.  A TermExtent for
+	    // the attribute value needs to be inserted at the current
+	    // position in the positions vector.
+	  
+	    // Need to get position of attribute value from
+	    // AttributeValuePair
+
+	    int len = strlen( tmp_buf );
+	    TermExtent extent;
+	    // Extent stored will be the extent of the URL as it
+	    // appears in the text, and the normalized form 
+	    // may exceed this extent.
+	    extent.begin = (*i).begin;
+	    extent.end = (*i).end;
+	    _document.positions.push_back( extent );
+
+	    // Allocate space within HTMLParser's Buffer
+	    char* write_location = _urlBuffer.write( len + 1 );
+	    memcpy( write_location, tmp_buf, len + 1 );
+	    _document.terms.push_back( write_location );
+
+// 	    std::cout << "Token [" << write_location << "] <" 
+// 		      << (*i).begin << ", " << (*i).end << ">" << std::endl;
+
+	    // decrement number of tokens removed from the stream 
+	    // so that future field positions line up correctly.
+	    tokens_excluded--;
+	  }
+
+	  addTag( tagProps->name, tagProps->name, te->pos );
+	  endTag( tagProps->name, tagProps->name, te->pos + 1 );
+	}
+	
+	tagProps = _anchorTag;
+	if( tagProps && !tagProps->exclude && !_exclude )
+	  addTag( tagProps->name, tagProps->name, te->pos + 1 );
+
+	handled_tag = true;
       }
+    }
 
-      if( tagProps && !tagProps->exclude && !_exclude ) {
-        writeToken(tmp_buf);
-        addTag(tagProps->name, tagProps->conflation, pos);
-        endTag(tagProps->name, tagProps->conflation, pos+1);
+    if ( ! handled_tag ) indri::parse::TaggedTextParser::handleTag( te );
+  
+  } else if ( ! strcmp( te->name, "base" ) ) { // <BASE HREF ...> tag
+
+    bool handled_tag = false;
+
+    for ( indri::utility::greedy_vector<indri::parse::AttributeValuePair,2>::iterator
+	    i = te->attributes.begin(); i != te->attributes.end(); i++ ) {
+
+      if ( ! strcmp( (*i).attribute, "href" ) ) {
+
+	// URL has already been extracted and is stored in (*i).value
+
+        prepURL( (*i).value );
+
+	int len = strlen( (*i).value );
+
+	char tmp_buf[MAX_URL_LENGTH];
+	strncpy( tmp_buf, (*i).value, lemur_compat::min<int>( len, MAX_URL_LENGTH - 1) );
+	tmp_buf[lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 )] = '\0';
+
+	normalizeURL( tmp_buf );
+	
+	len = strlen( tmp_buf );
+	strncpy( base_url, tmp_buf, lemur_compat::min<int>( len, MAX_URL_LENGTH-1 ) );
+	base_url[lemur_compat::min<int>( len, MAX_URL_LENGTH - 1 )] = '\0';
+
+	handled_tag = true;
       }
+    }
 
-      tagProps = _anchorTag;
-      if( tagProps && !tagProps->exclude && !_exclude )
-        addTag(tagProps->name, tagProps->conflation, pos+1);
-    }
-    else
-      indri::parse::TaggedTextParser::handleTag(token, pos);
-  }
-  // <BASE HREF ...> tag
-  else if (length > 5 &&
-           (token[1] == 'B' || token[1] == 'b') &&
-           (token[2] == 'A' || token[2] == 'a') &&
-           (token[3] == 'S' || token[3] == 's') &&
-           (token[4] == 'E' || token[4] == 'e') &&
-           token[5] == ' ') {
-    int i;
-    for(i = 5; i < length && token[i] == ' '; i++);
-    if(i + 3 < length &&
-       (token[i] == 'H' || token[i] == 'h') &&
-       (token[i+1] == 'R' || token[i+1] == 'r') &&
-       (token[i+2] == 'E' || token[i+2] == 'e') &&
-       (token[i+3] == 'F' || token[i+3] == 'f')) {
-      char tmp_buf[MAX_URL_LENGTH];
-      strncpy( tmp_buf, token, lemur_compat::min<int>(length,MAX_URL_LENGTH-1) );
-      if(!extractURL(tmp_buf))
-        return;
-      normalizeURL(tmp_buf);
-      strncpy(base_url, tmp_buf, lemur_compat::min<int>(length,MAX_URL_LENGTH-1));
-      base_url[MAX_URL_LENGTH-1] = 0;
-    }
-    else
-      TaggedTextParser::handleTag(token, pos);
-  }
-  // any other tag
-  else {
-    TaggedTextParser::handleTag(token, pos);
+    if ( ! handled_tag ) TaggedTextParser::handleTag( te );
+
+  } else { // any other tag
+
+    TaggedTextParser::handleTag( te );
   }
 }
 
-// extracts a URL (in place) from a tag of the form
-// <\w+[ ]*=[ ]*"{0,1\}URL"{0,1}.*>
-// returns true on success, false otherwise
-bool indri::parse::HTMLParser::extractURL(char *token) {
-  int i,j;
-  for(i = 0; token[i] != '='; i++) {
-    if(token[i] == '\0') {
-      return false;
-    }
-  }
-  for(i++; token[i] == ' ' || token[i] == '\"'; i++) {
-    if(token[i] == '\0') {
-      return false;
-    }
-  }
-  for(j = 0; token[i] && token[i] != ' ' && token[i] != '\n' && token[i] != '\"' && token[i] != '>'; i++)
-    token[j++] = token[i];
-
-  token[j] = '\0';
-  return true;
-}
 
 // normalizes a URL (in place)
 // largely based on information contained in RFC 1808
 // Note: returns true if the URL was a relative one, false if it was absolute
 //       the return value is not an error code here; the function should always succeed
-bool indri::parse::HTMLParser:: normalizeURL(char *s) {
+bool indri::parse::HTMLParser::normalizeURL(char *s) {
   char *normurl = s;
 
   // remove the fragment identifier, query information and parameter information
@@ -366,5 +403,21 @@ bool indri::parse::HTMLParser:: normalizeURL(char *s) {
   }
 
   return !found_scheme;
+}
+
+// preps a URL (in place)
+// Remove trailing whitespace by terminating the string.
+void indri::parse::HTMLParser::prepURL( char *s ) {
+
+  int len = strlen( s );
+  int i;
+
+  for ( i = 0; i < len; i++ ) {
+
+    if ( isspace( s[i] ) ) {
+      s[i] = '\0';
+      break;
+    }
+  }
 }
 

@@ -35,22 +35,20 @@ namespace indri
       ~HTMLParser() { }
 
     protected:
-      virtual void initialize( UnparsedDocument* unparsed, indri::api::ParsedDocument* parsed );
-      virtual void cleanup( UnparsedDocument* unparsed, indri::api::ParsedDocument* parsed );
-      virtual void handleTag(char* token, long pos);
+      virtual void initialize( TokenizedDocument* tokenized, indri::api::ParsedDocument* parsed );
+      virtual void cleanup( TokenizedDocument* tokenized, indri::api::ParsedDocument* parsed );
+      virtual void handleTag(TagEvent *te);
       char url[MAX_URL_LENGTH];
       char base_url[MAX_URL_LENGTH];
+      void prepURL(char *s);
       bool normalizeURL(char *s);
 
       tag_properties* _relativeUrlTag;
       tag_properties* _absoluteUrlTag;
       tag_properties* _anchorTag;
 
-    private:
-      bool extractURL(char *token);
-      void parseURL(char *url);
+      indri::utility::Buffer _urlBuffer;
     };
- 
   }
 }
 

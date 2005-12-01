@@ -53,6 +53,7 @@ namespace indri
   }
 }
 
+#include <functional>
 namespace std {
 
   // An STL comparator that implements first-and-longest ordering

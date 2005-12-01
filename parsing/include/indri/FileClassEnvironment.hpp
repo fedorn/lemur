@@ -18,6 +18,7 @@
 #ifndef INDRI_FILECLASSENVIRONMENT_HPP
 #define INDRI_FILECLASSENVIRONMENT_HPP
 
+#include "indri/IndriTokenizer.hpp"
 #include "indri/IndriParser.hpp"
 #include "indri/DocumentIterator.hpp"
 #include "indri/Conflater.hpp"
@@ -27,13 +28,15 @@ namespace indri
   {
     
     struct FileClassEnvironment {
-      FileClassEnvironment() : parser(0), iterator(0), conflater(0) {}
+      FileClassEnvironment() : tokenizer(0), parser(0), iterator(0), conflater(0) {}
       ~FileClassEnvironment() {
+	delete tokenizer;
         delete parser;
         delete iterator;
         delete conflater;
       }
 
+      Tokenizer* tokenizer;
       Parser* parser;
       DocumentIterator* iterator;
       Conflater* conflater;

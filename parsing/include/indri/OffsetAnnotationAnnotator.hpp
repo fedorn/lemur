@@ -164,7 +164,7 @@ namespace indri {
 
 	UINT64 result = 0;
 	int i = 0;
-	for ( const char* c = str; i < n & c != '\0'; c++, i++ )
+	for ( const char* c = str; i < n && c != '\0'; c++, i++ )
 	  result = result * 10 + ( *c - '0' );
 
 	return result;
@@ -211,7 +211,7 @@ namespace indri {
 	_tag_id_map.clear();
 	_attribute_id_map.clear();
 
-      }
+	}
 
       void convert_annotations( std::set<indri::parse::TagExtent*>* raw_tags,
 				std::set<indri::parse::TagExtent*>* converted_tags, 

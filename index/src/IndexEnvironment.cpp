@@ -20,9 +20,12 @@
 #include "indri/AnchorTextAnnotator.hpp"
 #include "indri/TaggedDocumentIterator.hpp"
 #include "indri/IndriParser.hpp"
+#include "indri/IndriTokenizer.hpp"
 #include "indri/Path.hpp"
+#include "indri/Conflater.hpp"
 
 void indri::api::IndexEnvironment::_getParsingContext( indri::parse::Parser** parser,
+                                                       indri::parse::Tokenizer** tokenizer,
                                                        indri::parse::DocumentIterator** iterDoc,
                                                        indri::parse::Conflater** conflater,
                                                        const std::string& className ) {
@@ -30,6 +33,7 @@ void indri::api::IndexEnvironment::_getParsingContext( indri::parse::Parser** pa
   std::string iteratorName;
 
   *parser = 0;
+  *tokenizer = 0;
   *iterDoc = 0;
   *conflater = 0;
 
@@ -39,6 +43,7 @@ void indri::api::IndexEnvironment::_getParsingContext( indri::parse::Parser** pa
 
   if( iter != _environments.end() ) {
     *parser = iter->second->parser;
+    *tokenizer = iter->second->tokenizer;
     *iterDoc = iter->second->iterator;
     *conflater = iter->second->conflater;
     return;
@@ -49,6 +54,7 @@ void indri::api::IndexEnvironment::_getParsingContext( indri::parse::Parser** pa
   if( fce ) {
     _environments[className] = fce;
     *parser = fce->parser;
+    *tokenizer = fce->tokenizer;
     *iterDoc = fce->iterator;
     *conflater = fce->conflater;
   }
@@ -168,6 +174,7 @@ void indri::api::IndexEnvironment::setStemmer( const std::string& stemmer ) {
 void indri::api::IndexEnvironment::addFileClass( const std::string& name, 
                                                  const std::string& iter,
                                                  const std::string& parser,
+                                                 const std::string& tokenizer,
                                                  const std::string& startDocTag,
                                                  const std::string& endDocTag,
                                                  const std::string& endMetadataTag,
@@ -177,7 +184,7 @@ void indri::api::IndexEnvironment::addFileClass( const std::string& name,
                                                  const std::vector<std::string>& metadata, 
                                                  const std::map<indri::parse::ConflationPattern*,std::string>& conflations )
 {
-  this->_fileClassFactory.addFileClass( name, iter, parser, startDocTag, endDocTag, endMetadataTag,
+  this->_fileClassFactory.addFileClass( name, iter, parser, tokenizer, startDocTag, endDocTag, endMetadataTag,
                                         include, exclude, index, metadata, conflations );
 
 }
@@ -278,10 +285,11 @@ void indri::api::IndexEnvironment::addFile( const std::string& fileName ) {
 
 void indri::api::IndexEnvironment::addFile( const std::string& fileName, const std::string& fileClass ) {
   indri::parse::Parser* parser = 0;
+  indri::parse::Tokenizer* tokenizer = 0;
   indri::parse::DocumentIterator* iterator = 0;
   indri::parse::Conflater* conflater = 0;
   
-  _getParsingContext( &parser, &iterator, &conflater, fileClass );
+  _getParsingContext( &parser, &tokenizer, &iterator, &conflater, fileClass );
 
   if( !parser || !iterator ) {
     _documentsSeen++;
@@ -289,6 +297,7 @@ void indri::api::IndexEnvironment::addFile( const std::string& fileName, const s
   } else {
     try {
       indri::parse::UnparsedDocument* document;
+      indri::parse::TokenizedDocument* tokenized;
       ParsedDocument* parsed;
 
       iterator->open( fileName );
@@ -301,7 +310,8 @@ void indri::api::IndexEnvironment::addFile( const std::string& fileName, const s
       while( document = iterator->nextDocument() ) {
         _documentsSeen++;
 
-        parsed = parser->parse( document );
+        tokenized = tokenizer->tokenize( document );
+        parsed = parser->parse( tokenized );
         parsed = _applyAnnotators( annotators, parsed );
 
         _repository.addDocument( parsed );
@@ -331,6 +341,7 @@ void indri::api::IndexEnvironment::addFile( const std::string& fileName, const s
 int indri::api::IndexEnvironment::addString( const std::string& documentString, const std::string& fileClass, const std::vector<indri::parse::MetadataPair>& metadata ) {
   indri::parse::UnparsedDocument document;
   indri::parse::Parser* parser;
+  indri::parse::Tokenizer* tokenizer;
   indri::parse::DocumentIterator* iterator;
   indri::parse::Conflater* conflater;
   std::string nothing;
@@ -343,13 +354,14 @@ int indri::api::IndexEnvironment::addString( const std::string& documentString, 
   document.content = document.text;
   document.contentLength = document.textLength;
   
-  _getParsingContext( &parser, &iterator, &conflater, fileClass );
+  _getParsingContext( &parser, &tokenizer, &iterator, &conflater, fileClass );
 
   if( parser == 0 ) {
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "File class '" + fileClass + "' wasn't recognized." );
   }
+  indri::parse::TokenizedDocument* tokenized = tokenizer->tokenize( &document );
 
-  ParsedDocument* parsed = parser->parse( &document );
+  ParsedDocument* parsed = parser->parse( tokenized );
   int documentID =_repository.addDocument( parsed );
 
   _documentsIndexed++;

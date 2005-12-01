@@ -50,6 +50,9 @@ namespace indri
       }
     };
 
+    //
+    // GenericHash<const char *>
+    //
 
     template<>
     class GenericHash<const char*> {
@@ -68,11 +71,47 @@ namespace indri
       }
     };
 
+    //
+    // GenericComparator<const char *>
+    //
+
     template<>
     class GenericComparator<const char*> {
     public:
       int operator () ( const char* const& one, const char* const& two ) const {
         return strcmp( one, two );
+      }
+    };
+
+    //
+    // GenericHash<std::string>
+    // (formerly StringHash from TaggedTextParser.hpp)
+    //
+
+    template<>
+    class GenericHash<std::string> {
+    public:
+      int operator() ( const std::string key ) const {
+        int hash = 0;
+
+        for(unsigned int i = 0; i < key.length(); i++)
+          hash += (unsigned char)key[i];
+
+        return hash;
+      }
+    };
+
+    //
+    // GenericComparator<std::string>
+    // (formerly StringComparator from TaggedTextParser.hpp)
+    //
+
+    template<>
+    class GenericComparator<std::string> {
+    public:
+      int operator() ( const std::string one, const std::string two ) const {
+
+        return one.compare(two);
       }
     };
 
@@ -92,10 +131,10 @@ namespace indri
     };
 
     //
-    // HashTableIterator<_Key, _Value>
+    // HashTableIterator<_Key, _Value, _Comparator>
     //
 
-    template<class _Key, class _Value>
+    template<class _Key, class _Value, class _Comparator>
     class HashTableIterator {
     private:
       typedef HashBucket<_Key, _Value> bucket_type;
@@ -179,14 +218,14 @@ namespace indri
     template<class _Key, class _Value, class _HashFunction = GenericHash<_Key>, class _Comparator = GenericComparator<_Key> >
     class HashTable {
     public:
-      friend class HashTableIterator<_Key, _Value>;
+      friend class HashTableIterator<_Key, _Value, _Comparator>;
 
       typedef HashBucket<_Key, _Value> bucket_type;
       typedef _Key key_type;
       typedef _Value value_type;
       typedef _HashFunction hash_type;
       typedef _Comparator compare_type;
-      typedef class HashTableIterator<_Key, _Value> iterator;
+      typedef class HashTableIterator<_Key, _Value, _Comparator> iterator;
 
     private:
       indri::utility::RegionAllocator* _allocator;

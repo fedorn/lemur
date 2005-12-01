@@ -26,6 +26,7 @@
 #include <vector>
 #include "indri/IndriParser.hpp"
 #include "indri/Buffer.hpp"
+#include "indri/ConflationPattern.hpp"
 #include "string-set.h"
 namespace indri
 {
@@ -37,9 +38,9 @@ namespace indri
       TextParser();
       ~TextParser();
   
-      indri::api::ParsedDocument* parse( UnparsedDocument* document );
+      indri::api::ParsedDocument* parse( TokenizedDocument* document );
 
-      void handle( UnparsedDocument* document );
+      void handle( TokenizedDocument* document );
       void setHandler( ObjectHandler<indri::api::ParsedDocument>& h );
 
       void setTags( const std::vector<std::string>& include,

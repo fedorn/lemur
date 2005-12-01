@@ -88,7 +88,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
   // Load file, and check consistency.  Ensure that there are no
   // undefined parent ids.
 
-  char buf[65536];
+  char buf[65536]; // these may not be big enough someday.
   char field[256];
 
   std::ifstream in;
@@ -166,25 +166,29 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 	  break;
 
 	case 4: // START (int)
-	  if ( type == 1 ) start = atoi( field );
-	  if ( start < 0 ) {
-	    std::cerr << "WARN: tag named '" << name 
-		      << "' starting at negative byte offest on line " 
-		      << line << "; ignoring line." << std::endl;
-	    line++;
-	    continue;
+	  if ( type == 1 ) {
+            start = atoi( field );
+            if ( start < 0 ) {
+              std::cerr << "WARN: tag named '" << name 
+                        << "' starting at negative byte offest on line " 
+                        << line << "; ignoring line." << std::endl;
+              line++;
+              continue;
+            }
 	  }
 	  break;
 
 	case 5: // LENGTH (int)
-	  if ( type == 1 ) length = atoi( field );
-	  if ( length <= 0 ) {
-	    std::cerr << "WARN: tag named '" << name 
-		      << "' with zero or negative byte length on line " 
-		      << line << "; ignoring line." << std::endl;
-	    line++;
-	    continue;
-	  }
+	  if ( type == 1 ) {
+            length = atoi( field );
+            if ( length <= 0 ) {
+              std::cerr << "WARN: tag named '" << name 
+                        << "' with zero or negative byte length on line " 
+                        << line << "; ignoring line." << std::endl;
+              line++;
+              continue;
+            }
+          }
 	  break;
 
 	case 6: // VALUE (UINT64 or string)
@@ -275,11 +279,11 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
       te->begin = start;
       te->end = start + length;
 
-      // Conflate tag if necessary
+	  // Conflate tag if necessary
       if ( _p_conflater ) _p_conflater->conflate( te );
 	  
       tags->insert( te );
-      _tag_id_map.insert( id, te );
+	  _tag_id_map.insert( id, te );
 
     } else if ( type == 2 ) {
 
@@ -315,20 +319,6 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
 
   const char *docno = _getDocno( document ); 
   std::set<indri::parse::TagExtent*>** p;
-
-  // Debug:
-
-  indri::utility::greedy_vector<char*>::iterator i =
-    document->terms.begin();
-  indri::utility::greedy_vector<indri::parse::TermExtent>::iterator j = 
-    document->positions.begin();
-
-  while ( i != document->terms.end() && j != document->positions.end() ) {
-
-    std::cerr << "Token " << (*i) << " [" << (*j).begin << ", "
-	      << (*j).end << "]" << std::endl;
-    i++; j++;
-  }
 
   // First, check if the annotations for this document have already been
   // converted to use token extents.
@@ -367,7 +357,7 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
 	
   for ( indri::utility::greedy_vector<TagExtent>::iterator i = 
 	  document->tags.begin(); i != document->tags.end(); i++ ) {
-
+	  
 //     std::cerr << "Inserting existing tag: " << (*i).name << " [" 
 // 	      << (*i).begin << ", " << (*i).end << "]" << std::endl;
 	  
@@ -391,14 +381,15 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
 	  
 //     std::cerr << "Inserting new tag: " << (*i)->name << " [" 
 // 	      << (*i)->begin << ", " << (*i)->end << "]" << std::endl;
-
+	  
     if ( ! itree.insert( (*i)->begin, (*i)->end ) ) {
 
+#if 0
       std::cerr << "Tag '" << (*i)->name << "' [" << (*i)->begin << ", "
 		<< (*i)->end << "] for docno '" << docno 
 		<< "' overlaps with an existing annotation; skipping..."
 		<< std::endl;
-
+#endif
     } else {
 
       document->tags.push_back( *(*i) );

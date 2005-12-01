@@ -25,6 +25,7 @@
 #include "indri/ConflationPattern.hpp"
 #include "indri/Repository.hpp"
 #include "indri/IndriParser.hpp"
+#include "indri/IndriTokenizer.hpp"
 #include "indri/DocumentIterator.hpp"
 #include "indri/AnchorTextAnnotator.hpp"
 #include "indri/OffsetAnnotationAnnotator.hpp"
@@ -89,6 +90,7 @@ namespace indri
       int _documentsSeen;
 
       void _getParsingContext( indri::parse::Parser** parser,
+                               indri::parse::Tokenizer** tokenizer,
                                indri::parse::DocumentIterator** iterator,
                                indri::parse::Conflater** conflater,
                                const std::string& extension );
@@ -126,7 +128,8 @@ namespace indri
       /// is passed into the FileClassEnvironmentFactory
       /// @param name name of this file class, eg trecweb
       /// @param iterator document iterator for this file class
-      /// @param parser document tokenizer for this file class
+      /// @param parser document parser for this file class
+      /// @param tokenizer document tokenizer for this file class
       /// @param startDocTag tag indicating start of a document
       /// @param endDocTag tag indicating the end of a document
       /// @param endMetadataTag tag indicating the end of the metadata fields
@@ -138,6 +141,7 @@ namespace indri
       void addFileClass( const std::string& name, 
                          const std::string& iterator,
                          const std::string& parser,
+                         const std::string& tokenizer,
                          const std::string& startDocTag,
                          const std::string& endDocTag,
                          const std::string& endMetadataTag,

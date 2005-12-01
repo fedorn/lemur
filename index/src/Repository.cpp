@@ -26,6 +26,7 @@
 #include "indri/Parameters.hpp"
 #include "indri/StemmerFactory.hpp"
 #include "indri/NormalizationTransformation.hpp"
+#include "indri/UTF8CaseNormalizationTransformation.hpp"
 #include "Exception.hpp"
 #include "indri/Thread.hpp"
 #include "indri/IndexWriter.hpp"
@@ -132,6 +133,7 @@ void indri::collection::Repository::_buildChain( indri::api::Parameters& paramet
 
   if( dontNormalize == false ) {
     _transformations.push_back( new indri::parse::NormalizationTransformation() );
+    _transformations.push_back( new indri::parse::UTF8CaseNormalizationTransformation() );
   }
 
   for( size_t i=0; i<_fields.size(); i++ ) {

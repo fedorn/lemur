@@ -55,11 +55,11 @@ void indri::parse::TextParser::setTags( const std::vector<std::string>& include,
                           const std::vector<std::string>& exclude,
                           const std::vector<std::string>& index,
                           const std::vector<std::string>& metadata, 
-                          const std::map<ConflationPattern*,std::string>& conflations ) {
+                          const std::map<indri::parse::ConflationPattern*,std::string>& conflations ) {
   // do nothing
 }
 
-indri::api::ParsedDocument* indri::parse::TextParser::parse( indri::parse::UnparsedDocument* document ) {
+indri::api::ParsedDocument* indri::parse::TextParser::parse( indri::parse::TokenizedDocument* document ) {
   _termBuffer.clear();
   _termBuffer.grow( document->textLength * 2 ); // leave a little extra room
   _document.terms.clear();
@@ -101,7 +101,7 @@ void indri::parse::TextParser::writeToken(char *token, int start, int end) {
   _document.terms.push_back( writeLocation );
 }
 
-void indri::parse::TextParser::handle( indri::parse::UnparsedDocument* document ) {
+void indri::parse::TextParser::handle( indri::parse::TokenizedDocument* document ) {
   _handler->handle( parse(document) );
 }
 

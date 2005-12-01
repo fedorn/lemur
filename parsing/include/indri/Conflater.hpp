@@ -28,6 +28,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "indri/TagExtent.hpp"
+#include "indri/TagEvent.hpp"
 #include "indri/ConflationPattern.hpp"
 #include "indri/HashTable.hpp"
 #include "indri/AttributeValuePair.hpp"
@@ -219,10 +220,22 @@ namespace indri {
 	}
       }
 
+      // Two convenient interfaces into the tag conflation algorithm.
+
       // When a tag is conflated, its attributes are wiped out
       // completely, and its tag name is changed to the conflation
       // string.
 
+      void conflate( TagEvent* tev ) {
+
+	const char *new_name = _lookup( tev->name, tev->attributes );
+
+	if ( new_name ) {
+
+	  tev->name = new_name;
+	  tev->attributes.clear();
+	}
+      }
 
       void conflate( TagExtent* tex ) {
 

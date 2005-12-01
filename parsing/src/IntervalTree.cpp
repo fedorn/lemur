@@ -90,46 +90,46 @@ namespace indri {
       // Check for enclosure
 
       if ( begin <= node->begin && end >= node->max_child_end ) {
-	
+
 	// This interval encloses the entire subtree rooted at this
 	// node.
 
-	  IntervalTreeNode *a = new IntervalTreeNode( begin, end );
+	IntervalTreeNode *a = new IntervalTreeNode( begin, end );
 	  
 	if ( node->begin < end ) { // left insertion
 
-	    a->left_child = node;
+	  a->left_child = node;
 
-	  } else { // right insertion
+	} else { // right insertion
 
-	    a->right_child = node;
-	  }
+	  a->right_child = node;
+	}
 
-	  if ( node->parent->right_child == node ) 
-	    node->parent->right_child = a;
-	  else if ( node->parent->left_child == node ) 
-	    node->parent->left_child = a;
+	if ( node->parent->right_child == node ) 
+	  node->parent->right_child = a;
+	else if ( node->parent->left_child == node ) 
+	  node->parent->left_child = a;
 
-	  a->parent = node->parent;
-	  node->parent = a;
+	a->parent = node->parent;
+	node->parent = a;
 
 	// Properly attach children
 	a->left_child = node->left_child;
 	a->right_child = node->right_child;
 
-	  int mce = a->max_child_end > node->max_child_end ?
-	    a->max_child_end : node->max_child_end;
+	int mce = a->max_child_end > node->max_child_end ?
+	  a->max_child_end : node->max_child_end;
 
-	  // Recursively update max_child_end
-	  IntervalTreeNode *par = node;
+	// Recursively update max_child_end
+	IntervalTreeNode *par = node;
 
-	  while ( par ) {
+	while ( par ) {
 
-	    if ( par->max_child_end < mce ) par->max_child_end = mce;
-	    par = par->parent;
-	  }
-	  return true;
-      }
+	  if ( par->max_child_end < mce ) par->max_child_end = mce;
+	  par = par->parent;
+	}
+	return true;
+      }	
 
       // Check for overlap
 

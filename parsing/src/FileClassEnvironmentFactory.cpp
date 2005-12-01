@@ -18,12 +18,15 @@
 #include "indri/FileClassEnvironmentFactory.hpp"
 #include "indri/DocumentIteratorFactory.hpp"
 #include "indri/ParserFactory.hpp"
+#include "indri/TokenizerFactory.hpp"
+#include <ctype.h>
 #include <map>
 #include <vector>
 
 struct file_class_environment_spec {
   const char* name;
   const char* parser;
+  const char* tokenizer;
   const char* iterator;
 
   // iterator tag information
@@ -65,6 +68,7 @@ static file_class_environment_spec environments[] = {
   { 
     "html",               // name
     "html",               // parser
+    "word",               // tokenizer
     "text",               // iterator
     NULL,                 // startDocTag
     NULL,                 // endDocTag
@@ -78,6 +82,7 @@ static file_class_environment_spec environments[] = {
   {
     "xml",               // name
     "xml",               // parser
+    "word",               // tokenizer
     "text",               // iterator
     NULL,                 // startDocTag
     NULL,                 // endDocTag
@@ -91,6 +96,7 @@ static file_class_environment_spec environments[] = {
   {
     "trecweb",            // name
     "html",               // parser
+    "word",               // tokenizer
     "tagged",             // iterator
     "<DOC>",              // startDocTag
     "</DOC>\n",             // endDocTag
@@ -105,6 +111,7 @@ static file_class_environment_spec environments[] = {
   {
     "trectext",           // name
     "xml",                // parser
+    "word",               // tokenizer
     "tagged",             // iterator
     "<DOC>",              // startDocTag
     "</DOC>\n",             // endDocTag
@@ -119,6 +126,7 @@ static file_class_environment_spec environments[] = {
   {
     "mbox",               // name
     "text",               // parser
+    "word",               // tokenizer
     "mbox",               // iterator
     NULL,                 // startDocTag
     NULL,                 // endDocTag
@@ -133,7 +141,8 @@ static file_class_environment_spec environments[] = {
 #ifdef WIN32
   {
     "doc",                // name
-    "text",               // parser
+    "word",               // parser
+    "text",               // tokenizer
     "doc",                // iterator
     NULL,                 // startDocTag
     NULL,                 // endDocTag
@@ -148,6 +157,7 @@ static file_class_environment_spec environments[] = {
   {
     "ppt",                // name
     "text",               // parser
+    "word",               // tokenizer
     "ppt",                // iterator
     NULL,                 // startDocTag
     NULL,                 // endDocTag
@@ -163,6 +173,7 @@ static file_class_environment_spec environments[] = {
   {
     "pdf",                // name
     "text",               // parser
+    "word",               // tokenizer
     "pdf",                // iterator
     NULL,                 // startDocTag
     NULL,                 // endDocTag
@@ -177,6 +188,7 @@ static file_class_environment_spec environments[] = {
   {
     "txt",                // name
     "text",               // parser
+    "word",               // tokenizer
     "text",               // iterator
     NULL,                 // startDocTag
     NULL,                 // endDocTag
@@ -189,7 +201,7 @@ static file_class_environment_spec environments[] = {
   },
 
   // null ending marker
-  { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
+  { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
 };
 
 static void copy_strings_to_vector( std::vector<std::string>& vec, const char** array ) {
@@ -223,7 +235,7 @@ static void copy_string_tuples_to_map( std::map<indri::parse::ConflationPattern*
        m[key] = value;
      }
    }
- }
+}
  
 static void cleanup_conflations_map( std::map<indri::parse::ConflationPattern*,std::string>& 
 				     conflations ) {
@@ -259,8 +271,13 @@ indri::parse::FileClassEnvironment* build_file_class_environment( const file_cla
   copy_string_tuples_to_map( conflations, spec->conflations );
 
   env->parser = indri::parse::ParserFactory::get( spec->parser, includeTags, excludeTags, indexTags, metadataTags, conflations );
+
+  env->tokenizer = indri::parse::TokenizerFactory::get( spec->tokenizer );
+
   env->conflater = new indri::parse::Conflater( conflations );
+
   cleanup_conflations_map( conflations );
+
   return env;
 }
 
@@ -277,7 +294,11 @@ indri::parse::FileClassEnvironment* build_file_class_environment( const indri::p
                                                   spec->index,
                                                   spec->metadata,
                                                   spec->conflations );
+
+  env->tokenizer = indri::parse::TokenizerFactory::get( spec->tokenizer );
+
   env->conflater = new indri::parse::Conflater( spec->conflations );
+
   return env;
 }
 
@@ -320,6 +341,7 @@ indri::parse::FileClassEnvironmentFactory::Specification* indri::parse::FileClas
     newSpec->name = spec->name;
     newSpec->iterator = spec->iterator;
     newSpec->parser = spec->parser;    
+    newSpec->tokenizer = spec->tokenizer;
     newSpec->index = indexTags;
     newSpec->metadata = metadataTags;
     newSpec->include = includeTags;
@@ -361,6 +383,7 @@ indri::parse::FileClassEnvironment* indri::parse::FileClassEnvironmentFactory::g
 void indri::parse::FileClassEnvironmentFactory::addFileClass( const std::string& name, 
                                                               const std::string& iterator,
                                                               const std::string& parser,
+							      const std::string& tokenizer,
                                                               const std::string& startDocTag,
                                                               const std::string& endDocTag,
                                                               const std::string& endMetadataTag,
@@ -376,6 +399,7 @@ void indri::parse::FileClassEnvironmentFactory::addFileClass( const std::string&
   spec->name = name;
   spec->iterator = iterator;
   spec->parser = parser;
+  spec->tokenizer = tokenizer;
 
   spec->include = include;
   spec->exclude = exclude;

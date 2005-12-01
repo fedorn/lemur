@@ -34,8 +34,10 @@ namespace indri
       struct Specification {
         ///  name of this file class, eg trecweb
         std::string name;
-        /// document tokenizer for this file class
+        /// document parser for this file class
         std::string parser;
+        /// document tokenizer for this file class
+        std::string tokenizer;
         /// document iterator for this file class
         std::string iterator;
         /// tag indicating start of a document
@@ -85,7 +87,8 @@ namespace indri
         \brief Add parsing information for a file class.
         @param name name of this file class, eg trecweb
         @param iterator document iterator for this file class
-        @param parser document tokenizer for this file class
+        @param parser document parser for this file class
+	@param tokenizer document tokenizer for this file class
         @param startDocTag tag indicating start of a document
         @param endDocTag tag indicating the end of a document
         @param endMetadataTag tag indicating the end of the metadata fields
@@ -98,6 +101,7 @@ namespace indri
       void addFileClass( const std::string& name, 
                          const std::string& iterator,
                          const std::string& parser,
+                         const std::string& tokenizer,
                          const std::string& startDocTag,
                          const std::string& endDocTag,
                          const std::string& endMetadataTag,
