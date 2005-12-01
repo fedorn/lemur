@@ -235,7 +235,16 @@
 				RelativePath=".\src\TextParser.cpp">
 			</File>
 			<File
+				RelativePath=".\src\TextTokenizer.cpp">
+			</File>
+			<File
+				RelativePath=".\src\TokenizerFactory.cpp">
+			</File>
+			<File
 				RelativePath=".\src\TrecParser.cpp">
+			</File>
+			<File
+				RelativePath=".\src\UTF8CaseNormalizationTransformation.cpp">
 			</File>
 			<File
 				RelativePath=".\src\WebParser.cpp">
@@ -336,6 +345,9 @@
 				RelativePath=".\include\indri\IndriParser.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\IndriTokenizer.hpp">
+			</File>
+			<File
 				RelativePath=".\include\InqArabicParser.hpp">
 			</File>
 			<File
@@ -423,6 +435,9 @@
 				RelativePath=".\include\indri\TagDocumentIterator.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\TagEvent.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\TaggedDocumentIterator.hpp">
 			</File>
 			<File
@@ -447,6 +462,15 @@
 				RelativePath=".\include\indri\TextParser.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\TextTokenizer.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\TokenizedDocument.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\TokenizerFactory.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\Transformation.hpp">
 			</File>
 			<File
@@ -454,6 +478,12 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\UnparsedDocument.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\UTF8CaseNormalizationTransformation.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\UTF8Transcoder.hpp">
 			</File>
 			<File
 				RelativePath=".\include\WebParser.hpp">
