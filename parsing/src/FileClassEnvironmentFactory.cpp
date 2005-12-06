@@ -141,8 +141,8 @@ static file_class_environment_spec environments[] = {
 #ifdef WIN32
   {
     "doc",                // name
-    "word",               // parser
-    "text",               // tokenizer
+    "text",               // parser
+    "word",               // tokenizer
     "doc",                // iterator
     NULL,                 // startDocTag
     NULL,                 // endDocTag
