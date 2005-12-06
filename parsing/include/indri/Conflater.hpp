@@ -27,6 +27,7 @@
 #include <vector>
 #include <ctype.h>
 #include <string.h>
+#include "indri/Buffer.hpp"
 #include "indri/TagExtent.hpp"
 #include "indri/TagEvent.hpp"
 #include "indri/ConflationPattern.hpp"
@@ -38,6 +39,16 @@ namespace indri {
 
     class Conflater {
 
+    private:
+      indri::utility::Buffer _stringBuf;
+      const char *_strdup(const char * token) {
+        size_t token_len = strlen(token);
+        char* write_loc = _stringBuf.write( token_len + 1 );
+        memcpy( write_loc, token, token_len + 1 );
+        return write_loc;
+      }
+      
+      
     protected:
 
       struct attribute_pattern {
@@ -120,6 +131,8 @@ namespace indri {
 
     public:
       Conflater( const std::map<ConflationPattern*,std::string>& conflations ) {
+        //allocate some space for the strings:
+        _stringBuf.grow(10*1024); // 10K should be plenty.
 
 	// Build _pattern_table.  The assumption is that patterns for
 	// tag names and attribute names are already downcased, so
@@ -155,7 +168,7 @@ namespace indri {
 	       ( ! p_cp->value ) ) {
 
 	    p_tag_pattern->match_tag_name = true;
-	    p_tag_pattern->conflation = conflation.c_str();
+	    p_tag_pattern->conflation = _strdup(conflation.c_str());
 	    continue;
 	  }
 
@@ -184,13 +197,13 @@ namespace indri {
 	  if ( ! p_cp->value ) {
 
 	    p_attribute_pattern->match_attribute_name = true;
-	    p_attribute_pattern->conflation = conflation.c_str();
+	    p_attribute_pattern->conflation = _strdup(conflation.c_str());
 	    continue;
 	  }
 	  
 	  // Otherwise, it is an attribute-value match:
 
-	  p_attribute_pattern->values.insert( p_cp->value, conflation.c_str() );
+	  p_attribute_pattern->values.insert( p_cp->value, _strdup(conflation.c_str()) );
 
 	}	
       }
