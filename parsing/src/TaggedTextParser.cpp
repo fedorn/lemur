@@ -174,18 +174,15 @@ indri::api::ParsedDocument* indri::parse::TaggedTextParser::parse( indri::parse:
     // if there is a tag at position i that starts an include region,
     // then we also need to include the token at position i.
 
-    if ( k != document->tags.end() ) {
-
-      while ( token_pos == (*k).pos ) { // There may be multiple tags at a token position
-
-	// Adjust actual token position for tokens that may have
-	// been excluded:
-	(*k).pos -= tokens_excluded;
-
-	handleTag( &(*k) );
-	k++;
-	}
-	}
+    while ( k != document->tags.end() && token_pos == (*k).pos ) { // There may be multiple tags at a token position
+      
+      // Adjust actual token position for tokens that may have
+      // been excluded:
+      (*k).pos -= tokens_excluded;
+      
+      handleTag( &(*k) );
+      k++;
+    }
 
     // The Parser's job is to have a look at the token stream produced
     // by the Tokenizer, and insert, discard or rewrite any tokens as
@@ -197,36 +194,33 @@ indri::api::ParsedDocument* indri::parse::TaggedTextParser::parse( indri::parse:
       _document.positions.push_back( (*i) );
       _document.terms.push_back( (*j) );
 
-//       std::cout << "Token [" << (*j) << "] <" << (*i).begin 
-// 		<< ", " << (*i).end << ">" << std::endl;
+      //       std::cout << "Token [" << (*j) << "] <" << (*i).begin 
+      // 		<< ", " << (*i).end << ">" << std::endl;
 
     } else {
 
       tokens_excluded++;
-	}
+    }
 
     i++;
     j++;
 
     token_pos++;
-	}
+  }
 
   // We've reached the end of the term positions, so close any tags
   // we've opened.
 
-  if ( k != document->tags.end() ) {
-
-    while ( token_pos == (*k).pos ) { // There may be multiple tags at a token position
-
-      // Adjust actual token position for tokens that may have
-      // been excluded:
-      (*k).pos -= tokens_excluded;
-
-      handleTag( &(*k) );
-      k++;
-	}
-	}
-
+  while ( k != document->tags.end() && token_pos == (*k).pos ) { // There may be multiple tags at a token position
+    
+    // Adjust actual token position for tokens that may have
+    // been excluded:
+    (*k).pos -= tokens_excluded;
+    
+    handleTag( &(*k) );
+    k++;
+  }
+  
   // Tag lists are actually written in the cleanup function:
   cleanup(document, &_document);
   return &_document;
