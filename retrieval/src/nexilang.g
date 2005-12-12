@@ -134,10 +134,16 @@ private:
   std::vector<indri::lang::Node*> _nodes;
   // makes sure nodes go away when parser goes away
   indri::utility::VectorDeleter<indri::lang::Node*> _deleter;
+    bool _shrinkage;
   
 public:
   void init( NexiLexer* lexer ) {
     _deleter.setVector( _nodes );
+    _shrinkage = true;
+  }
+
+  void setShrinkage( bool shrink ) {
+    _shrinkage = shrink;
   }
 }
 
@@ -331,10 +337,17 @@ filter returns [ indri::lang::ScoredExtentNode* s] {
 } :
   s=aboutClause
 | a=arithmeticClause {
- 
-    s = new indri::lang::NestedRawScorerNode( a, contexts );
-    _nodes.push_back( s );
- 
+
+    if ( _shrinkage == true ) {
+      indri::lang::DocumentStructureNode * d = new indri::lang::DocumentStructureNode;
+      _nodes.push_back( d );
+      s = new indri::lang::ShrinkageScorerNode( a, d );
+      _nodes.push_back( s );
+    } else {
+      s = new indri::lang::NestedRawScorerNode( a, contexts );
+      _nodes.push_back( s );
+    }
+
     indri::lang::MaxNode * m = new indri::lang::MaxNode;
     _nodes.push_back(m);
     m->addChild(s);
@@ -444,14 +457,27 @@ unrestrictedTerm returns [ indri::lang::ScoredExtentNode * t ]
   t = 0;
 }:
   raw=rawText {
-
-    t = new indri::lang::NestedRawScorerNode( raw, contexts );
-    _nodes.push_back( t );
+    if ( _shrinkage == true ) {
+      indri::lang::DocumentStructureNode * d = new indri::lang::DocumentStructureNode;
+      _nodes.push_back( d );
+      t = new indri::lang::ShrinkageScorerNode( raw, d );
+      _nodes.push_back( t );
+    } else {
+      t = new indri::lang::NestedRawScorerNode( raw, contexts );
+      _nodes.push_back( t );
+    }
   }
 | DBL_QUOTE raw=odNode DBL_QUOTE {
 
-    t = new indri::lang::NestedRawScorerNode( raw, contexts );
-    _nodes.push_back( t );
+    if ( _shrinkage == true ) {
+      indri::lang::DocumentStructureNode * d = new indri::lang::DocumentStructureNode;
+      _nodes.push_back( d );
+      t = new indri::lang::ShrinkageScorerNode( raw, d );
+      _nodes.push_back( t );
+    } else {
+      t = new indri::lang::NestedRawScorerNode( raw, contexts );
+      _nodes.push_back( t );
+    }
   }
 ;
  

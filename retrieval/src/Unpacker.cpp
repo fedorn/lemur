@@ -79,6 +79,11 @@ namespace indri {
       return (ScoredExtentNode*) _nodes[internalName];
     } 
 
+    DocumentStructureNode* Unpacker::getDocumentStructureNode( const char* name ) {
+      std::string internalName = _current->getChildValue(name);
+      return (DocumentStructureNode*) _nodes[internalName];
+    }
+
     ::std::vector<RawExtentNode*> Unpacker::getRawExtentVector( const char* name ) {
       return getNodeVector<RawExtentNode>(name);
     }

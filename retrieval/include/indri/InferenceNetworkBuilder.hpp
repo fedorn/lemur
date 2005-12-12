@@ -53,6 +53,7 @@ namespace indri
 
       void _after( indri::lang::NestedExtentInside* extentInside );
       void _after( indri::lang::NestedRawScorerNode* rawScorerNode );
+      void _after( indri::lang::ShrinkageScorerNode* shrinkageScorerNode );
       void _after( indri::lang::ExtentEnforcement * eeNode );
 
     public:
@@ -98,6 +99,8 @@ namespace indri
       void after( indri::lang::FieldWildcard* fieldWildcard );
       void after( indri::lang::ContextInclusionNode* contextInclusionNode );
       void after( indri::lang::LengthPrior* lengthPrior );
+      void after( indri::lang::DocumentStructureNode * docStruct );
+      void after( indri::lang::ShrinkageScorerNode* shrinkageScorerNode );
     };
   }
 }

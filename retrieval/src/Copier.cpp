@@ -90,6 +90,10 @@ namespace indri {
     Node* Copier::after( class ContextInclusionNode* oldNode, class ContextInclusionNode* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class LengthPrior* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class LengthPrior* oldNode, class LengthPrior* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class DocumentStructureNode* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class DocumentStructureNode* oldNode, class DocumentStructureNode* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class ShrinkageScorerNode* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class ShrinkageScorerNode* oldNode, class ShrinkageScorerNode* newNode ) { return defaultAfter( oldNode, newNode ); }
  };
 };
 

@@ -29,10 +29,16 @@ private:
   std::vector<indri::lang::Node*> _nodes;
   // makes sure nodes go away when parser goes away
   indri::utility::VectorDeleter<indri::lang::Node*> _deleter;
+    bool _shrinkage;
   
 public:
   void init( NexiLexer* lexer ) {
     _deleter.setVector( _nodes );
+    _shrinkage = true;
+  }
+
+  void setShrinkage( bool shrink ) {
+    _shrinkage = shrink;
   }
 #line 25 "NexiParser.hpp"
 public:

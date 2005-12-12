@@ -148,6 +148,24 @@ namespace indri
 	after( (indri::lang::RawScorerNode *) scorer );
       }
 
+      void after( indri::lang::ShrinkageScorerNode* scorer ) {
+	after( (indri::lang::RawScorerNode *) scorer );
+
+	for( int i=signed(_rules.size())-1; i >= 0; i-- ) {
+          const rule_type& rule = *_rules[i];
+
+          if( rule.node == "ShrinkageBelief" &&
+              rule.op == "*" ) {
+	    if ( rule.field == "*" ) {
+	      scorer->addShrinkageRule( rule.smoothing );
+	    } else {
+	      std::string ruleString = "field:" + rule.field + "," + rule.smoothing;
+	      scorer->addShrinkageRule( ruleString );
+	    }
+          }
+        }
+      }
+
       void after( indri::lang::LengthPrior* prior ) {
 	std::string ruleText = _matchSmoothingRule( "LengthPrior", "*", "*" );
 	double exponent = 0;

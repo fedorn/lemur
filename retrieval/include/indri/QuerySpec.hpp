@@ -3157,6 +3157,162 @@ namespace indri {
       }
     };
 
+    class DocumentStructureNode : public Node {
+    public:
+      
+      DocumentStructureNode( ) {	
+      }
+
+      DocumentStructureNode( Unpacker& unpacker ) {	
+      }
+
+      UINT64 hashCode() const {
+        return 117; //?????????
+      }
+
+      bool operator== ( Node& o ) {
+	DocumentStructureNode* other = dynamic_cast<DocumentStructureNode*>(&o);
+	return other; 
+      }
+
+      std::string typeName() const {
+        return "DocumentStructure";
+      }
+      
+      void pack( Packer& packer ) {
+        packer.before(this);
+        packer.after(this);
+      }
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+        walker.after(this);
+      }
+
+      std::string queryText() const {
+        return "";
+      }
+
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+
+        DocumentStructureNode* documentStructureCopy = new DocumentStructureNode;
+        documentStructureCopy->setNodeName( nodeName() );
+
+        return copier.after(this, documentStructureCopy);
+      }
+    };
+
+    class ShrinkageScorerNode : public RawScorerNode {
+    private:
+      DocumentStructureNode* _documentStructure;
+      
+      std::vector<std::string> _shrinkageRules;
+
+    public:
+      ShrinkageScorerNode( RawExtentNode* raw, 
+			   DocumentStructureNode* documentStructure, 
+			   std::string smoothing = "method:dirichlet,mu:2500" )
+	: RawScorerNode( raw, 0, smoothing ),
+	  _documentStructure( documentStructure ), 
+	  _shrinkageRules( 0 )
+      {
+      }
+
+      ShrinkageScorerNode( Unpacker& unpacker ) : RawScorerNode( 0, 0, "" ) {
+        _raw = unpacker.getRawExtentNode( "raw" );
+	_documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
+        _occurrences = unpacker.getDouble( "occurrences" );
+        _contextSize = unpacker.getDouble( "contextSize" );
+        _smoothing = unpacker.getString( "smoothing" );
+	_shrinkageRules = unpacker.getStringVector( "shrinkageRules" );
+      }
+
+      std::string typeName() const {
+        return "ShrinkageScorerNode";
+      }
+
+      std::string queryText() const {
+        std::stringstream qtext;
+        
+        qtext << _raw->queryText();
+
+        return qtext.str();
+      }
+
+      void addShrinkageRule( std::string rule ) {
+	_shrinkageRules.push_back( rule );
+      }
+      
+      std::vector<std::string> getShrinkageRules() {
+	return _shrinkageRules;
+      }
+
+      void setDocumentStructure( DocumentStructureNode* docStruct ) {
+        _documentStructure = docStruct;
+      }
+
+      DocumentStructureNode* getDocumentStructure() {
+        return _documentStructure;
+      }
+
+
+      UINT64 hashCode() const {
+	UINT64 hash = 0;
+
+        hash += 119;/////////////////????
+        hash += _raw->hashCode();
+
+        if( _context ) {
+          hash += _context->hashCode();
+        }
+
+        indri::utility::GenericHash<const char*> gh;
+        hash += gh( _smoothing.c_str() );
+
+        return hash;
+      }
+
+      void pack( Packer& packer ) {
+        packer.before(this);
+        packer.put( "raw", _raw );
+	packer.put( "documentStructure", _documentStructure );
+        packer.put( "occurrences", _occurrences );
+        packer.put( "contextSize", _contextSize );
+        packer.put( "smoothing", _smoothing );
+	packer.put( "shrinkageRules", _shrinkageRules );
+        packer.after(this);
+      }
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+        if( _raw )
+          _raw->walk(walker);
+	if( _documentStructure ) 
+	  _documentStructure->walk(walker);
+        walker.after(this);
+      }
+
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+
+        RawExtentNode* duplicateRaw = _raw ? dynamic_cast<RawExtentNode*>(_raw->copy(copier)) : 0;
+	DocumentStructureNode* duplicateDocStruct = _documentStructure ? dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier)) : 0;
+        ShrinkageScorerNode* duplicate = new ShrinkageScorerNode(*this);
+        duplicate->setRawExtent( duplicateRaw );
+        duplicate->setDocumentStructure( duplicateDocStruct );
+
+	std::vector<std::string>::iterator ruleIter = _shrinkageRules.begin();
+	while( ruleIter != _shrinkageRules.end() ) {
+	  duplicate->addShrinkageRule( *ruleIter );
+	  ruleIter++;
+	}
+
+        return copier.after(this, duplicate);
+      }
+    };
+
+
   }
 }
 

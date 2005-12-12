@@ -27,6 +27,7 @@ namespace indri {
   namespace lang {
     class RawExtentNode;
     class ScoredExtentNode;
+    class DocumentStructureNode;
 
     class Unpacker {
     private:
@@ -51,6 +52,7 @@ namespace indri {
       std::vector<double> getDoubleVector( const char* name ) ;
       ScoredExtentNode* getScoredExtentNode( const char* name );
       bool getBoolean( const char* name );
+      DocumentStructureNode* getDocumentStructureNode( const char* name );
 
       template<class T>
       std::vector<T*> getNodeVector( const char* name ) {

@@ -59,6 +59,13 @@ namespace indri
 	after( (indri::lang::RawScorerNode *) node );
       }
 
+      void before( indri::lang::ShrinkageScorerNode* node ) {
+	before( (indri::lang::RawScorerNode *) node );
+      }
+
+      void after( indri::lang::ShrinkageScorerNode* node ) {
+	after( (indri::lang::RawScorerNode *) node );
+      }
 
       std::vector<indri::lang::RawScorerNode*>& getScorerNodes() {
         return _scorerNodes;

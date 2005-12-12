@@ -26,6 +26,7 @@
 #include "indri/Index.hpp"
 #include "indri/DeletedDocumentList.hpp"
 #include "indri/PriorListIterator.hpp"
+#include "indri/DocumentStructureHolderNode.hpp"
 
 namespace indri
 {
@@ -54,6 +55,8 @@ namespace indri
       std::vector<EvaluatorNode*> _evaluators;
       std::vector<EvaluatorNode*> _complexEvaluators;
       std::vector<indri::query::TermScoreFunction*> _scoreFunctions;
+
+      DocumentStructureHolderNode * _documentStructureHolderNode;
 
       indri::utility::greedy_vector<class indri::index::DocListIterator*> _closeIterators;
       int _closeIteratorBound;
@@ -90,6 +93,7 @@ namespace indri
       void addEvaluatorNode( EvaluatorNode* evaluatorNode );
       void addComplexEvaluatorNode( EvaluatorNode* complexEvaluator );
       void addScoreFunction( indri::query::TermScoreFunction* scoreFunction );
+      void addDocumentStructureHolderNode( DocumentStructureHolderNode* docStruct );
       const MAllResults& evaluate();
     };
   }

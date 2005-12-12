@@ -59,6 +59,8 @@
 #include "indri/ExtentEnforcementNode.hpp"
 #include "indri/ContextInclusionAndNode.hpp"
 #include "indri/LengthPriorNode.hpp"
+#include "indri/DocumentStructureHolderNode.hpp"
+#include "indri/ShrinkageBeliefNode.hpp"
 
 #include <stdexcept>
 
@@ -683,8 +685,11 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::TermFrequencySc
 
 void indri::infnet::InferenceNetworkBuilder::after( indri::lang::RawScorerNode* rawScorerNode ) {
   indri::lang::NestedRawScorerNode * nested = dynamic_cast<indri::lang::NestedRawScorerNode*>(rawScorerNode);
+  indri::lang::ShrinkageScorerNode * shrinkage = dynamic_cast<indri::lang::ShrinkageScorerNode*>(rawScorerNode);
   if ( nested ) {
     _after( nested );
+  } else if ( shrinkage ) {
+    _after( shrinkage );
   } else if( _nodeMap.find( rawScorerNode ) == _nodeMap.end() ) {
     BeliefNode* belief;
     InferenceNetworkNode* untypedRawExtentNode = _nodeMap[rawScorerNode->getRawExtent()];
@@ -977,5 +982,69 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::LengthPrior* le
 
     _network->addBeliefNode( lengthPriorNode );
     _nodeMap[lengthPrior] = lengthPriorNode;
+  }
+}
+
+
+//
+// DocumentStructureNode
+//
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::DocumentStructureNode* docStructNode ) {
+  if( _nodeMap.find( docStructNode ) == _nodeMap.end() ) {
+    indri::infnet::DocumentStructureHolderNode* docStructHolderNode = 
+      new indri::infnet::DocumentStructureHolderNode( docStructNode->nodeName() );
+
+    _network->addDocumentStructureHolderNode( docStructHolderNode );
+    _nodeMap[docStructNode] = docStructHolderNode;
+  }
+}
+
+//
+// ShrinkageScorer
+//
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ShrinkageScorerNode* shrinkScorerNode ) {
+  _after( shrinkScorerNode );
+}
+
+void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ShrinkageScorerNode* shrinkScorerNode ) {
+  if( _nodeMap.find( shrinkScorerNode ) == _nodeMap.end() ) {
+    BeliefNode* belief;
+    InferenceNetworkNode* untypedShrinkExtentNode = _nodeMap[shrinkScorerNode->getRawExtent()];
+    InferenceNetworkNode* untypedContextNode = _nodeMap[shrinkScorerNode->getContext()];
+    ListIteratorNode* iterator = dynamic_cast<ListIteratorNode*>(untypedShrinkExtentNode);
+
+    indri::query::TermScoreFunction* function = 0;
+
+    function = _buildTermScoreFunction( shrinkScorerNode->getSmoothing(),
+                                        shrinkScorerNode->getOccurrences(),
+                                        shrinkScorerNode->getContextSize());
+
+    if( shrinkScorerNode->getOccurrences() > 0 && iterator != 0 ) {
+      
+      DocumentStructureHolderNode* docStruct = dynamic_cast<DocumentStructureHolderNode*>(_nodeMap[shrinkScorerNode->getDocumentStructure()]);
+      
+      // this is here to turn max-score off for this term
+      // only frequency lists are "max-scored"
+      double maximumScore = INDRI_HUGE_SCORE;
+      double maximumBackgroundScore = INDRI_HUGE_SCORE;
+      
+      ShrinkageBeliefNode * shrinkageBelief = new ShrinkageBeliefNode( shrinkScorerNode->nodeName(), *iterator, *docStruct, *function, maximumBackgroundScore, maximumScore );
+      belief = shrinkageBelief;
+      std::vector<std::string> shrinkageRules = shrinkScorerNode->getShrinkageRules();
+      std::vector<std::string>::iterator ruleIter = shrinkageRules.begin();
+      while( ruleIter != shrinkageRules.end() ) {
+	shrinkageBelief->addShrinkageRule( *ruleIter );
+	ruleIter++;
+      }
+
+    } else {
+      belief = new NullScorerNode( shrinkScorerNode->nodeName(), *function );
+    }
+
+    _network->addScoreFunction( function );
+    _network->addBeliefNode( belief );
+    _nodeMap[shrinkScorerNode] = belief;
   }
 }

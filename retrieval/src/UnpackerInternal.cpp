@@ -89,6 +89,10 @@ indri::lang::Node* indri::lang::Unpacker::_unpack( indri::xml::XMLNode* child ) 
     result = new ContextInclusionNode(*this);
   } else if( type == "LengthPrior" ) {
     result = new LengthPrior(*this);
+  } else if( type == "DocumentStructureNode" ) {
+    result = new DocumentStructureNode(*this);
+  } else if( type == "ShrinkageScorerNode" ) {
+    result = new ShrinkageScorerNode(*this);
   } else {
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Unknown node type '" + type + "' found during unpacking." );
   }
