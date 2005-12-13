@@ -132,6 +132,9 @@
 				RelativePath=".\src\DocListIteratorNode.cpp">
 			</File>
 			<File
+				RelativePath=".\src\DocumentStructureHolderNode.cpp">
+			</File>
+			<File
 				RelativePath=".\src\DocumentVector.cpp">
 			</File>
 			<File
@@ -300,6 +303,9 @@
 				RelativePath=".\src\ScoreAccumulator.cpp">
 			</File>
 			<File
+				RelativePath=".\src\ShrinkageBeliefNode.cpp">
+			</File>
+			<File
 				RelativePath=".\src\SimpleKLRetMethod.cpp">
 			</File>
 			<File
@@ -411,6 +417,9 @@
 			</File>
 			<File
 				RelativePath=".\include\DocumentRep.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\DocumentStructureHolderNode.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\DocumentVector.hpp">
@@ -645,6 +654,9 @@
 			</File>
 			<File
 				RelativePath=".\include\ScoreFunction.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\ShrinkageBeliefNode.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\SimpleCopier.hpp">
