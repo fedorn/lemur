@@ -9,7 +9,11 @@
 #include "indri/ShrinkageBeliefNode.hpp"
 #include "lemur-compat.hpp"
 #include "indri/Annotator.hpp"
-
+#include <cmath>
+#ifdef WIN32
+#include <float.h>
+#define isnan _isnan
+#endif
 
 indri::infnet::ShrinkageBeliefNode::ShrinkageBeliefNode( const std::string& name, ListIteratorNode& child, DocumentStructureHolderNode& documentStructureHolderNode, indri::query::TermScoreFunction& scoreFunction, double maximumBackgroundScore, double maximumScore )
   :
@@ -121,7 +125,8 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
       while( kids < kidsEnd ) {
 	// check for a smoothing rule for the child
 	int kidType = docStruct->type(*kids);
-	std::map<int, smoothing_rule, lt_rule>::iterator ruleIter = _ruleMap.find(kidType);
+//	std::map<int, smoothing_rule, lt_rule>::iterator ruleIter = _ruleMap.find(kidType);
+    std::map<int, smoothing_rule>::iterator ruleIter = _ruleMap.find(kidType);
 	if( ruleIter != _ruleMap.end() ) {
 	  smoothing_rule rule = ruleIter->second;
 	  if( rule.lengthProportional ) {
