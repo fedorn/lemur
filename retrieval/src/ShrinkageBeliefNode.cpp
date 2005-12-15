@@ -173,12 +173,12 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
     for( size_t i=2; i<=numNodes; i++ ) {
       if( _recursive ) {
 	_down[i] = (1.0 - _parentWeight - _docWeight) * _up[i] 
-	  + _parentWeight * _up[docStruct->parent(i)]
-	  + _docWeight * _up[1];
+	  + _parentWeight * _down[docStruct->parent(i)]
+	  + _docWeight * _down[1];
       } else {
 	_down[i] = (1.0 - _parentWeight - _docWeight) * _up[i]
-          + _parentWeight * _down[docStruct->parent(i)]
-          + _docWeight * _down[1];
+          + _parentWeight * _up[docStruct->parent(i)]
+          + _docWeight * _up[1];
       }
     }
 
