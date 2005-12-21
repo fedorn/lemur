@@ -352,7 +352,7 @@ int indri::api::IndexEnvironment::addString( const std::string& documentString, 
   document.textLength = documentString.length() + 1; // for the null
   document.metadata = metadata;
   document.content = document.text;
-  document.contentLength = document.textLength;
+  document.contentLength = document.textLength - 1;
   
   _getParsingContext( &parser, &tokenizer, &iterator, &conflater, fileClass );
 

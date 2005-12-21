@@ -64,7 +64,7 @@ indri::parse::UnparsedDocument* indri::parse::TextDocumentExtractor::nextDocumen
   _document.text = _buffer.front();
   _document.textLength = _buffer.position();
   _document.content = _buffer.front();
-  _document.contentLength = _buffer.position();
+  _document.contentLength = _buffer.position() - 1 ;
 
   return &_document;
 }
