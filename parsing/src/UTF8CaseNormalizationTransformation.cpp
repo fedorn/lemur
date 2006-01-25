@@ -40,12 +40,17 @@ void indri::parse::UTF8CaseNormalizationTransformation::setHandler( ObjectHandle
 
 indri::api::ParsedDocument* indri::parse::UTF8CaseNormalizationTransformation::transform( indri::api::ParsedDocument* document ) {
 
+  for ( std::vector<char*>::iterator i = _buffers_allocated.begin();
+	i != _buffers_allocated.end(); i++ )
+    delete[] (*i);
+  _buffers_allocated.clear();
+  
   // Here, detect UTF-8 strings and downcase them.
 
   // We don't have access to the original term buffer where these
   // term strings live, so this function will allocate a new
   // buffer for any UTF-8 term that needs to be downcased.
-  // These buffers are cleaned up in the destructor.
+  // These buffers are cleaned up on each call to transform.
 
   for ( int i = 0; i < document->terms.size(); i++ ) {
 
