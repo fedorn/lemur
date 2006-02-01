@@ -190,30 +190,41 @@ void indri::api::IndexEnvironment::addFileClass( const std::string& name,
 }
 
 void indri::api::IndexEnvironment::setIndexedFields( const std::vector<std::string>& fieldNames ) {
+  bool existingFields = _parameters.exists( "field" );
+  // if setNumericField was called before setIndexedFields, there
+  // will be an existing entry in the fields.
   for( unsigned int i=0; i<fieldNames.size(); i++) { 
-    if( i==0 )
-      _parameters.set("field.name", fieldNames[i]);
-    else
+    bool found = false;
+    if( existingFields ) {
+      Parameters fields = _parameters["field"];
+      for( int j=0; j<fields.size(); j++ ) {
+        std::string parameterFieldName = fields[j]["name"];
+        if( parameterFieldName == fieldNames[i] ) {
+          // already there, don't add
+          found = true;
+        }
+      }
+    }
+    if (! found) 
       _parameters.append("field").set("name",fieldNames[i]);
   }
 }
 
 void indri::api::IndexEnvironment::setNumericField( const std::string& fieldName, bool isNumeric, const std::string & parserName ) {
-  if( !_parameters.exists( "field" ) )
-    _parameters.set( "field" );
+  bool existingFields = _parameters.exists( "field" );
 
-  Parameters fields = _parameters["field"];
+  if (existingFields) {
+    Parameters fields = _parameters["field"];
+    for( int i=0; i<fields.size(); i++ ) {
+      std::string parameterFieldName = fields[i]["name"];
 
-  for( int i=0; i<fields.size(); i++ ) {
-    std::string parameterFieldName = fields[i]["name"];
-
-    if( parameterFieldName == fieldName ) {
-      fields[i].set( "numeric", isNumeric );
-      fields[i].set( "parserName", parserName );
-      return;
+      if( parameterFieldName == fieldName ) {
+        fields[i].set( "numeric", isNumeric );
+        fields[i].set( "parserName", parserName );
+        return;
+      }
     }
   }
-  
   Parameters field = _parameters.append("field");
   field.set( "name", fieldName );
   field.set( "numeric", isNumeric );
