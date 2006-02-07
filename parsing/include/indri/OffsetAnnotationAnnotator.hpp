@@ -171,6 +171,12 @@ namespace indri {
       }
 
       void _cleanup() {
+        // clear any allocated buffers
+	for ( std::vector<char *>::iterator i = _buffers_allocated.begin();
+	      i != _buffers_allocated.end(); i++ )
+	  delete[] (*i);
+
+        _buffers_allocated.clear();
 	
 	// Cleanup _annotations, _converted_annotations, _tag_id_map,
 	// and _attribute_id_map in preparation for object
@@ -186,6 +192,7 @@ namespace indri {
 
 	    delete (*j); // TagExtent
 	  }
+          delete(p_set);
 	}
 
 	_annotations.clear();
@@ -199,6 +206,7 @@ namespace indri {
 
 	    delete (*j); // TagExtent
 	  }
+          delete(p_set);
 	}
 
 	_converted_annotations.clear();
@@ -229,17 +237,16 @@ namespace indri {
 
 	_handler = NULL;
 	_p_conflater = NULL;
+	_first_open = true;
       }
 
       ~OffsetAnnotationAnnotator() {
-
 	_cleanup();
+      }
 
-	for ( std::vector<char *>::iterator i = _buffers_allocated.begin();
-	      i != _buffers_allocated.end(); i++ )
-	  delete[] (*i);
-
-	delete _p_conflater;
+      void setConflater(Conflater* p_conflater) 
+      {
+        _p_conflater = p_conflater;
       }
 
       void setHandler( ObjectHandler<indri::api::ParsedDocument>& handler ) {

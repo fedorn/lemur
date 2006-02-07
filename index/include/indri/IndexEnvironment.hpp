@@ -82,6 +82,7 @@ namespace indri
       indri::parse::FileClassEnvironmentFactory _fileClassFactory;
 
       indri::parse::AnchorTextAnnotator _annotator;
+      indri::parse::OffsetAnnotationAnnotator _oa_annotator;
       indri::parse::OffsetMetadataAnnotator _om_annotator;
 
       std::map<std::string, indri::parse::FileClassEnvironment*> _environments;

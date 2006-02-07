@@ -91,8 +91,11 @@ std::vector<indri::parse::Transformation*> indri::api::IndexEnvironment::_create
       offsetAnnotationsPath = indri::file::Path::combine( _offsetAnnotationsRoot, relativePath );
     else
       offsetAnnotationsPath = _offsetAnnotationsRoot;
-    oa_annotator = new indri::parse::OffsetAnnotationAnnotator( *conflater );
-    oa_annotator->open( offsetAnnotationsPath );
+    //    oa_annotator = new indri::parse::OffsetAnnotationAnnotator( *conflater );
+    //    oa_annotator->open( offsetAnnotationsPath );
+    _oa_annotator.setConflater( *conflater );
+    _oa_annotator.open( offsetAnnotationsPath );
+    oa_annotator = &_oa_annotator;
     annotators.push_back( oa_annotator );
   }
 
