@@ -25,12 +25,15 @@ indri::index::DocumentStructure::loadStructure(const indri::utility::greedy_vect
 
   _numNodes = fields.size();
 
+  // no fields? no data.
+  if (_numNodes==0) return;
+
   _nodes.resize( _numNodes );
   _childrenBuff.resize( _numNodes-1 );
 
   int i;
 
-  // copy values from field list, 
+  // copy values from field list,
   for (i = 0; i < _numNodes; i++) {
 
     int type = fields[i].id;
@@ -38,10 +41,10 @@ indri::index::DocumentStructure::loadStructure(const indri::utility::greedy_vect
     int end = fields[i].end;
     int length =  end - begin;
 
-    // Node ids are from 1 to _numNodes, but we index them in the 
+    // Node ids are from 1 to _numNodes, but we index them in the
     // _nodes vector by id - 1
     int id = i+1;
-    
+
 
     _nodes[i].begin = begin;
     _nodes[i].end = end;
@@ -57,12 +60,12 @@ indri::index::DocumentStructure::loadStructure(const indri::utility::greedy_vect
     int parent = i;
     if (parent > 1) {
       while ( _nodes[parent-1].end <= _nodes[i].begin) {
-	if ( _nodes[parent-1].begin <= _nodes[i].begin &&
-	     _nodes[parent-1].end >= _nodes[i].end ) break;
-	parent = _nodes[parent-1].parent;
+  if ( _nodes[parent-1].begin <= _nodes[i].begin &&
+       _nodes[parent-1].end >= _nodes[i].end ) break;
+  parent = _nodes[parent-1].parent;
       }
     }
-    
+
     _nodes[i].parent = parent;
 
     // count number of children
@@ -96,7 +99,7 @@ indri::index::DocumentStructure::loadStructure(const indri::utility::greedy_vect
     // int * child = node->children;
     // int * childrenEnd = child + node->numChildren;
     child_iterator child = childrenBegin( i );
-    child_iterator childEnd = childrenEnd( i );      
+    child_iterator childEnd = childrenEnd( i );
     while (child < childEnd) {
       _nodes[i-1].length -= _nodes[(*child)-1].totalLength;
       child++;
@@ -107,7 +110,7 @@ indri::index::DocumentStructure::loadStructure(const indri::utility::greedy_vect
 indri::index::DocumentStructure::~DocumentStructure() {
 }
 
-int 
+int
 indri::index::DocumentStructure::parent(int node) {
   if (node > 0 && node <= _numNodes) {
     return _nodes[node-1].parent;
@@ -117,7 +120,7 @@ indri::index::DocumentStructure::parent(int node) {
 }
 
 
-int 
+int
 indri::index::DocumentStructure::length(int node) {
   if (node > 0 && node <= _numNodes) {
     return _nodes[node-1].length;
@@ -127,7 +130,7 @@ indri::index::DocumentStructure::length(int node) {
 }
 
 
-int 
+int
 indri::index::DocumentStructure::begin(int node) {
   if (node > 0 && node <= _numNodes) {
     return _nodes[node-1].begin;
@@ -136,7 +139,7 @@ indri::index::DocumentStructure::begin(int node) {
   return 0;
 }
 
-int 
+int
 indri::index::DocumentStructure::end(int node) {
   if (node > 0 && node <= _numNodes) {
     return _nodes[node-1].end;
@@ -146,7 +149,7 @@ indri::index::DocumentStructure::end(int node) {
 }
 
 
-int 
+int
 indri::index::DocumentStructure::accumulatedLength(int node) {
   if (node > 0 && node <= _numNodes) {
     return _nodes[node-1].totalLength;
@@ -170,7 +173,7 @@ indri::index::DocumentStructure::child_iterator
 indri::index::DocumentStructure::childrenBegin( int node ) {
   if ( node > 0 && node <= _numNodes ) {
     return _childrenBuff.begin() + _nodes[node-1].children;
-  } 
+  }
   return _childrenBuff.end();
 }
 
@@ -178,18 +181,18 @@ indri::index::DocumentStructure::child_iterator
 indri::index::DocumentStructure::childrenEnd( int node ) {
   if ( node > 0 && node <= _numNodes ) {
     return _childrenBuff.begin() + _nodes[node-1].children + _nodes[node-1].numChildren;
-  } 
+  }
   return _childrenBuff.end();
 }
 
-bool 
+bool
 indri::index::DocumentStructure::ancestor(int node, int possibleAncestor) {
   bool anc = false;
   if (node == possibleAncestor) {
     anc = true;
   } else if (node < possibleAncestor) {
     anc = false;
-  } else {    
+  } else {
     anc = ancestor(parent(node), possibleAncestor);
   }
   return anc;
@@ -203,7 +206,7 @@ indri::index::DocumentStructure::findLeaf(int b, int e) {
   // start at root of tree and work way down to leaf
   if ( begin(1) <= b && end(1) >= e ) {
     leaf = 1;
-  } 
+  }
   int numChildren;
   child_iterator child = childrenBegin( 1 );
   child_iterator childEnd = childrenEnd( 1 );
@@ -213,19 +216,19 @@ indri::index::DocumentStructure::findLeaf(int b, int e) {
       leaf = *child;
       child = childrenBegin( leaf );
       childEnd = childrenEnd( leaf );
-      
+
     } else {
       child++;
     }
   }
-  
+
   return leaf;
 }
 
 std::string
 indri::index::DocumentStructure::path(int node) {
   std::stringstream path;
-  
+
   _constructNodePath(path, node);
 
   return path.str();
@@ -244,17 +247,17 @@ indri::index::DocumentStructure::_constructNodePath(std::stringstream & path, in
     child_iterator kids = childrenBegin( pid );
     child_iterator kidsEnd = childrenEnd( pid );
 
-    int nodeType = type(node);    
+    int nodeType = type(node);
     int sameType = 0;
     int sameTypeLoc = 0;
 
     while ( kids < kidsEnd ) {
       int sid = *kids;
       if (type(sid) == nodeType) {
-	sameType++;
-	if (sid == node) {
-	  sameTypeLoc = sameType;
-	}
+  sameType++;
+  if (sid == node) {
+    sameTypeLoc = sameType;
+  }
       }
       kids++;
     }
@@ -275,9 +278,9 @@ indri::index::DocumentStructure::fieldId( const std::string path ) {
   child_iterator kidsEnd = childrenEnd( 0 );
   int numKids = 1;
 
-  
+
   while ( loc >= 0 && loc < path.size() ) {
-  
+
     // seek to first path name
     int typeBegin = path.find_first_not_of( "/", loc );
     // find end of path name
@@ -286,7 +289,7 @@ indri::index::DocumentStructure::fieldId( const std::string path ) {
     int typeLength = typeEnd - typeBegin;
     const std::string typeString = path.substr( typeBegin, typeLength );
     int typeId = _index->field( typeString );
-    
+
     // extract count
     int countBegin = path.find_first_not_of( "[", typeEnd );
     int countEnd = path.find_first_of( "]" , typeBegin );
@@ -294,38 +297,38 @@ indri::index::DocumentStructure::fieldId( const std::string path ) {
     const std::string countString = path.substr( countBegin, countLength );
     int count = 0;
     sscanf( countString.c_str(), "%d", &count );
-  
+
     // find the node
-    
+
     int seen = 0;
     if ( node == 0 ) {
       if ( type( 1 ) == typeId ) {
-	seen++;
-      } 
+  seen++;
+      }
       if ( count == seen ) {
-	node = 1;
+  node = 1;
       }
     } else {
       while( kids < kidsEnd ) {
-	if( type( *kids ) == typeId ) {
-	  seen++;
-	}
-	if ( count == seen ) {
-	  node = *kids;
-	  break;
-	}
-	kids++;
+  if( type( *kids ) == typeId ) {
+    seen++;
+  }
+  if ( count == seen ) {
+    node = *kids;
+    break;
+  }
+  kids++;
       }
     }
-  
+
     if( count != seen ) {
       std::cerr << "Unable to find child" << std::endl;
     }
-    
+
     // set the children
     kids = childrenBegin( node );
     kidsEnd = childrenEnd( node );
-    
+
     loc = path.find_first_of( "/", countEnd );
   }
   return node;
