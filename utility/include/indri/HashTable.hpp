@@ -146,7 +146,7 @@ namespace indri
 
       void next() {
         // already at end
-        if( _currentBucket == -1 )
+        if( _currentBucket == (size_t)-1 )
           return;
 
         // in a chain with more entries left
@@ -168,12 +168,12 @@ namespace indri
 
         // none left
         _currentEntry = 0;
-        _currentBucket = -1;
+        _currentBucket = (size_t)-1;
       }
 
     public:
       HashTableIterator() {
-        _currentBucket = -1;
+        _currentBucket = (size_t)-1;
         _currentEntry = 0;
       }
 
