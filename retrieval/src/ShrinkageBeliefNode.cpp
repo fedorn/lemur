@@ -10,9 +10,13 @@
 #include "lemur-compat.hpp"
 #include "indri/Annotator.hpp"
 #include <cmath>
+#ifdef ISNAN_IN_NAMESPACE_STD
+using std::isnan;
+#else
 #ifdef WIN32
 #include <float.h>
 #define isnan _isnan
+#endif
 #endif
 
 indri::infnet::ShrinkageBeliefNode::ShrinkageBeliefNode( const std::string& name, ListIteratorNode& child, DocumentStructureHolderNode& documentStructureHolderNode, indri::query::TermScoreFunction& scoreFunction, double maximumBackgroundScore, double maximumScore )
