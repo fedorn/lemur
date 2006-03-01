@@ -26,6 +26,7 @@ namespace lemur
     /// Term match entry
     class TMatch {
     public:
+		TMatch() : tid(-1), start(0), end(0), position(0)  {};
       TMatch(TERMID_T t, int s, int e, int p): tid(t), start(s), end(e), 
                                                position(p) { }
       /// internal term id
