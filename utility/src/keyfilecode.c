@@ -2891,12 +2891,16 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, 
 		old_block_prefix_lc = old_block->prefix_lc;*/
     cnt = choose_left_move_cnt(f,new_block,old_block,k,&p,ix,insert,
       old_block->keys_in_block,&old_block_lc,&old_block_prefix_lc,&new_block_lc,&new_block_prefix_lc);
-    get_nth_key(old_block,&temp,0);
-    set_empty_block_prefix(new_block,&temp,new_block_prefix_lc);
+    if ( ix==0 )set_empty_block_prefix(new_block,k,new_block_prefix_lc);
+    else {
+      get_nth_key(old_block,&temp,0);
+      set_empty_block_prefix(new_block,&temp,new_block_prefix_lc);
+    }
     moved_new_key = move_keys_to_left(new_block,old_block,cnt,k,&p,ix,insert);
-    compress_ix_block(old_block,old_block_prefix_lc,f->trace);
-    if ( !moved_new_key ) {
+    if ( moved_new_key ) compress_ix_block(old_block,old_block_prefix_lc,f->trace);
+    else {
       if ( !insert ) simple_delete(old_block,ix-cnt);
+      compress_ix_block(old_block,old_block_prefix_lc,f->trace);
       if ( !simple_insert(old_block,ix-cnt,k,p) && show_errors ) printf("**insert failed in split_block, new is on rt\n");
     }
   }
@@ -2913,11 +2917,13 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr p, int bufix, 
     else {
       cnt = choose_right_move_cnt(f,old_block,new_block,k,&p,ix,insert,target,
         &old_block_lc,&old_block_prefix_lc,&new_block_lc,&new_block_prefix_lc);
-      set_empty_block_prefix(new_block,&original_max_key,new_block_prefix_lc);
+      if ( ix==old_block->keys_in_block-1 ) set_empty_block_prefix(new_block,k,new_block_prefix_lc);
+      else set_empty_block_prefix(new_block,&original_max_key,new_block_prefix_lc);
       moved_new_key = move_keys_to_right(old_block,new_block,cnt,k,&p,ix,insert);
-      compress_ix_block(old_block,old_block_prefix_lc,f->trace);
-      if ( !moved_new_key ) {
+      if ( moved_new_key ) compress_ix_block(old_block,old_block_prefix_lc,f->trace);
+      else {
         if ( !insert ) simple_delete(old_block,ix);
+        compress_ix_block(old_block,old_block_prefix_lc,f->trace);
         if ( !simple_insert(old_block,ix,k,p) && show_errors ) printf("**insert failed in split_block, new is on rt\n");
       }
     }
