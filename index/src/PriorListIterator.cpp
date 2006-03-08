@@ -77,7 +77,7 @@ void indri::collection::PriorListIterator::nextEntry() {
   if( _finished )
     return;
     
-  if( _entry.document >= _entryCount-1 ) {
+  if( _entry.document >= _entryCount ) {
     _finished = true;
     return;
   }
@@ -102,7 +102,7 @@ void indri::collection::PriorListIterator::nextEntry() {
 //
 
 void indri::collection::PriorListIterator::nextEntry( int document ) {
-  if( _finished || _entry.document >= _entryCount-1 ) {
+  if( _finished || _entry.document >= _entryCount ) {
     _finished = true;
     return;
   }
