@@ -87,12 +87,12 @@ std::vector<indri::parse::Transformation*> indri::api::IndexEnvironment::_create
   if( _offsetAnnotationsRoot.length() ) {
     // If the user specified an offset annotations file, we'll use it.
     std::string offsetAnnotationsPath;
-    if( relativePath.length() > 0 )
+    // only do path combining on directories. Otherwise, assume a single file
+    // for all corpus documents.
+    if( indri::file::Path::isDirectory( _offsetAnnotationsRoot ) && relativePath.length() > 0 )
       offsetAnnotationsPath = indri::file::Path::combine( _offsetAnnotationsRoot, relativePath );
     else
       offsetAnnotationsPath = _offsetAnnotationsRoot;
-    //    oa_annotator = new indri::parse::OffsetAnnotationAnnotator( *conflater );
-    //    oa_annotator->open( offsetAnnotationsPath );
     _oa_annotator.setConflater( *conflater );
     _oa_annotator.open( offsetAnnotationsPath );
     oa_annotator = &_oa_annotator;
@@ -102,7 +102,9 @@ std::vector<indri::parse::Transformation*> indri::api::IndexEnvironment::_create
   if( _offsetMetadataRoot.length() ) {
     // If the user specified an offset metadata path, we'll use it.
     std::string offsetMetadataPath;
-    if( relativePath.length() > 0 ) 
+    // only do path combining on directories. Otherwise, assume a single file
+    // for all corpus documents.
+    if( indri::file::Path::isDirectory( _offsetMetadataRoot ) && relativePath.length() > 0 ) 
       offsetMetadataPath = indri::file::Path::combine( _offsetMetadataRoot, relativePath );
     else 
       offsetMetadataPath = _offsetMetadataRoot;
