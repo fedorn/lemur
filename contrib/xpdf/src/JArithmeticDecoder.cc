@@ -92,7 +92,7 @@ JArithmeticDecoder::JArithmeticDecoder() {
 }
 
 JArithmeticDecoder::~JArithmeticDecoder() {
-  while (dataLen > 0) {
+  while (str && dataLen > 0) {
     readByte();
   }
 }
