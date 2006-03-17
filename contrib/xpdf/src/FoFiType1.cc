@@ -139,7 +139,6 @@ void FoFiType1::parse() {
   for (i = 1, line = (char *)file;
        i <= 100 && line && (!name || !encoding);
        ++i) {
-
     // get font name
     if (!name && !strncmp(line, "/FontName", 9)) {
       strncpy(buf, line, 255);
@@ -163,6 +162,9 @@ void FoFiType1::parse() {
       line = getNextLine(line);
       for (j = 0; j < 300 && line; ++j) {
 	line1 = getNextLine(line);
+
+  if (!line1) break; // 03-17-2006 - MJH - added to check.
+
 	if ((n = line1 - line) > 255) {
 	  n = 255;
 	}
