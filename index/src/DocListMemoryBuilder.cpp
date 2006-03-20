@@ -21,7 +21,7 @@
 #include "RVLCompress.hpp"
 
 const int MIN_SIZE = 128;
-const int GROW_TIMES = 11;
+const int GROW_TIMES = 13;
 const size_t PLENTY_OF_SPACE = 15; // docID, count, position: 5 bytes each
 const size_t TERMINATE_SPACE = 4; // need enough in case we have to grow
 const size_t LOCATION_SPACE = 5; // need enough in case we have to grow
