@@ -21,7 +21,7 @@
 #include "RVLCompress.hpp"
 
 const int MIN_SIZE = 128;
-const int GROW_TIMES = 13;
+const int GROW_TIMES = 11;
 const size_t PLENTY_OF_SPACE = 15; // docID, count, position: 5 bytes each
 const size_t TERMINATE_SPACE = 4; // need enough in case we have to grow
 const size_t LOCATION_SPACE = 5; // need enough in case we have to grow
@@ -53,6 +53,18 @@ indri::index::DocListMemoryBuilder::~DocListMemoryBuilder() {
 }
 
 //
+// _roundUP
+//
+size_t indri::index::DocListMemoryBuilder::_roundUp( size_t amount ) {
+  // round up by MIN_SIZE << GROW_TIMES if it's big enough
+  if( amount >= (MIN_SIZE << GROW_TIMES) ) {
+    return (amount + (MIN_SIZE << GROW_TIMES)) & ~((MIN_SIZE << GROW_TIMES) - 1);
+  }
+  // didn't actually round up, but _grow will take care of that
+  return amount;
+}
+
+//
 // _grow
 // 
 
@@ -75,7 +87,9 @@ void indri::index::DocListMemoryBuilder::_grow() {
 
   // actually add the new list
   unsigned int iterations = std::min<unsigned int>( GROW_TIMES, int(_lists.size()) );
-  size_t newSize = MIN_SIZE << iterations; // subtract 8 here to give the heap some room for accounting
+  size_t newSize = MIN_SIZE << iterations;
+
+  newSize = std::max<unsigned int>( newSize, _roundUp( documentCopyAmount ) );
 
   _list = (char*) _allocator->allocate( newSize );
   _listBegin = _list;
@@ -98,7 +112,6 @@ void indri::index::DocListMemoryBuilder::_grow() {
   assert( !_locationCountPointer || _listBegin < _locationCountPointer );
   assert( !_locationCountPointer || _listEnd > _locationCountPointer );
   assert( !_locationCountPointer || _list > _locationCountPointer );
-  assert( (_listEnd - _list) < (MIN_SIZE<<(GROW_TIMES+1)) );
   assert( _listEnd >= _list );
   assert( !_documentPointer || _listBegin <= _documentPointer );
   assert( !_documentPointer || _listEnd > _documentPointer );
@@ -156,7 +169,6 @@ inline void indri::index::DocListMemoryBuilder::_safeAddLocation( int position )
   assert( _listBegin < _locationCountPointer );
   assert( _listEnd > _locationCountPointer );
   assert( _list > _locationCountPointer );
-  assert( (_listEnd - _list) < (MIN_SIZE<<(GROW_TIMES+1)) );
   assert( _listEnd >= _list );
 }
 
@@ -202,7 +214,6 @@ void indri::index::DocListMemoryBuilder::endDocument() {
 void indri::index::DocListMemoryBuilder::addLocation( int position ) {
   size_t remaining = size_t(_listEnd - _list);
   assert( _listEnd >= _list );
-  assert( remaining < (MIN_SIZE<<(GROW_TIMES+1)) );
 
   if( remaining < LOCATION_SPACE ) {
     size_t size = lemur::utility::RVLCompress::compressedSize( position - _lastLocation );
@@ -214,7 +225,6 @@ void indri::index::DocListMemoryBuilder::addLocation( int position ) {
 
   _safeAddLocation( position );
 
-  assert( (_listEnd - _list) < (MIN_SIZE<<(GROW_TIMES+1)) );
   assert( _listEnd >= _list );
 }
 

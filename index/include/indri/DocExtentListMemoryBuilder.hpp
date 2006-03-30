@@ -86,6 +86,7 @@ namespace indri {
       inline size_t _compressedSize( int documentID, int begin, int end, INT64 number );
       inline void _safeAddLocation( int documentID, int begin, int end, INT64 number );
       void _growAddLocation( int documentID, int begin, int end, INT64 number, size_t newDataSize );
+      size_t _roundUp( size_t amount );
       void _grow();
       void _terminateDocument();
 

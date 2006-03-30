@@ -46,9 +46,7 @@ namespace indri
       }
 
       void* allocate( size_t bytes ) {
-        //return malloc( bytes ); // DEBUG!!!
-        assert( bytes <= 1024*1024 );
-    
+
         if( bytes > 1024*32 ) {
           _mallocBytes += bytes;
           _malloced.push_back( malloc( bytes ) );

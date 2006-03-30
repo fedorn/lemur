@@ -93,6 +93,7 @@ namespace indri {
       indri::utility::RegionAllocator* _allocator;
 
       inline void _safeAddLocation( int position );
+      size_t _roundUp( size_t amount );
       void _grow();
       void _terminateDocument();
 
