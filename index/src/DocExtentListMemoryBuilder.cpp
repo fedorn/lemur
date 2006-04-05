@@ -72,7 +72,7 @@ void indri::index::DocExtentListMemoryBuilder::_grow() {
   char* lastList = _list;
   char* lastListBegin = _listBegin;
   char* lastListEnd = _listEnd;
-  size_t documentCopyAmount = lastList - _documentPointer;
+  size_t documentCopyAmount = _documentPointer ? (lastList - _documentPointer) : 0;
 
   // fix data pointer of previous list
   if( lastList != 0 ) {
