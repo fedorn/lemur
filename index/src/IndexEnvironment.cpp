@@ -196,7 +196,7 @@ void indri::api::IndexEnvironment::addFileClass( const std::string& name,
 
 void indri::api::IndexEnvironment::setIndexedFields( const std::vector<std::string>& fieldNames ) {
   bool existingFields = _parameters.exists( "field" );
-  // if setNumericField was called before setIndexedFields, there
+  // if setNumericField or setOrdinalField was called before setIndexedFields, there
   // will be an existing entry in the fields.
   for( unsigned int i=0; i<fieldNames.size(); i++) { 
     bool found = false;
@@ -234,6 +234,26 @@ void indri::api::IndexEnvironment::setNumericField( const std::string& fieldName
   field.set( "name", fieldName );
   field.set( "numeric", isNumeric );
   field.set( "parserName", parserName );
+}
+
+void indri::api::IndexEnvironment::setOrdinalField( const std::string& fieldName, bool isOrdinal ) {
+  bool existingFields = _parameters.exists( "field" );
+
+  if ( existingFields ) {
+    Parameters fields = _parameters["field"];
+    
+    for( int i=0; i<fields.size(); i++ ) {
+      std::string parameterFieldName = fields[i]["name"];
+      
+      if( parameterFieldName == fieldName ) {
+	fields[i].set( "ordinal", isOrdinal );
+	return;
+      }
+    }
+  }  
+  Parameters field = _parameters.append("field");
+  field.set( "name", fieldName );
+  field.set( "ordinal", isOrdinal );
 }
 
 //
