@@ -361,8 +361,7 @@ private:
         output << documents[i]->text << std::endl;
       }
 
-      if( _printPassages ) {
-        // we'll print the text from the beginning of the first word
+      if( _printPassages ) {	
         int byteBegin = documents[i]->positions[ _results[i].begin ].begin;
         int byteEnd = documents[i]->positions[ _results[i].end-1 ].end;
         output.write( documents[i]->text + byteBegin, byteEnd - byteBegin );
@@ -397,6 +396,7 @@ public:
 
   UINT64 initialize() {
     _environment.setMemory( _parameters.get("memory", 100*1024*1024) );
+    _environment.setSingleBackgroundModel( _parameters.get("singleBackgroundModel", false) );
 
     std::vector<std::string> stopwords;
     if( copy_parameters_to_string_vector( stopwords, _parameters, "stopper.word" ) )
