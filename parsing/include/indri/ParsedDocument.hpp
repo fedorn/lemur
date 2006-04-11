@@ -41,7 +41,7 @@ namespace indri
       }
       
       indri::utility::greedy_vector<char*> terms;
-      indri::utility::greedy_vector<indri::parse::TagExtent> tags;
+      indri::utility::greedy_vector<indri::parse::TagExtent *> tags;
       indri::utility::greedy_vector<indri::parse::TermExtent> positions;
       indri::utility::greedy_vector<indri::parse::MetadataPair> metadata;
     };
