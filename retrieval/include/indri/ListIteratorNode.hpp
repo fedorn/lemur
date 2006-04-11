@@ -40,7 +40,12 @@ namespace indri
       /// annotate any results from this node from position begin to position end
       virtual void annotate( class Annotator& annotator, int documentID, int begin, int end ) = 0;
 
-
+      // Moved work of identifying matches of an extent from ExtentRestriction to here.
+      // This allows the computation for the list of matches for an extent to be 
+      // overridden.  ExtentParent, ExtentChild, and ExtentDescendant are among the
+      // classes that need to do this, as the parent/child/descedant relationships
+      // are not based on extent containment - these relationships may be among
+      // arbitrary fields in a document.
       virtual const indri::utility::greedy_vector<indri::index::Extent>& matches( indri::index::Extent extent ) {
 	int begin = extent.begin;
 	int end = extent.end;
