@@ -44,10 +44,10 @@ namespace indri
       indri::utility::greedy_vector<bool> _matches;
       std::string _name;
 
-      std::vector<double> _down;
-      std::vector<double> _up;
-      std::vector<double> _base;
-      std::vector<double> _counts;
+      indri::utility::greedy_vector<double> _down;
+      indri::utility::greedy_vector<double> _up;
+      indri::utility::greedy_vector<double> _base;
+      indri::utility::greedy_vector<double> _counts;
       int _documentID;
 
 
@@ -78,9 +78,16 @@ namespace indri
 
       double _parentWeight;
       double _docWeight;
+      double _otherWeight;
       bool _recursive;
       bool _queryLevelCombine;
+      double _defaultScore;
       
+
+      std::set<int> _roots;
+      indri::utility::greedy_vector<int> _topDownOrder;
+
+      void _buildScoreCache( int documentID );
 
     public:
       ShrinkageBeliefNode( const std::string& name,
@@ -95,11 +102,14 @@ namespace indri
       double maximumBackgroundScore();
       double maximumScore();
       const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int begin, int end, int documentLength );
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent extent, int documentLength );
       void annotate( class Annotator& annotator, int documentID, int begin, int end );
       bool hasMatch( int documentID );
       const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
       const std::string& getName() const;
       void addShrinkageRule( std::string rule );
+      // so that we can know collection/document lambdas of linear interpolation
+      void setSmoothing( const std::string & stringSpec );
     };
   }
 }
