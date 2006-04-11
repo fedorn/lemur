@@ -81,6 +81,9 @@ namespace indri
       /// \brief Set the amount of memory to use.
       /// @param memory number of bytes to allocate
       void setMemory( UINT64 memory );
+      /// \brief Set whether there should be one single background model or context sensitive models
+      /// @param background true for one background model false for context sensitive models
+      void setSingleBackgroundModel( bool background );
       /// \brief Set the scoring rules
       /// @param rules the vector of scoring rules.
       void setScoringRules( const std::vector<std::string>& rules );
