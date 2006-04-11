@@ -106,6 +106,7 @@ void IndexWriter::_writeManifest( const std::string& path ) {
     indri::api::Parameters field = fields["field"];
 
     field[i].set("isNumeric", _fields[i].numeric);
+    field[i].set("isOrdinal", _fields[i].ordinal);
     field[i].set("name", _fields[i].name);
     field[i].set("total-documents", (UINT64) _fieldData[i].documentCount);
     field[i].set("total-terms", (UINT64) _fieldData[i].totalCount);
@@ -231,7 +232,7 @@ void IndexWriter::_writeFieldLists( std::vector<indri::index::Index*>& indexes, 
     for( int i=0; i<indexes.size(); i++ )
       iterators.push_back( indexes[i]->fieldListIterator( field+1 ) ); 
 
-    _fieldData.push_back( FieldStatistics( _fields[field].name, _fields[field].numeric, 0, 0 ) );
+    _fieldData.push_back( FieldStatistics( _fields[field].name, _fields[field].numeric, _fields[field].ordinal, 0, 0 ) );
     _writeFieldList( fieldPath, field, iterators );
   }
 }
@@ -311,7 +312,12 @@ void IndexWriter::_writeFieldList( const std::string& fileName, int fieldIndex, 
   
   // write a control byte -- numeric fields use 0x02 (DiskDocExtentListIterator)
   UINT8 control = _fields[fieldIndex].numeric ? 0x02 : 0;
+  // ordinal fields use 0x04 (DiskDocExtentListIterator)
+  UINT8 ordinalControl = _fields[fieldIndex].ordinal ? 0x04: 0;  
+  control = control | ordinalControl;
   output.write( &control, sizeof(UINT8) );
+
+  bool ordinal = _fields[fieldIndex].ordinal;
 
   indri::utility::Buffer dataBuffer;
   const int minimumSkip = 1<<12; //4k
@@ -349,7 +355,8 @@ void IndexWriter::_writeFieldList( const std::string& fileName, int fieldIndex, 
 
       // extents and numbers
       int lastStart = 0;
-
+      int lastOrdinal = 0;
+ 
       for( int j=0; j<count; j++ ) {
         Extent& extent = entry->extents[j];
 
@@ -360,6 +367,11 @@ void IndexWriter::_writeFieldList( const std::string& fileName, int fieldIndex, 
         lastStart = extent.begin;
         stream << (extent.end - extent.begin);
         terms += (extent.end - extent.begin);
+
+	if ( ordinal ) {
+	  stream << (extent.ordinal - lastOrdinal);
+	  lastOrdinal = extent.ordinal;
+	}
 
         if( entry->numbers.size() )
           stream << entry->numbers[j];
