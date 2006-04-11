@@ -32,6 +32,7 @@ namespace indri {
       indri::file::SequentialReadBuffer* _file;
       UINT64 _startOffset;
       bool _numeric;
+      bool _ordinal;
 
       DocumentExtentData _data;
       bool _finished;
