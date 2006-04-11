@@ -48,10 +48,10 @@ namespace indri
 
       indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document ) {
         for( size_t i=0; i<document->tags.size(); i++ ) {
-          TagExtent& extent = document->tags[i];
+          TagExtent * extent = document->tags[i];
 
-          if( _field == extent.name && extent.begin != extent.end ) {
-            char* numberText = document->terms[ extent.begin ]; 
+          if( _field == extent->name && extent->begin != extent->end ) {
+            char* numberText = document->terms[ extent->begin ]; 
 	    // check for non-numeric characters
 	    char * begin = numberText;
 	    char * end = numberText;
@@ -94,7 +94,7 @@ namespace indri
 	      // convert the number
 	      value = string_to_i64( _numberCopy );
 	    }
-            extent.number = value;
+            extent->number = value;
           }
         }
 
