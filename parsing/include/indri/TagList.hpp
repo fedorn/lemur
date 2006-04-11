@@ -45,9 +45,17 @@ namespace indri
       indri::utility::greedy_vector<tag_entry> _tags;
       int _openList;
 
+      // Controls whether the list reconstructs a hierarchy of
+      // tags when writeTagList is called.
+      bool _findParents;
+
     public:
-      TagList() {
+      TagList() : _findParents(true) {
         clear();
+      }
+      
+      void setFindParents( bool findParents ) {
+	_findParents = findParents;
       }
 
       void clear() {
@@ -99,7 +107,7 @@ namespace indri
         }
       }
 
-      void writeTagList( indri::utility::greedy_vector<TagExtent>& tags ) {
+      void writeTagList( indri::utility::greedy_vector<TagExtent *>& tags ) {
         // look through the tags vector; they're already in sorted order by open
         // position.  Only add closed tags.
 
@@ -107,11 +115,26 @@ namespace indri
           tag_entry& entry = _tags[i];
 
           if( entry.end >= 0 ) {// data field might be empty at head of doc
-            TagExtent extent;
-            extent.begin = entry.begin;
-            extent.end = entry.end;
-            extent.name = entry.conflation;
-            extent.number = 0;
+	    TagExtent * extent = new TagExtent;
+            extent->begin = entry.begin;
+            extent->end = entry.end;
+            extent->name = entry.conflation;
+            extent->number = 0;
+
+	    if ( _findParents && (tags.size() > 0)) {
+	      // find this tag's parent
+		TagExtent * parent = tags.back();
+		while ( parent != NULL && 
+			parent->end <= extent->begin ) {
+		  if ( parent->begin <= extent->begin &&
+		       parent->end   >= extent->end ) break;
+		  parent = parent->parent;
+		}
+		extent->parent = parent;
+	    } else {
+	      extent->parent = 0;
+	    }
+
             tags.push_back(extent);
           }
         }
