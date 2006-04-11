@@ -85,13 +85,17 @@ namespace indri {
           FieldExtent extent;
           
           stream >> extent.id
+		 >> extent.parentOrdinal
                  >> extent.begin
                  >> extent.end
                  >> extent.number;
           
           assert( extent.id >= 0 );
+	  assert( extent.parentOrdinal >= 0 );
           assert( extent.begin >= 0 );
           assert( extent.end >= extent.begin );
+	  
+	  extent.ordinal = i + 1;
 
           _fields.push_back( extent );
         }
@@ -123,8 +127,10 @@ namespace indri {
         for( unsigned int i=0; i<_fields.size(); i++ ) {
 
           assert( _fields[i].id >= 0 );
+	  assert( _fields[i].ordinal == i + 1 );
 
           out << _fields[i].id
+	      << _fields[i].parentOrdinal
               << _fields[i].begin
               << _fields[i].end
               << _fields[i].number;
