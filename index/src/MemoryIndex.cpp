@@ -30,6 +30,8 @@
 #include "indri/greedy_vector"
 #include "indri/delete_range.hpp"
 
+#include <algorithm>
+
 const int HASH_TABLE_SIZE = 10*1024*1024;
 const int ONE_MEGABYTE = 1024*1024;
 
@@ -67,8 +69,8 @@ indri::index::MemoryIndex::MemoryIndex( int docBase, const std::vector<Index::Fi
   for( size_t i=0; i<fields.size(); i++ ) {
     int fieldID = i+1;
 
-    _fieldData.push_back( FieldStatistics( fields[i].name, fields[i].numeric, 0, 0 ) );
-    _fieldLists.push_back( new DocExtentListMemoryBuilder( fields[i].numeric ) );
+    _fieldData.push_back( FieldStatistics( fields[i].name, fields[i].numeric, fields[i].ordinal, 0, 0 ) );
+    _fieldLists.push_back( new DocExtentListMemoryBuilder( fields[i].numeric, fields[i].ordinal ) );
     _fieldLookup.insert( _fieldData.back().name.c_str(), fieldID );
   }
 }
@@ -319,12 +321,59 @@ int indri::index::MemoryIndex::_fieldID( const std::string& fieldName ) {
 // _writeFieldExtents
 //
 
-void indri::index::MemoryIndex::_writeFieldExtents( int documentID, indri::utility::greedy_vector<indri::index::FieldExtent>& indexedTags ) {
-  // write field data out
+void indri::index::MemoryIndex::_writeFieldExtents( int documentID, indri::utility::greedy_vector<indri::parse::TagExtent *>& indexedTags ) {
+  indri::utility::HashTable< indri::parse::TagExtent *, int> tagIdMap;
+  
+  // sort fields
+  std::sort( indexedTags.begin(), indexedTags.end(), indri::parse::LessTagExtent() );
+  
+  // we'll add to the end of the fields greedy_vector
+  indri::utility::greedy_vector<indri::index::FieldExtent> & fields = _termList.fields();
+  // this is used to set the parentOrdinals
+  int offset = fields.size();
+  
+  // convert to field extents, set ids, and create the node map
   for( unsigned int i=0; i<indexedTags.size(); i++ ) {
-    indri::index::FieldExtent& extent = indexedTags[i];
-    _termList.addField( extent );
-    _fieldLists[extent.id-1]->addLocation( documentID, extent.begin, extent.end, extent.number );
+    indri::parse::TagExtent * extent = indexedTags[i];
+    
+    int ordinal = i + 1;
+
+    // this is the id for the field type
+    int tagId = _fieldID( extent->name );
+    
+    // convert the field
+    indri::index::FieldExtent converted( tagId, extent->begin, extent->end, extent->number, ordinal);
+
+    // add this node to the map;
+    tagIdMap.insert( extent, ordinal );
+
+    // add his field to the field list for the document
+    fields.push_back( converted );
+
+    // add this location to the inverted list for fields
+    _fieldLists[tagId - 1]->addLocation( documentID, extent->begin, extent->end, extent->number, ordinal );
+  }
+
+  // set the parent ordinals
+  for( unsigned int i=0; i<indexedTags.size(); i++ ) {
+    indri::parse::TagExtent * extent = indexedTags[i];
+    
+    // look up the parent 
+    int parentOrdinal = 0;
+    int * parentIter;
+    if ( extent->parent != 0 ) {
+      parentIter = tagIdMap.find( extent->parent );
+      if( parentIter != 0 ) {
+	parentOrdinal = *parentIter;
+      } else {
+	parentOrdinal = 0;
+	std::cerr << "Could not find a parent for a node, storing as a root" << std::endl;
+// 	std::cerr << "Parent: " << extent->parent << " " << extent->parent->name << " " 
+// 		  << extent->parent->begin << ":" << extent->parent->end << std::endl;
+      }
+    }
+    // set the parent
+    fields[ offset + i ].parentOrdinal = parentOrdinal;
   }
 }
 
@@ -377,13 +426,13 @@ void indri::index::MemoryIndex::_writeDocumentStatistics( UINT64 offset, int byt
 // _addOpenTags
 //
 
-void indri::index::MemoryIndex::_addOpenTags( indri::utility::greedy_vector<indri::index::FieldExtent>& indexedTags,
-                                              indri::utility::greedy_vector<indri::index::FieldExtent>& openTags,
-                                              const indri::utility::greedy_vector<indri::parse::TagExtent>& extents,
+void indri::index::MemoryIndex::_addOpenTags( indri::utility::greedy_vector<indri::parse::TagExtent *>& indexedTags,
+                                              indri::utility::greedy_vector<indri::parse::TagExtent *>& openTags,
+					      indri::utility::greedy_vector<indri::parse::TagExtent *>& extents,
                                               unsigned int& extentIndex, 
                                               unsigned int position ) {
   for( ; extentIndex < extents.size(); extentIndex++ ) {
-    const indri::parse::TagExtent* extent = &extents[extentIndex];
+    indri::parse::TagExtent* extent = extents[extentIndex];
     
     if( extent->begin > position )
       break;
@@ -392,11 +441,9 @@ void indri::index::MemoryIndex::_addOpenTags( indri::utility::greedy_vector<indr
     
     if( tagId == 0 )
       continue;
-    
-    indri::index::FieldExtent converted( tagId, extent->begin, extent->end, extent->number );
-    
-    openTags.push_back( converted );
-    indexedTags.push_back( converted );
+     
+    openTags.push_back( extent );
+    indexedTags.push_back( extent );
   }
 }
 
@@ -404,9 +451,9 @@ void indri::index::MemoryIndex::_addOpenTags( indri::utility::greedy_vector<indr
 // _removeClosedTags
 //
 
-void indri::index::MemoryIndex::_removeClosedTags( indri::utility::greedy_vector<indri::index::FieldExtent>& tags, unsigned int position ) {
+void indri::index::MemoryIndex::_removeClosedTags( indri::utility::greedy_vector<indri::parse::TagExtent *>& tags, unsigned int position ) {
   for( unsigned int i=0; i<tags.size(); ) {
-    if( tags[i].end <= position ) {
+    if( tags[i]->end <= position ) {
       tags.erase( tags.begin() + i );
     } else {
       i++;
@@ -478,8 +525,8 @@ int indri::index::MemoryIndex::addDocument( indri::api::ParsedDocument& document
   
   unsigned int position = 0;
   unsigned int extentIndex = 0;
-  indri::utility::greedy_vector<indri::index::FieldExtent> openTags;
-  indri::utility::greedy_vector<indri::index::FieldExtent> indexedTags;
+  indri::utility::greedy_vector<indri::parse::TagExtent *> openTags;
+  indri::utility::greedy_vector<indri::parse::TagExtent *> indexedTags;
   unsigned int indexedTerms = 0;
   indri::utility::greedy_vector<char*>& words = document.terms;
   term_entry* entries = 0;
@@ -539,11 +586,12 @@ int indri::index::MemoryIndex::addDocument( indri::api::ParsedDocument& document
     _removeClosedTags( openTags, position );
 
     // for every open tag, we want to record that we've seen the 
-    for( indri::utility::greedy_vector<indri::index::FieldExtent>::iterator tag = openTags.begin(); tag != openTags.end(); tag++ ) {
-      indri::index::TermFieldStatistics* termField = &entry->termData->fields[tag->id-1];
+    for( indri::utility::greedy_vector<indri::parse::TagExtent *>::iterator tag = openTags.begin(); tag != openTags.end(); tag++ ) {
+      int id = _fieldID( (*tag)->name );
+      indri::index::TermFieldStatistics* termField = &entry->termData->fields[id - 1];
       termField->addOccurrence( documentID );
 
-      indri::index::FieldStatistics* field = &_fieldData[tag->id-1];
+      indri::index::FieldStatistics* field = &_fieldData[id - 1];
       field->addOccurrence( documentID );
     }
 
