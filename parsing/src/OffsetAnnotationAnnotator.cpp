@@ -78,14 +78,14 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
   _offsetAnnotationsFile = offsetAnnotationsFile;
 
-  std::cerr << "Loading offset annotations file: " << _offsetAnnotationsFile << std::endl;
+//   std::cerr << "Loading offset annotations file: " << _offsetAnnotationsFile << std::endl;
 
   if ( ! _first_open ) {
 
     _cleanup();
   }
 
-  std::cerr << "Done cleanup " << std::endl;
+//   std::cerr << "Done cleanup " << std::endl;
   _first_open = false;
 
   // Load file, and check consistency.  Ensure that there are no
