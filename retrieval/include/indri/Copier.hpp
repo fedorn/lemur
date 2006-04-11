@@ -95,6 +95,12 @@ namespace indri {
       virtual class Node* after( class DocumentStructureNode* oldNode, class DocumentStructureNode* newNode );
       virtual void before( class ShrinkageScorerNode* oldNode );
       virtual class Node* after( class ShrinkageScorerNode* oldNode, class ShrinkageScorerNode* newNode );
+      virtual void before( class ExtentDescendant* oldNode );
+      virtual class Node* after( class ExtentDescendant* oldNode, class ExtentDescendant* newNode );
+      virtual void before( class ExtentChild* oldNode );
+      virtual class Node* after( class ExtentChild* oldNode, class ExtentChild* newNode );
+      virtual void before( class ExtentParent* oldNode );
+      virtual class Node* after( class ExtentParent* oldNode, class ExtentParent* newNode );
    };
  };
 };
