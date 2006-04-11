@@ -61,6 +61,11 @@
 #include "indri/LengthPriorNode.hpp"
 #include "indri/DocumentStructureHolderNode.hpp"
 #include "indri/ShrinkageBeliefNode.hpp"
+#include "indri/ExtentParentNode.hpp"
+#include "indri/ExtentChildNode.hpp"
+#include "indri/ExtentDescendantNode.hpp"
+
+#include "indri/FieldBelowWalker.hpp"
 
 #include <stdexcept>
 
@@ -232,13 +237,28 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ExtentInside* e
   if( nestedExtentInside ) {
     _after( nestedExtentInside );
   } else if( _nodeMap.find( extentInside ) == _nodeMap.end() ) {
-    ExtentInsideNode* extentInsideNode = new ExtentInsideNode( 
-                                                              extentInside->nodeName(),
-                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
-                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]) );
+    indri::lang::FieldBelowWalker fieldFinder;
+    extentInside->walk( fieldFinder );
+    // If we use a field in specifying the ExtentInside (is that always?), we could have nested fields (or overlapping) and need the
+    // NestedExtentInside operator.  It would be nice later if Field lists know whether there's nesting or not (auto-detection at index time?)
+    // and then the FieldBelowWalker would check for nested/overlapping fields below rather than all fields.
+    if ( fieldFinder.fieldBelow() ) {    
+      NestedExtentInsideNode* extentInsideNode = new NestedExtentInsideNode( 
+									    extentInside->nodeName(),
+									    dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+									    dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]) );
 
-    _network->addListNode( extentInsideNode );
-    _nodeMap[extentInside] = extentInsideNode;
+      _network->addListNode( extentInsideNode );
+      _nodeMap[extentInside] = extentInsideNode;
+    } else {
+      ExtentInsideNode* extentInsideNode = new ExtentInsideNode( 
+								extentInside->nodeName(),
+								dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+								dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]) );
+
+      _network->addListNode( extentInsideNode );
+      _nodeMap[extentInside] = extentInsideNode;
+    }
   }
 }
 
@@ -716,8 +736,15 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::RawScorerNode* 
       // only frequency lists are "max-scored"
       double maximumScore = INDRI_HUGE_SCORE;
       double maximumBackgroundScore = INDRI_HUGE_SCORE;
-      
-      belief = new ListBeliefNode( rawScorerNode->nodeName(), *iterator, context, rawIterator, *function, maximumBackgroundScore, maximumScore );
+
+      // We need to use the NestedListBeliefNode if there is a field in the rawIterator or below it
+      indri::lang::FieldBelowWalker fieldFinder;
+      rawScorerNode->getRawExtent()->walk( fieldFinder );
+      if ( fieldFinder.fieldBelow() ) {      
+	belief = new NestedListBeliefNode( rawScorerNode->nodeName(), *iterator, context, rawIterator, *function, maximumBackgroundScore, maximumScore );
+      } else {
+	belief = new ListBeliefNode( rawScorerNode->nodeName(), *iterator, context, rawIterator, *function, maximumBackgroundScore, maximumScore );
+      }
     } else {
       belief = new NullScorerNode( rawScorerNode->nodeName(), *function );
     }
@@ -1046,5 +1073,79 @@ void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ShrinkageScore
     _network->addScoreFunction( function );
     _network->addBeliefNode( belief );
     _nodeMap[shrinkScorerNode] = belief;
+  }
+}
+
+//
+// ExtentDescendant
+//
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ExtentDescendant* extentInside ) {
+  _after( extentInside );
+}
+
+void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ExtentDescendant* extentInside ) {
+  if( _nodeMap.find( extentInside ) == _nodeMap.end() ) {
+   
+    DocumentStructureHolderNode* docStruct = dynamic_cast<DocumentStructureHolderNode*>(_nodeMap[extentInside->getDocumentStructure()]);
+
+    ExtentDescendantNode* extentInsideNode = new ExtentDescendantNode( 
+							      extentInside->nodeName(),
+							      dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]),
+                                                              *docStruct );
+
+    _network->addListNode( extentInsideNode );
+    _nodeMap[extentInside] = extentInsideNode;
+  }
+}
+
+
+//
+// ExtentChild
+//
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ExtentChild* extentInside ) {
+  _after( extentInside );
+}
+
+void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ExtentChild* extentInside ) {
+  if( _nodeMap.find( extentInside ) == _nodeMap.end() ) {
+
+    DocumentStructureHolderNode* docStruct = dynamic_cast<DocumentStructureHolderNode*>(_nodeMap[extentInside->getDocumentStructure()]);
+   
+    ExtentChildNode* extentInsideNode = new ExtentChildNode( 
+							      extentInside->nodeName(),
+							      dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]),
+                                                              *docStruct );
+
+    _network->addListNode( extentInsideNode );
+    _nodeMap[extentInside] = extentInsideNode;
+  }
+}
+
+
+//
+// ExtentParent
+//
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ExtentParent* extentInside ) {
+  _after( extentInside );
+}
+
+void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ExtentParent* extentInside ) {
+  if( _nodeMap.find( extentInside ) == _nodeMap.end() ) {
+
+    DocumentStructureHolderNode* docStruct = dynamic_cast<DocumentStructureHolderNode*>(_nodeMap[extentInside->getDocumentStructure()]);
+   
+    ExtentParentNode* extentInsideNode = new ExtentParentNode( 
+							      extentInside->nodeName(),
+							      dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]),
+                                                              *docStruct );
+
+    _network->addListNode( extentInsideNode );
+    _nodeMap[extentInside] = extentInsideNode;
   }
 }
