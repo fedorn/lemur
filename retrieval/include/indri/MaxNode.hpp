@@ -83,11 +83,13 @@ namespace indri
           const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, begin, end, end );
 
           for( unsigned int j=0; j<childResults.size(); j++ ) {
-            maxScore = lemur_compat::max<double>( maxScore, childResults[j].score );
-            maxI = i;
-            maxJ = j;
-            maxBegin = childResults[j].begin;
-            maxEnd = childResults[j].end;
+            if ( maxScore < childResults[j].score ) {
+	      maxScore = childResults[j].score;
+	      maxI = i;
+	      maxJ = j;
+	      maxBegin = childResults[j].begin;
+	      maxEnd = childResults[j].end;
+	    }
           }
         }
 
