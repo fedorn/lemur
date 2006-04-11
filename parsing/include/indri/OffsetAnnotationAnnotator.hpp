@@ -206,6 +206,7 @@ namespace indri {
 
 	    delete (*j); // TagExtent
 	  }
+	  delete (*i).first;
           delete(p_set);
 	}
 
@@ -217,9 +218,12 @@ namespace indri {
 	// deleted above.
 
 	_tag_id_map.clear();
+ // 	for ( indri::utility::HashTable<UINT64,AttributeValuePair*>::iterator i = _attribute_id_map.begin(); i != _attribute_id_map.end(); i++ ) {
+//  	  delete (*i).second;
+//  	}
 	_attribute_id_map.clear();
 
-	}
+      }
 
       void convert_annotations( std::set<indri::parse::TagExtent*>* raw_tags,
 				std::set<indri::parse::TagExtent*>* converted_tags, 
