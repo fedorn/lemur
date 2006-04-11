@@ -46,10 +46,11 @@ namespace indri {
       const char* _list;
       const char* _listEnd;
       bool _numeric;
+      bool _ordinal;
       bool _finished;
 
     public:
-      void reset( const indri::utility::greedy_vector< DocExtentListMemoryBuilderSegment, 4 >& lists, bool numeric );
+      void reset( const indri::utility::greedy_vector< DocExtentListMemoryBuilderSegment, 4 >& lists, bool numeric, bool ordinal );
       void reset( class DocExtentListMemoryBuilder& builder );
 
       DocExtentListMemoryBuilderIterator( const class DocExtentListMemoryBuilder& builder ); 
@@ -76,26 +77,27 @@ namespace indri {
 
       int _lastLocation;
       int _lastDocument;
+      int _lastOrdinal;
       int _lastExtentFrequency;
 
       char* _documentPointer;
       char* _locationCountPointer;
 
       bool _numeric;
+      bool _ordinal;
 
-      inline size_t _compressedSize( int documentID, int begin, int end, INT64 number );
-      inline void _safeAddLocation( int documentID, int begin, int end, INT64 number );
-      void _growAddLocation( int documentID, int begin, int end, INT64 number, size_t newDataSize );
+      inline size_t _compressedSize( int documentID, int begin, int end, INT64 number, int ordinal );
+      inline void _safeAddLocation( int documentID, int begin, int end, INT64 number, int ordinal );
+      void _growAddLocation( int documentID, int begin, int end, INT64 number, int ordinal, size_t newDataSize );
       size_t _roundUp( size_t amount );
       void _grow();
       void _terminateDocument();
 
     public:
-      DocExtentListMemoryBuilder( bool numeric );
+      DocExtentListMemoryBuilder( bool numeric, bool ordinal );
       ~DocExtentListMemoryBuilder();
 
-      void addLocation( int documentID, int begin, int end, INT64 number );
-      void addLocation( int documentID, int begin, int end );
+      void addLocation( int documentID, int begin, int end, INT64 number = 0, int ordinal = 0 );
 
       void clear();
       bool empty();
