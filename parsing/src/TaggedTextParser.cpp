@@ -141,6 +141,10 @@ indri::api::ParsedDocument* indri::parse::TaggedTextParser::parse( indri::parse:
   _document.text = document->text;
   _document.textLength = document->textLength;
 
+  for (int t = 0; t < _document.tags.size(); t++) {
+    delete _document.tags[t];
+  }
+
   _document.terms.clear();
   _document.tags.clear();
   _document.positions.clear();
