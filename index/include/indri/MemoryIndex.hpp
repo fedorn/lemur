@@ -112,13 +112,13 @@ namespace indri {
       std::list<indri::utility::Buffer*> _termLists;
       UINT64 _termListsBaseOffset;
       
-      void _addOpenTags( indri::utility::greedy_vector<indri::index::FieldExtent>& indexedTags,
-                         indri::utility::greedy_vector<indri::index::FieldExtent>& openTags,
-                         const indri::utility::greedy_vector<indri::parse::TagExtent>& extents,
+      void _addOpenTags( indri::utility::greedy_vector<indri::parse::TagExtent *>& indexedTags,
+                         indri::utility::greedy_vector<indri::parse::TagExtent *>& openTags,
+                         indri::utility::greedy_vector<indri::parse::TagExtent *>& extents,
                          unsigned int& extentIndex, 
                          unsigned int position );
-      void _removeClosedTags( indri::utility::greedy_vector<indri::index::FieldExtent>& tags, unsigned int position );
-      void _writeFieldExtents( int documentID, indri::utility::greedy_vector<indri::index::FieldExtent>& indexedTags );
+      void _removeClosedTags( indri::utility::greedy_vector<indri::parse::TagExtent *>& tags, unsigned int position );
+      void _writeFieldExtents( int documentID, indri::utility::greedy_vector<indri::parse::TagExtent *>& indexedTags );
       void _writeDocumentTermList( UINT64& offset, int& byteLength, int documentID, int documentLength, indri::index::TermList& locatedTerms );
       void _writeDocumentStatistics( UINT64 offset, int byteLength, int indexedLength, int totalLength, int uniqueTerms );
       term_entry* _lookupTerm( const char* term );
