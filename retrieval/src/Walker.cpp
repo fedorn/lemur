@@ -94,6 +94,12 @@ namespace indri {
    void Walker::after( class DocumentStructureNode* n ) { defaultAfter( n ); }
    void Walker::before( class ShrinkageScorerNode* n ) { defaultBefore( n ); }
    void Walker::after( class ShrinkageScorerNode* n ) { defaultAfter( n ); }
+   void Walker::before( class ExtentDescendant* n ) { defaultBefore( n ); }
+   void Walker::after( class ExtentDescendant* n ) { defaultAfter( n ); }
+   void Walker::before( class ExtentChild* n ) { defaultBefore( n ); }
+   void Walker::after( class ExtentChild* n ) { defaultAfter( n ); }
+   void Walker::before( class ExtentParent* n ) { defaultBefore( n ); }
+   void Walker::after( class ExtentParent* n ) { defaultAfter( n ); }
  };
 };
 
