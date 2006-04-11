@@ -50,13 +50,21 @@ double indri::infnet::NestedListBeliefNode::_contextOccurrences( int begin, int 
   double count = 0;
   int lastEnd = 0;
 
+  // Ideally this chunk of code would find the highest sum of weights from 
+  // non-overlapping extents that are
+  // contained in the context.  I haven't spent the time to find
+  // an obvious simple solution to this  
+  // problem, so we will do an approximation where we take the extent that ends
+  // first in a sequence and work greedily from the beginning of the extent list
+
   // look for all occurrences within bounds and that don't overlap
   for( size_t i=0; i<extents.size(); i++ ) {
     if( extents[i].begin >= begin &&
         extents[i].end <= end &&
         extents[i].begin >= lastEnd ) {
-      count += extents[i].weight;
-      lastEnd = extents[i].end;
+
+      	count += extents[i].weight;
+ 	lastEnd = extents[i].end;
     }
   }
 
@@ -146,29 +154,59 @@ const indri::utility::greedy_vector<bool>& indri::infnet::NestedListBeliefNode::
   _matches.clear();
   _matches.resize( matchExtents.size(), false );
 
-  size_t i=0;
-  size_t j=0; 
+  // if the extent list is empty, there are no matches
+  if ( extents.size() == 0 ) {
+    return _matches;
+  }
 
-  // with field wildcard node possibly in the matches extent list creation process,
-  // we can only move the
-  // extent iterator when we are sure that it doesn't overlap with the match list
-  // MAJOR flaw for now: we are assuming the extent list is nice and does not contain
-  // overlapping extents, and is in order of increasing begin
-  // we also assume that for any later extent in the match list the begin >= current begin
-  while( i < extents.size() && j < matchExtents.size() ) {
-    if( matchExtents[j].contains( extents[i] ) ) {
-      // found a match
+  size_t j = matchExtents.size(); 
+
+
+  // Walk through the match list from the end.
+  // As we encounter a new node in the match list:
+  // - check all inner extents for a new smaller end that has the same begin or greater
+  // - keep track of that smallest end
+  // - we know the begin is at least as big as the match begin
+  //   so we only have to check to make sure that the end is smaller than the match's end
+  int matchBegin = 0;
+  int smallestEnd = -1;
+  indri::utility::greedy_vector<const indri::index::Extent>::iterator innerIter = extents.end(); 
+
+  // move the pointer to the last item in the list
+  innerIter--;
+  bool doneInnerList = false;
+  while( j > 0 ) {
+    j--;
+    // check to see whether we need to look for a new smallest end of an inner extent
+    if ( matchBegin != matchExtents[j].begin ) {
+      // new begin for the match extents
+      matchBegin = matchExtents[j].begin;      
+      while ( ! doneInnerList ) {
+	// if the inner iter's begin is at least as large as the matchBegin
+	if ( innerIter->begin >= matchBegin ) {
+	  // set the new smallest end if it hasn't been set yet or 
+	  // if it is smaller than the current smallest seen end for an inner extent
+	  if ( smallestEnd == -1 || 
+	       innerIter->end < smallestEnd ) {
+	    smallestEnd = innerIter->end;
+	  }
+	  if ( innerIter == extents.begin() ) {
+	    // mark that we've finished processing the inner extent list
+	    doneInnerList = true;
+	  } else {
+	    // move back to the previous inner extent
+	    innerIter--;
+	  }
+	} else {
+	  // the inner iter's extent begin is smaller than the match extent's, so we can't consider
+	  // it or any others closer to the beginning of the inner extent list
+	  break;
+	}
+      }      
+    }
+    // check whether our extent has a match
+    if ( matchExtents[j].end >= smallestEnd ) {
       _matches[j] = true;
-      j++;
-    } else if( matchExtents[j].begin > extents[i].begin ) {
-      // Safe to increment pointer in extents list as 
-      // all extents in match list will have larger begin value than current one
-      i++;
-    } else {
-      // Either matchExtents[j].begin <= extents[i].begin or
-      // extents[i].contains( matchExtents[j] ).
-      // This means it is safe to increment j and check the next matchExtent.    
-      j++;
     }
   }
 
