@@ -21,18 +21,22 @@
 
 #include "lemur-platform.h"
 
+
 namespace indri {
   namespace index {
     struct FieldExtent {
       FieldExtent() {};
-      FieldExtent( int _id, int _begin, int _end, INT64 _number ) : id(_id), begin(_begin), end(_end), number(_number) {}
+      FieldExtent( int _id, int _begin, int _end, INT64 _number, int _ordinal = 0, int _parentOrdinal = 0) : id(_id), begin(_begin), end(_end), number(_number), ordinal(_ordinal), parentOrdinal(_parentOrdinal) {}
       unsigned int id;
       unsigned int begin;
       unsigned int end;
-      INT64 number;
-    };
+      unsigned int parentOrdinal;
+      unsigned int ordinal;
+      INT64 number;            
+    }; 
   }
 }
+
 
 #endif // INDRI_KEYFILEFIELDEXTENT_HPP
 
