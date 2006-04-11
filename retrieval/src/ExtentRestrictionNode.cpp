@@ -23,7 +23,8 @@
 indri::infnet::ExtentRestrictionNode::ExtentRestrictionNode( const std::string& name, BeliefNode* child, ListIteratorNode* field ) :
   _name(name),
   _child(child),
-  _field(field)
+  _field(field),
+ _matches()
 {
 }
 
@@ -41,72 +42,95 @@ double indri::infnet::ExtentRestrictionNode::maximumScore() {
 
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ExtentRestrictionNode::score( int documentID, int begin, int end, int documentLength ) {
   // we're going to run through the field list, etc.
-  const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, _field->extents() );
-  assert( matches.size() == _field->extents().size() );
+  if ( _field != NULL ) {
 
-  indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
-  _scores.clear();
+    indri::index::Extent extent(begin, end);
+    const indri::utility::greedy_vector<indri::index::Extent>& fieldExtentsTmp = _field->matches( extent );
+    indri::utility::greedy_vector<indri::index::Extent> fieldExtents;
+    fieldExtents.append(fieldExtentsTmp.begin(), fieldExtentsTmp.end());
+    
+    //   const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, fieldExtents );
+    //   assert( matches.size() == fieldExtents.size() );
+    
+    indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+    _scores.clear();
+    
+    for( size_t i = 0; i < fieldExtents.size(); i++ ) {    
+      //     if( !matches[i] )  // We actually want to score all, whether or not they have a query term 
+      //       continue;        // match.  This will give us proper scores when ther eis not a match.
+      
+      iter = &(fieldExtents[i]);
+      
+      if( iter->end - iter->begin == 0 )
+	continue; // this field has no text in it
+      
+      
+      int scoreBegin = iter->begin;
+      int scoreEnd = iter->end;
 
+//       std::cout << getName() << " " << documentID << " " << begin <<":"<<end << " " << iter->begin <<":"<< iter->end << std::endl;
+      
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, iter->begin, iter->end, documentLength );
+      
+      double fieldWeight = iter->weight;
+      
+      for( int i=0; i<childResults.size(); i++ ) {
+	indri::api::ScoredExtentResult result( fieldWeight*childResults[i].score, documentID, scoreBegin, scoreEnd );
+	_scores.push_back( result );
+      }
+    } 
 
-  for( size_t i = 0; i < matches.size(); i++ ) {
-    if( !matches[i] )
-      continue;
-
-    iter = &_field->extents()[i];
-
-    if( iter->end < begin )
-      continue; // this one isn't relevant to our cause
-
-    if( end < iter->begin )
-      break; // we've passed all the relevant fields
-
-    if( iter->end - iter->begin == 0 )
-      continue; // this field has no text in it
-
-    int scoreBegin = lemur_compat::max( iter->begin, begin );
-    int scoreEnd = lemur_compat::min( iter->end, end );
-
-    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, scoreBegin, scoreEnd, documentLength );
-
-    for( int i=0; i<childResults.size(); i++ ) {
-      indri::api::ScoredExtentResult result( childResults[i].score, documentID, scoreBegin, scoreEnd );
-      _scores.push_back( result );
-    }
+    // do a bad guess if there's no matching field
+//     if ( _scores.size() == 0 ) {
+//       const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, extent.begin, extent.begin, documentLength );
+//       for( int i=0; i<childResults.size(); i++ ) {
+// 	indri::api::ScoredExtentResult result( childResults[i].score, documentID, extent.begin, extent.begin );
+// 	_scores.push_back( result );
+//       }
+//     }
+  } else {
+    return _child->score( documentID, begin, end, documentLength );    
   }
 
   return _scores;
 }
 
 void indri::infnet::ExtentRestrictionNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
-  const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, _field->extents() );
-  assert( matches.size() == _field->extents().size() );
 
   annotator.add(this, documentID, begin, end);
   // we're going to run through the field list, etc.
 
-  const indri::utility::greedy_vector<indri::index::Extent>& extents = _field->extents(); 
-  int fieldCount = extents.size();
-  indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+  if ( _field != NULL) {
 
-  for( int i=0; i<fieldCount; i++ ) {
-    if( !matches[i] )
-      continue;
+    indri::index::Extent extent(begin, end);
+    const indri::utility::greedy_vector<indri::index::Extent>& fieldExtentsTmp = _field->matches( extent );
+    indri::utility::greedy_vector<indri::index::Extent> fieldExtents;
+    fieldExtents.append(fieldExtentsTmp.begin(), fieldExtentsTmp.end());
+    
+    //   const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, fieldExtents );
+    //   assert( matches.size() == fieldExtents.size() );
+    
+    indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+    _scores.clear();
+    
+    for( size_t i = 0; i < fieldExtents.size(); i++ ) {    
+      //     if( !matches[i] )  // We actually want to score all, whether or not they have a query term 
+      //       continue;        // match.  This will give us proper scores when ther eis not a match.
+      
+      iter = &(fieldExtents[i]);
+      
+      if( iter->end - iter->begin == 0 )
+	continue; // this field has no text in it
+      
+      
+      int scoreBegin = iter->begin;
+      int scoreEnd = iter->end;
 
-    iter = &extents[i];
-  
-    if( iter->end < begin )
-      continue; // this one isn't relevant to our cause
+      
+      _child->annotate( annotator, documentID, iter->begin, iter->end );
+      
+    } 
 
-    if( end < iter->begin )
-      break; // we've passed all the relevant fields
-
-    if( iter->end - iter->begin == 0 )
-      continue; // this field has no text in it
-
-    int scoreBegin = lemur_compat::max( iter->begin, begin );
-    int scoreEnd = lemur_compat::min( iter->end, end );
-
-    _child->annotate( annotator, documentID, scoreBegin, scoreEnd );
   }
 }
 
@@ -123,8 +147,30 @@ bool indri::infnet::ExtentRestrictionNode::hasMatch( int documentID ) {
 // 
 
 const indri::utility::greedy_vector<bool>& indri::infnet::ExtentRestrictionNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
-  // just delegate -- not perfect, but close
-  return _child->hasMatch( documentID, extents );
+   _matches.clear();
+  _matches.resize( extents.size(), false );
+
+  if ( _field != NULL ) {
+
+    for ( size_t i = 0; i < extents.size(); i++ ) {
+      const indri::utility::greedy_vector<indri::index::Extent>& fieldExtents = _field->matches( extents[i] );
+      
+      const indri::utility::greedy_vector<bool>& childMatches = _child->hasMatch( documentID, fieldExtents );
+      bool match = false;
+      for ( size_t j = 0; !match && j < childMatches.size(); j++ ) {
+	
+      if ( childMatches[ j ] ) {
+	match = true;
+      }
+      }
+      _matches[i] = match;
+    }
+  } else {
+    return _child->hasMatch( documentID, extents );
+  }
+  
+
+  return _matches;
 }
 
 //
