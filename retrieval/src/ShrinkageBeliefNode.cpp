@@ -9,15 +9,13 @@
 #include "indri/ShrinkageBeliefNode.hpp"
 #include "lemur-compat.hpp"
 #include "indri/Annotator.hpp"
+#include "indri/Parameters.hpp"
 #include <cmath>
-#ifdef ISNAN_IN_NAMESPACE_STD
-using std::isnan;
-#else
 #ifdef WIN32
 #include <float.h>
 #define isnan _isnan
 #endif
-#endif
+
 
 indri::infnet::ShrinkageBeliefNode::ShrinkageBeliefNode( const std::string& name, ListIteratorNode& child, DocumentStructureHolderNode& documentStructureHolderNode, indri::query::TermScoreFunction& scoreFunction, double maximumBackgroundScore, double maximumScore )
   :
@@ -27,13 +25,17 @@ indri::infnet::ShrinkageBeliefNode::ShrinkageBeliefNode( const std::string& name
   _maximumBackgroundScore(maximumBackgroundScore),
   _list(child),
   _docStructHolder(documentStructureHolderNode),
-  _down(0),
-  _up(0),
-  _base(0),
-  _counts(0),
+  _down(),
+  _up(),
+  _base(),
+  _counts(),
+  _roots(),
+  _topDownOrder(),
   _documentID(0),
   _parentWeight(0),
   _docWeight(0),
+  _otherWeight(0),
+  _defaultScore(0),
   _recursive(false),
   _queryLevelCombine(false)
 {
@@ -54,165 +56,80 @@ double indri::infnet::ShrinkageBeliefNode::maximumScore() {
 }
 
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ShrinkageBeliefNode::score( int documentID, int begin, int end, int documentLength ) {
+  indri::index::Extent extent( begin, end );
+  return score( documentID, extent, documentLength );
+}
 
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ShrinkageBeliefNode::score( int documentID, indri::index::Extent extent, int documentLength ) {
 
-
-  indri::index::DocumentStructure * docStruct = _docStructHolder.getDocumentStructure();
+indri::index::DocumentStructure * docStruct = _docStructHolder.getDocumentStructure();
   int numNodes = docStruct->nodeCount();
 
 
-  // build a new cache of scores
-  if ( documentID != _documentID ) {
+  indri::index::DocumentStructure::child_iterator root;
+  indri::index::DocumentStructure::child_iterator rootsEnd;
 
-
-    _counts.clear();
-    _base.clear();
-    _up.clear();
-    _down.clear();
-
-    _counts.resize( numNodes+1 );
-    _base.resize( numNodes+1 );
-    _up.resize( numNodes+1 );
-    _down.resize( numNodes+1 );
-
-  
-    // Count up the occurrences terms in the tree.
-    // We include all child components - this is a break from the model in my proposal, and is 
-    // to allow occurrences of phrases that cross field boundaries.  Otherwise, it is
-    // an equivalent reformulation of the original model, but the parameters learned/chosen
-    // would be different.
-
-    const indri::utility::greedy_vector<indri::index::Extent> & extents = _list.extents();
-    
-    int lastEnd = 0;
-    // look for all occurrences within bounds and that don't overlap
-    for( size_t i=0; i<extents.size(); i++ ) {
-      if( extents[i].begin >= lastEnd ) {
-	// locate the occurrences in the document tree
-	int leaf = docStruct->findLeaf( extents[i].begin, extents[i].end );
-	while (leaf >= 1) {
-	  _counts[leaf] += extents[i].weight;
-	  leaf = docStruct->parent(leaf);
-	}
-	lastEnd = extents[i].end;
-      }
-    }
-    
-
-    // estimate scores for each of the nodes ( \theta mixed with collection model )
-    for( size_t i=1; i<=numNodes; i++ ) {
-      int contextSize = docStruct->accumulatedLength(i);
-      double occurrences = _counts[i];
-      double score = _scoreFunction.scoreOccurrence( occurrences, contextSize );
-      if ( !_queryLevelCombine ) {
-	score = exp( score );
-      }
-      _base[i] = score;
-    }
-
-    // smooth up doc 
-    for( size_t i=numNodes; i>=1;i-- ) {
-
-      // what's left for the original model and the length proportional models
-      double remaining = 1;
-      
-      // for summing probabilities with absolute weights
-      double absolute = 0;
-
-      // for summing probabilites with length proportional weights
-      int length = docStruct->accumulatedLength( i );
-      double divisor = length;
-      double relative = _base[ i ] * length;
-
-      indri::index::DocumentStructure::child_iterator kids = docStruct->childrenBegin( i );
-      indri::index::DocumentStructure::child_iterator kidsEnd = docStruct->childrenEnd( i );      
-      while( kids < kidsEnd ) {
-	// check for a smoothing rule for the child
-	int kidType = docStruct->type(*kids);
-//	std::map<int, smoothing_rule, lt_rule>::iterator ruleIter = _ruleMap.find(kidType);
-    std::map<int, smoothing_rule>::iterator ruleIter = _ruleMap.find(kidType);
-	if( ruleIter != _ruleMap.end() ) {
-	  smoothing_rule rule = ruleIter->second;
-	  if( rule.lengthProportional ) {
-	    double lengthAlpha = rule.weight * docStruct->accumulatedLength( *kids );
-	    if( _recursive ) {
-	      relative += lengthAlpha * _up[ *kids ];
-	    } else {
-	      relative += lengthAlpha * _base[ *kids ];
-	    }
-	    divisor += lengthAlpha;
-	  } else {
-	    if( _recursive ) {
-	      absolute += rule.weight * _up[ *kids ];
-	    } else {
-	      absolute += rule.weight * _base[ *kids ];
-	    }
-	    remaining -= rule.weight;
-	  }
-	}
-	kids++;
-      }
-      relative /= divisor;
-      if ( ! isnan( relative ) ) {
-	if ( remaining >= 0 ) {
-	  _up[ i ] = remaining * relative + absolute;
-	} else {
-	  // the absolute weights sum to something larger than 1, so we will ignore these 
-	  _up[ i ] = relative;
-	}
-      } else {
-	// the divisor was 0, so we can't use the relative weights
-	if ( remaining >= 0 ) {
-	  _up[ i ] = remaining * _base[ i ] + absolute;
-	} else {
-	  // the absolute weights sum to something larger than 1, so we will ignore these 
-	  _up[ i ] = _base[ i ];
-	}
-      }
-
-    }
-
-    // smooth down the tree
-    _down[1] = _up[1];
-    for( size_t i=2; i<=numNodes; i++ ) {
-      if( _recursive ) {
-	_down[i] = (1.0 - _parentWeight - _docWeight) * _up[i] 
-	  + _parentWeight * _down[docStruct->parent(i)]
-	  + _docWeight * _down[1];
-      } else {
-	_down[i] = (1.0 - _parentWeight - _docWeight) * _up[i]
-          + _parentWeight * _up[docStruct->parent(i)]
-          + _docWeight * _up[1];
-      }
-    }
-
-        
-    _documentID = documentID;
-
-  }
+  _buildScoreCache( documentID );
 
   _results.clear();
 
-  // find the appropriate result 
-  int leaf = docStruct->findLeaf( begin, end );
-
-  // output for debugging
-  //  std::cout << _list.getName() << "\t\t    leaf: " << docStruct->path(leaf) 
-  //	    << "    count: " << _counts[leaf] 
-  //	    << "    score: " << _down[leaf] 
-  //	    << "    length: " << docStruct->accumulatedLength(leaf)
-  //	    << "    coll: " << _scoreFunction.scoreOccurrence( 0, docStruct->accumulatedLength(leaf) )
-  //	    << std::endl;
+  // Find the appropriate result.  We can't actually know which of the excatly annotations
+  // were requested, so we are forced to average these probabilities for now.
   
-  if (docStruct->begin(leaf) == begin && docStruct->end(leaf) == end) {
-    double score = _down[leaf];
+  double score = 0;
+  double matched = 0;
+
+  std::set<int> leafs;
+  if ( extent.ordinal == 0 ) {
+    docStruct->findLeafs( &leafs, extent.begin, extent.end, true );
+  } else {
+    leafs.insert( extent.ordinal );
+  }
+  if ( leafs.size() == 0 ) {
+    // can't find exact matches, so approximate instead
+    docStruct->findLeafs( &leafs, extent.begin, extent.end, false );
+  }
+  std::set<int>::iterator leaf = leafs.begin();
+  std::set<int>::iterator leafsEnd = leafs.end();
+  while ( leaf != leafsEnd ) {
+    // output for debugging
+//        std::cout << _list.getName() << "\t\t    leaf: " << docStruct->path(*leaf) << " " << extent.begin << ":" << extent.end
+//     	      << "    count: " << _counts[*leaf] 
+//      	      << "    score: " << _down[*leaf] 
+//     	      << "    length: " << docStruct->accumulatedLength(*leaf)
+//     	      << "    coll: " << _scoreFunction.scoreOccurrence( 0, docStruct->accumulatedLength(*leaf) )
+// 		 << "    parent: " << _down[docStruct->parent(*leaf)] 
+//     	      << std::endl;    
+    if ( _down[ *leaf ] != 0 ) {
+      score += _down[ *leaf ];
+      matched++;    
+    }
+    leaf++;
+  }
+
+  if ( matched > 0 ) {
+    score /= matched;
     if ( !_queryLevelCombine ) {
       score = log( score );
     }
-    _results.push_back( indri::api::ScoredExtentResult( score, documentID, 
-							begin, end ));
-  } 
+//     std::cout << "\t" << getName() << " " << extent.begin << ":" << extent.end << " " << score << std::endl;
 
+
+    _results.push_back( indri::api::ScoredExtentResult( score, documentID,
+							extent.begin, extent.end )); //, extent.ordinal ));
+  } else {    
+    score = _defaultScore;
+    if ( !_queryLevelCombine ) {
+      score = log( score );
+    }
+//       std::cout << _list.getName() << "\t\t    leaf: ? " << extent.begin << ":" << extent.end 
+//   	      << "    score: " << _defaultScore
+//    	      << std::endl;    
+//     std::cout << "\t" << getName() << " " << extent.begin << ":" << extent.end << " " << score << " " << "Default!" << std::endl;
+
+    _results.push_back( indri::api::ScoredExtentResult( score, documentID, 
+							extent.begin, extent.end )); // , extent.ordinal ));
+  }
   return _results;
 }
 
@@ -237,50 +154,303 @@ bool indri::infnet::ShrinkageBeliefNode::hasMatch( int documentID ) {
   return _list.extents().size() > 0;
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::ShrinkageBeliefNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& matchExtents ) {
 
+void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
+  indri::index::DocumentStructure * docStruct = _docStructHolder.getDocumentStructure();
+  int numNodes = docStruct->nodeCount();
+
+  int documentLength = docStruct->getIndex()->documentLength( documentID );
+
+  indri::index::DocumentStructure::child_iterator root;
+  indri::index::DocumentStructure::child_iterator rootsEnd;
+
+  // build a new cache of scores if needed
+  if ( documentID != _documentID ) {
+
+    _counts.clear();
+    _base.clear();
+    _up.clear();
+    _down.clear();
+
+    _counts.resize( numNodes+1, 0 );
+    _base.resize( numNodes+1, 0 );
+    _up.resize( numNodes+1, 0 );
+    _down.resize( numNodes+1, 0 );
+  
+    // Count up the occurrences terms in each tree.
+    // We include all child components - this is a break from the model in my proposal, and is 
+    // to allow occurrences of phrases that cross field boundaries.  Otherwise, it is
+    // an equivalent reformulation of the original model, but the parameters learned/chosen
+    // would be different.
+
+    const indri::utility::greedy_vector<indri::index::Extent> & extents = _list.extents();
+     // std::cout << "got list " << documentID << std::endl;
+
+    int lastEnd = 0;
+    
+
+    // keep track of the roots we need to work with for walking    
+    _roots.clear();
+
+
+    // Walk through the extent list.
+    // As we encounter a new term in the extent list:
+    // - add new extents to an active node list from the document nodes that have the same begin or less
+    // - remove extents from the active node list where the end is less then the begin of the term extent
+    // Scan the active node list for extents that contains the term extent.
+
+    // Sort the active node list by increasing end.
+    // - When removing, the extents to remove will be at the beginning
+    // - When scanning, check the from the end. All nodes that have a larger or equal end to the term
+    //   extent's end should have their count increased
+
+    // active document nodes
+    std::set<indri::index::Extent, indri::index::Extent::ends_before_less> activeOuterExtents;
+    
+    int docNode = 1;
+
+    indri::utility::greedy_vector<indri::index::Extent>::const_iterator innerIter = extents.begin();
+    while ( innerIter != extents.end() ) {
+      // remove outer extents we don't need anymore
+      std::set<indri::index::Extent, indri::index::Extent::ends_before_less>::iterator activeIter = activeOuterExtents.begin();
+      std::set<indri::index::Extent, indri::index::Extent::ends_before_less>::iterator activeEnd = activeOuterExtents.end();
+      while ( activeIter != activeEnd ) {
+	if ( activeIter->end >= innerIter->begin ) {
+	  break;
+	} 
+	activeIter++;
+      }
+      activeOuterExtents.erase( activeOuterExtents.begin(), activeIter );	  
+
+      // push new document node extents on that we may need
+      while ( docNode < numNodes && docStruct->begin( docNode ) <= innerIter->begin ) {      
+	indri::index::Extent extent( 1, docStruct->begin( docNode ), docStruct->end( docNode ), docNode );
+	// only insert if needed
+	if ( extent.end >= innerIter->begin ) {
+	  activeOuterExtents.insert( extent );
+	}
+	docNode++;
+      }
+
+      if ( innerIter->begin >= lastEnd ) {
+	_counts[0] += innerIter->weight;
+	// scan the doc nodes for nodes that match
+	activeIter = activeOuterExtents.end();
+	if (!activeOuterExtents.empty()) {
+	  activeIter--;
+	  bool doneActiveList = false;
+	  while ( ! doneActiveList &&
+		  activeIter->end >= innerIter->end ) {
+	    // Since we know that all active doc node extents have a begin that is at or before
+	    // the inner iter's begin, and from the if statement we know the end of one
+	    // of the active outer extents is at least 
+	    // as large as the inner end, we know the inner iter extent is contained
+	    // by this extent in the active list 
+	    _counts[ activeIter->ordinal ] += ( activeIter->weight * innerIter->weight );
+
+	    // keep track of roots we've seen
+	    int r = activeIter->ordinal;
+	    while ( docStruct->parent( r ) != 0 ) {
+	      r = docStruct->parent( r );
+	    }
+	    if ( _roots.find( r ) == _roots.end() ) {
+	      _roots.insert( r );
+	    }
+
+	    if ( activeIter == activeOuterExtents.begin() ) {
+	      doneActiveList = true;
+	    } else {
+	      activeIter--;
+	    }
+	  }
+	}
+	lastEnd = innerIter->end;
+      }
+      innerIter++;
+    }
+
+    _base[ 0 ] = _scoreFunction.scoreOccurrence( _counts[0], documentLength, _counts[0], documentLength );    
+
+    // weight given to smoothing in linear interpolation
+    double otherScore = 0;
+
+    _defaultScore = _scoreFunction.scoreOccurrence( 0, 0, _counts[0], documentLength );
+    if ( !_queryLevelCombine ) {
+      _base [ 0 ] = exp( _base[0] );
+      _defaultScore = exp( _defaultScore );
+    }
+    otherScore = _defaultScore;
+    _defaultScore = _docWeight * _base[0] + (1 - _docWeight) * _defaultScore;
+
+    docStruct->topDownOrder( _roots, _topDownOrder );
+    indri::utility::greedy_vector<int>::iterator nodesBegin = _topDownOrder.begin();
+    indri::utility::greedy_vector<int>::iterator nodesEnd = _topDownOrder.end();
+
+    // estimate scores for each of the nodes ( \theta mixed with collection model )
+    indri::utility::greedy_vector<int>::iterator node = nodesBegin;
+    while (node < nodesEnd) {
+      int i = *node;
+      int contextSize = docStruct->accumulatedLength(i);
+      double occurrences = _counts[i];
+      double score = _scoreFunction.scoreOccurrence( occurrences, contextSize, _counts[0], documentLength );
+      if ( !_queryLevelCombine ) {
+	// must subtract weight given to collection/document so that we can do the shrinkage properly
+	score = (exp( score ) - otherScore) / (1 - _otherWeight) ;
+      } 
+      _base[i] = score;
+      node++;
+    }
+
+    // std::cout << "done base " << documentID << std::endl;
+
+    // smooth up doc 
+    node = nodesEnd;
+    while (node != nodesBegin) {
+      node--;
+      size_t i = *node;
+
+      // what's left for the original model and the length proportional models
+      double remaining = 1;
+      
+      // for summing probabilities with absolute weights
+      double absolute = 0;
+
+      // for summing probabilites with length proportional weights
+      int length = docStruct->accumulatedLength( i );
+      double divisor = length;
+      double relative = _base[ i ] * length;
+
+      if ( !_ruleMap.empty() ) {
+
+	indri::index::DocumentStructure::child_iterator kids = docStruct->childrenBegin( i );
+	indri::index::DocumentStructure::child_iterator kidsEnd = docStruct->childrenEnd( i );      
+	while( kids < kidsEnd ) {
+	  // check for a smoothing rule for the child
+	  int kidType = docStruct->type(*kids);
+	  std::map<int, smoothing_rule>::iterator ruleIter = _ruleMap.find(kidType);
+	  if( ruleIter != _ruleMap.end() ) {
+	    smoothing_rule rule = ruleIter->second;
+	    if( rule.lengthProportional ) {
+	      double lengthAlpha = rule.weight * docStruct->accumulatedLength( *kids );
+	      if( _recursive ) {
+		relative += lengthAlpha * _up[ *kids ];
+	      } else {
+		relative += lengthAlpha * _base[ *kids ];
+	      }
+	      divisor += lengthAlpha;
+	    } else {
+	      if( _recursive ) {
+		absolute += rule.weight * _up[ *kids ];
+	      } else {
+		absolute += rule.weight * _base[ *kids ];
+	      }
+	      remaining -= rule.weight;
+	    }
+	  }
+	  kids++;
+	}
+      }
+
+      relative /= divisor;
+      
+      if ( ! isnan( relative ) ) {
+	if ( remaining >= 0 ) {
+	  _up[ i ] = remaining * relative + absolute;
+	} else {
+	  // the absolute weights sum to something larger than 1, so we will ignore these 
+	  _up[ i ] = relative;
+	}
+      } else {
+	// the divisor was 0, so we can't use the relative weights
+	if ( remaining >= 0 ) {
+	  _up[ i ] = remaining * _base[ i ] + absolute;
+	} else {
+	  // the absolute weights sum to something larger than 1, so we will ignore these 
+	  _up[ i ] = _base[ i ];
+	}
+      }
+
+    }
+    // std::cout << "done up " << documentID << std::endl;
+
+    // smooth down the each tree
+    _up[0] = _base[0];
+    _down[0] = _up[0];
+    node = nodesBegin;    
+    while ( node != nodesEnd ) {
+      size_t i = *node;
+      if ( docStruct->parent( i ) == 0 ) {
+	if ( _recursive ) {
+	  _down[i] = (1.0 - _docWeight) * _up[i] 
+	    + _docWeight * _down[0];
+	} else {
+	  _down[i] = (1.0 - _docWeight) * _up[i] 
+	    + _docWeight * _up[0];
+	}	  
+      } else {      
+	if( _recursive ) {
+	  _down[i] = (1.0 - _parentWeight - _docWeight) * _up[i] 
+	    + _parentWeight * _down[docStruct->parent(i)]
+	    + _docWeight * _down[0];
+	} else {
+	  _down[i] = (1.0 - _parentWeight - _docWeight) * _up[i]
+	    + _parentWeight * _up[docStruct->parent(i)]
+	    + _docWeight * _up[0];
+	}
+      }
+      node++;
+    }
+
+    // add back in the collection/doc weight
+    if ( ! _queryLevelCombine ) {
+      node = nodesBegin;
+      while ( node != nodesEnd ) {
+	size_t i = *node;
+	_down[i] = (1 - _otherWeight) * _down[i] + otherScore;
+	node++;
+      }
+    }
+    // std::cout << "done down " << documentID << std::endl;
+        
+    _documentID = documentID;
+
+//     std::cout << "done smoothing " << documentID <<std::endl;
+
+  }
+
+}
+
+const indri::utility::greedy_vector<bool>& indri::infnet::ShrinkageBeliefNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& matchExtents ) {
+  //  std::cout << this << " Matching " << documentID << std::endl;
   _matches.clear();
   // Allows matches elsewhere in the document as shrinkage may give a reasonably large belief
-  if ( hasMatch( documentID ) ) {
-    _matches.resize( matchExtents.size(), true );    
-  } else {
-    _matches.resize( matchExtents.size(), false );
-  }
-  /* 
-  // Requires a match of extent - may result in incorrect probability estimates
+  _matches.resize( matchExtents.size(), false );
 
-  const indri::utility::greedy_vector<indri::index::Extent>& extents = _list.extents();
+  indri::index::DocumentStructure * docStruct = _docStructHolder.getDocumentStructure();
 
-  indri::utility::greedy_vector<indri::index::Extent>::const_iterator matchIter = matchExtents.begin();
-  indri::utility::greedy_vector<bool>::iterator matchesIter = _matches.begin();
-  indri::utility::greedy_vector<indri::index::Extent>::const_iterator extentIter = extents.begin();
+  _buildScoreCache( documentID );
 
-
-  // with field wildcard node possibly in the matches extent list creation process,
-  // we can only move the
-  // extent iterator when we are sure that it doesn't overlap with the match list
-  // MAJOR flaw for now: we are assuming the extent list is nice and does not contain
-  // overlapping extents, and is in order of increasing begin
-  // we also assume that for any later extent in the match list the begin >= current begin
-  while( matchIter != matchExtents.end() && extentIter != extents.end() ) {
-    //    std::cout << documentID << " " << matchIter->begin << " " << matchIter->end 
-    //    	      << " " << extentIter->begin <<  " " << extentIter->end << "\n";
-    if( matchIter->contains( *extentIter ) ) {
-      *matchesIter = true;
-      matchIter++;
-      matchesIter++;
-      //      std::cout << "\tmatch, advancing matches\n";
-    } else if( extentIter->begin < matchIter->begin ) {
-      extentIter++;
-      //      std::cout << "\tadvancing extents\n";
+  for ( int i = 0 ; i < matchExtents.size() ; i++ ) {
+    const indri::index::Extent * extent =  &(matchExtents[i]);
+    std::set<int> leafs;
+    if ( extent->ordinal == 0 ) {
+      docStruct->findLeafs( &leafs, extent->begin, extent->end, true );
     } else {
-      matchIter++;
-      matchesIter++;
-      //      std::cout << "\tadvancing matches\n";
+      leafs.insert( extent->ordinal );
+    }
+    if ( leafs.size() == 0 ) {
+      // can't find exact matches, so approximate instead
+      docStruct->findLeafs( &leafs, extent->begin, extent->end, false );
+    }
+    std::set<int>::iterator leaf = leafs.begin();
+    std::set<int>::iterator leafsEnd = leafs.end();
+    while ( _matches[ i ] == false && leaf != leafsEnd ) {
+      if ( _down[ *leaf ] != 0 ) {
+	_matches[ i ] = true;
+      }
+      leaf++;
     }
   }
-
-  */
   return _matches;
 }
 
@@ -347,3 +517,42 @@ void indri::infnet::ShrinkageBeliefNode::addShrinkageRule( std::string ruleText 
 
 }
 
+
+void indri::infnet::ShrinkageBeliefNode::setSmoothing( const std::string & stringSpec ) {
+  indri::api::Parameters spec;
+
+  int nextComma = 0;
+  int nextColon = 0;
+  int location = 0;
+
+  for( location = 0; location < stringSpec.length(); ) {
+    nextComma = stringSpec.find( ',', location );
+    nextColon = stringSpec.find( ':', location );
+
+    std::string key = stringSpec.substr( location, nextColon-location );
+    std::string value = stringSpec.substr( nextColon+1, nextComma-nextColon-1 );
+
+    spec.set( key, value );
+
+    if( nextComma > 0 )
+      location = nextComma+1;
+    else
+      location = stringSpec.size();
+  }
+
+
+  std::string method = spec.get( "method", "dirichlet" );
+
+  if( method == "linear" || method == "jm" || method == "jelinek-mercer" ) {
+    // jelinek-mercer -- can take parameters collectionLambda (or just lambda) and documentLambda
+    double documentLambda = spec.get( "documentLambda", 0.0 );
+    double collectionLambda;
+    
+    if( spec.exists( "collectionLambda" ) )
+      collectionLambda = spec.get( "collectionLambda", 0.4 );
+    else
+      collectionLambda = spec.get( "lambda", 0.4 );
+
+    _otherWeight = documentLambda + collectionLambda;
+  }
+}
