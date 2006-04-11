@@ -178,6 +178,11 @@ namespace indri
       void setNumericField( const std::string& fieldName, bool isNumeric,
                             const std::string &parserName = "");
 
+      /// Set the ordinal property of a field. 
+      /// @param fieldName the field.
+      /// @param isOrdinal true if the field is an ordinal field, false if not.
+      void setOrdinalField( const std::string& fieldName, bool isOrdinal);
+
       /// Set names of metadata fields to be indexed for fast retrieval.
       /// The forward fields are indexed in a B-Tree mapping (documentID, metadataValue).
       /// If a field is not forward indexed, the documentMetadata calls will still work, but they
