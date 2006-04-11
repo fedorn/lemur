@@ -304,6 +304,10 @@ namespace indri {
 	_inner = inner;
       }
 
+      void setOuter( RawExtentNode * outer ) {
+	_outer = outer;
+      }
+
       RawExtentNode* getInner() {
         return _inner;
       }
@@ -3311,6 +3315,204 @@ namespace indri {
         return copier.after(this, duplicate);
       }
     };
+
+
+
+    class ExtentDescendant : public ExtentInside {
+    protected:
+
+      DocumentStructureNode* _documentStructure;
+      
+    public:
+      ExtentDescendant( RawExtentNode* inner, RawExtentNode* outer, DocumentStructureNode * docStruct ) :
+        ExtentInside( inner, outer ),
+	_documentStructure( docStruct)
+      {
+      }
+
+      ExtentDescendant( Unpacker& unpacker ):
+	ExtentInside( unpacker ) 
+      { 
+	_documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
+      }
+
+      bool operator== ( Node& o ) {
+        ExtentDescendant* other = dynamic_cast<ExtentDescendant*>(&o);
+  
+        return other &&
+          *_inner == *other->_inner &&
+          *_outer == *other->_outer &&
+	  *_documentStructure == *other->_documentStructure;
+      }
+      
+      void setDocumentStructure( DocumentStructureNode* docStruct ) {
+        _documentStructure = docStruct;
+      }
+
+      DocumentStructureNode* getDocumentStructure() {
+        return _documentStructure;
+      }
+
+      std::string typeName() const {
+        return "ExtentDescendant";
+      }
+
+      UINT64 hashCode() const {
+        return 125 + _inner->hashCode() + (_inner->hashCode() * 7);//???????????????
+      }
+
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+        _inner->walk(walker);
+        _outer->walk(walker);
+	_documentStructure->walk(walker);
+        walker.after(this);
+      }
+
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+        
+        RawExtentNode* newInner = dynamic_cast<RawExtentNode*>(_inner->copy(copier));
+        RawExtentNode* newOuter = dynamic_cast<RawExtentNode*>(_outer->copy(copier));
+	DocumentStructureNode * newDocStruct = dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier));
+        ExtentDescendant* extentInsideCopy = new ExtentDescendant( newInner, newOuter, newDocStruct );
+        extentInsideCopy->setNodeName( nodeName() );
+
+        return copier.after(this, extentInsideCopy);
+      }
+    };
+
+    class ExtentChild : public ExtentInside {
+    protected:
+
+      DocumentStructureNode* _documentStructure;
+      
+    public:
+      ExtentChild( RawExtentNode* inner, RawExtentNode* outer, DocumentStructureNode * docStruct ) :
+        ExtentInside( inner, outer ),
+	_documentStructure( docStruct)
+      {
+      }
+
+      ExtentChild( Unpacker& unpacker ):
+	ExtentInside( unpacker ) 
+      { 
+	_documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
+      }
+
+      bool operator== ( Node& o ) {
+        ExtentChild* other = dynamic_cast<ExtentChild*>(&o);
+  
+        return other &&
+          *_inner == *other->_inner &&
+          *_outer == *other->_outer &&
+	  *_documentStructure == *other->_documentStructure;
+      }
+
+      void setDocumentStructure( DocumentStructureNode* docStruct ) {
+        _documentStructure = docStruct;
+      }
+
+      DocumentStructureNode* getDocumentStructure() {
+        return _documentStructure;
+      }
+     
+      std::string typeName() const {
+        return "ExtentChild";
+      }
+
+      UINT64 hashCode() const {
+        return 129 + _inner->hashCode() + (_inner->hashCode() * 7);//???????????????
+      }
+
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+        _inner->walk(walker);
+        _outer->walk(walker);
+	_documentStructure->walk(walker);
+        walker.after(this);
+      }
+
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+        
+        RawExtentNode* newInner = dynamic_cast<RawExtentNode*>(_inner->copy(copier));
+        RawExtentNode* newOuter = dynamic_cast<RawExtentNode*>(_outer->copy(copier));
+	DocumentStructureNode * newDocStruct = dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier));
+        ExtentChild* extentInsideCopy = new ExtentChild( newInner, newOuter, newDocStruct );
+        extentInsideCopy->setNodeName( nodeName() );
+
+        return copier.after(this, extentInsideCopy);
+      }
+    };
+
+    class ExtentParent : public ExtentInside {
+    protected:
+
+      DocumentStructureNode* _documentStructure;
+      
+    public:
+      ExtentParent( RawExtentNode* inner, RawExtentNode* outer, DocumentStructureNode * docStruct ) :
+        ExtentInside( inner, outer ),
+	_documentStructure( docStruct)
+      {
+      }
+
+      ExtentParent( Unpacker& unpacker ):
+	ExtentInside( unpacker ) 
+      { 
+	_documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
+      }
+
+      bool operator== ( Node& o ) {
+        ExtentParent* other = dynamic_cast<ExtentParent*>(&o);
+  
+        return other &&
+          *_inner == *other->_inner &&
+          *_outer == *other->_outer &&
+	  *_documentStructure == *other->_documentStructure;
+      }
+
+      void setDocumentStructure( DocumentStructureNode* docStruct ) {
+        _documentStructure = docStruct;
+      }
+
+      DocumentStructureNode* getDocumentStructure() {
+        return _documentStructure;
+      }
+     
+      std::string typeName() const {
+        return "ExtentParent";
+      }
+
+      UINT64 hashCode() const {
+        return 129 + _inner->hashCode() + (_inner->hashCode() * 7);//???????????????
+      }
+
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+        _inner->walk(walker);
+        _outer->walk(walker);
+	_documentStructure->walk(walker);
+        walker.after(this);
+      }
+
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+        
+        RawExtentNode* newInner = dynamic_cast<RawExtentNode*>(_inner->copy(copier));
+        RawExtentNode* newOuter = dynamic_cast<RawExtentNode*>(_outer->copy(copier));
+	DocumentStructureNode * newDocStruct = dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier));
+        ExtentParent* extentInsideCopy = new ExtentParent( newInner, newOuter, newDocStruct );
+        extentInsideCopy->setNodeName( nodeName() );
+
+        return copier.after(this, extentInsideCopy);
+      }
+    };
+
 
 
   }
