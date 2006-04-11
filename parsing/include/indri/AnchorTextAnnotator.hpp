@@ -62,7 +62,7 @@ namespace indri
         _count = atoi( line+6 );
       }
 
-      void _fetchText( indri::utility::greedy_vector<TagExtent>& tags, indri::utility::greedy_vector<char*>& terms ) {
+      void _fetchText( indri::utility::greedy_vector<TagExtent *>& tags, indri::utility::greedy_vector<char*>& terms ) {
         // now, fetch the additional terms
         char line[65536];
         _buffer.clear();
@@ -108,13 +108,14 @@ namespace indri
               terms.push_back( beginWord );
             beginWord = 0;
         
-            TagExtent extent;
-            extent.name = "inlink";
-            extent.begin = beginIndex;
-            extent.end = terms.size();
-            extent.number = 0;
+	    TagExtent * extent = new TagExtent;
+            extent->name = "inlink";
+            extent->begin = beginIndex;
+            extent->end = terms.size();
+            extent->number = 0;
+	    extent->parent = 0;
 
-            assert( extent.begin <= extent.end );
+            assert( extent->begin <= extent->end );
 
             if( beginIndex ) {
               tags.push_back(extent);
@@ -168,18 +169,25 @@ namespace indri
       indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document ) {
 
 	// surround current text with a mainbody tag
-        TagExtent mainbody;
-        mainbody.begin = 0;
-        mainbody.end = document->terms.size();
-        mainbody.name = "mainbody";
-        mainbody.number = 0;
+        TagExtent * mainbody = new TagExtent;
+        mainbody->begin = 0;
+        mainbody->end = document->terms.size();
+        mainbody->name = "mainbody";
+        mainbody->number = 0;
+	mainbody->parent = 0;
+	// order no longer matters - the indexer takes care of any sorting needed
+	document->tags.push_back( mainbody );
 
-        indri::utility::greedy_vector<TagExtent> oldTags;
-        oldTags = document->tags;
-        document->tags.clear();
-        document->tags.push_back( mainbody );
-        document->tags.append( oldTags.begin(), oldTags.end() );
-	
+	// set old tags' parent to mainbody
+	indri::utility::greedy_vector<TagExtent *>::iterator oldTag = document->tags.begin();
+	indri::utility::greedy_vector<TagExtent *>::iterator oldTagsEnd = document->tags.end();
+	while ( oldTag != oldTagsEnd ) {
+	  if ((*oldTag)->parent == 0) {
+	    (*oldTag)->parent = mainbody;
+	  }
+	  oldTag++;
+	}
+
         if( _matchingDocno( document ) ) {
           _fetchText( document->tags, document->terms );
           _readDocumentHeader();
