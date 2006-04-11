@@ -94,6 +94,12 @@ namespace indri {
     Node* Copier::after( class DocumentStructureNode* oldNode, class DocumentStructureNode* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class ShrinkageScorerNode* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class ShrinkageScorerNode* oldNode, class ShrinkageScorerNode* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class ExtentDescendant* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class ExtentDescendant* oldNode, class ExtentDescendant* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class ExtentChild* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class ExtentChild* oldNode, class ExtentChild* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class ExtentParent* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class ExtentParent* oldNode, class ExtentParent* newNode ) { return defaultAfter( oldNode, newNode ); }
  };
 };
 
