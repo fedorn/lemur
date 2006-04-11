@@ -66,6 +66,7 @@
 #include <string.h>
 #include <string>
 #include <queue>
+#include <map>
 
 void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnnotationsFile ) {
   
@@ -83,6 +84,8 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
     _cleanup();
   }
+
+  std::cerr << "Done cleanup " << std::endl;
   _first_open = false;
 
   // Load file, and check consistency.  Ensure that there are no
@@ -147,6 +150,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 		      << field << "' on line " << line 
 		      << "; ignoring line." << std::endl;
 	    line++;
+	    fieldCount = 8;
 	    continue;
 	  }
 	  break;
@@ -173,6 +177,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
                         << "' starting at negative byte offest on line " 
                         << line << "; ignoring line." << std::endl;
               line++;
+	      fieldCount = 8; 
               continue;
             }
 	  }
@@ -186,6 +191,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
                         << "' with zero or negative byte length on line " 
                         << line << "; ignoring line." << std::endl;
               line++;
+	      fieldCount = 8;
               continue;
             }
           }
@@ -283,7 +289,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
       if ( _p_conflater ) _p_conflater->conflate( te );
 	  
       tags->insert( te );
-	  _tag_id_map.insert( id, te );
+      _tag_id_map.insert( id, te );
 
     } else if ( type == 2 ) {
 
@@ -300,17 +306,19 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 	continue;
       }
 
-      AttributeValuePair avp;
-      avp.attribute = name;
-      avp.value = s_value;
+      AttributeValuePair * avp = new AttributeValuePair;
+      avp->attribute = name;
+      avp->value = s_value;
 
-      p_te->attributes.push_back( avp );
-      _attribute_id_map.insert( id, &avp );
+      p_te->attributes.push_back( *avp );
+      _attribute_id_map.insert( id, avp );
 
     }
 
     line++;
   }
+
+  std::cerr << "Done loading" << std::endl;
 	
   in.close();
 }
@@ -345,31 +353,33 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
     }
 
     // Store newly converted tags back to the converted annotations table. 
-    _converted_annotations.insert( docno, converted_tags );
+    //    _converted_annotations.insert( docno, converted_tags );
   }
 
   // Return right away if there are no annotations for this document.
   if ( converted_tags->empty() ) return document;
 
-  IntervalTree itree;
+  // --------------- PARAMETERIZE USE OF INTERVAL TREE ----------------------
+
+  //  IntervalTree itree;
 
   // Load existing ParsedDocument tags into the IntervalTree:
 	
-  for ( indri::utility::greedy_vector<TagExtent>::iterator i = 
-	  document->tags.begin(); i != document->tags.end(); i++ ) {
+//   for ( indri::utility::greedy_vector<TagExtent>::iterator i = 
+// 	  document->tags.begin(); i != document->tags.end(); i++ ) {
 	  
 //     std::cerr << "Inserting existing tag: " << (*i).name << " [" 
 // 	      << (*i).begin << ", " << (*i).end << "]" << std::endl;
 	  
-    if ( ! itree.insert( (*i).begin, (*i).end ) ) {
+//     if ( ! itree.insert( (*i).begin, (*i).end ) ) {
 
-      std::cerr << "There was an error inserting ParsedDocument tag '"
-		<< (*i).name << "' [" << (*i).begin << ", "
-		<< (*i).end << "] into the IntervalTree for docno '"
-		<< docno << "'!  This isn't supposed to happen."
-		<< std::endl;
-    }
-  }
+//       std::cerr << "There was an error inserting ParsedDocument tag '"
+// 		<< (*i).name << "' [" << (*i).begin << ", "
+// 		<< (*i).end << "] into the IntervalTree for docno '"
+// 		<< docno << "'!  This isn't supposed to happen."
+// 		<< std::endl;
+//     }
+//   }
 
   // Add annotations from the offset annotations file to
   // IntervalTree, in case any of them overlap with the existing
@@ -382,19 +392,21 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
 //     std::cerr << "Inserting new tag: " << (*i)->name << " [" 
 // 	      << (*i)->begin << ", " << (*i)->end << "]" << std::endl;
 	  
-    if ( ! itree.insert( (*i)->begin, (*i)->end ) ) {
+//     if ( ! itree.insert( (*i)->begin, (*i)->end ) ) {
 
-#if 0
-      std::cerr << "Tag '" << (*i)->name << "' [" << (*i)->begin << ", "
-		<< (*i)->end << "] for docno '" << docno 
-		<< "' overlaps with an existing annotation; skipping..."
-		<< std::endl;
-#endif
-    } else {
+// #if 0
+//       std::cerr << "Tag '" << (*i)->name << "' [" << (*i)->begin << ", "
+// 		<< (*i)->end << "] for docno '" << docno 
+// 		<< "' overlaps with an existing annotation; skipping..."
+// 		<< std::endl;
+// #endif
+//     } else {
 
-      document->tags.push_back( *(*i) );
-    }
+      document->tags.push_back( (*i) );
+//    }
   }
+
+  converted_tags->clear();
 
   return document;
 }
@@ -407,6 +419,9 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
   std::priority_queue<indri::parse::TagExtent*,std::vector<indri::parse::TagExtent*>,indri::parse::TagExtent::lowest_end_first> active_tags;
 
   std::set<indri::parse::TagExtent*>::iterator curr_raw_tag = raw_tags->begin();
+
+  // to map the parent pointers
+  std::map<indri::parse::TagExtent*, indri::parse::TagExtent*> tagMap;
 
   long tok_pos = 0;
 
@@ -462,6 +477,13 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
 
       }
 
+      // ensure tag boundaries are still within the document
+      if (te->end > document->positions.size()) {
+	te->end = document->positions.size();
+      } 
+      if (te->end < 1) {
+	te->end = 1;
+      }
 
 //       std::cerr << "Closed Tag named " << te->name 
 // 	        << " at tok_pos " << te->end << std::endl;
@@ -502,6 +524,9 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
       te->parent = (*curr_raw_tag)->parent;
       te->attributes = (*curr_raw_tag)->attributes;
 
+      // store this map so that we can convert the parent pointers
+      tagMap[ *curr_raw_tag ] = te;
+
       // When the tag begins in the middle of the token, we need to
       // decide whether to round up (activate the tag at this token
       // position) or round down (activate the tag at tok_pos + 1).
@@ -519,6 +544,14 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
 	te->begin = tok_pos + 1;
 
       }
+
+      // Make sure tag boundaries are within the document
+      if (te->begin >= document->positions.size()) {
+	te->begin = document->positions.size() - 1;
+      } 
+      if (te->begin < 0) {
+	te->begin = 0;
+      }      
 
       // End value must be filled in when the tag is closed; for now,
       // we just store the byte offset of the end of the tag.
@@ -550,4 +583,21 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
     active_tags.pop();
     
   }
+
+  // Map the parent pointers to point to the right tag!
+  std::set<indri::parse::TagExtent*>::iterator converted = converted_tags->begin();
+  std::set<indri::parse::TagExtent*>::iterator convertedEnd = converted_tags->end();
+  while( converted != convertedEnd ) {
+    if ( (*converted)->parent != 0 ) {
+      std::map<indri::parse::TagExtent*, indri::parse::TagExtent*>::iterator iter = 
+	tagMap.find( (*converted)->parent );
+      if ( iter != tagMap.end() ) {
+	(*converted)->parent = iter->second;
+      } else {
+      (*converted)->parent = 0;
+      }
+    }
+    converted++;
+  }
+
 }
