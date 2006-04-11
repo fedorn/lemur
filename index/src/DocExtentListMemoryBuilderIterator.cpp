@@ -45,17 +45,18 @@ void indri::index::DocExtentListMemoryBuilderIterator::startIteration() {
 
 void indri::index::DocExtentListMemoryBuilderIterator::reset( DocExtentListMemoryBuilder& builder ) {
   builder.flush();
-  reset( builder._lists, builder._numeric );
+  reset( builder._lists, builder._numeric, builder._ordinal );
 }
 
 //
 // reset
 //
 
-void indri::index::DocExtentListMemoryBuilderIterator::reset( const indri::utility::greedy_vector< DocExtentListMemoryBuilderSegment, 4 >& lists, bool numeric ) {
+void indri::index::DocExtentListMemoryBuilderIterator::reset( const indri::utility::greedy_vector< DocExtentListMemoryBuilderSegment, 4 >& lists, bool numeric, bool ordinal ) {
   _lists = &lists;
   _numeric = numeric;
-  
+  _ordinal = ordinal;
+
   _current = _lists->begin();
   
   if( _current != _lists->end() ) {
@@ -80,7 +81,7 @@ void indri::index::DocExtentListMemoryBuilderIterator::reset( const indri::utili
 
 indri::index::DocExtentListMemoryBuilderIterator::DocExtentListMemoryBuilderIterator( const class DocExtentListMemoryBuilder& builder )
 {
-  reset( builder._lists, builder._numeric );
+  reset( builder._lists, builder._numeric, builder._ordinal );
 }
 
 //
@@ -114,9 +115,13 @@ bool indri::index::DocExtentListMemoryBuilderIterator::nextEntry() {
     _list = lemur::utility::RVLCompress::decompress_int( _list, extents );
 
     int deltaPosition;
+    int ordinal = 0;
+    int deltaOrdinal;
     Extent extent;
     extent.begin = 0;
     extent.end = 0;
+    extent.ordinal = 0;
+    extent.weight = 1;
 
     for( int i=0; i<extents; i++ ) {
       _list = lemur::utility::RVLCompress::decompress_int( _list, deltaPosition );
@@ -125,6 +130,12 @@ bool indri::index::DocExtentListMemoryBuilderIterator::nextEntry() {
       _list = lemur::utility::RVLCompress::decompress_int( _list, deltaPosition );
       // delta encode end with respect to begin
       extent.end = extent.begin + deltaPosition;
+
+      if( _ordinal ) {
+	_list = lemur::utility::RVLCompress::decompress_int( _list, deltaOrdinal );
+	ordinal = ordinal + deltaOrdinal;
+	extent.ordinal = ordinal;
+      }
 
       _data.extents.push_back( extent );
 
