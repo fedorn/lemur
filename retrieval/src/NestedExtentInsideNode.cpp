@@ -9,6 +9,8 @@
 #include "indri/NestedExtentInsideNode.hpp"
 #include "lemur-compat.hpp"
 #include "indri/Annotator.hpp"
+#include <set>
+
 
 indri::infnet::NestedExtentInsideNode::NestedExtentInsideNode( const std::string& name, ListIteratorNode* inner, ListIteratorNode* outer ) :
   _inner(inner),
@@ -29,26 +31,63 @@ void indri::infnet::NestedExtentInsideNode::prepare( int documentID ) {
   indri::utility::greedy_vector<indri::index::Extent>::const_iterator innerIter = inExtents.begin();
   indri::utility::greedy_vector<indri::index::Extent>::const_iterator outerIter = outExtents.begin();
 
-  // with field wildcard node possibly below, we can only move the
-  // outer iterator when we are sure that it doesn't overlap with the inner
-  // MAJOR flaw for now: we are assuming the Outer extent list is nice and does not contain
-  // overlapping extents, and is in order of increasing begin
-  // we also assume that for any later extent in the inner iterator the begin >= current begin
-  while( innerIter != inExtents.end() && outerIter != outExtents.end() ) {
-    if( outerIter->contains( *innerIter ) ) {
-      // Found a match, we can now increment the innerIter
-      _extents.push_back( *innerIter );
-      innerIter++;
-    } else if( outerIter->end < innerIter->begin ) {
-      // If the outerIter end is less than the innerIter begin, then it cannot contain
-      // the innerIter or later innerExtents      
-      outerIter++;
-    } else { 
-      // Default case, the innerIter extent is not inside outerExtent, and will not be
-      // inside later outerExtents.
-      innerIter++;
+
+  // Walk through the inner list.
+  // As we encounter a new node in the inner list:
+  // - add new extents to an active outer list in the outer list that have the same begin or less
+  // - remove extents from the active outer list where the end is less then the begin of the inner
+  // Scan the active outer list for an extent that contains the inner.
+
+  // Sort the active outer list by increasing end.
+  // - When removing, the extents to remove will be at the beginning
+  // - When scanning, check the last active outer extent.  If its end is larger than the inner
+  //   extent's end, then we can add the inner extent.
+
+  // Active outer extents
+  std::set<indri::index::Extent, indri::index::Extent::ends_before_less> activeOuterExtents;
+  while ( innerIter != inExtents.end() ) {
+    // remove outer extents we don't need anymore
+    std::set<indri::index::Extent, indri::index::Extent::ends_before_less>::iterator activeIter = activeOuterExtents.begin();
+    std::set<indri::index::Extent, indri::index::Extent::ends_before_less>::iterator activeEnd = activeOuterExtents.end();
+    while ( activeIter != activeEnd ) {
+      if ( activeIter->end >= innerIter->begin ) {
+	break;	
+      } 
+      activeIter++;
     }
+    activeOuterExtents.erase( activeOuterExtents.begin(), activeIter );
+
+    // push new outer extents on that we may need
+    while ( outerIter != outExtents.end() && outerIter->begin <= innerIter->begin ) {
+      // only insert if still applicable
+      if ( outerIter->end >= innerIter->begin ) {
+	activeOuterExtents.insert( *outerIter );
+      }
+      outerIter++;
+    }
+    // check to see if the last extent in the outer list contains the inner extent
+    activeIter = activeOuterExtents.end();
+    if (!activeOuterExtents.empty()) {
+      activeIter--;
+      if ( activeIter->end >= innerIter->end ) {
+	// Since we know that all active outer extents have a begin that is at or before
+	// the inner iter's begin, and from the if statement we know the end of one
+	// of the active outer extents is at least 
+	// as large as the inner end, we know the inner iter extent is contained
+	// by the last extent in the active list (and possibly others)
+
+	// !!!!!!!!!!!!!!! This may be wrong to use the activeIter weight here !!!!!!!!!!!!!!!!!
+	// What if multiple outer extents match? Here we just take the weight of the first one.
+	indri::index::Extent extent( innerIter->weight * activeIter->weight, 
+				     innerIter->begin,
+				     innerIter->end,
+				     innerIter->ordinal );
+	_extents.push_back( extent );
+      }
+    }
+    innerIter++;
   }
+
 }
 
 const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::NestedExtentInsideNode::extents() {
