@@ -41,6 +41,8 @@ namespace indri {
         std::string name;
         /// does the field contain numeric data
         bool numeric;
+	/// does the field have an ordinal
+	bool ordinal;
       };
       
       virtual ~Index() {};
