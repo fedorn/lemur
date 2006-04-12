@@ -30,9 +30,9 @@ const indri::utility::greedy_vector<bool>& indri::infnet::LengthPriorNode::hasMa
   return _child->hasMatch( documentID, extents );
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::LengthPriorNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::LengthPriorNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   _scores.clear();
-  const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, begin, end, documentLength );
+  const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, extent, documentLength );
   for( unsigned int j=0; j<childResults.size(); j++ ) {
     double score = childResults[j].score ;
     int b = childResults[j].begin;
@@ -57,10 +57,9 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _scores;
 }
 
-void indri::infnet::LengthPriorNode::annotate( class indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
-
-  annotator.add( this, documentID, begin, end ); 
-  _child->annotate( annotator, documentID, begin, end );
+void indri::infnet::LengthPriorNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+  annotator.add( this, documentID, extent); 
+  _child->annotate( annotator, documentID, extent );
 
 }
 

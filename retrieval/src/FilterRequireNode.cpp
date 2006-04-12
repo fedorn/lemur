@@ -62,21 +62,21 @@ const std::string& indri::infnet::FilterRequireNode::getName() const {
   return _name;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FilterRequireNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FilterRequireNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   _extents.clear();
   // if the filter applies, return the child score.
   if (_filter->extents().size() )
-    return _required->score( documentID, begin, end, documentLength );
+    return _required->score( documentID, extent, documentLength );
   else
     return _extents;
 }
 
-void indri::infnet::FilterRequireNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::FilterRequireNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   // mark up the filter
-  _filter->annotate( annotator, documentID, begin, end );
+  _filter->annotate( annotator, documentID, extent);
   // if the filter applied, mark up the matches.
   if( _filter->extents().size() ) {
-    _required->annotate( annotator, documentID, begin, end );
+    _required->annotate( annotator, documentID, extent );
   }
 }
 

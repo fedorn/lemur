@@ -55,14 +55,8 @@ double indri::infnet::ShrinkageBeliefNode::maximumScore() {
   return _maximumScore;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ShrinkageBeliefNode::score( int documentID, int begin, int end, int documentLength ) {
-  indri::index::Extent extent( begin, end );
-  return score( documentID, extent, documentLength );
-}
-
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ShrinkageBeliefNode::score( int documentID, indri::index::Extent extent, int documentLength ) {
-
-indri::index::DocumentStructure * docStruct = _docStructHolder.getDocumentStructure();
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ShrinkageBeliefNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+  indri::index::DocumentStructure * docStruct = _docStructHolder.getDocumentStructure();
   int numNodes = docStruct->nodeCount();
 
 
@@ -133,7 +127,7 @@ indri::index::DocumentStructure * docStruct = _docStructHolder.getDocumentStruct
   return _results;
 }
 
-void indri::infnet::ShrinkageBeliefNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::ShrinkageBeliefNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
 
  
   const indri::utility::greedy_vector<indri::index::Extent>& extents = _list.extents();
@@ -142,10 +136,10 @@ void indri::infnet::ShrinkageBeliefNode::annotate( Annotator& annotator, int doc
 
   // mark the begin and end points for this list
   for( size_t i=0; i<extents.size(); i++ ) {
-    if( extents[i].begin >= begin &&
-        extents[i].end <= end ) {
-      annotator.add( this, documentID, extents[i].begin, extents[i].end );
-      _list.annotate( annotator, documentID, extents[i].begin, extents[i].end );
+    if( extents[i].begin >= extent.begin &&
+        extents[i].end <= extent.end ) {
+      annotator.add( this, documentID, (indri::index::Extent &)extents[i] );
+      _list.annotate( annotator, documentID, (indri::index::Extent &)extents[i] );
     }
   }
 }

@@ -32,11 +32,11 @@ indri::infnet::OrNode::OrNode( const std::string& name, const std::vector<Belief
 {
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::OrNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::OrNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   double notScore = 1;
 
   for( unsigned int i=0; i<_children.size(); i++ ) {
-    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, begin, end, documentLength );
+    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, extent, documentLength );
 
     for( unsigned int j=0; j<childResults.size(); j++ ) {
       notScore *= 1. - exp( childResults[j].score );
@@ -45,16 +45,16 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   
   double score = log( 1. - notScore );
   _scores.clear();
-  _scores.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
+  _scores.push_back( indri::api::ScoredExtentResult( score, documentID, extent.begin, extent.end ) );
 
   return _scores;
 }
 
-void indri::infnet::OrNode::annotate( class indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
-  annotator.add(this, documentID, begin, end);
+void indri::infnet::OrNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+  annotator.add(this, documentID, extent);
 
   for( unsigned int i=0; i<_children.size(); i++ ) {
-    _children[i]->annotate( annotator, documentID, begin, end );
+    _children[i]->annotate( annotator, documentID, extent );
   }
 }
 

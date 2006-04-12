@@ -64,12 +64,12 @@ const std::string& indri::infnet::WeightedExtentOrNode::getName() const {
   return _name;
 }
 
-void indri::infnet::WeightedExtentOrNode::annotate( class Annotator& annotator, int documentID, int begin, int end ) {
-  annotator.addMatches( _extents, this, documentID, begin, end );
+void indri::infnet::WeightedExtentOrNode::annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+  annotator.addMatches( _extents, this, documentID, extent );
 
   for( unsigned int i=0; i<_extents.size(); i++ ) {
     for( unsigned int j=0; j<_children.size(); j++ ) {
-      _children[j]->annotate( annotator, documentID, _extents[i].begin, _extents[i].end );
+      _children[j]->annotate( annotator, documentID, _extents[i] );
     }
   }
 }

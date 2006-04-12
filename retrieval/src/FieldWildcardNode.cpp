@@ -85,8 +85,8 @@ const std::string& indri::infnet::FieldWildcardNode::getName() const {
   return _name;
 }
 
-void indri::infnet::FieldWildcardNode::annotate( class Annotator& annotator, int documentID, int begin, int end ) {
-  annotator.addMatches( _extents, this, documentID, begin, end );
+void indri::infnet::FieldWildcardNode::annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+  annotator.addMatches( _extents, this, documentID, extent );
 }
 
 void indri::infnet::FieldWildcardNode::indexChanged( indri::index::Index& index ) { 

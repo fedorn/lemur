@@ -29,10 +29,10 @@ double indri::infnet::ExtentEnforcementNode::maximumScore() {
   return INDRI_HUGE_SCORE;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ExtentEnforcementNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ExtentEnforcementNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   // we're going to run through the field list, etc.
-  indri::index::Extent extent( begin, end );
-  const indri::utility::greedy_vector<indri::index::Extent>& fieldExtentsTmp = _field->matches( extent );
+  indri::index::Extent tExtent( extent.begin, extent.end );
+  const indri::utility::greedy_vector<indri::index::Extent>& fieldExtentsTmp = _field->matches( tExtent );
   indri::utility::greedy_vector<indri::index::Extent> fieldExtents;
   fieldExtents.append(fieldExtentsTmp.begin(), fieldExtentsTmp.end());
 
@@ -53,8 +53,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
 
     int scoreBegin = iter->begin;
     int scoreEnd = iter->end;
-
-    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, iter->begin, iter->end, documentLength );
+    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, (indri::index::Extent&)(*iter), documentLength );
       //_child->score( documentID, *iter, documentLength );
 
     double fieldWeight = iter->weight;
@@ -76,15 +75,15 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _scores;
 }
 
-void indri::infnet::ExtentEnforcementNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::ExtentEnforcementNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
 
-  annotator.add(this, documentID, begin, end);
+  annotator.add(this, documentID, extent);
   // we're going to run through the field list, etc.
   
   if ( _field != NULL) {
 
-    indri::index::Extent extent(begin, end);
-    const indri::utility::greedy_vector<indri::index::Extent>& fieldExtentsTmp = _field->matches( extent );
+    indri::index::Extent tExtent(extent.begin, extent.end);
+    const indri::utility::greedy_vector<indri::index::Extent>& fieldExtentsTmp = _field->matches( tExtent );
     indri::utility::greedy_vector<indri::index::Extent> fieldExtents;
     fieldExtents.append(fieldExtentsTmp.begin(), fieldExtentsTmp.end());
     
@@ -108,7 +107,7 @@ void indri::infnet::ExtentEnforcementNode::annotate( indri::infnet::Annotator& a
       int scoreEnd = iter->end;
 
       
-      _child->annotate( annotator, documentID, iter->begin, iter->end );
+      _child->annotate( annotator, documentID, (indri::index::Extent&)(*iter));
       
     } 
 
@@ -134,7 +133,7 @@ const indri::utility::greedy_vector<bool>& indri::infnet::ExtentEnforcementNode:
    if ( _field != NULL ) {
      
      for ( size_t i = 0; i < extents.size(); i++ ) {
-       const indri::utility::greedy_vector<indri::index::Extent>& fieldExtents = _field->matches( extents[i] );
+       const indri::utility::greedy_vector<indri::index::Extent>& fieldExtents = _field->matches( (indri::index::Extent &)extents[i] );
        
        const indri::utility::greedy_vector<bool>& childMatches = _child->hasMatch( documentID, fieldExtents );
        bool match = false;

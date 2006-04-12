@@ -57,8 +57,8 @@ double indri::infnet::TermFrequencyBeliefNode::maximumScore() {
   return _maximumScore;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::TermFrequencyBeliefNode::score( int documentID, int begin, int end, int documentLength ) {
-  assert( begin == 0 && end == documentLength ); // FrequencyListCopier ensures this condition
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::TermFrequencyBeliefNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+  assert( extent.begin == 0 && extent.end == documentLength ); // FrequencyListCopier ensures this condition
   _extents.clear();
 
   double score = 0;
@@ -73,7 +73,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   } else {
     score = _function.scoreOccurrence( 0, documentLength );
   }
-    _extents.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
+    _extents.push_back( indri::api::ScoredExtentResult( score, documentID, extent.begin, extent.end ) );
 
   return _extents;
 }
@@ -129,6 +129,6 @@ void indri::infnet::TermFrequencyBeliefNode::indexChanged( indri::index::Index& 
   }
 }
 
-void indri::infnet::TermFrequencyBeliefNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::TermFrequencyBeliefNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   // can't annotate -- don't have position info
 }

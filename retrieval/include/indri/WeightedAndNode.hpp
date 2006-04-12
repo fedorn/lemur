@@ -78,8 +78,8 @@ namespace indri
       void indexChanged( indri::index::Index& index );
       double maximumScore();
       double maximumBackgroundScore();
-      indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int begin, int end, int documentLength );
-      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+      indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength );
+      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
       bool hasMatch( int documentID );
       const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
       const std::string& getName() const;

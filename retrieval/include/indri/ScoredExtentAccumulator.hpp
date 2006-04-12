@@ -49,7 +49,8 @@ namespace indri
 
       void evaluate( int documentID, int documentLength ) {
         if( _belief->hasMatch( documentID ) ) {
-          const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& documentScores = _belief->score( documentID, 0, documentLength, documentLength );
+          indri::index::Extent docExtent(0, documentLength);
+          const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& documentScores = _belief->score( documentID, docExtent, documentLength );
 
           for( unsigned int i=0; i<documentScores.size(); i++ ) {
             _scores.push( documentScores[i] );

@@ -116,8 +116,8 @@ const std::string& indri::infnet::ExtentAndNode::getName() const {
   return _name;
 }
 
-void indri::infnet::ExtentAndNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
-  annotator.addMatches( _extents, this, documentID, begin, end );
+void indri::infnet::ExtentAndNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent) {
+  annotator.addMatches( _extents, this, documentID, extent);
 }
 
 void indri::infnet::ExtentAndNode::indexChanged( indri::index::Index& index ) {

@@ -179,12 +179,12 @@ int indri::infnet::ContextInclusionAndNode::nextCandidateDocument() {
   return minDocument;
 }
 
-void indri::infnet::ContextInclusionAndNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::ContextInclusionAndNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   std::vector<child_type>::iterator iter;
-  annotator.add( this, documentID, begin, end );
+  annotator.add( this, documentID, extent);
 
   for( iter = _children.begin(); iter != _children.end(); iter++ ) {
-    (*iter).node->annotate( annotator, documentID, begin, end );
+    (*iter).node->annotate( annotator, documentID, extent );
   }
 }
 
@@ -210,7 +210,7 @@ double indri::infnet::ContextInclusionAndNode::maximumScore() {
   return maximum;
 }
 
-indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ContextInclusionAndNode::score( int documentID, int begin, int end, int documentLength ) {
+indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ContextInclusionAndNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   std::vector<child_type>::iterator iter;
   double score = 0;
   _scores.clear();
@@ -219,7 +219,7 @@ indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::Co
   assert( _preserveExtentsChild != 0 );
 
   for( iter = _children.begin(); iter != _children.end(); iter++ ) {
-    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = (*iter).node->score( documentID, begin, end, documentLength );
+    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = (*iter).node->score( documentID, extent, documentLength );
     if ( _preserveExtentsChild == (*iter).node ) {
       for( unsigned int j=0; j<childResults.size(); j++ ) {
 	double childScore = (*iter).weight * childResults[j].score;

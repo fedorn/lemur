@@ -47,7 +47,7 @@ namespace indri
       void indexChanged( indri::index::Index& index );
 
       const std::string& getName() const;
-      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
     };
   }
 }

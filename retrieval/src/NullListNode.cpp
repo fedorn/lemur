@@ -44,7 +44,7 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::NullLi
   return _extents;
 }
 
-void indri::infnet::NullListNode::annotate( class indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::NullListNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   // do nothing
 }
 

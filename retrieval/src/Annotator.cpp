@@ -25,36 +25,37 @@ indri::infnet::Annotator::Annotator( const std::string& name, BeliefNode* belief
 {
 }
 
-void indri::infnet::Annotator::add( InferenceNetworkNode* node, int documentID, int begin, int end ) {
+void indri::infnet::Annotator::add( InferenceNetworkNode* node, int documentID, indri::index::Extent &extent ) {
   indri::api::ScoredExtentResult a;
 
   a.document = documentID;
-  a.begin = begin;
-  a.end = end;
+  a.begin = extent.begin;
+  a.end = extent.end;
   a.score = 0;
 
   _annotations[node->getName()].push_back(a);
 }
 
-void indri::infnet::Annotator::addMatches( indri::utility::greedy_vector<indri::index::Extent>& extents, InferenceNetworkNode* node, int documentID, int begin, int end ) {
-  indri::index::Extent range( begin, end );
+void indri::infnet::Annotator::addMatches( indri::utility::greedy_vector<indri::index::Extent>& extents, InferenceNetworkNode* node, int documentID, indri::index::Extent &extent ) {
+  indri::index::Extent range( extent.begin, extent.end );
 
   indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
   iter = std::lower_bound( extents.begin(), extents.end(), range, indri::index::Extent::begins_before_less() );
 
   for( size_t i = iter - extents.begin(); i<extents.size(); i++ ) {
-    if( begin > extents[i].begin )
+    if( extent.begin > extents[i].begin )
       continue;
 
-    if( end < extents[i].end )
+    if( extent.end < extents[i].end )
       continue;
 
-    add( node, documentID, extents[i].begin, extents[i].end );
+    add( node, documentID, (indri::index::Extent &)extents[i]);
   }
 }
 
 void indri::infnet::Annotator::evaluate( int documentID, int documentLength ) {
-  _belief->annotate( *this, documentID, 0, documentLength );
+  indri::index::Extent tmpExtent(0, documentLength);
+  _belief->annotate( *this, documentID, tmpExtent );
 }
 
 int indri::infnet::Annotator::nextCandidateDocument() {

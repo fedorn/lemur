@@ -44,12 +44,12 @@ namespace indri
       double maximumScore();
       bool hasMatch( int documentID );
       const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
-      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int start, int end, int documentLength );
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength );
       int nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
 
       const std::string& getName() const;
-      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
     };
   }
 }

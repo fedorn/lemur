@@ -49,7 +49,7 @@ const indri::utility::greedy_vector<bool>& indri::infnet::PriorNode::hasMatch( i
   return _matches;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::PriorNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::PriorNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   int key;
   double score = -1e100;
   
@@ -57,15 +57,15 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
     score = _iterator->currentEntry()->score;
   
   _scores.clear();
-  _scores.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
+  _scores.push_back( indri::api::ScoredExtentResult( score, documentID, extent.begin, extent.end ) );
   return _scores;
 }
 
-void indri::infnet::PriorNode::annotate( class indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
-  score( documentID, begin, end, end );
+void indri::infnet::PriorNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+  score( documentID, extent, extent.end );
   
   for( unsigned int i=0; i<_scores.size(); i++ ) {
-    annotator.add( this, documentID, _scores[i].begin, _scores[i].end ); 
+    annotator.add( this, documentID, (indri::index::Extent &)_scores[i]); 
   }
 }
 

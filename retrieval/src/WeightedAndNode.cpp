@@ -185,12 +185,12 @@ int indri::infnet::WeightedAndNode::nextCandidateDocument() {
   return minDocument;
 }
 
-void indri::infnet::WeightedAndNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::WeightedAndNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   std::vector<child_type>::iterator iter;
-  annotator.add( this, documentID, begin, end );
+  annotator.add( this, documentID, extent );
 
   for( iter = _children.begin(); iter != _children.end(); iter++ ) {
-    (*iter).node->annotate( annotator, documentID, begin, end );
+    (*iter).node->annotate( annotator, documentID, extent );
   }
 }
 
@@ -216,12 +216,12 @@ double indri::infnet::WeightedAndNode::maximumScore() {
   return maximum;
 }
 
-indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedAndNode::score( int documentID, int begin, int end, int documentLength ) {
+indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedAndNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   std::vector<child_type>::iterator iter;
   double score = 0;
 
   for( iter = _children.begin(); iter != _children.end(); iter++ ) {
-    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = (*iter).node->score( documentID, begin, end, documentLength );
+    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = (*iter).node->score( documentID, extent, documentLength );
 
     double childScore = 0;
     for( unsigned int j=0; j<childResults.size(); j++ ) {
@@ -232,7 +232,7 @@ indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::We
   }
 
   _scores.clear();
-  _scores.push_back( indri::api::ScoredExtentResult(score, documentID, begin, end) );
+  _scores.push_back( indri::api::ScoredExtentResult(score, documentID, extent.begin, extent.end) );
 
   // advance candidates
   while( _candidatesIndex < _candidates.size() && _candidates[_candidatesIndex] <= documentID )

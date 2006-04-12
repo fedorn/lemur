@@ -40,8 +40,8 @@ namespace indri
 
     public:
       Annotator( const std::string& name, BeliefNode* belief );
-      void add( InferenceNetworkNode* node, int documentID, int begin, int end );
-      void addMatches( indri::utility::greedy_vector<indri::index::Extent>& extents, InferenceNetworkNode* node, int documentID, int begin, int end );
+      void add( InferenceNetworkNode* node, int documentID, indri::index::Extent &extent );
+      void addMatches( indri::utility::greedy_vector<indri::index::Extent>& extents, InferenceNetworkNode* node, int documentID, indri::index::Extent &extent );
       void evaluate( int documentID, int documentLength );
   
       int nextCandidateDocument();

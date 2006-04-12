@@ -65,8 +65,8 @@ const std::string& indri::infnet::DocListIteratorNode::getName() const {
   return _name;
 }
 
-void indri::infnet::DocListIteratorNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
-  annotator.addMatches( _extents, this, documentID, begin, end );
+void indri::infnet::DocListIteratorNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+  annotator.addMatches( _extents, this, documentID, extent );
 }
 
 void indri::infnet::DocListIteratorNode::indexChanged( indri::index::Index& index ) {

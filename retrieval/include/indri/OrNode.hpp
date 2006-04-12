@@ -45,8 +45,8 @@ namespace indri
       OrNode( const std::string& name );
       OrNode( const std::string& name, const std::vector<BeliefNode*>& children );
 
-      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int begin, int end, int documentLength );
-      void annotate( class Annotator& annotator, int documentID, int begin, int end );
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength );
+      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
       double maximumScore();
       double maximumBackgroundScore();
   

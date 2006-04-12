@@ -116,33 +116,33 @@ double indri::infnet::ListBeliefNode::maximumScore() {
   return _maximumScore;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ListBeliefNode::score( int documentID, int begin, int end, int documentLength ) {
-  int contextSize = _contextLength( begin, end );
-  double occurrences = _contextOccurrences( begin, end );
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ListBeliefNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+  int contextSize = _contextLength( extent.begin, extent.end );
+  double occurrences = _contextOccurrences( extent.begin, extent.end );
   double documentOccurrences = _raw ? _documentOccurrences() : occurrences;
   double score = 0;
   
   score = _scoreFunction.scoreOccurrence( occurrences, contextSize, documentOccurrences, documentLength );
 
   _scores.clear();
-  _scores.push_back( indri::api::ScoredExtentResult( score, documentID, begin, end ) );
+  _scores.push_back( indri::api::ScoredExtentResult( score, documentID, extent.begin, extent.end ) );
 
   return _scores;
 }
 
-void indri::infnet::ListBeliefNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::ListBeliefNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   const indri::utility::greedy_vector<indri::index::Extent>& extents = _list.extents();
 
-  indri::index::Extent range( begin, end );
+  indri::index::Extent range( extent.begin, extent.end );
   indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
   iter = std::lower_bound( extents.begin(), extents.end(), range, indri::index::Extent::begins_before_less() );
 
   // mark the begin and end points for this list
-  for( size_t i = iter - extents.begin(); i < extents.size() && extents[i].begin <= end; i++ ) {
-    if( extents[i].begin >= begin &&
-        extents[i].end <= end ) {
-      annotator.add( this, documentID, extents[i].begin, extents[i].end );
-      _list.annotate( annotator, documentID, extents[i].begin, extents[i].end );
+  for( size_t i = iter - extents.begin(); i < extents.size() && extents[i].begin <= extent.end; i++ ) {
+    if( extents[i].begin >= extent.begin &&
+        extents[i].end <= extent.end ) {
+      annotator.add( this, documentID, (indri::index::Extent &)extents[i] );
+      _list.annotate( annotator, documentID, (indri::index::Extent &)extents[i] );
     }
   }
 }

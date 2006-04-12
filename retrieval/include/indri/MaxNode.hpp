@@ -52,11 +52,11 @@ namespace indri
         return candidate;
       }
 
-      indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int begin, int end, int documentLength ) {
+      indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength ) {
         double maxScore = INDRI_TINY_SCORE;
 
         for( unsigned int i=0; i<_children.size(); i++ ) {
-          const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, begin, end, documentLength );
+          const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, extent, documentLength );
 
           for( unsigned int j=0; j<childResults.size(); j++ ) {
             maxScore = lemur_compat::max<double>( maxScore, childResults[j].score );
@@ -64,13 +64,13 @@ namespace indri
         }
 
         _scores.clear();
-        _scores.push_back( indri::api::ScoredExtentResult( maxScore, documentID, begin, end ) );
+        _scores.push_back( indri::api::ScoredExtentResult( maxScore, documentID, extent.begin, extent.end ) );
 
         return _scores;
       }
 
-      void annotate( class Annotator& annotator, int documentID, int begin, int end ) {
-        annotator.add( this, documentID, begin, end );
+      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+        annotator.add( this, documentID, extent);
 
         // find the maximum score here, then descend only into that one
         double maxScore = INDRI_TINY_SCORE;
@@ -80,7 +80,7 @@ namespace indri
         int maxEnd = -1;
 
         for( unsigned int i=0; i<_children.size(); i++ ) {
-          const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, begin, end, end );
+          const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, extent, extent.end);
 
           for( unsigned int j=0; j<childResults.size(); j++ ) {
             if ( maxScore < childResults[j].score ) {
@@ -93,7 +93,10 @@ namespace indri
           }
         }
 
-        _children[maxI]->annotate( annotator, documentID, maxBegin, maxEnd );
+         indri::index::Extent childExtent;
+         childExtent.begin=maxBegin;
+         childExtent.end=maxEnd;
+        _children[maxI]->annotate( annotator, documentID, childExtent );
       }
 
       double maximumScore() {

@@ -68,19 +68,19 @@ const std::string& indri::infnet::FilterRejectNode::getName() const {
   return _name;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FilterRejectNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FilterRejectNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   _extents.clear();
   // if the filter doesn't apply, return the child score.
   if ( _filter->extents().size() == 0 )
-    return _disallowed->score( documentID, begin, end, documentLength );
+    return _disallowed->score( documentID, extent, documentLength );
   else
     return _extents;
 }
 
-void indri::infnet::FilterRejectNode::annotate( Annotator& annotator, int documentID, int begin, int end ) {
-  _filter->annotate( annotator, documentID, begin, end );
+void indri::infnet::FilterRejectNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+  _filter->annotate( annotator, documentID, extent);
   if( _filter->extents().size() == 0 ) {
-    _disallowed->annotate( annotator, documentID, begin, end );
+    _disallowed->annotate( annotator, documentID, extent );
   }
 }
 

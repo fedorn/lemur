@@ -145,7 +145,7 @@ void indri::query::RelevanceModel::_countGrams() {
 
 void indri::query::RelevanceModel::_scoreGrams() {
   HGram::iterator iter;
-  double collectionCount = _environment.termCount();
+  double collectionCount = (double)_environment.termCount();
   indri::query::TermScoreFunction* function = 0;  
 
   // for each gram we've seen
@@ -161,7 +161,7 @@ void indri::query::RelevanceModel::_scoreGrams() {
       // we're smoothing with them; otherwise we don't care.
 
       if( gram->terms.size() == 1 ) {
-        gramCount = _environment.termCount( gram->terms[0] );
+        gramCount = (double)_environment.termCount( gram->terms[0] );
       } else {
         // notice that we're running a query here;
         // this is likely to be slow. (be warned)

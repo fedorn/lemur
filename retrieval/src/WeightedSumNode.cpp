@@ -55,11 +55,11 @@ double indri::infnet::WeightedSumNode::maximumBackgroundScore() {
   return log(s);
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedSumNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedSumNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   double s = 0;
 
   for( unsigned i=0; i<_children.size(); i++ ) {
-    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, begin, end, documentLength );
+    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, extent, documentLength );
 
     for( unsigned int j=0; j<childResults.size(); j++ ) {
       s += _weights[i] * exp( childResults[j].score );
@@ -67,16 +67,16 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   }
 
   _scores.clear();
-  _scores.push_back( indri::api::ScoredExtentResult( log(s), documentID, begin, end) );
+  _scores.push_back( indri::api::ScoredExtentResult( log(s), documentID, extent.begin, extent.end) );
 
   return _scores;
 }
 
-void indri::infnet::WeightedSumNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
-  annotator.add(this, documentID, begin, end);
+void indri::infnet::WeightedSumNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+  annotator.add(this, documentID, extent);
 
   for( unsigned i=0; i<_children.size(); i++ ) {
-    _children[i]->annotate( annotator, documentID, begin, end );
+    _children[i]->annotate( annotator, documentID, extent );
   }
 }
 

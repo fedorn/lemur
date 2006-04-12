@@ -55,8 +55,8 @@ const std::string& indri::infnet::BooleanAndNode::getName() const {
   return _name;
 }
 
-void indri::infnet::BooleanAndNode::annotate( class indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
-  annotator.addMatches( _extents, this, documentID, begin, end );
+void indri::infnet::BooleanAndNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+  annotator.addMatches( _extents, this, documentID, extent);
   /* Should have the same as ODN? Or just the inner loop like OrNode
   // _children are _lists in this context.
   for( size_t i=0; i<_extents.size(); i++ ) {

@@ -39,20 +39,21 @@ double indri::infnet::FixedPassageNode::maximumScore() {
   return INDRI_HUGE_SCORE;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FixedPassageNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FixedPassageNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   // we're going to run through the field list, etc.
   _scores.clear();
 
   // round down to find where the passage starts
-  int beginPassage = (begin / _increment) * _increment;
+  int beginPassage = (extent.begin / _increment) * _increment;
 
-  for( ; beginPassage < end; beginPassage += _increment ) {
+  for( ; beginPassage < extent.end; beginPassage += _increment ) {
     int endPassage = beginPassage + _windowSize;
 
-    int scoreBegin = lemur_compat::max( beginPassage, begin );
-    int scoreEnd = lemur_compat::min( endPassage, end );
+    int scoreBegin = lemur_compat::max( beginPassage, extent.begin );
+    int scoreEnd = lemur_compat::min( endPassage, extent.end );
 
-    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, scoreBegin, scoreEnd, documentLength );
+    indri::index::Extent scoreExtent(scoreBegin, scoreEnd);
+    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, scoreExtent, documentLength );
 
     for( int i=0; i<childResults.size(); i++ ) {
       indri::api::ScoredExtentResult result( childResults[i].score, documentID, scoreBegin, scoreEnd );
@@ -63,19 +64,20 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _scores;
 }
 
-void indri::infnet::FixedPassageNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
-  annotator.add(this, documentID, begin, end);
+void indri::infnet::FixedPassageNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+  annotator.add(this, documentID, extent);
 
   // round down to find where the passage starts
-  int beginPassage = (begin / _increment) * _increment;
+  int beginPassage = (extent.begin / _increment) * _increment;
 
-  for( ; beginPassage < end; beginPassage += _increment ) {
+  for( ; beginPassage < extent.end; beginPassage += _increment ) {
     int endPassage = beginPassage + _windowSize;
 
-    int scoreBegin = lemur_compat::max( beginPassage, begin );
-    int scoreEnd = lemur_compat::min( endPassage, end );
+    int scoreBegin = lemur_compat::max( beginPassage, extent.begin );
+    int scoreEnd = lemur_compat::min( endPassage, extent.end );
 
-    _child->annotate( annotator, documentID, scoreBegin, scoreEnd );
+    indri::index::Extent scoreExtent(scoreBegin, scoreEnd);
+    _child->annotate( annotator, documentID, scoreExtent);
   }
 }
 

@@ -57,12 +57,12 @@ namespace indri
         return _documents[_index];
       }
 
-      void annotate( Annotator& annotator, int documentID, int begin, int end ) {
-        return _belief->annotate( annotator, documentID, begin, end );
+      void annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+        return _belief->annotate( annotator, documentID, extent );
       }
 
-  const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int begin, int end, int documentLength ) {
-        return _belief->score( documentID, begin, end, documentLength );
+  const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength ) {
+        return _belief->score( documentID, extent, documentLength );
       }
 
       double maximumScore() {

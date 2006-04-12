@@ -47,14 +47,14 @@ const indri::utility::greedy_vector<bool>& indri::infnet::NullScorerNode::hasMat
   return _matches;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::NullScorerNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::NullScorerNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   _scores.clear();
-  _scores.push_back( indri::api::ScoredExtentResult( _maximumScore, documentID, begin, end ) );
+  _scores.push_back( indri::api::ScoredExtentResult( _maximumScore, documentID, extent.begin, extent.end ) );
 
   return _scores;
 }
 
-void indri::infnet::NullScorerNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::NullScorerNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   // no need to annotate; there will never be any matches
 }
 
