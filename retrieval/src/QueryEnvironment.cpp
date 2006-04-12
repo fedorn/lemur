@@ -57,6 +57,7 @@
 #include <map>
 
 #include "indri/Appliers.hpp"
+#include "indri/TreePrinterWalker.hpp"
 
 using namespace lemur::api;
 
@@ -146,6 +147,10 @@ indri::api::QueryEnvironment::~QueryEnvironment() {
 
 void indri::api::QueryEnvironment::setMemory( UINT64 memory ) {
   _parameters.set( "memory", memory );
+}
+
+void indri::api::QueryEnvironment::setSingleBackgroundModel( bool background ) {
+  _parameters.set( "singleBackgroundModel", background );
 }
 
 void indri::api::QueryEnvironment::setScoringRules( const std::vector<std::string>& rules ) {
@@ -815,7 +820,7 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
   // push down language models from ExtentRestriction nodes
   indri::lang::ExtentRestrictionModelAnnotatorCopier restrictionCopier;
   rootNode = dynamic_cast<indri::lang::ScoredExtentNode*>(rootNode->copy(restrictionCopier));
-  
+
   // extract the raw scorer nodes from the query tree
   indri::lang::RawScorerNodeExtractor extractor;
   rootNode->walk(extractor);
@@ -824,10 +829,21 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
   // so that we can get counts for everything in the query.  We need those counts
   // so that we can score the query terms correctly.
   std::vector<indri::lang::RawScorerNode*>& scorerNodes = extractor.getScorerNodes();
-  indri::lang::ApplyCopiers<indri::lang::ContextCountGraphCopier, indri::lang::RawScorerNode> graph( scorerNodes );
+
+  bool noContext = false;
+  if (_parameters.exists("singleBackgroundModel")) {
+    noContext = (bool) _parameters.get("singleBackgroundModel");
+  }
 
   indri::infnet::InferenceNetwork::MAllResults statisticsResults;
-  _sumServerQuery( statisticsResults, graph.roots(), 1000 );
+
+  if ( noContext ) {
+    indri::lang::ApplyCopiers<indri::lang::NoContextCountGraphCopier, indri::lang::RawScorerNode> graph( scorerNodes );
+    _sumServerQuery( statisticsResults, graph.roots(), 1000 );
+  } else {
+    indri::lang::ApplyCopiers<indri::lang::ContextCountGraphCopier, indri::lang::RawScorerNode> graph( scorerNodes );
+    _sumServerQuery( statisticsResults, graph.roots(), 1000 );
+  }
 
   PRINT_TIMER( "Statistics complete" );
 
