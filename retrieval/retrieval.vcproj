@@ -141,6 +141,12 @@
 				RelativePath=".\src\ExtentAndNode.cpp">
 			</File>
 			<File
+				RelativePath=".\src\ExtentChildNode.cpp">
+			</File>
+			<File
+				RelativePath=".\src\ExtentDescendantNode.cpp">
+			</File>
+			<File
 				RelativePath=".\src\ExtentEnforcementNode.cpp">
 			</File>
 			<File
@@ -148,6 +154,9 @@
 			</File>
 			<File
 				RelativePath=".\src\ExtentOrNode.cpp">
+			</File>
+			<File
+				RelativePath=".\src\ExtentParentNode.cpp">
 			</File>
 			<File
 				RelativePath=".\src\ExtentRestrictionNode.cpp">
@@ -431,6 +440,12 @@
 				RelativePath=".\include\indri\ExtentAndNode.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\ExtentChildNode.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\ExtentDescendantNode.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\ExtentEnforcementNode.hpp">
 			</File>
 			<File
@@ -438,6 +453,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\ExtentOrNode.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\ExtentParentNode.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\ExtentRestrictionModelAnnotatorCopier.hpp">
