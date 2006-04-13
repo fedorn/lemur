@@ -47,7 +47,7 @@ namespace indri
       const std::string& getName() const;
       void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
 
-      const indri::utility::greedy_vector<indri::index::Extent>& matches( indri::index::Extent extent );
+      const indri::utility::greedy_vector<indri::index::Extent>& matches( indri::index::Extent &extent );
     };
   }
 }

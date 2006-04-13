@@ -110,7 +110,7 @@ void indri::infnet::ExtentDescendantNode::indexChanged( indri::index::Index& ind
   // do nothing
 }
 
-const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::ExtentDescendantNode::matches( indri::index::Extent extent ) {
+const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::ExtentDescendantNode::matches( indri::index::Extent &extent ) {
 
   _matches.clear();
 

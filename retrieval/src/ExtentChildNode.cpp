@@ -153,7 +153,7 @@ void indri::infnet::ExtentChildNode::indexChanged( indri::index::Index& index ) 
 }
 
 
-const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::ExtentChildNode::matches( indri::index::Extent extent ) {
+const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::ExtentChildNode::matches( indri::index::Extent &extent ) {
 
   _matches.clear();
   
@@ -176,35 +176,35 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
       int innerEnd = _extents[i].end;
       
       if ( _extents[i].ordinal == 0 ) {
-	_leafs.clear();
-	docStruct->findLeafs( &_leafs, innerBegin, innerEnd, true);
+	      _leafs.clear();
+	      docStruct->findLeafs( &_leafs, innerBegin, innerEnd, true);
 
-	std::set<int>::iterator leafsBegin = _leafs.begin();
-	std::set<int>::iterator leafsEnd = _leafs.end();
+	      std::set<int>::iterator leafsBegin = _leafs.begin();
+	      std::set<int>::iterator leafsEnd = _leafs.end();
 
-	std::set<int>::iterator ancestor = ancestorsBegin;
-	while ( !match && ancestor != ancestorsEnd ) { 
-	  std::set<int>::iterator leaf = leafsBegin;
-	
-	  while ( !match && leaf != leafsEnd ) {
-	    if ( *ancestor == docStruct->parent(*leaf) ) {
-	      match = true;
-	    }
-	    leaf++;
-	  } 
-	  ancestor++;
-	}      
+	      std::set<int>::iterator ancestor = ancestorsBegin;
+	      while ( !match && ancestor != ancestorsEnd ) { 
+	        std::set<int>::iterator leaf = leafsBegin;
+      	
+	        while ( !match && leaf != leafsEnd ) {
+	          if ( *ancestor == docStruct->parent(*leaf) ) {
+	            match = true;
+	          }
+	          leaf++;
+	        } 
+	        ancestor++;
+	      }      
       } else {
-	std::set<int>::iterator ancestor = ancestorsBegin;
-	while ( !match && ancestor != ancestorsEnd ) { 
-	  if ( *ancestor == docStruct->parent( _extents[i].ordinal ) ) {
-	    match = true;
-	  }
-	  ancestor++;
-	}
+	      std::set<int>::iterator ancestor = ancestorsBegin;
+	      while ( !match && ancestor != ancestorsEnd ) { 
+	        if ( *ancestor == docStruct->parent( _extents[i].ordinal ) ) {
+	          match = true;
+	        }
+	        ancestor++;
+	      }
       }
       if ( match ) {
-	_matches.push_back(_extents[i]);
+	    _matches.push_back(_extents[i]);
       }
     }
 
@@ -216,26 +216,26 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
       
       bool match = false;
       if ( _extents[i].ordinal == 0 ) {
-	_leafs.clear();
-	docStruct->findLeafs( &_leafs, innerBegin, innerEnd, true);
-	
-	std::set<int>::iterator leafsBegin = _leafs.begin();
-	std::set<int>::iterator leafsEnd = _leafs.end();	
-	std::set<int>::iterator leaf = leafsBegin;
-	
-	while ( !match && leaf != leafsEnd ) {
-	  if ( extent.ordinal == docStruct->parent(*leaf) ) {
-	    match = true;
-	  }
-	  leaf++;
-	}             
+	      _leafs.clear();
+	      docStruct->findLeafs( &_leafs, innerBegin, innerEnd, true);
+      	
+	      std::set<int>::iterator leafsBegin = _leafs.begin();
+	      std::set<int>::iterator leafsEnd = _leafs.end();	
+	      std::set<int>::iterator leaf = leafsBegin;
+      	
+	      while ( !match && leaf != leafsEnd ) {
+	        if ( extent.ordinal == docStruct->parent(*leaf) ) {
+	          match = true;
+	        }
+	        leaf++;
+	      }             
       } else {
-	if ( extent.ordinal == docStruct->parent( _extents[i].ordinal ) ) {
-	  match = true;
-	}      
+	      if ( extent.ordinal == docStruct->parent( _extents[i].ordinal ) ) {
+	        match = true;
+	      }      
       }
       if ( match ) {
-	_matches.push_back(_extents[i]);
+      	_matches.push_back(_extents[i]);
       }
     }
   }
