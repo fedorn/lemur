@@ -347,10 +347,10 @@
 				RelativePath=".\include\IncPassageTextHandler.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\Index.hpp">
+				RelativePath=".\include\Index.hpp">
 			</File>
 			<File
-				RelativePath=".\include\Index.hpp">
+				RelativePath=".\include\indri\Index.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\IndexEnvironment.hpp">

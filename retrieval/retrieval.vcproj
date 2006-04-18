@@ -464,6 +464,9 @@
 				RelativePath=".\include\indri\ExtentRestrictionNode.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\FieldBelowWalker.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\FieldBetweenNode.hpp">
 			</File>
 			<File
