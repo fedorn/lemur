@@ -28,7 +28,7 @@ namespace indri
     class SmoothingAnnotatorWalker : public indri::lang::Walker {
     private:
       struct rule_type {
-	std::string node;
+        std::string node;
         std::string field;
         std::string op;
         std::string smoothing;
@@ -51,7 +51,7 @@ namespace indri
           int location = 0;
 
           rule_type* rule = new rule_type;
-	  rule->node = "RawScorerNode";
+          rule->node = "RawScorerNode";
           rule->op = "*";
           rule->field = "*";
 
@@ -62,9 +62,9 @@ namespace indri
             std::string key = ruleText.substr( location, nextColon-location );
             std::string value = ruleText.substr( nextColon+1, nextComma-nextColon-1 );
 
-	    if( key == "node" ) {
-	      rule->node = value;
-	    } else if( key == "field" ) {
+            if( key == "node" ) {
+              rule->node = value;
+            } else if( key == "field" ) {
               rule->field = value;
             } else if( key == "operator" ) {
               rule->op = value;
@@ -88,7 +88,7 @@ namespace indri
           const rule_type& rule = *_rules[i];
 
           if( ( rule.node == node ) &&
-	      ( rule.field == field || rule.field == "*" ) &&
+              ( rule.field == field || rule.field == "*" ) &&
               ( rule.op == op || rule.op == "*" ) ) {
             return rule.smoothing;
           }
@@ -145,52 +145,52 @@ namespace indri
       }
 
       void after( indri::lang::NestedRawScorerNode* scorer ) {
-	after( (indri::lang::RawScorerNode *) scorer );
+        after( (indri::lang::RawScorerNode *) scorer );
       }
 
       void after( indri::lang::ShrinkageScorerNode* scorer ) {
-	after( (indri::lang::RawScorerNode *) scorer );
+        after( (indri::lang::RawScorerNode *) scorer );
 
-	for( int i=signed(_rules.size())-1; i >= 0; i-- ) {
+        for( int i=signed(_rules.size())-1; i >= 0; i-- ) {
           const rule_type& rule = *_rules[i];
 
           if( rule.node == "ShrinkageBelief" &&
               rule.op == "*" ) {
-	    if ( rule.field == "*" ) {
-	      scorer->addShrinkageRule( rule.smoothing );
-	    } else {
-	      std::string ruleString = "field:" + rule.field + "," + rule.smoothing;
-	      scorer->addShrinkageRule( ruleString );
-	    }
+            if ( rule.field == "*" ) {
+              scorer->addShrinkageRule( rule.smoothing );
+            } else {
+              std::string ruleString = "field:" + rule.field + "," + rule.smoothing;
+              scorer->addShrinkageRule( ruleString );
+            }
           }
         }
       }
 
       void after( indri::lang::LengthPrior* prior ) {
-	std::string ruleText = _matchSmoothingRule( "LengthPrior", "*", "*" );
-	double exponent = 0;
+        std::string ruleText = _matchSmoothingRule( "LengthPrior", "*", "*" );
+        double exponent = 0;
 
-	int nextComma = 0;
-	int nextColon = 0;
-	int location = 0;
-	
-	for( location = 0; location < ruleText.length(); ) {
-	  nextComma = ruleText.find( ',', location );
-	  nextColon = ruleText.find( ':', location );
+        int nextComma = 0;
+        int nextColon = 0;
+        int location = 0;
+        
+        for( location = 0; location < ruleText.length(); ) {
+          nextComma = ruleText.find( ',', location );
+          nextColon = ruleText.find( ':', location );
 
-	  std::string key = ruleText.substr( location, nextColon-location );
-	  std::string value = ruleText.substr( nextColon+1, nextComma-nextColon-1 );
+          std::string key = ruleText.substr( location, nextColon-location );
+          std::string value = ruleText.substr( nextColon+1, nextComma-nextColon-1 );
 
-	  if( key == "exponent" ) {
-	    exponent = atof( value.c_str() );	    
-	  } 
-	  if( nextComma > 0 )
-	    location = nextComma+1;
-	  else
-	    location = ruleText.size();
-	}
-	
-	prior->setExponent( exponent );
+          if( key == "exponent" ) {
+            exponent = atof( value.c_str() );       
+          } 
+          if( nextComma > 0 )
+            location = nextComma+1;
+          else
+            location = ruleText.size();
+        }
+        
+        prior->setExponent( exponent );
       }
     };
   }

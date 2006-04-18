@@ -67,36 +67,36 @@ namespace indri {
           const char* attributeValue = (const char*) document->metadata[i].value;
 
           if( ! strcmp( attributeName, "docno" ) ) return attributeValue;
-	}
+        }
         return NULL;
       }
 
 
       void _cleanup() {
-	//Cleanup _annotations in preparation for object destruction,
-	// or for an open call on a new offset metadata file.
-	for( indri::utility::HashTable<const char *,indri::utility::greedy_vector<MetadataPair*>*>::iterator i = _annotations.begin(); 
+        //Cleanup _annotations in preparation for object destruction,
+        // or for an open call on a new offset metadata file.
+        for( indri::utility::HashTable<const char *,indri::utility::greedy_vector<MetadataPair*>*>::iterator i = _annotations.begin(); 
              i != _annotations.end(); i++ ) {
-	  indri::utility::greedy_vector<MetadataPair*>* p_vec = *(*i).second;
-	  for( indri::utility::greedy_vector<MetadataPair*>::iterator j = 
-		  p_vec->begin(); j != p_vec->end(); j++ ) {
-	    delete (*j); //MetadataPair 
-	  }
-	}
-	_annotations.clear();
+          indri::utility::greedy_vector<MetadataPair*>* p_vec = *(*i).second;
+          for( indri::utility::greedy_vector<MetadataPair*>::iterator j = 
+                  p_vec->begin(); j != p_vec->end(); j++ ) {
+            delete (*j); //MetadataPair 
+          }
+        }
+        _annotations.clear();
       }
 
     public:
       OffsetMetadataAnnotator() {
-	_handler = NULL;
+        _handler = NULL;
         _first_open = true;
       }
 
       ~OffsetMetadataAnnotator() {
-	_cleanup();
+        _cleanup();
 
-	for ( std::vector<char *>::iterator i = _buffers_allocated.begin(); i != _buffers_allocated.end(); i++ )
-	  delete[] (*i);
+        for ( std::vector<char *>::iterator i = _buffers_allocated.begin(); i != _buffers_allocated.end(); i++ )
+          delete[] (*i);
       }
 
       void setHandler( ObjectHandler<indri::api::ParsedDocument>& handler ) {

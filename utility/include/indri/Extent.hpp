@@ -54,57 +54,57 @@ namespace indri
       };
       
       struct ends_before_less {
-	bool operator() ( const Extent& one, const Extent& two ) const {
-	  if ( one.end < two.end ) {
-	    return true;
-	  } else if ( one.end == two.end ) {
-	    if ( one.begin < two.begin ) {
-	      return true;
-	    } else if ( one.begin == two.begin ) {
-	      if (one.ordinal < two.ordinal ) {
-		return true;
-	      } else if ( one.ordinal == two.ordinal ) {
-		if ( one.weight < two.weight ) {
-		  return true;
-		}
-	      } 
-	    }
-	  }
-	  return false;
-	}	
+        bool operator() ( const Extent& one, const Extent& two ) const {
+          if ( one.end < two.end ) {
+            return true;
+          } else if ( one.end == two.end ) {
+            if ( one.begin < two.begin ) {
+              return true;
+            } else if ( one.begin == two.begin ) {
+              if (one.ordinal < two.ordinal ) {
+                return true;
+              } else if ( one.ordinal == two.ordinal ) {
+                if ( one.weight < two.weight ) {
+                  return true;
+                }
+              } 
+            }
+          }
+          return false;
+        }       
       };
 
       struct ends_before_greater {
-	bool operator() ( const Extent& one, const Extent& two ) const {
-	  if ( one.end > two.end ) {
-	    return true;
-	  } else if ( one.end == two.end ) {
-	    if ( one.begin < two.begin ) {
-	      return true;
-	    } else if ( one.begin == two.begin ) {
-	      if (one.ordinal < two.ordinal ) {
-		return true;
-	      } else if ( one.ordinal == two.ordinal ) {
-		if ( one.weight < two.weight ) {
-		  return true;
-		}
-	      } 
-	    }
-	  }
-	  return false;
-	}	
+        bool operator() ( const Extent& one, const Extent& two ) const {
+          if ( one.end > two.end ) {
+            return true;
+          } else if ( one.end == two.end ) {
+            if ( one.begin < two.begin ) {
+              return true;
+            } else if ( one.begin == two.begin ) {
+              if (one.ordinal < two.ordinal ) {
+                return true;
+              } else if ( one.ordinal == two.ordinal ) {
+                if ( one.weight < two.weight ) {
+                  return true;
+                }
+              } 
+            }
+          }
+          return false;
+        }       
       };
 
       struct begins_before_ends_before_less {
         bool operator() ( const Extent& one, const Extent& two ) const {
-	  if ( one.beginsBefore( two ) )
-	    return true;
-	  else if ( one.begin == two.begin && one.end < two.end ) 
-	    return true;
-	  else if ( one.begin == two.begin && one.end == two.end && one.ordinal < two.ordinal )
-	    return true;
-	  
-	  return false;
+          if ( one.beginsBefore( two ) )
+            return true;
+          else if ( one.begin == two.begin && one.end < two.end ) 
+            return true;
+          else if ( one.begin == two.begin && one.end == two.end && one.ordinal < two.ordinal )
+            return true;
+          
+          return false;
         }
       };
     };

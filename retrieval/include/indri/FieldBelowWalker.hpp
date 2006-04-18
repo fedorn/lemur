@@ -1,3 +1,13 @@
+/*==========================================================================
+ * Copyright (c) 2006 Carnegie Mellon University.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 #include "indri/Walker.hpp"
 
 #ifndef INDRI_FIELDBELOWWALKER_HPP
@@ -22,11 +32,11 @@ namespace indri
       
       
       bool fieldBelow() {
-	return _seenField;
+        return _seenField;
       }
 
       void before( indri::lang::Field* f ) {
-	_seenField = true;
+        _seenField = true;
       }
     };
   }

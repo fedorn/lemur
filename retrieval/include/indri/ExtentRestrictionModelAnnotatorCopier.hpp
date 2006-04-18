@@ -64,19 +64,19 @@ namespace indri
       }
 
       indri::lang::Node* after( indri::lang::ExtentEnforcement* oldNode, indri::lang::ExtentEnforcement* newNode ) {
-	return after( (indri::lang::ExtentRestriction*) oldNode, (indri::lang::ExtentRestriction*) newNode );
+        return after( (indri::lang::ExtentRestriction*) oldNode, (indri::lang::ExtentRestriction*) newNode );
       }
   
       indri::lang::Node* after( indri::lang::RawScorerNode* oldNode, indri::lang::RawScorerNode* newNode ) {
         if( newNode->getContext() == 0 && _restrictions.size() ) {
-          newNode->setContext( _restrictions.top()->getField() );	  
+          newNode->setContext( _restrictions.top()->getField() );         
         }
         _nodes.push_back( newNode ); // should track for free.
         return newNode;
       }
 
       indri::lang::Node* after( indri::lang::NestedRawScorerNode* oldNode, indri::lang::NestedRawScorerNode* newNode ) {
-	return after( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
+        return after( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
       }
     };
   }

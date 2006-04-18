@@ -26,7 +26,7 @@ namespace indri {
         :
         name(_name),
         isNumeric(numeric),
-	isOrdinal(ordinal),
+        isOrdinal(ordinal),
         totalCount(0),
         documentCount(0),
         lastDocument(0),
@@ -38,7 +38,7 @@ namespace indri {
         :
         name(_name),
         isNumeric(numeric),
-	isOrdinal(ordinal),
+        isOrdinal(ordinal),
         totalCount(_totalCount),
         documentCount(_documentCount),
         lastDocument(0),

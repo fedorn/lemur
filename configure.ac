@@ -60,7 +60,21 @@ AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_STD],
 	    AC_DEFINE(ISNAN_IN_NAMESPACE_STD,,[define if the compiler has isnan function in namespace std])
 	 fi])
 
+AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX],
+	[AC_REQUIRE([AC_CXX_NAMESPACES])
+	AC_MSG_CHECKING([whether isnan is in namespace __gnu_cxx])
+	 AC_LANG_PUSH([C++])
+	 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <cmath>
+	   namespace lemur { int isnan(float x){ return __gnu_cxx::isnan(x); } };]], [[
+	   using namespace lemur; float x = 1.0; lemur::isnan(x); return 0;]])],[ac_cv_cxx_isnan_gnu_cxx=yes],[ac_cv_cxx_isnan_gnu_cxx=no])
+         AC_LANG_POP
+ 	  AC_MSG_RESULT($ac_cv_cxx_isnan_gnu_cxx)
+         if test "$ac_cv_cxx_isnan_gnu_cxx" = yes; then
+	    AC_DEFINE(ISNAN_IN_NAMESPACE_GNU_CXX,,[define if the compiler has isnan function in namespace __gnu_cxx])
+	 fi])
+
 AC_CXX_ISNAN_IN_NAMESPACE_STD	       
+AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX	       
 dnl Checks for typedefs, structures, and compiler characteristics.
 
 AC_C_BIGENDIAN

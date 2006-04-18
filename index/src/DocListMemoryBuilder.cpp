@@ -56,6 +56,7 @@ indri::index::DocListMemoryBuilder::~DocListMemoryBuilder() {
 // _roundUP
 //
 size_t indri::index::DocListMemoryBuilder::_roundUp( size_t amount ) {
+  
   // round up by MIN_SIZE << GROW_TIMES if it's big enough
   if( amount >= (MIN_SIZE << GROW_TIMES) ) {
     return (amount + (MIN_SIZE << GROW_TIMES)) & ~((MIN_SIZE << GROW_TIMES) - 1);
@@ -73,7 +74,7 @@ void indri::index::DocListMemoryBuilder::_grow() {
   char* lastListBegin = _listBegin;
   char* lastListEnd = _listEnd;
   size_t documentCopyAmount = _documentPointer ? (lastList - _documentPointer) : 0;
-
+  
   // fix data pointer of previous list
   if( lastList != 0 ) {
     if( _locationCountPointer ) {

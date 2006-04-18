@@ -88,11 +88,11 @@ namespace indri
         return _findReplacement<indri::lang::ExtentAnd>( _extentAnds, newExtentAnd );
       }
 
-      indri::lang::Node* after( indri::lang::ExtentInside* oldExtentInside, indri::lang::ExtentInside* newExtentInside ) {	
+      indri::lang::Node* after( indri::lang::ExtentInside* oldExtentInside, indri::lang::ExtentInside* newExtentInside ) {      
         return _findReplacement<indri::lang::ExtentInside>( _extentInsides, newExtentInside );
       }
 
-      indri::lang::Node* after( indri::lang::NestedExtentInside* oldExtentInside, indri::lang::NestedExtentInside* newExtentInside ) {	
+      indri::lang::Node* after( indri::lang::NestedExtentInside* oldExtentInside, indri::lang::NestedExtentInside* newExtentInside ) {  
         return after((indri::lang::ExtentInside*) oldExtentInside, (indri::lang::ExtentInside*) newExtentInside );
       }
  
@@ -105,11 +105,11 @@ namespace indri
       }
 
       indri::lang::Node* after( indri::lang::FieldWildcard* fieldWildcard, indri::lang::FieldWildcard* newFieldWildcard ) {
-	return _findReplacement<indri::lang::FieldWildcard>( _fieldWildcardNodes, newFieldWildcard );
+        return _findReplacement<indri::lang::FieldWildcard>( _fieldWildcardNodes, newFieldWildcard );
       }
 
       indri::lang::Node* after( indri::lang::DocumentStructureNode* docStruct, indri::lang::DocumentStructureNode* newDocStruct ) {
-	return _findReplacement<indri::lang::DocumentStructureNode>( _documentStructureNodes, newDocStruct );
+        return _findReplacement<indri::lang::DocumentStructureNode>( _documentStructureNodes, newDocStruct );
       }
       
     };

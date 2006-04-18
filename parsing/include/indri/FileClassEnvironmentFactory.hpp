@@ -88,7 +88,7 @@ namespace indri
         @param name name of this file class, eg trecweb
         @param iterator document iterator for this file class
         @param parser document parser for this file class
-	@param tokenizer document tokenizer for this file class
+        @param tokenizer document tokenizer for this file class
         @param startDocTag tag indicating start of a document
         @param endDocTag tag indicating the end of a document
         @param endMetadataTag tag indicating the end of the metadata fields

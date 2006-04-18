@@ -368,10 +368,10 @@ void IndexWriter::_writeFieldList( const std::string& fileName, int fieldIndex, 
         stream << (extent.end - extent.begin);
         terms += (extent.end - extent.begin);
 
-	if ( ordinal ) {
-	  stream << (extent.ordinal - lastOrdinal);
-	  lastOrdinal = extent.ordinal;
-	}
+        if ( ordinal ) {
+          stream << (extent.ordinal - lastOrdinal);
+          lastOrdinal = extent.ordinal;
+        }
 
         if( entry->numbers.size() )
           stream << entry->numbers[j];

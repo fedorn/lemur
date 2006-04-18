@@ -1,3 +1,13 @@
+/*==========================================================================
+ * Copyright (c) 2006 Carnegie Mellon University.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 //
 // LengthPriorNode
 //
@@ -40,9 +50,9 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
     double length = e - b;
 
     //    std::cout << documentID << " " 
-    //	      << b << ":" 
-    //	      << e << " " 
-    //	      << score << " ";
+    //        << b << ":" 
+    //        << e << " " 
+    //        << score << " ";
 
     
     if ( length > 0 ) {

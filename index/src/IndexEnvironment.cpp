@@ -246,8 +246,8 @@ void indri::api::IndexEnvironment::setOrdinalField( const std::string& fieldName
       std::string parameterFieldName = fields[i]["name"];
       
       if( parameterFieldName == fieldName ) {
-	fields[i].set( "ordinal", isOrdinal );
-	return;
+        fields[i].set( "ordinal", isOrdinal );
+        return;
       }
     }
   }  

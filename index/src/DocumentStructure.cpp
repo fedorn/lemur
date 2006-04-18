@@ -1,16 +1,13 @@
-
-
 /*==========================================================================
- * Copyright (c) 2003 Carnegie Mellon University.  All Rights Reserved.
+ * Copyright (c) 2006 Carnegie Mellon University.  All Rights Reserved.
  *
  * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
  * is subject to the terms of the software license set forth in the LICENSE
- * file included with this software, and also available at
- * http://www.cs.cmu.edu/~lemur/license.html
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
  *
  *==========================================================================
 */
-
 
 #include "indri/DocumentStructure.hpp"
 #include "indri/Index.hpp"
@@ -184,7 +181,7 @@ indri::index::DocumentStructure::child_iterator
 indri::index::DocumentStructure::childrenBegin( int node ) {
   if ( node >= 0 && node <= _numNodes ) {
     //    std::cout << "CB\t" << this << " " << node << " " << _numNodes 
-    //	      << " " << _nodes[node].children << " " << _nodes[node].numChildren <<  std::endl;
+    //        << " " << _nodes[node].children << " " << _nodes[node].numChildren <<  std::endl;
     return _childrenBuff.begin() + _nodes[node].children;
   } 
   return _childrenBuff.end();
@@ -224,7 +221,7 @@ indri::index::DocumentStructure::_findLeafs(int node, int b, int e, bool exact, 
   }
 //   if ( foundDescendant == false ) {    
     if ( (exact && begin( node ) == b && end( node ) == e ) ||
-	 (!exact && begin( node ) >= b && end( node ) <= e )) {
+         (!exact && begin( node ) >= b && end( node ) <= e )) {
       leafs->insert( node );
       foundDescendant = true;
     }
@@ -251,7 +248,7 @@ indri::index::DocumentStructure::findLeafs(std::set<int> * leafs, int b, int e, 
     int nodeBegin = begin( node );
     int nodeEnd = end( node );
     if ( (exact && nodeBegin == b && nodeEnd == e ) ||
-	 (!exact && nodeBegin >= b && nodeEnd <= e ) ) {
+         (!exact && nodeBegin >= b && nodeEnd <= e ) ) {
       leafs->insert( node );
     }
     if ( nodeBegin > e ) {
@@ -319,7 +316,7 @@ indri::index::DocumentStructure::_constructNodePath(std::stringstream & path, in
     if (type(sid) == nodeType) {
       sameType++;
       if (sid == node) {
-	sameTypeLoc = sameType;
+        sameTypeLoc = sameType;
       }
     }
     kids++;
@@ -364,11 +361,11 @@ indri::index::DocumentStructure::fieldId( const std::string path ) {
     // find the node
     while( kids < kidsEnd ) {
       if( type( *kids ) == typeId ) {
-	seen++;
+        seen++;
       }
       if ( count == seen ) {
-	node = *kids;
-	break;
+        node = *kids;
+        break;
       }
       kids++;
     }

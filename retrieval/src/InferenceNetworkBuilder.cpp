@@ -244,17 +244,17 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ExtentInside* e
     // and then the FieldBelowWalker would check for nested/overlapping fields below rather than all fields.
     if ( fieldFinder.fieldBelow() ) {    
       NestedExtentInsideNode* extentInsideNode = new NestedExtentInsideNode( 
-									    extentInside->nodeName(),
-									    dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
-									    dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]) );
+                                                                            extentInside->nodeName(),
+                                                                            dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+                                                                            dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]) );
 
       _network->addListNode( extentInsideNode );
       _nodeMap[extentInside] = extentInsideNode;
     } else {
       ExtentInsideNode* extentInsideNode = new ExtentInsideNode( 
-								extentInside->nodeName(),
-								dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
-								dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]) );
+                                                                extentInside->nodeName(),
+                                                                dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+                                                                dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]) );
 
       _network->addListNode( extentInsideNode );
       _nodeMap[extentInside] = extentInsideNode;
@@ -741,9 +741,9 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::RawScorerNode* 
       indri::lang::FieldBelowWalker fieldFinder;
       rawScorerNode->getRawExtent()->walk( fieldFinder );
       if ( fieldFinder.fieldBelow() ) {      
-	belief = new NestedListBeliefNode( rawScorerNode->nodeName(), *iterator, context, rawIterator, *function, maximumBackgroundScore, maximumScore );
+        belief = new NestedListBeliefNode( rawScorerNode->nodeName(), *iterator, context, rawIterator, *function, maximumBackgroundScore, maximumScore );
       } else {
-	belief = new ListBeliefNode( rawScorerNode->nodeName(), *iterator, context, rawIterator, *function, maximumBackgroundScore, maximumScore );
+        belief = new ListBeliefNode( rawScorerNode->nodeName(), *iterator, context, rawIterator, *function, maximumBackgroundScore, maximumScore );
       }
     } else {
       belief = new NullScorerNode( rawScorerNode->nodeName(), *function );
@@ -983,7 +983,7 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::ContextInclusio
     for( unsigned int i=0; i<children.size(); i++ ) {
       bool preserveExtents = false;
       if (children[i] == preserveExtentsChild) {
-	preserveExtents = true;
+        preserveExtents = true;
       }
       ciaNode->addChild( weight, translation[i], preserveExtents );
     }
@@ -1062,8 +1062,8 @@ void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ShrinkageScore
       std::vector<std::string> shrinkageRules = shrinkScorerNode->getShrinkageRules();
       std::vector<std::string>::iterator ruleIter = shrinkageRules.begin();
       while( ruleIter != shrinkageRules.end() ) {
-	shrinkageBelief->addShrinkageRule( *ruleIter );
-	ruleIter++;
+        shrinkageBelief->addShrinkageRule( *ruleIter );
+        ruleIter++;
       }
 
     } else {
@@ -1090,8 +1090,8 @@ void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ExtentDescenda
     DocumentStructureHolderNode* docStruct = dynamic_cast<DocumentStructureHolderNode*>(_nodeMap[extentInside->getDocumentStructure()]);
 
     ExtentDescendantNode* extentInsideNode = new ExtentDescendantNode( 
-							      extentInside->nodeName(),
-							      dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+                                                              extentInside->nodeName(),
+                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
                                                               dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]),
                                                               *docStruct );
 
@@ -1115,8 +1115,8 @@ void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ExtentChild* e
     DocumentStructureHolderNode* docStruct = dynamic_cast<DocumentStructureHolderNode*>(_nodeMap[extentInside->getDocumentStructure()]);
    
     ExtentChildNode* extentInsideNode = new ExtentChildNode( 
-							      extentInside->nodeName(),
-							      dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+                                                              extentInside->nodeName(),
+                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
                                                               dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]),
                                                               *docStruct );
 
@@ -1140,8 +1140,8 @@ void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ExtentParent* 
     DocumentStructureHolderNode* docStruct = dynamic_cast<DocumentStructureHolderNode*>(_nodeMap[extentInside->getDocumentStructure()]);
    
     ExtentParentNode* extentInsideNode = new ExtentParentNode( 
-							      extentInside->nodeName(),
-							      dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
+                                                              extentInside->nodeName(),
+                                                              dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getInner()]),
                                                               dynamic_cast<ListIteratorNode*>(_nodeMap[extentInside->getOuter()]),
                                                               *docStruct );
 

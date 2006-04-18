@@ -62,7 +62,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
       iter = &(fieldExtents[i]);
       
       if( iter->end - iter->begin == 0 )
-	continue; // this field has no text in it
+        continue; // this field has no text in it
       
       
       int scoreBegin = iter->begin;
@@ -75,8 +75,8 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
       double fieldWeight = iter->weight;
       
       for( int i=0; i<childResults.size(); i++ ) {
-	indri::api::ScoredExtentResult result( fieldWeight*childResults[i].score, documentID, scoreBegin, scoreEnd );
-	_scores.push_back( result );
+        indri::api::ScoredExtentResult result( fieldWeight*childResults[i].score, documentID, scoreBegin, scoreEnd );
+        _scores.push_back( result );
       }
     } 
 
@@ -84,8 +84,8 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
 //     if ( _scores.size() == 0 ) {
 //       const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, extent.begin, extent.begin, documentLength );
 //       for( int i=0; i<childResults.size(); i++ ) {
-// 	indri::api::ScoredExtentResult result( childResults[i].score, documentID, extent.begin, extent.begin );
-// 	_scores.push_back( result );
+//      indri::api::ScoredExtentResult result( childResults[i].score, documentID, extent.begin, extent.begin );
+//      _scores.push_back( result );
 //       }
 //     }
   } else {
@@ -120,7 +120,7 @@ void indri::infnet::ExtentRestrictionNode::annotate( indri::infnet::Annotator& a
       iter = &(fieldExtents[i]);
       
       if( iter->end - iter->begin == 0 )
-	continue; // this field has no text in it
+        continue; // this field has no text in it
       
       
       int scoreBegin = iter->begin;
@@ -158,9 +158,9 @@ const indri::utility::greedy_vector<bool>& indri::infnet::ExtentRestrictionNode:
       const indri::utility::greedy_vector<bool>& childMatches = _child->hasMatch( documentID, fieldExtents );
       bool match = false;
       for ( size_t j = 0; !match && j < childMatches.size(); j++ ) {
-	
+        
       if ( childMatches[ j ] ) {
-	match = true;
+        match = true;
       }
       }
       _matches[i] = match;

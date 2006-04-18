@@ -238,10 +238,10 @@ static void copy_string_tuples_to_map( std::map<indri::parse::ConflationPattern*
 }
  
 static void cleanup_conflations_map( std::map<indri::parse::ConflationPattern*,std::string>& 
-				     conflations ) {
+                                     conflations ) {
 
   for ( std::map<indri::parse::ConflationPattern*,std::string>::iterator i =
-	  conflations.begin(); i != conflations.end(); i++ )
+          conflations.begin(); i != conflations.end(); i++ )
     delete (*i).first;
 }
 
@@ -383,7 +383,7 @@ indri::parse::FileClassEnvironment* indri::parse::FileClassEnvironmentFactory::g
 void indri::parse::FileClassEnvironmentFactory::addFileClass( const std::string& name, 
                                                               const std::string& iterator,
                                                               const std::string& parser,
-							      const std::string& tokenizer,
+                                                              const std::string& tokenizer,
                                                               const std::string& startDocTag,
                                                               const std::string& endDocTag,
                                                               const std::string& endMetadataTag,

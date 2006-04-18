@@ -1,3 +1,13 @@
+/*==========================================================================
+ * Copyright (c) 2006 Carnegie Mellon University.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 
 
 //
@@ -100,7 +110,7 @@ void indri::infnet::ExtentEnforcementNode::annotate( indri::infnet::Annotator& a
       iter = &(fieldExtents[i]);
       
       if( iter->end - iter->begin == 0 )
-	continue; // this field has no text in it
+        continue; // this field has no text in it
       
       
       int scoreBegin = iter->begin;
@@ -138,10 +148,10 @@ const indri::utility::greedy_vector<bool>& indri::infnet::ExtentEnforcementNode:
        const indri::utility::greedy_vector<bool>& childMatches = _child->hasMatch( documentID, fieldExtents );
        bool match = false;
        for ( size_t j = 0; !match && j < childMatches.size(); j++ ) {
-	 
-	 if ( childMatches[ j ] ) {
-	   match = true;
-	 }
+         
+         if ( childMatches[ j ] ) {
+           match = true;
+         }
        }
        _matches[i] = match;
      }

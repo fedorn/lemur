@@ -74,8 +74,8 @@ namespace indri {
 
       if ( ! root ) {
 
-	root = new IntervalTreeNode( begin, end );
-	return true;
+        root = new IntervalTreeNode( begin, end );
+        return true;
       }
 
       return _insert( begin, end, root );
@@ -91,107 +91,107 @@ namespace indri {
 
       if ( begin <= node->begin && end >= node->max_child_end ) {
 
-	// This interval encloses the entire subtree rooted at this
-	// node.
+        // This interval encloses the entire subtree rooted at this
+        // node.
 
-	IntervalTreeNode *a = new IntervalTreeNode( begin, end );
-	  
-	if ( node->begin < end ) { // left insertion
+        IntervalTreeNode *a = new IntervalTreeNode( begin, end );
+          
+        if ( node->begin < end ) { // left insertion
 
-	  a->left_child = node;
+          a->left_child = node;
 
-	} else { // right insertion
+        } else { // right insertion
 
-	  a->right_child = node;
-	}
+          a->right_child = node;
+        }
 
-	if ( node->parent->right_child == node ) 
-	  node->parent->right_child = a;
-	else if ( node->parent->left_child == node ) 
-	  node->parent->left_child = a;
+        if ( node->parent->right_child == node ) 
+          node->parent->right_child = a;
+        else if ( node->parent->left_child == node ) 
+          node->parent->left_child = a;
 
-	a->parent = node->parent;
-	node->parent = a;
+        a->parent = node->parent;
+        node->parent = a;
 
-	// Properly attach children
-	a->left_child = node->left_child;
-	a->right_child = node->right_child;
+        // Properly attach children
+        a->left_child = node->left_child;
+        a->right_child = node->right_child;
 
-	int mce = a->max_child_end > node->max_child_end ?
-	  a->max_child_end : node->max_child_end;
+        int mce = a->max_child_end > node->max_child_end ?
+          a->max_child_end : node->max_child_end;
 
-	// Recursively update max_child_end
-	IntervalTreeNode *par = node;
+        // Recursively update max_child_end
+        IntervalTreeNode *par = node;
 
-	while ( par ) {
+        while ( par ) {
 
-	  if ( par->max_child_end < mce ) par->max_child_end = mce;
-	  par = par->parent;
-	}
-	return true;
-      }	
+          if ( par->max_child_end < mce ) par->max_child_end = mce;
+          par = par->parent;
+        }
+        return true;
+      } 
 
       // Check for overlap
 
       if ( ( begin < node->end && node->end < end ) || 
-	   ( begin < node->begin && node->begin < end ) ) {
+           ( begin < node->begin && node->begin < end ) ) {
 
-	std::cout << "Overlap detected." << std::endl;
-	return false;
+        std::cout << "Overlap detected." << std::endl;
+        return false;
       }
 
       // No overlap at this node so recurse:
       
       if ( begin < node->end ) { // left recursion
 
-	if ( node->left_child ) {
+        if ( node->left_child ) {
 
-// 	  if ( node->left_child->max_child_end <= end ) return false;
- 	  if ( end > node->end ) return false;
-	  else return _insert( begin, end, node->left_child );
+//        if ( node->left_child->max_child_end <= end ) return false;
+          if ( end > node->end ) return false;
+          else return _insert( begin, end, node->left_child );
 
-	} else {
-	  
-	  // Do the insertion
-	  node->left_child = new IntervalTreeNode( begin, end );
-	  node->left_child->parent = node;
+        } else {
+          
+          // Do the insertion
+          node->left_child = new IntervalTreeNode( begin, end );
+          node->left_child->parent = node;
 
-	  // Recursively update max_child_end
-	  IntervalTreeNode *par = node;
+          // Recursively update max_child_end
+          IntervalTreeNode *par = node;
 
-	  while ( par ) {
+          while ( par ) {
 
-	    if ( par->max_child_end < end ) par->max_child_end = end;
-	    par = par->parent;
-	  }
+            if ( par->max_child_end < end ) par->max_child_end = end;
+            par = par->parent;
+          }
 
-	  return true;
-	}
+          return true;
+        }
 
       } else { // right recursion
 
-	if ( node->right_child ) {
+        if ( node->right_child ) {
 
-	  // No max_child_end check here
-	  return _insert( begin, end, node->right_child );
+          // No max_child_end check here
+          return _insert( begin, end, node->right_child );
 
-	} else {
-	  
-	  // Do the insertion
-	  node->right_child = new IntervalTreeNode( begin, end );
-	  node->right_child->parent = node;
+        } else {
+          
+          // Do the insertion
+          node->right_child = new IntervalTreeNode( begin, end );
+          node->right_child->parent = node;
 
-	  // Recursively update max_child_end
-	  IntervalTreeNode *par = node;
+          // Recursively update max_child_end
+          IntervalTreeNode *par = node;
 
-	  while ( par ) {
+          while ( par ) {
 
-	    if ( par->max_child_end < end ) par->max_child_end = end;
-	    par = par->parent;
-	  }
+            if ( par->max_child_end < end ) par->max_child_end = end;
+            par = par->parent;
+          }
 
-	  return true;
-	}
+          return true;
+        }
 
       }
 
@@ -204,24 +204,24 @@ namespace indri {
     }
 
     void IntervalTree::_walk_tree( std::ostream& s, IntervalTreeNode* node, 
-				   int indent ) {
+                                   int indent ) {
       
       std::string ind( indent, ' ' );
       bool children = false;
 
       s << ind << "[<" << node->begin << ", " << node->end << ", " 
-	<< node->max_child_end << ">";
+        << node->max_child_end << ">";
 
       if ( node->left_child ) {
-	s << std::endl << ind << "left" << std::endl;
-	_walk_tree( s, node->left_child, indent + 2 );
-	children = true;
+        s << std::endl << ind << "left" << std::endl;
+        _walk_tree( s, node->left_child, indent + 2 );
+        children = true;
       }
       
       if ( node->right_child ) {
-	s <<  std::endl << ind << "right" << std::endl;
-	_walk_tree( s, node->right_child, indent + 2 );
-	children = true;
+        s <<  std::endl << ind << "right" << std::endl;
+        _walk_tree( s, node->right_child, indent + 2 );
+        children = true;
       }
 
       if ( children ) s << std::endl << ind;

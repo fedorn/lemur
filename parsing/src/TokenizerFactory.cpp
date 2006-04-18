@@ -52,8 +52,8 @@ std::string indri::parse::TokenizerFactory::preferredName( const std::string& na
        ( name[3] == 'd' || name[3] == 'D' ) ) {
 
     if ( name[4] == '-' && 
-	 ( name[5] == 'n' || name[5] == 'N' ) && 
-	 ( name[5] == 'o' || name[5] == 'O' ) ) {
+         ( name[5] == 'n' || name[5] == 'N' ) && 
+         ( name[5] == 'o' || name[5] == 'O' ) ) {
 
       // got "word-nomarkup"
       return TOKENIZER_WORD_NO_MARKUP;
@@ -63,13 +63,13 @@ std::string indri::parse::TokenizerFactory::preferredName( const std::string& na
     return TOKENIZER_WORD;
 
   } else if ( ( name[0] == 'c' || name[0] == 'C' ) &&
-	      ( name[1] == 'h' || name[1] == 'H' ) &&
-	      ( name[2] == 'a' || name[2] == 'A' ) &&
-	      ( name[3] == 'r' || name[3] == 'R' ) ) {
+              ( name[1] == 'h' || name[1] == 'H' ) &&
+              ( name[2] == 'a' || name[2] == 'A' ) &&
+              ( name[3] == 'r' || name[3] == 'R' ) ) {
 
     if ( name[4] == '-' && 
-	 ( name[5] == 'n' || name[5] == 'N' ) && 
-	 ( name[5] == 'o' || name[5] == 'O' ) ) {
+         ( name[5] == 'n' || name[5] == 'N' ) && 
+         ( name[5] == 'o' || name[5] == 'O' ) ) {
 
       // got "char-nomarkup"
       return TOKENIZER_CHAR_NO_MARKUP;

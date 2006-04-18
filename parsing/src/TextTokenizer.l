@@ -118,7 +118,7 @@ void indri::parse::TextTokenizer::processTag() {
     int len = 0;
 
     for ( char *c = toktext + 2; 
-	  isalnum( *c ) || *c == '-' || *c == '_'; c++ ) {
+          isalnum( *c ) || *c == '-' || *c == '_'; c++ ) {
 
       *c = tolower( *c );
       len++;
@@ -160,7 +160,7 @@ void indri::parse::TextTokenizer::processTag() {
 
       // Ensure tag name is downcased
       for ( int j = 0; j < i; j++ )
-	c[j] = tolower( c[j] );
+        c[j] = tolower( c[j] );
 
       TagEvent te;
 
@@ -189,7 +189,7 @@ void indri::parse::TextTokenizer::processTag() {
 
       // Ensure tag name is downcased
       for ( int j = 0; j < i; j++ )
-	c[j] = tolower( c[j] );
+        c[j] = tolower( c[j] );
 
       // need to write i characters, plus a NULL
       char* write_loc = _termBuffer.write( i + 1 );
@@ -210,89 +210,89 @@ void indri::parse::TextTokenizer::processTag() {
 
       while ( *c != '>' && *c != '\0' ) { 
 
-	AttributeValuePair avp;
+        AttributeValuePair avp;
 
-	// Try to extract attribute name:
+        // Try to extract attribute name:
 
-	i = 0;
-	while ( isalnum( c[i] ) ) i++;
+        i = 0;
+        while ( isalnum( c[i] ) ) i++;
 
-	if ( i == 0 ) break;
+        if ( i == 0 ) break;
 
-	// Ensure attribute name is downcased
-	for ( int j = 0; j < i; j++ )
-	  c[j] = tolower( c[j] );
+        // Ensure attribute name is downcased
+        for ( int j = 0; j < i; j++ )
+          c[j] = tolower( c[j] );
 
-	// need to write i characters, plus a NULL
-	write_loc = _termBuffer.write( i + 1 );
-	strncpy( write_loc, c, i );
-	write_loc[i] = '\0';
-	avp.attribute = write_loc;
-	c += i;
-	offset += i;
+        // need to write i characters, plus a NULL
+        write_loc = _termBuffer.write( i + 1 );
+        strncpy( write_loc, c, i );
+        write_loc[i] = '\0';
+        avp.attribute = write_loc;
+        c += i;
+        offset += i;
 
-	// attributes can be foo\s*=\s*"bar[">] or foo\s*=\s*bar
+        // attributes can be foo\s*=\s*"bar[">] or foo\s*=\s*bar
 
-	while ( isspace( *c ) ) { c++; offset++; }// ignore any spaces
+        while ( isspace( *c ) ) { c++; offset++; }// ignore any spaces
 
-	if ( *c == '=' ) {
+        if ( *c == '=' ) {
 
-	  c++; // get past the '=' sign.
-	  offset++;
-	  while ( isspace( *c ) ) { c++; offset++; }
+          c++; // get past the '=' sign.
+          offset++;
+          while ( isspace( *c ) ) { c++; offset++; }
 
-	  if ( *c == '>' ) {
+          if ( *c == '>' ) {
 
-	    // common malformed markup <a href=>
+            // common malformed markup <a href=>
 
-	    // Insert empty attribute value
-	    // need to write a single NULL
-	    write_loc = _termBuffer.write( 1 );
-	    write_loc[0] = '\0';
-	    avp.value = write_loc;
-	    avp.begin = byte_position - tokleng + offset;
-	    avp.end = byte_position - tokleng + offset;
+            // Insert empty attribute value
+            // need to write a single NULL
+            write_loc = _termBuffer.write( 1 );
+            write_loc[0] = '\0';
+            avp.value = write_loc;
+            avp.begin = byte_position - tokleng + offset;
+            avp.end = byte_position - tokleng + offset;
 
-	  } else {
+          } else {
 
-	    bool quoted = true;
+            bool quoted = true;
 
-	    if ( *c == '"' ) { c++; offset++; }
-	    else quoted = false;
+            if ( *c == '"' ) { c++; offset++; }
+            else quoted = false;
 
-	    // Attribute value starts here.
+            // Attribute value starts here.
 
-	    i = 0;
-	    if ( quoted ) 
-	      while ( c[i] != '"' && c[i] != '>' ) i++;
-	    else
-	      while ( ! isspace( c[i] ) && c[i] != '>' ) i++;
+            i = 0;
+            if ( quoted ) 
+              while ( c[i] != '"' && c[i] != '>' ) i++;
+            else
+              while ( ! isspace( c[i] ) && c[i] != '>' ) i++;
 
-	    // need to write i characters, plus a NULL
-	    write_loc = _termBuffer.write( i + 1 );
-	    strncpy( write_loc, c, i );
-	    write_loc[i] = '\0';
-	    avp.value = write_loc;
-	    avp.begin = byte_position - tokleng + offset;
-	    avp.end = byte_position - tokleng + offset + i;
-	    c += i;
-	    offset += i;
+            // need to write i characters, plus a NULL
+            write_loc = _termBuffer.write( i + 1 );
+            strncpy( write_loc, c, i );
+            write_loc[i] = '\0';
+            avp.value = write_loc;
+            avp.begin = byte_position - tokleng + offset;
+            avp.end = byte_position - tokleng + offset + i;
+            c += i;
+            offset += i;
 
-	  }
-	} else {
+          }
+        } else {
 
-	  // Insert empty attribute value
-	  // need to write a single NULL
-	  write_loc = _termBuffer.write( 1 );
-	  write_loc[0] = '\0';
-	  avp.value = write_loc;
-	  avp.begin = byte_position - tokleng + offset;
-	  avp.end = byte_position - tokleng + offset;
-	}
+          // Insert empty attribute value
+          // need to write a single NULL
+          write_loc = _termBuffer.write( 1 );
+          write_loc[0] = '\0';
+          avp.value = write_loc;
+          avp.begin = byte_position - tokleng + offset;
+          avp.end = byte_position - tokleng + offset;
+        }
 
-	while ( isspace( *c ) || *c == '"' ) { c++; offset++; }
+        while ( isspace( *c ) || *c == '"' ) { c++; offset++; }
 
-	te.attributes.push_back( avp );
+        te.attributes.push_back( avp );
       }
 
       _document.tags.push_back( te );
@@ -321,7 +321,7 @@ void indri::parse::TextTokenizer::processUTF8Token() {
   int* offsets = new int[len + 1];
   int* lengths = new int[len + 1];
   _transcoder.utf8_decode( toktext, &unicode_chars, NULL, NULL,
-			   &offsets, &lengths );
+                           &offsets, &lengths );
 
   const int* p;
   int cls;             // Character class of current UTF-8 character
@@ -351,9 +351,9 @@ void indri::parse::TextTokenizer::processUTF8Token() {
 
       if ( cls != 0 && cls != 3 && cls != 5 && cls != 9 ) {
 
-	writeToken( toktext + offsets[i], lengths[i],
-		    byte_position - tokleng + offsets[i], 
-		    byte_position - tokleng + offsets[i] + lengths[i] );
+        writeToken( toktext + offsets[i], lengths[i],
+                    byte_position - tokleng + offsets[i], 
+                    byte_position - tokleng + offsets[i] + lengths[i] );
       }
       continue;
     }
@@ -368,9 +368,9 @@ void indri::parse::TextTokenizer::processUTF8Token() {
 
       if ( token_len > 0 ) {
 
-	writeToken( toktext + offset, token_len,
-		    byte_position - tokleng + offset,
-		    byte_position - tokleng + offset + extent );
+        writeToken( toktext + offset, token_len,
+                    byte_position - tokleng + offset,
+                    byte_position - tokleng + offset + extent );
       }
 
       extent = 0;
@@ -387,14 +387,14 @@ void indri::parse::TextTokenizer::processUTF8Token() {
       // Action: write the token we are working on,
       // and write this symbol as a separate token
       writeToken( toktext + offset, extent,
-		  byte_position - tokleng + offset,
-		  byte_position - tokleng + offset + extent );
+                  byte_position - tokleng + offset,
+                  byte_position - tokleng + offset + extent );
 
       offset += extent;
 
       writeToken( toktext + offset, lengths[i], 
-		  byte_position - tokleng + offset, 
-		  byte_position - tokleng + offset + lengths[i] );
+                  byte_position - tokleng + offset, 
+                  byte_position - tokleng + offset + lengths[i] );
 
       offset += lengths[i];
       token_len = 0;
@@ -409,14 +409,14 @@ void indri::parse::TextTokenizer::processUTF8Token() {
       // Action: add this character to the end of the token we are
       // working on
       if ( no_letter ) { // This is a token boundary
-	writeToken( toktext + offset, token_len,
-		    byte_position - tokleng + offset,
-		    byte_position - tokleng + offset + extent );
+        writeToken( toktext + offset, token_len,
+                    byte_position - tokleng + offset,
+                    byte_position - tokleng + offset + extent );
 
-	offset += extent;
-	extent = 0;
-	token_len = 0;
-	no_letter = false;
+        offset += extent;
+        extent = 0;
+        token_len = 0;
+        no_letter = false;
 
       }
 
@@ -442,8 +442,8 @@ void indri::parse::TextTokenizer::processUTF8Token() {
       // Action: write the token we are working on.  Do not include
       // this character in any future token.
       writeToken( toktext + offset, token_len,
-		  byte_position - tokleng + offset,
-		  byte_position - tokleng + offset + extent );
+                  byte_position - tokleng + offset,
+                  byte_position - tokleng + offset + extent );
 
       offset += (extent + lengths[i]); // Include current character
       extent = 0;
@@ -457,8 +457,8 @@ void indri::parse::TextTokenizer::processUTF8Token() {
   // Write out last token
   if ( token_len > 0 )
     writeToken( toktext + offset, token_len,
-		byte_position - tokleng + offset,
-		byte_position - tokleng + offset + extent );
+                byte_position - tokleng + offset,
+                byte_position - tokleng + offset + extent );
   
   delete[] unicode_chars;
   delete[] offsets;
@@ -488,7 +488,7 @@ void indri::parse::TextTokenizer::processASCIIToken() {
 
     for ( int i = 0; i < token_len; i++ )
       writeToken( toktext + i, 1, byte_position - tokleng + i, 
-		  byte_position - tokleng + i + 1 );
+                  byte_position - tokleng + i + 1 );
   }
 }
 
@@ -506,7 +506,7 @@ void indri::parse::TextTokenizer::setHandler( ObjectHandler<indri::parse::Tokeni
 }
 
 void indri::parse::TextTokenizer::writeToken( char* token, int token_len, 
-					      int extent_begin, int extent_end ) {
+                                              int extent_begin, int extent_end ) {
 
 
   // The TermExtent for a token will include trailing punctuation.
@@ -527,7 +527,7 @@ void indri::parse::TextTokenizer::writeToken( char* token, int token_len,
   _document.terms.push_back( write_loc );
 
 //   std::cout << "Token [" << token << "], <" << extent.begin << ", " 
-// 	    << extent.end << ">" << std::endl;
+//          << extent.end << ">" << std::endl;
 }
 
 

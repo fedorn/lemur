@@ -78,14 +78,11 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
   _offsetAnnotationsFile = offsetAnnotationsFile;
 
-//   std::cerr << "Loading offset annotations file: " << _offsetAnnotationsFile << std::endl;
-
   if ( ! _first_open ) {
 
     _cleanup();
   }
 
-//   std::cerr << "Done cleanup " << std::endl;
   _first_open = false;
 
   // Load file, and check consistency.  Ensure that there are no
@@ -110,7 +107,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
     int fieldStart = 0;
     int fieldCount = 0;
     int fieldOffset = 0;
-	
+        
     char* docno = NULL;
     char* name = NULL;
     char* s_value = NULL;
@@ -125,109 +122,109 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
     int len = 0;
 
     for ( char *c = buf + fieldStart; *c != '\0' && fieldCount < 8 && 
-	    fieldOffset < sizeof(field); 
-	  c++, fieldOffset++ ) {
+            fieldOffset < sizeof(field); 
+          c++, fieldOffset++ ) {
 
       if ( *c == '\t' ) {
 
-	field[fieldOffset] = '\0';
-	      
-	switch ( fieldCount ) {
+        field[fieldOffset] = '\0';
+              
+        switch ( fieldCount ) {
 
-	case 0: // DOCNO (string)
-	  len = strlen( field );
-	  docno = new char[len + 1];
-	  strncpy( docno, field, len);
-	  docno[len] = '\0';
-	  _buffers_allocated.push_back( docno );
-	  break;
+        case 0: // DOCNO (string)
+          len = strlen( field );
+          docno = new char[len + 1];
+          strncpy( docno, field, len);
+          docno[len] = '\0';
+          _buffers_allocated.push_back( docno );
+          break;
 
-	case 1: // TYPE (flag)
-	  if ( *field == 't' || *field == 'T' ) type = 1;
-	  else if ( *field == 'a' || *field == 'A' ) type = 2;
-	  else {
-	    std::cerr << "WARN: Could not understand type specification '" 
-		      << field << "' on line " << line 
-		      << "; ignoring line." << std::endl;
-	    line++;
-	    fieldCount = 8;
-	    continue;
-	  }
-	  break;
+        case 1: // TYPE (flag)
+          if ( *field == 't' || *field == 'T' ) type = 1;
+          else if ( *field == 'a' || *field == 'A' ) type = 2;
+          else {
+            std::cerr << "WARN: Could not understand type specification '" 
+                      << field << "' on line " << line 
+                      << "; ignoring line." << std::endl;
+            line++;
+            fieldCount = 8;
+            continue;
+          }
+          break;
 
-	case 2: // ID (UINT64)
-	  id = parse_UINT64( field, fieldOffset );
-	  break;
+        case 2: // ID (UINT64)
+          id = parse_UINT64( field, fieldOffset );
+          break;
 
-	case 3: // NAME (string)
-	  len = strlen( field );
-	  name = new char[len + 1];
-	  strncpy( name, field, len );
-	  name[len] = '\0';
+        case 3: // NAME (string)
+          len = strlen( field );
+          name = new char[len + 1];
+          strncpy( name, field, len );
+          name[len] = '\0';
           // name should be case normalized to lower case.
           for (char *c = name; *c; c++) *c = tolower(*c);
-	  _buffers_allocated.push_back( name );
-	  break;
+          _buffers_allocated.push_back( name );
+          break;
 
-	case 4: // START (int)
-	  if ( type == 1 ) {
+        case 4: // START (int)
+          if ( type == 1 ) {
             start = atoi( field );
             if ( start < 0 ) {
               std::cerr << "WARN: tag named '" << name 
                         << "' starting at negative byte offest on line " 
                         << line << "; ignoring line." << std::endl;
               line++;
-	      fieldCount = 8; 
+              fieldCount = 8; 
               continue;
             }
-	  }
-	  break;
+          }
+          break;
 
-	case 5: // LENGTH (int)
-	  if ( type == 1 ) {
+        case 5: // LENGTH (int)
+          if ( type == 1 ) {
             length = atoi( field );
             if ( length <= 0 ) {
               std::cerr << "WARN: tag named '" << name 
                         << "' with zero or negative byte length on line " 
                         << line << "; ignoring line." << std::endl;
               line++;
-	      fieldCount = 8;
+              fieldCount = 8;
               continue;
             }
           }
-	  break;
+          break;
 
-	case 6: // VALUE (UINT64 or string)
-	  if ( type == 1 ) i_value = parse_UINT64( field, fieldOffset );
-	  else { 
-	    len = strlen( field );
-	    s_value = new char[len + 1];
-	    strncpy( s_value, field, len );
-	    s_value[len] = '\0';
-	    _buffers_allocated.push_back( s_value );
-	  }
-	  break;
+        case 6: // VALUE (UINT64 or string)
+          if ( type == 1 ) i_value = parse_UINT64( field, fieldOffset );
+          else { 
+            len = strlen( field );
+            s_value = new char[len + 1];
+            strncpy( s_value, field, len );
+            s_value[len] = '\0';
+            _buffers_allocated.push_back( s_value );
+          }
+          break;
 
-	case 7: // PARENT (UINT64; 0 indicates no parent );
-	  parent = parse_UINT64( field, fieldOffset );
-	  break;
+        case 7: // PARENT (UINT64; 0 indicates no parent );
+          parent = parse_UINT64( field, fieldOffset );
+          break;
 
-	}
+        }
 
-	fieldCount++;
-	fieldStart += ( fieldOffset + 1 );
-	fieldOffset = -1;
+        fieldCount++;
+        fieldStart += ( fieldOffset + 1 );
+        fieldOffset = -1;
 
       } else {
 
-	field[fieldOffset] = *c;
+        field[fieldOffset] = *c;
       }
     }
 
     if ( id == parent ) {
 
       std::cerr << "WARN: id and parent id are equal on line " << line 
-		<< "; ignoring line." << std::endl;
+                << "; ignoring line." << std::endl;
       line++;
       continue;
     }
@@ -235,7 +232,7 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
     // Now process the line we just read in.
 
     if ( type == 1 ) {
-	    
+            
       if ( ! _is_unique_id( id, line ) ) { line++; continue; }
 
       // Check that parent id is defined
@@ -244,18 +241,18 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
       if ( parent != 0 ) {
 
-	p_parent = _getTag( parent );
+        p_parent = _getTag( parent );
 
-	if ( p_parent == NULL ) {
+        if ( p_parent == NULL ) {
 
-	  std::cerr << "WARN: Undefined parent id '" << parent 
-		    << "' used on line " << line 
-		    << "; ignoring line" << std::endl;
+          std::cerr << "WARN: Undefined parent id '" << parent 
+                    << "' used on line " << line 
+                    << "; ignoring line" << std::endl;
 
-	  line++;
-	  continue;
+          line++;
+          continue;
 
-	}
+        }
       }
 
       // Create new TAG
@@ -266,8 +263,8 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
       if ( ! tags ) { 
 
-	tags = new std::set<indri::parse::TagExtent*>;
-	_annotations.insert( docno, tags );
+        tags = new std::set<indri::parse::TagExtent*>;
+        _annotations.insert( docno, tags );
       }
 
       TagExtent* te = new TagExtent;
@@ -285,9 +282,9 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
       te->begin = start;
       te->end = start + length;
 
-	  // Conflate tag if necessary
+          // Conflate tag if necessary
       if ( _p_conflater ) _p_conflater->conflate( te );
-	  
+          
       tags->insert( te );
       _tag_id_map.insert( id, te );
 
@@ -299,11 +296,11 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
 
       if ( p_te == NULL ) {
 
-	std::cerr << "WARN: Attribute for undefined tag id '" << parent
-		  << "' appears on line " << line
-		  << "; ignoring line" << std::endl;
-	line++;
-	continue;
+        std::cerr << "WARN: Attribute for undefined tag id '" << parent
+                  << "' appears on line " << line
+                  << "; ignoring line" << std::endl;
+        line++;
+        continue;
       }
 
       AttributeValuePair * avp = new AttributeValuePair;
@@ -318,8 +315,6 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
     line++;
   }
 
-  std::cerr << "Done loading" << std::endl;
-	
   in.close();
 }
 
@@ -359,51 +354,12 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
   // Return right away if there are no annotations for this document.
   if ( converted_tags->empty() ) return document;
 
-  // --------------- PARAMETERIZE USE OF INTERVAL TREE ----------------------
-
-  //  IntervalTree itree;
-
-  // Load existing ParsedDocument tags into the IntervalTree:
-	
-//   for ( indri::utility::greedy_vector<TagExtent>::iterator i = 
-// 	  document->tags.begin(); i != document->tags.end(); i++ ) {
-	  
-//     std::cerr << "Inserting existing tag: " << (*i).name << " [" 
-// 	      << (*i).begin << ", " << (*i).end << "]" << std::endl;
-	  
-//     if ( ! itree.insert( (*i).begin, (*i).end ) ) {
-
-//       std::cerr << "There was an error inserting ParsedDocument tag '"
-// 		<< (*i).name << "' [" << (*i).begin << ", "
-// 		<< (*i).end << "] into the IntervalTree for docno '"
-// 		<< docno << "'!  This isn't supposed to happen."
-// 		<< std::endl;
-//     }
-//   }
-
   // Add annotations from the offset annotations file to
-  // IntervalTree, in case any of them overlap with the existing
-  // annotations.  If they don't, add them to the ParsedDocument
-  // rep.
+  // the ParsedDocument rep.
 
   for ( std::set<TagExtent*>::iterator i = converted_tags->begin(); 
-	i != converted_tags->end(); i++ ) {
-	  
-//     std::cerr << "Inserting new tag: " << (*i)->name << " [" 
-// 	      << (*i)->begin << ", " << (*i)->end << "]" << std::endl;
-	  
-//     if ( ! itree.insert( (*i)->begin, (*i)->end ) ) {
-
-// #if 0
-//       std::cerr << "Tag '" << (*i)->name << "' [" << (*i)->begin << ", "
-// 		<< (*i)->end << "] for docno '" << docno 
-// 		<< "' overlaps with an existing annotation; skipping..."
-// 		<< std::endl;
-// #endif
-//     } else {
-
-      document->tags.push_back( (*i) );
-//    }
+        i != converted_tags->end(); i++ ) {
+    document->tags.push_back( (*i) );
   }
 
   converted_tags->clear();
@@ -412,8 +368,8 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
 }
 
 void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indri::parse::TagExtent*>* raw_tags,
-								   std::set<indri::parse::TagExtent*>* converted_tags, 
-								   indri::api::ParsedDocument* document ) {
+                                                                   std::set<indri::parse::TagExtent*>* converted_tags, 
+                                                                   indri::api::ParsedDocument* document ) {
 
   // At the top of this priority queue will be the tag that closes first.
   std::priority_queue<indri::parse::TagExtent*,std::vector<indri::parse::TagExtent*>,indri::parse::TagExtent::lowest_end_first> active_tags;
@@ -426,16 +382,16 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
   long tok_pos = 0;
 
   for ( indri::utility::greedy_vector<indri::parse::TermExtent>::iterator 
-	  token = document->positions.begin(); 
-	token != document->positions.end();
-	token++, tok_pos++ ) {
+          token = document->positions.begin(); 
+        token != document->positions.end();
+        token++, tok_pos++ ) {
 
     // Check to see if there are any active tags that can be closed.
     // The top element on active_tags will always be the tag that
     // closes first.
 
     while ( ! active_tags.empty() &&
-	    active_tags.top()->end <= (*token).end ) {
+            active_tags.top()->end <= (*token).end ) {
 
       // Tag on top of queue closes before the end of the current
       // token.
@@ -447,46 +403,31 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
 
       if ( te->end <= (*token).begin ) {
 
-	te->end = tok_pos;
-
-// 	std::cerr << "Closing tag named " << te->name
-// 		  << " at tok_pos " << te->end
-// 		  << " because tag end at " << te->end
-// 		  << " is before token [" << (*token).begin << ", "
-// 		  << (*token).end << "]" << std::endl;
+        te->end = tok_pos;
 
       } else { 
 
-	// Current tag ends inside the current token.
+        // Current tag ends inside the current token.
 
-	if ( te->end <= (*token).begin + ( (*token).end - (*token).begin )/2 ) {
+        if ( te->end <= (*token).begin + ( (*token).end - (*token).begin )/2 ) {
 
-	  te->end = tok_pos; // Round down to previous token boundary.
+          te->end = tok_pos; // Round down to previous token boundary.
 
-	} else {
-	  
-	  te->end = tok_pos + 1; // Round up to next token boundary.
-	  
-	}
-
-// 	std::cerr << "Closing tag named " << te->name
-// 		  << " at tok_pos " << te->end
-// 		  << " because tag end at " << te->end
-// 		  << " is inside token [" << (*token).begin << ", "
-// 		  << (*token).end << "]" << std::endl;
+        } else {
+          
+          te->end = tok_pos + 1; // Round up to next token boundary.
+          
+        }
 
       }
 
       // ensure tag boundaries are still within the document
       if (te->end > document->positions.size()) {
-	te->end = document->positions.size();
+        te->end = document->positions.size();
       } 
       if (te->end < 1) {
-	te->end = 1;
+        te->end = 1;
       }
-
-//       std::cerr << "Closed Tag named " << te->name 
-// 	        << " at tok_pos " << te->end << std::endl;
 
       converted_tags->insert( te );
       active_tags.pop();
@@ -505,14 +446,8 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
       // token-length tags and must be skipped.
       if ( (*curr_raw_tag)->end <= (*token).begin ) {
 
-// 	std::cerr << "Tag named " << (*curr_raw_tag)->name 
-// 		  << " beginning at byte offset " << (*curr_raw_tag)->begin
-// 		  << " and ending at byte offset " << (*curr_raw_tag)->end
-// 		  << " encloses no tokens and will be ignored."
-// 		  << std::endl;
-
-	curr_raw_tag++;
-	continue;
+        curr_raw_tag++;
+        continue;
       }
 
       // To activate a tag, create a copy of it and insert that copy
@@ -533,24 +468,24 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
 
       if ( (*curr_raw_tag)->begin <= (*token).begin + ( (*token).end - (*token).begin )/2 ) {
 
-	// Tag either begins before the token, or is closer to begin
-	// than to the end of the token, so we are rounding up.  Begin
-	// value will be be set to the current token position.
-	te->begin = tok_pos;
+        // Tag either begins before the token, or is closer to begin
+        // than to the end of the token, so we are rounding up.  Begin
+        // value will be be set to the current token position.
+        te->begin = tok_pos;
 
       } else {
 
-	// Tag begins closer to where the token ends, so we'll round down.
-	te->begin = tok_pos + 1;
+        // Tag begins closer to where the token ends, so we'll round down.
+        te->begin = tok_pos + 1;
 
       }
 
       // Make sure tag boundaries are within the document
       if (te->begin >= document->positions.size()) {
-	te->begin = document->positions.size() - 1;
+        te->begin = document->positions.size() - 1;
       } 
       if (te->begin < 0) {
-	te->begin = 0;
+        te->begin = 0;
       }      
 
       // End value must be filled in when the tag is closed; for now,
@@ -558,10 +493,6 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
       te->end = (*curr_raw_tag)->end;
      
       active_tags.push( te );
-
-//       std::cerr << "Activated Tag named " << (*curr_raw_tag)->name << " with byte range [" 
-// 		<< (*curr_raw_tag)->begin << ", " << (*curr_raw_tag)->end 
-// 		<< "] activated at tok_pos " << te->begin << std::endl;
 
       // Move onto the next tag
       curr_raw_tag++;
@@ -575,10 +506,6 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
 
     TagExtent *te = active_tags.top();
     te->end = tok_pos;
-
-//     std::cerr << "Closed Tag named " << te->name 
-// 	      << " at tok_pos " << te->end << std::endl;
-
     converted_tags->insert( te );
     active_tags.pop();
     
@@ -590,9 +517,9 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
   while( converted != convertedEnd ) {
     if ( (*converted)->parent != 0 ) {
       std::map<indri::parse::TagExtent*, indri::parse::TagExtent*>::iterator iter = 
-	tagMap.find( (*converted)->parent );
+        tagMap.find( (*converted)->parent );
       if ( iter != tagMap.end() ) {
-	(*converted)->parent = iter->second;
+        (*converted)->parent = iter->second;
       } else {
       (*converted)->parent = 0;
       }

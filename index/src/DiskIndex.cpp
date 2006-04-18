@@ -50,7 +50,7 @@ void indri::index::DiskIndex::_readManifest( const std::string& path ) {
       for( int i=0; i<field.size(); i++ ) {
         bool numeric = field[i].get( "isNumeric", false );
         bool ordinal = field[i].get( "isOrdinal", false );
-	int documentCount = field[i].get("total-documents", 0 );
+        int documentCount = field[i].get("total-documents", 0 );
         INT64 totalCount = field[i].get("total-terms", INT64(0) );
         std::string name = field[i].get( "name", "" );
 

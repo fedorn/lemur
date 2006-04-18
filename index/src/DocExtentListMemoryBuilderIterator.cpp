@@ -132,9 +132,9 @@ bool indri::index::DocExtentListMemoryBuilderIterator::nextEntry() {
       extent.end = extent.begin + deltaPosition;
 
       if( _ordinal ) {
-	_list = lemur::utility::RVLCompress::decompress_int( _list, deltaOrdinal );
-	ordinal = ordinal + deltaOrdinal;
-	extent.ordinal = ordinal;
+        _list = lemur::utility::RVLCompress::decompress_int( _list, deltaOrdinal );
+        ordinal = ordinal + deltaOrdinal;
+        extent.ordinal = ordinal;
       }
 
       _data.extents.push_back( extent );

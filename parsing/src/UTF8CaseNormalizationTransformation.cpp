@@ -24,7 +24,7 @@ indri::parse::UTF8CaseNormalizationTransformation::UTF8CaseNormalizationTransfor
 indri::parse::UTF8CaseNormalizationTransformation::~UTF8CaseNormalizationTransformation() {
 
   for ( std::vector<char*>::iterator i = _buffers_allocated.begin();
-	i != _buffers_allocated.end(); i++ )
+        i != _buffers_allocated.end(); i++ )
     delete[] (*i);
 }
 
@@ -41,10 +41,11 @@ void indri::parse::UTF8CaseNormalizationTransformation::setHandler( ObjectHandle
 indri::api::ParsedDocument* indri::parse::UTF8CaseNormalizationTransformation::transform( indri::api::ParsedDocument* document ) {
 
   for ( std::vector<char*>::iterator i = _buffers_allocated.begin();
-	i != _buffers_allocated.end(); i++ )
+        i != _buffers_allocated.end(); i++ )
     delete[] (*i);
   _buffers_allocated.clear();
   
+
   // Here, detect UTF-8 strings and downcase them.
 
   // We don't have access to the original term buffer where these
@@ -68,7 +69,7 @@ indri::api::ParsedDocument* indri::parse::UTF8CaseNormalizationTransformation::t
     if ( ! utf_8_detected ) { // In-place ASCII downcase
 
       for ( char *c = term; *c != '\0'; c++ )
-	*c = tolower( *c );
+        *c = tolower( *c );
 
       continue;
 
@@ -86,19 +87,19 @@ indri::api::ParsedDocument* indri::parse::UTF8CaseNormalizationTransformation::t
    
     UINT64* unicode_chars = new UINT64[len + 1];
     _transcoder.utf8_decode( term, &unicode_chars, NULL, NULL,
-			     NULL, NULL );
+                             NULL, NULL );
 
     int buf_index = 0;
     for ( int j = 0; j < len && unicode_chars[j]; j++ ) {
 
       UINT64* x = _downcase.find( unicode_chars[j] );
       if ( x ) unicode_chars[j] = *x;
-	      
+              
       // Re-encode and copy into new buffer
       _transcoder.utf8_encode( unicode_chars[j],  
-			       new_term + buf_index, NULL );
+                               new_term + buf_index, NULL );
     }
-	  
+          
     term = new_term;
     delete[] unicode_chars;
   }

@@ -131,10 +131,10 @@ UINT64 indri::collection::RepositoryMaintenanceThread::work() {
         Repository::Load queryLoad = _repository.queryLoad();
         UINT64 lastThrashing = _repository._timeSinceThrashing();
 
-	// if the number of open index files is pushing the open file limit,
-	// also schedule a merge.
-	unsigned int openFiles = state->size() * _repository.tags().size();
-	bool should_merge = openFiles > 512; // tighten this.
+        // if the number of open index files is pushing the open file limit,
+        // also schedule a merge.
+        unsigned int openFiles = state->size() * _repository.tags().size();
+        bool should_merge = openFiles > 512; // tighten this.
 
         if( should_merge || maintenance_should_merge( state, documentLoad, queryLoad, lastThrashing ) ) {
           _requests.push( MERGE );

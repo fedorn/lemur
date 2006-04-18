@@ -1,3 +1,13 @@
+/*==========================================================================
+ * Copyright (c) 2006 Carnegie Mellon University.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 
 
 //
@@ -51,7 +61,7 @@ void indri::infnet::NestedExtentInsideNode::prepare( int documentID ) {
     std::set<indri::index::Extent, indri::index::Extent::ends_before_less>::iterator activeEnd = activeOuterExtents.end();
     while ( activeIter != activeEnd ) {
       if ( activeIter->end >= innerIter->begin ) {
-	break;	
+        break;  
       } 
       activeIter++;
     }
@@ -61,7 +71,7 @@ void indri::infnet::NestedExtentInsideNode::prepare( int documentID ) {
     while ( outerIter != outExtents.end() && outerIter->begin <= innerIter->begin ) {
       // only insert if still applicable
       if ( outerIter->end >= innerIter->begin ) {
-	activeOuterExtents.insert( *outerIter );
+        activeOuterExtents.insert( *outerIter );
       }
       outerIter++;
     }
@@ -70,19 +80,19 @@ void indri::infnet::NestedExtentInsideNode::prepare( int documentID ) {
     if (!activeOuterExtents.empty()) {
       activeIter--;
       if ( activeIter->end >= innerIter->end ) {
-	// Since we know that all active outer extents have a begin that is at or before
-	// the inner iter's begin, and from the if statement we know the end of one
-	// of the active outer extents is at least 
-	// as large as the inner end, we know the inner iter extent is contained
-	// by the last extent in the active list (and possibly others)
+        // Since we know that all active outer extents have a begin that is at or before
+        // the inner iter's begin, and from the if statement we know the end of one
+        // of the active outer extents is at least 
+        // as large as the inner end, we know the inner iter extent is contained
+        // by the last extent in the active list (and possibly others)
 
-	// !!!!!!!!!!!!!!! This may be wrong to use the activeIter weight here !!!!!!!!!!!!!!!!!
-	// What if multiple outer extents match? Here we just take the weight of the first one.
-	indri::index::Extent extent( innerIter->weight * activeIter->weight, 
-				     innerIter->begin,
-				     innerIter->end,
-				     innerIter->ordinal );
-	_extents.push_back( extent );
+        // !!!!!!!!!!!!!!! This may be wrong to use the activeIter weight here !!!!!!!!!!!!!!!!!
+        // What if multiple outer extents match? Here we just take the weight of the first one.
+        indri::index::Extent extent( innerIter->weight * activeIter->weight, 
+                                     innerIter->begin,
+                                     innerIter->end,
+                                     innerIter->ordinal );
+        _extents.push_back( extent );
       }
     }
     innerIter++;

@@ -37,7 +37,7 @@ void indri::infnet::FieldBetweenNode::prepare( int documentID ) {
   const indri::utility::greedy_vector<indri::index::Extent>& extents = _field->extents();
 
   for( unsigned int i=0; i<numbers.size(); i++ ) {
-    if( numbers[i] >= _low && numbers[i] < _high ) {
+    if( numbers[i] >= _low && numbers[i] <= _high ) {
       _extents.push_back( extents[i] );
     }
   }

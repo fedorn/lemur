@@ -32,15 +32,15 @@ namespace indri
       // A comparator that sorts by end value, lowest first
       struct lowest_end_first {
 
-	bool operator() ( const indri::parse::TagExtent* x,
-			  const indri::parse::TagExtent* y ) const {
+        bool operator() ( const indri::parse::TagExtent* x,
+                          const indri::parse::TagExtent* y ) const {
 
-	  // returns true if x < y; false otherwise
+          // returns true if x < y; false otherwise
 
-	  if ( x->end > y->end ) return true;
-	  else if ( x->end == y->end ) return ( x < y ); 
-	  else return false;
-	}
+          if ( x->end > y->end ) return true;
+          else if ( x->end == y->end ) return ( x < y ); 
+          else return false;
+        }
       };
 
       const char* name;
@@ -56,17 +56,17 @@ namespace indri
     class LessTagExtent {
     public:
       bool operator()(indri::parse::TagExtent * extent1, indri::parse::TagExtent * extent2 ) {
-	if ( extent1->begin < extent2->begin )
-	  return true;
-	if ( extent1->begin == extent2->begin  
-	     && extent1->end > extent2->end )
-	  return true;
-	if ( extent1->begin == extent2->begin 
-	     &&  extent1->end == extent2->end ) {
-	  return (extent1 < extent2);
-	}
-						  
-	return false;	
+        if ( extent1->begin < extent2->begin )
+          return true;
+        if ( extent1->begin == extent2->begin  
+             && extent1->end > extent2->end )
+          return true;
+        if ( extent1->begin == extent2->begin 
+             &&  extent1->end == extent2->end ) {
+          return (extent1 < extent2);
+        }
+                                                  
+        return false;   
       }
     };
 
@@ -81,7 +81,7 @@ namespace std {
   struct less<indri::parse::TagExtent*> {
 
     bool operator() ( const indri::parse::TagExtent* x,
-		      const indri::parse::TagExtent* y ) const {
+                      const indri::parse::TagExtent* y ) const {
 
       // returns true if x < y; false otherwise
 
@@ -89,19 +89,19 @@ namespace std {
       else if ( x->begin > y->begin ) return false;
       else {
 
-	if ( ( x->end - x->begin ) > ( y->end - y->begin ) ) return true;
-	else if ( ( x->end - x->begin ) < ( y->end - y->begin ) ) return false;
-	else {
-	  // We might have two extents with the same names at the same locations
-	  // as a result of offset annotations that actually have different children etc.
-	  return (x < y);
+        if ( ( x->end - x->begin ) > ( y->end - y->begin ) ) return true;
+        else if ( ( x->end - x->begin ) < ( y->end - y->begin ) ) return false;
+        else {
+          // We might have two extents with the same names at the same locations
+          // as a result of offset annotations that actually have different children etc.
+          return (x < y);
 
-	  // Two TagExtents must have same begin and end and name to be
-	  // considered equal.
+          // Two TagExtents must have same begin and end and name to be
+          // considered equal.
 
-	  if ( strcmp( x->name, y->name ) < 0 ) return true;
-	  else return false;
-	}	
+          if ( strcmp( x->name, y->name ) < 0 ) return true;
+          else return false;
+        }       
       }
     }
   };

@@ -1,3 +1,13 @@
+/*==========================================================================
+ * Copyright (c) 2006 Carnegie Mellon University.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 
 
 //
@@ -11,9 +21,9 @@
 #include "indri/Annotator.hpp"
 
 indri::infnet::ExtentChildNode::ExtentChildNode( const std::string& name, 
-							   ListIteratorNode* inner, 
-							   ListIteratorNode* outer,
-							   DocumentStructureHolderNode & documentStructureHolderNode ) :
+                                                           ListIteratorNode* inner, 
+                                                           ListIteratorNode* outer,
+                                                           DocumentStructureHolderNode & documentStructureHolderNode ) :
   _inner(inner),
   _outer(outer),
   _docStructHolder(documentStructureHolderNode),
@@ -48,74 +58,74 @@ void indri::infnet::ExtentChildNode::prepare( int documentID ) {
 
       bool found = false;
       while ( leaf != leafsEnd && !found) {
-       	
-	indri::utility::greedy_vector<indri::index::Extent>::const_iterator outerIter = outerBegin;
-	while ( outerIter != outerEnd && !found ) {
+        
+        indri::utility::greedy_vector<indri::index::Extent>::const_iterator outerIter = outerBegin;
+        while ( outerIter != outerEnd && !found ) {
 
-	  if ( outerIter->ordinal == 0 ) {
-	    _ancestors.clear();
-	    docStruct->findLeafs( &_ancestors, outerIter->begin, outerIter->end, true );
-	    std::set<int>::iterator ancestor = _ancestors.begin();
-	    std::set<int>::iterator ancestorsEnd = _ancestors.end();
-	    while ( ancestor != ancestorsEnd && !found ) {
-	      if ( *ancestor == docStruct->parent( *leaf ) ) {
-		found = true;
-		indri::index::Extent extent( innerIter->weight * outerIter->weight, 
-					     innerIter->begin,
-					     innerIter->end,
-					     *leaf );     
-		
-		_extents.push_back( extent );
-	      }
-	      ancestor++;
-	    }
-	  } else {
+          if ( outerIter->ordinal == 0 ) {
+            _ancestors.clear();
+            docStruct->findLeafs( &_ancestors, outerIter->begin, outerIter->end, true );
+            std::set<int>::iterator ancestor = _ancestors.begin();
+            std::set<int>::iterator ancestorsEnd = _ancestors.end();
+            while ( ancestor != ancestorsEnd && !found ) {
+              if ( *ancestor == docStruct->parent( *leaf ) ) {
+                found = true;
+                indri::index::Extent extent( innerIter->weight * outerIter->weight, 
+                                             innerIter->begin,
+                                             innerIter->end,
+                                             *leaf );     
+                
+                _extents.push_back( extent );
+              }
+              ancestor++;
+            }
+          } else {
 
-	    if ( outerIter->ordinal == docStruct->parent( *leaf ) ) {
-	      indri::index::Extent extent( innerIter->weight * outerIter->weight, 
-					   innerIter->begin,
-					   innerIter->end,
-					   *leaf );    
-	      _extents.push_back( extent );
-	    }
-	  }
-	  outerIter++;
-	} 
-	leaf++;
+            if ( outerIter->ordinal == docStruct->parent( *leaf ) ) {
+              indri::index::Extent extent( innerIter->weight * outerIter->weight, 
+                                           innerIter->begin,
+                                           innerIter->end,
+                                           *leaf );    
+              _extents.push_back( extent );
+            }
+          }
+          outerIter++;
+        } 
+        leaf++;
       }
 
     } else {
       bool found = false;
       indri::utility::greedy_vector<indri::index::Extent>::const_iterator outerIter = outerBegin;
       while ( outerIter != outerEnd && !found ) {
-	
-	if ( outerIter->ordinal == 0 ) {
-	  _ancestors.clear();
-	  docStruct->findLeafs( &_ancestors, outerIter->begin, outerIter->end, true );
-	  std::set<int>::iterator ancestor = _ancestors.begin();
-	  std::set<int>::iterator ancestorsEnd = _ancestors.end();
-	  while ( ancestor != ancestorsEnd && !found ) {
-	    if ( *ancestor == docStruct->parent( innerIter->ordinal ) ) {
-	      found = true;
-	      indri::index::Extent extent( innerIter->weight * outerIter->weight, 
-					   innerIter->begin,
-					   innerIter->end,
-					   innerIter->ordinal );     
-		
-	      _extents.push_back( extent );
-	    }
-	    ancestor++;
-	  }
-	} else {
-	  if ( outerIter->ordinal == docStruct->parent( innerIter->ordinal ) ) {
-	    indri::index::Extent extent( innerIter->weight * outerIter->weight, 
-					 innerIter->begin,
-					 innerIter->end,
-					 innerIter->ordinal );    
-	    _extents.push_back( extent );
-	  }
-	}
-	outerIter++;
+        
+        if ( outerIter->ordinal == 0 ) {
+          _ancestors.clear();
+          docStruct->findLeafs( &_ancestors, outerIter->begin, outerIter->end, true );
+          std::set<int>::iterator ancestor = _ancestors.begin();
+          std::set<int>::iterator ancestorsEnd = _ancestors.end();
+          while ( ancestor != ancestorsEnd && !found ) {
+            if ( *ancestor == docStruct->parent( innerIter->ordinal ) ) {
+              found = true;
+              indri::index::Extent extent( innerIter->weight * outerIter->weight, 
+                                           innerIter->begin,
+                                           innerIter->end,
+                                           innerIter->ordinal );     
+                
+              _extents.push_back( extent );
+            }
+            ancestor++;
+          }
+        } else {
+          if ( outerIter->ordinal == docStruct->parent( innerIter->ordinal ) ) {
+            indri::index::Extent extent( innerIter->weight * outerIter->weight, 
+                                         innerIter->begin,
+                                         innerIter->end,
+                                         innerIter->ordinal );    
+            _extents.push_back( extent );
+          }
+        }
+        outerIter++;
       } 
     }
     innerIter++;
@@ -176,35 +186,35 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
       int innerEnd = _extents[i].end;
       
       if ( _extents[i].ordinal == 0 ) {
-	      _leafs.clear();
-	      docStruct->findLeafs( &_leafs, innerBegin, innerEnd, true);
+              _leafs.clear();
+              docStruct->findLeafs( &_leafs, innerBegin, innerEnd, true);
 
-	      std::set<int>::iterator leafsBegin = _leafs.begin();
-	      std::set<int>::iterator leafsEnd = _leafs.end();
+              std::set<int>::iterator leafsBegin = _leafs.begin();
+              std::set<int>::iterator leafsEnd = _leafs.end();
 
-	      std::set<int>::iterator ancestor = ancestorsBegin;
-	      while ( !match && ancestor != ancestorsEnd ) { 
-	        std::set<int>::iterator leaf = leafsBegin;
-      	
-	        while ( !match && leaf != leafsEnd ) {
-	          if ( *ancestor == docStruct->parent(*leaf) ) {
-	            match = true;
-	          }
-	          leaf++;
-	        } 
-	        ancestor++;
-	      }      
+              std::set<int>::iterator ancestor = ancestorsBegin;
+              while ( !match && ancestor != ancestorsEnd ) { 
+                std::set<int>::iterator leaf = leafsBegin;
+        
+                while ( !match && leaf != leafsEnd ) {
+                  if ( *ancestor == docStruct->parent(*leaf) ) {
+                    match = true;
+                  }
+                  leaf++;
+                } 
+                ancestor++;
+              }      
       } else {
-	      std::set<int>::iterator ancestor = ancestorsBegin;
-	      while ( !match && ancestor != ancestorsEnd ) { 
-	        if ( *ancestor == docStruct->parent( _extents[i].ordinal ) ) {
-	          match = true;
-	        }
-	        ancestor++;
-	      }
+              std::set<int>::iterator ancestor = ancestorsBegin;
+              while ( !match && ancestor != ancestorsEnd ) { 
+                if ( *ancestor == docStruct->parent( _extents[i].ordinal ) ) {
+                  match = true;
+                }
+                ancestor++;
+              }
       }
       if ( match ) {
-	    _matches.push_back(_extents[i]);
+            _matches.push_back(_extents[i]);
       }
     }
 
@@ -216,26 +226,26 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
       
       bool match = false;
       if ( _extents[i].ordinal == 0 ) {
-	      _leafs.clear();
-	      docStruct->findLeafs( &_leafs, innerBegin, innerEnd, true);
-      	
-	      std::set<int>::iterator leafsBegin = _leafs.begin();
-	      std::set<int>::iterator leafsEnd = _leafs.end();	
-	      std::set<int>::iterator leaf = leafsBegin;
-      	
-	      while ( !match && leaf != leafsEnd ) {
-	        if ( extent.ordinal == docStruct->parent(*leaf) ) {
-	          match = true;
-	        }
-	        leaf++;
-	      }             
+              _leafs.clear();
+              docStruct->findLeafs( &_leafs, innerBegin, innerEnd, true);
+        
+              std::set<int>::iterator leafsBegin = _leafs.begin();
+              std::set<int>::iterator leafsEnd = _leafs.end();  
+              std::set<int>::iterator leaf = leafsBegin;
+        
+              while ( !match && leaf != leafsEnd ) {
+                if ( extent.ordinal == docStruct->parent(*leaf) ) {
+                  match = true;
+                }
+                leaf++;
+              }             
       } else {
-	      if ( extent.ordinal == docStruct->parent( _extents[i].ordinal ) ) {
-	        match = true;
-	      }      
+              if ( extent.ordinal == docStruct->parent( _extents[i].ordinal ) ) {
+                match = true;
+              }      
       }
       if ( match ) {
-      	_matches.push_back(_extents[i]);
+        _matches.push_back(_extents[i]);
       }
     }
   }

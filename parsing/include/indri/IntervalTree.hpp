@@ -40,19 +40,19 @@ namespace indri {
 
       IntervalTreeNode( int begin = 0, int end = 0 ) {
 
-	left_child = NULL;
-	right_child = NULL;
-	parent = NULL;
+        left_child = NULL;
+        right_child = NULL;
+        parent = NULL;
 
-	this->begin = begin;
-	this->end = end;
-	max_child_end = end;
+        this->begin = begin;
+        this->end = end;
+        max_child_end = end;
       }
 
       ~IntervalTreeNode() {
-	
-	if ( left_child ) delete left_child;
-	if ( right_child ) delete right_child;
+        
+        if ( left_child ) delete left_child;
+        if ( right_child ) delete right_child;
       }
 
     };
@@ -73,8 +73,8 @@ namespace indri {
 
       void clear() {
 
-	if ( root ) delete root;
-	root = NULL;
+        if ( root ) delete root;
+        root = NULL;
       }
 
     };

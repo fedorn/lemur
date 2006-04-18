@@ -49,7 +49,7 @@ namespace indri
         std::string name;
         std::string parserName;
         bool numeric;
-	bool ordinal;
+        bool ordinal;
       };
 
       typedef std::vector<indri::index::Index*> index_vector;

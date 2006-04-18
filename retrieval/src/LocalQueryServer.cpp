@@ -437,19 +437,19 @@ indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::pat
       indri::index::Index * index = _indexWithDocument(indexes, documentID);
       const indri::index::TermList * termList = index->termList( documentID );
       if ( termList != 0 ) {
-	docStruct.setIndex( *index );
-	docStruct.loadStructure( termList->fields() );
-	delete termList;
-	lastDoc = docStructLoaded;
+        docStruct.setIndex( *index );
+        docStruct.loadStructure( termList->fields() );
+        delete termList;
+        lastDoc = docStructLoaded;
       } else {
-	docStructLoaded = false;
+        docStructLoaded = false;
       }       
     }
 
     std::string path = "";
     if ( docStructLoaded ) {
       path = docStruct.path( docStruct.findLeaf( pathBegins[docSorted[i].second], 
-						 pathEnds[docSorted[i].second] ) );
+                                                 pathEnds[docSorted[i].second] ) );
     }
     result.push_back( path );
   }

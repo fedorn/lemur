@@ -90,7 +90,7 @@ void indri::parse::OffsetMetadataAnnotator::open( const std::string& offsetMetad
     int fieldStart = 0;
     int fieldCount = 0;
     int fieldOffset = 0;
-	
+        
     char* docno = NULL;
     char* key = NULL;
     char* value = NULL;
@@ -102,7 +102,7 @@ void indri::parse::OffsetMetadataAnnotator::open( const std::string& offsetMetad
            c++, fieldOffset++ ) {
       if( *c == '\t' || *c == '\0' ) { 
         field[fieldOffset] = '\0';
-	      
+              
         switch( fieldCount ) {
           case 0: //DOCNO (string)
             len = strlen( field );

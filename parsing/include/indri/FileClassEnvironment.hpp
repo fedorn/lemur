@@ -30,7 +30,7 @@ namespace indri
     struct FileClassEnvironment {
       FileClassEnvironment() : tokenizer(0), parser(0), iterator(0), conflater(0) {}
       ~FileClassEnvironment() {
-	delete tokenizer;
+        delete tokenizer;
         delete parser;
         delete iterator;
         delete conflater;

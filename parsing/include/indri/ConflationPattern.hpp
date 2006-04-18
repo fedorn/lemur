@@ -59,11 +59,11 @@ namespace indri {
 
 namespace std {
 
-	template <>
-	struct less<indri::parse::ConflationPattern *> {
+        template <>
+        struct less<indri::parse::ConflationPattern *> {
     
     bool operator() ( const indri::parse::ConflationPattern* one, 
-		      const indri::parse::ConflationPattern* two ) const {
+                      const indri::parse::ConflationPattern* two ) const {
 
       // First compare tag_name, then attribute_name, then value.
       // Comparison is lexical ordering according to strcmp.  Recall
@@ -84,7 +84,7 @@ namespace std {
       // tag_name
     
       if ( one->tag_name && two->tag_name )
-	r = strcmp( one->tag_name, two->tag_name );
+        r = strcmp( one->tag_name, two->tag_name );
       else if ( ! one->tag_name ) return true;
       else if ( ! two->tag_name ) return false;
 
@@ -93,7 +93,7 @@ namespace std {
       // attribute_name
     
       if ( one->attribute_name && two->attribute_name )
-	r = strcmp( one->attribute_name, two->attribute_name );
+        r = strcmp( one->attribute_name, two->attribute_name );
       else if ( ! one->attribute_name ) return true;
       else if ( ! two->attribute_name ) return false;
     
@@ -102,7 +102,7 @@ namespace std {
       // value
     
       if ( one->value && two->value )
-	r = strcmp( one->value, two->value );
+        r = strcmp( one->value, two->value );
       else if ( ! one->value ) return true;
       else if ( ! two->value ) return false;
     

@@ -84,12 +84,12 @@ namespace indri
 
           for( unsigned int j=0; j<childResults.size(); j++ ) {
             if ( maxScore < childResults[j].score ) {
-	      maxScore = childResults[j].score;
-	      maxI = i;
-	      maxJ = j;
-	      maxBegin = childResults[j].begin;
-	      maxEnd = childResults[j].end;
-	    }
+              maxScore = childResults[j].score;
+              maxI = i;
+              maxJ = j;
+              maxBegin = childResults[j].begin;
+              maxEnd = childResults[j].end;
+            }
           }
         }
 

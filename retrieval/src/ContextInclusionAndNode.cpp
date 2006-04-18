@@ -1,3 +1,13 @@
+/*==========================================================================
+ * Copyright (c) 2006 Carnegie Mellon University.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 
 
 
@@ -222,15 +232,15 @@ indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::Co
     const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = (*iter).node->score( documentID, extent, documentLength );
     if ( _preserveExtentsChild == (*iter).node ) {
       for( unsigned int j=0; j<childResults.size(); j++ ) {
-	double childScore = (*iter).weight * childResults[j].score;
+        double childScore = (*iter).weight * childResults[j].score;
 
-	_scores.push_back( indri::api::ScoredExtentResult(childScore, documentID,
-							  childResults[j].begin, childResults[j].end) );
+        _scores.push_back( indri::api::ScoredExtentResult(childScore, documentID,
+                                                          childResults[j].begin, childResults[j].end) );
       }
     } else {
       double childScore = 0;
       for( unsigned int j=0; j<childResults.size(); j++ ) {
-	childScore += (*iter).weight * childResults[j].score;		
+        childScore += (*iter).weight * childResults[j].score;           
       }
       score += childScore;
     }

@@ -186,7 +186,8 @@ int main( int argc, char* argv[] ) {
 
     // wrap the index in a local server that the stub can talk to
     indri::collection::Repository* repository = new indri::collection::Repository();
-    repository->openRead( repositoryPath );
+    // pass in parameters, in case anyone wants to do query side stopping.
+    repository->openRead( repositoryPath, &parameters );
     indri::server::LocalQueryServer server( *repository );
 
     // open for business

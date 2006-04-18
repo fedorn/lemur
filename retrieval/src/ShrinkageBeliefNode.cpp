@@ -1,3 +1,13 @@
+/*==========================================================================
+ * Copyright (c) 2006 Carnegie Mellon University.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 
 
 //
@@ -11,11 +21,17 @@
 #include "indri/Annotator.hpp"
 #include "indri/Parameters.hpp"
 #include <cmath>
-#ifdef WIN32
-#include <float.h>
-#define isnan _isnan
+#ifdef ISNAN_IN_NAMESPACE_STD
+  using std::isnan;
+#else
+#ifdef ISNAN_IN_NAMESPACE_GNU_CXX
+  using __gnu_cxx::isnan;
 #endif
-
+#endif
+#ifdef WIN32
+  #include <float.h>
+  #define isnan _isnan
+#endif
 
 indri::infnet::ShrinkageBeliefNode::ShrinkageBeliefNode( const std::string& name, ListIteratorNode& child, DocumentStructureHolderNode& documentStructureHolderNode, indri::query::TermScoreFunction& scoreFunction, double maximumBackgroundScore, double maximumScore )
   :
@@ -88,12 +104,12 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   while ( leaf != leafsEnd ) {
     // output for debugging
 //        std::cout << _list.getName() << "\t\t    leaf: " << docStruct->path(*leaf) << " " << extent.begin << ":" << extent.end
-//     	      << "    count: " << _counts[*leaf] 
-//      	      << "    score: " << _down[*leaf] 
-//     	      << "    length: " << docStruct->accumulatedLength(*leaf)
-//     	      << "    coll: " << _scoreFunction.scoreOccurrence( 0, docStruct->accumulatedLength(*leaf) )
-// 		 << "    parent: " << _down[docStruct->parent(*leaf)] 
-//     	      << std::endl;    
+//            << "    count: " << _counts[*leaf] 
+//                    << "    score: " << _down[*leaf] 
+//            << "    length: " << docStruct->accumulatedLength(*leaf)
+//            << "    coll: " << _scoreFunction.scoreOccurrence( 0, docStruct->accumulatedLength(*leaf) )
+//               << "    parent: " << _down[docStruct->parent(*leaf)] 
+//            << std::endl;    
     if ( _down[ *leaf ] != 0 ) {
       score += _down[ *leaf ];
       matched++;    
@@ -110,19 +126,19 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
 
 
     _results.push_back( indri::api::ScoredExtentResult( score, documentID,
-							extent.begin, extent.end )); //, extent.ordinal ));
+                                                        extent.begin, extent.end )); //, extent.ordinal ));
   } else {    
     score = _defaultScore;
     if ( !_queryLevelCombine ) {
       score = log( score );
     }
 //       std::cout << _list.getName() << "\t\t    leaf: ? " << extent.begin << ":" << extent.end 
-//   	      << "    score: " << _defaultScore
-//    	      << std::endl;    
+//            << "    score: " << _defaultScore
+//            << std::endl;    
 //     std::cout << "\t" << getName() << " " << extent.begin << ":" << extent.end << " " << score << " " << "Default!" << std::endl;
 
     _results.push_back( indri::api::ScoredExtentResult( score, documentID, 
-							extent.begin, extent.end )); // , extent.ordinal ));
+                                                        extent.begin, extent.end )); // , extent.ordinal ));
   }
   return _results;
 }
@@ -209,56 +225,56 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
       std::set<indri::index::Extent, indri::index::Extent::ends_before_less>::iterator activeIter = activeOuterExtents.begin();
       std::set<indri::index::Extent, indri::index::Extent::ends_before_less>::iterator activeEnd = activeOuterExtents.end();
       while ( activeIter != activeEnd ) {
-	if ( activeIter->end >= innerIter->begin ) {
-	  break;
-	} 
-	activeIter++;
+        if ( activeIter->end >= innerIter->begin ) {
+          break;
+        } 
+        activeIter++;
       }
-      activeOuterExtents.erase( activeOuterExtents.begin(), activeIter );	  
+      activeOuterExtents.erase( activeOuterExtents.begin(), activeIter );         
 
       // push new document node extents on that we may need
       while ( docNode < numNodes && docStruct->begin( docNode ) <= innerIter->begin ) {      
-	indri::index::Extent extent( 1, docStruct->begin( docNode ), docStruct->end( docNode ), docNode );
-	// only insert if needed
-	if ( extent.end >= innerIter->begin ) {
-	  activeOuterExtents.insert( extent );
-	}
-	docNode++;
+        indri::index::Extent extent( 1, docStruct->begin( docNode ), docStruct->end( docNode ), docNode );
+        // only insert if needed
+        if ( extent.end >= innerIter->begin ) {
+          activeOuterExtents.insert( extent );
+        }
+        docNode++;
       }
 
       if ( innerIter->begin >= lastEnd ) {
-	_counts[0] += innerIter->weight;
-	// scan the doc nodes for nodes that match
-	activeIter = activeOuterExtents.end();
-	if (!activeOuterExtents.empty()) {
-	  activeIter--;
-	  bool doneActiveList = false;
-	  while ( ! doneActiveList &&
-		  activeIter->end >= innerIter->end ) {
-	    // Since we know that all active doc node extents have a begin that is at or before
-	    // the inner iter's begin, and from the if statement we know the end of one
-	    // of the active outer extents is at least 
-	    // as large as the inner end, we know the inner iter extent is contained
-	    // by this extent in the active list 
-	    _counts[ activeIter->ordinal ] += ( activeIter->weight * innerIter->weight );
+        _counts[0] += innerIter->weight;
+        // scan the doc nodes for nodes that match
+        activeIter = activeOuterExtents.end();
+        if (!activeOuterExtents.empty()) {
+          activeIter--;
+          bool doneActiveList = false;
+          while ( ! doneActiveList &&
+                  activeIter->end >= innerIter->end ) {
+            // Since we know that all active doc node extents have a begin that is at or before
+            // the inner iter's begin, and from the if statement we know the end of one
+            // of the active outer extents is at least 
+            // as large as the inner end, we know the inner iter extent is contained
+            // by this extent in the active list 
+            _counts[ activeIter->ordinal ] += ( activeIter->weight * innerIter->weight );
 
-	    // keep track of roots we've seen
-	    int r = activeIter->ordinal;
-	    while ( docStruct->parent( r ) != 0 ) {
-	      r = docStruct->parent( r );
-	    }
-	    if ( _roots.find( r ) == _roots.end() ) {
-	      _roots.insert( r );
-	    }
+            // keep track of roots we've seen
+            int r = activeIter->ordinal;
+            while ( docStruct->parent( r ) != 0 ) {
+              r = docStruct->parent( r );
+            }
+            if ( _roots.find( r ) == _roots.end() ) {
+              _roots.insert( r );
+            }
 
-	    if ( activeIter == activeOuterExtents.begin() ) {
-	      doneActiveList = true;
-	    } else {
-	      activeIter--;
-	    }
-	  }
-	}
-	lastEnd = innerIter->end;
+            if ( activeIter == activeOuterExtents.begin() ) {
+              doneActiveList = true;
+            } else {
+              activeIter--;
+            }
+          }
+        }
+        lastEnd = innerIter->end;
       }
       innerIter++;
     }
@@ -288,8 +304,8 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
       double occurrences = _counts[i];
       double score = _scoreFunction.scoreOccurrence( occurrences, contextSize, _counts[0], documentLength );
       if ( !_queryLevelCombine ) {
-	// must subtract weight given to collection/document so that we can do the shrinkage properly
-	score = (exp( score ) - otherScore) / (1 - _otherWeight) ;
+        // must subtract weight given to collection/document so that we can do the shrinkage properly
+        score = (exp( score ) - otherScore) / (1 - _otherWeight) ;
       } 
       _base[i] = score;
       node++;
@@ -316,52 +332,52 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
 
       if ( !_ruleMap.empty() ) {
 
-	indri::index::DocumentStructure::child_iterator kids = docStruct->childrenBegin( i );
-	indri::index::DocumentStructure::child_iterator kidsEnd = docStruct->childrenEnd( i );      
-	while( kids < kidsEnd ) {
-	  // check for a smoothing rule for the child
-	  int kidType = docStruct->type(*kids);
-	  std::map<int, smoothing_rule>::iterator ruleIter = _ruleMap.find(kidType);
-	  if( ruleIter != _ruleMap.end() ) {
-	    smoothing_rule rule = ruleIter->second;
-	    if( rule.lengthProportional ) {
-	      double lengthAlpha = rule.weight * docStruct->accumulatedLength( *kids );
-	      if( _recursive ) {
-		relative += lengthAlpha * _up[ *kids ];
-	      } else {
-		relative += lengthAlpha * _base[ *kids ];
-	      }
-	      divisor += lengthAlpha;
-	    } else {
-	      if( _recursive ) {
-		absolute += rule.weight * _up[ *kids ];
-	      } else {
-		absolute += rule.weight * _base[ *kids ];
-	      }
-	      remaining -= rule.weight;
-	    }
-	  }
-	  kids++;
-	}
+        indri::index::DocumentStructure::child_iterator kids = docStruct->childrenBegin( i );
+        indri::index::DocumentStructure::child_iterator kidsEnd = docStruct->childrenEnd( i );      
+        while( kids < kidsEnd ) {
+          // check for a smoothing rule for the child
+          int kidType = docStruct->type(*kids);
+          std::map<int, smoothing_rule>::iterator ruleIter = _ruleMap.find(kidType);
+          if( ruleIter != _ruleMap.end() ) {
+            smoothing_rule rule = ruleIter->second;
+            if( rule.lengthProportional ) {
+              double lengthAlpha = rule.weight * docStruct->accumulatedLength( *kids );
+              if( _recursive ) {
+                relative += lengthAlpha * _up[ *kids ];
+              } else {
+                relative += lengthAlpha * _base[ *kids ];
+              }
+              divisor += lengthAlpha;
+            } else {
+              if( _recursive ) {
+                absolute += rule.weight * _up[ *kids ];
+              } else {
+                absolute += rule.weight * _base[ *kids ];
+              }
+              remaining -= rule.weight;
+            }
+          }
+          kids++;
+        }
       }
 
       relative /= divisor;
       
       if ( ! isnan( relative ) ) {
-	if ( remaining >= 0 ) {
-	  _up[ i ] = remaining * relative + absolute;
-	} else {
-	  // the absolute weights sum to something larger than 1, so we will ignore these 
-	  _up[ i ] = relative;
-	}
+        if ( remaining >= 0 ) {
+          _up[ i ] = remaining * relative + absolute;
+        } else {
+          // the absolute weights sum to something larger than 1, so we will ignore these 
+          _up[ i ] = relative;
+        }
       } else {
-	// the divisor was 0, so we can't use the relative weights
-	if ( remaining >= 0 ) {
-	  _up[ i ] = remaining * _base[ i ] + absolute;
-	} else {
-	  // the absolute weights sum to something larger than 1, so we will ignore these 
-	  _up[ i ] = _base[ i ];
-	}
+        // the divisor was 0, so we can't use the relative weights
+        if ( remaining >= 0 ) {
+          _up[ i ] = remaining * _base[ i ] + absolute;
+        } else {
+          // the absolute weights sum to something larger than 1, so we will ignore these 
+          _up[ i ] = _base[ i ];
+        }
       }
 
     }
@@ -374,23 +390,23 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
     while ( node != nodesEnd ) {
       size_t i = *node;
       if ( docStruct->parent( i ) == 0 ) {
-	if ( _recursive ) {
-	  _down[i] = (1.0 - _docWeight) * _up[i] 
-	    + _docWeight * _down[0];
-	} else {
-	  _down[i] = (1.0 - _docWeight) * _up[i] 
-	    + _docWeight * _up[0];
-	}	  
+        if ( _recursive ) {
+          _down[i] = (1.0 - _docWeight) * _up[i] 
+            + _docWeight * _down[0];
+        } else {
+          _down[i] = (1.0 - _docWeight) * _up[i] 
+            + _docWeight * _up[0];
+        }         
       } else {      
-	if( _recursive ) {
-	  _down[i] = (1.0 - _parentWeight - _docWeight) * _up[i] 
-	    + _parentWeight * _down[docStruct->parent(i)]
-	    + _docWeight * _down[0];
-	} else {
-	  _down[i] = (1.0 - _parentWeight - _docWeight) * _up[i]
-	    + _parentWeight * _up[docStruct->parent(i)]
-	    + _docWeight * _up[0];
-	}
+        if( _recursive ) {
+          _down[i] = (1.0 - _parentWeight - _docWeight) * _up[i] 
+            + _parentWeight * _down[docStruct->parent(i)]
+            + _docWeight * _down[0];
+        } else {
+          _down[i] = (1.0 - _parentWeight - _docWeight) * _up[i]
+            + _parentWeight * _up[docStruct->parent(i)]
+            + _docWeight * _up[0];
+        }
       }
       node++;
     }
@@ -399,9 +415,9 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
     if ( ! _queryLevelCombine ) {
       node = nodesBegin;
       while ( node != nodesEnd ) {
-	size_t i = *node;
-	_down[i] = (1 - _otherWeight) * _down[i] + otherScore;
-	node++;
+        size_t i = *node;
+        _down[i] = (1 - _otherWeight) * _down[i] + otherScore;
+        node++;
       }
     }
     // std::cout << "done down " << documentID << std::endl;
@@ -440,7 +456,7 @@ const indri::utility::greedy_vector<bool>& indri::infnet::ShrinkageBeliefNode::h
     std::set<int>::iterator leafsEnd = leafs.end();
     while ( _matches[ i ] == false && leaf != leafsEnd ) {
       if ( _down[ *leaf ] != 0 ) {
-	_matches[ i ] = true;
+        _matches[ i ] = true;
       }
       leaf++;
     }
@@ -486,7 +502,7 @@ void indri::infnet::ShrinkageBeliefNode::addShrinkageRule( std::string ruleText 
     std::string value = ruleText.substr( nextColon+1, nextComma-nextColon-1 );
 
     if( key == "parentWeight" ) {
-      _parentWeight = atof( value.c_str() );	    
+      _parentWeight = atof( value.c_str() );        
     } else if( key == "docWeight" ) {
       _docWeight = atof( value.c_str() );
     } else if( key == "recursive" ) {

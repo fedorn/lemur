@@ -86,7 +86,7 @@ namespace indri
       }
       
       void before( indri::lang::WeightedExtentOr* wExOr ) {
-	_disqualifiedTree = true;
+        _disqualifiedTree = true;
       }
 
       void before( indri::lang::ODNode* odNode ) {
@@ -113,7 +113,7 @@ namespace indri
 
 
       void before( indri::lang::NestedRawScorerNode* oldNode, indri::lang::NestedRawScorerNode* newNode ) {
-	before( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
+        before( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
       }
 
       indri::lang::Node* after( indri::lang::RawScorerNode* oldNode, indri::lang::RawScorerNode* newNode ) {
@@ -127,7 +127,7 @@ namespace indri
 
           scorerNode->setNodeName( oldNode->nodeName() );
           scorerNode->setSmoothing( oldNode->getSmoothing() );
-	  scorerNode->setStatistics( oldNode->getOccurrences(), oldNode->getContextSize() );
+          scorerNode->setStatistics( oldNode->getOccurrences(), oldNode->getContextSize() );
 
           delete newNode;
           result = defaultAfter( oldNode, scorerNode );
@@ -158,7 +158,7 @@ namespace indri
       }
 
       indri::lang::Node* after( indri::lang::NestedRawScorerNode* oldNode, indri::lang::NestedRawScorerNode* newNode ) {
-	return after( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
+        return after( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
       }
     };
   }

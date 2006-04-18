@@ -60,15 +60,16 @@
 #ifndef INDRI_OFFSETANNOTATIONANNOTATOR_HPP
 #define INDRI_OFFSETANNOTATIONANNOTATOR_HPP
 
+#include <iostream>
+#include <vector>
+#include <string>
+#include <set>
+#include <utility>
+
 #include "indri/Buffer.hpp"
 #include "indri/Transformation.hpp"
-#include <iostream>
 #include "indri/TagExtent.hpp"
 #include "indri/ParsedDocument.hpp"
-#include "indri/IntervalTree.hpp"
-#include <vector>
-#include <string.h>
-#include <string>
 #include "indri/HashTable.hpp"
 #include "indri/greedy_vector"
 #include "indri/Conflater.hpp"
@@ -109,7 +110,7 @@ namespace indri {
           const char* attributeValue = (const char*) document->metadata[i].value;
 
           if ( ! strcmp( attributeName, "docno" ) ) return attributeValue;
-	}
+        }
  
         return NULL;
       }
@@ -117,135 +118,135 @@ namespace indri {
 
       TagExtent *_getTag( UINT64 id ) {
 
-	// return TagExtent corresponding to given id, or NULL if invalid id.
+        // return TagExtent corresponding to given id, or NULL if invalid id.
 
-	if ( id == 0 ) return NULL;
+        if ( id == 0 ) return NULL;
 
-	TagExtent** p = _tag_id_map.find( id );
+        TagExtent** p = _tag_id_map.find( id );
 
-	if ( ! p ) return NULL;
-	else return *p;
+        if ( ! p ) return NULL;
+        else return *p;
       }
      
       AttributeValuePair *_getAttribute( UINT64 id ) {
 
-	// return Attribute corresponding to given id, or NULL if invalid id.
+        // return Attribute corresponding to given id, or NULL if invalid id.
 
-	if ( id == 0 ) return NULL;
+        if ( id == 0 ) return NULL;
 
-	AttributeValuePair** p = _attribute_id_map.find( id );
+        AttributeValuePair** p = _attribute_id_map.find( id );
 
-	if ( ! p ) return NULL;
-	else return *p;
+        if ( ! p ) return NULL;
+        else return *p;
       }
 
       bool _is_unique_id( UINT64 id, int line ) {
 
-	// Make sure ID has not already been used.
+        // Make sure ID has not already been used.
 
-	if ( id == 0 ) {
+        if ( id == 0 ) {
 
-	  std::cerr << "WARN: Invalid id '0' used on line " << line 
-		    << "; ignoring line." << std::endl;
-	  return false;
-	}
+          std::cerr << "WARN: Invalid id '0' used on line " << line 
+                    << "; ignoring line." << std::endl;
+          return false;
+        }
 
-	if ( _getTag( id ) || _getAttribute( id ) ) {
+        if ( _getTag( id ) || _getAttribute( id ) ) {
 
-	  std::cerr << "WARN: Id '" << id << "' redefined on line " << line 
-		    << "; ignoring line." << std::endl;
-	  return false;
-	}
+          std::cerr << "WARN: Id '" << id << "' redefined on line " << line 
+                    << "; ignoring line." << std::endl;
+          return false;
+        }
 
-	return true;
+        return true;
       }
 
       UINT64 parse_UINT64( const char *str, int n ) {
 
-	UINT64 result = 0;
-	int i = 0;
-	for ( const char* c = str; i < n && c != '\0'; c++, i++ )
-	  result = result * 10 + ( *c - '0' );
+        UINT64 result = 0;
+        int i = 0;
+        for ( const char* c = str; i < n && c != '\0'; c++, i++ )
+          result = result * 10 + ( *c - '0' );
 
-	return result;
+        return result;
       }
 
       void _cleanup() {
         // clear any allocated buffers
-	for ( std::vector<char *>::iterator i = _buffers_allocated.begin();
-	      i != _buffers_allocated.end(); i++ )
-	  delete[] (*i);
+        for ( std::vector<char *>::iterator i = _buffers_allocated.begin();
+              i != _buffers_allocated.end(); i++ )
+          delete[] (*i);
 
         _buffers_allocated.clear();
-	
-	// Cleanup _annotations, _converted_annotations, _tag_id_map,
-	// and _attribute_id_map in preparation for object
-	// destruction, or for an open call on a new offset
-	// annotations file.
+        
+        // Cleanup _annotations, _converted_annotations, _tag_id_map,
+        // and _attribute_id_map in preparation for object
+        // destruction, or for an open call on a new offset
+        // annotations file.
 
-	for ( indri::utility::HashTable<const char *,std::set<TagExtent*>*>::iterator i = _annotations.begin(); i != _annotations.end(); i++ ) {
+        for ( indri::utility::HashTable<const char *,std::set<TagExtent*>*>::iterator i = _annotations.begin(); i != _annotations.end(); i++ ) {
 
-	  std::set<TagExtent*>* p_set = *(*i).second;
+          std::set<TagExtent*>* p_set = *(*i).second;
 
-	  for ( std::set<TagExtent*>::iterator j = p_set->begin(); 
-		j != p_set->end(); j++ ) {
+          for ( std::set<TagExtent*>::iterator j = p_set->begin(); 
+                j != p_set->end(); j++ ) {
 
-	    delete (*j); // TagExtent
-	  }
+            delete (*j); // TagExtent
+          }
           delete(p_set);
-	}
+        }
 
-	_annotations.clear();
+        _annotations.clear();
 
-	for ( indri::utility::HashTable<const char *,std::set<TagExtent*>*>::iterator i = _converted_annotations.begin(); i != _converted_annotations.end(); i++ ) {
+        for ( indri::utility::HashTable<const char *,std::set<TagExtent*>*>::iterator i = _converted_annotations.begin(); i != _converted_annotations.end(); i++ ) {
 
-	  std::set<TagExtent*>* p_set = *(*i).second;
+          std::set<TagExtent*>* p_set = *(*i).second;
 
-	  for ( std::set<TagExtent*>::iterator j = p_set->begin(); 
-		j != p_set->end(); j++ ) {
+          for ( std::set<TagExtent*>::iterator j = p_set->begin(); 
+                j != p_set->end(); j++ ) {
 
-	    delete (*j); // TagExtent
-	  }
-	  delete (*i).first;
+            delete (*j); // TagExtent
+          }
+          delete (*i).first;
           delete(p_set);
-	}
+        }
 
-	_converted_annotations.clear();
+        _converted_annotations.clear();
 
-	// Note: every TagExtent pointed to by an element of the
-	// _tag_id_map, and every AttributeValuePair pointed to by an
-	// element of the _attribute_id_map will have already been
-	// deleted above.
+        // Note: every TagExtent pointed to by an element of the
+        // _tag_id_map, and every AttributeValuePair pointed to by an
+        // element of the _attribute_id_map will have already been
+        // deleted above.
 
-	_tag_id_map.clear();
- // 	for ( indri::utility::HashTable<UINT64,AttributeValuePair*>::iterator i = _attribute_id_map.begin(); i != _attribute_id_map.end(); i++ ) {
-//  	  delete (*i).second;
-//  	}
-	_attribute_id_map.clear();
+        _tag_id_map.clear();
+ //     for ( indri::utility::HashTable<UINT64,AttributeValuePair*>::iterator i = _attribute_id_map.begin(); i != _attribute_id_map.end(); i++ ) {
+//        delete (*i).second;
+//      }
+        _attribute_id_map.clear();
 
       }
 
       void convert_annotations( std::set<indri::parse::TagExtent*>* raw_tags,
-				std::set<indri::parse::TagExtent*>* converted_tags, 
-				indri::api::ParsedDocument* document );
+                                std::set<indri::parse::TagExtent*>* converted_tags, 
+                                indri::api::ParsedDocument* document );
 
     public:
       OffsetAnnotationAnnotator( Conflater* p_conflater ) { 
 
         _handler = NULL;
-	_p_conflater = p_conflater;
-	_first_open = true;
+        _p_conflater = p_conflater;
+        _first_open = true;
       }
 
       OffsetAnnotationAnnotator() {
 
-	_handler = NULL;
-	_p_conflater = NULL;
-	_first_open = true;
+        _handler = NULL;
+        _p_conflater = NULL;
+        _first_open = true;
       }
 
       ~OffsetAnnotationAnnotator() {
-	_cleanup();
+        _cleanup();
       }
 
       void setConflater(Conflater* p_conflater) 

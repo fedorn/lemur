@@ -52,25 +52,25 @@ namespace indri
 
 
       typedef struct sr {
-	std::string fieldName;
-	double weight;
-	bool lengthProportional;	
+        std::string fieldName;
+        double weight;
+        bool lengthProportional;        
       } smoothing_rule;
 
       struct lt_rule {
-	bool operator()( smoothing_rule r1, smoothing_rule r2 ) const {
-	  int cmpVal = strcmp( r1.fieldName.c_str(), r2.fieldName.c_str() );
-	  if ( cmpVal != 0 ) {
-	    return cmpVal < 0;
-	  }
-	  if ( r1.weight != r2.weight ) {
-	    return r1.weight < r2.weight;
-	  } 
-	  if ( r1.lengthProportional != r2.lengthProportional) {
-	    return r1.lengthProportional;
-	  }
-	  return false;
-	}
+        bool operator()( smoothing_rule r1, smoothing_rule r2 ) const {
+          int cmpVal = strcmp( r1.fieldName.c_str(), r2.fieldName.c_str() );
+          if ( cmpVal != 0 ) {
+            return cmpVal < 0;
+          }
+          if ( r1.weight != r2.weight ) {
+            return r1.weight < r2.weight;
+          } 
+          if ( r1.lengthProportional != r2.lengthProportional) {
+            return r1.lengthProportional;
+          }
+          return false;
+        }
       };
 
       std::set<smoothing_rule, lt_rule> _ruleSet;
@@ -91,11 +91,11 @@ namespace indri
 
     public:
       ShrinkageBeliefNode( const std::string& name,
-			   ListIteratorNode& child,
-			   DocumentStructureHolderNode& documentStructureHolderNode,
-			   indri::query::TermScoreFunction& scoreFunction,
-			   double maximumBackgroundScore,
-			   double maximumScore );
+                           ListIteratorNode& child,
+                           DocumentStructureHolderNode& documentStructureHolderNode,
+                           indri::query::TermScoreFunction& scoreFunction,
+                           double maximumBackgroundScore,
+                           double maximumScore );
 
       int nextCandidateDocument();
       void indexChanged( indri::index::Index& index );

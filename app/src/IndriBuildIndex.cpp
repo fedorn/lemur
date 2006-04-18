@@ -696,7 +696,10 @@ int main(int argc, char * argv[]) {
       for( int i=0; i<slice.size(); i++ ) {
         bool isNumeric = slice[i].get(numName, false);
         if( isNumeric ) {
-          env.setNumericField(slice[i][subName], isNumeric, "NumericFieldAnnotator");
+          // let user override default NumericFieldAnnotator for parser
+          // enabling numeric fields in offset annotations.
+          std::string parserName = slice[i].get("parserName", "NumericFieldAnnotator");
+          env.setNumericField(slice[i][subName], isNumeric, parserName);
         }
 	bool isOrdinal = slice[i].get(ordName, false);
 	if( isOrdinal ) {

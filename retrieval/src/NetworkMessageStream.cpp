@@ -109,15 +109,15 @@ void indri::net::NetworkMessageStream::read( MessageStreamHandler& handler ) {
     if( _bufferLength() < length ) {
       _cleanBuffer();
       _buffer.grow( length );
-	  int toRead = length - _bufferLength();
+          int toRead = length - _bufferLength();
       int bytesRead = _stream->blockingRead( _buffer.front() + _writePosition, length - _bufferLength() );
 
       if( bytesRead <= 0 ) {
         _stream->close();
         return;
       }
-	  if( bytesRead != toRead )
-		LEMUR_THROW( LEMUR_NETWORK_ERROR, "Didn't read enough data" );
+          if( bytesRead != toRead )
+                LEMUR_THROW( LEMUR_NETWORK_ERROR, "Didn't read enough data" );
 
       _buffer.write(bytesRead);
       _writePosition += bytesRead;
@@ -135,15 +135,15 @@ void indri::net::NetworkMessageStream::read( MessageStreamHandler& handler ) {
     if( _bufferLength() < length ) {
       _cleanBuffer();
       _buffer.grow( length );
-	  int toRead = length - _bufferLength();
+          int toRead = length - _bufferLength();
       int bytesRead = _stream->blockingRead( _buffer.front() + _writePosition, length  - _bufferLength() );
       if( bytesRead <= 0 ) {
         _stream->close();
         return;
       }
 
-	  if( bytesRead != toRead )
-		LEMUR_THROW( LEMUR_NETWORK_ERROR, "Didn't read enough data" );
+          if( bytesRead != toRead )
+                LEMUR_THROW( LEMUR_NETWORK_ERROR, "Didn't read enough data" );
       
       _buffer.write(bytesRead);
       _writePosition += bytesRead;
@@ -164,14 +164,14 @@ void indri::net::NetworkMessageStream::read( MessageStreamHandler& handler ) {
     if( _bufferLength() < length ) {
       _cleanBuffer();
       _buffer.grow( length );
-	int toRead = length - _bufferLength();
+        int toRead = length - _bufferLength();
       int bytesRead = _stream->blockingRead( _buffer.front() + _writePosition, length - _bufferLength() );
       if( bytesRead <= 0 ) {
         _stream->close();
         return;
-      }	
-	  if( bytesRead != toRead )
-		LEMUR_THROW( LEMUR_NETWORK_ERROR, "Didn't read enough data" );
+      } 
+          if( bytesRead != toRead )
+                LEMUR_THROW( LEMUR_NETWORK_ERROR, "Didn't read enough data" );
 
       _buffer.write(bytesRead);
       _writePosition += bytesRead;

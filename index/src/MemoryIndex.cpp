@@ -364,12 +364,12 @@ void indri::index::MemoryIndex::_writeFieldExtents( int documentID, indri::utili
     if ( extent->parent != 0 ) {
       parentIter = tagIdMap.find( extent->parent );
       if( parentIter != 0 ) {
-	parentOrdinal = *parentIter;
+        parentOrdinal = *parentIter;
       } else {
-	parentOrdinal = 0;
-	std::cerr << "Could not find a parent for a node, storing as a root" << std::endl;
-// 	std::cerr << "Parent: " << extent->parent << " " << extent->parent->name << " " 
-// 		  << extent->parent->begin << ":" << extent->parent->end << std::endl;
+        parentOrdinal = 0;
+        std::cerr << "Could not find a parent for a node, storing as a root" << std::endl;
+//      std::cerr << "Parent: " << extent->parent << " " << extent->parent->name << " " 
+//                << extent->parent->begin << ":" << extent->parent->end << std::endl;
       }
     }
     // set the parent
@@ -428,7 +428,7 @@ void indri::index::MemoryIndex::_writeDocumentStatistics( UINT64 offset, int byt
 
 void indri::index::MemoryIndex::_addOpenTags( indri::utility::greedy_vector<indri::parse::TagExtent *>& indexedTags,
                                               indri::utility::greedy_vector<indri::parse::TagExtent *>& openTags,
-					      indri::utility::greedy_vector<indri::parse::TagExtent *>& extents,
+                                              indri::utility::greedy_vector<indri::parse::TagExtent *>& extents,
                                               unsigned int& extentIndex, 
                                               unsigned int position ) {
   for( ; extentIndex < extents.size(); extentIndex++ ) {

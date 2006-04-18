@@ -1,3 +1,13 @@
+/*==========================================================================
+ * Copyright (c) 2006 Carnegie Mellon University.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 
 
 //
@@ -40,12 +50,12 @@ namespace indri
 
     public:
       NestedListBeliefNode( const std::string& name,
-			    ListIteratorNode& child,
-			    ListIteratorNode* context,
-			    ListIteratorNode* raw,
-			    indri::query::TermScoreFunction& scoreFunction,
-			    double maximumBackgroundScore,
-			    double maximumScore );
+                            ListIteratorNode& child,
+                            ListIteratorNode* context,
+                            ListIteratorNode* raw,
+                            indri::query::TermScoreFunction& scoreFunction,
+                            double maximumBackgroundScore,
+                            double maximumScore );
       
       int nextCandidateDocument();
       void indexChanged( indri::index::Index& index );

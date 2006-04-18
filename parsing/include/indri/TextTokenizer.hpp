@@ -37,8 +37,8 @@ namespace indri {
     public:
       TextTokenizer( bool tokenize_markup = true, bool tokenize_entire_words = true ) : _handler(0) {
 
-	_tokenize_markup = tokenize_markup;
-	_tokenize_entire_words = tokenize_entire_words;
+        _tokenize_markup = tokenize_markup;
+        _tokenize_entire_words = tokenize_entire_words;
       }
 
       ~TextTokenizer() {}
@@ -64,7 +64,7 @@ namespace indri {
       TokenizedDocument _document;
 
       void writeToken( char* token, int token_len, int extent_begin, 
-		       int extent_end );
+                       int extent_end );
     };
   }
 }

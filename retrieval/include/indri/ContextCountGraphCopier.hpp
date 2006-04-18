@@ -52,11 +52,11 @@ namespace indri
       }
 
       indri::lang::Node* after( indri::lang::NestedRawScorerNode* oldNode, indri::lang::NestedRawScorerNode* newNode ) {
-	return after ( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
+        return after ( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
       }
 
       indri::lang::Node* after( indri::lang::ShrinkageScorerNode* oldNode, indri::lang::ShrinkageScorerNode* newNode ) {
-	return after ( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
+        return after ( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
       }
  
       std::vector<indri::lang::Node*>& getNodes() {
@@ -87,8 +87,8 @@ namespace indri
         indri::lang::RawExtentNode* raw = newNode->getRawExtent();
         indri::lang::RawExtentNode* context = newNode->getContext();
         delete newNode;
-	context = 0;
-	
+        context = 0;
+        
         indri::lang::ContextCounterNode* contextCounter = new indri::lang::ContextCounterNode( raw, context );
         // need to match the name of the raw scorer we're counting for
         contextCounter->setNodeName( oldNode->nodeName() );
@@ -98,18 +98,18 @@ namespace indri
       }
 
       indri::lang::Node* after( indri::lang::NestedRawScorerNode* oldNode, indri::lang::NestedRawScorerNode* newNode ) {
-	return after ( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
+        return after ( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
       }
 
       indri::lang::Node* after( indri::lang::ShrinkageScorerNode* oldNode, indri::lang::ShrinkageScorerNode* newNode ) {
-	return after ( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
+        return after ( (indri::lang::RawScorerNode*) oldNode, (indri::lang::RawScorerNode*) newNode );
       }
 
 
       indri::lang::Node* after( indri::lang::ExtentRestriction* oldNode, indri::lang::ExtentRestriction* newNode ) {
-	indri::lang::Node * child = newNode->getChild();
-	delete newNode;
-	return child;
+        indri::lang::Node * child = newNode->getChild();
+        delete newNode;
+        return child;
       }
 
       std::vector<indri::lang::Node*>& getNodes() {

@@ -301,11 +301,11 @@ namespace indri {
       }
 
       void setInner( RawExtentNode * inner ) {
-	_inner = inner;
+        _inner = inner;
       }
 
       void setOuter( RawExtentNode * outer ) {
-	_outer = outer;
+        _outer = outer;
       }
 
       RawExtentNode* getInner() {
@@ -2865,7 +2865,7 @@ namespace indri {
       }
 
       NestedExtentInside( Unpacker& unpacker ):
-	ExtentInside( unpacker ) 
+        ExtentInside( unpacker ) 
       { 
       }
 
@@ -2901,12 +2901,12 @@ namespace indri {
 
     public:
       NestedRawScorerNode( RawExtentNode* raw, RawExtentNode* context, std::string smoothing = "method:dirichlet,mu:2500" ) :
-	RawScorerNode( raw, context, smoothing )
+        RawScorerNode( raw, context, smoothing )
       {
       }
 
       NestedRawScorerNode( Unpacker& unpacker ) :
-	RawScorerNode( unpacker )
+        RawScorerNode( unpacker )
       {
       }
 
@@ -2915,7 +2915,7 @@ namespace indri {
       }
 
       UINT64 hashCode() const {
-	UINT64 hash = 0;
+        UINT64 hash = 0;
 
         hash += 105;
         hash += _raw->hashCode();
@@ -2948,11 +2948,11 @@ namespace indri {
 
     public:
       ExtentEnforcement( Unpacker& unpacker ) :
-	ExtentRestriction( unpacker ) {
+        ExtentRestriction( unpacker ) {
       }
 
       ExtentEnforcement( ScoredExtentNode* child, RawExtentNode* field ) :
-	ExtentRestriction( child, field )
+        ExtentRestriction( child, field )
       {
       }
 
@@ -2962,7 +2962,7 @@ namespace indri {
 
       
       UINT64 hashCode() const {
-	return 109 + _child->hashCode() * 7 + _field->hashCode();//??????????????
+        return 109 + _child->hashCode() * 7 + _field->hashCode();//??????????????
       }
 
 
@@ -2985,7 +2985,7 @@ namespace indri {
 
       void _unpack( Unpacker& unpacker ) {
         _children = unpacker.getScoredExtentVector( "children" );
-	_preserveExtentsChild = unpacker.getScoredExtentNode( "preserveExtentsChild" );
+        _preserveExtentsChild = unpacker.getScoredExtentNode( "preserveExtentsChild" );
       }
 
       UINT64 _hashCode() const {
@@ -3016,8 +3016,8 @@ namespace indri {
         _ThisType* duplicate = new _ThisType();
         duplicate->setNodeName( nodeName() );
         for( unsigned int i=0; i<_children.size(); i++ ) {
-	  bool preserveExtents = false;
-	  if ( _preserveExtentsChild == _children[i] ) {
+          bool preserveExtents = false;
+          if ( _preserveExtentsChild == _children[i] ) {
             preserveExtents = true;
           }
           duplicate->addChild( dynamic_cast<ScoredExtentNode*>(_children[i]->copy(copier)), preserveExtents );
@@ -3027,21 +3027,21 @@ namespace indri {
       }
 
       void _childText( std::stringstream& qtext ) const {
-	if ( _preserveExtentsChild != 0 ) {
-	  qtext << _preserveExtentsChild->queryText() << " ";
-	}
+        if ( _preserveExtentsChild != 0 ) {
+          qtext << _preserveExtentsChild->queryText() << " ";
+        }
         for( unsigned int i=0; i<_children.size(); i++ ) {
-	  if ( _children[i] != _preserveExtentsChild ) {
-	    if(i>0) qtext << " ";
-	    qtext << _children[i]->queryText();
-	  }
+          if ( _children[i] != _preserveExtentsChild ) {
+            if(i>0) qtext << " ";
+            qtext << _children[i]->queryText();
+          }
         }
       }
 
     public:
       ContextInclusionNode( ) { }
       ContextInclusionNode( Unpacker & unpacker ) {
-	_unpack( unpacker );
+        _unpack( unpacker );
       }
 
       const std::vector<ScoredExtentNode*>& getChildren() {
@@ -3049,13 +3049,13 @@ namespace indri {
       }
       
       ScoredExtentNode * getPreserveExtentsChild() {
-	return _preserveExtentsChild;
+        return _preserveExtentsChild;
       }
 
       void addChild( ScoredExtentNode* scoredNode, bool preserveExtents = false ) {
-	if (preserveExtents == true) {
+        if (preserveExtents == true) {
           _preserveExtentsChild = scoredNode;
-        }	
+        }       
         _children.push_back( scoredNode );
       }
 
@@ -3079,12 +3079,12 @@ namespace indri {
       void pack( Packer& packer ) {
         packer.before(this);
         packer.put( "children", _children );
-	packer.put( "preserveExtentsChild", _preserveExtentsChild);
+        packer.put( "preserveExtentsChild", _preserveExtentsChild);
         packer.after(this);
       }
 
       void walk( Walker& walker ) {
-	_walk( this, walker );
+        _walk( this, walker );
       }
       
       Node* copy( Copier& copier ) {
@@ -3099,23 +3099,23 @@ namespace indri {
 
     public:
       LengthPrior(ScoredExtentNode * child, double exponent) :
-	_child(child), 
-	_exponent(exponent)
+        _child(child), 
+        _exponent(exponent)
       {
-	
+        
       }
 
       LengthPrior( Unpacker& unpacker ) {
         _exponent = unpacker.getDouble( "exponent" );
-	_child = unpacker.getScoredExtentNode( "child" );
+        _child = unpacker.getScoredExtentNode( "child" );
       }
 
       std::string queryText() const {
         std::stringstream qtext;
         // with the definition of priors somewhat in flux, it's
         // hard to know what would be good to put here.  It's also
-	// a little hard when there realy isn't a way to 
-	// specify this in either of the indri/nexi query languages.
+        // a little hard when there realy isn't a way to 
+        // specify this in either of the indri/nexi query languages.
         qtext <<  "#lengthprior(" << _exponent << ")";
         return qtext.str();
       }
@@ -3125,15 +3125,15 @@ namespace indri {
       }
 
       void setExponent( double exponent ) {
-	_exponent = exponent;
+        _exponent = exponent;
       }
 
       double getExponent() {
-	return _exponent;
+        return _exponent;
       }
 
       ScoredExtentNode* getChild() {
-	return _child;
+        return _child;
       }
       
       virtual UINT64 hashCode() const {
@@ -3142,13 +3142,13 @@ namespace indri {
 
       void walk( Walker& walker ) {
         walker.before(this);
-	_child->walk(walker);
+        _child->walk(walker);
         walker.after(this);
       }
 
       indri::lang::Node* copy( Copier& copier ) {
         copier.before(this);
-	ScoredExtentNode * childCopy = dynamic_cast<ScoredExtentNode*> (_child->copy( copier ) );
+        ScoredExtentNode * childCopy = dynamic_cast<ScoredExtentNode*> (_child->copy( copier ) );
         LengthPrior* duplicate = new LengthPrior( childCopy, _exponent );
         return copier.after(this, duplicate);
       }
@@ -3156,7 +3156,7 @@ namespace indri {
       void pack( Packer& packer ) {
         packer.before(this);
         packer.put( "exponent", _exponent );
-	packer.put( "child", _child );
+        packer.put( "child", _child );
         packer.after(this);
       }
     };
@@ -3164,10 +3164,10 @@ namespace indri {
     class DocumentStructureNode : public Node {
     public:
       
-      DocumentStructureNode( ) {	
+      DocumentStructureNode( ) {        
       }
 
-      DocumentStructureNode( Unpacker& unpacker ) {	
+      DocumentStructureNode( Unpacker& unpacker ) {     
       }
 
       UINT64 hashCode() const {
@@ -3175,8 +3175,8 @@ namespace indri {
       }
 
       bool operator== ( Node& o ) {
-	DocumentStructureNode* other = dynamic_cast<DocumentStructureNode*>(&o);
-	return other; 
+        DocumentStructureNode* other = dynamic_cast<DocumentStructureNode*>(&o);
+        return other; 
       }
 
       std::string typeName() const {
@@ -3215,21 +3215,21 @@ namespace indri {
 
     public:
       ShrinkageScorerNode( RawExtentNode* raw, 
-			   DocumentStructureNode* documentStructure, 
-			   std::string smoothing = "method:dirichlet,mu:2500" )
-	: RawScorerNode( raw, 0, smoothing ),
-	  _documentStructure( documentStructure ), 
-	  _shrinkageRules( 0 )
+                           DocumentStructureNode* documentStructure, 
+                           std::string smoothing = "method:dirichlet,mu:2500" )
+        : RawScorerNode( raw, 0, smoothing ),
+          _documentStructure( documentStructure ), 
+          _shrinkageRules( 0 )
       {
       }
 
       ShrinkageScorerNode( Unpacker& unpacker ) : RawScorerNode( 0, 0, "" ) {
         _raw = unpacker.getRawExtentNode( "raw" );
-	_documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
+        _documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
         _occurrences = unpacker.getDouble( "occurrences" );
         _contextSize = unpacker.getDouble( "contextSize" );
         _smoothing = unpacker.getString( "smoothing" );
-	_shrinkageRules = unpacker.getStringVector( "shrinkageRules" );
+        _shrinkageRules = unpacker.getStringVector( "shrinkageRules" );
       }
 
       std::string typeName() const {
@@ -3245,11 +3245,11 @@ namespace indri {
       }
 
       void addShrinkageRule( std::string rule ) {
-	_shrinkageRules.push_back( rule );
+        _shrinkageRules.push_back( rule );
       }
       
       std::vector<std::string> getShrinkageRules() {
-	return _shrinkageRules;
+        return _shrinkageRules;
       }
 
       void setDocumentStructure( DocumentStructureNode* docStruct ) {
@@ -3262,7 +3262,7 @@ namespace indri {
 
 
       UINT64 hashCode() const {
-	UINT64 hash = 0;
+        UINT64 hash = 0;
 
         hash += 119;/////////////////????
         hash += _raw->hashCode();
@@ -3280,11 +3280,11 @@ namespace indri {
       void pack( Packer& packer ) {
         packer.before(this);
         packer.put( "raw", _raw );
-	packer.put( "documentStructure", _documentStructure );
+        packer.put( "documentStructure", _documentStructure );
         packer.put( "occurrences", _occurrences );
         packer.put( "contextSize", _contextSize );
         packer.put( "smoothing", _smoothing );
-	packer.put( "shrinkageRules", _shrinkageRules );
+        packer.put( "shrinkageRules", _shrinkageRules );
         packer.after(this);
       }
 
@@ -3292,8 +3292,8 @@ namespace indri {
         walker.before(this);
         if( _raw )
           _raw->walk(walker);
-	if( _documentStructure ) 
-	  _documentStructure->walk(walker);
+        if( _documentStructure ) 
+          _documentStructure->walk(walker);
         walker.after(this);
       }
 
@@ -3301,16 +3301,16 @@ namespace indri {
         copier.before(this);
 
         RawExtentNode* duplicateRaw = _raw ? dynamic_cast<RawExtentNode*>(_raw->copy(copier)) : 0;
-	DocumentStructureNode* duplicateDocStruct = _documentStructure ? dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier)) : 0;
+        DocumentStructureNode* duplicateDocStruct = _documentStructure ? dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier)) : 0;
         ShrinkageScorerNode* duplicate = new ShrinkageScorerNode(*this);
         duplicate->setRawExtent( duplicateRaw );
         duplicate->setDocumentStructure( duplicateDocStruct );
 
-	std::vector<std::string>::iterator ruleIter = _shrinkageRules.begin();
-	while( ruleIter != _shrinkageRules.end() ) {
-	  duplicate->addShrinkageRule( *ruleIter );
-	  ruleIter++;
-	}
+        std::vector<std::string>::iterator ruleIter = _shrinkageRules.begin();
+        while( ruleIter != _shrinkageRules.end() ) {
+          duplicate->addShrinkageRule( *ruleIter );
+          ruleIter++;
+        }
 
         return copier.after(this, duplicate);
       }
@@ -3326,14 +3326,14 @@ namespace indri {
     public:
       ExtentDescendant( RawExtentNode* inner, RawExtentNode* outer, DocumentStructureNode * docStruct ) :
         ExtentInside( inner, outer ),
-	_documentStructure( docStruct)
+        _documentStructure( docStruct)
       {
       }
 
       ExtentDescendant( Unpacker& unpacker ):
-	ExtentInside( unpacker ) 
+        ExtentInside( unpacker ) 
       { 
-	_documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
+        _documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
       }
 
       bool operator== ( Node& o ) {
@@ -3342,7 +3342,7 @@ namespace indri {
         return other &&
           *_inner == *other->_inner &&
           *_outer == *other->_outer &&
-	  *_documentStructure == *other->_documentStructure;
+          *_documentStructure == *other->_documentStructure;
       }
       
       void setDocumentStructure( DocumentStructureNode* docStruct ) {
@@ -3366,7 +3366,7 @@ namespace indri {
         walker.before(this);
         _inner->walk(walker);
         _outer->walk(walker);
-	_documentStructure->walk(walker);
+        _documentStructure->walk(walker);
         walker.after(this);
       }
 
@@ -3375,7 +3375,7 @@ namespace indri {
         
         RawExtentNode* newInner = dynamic_cast<RawExtentNode*>(_inner->copy(copier));
         RawExtentNode* newOuter = dynamic_cast<RawExtentNode*>(_outer->copy(copier));
-	DocumentStructureNode * newDocStruct = dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier));
+        DocumentStructureNode * newDocStruct = dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier));
         ExtentDescendant* extentInsideCopy = new ExtentDescendant( newInner, newOuter, newDocStruct );
         extentInsideCopy->setNodeName( nodeName() );
 
@@ -3391,14 +3391,14 @@ namespace indri {
     public:
       ExtentChild( RawExtentNode* inner, RawExtentNode* outer, DocumentStructureNode * docStruct ) :
         ExtentInside( inner, outer ),
-	_documentStructure( docStruct)
+        _documentStructure( docStruct)
       {
       }
 
       ExtentChild( Unpacker& unpacker ):
-	ExtentInside( unpacker ) 
+        ExtentInside( unpacker ) 
       { 
-	_documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
+        _documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
       }
 
       bool operator== ( Node& o ) {
@@ -3407,7 +3407,7 @@ namespace indri {
         return other &&
           *_inner == *other->_inner &&
           *_outer == *other->_outer &&
-	  *_documentStructure == *other->_documentStructure;
+          *_documentStructure == *other->_documentStructure;
       }
 
       void setDocumentStructure( DocumentStructureNode* docStruct ) {
@@ -3431,7 +3431,7 @@ namespace indri {
         walker.before(this);
         _inner->walk(walker);
         _outer->walk(walker);
-	_documentStructure->walk(walker);
+        _documentStructure->walk(walker);
         walker.after(this);
       }
 
@@ -3440,7 +3440,7 @@ namespace indri {
         
         RawExtentNode* newInner = dynamic_cast<RawExtentNode*>(_inner->copy(copier));
         RawExtentNode* newOuter = dynamic_cast<RawExtentNode*>(_outer->copy(copier));
-	DocumentStructureNode * newDocStruct = dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier));
+        DocumentStructureNode * newDocStruct = dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier));
         ExtentChild* extentInsideCopy = new ExtentChild( newInner, newOuter, newDocStruct );
         extentInsideCopy->setNodeName( nodeName() );
 
@@ -3456,14 +3456,14 @@ namespace indri {
     public:
       ExtentParent( RawExtentNode* inner, RawExtentNode* outer, DocumentStructureNode * docStruct ) :
         ExtentInside( inner, outer ),
-	_documentStructure( docStruct)
+        _documentStructure( docStruct)
       {
       }
 
       ExtentParent( Unpacker& unpacker ):
-	ExtentInside( unpacker ) 
+        ExtentInside( unpacker ) 
       { 
-	_documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
+        _documentStructure = unpacker.getDocumentStructureNode( "documentStructureNode" );
       }
 
       bool operator== ( Node& o ) {
@@ -3472,7 +3472,7 @@ namespace indri {
         return other &&
           *_inner == *other->_inner &&
           *_outer == *other->_outer &&
-	  *_documentStructure == *other->_documentStructure;
+          *_documentStructure == *other->_documentStructure;
       }
 
       void setDocumentStructure( DocumentStructureNode* docStruct ) {
@@ -3496,7 +3496,7 @@ namespace indri {
         walker.before(this);
         _inner->walk(walker);
         _outer->walk(walker);
-	_documentStructure->walk(walker);
+        _documentStructure->walk(walker);
         walker.after(this);
       }
 
@@ -3505,7 +3505,7 @@ namespace indri {
         
         RawExtentNode* newInner = dynamic_cast<RawExtentNode*>(_inner->copy(copier));
         RawExtentNode* newOuter = dynamic_cast<RawExtentNode*>(_outer->copy(copier));
-	DocumentStructureNode * newDocStruct = dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier));
+        DocumentStructureNode * newDocStruct = dynamic_cast<DocumentStructureNode*>(_documentStructure->copy(copier));
         ExtentParent* extentInsideCopy = new ExtentParent( newInner, newOuter, newDocStruct );
         extentInsideCopy->setNodeName( nodeName() );
 

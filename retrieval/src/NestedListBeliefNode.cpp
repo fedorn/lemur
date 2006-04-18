@@ -1,3 +1,13 @@
+/*==========================================================================
+ * Copyright (c) 2006 Carnegie Mellon University.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software (and below), and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 
 
 //
@@ -63,8 +73,8 @@ double indri::infnet::NestedListBeliefNode::_contextOccurrences( int begin, int 
         extents[i].end <= end &&
         extents[i].begin >= lastEnd ) {
 
-      	count += extents[i].weight;
- 	lastEnd = extents[i].end;
+        count += extents[i].weight;
+        lastEnd = extents[i].end;
     }
   }
 
@@ -183,26 +193,26 @@ const indri::utility::greedy_vector<bool>& indri::infnet::NestedListBeliefNode::
       // new begin for the match extents
       matchBegin = matchExtents[j].begin;      
       while ( ! doneInnerList ) {
-	// if the inner iter's begin is at least as large as the matchBegin
-	if ( innerIter->begin >= matchBegin ) {
-	  // set the new smallest end if it hasn't been set yet or 
-	  // if it is smaller than the current smallest seen end for an inner extent
-	  if ( smallestEnd == -1 || 
-	       innerIter->end < smallestEnd ) {
-	    smallestEnd = innerIter->end;
-	  }
-	  if ( innerIter == extents.begin() ) {
-	    // mark that we've finished processing the inner extent list
-	    doneInnerList = true;
-	  } else {
-	    // move back to the previous inner extent
-	    innerIter--;
-	  }
-	} else {
-	  // the inner iter's extent begin is smaller than the match extent's, so we can't consider
-	  // it or any others closer to the beginning of the inner extent list
-	  break;
-	}
+        // if the inner iter's begin is at least as large as the matchBegin
+        if ( innerIter->begin >= matchBegin ) {
+          // set the new smallest end if it hasn't been set yet or 
+          // if it is smaller than the current smallest seen end for an inner extent
+          if ( smallestEnd == -1 || 
+               innerIter->end < smallestEnd ) {
+            smallestEnd = innerIter->end;
+          }
+          if ( innerIter == extents.begin() ) {
+            // mark that we've finished processing the inner extent list
+            doneInnerList = true;
+          } else {
+            // move back to the previous inner extent
+            innerIter--;
+          }
+        } else {
+          // the inner iter's extent begin is smaller than the match extent's, so we can't consider
+          // it or any others closer to the beginning of the inner extent list
+          break;
+        }
       }      
     }
     // check whether our extent has a match

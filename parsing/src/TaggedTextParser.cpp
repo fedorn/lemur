@@ -5,7 +5,7 @@
  * is subject to the terms of the software license set forth in the LICENSE
  * file included with this software, and also available at
  * http://www.lemurproject.org/license.html
-	 *
+         *
  *==========================================================================
  */
 
@@ -39,11 +39,11 @@ indri::parse::TaggedTextParser::~TaggedTextParser() {
   indri::utility::HashTable<const char*,tag_properties*>::iterator iter;
   for( iter = _tagTable.begin(); iter != _tagTable.end(); iter++ ) {
     free( *iter->second );
-		}
+                }
 }
 
 void indri::parse::TaggedTextParser::initialize( indri::parse::TokenizedDocument* document, 
-						 indri::api::ParsedDocument* parsed ) {
+                                                 indri::api::ParsedDocument* parsed ) {
 
   _exclude = false;
   _include = _defaultInclude;
@@ -55,7 +55,7 @@ void indri::parse::TaggedTextParser::initialize( indri::parse::TokenizedDocument
 }
 
 void indri::parse::TaggedTextParser::cleanup( indri::parse::TokenizedDocument* document,
-					      indri::api::ParsedDocument* parsed ) {
+                                              indri::api::ParsedDocument* parsed ) {
 
   tl->writeTagList( parsed->tags );
   _metaList->writeMetadataList( parsed->metadata, _termBuffer, document->text );
@@ -93,11 +93,11 @@ indri::parse::TaggedTextParser::tag_properties* indri::parse::TaggedTextParser::
 }
 
 void indri::parse::TaggedTextParser::setTags( const std::vector<std::string>& include,
-					      const std::vector<std::string>& exclude,
-					      const std::vector<std::string>& index,
-					      const std::vector<std::string>& metadata, 
-					      const std::map<indri::parse::ConflationPattern*,std::string>& 
-					      conflations ) {
+                                              const std::vector<std::string>& exclude,
+                                              const std::vector<std::string>& index,
+                                              const std::vector<std::string>& metadata, 
+                                              const std::map<indri::parse::ConflationPattern*,std::string>& 
+                                              conflations ) {
 
   _defaultInclude = true;
 
@@ -111,25 +111,25 @@ void indri::parse::TaggedTextParser::setTags( const std::vector<std::string>& in
     tag_properties* result = _buildTag( *i );
     result->include = true;
     _defaultInclude = false;
-		}
+                }
 
   for ( i = exclude.begin(); i != exclude.end(); i++ ) {
 
     tag_properties* result = _buildTag( *i );
     result->exclude = true;
-		}
+                }
 
   for ( i = index.begin(); i != index.end(); i++ ) {
 
     tag_properties* result = _buildTag( *i );
     result->index = true;
-	}
+        }
 
   for ( i = metadata.begin(); i != metadata.end(); i++ ) {
 
     tag_properties* result = _buildTag( *i );
     result->metadata = true;
-	}
+        }
 
 }
 
@@ -199,7 +199,7 @@ indri::api::ParsedDocument* indri::parse::TaggedTextParser::parse( indri::parse:
       _document.terms.push_back( (*j) );
 
       //       std::cout << "Token [" << (*j) << "] <" << (*i).begin 
-      // 		<< ", " << (*i).end << ">" << std::endl;
+      //                << ", " << (*i).end << ">" << std::endl;
 
     } else {
 
@@ -298,12 +298,12 @@ void indri::parse::TaggedTextParser::handleTag( TagEvent* te ) {
     // index metadata if necessary
     if( tagProps->metadata ) {
       if( atEnd ) {
-	// te->begin is the byte offset of the beginning of the end
-	// tag ('<'), or end of the enclosed region.
+        // te->begin is the byte offset of the beginning of the end
+        // tag ('<'), or end of the enclosed region.
         endMetadataTag( original_name, tagProps->name, te->begin );
       } else {
-	// te->end is the byte offset of the end of the begin tag
-	// ('>'), or beginning of the enclosed region.
+        // te->end is the byte offset of the end of the begin tag
+        // ('>'), or beginning of the enclosed region.
         addMetadataTag( original_name, tagProps->name, te->end );
       }
     }

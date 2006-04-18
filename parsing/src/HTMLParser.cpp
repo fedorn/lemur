@@ -87,79 +87,79 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
     // Check for an "href" attribute:
 
     for ( indri::utility::greedy_vector<indri::parse::AttributeValuePair>::iterator
-	    i = te->attributes.begin(); i != te->attributes.end(); i++ ) {
-	    
+            i = te->attributes.begin(); i != te->attributes.end(); i++ ) {
+            
       if ( ! strcmp( (*i).attribute, "href" ) ) {
 
-	if ( ! _anchorTag && ! _relativeUrlTag && ! _absoluteUrlTag )
-	  return;
+        if ( ! _anchorTag && ! _relativeUrlTag && ! _absoluteUrlTag )
+          return;
 
-	// URL has already been extracted and is stored in (*i).value
+        // URL has already been extracted and is stored in (*i).value
         
         prepURL( (*i).value );
 
-	char tmp_buf[MAX_URL_LENGTH];
-	strncpy( tmp_buf, (*i).value, lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 ) );
-	tmp_buf[lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 )] = '\0';
+        char tmp_buf[MAX_URL_LENGTH];
+        strncpy( tmp_buf, (*i).value, lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 ) );
+        tmp_buf[lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 )] = '\0';
 
-	bool relative = normalizeURL( tmp_buf );
+        bool relative = normalizeURL( tmp_buf );
 
-	// if special url tags are requested, we'll
-	// store the url of the anchor text in the document itself
+        // if special url tags are requested, we'll
+        // store the url of the anchor text in the document itself
         
-	const TaggedTextParser::tag_properties* tagProps;
-	if( !relative ) {
-	  tagProps = _absoluteUrlTag;
-	} else {
-	  tagProps = _relativeUrlTag;
-	}
-	
-	_p_conflater->conflate( te );
+        const TaggedTextParser::tag_properties* tagProps;
+        if( !relative ) {
+          tagProps = _absoluteUrlTag;
+        } else {
+          tagProps = _relativeUrlTag;
+        }
+        
+        _p_conflater->conflate( te );
 
-	if( tagProps && !tagProps->exclude && !_exclude ) {
+        if( tagProps && !tagProps->exclude && !_exclude ) {
 
-	  // Original flag check from TaggedTextParser::writeToken
-	  if ( ! ( _exclude || ! _include ) ) {
+          // Original flag check from TaggedTextParser::writeToken
+          if ( ! ( _exclude || ! _include ) ) {
 
-	    // A HREF attribute value needs to be inserted at the
-	    // current position in the terms vector.  A TermExtent for
-	    // the attribute value needs to be inserted at the current
-	    // position in the positions vector.
-	  
-	    // Need to get position of attribute value from
-	    // AttributeValuePair
+            // A HREF attribute value needs to be inserted at the
+            // current position in the terms vector.  A TermExtent for
+            // the attribute value needs to be inserted at the current
+            // position in the positions vector.
+          
+            // Need to get position of attribute value from
+            // AttributeValuePair
 
-	    int len = strlen( tmp_buf );
-	    TermExtent extent;
-	    // Extent stored will be the extent of the URL as it
-	    // appears in the text, and the normalized form 
-	    // may exceed this extent.
-	    extent.begin = (*i).begin;
-	    extent.end = (*i).end;
-	    _document.positions.push_back( extent );
+            int len = strlen( tmp_buf );
+            TermExtent extent;
+            // Extent stored will be the extent of the URL as it
+            // appears in the text, and the normalized form 
+            // may exceed this extent.
+            extent.begin = (*i).begin;
+            extent.end = (*i).end;
+            _document.positions.push_back( extent );
 
-	    // Allocate space within HTMLParser's Buffer
-	    char* write_location = _urlBuffer.write( len + 1 );
-	    memcpy( write_location, tmp_buf, len + 1 );
-	    _document.terms.push_back( write_location );
+            // Allocate space within HTMLParser's Buffer
+            char* write_location = _urlBuffer.write( len + 1 );
+            memcpy( write_location, tmp_buf, len + 1 );
+            _document.terms.push_back( write_location );
 
-// 	    std::cout << "Token [" << write_location << "] <" 
-// 		      << (*i).begin << ", " << (*i).end << ">" << std::endl;
+//          std::cout << "Token [" << write_location << "] <" 
+//                    << (*i).begin << ", " << (*i).end << ">" << std::endl;
 
-	    // decrement number of tokens removed from the stream 
-	    // so that future field positions line up correctly.
-	    tokens_excluded--;
-	  }
+            // decrement number of tokens removed from the stream 
+            // so that future field positions line up correctly.
+            tokens_excluded--;
+          }
 
-	  addTag( tagProps->name, tagProps->name, te->pos );
-	  endTag( tagProps->name, tagProps->name, te->pos + 1 );
-	}
-	
-	tagProps = _anchorTag;
-	if( tagProps && !tagProps->exclude && !_exclude )
-	  addTag( tagProps->name, tagProps->name, te->pos + 1 );
+          addTag( tagProps->name, tagProps->name, te->pos );
+          endTag( tagProps->name, tagProps->name, te->pos + 1 );
+        }
+        
+        tagProps = _anchorTag;
+        if( tagProps && !tagProps->exclude && !_exclude )
+          addTag( tagProps->name, tagProps->name, te->pos + 1 );
 
-	handled_tag = true;
+        handled_tag = true;
       }
     }
 
@@ -170,27 +170,27 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
     bool handled_tag = false;
 
     for ( indri::utility::greedy_vector<indri::parse::AttributeValuePair,2>::iterator
-	    i = te->attributes.begin(); i != te->attributes.end(); i++ ) {
+            i = te->attributes.begin(); i != te->attributes.end(); i++ ) {
 
       if ( ! strcmp( (*i).attribute, "href" ) ) {
 
-	// URL has already been extracted and is stored in (*i).value
+        // URL has already been extracted and is stored in (*i).value
 
         prepURL( (*i).value );
 
-	int len = strlen( (*i).value );
+        int len = strlen( (*i).value );
 
-	char tmp_buf[MAX_URL_LENGTH];
-	strncpy( tmp_buf, (*i).value, lemur_compat::min<int>( len, MAX_URL_LENGTH - 1) );
-	tmp_buf[lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 )] = '\0';
+        char tmp_buf[MAX_URL_LENGTH];
+        strncpy( tmp_buf, (*i).value, lemur_compat::min<int>( len, MAX_URL_LENGTH - 1) );
+        tmp_buf[lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 )] = '\0';
 
-	normalizeURL( tmp_buf );
-	
-	len = strlen( tmp_buf );
-	strncpy( base_url, tmp_buf, lemur_compat::min<int>( len, MAX_URL_LENGTH-1 ) );
-	base_url[lemur_compat::min<int>( len, MAX_URL_LENGTH - 1 )] = '\0';
+        normalizeURL( tmp_buf );
+        
+        len = strlen( tmp_buf );
+        strncpy( base_url, tmp_buf, lemur_compat::min<int>( len, MAX_URL_LENGTH-1 ) );
+        base_url[lemur_compat::min<int>( len, MAX_URL_LENGTH - 1 )] = '\0';
 
-	handled_tag = true;
+        handled_tag = true;
       }
     }
 
