@@ -2500,7 +2500,7 @@ namespace indri {
         RawExtentNode* rawCopy = dynamic_cast<RawExtentNode*>(_raw->copy( copier ));
         ListAccumulator* duplicate = new ListAccumulator( rawCopy );
         duplicate->setNodeName( nodeName() );
-        copier.after(this, duplicate);
+        return copier.after(this, duplicate);
       }
     };
 
