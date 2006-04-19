@@ -110,6 +110,7 @@ void IndexWriter::_writeManifest( const std::string& path ) {
     field[i].set("name", _fields[i].name);
     field[i].set("total-documents", (UINT64) _fieldData[i].documentCount);
     field[i].set("total-terms", (UINT64) _fieldData[i].totalCount);
+    field[i].set("byte-offset", (UINT64) _fieldData[i].byteOffset);
   }
 
   manifest.writeFile( path );
@@ -142,6 +143,7 @@ void IndexWriter::write( std::vector<Index*>& indexes, std::vector<indri::index:
   std::string documentStatisticsPath = indri::file::Path::combine( path, "documentStatistics" );
   std::string invertedFilePath = indri::file::Path::combine( path, "invertedFile" );
   std::string directFilePath = indri::file::Path::combine( path, "directFile" );
+  std::string fieldsFilePath = indri::file::Path::combine( path, "fieldsFile" );
   std::string manifestPath = indri::file::Path::combine( path, "manifest" );
 
   // infrequent stuff
@@ -162,6 +164,7 @@ void IndexWriter::write( std::vector<Index*>& indexes, std::vector<indri::index:
   _documentLengths.create( documentLengthsPath );
   _invertedFile.create( invertedFilePath );
   _directFile.create( directFilePath );
+  _fieldsFile.create( fieldsFilePath );
 
   _invertedOutput = new indri::file::SequentialWriteBuffer( _invertedFile, OUTPUT_BUFFER_SIZE );
 
@@ -200,6 +203,7 @@ void IndexWriter::write( std::vector<Index*>& indexes, std::vector<indri::index:
   _documentLengths.close();
   _invertedFile.close();
   _directFile.close();
+  _fieldsFile.close();
 
   // write a manifest file
   _writeManifest( manifestPath );
@@ -221,20 +225,22 @@ void IndexWriter::_buildIndexContexts( std::vector<WriterIndexContext*>& context
 void IndexWriter::_writeFieldLists( std::vector<indri::index::Index*>& indexes, const std::string& path ) {
   if( indexes.size() == 0 )
     return;
+
+  indri::file::SequentialWriteBuffer* fieldsOutput = new indri::file::SequentialWriteBuffer( _fieldsFile, OUTPUT_BUFFER_SIZE );
   
   for( int field=0; field<_fields.size(); field++ ) {
-    std::stringstream fieldName;
     int fieldID = field+1;
-    fieldName << "field" << fieldID;
-    std::string fieldPath = indri::file::Path::combine( path, fieldName.str() );
 
     std::vector<indri::index::DocExtentListIterator*> iterators;
     for( int i=0; i<indexes.size(); i++ )
       iterators.push_back( indexes[i]->fieldListIterator( field+1 ) ); 
 
-    _fieldData.push_back( FieldStatistics( _fields[field].name, _fields[field].numeric, _fields[field].ordinal, 0, 0 ) );
-    _writeFieldList( fieldPath, field, iterators );
+    _fieldData.push_back( FieldStatistics( _fields[field].name, _fields[field].numeric, _fields[field].ordinal, 0, 0, fieldsOutput->tell() ) );
+    _writeFieldList( *fieldsOutput, field, iterators );
   }
+
+  fieldsOutput->flush();
+  delete fieldsOutput;
 }
 
 //
@@ -305,19 +311,15 @@ void IndexWriter::_writeStatistics( indri::utility::greedy_vector<WriterIndexCon
 //  document / 
 //
 
-void IndexWriter::_writeFieldList( const std::string& fileName, int fieldIndex, std::vector<indri::index::DocExtentListIterator*> iterators ) {
-  indri::file::File outputFile;
-  outputFile.create( fileName );
-  indri::file::SequentialWriteBuffer output( outputFile, 1024*1024 );
-  
-  // write a control byte -- numeric fields use 0x02 (DiskDocExtentListIterator)
-  UINT8 control = _fields[fieldIndex].numeric ? 0x02 : 0;
-  // ordinal fields use 0x04 (DiskDocExtentListIterator)
-  UINT8 ordinalControl = _fields[fieldIndex].ordinal ? 0x04: 0;  
-  control = control | ordinalControl;
-  output.write( &control, sizeof(UINT8) );
-
+void IndexWriter::_writeFieldList( indri::file::SequentialWriteBuffer& output, int fieldIndex, std::vector<indri::index::DocExtentListIterator*> iterators ) {
+  bool numeric = _fields[fieldIndex].numeric;
   bool ordinal = _fields[fieldIndex].ordinal;
+
+  // write a control byte -- numeric fields use 0x02 (DiskDocExtentListIterator)
+  // ordinal fields use 0x04 (DiskDocExtentListIterator)
+  UINT8 control = (numeric ? 0x02 : 0) |
+                  (ordinal ? 0x04 : 0);
+  output.write( &control, sizeof(UINT8) );
 
   indri::utility::Buffer dataBuffer;
   const int minimumSkip = 1<<12; //4k
@@ -356,7 +358,7 @@ void IndexWriter::_writeFieldList( const std::string& fileName, int fieldIndex, 
       // extents and numbers
       int lastStart = 0;
       int lastOrdinal = 0;
- 
+
       for( int j=0; j<count; j++ ) {
         Extent& extent = entry->extents[j];
 
@@ -389,8 +391,6 @@ void IndexWriter::_writeFieldList( const std::string& fileName, int fieldIndex, 
   _fieldData[fieldIndex].totalCount = terms;
 
   _writeBatch( &output, -1, dataBuffer.position(), dataBuffer );
-  output.flush();
-  outputFile.close();
 }
 
 //

@@ -51,11 +51,11 @@ namespace indri {
 
       indri::file::File _invertedFile;
       indri::file::File _directFile;
+      indri::file::File _fieldsFile;
 
       indri::file::SequentialReadBuffer _lengthsBuffer;
 
       std::vector<FieldStatistics> _fieldData;
-      std::vector<indri::file::File*> _fieldFiles;
       int _documentBase;
       int _infrequentTermBase;
 

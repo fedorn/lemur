@@ -69,7 +69,7 @@ indri::index::MemoryIndex::MemoryIndex( int docBase, const std::vector<Index::Fi
   for( size_t i=0; i<fields.size(); i++ ) {
     int fieldID = i+1;
 
-    _fieldData.push_back( FieldStatistics( fields[i].name, fields[i].numeric, fields[i].ordinal, 0, 0 ) );
+    _fieldData.push_back( FieldStatistics( fields[i].name, fields[i].numeric, fields[i].ordinal, 0, 0, 0 ) );
     _fieldLists.push_back( new DocExtentListMemoryBuilder( fields[i].numeric, fields[i].ordinal ) );
     _fieldLookup.insert( _fieldData.back().name.c_str(), fieldID );
   }

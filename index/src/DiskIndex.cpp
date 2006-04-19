@@ -53,8 +53,9 @@ void indri::index::DiskIndex::_readManifest( const std::string& path ) {
         int documentCount = field[i].get("total-documents", 0 );
         INT64 totalCount = field[i].get("total-terms", INT64(0) );
         std::string name = field[i].get( "name", "" );
+        INT64 byteOffset = field[i].get( "byte-offset", INT64(0) );
 
-        _fieldData.push_back( FieldStatistics( name, numeric, ordinal, totalCount, documentCount ) );
+        _fieldData.push_back( FieldStatistics( name, numeric, ordinal, totalCount, documentCount, byteOffset ) );
       }
     }
   }
@@ -78,6 +79,7 @@ void indri::index::DiskIndex::open( const std::string& base, const std::string& 
   std::string documentStatisticsPath = indri::file::Path::combine( path, "documentStatistics" );
   std::string invertedFilePath = indri::file::Path::combine( path, "invertedFile" );
   std::string directFilePath = indri::file::Path::combine( path, "directFile" );
+  std::string fieldsFilePath = indri::file::Path::combine( path, "fieldsFile" );
   std::string manifestPath = indri::file::Path::combine( path, "manifest" );
 
   _readManifest( manifestPath );
@@ -94,19 +96,9 @@ void indri::index::DiskIndex::open( const std::string& base, const std::string& 
 
   _invertedFile.openRead( invertedFilePath );
   _directFile.openRead( directFilePath );
+  _fieldsFile.openRead( fieldsFilePath );
 
   _lengthsBuffer.cache( 0, _documentLengths.size() );
-
-  for( int field=1; field <= _fieldData.size(); field++ ) {
-    std::stringstream fieldFilename;
-    fieldFilename << "field" << field;
-    std::string fieldPath = indri::file::Path::combine( path, fieldFilename.str() );
-
-    indri::file::File* fieldFile = new indri::file::File();
-    fieldFile->openRead( fieldPath );
-
-    _fieldFiles.push_back( fieldFile );
-  }
 }
 
 //
@@ -114,8 +106,6 @@ void indri::index::DiskIndex::open( const std::string& base, const std::string& 
 //
 
 void indri::index::DiskIndex::close() {
-  indri::utility::delete_vector_contents( _fieldFiles );
-
   _frequentStringToTerm.close();
   _infrequentStringToTerm.close();
 
@@ -467,8 +457,8 @@ indri::index::DocExtentListIterator* indri::index::DiskIndex::fieldListIterator(
     return 0;
   }
 
-  indri::file::File* fieldFile = _fieldFiles[fieldID-1];
-  return new DiskDocExtentListIterator( new indri::file::SequentialReadBuffer( *fieldFile ), 0 );
+  UINT64 byteOffset = _fieldData[fieldID-1].byteOffset;
+  return new DiskDocExtentListIterator( new indri::file::SequentialReadBuffer( _fieldsFile ), byteOffset );
 }
 
 //
@@ -481,8 +471,7 @@ indri::index::DocExtentListIterator* indri::index::DiskIndex::fieldListIterator(
   if( fieldID == 0 )
     return 0;
 
-  indri::file::File* fieldFile = _fieldFiles[fieldID-1];
-  return new DiskDocExtentListIterator( new indri::file::SequentialReadBuffer( *fieldFile ), 0 );
+  return fieldListIterator( fieldID );
 }
 
 //
