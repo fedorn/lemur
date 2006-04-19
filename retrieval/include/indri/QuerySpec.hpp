@@ -2452,6 +2452,58 @@ namespace indri {
       }
     };
 
+    class ListAccumulator : public AccumulatorNode {
+    private:
+      RawExtentNode* _raw;
+     
+    public:
+      ListAccumulator( RawExtentNode* raw ) :
+        _raw(raw)
+      {
+      }
+
+      ListAccumulator( Unpacker& unpacker ) {
+        _raw = unpacker.getRawExtentNode( "raw" );
+      }
+
+      std::string typeName() const {
+        return "ListAccumulator";
+      }
+
+      std::string queryText() const {
+        return _raw->queryText();
+      }
+
+      UINT64 hashCode() const {
+        // we don't use hashCodes for accumulatorNodes
+        return 0;
+      }
+
+      RawExtentNode* getRawExtent() {
+        return _raw;
+      }
+
+      void pack( Packer& packer ) {
+        packer.before(this);
+        packer.put( "raw", _raw );
+        packer.after(this);
+      }
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+        _raw->walk( walker );
+        walker.after(this);
+      }
+
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+        RawExtentNode* rawCopy = dynamic_cast<RawExtentNode*>(_raw->copy( copier ));
+        ListAccumulator* duplicate = new ListAccumulator( rawCopy );
+        duplicate->setNodeName( nodeName() );
+        copier.after(this, duplicate);
+      }
+    };
+
     class ContextCounterNode : public AccumulatorNode {
     private:
       RawExtentNode* _raw;

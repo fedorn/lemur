@@ -70,6 +70,8 @@ namespace indri {
    void Walker::after( class FixedPassage* n ) { defaultAfter( n ); }
    void Walker::before( class FilterNode* n ) { defaultBefore( n ); }
    void Walker::after( class FilterNode* n ) { defaultAfter( n ); }
+   void Walker::before( class ListAccumulator* n ) { defaultBefore( n ); }
+   void Walker::after( class ListAccumulator* n ) { defaultAfter( n ); }
    void Walker::before( class ContextCounterNode* n ) { defaultBefore( n ); }
    void Walker::after( class ContextCounterNode* n ) { defaultAfter( n ); }
    void Walker::before( class ContextSimpleCounterNode* n ) { defaultBefore( n ); }

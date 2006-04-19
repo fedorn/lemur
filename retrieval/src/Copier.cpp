@@ -70,6 +70,8 @@ namespace indri {
     Node* Copier::after( class FixedPassage* oldNode, class FixedPassage* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class FilterNode* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class FilterNode* oldNode, class FilterNode* newNode ) { return defaultAfter( oldNode, newNode ); }
+    void Copier::before( class ListAccumulator* oldNode ) { defaultBefore( oldNode ); }
+    Node* Copier::after( class ListAccumulator* oldNode, class ListAccumulator* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class ContextCounterNode* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class ContextCounterNode* oldNode, class ContextCounterNode* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class ContextSimpleCounterNode* oldNode ) { defaultBefore( oldNode ); }

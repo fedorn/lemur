@@ -69,6 +69,8 @@ indri::lang::Node* indri::lang::Unpacker::_unpack( indri::xml::XMLNode* child ) 
     result = new FixedPassage(*this);
   } else if( type == "FilterNode" ) {
     result = new FilterNode(*this);
+  } else if( type == "ListAccumulator" ) {
+    result = new ListAccumulator(*this);
   } else if( type == "ContextCounterNode" ) {
     result = new ContextCounterNode(*this);
   } else if( type == "ContextSimpleCounterNode" ) {

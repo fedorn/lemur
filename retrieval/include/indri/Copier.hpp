@@ -71,6 +71,8 @@ namespace indri {
       virtual class Node* after( class FixedPassage* oldNode, class FixedPassage* newNode );
       virtual void before( class FilterNode* oldNode );
       virtual class Node* after( class FilterNode* oldNode, class FilterNode* newNode );
+      virtual void before( class ListAccumulator* oldNode );
+      virtual class Node* after( class ListAccumulator* oldNode, class ListAccumulator* newNode );
       virtual void before( class ContextCounterNode* oldNode );
       virtual class Node* after( class ContextCounterNode* oldNode, class ContextCounterNode* newNode );
       virtual void before( class ContextSimpleCounterNode* oldNode );

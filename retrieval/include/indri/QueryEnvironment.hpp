@@ -192,6 +192,13 @@ namespace indri
       /// @param expression The expression to evaluate, probably an ordered or unordered window expression
       double expressionCount( const std::string& expression,
                               const std::string &queryType = "indri" );
+      /// \brief Return all the occurrences of this expression in the collection.
+      /// Note that the returned vector may be quite large for large collections, and therefore
+      /// has the very real possibility of exhausting the memory of the machine.  Use this method
+      /// with discretion.
+      /// @param expression The expression to evaluate, probably an ordered or unordered window expression
+      std::vector<ScoredExtentResult> expressionList( const std::string& expression, 
+                                                      const std::string& queryType = "indri" );
       /// \brief Return the list of fields.
       /// @return vector of field names.
       std::vector<std::string> fieldList();

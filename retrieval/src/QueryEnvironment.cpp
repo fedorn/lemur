@@ -758,12 +758,46 @@ void indri::api::QueryEnvironment::_annotateQuery( indri::infnet::InferenceNetwo
 }
 
 //
+// expressionList
+//
+
+std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::expressionList( const std::string& expression, const std::string& queryType ) {
+  QueryParserWrapper* parser = QueryParserFactory::get(expression, queryType);
+  indri::lang::ScoredExtentNode* rootNode;
+
+  try {
+    rootNode = parser->query();
+  } catch( antlr::ANTLRException e ) {
+    LEMUR_THROW( LEMUR_PARSE_ERROR, "Couldn't understand this query: " + e.getMessage() );
+  }
+
+  indri::lang::RawScorerNode* rootScorer = dynamic_cast<indri::lang::RawScorerNode*>(rootNode);
+  
+  if( rootScorer == 0 ) {
+    LEMUR_THROW( LEMUR_PARSE_ERROR, "This query does not appear to be a proximity expression" );
+  }
+
+  // replace the raw scorer node with a listAccumulator
+  indri::lang::ListAccumulator* listAccumulator = new indri::lang::ListAccumulator( rootScorer->getRawExtent() );
+  listAccumulator->setNodeName( rootScorer->nodeName() );
+  
+  std::vector<indri::lang::Node*> roots;
+  roots.push_back( listAccumulator );
+
+  indri::infnet::InferenceNetwork::MAllResults statisticsResults;
+  _sumServerQuery( statisticsResults, roots, MAX_INT32 );
+  
+  std::vector<ScoredExtentResult>& occurrencesList = statisticsResults[ listAccumulator->nodeName() ][ "occurrences" ];
+  delete parser;
+  return occurrencesList;
+}
+
+//
 // expressionCount
 //
 
-double indri::api::QueryEnvironment::expressionCount( const std::string& expression, const std::string &queryType ) {
-  QueryParserWrapper *parser = QueryParserFactory::get(expression, queryType);
-
+double indri::api::QueryEnvironment::expressionCount( const std::string& expression, const std::string& queryType ) {
+  QueryParserWrapper* parser = QueryParserFactory::get(expression, queryType);
   indri::lang::ScoredExtentNode* rootNode;
 
   try {
@@ -790,7 +824,7 @@ double indri::api::QueryEnvironment::expressionCount( const std::string& express
   _sumServerQuery( statisticsResults, roots, 1000 );
   
   std::vector<ScoredExtentResult>& occurrencesList = statisticsResults[ contextCounter->nodeName() ][ "occurrences" ];
-  delete(parser);
+  delete parser;
   
   return occurrencesList[0].score;
 }
