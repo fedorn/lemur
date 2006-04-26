@@ -1693,8 +1693,12 @@ void indri::parse::TextTokenizer::processTag() {
     te.end = byte_position;
 
     _document.tags.push_back( te );
-    
-  } else if ( isalpha( toktext[1] ) ) { 
+
+#ifndef WIN32
+    } else if ( isalpha( toktext[1] ) ) {
+#else
+    } else if ( (toktext[1]  >= 0) && (isalpha( toktext[1] ) )) {
+#endif
 
     // Try to extract the tag name:
 
@@ -1731,7 +1735,11 @@ void indri::parse::TextTokenizer::processTag() {
       
       _document.tags.push_back( te );
 
-    } else if ( isspace( c[i] ) ) {
+#ifndef WIN32
+    } else if ( isspace( toktext[1] ) ) {
+#else
+    } else if ( (toktext[1]  >= 0) && (isspace( toktext[1] ) )) {
+#endif
 
       // open tag with attributes, eg. <A HREF="www.foo.com/bar">
 
@@ -1751,7 +1759,12 @@ void indri::parse::TextTokenizer::processTag() {
       c += i;
       offset += i;
 
-      while ( isspace( *c ) ) { c++; offset++; }
+
+#ifndef WIN32
+    while ( isspace( *c ) ) { c++; offset++; }
+#else
+    while (((*c) >=0) &&  isspace( *c )) { c++; offset++; }
+#endif
 
       te.pos = _document.terms.size();
 
@@ -1785,14 +1798,22 @@ void indri::parse::TextTokenizer::processTag() {
 
         // attributes can be foo\s*=\s*"bar[">] or foo\s*=\s*bar
 
-        while ( isspace( *c ) ) { c++; offset++; }// ignore any spaces
+        // ignore any spaces
+#ifndef WIN32
+    while ( isspace( *c ) ) { c++; offset++; }
+#else
+    while (((*c) >=0) &&  isspace( *c )) { c++; offset++; }
+#endif
 
         if ( *c == '=' ) {
 
           c++; // get past the '=' sign.
           offset++;
-          while ( isspace( *c ) ) { c++; offset++; }
-
+#ifndef WIN32
+    while ( isspace( *c ) ) { c++; offset++; }
+#else
+    while (((*c) >=0) &&  isspace( *c )) { c++; offset++; }
+#endif
           if ( *c == '>' ) {
 
             // common malformed markup <a href=>
