@@ -97,6 +97,8 @@ DBL_QUOTE: '\"';
 QUOTE:     '\'';
 DOT:       '.';
 COMMA:     ',';
+SLASH:     '/';
+B_SLASH:   '\\';
 
 protected DASH:      '-';
 COLON:     ':';
@@ -154,6 +156,23 @@ private:
   std::vector<indri::lang::Node*> _nodes;
   // makes sure nodes go away when parser goes away
   indri::utility::VectorDeleter<indri::lang::Node*> _deleter;
+    
+  indri::lang::RawExtentNode * innerMost( indri::lang::ScoredExtentNode* sr ) {
+    indri::lang::RawExtentNode * ou = 0;
+    // set the new outer node we need to pass down (the innermost of field or field list of 
+    // of this restriction)
+    indri::lang::ExtentRestriction * er = dynamic_cast<indri::lang::ExtentRestriction *>(sr);
+    if (er != 0) {
+      indri::lang::RawExtentNode * f = er->getField();
+      indri::lang::ExtentInside * ei = dynamic_cast<indri::lang::ExtentInside *>(f);
+      while (ei != 0) {
+        f = ei->getInner();
+        ei = dynamic_cast<indri::lang::ExtentInside *>(f);
+      }       
+      ou = f;
+    }
+    return ou;         
+  }
   
 public:
   void init( QueryLexer* lexer ) {
@@ -166,8 +185,8 @@ query returns [ indri::lang::ScoredExtentNode* q ] {
     indri::lang::ScoredExtentNode* s = 0;
     q = 0;
   } :
-  q=scoredExtentNode
-  ( options { greedy=true; } : s=scoredExtentNode
+  q=scoredExtentNode[0]
+  ( options { greedy=true; } : s=scoredExtentNode[0]
     {
       c = new CombineNode;
       c->addChild(q);
@@ -175,24 +194,24 @@ query returns [ indri::lang::ScoredExtentNode* q ] {
       _nodes.push_back(c);
       q = c;
     }
-    ( options { greedy=true; } : s=scoredExtentNode 
+    ( options { greedy=true; } : s=scoredExtentNode[0]
       {
         c->addChild(s);
       }
     )*
   )? EOF;
 
-scoredExtentNode returns [ indri::lang::ScoredExtentNode* s ] :
-    ( WEIGHT ) => s=weightNode
-  | ( COMBINE ) => s=combineNode
-  | ( OR ) => s=orNode
-  | ( NOT ) => s=notNode
-  | ( WAND ) => s=wandNode
-  | ( WSUM ) => s=wsumNode
-  | ( MAX ) => s=maxNode
+scoredExtentNode [ indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* s ] :
+    ( WEIGHT ) => s=weightNode[ou]
+  | ( COMBINE ) => s=combineNode[ou]
+  | ( OR ) => s=orNode[ou]
+  | ( NOT ) => s=notNode[ou]
+  | ( WAND ) => s=wandNode[ou]
+  | ( WSUM ) => s=wsumNode[ou]
+  | ( MAX ) => s=maxNode[ou]
   | ( PRIOR ) => s=priorNode
-  | ( FILREJ ) => s=filrejNode
-  | ( FILREQ ) => s=filreqNode
+  | ( FILREJ ) => s=filrejNode[ou]
+  | ( FILREQ ) => s=filreqNode[ou]
   | s=scoredRaw
   ;
 
@@ -239,102 +258,102 @@ scoredRaw returns [ indri::lang::ScoredExtentNode* sn ]
 //    #not = notNode
 //
 
-weightedList[ indri::lang::WeightedCombinationNode* wn ] returns [ indri::lang::ScoredExtentNode* sr ] 
+weightedList[ indri::lang::WeightedCombinationNode* wn, indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* sr ] 
   {
     double w = 0;
     ScoredExtentNode* n = 0;
     sr = wn;
   } :
-  ( sr=extentRestriction[wn] )?
+  ( sr=extentRestriction[wn, ou] { ou = innerMost(sr); } )? 
   O_PAREN 
     (
       w=floating
-      n=scoredExtentNode
+      n=scoredExtentNode[ou]
       { wn->addChild( w, n ); }
     )+
   C_PAREN
   ;
 
-sumList[ indri::lang::WSumNode* wn ] returns [ indri::lang::ScoredExtentNode* sr ] 
+sumList[ indri::lang::WSumNode* wn, indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* sr ] 
   {
     double w = 0;
     ScoredExtentNode* n = 0;
     sr = wn;
   } :
-  ( sr=extentRestriction[wn] )?
+  ( sr=extentRestriction[wn, ou] { ou = innerMost(sr); } )?
   O_PAREN 
-    ( options { greedy=true; } : n=scoredExtentNode { wn->addChild( 1.0, n ); } )+
+    ( options { greedy=true; } : n=scoredExtentNode[ou] { wn->addChild( 1.0, n ); } )+
   C_PAREN
   ;
 
-unweightedList[ indri::lang::UnweightedCombinationNode* cn ] returns [ indri::lang::ScoredExtentNode* sr ]
+unweightedList[ indri::lang::UnweightedCombinationNode* cn, indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* sr ]
   {
     ScoredExtentNode* n = 0;
     sr = cn;
   } :
-  ( sr=extentRestriction[cn] )?
+  ( sr=extentRestriction[cn, ou] { ou = innerMost(sr); } )?
   O_PAREN
-    ( options { greedy=true; } : n=scoredExtentNode { cn->addChild( n ); } )+
+    ( options { greedy=true; } : n=scoredExtentNode[ou] { cn->addChild( n ); } )+
   C_PAREN
   ;
 
-weightNode returns [ indri::lang::ScoredExtentNode* r ] 
+weightNode [indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* r ] 
   {
     indri::lang::WeightNode* wn = new indri::lang::WeightNode;
     _nodes.push_back(wn);
   } :
-  WEIGHT r=weightedList[wn];
+  WEIGHT r=weightedList[wn, ou];
 
-combineNode returns [ indri::lang::ScoredExtentNode* r ]
+combineNode [indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* r ]
   { 
     indri::lang::CombineNode* cn = new indri::lang::CombineNode;
     _nodes.push_back(cn);
   } :
-  COMBINE r=unweightedList[cn];
+  COMBINE r=unweightedList[cn, ou];
 
-sumNode returns [ indri::lang::ScoredExtentNode* r ]
+sumNode [indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* r ]
   {
     indri::lang::WSumNode* wn = new indri::lang::WSumNode;
     _nodes.push_back(wn);
   } :
-  SUM r=sumList[wn];
+  SUM r=sumList[wn, ou];
 
-wsumNode returns [ indri::lang::ScoredExtentNode* r ] 
+wsumNode [indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* r ] 
   {
     indri::lang::WSumNode* wn = new indri::lang::WSumNode;
     _nodes.push_back(wn);
   } :
-  WSUM r=weightedList[wn];
+  WSUM r=weightedList[wn, ou];
 
-wandNode returns [ indri::lang::ScoredExtentNode* r ]
+wandNode [indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* r ]
   {
     indri::lang::WAndNode* wn = new indri::lang::WAndNode;
     _nodes.push_back(wn);
   } :
-  WAND r=weightedList[wn];
+  WAND r=weightedList[wn, ou];
   
-orNode returns [ indri::lang::ScoredExtentNode* r ]
+orNode [indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* r ]
   {
     indri::lang::OrNode* on = new indri::lang::OrNode;
     _nodes.push_back(on);
   } :
-  OR r=unweightedList[on];
+  OR r=unweightedList[on, ou];
 
-maxNode returns [ indri::lang::ScoredExtentNode* r ]
+maxNode [indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* r ]
   {
     indri::lang::MaxNode* mn = new indri::lang::MaxNode;
     _nodes.push_back(mn);
   } :
-  MAX r=unweightedList[mn];
+  MAX r=unweightedList[mn, ou];
   
-notNode returns [ indri::lang::ScoredExtentNode* r ]
+notNode [indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* r ]
   {
     indri::lang::NotNode* n = new indri::lang::NotNode;
     indri::lang::ScoredExtentNode* c = 0;
     _nodes.push_back(n);
     r = n;
   } :
-  NOT (r=extentRestriction[r])? O_PAREN c=scoredExtentNode C_PAREN
+  NOT (r=extentRestriction[r, ou])? O_PAREN c=scoredExtentNode[ou] C_PAREN
   {
     n->setChild(c);
   };
@@ -422,24 +441,24 @@ bandNode returns [ indri::lang::BAndNode* b ]
     ( options { greedy=true; } : rn=unscoredTerm { b->addChild( rn ); } )+
   C_PAREN;
   
-filrejNode returns [ indri::lang::FilRejNode* fj ]
+filrejNode [ indri::lang::RawExtentNode * ou ] returns [ indri::lang::FilRejNode* fj ]
   {
     RawExtentNode* filter = 0;
     ScoredExtentNode* disallowed = 0;
   } :
   FILREJ
-  O_PAREN filter=unscoredTerm disallowed=scoredExtentNode C_PAREN {
+  O_PAREN filter=unscoredTerm disallowed=scoredExtentNode[ou] C_PAREN {
     fj = new FilRejNode( filter, disallowed );
     _nodes.push_back(fj);
   }; 
   
-filreqNode returns [ indri::lang::FilReqNode* fq ]
+filreqNode[ indri::lang::RawExtentNode * ou ] returns [ indri::lang::FilReqNode* fq ]
   {
     RawExtentNode* filter = 0;
     ScoredExtentNode* required = 0;
   } :
   FILREQ
-  O_PAREN filter=unscoredTerm required=scoredExtentNode C_PAREN {
+  O_PAREN filter=unscoredTerm required=scoredExtentNode[ou] C_PAREN {
     fq = new FilReqNode( filter, required );
     _nodes.push_back(fq);
   }; 
@@ -495,9 +514,10 @@ unqualifiedTerm returns [ indri::lang::RawExtentNode* re ] :
   | ( EQUALS ) => re=equalsNode
   | re=rawText;
           
-extentRestriction [ indri::lang::ScoredExtentNode* sn ] returns [ indri::lang::ScoredExtentNode* er ] {
+extentRestriction [ indri::lang::ScoredExtentNode* sn, indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* er ] {
     indri::lang::Field* f = 0;
     er = 0;
+    indri::lang::ExtentInside * po = 0;
   } :
   ( O_SQUARE TERM COLON ) => O_SQUARE passageWindowSize:TERM COLON inc:NUMBER C_SQUARE
   {
@@ -513,13 +533,58 @@ extentRestriction [ indri::lang::ScoredExtentNode* sn ] returns [ indri::lang::S
     
     er = new indri::lang::FixedPassage(sn, windowSize, increment);
   } |
-  O_SQUARE field:TERM C_SQUARE
+  ( O_SQUARE TERM ) =>  O_SQUARE field:TERM C_SQUARE
   {
     f = new indri::lang::Field(field->getText());
     _nodes.push_back(f);
     er = new indri::lang::ExtentRestriction(sn, f);
     _nodes.push_back(er);
-  };
+  } |
+  O_SQUARE DOT po=pathOperator fieldRestricted:TERM C_SQUARE 
+  {
+
+    if ( ou == 0 ) {
+      throw new antlr::SemanticException("Use of a . in a extent restriction without a valid outer context.");
+    }
+    f = new indri::lang::Field(fieldRestricted->getText());
+    _nodes.push_back(f);
+    po->setInner(f);
+    po->setOuter(ou);
+    er = new indri::lang::ExtentRestriction(sn, po);
+    _nodes.push_back(er);
+  }
+;
+
+pathOperator returns [ indri::lang::ExtentInside* r ] {
+    r = 0;
+    indri::lang::DocumentStructureNode * ds = 0;
+  } :
+  SLASH (SLASH {    
+    ds = new indri::lang::DocumentStructureNode;
+    _nodes.push_back(ds);
+    r = new indri::lang::ExtentDescendant(NULL, NULL, ds);
+    _nodes.push_back(r);
+  })? { 
+    if (r == 0) {
+      ds = new indri::lang::DocumentStructureNode;
+      _nodes.push_back(ds);
+      r = new indri::lang::ExtentChild(NULL, NULL, ds);
+      _nodes.push_back(r);
+    }
+  } | 
+  B_SLASH {
+   ds = new indri::lang::DocumentStructureNode;
+   _nodes.push_back(ds);
+   r = new indri::lang::ExtentParent(NULL, NULL, ds);
+   _nodes.push_back(r);
+  } |
+  O_BRACE {
+    r = new indri::lang::ExtentInside(NULL, NULL);   
+    _nodes.push_back(r);
+  }
+;        
+
+
         
 synonym_list returns [ indri::lang::ExtentOr* s ] {
     indri::lang::RawExtentNode* term = 0;
