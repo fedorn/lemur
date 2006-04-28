@@ -20,13 +20,30 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API QueryParser : public ANTLR_USE_NAMESPACE(antlr)LLkParser, public QueryLexerTokenTypes
 {
-#line 151 "indrilang.g"
+#line 156 "indrilang.g"
 
 private:
   // storage for allocated nodes
   std::vector<indri::lang::Node*> _nodes;
   // makes sure nodes go away when parser goes away
   indri::utility::VectorDeleter<indri::lang::Node*> _deleter;
+    
+  indri::lang::RawExtentNode * innerMost( indri::lang::ScoredExtentNode* sr ) {
+    indri::lang::RawExtentNode * ou = 0;
+    // set the new outer node we need to pass down (the innermost of field or field list of 
+    // of this restriction)
+    indri::lang::ExtentRestriction * er = dynamic_cast<indri::lang::ExtentRestriction *>(sr);
+    if (er != 0) {
+      indri::lang::RawExtentNode * f = er->getField();
+      indri::lang::ExtentInside * ei = dynamic_cast<indri::lang::ExtentInside *>(f);
+      while (ei != 0) {
+        f = ei->getInner();
+        ei = dynamic_cast<indri::lang::ExtentInside *>(f);
+      }       
+      ou = f;
+    }
+    return ou;         
+  }
   
 public:
   void init( QueryLexer* lexer ) {
@@ -58,35 +75,60 @@ public:
 		return QueryParser::tokenNames;
 	}
 	public:  indri::lang::ScoredExtentNode*  query();
-	public:  indri::lang::ScoredExtentNode*  scoredExtentNode();
-	public:  indri::lang::ScoredExtentNode*  weightNode();
-	public:  indri::lang::ScoredExtentNode*  combineNode();
-	public:  indri::lang::ScoredExtentNode*  orNode();
-	public:  indri::lang::ScoredExtentNode*  notNode();
-	public:  indri::lang::ScoredExtentNode*  wandNode();
-	public:  indri::lang::ScoredExtentNode*  wsumNode();
-	public:  indri::lang::ScoredExtentNode*  maxNode();
+	public:  indri::lang::ScoredExtentNode*  scoredExtentNode(
+		 indri::lang::RawExtentNode * ou 
+	);
+	public:  indri::lang::ScoredExtentNode*  weightNode(
+		indri::lang::RawExtentNode * ou 
+	);
+	public:  indri::lang::ScoredExtentNode*  combineNode(
+		indri::lang::RawExtentNode * ou 
+	);
+	public:  indri::lang::ScoredExtentNode*  orNode(
+		indri::lang::RawExtentNode * ou 
+	);
+	public:  indri::lang::ScoredExtentNode*  notNode(
+		indri::lang::RawExtentNode * ou 
+	);
+	public:  indri::lang::ScoredExtentNode*  wandNode(
+		indri::lang::RawExtentNode * ou 
+	);
+	public:  indri::lang::ScoredExtentNode*  wsumNode(
+		indri::lang::RawExtentNode * ou 
+	);
+	public:  indri::lang::ScoredExtentNode*  maxNode(
+		indri::lang::RawExtentNode * ou 
+	);
 	public:  indri::lang::PriorNode*  priorNode();
-	public:  indri::lang::FilRejNode*  filrejNode();
-	public:  indri::lang::FilReqNode*  filreqNode();
+	public:  indri::lang::FilRejNode*  filrejNode(
+		 indri::lang::RawExtentNode * ou 
+	);
+	public:  indri::lang::FilReqNode*  filreqNode(
+		 indri::lang::RawExtentNode * ou 
+	);
 	public:  indri::lang::ScoredExtentNode*  scoredRaw();
+	public:  indri::lang::ScoredExtentNode*  tandNode(
+		indri::lang::RawExtentNode * ou 
+	);
 	public:  RawExtentNode*  qualifiedTerm();
 	public:  ExtentOr*  context_list();
 	public:  indri::lang::RawExtentNode*  unqualifiedTerm();
 	public:  indri::lang::ScoredExtentNode*  weightedList(
-		 indri::lang::WeightedCombinationNode* wn 
+		 indri::lang::WeightedCombinationNode* wn, indri::lang::RawExtentNode * ou 
 	);
 	public:  indri::lang::ScoredExtentNode*  extentRestriction(
-		 indri::lang::ScoredExtentNode* sn 
+		 indri::lang::ScoredExtentNode* sn, indri::lang::RawExtentNode * ou 
 	);
 	public:  double  floating();
 	public:  indri::lang::ScoredExtentNode*  sumList(
-		 indri::lang::WSumNode* wn 
+		 indri::lang::WSumNode* wn, indri::lang::RawExtentNode * ou 
 	);
 	public:  indri::lang::ScoredExtentNode*  unweightedList(
-		 indri::lang::UnweightedCombinationNode* cn 
+		 indri::lang::UnweightedCombinationNode* cn, indri::lang::RawExtentNode * ou 
 	);
-	public:  indri::lang::ScoredExtentNode*  sumNode();
+	public:  indri::lang::ScoredExtentNode*  sumNode(
+		indri::lang::RawExtentNode * ou 
+	);
 	public:  indri::lang::WeightedExtentOr*  wsynNode();
 	public:  RawExtentNode*  unscoredTerm();
 	public:  indri::lang::ODNode*  odNode();
@@ -105,12 +147,16 @@ public:
 	public:  indri::lang::FieldBetweenNode*  betweenNode();
 	public:  indri::lang::FieldEqualsNode*  equalsNode();
 	public:  indri::lang::IndexTerm*  rawText();
+	public:  indri::lang::ExtentInside*  pathOperator();
 	public:  indri::lang::Field*  field_restriction();
 	public:  UINT64  date();
 	public:  UINT64  slashDate();
 	public:  UINT64  spaceDate();
 	public:  UINT64  dashDate();
 	public:  INT64  number();
+	public:  indri::lang::ScoredExtentNode*  tieredList(
+		 indri::lang::TieredCombinationNode * tn, indri::lang::RawExtentNode * ou 
+	);
 public:
 	ANTLR_USE_NAMESPACE(antlr)RefAST getAST()
 	{
@@ -122,10 +168,10 @@ protected:
 private:
 	static const char* tokenNames[];
 #ifndef NO_STATIC_CONSTS
-	static const int NUM_TOKENS = 63;
+	static const int NUM_TOKENS = 65;
 #else
 	enum {
-		NUM_TOKENS = 63
+		NUM_TOKENS = 65
 	};
 #endif
 	
