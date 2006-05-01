@@ -40,7 +40,6 @@ void QueryLexer::initLiterals()
 	literals["#prior"] = 20;
 	literals["#date:before"] = 22;
 	literals["#sum"] = 4;
-	literals["#tand"] = 31;
 	literals["#less"] = 24;
 	literals["#or"] = 8;
 	literals["#uw"] = 10;
@@ -1101,9 +1100,9 @@ void QueryLexer::mTERM(bool _createToken) {
 	if ( synPredMatched55 ) {
 		mFLOAT(false);
 		if ( inputState->guessing==0 ) {
-#line 134 "indrilang.g"
+#line 131 "indrilang.g"
 			_ttype = FLOAT;
-#line 1105 "QueryLexer.cpp"
+#line 1104 "QueryLexer.cpp"
 		}
 	}
 	else {
@@ -1126,9 +1125,9 @@ void QueryLexer::mTERM(bool _createToken) {
 		if ( synPredMatched59 ) {
 			mNEGATIVE_NUMBER(false);
 			if ( inputState->guessing==0 ) {
-#line 136 "indrilang.g"
+#line 133 "indrilang.g"
 				_ttype = NEGATIVE_NUMBER;
-#line 1130 "QueryLexer.cpp"
+#line 1129 "QueryLexer.cpp"
 			}
 		}
 		else {
@@ -1196,9 +1195,9 @@ void QueryLexer::mTERM(bool _createToken) {
 				if ( synPredMatched57 ) {
 					mNUMBER(false);
 					if ( inputState->guessing==0 ) {
-#line 135 "indrilang.g"
+#line 132 "indrilang.g"
 						_ttype = NUMBER;
-#line 1200 "QueryLexer.cpp"
+#line 1199 "QueryLexer.cpp"
 					}
 				}
 				else if ((_tokenSet_0.member(LA(1))) && (true)) {
@@ -1412,9 +1411,9 @@ void QueryLexer::mOPERATOR(bool _createToken) {
 	if ( synPredMatched76 ) {
 		mENCODED_QUOTED_TERM(false);
 		if ( inputState->guessing==0 ) {
-#line 144 "indrilang.g"
+#line 141 "indrilang.g"
 			_ttype = ENCODED_QUOTED_TERM;
-#line 1416 "QueryLexer.cpp"
+#line 1415 "QueryLexer.cpp"
 		}
 	}
 	else {
@@ -1437,9 +1436,9 @@ void QueryLexer::mOPERATOR(bool _createToken) {
 		if ( synPredMatched78 ) {
 			mENCODED_TERM(false);
 			if ( inputState->guessing==0 ) {
-#line 145 "indrilang.g"
+#line 142 "indrilang.g"
 				_ttype = ENCODED_TERM;
-#line 1441 "QueryLexer.cpp"
+#line 1440 "QueryLexer.cpp"
 			}
 		}
 		else if ((LA(1) == 0x23 /* '#' */ ) && (true)) {
@@ -1504,9 +1503,9 @@ void QueryLexer::mJUNK(bool _createToken) {
 	}
 	}
 	if ( inputState->guessing==0 ) {
-#line 149 "indrilang.g"
+#line 146 "indrilang.g"
 		_ttype = antlr::Token::SKIP;
-#line 1508 "QueryLexer.cpp"
+#line 1507 "QueryLexer.cpp"
 	}
 	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
 	   _token = makeToken(_ttype);
