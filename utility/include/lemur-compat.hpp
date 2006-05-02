@@ -67,7 +67,7 @@ _Type max( _Type x, _Type y ) {
 #else
   return std::max<_Type>( x, y );
 #endif
-};
+}
 
 /// resets an auto_ptr; same as ptr.reset(), but 
 /// compatible with VC++ 6
@@ -79,7 +79,7 @@ void autoptr_reset( std::auto_ptr<_Type>& ptr ) {
   #else
     ptr.reset();
   #endif
-};
+}
 
 /// resets an auto_ptr; same as ptr.reset(), but 
 /// compatible with VC++ 6
@@ -90,7 +90,7 @@ void autoptr_reset( std::auto_ptr<_Type>& ptr, _Type& newValue ) {
   #else
     ptr.reset( newValue );
   #endif
-};
+}
 
 /// remove a file (same as ::remove)
 inline int remove( const char* fileName ) {
@@ -204,7 +204,7 @@ inline UINT64 ntohll( UINT64 native ) {
 void initializeNetwork();
 void closesocket( socket_t s );
 
-};
+}
 
 #endif /* LEMUR_COMPAT_HPP */
 

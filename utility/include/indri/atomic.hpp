@@ -50,7 +50,7 @@ namespace indri {
       __atomic_add( &variable, -1 );
     }
 #endif
-  };
+  }
 }
 
 #endif // INDRI_ATOMIC_HPP

@@ -137,7 +137,7 @@ namespace indri
       BulkBlock* _fetch( UINT32 id );
 
     public:
-      BulkTreeReader::BulkTreeReader();
+      BulkTreeReader();
       BulkTreeReader( File& file );
       BulkTreeReader( File& file, UINT64 length );
       ~BulkTreeReader();
