@@ -102,6 +102,6 @@ namespace indri {
    void Walker::after( class ExtentChild* n ) { defaultAfter( n ); }
    void Walker::before( class ExtentParent* n ) { defaultBefore( n ); }
    void Walker::after( class ExtentParent* n ) { defaultAfter( n ); }
- };
-};
+ }
+}
 

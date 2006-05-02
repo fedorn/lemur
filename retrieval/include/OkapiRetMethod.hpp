@@ -40,7 +40,7 @@ namespace OkapiParameter {
 
   static double defaultExpQTF = 0.5;
   static int defaultHowManyTerms = 50;
-};
+}
 namespace lemur 
 {
   namespace retrieval 

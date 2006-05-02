@@ -104,8 +104,8 @@ namespace indri {
       virtual void before( class ExtentParent* oldNode );
       virtual class Node* after( class ExtentParent* oldNode, class ExtentParent* newNode );
    };
- };
-};
+ }
+}
 
 #endif // INDRI_COPER_HPP
 

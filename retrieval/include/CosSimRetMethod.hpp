@@ -26,7 +26,7 @@ namespace CosSimParameter {
   static int defaultHowManyTerms = 50;
   static double defaultPosCoeff = 0.5;
   static const string defaultL2File = "cos.L2";
-};
+}
 namespace lemur
 {
   namespace retrieval 

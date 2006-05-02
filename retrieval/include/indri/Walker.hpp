@@ -104,8 +104,8 @@ namespace indri {
       virtual void before( class ExtentParent* n );
       virtual void after( class ExtentParent* n );
    };
- };
-};
+ }
+}
 
 #endif // INDRI_WALKER_HPP
 

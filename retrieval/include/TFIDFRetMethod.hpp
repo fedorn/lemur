@@ -35,7 +35,7 @@ namespace TFIDFParameter {
   static double defaultQryB = 0;
   static int defaultHowManyTerms = 50;
   static double defaultPosCoeff = 0.5;
-};
+}
 namespace lemur 
 {
   namespace retrieval 

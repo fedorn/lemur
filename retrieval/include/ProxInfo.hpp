@@ -34,7 +34,7 @@ namespace lemur
       ProxInfo() : nextPos(0), posList(NULL), size(0),
                    dList(NULL), listSize(0) { }
       /// Make one from an InvFPDocList
-      ProxInfo::ProxInfo(int num, int tf, const lemur::api::DocInfoList *dl);
+      ProxInfo(int num, int tf, const lemur::api::DocInfoList *dl);
   
       /// Make one from a doc positions list.
       ProxInfo(int  num, int tf, lemur::api::LOC_T *pl);

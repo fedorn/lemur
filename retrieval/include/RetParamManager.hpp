@@ -91,7 +91,7 @@ namespace RetrievalParameter {
     resultCount = lemur::api::ParamGetInt("resultCount", 1000); 
     
   }
-};
+}
 
 /// TFIDF retrieval method parameters.
 namespace TFIDFParameter {
@@ -124,7 +124,7 @@ namespace TFIDFParameter {
     fbPrm.howManyTerms = lemur::api::ParamGetInt("feedbackTermCount",defaultHowManyTerms);
     fbPrm.posCoeff = lemur::api::ParamGetDouble("feedbackPosCoeff", defaultPosCoeff); 
   }
-};
+}
 
 /// Okapi retrieval method parameters.
 namespace OkapiParameter {
@@ -145,7 +145,7 @@ namespace OkapiParameter {
     fbPrm.howManyTerms = lemur::api::ParamGetInt("feedbackTermCount",defaultHowManyTerms);
     
   }
-};
+}
 /// Simple KL retrieval method parameters.
 namespace SimpleKLParameter {
   /// @name Simple KL model parameters
@@ -241,7 +241,7 @@ namespace SimpleKLParameter {
     qryPrm.emIterations = lemur::api::ParamGetInt("emIterations", defaultEMIterations);
                                               
   }
-};
+}
 /// CORI retrieval method parameters.
 namespace CORIParameter {
   static lemur::utility::String collectionCounts;
@@ -256,7 +256,7 @@ namespace CORIParameter {
     doctffactor = lemur::api::ParamGetDouble("DOCCTF_factor", 1.5);
     doctfbaseline = lemur::api::ParamGetDouble("DOCCTF_baseline", 0.5);
   }
-};
+}
 /// Cosine similarity retrieval method parameters.
 namespace CosSimParameter {
 
@@ -272,7 +272,7 @@ namespace CosSimParameter {
     fbPrm.posCoeff = lemur::api::ParamGetDouble("feedbackPosCoeff", defaultPosCoeff); 
     L2NormFile = lemur::api::ParamGetString("L2File", defaultL2File);
   }
-};
+}
 /// Parameters used in the InQuery structured query retrieval method
 namespace InQueryParameter {
   /// @name InQuery structured query parameters
@@ -292,7 +292,7 @@ namespace InQueryParameter {
     string tmpString = RetrievalParameter::getLower("cacheIDF", "true");
     cacheIDF = (tmpString == "true" || tmpString == "1");
   }
-};
+}
 
 /// Parameters used in the Indri query language
 namespace IndriParameter {
@@ -322,6 +322,6 @@ namespace IndriParameter {
     // results count
     params.set( "count", RetrievalParameter::resultCount );
   }
-};
+}
 
 #endif

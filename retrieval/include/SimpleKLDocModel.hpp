@@ -76,7 +76,7 @@ namespace SimpleKLParameter {
   static double defaultFBMixNoise = 0.5;
   static int defaultEMIterations = 50;
   static double defaultQryNoise = 0; //maximum likelihood estimator
-};
+}
 
 namespace lemur 
 {

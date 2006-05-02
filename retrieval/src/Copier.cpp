@@ -102,6 +102,6 @@ namespace indri {
     Node* Copier::after( class ExtentChild* oldNode, class ExtentChild* newNode ) { return defaultAfter( oldNode, newNode ); }
     void Copier::before( class ExtentParent* oldNode ) { defaultBefore( oldNode ); }
     Node* Copier::after( class ExtentParent* oldNode, class ExtentParent* newNode ) { return defaultAfter( oldNode, newNode ); }
- };
-};
+ }
+}
 

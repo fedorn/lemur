@@ -23,8 +23,8 @@ BEGIN {
 
 END {
   print "   };";
-  print " };";
-  print "};";
+  print " }";
+  print "}";
   print "";
   print "#endif // INDRI_COPER_HPP";
   print "";
