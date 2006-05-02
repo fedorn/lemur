@@ -88,6 +88,6 @@ namespace ClusterParam {
     maxIters = lemur::api::ParamGetInt("maxIters", 100);
     numIters = lemur::api::ParamGetInt("bkIters", 5);
   }
-};
+}
 
 #endif

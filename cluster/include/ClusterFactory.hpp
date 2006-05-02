@@ -29,7 +29,7 @@ namespace lemur
                      enum ClusterParam::clusterTypes clusterType = ClusterParam::CENTROID,
                      enum ClusterParam::docModes docMode = ClusterParam::DMAX);
       /// Make an instance of the appropriate cluster type.
-      Cluster *ClusterFactory::allocateCluster(int clusterID = 1);
+      Cluster *allocateCluster(int clusterID = 1);
   
     private:
       const lemur::api::Index &index;
