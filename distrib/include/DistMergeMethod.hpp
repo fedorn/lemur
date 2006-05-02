@@ -30,7 +30,7 @@ namespace DistMergeMethodParameter {
   static void get() {
     mergeMethod=lemur::api::ParamGetInt("mergeMethod",0);
   }
-};
+}
 
 
 namespace lemur 

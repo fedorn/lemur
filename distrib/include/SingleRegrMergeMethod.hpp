@@ -34,7 +34,7 @@ namespace SingleRegrMergeMethodParameter {
   static void get() {
     csDbDataBaseIndex = lemur::api::ParamGetString("csDbDataBaseIndex","");
   }
-};
+}
 
 namespace lemur 
 {
