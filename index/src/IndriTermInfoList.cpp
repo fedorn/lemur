@@ -133,8 +133,8 @@ namespace indri {
       const_cast<PositionList*>(this)->_position++;
       return &const_cast<PositionList*>(this)->_info;
     }
-  };
-};
+  }
+}
 
 
 

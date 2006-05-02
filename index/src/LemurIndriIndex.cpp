@@ -70,7 +70,7 @@ lemur::api::DOCID_T lemur::index::LemurIndriIndex::document(const lemur::api::EX
   if (ids.size() > 0) 
     docid = ids[0];
   return docid;
-};
+}
 
 const lemur::api::EXDOCID_T lemur::index::LemurIndriIndex::document(lemur::api::DOCID_T docID) const { 
   return _repository->collection()->retrieveMetadatum(docID, "docno");

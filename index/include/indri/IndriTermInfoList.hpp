@@ -94,7 +94,7 @@ namespace indri {
 
       lemur::api::TermInfo* nextEntry() const ;
     };
-  };
+  }
 }
 
 #endif // INDRI_TERMINFOLIST_HPP

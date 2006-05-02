@@ -45,7 +45,7 @@ namespace indri {
       const int decimal = 10;
       const int hyphen = 11;
       const int thousand = 12;
-    };
+    }
 
     class UTF8Transcoder {
 

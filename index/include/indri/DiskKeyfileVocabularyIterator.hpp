@@ -55,7 +55,7 @@ namespace indri {
       bool finished();
     };
   }
-};
+}
 
 #endif // INDRI_DISKKEYFILEVOCABULARYITERATOR_HPP
 

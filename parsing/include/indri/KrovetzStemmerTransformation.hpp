@@ -38,7 +38,7 @@ namespace indri
       const char* _getBufferEnd() const;
       indri::api::ParsedDocument* _restart( indri::api::ParsedDocument* document, size_t lastIndex, char* endOfStemming );
       indri::api::ParsedDocument* _processTerms( indri::api::ParsedDocument* document, size_t start, char* stem, const char* end );
-      char* KrovetzStemmerTransformation::_growBuffer( size_t length, char* oldEnd );
+      char* _growBuffer( size_t length, char* oldEnd );
 
     public:
       KrovetzStemmerTransformation( indri::api::Parameters& parameters );
