@@ -46,11 +46,12 @@ INDRI_PROPS = $(patsubst %,$(INDRI_OUTDIRPROP)/%, $(notdir $(wildcard $(INDRI_JS
 
 LEMUR_MFST=java/manifest.lemur
 LEMUR_MFSTRET=java/manifest.LemurRet
+LEMUR_MFSTIND=java/manifest.LemurIndex
 INDRI_MFST=java/manifest.indri
 MFSTRET=java/manifest.RetUI
 MFSTIND=java/manifest.IndexUI
 
-JARFILES=$(OBJ)/java/indri.jar $(OBJ)/java/RetUI.jar $(OBJ)/java/IndexUI.jar $(OBJ)/java/lemur.jar $(OBJ)/java/LemurRet.jar
+JARFILES=$(OBJ)/java/indri.jar $(OBJ)/java/RetUI.jar $(OBJ)/java/IndexUI.jar $(OBJ)/java/lemur.jar $(OBJ)/java/LemurRet.jar $(OBJ)/java/LemurIndex.jar
 
 INTERFACES = $(wildcard interface/*.i)
 
@@ -177,6 +178,10 @@ $(OBJ)/java/lemur.jar: $(JAVAOBJ) $(LEMUR_MFST) $(DOCDEP)
 $(OBJ)/java/LemurRet.jar: $(JAVAOBJ) $(LEMUR_MFSTRET) $(DOCDEP)
 	rm -f $@
 	cd $(OBJ)/java; $(JAR) cmf ../../src/$(LEMUR_MFSTRET) LemurRet.jar lemurproject docs
+
+$(OBJ)/java/LemurIndex.jar: $(JAVAOBJ) $(LEMUR_MFSTIND) $(DOCDEP)
+	rm -f $@
+	cd $(OBJ)/java; $(JAR) cmf ../../src/$(LEMUR_MFSTIND) LemurIndex.jar lemurproject docs
 
 $(OBJ)/java/indri.jar: $(JAVAOBJ) $(INDRI_MFST) $(DOCDEP)
 	rm -f $@
