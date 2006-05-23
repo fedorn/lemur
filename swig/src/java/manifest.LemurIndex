@@ -1,0 +1,7 @@
+Name: lemurproject/lemur/ui
+Main-Class: lemurproject.lemur.ui.LemurIndexGUI
+Specification-Title:  Indexing UI
+Specification-Vendor: Lemur Project
+Specification-Version: 0.6
+Package-Title: lemurproject.lemur.ui
+Package-Vendor: Lemur Project
