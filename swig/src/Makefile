@@ -1,4 +1,4 @@
-LEMURDIR = /usr/ind1/tmp2/dfisher/src/lemurall/lemur
+LEMURDIR = ../..
 include $(LEMURDIR)/MakeDefns
 
 PACKAGE = lemur_jni
@@ -161,10 +161,10 @@ $(INDRI_OUTDIR)/%.class:$(INDRI_JSRC)/%.java
 	$(JAVAC) -classpath java -d $(OBJ)/java $<
 
 $(OUTDIRPROP)/%:$(JSRCUI)/properties/%
-	$(INSTALL_DATA) $< $@
+	if test -f $< ; then $(INSTALL_DATA) $< $@ ; fi
 
 $(INDRI_OUTDIRPROP)/%:$(INDRI_JSRCUI)/properties/%
-	$(INSTALL_DATA) $< $@
+	if test -f $< ; then $(INSTALL_DATA) $< $@ ; fi
 
 
 $(DOCDEP): $(ALLSRC)
