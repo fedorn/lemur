@@ -139,4 +139,20 @@ public class QueryEnvironment {
   return indriJNI.QueryEnvironment_documentVectors(swigCPtr, documentIDs);
 }
 
+  public double expressionCount(String expression, String queryType) {
+    return indriJNI.QueryEnvironment_expressionCount__SWIG_0(swigCPtr, expression, queryType);
+  }
+
+  public double expressionCount(String expression) {
+    return indriJNI.QueryEnvironment_expressionCount__SWIG_1(swigCPtr, expression);
+  }
+
+  public ScoredExtentResult[] expressionList(String expression, String queryType) {
+  return indriJNI.QueryEnvironment_expressionList__SWIG_0(swigCPtr, expression, queryType);
+}
+
+  public ScoredExtentResult[] expressionList(String expression) {
+  return indriJNI.QueryEnvironment_expressionList__SWIG_1(swigCPtr, expression);
+}
+
 }

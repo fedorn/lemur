@@ -39,6 +39,10 @@ public:
   INT64 documentCount( const std::string& term ) throw (lemur::api::Exception);
 
   std::vector<indri::api::DocumentVector*> documentVectors( const std::vector<int>& documentIDs ) throw (lemur::api::Exception);
+
+  double expressionCount( const std::string& expression, const std::string &queryType = "indri" );
+  std::vector<indri::api::ScoredExtentResult> expressionList( const std::string& expression,  const std::string& queryType = "indri" );
+
 };
 
 }}

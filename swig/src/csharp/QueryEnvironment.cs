@@ -184,6 +184,30 @@ public class QueryEnvironment : IDisposable {
     return ret;
   }
 
+  public double expressionCount(string expression, string queryType) {
+    double ret = indriPINVOKE.QueryEnvironment_expressionCount__SWIG_0(swigCPtr, expression, queryType);
+    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public double expressionCount(string expression) {
+    double ret = indriPINVOKE.QueryEnvironment_expressionCount__SWIG_1(swigCPtr, expression);
+    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public ScoredExtentResultVector expressionList(string expression, string queryType) {
+    ScoredExtentResultVector ret = new ScoredExtentResultVector(indriPINVOKE.QueryEnvironment_expressionList__SWIG_0(swigCPtr, expression, queryType), true);
+    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public ScoredExtentResultVector expressionList(string expression) {
+    ScoredExtentResultVector ret = new ScoredExtentResultVector(indriPINVOKE.QueryEnvironment_expressionList__SWIG_1(swigCPtr, expression), true);
+    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
 }
 
 }

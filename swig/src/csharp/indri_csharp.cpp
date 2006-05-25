@@ -6803,6 +6803,96 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_QueryEnvironment_documentVectors(void * jar
 }
 
 
+SWIGEXPORT double SWIGSTDCALL CSharp_QueryEnvironment_expressionCount__SWIG_0(void * jarg1, char * jarg2, char * jarg3) {
+  double jresult ;
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  double result;
+  
+  arg1 = (indri::api::QueryEnvironment *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  if (!jarg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg3_str(jarg3);
+  arg3 = &arg3_str; 
+  result = (double)(arg1)->expressionCount((std::string const &)*arg2,(std::string const &)*arg3);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_QueryEnvironment_expressionCount__SWIG_1(void * jarg1, char * jarg2) {
+  double jresult ;
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  double result;
+  
+  arg1 = (indri::api::QueryEnvironment *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  result = (double)(arg1)->expressionCount((std::string const &)*arg2);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_QueryEnvironment_expressionList__SWIG_0(void * jarg1, char * jarg2, char * jarg3) {
+  void * jresult ;
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  std::vector<indri::api::ScoredExtentResult > result;
+  
+  arg1 = (indri::api::QueryEnvironment *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  if (!jarg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg3_str(jarg3);
+  arg3 = &arg3_str; 
+  result = (arg1)->expressionList((std::string const &)*arg2,(std::string const &)*arg3);
+  jresult = new std::vector<indri::api::ScoredExtentResult >((std::vector<indri::api::ScoredExtentResult > &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_QueryEnvironment_expressionList__SWIG_1(void * jarg1, char * jarg2) {
+  void * jresult ;
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  std::vector<indri::api::ScoredExtentResult > result;
+  
+  arg1 = (indri::api::QueryEnvironment *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  result = (arg1)->expressionList((std::string const &)*arg2);
+  jresult = new std::vector<indri::api::ScoredExtentResult >((std::vector<indri::api::ScoredExtentResult > &)result); 
+  return jresult;
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_delete_QueryEnvironment(void * jarg1) {
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   

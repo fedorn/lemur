@@ -40,6 +40,10 @@ class indriJNI {
   public final static native long QueryEnvironment_documentCount__SWIG_0(long jarg1) throws java.lang.Exception;
   public final static native long QueryEnvironment_documentCount__SWIG_1(long jarg1, String jarg2) throws java.lang.Exception;
   public final static native DocumentVector[] QueryEnvironment_documentVectors(long jarg1, int[] jarg2) throws java.lang.Exception;
+  public final static native double QueryEnvironment_expressionCount__SWIG_0(long jarg1, String jarg2, String jarg3);
+  public final static native double QueryEnvironment_expressionCount__SWIG_1(long jarg1, String jarg2);
+  public final static native ScoredExtentResult[] QueryEnvironment_expressionList__SWIG_0(long jarg1, String jarg2, String jarg3);
+  public final static native ScoredExtentResult[] QueryEnvironment_expressionList__SWIG_1(long jarg1, String jarg2);
   public final static native void delete_QueryEnvironment(long jarg1);
   public final static native void delete_IndexStatus(long jarg1);
   public final static native void IndexStatus_status(long jarg1, int jarg2, String jarg3, String jarg4, int jarg5, int jarg6);

@@ -1142,6 +1142,10 @@ static zend_function_entry QueryEnvironment_functions[] = {
  ZEND_NAMED_FE(documentcount,_wrap_QueryEnvironment_documentCount, NULL)
  ZEND_NAMED_FE(queryenvironment_onedocumentcount,_wrap_QueryEnvironment_onedocumentCount, NULL)
  ZEND_NAMED_FE(onedocumentcount,_wrap_QueryEnvironment_onedocumentCount, NULL)
+ ZEND_NAMED_FE(queryenvironment_expressioncount,_wrap_QueryEnvironment_expressionCount, NULL)
+ ZEND_NAMED_FE(expressioncount,_wrap_QueryEnvironment_expressionCount, NULL)
+ ZEND_NAMED_FE(queryenvironment_expressionlist,_wrap_QueryEnvironment_expressionList, NULL)
+ ZEND_NAMED_FE(expressionlist,_wrap_QueryEnvironment_expressionList, NULL)
  ZEND_NAMED_FE(new_queryenvironment,_wrap_new_QueryEnvironment, NULL)
  ZEND_NAMED_FE(queryenvironment,_wrap_new_QueryEnvironment, NULL)
    { NULL, NULL, NULL}
@@ -3307,6 +3311,298 @@ ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_onedocumentCount) {
   
   return;
 fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_expressionCount__SWIG_0) {
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  double result;
+  std::string temp2 ;
+  std::string temp3 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__QueryEnvironment, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of QueryEnvironment_expressionCount. Expected SWIGTYPE_p_indri__api__QueryEnvironment");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  {
+    convert_to_string_ex(args[1]);
+    temp3 = std::string(Z_STRVAL_PP(args[1]),Z_STRLEN_PP(args[1]));
+    arg3 = &temp3;
+  }
+  result = (double)(arg1)->expressionCount((std::string const &)*arg2,(std::string const &)*arg3);
+  {
+    ZVAL_DOUBLE(return_value,result);
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_expressionCount__SWIG_1) {
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  double result;
+  std::string temp2 ;
+  zval **args[1];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 1) || (zend_get_parameters_array_ex(1, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__QueryEnvironment, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of QueryEnvironment_expressionCount. Expected SWIGTYPE_p_indri__api__QueryEnvironment");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  result = (double)(arg1)->expressionCount((std::string const &)*arg2);
+  {
+    ZVAL_DOUBLE(return_value,result);
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_expressionCount) {
+  int argc;
+  zval **argv[3];
+  int ii;
+  
+  argc = ZEND_NUM_ARGS();
+  argv[0] = &this_ptr;
+  zend_get_parameters_array_ex(argc,argv+1);
+  argc++;
+  if (argc == 2) {
+    int _v;
+    {
+      /* typecheck SWIGTYPE * */
+      void *tmp;
+      _v = (SWIG_ConvertPtr( *argv[0], (void**)&tmp, SWIGTYPE_p_indri__api__QueryEnvironment, 0) < 0)? 0:1;
+    }
+    if (_v) {
+      {
+        _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      }
+      if (_v) {
+        return _wrap_QueryEnvironment_expressionCount__SWIG_1(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      /* typecheck SWIGTYPE * */
+      void *tmp;
+      _v = (SWIG_ConvertPtr( *argv[0], (void**)&tmp, SWIGTYPE_p_indri__api__QueryEnvironment, 0) < 0)? 0:1;
+    }
+    if (_v) {
+      {
+        _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      }
+      if (_v) {
+        {
+          _v = ( Z_TYPE_PP(argv[2]) == IS_STRING ) ? 1 : 0;
+        }
+        if (_v) {
+          return _wrap_QueryEnvironment_expressionCount__SWIG_0(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+        }
+      }
+    }
+  }
+  
+  ErrorCode() = E_ERROR;
+  ErrorMsg() = "No matching function for overloaded 'QueryEnvironment_expressionCount'";
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_expressionList__SWIG_0) {
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  SwigValueWrapper<std::vector<indri::api::ScoredExtentResult > > result;
+  std::string temp2 ;
+  std::string temp3 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__QueryEnvironment, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of QueryEnvironment_expressionList. Expected SWIGTYPE_p_indri__api__QueryEnvironment");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  {
+    convert_to_string_ex(args[1]);
+    temp3 = std::string(Z_STRVAL_PP(args[1]),Z_STRLEN_PP(args[1]));
+    arg3 = &temp3;
+  }
+  result = (arg1)->expressionList((std::string const &)*arg2,(std::string const &)*arg3);
+  {
+    std::vector< indri::api::ScoredExtentResult >::size_type iIndex;
+    array_init(return_value);
+    std::vector< indri::api::ScoredExtentResult > *resultobj = &result; 
+    for (iIndex=0;iIndex<resultobj->size();iIndex++)  {
+      zval *obj, *_cPtr;
+      MAKE_STD_ZVAL(obj);
+      MAKE_STD_ZVAL(_cPtr);
+      indri::api::ScoredExtentResult *r = new indri::api::ScoredExtentResult((*resultobj)[iIndex]);
+      SWIG_SetPointerZval(obj, (void *)r, SWIGTYPE_p_indri__api__ScoredExtentResult, 1);
+      *_cPtr = *obj;
+      INIT_ZVAL(*obj);
+      object_init_ex(obj,ptr_ce_swig_ScoredExtentResult);
+      add_property_double(obj,"score",r->score);
+      add_property_long(obj,"document",r->document);
+      add_property_long(obj,"begin",r->begin);
+      add_property_long(obj,"end",r->end);
+      add_property_zval(obj,"_cPtr",_cPtr);
+      add_next_index_zval(return_value, obj);
+    }
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_expressionList__SWIG_1) {
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  SwigValueWrapper<std::vector<indri::api::ScoredExtentResult > > result;
+  std::string temp2 ;
+  zval **args[1];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 1) || (zend_get_parameters_array_ex(1, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__QueryEnvironment, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of QueryEnvironment_expressionList. Expected SWIGTYPE_p_indri__api__QueryEnvironment");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  result = (arg1)->expressionList((std::string const &)*arg2);
+  {
+    std::vector< indri::api::ScoredExtentResult >::size_type iIndex;
+    array_init(return_value);
+    std::vector< indri::api::ScoredExtentResult > *resultobj = &result; 
+    for (iIndex=0;iIndex<resultobj->size();iIndex++)  {
+      zval *obj, *_cPtr;
+      MAKE_STD_ZVAL(obj);
+      MAKE_STD_ZVAL(_cPtr);
+      indri::api::ScoredExtentResult *r = new indri::api::ScoredExtentResult((*resultobj)[iIndex]);
+      SWIG_SetPointerZval(obj, (void *)r, SWIGTYPE_p_indri__api__ScoredExtentResult, 1);
+      *_cPtr = *obj;
+      INIT_ZVAL(*obj);
+      object_init_ex(obj,ptr_ce_swig_ScoredExtentResult);
+      add_property_double(obj,"score",r->score);
+      add_property_long(obj,"document",r->document);
+      add_property_long(obj,"begin",r->begin);
+      add_property_long(obj,"end",r->end);
+      add_property_zval(obj,"_cPtr",_cPtr);
+      add_next_index_zval(return_value, obj);
+    }
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_expressionList) {
+  int argc;
+  zval **argv[3];
+  int ii;
+  
+  argc = ZEND_NUM_ARGS();
+  argv[0] = &this_ptr;
+  zend_get_parameters_array_ex(argc,argv+1);
+  argc++;
+  if (argc == 2) {
+    int _v;
+    {
+      /* typecheck SWIGTYPE * */
+      void *tmp;
+      _v = (SWIG_ConvertPtr( *argv[0], (void**)&tmp, SWIGTYPE_p_indri__api__QueryEnvironment, 0) < 0)? 0:1;
+    }
+    if (_v) {
+      {
+        _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      }
+      if (_v) {
+        return _wrap_QueryEnvironment_expressionList__SWIG_1(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      /* typecheck SWIGTYPE * */
+      void *tmp;
+      _v = (SWIG_ConvertPtr( *argv[0], (void**)&tmp, SWIGTYPE_p_indri__api__QueryEnvironment, 0) < 0)? 0:1;
+    }
+    if (_v) {
+      {
+        _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      }
+      if (_v) {
+        {
+          _v = ( Z_TYPE_PP(argv[2]) == IS_STRING ) ? 1 : 0;
+        }
+        if (_v) {
+          return _wrap_QueryEnvironment_expressionList__SWIG_0(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+        }
+      }
+    }
+  }
+  
+  ErrorCode() = E_ERROR;
+  ErrorMsg() = "No matching function for overloaded 'QueryEnvironment_expressionList'";
   zend_error(ErrorCode(),ErrorMsg());
 }
 

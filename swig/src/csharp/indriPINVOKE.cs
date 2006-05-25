@@ -1187,6 +1187,18 @@ class indriPINVOKE {
   [DllImport("indri", EntryPoint="CSharp_QueryEnvironment_documentVectors")]
   public static extern IntPtr QueryEnvironment_documentVectors(HandleRef jarg1, HandleRef jarg2);
 
+  [DllImport("indri", EntryPoint="CSharp_QueryEnvironment_expressionCount__SWIG_0")]
+  public static extern double QueryEnvironment_expressionCount__SWIG_0(HandleRef jarg1, string jarg2, string jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryEnvironment_expressionCount__SWIG_1")]
+  public static extern double QueryEnvironment_expressionCount__SWIG_1(HandleRef jarg1, string jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryEnvironment_expressionList__SWIG_0")]
+  public static extern IntPtr QueryEnvironment_expressionList__SWIG_0(HandleRef jarg1, string jarg2, string jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryEnvironment_expressionList__SWIG_1")]
+  public static extern IntPtr QueryEnvironment_expressionList__SWIG_1(HandleRef jarg1, string jarg2);
+
   [DllImport("indri", EntryPoint="CSharp_delete_QueryEnvironment")]
   public static extern void delete_QueryEnvironment(HandleRef jarg1);
 

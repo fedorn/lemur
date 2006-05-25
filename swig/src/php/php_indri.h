@@ -112,6 +112,10 @@ ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_documentCount);
 ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_documentCount);
 ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_onedocumentCount);
 ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_onedocumentCount);
+ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_expressionCount);
+ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_expressionCount);
+ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_expressionList);
+ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_expressionList);
 ZEND_NAMED_FUNCTION(_wrap_new_QueryEnvironment);
 ZEND_NAMED_FUNCTION(_wrap_new_QueryEnvironment);
 #endif /* PHP_INDRI_H */
