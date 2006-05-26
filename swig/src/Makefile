@@ -219,7 +219,7 @@ install: install_dirs install_data install_docs
 install_docs:
 ifeq ($(WITH_SWIG), 1)
   ifeq ($(WITH_JAVA), 1)
-	cp -pr obj/java/docs/* $(pkgdatadir)/JNIdoc
+	cp -pr $(OBJ)/java/docs/* $(pkgdatadir)/JNIdoc
   endif
 endif
 
