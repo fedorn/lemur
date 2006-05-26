@@ -17,6 +17,18 @@
 		- <tt>--prefix=<install-directory></tt> Specifies the 
 		  directory for the installed toolkit. 
 		  Default is /usr/local.
+		- <tt>--enable-java</tt> compiles and installs the
+		  swig generated java wrappers. Default is disabled.
+		- <tt>--enable-php</tt> compiles and installs the
+		  swig generated php wrappers. Default is disabled.
+		- <tt>--enable-csharp</tt> compiles and installs the
+		  swig generated C# wrappers. Default is disabled.
+		- <tt>--with-javahome=<path></tt> Path to JAVAHOME for
+		  compiling the swig generated shared library. 
+		- <tt>--with-php-config=<path></tt> Path to php-config
+                  binary. Only required if php-config is not on the path. 
+		- <tt>--with-swig=<path></tt> Path to swig binary. Only
+		  required if the wrapper interfaces are changed. 
 
   - To make the lemur toolkit library and applications
       -# go to top level lemur directory.
@@ -37,10 +49,7 @@ The lemur include files will be installed in
 <install-directory>/lib/liblemur.a, and the applications will be
 installed in <install-directory>/bin. If you only want the applications,
 you can use <tt>make install-bin</tt>. If you only want the library and 
-header files, you can use <tt>make install-lib</tt>. The stemmer data 
-files are installed in <install-directory>/kstem_data and
-<install-directory>/arabic_stem_data when either the applications or the
-library are installed.
+header files, you can use <tt>make install-lib</tt>. 
 
   \section program  Programming with the lemur toolkit
 
