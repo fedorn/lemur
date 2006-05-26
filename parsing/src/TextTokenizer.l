@@ -184,9 +184,9 @@ void indri::parse::TextTokenizer::processTag() {
       _document.tags.push_back( te );
 
 #ifndef WIN32
-    } else if ( isspace( toktext[1] ) ) {
+    } else if ( isspace( c[i] ) ) {
 #else
-    } else if ( (toktext[1]  >= 0) && (isspace( toktext[1] ) )) {
+    } else if ( (c[i]  >= 0) && (isspace( c[i] ) )) {
 #endif
 
       // open tag with attributes, eg. <A HREF="www.foo.com/bar">

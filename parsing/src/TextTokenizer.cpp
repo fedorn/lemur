@@ -585,7 +585,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
+	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
 #line 42 "../src/TextTokenizer.l"
@@ -1096,6 +1096,7 @@ register char *yy_bp;
 #endif	/* ifndef YY_NO_UNPUT */
 
 
+#ifndef YY_NO_INPUT
 #ifdef __cplusplus
 static int yyinput()
 #else
@@ -1167,7 +1168,7 @@ static int input()
 
 	return c;
 	}
-
+#endif /* YY_NO_INPUT */
 
 #ifdef YY_USE_PROTOS
 void yyrestart( FILE *input_file )
@@ -1278,11 +1279,6 @@ YY_BUFFER_STATE b;
 	}
 
 
-#ifndef YY_ALWAYS_INTERACTIVE
-#ifndef YY_NEVER_INTERACTIVE
-extern int isatty YY_PROTO(( int ));
-#endif
-#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -1693,7 +1689,7 @@ void indri::parse::TextTokenizer::processTag() {
     te.end = byte_position;
 
     _document.tags.push_back( te );
-
+    
 #ifndef WIN32
     } else if ( isalpha( toktext[1] ) ) {
 #else
@@ -1736,9 +1732,9 @@ void indri::parse::TextTokenizer::processTag() {
       _document.tags.push_back( te );
 
 #ifndef WIN32
-    } else if ( isspace( toktext[1] ) ) {
+    } else if ( isspace( c[i] ) ) {
 #else
-    } else if ( (toktext[1]  >= 0) && (isspace( toktext[1] ) )) {
+    } else if ( (c[i]  >= 0) && (isspace( c[i] ) )) {
 #endif
 
       // open tag with attributes, eg. <A HREF="www.foo.com/bar">
@@ -1758,7 +1754,6 @@ void indri::parse::TextTokenizer::processTag() {
       te.name = write_loc;
       c += i;
       offset += i;
-
 
 #ifndef WIN32
     while ( isspace( *c ) ) { c++; offset++; }
@@ -1798,7 +1793,7 @@ void indri::parse::TextTokenizer::processTag() {
 
         // attributes can be foo\s*=\s*"bar[">] or foo\s*=\s*bar
 
-        // ignore any spaces
+		// ignore any spaces
 #ifndef WIN32
     while ( isspace( *c ) ) { c++; offset++; }
 #else
@@ -1809,11 +1804,13 @@ void indri::parse::TextTokenizer::processTag() {
 
           c++; // get past the '=' sign.
           offset++;
+
 #ifndef WIN32
     while ( isspace( *c ) ) { c++; offset++; }
 #else
     while (((*c) >=0) &&  isspace( *c )) { c++; offset++; }
 #endif
+
           if ( *c == '>' ) {
 
             // common malformed markup <a href=>
