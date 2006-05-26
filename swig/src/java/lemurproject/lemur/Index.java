@@ -21,87 +21,170 @@ public class Index {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected void finalize() {
-    delete();
-  }
-
   public void delete() {
     if(swigCPtr != 0 && swigCMemOwn) {
       swigCMemOwn = false;
-      lemurJNI.delete_Index(swigCPtr);
+      throw new UnsupportedOperationException("C++ destructor does not have public access");
     }
     swigCPtr = 0;
   }
 
-  public boolean open(String indexName) throws java.lang.Exception {
+  
+/**
+       Open previously created Index, return true if opened successfully, <tt>indexName</tt> should be the full name of the table-of-content file for the index. E.g., index.key for a KeyfileIncIndex. 
+
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public boolean open(String indexName) throws java.lang.Exception {
     return lemurJNI.Index_open(swigCPtr, indexName);
   }
 
-  public int term(String word) throws java.lang.Exception {
+  
+/**
+       Convert a term spelling to a termID, returns 0 if out of vocabulary. Valid index starts at 1.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public int term(String word) throws java.lang.Exception {
     return lemurJNI.Index_term__SWIG_0(swigCPtr, word);
   }
 
-  public String term(int termID) throws java.lang.Exception {
+  
+/**
+       Convert a valid termID to its spelling
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public String term(int termID) throws java.lang.Exception {
     return lemurJNI.Index_term__SWIG_1(swigCPtr, termID);
   }
 
-  public int document(String docIDStr) throws java.lang.Exception {
+  
+/**
+       Convert a spelling to docID, returns 0 if out of vocabulary. Valid index starts at 1.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public int document(String docIDStr) throws java.lang.Exception {
     return lemurJNI.Index_document__SWIG_0(swigCPtr, docIDStr);
   }
 
-  public String document(int docID) throws java.lang.Exception {
+  
+/**
+       Convert a valid docID to its spelling
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public String document(int docID) throws java.lang.Exception {
     return lemurJNI.Index_document__SWIG_1(swigCPtr, docID);
   }
 
-  public DocumentManager docManager(int docID) throws java.lang.Exception {
+  
+/**
+@return the document manager to get at the source
+       of the document with this document id
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public DocumentManager docManager(int docID) throws java.lang.Exception {
     long cPtr = lemurJNI.Index_docManager(swigCPtr, docID);
     return (cPtr == 0) ? null : new DocumentManager(cPtr, false);
   }
 
-  public int docCount() throws java.lang.Exception {
+  
+/**
+       Total count (i.e., number) of documents in collection
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public int docCount() throws java.lang.Exception {
     return lemurJNI.Index_docCount__SWIG_0(swigCPtr);
   }
 
-  public int termCountUnique() throws java.lang.Exception {
+  
+/**
+       Total count of unique terms in collection, i.e., the term vocabulary size
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public int termCountUnique() throws java.lang.Exception {
     return lemurJNI.Index_termCountUnique(swigCPtr);
   }
 
-  public int termCount(int termID) throws java.lang.Exception {
+  
+/**
+       Total counts of a term in collection
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public int termCount(int termID) throws java.lang.Exception {
     return lemurJNI.Index_termCount__SWIG_0(swigCPtr, termID);
   }
 
-  public int termCount() throws java.lang.Exception {
+  
+/**
+       Total counts of all terms in collection
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public int termCount() throws java.lang.Exception {
     return lemurJNI.Index_termCount__SWIG_1(swigCPtr);
   }
 
-  public float docLengthAvg() throws java.lang.Exception {
+  
+/**
+       Average document length 
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public float docLengthAvg() throws java.lang.Exception {
     return lemurJNI.Index_docLengthAvg(swigCPtr);
   }
 
-  public int docCount(int termID) throws java.lang.Exception {
+  
+/**
+       Total counts of doc with a given term
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public int docCount(int termID) throws java.lang.Exception {
     return lemurJNI.Index_docCount__SWIG_1(swigCPtr, termID);
   }
 
-  public int docLength(int docID) throws java.lang.Exception {
+  
+/**
+       Total counts of terms in a document  
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public int docLength(int docID) throws java.lang.Exception {
     return lemurJNI.Index_docLength(swigCPtr, docID);
   }
 
-  public DocInfoList docInfoList(int termID) throws java.lang.Exception {
+  
+/**
+       returns a new instance of DocInfoList which represents the doc entries in a term index.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public DocInfoList docInfoList(int termID) throws java.lang.Exception {
     long cPtr = lemurJNI.Index_docInfoList(swigCPtr, termID);
     return (cPtr == 0) ? null : new DocInfoList(cPtr, true);
   }
 
-  public TermInfoList termInfoList(int docID) throws java.lang.Exception {
+  
+/**
+       returns a new instance of TermInfoList which represents the word entries in a document index.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public TermInfoList termInfoList(int docID) throws java.lang.Exception {
     long cPtr = lemurJNI.Index_termInfoList(swigCPtr, docID);
     return (cPtr == 0) ? null : new TermInfoList(cPtr, true);
   }
 
-  public TermInfoList termInfoListSeq(int docID) throws java.lang.Exception {
+  
+/**
+       returns TermInfoList is sequential representation (not bag of words)
+       return NULL list when sequence is not available.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public TermInfoList termInfoListSeq(int docID) throws java.lang.Exception {
     long cPtr = lemurJNI.Index_termInfoListSeq(swigCPtr, docID);
     return (cPtr == 0) ? null : new TermInfoList(cPtr, true);
   }
 
-  public void setProps() {
+  
+/**
+Loads the stemmer/stopword properties for the index.
+*/
+public void setProps() {
     lemurJNI.Index_setProps(swigCPtr);
   }
 

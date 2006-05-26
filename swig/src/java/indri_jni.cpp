@@ -386,7 +386,7 @@ namespace Swig {
 #include "indri/Parameters.hpp"
 #include "indri/ConflationPattern.hpp"
 #include "Exception.hpp"
-
+  
 
 #include <string>
 
@@ -428,565 +428,565 @@ SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
 #include <stdexcept>
 
 
-jobjectArray java_build_scoredextentresult( JNIEnv* jenv, const std::vector<indri::api::ScoredExtentResult>& input ) {
-  jclass clazz = jenv->FindClass("lemurproject/indri/ScoredExtentResult");
-  jmethodID constructor = jenv->GetMethodID(clazz, "<init>", "()V" );
-  jobjectArray result;
+  jobjectArray java_build_scoredextentresult( JNIEnv* jenv, const std::vector<indri::api::ScoredExtentResult>& input ) {
+    jclass clazz = jenv->FindClass("lemurproject/indri/ScoredExtentResult");
+    jmethodID constructor = jenv->GetMethodID(clazz, "<init>", "()V" );
+    jobjectArray result;
 
-  result = jenv->NewObjectArray(input.size(), clazz, NULL);
-  if (!result) {
-    return 0;
+    result = jenv->NewObjectArray(input.size(), clazz, NULL);
+    if (!result) {
+      return 0;
+    }
+
+    jfieldID scoreField = jenv->GetFieldID(clazz, "score", "D" );
+    jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
+    jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
+    jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+
+    for( jsize i=0; i<input.size(); i++ ) {
+      // make a new scored extent result object
+      jobject ser = jenv->NewObject(clazz, constructor);
+
+      // fill in the fields
+      jenv->SetDoubleField(ser, scoreField, input[i].score );
+      jenv->SetIntField(ser, beginField, input[i].begin );
+      jenv->SetIntField(ser, endField, input[i].end );
+      jenv->SetIntField(ser, documentField, input[i].document );
+
+      jenv->SetObjectArrayElement(result, i, ser);
+    }
+
+    return result;
+  }
+  
+
+
+  struct jni_parseddocument_info {
+    jclass pdClazz;
+    jmethodID pdConstructor;
+
+    jclass stringClazz;
+    jclass byteArrayClazz;
+
+    jclass mapClazz;
+    jmethodID mapConstructor;
+    jmethodID putMethod;
+
+    jclass teClazz;
+    jmethodID teConstructor;
+
+    jfieldID termsField;
+    jfieldID textField;
+    jfieldID contentField;
+    jfieldID positionsField;
+    jfieldID metadataField;
+
+    jfieldID beginField;
+    jfieldID endField;
+  };
+
+  void parseddocument_init( JNIEnv* jenv, jni_parseddocument_info& info ) {
+    info.pdClazz = jenv->FindClass("lemurproject/indri/ParsedDocument");
+    info.pdConstructor = jenv->GetMethodID(info.pdClazz, "<init>", "()V" );
+
+    info.stringClazz = jenv->FindClass("java/lang/String" );
+    info.byteArrayClazz = jenv->FindClass("[B" );
+
+    info.mapClazz = jenv->FindClass("java/util/HashMap");
+    info.mapConstructor = jenv->GetMethodID(info.mapClazz, "<init>", "()V" );
+
+    info.putMethod = jenv->GetMethodID(info.mapClazz, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
+    info.teClazz = jenv->FindClass("lemurproject/indri/ParsedDocument$TermExtent" );
+    info.teConstructor = jenv->GetMethodID(info.teClazz, "<init>", "(II)V" );
+
+    info.textField = jenv->GetFieldID(info.pdClazz, "text", "Ljava/lang/String;" );
+    info.contentField = jenv->GetFieldID(info.pdClazz, "content", "Ljava/lang/String;" );
+    info.termsField = jenv->GetFieldID(info.pdClazz, "terms", "[Ljava/lang/String;" );
+    info.positionsField = jenv->GetFieldID(info.pdClazz, "positions", "[Llemurproject/indri/ParsedDocument$TermExtent;" );
+    info.metadataField = jenv->GetFieldID(info.pdClazz, "metadata", "Ljava/util/Map;" );
+
+    info.beginField = jenv->GetFieldID(info.teClazz, "begin", "I");
+    info.endField = jenv->GetFieldID(info.teClazz, "end", "I");
   }
 
-  jfieldID scoreField = jenv->GetFieldID(clazz, "score", "D" );
-  jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
-  jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
-  jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+  jobject parseddocument_copy( JNIEnv* jenv, jni_parseddocument_info& info, indri::api::ParsedDocument* doc ) {
+    // make a parsed document
+    jobject result = jenv->NewObject(info.pdClazz, info.pdConstructor);
 
-  for( jsize i=0; i<input.size(); i++ ) {
-    // make a new scored extent result object
-    jobject ser = jenv->NewObject(clazz, constructor);
+    // make a metadata map to go in it
+    jobject mapObject = jenv->NewObject(info.mapClazz, info.mapConstructor);
 
-    // fill in the fields
-    jenv->SetDoubleField(ser, scoreField, input[i].score );
-    jenv->SetIntField(ser, beginField, input[i].begin );
-    jenv->SetIntField(ser, endField, input[i].end );
-    jenv->SetIntField(ser, documentField, input[i].document );
+    // copy metadata information
+    for( unsigned int i=0; i<doc->metadata.size(); i++ ) {
+      indri::parse::MetadataPair& pair = doc->metadata[i];
 
-    jenv->SetObjectArrayElement(result, i, ser);
+      jstring key = jenv->NewStringUTF(pair.key);
+      jbyteArray value = jenv->NewByteArray(pair.valueLength);
+
+      jbyte* elements = jenv->GetByteArrayElements(value, 0);
+      memcpy( elements, pair.value, pair.valueLength );
+      jenv->ReleaseByteArrayElements(value, elements, 0);
+
+      // put it in the map
+      jenv->CallObjectMethod(mapObject, info.putMethod, key, value);
+    }
+
+    // make a terms string array
+    jobjectArray termsArray = jenv->NewObjectArray(doc->terms.size(), info.stringClazz, NULL);
+
+    // copy terms information
+    for( unsigned int i=0; i<doc->terms.size(); i++ ) {
+      jstring term = jenv->NewStringUTF(doc->terms[i]);
+      jenv->SetObjectArrayElement(termsArray, i, term);
+    }
+
+    // make a positions array
+    jobjectArray positionsArray = jenv->NewObjectArray(doc->positions.size(), info.teClazz, NULL);
+
+    // copy positions information
+    for( unsigned int i=0; i<doc->positions.size(); i++ ) {
+      int begin = doc->positions[i].begin;
+      int end = doc->positions[i].end;
+      jobject position = jenv->NewObject(info.teClazz, info.teConstructor, begin, end);
+
+      // add this object to the array
+      jenv->SetObjectArrayElement(positionsArray, i, position);
+    }
+
+    // store field data
+    jstring text = jenv->NewStringUTF(doc->text);
+
+    jenv->SetObjectField(result, info.textField, text);
+
+    // this makes a copy...
+    jstring content = jenv->NewStringUTF(doc->getContent().c_str());
+
+    jenv->SetObjectField(result, info.contentField, content);
+
+    jenv->SetObjectField(result, info.termsField, termsArray);
+    jenv->SetObjectField(result, info.positionsField, positionsArray);
+    jenv->SetObjectField(result, info.metadataField, mapObject);
+
+    return result;
   }
 
-  return result;
-}
+  
 
 
+  jobject java_build_queryannotationnode( indri::api::QueryAnnotationNode* in,
+                                          JNIEnv* jenv,
+                                          jclass qanClazz,
+                                          jmethodID qanConst ) {
+    jobjectArray children = jenv->NewObjectArray(in->children.size(), qanClazz, NULL);
 
-struct jni_parseddocument_info {
-  jclass pdClazz;
-  jmethodID pdConstructor;
+    for( unsigned int i=0; i<in->children.size(); i++ ) {
+      jobject child = java_build_queryannotationnode( in->children[i], jenv, qanClazz, qanConst );
+      jenv->SetObjectArrayElement(children, i, child);
+    }
 
-  jclass stringClazz;
-  jclass byteArrayClazz;
+    jstring name = jenv->NewStringUTF(in->name.c_str());
+    jstring type = jenv->NewStringUTF(in->type.c_str());
+    jstring queryText = jenv->NewStringUTF(in->queryText.c_str());
 
-  jclass mapClazz;
-  jmethodID mapConstructor;
-  jmethodID putMethod;
+    jobject node = jenv->NewObject(qanClazz, qanConst, name, type, queryText, children);
 
-  jclass teClazz;
-  jmethodID teConstructor;
-
-  jfieldID termsField;
-  jfieldID textField;
-  jfieldID contentField;
-  jfieldID positionsField;
-  jfieldID metadataField;
-
-  jfieldID beginField;
-  jfieldID endField;
-};
-
-void parseddocument_init( JNIEnv* jenv, jni_parseddocument_info& info ) {
-  info.pdClazz = jenv->FindClass("lemurproject/indri/ParsedDocument");
-  info.pdConstructor = jenv->GetMethodID(info.pdClazz, "<init>", "()V" );
-
-  info.stringClazz = jenv->FindClass("java/lang/String" );
-  info.byteArrayClazz = jenv->FindClass("[B" );
-
-  info.mapClazz = jenv->FindClass("java/util/HashMap");
-  info.mapConstructor = jenv->GetMethodID(info.mapClazz, "<init>", "()V" );
-
-  info.putMethod = jenv->GetMethodID(info.mapClazz, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
-  info.teClazz = jenv->FindClass("lemurproject/indri/ParsedDocument$TermExtent" );
-  info.teConstructor = jenv->GetMethodID(info.teClazz, "<init>", "(II)V" );
-
-  info.textField = jenv->GetFieldID(info.pdClazz, "text", "Ljava/lang/String;" );
-  info.contentField = jenv->GetFieldID(info.pdClazz, "content", "Ljava/lang/String;" );
-  info.termsField = jenv->GetFieldID(info.pdClazz, "terms", "[Ljava/lang/String;" );
-  info.positionsField = jenv->GetFieldID(info.pdClazz, "positions", "[Llemurproject/indri/ParsedDocument$TermExtent;" );
-  info.metadataField = jenv->GetFieldID(info.pdClazz, "metadata", "Ljava/util/Map;" );
-
-  info.beginField = jenv->GetFieldID(info.teClazz, "begin", "I");
-  info.endField = jenv->GetFieldID(info.teClazz, "end", "I");
-}
-
-jobject parseddocument_copy( JNIEnv* jenv, jni_parseddocument_info& info, indri::api::ParsedDocument* doc ) {
-  // make a parsed document
-  jobject result = jenv->NewObject(info.pdClazz, info.pdConstructor);
-
-  // make a metadata map to go in it
-  jobject mapObject = jenv->NewObject(info.mapClazz, info.mapConstructor);
-
-  // copy metadata information
-  for( unsigned int i=0; i<doc->metadata.size(); i++ ) {
-    indri::parse::MetadataPair& pair = doc->metadata[i];
-
-    jstring key = jenv->NewStringUTF(pair.key);
-    jbyteArray value = jenv->NewByteArray(pair.valueLength);
-
-    jbyte* elements = jenv->GetByteArrayElements(value, 0);
-    memcpy( elements, pair.value, pair.valueLength );
-    jenv->ReleaseByteArrayElements(value, elements, 0);
-
-    // put it in the map
-    jenv->CallObjectMethod(mapObject, info.putMethod, key, value);
+    return node;
   }
 
-  // make a terms string array
-  jobjectArray termsArray = jenv->NewObjectArray(doc->terms.size(), info.stringClazz, NULL);
+  
 
-  // copy terms information
-  for( unsigned int i=0; i<doc->terms.size(); i++ ) {
-    jstring term = jenv->NewStringUTF(doc->terms[i]);
-    jenv->SetObjectArrayElement(termsArray, i, term);
+
+  struct jni_parameters_info {
+    jclass stringClazz;
+    jclass mapClazz;
+    jclass setClazz;
+    jclass arrayOfMaps;
+    jclass arrayOfString;
+  };
+
+  void java_parameters_map( JNIEnv* jenv, jni_parameters_info& info, indri::api::Parameters p, jobject obj );
+  void java_parameters_array_of_maps( JNIEnv* jenv, jni_parameters_info& info, indri::api::Parameters p, const std::string& key, jobjectArray array );
+
+  void java_parameters_init( JNIEnv* jenv, jni_parameters_info& info ) {
+    info.stringClazz = jenv->FindClass("java/lang/String");
+    info.mapClazz = jenv->FindClass("java/util/Map");
+    info.setClazz = jenv->FindClass("java/util/Set");
+    info.arrayOfMaps = jenv->FindClass("[Ljava/util/Map;");
+    info.arrayOfString = jenv->FindClass("[Ljava/lang/String;");
   }
 
-  // make a positions array
-  jobjectArray positionsArray = jenv->NewObjectArray(doc->positions.size(), info.teClazz, NULL);
+  void java_parameters_array_of_strings( JNIEnv* jenv, jni_parameters_info& info, indri::api::Parameters p, const std::string& key, jobjectArray array ) {
+    // get the array size
+    jsize arrayLength = jenv->GetArrayLength(array);
 
-  // copy positions information
-  for( unsigned int i=0; i<doc->positions.size(); i++ ) {
-    int begin = doc->positions[i].begin;
-    int end = doc->positions[i].end;
-    jobject position = jenv->NewObject(info.teClazz, info.teConstructor, begin, end);
-
-    // add this object to the array
-    jenv->SetObjectArrayElement(positionsArray, i, position);
-  }
-
-  // store field data
-  jstring text = jenv->NewStringUTF(doc->text);
-
-  jenv->SetObjectField(result, info.textField, text);
-
-  // this makes a copy...
-  jstring content = jenv->NewStringUTF(doc->getContent().c_str());
-
-  jenv->SetObjectField(result, info.contentField, content);
-
-  jenv->SetObjectField(result, info.termsField, termsArray);
-  jenv->SetObjectField(result, info.positionsField, positionsArray);
-  jenv->SetObjectField(result, info.metadataField, mapObject);
-
-  return result;
-}
-
-
-
-
-jobject java_build_queryannotationnode( indri::api::QueryAnnotationNode* in,
-                                   JNIEnv* jenv,
-                                   jclass qanClazz,
-                                   jmethodID qanConst ) {
-  jobjectArray children = jenv->NewObjectArray(in->children.size(), qanClazz, NULL);
-
-  for( unsigned int i=0; i<in->children.size(); i++ ) {
-    jobject child = java_build_queryannotationnode( in->children[i], jenv, qanClazz, qanConst );
-    jenv->SetObjectArrayElement(children, i, child);
-  }
-
-  jstring name = jenv->NewStringUTF(in->name.c_str());
-  jstring type = jenv->NewStringUTF(in->type.c_str());
-  jstring queryText = jenv->NewStringUTF(in->queryText.c_str());
-
-  jobject node = jenv->NewObject(qanClazz, qanConst, name, type, queryText, children);
-
-  return node;
-}
-
-
-
-
-struct jni_parameters_info {
-  jclass stringClazz;
-  jclass mapClazz;
-  jclass setClazz;
-  jclass arrayOfMaps;
-  jclass arrayOfString;
-};
-
-void java_parameters_map( JNIEnv* jenv, jni_parameters_info& info, indri::api::Parameters p, jobject obj );
-void java_parameters_array_of_maps( JNIEnv* jenv, jni_parameters_info& info, indri::api::Parameters p, const std::string& key, jobjectArray array );
-
-void java_parameters_init( JNIEnv* jenv, jni_parameters_info& info ) {
-  info.stringClazz = jenv->FindClass("java/lang/String");
-  info.mapClazz = jenv->FindClass("java/util/Map");
-  info.setClazz = jenv->FindClass("java/util/Set");
-  info.arrayOfMaps = jenv->FindClass("[Ljava/util/Map;");
-  info.arrayOfString = jenv->FindClass("[Ljava/lang/String;");
-}
-
-void java_parameters_array_of_strings( JNIEnv* jenv, jni_parameters_info& info, indri::api::Parameters p, const std::string& key, jobjectArray array ) {
-  // get the array size
-  jsize arrayLength = jenv->GetArrayLength(array);
-
-  for( int i=0; i<arrayLength; i++ ) {
-    jstring s = (jstring) jenv->GetObjectArrayElement( array, i );
+    for( int i=0; i<arrayLength; i++ ) {
+      jstring s = (jstring) jenv->GetObjectArrayElement( array, i );
     
-    const char* valueBytes = jenv->GetStringUTFChars(s, 0);
-    std::string valueString = (const char*) valueBytes;
-    jenv->ReleaseStringUTFChars(s, valueBytes);
-    
-    p.append(key).set(valueString);
-  }
-}
-
-void java_parameters_array_of_maps( JNIEnv* jenv, jni_parameters_info& info, indri::api::Parameters p, const std::string& key, jobjectArray array ) {
-  // get the array size
-  jsize arrayLength = jenv->GetArrayLength(array);
-
-  for( int i=0; i<arrayLength; i++ ) {
-    jobject obj = jenv->GetObjectArrayElement( array, i );
-    java_parameters_map( jenv, info, p, obj );
-  }
-}
-
-void java_parameters_map( JNIEnv* jenv, jni_parameters_info& info, indri::api::Parameters p, jobject mapObj ) {
-  // get map class and entrySet method pointer
-  jclass mapClazz = jenv->GetObjectClass(mapObj);
-  jmethodID mapEntrySet = jenv->GetMethodID(mapClazz, "entrySet", "()Ljava/util/Set;" );
-
-  // call entry set function to set a Set of entries
-  jobject entrySet = jenv->CallObjectMethod(mapObj, mapEntrySet);
-  jclass setClazz = jenv->GetObjectClass(entrySet);
-  jmethodID setToArray = jenv->GetMethodID(setClazz, "toArray", "()[Ljava/lang/Object;" );
-
-  // turn that set into an array of objects (entries)
-  jobjectArray entryArray = (jobjectArray) jenv->CallObjectMethod(entrySet, setToArray);
-
-  // get the array size
-  jsize entryArrayLength = jenv->GetArrayLength(entryArray);
-
-  for( int i=0; i<entryArrayLength; i++ ) {
-    // get the key string
-    jobject entryObject = (jstring) jenv->GetObjectArrayElement( entryArray, i );
-    jclass mapEntryClazz = jenv->GetObjectClass(entryObject);
-    jmethodID mapEntryGetKey = jenv->GetMethodID(mapEntryClazz, "getKey", "()Ljava/lang/Object;" );
-    jmethodID mapEntryGetValue = jenv->GetMethodID(mapEntryClazz, "getValue", "()Ljava/lang/Object;" );
-
-    // get key string
-    jstring key = (jstring) jenv->CallObjectMethod(entryObject, mapEntryGetKey);
-    const char* bytes = jenv->GetStringUTFChars(key, 0);
-    std::string keyString = (const char*) bytes;
-    jenv->ReleaseStringUTFChars(key, bytes);
-    
-    // get value object
-    jobject value = jenv->CallObjectMethod(entryObject, mapEntryGetValue);
-    
-    // figure out object type
-    if( jenv->IsInstanceOf( value, info.stringClazz ) ) {
-      const char* valueBytes = jenv->GetStringUTFChars( (jstring)value, 0);
+      const char* valueBytes = jenv->GetStringUTFChars(s, 0);
       std::string valueString = (const char*) valueBytes;
-      jenv->ReleaseStringUTFChars( (jstring)value, valueBytes);
-      
-      p.set( keyString, valueString );
-    } else if( jenv->IsInstanceOf( value, info.mapClazz ) ) {
-      indri::api::Parameters sub = p.append( keyString );
-      java_parameters_map( jenv, info, p, value );
-    } else if( jenv->IsInstanceOf( value, info.arrayOfMaps ) ) {
-      java_parameters_array_of_maps( jenv, info, p, keyString, (jobjectArray) value );
-    } else if( jenv->IsInstanceOf( value, info.arrayOfString ) ) {
-      java_parameters_array_of_strings( jenv, info, p, keyString, (jobjectArray) value );
-    } else {
-      SWIG_JavaException(jenv, SWIG_RuntimeError, "Found something in a Parameters parameter that wasn't a String, Map, String[] or Map[]." );
+      jenv->ReleaseStringUTFChars(s, valueBytes);
+    
+      p.append(key).set(valueString);
     }
   }
-}
 
+  void java_parameters_array_of_maps( JNIEnv* jenv, jni_parameters_info& info, indri::api::Parameters p, const std::string& key, jobjectArray array ) {
+    // get the array size
+    jsize arrayLength = jenv->GetArrayLength(array);
 
-
-
-jobject documentvector_copy( JNIEnv* jenv, indri::api::DocumentVector* vec ) {
-  jobject result;
-
-  jclass stringClazz = jenv->FindClass( "java/lang/String" );
-  jclass docVectorClazz = jenv->FindClass( "lemurproject/indri/DocumentVector" );
-  jclass fieldClazz = jenv->FindClass( "lemurproject/indri/DocumentVector$Field" );
-
-  jfieldID beginField = jenv->GetFieldID( fieldClazz, "begin", "I" );
-  jfieldID endField = jenv->GetFieldID( fieldClazz, "end", "I" );
-  jfieldID numberField = jenv->GetFieldID( fieldClazz, "number", "J" );
-  jfieldID nameField = jenv->GetFieldID( fieldClazz, "name", "Ljava/lang/String;" );
-
-  jfieldID stemsField = jenv->GetFieldID( docVectorClazz, "stems", "[Ljava/lang/String;" );
-  jfieldID positionsField = jenv->GetFieldID( docVectorClazz, "positions", "[I" );
-  jfieldID fieldsField = jenv->GetFieldID( docVectorClazz, "fields", "[Llemurproject/indri/DocumentVector$Field;" );
-  
-  jmethodID fieldConstructor = jenv->GetMethodID( fieldClazz, "<init>", "()V" );
-  jmethodID docVecConstructor = jenv->GetMethodID( docVectorClazz, "<init>", "()V" );
-
-  int stemsCount = vec->stems().size();
-  int positionsCount = vec->positions().size();
-  int fieldsCount = vec->fields().size();
-  
-  // store positions
-  jintArray posArray = jenv->NewIntArray( positionsCount );
-  jint* posElements = jenv->GetIntArrayElements( posArray, 0 );
-
-  for( int i=0; i<positionsCount; i++ ) {
-    posElements[i] = vec->positions()[i];
+    for( int i=0; i<arrayLength; i++ ) {
+      jobject obj = jenv->GetObjectArrayElement( array, i );
+      java_parameters_map( jenv, info, p, obj );
+    }
   }
 
-  jenv->ReleaseIntArrayElements( posArray, posElements, 0 );
+  void java_parameters_map( JNIEnv* jenv, jni_parameters_info& info, indri::api::Parameters p, jobject mapObj ) {
+    // get map class and entrySet method pointer
+    jclass mapClazz = jenv->GetObjectClass(mapObj);
+    jmethodID mapEntrySet = jenv->GetMethodID(mapClazz, "entrySet", "()Ljava/util/Set;" );
 
-  // store stems
-  jobjectArray stemArray = jenv->NewObjectArray( stemsCount, stringClazz, 0 );
+    // call entry set function to set a Set of entries
+    jobject entrySet = jenv->CallObjectMethod(mapObj, mapEntrySet);
+    jclass setClazz = jenv->GetObjectClass(entrySet);
+    jmethodID setToArray = jenv->GetMethodID(setClazz, "toArray", "()[Ljava/lang/Object;" );
 
-  for( int i=0; i<stemsCount; i++ ) {
-    jstring s = jenv->NewStringUTF( vec->stems()[i].c_str() );
-    jenv->SetObjectArrayElement( stemArray, i, s );
-  }
-  
-  // store fields
-  jobjectArray fieldsArray = jenv->NewObjectArray( fieldsCount, fieldClazz, 0 );
-  
-  for( int i=0; i<fieldsCount; i++ ) {
-    // make a field object
-    jobject f = jenv->NewObject( fieldClazz, fieldConstructor );
-    jstring name = jenv->NewStringUTF( vec->fields()[i].name.c_str() );
+    // turn that set into an array of objects (entries)
+    jobjectArray entryArray = (jobjectArray) jenv->CallObjectMethod(entrySet, setToArray);
+
+    // get the array size
+    jsize entryArrayLength = jenv->GetArrayLength(entryArray);
+
+    for( int i=0; i<entryArrayLength; i++ ) {
+      // get the key string
+      jobject entryObject = (jstring) jenv->GetObjectArrayElement( entryArray, i );
+      jclass mapEntryClazz = jenv->GetObjectClass(entryObject);
+      jmethodID mapEntryGetKey = jenv->GetMethodID(mapEntryClazz, "getKey", "()Ljava/lang/Object;" );
+      jmethodID mapEntryGetValue = jenv->GetMethodID(mapEntryClazz, "getValue", "()Ljava/lang/Object;" );
+
+      // get key string
+      jstring key = (jstring) jenv->CallObjectMethod(entryObject, mapEntryGetKey);
+      const char* bytes = jenv->GetStringUTFChars(key, 0);
+      std::string keyString = (const char*) bytes;
+      jenv->ReleaseStringUTFChars(key, bytes);
     
-    jenv->SetIntField( f, beginField, vec->fields()[i].begin );
-    jenv->SetIntField( f, endField, vec->fields()[i].end );
-    jenv->SetLongField( f, numberField, vec->fields()[i].number );
-    jenv->SetObjectField( f, nameField, name );
-  
-    // put it in the array
-    jenv->SetObjectArrayElement( fieldsArray, i, f );
-  }
-// don't delete this twice.
-//  delete vec;
-  
-  // build the document vector object
-  result = jenv->NewObject( docVectorClazz, docVecConstructor );
-
-  // store fields
-  jenv->SetObjectField( result, stemsField, stemArray );
-  jenv->SetObjectField( result, positionsField, posArray );
-  jenv->SetObjectField( result, fieldsField, fieldsArray );
-
-  return result;
-}
-
-
-
-struct jni_specification_info {
-  // Specification
-  jclass specClazz;
-  jmethodID specConstructor;
-  jfieldID nameField;
-  jfieldID tokenizerField;
-  jfieldID parserField;
-  jfieldID iteratorField;
-  jfieldID startDocTagField;
-  jfieldID endDocTagField;
-  jfieldID endMetadataTagField;
-  jfieldID includeField;
-  jfieldID excludeField;
-  jfieldID indexField;
-  jfieldID metadataField;
-  jfieldID conflationsField;
-  // support classes
-  jclass mapClazz;
-  jmethodID mapConstructor;
-  jmethodID putMethod;
-};
- 
- void print_info(jni_specification_info& info) 
-   {
-     std::cerr << info.specClazz << std::endl;
-     std::cerr << info.specConstructor << std::endl;
-     // get all the fields
-     std::cerr << info.nameField << std::endl;
-     std::cerr << info.tokenizerField << std::endl;
-     std::cerr << info.parserField << std::endl;
-     std::cerr << info.iteratorField << std::endl;
-     std::cerr << info.startDocTagField << std::endl;
-     std::cerr << info.endDocTagField << std::endl;
-     std::cerr << info.endMetadataTagField << std::endl;
-     std::cerr << info.includeField << std::endl;
-     std::cerr << info.excludeField << std::endl;
-     std::cerr << info.indexField << std::endl;
-     std::cerr << info.metadataField << std::endl;
-     std::cerr << info.conflationsField << std::endl;
-     std::cerr << info.mapClazz << std::endl;
-     std::cerr << info.mapConstructor << std::endl;
-     std::cerr << info.putMethod << std::endl;
-   }
- 
-void specification_init( JNIEnv* jenv, jni_specification_info& info ) {
-
-  info.specClazz = jenv->FindClass("lemurproject/indri/Specification");
-  info.specConstructor = jenv->GetMethodID(info.specClazz, "<init>", "()V" );
-  // get all the fields
-  info.nameField = jenv->GetFieldID(info.specClazz, "name", "Ljava/lang/String;");
-  info.tokenizerField = jenv->GetFieldID(info.specClazz, "tokenizer", "Ljava/lang/String;");  
-  info.parserField = jenv->GetFieldID(info.specClazz, "parser", "Ljava/lang/String;");
-  info.iteratorField = jenv->GetFieldID(info.specClazz, "iterator", "Ljava/lang/String;");
-  info.startDocTagField = jenv->GetFieldID(info.specClazz, "startDocTag", "Ljava/lang/String;");
-  info.endDocTagField = jenv->GetFieldID(info.specClazz, "endDocTag", "Ljava/lang/String;");
-  info.endMetadataTagField = jenv->GetFieldID(info.specClazz, "endMetadataTag", "Ljava/lang/String;");
-  info.includeField = jenv->GetFieldID(info.specClazz, "include", "[Ljava/lang/String;");
-  info.excludeField = jenv->GetFieldID(info.specClazz, "exclude", "[Ljava/lang/String;");
-  info.indexField = jenv->GetFieldID(info.specClazz, "index", "[Ljava/lang/String;");
-  info.metadataField = jenv->GetFieldID(info.specClazz, "metadata", "[Ljava/lang/String;");
-  info.conflationsField = jenv->GetFieldID(info.specClazz, "conflations", "Ljava/util/Map;");
-
-  info.mapClazz = jenv->FindClass("java/util/HashMap");
-  info.mapConstructor = jenv->GetMethodID(info.mapClazz, "<init>", "()V" );
-  info.putMethod = jenv->GetMethodID(info.mapClazz, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
-}
-
- jobjectArray string_vector_copy(JNIEnv* jenv, std::vector<std::string> &vec) {
-   jclass stringClazz = jenv->FindClass("java/lang/String" );
-   // fill in array  
-   jobjectArray stringArray = jenv->NewObjectArray(vec.size(), stringClazz,
-						   NULL);
-   for(int i = 0; i < vec.size(); i++ ) {
-     jstring val = jenv->NewStringUTF(vec[i].c_str());
-     jenv->SetObjectArrayElement(stringArray, i, val);
-   }
-   return stringArray;
- }
- 
- jobject specification_copy( JNIEnv* jenv, jni_specification_info& info, 
-			     indri::parse::FileClassEnvironmentFactory::Specification* thisSpec ) {
-   jobject result = jenv->NewObject(info.specClazz, info.specConstructor);
-   // initialize the fields
-   jstring stringField;
-   stringField = jenv->NewStringUTF(thisSpec->name.c_str());
-   jenv->SetObjectField(result, info.nameField, stringField);
-   stringField = jenv->NewStringUTF(thisSpec->tokenizer.c_str());
-   jenv->SetObjectField(result, info.tokenizerField, stringField);
-   stringField = jenv->NewStringUTF(thisSpec->parser.c_str());
-   jenv->SetObjectField(result, info.parserField, stringField);
-   stringField = jenv->NewStringUTF(thisSpec->iterator.c_str());
-   jenv->SetObjectField(result, info.iteratorField, stringField);
-   stringField = jenv->NewStringUTF(thisSpec->startDocTag.c_str());
-   jenv->SetObjectField(result, info.startDocTagField, stringField);
-   stringField = jenv->NewStringUTF(thisSpec->endDocTag.c_str());
-   jenv->SetObjectField(result, info.endDocTagField, stringField);
-   stringField = jenv->NewStringUTF(thisSpec->endMetadataTag.c_str());
-   jenv->SetObjectField(result, info.endMetadataTagField, stringField);
-   // make a conflations map to go in it
-
-  jclass conflationClazz = jenv->FindClass("lemurproject/indri/ConflationPattern");
-  jmethodID conflationConstructor = jenv->GetMethodID(conflationClazz, "<init>", "()V" ); 
-  jfieldID tag_nameField = jenv->GetFieldID(conflationClazz, "tag_name", "Ljava/lang/String;" );
-  jfieldID attribute_nameField = jenv->GetFieldID(conflationClazz, "attribute_name", "Ljava/lang/String;"  );
-  jfieldID valueField = jenv->GetFieldID(conflationClazz, "value", "Ljava/lang/String;" );
-
-   jobject mapObject = jenv->NewObject(info.mapClazz, info.mapConstructor);
-   for( std::map<indri::parse::ConflationPattern *, std::string>::iterator iter = thisSpec->conflations.begin(); 
-	iter != thisSpec->conflations.end(); iter++ ) {
-     const indri::parse::ConflationPattern *thisKey = iter->first;
-     const std::string &thisVal = iter->second;
-     jobject patternObject = jenv->NewObject(conflationClazz, conflationConstructor);
-     jstring patVal;
-     const char *c_str = thisKey->tag_name;
-     if (c_str == NULL) c_str = ""; // don't give NewStringUTF a NULL.
-     patVal = jenv->NewStringUTF(c_str);
-     jenv->SetObjectField(patternObject, tag_nameField, patVal);
-     c_str = thisKey->attribute_name;
-     if (c_str == NULL) c_str = ""; // don't give NewStringUTF a NULL.
-     patVal = jenv->NewStringUTF(c_str);
-     jenv->SetObjectField(patternObject, attribute_nameField, patVal);
-     c_str = thisKey->value;
-     if (c_str == NULL) c_str = ""; // don't give NewStringUTF a NULL.
-     patVal = jenv->NewStringUTF(c_str);
-     jenv->SetObjectField(patternObject, valueField, patVal);
-
-     jstring val = jenv->NewStringUTF(thisVal.c_str());
-     jenv->CallObjectMethod(mapObject, info.putMethod, patternObject, val);
-   }
-   jenv->SetObjectField(result, info.conflationsField, mapObject);
-   jobjectArray stringArray = string_vector_copy(jenv, thisSpec->include);
-   jenv->SetObjectField(result, info.includeField, stringArray);
-   stringArray = string_vector_copy(jenv, thisSpec->exclude);
-   jenv->SetObjectField(result, info.excludeField, stringArray);
-   stringArray = string_vector_copy(jenv, thisSpec->index);
-   jenv->SetObjectField(result, info.indexField, stringArray);
-   stringArray = string_vector_copy(jenv, thisSpec->metadata);
-   jenv->SetObjectField(result, info.metadataField, stringArray);
-   return result;
- }
-
- // copy to string
- void copy_to_string(JNIEnv* jenv, jstring src, std::string &target) {
-   jsize stringLength = jenv->GetStringUTFLength(src);
-   const char* stringChars = jenv->GetStringUTFChars(src, 0);
-   target.assign( stringChars, stringChars + stringLength );
- }
-
- // copy to string vector (stringvector.i)
- void copy_to_string_vector(JNIEnv* jenv, jobjectArray src, 
-			    std::vector<std::string> &target) {
-  jsize arrayLength = jenv->GetArrayLength(src);
-  for( unsigned int i = 0; i < arrayLength; i++ ) {
-    std::string stringCopy;
-    jstring str = (jstring) jenv->GetObjectArrayElement(src, i);
-    copy_to_string(jenv, str, stringCopy);    
-    target.push_back(stringCopy);
-  }
- }
- 
- // copy to map (stringmap.i)
- void copy_to_map(JNIEnv* jenv, jobject src,
-			    std::map<indri::parse::ConflationPattern*, std::string> &map) {
-
-  // get map class and entrySet method pointer
-  jclass mapClazz = jenv->GetObjectClass(src);
-  jmethodID mapEntrySet = jenv->GetMethodID(mapClazz, "entrySet", "()Ljava/util/Set;" );
-
-  // call entry set function to set a Set of entries
-  jobject entrySet = jenv->CallObjectMethod(src, mapEntrySet);
-  jclass setClazz = jenv->GetObjectClass(entrySet);
-  jmethodID setToArray = jenv->GetMethodID(setClazz, "toArray", "()[Ljava/lang/Object;" );
-
-  // turn that set into an array of objects (entries)
-  jobjectArray entryArray = (jobjectArray) jenv->CallObjectMethod(entrySet, setToArray);
-
-  // get the array size
-  jsize entryArrayLength = jenv->GetArrayLength(entryArray);
-
-  jclass conflationClazz = jenv->FindClass("lemurproject/indri/ConflationPattern");
-  jfieldID tag_nameField = jenv->GetFieldID(conflationClazz, "tag_name", "Ljava/lang/String;" );
-  jfieldID attribute_nameField = jenv->GetFieldID(conflationClazz, "attribute_name", "Ljava/lang/String;"  );
-  jfieldID valueField = jenv->GetFieldID(conflationClazz, "value", "Ljava/lang/String;" );
-
-  for( int i=0; i<entryArrayLength; i++ ) {
-    // get the key string
-    jobject entryObject = (jstring) jenv->GetObjectArrayElement( entryArray, i );
-    jclass mapEntryClazz = jenv->GetObjectClass(entryObject);
-    jmethodID mapEntryGetKey = jenv->GetMethodID(mapEntryClazz, "getKey", "()Ljava/lang/Object;" );
-    jmethodID mapEntryGetValue = jenv->GetMethodID(mapEntryClazz, "getValue", "()Ljava/lang/Object;" );
-
-    jobject key = jenv->CallObjectMethod( entryObject, mapEntryGetKey );
-    jobject value = jenv->CallObjectMethod( entryObject, mapEntryGetValue );
+      // get value object
+      jobject value = jenv->CallObjectMethod(entryObject, mapEntryGetValue);
     
-    indri::parse::ConflationPattern * pattern = new indri::parse::ConflationPattern();
-
-    const char* valueChars = jenv->GetStringUTFChars( (jstring) value, 0 );
-    std::string valueString = valueChars;
-    jenv->ReleaseStringUTFChars( (jstring) value, valueChars );
-
-    jstring fieldValue = (jstring) jenv->GetObjectField(key, tag_nameField);
-    valueChars = jenv->GetStringUTFChars( (jstring) fieldValue, 0 );
-    if (valueChars[0] == '\0') valueChars = NULL; // empty strings are NULL
-    pattern->tag_name = valueChars;
-  
-    fieldValue = (jstring) jenv->GetObjectField(key, attribute_nameField);
-    valueChars = jenv->GetStringUTFChars( (jstring) fieldValue, 0 );
-    if (valueChars[0] == '\0') valueChars = NULL; // empty strings are NULL
-    pattern->attribute_name = valueChars;
-
-    fieldValue = (jstring) jenv->GetObjectField(key, valueField);
-    valueChars = jenv->GetStringUTFChars( (jstring) fieldValue, 0 );
-    if (valueChars[0] == '\0') valueChars = NULL; // empty strings are NULL
-    pattern->value = valueChars;
-    map[pattern] = valueString ;
+      // figure out object type
+      if( jenv->IsInstanceOf( value, info.stringClazz ) ) {
+        const char* valueBytes = jenv->GetStringUTFChars( (jstring)value, 0);
+        std::string valueString = (const char*) valueBytes;
+        jenv->ReleaseStringUTFChars( (jstring)value, valueBytes);
+      
+        p.set( keyString, valueString );
+      } else if( jenv->IsInstanceOf( value, info.mapClazz ) ) {
+        indri::api::Parameters sub = p.append( keyString );
+        java_parameters_map( jenv, info, p, value );
+      } else if( jenv->IsInstanceOf( value, info.arrayOfMaps ) ) {
+        java_parameters_array_of_maps( jenv, info, p, keyString, (jobjectArray) value );
+      } else if( jenv->IsInstanceOf( value, info.arrayOfString ) ) {
+        java_parameters_array_of_strings( jenv, info, p, keyString, (jobjectArray) value );
+      } else {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, "Found something in a Parameters parameter that wasn't a String, Map, String[] or Map[]." );
+      }
+    }
   }
- }
- 
 
+  
+
+
+  jobject documentvector_copy( JNIEnv* jenv, indri::api::DocumentVector* vec ) {
+    jobject result;
+
+    jclass stringClazz = jenv->FindClass( "java/lang/String" );
+    jclass docVectorClazz = jenv->FindClass( "lemurproject/indri/DocumentVector" );
+    jclass fieldClazz = jenv->FindClass( "lemurproject/indri/DocumentVector$Field" );
+
+    jfieldID beginField = jenv->GetFieldID( fieldClazz, "begin", "I" );
+    jfieldID endField = jenv->GetFieldID( fieldClazz, "end", "I" );
+    jfieldID numberField = jenv->GetFieldID( fieldClazz, "number", "J" );
+    jfieldID nameField = jenv->GetFieldID( fieldClazz, "name", "Ljava/lang/String;" );
+
+    jfieldID stemsField = jenv->GetFieldID( docVectorClazz, "stems", "[Ljava/lang/String;" );
+    jfieldID positionsField = jenv->GetFieldID( docVectorClazz, "positions", "[I" );
+    jfieldID fieldsField = jenv->GetFieldID( docVectorClazz, "fields", "[Llemurproject/indri/DocumentVector$Field;" );
+  
+    jmethodID fieldConstructor = jenv->GetMethodID( fieldClazz, "<init>", "()V" );
+    jmethodID docVecConstructor = jenv->GetMethodID( docVectorClazz, "<init>", "()V" );
+
+    int stemsCount = vec->stems().size();
+    int positionsCount = vec->positions().size();
+    int fieldsCount = vec->fields().size();
+  
+    // store positions
+    jintArray posArray = jenv->NewIntArray( positionsCount );
+    jint* posElements = jenv->GetIntArrayElements( posArray, 0 );
+
+    for( int i=0; i<positionsCount; i++ ) {
+      posElements[i] = vec->positions()[i];
+    }
+
+    jenv->ReleaseIntArrayElements( posArray, posElements, 0 );
+
+    // store stems
+    jobjectArray stemArray = jenv->NewObjectArray( stemsCount, stringClazz, 0 );
+
+    for( int i=0; i<stemsCount; i++ ) {
+      jstring s = jenv->NewStringUTF( vec->stems()[i].c_str() );
+      jenv->SetObjectArrayElement( stemArray, i, s );
+    }
+  
+    // store fields
+    jobjectArray fieldsArray = jenv->NewObjectArray( fieldsCount, fieldClazz, 0 );
+  
+    for( int i=0; i<fieldsCount; i++ ) {
+      // make a field object
+      jobject f = jenv->NewObject( fieldClazz, fieldConstructor );
+      jstring name = jenv->NewStringUTF( vec->fields()[i].name.c_str() );
+    
+      jenv->SetIntField( f, beginField, vec->fields()[i].begin );
+      jenv->SetIntField( f, endField, vec->fields()[i].end );
+      jenv->SetLongField( f, numberField, vec->fields()[i].number );
+      jenv->SetObjectField( f, nameField, name );
+  
+      // put it in the array
+      jenv->SetObjectArrayElement( fieldsArray, i, f );
+    }
+    // don't delete this twice.
+    //  delete vec;
+  
+    // build the document vector object
+    result = jenv->NewObject( docVectorClazz, docVecConstructor );
+
+    // store fields
+    jenv->SetObjectField( result, stemsField, stemArray );
+    jenv->SetObjectField( result, positionsField, posArray );
+    jenv->SetObjectField( result, fieldsField, fieldsArray );
+
+    return result;
+  }
+
+  
+
+  struct jni_specification_info {
+    // Specification
+    jclass specClazz;
+    jmethodID specConstructor;
+    jfieldID nameField;
+    jfieldID tokenizerField;
+    jfieldID parserField;
+    jfieldID iteratorField;
+    jfieldID startDocTagField;
+    jfieldID endDocTagField;
+    jfieldID endMetadataTagField;
+    jfieldID includeField;
+    jfieldID excludeField;
+    jfieldID indexField;
+    jfieldID metadataField;
+    jfieldID conflationsField;
+    // support classes
+    jclass mapClazz;
+    jmethodID mapConstructor;
+    jmethodID putMethod;
+  };
+ 
+  void print_info(jni_specification_info& info) 
+    {
+      std::cerr << info.specClazz << std::endl;
+      std::cerr << info.specConstructor << std::endl;
+      // get all the fields
+      std::cerr << info.nameField << std::endl;
+      std::cerr << info.tokenizerField << std::endl;
+      std::cerr << info.parserField << std::endl;
+      std::cerr << info.iteratorField << std::endl;
+      std::cerr << info.startDocTagField << std::endl;
+      std::cerr << info.endDocTagField << std::endl;
+      std::cerr << info.endMetadataTagField << std::endl;
+      std::cerr << info.includeField << std::endl;
+      std::cerr << info.excludeField << std::endl;
+      std::cerr << info.indexField << std::endl;
+      std::cerr << info.metadataField << std::endl;
+      std::cerr << info.conflationsField << std::endl;
+      std::cerr << info.mapClazz << std::endl;
+      std::cerr << info.mapConstructor << std::endl;
+      std::cerr << info.putMethod << std::endl;
+    }
+ 
+  void specification_init( JNIEnv* jenv, jni_specification_info& info ) {
+
+    info.specClazz = jenv->FindClass("lemurproject/indri/Specification");
+    info.specConstructor = jenv->GetMethodID(info.specClazz, "<init>", "()V" );
+    // get all the fields
+    info.nameField = jenv->GetFieldID(info.specClazz, "name", "Ljava/lang/String;");
+    info.tokenizerField = jenv->GetFieldID(info.specClazz, "tokenizer", "Ljava/lang/String;");  
+    info.parserField = jenv->GetFieldID(info.specClazz, "parser", "Ljava/lang/String;");
+    info.iteratorField = jenv->GetFieldID(info.specClazz, "iterator", "Ljava/lang/String;");
+    info.startDocTagField = jenv->GetFieldID(info.specClazz, "startDocTag", "Ljava/lang/String;");
+    info.endDocTagField = jenv->GetFieldID(info.specClazz, "endDocTag", "Ljava/lang/String;");
+    info.endMetadataTagField = jenv->GetFieldID(info.specClazz, "endMetadataTag", "Ljava/lang/String;");
+    info.includeField = jenv->GetFieldID(info.specClazz, "include", "[Ljava/lang/String;");
+    info.excludeField = jenv->GetFieldID(info.specClazz, "exclude", "[Ljava/lang/String;");
+    info.indexField = jenv->GetFieldID(info.specClazz, "index", "[Ljava/lang/String;");
+    info.metadataField = jenv->GetFieldID(info.specClazz, "metadata", "[Ljava/lang/String;");
+    info.conflationsField = jenv->GetFieldID(info.specClazz, "conflations", "Ljava/util/Map;");
+
+    info.mapClazz = jenv->FindClass("java/util/HashMap");
+    info.mapConstructor = jenv->GetMethodID(info.mapClazz, "<init>", "()V" );
+    info.putMethod = jenv->GetMethodID(info.mapClazz, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
+  }
+
+  jobjectArray string_vector_copy(JNIEnv* jenv, std::vector<std::string> &vec) {
+    jclass stringClazz = jenv->FindClass("java/lang/String" );
+    // fill in array  
+    jobjectArray stringArray = jenv->NewObjectArray(vec.size(), stringClazz,
+                                                    NULL);
+    for(int i = 0; i < vec.size(); i++ ) {
+      jstring val = jenv->NewStringUTF(vec[i].c_str());
+      jenv->SetObjectArrayElement(stringArray, i, val);
+    }
+    return stringArray;
+  }
+ 
+  jobject specification_copy( JNIEnv* jenv, jni_specification_info& info, 
+                              indri::parse::FileClassEnvironmentFactory::Specification* thisSpec ) {
+    jobject result = jenv->NewObject(info.specClazz, info.specConstructor);
+    // initialize the fields
+    jstring stringField;
+    stringField = jenv->NewStringUTF(thisSpec->name.c_str());
+    jenv->SetObjectField(result, info.nameField, stringField);
+    stringField = jenv->NewStringUTF(thisSpec->tokenizer.c_str());
+    jenv->SetObjectField(result, info.tokenizerField, stringField);
+    stringField = jenv->NewStringUTF(thisSpec->parser.c_str());
+    jenv->SetObjectField(result, info.parserField, stringField);
+    stringField = jenv->NewStringUTF(thisSpec->iterator.c_str());
+    jenv->SetObjectField(result, info.iteratorField, stringField);
+    stringField = jenv->NewStringUTF(thisSpec->startDocTag.c_str());
+    jenv->SetObjectField(result, info.startDocTagField, stringField);
+    stringField = jenv->NewStringUTF(thisSpec->endDocTag.c_str());
+    jenv->SetObjectField(result, info.endDocTagField, stringField);
+    stringField = jenv->NewStringUTF(thisSpec->endMetadataTag.c_str());
+    jenv->SetObjectField(result, info.endMetadataTagField, stringField);
+    // make a conflations map to go in it
+
+    jclass conflationClazz = jenv->FindClass("lemurproject/indri/ConflationPattern");
+    jmethodID conflationConstructor = jenv->GetMethodID(conflationClazz, "<init>", "()V" ); 
+    jfieldID tag_nameField = jenv->GetFieldID(conflationClazz, "tag_name", "Ljava/lang/String;" );
+    jfieldID attribute_nameField = jenv->GetFieldID(conflationClazz, "attribute_name", "Ljava/lang/String;"  );
+    jfieldID valueField = jenv->GetFieldID(conflationClazz, "value", "Ljava/lang/String;" );
+
+    jobject mapObject = jenv->NewObject(info.mapClazz, info.mapConstructor);
+    for( std::map<indri::parse::ConflationPattern *, std::string>::iterator iter = thisSpec->conflations.begin(); 
+         iter != thisSpec->conflations.end(); iter++ ) {
+      const indri::parse::ConflationPattern *thisKey = iter->first;
+      const std::string &thisVal = iter->second;
+      jobject patternObject = jenv->NewObject(conflationClazz, conflationConstructor);
+      jstring patVal;
+      const char *c_str = thisKey->tag_name;
+      if (c_str == NULL) c_str = ""; // don't give NewStringUTF a NULL.
+      patVal = jenv->NewStringUTF(c_str);
+      jenv->SetObjectField(patternObject, tag_nameField, patVal);
+      c_str = thisKey->attribute_name;
+      if (c_str == NULL) c_str = ""; // don't give NewStringUTF a NULL.
+      patVal = jenv->NewStringUTF(c_str);
+      jenv->SetObjectField(patternObject, attribute_nameField, patVal);
+      c_str = thisKey->value;
+      if (c_str == NULL) c_str = ""; // don't give NewStringUTF a NULL.
+      patVal = jenv->NewStringUTF(c_str);
+      jenv->SetObjectField(patternObject, valueField, patVal);
+
+      jstring val = jenv->NewStringUTF(thisVal.c_str());
+      jenv->CallObjectMethod(mapObject, info.putMethod, patternObject, val);
+    }
+    jenv->SetObjectField(result, info.conflationsField, mapObject);
+    jobjectArray stringArray = string_vector_copy(jenv, thisSpec->include);
+    jenv->SetObjectField(result, info.includeField, stringArray);
+    stringArray = string_vector_copy(jenv, thisSpec->exclude);
+    jenv->SetObjectField(result, info.excludeField, stringArray);
+    stringArray = string_vector_copy(jenv, thisSpec->index);
+    jenv->SetObjectField(result, info.indexField, stringArray);
+    stringArray = string_vector_copy(jenv, thisSpec->metadata);
+    jenv->SetObjectField(result, info.metadataField, stringArray);
+    return result;
+  }
+
+  // copy to string
+  void copy_to_string(JNIEnv* jenv, jstring src, std::string &target) {
+    jsize stringLength = jenv->GetStringUTFLength(src);
+    const char* stringChars = jenv->GetStringUTFChars(src, 0);
+    target.assign( stringChars, stringChars + stringLength );
+  }
+
+  // copy to string vector (stringvector.i)
+  void copy_to_string_vector(JNIEnv* jenv, jobjectArray src, 
+                             std::vector<std::string> &target) {
+    jsize arrayLength = jenv->GetArrayLength(src);
+    for( unsigned int i = 0; i < arrayLength; i++ ) {
+      std::string stringCopy;
+      jstring str = (jstring) jenv->GetObjectArrayElement(src, i);
+      copy_to_string(jenv, str, stringCopy);    
+      target.push_back(stringCopy);
+    }
+  }
+ 
+  // copy to map (stringmap.i)
+  void copy_to_map(JNIEnv* jenv, jobject src,
+                   std::map<indri::parse::ConflationPattern*, std::string> &map) {
+
+    // get map class and entrySet method pointer
+    jclass mapClazz = jenv->GetObjectClass(src);
+    jmethodID mapEntrySet = jenv->GetMethodID(mapClazz, "entrySet", "()Ljava/util/Set;" );
+
+    // call entry set function to set a Set of entries
+    jobject entrySet = jenv->CallObjectMethod(src, mapEntrySet);
+    jclass setClazz = jenv->GetObjectClass(entrySet);
+    jmethodID setToArray = jenv->GetMethodID(setClazz, "toArray", "()[Ljava/lang/Object;" );
+
+    // turn that set into an array of objects (entries)
+    jobjectArray entryArray = (jobjectArray) jenv->CallObjectMethod(entrySet, setToArray);
+
+    // get the array size
+    jsize entryArrayLength = jenv->GetArrayLength(entryArray);
+
+    jclass conflationClazz = jenv->FindClass("lemurproject/indri/ConflationPattern");
+    jfieldID tag_nameField = jenv->GetFieldID(conflationClazz, "tag_name", "Ljava/lang/String;" );
+    jfieldID attribute_nameField = jenv->GetFieldID(conflationClazz, "attribute_name", "Ljava/lang/String;"  );
+    jfieldID valueField = jenv->GetFieldID(conflationClazz, "value", "Ljava/lang/String;" );
+
+    for( int i=0; i<entryArrayLength; i++ ) {
+      // get the key string
+      jobject entryObject = (jstring) jenv->GetObjectArrayElement( entryArray, i );
+      jclass mapEntryClazz = jenv->GetObjectClass(entryObject);
+      jmethodID mapEntryGetKey = jenv->GetMethodID(mapEntryClazz, "getKey", "()Ljava/lang/Object;" );
+      jmethodID mapEntryGetValue = jenv->GetMethodID(mapEntryClazz, "getValue", "()Ljava/lang/Object;" );
+
+      jobject key = jenv->CallObjectMethod( entryObject, mapEntryGetKey );
+      jobject value = jenv->CallObjectMethod( entryObject, mapEntryGetValue );
+    
+      indri::parse::ConflationPattern * pattern = new indri::parse::ConflationPattern();
+
+      const char* valueChars = jenv->GetStringUTFChars( (jstring) value, 0 );
+      std::string valueString = valueChars;
+      jenv->ReleaseStringUTFChars( (jstring) value, valueChars );
+
+      jstring fieldValue = (jstring) jenv->GetObjectField(key, tag_nameField);
+      valueChars = jenv->GetStringUTFChars( (jstring) fieldValue, 0 );
+      if (valueChars[0] == '\0') valueChars = NULL; // empty strings are NULL
+      pattern->tag_name = valueChars;
+  
+      fieldValue = (jstring) jenv->GetObjectField(key, attribute_nameField);
+      valueChars = jenv->GetStringUTFChars( (jstring) fieldValue, 0 );
+      if (valueChars[0] == '\0') valueChars = NULL; // empty strings are NULL
+      pattern->attribute_name = valueChars;
+
+      fieldValue = (jstring) jenv->GetObjectField(key, valueField);
+      valueChars = jenv->GetStringUTFChars( (jstring) fieldValue, 0 );
+      if (valueChars[0] == '\0') valueChars = NULL; // empty strings are NULL
+      pattern->value = valueChars;
+      map[pattern] = valueString ;
+    }
+  }
+ 
+  
 
 
 /* ---------------------------------------------------

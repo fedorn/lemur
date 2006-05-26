@@ -17,37 +17,37 @@
 %typemap(jstype) const std::vector<indri::api::ScoredExtentResult>& "ScoredExtentResult[]"
 
 %{
-jobjectArray java_build_scoredextentresult( JNIEnv* jenv, const std::vector<indri::api::ScoredExtentResult>& input ) {
-  jclass clazz = jenv->FindClass("lemurproject/indri/ScoredExtentResult");
-  jmethodID constructor = jenv->GetMethodID(clazz, "<init>", "()V" );
-  jobjectArray result;
+  jobjectArray java_build_scoredextentresult( JNIEnv* jenv, const std::vector<indri::api::ScoredExtentResult>& input ) {
+    jclass clazz = jenv->FindClass("lemurproject/indri/ScoredExtentResult");
+    jmethodID constructor = jenv->GetMethodID(clazz, "<init>", "()V" );
+    jobjectArray result;
 
-  result = jenv->NewObjectArray(input.size(), clazz, NULL);
-  if (!result) {
-    return 0;
+    result = jenv->NewObjectArray(input.size(), clazz, NULL);
+    if (!result) {
+      return 0;
+    }
+
+    jfieldID scoreField = jenv->GetFieldID(clazz, "score", "D" );
+    jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
+    jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
+    jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+
+    for( jsize i=0; i<input.size(); i++ ) {
+      // make a new scored extent result object
+      jobject ser = jenv->NewObject(clazz, constructor);
+
+      // fill in the fields
+      jenv->SetDoubleField(ser, scoreField, input[i].score );
+      jenv->SetIntField(ser, beginField, input[i].begin );
+      jenv->SetIntField(ser, endField, input[i].end );
+      jenv->SetIntField(ser, documentField, input[i].document );
+
+      jenv->SetObjectArrayElement(result, i, ser);
+    }
+
+    return result;
   }
-
-  jfieldID scoreField = jenv->GetFieldID(clazz, "score", "D" );
-  jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
-  jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
-  jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
-
-  for( jsize i=0; i<input.size(); i++ ) {
-    // make a new scored extent result object
-    jobject ser = jenv->NewObject(clazz, constructor);
-
-    // fill in the fields
-    jenv->SetDoubleField(ser, scoreField, input[i].score );
-    jenv->SetIntField(ser, beginField, input[i].begin );
-    jenv->SetIntField(ser, endField, input[i].end );
-    jenv->SetIntField(ser, documentField, input[i].document );
-
-    jenv->SetObjectArrayElement(result, i, ser);
-  }
-
-  return result;
-}
-%}
+  %}
 
 %typemap(out) std::vector<indri::api::ScoredExtentResult>
 {
@@ -95,15 +95,16 @@ jobjectArray java_build_scoredextentresult( JNIEnv* jenv, const std::vector<indr
 
 #ifdef SWIGCSHARP
 SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(ScoredExtentResult, indri::api::ScoredExtentResult)
-%template(ScoredExtentResultVector) std::vector<indri::api::ScoredExtentResult>;
+  %template(ScoredExtentResultVector) std::vector<indri::api::ScoredExtentResult>;
 
 namespace indri {
-namespace api {
-   struct ScoredExtentResult {
+  namespace api {
+    struct ScoredExtentResult {
       double score;
       int document;
       int begin;
       int end;
-};
-}}
+    };
+  }
+}
 #endif

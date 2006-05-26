@@ -9,6 +9,7 @@ namespace lemur {
   {
     class ArrayAccumulator : public lemur::api::ScoreAccumulator {
     public:
+
       ArrayAccumulator(int maxID);
     };
   }

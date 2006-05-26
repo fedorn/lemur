@@ -279,7 +279,7 @@ SWIGEXPORT void SWIGSTDCALL SWIGRegisterStringCallback_lemur_csharp(SWIG_CSharpS
 #include "TextQueryRetMethod.hpp"
 #include "MatchInfo.hpp"
 #include "ElemDocMgr.hpp"
-
+  
 
 #include <string>
 
@@ -422,12 +422,12 @@ SWIGINTERN void std_vector_Sl_lemur_api_IndexedReal_Sg__SetRange(std::vector<lem
         std::copy(values.begin(), values.end(), self->begin()+index);
       }
 SWIGINTERN char *lemur_api_DocumentManager_docElement(lemur::api::DocumentManager *self,std::string const &docid,std::string const &elt){
-          lemur::parse::ElemDocMgr *dm = dynamic_cast<lemur::parse::ElemDocMgr *>(self);
-          if (dm)
-            return dm->getElement(docid.c_str(), elt.c_str());
-          else
-            return NULL;
-        }
+            lemur::parse::ElemDocMgr *dm = dynamic_cast<lemur::parse::ElemDocMgr *>(self);
+            if (dm)
+              return dm->getElement(docid.c_str(), elt.c_str());
+            else
+              return NULL;
+          }
 SWIGINTERN void lemur_api_Index_setProps(lemur::api::Index *self){
             const lemur::parse::BasicCollectionProps* props = dynamic_cast<const lemur::parse::BasicCollectionProps*> (self->collectionProps());
             if (props) {
@@ -1661,15 +1661,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Index_setProps(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_delete_Index(void * jarg1) {
-  lemur::api::Index *arg1 = (lemur::api::Index *) 0 ;
-  
-  arg1 = (lemur::api::Index *)jarg1; 
-  delete arg1;
-  
-}
-
-
 SWIGEXPORT void * SWIGSTDCALL CSharp_IndexManager_openIndex(char * jarg1) {
   void * jresult ;
   std::string *arg1 = 0 ;
@@ -1691,6 +1682,25 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_IndexManager_openIndex(char * jarg1) {
   
   jresult = (void *)result; 
   return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_IndexManager() {
+  void * jresult ;
+  lemur::api::IndexManager *result = 0 ;
+  
+  result = (lemur::api::IndexManager *)new lemur::api::IndexManager();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_IndexManager(void * jarg1) {
+  lemur::api::IndexManager *arg1 = (lemur::api::IndexManager *) 0 ;
+  
+  arg1 = (lemur::api::IndexManager *)jarg1; 
+  delete arg1;
+  
 }
 
 

@@ -37,121 +37,329 @@ public class QueryEnvironment {
     this(indriJNI.new_QueryEnvironment(), true);
   }
 
-  public void addServer(String hostname) throws java.lang.Exception {
+  
+/**
+        Add a remote server
+       @param hostname the host the server is running on
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void addServer(String hostname) throws java.lang.Exception {
     indriJNI.QueryEnvironment_addServer(swigCPtr, hostname);
   }
 
-  public void addIndex(String pathname) throws java.lang.Exception {
+  
+/**
+        Add a local repository
+       @param pathname the path to the repository.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void addIndex(String pathname) throws java.lang.Exception {
     indriJNI.QueryEnvironment_addIndex(swigCPtr, pathname);
   }
 
-  public void removeServer(String hostname) throws java.lang.Exception {
+  
+/**
+        Remove a remote server
+       @param hostname the host the server is running on
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void removeServer(String hostname) throws java.lang.Exception {
     indriJNI.QueryEnvironment_removeServer(swigCPtr, hostname);
   }
 
-  public void removeIndex(String pathname) throws java.lang.Exception {
+  
+/**
+        Remove a local repository
+       @param pathname the path to the repository.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void removeIndex(String pathname) throws java.lang.Exception {
     indriJNI.QueryEnvironment_removeIndex(swigCPtr, pathname);
   }
 
-  public void close() throws java.lang.Exception {
+  
+/**
+       Close the QueryEnvironment.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void close() throws java.lang.Exception {
     indriJNI.QueryEnvironment_close(swigCPtr);
   }
 
-  public void setMemory(long memory) throws java.lang.Exception {
+  
+/**
+        Set the amount of memory to use.
+       @param memory number of bytes to allocate
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void setMemory(long memory) throws java.lang.Exception {
     indriJNI.QueryEnvironment_setMemory(swigCPtr, memory);
   }
 
-  public void setScoringRules(String[] rules) throws java.lang.Exception {
+  
+/**
+        Set the scoring rules
+       @param rules the vector of scoring rules.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void setScoringRules(String[] rules) throws java.lang.Exception {
     indriJNI.QueryEnvironment_setScoringRules(swigCPtr, rules);
   }
 
-  public void setStopwords(String[] stopwords) throws java.lang.Exception {
+  
+/**
+        Set the stopword list for query processing
+       @param stopwords the list of stopwords
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void setStopwords(String[] stopwords) throws java.lang.Exception {
     indriJNI.QueryEnvironment_setStopwords(swigCPtr, stopwords);
   }
 
-  public ScoredExtentResult[] runQuery(String query, int resultsRequested) throws java.lang.Exception {
+  
+/**
+        Run an Indri query language query.
+       @param query the query to run
+       @param resultsRequested maximum number of results to return
+       @return the vector of ScoredExtentResults for the query
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public ScoredExtentResult[] runQuery(String query, int resultsRequested) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_runQuery__SWIG_0(swigCPtr, query, resultsRequested);
 }
 
-  public ScoredExtentResult[] runQuery(String query, int[] documentSet, int resultsRequested) throws java.lang.Exception {
+  
+/**
+        Run an Indri query language query on a set of documents.
+       @param query the query to run
+       @param resultsRequested maximum number of results to return
+@param documentSet the list of document ids to score.
+       @return the vector of ScoredExtentResults for the query
+
+
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public ScoredExtentResult[] runQuery(String query, int[] documentSet, int resultsRequested) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_runQuery__SWIG_1(swigCPtr, query, documentSet, resultsRequested);
 }
 
-  public QueryAnnotation runAnnotatedQuery(String query, int resultsRequested) throws java.lang.Exception {
+  
+/**
+        Run an Indri query language query.
+       @param query the query to run
+       @param resultsRequested maximum number of results to return
+       @return pointer to QueryAnnotations for the query
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public QueryAnnotation runAnnotatedQuery(String query, int resultsRequested) throws java.lang.Exception {
     long cPtr = indriJNI.QueryEnvironment_runAnnotatedQuery__SWIG_0(swigCPtr, query, resultsRequested);
     return (cPtr == 0) ? null : new QueryAnnotation(cPtr, true);
   }
 
-  public QueryAnnotation runAnnotatedQuery(String query, int[] documentSet, int resultsRequested) throws java.lang.Exception {
+  
+/**
+        Run an Indri query language query on a set of documents.
+       @param query the query to run
+@param documentSet list of document ids to score.
+       @param resultsRequested maximum number of results to return
+       @return pointer to QueryAnnotations for the query
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public QueryAnnotation runAnnotatedQuery(String query, int[] documentSet, int resultsRequested) throws java.lang.Exception {
     long cPtr = indriJNI.QueryEnvironment_runAnnotatedQuery__SWIG_1(swigCPtr, query, documentSet, resultsRequested);
     return (cPtr == 0) ? null : new QueryAnnotation(cPtr, true);
   }
 
-  public ParsedDocument[] documents(int[] documentIDs) throws java.lang.Exception {
+  
+/**
+        Fetch the parsed documents for a given list of ScoredExtentResults
+       @param documentIDs the list of ScoredExtentResults
+       @return the vector of ParsedDocument pointers.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public ParsedDocument[] documents(int[] documentIDs) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_documents__SWIG_0(swigCPtr, documentIDs);
 }
 
-  public ParsedDocument[] documents(ScoredExtentResult[] results) throws java.lang.Exception {
+  
+/**
+        Fetch the parsed documents for a given list of ScoredExtentResults
+       @param results the list of ScoredExtentResults
+       @return the vector of ParsedDocument pointers.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public ParsedDocument[] documents(ScoredExtentResult[] results) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_documents__SWIG_1(swigCPtr, results);
 }
 
-  public String[] documentMetadata(int[] documentIDs, String attributeName) throws java.lang.Exception {
+  
+/**
+        Fetch the named metadata attribute for a list of document ids
+       @param documentIDs the list of ids
+       @param attributeName the name of the metadata attribute
+       @return the vector of string values for that attribute
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public String[] documentMetadata(int[] documentIDs, String attributeName) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_documentMetadata__SWIG_0(swigCPtr, documentIDs, attributeName);
 }
 
-  public String[] documentMetadata(ScoredExtentResult[] documentIDs, String attributeName) throws java.lang.Exception {
+  
+/**
+        Fetch the named metadata attribute for a list of ScoredExtentResults
+       @param documentIDs the list of ScoredExtentResults
+       @param attributeName the name of the metadata attribute
+       @return the vector of string values for that attribute
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public String[] documentMetadata(ScoredExtentResult[] documentIDs, String attributeName) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_documentMetadata__SWIG_1(swigCPtr, documentIDs, attributeName);
 }
 
-  public int[] documentIDsFromMetadata(String attributeName, String[] attributeValue) throws java.lang.Exception {
+  
+/**
+        Return a list of document IDs where the document has a metadata key that matches attributeName, with a value matching one of the attributeValues.
+       @param attributeName the name of the metadata attribute (e.g. 'url' or 'docno')
+       @param attributeValue values that the metadata attribute should match
+       @return a vector of ParsedDocuments that match the given metadata criteria
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public int[] documentIDsFromMetadata(String attributeName, String[] attributeValue) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_documentIDsFromMetadata(swigCPtr, attributeName, attributeValue);
 }
 
-  public ParsedDocument[] documentsFromMetadata(String attributeName, String[] attributeValue) throws java.lang.Exception {
+  
+/**
+        Fetch all documents with a metadata key that matches attributeName, with a value matching one of the attributeValues.
+       @param attributeName the name of the metadata attribute (e.g. 'url' or 'docno')
+       @param attributeValues values that the metadata attribute should match
+       @return a vector of ParsedDocuments that match the given metadata criteria
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public ParsedDocument[] documentsFromMetadata(String attributeName, String[] attributeValue) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_documentsFromMetadata(swigCPtr, attributeName, attributeValue);
 }
 
-  public long termCount() throws java.lang.Exception {
+  
+/**
+        Return total number of terms.
+       @return total number of terms in the aggregated collection
+
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public long termCount() throws java.lang.Exception {
     return indriJNI.QueryEnvironment_termCount__SWIG_0(swigCPtr);
   }
 
-  public long termCount(String term) throws java.lang.Exception {
+  
+/**
+        Return total number of term occurrences.
+       @param term the term to count
+       @return total frequency of this term in the aggregated collection
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public long termCount(String term) throws java.lang.Exception {
     return indriJNI.QueryEnvironment_termCount__SWIG_1(swigCPtr, term);
   }
 
-  public long termFieldCount(String term, String field) throws java.lang.Exception {
+  
+/**
+        Return total number of term occurrences within a field.
+       @param term the term to count
+       @param field the name of the field
+       @return total frequency of this term within this field in the 
+       aggregated collection
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public long termFieldCount(String term, String field) throws java.lang.Exception {
     return indriJNI.QueryEnvironment_termFieldCount(swigCPtr, term, field);
   }
 
-  public String[] fieldList() throws java.lang.Exception {
+  
+/**
+        Return the list of fields.
+       @return vector of field names.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public String[] fieldList() throws java.lang.Exception {
   return indriJNI.QueryEnvironment_fieldList(swigCPtr);
 }
 
-  public long documentCount() throws java.lang.Exception {
+  
+/**
+        Return total number of documents in the collection.
+       @return total number of documents in the aggregated collection
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public long documentCount() throws java.lang.Exception {
     return indriJNI.QueryEnvironment_documentCount__SWIG_0(swigCPtr);
   }
 
-  public long documentCount(String term) throws java.lang.Exception {
+  
+/**
+        Return total number of documents in the collection for the given term.
+@param term the term to count documents for
+       @return total number of documents containing the term in the aggregated collection
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public long documentCount(String term) throws java.lang.Exception {
     return indriJNI.QueryEnvironment_documentCount__SWIG_1(swigCPtr, term);
   }
 
-  public DocumentVector[] documentVectors(int[] documentIDs) throws java.lang.Exception {
+  
+/**
+        Fetch a document vector for a list of documents. 
+       @param documentIDs the vector of document ids.
+       @return DocumentVector pointer for the specified document.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public DocumentVector[] documentVectors(int[] documentIDs) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_documentVectors(swigCPtr, documentIDs);
 }
 
-  public double expressionCount(String expression, String queryType) {
+  
+/**
+        Return the total number of times this expression appears in the collection.
+       @param expression The expression to evaluate, probably an ordered or unordered window expression
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public double expressionCount(String expression, String queryType) {
     return indriJNI.QueryEnvironment_expressionCount__SWIG_0(swigCPtr, expression, queryType);
   }
 
-  public double expressionCount(String expression) {
+  
+/**
+        Return the total number of times this expression appears in the collection.
+       @param expression The expression to evaluate, probably an ordered or unordered window expression
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public double expressionCount(String expression) {
     return indriJNI.QueryEnvironment_expressionCount__SWIG_1(swigCPtr, expression);
   }
 
-  public ScoredExtentResult[] expressionList(String expression, String queryType) {
+  
+/**
+        Return all the occurrences of this expression in the collection.
+       Note that the returned vector may be quite large for large collections, and therefore
+       has the very real possibility of exhausting the memory of the machine.  Use this method
+       with discretion.
+       @param expression The expression to evaluate, probably an ordered or unordered window expression
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public ScoredExtentResult[] expressionList(String expression, String queryType) {
   return indriJNI.QueryEnvironment_expressionList__SWIG_0(swigCPtr, expression, queryType);
 }
 
-  public ScoredExtentResult[] expressionList(String expression) {
+  
+/**
+        Return all the occurrences of this expression in the collection.
+       Note that the returned vector may be quite large for large collections, and therefore
+       has the very real possibility of exhausting the memory of the machine.  Use this method
+       with discretion.
+       @param expression The expression to evaluate, probably an ordered or unordered window expression
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public ScoredExtentResult[] expressionList(String expression) {
   return indriJNI.QueryEnvironment_expressionList__SWIG_1(swigCPtr, expression);
 }
 

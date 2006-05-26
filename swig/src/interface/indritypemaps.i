@@ -7,12 +7,12 @@ typedef long long UINT64;
 %typemap(out) INT64, UINT64 %{
 
   ZVAL_LONG(return_value,$1);
-%}
+  %}
 
 %typemap(in) INT64, UINT64 %{
-	convert_to_long_ex($input);
-	$1 = ($1_ltype) Z_LVAL_PP($input);
-%}
+  convert_to_long_ex($input);
+  $1 = ($1_ltype) Z_LVAL_PP($input);
+  %}
 
 %include "std_vector.i"
 
@@ -275,43 +275,43 @@ typedef long long UINT64;
 // need a method to make zvals for each child.
 %wrapper %{
 
-zval *php_makeQueryAnnotationNode(indri::api::QueryAnnotationNode *inNode) {
-  zval *retval = 0, *_cPtr;
-  MAKE_STD_ZVAL(_cPtr);
-  MAKE_STD_ZVAL(retval);
-  SWIG_SetPointerZval(retval, (void *)inNode,SWIGTYPE_p_indri__api__QueryAnnotationNode, 0);
-  *_cPtr = *retval;
-  INIT_ZVAL(*retval);
-  object_init_ex(retval,ptr_ce_swig_QueryAnnotationNode);
-  add_property_zval(retval,"_cPtr",_cPtr);
-  // don't deref NULL
-  if (inNode) {
-  // name
-  // type
-  // query text
-  // children
-  add_property_string(retval, "name", (char *)inNode->name.c_str(), 1);
-  add_property_string(retval, "type",  (char *)inNode->type.c_str(), 1);
-  add_property_string(retval, "queryText",  (char *)inNode->queryText.c_str(), 1);
-  zval *children;
-  MAKE_STD_ZVAL(children);
-  array_init(children);
-  add_property_zval(retval, "children", children);
-  for( unsigned int i=0; i<inNode->children.size(); i++ ) {
-    zval *child;
-    child = php_makeQueryAnnotationNode(inNode->children[i]);
-    add_next_index_zval(children, child);
+  zval *php_makeQueryAnnotationNode(indri::api::QueryAnnotationNode *inNode) {
+    zval *retval = 0, *_cPtr;
+    MAKE_STD_ZVAL(_cPtr);
+    MAKE_STD_ZVAL(retval);
+    SWIG_SetPointerZval(retval, (void *)inNode,SWIGTYPE_p_indri__api__QueryAnnotationNode, 0);
+    *_cPtr = *retval;
+    INIT_ZVAL(*retval);
+    object_init_ex(retval,ptr_ce_swig_QueryAnnotationNode);
+    add_property_zval(retval,"_cPtr",_cPtr);
+    // don't deref NULL
+    if (inNode) {
+      // name
+      // type
+      // query text
+      // children
+      add_property_string(retval, "name", (char *)inNode->name.c_str(), 1);
+      add_property_string(retval, "type",  (char *)inNode->type.c_str(), 1);
+      add_property_string(retval, "queryText",  (char *)inNode->queryText.c_str(), 1);
+      zval *children;
+      MAKE_STD_ZVAL(children);
+      array_init(children);
+      add_property_zval(retval, "children", children);
+      for( unsigned int i=0; i<inNode->children.size(); i++ ) {
+        zval *child;
+        child = php_makeQueryAnnotationNode(inNode->children[i]);
+        add_next_index_zval(children, child);
+      }
+    }
+    // need the _cPtr, etc.
+    return retval;
   }
-}
-  // need the _cPtr, etc.
-  return retval;
-}
-%}
+  %}
 
 // --- Argument clean up -------------------------------------------------
 
 %typemap(freearg) 
- std::vector< std::string > *, 
+  std::vector< std::string > *, 
  std::vector< std::string > &, 
  std::vector< std::string >, 
  std::vector< indri::api::ScoredExtentResult > *, 

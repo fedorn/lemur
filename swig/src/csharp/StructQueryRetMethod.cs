@@ -36,8 +36,8 @@ public class StructQueryRetMethod : RetrievalMethod {
     base.Dispose();
   }
 
-        public StructQueryRetMethod(RetrievalMethod m) : this((IntPtr)RetrievalMethod.getCPtr(m), false) {}
-        
+  public StructQueryRetMethod(RetrievalMethod m) : this((IntPtr)RetrievalMethod.getCPtr(m), false) {}
+  
 }
 
 }

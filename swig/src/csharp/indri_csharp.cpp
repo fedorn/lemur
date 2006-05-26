@@ -280,7 +280,7 @@ SWIGEXPORT void SWIGSTDCALL SWIGRegisterStringCallback_indri(SWIG_CSharpStringHe
 #include "indri/Parameters.hpp"
 #include "indri/ConflationPattern.hpp"
 #include "Exception.hpp"
-
+  
 
 #include <string>
 
@@ -1242,25 +1242,25 @@ SWIGINTERN void std_vector_Sl_indri_api_DocumentVector_Field_Sg__SetRange(std::v
         std::copy(values.begin(), values.end(), self->begin()+index);
       }
 
-namespace indri 
-{
-  namespace api 
+  namespace indri 
   {
-    typedef indri::api::DocumentVector::Field Field ;
+    namespace api 
+    {
+      typedef indri::api::DocumentVector::Field Field ;
+    }
   }
-}
+  
 
-
-namespace indri 
-{
-  namespace parse
+  namespace indri 
   {
-    typedef indri::parse::FileClassEnvironmentFactory::Specification Specification ;
+    namespace parse
+    {
+      typedef indri::parse::FileClassEnvironmentFactory::Specification Specification ;
+    }
   }
-}
 
-//#define Specification FileClassEnvironmentFactory::Specification
-
+  //#define Specification FileClassEnvironmentFactory::Specification
+  
 
 #ifdef __cplusplus
 extern "C" {

@@ -33,15 +33,27 @@ public class DocInfoList {
     swigCPtr = 0;
   }
 
-  public void startIteration() {
+  
+/**
+prepare iteration
+*/
+public void startIteration() {
     lemurJNI.DocInfoList_startIteration(swigCPtr);
   }
 
-  public boolean hasMore() {
+  
+/**
+test if there's any entry
+*/
+public boolean hasMore() {
     return lemurJNI.DocInfoList_hasMore(swigCPtr);
   }
 
-  public DocInfo nextEntry() {
+  
+/**
+@return the next entry
+*/
+public DocInfo nextEntry() {
     long cPtr = lemurJNI.DocInfoList_nextEntry(swigCPtr);
     return (cPtr == 0) ? null : new DocInfo(cPtr, false);
   }

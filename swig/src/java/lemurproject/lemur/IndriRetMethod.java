@@ -33,6 +33,13 @@ public class IndriRetMethod extends RetrievalMethod {
     super.delete();
   }
 
+        /**
+           Run an Indri structured query.
+           @param searchQuery the query to run
+           @return array of IndexedReal results
+           @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+        */
+
 public IndexedReal[] runQuery(String searchQuery) throws Exception {
   return RetMethodManager.runQuery(searchQuery, this);
 }

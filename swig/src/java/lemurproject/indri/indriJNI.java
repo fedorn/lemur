@@ -83,7 +83,7 @@ class indriJNI {
   static {
     System.loadLibrary("lemur_jni");
   }
-
+  
 
   /* Director upcall methods: */
 

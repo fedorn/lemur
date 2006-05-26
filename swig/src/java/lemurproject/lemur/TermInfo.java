@@ -37,19 +37,37 @@ public class TermInfo {
     this(lemurJNI.new_TermInfo(termID, termCount), true);
   }
 
-  public int termID() {
+  
+/**
+@return term id
+*/
+public int termID() {
     return lemurJNI.TermInfo_termID(swigCPtr);
   }
 
-  public int count() {
+  
+/**
+@return term count in document
+*/
+public int count() {
     return lemurJNI.TermInfo_count(swigCPtr);
   }
 
-  public int[] positions() {
+  
+/**
+       Return list of positions this term occurs in this document
+       (can be a list of 1 item)
+*/
+public int[] positions() {
   return lemurJNI.TermInfo_positions(swigCPtr);
 }
 
-  public int position() {
+  
+/**
+       Return position this term occurs in this document
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public int position() {
     return lemurJNI.TermInfo_position(swigCPtr);
   }
 

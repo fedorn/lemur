@@ -36,8 +36,8 @@ public class TextQueryRetMethod : RetrievalMethod {
     base.Dispose();
   }
 
-        public TextQueryRetMethod(RetrievalMethod m) : this((IntPtr)RetrievalMethod.getCPtr(m), false) {}
-        
+  public TextQueryRetMethod(RetrievalMethod m) : this((IntPtr)RetrievalMethod.getCPtr(m), false) {}
+  
 }
 
 }

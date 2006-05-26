@@ -98,14 +98,15 @@
 %include "cpointer.i"
 
 SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(MetadataPair, indri::parse::MetadataPair)
-%template(MetadataPairVector) std::vector<indri::parse::MetadataPair>;
+  %template(MetadataPairVector) std::vector<indri::parse::MetadataPair>;
 namespace indri {
-namespace parse {
-%nodefault MetadataPair;
+  namespace parse {
+    %nodefault MetadataPair;
     struct MetadataPair {
       const char* key;
       const void* value;
       int valueLength;
-};
-}}
+    };
+  }
+}
 #endif

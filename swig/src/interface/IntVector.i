@@ -37,7 +37,7 @@
   $result = jenv->NewIntArray(input.size()); 
   jint * body = jenv->GetIntArrayElements($result, 0);
   for( jsize i=0; i<input.size(); i++ ) {
-     body[i] = input[i];
+    body[i] = input[i];
   }
   jenv->ReleaseIntArrayElements($result, body, 0);
 }

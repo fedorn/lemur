@@ -214,7 +214,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include "TextQueryRetMethod.hpp"
 #include "MatchInfo.hpp"
 #include "ElemDocMgr.hpp"
-
+  
 
 #include <string>
 
@@ -264,40 +264,40 @@ SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
 
 
 
-void java_fill_indexedrealvector( JNIEnv* jenv, const lemur::api::IndexedRealVector& input, jobjectArray result ) {
-  if (!result) {
-    return ;
+  void java_fill_indexedrealvector( JNIEnv* jenv, const lemur::api::IndexedRealVector& input, jobjectArray result ) {
+    if (!result) {
+      return ;
+    }
+    jclass clazz = jenv->FindClass("lemurproject/lemur/IndexedReal");
+    jmethodID constructor = jenv->GetMethodID(clazz, "<init>", "()V" );
+    jfieldID scoreField = jenv->GetFieldID(clazz, "val", "D" );
+    jfieldID idField = jenv->GetFieldID(clazz, "ind", "I" );
+    jsize size = jenv->GetArrayLength(result);
+    jsize limit = std::min((size_t)size, input.size());
+
+    for( jsize i=0; i<limit; i++ ) {
+      jobject ser = jenv->NewObject(clazz, constructor);
+      jenv->SetDoubleField(ser, scoreField, input[i].val );
+      jenv->SetIntField(ser, idField, input[i].ind );
+      jenv->SetObjectArrayElement(result, i, ser);
+    }
   }
-  jclass clazz = jenv->FindClass("lemurproject/lemur/IndexedReal");
-  jmethodID constructor = jenv->GetMethodID(clazz, "<init>", "()V" );
-  jfieldID scoreField = jenv->GetFieldID(clazz, "val", "D" );
-  jfieldID idField = jenv->GetFieldID(clazz, "ind", "I" );
-  jsize size = jenv->GetArrayLength(result);
-  jsize limit = std::min((size_t)size, input.size());
-
-  for( jsize i=0; i<limit; i++ ) {
-    jobject ser = jenv->NewObject(clazz, constructor);
-    jenv->SetDoubleField(ser, scoreField, input[i].val );
-    jenv->SetIntField(ser, idField, input[i].ind );
-    jenv->SetObjectArrayElement(result, i, ser);
+  jobjectArray java_build_indexedrealvector( JNIEnv* jenv, const lemur::api::IndexedRealVector& input ) {
+    jclass clazz = jenv->FindClass("lemurproject/lemur/IndexedReal");
+    jobjectArray result;
+    result = jenv->NewObjectArray(input.size(), clazz, NULL);
+    java_fill_indexedrealvector(jenv, input, result);
+    return result;
   }
-}
-jobjectArray java_build_indexedrealvector( JNIEnv* jenv, const lemur::api::IndexedRealVector& input ) {
-  jclass clazz = jenv->FindClass("lemurproject/lemur/IndexedReal");
-  jobjectArray result;
-  result = jenv->NewObjectArray(input.size(), clazz, NULL);
-  java_fill_indexedrealvector(jenv, input, result);
-  return result;
-}
 
-
+  
 SWIGINTERN char *lemur_api_DocumentManager_docElement(lemur::api::DocumentManager *self,std::string const &docid,std::string const &elt){
-          lemur::parse::ElemDocMgr *dm = dynamic_cast<lemur::parse::ElemDocMgr *>(self);
-          if (dm)
-            return dm->getElement(docid.c_str(), elt.c_str());
-          else
-            return NULL;
-        }
+            lemur::parse::ElemDocMgr *dm = dynamic_cast<lemur::parse::ElemDocMgr *>(self);
+            if (dm)
+              return dm->getElement(docid.c_str(), elt.c_str());
+            else
+              return NULL;
+          }
 SWIGINTERN void lemur_api_Index_setProps(lemur::api::Index *self){
             const lemur::parse::BasicCollectionProps* props = dynamic_cast<const lemur::parse::BasicCollectionProps*> (self->collectionProps());
             if (props) {
@@ -377,7 +377,7 @@ SWIGINTERN lemur::api::IndexedRealVector *lemur_api_RetMethodManager_runIndriQue
     }
     return result;
   }
-
+  
 
 #ifdef __cplusplus
 extern "C" {
@@ -1563,27 +1563,6 @@ JNIEXPORT void JNICALL Java_lemurproject_lemur_lemurJNI_Index_1setProps(JNIEnv *
   {
     try {
       lemur_api_Index_setProps(arg1);
-    } catch( lemur::api::Exception& e ) {
-      {
-        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
-      };
-      // control does not leave method when thrown. (fixed in 1.3.25
-      // return ;
-    }
-  }
-}
-
-
-JNIEXPORT void JNICALL Java_lemurproject_lemur_lemurJNI_delete_1Index(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  lemur::api::Index *arg1 = (lemur::api::Index *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(lemur::api::Index **)&jarg1; 
-  {
-    try {
-      delete arg1;
-      
     } catch( lemur::api::Exception& e ) {
       {
         SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 

@@ -33,11 +33,22 @@ public class DocumentManager {
     swigCPtr = 0;
   }
 
-  public String getDoc(String docID) {
+  
+/**
+@return the document with the given docID (usually in raw format)
+*/
+public String getDoc(String docID) {
     return lemurJNI.DocumentManager_getDoc(swigCPtr, docID);
   }
 
-  public String docElement(String docid, String elt) {
+  
+/**
+       Get an element of a document with element name
+
+@param docid the external document id
+@param elt the name of the element to return 
+*/
+public String docElement(String docid, String elt) {
     return lemurJNI.DocumentManager_docElement(swigCPtr, docid, elt);
   }
 

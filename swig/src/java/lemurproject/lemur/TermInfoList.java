@@ -33,15 +33,27 @@ public class TermInfoList {
     swigCPtr = 0;
   }
 
-  public void startIteration() {
+  
+/**
+prepare iteration
+*/
+public void startIteration() {
     lemurJNI.TermInfoList_startIteration(swigCPtr);
   }
 
-  public boolean hasMore() {
+  
+/**
+test if there's any entry
+*/
+public boolean hasMore() {
     return lemurJNI.TermInfoList_hasMore(swigCPtr);
   }
 
-  public TermInfo nextEntry() {
+  
+/**
+@return the next entry
+*/
+public TermInfo nextEntry() {
     long cPtr = lemurJNI.TermInfoList_nextEntry(swigCPtr);
     return (cPtr == 0) ? null : new TermInfo(cPtr, false);
   }

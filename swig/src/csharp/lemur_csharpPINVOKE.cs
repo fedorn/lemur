@@ -383,11 +383,14 @@ class lemur_csharpPINVOKE {
   [DllImport("lemur_csharp", EntryPoint="CSharp_Index_setProps")]
   public static extern void Index_setProps(HandleRef jarg1);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_Index")]
-  public static extern void delete_Index(HandleRef jarg1);
-
   [DllImport("lemur_csharp", EntryPoint="CSharp_IndexManager_openIndex")]
   public static extern IntPtr IndexManager_openIndex(string jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_IndexManager")]
+  public static extern IntPtr new_IndexManager();
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_IndexManager")]
+  public static extern void delete_IndexManager(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Query_makeQuery__SWIG_0")]
   public static extern IntPtr Query_makeQuery__SWIG_0(string jarg1, string jarg2, string jarg3, string jarg4, string jarg5);

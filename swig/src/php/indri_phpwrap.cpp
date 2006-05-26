@@ -998,7 +998,7 @@ extern "C" {
 #include "indri/Parameters.hpp"
 #include "indri/ConflationPattern.hpp"
 #include "Exception.hpp"
-
+  
 
 #if PHP_MAJOR_VERSION < 5
 # define SWIG_exception(code, msg) { zend_error(E_ERROR, msg); }
@@ -1017,14 +1017,14 @@ extern "C" {
 #include "lemur-compat.hpp"
 #include "indri/QueryEnvironment.hpp"
 #include "Exception.hpp"
-// remap overloaded method names.
+  // remap overloaded method names.
 #define onetermCount termCount
 #define onedocumentCount documentCount
 #define runQuerydocset runQuery
 #define runAnnotatedQuerydocset runAnnotatedQuery
 #define documentsdocids documents
 #define documentMetadatadocids documentMetadata
-
+  
 
 #include <stdexcept>
 
@@ -1258,38 +1258,38 @@ static int le_swig__p_indri__api__QueryAnnotation=0; /* handle for QueryAnnotati
 /* wrapper section */
 
 
-zval *php_makeQueryAnnotationNode(indri::api::QueryAnnotationNode *inNode) {
-  zval *retval = 0, *_cPtr;
-  MAKE_STD_ZVAL(_cPtr);
-  MAKE_STD_ZVAL(retval);
-  SWIG_SetPointerZval(retval, (void *)inNode,SWIGTYPE_p_indri__api__QueryAnnotationNode, 0);
-  *_cPtr = *retval;
-  INIT_ZVAL(*retval);
-  object_init_ex(retval,ptr_ce_swig_QueryAnnotationNode);
-  add_property_zval(retval,"_cPtr",_cPtr);
-  // don't deref NULL
-  if (inNode) {
-  // name
-  // type
-  // query text
-  // children
-  add_property_string(retval, "name", (char *)inNode->name.c_str(), 1);
-  add_property_string(retval, "type",  (char *)inNode->type.c_str(), 1);
-  add_property_string(retval, "queryText",  (char *)inNode->queryText.c_str(), 1);
-  zval *children;
-  MAKE_STD_ZVAL(children);
-  array_init(children);
-  add_property_zval(retval, "children", children);
-  for( unsigned int i=0; i<inNode->children.size(); i++ ) {
-    zval *child;
-    child = php_makeQueryAnnotationNode(inNode->children[i]);
-    add_next_index_zval(children, child);
+  zval *php_makeQueryAnnotationNode(indri::api::QueryAnnotationNode *inNode) {
+    zval *retval = 0, *_cPtr;
+    MAKE_STD_ZVAL(_cPtr);
+    MAKE_STD_ZVAL(retval);
+    SWIG_SetPointerZval(retval, (void *)inNode,SWIGTYPE_p_indri__api__QueryAnnotationNode, 0);
+    *_cPtr = *retval;
+    INIT_ZVAL(*retval);
+    object_init_ex(retval,ptr_ce_swig_QueryAnnotationNode);
+    add_property_zval(retval,"_cPtr",_cPtr);
+    // don't deref NULL
+    if (inNode) {
+      // name
+      // type
+      // query text
+      // children
+      add_property_string(retval, "name", (char *)inNode->name.c_str(), 1);
+      add_property_string(retval, "type",  (char *)inNode->type.c_str(), 1);
+      add_property_string(retval, "queryText",  (char *)inNode->queryText.c_str(), 1);
+      zval *children;
+      MAKE_STD_ZVAL(children);
+      array_init(children);
+      add_property_zval(retval, "children", children);
+      for( unsigned int i=0; i<inNode->children.size(); i++ ) {
+        zval *child;
+        child = php_makeQueryAnnotationNode(inNode->children[i]);
+        add_next_index_zval(children, child);
+      }
+    }
+    // need the _cPtr, etc.
+    return retval;
   }
-}
-  // need the _cPtr, etc.
-  return retval;
-}
-
+  
 static int _wrap_TermExtent_begin_set(zend_property_reference *property_reference, pval *value) {
   indri::parse::TermExtent *arg1 = (indri::parse::TermExtent *) 0 ;
   int arg2 ;

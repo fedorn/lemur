@@ -29,70 +29,180 @@ public class RetMethodManager {
     swigCPtr = 0;
   }
 
+        /**
+           Run a string query with a given retrieval method instance.
+           @param searchQuery the query to run
+           @param m The retrieval method to use.
+           @return array of IndexedReal results
+           @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+        */
+
 public static IndexedReal[] runQuery(String searchQuery, IndriRetMethod m) throws Exception
   {
     return RetMethodManager.runIndriQuery(searchQuery, m);
   }
+/**
+   Run a string query with a given retrieval method instance.
+   @param searchQuery the query to run
+   @param m The retrieval method to use.
+   @return array of IndexedReal results
+   @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
 
 public static IndexedReal[] runQuery(String searchQuery, StructQueryRetMethod m) throws Exception
   {
     return RetMethodManager.runStructQuery(searchQuery, m);
   }
+/**
+   Run a string query with a given retrieval method instance.
+   @param searchQuery the query to run
+   @param m The retrieval method to use.
+   @return array of IndexedReal results
+   @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+
 public static IndexedReal[] runQuery(String searchQuery, TextQueryRetMethod m) throws Exception
   {
     return RetMethodManager.runTextQuery(searchQuery, m);
   }
  
  
-  public static RetrievalMethod createModel(Index ind, ScoreAccumulator accum, String type) throws java.lang.Exception {
+  
+/**
+Create a retrieval model
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static RetrievalMethod createModel(Index ind, ScoreAccumulator accum, String type) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_createModel__SWIG_0(Index.getCPtr(ind), ScoreAccumulator.getCPtr(accum), type);
 }
 
-  public static RetrievalMethod createModel(Index ind, ScoreAccumulator accum) throws java.lang.Exception {
+  
+/**
+Create a retrieval model
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static RetrievalMethod createModel(Index ind, ScoreAccumulator accum) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_createModel__SWIG_1(Index.getCPtr(ind), ScoreAccumulator.getCPtr(accum));
 }
 
-  public static IndexedReal[] runTextQuery(String query, TextQueryRetMethod model, String stopfile, String stemtype, String datadir, String func) throws java.lang.Exception {
+  
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static IndexedReal[] runTextQuery(String query, TextQueryRetMethod model, String stopfile, String stemtype, String datadir, String func) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runTextQuery__SWIG_0(query, TextQueryRetMethod.getCPtr(model), stopfile, stemtype, datadir, func);
 }
 
-  public static IndexedReal[] runTextQuery(String query, TextQueryRetMethod model, String stopfile, String stemtype, String datadir) throws java.lang.Exception {
+  
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static IndexedReal[] runTextQuery(String query, TextQueryRetMethod model, String stopfile, String stemtype, String datadir) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runTextQuery__SWIG_1(query, TextQueryRetMethod.getCPtr(model), stopfile, stemtype, datadir);
 }
 
-  public static IndexedReal[] runTextQuery(String query, TextQueryRetMethod model, String stopfile, String stemtype) throws java.lang.Exception {
+  
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static IndexedReal[] runTextQuery(String query, TextQueryRetMethod model, String stopfile, String stemtype) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runTextQuery__SWIG_2(query, TextQueryRetMethod.getCPtr(model), stopfile, stemtype);
 }
 
-  public static IndexedReal[] runTextQuery(String query, TextQueryRetMethod model, String stopfile) throws java.lang.Exception {
+  
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static IndexedReal[] runTextQuery(String query, TextQueryRetMethod model, String stopfile) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runTextQuery__SWIG_3(query, TextQueryRetMethod.getCPtr(model), stopfile);
 }
 
-  public static IndexedReal[] runTextQuery(String query, TextQueryRetMethod model) throws java.lang.Exception {
+  
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static IndexedReal[] runTextQuery(String query, TextQueryRetMethod model) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runTextQuery__SWIG_4(query, TextQueryRetMethod.getCPtr(model));
 }
 
-  public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod model, String stopfile, String stemtype, String datadir, String func) throws java.lang.Exception {
+  
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod model, String stopfile, String stemtype, String datadir, String func) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runStructQuery__SWIG_0(query, StructQueryRetMethod.getCPtr(model), stopfile, stemtype, datadir, func);
 }
 
-  public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod model, String stopfile, String stemtype, String datadir) throws java.lang.Exception {
+  
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod model, String stopfile, String stemtype, String datadir) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runStructQuery__SWIG_1(query, StructQueryRetMethod.getCPtr(model), stopfile, stemtype, datadir);
 }
 
-  public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod model, String stopfile, String stemtype) throws java.lang.Exception {
+  
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod model, String stopfile, String stemtype) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runStructQuery__SWIG_2(query, StructQueryRetMethod.getCPtr(model), stopfile, stemtype);
 }
 
-  public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod model, String stopfile) throws java.lang.Exception {
+  
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod model, String stopfile) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runStructQuery__SWIG_3(query, StructQueryRetMethod.getCPtr(model), stopfile);
 }
 
-  public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod model) throws java.lang.Exception {
+  
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod model) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runStructQuery__SWIG_4(query, StructQueryRetMethod.getCPtr(model));
 }
 
-  public static IndexedReal[] runIndriQuery(String query, IndriRetMethod model) throws java.lang.Exception {
+  
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static IndexedReal[] runIndriQuery(String query, IndriRetMethod model) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runIndriQuery(query, IndriRetMethod.getCPtr(model));
 }
 

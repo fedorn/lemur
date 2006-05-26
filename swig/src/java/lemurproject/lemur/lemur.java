@@ -9,19 +9,46 @@
 package lemurproject.lemur;
 
 public class lemur {
-  public static void ParamSet(String key, String value) throws java.lang.Exception {
+  
+/**
+    Add a parameter value pair. 
+    If no parameter file has been pushed,
+      a new empty Parameters object is put on the stack.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static void ParamSet(String key, String value) throws java.lang.Exception {
     lemurJNI.ParamSet(key, value);
   }
 
-  public static void ParamClear() throws java.lang.Exception {
+  
+/**
+Clear the parameter stack and deallocate all memory.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static void ParamClear() throws java.lang.Exception {
     lemurJNI.ParamClear();
   }
 
-  public static int ParamPushFile(String s) throws java.lang.Exception {
+  
+/**
+ Load parameters from a parameter file.
+ Adds a set of parameters to the parameter stack.
+      @param s the parameter file to load.
+      @return true if the file was loaded. false if it was not.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static int ParamPushFile(String s) throws java.lang.Exception {
     return lemurJNI.ParamPushFile(s);
   }
 
-  public static String ParamPopFile() throws java.lang.Exception {
+  
+/**
+ Remove parameters from the parameter stack.
+ Removes the most recently pushed parameter file from the stack.
+      @return an empty String
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static String ParamPopFile() throws java.lang.Exception {
     return lemurJNI.ParamPopFile();
   }
 

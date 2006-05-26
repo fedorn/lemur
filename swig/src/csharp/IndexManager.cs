@@ -24,10 +24,14 @@ public class IndexManager : IDisposable {
     return (obj == null) ? new HandleRef(null, IntPtr.Zero) : obj.swigCPtr;
   }
 
+  ~IndexManager() {
+    Dispose();
+  }
+
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      throw new MethodAccessException("C++ destructor does not have public access");
+      lemur_csharpPINVOKE.delete_IndexManager(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -35,9 +39,12 @@ public class IndexManager : IDisposable {
 
   public static Index openIndex(string indexTOCFile) {
     IntPtr cPtr = lemur_csharpPINVOKE.IndexManager_openIndex(indexTOCFile);
-    Index ret = (cPtr == IntPtr.Zero) ? null : new Index(cPtr, true);
+    Index ret = (cPtr == IntPtr.Zero) ? null : new Index(cPtr, false);
     if (lemur_csharpPINVOKE.SWIGPendingException.Pending) throw lemur_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
+  }
+
+  public IndexManager() : this(lemur_csharpPINVOKE.new_IndexManager(), true) {
   }
 
 }

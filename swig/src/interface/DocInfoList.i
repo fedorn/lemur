@@ -12,7 +12,7 @@
   }
   jint * body = jenv->GetIntArrayElements($result, 0);
   for( jsize i=0; i<count; i++ ) {
-     body[i] = tmp[i];
+    body[i] = tmp[i];
   }
   jenv->ReleaseIntArrayElements($result, body, 0);
 }
@@ -34,7 +34,7 @@
 
 %typemap(csout, excode=SWIGEXCODE) const lemur::api::LOC_T* {
   int[] ret= $imcall;$excode
-  return ret;
+                       return ret;
 }
 #endif
 
@@ -43,16 +43,65 @@ namespace lemur {
 
     class DocInfo {
     public:
+
       DocInfo( lemur::api::DOCID_T termID, lemur::api::COUNT_T termCount);
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+@return the document id.
+*/
+public";
+#endif
+
       lemur::api::DOCID_T docID() const;
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+@return term count in document.
+*/
+public";
+#endif
+
       lemur::api::COUNT_T termCount() const;
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+@return list of positions this term occurs in this document
+*/
+public";
+#endif
+
       // needs a map
       const lemur::api::LOC_T* positions() const;
     };
     class DocInfoList {
     public:
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+prepare iteration
+*/
+public";
+#endif
+
       void startIteration() const=0;
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+test if there's any entry
+*/
+public";
+#endif
+
       bool hasMore() const=0;
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+@return the next entry
+*/
+public";
+#endif
+
       lemur::api::DocInfo *nextEntry() const=0;
     };
   }

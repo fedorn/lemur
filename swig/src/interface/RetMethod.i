@@ -71,6 +71,19 @@ namespace lemur {
       %newobject makeQuery;
     public:
       %extend {
+#ifdef SWIGJAVA
+        %javamethodmodifiers  "
+/** Create a stopped, stemmed Query from a string.
+@param query the input query
+@param stopfile optional file containing a list of stopwords
+@param stemtype optional stemmer type
+@param datadir optional ignored
+@param func optional stemmer function for arabic stemming.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
+
         // should get the params off the param stack
         static lemur::api::Query *makeQuery(std::string query, const std::string& stopfile="", const std::string& stemtype="", const std::string& datadir="", const std::string& func="") throw (lemur::api::Exception) {
           lemur::api::Stopper* stopper = lemur::api::TextHandlerManager::createStopper(stopfile);
@@ -112,15 +125,47 @@ namespace lemur {
     class RetrievalMethod {
     public:
       // needs a typemap
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+Score all documents in the collection
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
+
       virtual void scoreCollection(const lemur::api::QueryRep &qry, lemur::api::IndexedRealVector &results) throw (lemur::api::Exception);
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+update the query, feedback support
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
+
       virtual void updateQuery (lemur::api::QueryRep &qryRep, const lemur::api::DocIDSet &relDocs) throw (lemur::api::Exception) = 0;      
       %typemap(javacode) RetrievalMethod %{
+        /**
+           Run a string query. Specialized by RetrievalMethod subclasses.
+           @param searchQuery the query to run
+           @return array of IndexedReal results
+           @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+        */
+
 public  abstract IndexedReal[] runQuery(String searchQuery) throws Exception;
  %}
     };
 
     class TextQueryRetMethod : public RetrievalMethod {
       %typemap(javacode) TextQueryRetMethod %{
+        /**
+           Run a string query.
+           @param searchQuery the query to run
+           @return array of IndexedReal results
+           @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+        */
+
 public  IndexedReal[] runQuery(String searchQuery)  throws Exception {
   return RetMethodManager.runQuery(searchQuery, this);
 }
@@ -128,20 +173,27 @@ public  IndexedReal[] runQuery(String searchQuery)  throws Exception {
       // this doesn't address the need for dynamic_casting. Bleah.
 #ifdef SWIGCSHARP
       %typemap(cscode) TextQueryRetMethod %{
-        public TextQueryRetMethod(RetrievalMethod m) : this((IntPtr)RetrievalMethod.getCPtr(m), false) {}
-        %};
+  public TextQueryRetMethod(RetrievalMethod m) : this((IntPtr)RetrievalMethod.getCPtr(m), false) {}
+  %};
 #endif
     };
     class StructQueryRetMethod : public RetrievalMethod {
       %typemap(javacode) StructQueryRetMethod %{
+        /**
+           Run a InQuery structured query language query.
+           @param searchQuery the query to run
+           @return array of IndexedReal results
+           @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+        */
+
 public IndexedReal[] runQuery(String searchQuery) throws Exception {
   return RetMethodManager.runQuery(searchQuery, this);
 }
  %}
 #ifdef SWIGCSHARP
       %typemap(cscode) StructQueryRetMethod %{
-        public StructQueryRetMethod(RetrievalMethod m) : this((IntPtr)RetrievalMethod.getCPtr(m), false) {}
-        %};
+  public StructQueryRetMethod(RetrievalMethod m) : this((IntPtr)RetrievalMethod.getCPtr(m), false) {}
+  %};
 #endif
 
     };
@@ -151,6 +203,13 @@ public IndexedReal[] runQuery(String searchQuery) throws Exception {
   {
     class IndriRetMethod : public lemur::api::RetrievalMethod {
       %typemap(javacode)  IndriRetMethod %{
+        /**
+           Run an Indri structured query.
+           @param searchQuery the query to run
+           @return array of IndexedReal results
+           @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+        */
+
 public IndexedReal[] runQuery(String searchQuery) throws Exception {
   return RetMethodManager.runQuery(searchQuery, this);
 }
@@ -164,14 +223,53 @@ public IndexedReal[] runQuery(String searchQuery) throws Exception {
     %newobject RetMethodManager::createModel;    
     class RetMethodManager {
     public:
-      // needs a typeMap
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+Create a retrieval model
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
+
       static lemur::api::RetrievalMethod* createModel(const lemur::api::Index* ind, lemur::api::ScoreAccumulator* accum, std::string type = "") throw (lemur::api::Exception);
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
 
       static lemur::api::IndexedRealVector* runTextQuery(const std::string& query, lemur::api::TextQueryRetMethod* model, const std::string& stopfile="", const std::string& stemtype="", const std::string& datadir="", const std::string& func="") throw (lemur::api::Exception);
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
 
       static lemur::api::IndexedRealVector* runStructQuery(const std::string& query, lemur::api::StructQueryRetMethod* model, const std::string& stopfile="", const std::string& stemtype="", const std::string& datadir="", const std::string& func="") throw (lemur::api::Exception);
 
       %extend { 
+#ifdef SWIGJAVA
+        %javamethodmodifiers  "
+/**
+      Automatically generate query models from the given query and run through
+      given retrieval model. Stopword file and stemmer are optional
+      query terms delimited by space
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
+
         static lemur::api::IndexedRealVector* runIndriQuery(const std::string& query, lemur::retrieval::IndriRetMethod* model) throw (lemur::api::Exception) {
           lemur::api::IndexedRealVector *tmp = new lemur::api::IndexedRealVector();
           model->scoreCollection(query, *tmp);
@@ -197,15 +295,38 @@ public IndexedReal[] runQuery(String searchQuery) throws Exception {
       }
 
       %typemap(javacode) RetMethodManager %{
+        /**
+           Run a string query with a given retrieval method instance.
+           @param searchQuery the query to run
+           @param m The retrieval method to use.
+           @return array of IndexedReal results
+           @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+        */
+
 public static IndexedReal[] runQuery(String searchQuery, IndriRetMethod m) throws Exception
   {
     return RetMethodManager.runIndriQuery(searchQuery, m);
   }
+/**
+   Run a string query with a given retrieval method instance.
+   @param searchQuery the query to run
+   @param m The retrieval method to use.
+   @return array of IndexedReal results
+   @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
 
 public static IndexedReal[] runQuery(String searchQuery, StructQueryRetMethod m) throws Exception
   {
     return RetMethodManager.runStructQuery(searchQuery, m);
   }
+/**
+   Run a string query with a given retrieval method instance.
+   @param searchQuery the query to run
+   @param m The retrieval method to use.
+   @return array of IndexedReal results
+   @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+
 public static IndexedReal[] runQuery(String searchQuery, TextQueryRetMethod m) throws Exception
   {
     return RetMethodManager.runTextQuery(searchQuery, m);

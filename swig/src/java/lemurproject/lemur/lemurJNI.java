@@ -13,7 +13,7 @@ class lemurJNI {
   static {
     System.loadLibrary("lemur_jni");
   }
-
+  
   public final static native long new_TermInfo(int jarg1, int jarg2);
   public final static native int TermInfo_termID(long jarg1);
   public final static native int TermInfo_count(long jarg1);
@@ -53,7 +53,6 @@ class lemurJNI {
   public final static native long Index_termInfoList(long jarg1, int jarg2) throws java.lang.Exception;
   public final static native long Index_termInfoListSeq(long jarg1, int jarg2) throws java.lang.Exception;
   public final static native void Index_setProps(long jarg1);
-  public final static native void delete_Index(long jarg1);
   public final static native long IndexManager_openIndex(String jarg1) throws java.lang.Exception;
   public final static native long Query_makeQuery__SWIG_0(String jarg1, String jarg2, String jarg3, String jarg4, String jarg5) throws java.lang.Exception;
   public final static native long Query_makeQuery__SWIG_1(String jarg1, String jarg2, String jarg3, String jarg4) throws java.lang.Exception;

@@ -52,7 +52,7 @@ public class DocInfo : IDisposable {
 
   public int[] positions() {
   int[] ret= lemur_csharpPINVOKE.DocInfo_positions(swigCPtr);
-  return ret;
+                       return ret;
 }
 
 }

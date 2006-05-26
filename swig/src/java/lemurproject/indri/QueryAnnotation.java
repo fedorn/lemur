@@ -33,15 +33,30 @@ public class QueryAnnotation {
     swigCPtr = 0;
   }
 
-  public QueryAnnotationNode getQueryTree() throws java.lang.Exception {
+  
+/**
+@return QueryAnnotationNodes for the query tree.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public QueryAnnotationNode getQueryTree() throws java.lang.Exception {
   return indriJNI.QueryAnnotation_getQueryTree(swigCPtr);
 }
 
-  public java.util.Map getAnnotations() throws java.lang.Exception {
+  
+/**
+@return Annotations for the query tree.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public java.util.Map getAnnotations() throws java.lang.Exception {
   return indriJNI.QueryAnnotation_getAnnotations(swigCPtr);
 }
 
-  public ScoredExtentResult[] getResults() throws java.lang.Exception {
+  
+/**
+@return ScoredExtentResults for the query tree.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public ScoredExtentResult[] getResults() throws java.lang.Exception {
   return indriJNI.QueryAnnotation_getResults(swigCPtr);
 }
 

@@ -33,13 +33,30 @@ public abstract class RetrievalMethod {
     swigCPtr = 0;
   }
 
+        /**
+           Run a string query. Specialized by RetrievalMethod subclasses.
+           @param searchQuery the query to run
+           @return array of IndexedReal results
+           @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+        */
+
 public  abstract IndexedReal[] runQuery(String searchQuery) throws Exception;
  
-  public void scoreCollection(QueryRep qry, IndexedReal[] results) throws java.lang.Exception {
+  
+/**
+Score all documents in the collection
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void scoreCollection(QueryRep qry, IndexedReal[] results) throws java.lang.Exception {
     lemurJNI.RetrievalMethod_scoreCollection(swigCPtr, QueryRep.getCPtr(qry), results);
   }
 
-  public void updateQuery(QueryRep qryRep, WeightedIDSet relDocs) throws java.lang.Exception {
+  
+/**
+update the query, feedback support
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void updateQuery(QueryRep qryRep, WeightedIDSet relDocs) throws java.lang.Exception {
     lemurJNI.RetrievalMethod_updateQuery(swigCPtr, QueryRep.getCPtr(qryRep), WeightedIDSet.getCPtr(relDocs));
   }
 

@@ -15,116 +15,116 @@
 
 %{
 
-struct jni_parseddocument_info {
-  jclass pdClazz;
-  jmethodID pdConstructor;
+  struct jni_parseddocument_info {
+    jclass pdClazz;
+    jmethodID pdConstructor;
 
-  jclass stringClazz;
-  jclass byteArrayClazz;
+    jclass stringClazz;
+    jclass byteArrayClazz;
 
-  jclass mapClazz;
-  jmethodID mapConstructor;
-  jmethodID putMethod;
+    jclass mapClazz;
+    jmethodID mapConstructor;
+    jmethodID putMethod;
 
-  jclass teClazz;
-  jmethodID teConstructor;
+    jclass teClazz;
+    jmethodID teConstructor;
 
-  jfieldID termsField;
-  jfieldID textField;
-  jfieldID contentField;
-  jfieldID positionsField;
-  jfieldID metadataField;
+    jfieldID termsField;
+    jfieldID textField;
+    jfieldID contentField;
+    jfieldID positionsField;
+    jfieldID metadataField;
 
-  jfieldID beginField;
-  jfieldID endField;
-};
+    jfieldID beginField;
+    jfieldID endField;
+  };
 
-void parseddocument_init( JNIEnv* jenv, jni_parseddocument_info& info ) {
-  info.pdClazz = jenv->FindClass("lemurproject/indri/ParsedDocument");
-  info.pdConstructor = jenv->GetMethodID(info.pdClazz, "<init>", "()V" );
+  void parseddocument_init( JNIEnv* jenv, jni_parseddocument_info& info ) {
+    info.pdClazz = jenv->FindClass("lemurproject/indri/ParsedDocument");
+    info.pdConstructor = jenv->GetMethodID(info.pdClazz, "<init>", "()V" );
 
-  info.stringClazz = jenv->FindClass("java/lang/String" );
-  info.byteArrayClazz = jenv->FindClass("[B" );
+    info.stringClazz = jenv->FindClass("java/lang/String" );
+    info.byteArrayClazz = jenv->FindClass("[B" );
 
-  info.mapClazz = jenv->FindClass("java/util/HashMap");
-  info.mapConstructor = jenv->GetMethodID(info.mapClazz, "<init>", "()V" );
+    info.mapClazz = jenv->FindClass("java/util/HashMap");
+    info.mapConstructor = jenv->GetMethodID(info.mapClazz, "<init>", "()V" );
 
-  info.putMethod = jenv->GetMethodID(info.mapClazz, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
-  info.teClazz = jenv->FindClass("lemurproject/indri/ParsedDocument$TermExtent" );
-  info.teConstructor = jenv->GetMethodID(info.teClazz, "<init>", "(II)V" );
+    info.putMethod = jenv->GetMethodID(info.mapClazz, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
+    info.teClazz = jenv->FindClass("lemurproject/indri/ParsedDocument$TermExtent" );
+    info.teConstructor = jenv->GetMethodID(info.teClazz, "<init>", "(II)V" );
 
-  info.textField = jenv->GetFieldID(info.pdClazz, "text", "Ljava/lang/String;" );
-  info.contentField = jenv->GetFieldID(info.pdClazz, "content", "Ljava/lang/String;" );
-  info.termsField = jenv->GetFieldID(info.pdClazz, "terms", "[Ljava/lang/String;" );
-  info.positionsField = jenv->GetFieldID(info.pdClazz, "positions", "[Llemurproject/indri/ParsedDocument$TermExtent;" );
-  info.metadataField = jenv->GetFieldID(info.pdClazz, "metadata", "Ljava/util/Map;" );
+    info.textField = jenv->GetFieldID(info.pdClazz, "text", "Ljava/lang/String;" );
+    info.contentField = jenv->GetFieldID(info.pdClazz, "content", "Ljava/lang/String;" );
+    info.termsField = jenv->GetFieldID(info.pdClazz, "terms", "[Ljava/lang/String;" );
+    info.positionsField = jenv->GetFieldID(info.pdClazz, "positions", "[Llemurproject/indri/ParsedDocument$TermExtent;" );
+    info.metadataField = jenv->GetFieldID(info.pdClazz, "metadata", "Ljava/util/Map;" );
 
-  info.beginField = jenv->GetFieldID(info.teClazz, "begin", "I");
-  info.endField = jenv->GetFieldID(info.teClazz, "end", "I");
-}
-
-jobject parseddocument_copy( JNIEnv* jenv, jni_parseddocument_info& info, indri::api::ParsedDocument* doc ) {
-  // make a parsed document
-  jobject result = jenv->NewObject(info.pdClazz, info.pdConstructor);
-
-  // make a metadata map to go in it
-  jobject mapObject = jenv->NewObject(info.mapClazz, info.mapConstructor);
-
-  // copy metadata information
-  for( unsigned int i=0; i<doc->metadata.size(); i++ ) {
-    indri::parse::MetadataPair& pair = doc->metadata[i];
-
-    jstring key = jenv->NewStringUTF(pair.key);
-    jbyteArray value = jenv->NewByteArray(pair.valueLength);
-
-    jbyte* elements = jenv->GetByteArrayElements(value, 0);
-    memcpy( elements, pair.value, pair.valueLength );
-    jenv->ReleaseByteArrayElements(value, elements, 0);
-
-    // put it in the map
-    jenv->CallObjectMethod(mapObject, info.putMethod, key, value);
+    info.beginField = jenv->GetFieldID(info.teClazz, "begin", "I");
+    info.endField = jenv->GetFieldID(info.teClazz, "end", "I");
   }
 
-  // make a terms string array
-  jobjectArray termsArray = jenv->NewObjectArray(doc->terms.size(), info.stringClazz, NULL);
+  jobject parseddocument_copy( JNIEnv* jenv, jni_parseddocument_info& info, indri::api::ParsedDocument* doc ) {
+    // make a parsed document
+    jobject result = jenv->NewObject(info.pdClazz, info.pdConstructor);
 
-  // copy terms information
-  for( unsigned int i=0; i<doc->terms.size(); i++ ) {
-    jstring term = jenv->NewStringUTF(doc->terms[i]);
-    jenv->SetObjectArrayElement(termsArray, i, term);
+    // make a metadata map to go in it
+    jobject mapObject = jenv->NewObject(info.mapClazz, info.mapConstructor);
+
+    // copy metadata information
+    for( unsigned int i=0; i<doc->metadata.size(); i++ ) {
+      indri::parse::MetadataPair& pair = doc->metadata[i];
+
+      jstring key = jenv->NewStringUTF(pair.key);
+      jbyteArray value = jenv->NewByteArray(pair.valueLength);
+
+      jbyte* elements = jenv->GetByteArrayElements(value, 0);
+      memcpy( elements, pair.value, pair.valueLength );
+      jenv->ReleaseByteArrayElements(value, elements, 0);
+
+      // put it in the map
+      jenv->CallObjectMethod(mapObject, info.putMethod, key, value);
+    }
+
+    // make a terms string array
+    jobjectArray termsArray = jenv->NewObjectArray(doc->terms.size(), info.stringClazz, NULL);
+
+    // copy terms information
+    for( unsigned int i=0; i<doc->terms.size(); i++ ) {
+      jstring term = jenv->NewStringUTF(doc->terms[i]);
+      jenv->SetObjectArrayElement(termsArray, i, term);
+    }
+
+    // make a positions array
+    jobjectArray positionsArray = jenv->NewObjectArray(doc->positions.size(), info.teClazz, NULL);
+
+    // copy positions information
+    for( unsigned int i=0; i<doc->positions.size(); i++ ) {
+      int begin = doc->positions[i].begin;
+      int end = doc->positions[i].end;
+      jobject position = jenv->NewObject(info.teClazz, info.teConstructor, begin, end);
+
+      // add this object to the array
+      jenv->SetObjectArrayElement(positionsArray, i, position);
+    }
+
+    // store field data
+    jstring text = jenv->NewStringUTF(doc->text);
+
+    jenv->SetObjectField(result, info.textField, text);
+
+    // this makes a copy...
+    jstring content = jenv->NewStringUTF(doc->getContent().c_str());
+
+    jenv->SetObjectField(result, info.contentField, content);
+
+    jenv->SetObjectField(result, info.termsField, termsArray);
+    jenv->SetObjectField(result, info.positionsField, positionsArray);
+    jenv->SetObjectField(result, info.metadataField, mapObject);
+
+    return result;
   }
 
-  // make a positions array
-  jobjectArray positionsArray = jenv->NewObjectArray(doc->positions.size(), info.teClazz, NULL);
-
-  // copy positions information
-  for( unsigned int i=0; i<doc->positions.size(); i++ ) {
-    int begin = doc->positions[i].begin;
-    int end = doc->positions[i].end;
-    jobject position = jenv->NewObject(info.teClazz, info.teConstructor, begin, end);
-
-    // add this object to the array
-    jenv->SetObjectArrayElement(positionsArray, i, position);
-  }
-
-  // store field data
-  jstring text = jenv->NewStringUTF(doc->text);
-
-  jenv->SetObjectField(result, info.textField, text);
-
-  // this makes a copy...
-  jstring content = jenv->NewStringUTF(doc->getContent().c_str());
-
-  jenv->SetObjectField(result, info.contentField, content);
-
-  jenv->SetObjectField(result, info.termsField, termsArray);
-  jenv->SetObjectField(result, info.positionsField, positionsArray);
-  jenv->SetObjectField(result, info.metadataField, mapObject);
-
-  return result;
-}
-
-%}
+  %}
 
 %typemap(in) const indri::api::ParsedDocument& ( indri::api::ParsedDocument pdoc, indri::utility::Buffer buf ) {
   jni_parseddocument_info info;
@@ -282,20 +282,20 @@ jobject parseddocument_copy( JNIEnv* jenv, jni_parseddocument_info& info, indri:
 #ifdef SWIGCSHARP
 
 SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(ParsedDocument, indri::api::ParsedDocument *)
-%template(ParsedDocumentVector) std::vector<indri::api::ParsedDocument
+  %template(ParsedDocumentVector) std::vector<indri::api::ParsedDocument
 *>;
 SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(TermExtent, indri::parse::TermExtent)
-%template(TermExtentVector) std::vector<indri::parse::TermExtent>;
+  %template(TermExtentVector) std::vector<indri::parse::TermExtent>;
 
 namespace indri {
-          namespace parse {
-              struct TermExtent {
+  namespace parse {
+    struct TermExtent {
       int begin;
       int end;
     };
-}
-// ought to wrap greedy vector too.
-namespace api {
+  }
+  // ought to wrap greedy vector too.
+  namespace api {
     struct ParsedDocument {  
       char* text;
       size_t textLength;
@@ -313,5 +313,6 @@ namespace api {
       std::vector<indri::parse::MetadataPair> metadata;
     };
 
-}}
+  }
+}
 #endif

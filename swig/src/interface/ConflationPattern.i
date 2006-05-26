@@ -13,7 +13,7 @@
 %typemap(javain) const std::map<indri::parse::ConflationPattern*,std::string>& "$javainput";
 
 %typemap(in) const std::map<indri::parse::ConflationPattern*,std::string>&  (std::map<indri::parse::ConflationPattern*,std::string> map){
-   // make a conflations map to go in it
+  // make a conflations map to go in it
   // get map class and entrySet method pointer
   jobject src = $input;
   jclass mapClazz = jenv->GetObjectClass(src);

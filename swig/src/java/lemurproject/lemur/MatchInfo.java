@@ -29,7 +29,12 @@ public class MatchInfo {
     swigCPtr = 0;
   }
 
-  public static TMatch[] getMatches(Index ind, Query qry, int docID) throws java.lang.Exception {
+  
+/**
+       Construct the match list for a given query/document pair.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static TMatch[] getMatches(Index ind, Query qry, int docID) throws java.lang.Exception {
   return lemurJNI.MatchInfo_getMatches(Index.getCPtr(ind), Query.getCPtr(qry), docID);
 }
 

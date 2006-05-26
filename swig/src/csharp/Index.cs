@@ -24,14 +24,10 @@ public class Index : IDisposable {
     return (obj == null) ? new HandleRef(null, IntPtr.Zero) : obj.swigCPtr;
   }
 
-  ~Index() {
-    Dispose();
-  }
-
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      lemur_csharpPINVOKE.delete_Index(swigCPtr);
+      throw new MethodAccessException("C++ destructor does not have public access");
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);

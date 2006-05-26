@@ -29,27 +29,72 @@ public class Query {
     swigCPtr = 0;
   }
 
-  public static Query makeQuery(String query, String stopfile, String stemtype, String datadir, String func) throws java.lang.Exception {
+  
+/** Create a stopped, stemmed Query from a string.
+@param query the input query
+@param stopfile optional file containing a list of stopwords
+@param stemtype optional stemmer type
+@param datadir optional ignored
+@param func optional stemmer function for arabic stemming.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static Query makeQuery(String query, String stopfile, String stemtype, String datadir, String func) throws java.lang.Exception {
     long cPtr = lemurJNI.Query_makeQuery__SWIG_0(query, stopfile, stemtype, datadir, func);
     return (cPtr == 0) ? null : new Query(cPtr, true);
   }
 
-  public static Query makeQuery(String query, String stopfile, String stemtype, String datadir) throws java.lang.Exception {
+  
+/** Create a stopped, stemmed Query from a string.
+@param query the input query
+@param stopfile optional file containing a list of stopwords
+@param stemtype optional stemmer type
+@param datadir optional ignored
+@param func optional stemmer function for arabic stemming.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static Query makeQuery(String query, String stopfile, String stemtype, String datadir) throws java.lang.Exception {
     long cPtr = lemurJNI.Query_makeQuery__SWIG_1(query, stopfile, stemtype, datadir);
     return (cPtr == 0) ? null : new Query(cPtr, true);
   }
 
-  public static Query makeQuery(String query, String stopfile, String stemtype) throws java.lang.Exception {
+  
+/** Create a stopped, stemmed Query from a string.
+@param query the input query
+@param stopfile optional file containing a list of stopwords
+@param stemtype optional stemmer type
+@param datadir optional ignored
+@param func optional stemmer function for arabic stemming.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static Query makeQuery(String query, String stopfile, String stemtype) throws java.lang.Exception {
     long cPtr = lemurJNI.Query_makeQuery__SWIG_2(query, stopfile, stemtype);
     return (cPtr == 0) ? null : new Query(cPtr, true);
   }
 
-  public static Query makeQuery(String query, String stopfile) throws java.lang.Exception {
+  
+/** Create a stopped, stemmed Query from a string.
+@param query the input query
+@param stopfile optional file containing a list of stopwords
+@param stemtype optional stemmer type
+@param datadir optional ignored
+@param func optional stemmer function for arabic stemming.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static Query makeQuery(String query, String stopfile) throws java.lang.Exception {
     long cPtr = lemurJNI.Query_makeQuery__SWIG_3(query, stopfile);
     return (cPtr == 0) ? null : new Query(cPtr, true);
   }
 
-  public static Query makeQuery(String query) throws java.lang.Exception {
+  
+/** Create a stopped, stemmed Query from a string.
+@param query the input query
+@param stopfile optional file containing a list of stopwords
+@param stemtype optional stemmer type
+@param datadir optional ignored
+@param func optional stemmer function for arabic stemming.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public static Query makeQuery(String query) throws java.lang.Exception {
     long cPtr = lemurJNI.Query_makeQuery__SWIG_4(query);
     return (cPtr == 0) ? null : new Query(cPtr, true);
   }

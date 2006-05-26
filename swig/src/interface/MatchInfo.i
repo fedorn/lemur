@@ -33,7 +33,7 @@
     }
     return result;
   }
-%}
+  %}
 
 %typemap(out) lemur::api::TMatch* {
   $result = java_build_matchinfo( jenv, (const lemur::api::MatchInfo*)$1 );
@@ -49,7 +49,7 @@
 
 #ifdef SWIGCSHARP
 SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(TMatch, lemur::api::TMatch)
-%template(TMatchVector) std::vector<lemur::api::TMatch>;
+  %template(TMatchVector) std::vector<lemur::api::TMatch>;
 
 #endif
 
@@ -57,28 +57,37 @@ namespace lemur {
   namespace api {
 #ifdef SWIGCSHARP
     %nodefault TMatch;
-       struct TMatch {
-       public:
-         int tid;
-         int start;
-         int end;
-         int position;
-       };
-%nodefault MatchInfo;
+    struct TMatch {
+    public:
+      int tid;
+      int start;
+      int end;
+      int position;
+    };
+    %nodefault MatchInfo;
     class MatchInfo : public std::vector<lemur::api::TMatch> {
     public:
       static lemur::api::MatchInfo* getMatches(const lemur::api::Index
-  &ind, const lemur::api::Query &qry, lemur::api::DOCID_T docID) ;
+                                               &ind, const lemur::api::Query &qry, lemur::api::DOCID_T docID) ;
     };
 #endif
 #ifdef SWIGJAVA
-%nodefault MatchInfo;
+    %nodefault MatchInfo;
     class MatchInfo {
     public:
-    // this gets generated with the wrong intermediate type. Bleah
+      // this gets generated with the wrong intermediate type. Bleah
       // punning the type will work, but the cast is bogus.
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+       Construct the match list for a given query/document pair.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
+
       static lemur::api::TMatch* getMatches(const lemur::api::Index
-  &ind, const lemur::api::Query &qry, lemur::api::DOCID_T docID) throw (lemur::api::Exception);
+                                            &ind, const lemur::api::Query &qry, lemur::api::DOCID_T docID) throw (lemur::api::Exception);
     };
 #endif
   }

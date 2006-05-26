@@ -37,15 +37,27 @@ public class DocInfo {
     this(lemurJNI.new_DocInfo(termID, termCount), true);
   }
 
-  public int docID() {
+  
+/**
+@return the document id.
+*/
+public int docID() {
     return lemurJNI.DocInfo_docID(swigCPtr);
   }
 
-  public int termCount() {
+  
+/**
+@return term count in document.
+*/
+public int termCount() {
     return lemurJNI.DocInfo_termCount(swigCPtr);
   }
 
-  public int[] positions() {
+  
+/**
+@return list of positions this term occurs in this document
+*/
+public int[] positions() {
   return lemurJNI.DocInfo_positions(swigCPtr);
 }
 

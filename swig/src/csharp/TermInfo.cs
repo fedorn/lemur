@@ -52,7 +52,7 @@ public class TermInfo : IDisposable {
 
   public int[] positions() {
   int[] ret = lemur_csharpPINVOKE.TermInfo_positions(swigCPtr);
-  return ret;
+                        return ret;
 }
 
   public int position() {
