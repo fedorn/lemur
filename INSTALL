@@ -14,7 +14,7 @@
 		  document clustering components. Default is disabled.
 		- <tt>--enable-assert</tt> Enable assert statements in
                   the code. Default is disabled.
-		- <tt>--prefix=<install-directory></tt> Specifies the 
+		- <tt>--prefix=&lt;install-directory&gt;</tt> Specifies the 
 		  directory for the installed toolkit. 
 		  Default is /usr/local.
 		- <tt>--enable-java</tt> compiles and installs the
@@ -23,11 +23,11 @@
 		  swig generated php wrappers. Default is disabled.
 		- <tt>--enable-csharp</tt> compiles and installs the
 		  swig generated C# wrappers. Default is disabled.
-		- <tt>--with-javahome=<path></tt> Path to JAVAHOME for
+		- <tt>--with-javahome=&lt;path&gt;</tt> Path to JAVAHOME for
 		  compiling the swig generated shared library. 
-		- <tt>--with-php-config=<path></tt> Path to php-config
+		- <tt>--with-php-config=&lt;path&gt;</tt> Path to php-config
                   binary. Only required if php-config is not on the path. 
-		- <tt>--with-swig=<path></tt> Path to swig binary. Only
+		- <tt>--with-swig=&lt;path&gt;</tt> Path to swig binary. Only
 		  required if the wrapper interfaces are changed. 
 
   - To make the lemur toolkit library and applications
@@ -45,11 +45,53 @@
       -# run <tt>make install</tt> (or gmake install)
 
 The lemur include files will be installed in
-<install-directory>/include, the lemur library will be installed in
-<install-directory>/lib/liblemur.a, and the applications will be
-installed in <install-directory>/bin. If you only want the applications,
+&lt;install-directory&gt;/include, the lemur library will be installed in
+&lt;install-directory&gt;/lib/liblemur.a, and the applications will be
+installed in &lt;install-directory&gt;/bin. If you only want the applications,
 you can use <tt>make install-bin</tt>. If you only want the library and 
 header files, you can use <tt>make install-lib</tt>. 
+
+
+<p> If configured with --enable-java, documentation
+for the Lemur JNI will be installed in
+&lt;install-directory&gt;/share/lemur/JNIdoc. The file index.html points into the
+javadoc generated documentation.
+
+<p>If configured with --enable-java,
+the shared library will be installed in
+&lt;install-directory&gt;/lib/liblemur_jni.so and the java class files will be
+installed in &lt;install-directory&gt;/share/lemur/lemur.jar and
+&lt;install-directory&gt;/share/lemur/indri.jar, for the Lemur and Indri
+APIS. You will need to 
+add &lt;install-directory&gt;/lib to your LD_LIBRARY_PATH and add
+the appropriate jar file(s) to your CLASSPATH to use the
+JNI interface.
+
+<p> Four additional jar files are installed. RetUI.jar provides a basic
+document retrieval GUI for interactive queries, using the Indri
+API. IndexUI.jar provides a 
+basic collection indexing GUI for building an indri
+repository. LemurRet.jar provides a basic document retrieval GUI for
+interactive queries using the Lemur API. LemurIndex.jar provides a basic
+collection indexing GUI for building Lemur indexes. All are
+installed in &lt;install-directory&gt;/share/lemur and can be run with 
+<br>
+<pre>
+java -jar &lt;jarfilename&gt;
+</pre>
+
+<p>If configured with --enable-php,
+the shared library will be installed in
+&lt;install-directory&gt;/lib/libindri_php.so. You will need to manually
+install it in the correct extensions directory for your php
+configuration. Note that only portions of the Indri API are wrapped for
+use with PHP.
+
+<p>If configured with --enable-csharp,
+the shared library will be installed in
+&lt;install-directory&gt;/lib/liblemur_csharp.so. The C# wrapper classes
+assembly will be installed  in &lt;install-directory&gt;/lib/LemurCsharp.dll
+This assembly should be referenced by your C# program.
 
   \section program  Programming with the lemur toolkit
 
