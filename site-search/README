@@ -1,0 +1,26 @@
+1. run configure in the main lemur directory. Provide
+   --with-site-seed=hostname to specify the host to use as a
+   seed. Alternatively, after running configure, manually edit the file
+   seeds.txt, inserting one hostname per line. configure will create the
+   files site-search/build.param, site-search/crawl-index, and
+   site-search/seeds.txt.
+
+2. Run make in the lemur source tree (if necessary).
+
+3. The script crawl-index will create a directory named crawl within the
+   site-search subdirectory of the lemur source tree. The location to
+   build in will become a parameter later. The script will then run
+   heritrix in the crawl subdirectory, placing the trecweb format data
+   files in the corpus subdirectory. When the crawler has finished,
+   harvestlinks will run over the files in corpus, generating inlink
+   data in the linkz subdirectory. When harvestlinks has finished,
+   IndriBuildIndex will run, using the build.param file and default
+   stopwords. The output index with be placed in crawl/index/crawl. The
+   script will chmod the index to be world readable. The index can be
+   moved before use.
+
+4. The php/cgi bits will come later. 
+
+The heritrix crawler (http://crawler.archive.org) has been modified to
+include the TrecWebWriterProcessor to emit trecweb formatted
+documents. Full documentation/source, available via the website.

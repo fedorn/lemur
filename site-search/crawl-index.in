@@ -1,0 +1,27 @@
+#!/bin/sh
+LEMUR=@abs_srcdir@
+FOREGROUND=true
+export FOREGROUND
+JAVA_HOME=@JAVAHOME@
+export JAVA_HOME
+HERITRIX=$LEMUR/heritrix/bin/heritrix
+HARVEST=$LEMUR/../app/obj/harvestlinks
+BUILD=$LEMUR/../app/obj/IndriBuildIndex
+# make sure we're in the right directory
+cd $LEMUR
+#clear the directory, save one backup instance
+test -d crawl.bak && rm -rf crawl.bak
+test -d crawl &&  mv crawl crawl.bak
+test -d crawl || mkdir crawl
+#install files
+cp order.xml seeds.txt build.param crawl
+#run in the crawl subdirectory.
+cd crawl
+# run crawl in foreground, no ui
+$HERITRIX -n order.xml || exit 1
+test -d linkz || mkdir linkz
+$HARVEST -corpus=corpus -output=linkz -redirect=/dev/null || exit 1
+test -d index || mkdir index
+$BUILD build.param ../stopwords  || exit 1
+# make the index files world and group readable
+chmod -R og+r index
