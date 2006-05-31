@@ -29,6 +29,8 @@
                   binary. Only required if php-config is not on the path. 
 		- <tt>--with-swig=&lt;path&gt;</tt> Path to swig binary. Only
 		  required if the wrapper interfaces are changed. 
+                - <tt>--with-site-seed=&lt;hostname&gt;</tt> Hostname
+                  to use as the seed for building a site search index.
 
   - To make the lemur toolkit library and applications
       -# go to top level lemur directory.
