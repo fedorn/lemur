@@ -29,6 +29,8 @@ import lemurproject.lemur.*;
 */
 /** tnt - modified layout, add JNI, add LemurIndriIndex, add option for 
  *  incremental indexing,additional error checks
+ *  
+ *  mjh - 5/26/06 - modified various defaults, HCI issues
  */
 
 public class LemurIndexGUI extends JPanel implements ActionListener,
@@ -63,9 +65,9 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
     private DefaultListModel cfModel;
     /** separate thread for blinking the status  */
     private Thread bl;
-    /** File chooser starting in current directory */
+    /** File chooser starting in user's home directory */
     private final JFileChooser fc =
-        new JFileChooser(System.getProperties().getProperty("user.dir"));
+        new JFileChooser(System.getProperties().getProperty("user.home"));
     /** data directory paths */
     private String stopwords, bindir;
     /** Help file for the application */
@@ -76,6 +78,9 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
     private final static String logoFile = "properties/lemur_logo.gif";
     // the full Lemur
     //    final static String logoFile = "properties/lemur_logo_100.gif";
+    
+    private final static String defaultStopwordFile="properties" + SLASH + "stoplist.dft";
+    
     /** Lemur index types */
     private final static String[] indTypes = {"KeyfileIncIndex", "LemurIndriIndex", "InvFPIndex", "InvIndex"};
     /** Lemur document manager types */
@@ -90,7 +95,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         "  64 MB", "  96 MB", " 128 MB",
         " 256 MB", " 512 MB", "1024 MB"};
     /** Lemur stemmer types */
-    private final static String[] sTypes = {"Porter", "Krovetz"};
+    private final static String[] sTypes = {"Krovetz", "Porter"};
     /** Arabic stemmer functions */
     private final static String[] sFuncs =
     {
@@ -138,6 +143,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         JPanel panel1 = makePanel("Index");
         panel1.setPreferredSize(new Dimension(600,150));
         indexTypeBox = new JComboBox(indTypes);
+        indexTypeBox.setSelectedIndex(1);
         indexTypeBox.setToolTipText("Select the index type");
         indexTypeBox.addActionListener(this);
         browse = new JButton("Browse...");
@@ -156,9 +162,11 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         addLabeledRow(panel1, Spring.sum(spring.getConstraint(SpringLayout.SOUTH, indexTypeBox),pad), "Index Name: ", iname, browse);
 
         doDM = new JCheckBox("Build a Document Manager for this index", true);
+        doDM.setEnabled(false);
         doDM.setToolTipText("Build a document manager to retrieve original text for this index");
         doDM.addItemListener(this);
         dmTypeBox = new JComboBox(mgrTypes);
+        dmTypeBox.setEnabled(false);
         dmTypeBox.setToolTipText("Select document manager type");
 
         //add DM options
@@ -266,6 +274,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         spring.putConstraint(SpringLayout.NORTH, doStop, pad, SpringLayout.NORTH, panel2);
 
         stopwordlist = new JTextField("",25);
+        stopwordlist.setText(System.getProperty("user.dir") + SLASH + defaultStopwordFile);
         stopwordlist.setToolTipText("Enter a stopword list or browse to select.");
 
         stopBrowse = new JButton("Browse...");
@@ -350,6 +359,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         buttons.add(go);
         buttons.add(stop);
         status = new JLabel("Ready...", lemurIcon, JLabel.LEFT);
+        status.setBorder(new BevelBorder(BevelBorder.LOWERED));
         add(tabbedPane, BorderLayout.NORTH);
         add(buttons, BorderLayout.CENTER);
         add(status, BorderLayout.SOUTH);
@@ -656,8 +666,8 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                         docFormat.addItem("trec");
                         docFormat.addItem("web");
                         docFormat.addItem("reuters");
-                        stemmers.addItem("Porter");
                         stemmers.addItem("Krovetz");
+                        stemmers.addItem("Porter");
                         doStem.setEnabled(true);
                         stemmers.setEnabled(doStem.isSelected());
                         stemFuncs.setVisible(false);
@@ -1180,6 +1190,9 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                     }
             }
 
+        // disable the build button...
+        go.setEnabled(false);
+        
         // don't let 'em quit easy while it is running.
         fQuit.setEnabled(false);
         stop.setEnabled(false);
@@ -1406,6 +1419,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
     public void buildDone()
     {
         fQuit.setEnabled(true);
+        go.setEnabled(true);
         stop.setEnabled(true);
 
         blinking = false;
@@ -1440,6 +1454,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                 buf.close();
                 status.setText("Finished building " + iname.getText());
                 messages.append("Finished building " + iname.getText() + "\n\n");
+                messages.append("The index has been successfully built. You may now either exit the Lemur Indexing GUI and use the index, or, build another index.");
                 ensureMessagesVisible();
             }
         catch (IOException ex)
