@@ -73,6 +73,10 @@ of your website is at "/var/cache/mirrored_site/", if you do not have the
 LemurCGI set to strip paths, the original URLs displayed would include the
 prefix "/var/cache/mirrored_site/" in front of every result.
 
+Also, there is an element, <supportanchortext> that can be set to true to
+also include support for retrieval of inlinks if you have used the 
+harvestlinks program to gather these from your corpus.
+
 If you wish to use the default HTML templates, no modifications are
 necessary, but if you want to modify the HTML templates for your own uses,
 be sure to read the "README_Templates.txt" file for instructions on
