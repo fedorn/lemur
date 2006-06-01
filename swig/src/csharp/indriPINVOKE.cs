@@ -860,6 +860,72 @@ class indriPINVOKE {
   [DllImport("indri", EntryPoint="CSharp_delete_ScoredExtentResult")]
   public static extern void delete_ScoredExtentResult(HandleRef jarg1);
 
+  [DllImport("indri", EntryPoint="CSharp_new_Parameters")]
+  public static extern IntPtr new_Parameters();
+
+  [DllImport("indri", EntryPoint="CSharp_delete_Parameters")]
+  public static extern void delete_Parameters(HandleRef jarg1);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_get__SWIG_0")]
+  public static extern IntPtr Parameters_get__SWIG_0(HandleRef jarg1, int jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_get__SWIG_1")]
+  public static extern IntPtr Parameters_get__SWIG_1(HandleRef jarg1, string jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_get__SWIG_2")]
+  public static extern bool Parameters_get__SWIG_2(HandleRef jarg1, string jarg2, bool jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_get__SWIG_3")]
+  public static extern int Parameters_get__SWIG_3(HandleRef jarg1, string jarg2, int jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_get__SWIG_4")]
+  public static extern double Parameters_get__SWIG_4(HandleRef jarg1, string jarg2, double jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_get__SWIG_5")]
+  public static extern long Parameters_get__SWIG_5(HandleRef jarg1, string jarg2, long jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_get__SWIG_6")]
+  public static extern string Parameters_get__SWIG_6(HandleRef jarg1, string jarg2, string jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_append")]
+  public static extern IntPtr Parameters_append(HandleRef jarg1, string jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_remove")]
+  public static extern void Parameters_remove(HandleRef jarg1, string jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_set__SWIG_0")]
+  public static extern void Parameters_set__SWIG_0(HandleRef jarg1, string jarg2, bool jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_set__SWIG_1")]
+  public static extern void Parameters_set__SWIG_1(HandleRef jarg1, string jarg2, string jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_set__SWIG_2")]
+  public static extern void Parameters_set__SWIG_2(HandleRef jarg1, string jarg2, int jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_set__SWIG_3")]
+  public static extern void Parameters_set__SWIG_3(HandleRef jarg1, string jarg2, long jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_set__SWIG_4")]
+  public static extern void Parameters_set__SWIG_4(HandleRef jarg1, string jarg2, double jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_set__SWIG_5")]
+  public static extern void Parameters_set__SWIG_5(HandleRef jarg1, string jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_clear")]
+  public static extern void Parameters_clear(HandleRef jarg1);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_size")]
+  public static extern uint Parameters_size(HandleRef jarg1);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_exists__SWIG_0")]
+  public static extern bool Parameters_exists__SWIG_0(HandleRef jarg1, int jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_exists__SWIG_1")]
+  public static extern bool Parameters_exists__SWIG_1(HandleRef jarg1, string jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_Parameters_instance")]
+  public static extern IntPtr Parameters_instance();
+
   [DllImport("indri", EntryPoint="CSharp_DocumentVectorVector_Clear")]
   public static extern void DocumentVectorVector_Clear(HandleRef jarg1);
 
@@ -1202,6 +1268,36 @@ class indriPINVOKE {
   [DllImport("indri", EntryPoint="CSharp_delete_QueryEnvironment")]
   public static extern void delete_QueryEnvironment(HandleRef jarg1);
 
+  [DllImport("indri", EntryPoint="CSharp_delete_QueryExpander")]
+  public static extern void delete_QueryExpander(HandleRef jarg1);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryExpander_runExpandedQuery__SWIG_0")]
+  public static extern IntPtr QueryExpander_runExpandedQuery__SWIG_0(HandleRef jarg1, string jarg2, int jarg3, bool jarg4);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryExpander_runExpandedQuery__SWIG_1")]
+  public static extern IntPtr QueryExpander_runExpandedQuery__SWIG_1(HandleRef jarg1, string jarg2, int jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryExpander_expand")]
+  public static extern string QueryExpander_expand(HandleRef jarg1, string jarg2, HandleRef jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_new_RMExpander")]
+  public static extern IntPtr new_RMExpander(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_RMExpander_expand")]
+  public static extern string RMExpander_expand(HandleRef jarg1, string jarg2, HandleRef jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_delete_RMExpander")]
+  public static extern void delete_RMExpander(HandleRef jarg1);
+
+  [DllImport("indri", EntryPoint="CSharp_new_PonteExpander")]
+  public static extern IntPtr new_PonteExpander(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_PonteExpander_expand")]
+  public static extern string PonteExpander_expand(HandleRef jarg1, string jarg2, HandleRef jarg3);
+
+  [DllImport("indri", EntryPoint="CSharp_delete_PonteExpander")]
+  public static extern void delete_PonteExpander(HandleRef jarg1);
+
   [DllImport("indri", EntryPoint="CSharp_delete_IndexStatus")]
   public static extern void delete_IndexStatus(HandleRef jarg1);
 
@@ -1294,6 +1390,12 @@ class indriPINVOKE {
 
   [DllImport("indri", EntryPoint="CSharp_IndexEnvironment_documentsSeen")]
   public static extern int IndexEnvironment_documentsSeen(HandleRef jarg1);
+
+  [DllImport("indri", EntryPoint="CSharp_RMExpanderUpcast")]
+  public static extern IntPtr RMExpanderUpcast(IntPtr objectRef);
+
+  [DllImport("indri", EntryPoint="CSharp_PonteExpanderUpcast")]
+  public static extern IntPtr PonteExpanderUpcast(IntPtr objectRef);
 }
 
 }

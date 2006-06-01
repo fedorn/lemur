@@ -45,6 +45,16 @@ class indriJNI {
   public final static native ScoredExtentResult[] QueryEnvironment_expressionList__SWIG_0(long jarg1, String jarg2, String jarg3);
   public final static native ScoredExtentResult[] QueryEnvironment_expressionList__SWIG_1(long jarg1, String jarg2);
   public final static native void delete_QueryEnvironment(long jarg1);
+  public final static native void delete_QueryExpander(long jarg1);
+  public final static native ScoredExtentResult[] QueryExpander_runExpandedQuery__SWIG_0(long jarg1, String jarg2, int jarg3, boolean jarg4);
+  public final static native ScoredExtentResult[] QueryExpander_runExpandedQuery__SWIG_1(long jarg1, String jarg2, int jarg3);
+  public final static native String QueryExpander_expand(long jarg1, String jarg2, ScoredExtentResult[] jarg3);
+  public final static native long new_RMExpander(long jarg1, Map jarg2);
+  public final static native String RMExpander_expand(long jarg1, String jarg2, ScoredExtentResult[] jarg3);
+  public final static native void delete_RMExpander(long jarg1);
+  public final static native long new_PonteExpander(long jarg1, Map jarg2);
+  public final static native String PonteExpander_expand(long jarg1, String jarg2, ScoredExtentResult[] jarg3);
+  public final static native void delete_PonteExpander(long jarg1);
   public final static native void delete_IndexStatus(long jarg1);
   public final static native void IndexStatus_status(long jarg1, int jarg2, String jarg3, String jarg4, int jarg5, int jarg6);
   public final static native long new_IndexStatus();
@@ -84,6 +94,8 @@ class indriJNI {
     System.loadLibrary("lemur_jni");
   }
   
+  public final static native long SWIGRMExpanderUpcast(long jarg1);
+  public final static native long SWIGPonteExpanderUpcast(long jarg1);
 
   /* Director upcall methods: */
 

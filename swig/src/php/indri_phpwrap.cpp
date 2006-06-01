@@ -916,18 +916,22 @@ static void SWIG_Php4_SetModule(swig_module_info *pointer) {
 
 /* -------- TYPES TABLE (BEGIN) -------- */
 
-#define SWIGTYPE_p_indri__api__ParsedDocument swig_types[0]
-#define SWIGTYPE_p_indri__api__QueryAnnotation swig_types[1]
-#define SWIGTYPE_p_indri__api__QueryAnnotationNode swig_types[2]
-#define SWIGTYPE_p_indri__api__QueryEnvironment swig_types[3]
-#define SWIGTYPE_p_indri__api__ScoredExtentResult swig_types[4]
-#define SWIGTYPE_p_indri__parse__TermExtent swig_types[5]
-#define SWIGTYPE_p_long_long swig_types[6]
-#define SWIGTYPE_p_std__vectorTindri__api__ScoredExtentResult_t swig_types[7]
-#define SWIGTYPE_p_std__vectorTlemur__api__DOCID_T_t swig_types[8]
-#define SWIGTYPE_p_std__vectorTstd__string_t swig_types[9]
-static swig_type_info *swig_types[11];
-static swig_module_info swig_module = {swig_types, 10, 0, 0, 0, 0};
+#define SWIGTYPE_p_indri__api__Parameters swig_types[0]
+#define SWIGTYPE_p_indri__api__ParsedDocument swig_types[1]
+#define SWIGTYPE_p_indri__api__QueryAnnotation swig_types[2]
+#define SWIGTYPE_p_indri__api__QueryAnnotationNode swig_types[3]
+#define SWIGTYPE_p_indri__api__QueryEnvironment swig_types[4]
+#define SWIGTYPE_p_indri__api__ScoredExtentResult swig_types[5]
+#define SWIGTYPE_p_indri__parse__TermExtent swig_types[6]
+#define SWIGTYPE_p_indri__query__PonteExpander swig_types[7]
+#define SWIGTYPE_p_indri__query__QueryExpander swig_types[8]
+#define SWIGTYPE_p_indri__query__RMExpander swig_types[9]
+#define SWIGTYPE_p_long_long swig_types[10]
+#define SWIGTYPE_p_std__vectorTindri__api__ScoredExtentResult_t swig_types[11]
+#define SWIGTYPE_p_std__vectorTlemur__api__DOCID_T_t swig_types[12]
+#define SWIGTYPE_p_std__vectorTstd__string_t swig_types[13]
+static swig_type_info *swig_types[15];
+static swig_module_info swig_module = {swig_types, 14, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -992,6 +996,9 @@ extern "C" {
 #include "indri/indri-platform.h"
 #include "lemur-compat.hpp"
 #include "indri/QueryEnvironment.hpp"
+#include "indri/QueryExpander.hpp"
+#include "indri/RMExpander.hpp"
+#include "indri/PonteExpander.hpp"
 #include "indri/ScoredExtentResult.hpp"
 #include "indri/ParsedDocument.hpp"
 #include "indri/IndexEnvironment.hpp"
@@ -1016,6 +1023,9 @@ extern "C" {
 #include "indri/indri-platform.h"
 #include "lemur-compat.hpp"
 #include "indri/QueryEnvironment.hpp"
+#include "indri/QueryExpander.hpp"
+#include "indri/RMExpander.hpp"
+#include "indri/PonteExpander.hpp"
 #include "Exception.hpp"
   // remap overloaded method names.
 #define onetermCount termCount
@@ -1024,6 +1034,19 @@ extern "C" {
 #define runAnnotatedQuerydocset runAnnotatedQuery
 #define documentsdocids documents
 #define documentMetadatadocids documentMetadata
+
+
+#define set_int set
+#define set_bool set
+#define set_string set
+#define set_UINT64 set
+#define set_double set
+#define get_bool get
+#define get_int get
+#define get_string get
+#define get_INT64 get
+#define get_double get
+
   
 
 #include <stdexcept>
@@ -1057,6 +1080,22 @@ static int _wrap_propset_QueryEnvironment(zend_property_reference *property_refe
 static int _propset_QueryEnvironment(zend_property_reference *property_reference, pval *value);
 static pval _wrap_propget_QueryEnvironment(zend_property_reference *property_reference);
 static int _propget_QueryEnvironment(zend_property_reference *property_reference, pval *value);
+static int _wrap_propset_Parameters(zend_property_reference *property_reference, pval *value);
+static int _propset_Parameters(zend_property_reference *property_reference, pval *value);
+static pval _wrap_propget_Parameters(zend_property_reference *property_reference);
+static int _propget_Parameters(zend_property_reference *property_reference, pval *value);
+static int _wrap_propset_QueryExpander(zend_property_reference *property_reference, pval *value);
+static int _propset_QueryExpander(zend_property_reference *property_reference, pval *value);
+static pval _wrap_propget_QueryExpander(zend_property_reference *property_reference);
+static int _propget_QueryExpander(zend_property_reference *property_reference, pval *value);
+static int _wrap_propset_RMExpander(zend_property_reference *property_reference, pval *value);
+static int _propset_RMExpander(zend_property_reference *property_reference, pval *value);
+static pval _wrap_propget_RMExpander(zend_property_reference *property_reference);
+static int _propget_RMExpander(zend_property_reference *property_reference, pval *value);
+static int _wrap_propset_PonteExpander(zend_property_reference *property_reference, pval *value);
+static int _propset_PonteExpander(zend_property_reference *property_reference, pval *value);
+static pval _wrap_propget_PonteExpander(zend_property_reference *property_reference);
+static int _propget_PonteExpander(zend_property_reference *property_reference, pval *value);
 /* class entry subsection */
 /* Function entries for TermExtent */
 static zend_function_entry TermExtent_functions[] = {
@@ -1150,6 +1189,67 @@ static zend_function_entry QueryEnvironment_functions[] = {
  ZEND_NAMED_FE(queryenvironment,_wrap_new_QueryEnvironment, NULL)
    { NULL, NULL, NULL}
 };
+/* Function entries for Parameters */
+static zend_function_entry Parameters_functions[] = {
+ ZEND_NAMED_FE(new_parameters,_wrap_new_Parameters, NULL)
+ ZEND_NAMED_FE(parameters,_wrap_new_Parameters, NULL)
+ ZEND_NAMED_FE(parameters_get,_wrap_Parameters_get, NULL)
+ ZEND_NAMED_FE(get,_wrap_Parameters_get, NULL)
+ ZEND_NAMED_FE(parameters_get_bool,_wrap_Parameters_get_bool, NULL)
+ ZEND_NAMED_FE(get_bool,_wrap_Parameters_get_bool, NULL)
+ ZEND_NAMED_FE(parameters_get_int,_wrap_Parameters_get_int, NULL)
+ ZEND_NAMED_FE(get_int,_wrap_Parameters_get_int, NULL)
+ ZEND_NAMED_FE(parameters_get_double,_wrap_Parameters_get_double, NULL)
+ ZEND_NAMED_FE(get_double,_wrap_Parameters_get_double, NULL)
+ ZEND_NAMED_FE(parameters_get_int64,_wrap_Parameters_get_INT64, NULL)
+ ZEND_NAMED_FE(get_int64,_wrap_Parameters_get_INT64, NULL)
+ ZEND_NAMED_FE(parameters_get_string,_wrap_Parameters_get_string, NULL)
+ ZEND_NAMED_FE(get_string,_wrap_Parameters_get_string, NULL)
+ ZEND_NAMED_FE(parameters_remove,_wrap_Parameters_remove, NULL)
+ ZEND_NAMED_FE(remove,_wrap_Parameters_remove, NULL)
+ ZEND_NAMED_FE(parameters_set_bool,_wrap_Parameters_set_bool, NULL)
+ ZEND_NAMED_FE(set_bool,_wrap_Parameters_set_bool, NULL)
+ ZEND_NAMED_FE(parameters_set_string,_wrap_Parameters_set_string, NULL)
+ ZEND_NAMED_FE(set_string,_wrap_Parameters_set_string, NULL)
+ ZEND_NAMED_FE(parameters_set_int,_wrap_Parameters_set_int, NULL)
+ ZEND_NAMED_FE(set_int,_wrap_Parameters_set_int, NULL)
+ ZEND_NAMED_FE(parameters_set_uint64,_wrap_Parameters_set_UINT64, NULL)
+ ZEND_NAMED_FE(set_uint64,_wrap_Parameters_set_UINT64, NULL)
+ ZEND_NAMED_FE(parameters_set_double,_wrap_Parameters_set_double, NULL)
+ ZEND_NAMED_FE(set_double,_wrap_Parameters_set_double, NULL)
+ ZEND_NAMED_FE(parameters_clear,_wrap_Parameters_clear, NULL)
+ ZEND_NAMED_FE(clear,_wrap_Parameters_clear, NULL)
+ ZEND_NAMED_FE(parameters_size,_wrap_Parameters_size, NULL)
+ ZEND_NAMED_FE(size,_wrap_Parameters_size, NULL)
+ ZEND_NAMED_FE(parameters_exists,_wrap_Parameters_exists, NULL)
+ ZEND_NAMED_FE(exists,_wrap_Parameters_exists, NULL)
+   { NULL, NULL, NULL}
+};
+/* Function entries for QueryExpander */
+static zend_function_entry QueryExpander_functions[] = {
+ ZEND_NAMED_FE(queryexpander_runexpandedquery,_wrap_QueryExpander_runExpandedQuery, NULL)
+ ZEND_NAMED_FE(runexpandedquery,_wrap_QueryExpander_runExpandedQuery, NULL)
+ ZEND_NAMED_FE(queryexpander_expand,_wrap_QueryExpander_expand, NULL)
+ ZEND_NAMED_FE(expand,_wrap_QueryExpander_expand, NULL)
+ ZEND_NAMED_FE(queryexpander,_wrap_new_QueryExpander, NULL)
+   { NULL, NULL, NULL}
+};
+/* Function entries for RMExpander */
+static zend_function_entry RMExpander_functions[] = {
+ ZEND_NAMED_FE(new_rmexpander,_wrap_new_RMExpander, NULL)
+ ZEND_NAMED_FE(rmexpander,_wrap_new_RMExpander, NULL)
+ ZEND_NAMED_FE(rmexpander_expand,_wrap_RMExpander_expand, NULL)
+ ZEND_NAMED_FE(expand,_wrap_RMExpander_expand, NULL)
+   { NULL, NULL, NULL}
+};
+/* Function entries for PonteExpander */
+static zend_function_entry PonteExpander_functions[] = {
+ ZEND_NAMED_FE(new_ponteexpander,_wrap_new_PonteExpander, NULL)
+ ZEND_NAMED_FE(ponteexpander,_wrap_new_PonteExpander, NULL)
+ ZEND_NAMED_FE(ponteexpander_expand,_wrap_PonteExpander_expand, NULL)
+ ZEND_NAMED_FE(expand,_wrap_PonteExpander_expand, NULL)
+   { NULL, NULL, NULL}
+};
 
 
 /* entry subsection */
@@ -1179,48 +1279,70 @@ zend_module_entry* SWIG_module_entry = &indri_module_entry;
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
+static void *_p_indri__query__RMExpanderTo_p_indri__query__QueryExpander(void *x) {
+    return (void *)((indri::query::QueryExpander *)  ((indri::query::RMExpander *) x));
+}
+static void *_p_indri__query__PonteExpanderTo_p_indri__query__QueryExpander(void *x) {
+    return (void *)((indri::query::QueryExpander *)  ((indri::query::PonteExpander *) x));
+}
+static swig_type_info _swigt__p_indri__api__Parameters = {"_p_indri__api__Parameters", "indri::api::Parameters *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_indri__api__ParsedDocument = {"_p_indri__api__ParsedDocument", "indri::api::ParsedDocument *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_indri__api__QueryAnnotation = {"_p_indri__api__QueryAnnotation", "indri::api::QueryAnnotation *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_indri__api__QueryAnnotationNode = {"_p_indri__api__QueryAnnotationNode", "indri::api::QueryAnnotationNode *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_indri__api__QueryEnvironment = {"_p_indri__api__QueryEnvironment", "indri::api::QueryEnvironment *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_indri__api__ScoredExtentResult = {"_p_indri__api__ScoredExtentResult", "indri::api::ScoredExtentResult *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_indri__parse__TermExtent = {"_p_indri__parse__TermExtent", "indri::parse::TermExtent *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_indri__query__PonteExpander = {"_p_indri__query__PonteExpander", "indri::query::PonteExpander *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_indri__query__QueryExpander = {"_p_indri__query__QueryExpander", "indri::query::QueryExpander *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_indri__query__RMExpander = {"_p_indri__query__RMExpander", "indri::query::RMExpander *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "long long *|UINT64 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorTindri__api__ScoredExtentResult_t = {"_p_std__vectorTindri__api__ScoredExtentResult_t", "std::vector<indri::api::ScoredExtentResult > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorTlemur__api__DOCID_T_t = {"_p_std__vectorTlemur__api__DOCID_T_t", "std::vector<lemur::api::DOCID_T > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorTstd__string_t = {"_p_std__vectorTstd__string_t", "std::vector<std::string > *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
+  &_swigt__p_indri__api__Parameters,
   &_swigt__p_indri__api__ParsedDocument,
   &_swigt__p_indri__api__QueryAnnotation,
   &_swigt__p_indri__api__QueryAnnotationNode,
   &_swigt__p_indri__api__QueryEnvironment,
   &_swigt__p_indri__api__ScoredExtentResult,
   &_swigt__p_indri__parse__TermExtent,
+  &_swigt__p_indri__query__PonteExpander,
+  &_swigt__p_indri__query__QueryExpander,
+  &_swigt__p_indri__query__RMExpander,
   &_swigt__p_long_long,
   &_swigt__p_std__vectorTindri__api__ScoredExtentResult_t,
   &_swigt__p_std__vectorTlemur__api__DOCID_T_t,
   &_swigt__p_std__vectorTstd__string_t,
 };
 
+static swig_cast_info _swigc__p_indri__api__Parameters[] = {  {&_swigt__p_indri__api__Parameters, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_indri__api__ParsedDocument[] = {  {&_swigt__p_indri__api__ParsedDocument, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_indri__api__QueryAnnotation[] = {  {&_swigt__p_indri__api__QueryAnnotation, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_indri__api__QueryAnnotationNode[] = {  {&_swigt__p_indri__api__QueryAnnotationNode, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_indri__api__QueryEnvironment[] = {  {&_swigt__p_indri__api__QueryEnvironment, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_indri__api__ScoredExtentResult[] = {  {&_swigt__p_indri__api__ScoredExtentResult, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_indri__parse__TermExtent[] = {  {&_swigt__p_indri__parse__TermExtent, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_indri__query__PonteExpander[] = {  {&_swigt__p_indri__query__PonteExpander, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_indri__query__QueryExpander[] = {  {&_swigt__p_indri__query__QueryExpander, 0, 0, 0},  {&_swigt__p_indri__query__RMExpander, _p_indri__query__RMExpanderTo_p_indri__query__QueryExpander, 0, 0},  {&_swigt__p_indri__query__PonteExpander, _p_indri__query__PonteExpanderTo_p_indri__query__QueryExpander, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_indri__query__RMExpander[] = {  {&_swigt__p_indri__query__RMExpander, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_long_long[] = {  {&_swigt__p_long_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorTindri__api__ScoredExtentResult_t[] = {  {&_swigt__p_std__vectorTindri__api__ScoredExtentResult_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorTlemur__api__DOCID_T_t[] = {  {&_swigt__p_std__vectorTlemur__api__DOCID_T_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorTstd__string_t[] = {  {&_swigt__p_std__vectorTstd__string_t, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
+  _swigc__p_indri__api__Parameters,
   _swigc__p_indri__api__ParsedDocument,
   _swigc__p_indri__api__QueryAnnotation,
   _swigc__p_indri__api__QueryAnnotationNode,
   _swigc__p_indri__api__QueryEnvironment,
   _swigc__p_indri__api__ScoredExtentResult,
   _swigc__p_indri__parse__TermExtent,
+  _swigc__p_indri__query__PonteExpander,
+  _swigc__p_indri__query__QueryExpander,
+  _swigc__p_indri__query__RMExpander,
   _swigc__p_long_long,
   _swigc__p_std__vectorTindri__api__ScoredExtentResult_t,
   _swigc__p_std__vectorTlemur__api__DOCID_T_t,
@@ -1244,16 +1366,28 @@ static zend_class_entry ce_swig_QueryAnnotation;
 static zend_class_entry* ptr_ce_swig_QueryAnnotation=NULL;
 static zend_class_entry ce_swig_QueryEnvironment;
 static zend_class_entry* ptr_ce_swig_QueryEnvironment=NULL;
-static int le_swig__p_indri__parse__TermExtent=0; /* handle for TermExtent */
-static int le_swig__p_indri__api__ScoredExtentResult=0; /* handle for ScoredExtentResult */
-static int le_swig__p_std__vectorTlemur__api__DOCID_T_t=0; /* handle for ScoredExtentResult */
-static int le_swig__p_long_long=0; /* handle for ScoredExtentResult */
-static int le_swig__p_indri__api__QueryEnvironment=0; /* handle for QueryEnvironment */
-static int le_swig__p_std__vectorTstd__string_t=0; /* handle for QueryEnvironment */
-static int le_swig__p_indri__api__ParsedDocument=0; /* handle for ParsedDocument */
-static int le_swig__p_indri__api__QueryAnnotationNode=0; /* handle for QueryAnnotationNode */
-static int le_swig__p_std__vectorTindri__api__ScoredExtentResult_t=0; /* handle for QueryAnnotationNode */
+static zend_class_entry ce_swig_Parameters;
+static zend_class_entry* ptr_ce_swig_Parameters=NULL;
+static zend_class_entry ce_swig_QueryExpander;
+static zend_class_entry* ptr_ce_swig_QueryExpander=NULL;
+static zend_class_entry ce_swig_RMExpander;
+static zend_class_entry* ptr_ce_swig_RMExpander=NULL;
+static zend_class_entry ce_swig_PonteExpander;
+static zend_class_entry* ptr_ce_swig_PonteExpander=NULL;
+static int le_swig__p_indri__api__Parameters=0; /* handle for Parameters */
 static int le_swig__p_indri__api__QueryAnnotation=0; /* handle for QueryAnnotation */
+static int le_swig__p_indri__parse__TermExtent=0; /* handle for TermExtent */
+static int le_swig__p_indri__api__QueryEnvironment=0; /* handle for QueryEnvironment */
+static int le_swig__p_long_long=0; /* handle for QueryEnvironment */
+static int le_swig__p_std__vectorTindri__api__ScoredExtentResult_t=0; /* handle for QueryEnvironment */
+static int le_swig__p_indri__query__PonteExpander=0; /* handle for PonteExpander */
+static int le_swig__p_indri__query__RMExpander=0; /* handle for RMExpander */
+static int le_swig__p_indri__query__QueryExpander=0; /* handle for QueryExpander */
+static int le_swig__p_std__vectorTlemur__api__DOCID_T_t=0; /* handle for QueryExpander */
+static int le_swig__p_indri__api__ScoredExtentResult=0; /* handle for ScoredExtentResult */
+static int le_swig__p_indri__api__ParsedDocument=0; /* handle for ParsedDocument */
+static int le_swig__p_std__vectorTstd__string_t=0; /* handle for ParsedDocument */
+static int le_swig__p_indri__api__QueryAnnotationNode=0; /* handle for QueryAnnotationNode */
 /* end vdecl subsection */
 /* wrapper section */
 
@@ -3692,23 +3826,1355 @@ static int _propset_QueryEnvironment(zend_property_reference *property_reference
   return FAILURE;
 }
 
+ZEND_NAMED_FUNCTION(_wrap_new_Parameters) {
+  indri::api::Parameters *result = 0 ;
+  zval **args[0];
+  
+  SWIG_ResetError();
+  /* NATIVE Constructor */
+  if(((ZEND_NUM_ARGS() )!= 0) || (zend_get_parameters_array_ex(0, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  result = (indri::api::Parameters *)new indri::api::Parameters();
+  {
+    SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_indri__api__Parameters, 1);
+  }
+  /* Wrap this return value */
+  if (this_ptr) {
+    /* NATIVE Constructor, use this_ptr */
+    zval *_cPtr; MAKE_STD_ZVAL(_cPtr);
+    *_cPtr = *return_value;
+    INIT_ZVAL(*return_value);
+    add_property_zval(this_ptr,"_cPtr",_cPtr);
+  } else if (! this_ptr) {
+    /* ALTERNATIVE Constructor, make an object wrapper */
+    zval *obj, *_cPtr;
+    MAKE_STD_ZVAL(obj);
+    MAKE_STD_ZVAL(_cPtr);
+    *_cPtr = *return_value;
+    INIT_ZVAL(*return_value);
+    object_init_ex(obj,ptr_ce_swig_Parameters);
+    add_property_zval(obj,"_cPtr",_cPtr);
+    *return_value=*obj;
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+/* This function is designed to be called by the zend list destructors */
+/* to typecast and do the actual destruction */
+void __wrap_delete_Parameters(zend_rsrc_list_entry *rsrc, const char *type_name TSRMLS_DC) {
+  swig_object_wrapper *value=(swig_object_wrapper *) rsrc->ptr ;
+  void *ptr=value->ptr ;
+  int newobject=value->newobject ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  
+  efree(value);
+  if (! newobject) return; /* can't delete it! */
+  SWIG_ZTS_ConvertResourceData(ptr,rsrc->type,type_name,(void **) &arg1,SWIGTYPE_p_indri__api__Parameters TSRMLS_CC);
+  if (! arg1) zend_error(E_ERROR, "indri::api::Parameters resource already free'd");
+  delete arg1;
+  
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_get) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  indri::api::Parameters result;
+  std::string temp2 ;
+  zval **args[1];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 1) || (zend_get_parameters_array_ex(1, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_get. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  result = (arg1)->get((std::string const &)*arg2);
+  {
+    indri::api::Parameters * resultobj = new indri::api::Parameters((indri::api::Parameters &) result);
+    SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p_indri__api__Parameters, 1);
+  }
+  /* Wrap this return value */
+  {
+    /* ALTERNATIVE Constructor, make an object wrapper */
+    zval *obj, *_cPtr;
+    MAKE_STD_ZVAL(obj);
+    MAKE_STD_ZVAL(_cPtr);
+    *_cPtr = *return_value;
+    INIT_ZVAL(*return_value);
+    object_init_ex(obj,ptr_ce_swig_Parameters);
+    add_property_zval(obj,"_cPtr",_cPtr);
+    *return_value=*obj;
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_get_bool) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  bool arg3 ;
+  bool result;
+  std::string temp2 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_get_bool. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  {
+    /*@SWIG:CONVERT_BOOL_IN@*/
+    convert_to_boolean_ex(args[1]);
+    arg3 = (bool) Z_LVAL_PP(args[1]);
+    /*@SWIG@*/;
+  }
+  result = (bool)(arg1)->get_bool((std::string const &)*arg2,arg3);
+  {
+    ZVAL_BOOL(return_value,(result)?1:0);
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_get_int) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  int arg3 ;
+  int result;
+  std::string temp2 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_get_int. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  {
+    /*@SWIG:CONVERT_INT_IN@*/
+    convert_to_long_ex(args[1]);
+    arg3 = (int) Z_LVAL_PP(args[1]);
+    /*@SWIG@*/;
+  }
+  result = (int)(arg1)->get_int((std::string const &)*arg2,arg3);
+  {
+    ZVAL_LONG(return_value,result);
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_get_double) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  double arg3 ;
+  double result;
+  std::string temp2 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_get_double. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  {
+    /*@SWIG:CONVERT_FLOAT_IN@*/
+    convert_to_double_ex(args[1]);
+    arg3 = (double) Z_DVAL_PP(args[1]);
+    /*@SWIG@*/;
+  }
+  result = (double)(arg1)->get_double((std::string const &)*arg2,arg3);
+  {
+    ZVAL_DOUBLE(return_value,result);
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_get_INT64) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  INT64 arg3 ;
+  INT64 result;
+  std::string temp2 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_get_INT64. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  
+  convert_to_long_ex(args[1]);
+  arg3 = (INT64) Z_LVAL_PP(args[1]);
+  
+  result = (INT64)(arg1)->get_INT64((std::string const &)*arg2,arg3);
+  
+  
+  ZVAL_LONG(return_value,result);
+  
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_get_string) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  std::string result;
+  std::string temp2 ;
+  std::string temp3 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_get_string. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  {
+    convert_to_string_ex(args[1]);
+    temp3 = std::string(Z_STRVAL_PP(args[1]),Z_STRLEN_PP(args[1]));
+    arg3 = &temp3;
+  }
+  result = (arg1)->get_string((std::string const &)*arg2,(std::string const &)*arg3);
+  {
+    ZVAL_STRINGL(return_value,const_cast<char*>((&result)->data()),(&result)->length(),1);
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_remove) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string temp2 ;
+  zval **args[1];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 1) || (zend_get_parameters_array_ex(1, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_remove. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  (arg1)->remove((std::string const &)*arg2);
+  
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_set_bool) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  bool arg3 ;
+  std::string temp2 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_set_bool. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  {
+    /*@SWIG:CONVERT_BOOL_IN@*/
+    convert_to_boolean_ex(args[1]);
+    arg3 = (bool) Z_LVAL_PP(args[1]);
+    /*@SWIG@*/;
+  }
+  (arg1)->set_bool((std::string const &)*arg2,arg3);
+  
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_set_string) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  std::string temp2 ;
+  std::string temp3 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_set_string. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  {
+    convert_to_string_ex(args[1]);
+    temp3 = std::string(Z_STRVAL_PP(args[1]),Z_STRLEN_PP(args[1]));
+    arg3 = &temp3;
+  }
+  (arg1)->set_string((std::string const &)*arg2,(std::string const &)*arg3);
+  
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_set_int) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  int arg3 ;
+  std::string temp2 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_set_int. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  {
+    /*@SWIG:CONVERT_INT_IN@*/
+    convert_to_long_ex(args[1]);
+    arg3 = (int) Z_LVAL_PP(args[1]);
+    /*@SWIG@*/;
+  }
+  (arg1)->set_int((std::string const &)*arg2,arg3);
+  
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_set_UINT64) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  UINT64 arg3 ;
+  std::string temp2 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_set_UINT64. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  
+  convert_to_long_ex(args[1]);
+  arg3 = (UINT64) Z_LVAL_PP(args[1]);
+  
+  (arg1)->set_UINT64((std::string const &)*arg2,arg3);
+  
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_set_double) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  double arg3 ;
+  std::string temp2 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_set_double. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  {
+    /*@SWIG:CONVERT_FLOAT_IN@*/
+    convert_to_double_ex(args[1]);
+    arg3 = (double) Z_DVAL_PP(args[1]);
+    /*@SWIG@*/;
+  }
+  (arg1)->set_double((std::string const &)*arg2,arg3);
+  
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_clear) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  zval **args[0];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 0) || (zend_get_parameters_array_ex(0, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_clear. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  (arg1)->clear();
+  
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_size) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  size_t result;
+  zval **args[0];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 0) || (zend_get_parameters_array_ex(0, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_size. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  result = (arg1)->size();
+  {
+    ZVAL_LONG(return_value,result);
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_exists) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  bool result;
+  std::string temp2 ;
+  zval **args[1];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 1) || (zend_get_parameters_array_ex(1, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_exists. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  result = (bool)(arg1)->exists((std::string const &)*arg2);
+  {
+    ZVAL_BOOL(return_value,(result)?1:0);
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+/* property handler for class Parameters */
+static pval _wrap_propget_Parameters(zend_property_reference *property_reference) {
+  pval result;
+  pval **_result;
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  result.type = IS_NULL;
+  if (_propget_Parameters(property_reference, &result)==SUCCESS) return result;
+  /* return it ourselves */
+  if (zend_hash_find(Z_OBJPROP_P(property_reference->object),Z_STRVAL_P(&(property->element)),1+Z_STRLEN_P(&(property->element)),(void**)&_result)==SUCCESS) {
+  zval *_value;
+  MAKE_STD_ZVAL(_value);  *_value=**_result;
+  INIT_PZVAL(_value);
+  zval_copy_ctor(_value);
+  return *_value;
+  }
+  result.type = IS_NULL;
+  return result;
+}
+static int _propget_Parameters(zend_property_reference *property_reference, pval *value) {
+  /* get the property name */
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  char *propname=Z_STRVAL_P(&(property->element));
+  return FAILURE;
+}
+
+static int _wrap_propset_Parameters(zend_property_reference *property_reference, pval *value) { 
+  zval * _value;
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  if (_propset_Parameters(property_reference, value)==SUCCESS) return SUCCESS;
+  /* set it ourselves as it is Parameters */
+  MAKE_STD_ZVAL(_value);
+  *_value=*value;
+  INIT_PZVAL(_value);
+  zval_copy_ctor(_value);
+  return add_property_zval_ex(property_reference->object,Z_STRVAL_P(&(property->element)),1+Z_STRLEN_P(&(property->element)),_value);
+}
+static int _propset_Parameters(zend_property_reference *property_reference, pval *value) {
+  /* get the property name */
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  char *propname=Z_STRVAL_P(&(property->element));
+  return FAILURE;
+}
+
+/* This function is designed to be called by the zend list destructors */
+/* to typecast and do the actual destruction */
+void __wrap_delete_QueryExpander(zend_rsrc_list_entry *rsrc, const char *type_name TSRMLS_DC) {
+  swig_object_wrapper *value=(swig_object_wrapper *) rsrc->ptr ;
+  void *ptr=value->ptr ;
+  int newobject=value->newobject ;
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  
+  efree(value);
+  if (! newobject) return; /* can't delete it! */
+  SWIG_ZTS_ConvertResourceData(ptr,rsrc->type,type_name,(void **) &arg1,SWIGTYPE_p_indri__query__QueryExpander TSRMLS_CC);
+  if (! arg1) zend_error(E_ERROR, "indri::query::QueryExpander resource already free'd");
+  delete arg1;
+  
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_QueryExpander_runExpandedQuery__SWIG_0) {
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  std::string arg2 ;
+  int arg3 ;
+  bool arg4 ;
+  SwigValueWrapper<std::vector<indri::api::ScoredExtentResult > > result;
+  zval **args[3];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 3) || (zend_get_parameters_array_ex(3, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__query__QueryExpander, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of QueryExpander_runExpandedQuery. Expected SWIGTYPE_p_indri__query__QueryExpander");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    arg2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+  }
+  {
+    /*@SWIG:CONVERT_INT_IN@*/
+    convert_to_long_ex(args[1]);
+    arg3 = (int) Z_LVAL_PP(args[1]);
+    /*@SWIG@*/;
+  }
+  {
+    /*@SWIG:CONVERT_BOOL_IN@*/
+    convert_to_boolean_ex(args[2]);
+    arg4 = (bool) Z_LVAL_PP(args[2]);
+    /*@SWIG@*/;
+  }
+  result = (arg1)->runExpandedQuery(arg2,arg3,arg4);
+  {
+    std::vector< indri::api::ScoredExtentResult >::size_type iIndex;
+    array_init(return_value);
+    std::vector< indri::api::ScoredExtentResult > *resultobj = &result; 
+    for (iIndex=0;iIndex<resultobj->size();iIndex++)  {
+      zval *obj, *_cPtr;
+      MAKE_STD_ZVAL(obj);
+      MAKE_STD_ZVAL(_cPtr);
+      indri::api::ScoredExtentResult *r = new indri::api::ScoredExtentResult((*resultobj)[iIndex]);
+      SWIG_SetPointerZval(obj, (void *)r, SWIGTYPE_p_indri__api__ScoredExtentResult, 1);
+      *_cPtr = *obj;
+      INIT_ZVAL(*obj);
+      object_init_ex(obj,ptr_ce_swig_ScoredExtentResult);
+      add_property_double(obj,"score",r->score);
+      add_property_long(obj,"document",r->document);
+      add_property_long(obj,"begin",r->begin);
+      add_property_long(obj,"end",r->end);
+      add_property_zval(obj,"_cPtr",_cPtr);
+      add_next_index_zval(return_value, obj);
+    }
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_QueryExpander_runExpandedQuery__SWIG_1) {
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  std::string arg2 ;
+  int arg3 ;
+  SwigValueWrapper<std::vector<indri::api::ScoredExtentResult > > result;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__query__QueryExpander, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of QueryExpander_runExpandedQuery. Expected SWIGTYPE_p_indri__query__QueryExpander");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    arg2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+  }
+  {
+    /*@SWIG:CONVERT_INT_IN@*/
+    convert_to_long_ex(args[1]);
+    arg3 = (int) Z_LVAL_PP(args[1]);
+    /*@SWIG@*/;
+  }
+  result = (arg1)->runExpandedQuery(arg2,arg3);
+  {
+    std::vector< indri::api::ScoredExtentResult >::size_type iIndex;
+    array_init(return_value);
+    std::vector< indri::api::ScoredExtentResult > *resultobj = &result; 
+    for (iIndex=0;iIndex<resultobj->size();iIndex++)  {
+      zval *obj, *_cPtr;
+      MAKE_STD_ZVAL(obj);
+      MAKE_STD_ZVAL(_cPtr);
+      indri::api::ScoredExtentResult *r = new indri::api::ScoredExtentResult((*resultobj)[iIndex]);
+      SWIG_SetPointerZval(obj, (void *)r, SWIGTYPE_p_indri__api__ScoredExtentResult, 1);
+      *_cPtr = *obj;
+      INIT_ZVAL(*obj);
+      object_init_ex(obj,ptr_ce_swig_ScoredExtentResult);
+      add_property_double(obj,"score",r->score);
+      add_property_long(obj,"document",r->document);
+      add_property_long(obj,"begin",r->begin);
+      add_property_long(obj,"end",r->end);
+      add_property_zval(obj,"_cPtr",_cPtr);
+      add_next_index_zval(return_value, obj);
+    }
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_QueryExpander_runExpandedQuery) {
+  int argc;
+  zval **argv[4];
+  int ii;
+  
+  argc = ZEND_NUM_ARGS();
+  argv[0] = &this_ptr;
+  zend_get_parameters_array_ex(argc,argv+1);
+  argc++;
+  if (argc == 3) {
+    int _v;
+    {
+      /* typecheck SWIGTYPE * */
+      void *tmp;
+      _v = (SWIG_ConvertPtr( *argv[0], (void**)&tmp, SWIGTYPE_p_indri__query__QueryExpander, 0) < 0)? 0:1;
+    }
+    if (_v) {
+      {
+        _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      }
+      if (_v) {
+        _v = (Z_TYPE_PP(argv[2]) == IS_LONG ||
+          Z_TYPE_PP(argv[2]) == IS_DOUBLE ||
+          Z_TYPE_PP(argv[2]) == IS_STRING) ? 1 : 0; 
+        if (_v) {
+          return _wrap_QueryExpander_runExpandedQuery__SWIG_1(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    {
+      /* typecheck SWIGTYPE * */
+      void *tmp;
+      _v = (SWIG_ConvertPtr( *argv[0], (void**)&tmp, SWIGTYPE_p_indri__query__QueryExpander, 0) < 0)? 0:1;
+    }
+    if (_v) {
+      {
+        _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      }
+      if (_v) {
+        _v = (Z_TYPE_PP(argv[2]) == IS_LONG ||
+          Z_TYPE_PP(argv[2]) == IS_DOUBLE ||
+          Z_TYPE_PP(argv[2]) == IS_STRING) ? 1 : 0; 
+        if (_v) {
+          _v = (Z_TYPE_PP(argv[3]) == IS_LONG ||
+            Z_TYPE_PP(argv[3]) == IS_DOUBLE ||
+            Z_TYPE_PP(argv[3]) == IS_STRING) ? 1 : 0; 
+          if (_v) {
+            return _wrap_QueryExpander_runExpandedQuery__SWIG_0(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+          }
+        }
+      }
+    }
+  }
+  
+  ErrorCode() = E_ERROR;
+  ErrorMsg() = "No matching function for overloaded 'QueryExpander_runExpandedQuery'";
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_QueryExpander_expand) {
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  std::string arg2 ;
+  std::vector<indri::api::ScoredExtentResult > *arg3 = 0 ;
+  std::string result;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__query__QueryExpander, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of QueryExpander_expand. Expected SWIGTYPE_p_indri__query__QueryExpander");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    arg2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+  }
+  {
+    int iStatus;
+    ulong iIndex;
+    char *sIndex=NULL;
+    zval **Data;
+    arg3=new std::vector< indri::api::ScoredExtentResult >;
+    convert_to_array(*args[1]);
+    zend_hash_internal_pointer_reset((*args[1])->value.ht);
+    while((iStatus=zend_hash_get_current_key((*args[1])->value.ht,&sIndex,&iIndex,1))!=HASH_KEY_NON_EXISTANT) {
+      zend_hash_get_current_data((*args[1])->value.ht,(void **) &Data);
+      indri::api::ScoredExtentResult * arg1 = 0;
+      SWIG_ConvertPtr(*(Data), (void **) &arg1, SWIGTYPE_p_indri__api__ScoredExtentResult, 0);
+      arg3->push_back(*arg1);
+      zend_hash_move_forward((*args[1])->value.ht);  
+      if (sIndex) {
+        efree(sIndex);
+        sIndex=NULL;
+      }
+    }
+    zend_hash_internal_pointer_reset((*args[1])->value.ht);
+  }
+  result = (arg1)->expand(arg2,*arg3);
+  {
+    ZVAL_STRINGL(return_value,const_cast<char*>((&result)->data()),(&result)->length(),1);
+  }
+  {
+    // freearg typemap
+    delete arg3;
+  }
+  return;
+fail:
+  {
+    // freearg typemap
+    delete arg3;
+  }
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_new_QueryExpander) {
+  zend_error(E_ERROR,"Cannot create swig object type: QueryExpander as the underlying object is abstract");
+}
+
+
+
+
+
+/* property handler for class QueryExpander */
+static pval _wrap_propget_QueryExpander(zend_property_reference *property_reference) {
+  pval result;
+  pval **_result;
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  result.type = IS_NULL;
+  if (_propget_QueryExpander(property_reference, &result)==SUCCESS) return result;
+  /* return it ourselves */
+  if (zend_hash_find(Z_OBJPROP_P(property_reference->object),Z_STRVAL_P(&(property->element)),1+Z_STRLEN_P(&(property->element)),(void**)&_result)==SUCCESS) {
+  zval *_value;
+  MAKE_STD_ZVAL(_value);  *_value=**_result;
+  INIT_PZVAL(_value);
+  zval_copy_ctor(_value);
+  return *_value;
+  }
+  result.type = IS_NULL;
+  return result;
+}
+static int _propget_QueryExpander(zend_property_reference *property_reference, pval *value) {
+  /* get the property name */
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  char *propname=Z_STRVAL_P(&(property->element));
+  return FAILURE;
+}
+
+static int _wrap_propset_QueryExpander(zend_property_reference *property_reference, pval *value) { 
+  zval * _value;
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  if (_propset_QueryExpander(property_reference, value)==SUCCESS) return SUCCESS;
+  /* set it ourselves as it is QueryExpander */
+  MAKE_STD_ZVAL(_value);
+  *_value=*value;
+  INIT_PZVAL(_value);
+  zval_copy_ctor(_value);
+  return add_property_zval_ex(property_reference->object,Z_STRVAL_P(&(property->element)),1+Z_STRLEN_P(&(property->element)),_value);
+}
+static int _propset_QueryExpander(zend_property_reference *property_reference, pval *value) {
+  /* get the property name */
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  char *propname=Z_STRVAL_P(&(property->element));
+  return FAILURE;
+}
+
+ZEND_NAMED_FUNCTION(_wrap_new_RMExpander) {
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  indri::api::Parameters *arg2 = 0 ;
+  indri::query::RMExpander *result = 0 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* NATIVE Constructor */
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_indri__api__QueryEnvironment, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of new_RMExpander. Expected SWIGTYPE_p_indri__api__QueryEnvironment");
+    }
+  }
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of new_RMExpander. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  result = (indri::query::RMExpander *)new indri::query::RMExpander(arg1,*arg2);
+  {
+    SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_indri__query__RMExpander, 1);
+  }
+  /* Wrap this return value */
+  if (this_ptr) {
+    /* NATIVE Constructor, use this_ptr */
+    zval *_cPtr; MAKE_STD_ZVAL(_cPtr);
+    *_cPtr = *return_value;
+    INIT_ZVAL(*return_value);
+    add_property_zval(this_ptr,"_cPtr",_cPtr);
+  } else if (! this_ptr) {
+    /* ALTERNATIVE Constructor, make an object wrapper */
+    zval *obj, *_cPtr;
+    MAKE_STD_ZVAL(obj);
+    MAKE_STD_ZVAL(_cPtr);
+    *_cPtr = *return_value;
+    INIT_ZVAL(*return_value);
+    object_init_ex(obj,ptr_ce_swig_RMExpander);
+    add_property_zval(obj,"_cPtr",_cPtr);
+    *return_value=*obj;
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_RMExpander_expand) {
+  indri::query::RMExpander *arg1 = (indri::query::RMExpander *) 0 ;
+  std::string arg2 ;
+  std::vector<indri::api::ScoredExtentResult > *arg3 = 0 ;
+  std::string result;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__query__RMExpander, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of RMExpander_expand. Expected SWIGTYPE_p_indri__query__RMExpander");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    arg2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+  }
+  {
+    int iStatus;
+    ulong iIndex;
+    char *sIndex=NULL;
+    zval **Data;
+    arg3=new std::vector< indri::api::ScoredExtentResult >;
+    convert_to_array(*args[1]);
+    zend_hash_internal_pointer_reset((*args[1])->value.ht);
+    while((iStatus=zend_hash_get_current_key((*args[1])->value.ht,&sIndex,&iIndex,1))!=HASH_KEY_NON_EXISTANT) {
+      zend_hash_get_current_data((*args[1])->value.ht,(void **) &Data);
+      indri::api::ScoredExtentResult * arg1 = 0;
+      SWIG_ConvertPtr(*(Data), (void **) &arg1, SWIGTYPE_p_indri__api__ScoredExtentResult, 0);
+      arg3->push_back(*arg1);
+      zend_hash_move_forward((*args[1])->value.ht);  
+      if (sIndex) {
+        efree(sIndex);
+        sIndex=NULL;
+      }
+    }
+    zend_hash_internal_pointer_reset((*args[1])->value.ht);
+  }
+  result = (arg1)->expand(arg2,*arg3);
+  {
+    ZVAL_STRINGL(return_value,const_cast<char*>((&result)->data()),(&result)->length(),1);
+  }
+  {
+    // freearg typemap
+    delete arg3;
+  }
+  return;
+fail:
+  {
+    // freearg typemap
+    delete arg3;
+  }
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+/* This function is designed to be called by the zend list destructors */
+/* to typecast and do the actual destruction */
+void __wrap_delete_RMExpander(zend_rsrc_list_entry *rsrc, const char *type_name TSRMLS_DC) {
+  swig_object_wrapper *value=(swig_object_wrapper *) rsrc->ptr ;
+  void *ptr=value->ptr ;
+  int newobject=value->newobject ;
+  indri::query::RMExpander *arg1 = (indri::query::RMExpander *) 0 ;
+  
+  efree(value);
+  if (! newobject) return; /* can't delete it! */
+  SWIG_ZTS_ConvertResourceData(ptr,rsrc->type,type_name,(void **) &arg1,SWIGTYPE_p_indri__query__RMExpander TSRMLS_CC);
+  if (! arg1) zend_error(E_ERROR, "indri::query::RMExpander resource already free'd");
+  delete arg1;
+  
+}
+
+
+/* property handler for class RMExpander */
+static pval _wrap_propget_RMExpander(zend_property_reference *property_reference) {
+  pval result;
+  pval **_result;
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  result.type = IS_NULL;
+  if (_propget_RMExpander(property_reference, &result)==SUCCESS) return result;
+  /* return it ourselves */
+  if (zend_hash_find(Z_OBJPROP_P(property_reference->object),Z_STRVAL_P(&(property->element)),1+Z_STRLEN_P(&(property->element)),(void**)&_result)==SUCCESS) {
+  zval *_value;
+  MAKE_STD_ZVAL(_value);  *_value=**_result;
+  INIT_PZVAL(_value);
+  zval_copy_ctor(_value);
+  return *_value;
+  }
+  result.type = IS_NULL;
+  return result;
+}
+static int _propget_RMExpander(zend_property_reference *property_reference, pval *value) {
+  /* No extra properties for subclass RMExpander */
+  {
+    /* chain to base class */
+    if (_propget_QueryExpander(property_reference,  value)==SUCCESS) return SUCCESS;
+  }
+  return FAILURE;
+}
+
+static int _wrap_propset_RMExpander(zend_property_reference *property_reference, pval *value) { 
+  zval * _value;
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  if (_propset_RMExpander(property_reference, value)==SUCCESS) return SUCCESS;
+  /* set it ourselves as it is RMExpander */
+  MAKE_STD_ZVAL(_value);
+  *_value=*value;
+  INIT_PZVAL(_value);
+  zval_copy_ctor(_value);
+  return add_property_zval_ex(property_reference->object,Z_STRVAL_P(&(property->element)),1+Z_STRLEN_P(&(property->element)),_value);
+}
+static int _propset_RMExpander(zend_property_reference *property_reference, pval *value) {
+  /* No extra properties for subclass RMExpander */
+  {
+    /* chain to base class */
+    if (_propset_QueryExpander(property_reference, value)==SUCCESS) return SUCCESS;
+  }
+  return FAILURE;
+}
+
+ZEND_NAMED_FUNCTION(_wrap_new_PonteExpander) {
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  indri::api::Parameters *arg2 = 0 ;
+  indri::query::PonteExpander *result = 0 ;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* NATIVE Constructor */
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_indri__api__QueryEnvironment, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of new_PonteExpander. Expected SWIGTYPE_p_indri__api__QueryEnvironment");
+    }
+  }
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*args[1], (void **) &arg2, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of new_PonteExpander. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  result = (indri::query::PonteExpander *)new indri::query::PonteExpander(arg1,*arg2);
+  {
+    SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_indri__query__PonteExpander, 1);
+  }
+  /* Wrap this return value */
+  if (this_ptr) {
+    /* NATIVE Constructor, use this_ptr */
+    zval *_cPtr; MAKE_STD_ZVAL(_cPtr);
+    *_cPtr = *return_value;
+    INIT_ZVAL(*return_value);
+    add_property_zval(this_ptr,"_cPtr",_cPtr);
+  } else if (! this_ptr) {
+    /* ALTERNATIVE Constructor, make an object wrapper */
+    zval *obj, *_cPtr;
+    MAKE_STD_ZVAL(obj);
+    MAKE_STD_ZVAL(_cPtr);
+    *_cPtr = *return_value;
+    INIT_ZVAL(*return_value);
+    object_init_ex(obj,ptr_ce_swig_PonteExpander);
+    add_property_zval(obj,"_cPtr",_cPtr);
+    *return_value=*obj;
+  }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_PonteExpander_expand) {
+  indri::query::PonteExpander *arg1 = (indri::query::PonteExpander *) 0 ;
+  std::string arg2 ;
+  std::vector<indri::api::ScoredExtentResult > *arg3 = 0 ;
+  std::string result;
+  zval **args[2];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 2) || (zend_get_parameters_array_ex(2, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__query__PonteExpander, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of PonteExpander_expand. Expected SWIGTYPE_p_indri__query__PonteExpander");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    arg2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+  }
+  {
+    int iStatus;
+    ulong iIndex;
+    char *sIndex=NULL;
+    zval **Data;
+    arg3=new std::vector< indri::api::ScoredExtentResult >;
+    convert_to_array(*args[1]);
+    zend_hash_internal_pointer_reset((*args[1])->value.ht);
+    while((iStatus=zend_hash_get_current_key((*args[1])->value.ht,&sIndex,&iIndex,1))!=HASH_KEY_NON_EXISTANT) {
+      zend_hash_get_current_data((*args[1])->value.ht,(void **) &Data);
+      indri::api::ScoredExtentResult * arg1 = 0;
+      SWIG_ConvertPtr(*(Data), (void **) &arg1, SWIGTYPE_p_indri__api__ScoredExtentResult, 0);
+      arg3->push_back(*arg1);
+      zend_hash_move_forward((*args[1])->value.ht);  
+      if (sIndex) {
+        efree(sIndex);
+        sIndex=NULL;
+      }
+    }
+    zend_hash_internal_pointer_reset((*args[1])->value.ht);
+  }
+  result = (arg1)->expand(arg2,*arg3);
+  {
+    ZVAL_STRINGL(return_value,const_cast<char*>((&result)->data()),(&result)->length(),1);
+  }
+  {
+    // freearg typemap
+    delete arg3;
+  }
+  return;
+fail:
+  {
+    // freearg typemap
+    delete arg3;
+  }
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+/* This function is designed to be called by the zend list destructors */
+/* to typecast and do the actual destruction */
+void __wrap_delete_PonteExpander(zend_rsrc_list_entry *rsrc, const char *type_name TSRMLS_DC) {
+  swig_object_wrapper *value=(swig_object_wrapper *) rsrc->ptr ;
+  void *ptr=value->ptr ;
+  int newobject=value->newobject ;
+  indri::query::PonteExpander *arg1 = (indri::query::PonteExpander *) 0 ;
+  
+  efree(value);
+  if (! newobject) return; /* can't delete it! */
+  SWIG_ZTS_ConvertResourceData(ptr,rsrc->type,type_name,(void **) &arg1,SWIGTYPE_p_indri__query__PonteExpander TSRMLS_CC);
+  if (! arg1) zend_error(E_ERROR, "indri::query::PonteExpander resource already free'd");
+  delete arg1;
+  
+}
+
+
+/* property handler for class PonteExpander */
+static pval _wrap_propget_PonteExpander(zend_property_reference *property_reference) {
+  pval result;
+  pval **_result;
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  result.type = IS_NULL;
+  if (_propget_PonteExpander(property_reference, &result)==SUCCESS) return result;
+  /* return it ourselves */
+  if (zend_hash_find(Z_OBJPROP_P(property_reference->object),Z_STRVAL_P(&(property->element)),1+Z_STRLEN_P(&(property->element)),(void**)&_result)==SUCCESS) {
+  zval *_value;
+  MAKE_STD_ZVAL(_value);  *_value=**_result;
+  INIT_PZVAL(_value);
+  zval_copy_ctor(_value);
+  return *_value;
+  }
+  result.type = IS_NULL;
+  return result;
+}
+static int _propget_PonteExpander(zend_property_reference *property_reference, pval *value) {
+  /* No extra properties for subclass PonteExpander */
+  {
+    /* chain to base class */
+    if (_propget_QueryExpander(property_reference,  value)==SUCCESS) return SUCCESS;
+  }
+  return FAILURE;
+}
+
+static int _wrap_propset_PonteExpander(zend_property_reference *property_reference, pval *value) { 
+  zval * _value;
+  zend_llist_element *element = property_reference->elements_list->head;
+  zend_overloaded_element *property=(zend_overloaded_element *)element->data;
+  if (_propset_PonteExpander(property_reference, value)==SUCCESS) return SUCCESS;
+  /* set it ourselves as it is PonteExpander */
+  MAKE_STD_ZVAL(_value);
+  *_value=*value;
+  INIT_PZVAL(_value);
+  zval_copy_ctor(_value);
+  return add_property_zval_ex(property_reference->object,Z_STRVAL_P(&(property->element)),1+Z_STRLEN_P(&(property->element)),_value);
+}
+static int _propset_PonteExpander(zend_property_reference *property_reference, pval *value) {
+  /* No extra properties for subclass PonteExpander */
+  {
+    /* chain to base class */
+    if (_propset_QueryExpander(property_reference, value)==SUCCESS) return SUCCESS;
+  }
+  return FAILURE;
+}
+
+/* NEW Destructor style */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__api__Parameters) {
+  /* has destructor: __wrap_delete_Parameters */
+  __wrap_delete_Parameters(rsrc, SWIGTYPE_p_indri__api__Parameters->name TSRMLS_CC);
+}
+/* NEW Destructor style */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__api__QueryAnnotation) {
+  /* has destructor: __wrap_delete_QueryAnnotation */
+  __wrap_delete_QueryAnnotation(rsrc, SWIGTYPE_p_indri__api__QueryAnnotation->name TSRMLS_CC);
+}
 /* NEW Destructor style */
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__parse__TermExtent) {
   /* has destructor: __wrap_delete_TermExtent */
   __wrap_delete_TermExtent(rsrc, SWIGTYPE_p_indri__parse__TermExtent->name TSRMLS_CC);
-}
-/* NEW Destructor style */
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__api__ScoredExtentResult) {
-  /* has destructor: __wrap_delete_ScoredExtentResult */
-  __wrap_delete_ScoredExtentResult(rsrc, SWIGTYPE_p_indri__api__ScoredExtentResult->name TSRMLS_CC);
-}
-/* NEW Destructor style */
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__vectorTlemur__api__DOCID_T_t) {
-  /* bah! No destructor for this simple type!! */
-}
-/* NEW Destructor style */
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_long_long) {
-  /* bah! No destructor for this simple type!! */
 }
 /* NEW Destructor style */
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__api__QueryEnvironment) {
@@ -3716,8 +5182,36 @@ static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__api__QueryEnvironment) {
   __wrap_delete_QueryEnvironment(rsrc, SWIGTYPE_p_indri__api__QueryEnvironment->name TSRMLS_CC);
 }
 /* NEW Destructor style */
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__vectorTstd__string_t) {
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_long_long) {
   /* bah! No destructor for this simple type!! */
+}
+/* NEW Destructor style */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__vectorTindri__api__ScoredExtentResult_t) {
+  /* bah! No destructor for this simple type!! */
+}
+/* NEW Destructor style */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__query__PonteExpander) {
+  /* has destructor: __wrap_delete_PonteExpander */
+  __wrap_delete_PonteExpander(rsrc, SWIGTYPE_p_indri__query__PonteExpander->name TSRMLS_CC);
+}
+/* NEW Destructor style */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__query__RMExpander) {
+  /* has destructor: __wrap_delete_RMExpander */
+  __wrap_delete_RMExpander(rsrc, SWIGTYPE_p_indri__query__RMExpander->name TSRMLS_CC);
+}
+/* NEW Destructor style */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__query__QueryExpander) {
+  /* has destructor: __wrap_delete_QueryExpander */
+  __wrap_delete_QueryExpander(rsrc, SWIGTYPE_p_indri__query__QueryExpander->name TSRMLS_CC);
+}
+/* NEW Destructor style */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__vectorTlemur__api__DOCID_T_t) {
+  /* bah! No destructor for this simple type!! */
+}
+/* NEW Destructor style */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__api__ScoredExtentResult) {
+  /* has destructor: __wrap_delete_ScoredExtentResult */
+  __wrap_delete_ScoredExtentResult(rsrc, SWIGTYPE_p_indri__api__ScoredExtentResult->name TSRMLS_CC);
 }
 /* NEW Destructor style */
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__api__ParsedDocument) {
@@ -3725,18 +5219,13 @@ static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__api__ParsedDocument) {
   __wrap_delete_ParsedDocument(rsrc, SWIGTYPE_p_indri__api__ParsedDocument->name TSRMLS_CC);
 }
 /* NEW Destructor style */
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__api__QueryAnnotationNode) {
-  /* has destructor: __wrap_delete_QueryAnnotationNode */
-  __wrap_delete_QueryAnnotationNode(rsrc, SWIGTYPE_p_indri__api__QueryAnnotationNode->name TSRMLS_CC);
-}
-/* NEW Destructor style */
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__vectorTindri__api__ScoredExtentResult_t) {
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__vectorTstd__string_t) {
   /* bah! No destructor for this simple type!! */
 }
 /* NEW Destructor style */
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__api__QueryAnnotation) {
-  /* has destructor: __wrap_delete_QueryAnnotation */
-  __wrap_delete_QueryAnnotation(rsrc, SWIGTYPE_p_indri__api__QueryAnnotation->name TSRMLS_CC);
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_indri__api__QueryAnnotationNode) {
+  /* has destructor: __wrap_delete_QueryAnnotationNode */
+  __wrap_delete_QueryAnnotationNode(rsrc, SWIGTYPE_p_indri__api__QueryAnnotationNode->name TSRMLS_CC);
 }
 /* end wrapper section */
 /* init section */
@@ -3990,28 +5479,52 @@ if (! (ptr_ce_swig_QueryAnnotation=zend_register_internal_class_ex(&ce_swig_Quer
 INIT_OVERLOADED_CLASS_ENTRY(ce_swig_QueryEnvironment,"queryenvironment",QueryEnvironment_functions,NULL,_wrap_propget_QueryEnvironment,_wrap_propset_QueryEnvironment);
 if (! (ptr_ce_swig_QueryEnvironment=zend_register_internal_class_ex(&ce_swig_QueryEnvironment,NULL,NULL))) zend_error(E_ERROR,"Error registering wrapper for class QueryEnvironment");
 
+/* Define class Parameters */
+INIT_OVERLOADED_CLASS_ENTRY(ce_swig_Parameters,"parameters",Parameters_functions,NULL,_wrap_propget_Parameters,_wrap_propset_Parameters);
+if (! (ptr_ce_swig_Parameters=zend_register_internal_class_ex(&ce_swig_Parameters,NULL,NULL))) zend_error(E_ERROR,"Error registering wrapper for class Parameters");
+
+/* Define class QueryExpander */
+INIT_OVERLOADED_CLASS_ENTRY(ce_swig_QueryExpander,"queryexpander",QueryExpander_functions,NULL,_wrap_propget_QueryExpander,_wrap_propset_QueryExpander);
+if (! (ptr_ce_swig_QueryExpander=zend_register_internal_class_ex(&ce_swig_QueryExpander,NULL,NULL))) zend_error(E_ERROR,"Error registering wrapper for class QueryExpander");
+
+/* Define class RMExpander */
+INIT_OVERLOADED_CLASS_ENTRY(ce_swig_RMExpander,"rmexpander",RMExpander_functions,NULL,_wrap_propget_RMExpander,_wrap_propset_RMExpander);
+if (! (ptr_ce_swig_RMExpander=zend_register_internal_class_ex(&ce_swig_RMExpander,&ce_swig_QueryExpander,NULL))) zend_error(E_ERROR,"Error registering wrapper for class RMExpander");
+
+/* Define class PonteExpander */
+INIT_OVERLOADED_CLASS_ENTRY(ce_swig_PonteExpander,"ponteexpander",PonteExpander_functions,NULL,_wrap_propget_PonteExpander,_wrap_propset_PonteExpander);
+if (! (ptr_ce_swig_PonteExpander=zend_register_internal_class_ex(&ce_swig_PonteExpander,&ce_swig_QueryExpander,NULL))) zend_error(E_ERROR,"Error registering wrapper for class PonteExpander");
+
 
 /* Register resource destructors for pointer types */
-le_swig__p_indri__parse__TermExtent=zend_register_list_destructors_ex(_wrap_destroy_p_indri__parse__TermExtent,NULL,(char *)(SWIGTYPE_p_indri__parse__TermExtent->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_indri__parse__TermExtent,&le_swig__p_indri__parse__TermExtent);
-le_swig__p_indri__api__ScoredExtentResult=zend_register_list_destructors_ex(_wrap_destroy_p_indri__api__ScoredExtentResult,NULL,(char *)(SWIGTYPE_p_indri__api__ScoredExtentResult->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_indri__api__ScoredExtentResult,&le_swig__p_indri__api__ScoredExtentResult);
-le_swig__p_std__vectorTlemur__api__DOCID_T_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__vectorTlemur__api__DOCID_T_t,NULL,(char *)(SWIGTYPE_p_std__vectorTlemur__api__DOCID_T_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_std__vectorTlemur__api__DOCID_T_t,&le_swig__p_std__vectorTlemur__api__DOCID_T_t);
-le_swig__p_long_long=zend_register_list_destructors_ex(_wrap_destroy_p_long_long,NULL,(char *)(SWIGTYPE_p_long_long->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_long_long,&le_swig__p_long_long);
-le_swig__p_indri__api__QueryEnvironment=zend_register_list_destructors_ex(_wrap_destroy_p_indri__api__QueryEnvironment,NULL,(char *)(SWIGTYPE_p_indri__api__QueryEnvironment->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_indri__api__QueryEnvironment,&le_swig__p_indri__api__QueryEnvironment);
-le_swig__p_std__vectorTstd__string_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__vectorTstd__string_t,NULL,(char *)(SWIGTYPE_p_std__vectorTstd__string_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_std__vectorTstd__string_t,&le_swig__p_std__vectorTstd__string_t);
-le_swig__p_indri__api__ParsedDocument=zend_register_list_destructors_ex(_wrap_destroy_p_indri__api__ParsedDocument,NULL,(char *)(SWIGTYPE_p_indri__api__ParsedDocument->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_indri__api__ParsedDocument,&le_swig__p_indri__api__ParsedDocument);
-le_swig__p_indri__api__QueryAnnotationNode=zend_register_list_destructors_ex(_wrap_destroy_p_indri__api__QueryAnnotationNode,NULL,(char *)(SWIGTYPE_p_indri__api__QueryAnnotationNode->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_indri__api__QueryAnnotationNode,&le_swig__p_indri__api__QueryAnnotationNode);
-le_swig__p_std__vectorTindri__api__ScoredExtentResult_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__vectorTindri__api__ScoredExtentResult_t,NULL,(char *)(SWIGTYPE_p_std__vectorTindri__api__ScoredExtentResult_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_std__vectorTindri__api__ScoredExtentResult_t,&le_swig__p_std__vectorTindri__api__ScoredExtentResult_t);
+le_swig__p_indri__api__Parameters=zend_register_list_destructors_ex(_wrap_destroy_p_indri__api__Parameters,NULL,(char *)(SWIGTYPE_p_indri__api__Parameters->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_indri__api__Parameters,&le_swig__p_indri__api__Parameters);
 le_swig__p_indri__api__QueryAnnotation=zend_register_list_destructors_ex(_wrap_destroy_p_indri__api__QueryAnnotation,NULL,(char *)(SWIGTYPE_p_indri__api__QueryAnnotation->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_indri__api__QueryAnnotation,&le_swig__p_indri__api__QueryAnnotation);
+le_swig__p_indri__parse__TermExtent=zend_register_list_destructors_ex(_wrap_destroy_p_indri__parse__TermExtent,NULL,(char *)(SWIGTYPE_p_indri__parse__TermExtent->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_indri__parse__TermExtent,&le_swig__p_indri__parse__TermExtent);
+le_swig__p_indri__api__QueryEnvironment=zend_register_list_destructors_ex(_wrap_destroy_p_indri__api__QueryEnvironment,NULL,(char *)(SWIGTYPE_p_indri__api__QueryEnvironment->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_indri__api__QueryEnvironment,&le_swig__p_indri__api__QueryEnvironment);
+le_swig__p_long_long=zend_register_list_destructors_ex(_wrap_destroy_p_long_long,NULL,(char *)(SWIGTYPE_p_long_long->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_long_long,&le_swig__p_long_long);
+le_swig__p_std__vectorTindri__api__ScoredExtentResult_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__vectorTindri__api__ScoredExtentResult_t,NULL,(char *)(SWIGTYPE_p_std__vectorTindri__api__ScoredExtentResult_t->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_std__vectorTindri__api__ScoredExtentResult_t,&le_swig__p_std__vectorTindri__api__ScoredExtentResult_t);
+le_swig__p_indri__query__PonteExpander=zend_register_list_destructors_ex(_wrap_destroy_p_indri__query__PonteExpander,NULL,(char *)(SWIGTYPE_p_indri__query__PonteExpander->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_indri__query__PonteExpander,&le_swig__p_indri__query__PonteExpander);
+le_swig__p_indri__query__RMExpander=zend_register_list_destructors_ex(_wrap_destroy_p_indri__query__RMExpander,NULL,(char *)(SWIGTYPE_p_indri__query__RMExpander->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_indri__query__RMExpander,&le_swig__p_indri__query__RMExpander);
+le_swig__p_indri__query__QueryExpander=zend_register_list_destructors_ex(_wrap_destroy_p_indri__query__QueryExpander,NULL,(char *)(SWIGTYPE_p_indri__query__QueryExpander->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_indri__query__QueryExpander,&le_swig__p_indri__query__QueryExpander);
+le_swig__p_std__vectorTlemur__api__DOCID_T_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__vectorTlemur__api__DOCID_T_t,NULL,(char *)(SWIGTYPE_p_std__vectorTlemur__api__DOCID_T_t->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_std__vectorTlemur__api__DOCID_T_t,&le_swig__p_std__vectorTlemur__api__DOCID_T_t);
+le_swig__p_indri__api__ScoredExtentResult=zend_register_list_destructors_ex(_wrap_destroy_p_indri__api__ScoredExtentResult,NULL,(char *)(SWIGTYPE_p_indri__api__ScoredExtentResult->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_indri__api__ScoredExtentResult,&le_swig__p_indri__api__ScoredExtentResult);
+le_swig__p_indri__api__ParsedDocument=zend_register_list_destructors_ex(_wrap_destroy_p_indri__api__ParsedDocument,NULL,(char *)(SWIGTYPE_p_indri__api__ParsedDocument->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_indri__api__ParsedDocument,&le_swig__p_indri__api__ParsedDocument);
+le_swig__p_std__vectorTstd__string_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__vectorTstd__string_t,NULL,(char *)(SWIGTYPE_p_std__vectorTstd__string_t->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_std__vectorTstd__string_t,&le_swig__p_std__vectorTstd__string_t);
+le_swig__p_indri__api__QueryAnnotationNode=zend_register_list_destructors_ex(_wrap_destroy_p_indri__api__QueryAnnotationNode,NULL,(char *)(SWIGTYPE_p_indri__api__QueryAnnotationNode->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_indri__api__QueryAnnotationNode,&le_swig__p_indri__api__QueryAnnotationNode);
 CG(active_class_entry) = NULL;
 /* end oinit subsection */
 

@@ -274,6 +274,9 @@ SWIGEXPORT void SWIGSTDCALL SWIGRegisterStringCallback_indri(SWIG_CSharpStringHe
 #include "indri/indri-platform.h"
 #include "lemur-compat.hpp"
 #include "indri/QueryEnvironment.hpp"
+#include "indri/QueryExpander.hpp"
+#include "indri/RMExpander.hpp"
+#include "indri/PonteExpander.hpp"
 #include "indri/ScoredExtentResult.hpp"
 #include "indri/ParsedDocument.hpp"
 #include "indri/IndexEnvironment.hpp"
@@ -4900,6 +4903,373 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ScoredExtentResult(void * jarg1) {
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_Parameters() {
+  void * jresult ;
+  indri::api::Parameters *result = 0 ;
+  
+  result = (indri::api::Parameters *)new indri::api::Parameters();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_Parameters(void * jarg1) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  delete arg1;
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Parameters_get__SWIG_0(void * jarg1, int jarg2) {
+  void * jresult ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  int arg2 ;
+  indri::api::Parameters result;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (arg1)->get(arg2);
+  jresult = new indri::api::Parameters((indri::api::Parameters &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Parameters_get__SWIG_1(void * jarg1, char * jarg2) {
+  void * jresult ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  indri::api::Parameters result;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  result = (arg1)->get((std::string const &)*arg2);
+  jresult = new indri::api::Parameters((indri::api::Parameters &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Parameters_get__SWIG_2(void * jarg1, char * jarg2, unsigned int jarg3) {
+  unsigned int jresult ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  bool arg3 ;
+  bool result;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  arg3 = jarg3 ? true : false; 
+  result = (bool)(arg1)->get((std::string const &)*arg2,arg3);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Parameters_get__SWIG_3(void * jarg1, char * jarg2, int jarg3) {
+  int jresult ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  int arg3 ;
+  int result;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  arg3 = (int)jarg3; 
+  result = (int)(arg1)->get((std::string const &)*arg2,arg3);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT double SWIGSTDCALL CSharp_Parameters_get__SWIG_4(void * jarg1, char * jarg2, double jarg3) {
+  double jresult ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  double arg3 ;
+  double result;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  arg3 = (double)jarg3; 
+  result = (double)(arg1)->get((std::string const &)*arg2,arg3);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT long long SWIGSTDCALL CSharp_Parameters_get__SWIG_5(void * jarg1, char * jarg2, long long jarg3) {
+  long long jresult ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  INT64 arg3 ;
+  INT64 result;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  arg3 = (INT64)jarg3; 
+  result = (INT64)(arg1)->get((std::string const &)*arg2,arg3);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Parameters_get__SWIG_6(void * jarg1, char * jarg2, char * jarg3) {
+  char * jresult ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  std::string result;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  if (!jarg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg3_str(jarg3);
+  arg3 = &arg3_str; 
+  result = (arg1)->get((std::string const &)*arg2,(std::string const &)*arg3);
+  jresult = SWIG_csharp_string_callback((&result)->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Parameters_append(void * jarg1, char * jarg2) {
+  void * jresult ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  indri::api::Parameters result;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  result = (arg1)->append((std::string const &)*arg2);
+  jresult = new indri::api::Parameters((indri::api::Parameters &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Parameters_remove(void * jarg1, char * jarg2) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  (arg1)->remove((std::string const &)*arg2);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Parameters_set__SWIG_0(void * jarg1, char * jarg2, unsigned int jarg3) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  bool arg3 ;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  arg3 = jarg3 ? true : false; 
+  (arg1)->set((std::string const &)*arg2,arg3);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Parameters_set__SWIG_1(void * jarg1, char * jarg2, char * jarg3) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  if (!jarg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg3_str(jarg3);
+  arg3 = &arg3_str; 
+  (arg1)->set((std::string const &)*arg2,(std::string const &)*arg3);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Parameters_set__SWIG_2(void * jarg1, char * jarg2, int jarg3) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  int arg3 ;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  arg3 = (int)jarg3; 
+  (arg1)->set((std::string const &)*arg2,arg3);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Parameters_set__SWIG_3(void * jarg1, char * jarg2, long long jarg3) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  UINT64 arg3 ;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  arg3 = (UINT64)jarg3; 
+  (arg1)->set((std::string const &)*arg2,arg3);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Parameters_set__SWIG_4(void * jarg1, char * jarg2, double jarg3) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  double arg3 ;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  arg3 = (double)jarg3; 
+  (arg1)->set((std::string const &)*arg2,arg3);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Parameters_set__SWIG_5(void * jarg1, char * jarg2) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  (arg1)->set((std::string const &)*arg2);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Parameters_clear(void * jarg1) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  (arg1)->clear();
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Parameters_size(void * jarg1) {
+  unsigned long jresult ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  size_t result;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  result = (arg1)->size();
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Parameters_exists__SWIG_0(void * jarg1, int jarg2) {
+  unsigned int jresult ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)(arg1)->exists(arg2);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Parameters_exists__SWIG_1(void * jarg1, char * jarg2) {
+  unsigned int jresult ;
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  bool result;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  result = (bool)(arg1)->exists((std::string const &)*arg2);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Parameters_instance() {
+  void * jresult ;
+  indri::api::Parameters *result = 0 ;
+  
+  {
+    indri::api::Parameters &_result_ref = indri::api::Parameters::instance();
+    result = (indri::api::Parameters *) &_result_ref;
+  }
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_DocumentVectorVector_Clear(void * jarg1) {
   std::vector<indri::api::DocumentVector * > *arg1 = (std::vector<indri::api::DocumentVector * > *) 0 ;
   
@@ -6902,6 +7272,183 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_QueryEnvironment(void * jarg1) {
 }
 
 
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_QueryExpander(void * jarg1) {
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  
+  arg1 = (indri::query::QueryExpander *)jarg1; 
+  delete arg1;
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_QueryExpander_runExpandedQuery__SWIG_0(void * jarg1, char * jarg2, int jarg3, unsigned int jarg4) {
+  void * jresult ;
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  std::string arg2 ;
+  int arg3 ;
+  bool arg4 ;
+  std::vector<indri::api::ScoredExtentResult > result;
+  
+  arg1 = (indri::query::QueryExpander *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  arg2 = std::string(jarg2); 
+  arg3 = (int)jarg3; 
+  arg4 = jarg4 ? true : false; 
+  result = (arg1)->runExpandedQuery(arg2,arg3,arg4);
+  jresult = new std::vector<indri::api::ScoredExtentResult >((std::vector<indri::api::ScoredExtentResult > &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_QueryExpander_runExpandedQuery__SWIG_1(void * jarg1, char * jarg2, int jarg3) {
+  void * jresult ;
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  std::string arg2 ;
+  int arg3 ;
+  std::vector<indri::api::ScoredExtentResult > result;
+  
+  arg1 = (indri::query::QueryExpander *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  arg2 = std::string(jarg2); 
+  arg3 = (int)jarg3; 
+  result = (arg1)->runExpandedQuery(arg2,arg3);
+  jresult = new std::vector<indri::api::ScoredExtentResult >((std::vector<indri::api::ScoredExtentResult > &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_QueryExpander_expand(void * jarg1, char * jarg2, void * jarg3) {
+  char * jresult ;
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  std::string arg2 ;
+  std::vector<indri::api::ScoredExtentResult > *arg3 = 0 ;
+  std::string result;
+  
+  arg1 = (indri::query::QueryExpander *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  arg2 = std::string(jarg2); 
+  arg3 = (std::vector<indri::api::ScoredExtentResult > *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector<indri::api::ScoredExtentResult > & type is null", 0);
+    return 0;
+  } 
+  result = (arg1)->expand(arg2,*arg3);
+  jresult = SWIG_csharp_string_callback((&result)->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_RMExpander(void * jarg1, void * jarg2) {
+  void * jresult ;
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  indri::api::Parameters *arg2 = 0 ;
+  indri::query::RMExpander *result = 0 ;
+  
+  arg1 = (indri::api::QueryEnvironment *)jarg1; 
+  arg2 = (indri::api::Parameters *)jarg2;
+  if(!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::api::Parameters & type is null", 0);
+    return 0;
+  } 
+  result = (indri::query::RMExpander *)new indri::query::RMExpander(arg1,*arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_RMExpander_expand(void * jarg1, char * jarg2, void * jarg3) {
+  char * jresult ;
+  indri::query::RMExpander *arg1 = (indri::query::RMExpander *) 0 ;
+  std::string arg2 ;
+  std::vector<indri::api::ScoredExtentResult > *arg3 = 0 ;
+  std::string result;
+  
+  arg1 = (indri::query::RMExpander *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  arg2 = std::string(jarg2); 
+  arg3 = (std::vector<indri::api::ScoredExtentResult > *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector<indri::api::ScoredExtentResult > & type is null", 0);
+    return 0;
+  } 
+  result = (arg1)->expand(arg2,*arg3);
+  jresult = SWIG_csharp_string_callback((&result)->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_RMExpander(void * jarg1) {
+  indri::query::RMExpander *arg1 = (indri::query::RMExpander *) 0 ;
+  
+  arg1 = (indri::query::RMExpander *)jarg1; 
+  delete arg1;
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_PonteExpander(void * jarg1, void * jarg2) {
+  void * jresult ;
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  indri::api::Parameters *arg2 = 0 ;
+  indri::query::PonteExpander *result = 0 ;
+  
+  arg1 = (indri::api::QueryEnvironment *)jarg1; 
+  arg2 = (indri::api::Parameters *)jarg2;
+  if(!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::api::Parameters & type is null", 0);
+    return 0;
+  } 
+  result = (indri::query::PonteExpander *)new indri::query::PonteExpander(arg1,*arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_PonteExpander_expand(void * jarg1, char * jarg2, void * jarg3) {
+  char * jresult ;
+  indri::query::PonteExpander *arg1 = (indri::query::PonteExpander *) 0 ;
+  std::string arg2 ;
+  std::vector<indri::api::ScoredExtentResult > *arg3 = 0 ;
+  std::string result;
+  
+  arg1 = (indri::query::PonteExpander *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  arg2 = std::string(jarg2); 
+  arg3 = (std::vector<indri::api::ScoredExtentResult > *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector<indri::api::ScoredExtentResult > & type is null", 0);
+    return 0;
+  } 
+  result = (arg1)->expand(arg2,*arg3);
+  jresult = SWIG_csharp_string_callback((&result)->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_PonteExpander(void * jarg1) {
+  indri::query::PonteExpander *arg1 = (indri::query::PonteExpander *) 0 ;
+  
+  arg1 = (indri::query::PonteExpander *)jarg1; 
+  delete arg1;
+  
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_delete_IndexStatus(void * jarg1) {
   indri::api::IndexStatus *arg1 = (indri::api::IndexStatus *) 0 ;
   
@@ -7639,6 +8186,14 @@ SWIGEXPORT int SWIGSTDCALL CSharp_IndexEnvironment_documentsSeen(void * jarg1) {
   return jresult;
 }
 
+
+SWIGEXPORT indri::query::QueryExpander * SWIGSTDCALL CSharp_RMExpanderUpcast(indri::query::RMExpander *objectRef) {
+    return (indri::query::QueryExpander *)objectRef;
+}
+
+SWIGEXPORT indri::query::QueryExpander * SWIGSTDCALL CSharp_PonteExpanderUpcast(indri::query::PonteExpander *objectRef) {
+    return (indri::query::QueryExpander *)objectRef;
+}
 
 #ifdef __cplusplus
 }

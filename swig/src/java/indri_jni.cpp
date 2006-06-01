@@ -380,6 +380,9 @@ namespace Swig {
 #include "indri/indri-platform.h"
 #include "lemur-compat.hpp"
 #include "indri/QueryEnvironment.hpp"
+#include "indri/QueryExpander.hpp"
+#include "indri/RMExpander.hpp"
+#include "indri/PonteExpander.hpp"
 #include "indri/ScoredExtentResult.hpp"
 #include "indri/ParsedDocument.hpp"
 #include "indri/IndexEnvironment.hpp"
@@ -2757,6 +2760,386 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1QueryEnvironment
 }
 
 
+JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1QueryExpander(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::query::QueryExpander **)&jarg1; 
+  {
+    try {
+      delete arg1;
+      
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return ;
+    }
+  }
+}
+
+
+JNIEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryExpander_1runExpandedQuery_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jint jarg3, jboolean jarg4) {
+  jobjectArray jresult = 0 ;
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  std::string arg2 ;
+  int arg3 ;
+  bool arg4 ;
+  std::vector<indri::api::ScoredExtentResult > result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::query::QueryExpander **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return 0;
+  } 
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return 0;
+  arg2 =  std::string(arg2_pstr);
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  arg3 = (int)jarg3; 
+  arg4 = jarg4 ? true : false; 
+  {
+    try {
+      result = (arg1)->runExpandedQuery(arg2,arg3,arg4);
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  {
+    jresult = java_build_scoredextentresult( jenv, result );
+  }
+  return jresult;
+}
+
+
+JNIEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryExpander_1runExpandedQuery_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jint jarg3) {
+  jobjectArray jresult = 0 ;
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  std::string arg2 ;
+  int arg3 ;
+  std::vector<indri::api::ScoredExtentResult > result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::query::QueryExpander **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return 0;
+  } 
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return 0;
+  arg2 =  std::string(arg2_pstr);
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  arg3 = (int)jarg3; 
+  {
+    try {
+      result = (arg1)->runExpandedQuery(arg2,arg3);
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  {
+    jresult = java_build_scoredextentresult( jenv, result );
+  }
+  return jresult;
+}
+
+
+JNIEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_QueryExpander_1expand(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jobjectArray jarg3) {
+  jstring jresult = 0 ;
+  indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
+  std::string arg2 ;
+  std::vector<indri::api::ScoredExtentResult > *arg3 = 0 ;
+  std::string result;
+  std::vector<indri::api::ScoredExtentResult > resin3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::query::QueryExpander **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return 0;
+  } 
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return 0;
+  arg2 =  std::string(arg2_pstr);
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  {
+    jsize size = jenv->GetArrayLength(jarg3);
+    
+    jclass clazz = jenv->FindClass("lemurproject/indri/ScoredExtentResult");
+    jfieldID scoreField = jenv->GetFieldID(clazz, "score", "D" );
+    jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
+    jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
+    jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+    arg3 = &resin3;
+    
+    for( jsize i=0; i<size; i++ ) {
+      jobject seobj  = jenv->GetObjectArrayElement(jarg3, i);
+      indri::api::ScoredExtentResult ser;
+      
+      ser.begin = jenv->GetIntField(seobj, beginField);
+      ser.end = jenv->GetIntField(seobj, endField);
+      ser.document = jenv->GetIntField(seobj, documentField);
+      ser.score = jenv->GetDoubleField(seobj, scoreField);
+      
+      arg3->push_back( ser );
+    }
+  }
+  {
+    try {
+      result = (arg1)->expand(arg2,*arg3);
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  jresult = jenv->NewStringUTF((&result)->c_str()); 
+  return jresult;
+}
+
+
+JNIEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1RMExpander(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2) {
+  jlong jresult = 0 ;
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  indri::api::Parameters *arg2 = 0 ;
+  indri::query::RMExpander *result = 0 ;
+  indri::api::Parameters p2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::api::QueryEnvironment **)&jarg1; 
+  {
+    if( jarg2 != 0 ) {
+      jni_parameters_info info;
+      java_parameters_init( jenv, info );
+      
+      java_parameters_map( jenv, info, p2, jarg2 );
+    }   
+    arg2 = &p2;
+  }
+  {
+    try {
+      result = (indri::query::RMExpander *)new indri::query::RMExpander(arg1,*arg2);
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  *(indri::query::RMExpander **)&jresult = result; 
+  return jresult;
+}
+
+
+JNIEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_RMExpander_1expand(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jobjectArray jarg3) {
+  jstring jresult = 0 ;
+  indri::query::RMExpander *arg1 = (indri::query::RMExpander *) 0 ;
+  std::string arg2 ;
+  std::vector<indri::api::ScoredExtentResult > *arg3 = 0 ;
+  std::string result;
+  std::vector<indri::api::ScoredExtentResult > resin3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::query::RMExpander **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return 0;
+  } 
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return 0;
+  arg2 =  std::string(arg2_pstr);
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  {
+    jsize size = jenv->GetArrayLength(jarg3);
+    
+    jclass clazz = jenv->FindClass("lemurproject/indri/ScoredExtentResult");
+    jfieldID scoreField = jenv->GetFieldID(clazz, "score", "D" );
+    jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
+    jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
+    jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+    arg3 = &resin3;
+    
+    for( jsize i=0; i<size; i++ ) {
+      jobject seobj  = jenv->GetObjectArrayElement(jarg3, i);
+      indri::api::ScoredExtentResult ser;
+      
+      ser.begin = jenv->GetIntField(seobj, beginField);
+      ser.end = jenv->GetIntField(seobj, endField);
+      ser.document = jenv->GetIntField(seobj, documentField);
+      ser.score = jenv->GetDoubleField(seobj, scoreField);
+      
+      arg3->push_back( ser );
+    }
+  }
+  {
+    try {
+      result = (arg1)->expand(arg2,*arg3);
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  jresult = jenv->NewStringUTF((&result)->c_str()); 
+  return jresult;
+}
+
+
+JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1RMExpander(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  indri::query::RMExpander *arg1 = (indri::query::RMExpander *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::query::RMExpander **)&jarg1; 
+  {
+    try {
+      delete arg1;
+      
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return ;
+    }
+  }
+}
+
+
+JNIEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1PonteExpander(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2) {
+  jlong jresult = 0 ;
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  indri::api::Parameters *arg2 = 0 ;
+  indri::query::PonteExpander *result = 0 ;
+  indri::api::Parameters p2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::api::QueryEnvironment **)&jarg1; 
+  {
+    if( jarg2 != 0 ) {
+      jni_parameters_info info;
+      java_parameters_init( jenv, info );
+      
+      java_parameters_map( jenv, info, p2, jarg2 );
+    }   
+    arg2 = &p2;
+  }
+  {
+    try {
+      result = (indri::query::PonteExpander *)new indri::query::PonteExpander(arg1,*arg2);
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  *(indri::query::PonteExpander **)&jresult = result; 
+  return jresult;
+}
+
+
+JNIEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_PonteExpander_1expand(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jobjectArray jarg3) {
+  jstring jresult = 0 ;
+  indri::query::PonteExpander *arg1 = (indri::query::PonteExpander *) 0 ;
+  std::string arg2 ;
+  std::vector<indri::api::ScoredExtentResult > *arg3 = 0 ;
+  std::string result;
+  std::vector<indri::api::ScoredExtentResult > resin3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::query::PonteExpander **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return 0;
+  } 
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return 0;
+  arg2 =  std::string(arg2_pstr);
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  {
+    jsize size = jenv->GetArrayLength(jarg3);
+    
+    jclass clazz = jenv->FindClass("lemurproject/indri/ScoredExtentResult");
+    jfieldID scoreField = jenv->GetFieldID(clazz, "score", "D" );
+    jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
+    jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
+    jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+    arg3 = &resin3;
+    
+    for( jsize i=0; i<size; i++ ) {
+      jobject seobj  = jenv->GetObjectArrayElement(jarg3, i);
+      indri::api::ScoredExtentResult ser;
+      
+      ser.begin = jenv->GetIntField(seobj, beginField);
+      ser.end = jenv->GetIntField(seobj, endField);
+      ser.document = jenv->GetIntField(seobj, documentField);
+      ser.score = jenv->GetDoubleField(seobj, scoreField);
+      
+      arg3->push_back( ser );
+    }
+  }
+  {
+    try {
+      result = (arg1)->expand(arg2,*arg3);
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  jresult = jenv->NewStringUTF((&result)->c_str()); 
+  return jresult;
+}
+
+
+JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1PonteExpander(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  indri::query::PonteExpander *arg1 = (indri::query::PonteExpander *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::query::PonteExpander **)&jarg1; 
+  {
+    try {
+      delete arg1;
+      
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return ;
+    }
+  }
+}
+
+
 JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1IndexStatus(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   indri::api::IndexStatus *arg1 = (indri::api::IndexStatus *) 0 ;
   
@@ -4357,6 +4740,22 @@ JNIEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1docume
   return jresult;
 }
 
+
+JNIEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_SWIGRMExpanderUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(indri::query::QueryExpander **)&baseptr = *(indri::query::RMExpander **)&jarg1;
+    return baseptr;
+}
+
+JNIEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_SWIGPonteExpanderUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(indri::query::QueryExpander **)&baseptr = *(indri::query::PonteExpander **)&jarg1;
+    return baseptr;
+}
 
 JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_swig_1module_1init(JNIEnv *jenv, jclass jcls) {
   int i;

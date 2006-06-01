@@ -16,6 +16,10 @@
 %typemap(jtype) const std::vector<indri::api::ScoredExtentResult>& "ScoredExtentResult[]"
 %typemap(jstype) const std::vector<indri::api::ScoredExtentResult>& "ScoredExtentResult[]"
 
+%typemap(jni) std::vector<indri::api::ScoredExtentResult>& "jobjectArray"
+%typemap(jtype) std::vector<indri::api::ScoredExtentResult>& "ScoredExtentResult[]"
+%typemap(jstype) std::vector<indri::api::ScoredExtentResult>& "ScoredExtentResult[]"
+
 %{
   jobjectArray java_build_scoredextentresult( JNIEnv* jenv, const std::vector<indri::api::ScoredExtentResult>& input ) {
     jclass clazz = jenv->FindClass("lemurproject/indri/ScoredExtentResult");
@@ -83,6 +87,30 @@
 }
 
 %typemap(javain) const std::vector<indri::api::ScoredExtentResult>& "$javainput"
+%typemap(in) std::vector<indri::api::ScoredExtentResult>& ( std::vector<indri::api::ScoredExtentResult> resin )
+{
+  jsize size = jenv->GetArrayLength($input);
+
+  jclass clazz = jenv->FindClass("lemurproject/indri/ScoredExtentResult");
+  jfieldID scoreField = jenv->GetFieldID(clazz, "score", "D" );
+  jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
+  jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
+  jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+  $1 = &resin;
+
+  for( jsize i=0; i<size; i++ ) {
+    jobject seobj  = jenv->GetObjectArrayElement($input, i);
+    indri::api::ScoredExtentResult ser;
+
+    ser.begin = jenv->GetIntField(seobj, beginField);
+    ser.end = jenv->GetIntField(seobj, endField);
+    ser.document = jenv->GetIntField(seobj, documentField);
+    ser.score = jenv->GetDoubleField(seobj, scoreField);
+
+    $1->push_back( ser );
+  }
+}
+%typemap(javain) std::vector<indri::api::ScoredExtentResult>& "$javainput"
 %typemap(javaout) std::vector<indri::api::ScoredExtentResult> {
   return $jnicall;
 }
