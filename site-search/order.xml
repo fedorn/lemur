@@ -120,6 +120,12 @@
       <newObject name="QueryStrPrefix" class="org.archive.crawler.url.canonicalize.FixupQueryStr">
         <boolean name="enabled">true</boolean>
       </newObject>
+      <newObject name="normalize" class="org.archive.crawler.url.canonicalize.RegexRule">
+        <boolean name="enabled">true</boolean>
+        <string name="matching-regex">^([^~]*)~([^~]*)$</string>
+        <string name="format">${1}%7e${2}</string>
+        <string name="comment">Replace ~ with %7e</string>
+      </newObject>
     </map>
     <map name="pre-fetch-processors">
       <newObject name="Preselector" class="org.archive.crawler.prefetch.Preselector">
