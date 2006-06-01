@@ -5,7 +5,7 @@ SingleResultItem::SingleResultItem(string templateString) {
 }
 
 SingleResultItem::~SingleResultItem() {
-  
+
 }
 
 void SingleResultItem::setVariable(string variableName, string value) {
@@ -43,16 +43,24 @@ string SingleResultItem::toString() {
   if (variables.get("URL")) {
     URLStringToUse=variables.get("URL");
 
-    if (URLStringToUse=="") {
-      URLStringToUse=cachedURL;
+   if (URLStringToUse=="") {
+      // see if we have an original URL set at least...
+      URLStringToUse=variables.get("origURL");
+      if (URLStringToUse=="") {
+        // still nothing? default to the cache.
+        URLStringToUse=cachedURL;
+      }
     } else {
       // insert anything from the root add path... (only if not cached)
       URLStringToUse.insert(0, CGIConfiguration::getInstance().getRootAddPath());
-      URLStringToUse="http://" + URLStringToUse;
+      // ensure http:// is not included if it already exists...
+      if ((URLStringToUse.find("http://")!=0) && (URLStringToUse.find("HTTP://")!=0)) {
+        URLStringToUse="http://" + URLStringToUse;
+      }
     }
   }
   replaceAll(&outputString, "{%ResURL%}", URLStringToUse);
-  
+
   // ResTitle
   findAndReplace(&outputString, "title", "{%ResTitle%}");
 

@@ -49,7 +49,7 @@ string CGIOutput::loadPageTemplate(string templateFile) {
   }
 
   infile.close();
- 
+
   replaceCompileDateVersion(&outputString);
   return outputString;
 }
@@ -97,7 +97,7 @@ void CGIOutput::replaceTemplateCommand(string *templatePage, string variableName
 
   size_t currentPlace=templatePage->find(fullVariableString);
   while (currentPlace!=std::string::npos) {
-    templatePage->replace(currentPlace, fullVarLen, replacement); 
+    templatePage->replace(currentPlace, fullVarLen, replacement);
     currentPlace=templatePage->find(fullVariableString);
   }
 }
@@ -184,8 +184,8 @@ string CGIOutput::processParameterCommand(string command, string paramValue) {
 
     if (startPage > 1) {
       outString << "&nbsp;<a href=\"" << scriptURL << "?d=" << currentDatasourceID << "&s=0"
-                << "&n=" << maxResultsPerPage 
-                << "&q=" << URLEncodeString(queryTerms) 
+                << "&n=" << maxResultsPerPage
+                << "&q=" << URLEncodeString(queryTerms)
                 << "\">" << 1 << "</a>";
       outString << "&nbsp;...";
     }
@@ -196,8 +196,8 @@ string CGIOutput::processParameterCommand(string command, string paramValue) {
         outString << "&nbsp;" << i;
       } else {
         outString << "&nbsp;<a href=\"" << scriptURL << "?d=" << currentDatasourceID << "&s=" << pageStartRank
-                  << "&n=" << maxResultsPerPage 
-                  << "&q=" << URLEncodeString(queryTerms) 
+                  << "&n=" << maxResultsPerPage
+                  << "&q=" << URLEncodeString(queryTerms)
                   << "\">" << i << "</a>";
       }
     }
@@ -205,8 +205,8 @@ string CGIOutput::processParameterCommand(string command, string paramValue) {
     if (endPage < numPages) {
       outString << "&nbsp;...";
       outString << "&nbsp;<a href=\"" << scriptURL << "?d=" << currentDatasourceID << "&s=" << MIN(((numPages-1)*maxResultsPerPage), totalResultNum)
-                << "&n=" << maxResultsPerPage 
-                << "&q=" << URLEncodeString(queryTerms) 
+                << "&n=" << maxResultsPerPage
+                << "&q=" << URLEncodeString(queryTerms)
                 << "\">" << numPages << "</a>";
     }
 
@@ -258,7 +258,7 @@ void CGIOutput::replaceResultsPageParameters(string *templatePage) {
     // do the final replacement.
     templatePage->erase(currentPlace, (endTag-currentPlace)+2);
     templatePage->insert(currentPlace, parameterValue);
-  
+
     // loop
     currentPlace=templatePage->find("{%");
   }
@@ -345,7 +345,7 @@ bool CGIOutput::resetResultsPage() {
     writeErrorMessage("Multiple LemurSearchResults tags found.", "Error in results page template. Multiple {%LemurSearchResults%} tags were found. Only one is allowed.");
     return false;
   }
-  
+
   // process any pre-processor tags (# results, etc.)
 
   // load in the result item template
@@ -445,7 +445,7 @@ void CGIOutput::displayIndexListingPage() {
   lemurIndexItems << "IndexID " << setw(9) << "Index Description\n\n";
 
   for (int i=0; i < nIndices; i++) {
-    lemurIndexItems << i << " " << setw(9) << CGIConfiguration::getInstance().getIndexDescription(i) << "\n";    
+    lemurIndexItems << i << " " << setw(9) << CGIConfiguration::getInstance().getIndexDescription(i) << "\n";
   }
 
   lemurIndexItems << "</PRE>\n";
@@ -491,7 +491,9 @@ bool CGIOutput::writeSearchResult(string resultURL, string origURL, string resul
       // should we add anything?
       oURLCopy.insert(0, CGIConfiguration::getInstance().getRootAddPath());
 
-      oURLCopy.insert(0, "http://");
+      if ((oURLCopy.find("http://")!=0) && (oURLCopy.find("HTTP://")!=0)) {
+        oURLCopy="http://" + oURLCopy;
+      }
     }
     thisItem.setVariable("origURL", oURLCopy);
 
