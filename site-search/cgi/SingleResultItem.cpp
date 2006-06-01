@@ -1,0 +1,70 @@
+#include "SingleResultItem.h"
+
+SingleResultItem::SingleResultItem(string templateString) {
+  thisTemplate=templateString;
+}
+
+SingleResultItem::~SingleResultItem() {
+  
+}
+
+void SingleResultItem::setVariable(string variableName, string value) {
+  variables.put(variableName.c_str(), value.c_str());
+}
+
+void SingleResultItem::replaceAll(string *s, string variable, string value) {
+  size_t currentPos=s->find(variable);
+  while (currentPos!=std::string::npos) {
+    s->replace(currentPos, variable.length(), value);
+    currentPos=s->find(variable);
+  }
+}
+
+void SingleResultItem::findAndReplace(string *s, string varName, string templateVariable) {
+  char *value=variables.get(varName.c_str());
+  if (value) {
+    replaceAll(s, templateVariable, value);
+  }
+}
+
+string SingleResultItem::toString() {
+  string outputString=thisTemplate;
+
+  // ResCachedURL
+  string cachedURL="{$appPath}?d={$datasource}&i={$resID}";
+  findAndReplace(&cachedURL, "scriptname", "{$appPath}");
+  findAndReplace(&cachedURL, "datasource", "{$datasource}");
+  findAndReplace(&cachedURL, "id", "{$resID}");
+  replaceAll(&outputString, "{%ResCachedURL%}", cachedURL);
+
+  // ResURL
+  // if the URL is "" or missing, use the cached URL
+  string URLStringToUse=cachedURL;
+  if (variables.get("URL")) {
+    URLStringToUse=variables.get("URL");
+
+    if (URLStringToUse=="") {
+      URLStringToUse=cachedURL;
+    } else {
+      // insert anything from the root add path... (only if not cached)
+      URLStringToUse.insert(0, CGIConfiguration::getInstance().getRootAddPath());
+      URLStringToUse="http://" + URLStringToUse;
+    }
+  }
+  replaceAll(&outputString, "{%ResURL%}", URLStringToUse);
+  
+  // ResTitle
+  findAndReplace(&outputString, "title", "{%ResTitle%}");
+
+  // ResSummary
+  findAndReplace(&outputString, "summary", "{%ResSummary%}");
+
+  // ResScore
+  findAndReplace(&outputString, "score", "{%ResScore%}");
+
+  // ResOrigUrl
+  findAndReplace(&outputString, "origURL", "{%ResOrigURL%}");
+
+  return outputString;
+}
+
