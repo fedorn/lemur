@@ -38,3 +38,5 @@ DBInterface.o: DBInterface.cpp DBInterface.h CGIOutput.h
 DictionaryHash.o: DictionaryHash.cpp DictionaryHash.h
 SingleResultItem.o: SingleResultItem.cpp SingleResultItem.h LemurSearchCGIConstants.h DictionaryHash.h
 
+install:
+	echo "read README for install instructions."

@@ -21,6 +21,21 @@
 
 4. The php/cgi bits will come later. 
 
+php ui:
+!*!FIXME!*!
+2) Type 'make' to build Indri.  The PHP library will appear in
+indri/swig/obj/php/libindri_php.so.  Install this library somewhere that PHP
+can find it.  You may need to talk to your system administrator to 
+figure this out.
+
+3) Put the PHP files somewhere that your webserver can find them.
+
+4) Edit the include/config.php file according to the comments in it.
+!*!FIXME!*!
+
+cgi:
+
+
 The heritrix crawler (http://crawler.archive.org) has been modified to
 include the TrecWebWriterProcessor to emit trecweb formatted
 documents. Full documentation/source, available via the website.
