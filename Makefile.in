@@ -15,9 +15,9 @@ INSTALLDIRS = $(bindir) $(includedir) $(includedir)/indri $(libdir)
 
 MF = ../src/Makefile
 
-.PHONY: all lib clean install install-bin install-lib install-data $(DIRS) $(INSTALLDIRS)
+.PHONY: all lib clean install install-bin install-lib install-site-search $(DIRS) $(INSTALLDIRS) site-search
 
-all: $(DIRS) 
+all: $(DIRS) site-search
 
 lib: $(LIBDIRS)
 
@@ -27,10 +27,17 @@ $(OBJDIRS) $(DEPENDDIRS) $(INSTALLDIRS):
 $(DIRS): $(OBJDIRS) $(DEPENDDIRS)
 	$(MAKE) -C $@/obj -f $(MF) all
 
+site-search:
+	$(MAKE) -C $@ all
+
 clean:
 	for dir in $(DIRS) ; do $(MAKE) -C $$dir/obj -f $(MF) clean ; done
+	$(MAKE) -C site-search clean
 
-install: install-lib install-bin
+install: install-lib install-bin install-site-search
+
+install-site-search:
+	$(MAKE) -C site-search install
 
 install-bin: $(INSTALLDIRS)
 	for dir in $(APPDIRS) ; do $(MAKE) -C $$dir/obj -f $(MF) install; done
