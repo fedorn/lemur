@@ -1666,7 +1666,11 @@ void indri::parse::TextTokenizer::processTag() {
     int len = 0;
 
     for ( char *c = toktext + 2; 
+#ifndef WIN32
           isalnum( *c ) || *c == '-' || *c == '_'; c++ ) {
+#else
+          ((*c >= 0) && isalnum( *c )) || *c == '-' || *c == '_'; c++ ) {
+#endif
 
       *c = tolower( *c );
       len++;
@@ -1704,8 +1708,11 @@ void indri::parse::TextTokenizer::processTag() {
     // it starts at one because it is incremented when c is, and c starts at one.
     char* write_loc;
 
+#ifndef WIN32
     while ( isalnum( c[i] ) || c[i] == '-' || c[i] == '_' ) i++;
-
+#else
+    while ( ( (c[i] >= 0) && isalnum( c[i] )) || c[i] == '-' || c[i] == '_' ) i++;
+#endif
     if ( c[i] == '>' ) {
 
       // open tag with no attributes, eg. <title>
@@ -1775,7 +1782,11 @@ void indri::parse::TextTokenizer::processTag() {
         // Try to extract attribute name:
 
         i = 0;
+#ifndef WIN32
         while ( isalnum( c[i] ) ) i++;
+#else
+        while ( (c[i] >= 0) && isalnum( c[i] ) ) i++;
+#endif
 
         if ( i == 0 ) break;
 
@@ -1836,7 +1847,11 @@ void indri::parse::TextTokenizer::processTag() {
             if ( quoted ) 
               while ( c[i] != '"' && c[i] != '>' ) i++;
             else
+#ifndef WIN32
               while ( ! isspace( c[i] ) && c[i] != '>' ) i++;
+#else
+              while ( ((c[i] >= 0)  && ! isspace( c[i] ) ) && c[i] != '>' ) i++;
+#endif
 
             // need to write i characters, plus a NULL
             write_loc = _termBuffer.write( i + 1 );
@@ -1859,8 +1874,11 @@ void indri::parse::TextTokenizer::processTag() {
           avp.begin = byte_position - tokleng + offset;
           avp.end = byte_position - tokleng + offset;
         }
-
+#ifndef WIN32
         while ( isspace( *c ) || *c == '"' ) { c++; offset++; }
+#else
+        while ( ((*c >= 0) && isspace( *c )) || *c == '"' ) { c++; offset++; }
+#endif
 
         te.attributes.push_back( avp );
       }
