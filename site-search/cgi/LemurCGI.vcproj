@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../lemur/utility/include;../lemur/retrieval/include;../lemur/parsing/include;../lemur/langmod/include;../lemur/index/include"
+				AdditionalIncludeDirectories="S:\Development\lemurall\lemur\utility\include;S:\Development\lemurall\lemur\retrieval\include;S:\Development\lemurall\lemur\parsing\include;S:\Development\lemurall\lemur\langmod\include;S:\Development\lemurall\lemur\index\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -33,7 +33,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="index.lib langmod.lib retrieval.lib parsing.lib utility.lib antlr.lib xpdf.lib zlib.lib wsock32.lib"
+				AdditionalDependencies="wsock32.lib"
 				OutputFile="$(OutDir)/LemurCGI.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../lemur/contrib/antlr/Debug;../lemur/contrib/xpdf/Debug;../lemur/contrib/zlib/Debug;../lemur/utility/obj;../lemur/utility/Debug;../lemur/retrieval/Debug;../lemur/parsing/Debug;../lemur/langmod/Debug;../lemur/index/Debug"
@@ -70,8 +70,10 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="S:\Development\lemurall\lemur\utility\include;S:\Development\lemurall\lemur\retrieval\include;S:\Development\lemurall\lemur\parsing\include;S:\Development\lemurall\lemur\langmod\include;S:\Development\lemurall\lemur\index\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="4"
+				RuntimeLibrary="2"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -80,6 +82,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="wsock32.lib"
 				OutputFile="$(OutDir)/LemurCGI.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"

@@ -76,7 +76,7 @@
                 />
                 <Reference
                     Name = "System.XML"
-                    AssemblyName = "System.XML"
+                    AssemblyName = "System.Xml"
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
                 />
             </References>
@@ -224,12 +224,22 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "Parameters.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "ParsedDocument.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
                     RelPath = "ParsedDocumentVector.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "PonteExpander.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -259,6 +269,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "QueryExpander.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "QueryRep.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -270,6 +285,11 @@
                 />
                 <File
                     RelPath = "RetrievalMethod.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "RMExpander.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
