@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="S:\Development\lemurall\lemur\utility\include;S:\Development\lemurall\lemur\retrieval\include;S:\Development\lemurall\lemur\parsing\include;S:\Development\lemurall\lemur\langmod\include;S:\Development\lemurall\lemur\index\include"
+				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LEMUR_CSHARP_EXPORTS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -70,7 +70,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="S:\Development\lemurall\lemur\utility\include;S:\Development\lemurall\lemur\retrieval\include;S:\Development\lemurall\lemur\parsing\include;S:\Development\lemurall\lemur\langmod\include;S:\Development\lemurall\lemur\index\include"
+				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LEMUR_CSHARP_EXPORTS"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
