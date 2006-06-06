@@ -212,7 +212,7 @@ scoredExtentNode [ indri::lang::RawExtentNode * ou ] returns [ indri::lang::Scor
   | ( PRIOR ) => s=priorNode
   | ( FILREJ ) => s=filrejNode[ou]
   | ( FILREQ ) => s=filreqNode[ou]
-  | s=scoredRaw
+  | s=scoredRaw[ou]
   ;
 
 //
@@ -220,13 +220,13 @@ scoredExtentNode [ indri::lang::RawExtentNode * ou ] returns [ indri::lang::Scor
 // but for some reason I can't make the "( DOT context_list )?" work right.
 //
 
-scoredRaw returns [ indri::lang::ScoredExtentNode* sn ]
+scoredRaw [ indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* sn ]
   {
     RawExtentNode* raw = 0;
     RawExtentNode* contexts = 0;
     sn = 0;
   } :
-    ( qualifiedTerm DOT ) => raw=qualifiedTerm DOT contexts=context_list
+    ( qualifiedTerm DOT ) => raw=qualifiedTerm DOT contexts=context_list[ou]
   {
     sn = new indri::lang::RawScorerNode( raw, contexts );
     _nodes.push_back(sn);
@@ -236,7 +236,7 @@ scoredRaw returns [ indri::lang::ScoredExtentNode* sn ]
     sn = new indri::lang::RawScorerNode( raw, contexts );
     _nodes.push_back(sn);
   }
-  | ( unqualifiedTerm DOT ) => raw=unqualifiedTerm DOT contexts=context_list
+  | ( unqualifiedTerm DOT ) => raw=unqualifiedTerm DOT contexts=context_list[ou]
   {
     sn = new indri::lang::RawScorerNode( raw, contexts );
     _nodes.push_back(sn);
@@ -540,19 +540,38 @@ extentRestriction [ indri::lang::ScoredExtentNode* sn, indri::lang::RawExtentNod
     er = new indri::lang::ExtentRestriction(sn, f);
     _nodes.push_back(er);
   } |
-  O_SQUARE DOT po=pathOperator fieldRestricted:TERM C_SQUARE 
+  O_SQUARE DOT po=path C_SQUARE 
   {
 
     if ( ou == 0 ) {
       throw new antlr::SemanticException("Use of a . in a extent restriction without a valid outer context.");
     }
-    f = new indri::lang::Field(fieldRestricted->getText());
-    _nodes.push_back(f);
-    po->setInner(f);
     po->setOuter(ou);
     er = new indri::lang::ExtentRestriction(sn, po);
     _nodes.push_back(er);
   }
+;
+
+path returns [ indri::lang::ExtentInside* r ] {
+    r = 0;
+    indri::lang::Field * f = 0;
+    indri::lang::ExtentInside * po = 0;
+    indri::lang::ExtentInside * lastPo = 0;
+} :
+  (options{greedy=true;} : po=pathOperator fieldRestricted:TERM {
+      if ( r == 0 ) {  // set the root
+        r = po;
+      }      
+      f = new indri::lang::Field(fieldRestricted->getText());
+      _nodes.push_back(f);      
+      po->setInner(f);  // set the leaf's inner
+      if ( lastPo != 0 ) {  // add this operator into the chain
+        po->setOuter( lastPo->getInner() );
+        lastPo->setInner( po );
+      }
+      lastPo = po;
+    }
+  )+
 ;
 
 pathOperator returns [ indri::lang::ExtentInside* r ] {
@@ -635,26 +654,39 @@ field_list returns [ indri::lang::ExtentAnd* fields ]
       }
   )*;
 
-context_list returns [ ExtentOr* contexts ] {
+context_list [ indri::lang::RawExtentNode * ou ] returns [ ExtentOr* contexts ] {
     contexts = new ExtentOr;
     _nodes.push_back( contexts );
+    indri::lang::ExtentInside * p = 0;
+    indri::lang::ExtentInside * pAdditional = 0;
   } :
   O_PAREN
   // first field
-  first:TERM {
+  (first:TERM {
     Field* firstField = new indri::lang::Field( first->getText() );
     _nodes.push_back( firstField );
     contexts->addChild( firstField );
   }
+  | 
+  (DOT p=path {
+    p->setOuter( ou );
+    contexts->addChild( p );
+  }))
   // additional fields
   ( options { greedy=true; } :
-      COMMA additional:TERM {
+      COMMA ( additional:TERM {
         Field* additionalField = new Field(additional->getText());
         _nodes.push_back( additionalField );
         contexts->addChild( additionalField );
-      }
+      } |
+      (DOT pAdditional=path {
+          pAdditional->setOuter( ou );
+          contexts->addChild( pAdditional );
+       }))
   )*
   C_PAREN;
+
+
 
 field_restriction returns [ indri::lang::Field* extent ] :
   O_SQUARE

@@ -106,9 +106,13 @@ public:
 	public:  indri::lang::FilReqNode*  filreqNode(
 		 indri::lang::RawExtentNode * ou 
 	);
-	public:  indri::lang::ScoredExtentNode*  scoredRaw();
+	public:  indri::lang::ScoredExtentNode*  scoredRaw(
+		 indri::lang::RawExtentNode * ou 
+	);
 	public:  RawExtentNode*  qualifiedTerm();
-	public:  ExtentOr*  context_list();
+	public:  ExtentOr*  context_list(
+		 indri::lang::RawExtentNode * ou 
+	);
 	public:  indri::lang::RawExtentNode*  unqualifiedTerm();
 	public:  indri::lang::ScoredExtentNode*  weightedList(
 		 indri::lang::WeightedCombinationNode* wn, indri::lang::RawExtentNode * ou 
@@ -144,6 +148,7 @@ public:
 	public:  indri::lang::FieldBetweenNode*  betweenNode();
 	public:  indri::lang::FieldEqualsNode*  equalsNode();
 	public:  indri::lang::IndexTerm*  rawText();
+	public:  indri::lang::ExtentInside*  path();
 	public:  indri::lang::ExtentInside*  pathOperator();
 	public:  indri::lang::Field*  field_restriction();
 	public:  UINT64  date();
