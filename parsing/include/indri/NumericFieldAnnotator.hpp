@@ -90,7 +90,7 @@ namespace indri
                 len = _numberCopyLength;
               }
               _numberCopy[ len ] = '\0';
-              strncpy( begin, _numberCopy, len );
+              strncpy( _numberCopy, begin, len );
               // convert the number
               value = string_to_i64( _numberCopy );
             }
