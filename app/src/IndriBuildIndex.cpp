@@ -432,6 +432,11 @@ optional parameter with the default of no stopping.</dd>
 
 */
 
+#include <algorithm>
+#include <cstring>
+#include <string>
+#include <cctype>
+
 #include "indri/Parameters.hpp"
 #include "indri/IndexEnvironment.hpp"
 #include <time.h>
@@ -513,6 +518,14 @@ class StatusMonitor : public indri::api::IndexStatus {
     }
   }
 };
+
+static void downcase_string_vector (std::vector<std::string> & vec) {
+  // destructively downcase the strings c_str.  
+  for (int i = 0; i < vec.size(); i++) {
+    std::transform(vec[i].c_str(), vec[i].c_str() + vec[i].length(),
+                   (char *)vec[i].c_str(), ::tolower);
+  }
+}
 
 static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, indri::api::Parameters p, const std::string& parameterName, const std::string* subName = 0 ) {
   if( !p.exists(parameterName) )
@@ -670,8 +683,12 @@ int main(int argc, char * argv[]) {
     // metadata fields that should have a backward lookup table.
     std::vector<std::string> metadataBackward;
     copy_parameters_to_string_vector( metadata, parameters, "metadata.field" ); 
+    downcase_string_vector(metadata);
+    
     copy_parameters_to_string_vector( metadataForward, parameters, "metadata.forward" ); 
+    downcase_string_vector(metadataForward);
     copy_parameters_to_string_vector( metadataBackward, parameters, "metadata.backward" );
+    downcase_string_vector(metadataBackward);
     // docno is a special field, automagically add it as forward and backward.
     std::string docno = "docno";
     if( std::find( metadataForward.begin(), 
@@ -688,6 +705,7 @@ int main(int argc, char * argv[]) {
     std::vector<std::string> fields;
     std::string subName = "name";
     if( copy_parameters_to_string_vector( fields, parameters, "field", &subName ) ) {
+      downcase_string_vector(fields);
       env.setIndexedFields(fields);
       // have to update any numeric fields.
       std::string numName = "numeric";
@@ -699,11 +717,20 @@ int main(int argc, char * argv[]) {
           // let user override default NumericFieldAnnotator for parser
           // enabling numeric fields in offset annotations.
           std::string parserName = slice[i].get("parserName", "NumericFieldAnnotator");
-          env.setNumericField(slice[i][subName], isNumeric, parserName);
+          std::string fieldName = slice[i][subName];
+          std::transform(fieldName.c_str(), 
+                         fieldName.c_str() + fieldName.length(),
+                         (char *)fieldName.c_str(), ::tolower);
+
+          env.setNumericField(fieldName, isNumeric, parserName);
         }
 	bool isOrdinal = slice[i].get(ordName, false);
 	if( isOrdinal ) {
-	  env.setOrdinalField(slice[i][subName], isOrdinal);
+          std::string fieldName = slice[i][subName];
+          std::transform(fieldName.c_str(), 
+                         fieldName.c_str() + fieldName.length(),
+                         (char *)fieldName.c_str(), ::tolower);
+	  env.setOrdinalField(fieldName, isOrdinal);
 	}
       }
     }
