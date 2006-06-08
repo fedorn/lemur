@@ -63,9 +63,7 @@ INDRI_CSHARP_CPP=csharp/indri_csharp.cpp
 PHPSRC=interface/indri.i
 PHPINTERFACES = $(PHPSRC) interface/indritypemaps.i
 ## get from configure
-PHP_SHARED = -shared
-PHP_SO = .so
-PHPINCLUDE = -I/usr/local/apache2/php/include/php -I/usr/local/apache2/php/include/php/main -I/usr/local/apache2/php/include/php/Zend -I/usr/local/apache2/php/include/php/TSRM
+
 OUTDIRPHP=$(OBJ)/php
 PHPLIB=$(OUTDIRPHP)/libindri_php$(PHP_SO)
 
