@@ -48,7 +48,7 @@
           <newObject name="wiki" class="org.archive.crawler.filter.URIRegExpFilter">
             <boolean name="enabled">true</boolean>
             <boolean name="if-match-return">true</boolean>
-            <string name="regexp">.*(?i)((skin=)|(rev=)|(title=Special)).*$</string>
+            <string name="regexp">.*(?i)((action=edit)|(action=diff)|(action=search)|(action=print)|(skin=)|(rev=)|(title=Special)).*$</string>
           </newObject>
         </map>
       </newObject>
