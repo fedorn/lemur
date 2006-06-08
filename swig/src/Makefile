@@ -110,11 +110,13 @@ endif
 all: $(TARGETS)
 
 
-java-lib: $(LIBDEPS) $(JAVADIRS) $(PROPS) $(INDRI_PROPS) $(SOLIB) $(JARFILES)
+java-lib: $(JAVADIRS) $(PROPS) $(INDRI_PROPS) $(SOLIB) $(JARFILES)
 
-php-lib: $(LIBDEPS) $(OUTDIRPHP) $(PHPLIB)
+php-lib: $(OUTDIRPHP) $(PHPLIB)
 
-csharp-lib: $(LIBDEPS) $(OUTDIRCSHARP) $(CSHARPLIB) $(CSHARP_DLL)
+csharp-lib: $(OUTDIRCSHARP) $(CSHARPLIB) $(CSHARP_DLL)
+
+$(SOLIB): $(LIBDEPS)
 
 $(SOLIB): $(OBJ)/java/lemur_jni.o $(OBJ)/java/indri_jni.o  $(OBJ)/java/JBuildIndex.o
 	$(CXX) $(JAVA_SHARED)  $^ -o $@ $(LDFLAGS)
@@ -145,6 +147,8 @@ $(OUTDIRCSHARP)/indri_csharp.o: $(INDRI_CSHARP_CPP)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 #needs csharp_shared
+$(CSHARPLIB): $(LIBDEPS)
+
 $(CSHARPLIB): $(OUTDIRCSHARP)/lemur_csharp.o  $(OUTDIRCSHARP)/indri_csharp.o
 #$(CSHARPLIB): $(OUTDIRCSHARP)/indri_csharp.o $(LIBDEPS)
 	$(CXX) -g $(PHP_SHARED) $^ -o $@ $(LDFLAGS)
@@ -201,6 +205,8 @@ php/indri_phpwrap.cpp: $(PHPINTERFACES)
 
 $(OUTDIRPHP)/indri_phpwrap.o: php/indri_phpwrap.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(PHPINCLUDE)
+
+$(PHPLIB): $(LIBDEPS)
 
 $(PHPLIB): $(OUTDIRPHP)/indri_phpwrap.o 
 	$(CXX) -g $(PHP_SHARED) $< -o $@ $(LDFLAGS)
