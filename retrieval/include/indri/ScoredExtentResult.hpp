@@ -35,7 +35,11 @@ namespace indri
           if( one.document != two.document )
             return one.document > two.document;
 
-          return one.begin > two.begin;
+          if ( one.begin != two.begin )
+            return one.begin > two.begin;
+
+          return one.end > two.end;
+
         }
       };
 
@@ -83,6 +87,11 @@ namespace indri
 
       bool operator< ( const ScoredExtentResult& other ) const {
         return score > other.score;
+      }
+
+      bool operator== ( const ScoredExtentResult& other ) const {
+        return ( document == other.document && score == other.score
+                 && begin == other.begin && end == other.end );
       }
 
       double score;

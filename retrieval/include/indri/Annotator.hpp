@@ -22,6 +22,8 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <set>
+
 #include "indri/InferenceNetworkNode.hpp"
 #include "indri/BeliefNode.hpp"
 #include "indri/EvaluatorNode.hpp"
@@ -37,6 +39,8 @@ namespace indri
       BeliefNode* _belief;
       EvaluatorNode::MResults _annotations;
       std::string _name;
+
+      std::map<std::string, std::set<indri::api::ScoredExtentResult, indri::api::ScoredExtentResult::score_greater> > _seen;
 
     public:
       Annotator( const std::string& name, BeliefNode* belief );

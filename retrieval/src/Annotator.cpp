@@ -33,6 +33,12 @@ void indri::infnet::Annotator::add( InferenceNetworkNode* node, int documentID, 
   a.end = extent.end;
   a.score = 0;
 
+  std::set<indri::api::ScoredExtentResult, indri::api::ScoredExtentResult::score_greater> &nodeSeen = _seen[node->getName()];
+  
+  if ( nodeSeen.find( a ) != nodeSeen.end() )
+    return;
+
+  nodeSeen.insert(a);
   _annotations[node->getName()].push_back(a);
 }
 
