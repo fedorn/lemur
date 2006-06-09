@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 #include "indri/Walker.hpp"
 
 #ifndef INDRI_FIELDBELOWWALKER_HPP

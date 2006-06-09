@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -22,15 +22,15 @@
 #include "indri/Parameters.hpp"
 #include <cmath>
 #ifdef ISNAN_IN_NAMESPACE_STD
-  using std::isnan;
+using std::isnan;
 #else
 #ifdef ISNAN_IN_NAMESPACE_GNU_CXX
-  using __gnu_cxx::isnan;
+using __gnu_cxx::isnan;
 #endif
 #endif
 #ifdef WIN32
-  #include <float.h>
-  #define isnan _isnan
+#include <float.h>
+#define isnan _isnan
 #endif
 
 indri::infnet::ShrinkageBeliefNode::ShrinkageBeliefNode( const std::string& name, ListIteratorNode& child, DocumentStructureHolderNode& documentStructureHolderNode, indri::query::TermScoreFunction& scoreFunction, double maximumBackgroundScore, double maximumScore )
@@ -103,13 +103,13 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   std::set<int>::iterator leafsEnd = leafs.end();
   while ( leaf != leafsEnd ) {
     // output for debugging
-//        std::cout << _list.getName() << "\t\t    leaf: " << docStruct->path(*leaf) << " " << extent.begin << ":" << extent.end
-//            << "    count: " << _counts[*leaf] 
-//                    << "    score: " << _down[*leaf] 
-//            << "    length: " << docStruct->accumulatedLength(*leaf)
-//            << "    coll: " << _scoreFunction.scoreOccurrence( 0, docStruct->accumulatedLength(*leaf) )
-//               << "    parent: " << _down[docStruct->parent(*leaf)] 
-//            << std::endl;    
+    //        std::cout << _list.getName() << "\t\t    leaf: " << docStruct->path(*leaf) << " " << extent.begin << ":" << extent.end
+    //            << "    count: " << _counts[*leaf] 
+    //                    << "    score: " << _down[*leaf] 
+    //            << "    length: " << docStruct->accumulatedLength(*leaf)
+    //            << "    coll: " << _scoreFunction.scoreOccurrence( 0, docStruct->accumulatedLength(*leaf) )
+    //               << "    parent: " << _down[docStruct->parent(*leaf)] 
+    //            << std::endl;    
     if ( _down[ *leaf ] != 0 ) {
       score += _down[ *leaf ];
       matched++;    
@@ -122,7 +122,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
     if ( !_queryLevelCombine ) {
       score = log( score );
     }
-//     std::cout << "\t" << getName() << " " << extent.begin << ":" << extent.end << " " << score << std::endl;
+    //     std::cout << "\t" << getName() << " " << extent.begin << ":" << extent.end << " " << score << std::endl;
 
 
     _results.push_back( indri::api::ScoredExtentResult( score, documentID,
@@ -132,10 +132,10 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
     if ( !_queryLevelCombine ) {
       score = log( score );
     }
-//       std::cout << _list.getName() << "\t\t    leaf: ? " << extent.begin << ":" << extent.end 
-//            << "    score: " << _defaultScore
-//            << std::endl;    
-//     std::cout << "\t" << getName() << " " << extent.begin << ":" << extent.end << " " << score << " " << "Default!" << std::endl;
+    //       std::cout << _list.getName() << "\t\t    leaf: ? " << extent.begin << ":" << extent.end 
+    //            << "    score: " << _defaultScore
+    //            << std::endl;    
+    //     std::cout << "\t" << getName() << " " << extent.begin << ":" << extent.end << " " << score << " " << "Default!" << std::endl;
 
     _results.push_back( indri::api::ScoredExtentResult( score, documentID, 
                                                         extent.begin, extent.end )); // , extent.ordinal ));
@@ -194,7 +194,7 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
     // would be different.
 
     const indri::utility::greedy_vector<indri::index::Extent> & extents = _list.extents();
-     // std::cout << "got list " << documentID << std::endl;
+    // std::cout << "got list " << documentID << std::endl;
 
     int lastEnd = 0;
     
@@ -424,7 +424,7 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
         
     _documentID = documentID;
 
-//     std::cout << "done smoothing " << documentID <<std::endl;
+    //     std::cout << "done smoothing " << documentID <<std::endl;
 
   }
 

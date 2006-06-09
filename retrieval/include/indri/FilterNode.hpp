@@ -61,7 +61,7 @@ namespace indri
         return _belief->annotate( annotator, documentID, extent );
       }
 
-  const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength ) {
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength ) {
         return _belief->score( documentID, extent, documentLength );
       }
 
@@ -77,9 +77,9 @@ namespace indri
         return _belief->hasMatch( documentID );
       }
 
-  const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
-    return _belief->hasMatch( documentID, extents );
-  }
+      const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+        return _belief->hasMatch( documentID, extents );
+      }
 
       void indexChanged( indri::index::Index& index ) {
         // do nothing

@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -73,8 +73,8 @@ double indri::infnet::NestedListBeliefNode::_contextOccurrences( int begin, int 
         extents[i].end <= end &&
         extents[i].begin >= lastEnd ) {
 
-        count += extents[i].weight;
-        lastEnd = extents[i].end;
+      count += extents[i].weight;
+      lastEnd = extents[i].end;
     }
   }
 

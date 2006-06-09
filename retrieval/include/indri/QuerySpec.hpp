@@ -945,8 +945,8 @@ namespace indri {
 
       UINT64 hashCode() const {
         return 27 +
-               _filter->hashCode() * 3 +
-               _required->hashCode();
+          _filter->hashCode() * 3 +
+          _required->hashCode();
       }
 
       std::string queryText() const {
@@ -1035,8 +1035,8 @@ namespace indri {
 
       UINT64 hashCode() const {
         return 29 +
-               _filter->hashCode() * 3 +
-               _disallowed->hashCode();
+          _filter->hashCode() * 3 +
+          _disallowed->hashCode();
       }
 
       RawExtentNode* getFilter() {
@@ -1108,8 +1108,8 @@ namespace indri {
 
       UINT64 hashCode() const {
         return 31 +
-               _constant +
-               _field->hashCode();
+          _constant +
+          _field->hashCode();
       }
 
       INT64 getConstant() const {
@@ -1177,8 +1177,8 @@ namespace indri {
 
       UINT64 hashCode() const {
         return 33 +
-               _constant +
-               _field->hashCode();
+          _constant +
+          _field->hashCode();
       }
 
       INT64 getConstant() const {
@@ -1249,9 +1249,9 @@ namespace indri {
 
       UINT64 hashCode() const {
         return 37 +
-               _low * 3 +
-               _high +
-               _field->hashCode();
+          _low * 3 +
+          _high +
+          _field->hashCode();
       }
 
       INT64 getLow() const {
@@ -1325,8 +1325,8 @@ namespace indri {
 
       UINT64 hashCode() const {
         return 41 +
-               _constant +
-               _field->hashCode();
+          _constant +
+          _field->hashCode();
       }
 
       INT64 getConstant() const {
@@ -1662,8 +1662,8 @@ namespace indri {
 
         indri::utility::GenericHash<const char*> hash;
         return _raw->hashCode() * 7 + 
-               _context->hashCode() + 
-               hash( _smoothing.c_str() );
+          _context->hashCode() + 
+          hash( _smoothing.c_str() );
       }
 
       void setSmoothing( const std::string& smoothing ) {
@@ -3564,9 +3564,6 @@ namespace indri {
         return copier.after(this, extentInsideCopy);
       }
     };
-
-
-
   }
 }
 

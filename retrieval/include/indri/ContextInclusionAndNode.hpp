@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -45,8 +45,8 @@ namespace indri
             // #wand.  What is the threshold of each ordering?  Sort by
             // the lowest threshold.
 
-        return (one.backgroundWeightedScore) > 
-               (two.backgroundWeightedScore);
+            return (one.backgroundWeightedScore) > 
+              (two.backgroundWeightedScore);
           }
         };
 

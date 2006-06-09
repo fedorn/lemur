@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // ExtentChildNode
@@ -45,9 +45,9 @@ namespace indri
 
     public:
       ExtentChildNode( const std::string& name, 
-                            ListIteratorNode* inner, 
-                            ListIteratorNode* outer,
-                            DocumentStructureHolderNode & documentStructureHolderNode  );
+                       ListIteratorNode* inner, 
+                       ListIteratorNode* outer,
+                       DocumentStructureHolderNode & documentStructureHolderNode  );
 
       void prepare( int documentID );
       const indri::utility::greedy_vector<indri::index::Extent>& extents();
