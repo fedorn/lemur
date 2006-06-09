@@ -16,6 +16,11 @@ LIBDEPS=$(join $(LIBDIRS), $(LIBNAMESFULL))
 
 LDFLAGS = $(LIBPATH) $(LIBS) $(CPPLDFLAGS)
 
+INSTDIR=$(pkgdatadir)/cgi
+INSTALLDIRS=$(INSTDIR) $(INSTDIR)/templates
+FILES=REAME README_Templates.txt bin/help-db.html bin/help-qry.html bin/lemur.config bin/lemur100.gif bin/lemur150.gif
+TEMPLATE_FILES=bin/templates/ErrorPage.html bin/templates/GenericPage.html bin/templates/ResultsPage.html bin/templates/SearchPage.html bin/templates/SingleResult.html
+ 
 OBJS = LemurCGI.o CGIConfiguration.o CGIOutput.o DBInterface.o DictionaryHash.o SingleResultItem.o
 PROG = bin/lemur.cgi
 
@@ -38,5 +43,11 @@ DBInterface.o: DBInterface.cpp DBInterface.h CGIOutput.h
 DictionaryHash.o: DictionaryHash.cpp DictionaryHash.h
 SingleResultItem.o: SingleResultItem.cpp SingleResultItem.h LemurSearchCGIConstants.h DictionaryHash.h
 
-install:
-	echo "read README for install instructions."
+$(INSTALLDIRS):
+	$(INSTALL_DIR) $@
+
+install: $(INSTALLDIRS)
+	$(INSTALL_PROGRAM) $(PROG)  $(INSTDIR)
+	$(INSTALL_DATA) $(FILES) $(INSTDIR)
+	$(INSTALL_DATA) $(TEMPLATE_FILES) $(INSTDIR)/templates
+	echo "read $(INSTDIR)/README for web server install instructions."

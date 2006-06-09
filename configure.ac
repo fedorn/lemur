@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT([Lemur],[4.3],[project@lemurproject.org])
 AC_CONFIG_SRCDIR(app/src/RetEval.cpp)
 AC_CONFIG_FILES([MakeDefns Makefile Makefile.app])
-AC_CONFIG_FILES([site-search/build.param site-search/crawl-index site-search/seeds.txt], [test -f site-search/crawl-index && chmod +x site-search/crawl-index])
+AC_CONFIG_FILES([site-search/build.param site-search/crawl-index site-search/seeds.txt site-search/excluded_hosts], [test -f site-search/crawl-index && chmod +x site-search/crawl-index])
 dnl To use a header file instead of command line -D defs, use
 dnl AC_CONFIG_HEADERS(config.h)
 

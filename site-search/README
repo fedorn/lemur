@@ -3,7 +3,9 @@
    seed. Alternatively, after running configure, manually edit the file
    seeds.txt, inserting one hostname per line. configure will create the
    files site-search/build.param, site-search/crawl-index, and
-   site-search/seeds.txt.
+   site-search/seeds.txt. Manually edit the file
+   site-search/excluded_hosts to give the urls of any hosts to exclude
+   from the crawl. You must include the http:/ prefix on the hostnames.
 
 2. Run make in the lemur source tree (if necessary).
 
@@ -19,21 +21,67 @@
    script will chmod the index to be world readable. The index can be
    moved before use.
 
-4. The php/cgi bits will come later. 
+4. php ui components
 
-php ui:
-!*!FIXME!*!
-2) Type 'make' to build Indri.  The PHP library will appear in
-indri/swig/obj/php/libindri_php.so.  Install this library somewhere that PHP
-can find it.  You may need to talk to your system administrator to 
+If configured with --enable-php, the PHP library will be installed in
+${exec_prefix}/lib/libindri_php.so.  Install this library somewhere that
+PHP can find it. You may need to talk to your system administrator to 
 figure this out.
 
-3) Put the PHP files somewhere that your webserver can find them.
+The PHP files will be installed in ${prefix}/share/php. Copy the
+contents of this directory to somewhere that your webserver can find
+them. Edit the include/config.php file according to the comments in it
+to set the path to your index, sitename, and document format.
 
-4) Edit the include/config.php file according to the comments in it.
-!*!FIXME!*!
+5. cgi ui components
 
-cgi:
+The CGI files will be installed in ${prefix}/share/cgi. Copy the
+contents of this folder to the location accessible via your
+webserver. Be sure that your webserver configuration will allow
+executables to be run. Consult your webserver documentation or system
+administator if you are uncertain how to ensure this.
+
+Before the initial execution, edit the "lemur.config" file (which should stay
+in the same directory as lemur.cgi) to reflect your configuration. 
+
+See the ${prefix}/share/cgi/lemur.config file for an example configuration.
+
+The configuration file is a well-formed XML file with the opening tag
+<lemurconfig>. There are two required elements within the configuration file:
+
+<templatepath>: this should reflect the path (either relative or absolute) to
+                the template files.
+
+<indexes>: this section contains information about what indexes are available,
+           and can contain as many indexes as needed. For each <index> item,
+           there should be two elements. First, a <path> element must be set
+           pointing at where the index is located. Secondly (and optionally),
+           a <description> tag can be set to be a description of the pointed
+           index. The path should be the full path to the index
+           constructed by the crawl-index script.
+           
+There is also an optional element <rootpaths> that defines if the original
+path in the search result exists, then to strip it out of the URL. This is
+most useful for enabling a site-search capability where there are locally 
+mirrored versions of the indexed web pages. For example, if your local cache
+of your website is at "/var/cache/mirrored_site/", if you do not have the
+LemurCGI set to strip paths, the original URLs displayed would include the
+prefix "/var/cache/mirrored_site/" in front of every result. This option
+is not necessary for indexes built with the crawl-index script.
+
+Also, there is an element, <supportanchortext> that can be set to true to
+also include support for retrieval of inlinks if you have used the 
+harvestlinks program to gather these from your corpus. This is the
+default setting for indexes built with crawl-index.
+
+Edit the file help-db.html to describe the contents of the text
+database(s) being searched by the Lemur search engine.  You can describe
+the documents in whatever way you feel is most helpful to your users.
+
+If you wish to use the default HTML templates, no modifications are
+necessary, but if you want to modify the HTML templates for your own uses,
+be sure to read the "README_Templates.txt" file for instructions on
+available commands that you can use within the templates.
 
 
 The heritrix crawler (http://crawler.archive.org) has been modified to
