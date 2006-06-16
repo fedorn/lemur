@@ -53,8 +53,7 @@ indri::index::DocumentStructure::loadStructure(const indri::utility::greedy_vect
     int id = fields[i].ordinal;   
     int parent = fields[i].parentOrdinal;
 
-    assert( id == i + 1 );
-    assert( parent < id );
+    //    assert( id == i + 1 );
 
     _nodes[id].begin = begin;
     _nodes[id].end = end;
@@ -65,8 +64,6 @@ indri::index::DocumentStructure::loadStructure(const indri::utility::greedy_vect
     _nodes[id].numChildren = 0;
     _nodes[id].parent = parent;
     _nodes[id].children = 0;
-
-//     std::cout << id << " " << begin << ":" << end << " " << " " << length << " P:" << parent <<  " " << _index->field(type)<< std::endl;
 
   }
   // count the children for each node
@@ -123,7 +120,6 @@ indri::index::DocumentStructure::parent(int node) {
   if (node > 0 && node <= _numNodes) {
     return _nodes[node].parent;
   }
-  // cerr << "DocumentStructure: tried to get parent of non-existant node." << endl;
   return 0;
 }
 
@@ -133,7 +129,6 @@ indri::index::DocumentStructure::length(int node) {
   if (node > 0 && node <= _numNodes) {
     return _nodes[node].length;
   }
-  // cerr << "DocumentStructure: tried to get length of non-existant node." << endl;
   return 0;
 }
 
@@ -143,7 +138,6 @@ indri::index::DocumentStructure::begin(int node) {
   if (node > 0 && node <= _numNodes) {
     return _nodes[node].begin;
   }
-  // cerr << "DocumentStructure: tried to get beginning location of non-existant node." << endl;
   return 0;
 }
 
@@ -152,7 +146,6 @@ indri::index::DocumentStructure::end(int node) {
   if (node > 0 && node <= _numNodes) {
     return _nodes[node].end;
   }
-  // cerr << "DocumentStructure: tried to get ending location of non-existant node." << endl;
   return 0;
 }
 
@@ -162,7 +155,6 @@ indri::index::DocumentStructure::accumulatedLength(int node) {
   if (node > 0 && node <= _numNodes) {
     return _nodes[node].totalLength;
   }
-  // cerr << "DocumentStructure: tried to get accumulated length of non-existant node." << endl;
   return 0;
 }
 
@@ -172,7 +164,6 @@ indri::index::DocumentStructure::type(int node) {
   if (node > 0 && node <= _numNodes) {
     return _nodes[node].type;
   }
-  // cerr << "DocumentStructure: tried to get type of non-existant node." << endl;
   return 0;
 }
 
@@ -180,8 +171,6 @@ indri::index::DocumentStructure::type(int node) {
 indri::index::DocumentStructure::child_iterator
 indri::index::DocumentStructure::childrenBegin( int node ) {
   if ( node >= 0 && node <= _numNodes ) {
-    //    std::cout << "CB\t" << this << " " << node << " " << _numNodes 
-    //        << " " << _nodes[node].children << " " << _nodes[node].numChildren <<  std::endl;
     return _childrenBuff.begin() + _nodes[node].children;
   } 
   return _childrenBuff.end();
