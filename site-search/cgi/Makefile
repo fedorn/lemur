@@ -8,7 +8,7 @@ CFLAGS += $(INCPATH)
 CXXFLAGS += $(INCPATH)
 
 LIBPATH=$(patsubst %,-L$(LEMURDIR)/%/obj, $(CONTMODULES))
-LIBS=$(patsubst %,-l%, $(LIBNAMES))
+LIBS=$(patsubst %,-l%, $(LIBNAMES) antlr xpdf)
 
 LIBDIRS=$(patsubst %,$(LEMURDIR)/%/obj/, $(CONTMODULES))
 LIBNAMESFULL=$(patsubst %,lib%.a, $(LIBNAMES))
