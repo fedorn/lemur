@@ -5161,11 +5161,11 @@ echo "${ECHO_T}no" >&6
 fi
 
   fi
-fi
-if test -z "$MCS" ; then
-   { echo "$as_me:$LINENO: WARNING: cannot find the program mcs on your path. Add MCS=/path/to/mcs to your configure command line" >&5
+  if test -z "$MCS" ; then
+     { echo "$as_me:$LINENO: WARNING: cannot find the program mcs on your path. Add MCS=/path/to/mcs to your configure command line" >&5
 echo "$as_me: WARNING: cannot find the program mcs on your path. Add MCS=/path/to/mcs to your configure command line" >&2;}
-   MCS="echo install mcs"
+     MCS="echo install mcs"
+  fi
 fi
 
 SWIG=

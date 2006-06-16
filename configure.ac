@@ -245,10 +245,10 @@ if test "$enable_csharp" = yes ; then
   if test -z "$MCS" ; then
      AC_PATH_PROG(MCS, mcs)
   fi
-fi
-if test -z "$MCS" ; then
-   AC_MSG_WARN([cannot find the program mcs on your path. Add MCS=/path/to/mcs to your configure command line])
-   MCS="echo install mcs"
+  if test -z "$MCS" ; then
+     AC_MSG_WARN([cannot find the program mcs on your path. Add MCS=/path/to/mcs to your configure command line])
+     MCS="echo install mcs"
+  fi
 fi
 
 dnl Look for swig
