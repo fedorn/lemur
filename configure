@@ -5120,7 +5120,8 @@ fi
 
 
 if test "$enable_csharp" = yes ; then
-# Extract the first word of "mcs", so it can be a program name with args.
+  if test -z "$MCS" ; then
+     # Extract the first word of "mcs", so it can be a program name with args.
 set dummy mcs; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
@@ -5159,7 +5160,14 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
+  fi
 fi
+if test -z "$MCS" ; then
+   { echo "$as_me:$LINENO: WARNING: cannot find the program mcs on your path. Add MCS=/path/to/mcs to your configure command line" >&5
+echo "$as_me: WARNING: cannot find the program mcs on your path. Add MCS=/path/to/mcs to your configure command line" >&2;}
+   MCS="echo install mcs"
+fi
+
 SWIG=
 if test $WITH_SWIG = 1 ; then
 

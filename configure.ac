@@ -242,8 +242,15 @@ AC_SUBST(WITH_PHP)
 
 dnl Look for mono csharp compiler
 if test "$enable_csharp" = yes ; then
-AC_PATH_PROG(MCS, mcs)
+  if test -z "$MCS" ; then
+     AC_PATH_PROG(MCS, mcs)
+  fi
 fi
+if test -z "$MCS" ; then
+   AC_MSG_WARN([cannot find the program mcs on your path. Add MCS=/path/to/mcs to your configure command line])
+   MCS="echo install mcs"
+fi
+
 dnl Look for swig
 SWIG=
 if test $WITH_SWIG = 1 ; then
