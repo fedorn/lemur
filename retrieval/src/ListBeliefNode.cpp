@@ -21,7 +21,7 @@
 #include "indri/Annotator.hpp"
 
 // computes the length of the scored context
-int indri::infnet::ListBeliefNode::_contextLength( int begin, int end ) {
+int indri::infnet::ListBeliefNode::_contextLength( indri::index::Extent &extent ) {
   //
   // There are two possible contexts at work here.  Consider the query
   // #combine[sentence]( dog.(paragraph) )
@@ -33,21 +33,21 @@ int indri::infnet::ListBeliefNode::_contextLength( int begin, int end ) {
   //
 
   if( !_context )
-    return end - begin;
+    return extent.end - extent.begin;
 
   int contextLength = 0;
   const indri::utility::greedy_vector<indri::index::Extent>& extents = _context->extents();
 
   for( size_t i=0; i<extents.size(); i++ ) {
-    if( extents[i].begin > end )
+    if( extents[i].begin > extent.end )
       break;
 
-    if( extents[i].end < begin )
+    if( extents[i].end < extent.begin )
       continue; 
 
     // make sure to restrict the extents here to match the scored region
-    int extentBegin = lemur_compat::max( extents[i].begin, begin );
-    int extentEnd = lemur_compat::min( extents[i].end, end );
+    int extentBegin = lemur_compat::max( extents[i].begin, extent.begin );
+    int extentEnd = lemur_compat::min( extents[i].end, extent.end );
 
     contextLength += extentEnd - extentBegin;
   }
@@ -55,15 +55,15 @@ int indri::infnet::ListBeliefNode::_contextLength( int begin, int end ) {
   return contextLength;
 }
 
-double indri::infnet::ListBeliefNode::_contextOccurrences( int begin, int end ) {
+double indri::infnet::ListBeliefNode::_contextOccurrences( indri::index::Extent &extent ) {
   const indri::utility::greedy_vector<indri::index::Extent>& extents = _list.extents();
   double count = 0;
   int lastEnd = 0;
 
   // look for all occurrences within bounds and that don't overlap
   for( size_t i=0; i<extents.size(); i++ ) {
-    if( extents[i].begin >= begin &&
-        extents[i].end <= end &&
+    if( extents[i].begin >= extent.begin &&
+        extents[i].end <= extent.end &&
         extents[i].begin >= lastEnd ) {
       count += extents[i].weight;
       lastEnd = extents[i].end;
@@ -117,8 +117,8 @@ double indri::infnet::ListBeliefNode::maximumScore() {
 }
 
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ListBeliefNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
-  int contextSize = _contextLength( extent.begin, extent.end );
-  double occurrences = _contextOccurrences( extent.begin, extent.end );
+  int contextSize = _contextLength( extent );
+  double occurrences = _contextOccurrences( extent );
   double documentOccurrences = _raw ? _documentOccurrences() : occurrences;
   double score = 0;
   
