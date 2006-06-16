@@ -3370,7 +3370,7 @@ fi
      PHP_SO=".so"
      JAVA_SHARED="-shared"
      JAVA_SO=".so"
-     CSHARP_SHARED="-G"
+     CSHARP_SHARED="-shared"
      CSHARP_SO=".so"
      ;;
    *-*-darwin*)
@@ -4862,6 +4862,7 @@ _ACEOF
 
 
 
+WITH_SWIG=0
 # Check whether --enable-php or --disable-php was given.
 if test "${enable_php+set}" = set; then
   enableval="$enable_php"

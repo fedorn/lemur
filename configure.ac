@@ -38,7 +38,7 @@ case $host in
      PHP_SO=".so"
      JAVA_SHARED="-shared"
      JAVA_SO=".so"
-     CSHARP_SHARED="-G"
+     CSHARP_SHARED="-shared"
      CSHARP_SO=".so"
      ;;
    *-*-darwin*)
@@ -135,6 +135,7 @@ dnl ########################################################################
 
 dnl check for optional components.
 
+WITH_SWIG=0
 AC_ARG_ENABLE(php,
 	    AS_HELP_STRING(--enable-php,Enable php shared library generation))
 if test "$enable_php" = "yes" ; then

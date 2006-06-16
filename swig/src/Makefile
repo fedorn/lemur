@@ -117,7 +117,7 @@ csharp-lib: $(OUTDIRCSHARP) $(CSHARPLIB) $(CSHARP_DLL)
 $(SOLIB): $(LIBDEPS)
 
 $(SOLIB): $(OBJ)/java/lemur_jni.o $(OBJ)/java/indri_jni.o  $(OBJ)/java/JBuildIndex.o
-	$(CXX) $(JAVA_SHARED)  $^ -o $@ $(LDFLAGS)
+	$(CXX) $(JAVA_SHARED)  $(OBJ)/java/lemur_jni.o $(OBJ)/java/indri_jni.o  $(OBJ)/java/JBuildIndex.o -o $@ $(LDFLAGS)
 
 $(OBJ)/java/lemur_jni.o: java/lemur_jni.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(JAVAINC)
@@ -148,8 +148,7 @@ $(OUTDIRCSHARP)/indri_csharp.o: $(INDRI_CSHARP_CPP)
 $(CSHARPLIB): $(LIBDEPS)
 
 $(CSHARPLIB): $(OUTDIRCSHARP)/lemur_csharp.o  $(OUTDIRCSHARP)/indri_csharp.o
-#$(CSHARPLIB): $(OUTDIRCSHARP)/indri_csharp.o $(LIBDEPS)
-	$(CXX) -g $(PHP_SHARED) $^ -o $@ $(LDFLAGS)
+	$(CXX) -g $(CSHARP_SHARED) $(OUTDIRCSHARP)/lemur_csharp.o  $(OUTDIRCSHARP)/indri_csharp.o -o $@ $(LDFLAGS)
 
 $(CSHARP_DLL): $(CSHARP_CPP)
 	$(MCS) -target:library -out:$@ csharp/*.cs
