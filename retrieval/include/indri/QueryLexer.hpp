@@ -10,11 +10,11 @@
 
 #line 12 "QueryLexer.hpp"
 #include <antlr/config.hpp>
-/* $ANTLR 2.7.4: "indrilang.g" -> "QueryLexer.hpp"$ */
+/* $ANTLR 2.7.3 (20060307-1): "indrilang.g" -> "QueryLexer.hpp"$ */
 #include <antlr/CommonToken.hpp>
 #include <antlr/InputBuffer.hpp>
 #include <antlr/BitSet.hpp>
-#include "QueryLexerTokenTypes.hpp"
+#include "indri/QueryLexerTokenTypes.hpp"
 #include <antlr/CharScanner.hpp>
 ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)

@@ -140,7 +140,8 @@ OPERATOR
   options { testLiterals = true; }:
     ( "#base64quote" ) => ENCODED_QUOTED_TERM { $setType(ENCODED_QUOTED_TERM); } |
     ( "#base64" ) => ENCODED_TERM { $setType(ENCODED_TERM); } |
-    '#' (ASCII_LETTER)*;
+    ('#' ASCII_LETTER) => '#' (ASCII_LETTER)* (COLON (ASCII_LETTER)+)? |
+    '#';
 
 JUNK:      ( TAB | CR | LF | SPACE )
            { $setType(antlr::Token::SKIP); };

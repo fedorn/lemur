@@ -1,4 +1,4 @@
-/* $ANTLR 2.7.4: "indrilang.g" -> "QueryLexer.cpp"$ */
+/* $ANTLR 2.7.3 (20060307-1): "indrilang.g" -> "QueryLexer.cpp"$ */
 #include "indri/QueryLexer.hpp"
 #include <antlr/CharBuffer.hpp>
 #include <antlr/TokenStreamException.hpp>
@@ -1441,25 +1441,68 @@ void QueryLexer::mOPERATOR(bool _createToken) {
 #line 1440 "QueryLexer.cpp"
 			}
 		}
-		else if ((LA(1) == 0x23 /* '#' */ ) && (true)) {
-			match('#');
-			{ // ( ... )*
-			for (;;) {
-				if ((_tokenSet_6.member(LA(1)))) {
+		else {
+			bool synPredMatched80 = false;
+			if (((LA(1) == 0x23 /* '#' */ ) && (true))) {
+				int _m80 = mark();
+				synPredMatched80 = true;
+				inputState->guessing++;
+				try {
+					{
+					match('#');
 					mASCII_LETTER(false);
+					}
+				}
+				catch (ANTLR_USE_NAMESPACE(antlr)RecognitionException& pe) {
+					synPredMatched80 = false;
+				}
+				rewind(_m80);
+				inputState->guessing--;
+			}
+			if ( synPredMatched80 ) {
+				match('#');
+				{ // ( ... )*
+				for (;;) {
+					if ((_tokenSet_6.member(LA(1)))) {
+						mASCII_LETTER(false);
+					}
+					else {
+						goto _loop82;
+					}
+					
+				}
+				_loop82:;
+				} // ( ... )*
+				{
+				if ((LA(1) == 0x3a /* ':' */ )) {
+					mCOLON(false);
+					{ // ( ... )+
+					int _cnt85=0;
+					for (;;) {
+						if ((_tokenSet_6.member(LA(1)))) {
+							mASCII_LETTER(false);
+						}
+						else {
+							if ( _cnt85>=1 ) { goto _loop85; } else {throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+						}
+						
+						_cnt85++;
+					}
+					_loop85:;
+					}  // ( ... )+
 				}
 				else {
-					goto _loop80;
 				}
 				
+				}
 			}
-			_loop80:;
-			} // ( ... )*
-		}
+			else if ((LA(1) == 0x23 /* '#' */ ) && (true)) {
+				match('#');
+			}
 	else {
 		throw ANTLR_USE_NAMESPACE(antlr)NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
 	}
-	}
+	}}
 	_ttype = testLiteralsTable(_ttype);
 	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
 	   _token = makeToken(_ttype);
@@ -1503,9 +1546,9 @@ void QueryLexer::mJUNK(bool _createToken) {
 	}
 	}
 	if ( inputState->guessing==0 ) {
-#line 146 "indrilang.g"
+#line 147 "indrilang.g"
 		_ttype = antlr::Token::SKIP;
-#line 1507 "QueryLexer.cpp"
+#line 1550 "QueryLexer.cpp"
 	}
 	if ( _createToken && _token==ANTLR_USE_NAMESPACE(antlr)nullToken && _ttype!=ANTLR_USE_NAMESPACE(antlr)Token::SKIP ) {
 	   _token = makeToken(_ttype);
