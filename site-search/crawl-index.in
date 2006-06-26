@@ -14,7 +14,7 @@ test -d crawl.bak && rm -rf crawl.bak
 test -d crawl &&  mv crawl crawl.bak
 test -d crawl || mkdir crawl
 #install files
-cp order.xml seeds.txt build.param crawl
+cp order.xml seeds.txt excluded_hosts build.param crawl
 #run in the crawl subdirectory.
 cd crawl
 # run crawl in foreground, no ui
