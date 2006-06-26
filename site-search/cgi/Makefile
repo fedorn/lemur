@@ -18,7 +18,7 @@ LDFLAGS = $(LIBPATH) $(LIBS) $(CPPLDFLAGS)
 
 INSTDIR=$(pkgdatadir)/cgi
 INSTALLDIRS=$(INSTDIR) $(INSTDIR)/templates
-FILES=REAME README_Templates.txt bin/help-db.html bin/help-qry.html bin/lemur.config bin/lemur100.gif bin/lemur150.gif
+FILES=README README_Templates.txt bin/help-db.html bin/help-qry.html bin/lemur.config bin/lemur100.gif bin/lemur150.gif
 TEMPLATE_FILES=bin/templates/ErrorPage.html bin/templates/GenericPage.html bin/templates/ResultsPage.html bin/templates/SearchPage.html bin/templates/SingleResult.html
  
 OBJS = LemurCGI.o CGIConfiguration.o CGIOutput.o DBInterface.o DictionaryHash.o SingleResultItem.o
