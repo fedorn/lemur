@@ -286,7 +286,7 @@ void processRequest(CGIOutput *output) {
                 } break;
       case 'q': {
                   // query
-                  db.search(datasourceToUse, &thisVal, maxDocsToRetrievePerPage, startRank, currentQueryType);
+                  db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, startRank, currentQueryType);
                   hasOutput=true;
                 } break;
       case 'e': {

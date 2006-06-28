@@ -9,6 +9,7 @@ SingleResultItem::~SingleResultItem() {
 }
 
 void SingleResultItem::setVariable(string variableName, string value) {
+  replaceAll(&value, "/%7E", "/~");
   variables.put(variableName.c_str(), value.c_str());
 }
 
@@ -59,6 +60,8 @@ string SingleResultItem::toString() {
       }
     }
   }
+  // check the URL - change any %7E's to ~'s - 
+  replaceAll(&URLStringToUse, "/%7E", "/~");
   replaceAll(&outputString, "{%ResURL%}", URLStringToUse);
 
   // ResTitle

@@ -39,7 +39,7 @@ private:
   
   lemur::api::Index *openIndex();
 
-  lemur::api::IndexedRealVector removeDuplicateResults(lemur::api::IndexedRealVector results);
+  lemur::api::IndexedRealVector removeDuplicateResults(lemur::api::IndexedRealVector results, lemur::api::Index *db);
 
   /**
   * @param datasourceID the index of the database used for this search
@@ -113,7 +113,7 @@ private:
    * @param origQuery the original query
    * @return the (possibly) modified query string
    */
-  string indriDefaultQueryExpansion(string origQuery);
+  string indriDefaultQueryExpansion(string &origQuery);
 
 
 public:
@@ -180,7 +180,7 @@ public:
    * @param rankStart the starting number to use for our results
    * @param queryType the query language type
    */
-  void search(int datasourceID, string *query, long listLength, long rankStart, QUERY_INTERFACE_TYPE queryType=QUERY_INTERFACE_INDRI);
+  void search(int datasourceID, string &query, long listLength, long rankStart, QUERY_INTERFACE_TYPE queryType=QUERY_INTERFACE_INDRI);
 
   /**
    * Retrieves a parsed document and outputs it

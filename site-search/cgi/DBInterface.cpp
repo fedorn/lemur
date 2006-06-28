@@ -348,20 +348,67 @@ std::string DBInterface::getSummaryString(const lemur::api::DocumentManager* dm,
     return retSummary;
 }
 
-lemur::api::IndexedRealVector DBInterface::removeDuplicateResults(lemur::api::IndexedRealVector results) {
+lemur::api::IndexedRealVector DBInterface::removeDuplicateResults(lemur::api::IndexedRealVector results, lemur::api::Index *db) {
   // simple duplicate detection and removal...
   // based on Don Metzler's work - in theory, if two results have
   // the _exact_ same score, they should be duplicates....
+  //
+  // also - remove any documents where the ~ and %7E are interchangable!
 
   lemur::api::IndexedRealVector retVector;
 
   lemur::api::IndexedRealVector::iterator vIter=results.begin();
+
+  std::string lastDocNo="";
+  string::size_type lastDocTildePos=string::npos;
+
   // some riduculous seed value...
   double currentScore=9999999999.999999;
   while (vIter!=results.end()) {
     if ((*vIter).val!=currentScore) {
-      retVector.push_back((*vIter));
-      currentScore=(*vIter).val;
+      std::string thisDocIDString=db->document((*vIter).ind);
+      string::size_type thisDocTildePos=thisDocIDString.find("~");
+      bool isOK=true;
+      
+      if (thisDocTildePos==string::npos) {
+         thisDocTildePos=thisDocIDString.find("%7E");
+      }
+     
+      if (thisDocTildePos!=string::npos) {
+        if (lastDocTildePos==thisDocTildePos) {
+          // so far - it looks the same...
+          // check out the string in the beginning...
+          string beginLastString=lastDocNo.substr(0, lastDocTildePos); 
+          string beginThisString=thisDocIDString.substr(0, thisDocTildePos);
+          if (beginLastString==beginThisString) {
+            // OK - so far, so good - check out the ending of the string...
+            string endLastString="";
+            string endThisString="";
+            if (lastDocNo[lastDocTildePos]=='~') {
+              endLastString=lastDocNo.substr(lastDocTildePos+1);
+            } else {
+              endLastString=lastDocNo.substr(lastDocTildePos+3);      
+            }
+            if (thisDocIDString[thisDocTildePos]=='~') {
+              endThisString=thisDocIDString.substr(thisDocTildePos+1);
+            } else {
+              endThisString=thisDocIDString.substr(thisDocTildePos+3);      
+            }
+            if (endLastString==endThisString) {
+              // not OK - it's the same...
+              isOK=false;
+            }
+          }
+        } 
+      }
+
+      if (isOK) {          
+        retVector.push_back((*vIter));
+        currentScore=(*vIter).val;
+      }
+
+      lastDocTildePos=thisDocTildePos;
+      lastDocNo=thisDocIDString;
     }
     vIter++;
   }
@@ -491,7 +538,7 @@ void DBInterface::displaySearchResults(lemur::api::Index *db, int datasourceID, 
   output->displayResultsPageEnding();
 }
 
-string DBInterface::indriDefaultQueryExpansion(string origQuery) {
+string DBInterface::indriDefaultQueryExpansion(string &origQuery) {
 
   if (CGIConfiguration::getInstance().getKVItem("expandindriquery")!="true") {
     return origQuery;
@@ -502,66 +549,122 @@ string DBInterface::indriDefaultQueryExpansion(string origQuery) {
     return origQuery;
   }
 
+  // also - don't reformulate if we find any quotes...
+  if ((origQuery.find("\"")!=string::npos) || (origQuery.find("%22")!=string::npos)) {
+  //  // however, if we do find quotes - wrap the terms in a #1(...)
+    string::size_type qPos=origQuery.find("\"");
+    while (qPos!=string::npos) {
+      origQuery.replace(qPos, 1, " ");      
+      qPos=origQuery.find("\"");
+    }
+   
+    qPos=origQuery.find("%22");
+    while (qPos!=string::npos) {
+      origQuery.replace(qPos, 3, " ");      
+      qPos=origQuery.find("%22");
+    }
+    //return origQuery;      
+    //
+  }
+
+  // remove any oddball punctuation
+  char *removeCopy=new char[origQuery.length() + 2];
+  memset(removeCopy, 0, origQuery.length() + 2);
+  memcpy(removeCopy, origQuery.c_str(), origQuery.length());
+
+  // phase 1 - identify and mark
+  char *rcPtr=removeCopy;
+  while ((rcPtr) && (*rcPtr)) {
+    if (!isspace(*rcPtr) && !isalpha(*rcPtr) && !isdigit(*rcPtr)) {
+      *rcPtr=0x01;      
+    }
+    rcPtr++;
+  }
+
+  // phase 2 - collapse it
+  rcPtr=removeCopy;
+  while ((rcPtr) && (*rcPtr)) {
+    if (*rcPtr==0x01) {      
+      strcpy(rcPtr, rcPtr+1);      
+    } else {
+      rcPtr++;      
+    }
+  }
+
+  origQuery=removeCopy;
+  delete[] removeCopy;
+
   // wrap a weighted operator around each term
   // first, split it via whitespace
-  std::vector<string> queryTermVector;
-  string queryCopy=origQuery;
-  char *thisToken=strtok((char *)queryCopy.c_str(), " \t\n\r");
+  std::vector<char*> queryTermVector;
+  string queryCopy;
+  char *stringCopy=new char[origQuery.length() + 2];
+  memset(stringCopy, 0, origQuery.length() + 2);
+  memcpy(stringCopy, origQuery.c_str(), origQuery.length());
+  char *thisToken=strtok(stringCopy, " \t\n\r\"");
   while (thisToken) {
-    string thisString=thisToken;
-    if (thisString.length() > 0) {
-      queryTermVector.push_back(thisString);
+    if (strlen(thisToken)) {      
+      char *thisString=strdup(thisToken);
+      if (thisString) {
+        queryTermVector.push_back(thisString);
+      }  
     }
-    thisToken=strtok(NULL, " \t\n\r");
+    thisToken=strtok(NULL, " \t\n\r\"");
   }
+
+  delete[] stringCopy;
 
   // if we've got more than 4 terms, don't build a complex
   // query... wrap it with a combine operator and return
   if ((queryTermVector.size() > 4) || (queryTermVector.size()==0)) {
-    return "#combine( " + origQuery + " )";
+    queryTermVector.clear();      
+    stringstream retString;
+    retString << "#combine( " << origQuery << " )";
+    return retString.str();
   }
 
   int numTerms=queryTermVector.size();
 
-  string queryT="";
-  string queryO="";
-  string queryU="";
+  stringstream queryT;
+  stringstream queryO;
+  stringstream queryU;
 
   for (int startPos=0; startPos < numTerms; startPos++) {
     for (int endPos=startPos; endPos < numTerms; endPos++) {
       if (startPos==endPos) {
-        queryT += "#wsum( 1.0 " + queryTermVector[startPos] + ".(title) 3.0 " + queryTermVector[startPos] + " 1.0 " + queryTermVector[startPos] + ".(heading) ) ";
+        queryT << "#wsum( 1.0 " <<  queryTermVector[startPos] << ".(title) 3.0 " << queryTermVector[startPos] << " 1.0 " << queryTermVector[startPos] << ".(heading) ) ";
         continue;
       }
 
       for (int i=startPos; i <= endPos; i++) {
-        string w = "#1( " + queryTermVector[i] + " )";
-        queryO += "#wsum( 1.0 " + w + ".(title) 3.0 " + w + " 1.0 " + w + ".(heading) ) ";
+        stringstream w;
+        w << "#1( " << queryTermVector[i] << " )";
+        queryO << "#wsum( 1.0 " << w.str() << ".(title) 3.0 " << w.str() << " 1.0 " << w.str() << ".(heading) ) ";
 
         stringstream uw;
         uw << " #uw" << (4*( endPos - startPos + 1 )) << "( " << queryTermVector[i] << " )";
-        queryU += "#wsum( 1.0 " + uw.str() + ".(title) 3.0 " + uw.str() + " 1.0 " + uw.str() + ".(heading) ) ";
+        queryU << "#wsum( 1.0 " << uw.str() << ".(title) 3.0 " << uw.str() + " 1.0 " << uw.str() + ".(heading) ) ";
       } // end for (int i=startPos; i <= endPos; i++)
     } // end for (int endPos=startPos; endPos < numTerms; endPos++)
   } // end for (int startPos=0; startPos < numTerms; startPos++)
 
-  string retString="#weight( ";
-  if (queryT.length() > 0) {
-    retString += "0.8 #combine(" + queryT + ") ";
+  stringstream retString;
+  retString << "#weight( ";
+  if (queryT.str().length() > 0) {
+    retString << "0.8 #combine(" << queryT.str() << ") ";
   }
-  if (queryO.length() > 0) {
-    retString += "0.1 #combine(" + queryO + ") ";
+  if (queryO.str().length() > 0) {
+    retString << "0.1 #combine(" << queryO.str() << ") ";
   }
-  if (queryU.length() > 0) {
-    retString += "0.1 #combine(" + queryU + ") ";
+  if (queryU.str().length() > 0) {
+    retString << "0.1 #combine(" << queryU.str() << ") ";
   }
-  retString += ")";
+  retString << ")";
 
-  return retString;
+  return retString.str();
 }
 
-
-void DBInterface::search(int datasourceID, string *query, long listLength, long rankStart, QUERY_INTERFACE_TYPE queryType) {
+void DBInterface::search(int datasourceID, string &query, long listLength, long rankStart, QUERY_INTERFACE_TYPE queryType) {
   lemur::api::Index *db=openIndex();
   if (!db) {
     output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
@@ -607,7 +710,7 @@ void DBInterface::search(int datasourceID, string *query, long listLength, long 
     int maxToRet=DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE;
     if (maxToRet==0) maxToRet=1000000;
 
-    string reformulatedQuery=indriDefaultQueryExpansion((*query));
+    string reformulatedQuery=indriDefaultQueryExpansion(query);
 
     std::vector<indri::api::ScoredExtentResult> _results=indriEnvironment->runQuery(reformulatedQuery, maxToRet);
     std::vector<indri::api::ScoredExtentResult>::iterator rIter=_results.begin();
@@ -621,12 +724,12 @@ void DBInterface::search(int datasourceID, string *query, long listLength, long 
       rIter++;
     }
 
-    lemur::parse::StringQuery* q = new lemur::parse::StringQuery(query->c_str());
+    lemur::parse::StringQuery* q = new lemur::parse::StringQuery(query.c_str());
     // reset out results page to initialize it...
     output->resetResultsPage();
-    output->setResultQuery(*query);
+    output->setResultQuery(query);
 
-    results=removeDuplicateResults(results);
+    results=removeDuplicateResults(results, db);
 
     // Display results
     //
@@ -649,9 +752,9 @@ void DBInterface::search(int datasourceID, string *query, long listLength, long 
     lemur::retrieval::InQueryRetMethod *model = new lemur::retrieval::InQueryRetMethod(*db, 0.4, 50, 0.5, false);
 
 
-    int qlen = query->length();
+    int qlen = query.length();
     char* qChar = new char[qlen+5];
-    sprintf(qChar, "#q1=%s\0", query->c_str());
+    sprintf(qChar, "#q1=%s\0", query.c_str());
     lemur::parse::InQueryOpParser opparser;
     lemur::parse::StringQuery* q = new lemur::parse::StringQuery();
     TextHandler* th = &opparser;
@@ -677,9 +780,9 @@ void DBInterface::search(int datasourceID, string *query, long listLength, long 
 
     // reset out results page to initialize it...
     output->resetResultsPage();
-    output->setResultQuery(*query);
+    output->setResultQuery(query);
 
-    results=removeDuplicateResults(results);
+    results=removeDuplicateResults(results, db);
 
     // Display results
     //
