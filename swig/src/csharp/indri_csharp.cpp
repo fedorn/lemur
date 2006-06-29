@@ -4323,6 +4323,122 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_QueryAnnotationNodeVector(void * jarg1
 }
 
 
+SWIGEXPORT void SWIGSTDCALL CSharp_QueryAnnotationNode_name_set(void * jarg1, char * jarg2) {
+  indri::api::QueryAnnotationNode *arg1 = (indri::api::QueryAnnotationNode *) 0 ;
+  std::string *arg2 = 0 ;
+  
+  arg1 = (indri::api::QueryAnnotationNode *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  if (arg1) (arg1)->name = *arg2;
+  
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_QueryAnnotationNode_name_get(void * jarg1) {
+  char * jresult ;
+  indri::api::QueryAnnotationNode *arg1 = (indri::api::QueryAnnotationNode *) 0 ;
+  std::string *result = 0 ;
+  
+  arg1 = (indri::api::QueryAnnotationNode *)jarg1; 
+  {
+    std::string const &_result_ref =  ((arg1)->name);
+    result = (std::string *) &_result_ref;
+  }
+  jresult = SWIG_csharp_string_callback(result->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_QueryAnnotationNode_type_set(void * jarg1, char * jarg2) {
+  indri::api::QueryAnnotationNode *arg1 = (indri::api::QueryAnnotationNode *) 0 ;
+  std::string *arg2 = 0 ;
+  
+  arg1 = (indri::api::QueryAnnotationNode *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  if (arg1) (arg1)->type = *arg2;
+  
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_QueryAnnotationNode_type_get(void * jarg1) {
+  char * jresult ;
+  indri::api::QueryAnnotationNode *arg1 = (indri::api::QueryAnnotationNode *) 0 ;
+  std::string *result = 0 ;
+  
+  arg1 = (indri::api::QueryAnnotationNode *)jarg1; 
+  {
+    std::string const &_result_ref =  ((arg1)->type);
+    result = (std::string *) &_result_ref;
+  }
+  jresult = SWIG_csharp_string_callback(result->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_QueryAnnotationNode_queryText_set(void * jarg1, char * jarg2) {
+  indri::api::QueryAnnotationNode *arg1 = (indri::api::QueryAnnotationNode *) 0 ;
+  std::string *arg2 = 0 ;
+  
+  arg1 = (indri::api::QueryAnnotationNode *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  if (arg1) (arg1)->queryText = *arg2;
+  
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_QueryAnnotationNode_queryText_get(void * jarg1) {
+  char * jresult ;
+  indri::api::QueryAnnotationNode *arg1 = (indri::api::QueryAnnotationNode *) 0 ;
+  std::string *result = 0 ;
+  
+  arg1 = (indri::api::QueryAnnotationNode *)jarg1; 
+  {
+    std::string const &_result_ref =  ((arg1)->queryText);
+    result = (std::string *) &_result_ref;
+  }
+  jresult = SWIG_csharp_string_callback(result->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_QueryAnnotationNode_children_set(void * jarg1, void * jarg2) {
+  indri::api::QueryAnnotationNode *arg1 = (indri::api::QueryAnnotationNode *) 0 ;
+  std::vector<indri::api::QueryAnnotationNode * > *arg2 = (std::vector<indri::api::QueryAnnotationNode * > *) 0 ;
+  
+  arg1 = (indri::api::QueryAnnotationNode *)jarg1; 
+  arg2 = (std::vector<indri::api::QueryAnnotationNode * > *)jarg2; 
+  if (arg1) (arg1)->children = *arg2;
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_QueryAnnotationNode_children_get(void * jarg1) {
+  void * jresult ;
+  indri::api::QueryAnnotationNode *arg1 = (indri::api::QueryAnnotationNode *) 0 ;
+  std::vector<indri::api::QueryAnnotationNode * > *result = 0 ;
+  
+  arg1 = (indri::api::QueryAnnotationNode *)jarg1; 
+  result = (std::vector<indri::api::QueryAnnotationNode * > *)& ((arg1)->children);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_QueryAnnotationNode() {
   void * jresult ;
   indri::api::QueryAnnotationNode *result = 0 ;

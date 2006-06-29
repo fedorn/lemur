@@ -746,6 +746,30 @@ class indriPINVOKE {
   [DllImport("indri", EntryPoint="CSharp_delete_QueryAnnotationNodeVector")]
   public static extern void delete_QueryAnnotationNodeVector(HandleRef jarg1);
 
+  [DllImport("indri", EntryPoint="CSharp_QueryAnnotationNode_name_set")]
+  public static extern void QueryAnnotationNode_name_set(HandleRef jarg1, string jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryAnnotationNode_name_get")]
+  public static extern string QueryAnnotationNode_name_get(HandleRef jarg1);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryAnnotationNode_type_set")]
+  public static extern void QueryAnnotationNode_type_set(HandleRef jarg1, string jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryAnnotationNode_type_get")]
+  public static extern string QueryAnnotationNode_type_get(HandleRef jarg1);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryAnnotationNode_queryText_set")]
+  public static extern void QueryAnnotationNode_queryText_set(HandleRef jarg1, string jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryAnnotationNode_queryText_get")]
+  public static extern string QueryAnnotationNode_queryText_get(HandleRef jarg1);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryAnnotationNode_children_set")]
+  public static extern void QueryAnnotationNode_children_set(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("indri", EntryPoint="CSharp_QueryAnnotationNode_children_get")]
+  public static extern IntPtr QueryAnnotationNode_children_get(HandleRef jarg1);
+
   [DllImport("indri", EntryPoint="CSharp_new_QueryAnnotationNode")]
   public static extern IntPtr new_QueryAnnotationNode();
 

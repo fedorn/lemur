@@ -62,12 +62,11 @@ namespace indri {
 #ifdef SWIGCSHARP
     
     class QueryAnnotationNode {
-      struct QueryAnnotationNode {
+    public:
         std::string name;
         std::string type;
         std::string queryText;
         std::vector<QueryAnnotationNode*> children;
-      };
     };
 #endif
 
