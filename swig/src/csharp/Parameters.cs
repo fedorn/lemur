@@ -31,119 +31,119 @@ public class Parameters : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_Parameters(swigCPtr);
+      indri_csharpPINVOKE.delete_Parameters(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
   }
 
-  public Parameters() : this(indriPINVOKE.new_Parameters(), true) {
+  public Parameters() : this(indri_csharpPINVOKE.new_Parameters(), true) {
   }
 
   public Parameters get(int index) {
-    Parameters ret = new Parameters(indriPINVOKE.Parameters_get__SWIG_0(swigCPtr, index), true);
+    Parameters ret = new Parameters(indri_csharpPINVOKE.Parameters_get__SWIG_0(swigCPtr, index), true);
     return ret;
   }
 
   public Parameters get(string name) {
-    Parameters ret = new Parameters(indriPINVOKE.Parameters_get__SWIG_1(swigCPtr, name), true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    Parameters ret = new Parameters(indri_csharpPINVOKE.Parameters_get__SWIG_1(swigCPtr, name), true);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public bool get(string name, bool def) {
-    bool ret = indriPINVOKE.Parameters_get__SWIG_2(swigCPtr, name, def);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    bool ret = indri_csharpPINVOKE.Parameters_get__SWIG_2(swigCPtr, name, def);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public int get(string name, int def) {
-    int ret = indriPINVOKE.Parameters_get__SWIG_3(swigCPtr, name, def);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    int ret = indri_csharpPINVOKE.Parameters_get__SWIG_3(swigCPtr, name, def);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public double get(string name, double def) {
-    double ret = indriPINVOKE.Parameters_get__SWIG_4(swigCPtr, name, def);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    double ret = indri_csharpPINVOKE.Parameters_get__SWIG_4(swigCPtr, name, def);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public long get(string name, long def) {
-    long ret = indriPINVOKE.Parameters_get__SWIG_5(swigCPtr, name, def);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    long ret = indri_csharpPINVOKE.Parameters_get__SWIG_5(swigCPtr, name, def);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public string get(string name, string def) {
-    string ret = indriPINVOKE.Parameters_get__SWIG_6(swigCPtr, name, def);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    string ret = indri_csharpPINVOKE.Parameters_get__SWIG_6(swigCPtr, name, def);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public Parameters append(string path) {
-    Parameters ret = new Parameters(indriPINVOKE.Parameters_append(swigCPtr, path), true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    Parameters ret = new Parameters(indri_csharpPINVOKE.Parameters_append(swigCPtr, path), true);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void remove(string path) {
-    indriPINVOKE.Parameters_remove(swigCPtr, path);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.Parameters_remove(swigCPtr, path);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void set(string name, bool value) {
-    indriPINVOKE.Parameters_set__SWIG_0(swigCPtr, name, value);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.Parameters_set__SWIG_0(swigCPtr, name, value);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void set(string name, string value) {
-    indriPINVOKE.Parameters_set__SWIG_1(swigCPtr, name, value);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.Parameters_set__SWIG_1(swigCPtr, name, value);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void set(string name, int value) {
-    indriPINVOKE.Parameters_set__SWIG_2(swigCPtr, name, value);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.Parameters_set__SWIG_2(swigCPtr, name, value);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void set(string name, long value) {
-    indriPINVOKE.Parameters_set__SWIG_3(swigCPtr, name, value);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.Parameters_set__SWIG_3(swigCPtr, name, value);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void set(string name, double value) {
-    indriPINVOKE.Parameters_set__SWIG_4(swigCPtr, name, value);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.Parameters_set__SWIG_4(swigCPtr, name, value);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void set(string value) {
-    indriPINVOKE.Parameters_set__SWIG_5(swigCPtr, value);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.Parameters_set__SWIG_5(swigCPtr, value);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void clear() {
-    indriPINVOKE.Parameters_clear(swigCPtr);
+    indri_csharpPINVOKE.Parameters_clear(swigCPtr);
   }
 
   public uint size() {
-    uint ret = indriPINVOKE.Parameters_size(swigCPtr);
+    uint ret = indri_csharpPINVOKE.Parameters_size(swigCPtr);
     return ret;
   }
 
   public bool exists(int index) {
-    bool ret = indriPINVOKE.Parameters_exists__SWIG_0(swigCPtr, index);
+    bool ret = indri_csharpPINVOKE.Parameters_exists__SWIG_0(swigCPtr, index);
     return ret;
   }
 
   public bool exists(string name) {
-    bool ret = indriPINVOKE.Parameters_exists__SWIG_1(swigCPtr, name);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    bool ret = indri_csharpPINVOKE.Parameters_exists__SWIG_1(swigCPtr, name);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public static Parameters instance() {
-    Parameters ret = new Parameters(indriPINVOKE.Parameters_instance(), false);
+    Parameters ret = new Parameters(indri_csharpPINVOKE.Parameters_instance(), false);
     return ret;
   }
 

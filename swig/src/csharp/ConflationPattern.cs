@@ -31,7 +31,7 @@ public class ConflationPattern : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_ConflationPattern(swigCPtr);
+      indri_csharpPINVOKE.delete_ConflationPattern(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -39,35 +39,35 @@ public class ConflationPattern : IDisposable {
 
   public string tag_name {
     set {
-      indriPINVOKE.ConflationPattern_tag_name_set(swigCPtr, value);
+      indri_csharpPINVOKE.ConflationPattern_tag_name_set(swigCPtr, value);
     } 
     get {
-      string ret = indriPINVOKE.ConflationPattern_tag_name_get(swigCPtr);
+      string ret = indri_csharpPINVOKE.ConflationPattern_tag_name_get(swigCPtr);
       return ret;
     } 
   }
 
   public string attribute_name {
     set {
-      indriPINVOKE.ConflationPattern_attribute_name_set(swigCPtr, value);
+      indri_csharpPINVOKE.ConflationPattern_attribute_name_set(swigCPtr, value);
     } 
     get {
-      string ret = indriPINVOKE.ConflationPattern_attribute_name_get(swigCPtr);
+      string ret = indri_csharpPINVOKE.ConflationPattern_attribute_name_get(swigCPtr);
       return ret;
     } 
   }
 
   public string value {
     set {
-      indriPINVOKE.ConflationPattern_value_set(swigCPtr, value);
+      indri_csharpPINVOKE.ConflationPattern_value_set(swigCPtr, value);
     } 
     get {
-      string ret = indriPINVOKE.ConflationPattern_value_get(swigCPtr);
+      string ret = indri_csharpPINVOKE.ConflationPattern_value_get(swigCPtr);
       return ret;
     } 
   }
 
-  public ConflationPattern() : this(indriPINVOKE.new_ConflationPattern(), true) {
+  public ConflationPattern() : this(indri_csharpPINVOKE.new_ConflationPattern(), true) {
   }
 
 }

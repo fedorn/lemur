@@ -31,7 +31,7 @@ public class TermExtentVector : IDisposable, System.Collections.IEnumerable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_TermExtentVector(swigCPtr);
+      indri_csharpPINVOKE.delete_TermExtentVector(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -183,103 +183,103 @@ public class TermExtentVector : IDisposable, System.Collections.IEnumerable {
   }
 
   public void Clear() {
-    indriPINVOKE.TermExtentVector_Clear(swigCPtr);
+    indri_csharpPINVOKE.TermExtentVector_Clear(swigCPtr);
   }
 
   public void Add(TermExtent value) {
-    indriPINVOKE.TermExtentVector_Add(swigCPtr, TermExtent.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.TermExtentVector_Add(swigCPtr, TermExtent.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   private uint size() {
-    uint ret = indriPINVOKE.TermExtentVector_size(swigCPtr);
+    uint ret = indri_csharpPINVOKE.TermExtentVector_size(swigCPtr);
     return ret;
   }
 
   private uint capacity() {
-    uint ret = indriPINVOKE.TermExtentVector_capacity(swigCPtr);
+    uint ret = indri_csharpPINVOKE.TermExtentVector_capacity(swigCPtr);
     return ret;
   }
 
   private void reserve(uint n) {
-    indriPINVOKE.TermExtentVector_reserve(swigCPtr, n);
+    indri_csharpPINVOKE.TermExtentVector_reserve(swigCPtr, n);
   }
 
-  public TermExtentVector() : this(indriPINVOKE.new_TermExtentVector__SWIG_0(), true) {
+  public TermExtentVector() : this(indri_csharpPINVOKE.new_TermExtentVector__SWIG_0(), true) {
   }
 
-  public TermExtentVector(int capacity) : this(indriPINVOKE.new_TermExtentVector__SWIG_1(capacity), true) {
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+  public TermExtentVector(int capacity) : this(indri_csharpPINVOKE.new_TermExtentVector__SWIG_1(capacity), true) {
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   private TermExtent getitemcopy(int index) {
-    TermExtent ret = new TermExtent(indriPINVOKE.TermExtentVector_getitemcopy(swigCPtr, index), true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    TermExtent ret = new TermExtent(indri_csharpPINVOKE.TermExtentVector_getitemcopy(swigCPtr, index), true);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private TermExtent getitem(int index) {
-    TermExtent ret = new TermExtent(indriPINVOKE.TermExtentVector_getitem(swigCPtr, index), false);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    TermExtent ret = new TermExtent(indri_csharpPINVOKE.TermExtentVector_getitem(swigCPtr, index), false);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private void setitem(int index, TermExtent value) {
-    indriPINVOKE.TermExtentVector_setitem(swigCPtr, index, TermExtent.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.TermExtentVector_setitem(swigCPtr, index, TermExtent.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void AddRange(TermExtentVector values) {
-    indriPINVOKE.TermExtentVector_AddRange(swigCPtr, TermExtentVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.TermExtentVector_AddRange(swigCPtr, TermExtentVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public TermExtentVector GetRange(int index, int count) {
-    IntPtr cPtr = indriPINVOKE.TermExtentVector_GetRange(swigCPtr, index, count);
+    IntPtr cPtr = indri_csharpPINVOKE.TermExtentVector_GetRange(swigCPtr, index, count);
     TermExtentVector ret = (cPtr == IntPtr.Zero) ? null : new TermExtentVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Insert(int index, TermExtent value) {
-    indriPINVOKE.TermExtentVector_Insert(swigCPtr, index, TermExtent.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.TermExtentVector_Insert(swigCPtr, index, TermExtent.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void InsertRange(int index, TermExtentVector values) {
-    indriPINVOKE.TermExtentVector_InsertRange(swigCPtr, index, TermExtentVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.TermExtentVector_InsertRange(swigCPtr, index, TermExtentVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveAt(int index) {
-    indriPINVOKE.TermExtentVector_RemoveAt(swigCPtr, index);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.TermExtentVector_RemoveAt(swigCPtr, index);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveRange(int index, int count) {
-    indriPINVOKE.TermExtentVector_RemoveRange(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.TermExtentVector_RemoveRange(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public static TermExtentVector Repeat(TermExtent value, int count) {
-    IntPtr cPtr = indriPINVOKE.TermExtentVector_Repeat(TermExtent.getCPtr(value), count);
+    IntPtr cPtr = indri_csharpPINVOKE.TermExtentVector_Repeat(TermExtent.getCPtr(value), count);
     TermExtentVector ret = (cPtr == IntPtr.Zero) ? null : new TermExtentVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Reverse() {
-    indriPINVOKE.TermExtentVector_Reverse__SWIG_0(swigCPtr);
+    indri_csharpPINVOKE.TermExtentVector_Reverse__SWIG_0(swigCPtr);
   }
 
   public void Reverse(int index, int count) {
-    indriPINVOKE.TermExtentVector_Reverse__SWIG_1(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.TermExtentVector_Reverse__SWIG_1(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void SetRange(int index, TermExtentVector values) {
-    indriPINVOKE.TermExtentVector_SetRange(swigCPtr, index, TermExtentVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.TermExtentVector_SetRange(swigCPtr, index, TermExtentVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
 }

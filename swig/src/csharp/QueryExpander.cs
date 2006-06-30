@@ -31,27 +31,27 @@ public class QueryExpander : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_QueryExpander(swigCPtr);
+      indri_csharpPINVOKE.delete_QueryExpander(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
   }
 
   public ScoredExtentResultVector runExpandedQuery(string originalQuery, int resultsRequested, bool verbose) {
-    ScoredExtentResultVector ret = new ScoredExtentResultVector(indriPINVOKE.QueryExpander_runExpandedQuery__SWIG_0(swigCPtr, originalQuery, resultsRequested, verbose), true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    ScoredExtentResultVector ret = new ScoredExtentResultVector(indri_csharpPINVOKE.QueryExpander_runExpandedQuery__SWIG_0(swigCPtr, originalQuery, resultsRequested, verbose), true);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public ScoredExtentResultVector runExpandedQuery(string originalQuery, int resultsRequested) {
-    ScoredExtentResultVector ret = new ScoredExtentResultVector(indriPINVOKE.QueryExpander_runExpandedQuery__SWIG_1(swigCPtr, originalQuery, resultsRequested), true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    ScoredExtentResultVector ret = new ScoredExtentResultVector(indri_csharpPINVOKE.QueryExpander_runExpandedQuery__SWIG_1(swigCPtr, originalQuery, resultsRequested), true);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public virtual string expand(string originalQuery, ScoredExtentResultVector results) {
-    string ret = indriPINVOKE.QueryExpander_expand(swigCPtr, originalQuery, ScoredExtentResultVector.getCPtr(results));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    string ret = indri_csharpPINVOKE.QueryExpander_expand(swigCPtr, originalQuery, ScoredExtentResultVector.getCPtr(results));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 

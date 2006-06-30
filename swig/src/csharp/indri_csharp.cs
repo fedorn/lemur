@@ -11,7 +11,7 @@ namespace Indri {
 using System;
 using System.Runtime.InteropServices;
 
-public class indri {
+public class indri_csharp {
 }
 
 }

@@ -31,7 +31,7 @@ public class ScoredExtentResult : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_ScoredExtentResult(swigCPtr);
+      indri_csharpPINVOKE.delete_ScoredExtentResult(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -39,45 +39,45 @@ public class ScoredExtentResult : IDisposable {
 
   public double score {
     set {
-      indriPINVOKE.ScoredExtentResult_score_set(swigCPtr, value);
+      indri_csharpPINVOKE.ScoredExtentResult_score_set(swigCPtr, value);
     } 
     get {
-      double ret = indriPINVOKE.ScoredExtentResult_score_get(swigCPtr);
+      double ret = indri_csharpPINVOKE.ScoredExtentResult_score_get(swigCPtr);
       return ret;
     } 
   }
 
   public int document {
     set {
-      indriPINVOKE.ScoredExtentResult_document_set(swigCPtr, value);
+      indri_csharpPINVOKE.ScoredExtentResult_document_set(swigCPtr, value);
     } 
     get {
-      int ret = indriPINVOKE.ScoredExtentResult_document_get(swigCPtr);
+      int ret = indri_csharpPINVOKE.ScoredExtentResult_document_get(swigCPtr);
       return ret;
     } 
   }
 
   public int begin {
     set {
-      indriPINVOKE.ScoredExtentResult_begin_set(swigCPtr, value);
+      indri_csharpPINVOKE.ScoredExtentResult_begin_set(swigCPtr, value);
     } 
     get {
-      int ret = indriPINVOKE.ScoredExtentResult_begin_get(swigCPtr);
+      int ret = indri_csharpPINVOKE.ScoredExtentResult_begin_get(swigCPtr);
       return ret;
     } 
   }
 
   public int end {
     set {
-      indriPINVOKE.ScoredExtentResult_end_set(swigCPtr, value);
+      indri_csharpPINVOKE.ScoredExtentResult_end_set(swigCPtr, value);
     } 
     get {
-      int ret = indriPINVOKE.ScoredExtentResult_end_get(swigCPtr);
+      int ret = indri_csharpPINVOKE.ScoredExtentResult_end_get(swigCPtr);
       return ret;
     } 
   }
 
-  public ScoredExtentResult() : this(indriPINVOKE.new_ScoredExtentResult(), true) {
+  public ScoredExtentResult() : this(indri_csharpPINVOKE.new_ScoredExtentResult(), true) {
   }
 
 }

@@ -31,7 +31,7 @@ public class Field : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_Field(swigCPtr);
+      indri_csharpPINVOKE.delete_Field(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -39,47 +39,47 @@ public class Field : IDisposable {
 
   public string name {
     set {
-      indriPINVOKE.Field_name_set(swigCPtr, value);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      indri_csharpPINVOKE.Field_name_set(swigCPtr, value);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
-      string ret = indriPINVOKE.Field_name_get(swigCPtr);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      string ret = indri_csharpPINVOKE.Field_name_get(swigCPtr);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
   }
 
   public int begin {
     set {
-      indriPINVOKE.Field_begin_set(swigCPtr, value);
+      indri_csharpPINVOKE.Field_begin_set(swigCPtr, value);
     } 
     get {
-      int ret = indriPINVOKE.Field_begin_get(swigCPtr);
+      int ret = indri_csharpPINVOKE.Field_begin_get(swigCPtr);
       return ret;
     } 
   }
 
   public int end {
     set {
-      indriPINVOKE.Field_end_set(swigCPtr, value);
+      indri_csharpPINVOKE.Field_end_set(swigCPtr, value);
     } 
     get {
-      int ret = indriPINVOKE.Field_end_get(swigCPtr);
+      int ret = indri_csharpPINVOKE.Field_end_get(swigCPtr);
       return ret;
     } 
   }
 
   public long number {
     set {
-      indriPINVOKE.Field_number_set(swigCPtr, value);
+      indri_csharpPINVOKE.Field_number_set(swigCPtr, value);
     } 
     get {
-      long ret = indriPINVOKE.Field_number_get(swigCPtr);
+      long ret = indri_csharpPINVOKE.Field_number_get(swigCPtr);
       return ret;
     } 
   }
 
-  public Field() : this(indriPINVOKE.new_Field(), true) {
+  public Field() : this(indri_csharpPINVOKE.new_Field(), true) {
   }
 
 }

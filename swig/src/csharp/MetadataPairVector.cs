@@ -31,7 +31,7 @@ public class MetadataPairVector : IDisposable, System.Collections.IEnumerable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_MetadataPairVector(swigCPtr);
+      indri_csharpPINVOKE.delete_MetadataPairVector(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -183,103 +183,103 @@ public class MetadataPairVector : IDisposable, System.Collections.IEnumerable {
   }
 
   public void Clear() {
-    indriPINVOKE.MetadataPairVector_Clear(swigCPtr);
+    indri_csharpPINVOKE.MetadataPairVector_Clear(swigCPtr);
   }
 
   public void Add(MetadataPair value) {
-    indriPINVOKE.MetadataPairVector_Add(swigCPtr, MetadataPair.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.MetadataPairVector_Add(swigCPtr, MetadataPair.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   private uint size() {
-    uint ret = indriPINVOKE.MetadataPairVector_size(swigCPtr);
+    uint ret = indri_csharpPINVOKE.MetadataPairVector_size(swigCPtr);
     return ret;
   }
 
   private uint capacity() {
-    uint ret = indriPINVOKE.MetadataPairVector_capacity(swigCPtr);
+    uint ret = indri_csharpPINVOKE.MetadataPairVector_capacity(swigCPtr);
     return ret;
   }
 
   private void reserve(uint n) {
-    indriPINVOKE.MetadataPairVector_reserve(swigCPtr, n);
+    indri_csharpPINVOKE.MetadataPairVector_reserve(swigCPtr, n);
   }
 
-  public MetadataPairVector() : this(indriPINVOKE.new_MetadataPairVector__SWIG_0(), true) {
+  public MetadataPairVector() : this(indri_csharpPINVOKE.new_MetadataPairVector__SWIG_0(), true) {
   }
 
-  public MetadataPairVector(int capacity) : this(indriPINVOKE.new_MetadataPairVector__SWIG_1(capacity), true) {
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+  public MetadataPairVector(int capacity) : this(indri_csharpPINVOKE.new_MetadataPairVector__SWIG_1(capacity), true) {
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   private MetadataPair getitemcopy(int index) {
-    MetadataPair ret = new MetadataPair(indriPINVOKE.MetadataPairVector_getitemcopy(swigCPtr, index), true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    MetadataPair ret = new MetadataPair(indri_csharpPINVOKE.MetadataPairVector_getitemcopy(swigCPtr, index), true);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private MetadataPair getitem(int index) {
-    MetadataPair ret = new MetadataPair(indriPINVOKE.MetadataPairVector_getitem(swigCPtr, index), false);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    MetadataPair ret = new MetadataPair(indri_csharpPINVOKE.MetadataPairVector_getitem(swigCPtr, index), false);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private void setitem(int index, MetadataPair value) {
-    indriPINVOKE.MetadataPairVector_setitem(swigCPtr, index, MetadataPair.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.MetadataPairVector_setitem(swigCPtr, index, MetadataPair.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void AddRange(MetadataPairVector values) {
-    indriPINVOKE.MetadataPairVector_AddRange(swigCPtr, MetadataPairVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.MetadataPairVector_AddRange(swigCPtr, MetadataPairVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public MetadataPairVector GetRange(int index, int count) {
-    IntPtr cPtr = indriPINVOKE.MetadataPairVector_GetRange(swigCPtr, index, count);
+    IntPtr cPtr = indri_csharpPINVOKE.MetadataPairVector_GetRange(swigCPtr, index, count);
     MetadataPairVector ret = (cPtr == IntPtr.Zero) ? null : new MetadataPairVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Insert(int index, MetadataPair value) {
-    indriPINVOKE.MetadataPairVector_Insert(swigCPtr, index, MetadataPair.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.MetadataPairVector_Insert(swigCPtr, index, MetadataPair.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void InsertRange(int index, MetadataPairVector values) {
-    indriPINVOKE.MetadataPairVector_InsertRange(swigCPtr, index, MetadataPairVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.MetadataPairVector_InsertRange(swigCPtr, index, MetadataPairVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveAt(int index) {
-    indriPINVOKE.MetadataPairVector_RemoveAt(swigCPtr, index);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.MetadataPairVector_RemoveAt(swigCPtr, index);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveRange(int index, int count) {
-    indriPINVOKE.MetadataPairVector_RemoveRange(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.MetadataPairVector_RemoveRange(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public static MetadataPairVector Repeat(MetadataPair value, int count) {
-    IntPtr cPtr = indriPINVOKE.MetadataPairVector_Repeat(MetadataPair.getCPtr(value), count);
+    IntPtr cPtr = indri_csharpPINVOKE.MetadataPairVector_Repeat(MetadataPair.getCPtr(value), count);
     MetadataPairVector ret = (cPtr == IntPtr.Zero) ? null : new MetadataPairVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Reverse() {
-    indriPINVOKE.MetadataPairVector_Reverse__SWIG_0(swigCPtr);
+    indri_csharpPINVOKE.MetadataPairVector_Reverse__SWIG_0(swigCPtr);
   }
 
   public void Reverse(int index, int count) {
-    indriPINVOKE.MetadataPairVector_Reverse__SWIG_1(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.MetadataPairVector_Reverse__SWIG_1(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void SetRange(int index, MetadataPairVector values) {
-    indriPINVOKE.MetadataPairVector_SetRange(swigCPtr, index, MetadataPairVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.MetadataPairVector_SetRange(swigCPtr, index, MetadataPairVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
 }

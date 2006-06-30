@@ -169,12 +169,12 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "indri.cs"
+                    RelPath = "indri_csharp.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "indriPINVOKE.cs"
+                    RelPath = "indri_csharpPINVOKE.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

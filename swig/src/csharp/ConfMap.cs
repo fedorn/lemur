@@ -31,51 +31,51 @@ public class ConfMap : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_ConfMap(swigCPtr);
+      indri_csharpPINVOKE.delete_ConfMap(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
   }
 
-  public ConfMap() : this(indriPINVOKE.new_ConfMap__SWIG_0(), true) {
+  public ConfMap() : this(indri_csharpPINVOKE.new_ConfMap__SWIG_0(), true) {
   }
 
-  public ConfMap(ConfMap arg0) : this(indriPINVOKE.new_ConfMap__SWIG_1(ConfMap.getCPtr(arg0)), true) {
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+  public ConfMap(ConfMap arg0) : this(indri_csharpPINVOKE.new_ConfMap__SWIG_1(ConfMap.getCPtr(arg0)), true) {
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public uint size() {
-    uint ret = indriPINVOKE.ConfMap_size(swigCPtr);
+    uint ret = indri_csharpPINVOKE.ConfMap_size(swigCPtr);
     return ret;
   }
 
   public bool empty() {
-    bool ret = indriPINVOKE.ConfMap_empty(swigCPtr);
+    bool ret = indri_csharpPINVOKE.ConfMap_empty(swigCPtr);
     return ret;
   }
 
   public void clear() {
-    indriPINVOKE.ConfMap_clear(swigCPtr);
+    indri_csharpPINVOKE.ConfMap_clear(swigCPtr);
   }
 
   public string get(ConflationPattern key) {
-    string ret = indriPINVOKE.ConfMap_get(swigCPtr, ConflationPattern.getCPtr(key));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    string ret = indri_csharpPINVOKE.ConfMap_get(swigCPtr, ConflationPattern.getCPtr(key));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void set(ConflationPattern key, string x) {
-    indriPINVOKE.ConfMap_set(swigCPtr, ConflationPattern.getCPtr(key), x);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.ConfMap_set(swigCPtr, ConflationPattern.getCPtr(key), x);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void del(ConflationPattern key) {
-    indriPINVOKE.ConfMap_del(swigCPtr, ConflationPattern.getCPtr(key));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.ConfMap_del(swigCPtr, ConflationPattern.getCPtr(key));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public bool has_key(ConflationPattern key) {
-    bool ret = indriPINVOKE.ConfMap_has_key(swigCPtr, ConflationPattern.getCPtr(key));
+    bool ret = indri_csharpPINVOKE.ConfMap_has_key(swigCPtr, ConflationPattern.getCPtr(key));
     return ret;
   }
 

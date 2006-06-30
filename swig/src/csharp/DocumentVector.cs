@@ -31,28 +31,28 @@ public class DocumentVector : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_DocumentVector(swigCPtr);
+      indri_csharpPINVOKE.delete_DocumentVector(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
   }
 
   public StringVector stems() {
-    StringVector ret = new StringVector(indriPINVOKE.DocumentVector_stems(swigCPtr), false);
+    StringVector ret = new StringVector(indri_csharpPINVOKE.DocumentVector_stems(swigCPtr), false);
     return ret;
   }
 
   public IntVector positions() {
-    IntVector ret = new IntVector(indriPINVOKE.DocumentVector_positions(swigCPtr), false);
+    IntVector ret = new IntVector(indri_csharpPINVOKE.DocumentVector_positions(swigCPtr), false);
     return ret;
   }
 
   public FieldVector fields() {
-    FieldVector ret = new FieldVector(indriPINVOKE.DocumentVector_fields(swigCPtr), false);
+    FieldVector ret = new FieldVector(indri_csharpPINVOKE.DocumentVector_fields(swigCPtr), false);
     return ret;
   }
 
-  public DocumentVector() : this(indriPINVOKE.new_DocumentVector(), true) {
+  public DocumentVector() : this(indri_csharpPINVOKE.new_DocumentVector(), true) {
   }
 
 }

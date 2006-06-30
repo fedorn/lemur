@@ -31,7 +31,7 @@ public class QueryAnnotationNode : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_QueryAnnotationNode(swigCPtr);
+      indri_csharpPINVOKE.delete_QueryAnnotationNode(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -39,52 +39,52 @@ public class QueryAnnotationNode : IDisposable {
 
   public string name {
     set {
-      indriPINVOKE.QueryAnnotationNode_name_set(swigCPtr, value);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      indri_csharpPINVOKE.QueryAnnotationNode_name_set(swigCPtr, value);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
-      string ret = indriPINVOKE.QueryAnnotationNode_name_get(swigCPtr);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      string ret = indri_csharpPINVOKE.QueryAnnotationNode_name_get(swigCPtr);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
   }
 
   public string type {
     set {
-      indriPINVOKE.QueryAnnotationNode_type_set(swigCPtr, value);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      indri_csharpPINVOKE.QueryAnnotationNode_type_set(swigCPtr, value);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
-      string ret = indriPINVOKE.QueryAnnotationNode_type_get(swigCPtr);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      string ret = indri_csharpPINVOKE.QueryAnnotationNode_type_get(swigCPtr);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
   }
 
   public string queryText {
     set {
-      indriPINVOKE.QueryAnnotationNode_queryText_set(swigCPtr, value);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      indri_csharpPINVOKE.QueryAnnotationNode_queryText_set(swigCPtr, value);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
-      string ret = indriPINVOKE.QueryAnnotationNode_queryText_get(swigCPtr);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      string ret = indri_csharpPINVOKE.QueryAnnotationNode_queryText_get(swigCPtr);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
   }
 
   public QueryAnnotationNodeVector children {
     set {
-      indriPINVOKE.QueryAnnotationNode_children_set(swigCPtr, QueryAnnotationNodeVector.getCPtr(value));
+      indri_csharpPINVOKE.QueryAnnotationNode_children_set(swigCPtr, QueryAnnotationNodeVector.getCPtr(value));
     } 
     get {
-      IntPtr cPtr = indriPINVOKE.QueryAnnotationNode_children_get(swigCPtr);
+      IntPtr cPtr = indri_csharpPINVOKE.QueryAnnotationNode_children_get(swigCPtr);
       QueryAnnotationNodeVector ret = (cPtr == IntPtr.Zero) ? null : new QueryAnnotationNodeVector(cPtr, false);
       return ret;
     } 
   }
 
-  public QueryAnnotationNode() : this(indriPINVOKE.new_QueryAnnotationNode(), true) {
+  public QueryAnnotationNode() : this(indri_csharpPINVOKE.new_QueryAnnotationNode(), true) {
   }
 
 }

@@ -23,7 +23,7 @@ typedef long long UINT64;
 %include "exception.i"
 
 #ifdef SWIGCSHARP
-%module (directors="1") indri
+%module (directors="1") indri_csharp
 
 %apply const std::string & {std::string &};
 

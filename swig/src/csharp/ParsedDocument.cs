@@ -31,7 +31,7 @@ public class ParsedDocument : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_ParsedDocument(swigCPtr);
+      indri_csharpPINVOKE.delete_ParsedDocument(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -39,55 +39,55 @@ public class ParsedDocument : IDisposable {
 
   public string text {
     set {
-      indriPINVOKE.ParsedDocument_text_set(swigCPtr, value);
+      indri_csharpPINVOKE.ParsedDocument_text_set(swigCPtr, value);
     } 
     get {
-      string ret = indriPINVOKE.ParsedDocument_text_get(swigCPtr);
+      string ret = indri_csharpPINVOKE.ParsedDocument_text_get(swigCPtr);
       return ret;
     } 
   }
 
   public uint textLength {
     set {
-      indriPINVOKE.ParsedDocument_textLength_set(swigCPtr, value);
+      indri_csharpPINVOKE.ParsedDocument_textLength_set(swigCPtr, value);
     } 
     get {
-      uint ret = indriPINVOKE.ParsedDocument_textLength_get(swigCPtr);
+      uint ret = indri_csharpPINVOKE.ParsedDocument_textLength_get(swigCPtr);
       return ret;
     } 
   }
 
   public string content {
     set {
-      indriPINVOKE.ParsedDocument_content_set(swigCPtr, value);
+      indri_csharpPINVOKE.ParsedDocument_content_set(swigCPtr, value);
     } 
     get {
-      string ret = indriPINVOKE.ParsedDocument_content_get(swigCPtr);
+      string ret = indri_csharpPINVOKE.ParsedDocument_content_get(swigCPtr);
       return ret;
     } 
   }
 
   public uint contentLength {
     set {
-      indriPINVOKE.ParsedDocument_contentLength_set(swigCPtr, value);
+      indri_csharpPINVOKE.ParsedDocument_contentLength_set(swigCPtr, value);
     } 
     get {
-      uint ret = indriPINVOKE.ParsedDocument_contentLength_get(swigCPtr);
+      uint ret = indri_csharpPINVOKE.ParsedDocument_contentLength_get(swigCPtr);
       return ret;
     } 
   }
 
   public string getContent() {
-    string ret = indriPINVOKE.ParsedDocument_getContent(swigCPtr);
+    string ret = indri_csharpPINVOKE.ParsedDocument_getContent(swigCPtr);
     return ret;
   }
 
   public TermExtentVector positions {
     set {
-      indriPINVOKE.ParsedDocument_positions_set(swigCPtr, TermExtentVector.getCPtr(value));
+      indri_csharpPINVOKE.ParsedDocument_positions_set(swigCPtr, TermExtentVector.getCPtr(value));
     } 
     get {
-      IntPtr cPtr = indriPINVOKE.ParsedDocument_positions_get(swigCPtr);
+      IntPtr cPtr = indri_csharpPINVOKE.ParsedDocument_positions_get(swigCPtr);
       TermExtentVector ret = (cPtr == IntPtr.Zero) ? null : new TermExtentVector(cPtr, false);
       return ret;
     } 
@@ -95,16 +95,16 @@ public class ParsedDocument : IDisposable {
 
   public MetadataPairVector metadata {
     set {
-      indriPINVOKE.ParsedDocument_metadata_set(swigCPtr, MetadataPairVector.getCPtr(value));
+      indri_csharpPINVOKE.ParsedDocument_metadata_set(swigCPtr, MetadataPairVector.getCPtr(value));
     } 
     get {
-      IntPtr cPtr = indriPINVOKE.ParsedDocument_metadata_get(swigCPtr);
+      IntPtr cPtr = indri_csharpPINVOKE.ParsedDocument_metadata_get(swigCPtr);
       MetadataPairVector ret = (cPtr == IntPtr.Zero) ? null : new MetadataPairVector(cPtr, false);
       return ret;
     } 
   }
 
-  public ParsedDocument() : this(indriPINVOKE.new_ParsedDocument(), true) {
+  public ParsedDocument() : this(indri_csharpPINVOKE.new_ParsedDocument(), true) {
   }
 
 }

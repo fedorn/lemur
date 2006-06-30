@@ -31,7 +31,7 @@ public class IntVector : IDisposable, System.Collections.IEnumerable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_IntVector(swigCPtr);
+      indri_csharpPINVOKE.delete_IntVector(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -183,121 +183,121 @@ public class IntVector : IDisposable, System.Collections.IEnumerable {
   }
 
   public void Clear() {
-    indriPINVOKE.IntVector_Clear(swigCPtr);
+    indri_csharpPINVOKE.IntVector_Clear(swigCPtr);
   }
 
   public void Add(int value) {
-    indriPINVOKE.IntVector_Add(swigCPtr, value);
+    indri_csharpPINVOKE.IntVector_Add(swigCPtr, value);
   }
 
   private uint size() {
-    uint ret = indriPINVOKE.IntVector_size(swigCPtr);
+    uint ret = indri_csharpPINVOKE.IntVector_size(swigCPtr);
     return ret;
   }
 
   private uint capacity() {
-    uint ret = indriPINVOKE.IntVector_capacity(swigCPtr);
+    uint ret = indri_csharpPINVOKE.IntVector_capacity(swigCPtr);
     return ret;
   }
 
   private void reserve(uint n) {
-    indriPINVOKE.IntVector_reserve(swigCPtr, n);
+    indri_csharpPINVOKE.IntVector_reserve(swigCPtr, n);
   }
 
-  public IntVector() : this(indriPINVOKE.new_IntVector__SWIG_0(), true) {
+  public IntVector() : this(indri_csharpPINVOKE.new_IntVector__SWIG_0(), true) {
   }
 
-  public IntVector(int capacity) : this(indriPINVOKE.new_IntVector__SWIG_1(capacity), true) {
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+  public IntVector(int capacity) : this(indri_csharpPINVOKE.new_IntVector__SWIG_1(capacity), true) {
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   private int getitemcopy(int index) {
-    int ret = indriPINVOKE.IntVector_getitemcopy(swigCPtr, index);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    int ret = indri_csharpPINVOKE.IntVector_getitemcopy(swigCPtr, index);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private int getitem(int index) {
-    int ret = indriPINVOKE.IntVector_getitem(swigCPtr, index);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    int ret = indri_csharpPINVOKE.IntVector_getitem(swigCPtr, index);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private void setitem(int index, int value) {
-    indriPINVOKE.IntVector_setitem(swigCPtr, index, value);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.IntVector_setitem(swigCPtr, index, value);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void AddRange(IntVector values) {
-    indriPINVOKE.IntVector_AddRange(swigCPtr, IntVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.IntVector_AddRange(swigCPtr, IntVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public IntVector GetRange(int index, int count) {
-    IntPtr cPtr = indriPINVOKE.IntVector_GetRange(swigCPtr, index, count);
+    IntPtr cPtr = indri_csharpPINVOKE.IntVector_GetRange(swigCPtr, index, count);
     IntVector ret = (cPtr == IntPtr.Zero) ? null : new IntVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Insert(int index, int value) {
-    indriPINVOKE.IntVector_Insert(swigCPtr, index, value);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.IntVector_Insert(swigCPtr, index, value);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void InsertRange(int index, IntVector values) {
-    indriPINVOKE.IntVector_InsertRange(swigCPtr, index, IntVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.IntVector_InsertRange(swigCPtr, index, IntVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveAt(int index) {
-    indriPINVOKE.IntVector_RemoveAt(swigCPtr, index);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.IntVector_RemoveAt(swigCPtr, index);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveRange(int index, int count) {
-    indriPINVOKE.IntVector_RemoveRange(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.IntVector_RemoveRange(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public static IntVector Repeat(int value, int count) {
-    IntPtr cPtr = indriPINVOKE.IntVector_Repeat(value, count);
+    IntPtr cPtr = indri_csharpPINVOKE.IntVector_Repeat(value, count);
     IntVector ret = (cPtr == IntPtr.Zero) ? null : new IntVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Reverse() {
-    indriPINVOKE.IntVector_Reverse__SWIG_0(swigCPtr);
+    indri_csharpPINVOKE.IntVector_Reverse__SWIG_0(swigCPtr);
   }
 
   public void Reverse(int index, int count) {
-    indriPINVOKE.IntVector_Reverse__SWIG_1(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.IntVector_Reverse__SWIG_1(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void SetRange(int index, IntVector values) {
-    indriPINVOKE.IntVector_SetRange(swigCPtr, index, IntVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.IntVector_SetRange(swigCPtr, index, IntVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public bool Contains(int value) {
-    bool ret = indriPINVOKE.IntVector_Contains(swigCPtr, value);
+    bool ret = indri_csharpPINVOKE.IntVector_Contains(swigCPtr, value);
     return ret;
   }
 
   public int IndexOf(int value) {
-    int ret = indriPINVOKE.IntVector_IndexOf(swigCPtr, value);
+    int ret = indri_csharpPINVOKE.IntVector_IndexOf(swigCPtr, value);
     return ret;
   }
 
   public int LastIndexOf(int value) {
-    int ret = indriPINVOKE.IntVector_LastIndexOf(swigCPtr, value);
+    int ret = indri_csharpPINVOKE.IntVector_LastIndexOf(swigCPtr, value);
     return ret;
   }
 
   public void Remove(int value) {
-    indriPINVOKE.IntVector_Remove(swigCPtr, value);
+    indri_csharpPINVOKE.IntVector_Remove(swigCPtr, value);
   }
 
 }

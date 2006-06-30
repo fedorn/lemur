@@ -31,7 +31,7 @@ public class QueryAnnotationNodeVector : IDisposable, System.Collections.IEnumer
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_QueryAnnotationNodeVector(swigCPtr);
+      indri_csharpPINVOKE.delete_QueryAnnotationNodeVector(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -183,104 +183,104 @@ public class QueryAnnotationNodeVector : IDisposable, System.Collections.IEnumer
   }
 
   public void Clear() {
-    indriPINVOKE.QueryAnnotationNodeVector_Clear(swigCPtr);
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_Clear(swigCPtr);
   }
 
   public void Add(QueryAnnotationNode value) {
-    indriPINVOKE.QueryAnnotationNodeVector_Add(swigCPtr, QueryAnnotationNode.getCPtr(value));
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_Add(swigCPtr, QueryAnnotationNode.getCPtr(value));
   }
 
   private uint size() {
-    uint ret = indriPINVOKE.QueryAnnotationNodeVector_size(swigCPtr);
+    uint ret = indri_csharpPINVOKE.QueryAnnotationNodeVector_size(swigCPtr);
     return ret;
   }
 
   private uint capacity() {
-    uint ret = indriPINVOKE.QueryAnnotationNodeVector_capacity(swigCPtr);
+    uint ret = indri_csharpPINVOKE.QueryAnnotationNodeVector_capacity(swigCPtr);
     return ret;
   }
 
   private void reserve(uint n) {
-    indriPINVOKE.QueryAnnotationNodeVector_reserve(swigCPtr, n);
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_reserve(swigCPtr, n);
   }
 
-  public QueryAnnotationNodeVector() : this(indriPINVOKE.new_QueryAnnotationNodeVector__SWIG_0(), true) {
+  public QueryAnnotationNodeVector() : this(indri_csharpPINVOKE.new_QueryAnnotationNodeVector__SWIG_0(), true) {
   }
 
-  public QueryAnnotationNodeVector(int capacity) : this(indriPINVOKE.new_QueryAnnotationNodeVector__SWIG_1(capacity), true) {
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+  public QueryAnnotationNodeVector(int capacity) : this(indri_csharpPINVOKE.new_QueryAnnotationNodeVector__SWIG_1(capacity), true) {
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   private QueryAnnotationNode getitemcopy(int index) {
-    IntPtr cPtr = indriPINVOKE.QueryAnnotationNodeVector_getitemcopy(swigCPtr, index);
+    IntPtr cPtr = indri_csharpPINVOKE.QueryAnnotationNodeVector_getitemcopy(swigCPtr, index);
     QueryAnnotationNode ret = (cPtr == IntPtr.Zero) ? null : new QueryAnnotationNode(cPtr, false);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private QueryAnnotationNode getitem(int index) {
-    IntPtr cPtr = indriPINVOKE.QueryAnnotationNodeVector_getitem(swigCPtr, index);
+    IntPtr cPtr = indri_csharpPINVOKE.QueryAnnotationNodeVector_getitem(swigCPtr, index);
     QueryAnnotationNode ret = (cPtr == IntPtr.Zero) ? null : new QueryAnnotationNode(cPtr, false);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private void setitem(int index, QueryAnnotationNode value) {
-    indriPINVOKE.QueryAnnotationNodeVector_setitem(swigCPtr, index, QueryAnnotationNode.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_setitem(swigCPtr, index, QueryAnnotationNode.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void AddRange(QueryAnnotationNodeVector values) {
-    indriPINVOKE.QueryAnnotationNodeVector_AddRange(swigCPtr, QueryAnnotationNodeVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_AddRange(swigCPtr, QueryAnnotationNodeVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public QueryAnnotationNodeVector GetRange(int index, int count) {
-    IntPtr cPtr = indriPINVOKE.QueryAnnotationNodeVector_GetRange(swigCPtr, index, count);
+    IntPtr cPtr = indri_csharpPINVOKE.QueryAnnotationNodeVector_GetRange(swigCPtr, index, count);
     QueryAnnotationNodeVector ret = (cPtr == IntPtr.Zero) ? null : new QueryAnnotationNodeVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Insert(int index, QueryAnnotationNode value) {
-    indriPINVOKE.QueryAnnotationNodeVector_Insert(swigCPtr, index, QueryAnnotationNode.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_Insert(swigCPtr, index, QueryAnnotationNode.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void InsertRange(int index, QueryAnnotationNodeVector values) {
-    indriPINVOKE.QueryAnnotationNodeVector_InsertRange(swigCPtr, index, QueryAnnotationNodeVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_InsertRange(swigCPtr, index, QueryAnnotationNodeVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveAt(int index) {
-    indriPINVOKE.QueryAnnotationNodeVector_RemoveAt(swigCPtr, index);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_RemoveAt(swigCPtr, index);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveRange(int index, int count) {
-    indriPINVOKE.QueryAnnotationNodeVector_RemoveRange(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_RemoveRange(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public static QueryAnnotationNodeVector Repeat(QueryAnnotationNode value, int count) {
-    IntPtr cPtr = indriPINVOKE.QueryAnnotationNodeVector_Repeat(QueryAnnotationNode.getCPtr(value), count);
+    IntPtr cPtr = indri_csharpPINVOKE.QueryAnnotationNodeVector_Repeat(QueryAnnotationNode.getCPtr(value), count);
     QueryAnnotationNodeVector ret = (cPtr == IntPtr.Zero) ? null : new QueryAnnotationNodeVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Reverse() {
-    indriPINVOKE.QueryAnnotationNodeVector_Reverse__SWIG_0(swigCPtr);
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_Reverse__SWIG_0(swigCPtr);
   }
 
   public void Reverse(int index, int count) {
-    indriPINVOKE.QueryAnnotationNodeVector_Reverse__SWIG_1(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_Reverse__SWIG_1(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void SetRange(int index, QueryAnnotationNodeVector values) {
-    indriPINVOKE.QueryAnnotationNodeVector_SetRange(swigCPtr, index, QueryAnnotationNodeVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.QueryAnnotationNodeVector_SetRange(swigCPtr, index, QueryAnnotationNodeVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
 }

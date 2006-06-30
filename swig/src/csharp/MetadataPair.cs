@@ -35,20 +35,20 @@ public class MetadataPair : IDisposable {
 
   public string key {
     set {
-      indriPINVOKE.MetadataPair_key_set(swigCPtr, value);
+      indri_csharpPINVOKE.MetadataPair_key_set(swigCPtr, value);
     } 
     get {
-      string ret = indriPINVOKE.MetadataPair_key_get(swigCPtr);
+      string ret = indri_csharpPINVOKE.MetadataPair_key_get(swigCPtr);
       return ret;
     } 
   }
 
   public SWIGTYPE_p_void value {
     set {
-      indriPINVOKE.MetadataPair_value_set(swigCPtr, SWIGTYPE_p_void.getCPtr(value));
+      indri_csharpPINVOKE.MetadataPair_value_set(swigCPtr, SWIGTYPE_p_void.getCPtr(value));
     } 
     get {
-      IntPtr cPtr = indriPINVOKE.MetadataPair_value_get(swigCPtr);
+      IntPtr cPtr = indri_csharpPINVOKE.MetadataPair_value_get(swigCPtr);
       SWIGTYPE_p_void ret = (cPtr == IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
       return ret;
     } 
@@ -56,10 +56,10 @@ public class MetadataPair : IDisposable {
 
   public int valueLength {
     set {
-      indriPINVOKE.MetadataPair_valueLength_set(swigCPtr, value);
+      indri_csharpPINVOKE.MetadataPair_valueLength_set(swigCPtr, value);
     } 
     get {
-      int ret = indriPINVOKE.MetadataPair_valueLength_get(swigCPtr);
+      int ret = indri_csharpPINVOKE.MetadataPair_valueLength_get(swigCPtr);
       return ret;
     } 
   }

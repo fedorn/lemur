@@ -31,7 +31,7 @@ public class FieldVector : IDisposable, System.Collections.IEnumerable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_FieldVector(swigCPtr);
+      indri_csharpPINVOKE.delete_FieldVector(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -183,103 +183,103 @@ public class FieldVector : IDisposable, System.Collections.IEnumerable {
   }
 
   public void Clear() {
-    indriPINVOKE.FieldVector_Clear(swigCPtr);
+    indri_csharpPINVOKE.FieldVector_Clear(swigCPtr);
   }
 
   public void Add(Field value) {
-    indriPINVOKE.FieldVector_Add(swigCPtr, Field.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.FieldVector_Add(swigCPtr, Field.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   private uint size() {
-    uint ret = indriPINVOKE.FieldVector_size(swigCPtr);
+    uint ret = indri_csharpPINVOKE.FieldVector_size(swigCPtr);
     return ret;
   }
 
   private uint capacity() {
-    uint ret = indriPINVOKE.FieldVector_capacity(swigCPtr);
+    uint ret = indri_csharpPINVOKE.FieldVector_capacity(swigCPtr);
     return ret;
   }
 
   private void reserve(uint n) {
-    indriPINVOKE.FieldVector_reserve(swigCPtr, n);
+    indri_csharpPINVOKE.FieldVector_reserve(swigCPtr, n);
   }
 
-  public FieldVector() : this(indriPINVOKE.new_FieldVector__SWIG_0(), true) {
+  public FieldVector() : this(indri_csharpPINVOKE.new_FieldVector__SWIG_0(), true) {
   }
 
-  public FieldVector(int capacity) : this(indriPINVOKE.new_FieldVector__SWIG_1(capacity), true) {
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+  public FieldVector(int capacity) : this(indri_csharpPINVOKE.new_FieldVector__SWIG_1(capacity), true) {
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   private Field getitemcopy(int index) {
-    Field ret = new Field(indriPINVOKE.FieldVector_getitemcopy(swigCPtr, index), true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    Field ret = new Field(indri_csharpPINVOKE.FieldVector_getitemcopy(swigCPtr, index), true);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private Field getitem(int index) {
-    Field ret = new Field(indriPINVOKE.FieldVector_getitem(swigCPtr, index), false);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    Field ret = new Field(indri_csharpPINVOKE.FieldVector_getitem(swigCPtr, index), false);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private void setitem(int index, Field value) {
-    indriPINVOKE.FieldVector_setitem(swigCPtr, index, Field.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.FieldVector_setitem(swigCPtr, index, Field.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void AddRange(FieldVector values) {
-    indriPINVOKE.FieldVector_AddRange(swigCPtr, FieldVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.FieldVector_AddRange(swigCPtr, FieldVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public FieldVector GetRange(int index, int count) {
-    IntPtr cPtr = indriPINVOKE.FieldVector_GetRange(swigCPtr, index, count);
+    IntPtr cPtr = indri_csharpPINVOKE.FieldVector_GetRange(swigCPtr, index, count);
     FieldVector ret = (cPtr == IntPtr.Zero) ? null : new FieldVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Insert(int index, Field value) {
-    indriPINVOKE.FieldVector_Insert(swigCPtr, index, Field.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.FieldVector_Insert(swigCPtr, index, Field.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void InsertRange(int index, FieldVector values) {
-    indriPINVOKE.FieldVector_InsertRange(swigCPtr, index, FieldVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.FieldVector_InsertRange(swigCPtr, index, FieldVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveAt(int index) {
-    indriPINVOKE.FieldVector_RemoveAt(swigCPtr, index);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.FieldVector_RemoveAt(swigCPtr, index);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveRange(int index, int count) {
-    indriPINVOKE.FieldVector_RemoveRange(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.FieldVector_RemoveRange(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public static FieldVector Repeat(Field value, int count) {
-    IntPtr cPtr = indriPINVOKE.FieldVector_Repeat(Field.getCPtr(value), count);
+    IntPtr cPtr = indri_csharpPINVOKE.FieldVector_Repeat(Field.getCPtr(value), count);
     FieldVector ret = (cPtr == IntPtr.Zero) ? null : new FieldVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Reverse() {
-    indriPINVOKE.FieldVector_Reverse__SWIG_0(swigCPtr);
+    indri_csharpPINVOKE.FieldVector_Reverse__SWIG_0(swigCPtr);
   }
 
   public void Reverse(int index, int count) {
-    indriPINVOKE.FieldVector_Reverse__SWIG_1(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.FieldVector_Reverse__SWIG_1(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void SetRange(int index, FieldVector values) {
-    indriPINVOKE.FieldVector_SetRange(swigCPtr, index, FieldVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.FieldVector_SetRange(swigCPtr, index, FieldVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
 }

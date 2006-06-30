@@ -140,7 +140,7 @@ $(OUTDIRCSHARP)/lemur_csharp.o: $(CSHARP_CPP)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(INDRI_CSHARP_CPP): $(INTERFACES)
-	$(SWIG) -c++ -csharp -namespace Indri -o $@ -outdir csharp $(INDRI_CSHARPSRC) 
+	$(SWIG) -c++ -csharp -dllimport lemur_csharp -namespace Indri -o $@ -outdir csharp $(INDRI_CSHARPSRC) 
 $(OUTDIRCSHARP)/indri_csharp.o: $(INDRI_CSHARP_CPP)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 

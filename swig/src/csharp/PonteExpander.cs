@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 public class PonteExpander : QueryExpander {
   private HandleRef swigCPtr;
 
-  internal PonteExpander(IntPtr cPtr, bool cMemoryOwn) : base(indriPINVOKE.PonteExpanderUpcast(cPtr), cMemoryOwn) {
+  internal PonteExpander(IntPtr cPtr, bool cMemoryOwn) : base(indri_csharpPINVOKE.PonteExpanderUpcast(cPtr), cMemoryOwn) {
     swigCPtr = new HandleRef(this, cPtr);
   }
 
@@ -29,20 +29,20 @@ public class PonteExpander : QueryExpander {
   public override void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_PonteExpander(swigCPtr);
+      indri_csharpPINVOKE.delete_PonteExpander(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
     base.Dispose();
   }
 
-  public PonteExpander(QueryEnvironment env, Parameters param) : this(indriPINVOKE.new_PonteExpander(QueryEnvironment.getCPtr(env), Parameters.getCPtr(param)), true) {
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+  public PonteExpander(QueryEnvironment env, Parameters param) : this(indri_csharpPINVOKE.new_PonteExpander(QueryEnvironment.getCPtr(env), Parameters.getCPtr(param)), true) {
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public override string expand(string originalQuery, ScoredExtentResultVector results) {
-    string ret = indriPINVOKE.PonteExpander_expand(swigCPtr, originalQuery, ScoredExtentResultVector.getCPtr(results));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    string ret = indri_csharpPINVOKE.PonteExpander_expand(swigCPtr, originalQuery, ScoredExtentResultVector.getCPtr(results));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 

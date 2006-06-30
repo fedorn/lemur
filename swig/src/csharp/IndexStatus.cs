@@ -31,15 +31,15 @@ public class IndexStatus : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_IndexStatus(swigCPtr);
+      indri_csharpPINVOKE.delete_IndexStatus(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
   }
 
   public virtual void status(int code, string documentPath, string error, int documentsIndexed, int documentsSeen) {
-    indriPINVOKE.IndexStatus_status(swigCPtr, code, documentPath, error, documentsIndexed, documentsSeen);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.IndexStatus_status(swigCPtr, code, documentPath, error, documentsIndexed, documentsSeen);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public enum action_code {

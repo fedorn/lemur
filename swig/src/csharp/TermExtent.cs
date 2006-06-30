@@ -31,7 +31,7 @@ public class TermExtent : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_TermExtent(swigCPtr);
+      indri_csharpPINVOKE.delete_TermExtent(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -39,25 +39,25 @@ public class TermExtent : IDisposable {
 
   public int begin {
     set {
-      indriPINVOKE.TermExtent_begin_set(swigCPtr, value);
+      indri_csharpPINVOKE.TermExtent_begin_set(swigCPtr, value);
     } 
     get {
-      int ret = indriPINVOKE.TermExtent_begin_get(swigCPtr);
+      int ret = indri_csharpPINVOKE.TermExtent_begin_get(swigCPtr);
       return ret;
     } 
   }
 
   public int end {
     set {
-      indriPINVOKE.TermExtent_end_set(swigCPtr, value);
+      indri_csharpPINVOKE.TermExtent_end_set(swigCPtr, value);
     } 
     get {
-      int ret = indriPINVOKE.TermExtent_end_get(swigCPtr);
+      int ret = indri_csharpPINVOKE.TermExtent_end_get(swigCPtr);
       return ret;
     } 
   }
 
-  public TermExtent() : this(indriPINVOKE.new_TermExtent(), true) {
+  public TermExtent() : this(indri_csharpPINVOKE.new_TermExtent(), true) {
   }
 
 }

@@ -31,32 +31,32 @@ public class QueryAnnotation : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_QueryAnnotation(swigCPtr);
+      indri_csharpPINVOKE.delete_QueryAnnotation(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
   }
 
   public QueryAnnotationNode getQueryTree() {
-    IntPtr cPtr = indriPINVOKE.QueryAnnotation_getQueryTree(swigCPtr);
+    IntPtr cPtr = indri_csharpPINVOKE.QueryAnnotation_getQueryTree(swigCPtr);
     QueryAnnotationNode ret = (cPtr == IntPtr.Zero) ? null : new QueryAnnotationNode(cPtr, false);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public MResults getAnnotations() {
-    MResults ret = new MResults(indriPINVOKE.QueryAnnotation_getAnnotations(swigCPtr), false);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    MResults ret = new MResults(indri_csharpPINVOKE.QueryAnnotation_getAnnotations(swigCPtr), false);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public ScoredExtentResultVector getResults() {
-    ScoredExtentResultVector ret = new ScoredExtentResultVector(indriPINVOKE.QueryAnnotation_getResults(swigCPtr), false);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    ScoredExtentResultVector ret = new ScoredExtentResultVector(indri_csharpPINVOKE.QueryAnnotation_getResults(swigCPtr), false);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public QueryAnnotation() : this(indriPINVOKE.new_QueryAnnotation(), true) {
+  public QueryAnnotation() : this(indri_csharpPINVOKE.new_QueryAnnotation(), true) {
   }
 
 }

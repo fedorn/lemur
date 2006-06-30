@@ -31,7 +31,7 @@ public class ScoredExtentResultVector : IDisposable, System.Collections.IEnumera
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_ScoredExtentResultVector(swigCPtr);
+      indri_csharpPINVOKE.delete_ScoredExtentResultVector(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -183,103 +183,103 @@ public class ScoredExtentResultVector : IDisposable, System.Collections.IEnumera
   }
 
   public void Clear() {
-    indriPINVOKE.ScoredExtentResultVector_Clear(swigCPtr);
+    indri_csharpPINVOKE.ScoredExtentResultVector_Clear(swigCPtr);
   }
 
   public void Add(ScoredExtentResult value) {
-    indriPINVOKE.ScoredExtentResultVector_Add(swigCPtr, ScoredExtentResult.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.ScoredExtentResultVector_Add(swigCPtr, ScoredExtentResult.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   private uint size() {
-    uint ret = indriPINVOKE.ScoredExtentResultVector_size(swigCPtr);
+    uint ret = indri_csharpPINVOKE.ScoredExtentResultVector_size(swigCPtr);
     return ret;
   }
 
   private uint capacity() {
-    uint ret = indriPINVOKE.ScoredExtentResultVector_capacity(swigCPtr);
+    uint ret = indri_csharpPINVOKE.ScoredExtentResultVector_capacity(swigCPtr);
     return ret;
   }
 
   private void reserve(uint n) {
-    indriPINVOKE.ScoredExtentResultVector_reserve(swigCPtr, n);
+    indri_csharpPINVOKE.ScoredExtentResultVector_reserve(swigCPtr, n);
   }
 
-  public ScoredExtentResultVector() : this(indriPINVOKE.new_ScoredExtentResultVector__SWIG_0(), true) {
+  public ScoredExtentResultVector() : this(indri_csharpPINVOKE.new_ScoredExtentResultVector__SWIG_0(), true) {
   }
 
-  public ScoredExtentResultVector(int capacity) : this(indriPINVOKE.new_ScoredExtentResultVector__SWIG_1(capacity), true) {
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+  public ScoredExtentResultVector(int capacity) : this(indri_csharpPINVOKE.new_ScoredExtentResultVector__SWIG_1(capacity), true) {
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   private ScoredExtentResult getitemcopy(int index) {
-    ScoredExtentResult ret = new ScoredExtentResult(indriPINVOKE.ScoredExtentResultVector_getitemcopy(swigCPtr, index), true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    ScoredExtentResult ret = new ScoredExtentResult(indri_csharpPINVOKE.ScoredExtentResultVector_getitemcopy(swigCPtr, index), true);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private ScoredExtentResult getitem(int index) {
-    ScoredExtentResult ret = new ScoredExtentResult(indriPINVOKE.ScoredExtentResultVector_getitem(swigCPtr, index), false);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    ScoredExtentResult ret = new ScoredExtentResult(indri_csharpPINVOKE.ScoredExtentResultVector_getitem(swigCPtr, index), false);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private void setitem(int index, ScoredExtentResult value) {
-    indriPINVOKE.ScoredExtentResultVector_setitem(swigCPtr, index, ScoredExtentResult.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.ScoredExtentResultVector_setitem(swigCPtr, index, ScoredExtentResult.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void AddRange(ScoredExtentResultVector values) {
-    indriPINVOKE.ScoredExtentResultVector_AddRange(swigCPtr, ScoredExtentResultVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.ScoredExtentResultVector_AddRange(swigCPtr, ScoredExtentResultVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public ScoredExtentResultVector GetRange(int index, int count) {
-    IntPtr cPtr = indriPINVOKE.ScoredExtentResultVector_GetRange(swigCPtr, index, count);
+    IntPtr cPtr = indri_csharpPINVOKE.ScoredExtentResultVector_GetRange(swigCPtr, index, count);
     ScoredExtentResultVector ret = (cPtr == IntPtr.Zero) ? null : new ScoredExtentResultVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Insert(int index, ScoredExtentResult value) {
-    indriPINVOKE.ScoredExtentResultVector_Insert(swigCPtr, index, ScoredExtentResult.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.ScoredExtentResultVector_Insert(swigCPtr, index, ScoredExtentResult.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void InsertRange(int index, ScoredExtentResultVector values) {
-    indriPINVOKE.ScoredExtentResultVector_InsertRange(swigCPtr, index, ScoredExtentResultVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.ScoredExtentResultVector_InsertRange(swigCPtr, index, ScoredExtentResultVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveAt(int index) {
-    indriPINVOKE.ScoredExtentResultVector_RemoveAt(swigCPtr, index);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.ScoredExtentResultVector_RemoveAt(swigCPtr, index);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveRange(int index, int count) {
-    indriPINVOKE.ScoredExtentResultVector_RemoveRange(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.ScoredExtentResultVector_RemoveRange(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public static ScoredExtentResultVector Repeat(ScoredExtentResult value, int count) {
-    IntPtr cPtr = indriPINVOKE.ScoredExtentResultVector_Repeat(ScoredExtentResult.getCPtr(value), count);
+    IntPtr cPtr = indri_csharpPINVOKE.ScoredExtentResultVector_Repeat(ScoredExtentResult.getCPtr(value), count);
     ScoredExtentResultVector ret = (cPtr == IntPtr.Zero) ? null : new ScoredExtentResultVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Reverse() {
-    indriPINVOKE.ScoredExtentResultVector_Reverse__SWIG_0(swigCPtr);
+    indri_csharpPINVOKE.ScoredExtentResultVector_Reverse__SWIG_0(swigCPtr);
   }
 
   public void Reverse(int index, int count) {
-    indriPINVOKE.ScoredExtentResultVector_Reverse__SWIG_1(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.ScoredExtentResultVector_Reverse__SWIG_1(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void SetRange(int index, ScoredExtentResultVector values) {
-    indriPINVOKE.ScoredExtentResultVector_SetRange(swigCPtr, index, ScoredExtentResultVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.ScoredExtentResultVector_SetRange(swigCPtr, index, ScoredExtentResultVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
 }

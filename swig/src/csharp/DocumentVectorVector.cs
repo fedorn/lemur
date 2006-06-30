@@ -31,7 +31,7 @@ public class DocumentVectorVector : IDisposable, System.Collections.IEnumerable 
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_DocumentVectorVector(swigCPtr);
+      indri_csharpPINVOKE.delete_DocumentVectorVector(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -183,104 +183,104 @@ public class DocumentVectorVector : IDisposable, System.Collections.IEnumerable 
   }
 
   public void Clear() {
-    indriPINVOKE.DocumentVectorVector_Clear(swigCPtr);
+    indri_csharpPINVOKE.DocumentVectorVector_Clear(swigCPtr);
   }
 
   public void Add(DocumentVector value) {
-    indriPINVOKE.DocumentVectorVector_Add(swigCPtr, DocumentVector.getCPtr(value));
+    indri_csharpPINVOKE.DocumentVectorVector_Add(swigCPtr, DocumentVector.getCPtr(value));
   }
 
   private uint size() {
-    uint ret = indriPINVOKE.DocumentVectorVector_size(swigCPtr);
+    uint ret = indri_csharpPINVOKE.DocumentVectorVector_size(swigCPtr);
     return ret;
   }
 
   private uint capacity() {
-    uint ret = indriPINVOKE.DocumentVectorVector_capacity(swigCPtr);
+    uint ret = indri_csharpPINVOKE.DocumentVectorVector_capacity(swigCPtr);
     return ret;
   }
 
   private void reserve(uint n) {
-    indriPINVOKE.DocumentVectorVector_reserve(swigCPtr, n);
+    indri_csharpPINVOKE.DocumentVectorVector_reserve(swigCPtr, n);
   }
 
-  public DocumentVectorVector() : this(indriPINVOKE.new_DocumentVectorVector__SWIG_0(), true) {
+  public DocumentVectorVector() : this(indri_csharpPINVOKE.new_DocumentVectorVector__SWIG_0(), true) {
   }
 
-  public DocumentVectorVector(int capacity) : this(indriPINVOKE.new_DocumentVectorVector__SWIG_1(capacity), true) {
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+  public DocumentVectorVector(int capacity) : this(indri_csharpPINVOKE.new_DocumentVectorVector__SWIG_1(capacity), true) {
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   private DocumentVector getitemcopy(int index) {
-    IntPtr cPtr = indriPINVOKE.DocumentVectorVector_getitemcopy(swigCPtr, index);
+    IntPtr cPtr = indri_csharpPINVOKE.DocumentVectorVector_getitemcopy(swigCPtr, index);
     DocumentVector ret = (cPtr == IntPtr.Zero) ? null : new DocumentVector(cPtr, false);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private DocumentVector getitem(int index) {
-    IntPtr cPtr = indriPINVOKE.DocumentVectorVector_getitem(swigCPtr, index);
+    IntPtr cPtr = indri_csharpPINVOKE.DocumentVectorVector_getitem(swigCPtr, index);
     DocumentVector ret = (cPtr == IntPtr.Zero) ? null : new DocumentVector(cPtr, false);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   private void setitem(int index, DocumentVector value) {
-    indriPINVOKE.DocumentVectorVector_setitem(swigCPtr, index, DocumentVector.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.DocumentVectorVector_setitem(swigCPtr, index, DocumentVector.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void AddRange(DocumentVectorVector values) {
-    indriPINVOKE.DocumentVectorVector_AddRange(swigCPtr, DocumentVectorVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.DocumentVectorVector_AddRange(swigCPtr, DocumentVectorVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public DocumentVectorVector GetRange(int index, int count) {
-    IntPtr cPtr = indriPINVOKE.DocumentVectorVector_GetRange(swigCPtr, index, count);
+    IntPtr cPtr = indri_csharpPINVOKE.DocumentVectorVector_GetRange(swigCPtr, index, count);
     DocumentVectorVector ret = (cPtr == IntPtr.Zero) ? null : new DocumentVectorVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Insert(int index, DocumentVector value) {
-    indriPINVOKE.DocumentVectorVector_Insert(swigCPtr, index, DocumentVector.getCPtr(value));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.DocumentVectorVector_Insert(swigCPtr, index, DocumentVector.getCPtr(value));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void InsertRange(int index, DocumentVectorVector values) {
-    indriPINVOKE.DocumentVectorVector_InsertRange(swigCPtr, index, DocumentVectorVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.DocumentVectorVector_InsertRange(swigCPtr, index, DocumentVectorVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveAt(int index) {
-    indriPINVOKE.DocumentVectorVector_RemoveAt(swigCPtr, index);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.DocumentVectorVector_RemoveAt(swigCPtr, index);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveRange(int index, int count) {
-    indriPINVOKE.DocumentVectorVector_RemoveRange(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.DocumentVectorVector_RemoveRange(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public static DocumentVectorVector Repeat(DocumentVector value, int count) {
-    IntPtr cPtr = indriPINVOKE.DocumentVectorVector_Repeat(DocumentVector.getCPtr(value), count);
+    IntPtr cPtr = indri_csharpPINVOKE.DocumentVectorVector_Repeat(DocumentVector.getCPtr(value), count);
     DocumentVectorVector ret = (cPtr == IntPtr.Zero) ? null : new DocumentVectorVector(cPtr, true);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Reverse() {
-    indriPINVOKE.DocumentVectorVector_Reverse__SWIG_0(swigCPtr);
+    indri_csharpPINVOKE.DocumentVectorVector_Reverse__SWIG_0(swigCPtr);
   }
 
   public void Reverse(int index, int count) {
-    indriPINVOKE.DocumentVectorVector_Reverse__SWIG_1(swigCPtr, index, count);
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.DocumentVectorVector_Reverse__SWIG_1(swigCPtr, index, count);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void SetRange(int index, DocumentVectorVector values) {
-    indriPINVOKE.DocumentVectorVector_SetRange(swigCPtr, index, DocumentVectorVector.getCPtr(values));
-    if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+    indri_csharpPINVOKE.DocumentVectorVector_SetRange(swigCPtr, index, DocumentVectorVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
 }

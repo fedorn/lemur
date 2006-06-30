@@ -31,7 +31,7 @@ public class Specification : IDisposable {
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indriPINVOKE.delete_Specification(swigCPtr);
+      indri_csharpPINVOKE.delete_Specification(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
@@ -39,94 +39,94 @@ public class Specification : IDisposable {
 
   public string name {
     set {
-      indriPINVOKE.Specification_name_set(swigCPtr, value);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      indri_csharpPINVOKE.Specification_name_set(swigCPtr, value);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
-      string ret = indriPINVOKE.Specification_name_get(swigCPtr);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      string ret = indri_csharpPINVOKE.Specification_name_get(swigCPtr);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
   }
 
   public string parser {
     set {
-      indriPINVOKE.Specification_parser_set(swigCPtr, value);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      indri_csharpPINVOKE.Specification_parser_set(swigCPtr, value);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
-      string ret = indriPINVOKE.Specification_parser_get(swigCPtr);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      string ret = indri_csharpPINVOKE.Specification_parser_get(swigCPtr);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
   }
 
   public string tokenizer {
     set {
-      indriPINVOKE.Specification_tokenizer_set(swigCPtr, value);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      indri_csharpPINVOKE.Specification_tokenizer_set(swigCPtr, value);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
-      string ret = indriPINVOKE.Specification_tokenizer_get(swigCPtr);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      string ret = indri_csharpPINVOKE.Specification_tokenizer_get(swigCPtr);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
   }
 
   public string iterator {
     set {
-      indriPINVOKE.Specification_iterator_set(swigCPtr, value);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      indri_csharpPINVOKE.Specification_iterator_set(swigCPtr, value);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
-      string ret = indriPINVOKE.Specification_iterator_get(swigCPtr);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      string ret = indri_csharpPINVOKE.Specification_iterator_get(swigCPtr);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
   }
 
   public string startDocTag {
     set {
-      indriPINVOKE.Specification_startDocTag_set(swigCPtr, value);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      indri_csharpPINVOKE.Specification_startDocTag_set(swigCPtr, value);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
-      string ret = indriPINVOKE.Specification_startDocTag_get(swigCPtr);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      string ret = indri_csharpPINVOKE.Specification_startDocTag_get(swigCPtr);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
   }
 
   public string endDocTag {
     set {
-      indriPINVOKE.Specification_endDocTag_set(swigCPtr, value);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      indri_csharpPINVOKE.Specification_endDocTag_set(swigCPtr, value);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
-      string ret = indriPINVOKE.Specification_endDocTag_get(swigCPtr);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      string ret = indri_csharpPINVOKE.Specification_endDocTag_get(swigCPtr);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
   }
 
   public string endMetadataTag {
     set {
-      indriPINVOKE.Specification_endMetadataTag_set(swigCPtr, value);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      indri_csharpPINVOKE.Specification_endMetadataTag_set(swigCPtr, value);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
-      string ret = indriPINVOKE.Specification_endMetadataTag_get(swigCPtr);
-      if (indriPINVOKE.SWIGPendingException.Pending) throw indriPINVOKE.SWIGPendingException.Retrieve();
+      string ret = indri_csharpPINVOKE.Specification_endMetadataTag_get(swigCPtr);
+      if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
   }
 
   public StringVector include {
     set {
-      indriPINVOKE.Specification_include_set(swigCPtr, StringVector.getCPtr(value));
+      indri_csharpPINVOKE.Specification_include_set(swigCPtr, StringVector.getCPtr(value));
     } 
     get {
-      IntPtr cPtr = indriPINVOKE.Specification_include_get(swigCPtr);
+      IntPtr cPtr = indri_csharpPINVOKE.Specification_include_get(swigCPtr);
       StringVector ret = (cPtr == IntPtr.Zero) ? null : new StringVector(cPtr, false);
       return ret;
     } 
@@ -134,10 +134,10 @@ public class Specification : IDisposable {
 
   public StringVector exclude {
     set {
-      indriPINVOKE.Specification_exclude_set(swigCPtr, StringVector.getCPtr(value));
+      indri_csharpPINVOKE.Specification_exclude_set(swigCPtr, StringVector.getCPtr(value));
     } 
     get {
-      IntPtr cPtr = indriPINVOKE.Specification_exclude_get(swigCPtr);
+      IntPtr cPtr = indri_csharpPINVOKE.Specification_exclude_get(swigCPtr);
       StringVector ret = (cPtr == IntPtr.Zero) ? null : new StringVector(cPtr, false);
       return ret;
     } 
@@ -145,10 +145,10 @@ public class Specification : IDisposable {
 
   public StringVector index {
     set {
-      indriPINVOKE.Specification_index_set(swigCPtr, StringVector.getCPtr(value));
+      indri_csharpPINVOKE.Specification_index_set(swigCPtr, StringVector.getCPtr(value));
     } 
     get {
-      IntPtr cPtr = indriPINVOKE.Specification_index_get(swigCPtr);
+      IntPtr cPtr = indri_csharpPINVOKE.Specification_index_get(swigCPtr);
       StringVector ret = (cPtr == IntPtr.Zero) ? null : new StringVector(cPtr, false);
       return ret;
     } 
@@ -156,10 +156,10 @@ public class Specification : IDisposable {
 
   public StringVector metadata {
     set {
-      indriPINVOKE.Specification_metadata_set(swigCPtr, StringVector.getCPtr(value));
+      indri_csharpPINVOKE.Specification_metadata_set(swigCPtr, StringVector.getCPtr(value));
     } 
     get {
-      IntPtr cPtr = indriPINVOKE.Specification_metadata_get(swigCPtr);
+      IntPtr cPtr = indri_csharpPINVOKE.Specification_metadata_get(swigCPtr);
       StringVector ret = (cPtr == IntPtr.Zero) ? null : new StringVector(cPtr, false);
       return ret;
     } 
@@ -167,16 +167,16 @@ public class Specification : IDisposable {
 
   public ConfMap conflations {
     set {
-      indriPINVOKE.Specification_conflations_set(swigCPtr, ConfMap.getCPtr(value));
+      indri_csharpPINVOKE.Specification_conflations_set(swigCPtr, ConfMap.getCPtr(value));
     } 
     get {
-      IntPtr cPtr = indriPINVOKE.Specification_conflations_get(swigCPtr);
+      IntPtr cPtr = indri_csharpPINVOKE.Specification_conflations_get(swigCPtr);
       ConfMap ret = (cPtr == IntPtr.Zero) ? null : new ConfMap(cPtr, false);
       return ret;
     } 
   }
 
-  public Specification() : this(indriPINVOKE.new_Specification(), true) {
+  public Specification() : this(indri_csharpPINVOKE.new_Specification(), true) {
   }
 
 }
