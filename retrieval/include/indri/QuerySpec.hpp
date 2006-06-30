@@ -913,6 +913,7 @@ namespace indri {
         copier.before(this);
         
         ODNode* duplicate = new ODNode();
+        duplicate->setNodeName( nodeName() );
         duplicate->setWindowSize( _windowSize );
         for(unsigned int i=0; i<_children.size(); i++) {
           Node* child = _children[i]->copy(copier);
