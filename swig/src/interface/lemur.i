@@ -30,7 +30,7 @@
 #endif
 
 // lemur components
-%include "Exception.i"
+%include "LemurException.i"
 %include "typedefs.i"
 %include "TermInfoList.i"
 %include "DocInfoList.i"

@@ -31,7 +31,7 @@ typedef long long UINT64;
 %include "std_map.i"
 %include "std_vector.i"
 
-%include "Exception.i"
+%include "LemurException.i"
 %include "IntVector.i"
 %include "StringVector.i"
 %include "ConflationPattern.i"
@@ -52,7 +52,7 @@ typedef long long UINT64;
 #ifdef SWIGJAVA
 %pragma(java) jniclassimports="import java.util.Map;";
 
-%include "Exception.i"
+%include "LemurException.i"
 %include "ConflationPattern.i"
 %include "MResults.i"
 %include "ScoredExtentArray.i"
@@ -119,7 +119,7 @@ typedef long long UINT64;
 %include "std_string.i"
 %include "exception.i"
 %include "indritypemaps.i"
-%include "Exception.i"
+%include "LemurException.i"
 
 namespace indri{
   namespace parse{
