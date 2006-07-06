@@ -94,6 +94,21 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "AttributeValuePair.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "AttributeValuePairVector.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Char_pVector.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "ConflationPattern.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -214,6 +229,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "MetadataPairSTDVector.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "MetadataPairVector.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -324,7 +344,12 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "SWIGTYPE_p_void.cs"
+                    RelPath = "TagExtent.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "TagExtentVector.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
