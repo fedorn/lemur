@@ -247,6 +247,9 @@
 				RelativePath=".\src\UTF8CaseNormalizationTransformation.cpp">
 			</File>
 			<File
+				RelativePath=".\src\UTF8Transcoder.cpp">
+			</File>
+			<File
 				RelativePath=".\src\WebParser.cpp">
 			</File>
 			<File
