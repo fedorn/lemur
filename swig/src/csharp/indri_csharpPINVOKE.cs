@@ -413,68 +413,68 @@ class indri_csharpPINVOKE {
   [DllImport("lemur_csharp", EntryPoint="CSharp_delete_MResults")]
   public static extern void delete_MResults(HandleRef jarg1);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Clear")]
-  public static extern void MetadataPairVector_Clear(HandleRef jarg1);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_Clear")]
+  public static extern void MetadataPairSTDVector_Clear(HandleRef jarg1);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Add")]
-  public static extern void MetadataPairVector_Add(HandleRef jarg1, HandleRef jarg2);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_Add")]
+  public static extern void MetadataPairSTDVector_Add(HandleRef jarg1, HandleRef jarg2);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_size")]
-  public static extern uint MetadataPairVector_size(HandleRef jarg1);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_size")]
+  public static extern uint MetadataPairSTDVector_size(HandleRef jarg1);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_capacity")]
-  public static extern uint MetadataPairVector_capacity(HandleRef jarg1);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_capacity")]
+  public static extern uint MetadataPairSTDVector_capacity(HandleRef jarg1);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_reserve")]
-  public static extern void MetadataPairVector_reserve(HandleRef jarg1, uint jarg2);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_reserve")]
+  public static extern void MetadataPairSTDVector_reserve(HandleRef jarg1, uint jarg2);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_new_MetadataPairVector__SWIG_0")]
-  public static extern IntPtr new_MetadataPairVector__SWIG_0();
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_MetadataPairSTDVector__SWIG_0")]
+  public static extern IntPtr new_MetadataPairSTDVector__SWIG_0();
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_new_MetadataPairVector__SWIG_1")]
-  public static extern IntPtr new_MetadataPairVector__SWIG_1(int jarg1);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_MetadataPairSTDVector__SWIG_1")]
+  public static extern IntPtr new_MetadataPairSTDVector__SWIG_1(int jarg1);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_getitemcopy")]
-  public static extern IntPtr MetadataPairVector_getitemcopy(HandleRef jarg1, int jarg2);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_getitemcopy")]
+  public static extern IntPtr MetadataPairSTDVector_getitemcopy(HandleRef jarg1, int jarg2);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_getitem")]
-  public static extern IntPtr MetadataPairVector_getitem(HandleRef jarg1, int jarg2);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_getitem")]
+  public static extern IntPtr MetadataPairSTDVector_getitem(HandleRef jarg1, int jarg2);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_setitem")]
-  public static extern void MetadataPairVector_setitem(HandleRef jarg1, int jarg2, HandleRef jarg3);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_setitem")]
+  public static extern void MetadataPairSTDVector_setitem(HandleRef jarg1, int jarg2, HandleRef jarg3);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_AddRange")]
-  public static extern void MetadataPairVector_AddRange(HandleRef jarg1, HandleRef jarg2);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_AddRange")]
+  public static extern void MetadataPairSTDVector_AddRange(HandleRef jarg1, HandleRef jarg2);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_GetRange")]
-  public static extern IntPtr MetadataPairVector_GetRange(HandleRef jarg1, int jarg2, int jarg3);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_GetRange")]
+  public static extern IntPtr MetadataPairSTDVector_GetRange(HandleRef jarg1, int jarg2, int jarg3);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Insert")]
-  public static extern void MetadataPairVector_Insert(HandleRef jarg1, int jarg2, HandleRef jarg3);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_Insert")]
+  public static extern void MetadataPairSTDVector_Insert(HandleRef jarg1, int jarg2, HandleRef jarg3);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_InsertRange")]
-  public static extern void MetadataPairVector_InsertRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_InsertRange")]
+  public static extern void MetadataPairSTDVector_InsertRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_RemoveAt")]
-  public static extern void MetadataPairVector_RemoveAt(HandleRef jarg1, int jarg2);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_RemoveAt")]
+  public static extern void MetadataPairSTDVector_RemoveAt(HandleRef jarg1, int jarg2);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_RemoveRange")]
-  public static extern void MetadataPairVector_RemoveRange(HandleRef jarg1, int jarg2, int jarg3);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_RemoveRange")]
+  public static extern void MetadataPairSTDVector_RemoveRange(HandleRef jarg1, int jarg2, int jarg3);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Repeat")]
-  public static extern IntPtr MetadataPairVector_Repeat(HandleRef jarg1, int jarg2);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_Repeat")]
+  public static extern IntPtr MetadataPairSTDVector_Repeat(HandleRef jarg1, int jarg2);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Reverse__SWIG_0")]
-  public static extern void MetadataPairVector_Reverse__SWIG_0(HandleRef jarg1);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_Reverse__SWIG_0")]
+  public static extern void MetadataPairSTDVector_Reverse__SWIG_0(HandleRef jarg1);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Reverse__SWIG_1")]
-  public static extern void MetadataPairVector_Reverse__SWIG_1(HandleRef jarg1, int jarg2, int jarg3);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_Reverse__SWIG_1")]
+  public static extern void MetadataPairSTDVector_Reverse__SWIG_1(HandleRef jarg1, int jarg2, int jarg3);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_SetRange")]
-  public static extern void MetadataPairVector_SetRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairSTDVector_SetRange")]
+  public static extern void MetadataPairSTDVector_SetRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_MetadataPairVector")]
-  public static extern void delete_MetadataPairVector(HandleRef jarg1);
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_MetadataPairSTDVector")]
+  public static extern void delete_MetadataPairSTDVector(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPair_key_set")]
   public static extern void MetadataPair_key_set(HandleRef jarg1, string jarg2);
@@ -483,16 +483,22 @@ class indri_csharpPINVOKE {
   public static extern string MetadataPair_key_get(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPair_value_set")]
-  public static extern void MetadataPair_value_set(HandleRef jarg1, HandleRef jarg2);
+  public static extern void MetadataPair_value_set(HandleRef jarg1, string jarg2);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPair_value_get")]
-  public static extern IntPtr MetadataPair_value_get(HandleRef jarg1);
+  public static extern string MetadataPair_value_get(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPair_valueLength_set")]
   public static extern void MetadataPair_valueLength_set(HandleRef jarg1, int jarg2);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPair_valueLength_get")]
   public static extern int MetadataPair_valueLength_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_MetadataPair")]
+  public static extern IntPtr new_MetadataPair();
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_MetadataPair")]
+  public static extern void delete_MetadataPair(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocumentVector_Clear")]
   public static extern void ParsedDocumentVector_Clear(HandleRef jarg1);
@@ -620,6 +626,258 @@ class indri_csharpPINVOKE {
   [DllImport("lemur_csharp", EntryPoint="CSharp_delete_TermExtentVector")]
   public static extern void delete_TermExtentVector(HandleRef jarg1);
 
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Clear")]
+  public static extern void MetadataPairVector_Clear(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Add")]
+  public static extern void MetadataPairVector_Add(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_size")]
+  public static extern uint MetadataPairVector_size(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_capacity")]
+  public static extern uint MetadataPairVector_capacity(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_reserve")]
+  public static extern void MetadataPairVector_reserve(HandleRef jarg1, uint jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_MetadataPairVector__SWIG_0")]
+  public static extern IntPtr new_MetadataPairVector__SWIG_0();
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_MetadataPairVector__SWIG_1")]
+  public static extern IntPtr new_MetadataPairVector__SWIG_1(int jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_getitemcopy")]
+  public static extern IntPtr MetadataPairVector_getitemcopy(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_getitem")]
+  public static extern IntPtr MetadataPairVector_getitem(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_setitem")]
+  public static extern void MetadataPairVector_setitem(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_AddRange")]
+  public static extern void MetadataPairVector_AddRange(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_GetRange")]
+  public static extern IntPtr MetadataPairVector_GetRange(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Insert")]
+  public static extern void MetadataPairVector_Insert(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_InsertRange")]
+  public static extern void MetadataPairVector_InsertRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_RemoveAt")]
+  public static extern void MetadataPairVector_RemoveAt(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_RemoveRange")]
+  public static extern void MetadataPairVector_RemoveRange(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Repeat")]
+  public static extern IntPtr MetadataPairVector_Repeat(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Reverse__SWIG_0")]
+  public static extern void MetadataPairVector_Reverse__SWIG_0(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_Reverse__SWIG_1")]
+  public static extern void MetadataPairVector_Reverse__SWIG_1(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_MetadataPairVector_SetRange")]
+  public static extern void MetadataPairVector_SetRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_MetadataPairVector")]
+  public static extern void delete_MetadataPairVector(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_Clear")]
+  public static extern void TagExtentVector_Clear(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_Add")]
+  public static extern void TagExtentVector_Add(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_size")]
+  public static extern uint TagExtentVector_size(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_capacity")]
+  public static extern uint TagExtentVector_capacity(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_reserve")]
+  public static extern void TagExtentVector_reserve(HandleRef jarg1, uint jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_TagExtentVector__SWIG_0")]
+  public static extern IntPtr new_TagExtentVector__SWIG_0();
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_TagExtentVector__SWIG_1")]
+  public static extern IntPtr new_TagExtentVector__SWIG_1(int jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_getitemcopy")]
+  public static extern IntPtr TagExtentVector_getitemcopy(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_getitem")]
+  public static extern IntPtr TagExtentVector_getitem(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_setitem")]
+  public static extern void TagExtentVector_setitem(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_AddRange")]
+  public static extern void TagExtentVector_AddRange(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_GetRange")]
+  public static extern IntPtr TagExtentVector_GetRange(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_Insert")]
+  public static extern void TagExtentVector_Insert(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_InsertRange")]
+  public static extern void TagExtentVector_InsertRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_RemoveAt")]
+  public static extern void TagExtentVector_RemoveAt(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_RemoveRange")]
+  public static extern void TagExtentVector_RemoveRange(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_Repeat")]
+  public static extern IntPtr TagExtentVector_Repeat(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_Reverse__SWIG_0")]
+  public static extern void TagExtentVector_Reverse__SWIG_0(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_Reverse__SWIG_1")]
+  public static extern void TagExtentVector_Reverse__SWIG_1(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtentVector_SetRange")]
+  public static extern void TagExtentVector_SetRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_TagExtentVector")]
+  public static extern void delete_TagExtentVector(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_Clear")]
+  public static extern void Char_pVector_Clear(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_Add")]
+  public static extern void Char_pVector_Add(HandleRef jarg1, string jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_size")]
+  public static extern uint Char_pVector_size(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_capacity")]
+  public static extern uint Char_pVector_capacity(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_reserve")]
+  public static extern void Char_pVector_reserve(HandleRef jarg1, uint jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_Char_pVector__SWIG_0")]
+  public static extern IntPtr new_Char_pVector__SWIG_0();
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_Char_pVector__SWIG_1")]
+  public static extern IntPtr new_Char_pVector__SWIG_1(int jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_getitemcopy")]
+  public static extern string Char_pVector_getitemcopy(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_getitem")]
+  public static extern string Char_pVector_getitem(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_setitem")]
+  public static extern void Char_pVector_setitem(HandleRef jarg1, int jarg2, string jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_AddRange")]
+  public static extern void Char_pVector_AddRange(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_GetRange")]
+  public static extern IntPtr Char_pVector_GetRange(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_Insert")]
+  public static extern void Char_pVector_Insert(HandleRef jarg1, int jarg2, string jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_InsertRange")]
+  public static extern void Char_pVector_InsertRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_RemoveAt")]
+  public static extern void Char_pVector_RemoveAt(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_RemoveRange")]
+  public static extern void Char_pVector_RemoveRange(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_Repeat")]
+  public static extern IntPtr Char_pVector_Repeat(string jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_Reverse__SWIG_0")]
+  public static extern void Char_pVector_Reverse__SWIG_0(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_Reverse__SWIG_1")]
+  public static extern void Char_pVector_Reverse__SWIG_1(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Char_pVector_SetRange")]
+  public static extern void Char_pVector_SetRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_Char_pVector")]
+  public static extern void delete_Char_pVector(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_Clear")]
+  public static extern void AttributeValuePairVector_Clear(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_Add")]
+  public static extern void AttributeValuePairVector_Add(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_size")]
+  public static extern uint AttributeValuePairVector_size(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_capacity")]
+  public static extern uint AttributeValuePairVector_capacity(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_reserve")]
+  public static extern void AttributeValuePairVector_reserve(HandleRef jarg1, uint jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_AttributeValuePairVector__SWIG_0")]
+  public static extern IntPtr new_AttributeValuePairVector__SWIG_0();
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_AttributeValuePairVector__SWIG_1")]
+  public static extern IntPtr new_AttributeValuePairVector__SWIG_1(int jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_getitemcopy")]
+  public static extern IntPtr AttributeValuePairVector_getitemcopy(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_getitem")]
+  public static extern IntPtr AttributeValuePairVector_getitem(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_setitem")]
+  public static extern void AttributeValuePairVector_setitem(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_AddRange")]
+  public static extern void AttributeValuePairVector_AddRange(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_GetRange")]
+  public static extern IntPtr AttributeValuePairVector_GetRange(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_Insert")]
+  public static extern void AttributeValuePairVector_Insert(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_InsertRange")]
+  public static extern void AttributeValuePairVector_InsertRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_RemoveAt")]
+  public static extern void AttributeValuePairVector_RemoveAt(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_RemoveRange")]
+  public static extern void AttributeValuePairVector_RemoveRange(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_Repeat")]
+  public static extern IntPtr AttributeValuePairVector_Repeat(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_Reverse__SWIG_0")]
+  public static extern void AttributeValuePairVector_Reverse__SWIG_0(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_Reverse__SWIG_1")]
+  public static extern void AttributeValuePairVector_Reverse__SWIG_1(HandleRef jarg1, int jarg2, int jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePairVector_SetRange")]
+  public static extern void AttributeValuePairVector_SetRange(HandleRef jarg1, int jarg2, HandleRef jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_AttributeValuePairVector")]
+  public static extern void delete_AttributeValuePairVector(HandleRef jarg1);
+
   [DllImport("lemur_csharp", EntryPoint="CSharp_TermExtent_begin_set")]
   public static extern void TermExtent_begin_set(HandleRef jarg1, int jarg2);
 
@@ -637,6 +895,78 @@ class indri_csharpPINVOKE {
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_delete_TermExtent")]
   public static extern void delete_TermExtent(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_name_set")]
+  public static extern void TagExtent_name_set(HandleRef jarg1, string jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_name_get")]
+  public static extern string TagExtent_name_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_begin_set")]
+  public static extern void TagExtent_begin_set(HandleRef jarg1, uint jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_begin_get")]
+  public static extern uint TagExtent_begin_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_end_set")]
+  public static extern void TagExtent_end_set(HandleRef jarg1, uint jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_end_get")]
+  public static extern uint TagExtent_end_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_number_set")]
+  public static extern void TagExtent_number_set(HandleRef jarg1, long jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_number_get")]
+  public static extern long TagExtent_number_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_parent_set")]
+  public static extern void TagExtent_parent_set(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_parent_get")]
+  public static extern IntPtr TagExtent_parent_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_attributes_set")]
+  public static extern void TagExtent_attributes_set(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_TagExtent_attributes_get")]
+  public static extern IntPtr TagExtent_attributes_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_TagExtent")]
+  public static extern IntPtr new_TagExtent();
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_TagExtent")]
+  public static extern void delete_TagExtent(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePair_attribute_set")]
+  public static extern void AttributeValuePair_attribute_set(HandleRef jarg1, string jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePair_attribute_get")]
+  public static extern string AttributeValuePair_attribute_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePair_value_set")]
+  public static extern void AttributeValuePair_value_set(HandleRef jarg1, string jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePair_value_get")]
+  public static extern string AttributeValuePair_value_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePair_begin_set")]
+  public static extern void AttributeValuePair_begin_set(HandleRef jarg1, uint jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePair_begin_get")]
+  public static extern uint AttributeValuePair_begin_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePair_end_set")]
+  public static extern void AttributeValuePair_end_set(HandleRef jarg1, uint jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_AttributeValuePair_end_get")]
+  public static extern uint AttributeValuePair_end_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_AttributeValuePair")]
+  public static extern IntPtr new_AttributeValuePair();
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_AttributeValuePair")]
+  public static extern void delete_AttributeValuePair(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_text_set")]
   public static extern void ParsedDocument_text_set(HandleRef jarg1, string jarg2);
@@ -664,6 +994,18 @@ class indri_csharpPINVOKE {
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_getContent")]
   public static extern string ParsedDocument_getContent(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_terms_set")]
+  public static extern void ParsedDocument_terms_set(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_terms_get")]
+  public static extern IntPtr ParsedDocument_terms_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_tags_set")]
+  public static extern void ParsedDocument_tags_set(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_tags_get")]
+  public static extern IntPtr ParsedDocument_tags_get(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_positions_set")]
   public static extern void ParsedDocument_positions_set(HandleRef jarg1, HandleRef jarg2);

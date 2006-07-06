@@ -95,18 +95,21 @@
 #endif
 
 #ifdef SWIGCSHARP
-%include "cpointer.i"
+
 
 SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(MetadataPair, indri::parse::MetadataPair)
-  %template(MetadataPairVector) std::vector<indri::parse::MetadataPair>;
+
+%template(MetadataPairSTDVector) std::vector<indri::parse::MetadataPair>;
+
 namespace indri {
-  namespace parse {
-    %nodefault MetadataPair;
+  namespace parse 
+  {
     struct MetadataPair {
       const char* key;
-      const void* value;
+      const char* value;
       int valueLength;
     };
   }
 }
+
 #endif

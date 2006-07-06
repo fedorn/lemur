@@ -11,39 +11,36 @@ namespace Indri {
 using System;
 using System.Runtime.InteropServices;
 
-public class ParsedDocumentVector : IDisposable, System.Collections.IEnumerable {
+public class Char_pVector : IDisposable, System.Collections.IEnumerable {
   private HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
-  internal ParsedDocumentVector(IntPtr cPtr, bool cMemoryOwn) {
+  internal Char_pVector(IntPtr cPtr, bool cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = new HandleRef(this, cPtr);
   }
 
-  internal static HandleRef getCPtr(ParsedDocumentVector obj) {
+  internal static HandleRef getCPtr(Char_pVector obj) {
     return (obj == null) ? new HandleRef(null, IntPtr.Zero) : obj.swigCPtr;
   }
 
-  ~ParsedDocumentVector() {
+  ~Char_pVector() {
     Dispose();
   }
 
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      for (int i=0; i<Count; i++) {
-        indri_csharpPINVOKE.delete_ParsedDocument(ParsedDocument.getCPtr(getitem(i)));
-    }        
-      indri_csharpPINVOKE.delete_ParsedDocumentVector(swigCPtr);
+      indri_csharpPINVOKE.delete_Char_pVector(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
   }
 
-  public ParsedDocumentVector(System.Collections.ICollection c) : this() {
+  public Char_pVector(System.Collections.ICollection c) : this() {
     if (c == null)
       throw new ArgumentNullException("c");
-    foreach (ParsedDocument element in c) {
+    foreach (string element in c) {
       this.Add(element);
     }
   }
@@ -60,7 +57,7 @@ public class ParsedDocumentVector : IDisposable, System.Collections.IEnumerable 
     }
   }
 
-  public ParsedDocument this[int index]  {
+  public string this[int index]  {
     get {
       return getitem(index);
     }
@@ -119,11 +116,11 @@ public class ParsedDocumentVector : IDisposable, System.Collections.IEnumerable 
 
   // Type-safe version of IEnumerable.GetEnumerator
   System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
-    return new ParsedDocumentVectorEnumerator(this);
+    return new Char_pVectorEnumerator(this);
   }
 
-  public ParsedDocumentVectorEnumerator GetEnumerator() {
-    return new ParsedDocumentVectorEnumerator(this);
+  public Char_pVectorEnumerator GetEnumerator() {
+    return new Char_pVectorEnumerator(this);
   }
 
   // Type-safe enumerator
@@ -131,13 +128,13 @@ public class ParsedDocumentVector : IDisposable, System.Collections.IEnumerable 
   /// whenever the collection is modified. This has been done for changes in the size of the
   /// collection but not when one of the elements of the collection is modified as it is a bit
   /// tricky to detect unmanaged code that modifies the collection under our feet.
-  public sealed class ParsedDocumentVectorEnumerator : System.Collections.IEnumerator {
-    private ParsedDocumentVector collectionRef;
+  public sealed class Char_pVectorEnumerator : System.Collections.IEnumerator {
+    private Char_pVector collectionRef;
     private int currentIndex;
     private object currentObject;
     private int currentSize;
 
-    public ParsedDocumentVectorEnumerator(ParsedDocumentVector collection) {
+    public Char_pVectorEnumerator(Char_pVector collection) {
       collectionRef = collection;
       currentIndex = -1;
       currentObject = null;
@@ -145,7 +142,7 @@ public class ParsedDocumentVector : IDisposable, System.Collections.IEnumerable 
     }
 
     // Type-safe iterator Current
-    public ParsedDocument Current {
+    public string Current {
       get {
         if (currentIndex == -1)
           throw new InvalidOperationException("Enumeration not started.");
@@ -153,7 +150,7 @@ public class ParsedDocumentVector : IDisposable, System.Collections.IEnumerable 
           throw new InvalidOperationException("Enumeration finished.");
         if (currentObject == null)
           throw new InvalidOperationException("Collection modified.");
-        return (ParsedDocument)currentObject;
+        return (string)currentObject;
       }
     }
 
@@ -186,103 +183,101 @@ public class ParsedDocumentVector : IDisposable, System.Collections.IEnumerable 
   }
 
   public void Clear() {
-    indri_csharpPINVOKE.ParsedDocumentVector_Clear(swigCPtr);
+    indri_csharpPINVOKE.Char_pVector_Clear(swigCPtr);
   }
 
-  public void Add(ParsedDocument value) {
-    indri_csharpPINVOKE.ParsedDocumentVector_Add(swigCPtr, ParsedDocument.getCPtr(value));
+  public void Add(string value) {
+    indri_csharpPINVOKE.Char_pVector_Add(swigCPtr, value);
   }
 
   private uint size() {
-    uint ret = indri_csharpPINVOKE.ParsedDocumentVector_size(swigCPtr);
+    uint ret = indri_csharpPINVOKE.Char_pVector_size(swigCPtr);
     return ret;
   }
 
   private uint capacity() {
-    uint ret = indri_csharpPINVOKE.ParsedDocumentVector_capacity(swigCPtr);
+    uint ret = indri_csharpPINVOKE.Char_pVector_capacity(swigCPtr);
     return ret;
   }
 
   private void reserve(uint n) {
-    indri_csharpPINVOKE.ParsedDocumentVector_reserve(swigCPtr, n);
+    indri_csharpPINVOKE.Char_pVector_reserve(swigCPtr, n);
   }
 
-  public ParsedDocumentVector() : this(indri_csharpPINVOKE.new_ParsedDocumentVector__SWIG_0(), true) {
+  public Char_pVector() : this(indri_csharpPINVOKE.new_Char_pVector__SWIG_0(), true) {
   }
 
-  public ParsedDocumentVector(int capacity) : this(indri_csharpPINVOKE.new_ParsedDocumentVector__SWIG_1(capacity), true) {
+  public Char_pVector(int capacity) : this(indri_csharpPINVOKE.new_Char_pVector__SWIG_1(capacity), true) {
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  private ParsedDocument getitemcopy(int index) {
-    IntPtr cPtr = indri_csharpPINVOKE.ParsedDocumentVector_getitemcopy(swigCPtr, index);
-    ParsedDocument ret = (cPtr == IntPtr.Zero) ? null : new ParsedDocument(cPtr, false);
-    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  private ParsedDocument getitem(int index) {
-    IntPtr cPtr = indri_csharpPINVOKE.ParsedDocumentVector_getitem(swigCPtr, index);
-    ParsedDocument ret = (cPtr == IntPtr.Zero) ? null : new ParsedDocument(cPtr, false);
+  private string getitemcopy(int index) {
+    string ret = indri_csharpPINVOKE.Char_pVector_getitemcopy(swigCPtr, index);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  private void setitem(int index, ParsedDocument value) {
-    indri_csharpPINVOKE.ParsedDocumentVector_setitem(swigCPtr, index, ParsedDocument.getCPtr(value));
-    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public void AddRange(ParsedDocumentVector values) {
-    indri_csharpPINVOKE.ParsedDocumentVector_AddRange(swigCPtr, ParsedDocumentVector.getCPtr(values));
-    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public ParsedDocumentVector GetRange(int index, int count) {
-    IntPtr cPtr = indri_csharpPINVOKE.ParsedDocumentVector_GetRange(swigCPtr, index, count);
-    ParsedDocumentVector ret = (cPtr == IntPtr.Zero) ? null : new ParsedDocumentVector(cPtr, true);
+  private string getitem(int index) {
+    string ret = indri_csharpPINVOKE.Char_pVector_getitem(swigCPtr, index);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public void Insert(int index, ParsedDocument value) {
-    indri_csharpPINVOKE.ParsedDocumentVector_Insert(swigCPtr, index, ParsedDocument.getCPtr(value));
+  private void setitem(int index, string value) {
+    indri_csharpPINVOKE.Char_pVector_setitem(swigCPtr, index, value);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void InsertRange(int index, ParsedDocumentVector values) {
-    indri_csharpPINVOKE.ParsedDocumentVector_InsertRange(swigCPtr, index, ParsedDocumentVector.getCPtr(values));
+  public void AddRange(Char_pVector values) {
+    indri_csharpPINVOKE.Char_pVector_AddRange(swigCPtr, Char_pVector.getCPtr(values));
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public Char_pVector GetRange(int index, int count) {
+    IntPtr cPtr = indri_csharpPINVOKE.Char_pVector_GetRange(swigCPtr, index, count);
+    Char_pVector ret = (cPtr == IntPtr.Zero) ? null : new Char_pVector(cPtr, true);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public void Insert(int index, string value) {
+    indri_csharpPINVOKE.Char_pVector_Insert(swigCPtr, index, value);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public void InsertRange(int index, Char_pVector values) {
+    indri_csharpPINVOKE.Char_pVector_InsertRange(swigCPtr, index, Char_pVector.getCPtr(values));
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveAt(int index) {
-    indri_csharpPINVOKE.ParsedDocumentVector_RemoveAt(swigCPtr, index);
+    indri_csharpPINVOKE.Char_pVector_RemoveAt(swigCPtr, index);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveRange(int index, int count) {
-    indri_csharpPINVOKE.ParsedDocumentVector_RemoveRange(swigCPtr, index, count);
+    indri_csharpPINVOKE.Char_pVector_RemoveRange(swigCPtr, index, count);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ParsedDocumentVector Repeat(ParsedDocument value, int count) {
-    IntPtr cPtr = indri_csharpPINVOKE.ParsedDocumentVector_Repeat(ParsedDocument.getCPtr(value), count);
-    ParsedDocumentVector ret = (cPtr == IntPtr.Zero) ? null : new ParsedDocumentVector(cPtr, true);
+  public static Char_pVector Repeat(string value, int count) {
+    IntPtr cPtr = indri_csharpPINVOKE.Char_pVector_Repeat(value, count);
+    Char_pVector ret = (cPtr == IntPtr.Zero) ? null : new Char_pVector(cPtr, true);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void Reverse() {
-    indri_csharpPINVOKE.ParsedDocumentVector_Reverse__SWIG_0(swigCPtr);
+    indri_csharpPINVOKE.Char_pVector_Reverse__SWIG_0(swigCPtr);
   }
 
   public void Reverse(int index, int count) {
-    indri_csharpPINVOKE.ParsedDocumentVector_Reverse__SWIG_1(swigCPtr, index, count);
+    indri_csharpPINVOKE.Char_pVector_Reverse__SWIG_1(swigCPtr, index, count);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetRange(int index, ParsedDocumentVector values) {
-    indri_csharpPINVOKE.ParsedDocumentVector_SetRange(swigCPtr, index, ParsedDocumentVector.getCPtr(values));
+  public void SetRange(int index, Char_pVector values) {
+    indri_csharpPINVOKE.Char_pVector_SetRange(swigCPtr, index, Char_pVector.getCPtr(values));
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 

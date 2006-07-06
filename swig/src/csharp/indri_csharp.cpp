@@ -789,65 +789,78 @@ SWIGINTERN void std_vector_Sl_indri_api_ParsedDocument_Sm__Sg__SetRange(std::vec
           throw std::out_of_range("index");
         std::copy(values.begin(), values.end(), self->begin()+index);
       }
-SWIGINTERN std::vector<indri::parse::TermExtent > *new_std_vector_Sl_indri_parse_TermExtent_Sg___SWIG_1(int capacity){
-        std::vector<indri::parse::TermExtent >* pv = 0;
+
+#include "indri/greedy_vector"
+#include <algorithm>
+#include <stdexcept>
+
+SWIGINTERN indri::utility::greedy_vector<indri::parse::TermExtent > *new_indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg___SWIG_1(int capacity){
+        indri::utility::greedy_vector<indri::parse::TermExtent >* pv = 0;
         if (capacity >= 0) {
-          pv = new std::vector<indri::parse::TermExtent >();
+          pv = new indri::utility::greedy_vector<indri::parse::TermExtent >();
           pv->reserve(capacity);
        } else {
           throw std::out_of_range("capacity");
        }
        return pv;
       }
-SWIGINTERN indri::parse::TermExtent std_vector_Sl_indri_parse_TermExtent_Sg__getitemcopy(std::vector<indri::parse::TermExtent > *self,int index){
+SWIGINTERN indri::parse::TermExtent indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__getitemcopy(indri::utility::greedy_vector<indri::parse::TermExtent > *self,int index){
         if (index>=0 && index<(int)self->size())
           return (*self)[index];
         else
           throw std::out_of_range("index");
       }
-SWIGINTERN std::vector<indri::parse::TermExtent >::const_reference std_vector_Sl_indri_parse_TermExtent_Sg__getitem(std::vector<indri::parse::TermExtent > *self,int index){
+SWIGINTERN indri::utility::greedy_vector<indri::parse::TermExtent >::const_reference indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__getitem(indri::utility::greedy_vector<indri::parse::TermExtent > *self,int index){
         if (index>=0 && index<(int)self->size())
           return (*self)[index];
         else
           throw std::out_of_range("index");
       }
-SWIGINTERN void std_vector_Sl_indri_parse_TermExtent_Sg__setitem(std::vector<indri::parse::TermExtent > *self,int index,std::vector<indri::parse::TermExtent >::value_type const &value){
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__setitem(indri::utility::greedy_vector<indri::parse::TermExtent > *self,int index,indri::parse::TermExtent const &value){
         if (index>=0 && index<(int)self->size())
-          (*self)[index] = value;
+          (*self)[index] = const_cast<indri::parse::TermExtent &>(value);
         else
           throw std::out_of_range("index");
       }
-SWIGINTERN void std_vector_Sl_indri_parse_TermExtent_Sg__AddRange(std::vector<indri::parse::TermExtent > *self,std::vector<indri::parse::TermExtent > const &values){
-        self->insert(self->end(), values.begin(), values.end());
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__AddRange(indri::utility::greedy_vector<indri::parse::TermExtent > *self,indri::utility::greedy_vector<indri::parse::TermExtent > const &values){
+        self->append(values.begin(), values.end());
       }
-SWIGINTERN std::vector<indri::parse::TermExtent > *std_vector_Sl_indri_parse_TermExtent_Sg__GetRange(std::vector<indri::parse::TermExtent > *self,int index,int count){
+SWIGINTERN indri::utility::greedy_vector<indri::parse::TermExtent > *indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__GetRange(indri::utility::greedy_vector<indri::parse::TermExtent > *self,int index,int count){
         if (index < 0)
           throw std::out_of_range("index");
         if (count < 0)
           throw std::out_of_range("count");
         if (index >= (int)self->size()+1 || index+count > (int)self->size())
           throw std::invalid_argument("invalid range");
-        return new std::vector<indri::parse::TermExtent >(self->begin()+index, self->begin()+index+count);
+        indri::utility::greedy_vector<indri::parse::TermExtent > *res = new indri::utility::greedy_vector<indri::parse::TermExtent >((size_t) count);
+        res->assign(self->begin()+index, self->begin()+index+count);
+        return res;
       }
-SWIGINTERN void std_vector_Sl_indri_parse_TermExtent_Sg__Insert(std::vector<indri::parse::TermExtent > *self,int index,std::vector<indri::parse::TermExtent >::value_type const &value){
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__Insert(indri::utility::greedy_vector<indri::parse::TermExtent > *self,int index,indri::parse::TermExtent const &value){
         if (index>=0 && index<(int)self->size()+1)
-          self->insert(self->begin()+index, value);
+          // insert x before pos
+          // violates insert semantics.
+          // FIXME
+          self->push_back(const_cast<indri::parse::TermExtent &>(value));
         else
           throw std::out_of_range("index");
       }
-SWIGINTERN void std_vector_Sl_indri_parse_TermExtent_Sg__InsertRange(std::vector<indri::parse::TermExtent > *self,int index,std::vector<indri::parse::TermExtent > const &values){
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__InsertRange(indri::utility::greedy_vector<indri::parse::TermExtent > *self,int index,indri::utility::greedy_vector<indri::parse::TermExtent > const &values){
         if (index>=0 && index<(int)self->size()+1)
-          self->insert(self->begin()+index, values.begin(), values.end());
+          // violates insert semantics.
+          //Inserts the range [first, last) before pos.
+          //FIXME
+          self->append(values.begin(), values.end());
         else
           throw std::out_of_range("index");
       }
-SWIGINTERN void std_vector_Sl_indri_parse_TermExtent_Sg__RemoveAt(std::vector<indri::parse::TermExtent > *self,int index){
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__RemoveAt(indri::utility::greedy_vector<indri::parse::TermExtent > *self,int index){
         if (index>=0 && index<(int)self->size())
           self->erase(self->begin() + index);
         else
           throw std::out_of_range("index");
       }
-SWIGINTERN void std_vector_Sl_indri_parse_TermExtent_Sg__RemoveRange(std::vector<indri::parse::TermExtent > *self,int index,int count){
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__RemoveRange(indri::utility::greedy_vector<indri::parse::TermExtent > *self,int index,int count){
         if (index < 0)
           throw std::out_of_range("index");
         if (count < 0)
@@ -856,15 +869,19 @@ SWIGINTERN void std_vector_Sl_indri_parse_TermExtent_Sg__RemoveRange(std::vector
           throw std::invalid_argument("invalid range");
         self->erase(self->begin()+index, self->begin()+index+count);
       }
-SWIGINTERN std::vector<indri::parse::TermExtent > *std_vector_Sl_indri_parse_TermExtent_Sg__Repeat(std::vector<indri::parse::TermExtent >::value_type const &value,int count){
+SWIGINTERN indri::utility::greedy_vector<indri::parse::TermExtent > *indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__Repeat(indri::parse::TermExtent const &value,int count){
         if (count < 0)
           throw std::out_of_range("count");
-        return new std::vector<indri::parse::TermExtent >(count, value);
+        indri::utility::greedy_vector<indri::parse::TermExtent > *res = new indri::utility::greedy_vector<indri::parse::TermExtent >();
+        for (int i = 0; i < count; i++) {
+          res->push_back( const_cast<indri::parse::TermExtent &>(value) );
+        }
+        return res;        
       }
-SWIGINTERN void std_vector_Sl_indri_parse_TermExtent_Sg__Reverse__SWIG_0(std::vector<indri::parse::TermExtent > *self){
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__Reverse__SWIG_0(indri::utility::greedy_vector<indri::parse::TermExtent > *self){
         std::reverse(self->begin(), self->end());
       }
-SWIGINTERN void std_vector_Sl_indri_parse_TermExtent_Sg__Reverse__SWIG_1(std::vector<indri::parse::TermExtent > *self,int index,int count){
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__Reverse__SWIG_1(indri::utility::greedy_vector<indri::parse::TermExtent > *self,int index,int count){
         if (index < 0)
           throw std::out_of_range("index");
         if (count < 0)
@@ -873,7 +890,419 @@ SWIGINTERN void std_vector_Sl_indri_parse_TermExtent_Sg__Reverse__SWIG_1(std::ve
           throw std::invalid_argument("invalid range");
         std::reverse(self->begin()+index, self->begin()+index+count);
       }
-SWIGINTERN void std_vector_Sl_indri_parse_TermExtent_Sg__SetRange(std::vector<indri::parse::TermExtent > *self,int index,std::vector<indri::parse::TermExtent > const &values){
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__SetRange(indri::utility::greedy_vector<indri::parse::TermExtent > *self,int index,indri::utility::greedy_vector<indri::parse::TermExtent > const &values){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (index+values.size() > self->size())
+          throw std::out_of_range("index");
+        std::copy(values.begin(), values.end(), self->begin()+index);
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::MetadataPair > *new_indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg___SWIG_1(int capacity){
+        indri::utility::greedy_vector<indri::parse::MetadataPair >* pv = 0;
+        if (capacity >= 0) {
+          pv = new indri::utility::greedy_vector<indri::parse::MetadataPair >();
+          pv->reserve(capacity);
+       } else {
+          throw std::out_of_range("capacity");
+       }
+       return pv;
+      }
+SWIGINTERN indri::parse::MetadataPair indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__getitemcopy(indri::utility::greedy_vector<indri::parse::MetadataPair > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::MetadataPair >::const_reference indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__getitem(indri::utility::greedy_vector<indri::parse::MetadataPair > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__setitem(indri::utility::greedy_vector<indri::parse::MetadataPair > *self,int index,indri::parse::MetadataPair const &value){
+        if (index>=0 && index<(int)self->size())
+          (*self)[index] = const_cast<indri::parse::MetadataPair &>(value);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__AddRange(indri::utility::greedy_vector<indri::parse::MetadataPair > *self,indri::utility::greedy_vector<indri::parse::MetadataPair > const &values){
+        self->append(values.begin(), values.end());
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::MetadataPair > *indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__GetRange(indri::utility::greedy_vector<indri::parse::MetadataPair > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        indri::utility::greedy_vector<indri::parse::MetadataPair > *res = new indri::utility::greedy_vector<indri::parse::MetadataPair >((size_t) count);
+        res->assign(self->begin()+index, self->begin()+index+count);
+        return res;
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__Insert(indri::utility::greedy_vector<indri::parse::MetadataPair > *self,int index,indri::parse::MetadataPair const &value){
+        if (index>=0 && index<(int)self->size()+1)
+          // insert x before pos
+          // violates insert semantics.
+          // FIXME
+          self->push_back(const_cast<indri::parse::MetadataPair &>(value));
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__InsertRange(indri::utility::greedy_vector<indri::parse::MetadataPair > *self,int index,indri::utility::greedy_vector<indri::parse::MetadataPair > const &values){
+        if (index>=0 && index<(int)self->size()+1)
+          // violates insert semantics.
+          //Inserts the range [first, last) before pos.
+          //FIXME
+          self->append(values.begin(), values.end());
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__RemoveAt(indri::utility::greedy_vector<indri::parse::MetadataPair > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          self->erase(self->begin() + index);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__RemoveRange(indri::utility::greedy_vector<indri::parse::MetadataPair > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        self->erase(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::MetadataPair > *indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__Repeat(indri::parse::MetadataPair const &value,int count){
+        if (count < 0)
+          throw std::out_of_range("count");
+        indri::utility::greedy_vector<indri::parse::MetadataPair > *res = new indri::utility::greedy_vector<indri::parse::MetadataPair >();
+        for (int i = 0; i < count; i++) {
+          res->push_back( const_cast<indri::parse::MetadataPair &>(value) );
+        }
+        return res;        
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__Reverse__SWIG_0(indri::utility::greedy_vector<indri::parse::MetadataPair > *self){
+        std::reverse(self->begin(), self->end());
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__Reverse__SWIG_1(indri::utility::greedy_vector<indri::parse::MetadataPair > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        std::reverse(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__SetRange(indri::utility::greedy_vector<indri::parse::MetadataPair > *self,int index,indri::utility::greedy_vector<indri::parse::MetadataPair > const &values){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (index+values.size() > self->size())
+          throw std::out_of_range("index");
+        std::copy(values.begin(), values.end(), self->begin()+index);
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::TagExtent * > *new_indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg___SWIG_1(int capacity){
+        indri::utility::greedy_vector<indri::parse::TagExtent * >* pv = 0;
+        if (capacity >= 0) {
+          pv = new indri::utility::greedy_vector<indri::parse::TagExtent * >();
+          pv->reserve(capacity);
+       } else {
+          throw std::out_of_range("capacity");
+       }
+       return pv;
+      }
+SWIGINTERN indri::parse::TagExtent *indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__getitemcopy(indri::utility::greedy_vector<indri::parse::TagExtent * > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::TagExtent * >::const_reference indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__getitem(indri::utility::greedy_vector<indri::parse::TagExtent * > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__setitem(indri::utility::greedy_vector<indri::parse::TagExtent * > *self,int index,indri::parse::TagExtent const *&value){
+        if (index>=0 && index<(int)self->size())
+          (*self)[index] = const_cast<indri::parse::TagExtent * &>(value);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__AddRange(indri::utility::greedy_vector<indri::parse::TagExtent * > *self,indri::utility::greedy_vector<indri::parse::TagExtent * > const &values){
+        self->append(values.begin(), values.end());
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::TagExtent * > *indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__GetRange(indri::utility::greedy_vector<indri::parse::TagExtent * > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        indri::utility::greedy_vector<indri::parse::TagExtent * > *res = new indri::utility::greedy_vector<indri::parse::TagExtent * >((size_t) count);
+        res->assign(self->begin()+index, self->begin()+index+count);
+        return res;
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__Insert(indri::utility::greedy_vector<indri::parse::TagExtent * > *self,int index,indri::parse::TagExtent const *&value){
+        if (index>=0 && index<(int)self->size()+1)
+          // insert x before pos
+          // violates insert semantics.
+          // FIXME
+          self->push_back(const_cast<indri::parse::TagExtent * &>(value));
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__InsertRange(indri::utility::greedy_vector<indri::parse::TagExtent * > *self,int index,indri::utility::greedy_vector<indri::parse::TagExtent * > const &values){
+        if (index>=0 && index<(int)self->size()+1)
+          // violates insert semantics.
+          //Inserts the range [first, last) before pos.
+          //FIXME
+          self->append(values.begin(), values.end());
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__RemoveAt(indri::utility::greedy_vector<indri::parse::TagExtent * > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          self->erase(self->begin() + index);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__RemoveRange(indri::utility::greedy_vector<indri::parse::TagExtent * > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        self->erase(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::TagExtent * > *indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__Repeat(indri::parse::TagExtent const *&value,int count){
+        if (count < 0)
+          throw std::out_of_range("count");
+        indri::utility::greedy_vector<indri::parse::TagExtent * > *res = new indri::utility::greedy_vector<indri::parse::TagExtent * >();
+        for (int i = 0; i < count; i++) {
+          res->push_back( const_cast<indri::parse::TagExtent * &>(value) );
+        }
+        return res;        
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__Reverse__SWIG_0(indri::utility::greedy_vector<indri::parse::TagExtent * > *self){
+        std::reverse(self->begin(), self->end());
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__Reverse__SWIG_1(indri::utility::greedy_vector<indri::parse::TagExtent * > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        std::reverse(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__SetRange(indri::utility::greedy_vector<indri::parse::TagExtent * > *self,int index,indri::utility::greedy_vector<indri::parse::TagExtent * > const &values){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (index+values.size() > self->size())
+          throw std::out_of_range("index");
+        std::copy(values.begin(), values.end(), self->begin()+index);
+      }
+SWIGINTERN indri::utility::greedy_vector<char * > *new_indri_utility_greedy_vector_Sl_char_Sm__Sg___SWIG_1(int capacity){
+        indri::utility::greedy_vector<char * >* pv = 0;
+        if (capacity >= 0) {
+          pv = new indri::utility::greedy_vector<char * >();
+          pv->reserve(capacity);
+       } else {
+          throw std::out_of_range("capacity");
+       }
+       return pv;
+      }
+SWIGINTERN char *indri_utility_greedy_vector_Sl_char_Sm__Sg__getitemcopy(indri::utility::greedy_vector<char * > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN indri::utility::greedy_vector<char * >::const_reference indri_utility_greedy_vector_Sl_char_Sm__Sg__getitem(indri::utility::greedy_vector<char * > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_char_Sm__Sg__setitem(indri::utility::greedy_vector<char * > *self,int index,char const *&value){
+        if (index>=0 && index<(int)self->size())
+          (*self)[index] = const_cast<char * &>(value);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_char_Sm__Sg__AddRange(indri::utility::greedy_vector<char * > *self,indri::utility::greedy_vector<char * > const &values){
+        self->append(values.begin(), values.end());
+      }
+SWIGINTERN indri::utility::greedy_vector<char * > *indri_utility_greedy_vector_Sl_char_Sm__Sg__GetRange(indri::utility::greedy_vector<char * > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        indri::utility::greedy_vector<char * > *res = new indri::utility::greedy_vector<char * >((size_t) count);
+        res->assign(self->begin()+index, self->begin()+index+count);
+        return res;
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_char_Sm__Sg__Insert(indri::utility::greedy_vector<char * > *self,int index,char const *&value){
+        if (index>=0 && index<(int)self->size()+1)
+          // insert x before pos
+          // violates insert semantics.
+          // FIXME
+          self->push_back(const_cast<char * &>(value));
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_char_Sm__Sg__InsertRange(indri::utility::greedy_vector<char * > *self,int index,indri::utility::greedy_vector<char * > const &values){
+        if (index>=0 && index<(int)self->size()+1)
+          // violates insert semantics.
+          //Inserts the range [first, last) before pos.
+          //FIXME
+          self->append(values.begin(), values.end());
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_char_Sm__Sg__RemoveAt(indri::utility::greedy_vector<char * > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          self->erase(self->begin() + index);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_char_Sm__Sg__RemoveRange(indri::utility::greedy_vector<char * > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        self->erase(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN indri::utility::greedy_vector<char * > *indri_utility_greedy_vector_Sl_char_Sm__Sg__Repeat(char const *&value,int count){
+        if (count < 0)
+          throw std::out_of_range("count");
+        indri::utility::greedy_vector<char * > *res = new indri::utility::greedy_vector<char * >();
+        for (int i = 0; i < count; i++) {
+          res->push_back( const_cast<char * &>(value) );
+        }
+        return res;        
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_char_Sm__Sg__Reverse__SWIG_0(indri::utility::greedy_vector<char * > *self){
+        std::reverse(self->begin(), self->end());
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_char_Sm__Sg__Reverse__SWIG_1(indri::utility::greedy_vector<char * > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        std::reverse(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_char_Sm__Sg__SetRange(indri::utility::greedy_vector<char * > *self,int index,indri::utility::greedy_vector<char * > const &values){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (index+values.size() > self->size())
+          throw std::out_of_range("index");
+        std::copy(values.begin(), values.end(), self->begin()+index);
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::AttributeValuePair > *new_indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg___SWIG_1(int capacity){
+        indri::utility::greedy_vector<indri::parse::AttributeValuePair >* pv = 0;
+        if (capacity >= 0) {
+          pv = new indri::utility::greedy_vector<indri::parse::AttributeValuePair >();
+          pv->reserve(capacity);
+       } else {
+          throw std::out_of_range("capacity");
+       }
+       return pv;
+      }
+SWIGINTERN indri::parse::AttributeValuePair indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__getitemcopy(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::AttributeValuePair >::const_reference indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__getitem(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          return (*self)[index];
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__setitem(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self,int index,indri::parse::AttributeValuePair const &value){
+        if (index>=0 && index<(int)self->size())
+          (*self)[index] = const_cast<indri::parse::AttributeValuePair &>(value);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__AddRange(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self,indri::utility::greedy_vector<indri::parse::AttributeValuePair > const &values){
+        self->append(values.begin(), values.end());
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::AttributeValuePair > *indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__GetRange(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        indri::utility::greedy_vector<indri::parse::AttributeValuePair > *res = new indri::utility::greedy_vector<indri::parse::AttributeValuePair >((size_t) count);
+        res->assign(self->begin()+index, self->begin()+index+count);
+        return res;
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__Insert(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self,int index,indri::parse::AttributeValuePair const &value){
+        if (index>=0 && index<(int)self->size()+1)
+          // insert x before pos
+          // violates insert semantics.
+          // FIXME
+          self->push_back(const_cast<indri::parse::AttributeValuePair &>(value));
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__InsertRange(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self,int index,indri::utility::greedy_vector<indri::parse::AttributeValuePair > const &values){
+        if (index>=0 && index<(int)self->size()+1)
+          // violates insert semantics.
+          //Inserts the range [first, last) before pos.
+          //FIXME
+          self->append(values.begin(), values.end());
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__RemoveAt(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self,int index){
+        if (index>=0 && index<(int)self->size())
+          self->erase(self->begin() + index);
+        else
+          throw std::out_of_range("index");
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__RemoveRange(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        self->erase(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN indri::utility::greedy_vector<indri::parse::AttributeValuePair > *indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__Repeat(indri::parse::AttributeValuePair const &value,int count){
+        if (count < 0)
+          throw std::out_of_range("count");
+        indri::utility::greedy_vector<indri::parse::AttributeValuePair > *res = new indri::utility::greedy_vector<indri::parse::AttributeValuePair >();
+        for (int i = 0; i < count; i++) {
+          res->push_back( const_cast<indri::parse::AttributeValuePair &>(value) );
+        }
+        return res;        
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__Reverse__SWIG_0(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self){
+        std::reverse(self->begin(), self->end());
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__Reverse__SWIG_1(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self,int index,int count){
+        if (index < 0)
+          throw std::out_of_range("index");
+        if (count < 0)
+          throw std::out_of_range("count");
+        if (index >= (int)self->size()+1 || index+count > (int)self->size())
+          throw std::invalid_argument("invalid range");
+        std::reverse(self->begin()+index, self->begin()+index+count);
+      }
+SWIGINTERN void indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__SetRange(indri::utility::greedy_vector<indri::parse::AttributeValuePair > *self,int index,indri::utility::greedy_vector<indri::parse::AttributeValuePair > const &values){
         if (index < 0)
           throw std::out_of_range("index");
         if (index+values.size() > self->size())
@@ -2544,7 +2973,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_MResults(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Clear(void * jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_Clear(void * jarg1) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   
   arg1 = (std::vector<indri::parse::MetadataPair > *)jarg1; 
@@ -2552,7 +2981,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Clear(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Add(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_Add(void * jarg1, void * jarg2) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   std::vector<indri::parse::MetadataPair >::value_type *arg2 = 0 ;
   
@@ -2566,7 +2995,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Add(void * jarg1, void * j
 }
 
 
-SWIGEXPORT unsigned long SWIGSTDCALL CSharp_MetadataPairVector_size(void * jarg1) {
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_MetadataPairSTDVector_size(void * jarg1) {
   unsigned long jresult ;
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   std::vector<indri::parse::MetadataPair >::size_type result;
@@ -2578,7 +3007,7 @@ SWIGEXPORT unsigned long SWIGSTDCALL CSharp_MetadataPairVector_size(void * jarg1
 }
 
 
-SWIGEXPORT unsigned long SWIGSTDCALL CSharp_MetadataPairVector_capacity(void * jarg1) {
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_MetadataPairSTDVector_capacity(void * jarg1) {
   unsigned long jresult ;
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   std::vector<indri::parse::MetadataPair >::size_type result;
@@ -2590,7 +3019,7 @@ SWIGEXPORT unsigned long SWIGSTDCALL CSharp_MetadataPairVector_capacity(void * j
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_reserve(void * jarg1, unsigned long jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_reserve(void * jarg1, unsigned long jarg2) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   std::vector<indri::parse::MetadataPair >::size_type arg2 ;
   
@@ -2600,7 +3029,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_reserve(void * jarg1, unsi
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_MetadataPairVector__SWIG_0() {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MetadataPairSTDVector__SWIG_0() {
   void * jresult ;
   std::vector<indri::parse::MetadataPair > *result = 0 ;
   
@@ -2610,7 +3039,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_MetadataPairVector__SWIG_0() {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_MetadataPairVector__SWIG_1(int jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MetadataPairSTDVector__SWIG_1(int jarg1) {
   void * jresult ;
   int arg1 ;
   std::vector<indri::parse::MetadataPair > *result = 0 ;
@@ -2629,7 +3058,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_MetadataPairVector__SWIG_1(int jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_getitemcopy(void * jarg1, int jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairSTDVector_getitemcopy(void * jarg1, int jarg2) {
   void * jresult ;
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   int arg2 ;
@@ -2650,7 +3079,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_getitemcopy(void * jarg1
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_getitem(void * jarg1, int jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairSTDVector_getitem(void * jarg1, int jarg2) {
   void * jresult ;
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   int arg2 ;
@@ -2674,7 +3103,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_getitem(void * jarg1, in
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_setitem(void * jarg1, int jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_setitem(void * jarg1, int jarg2, void * jarg3) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   int arg2 ;
   std::vector<indri::parse::MetadataPair >::value_type *arg3 = 0 ;
@@ -2697,7 +3126,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_setitem(void * jarg1, int 
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_AddRange(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_AddRange(void * jarg1, void * jarg2) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   std::vector<indri::parse::MetadataPair > *arg2 = 0 ;
   
@@ -2711,7 +3140,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_AddRange(void * jarg1, voi
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_GetRange(void * jarg1, int jarg2, int jarg3) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairSTDVector_GetRange(void * jarg1, int jarg2, int jarg3) {
   void * jresult ;
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   int arg2 ;
@@ -2738,7 +3167,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_GetRange(void * jarg1, i
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Insert(void * jarg1, int jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_Insert(void * jarg1, int jarg2, void * jarg3) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   int arg2 ;
   std::vector<indri::parse::MetadataPair >::value_type *arg3 = 0 ;
@@ -2761,7 +3190,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Insert(void * jarg1, int j
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   int arg2 ;
   std::vector<indri::parse::MetadataPair > *arg3 = 0 ;
@@ -2784,7 +3213,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_InsertRange(void * jarg1, 
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_RemoveAt(void * jarg1, int jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_RemoveAt(void * jarg1, int jarg2) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   int arg2 ;
   
@@ -2801,7 +3230,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_RemoveAt(void * jarg1, int
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   int arg2 ;
   int arg3 ;
@@ -2824,7 +3253,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_RemoveRange(void * jarg1, 
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_Repeat(void * jarg1, int jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairSTDVector_Repeat(void * jarg1, int jarg2) {
   void * jresult ;
   std::vector<indri::parse::MetadataPair >::value_type *arg1 = 0 ;
   int arg2 ;
@@ -2849,7 +3278,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_Repeat(void * jarg1, int
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Reverse__SWIG_0(void * jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_Reverse__SWIG_0(void * jarg1) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   
   arg1 = (std::vector<indri::parse::MetadataPair > *)jarg1; 
@@ -2857,7 +3286,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Reverse__SWIG_0(void * jar
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   int arg2 ;
   int arg3 ;
@@ -2880,7 +3309,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Reverse__SWIG_1(void * jar
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairSTDVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   int arg2 ;
   std::vector<indri::parse::MetadataPair > *arg3 = 0 ;
@@ -2903,7 +3332,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_SetRange(void * jarg1, int
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_delete_MetadataPairVector(void * jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MetadataPairSTDVector(void * jarg1) {
   std::vector<indri::parse::MetadataPair > *arg1 = (std::vector<indri::parse::MetadataPair > *) 0 ;
   
   arg1 = (std::vector<indri::parse::MetadataPair > *)jarg1; 
@@ -2941,25 +3370,31 @@ SWIGEXPORT char * SWIGSTDCALL CSharp_MetadataPair_key_get(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPair_value_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPair_value_set(void * jarg1, char * jarg2) {
   indri::parse::MetadataPair *arg1 = (indri::parse::MetadataPair *) 0 ;
-  void *arg2 = (void *) 0 ;
+  char *arg2 = (char *) 0 ;
   
   arg1 = (indri::parse::MetadataPair *)jarg1; 
-  arg2 = (void *)jarg2; 
-  if (arg1) (arg1)->value = (void const *)arg2;
-  
+  arg2 = jarg2; 
+  {
+    if (arg2) {
+      arg1->value = (char const *) (new char[strlen(arg2)+1]);
+      strcpy((char *) arg1->value,arg2);
+    } else {
+      arg1->value = 0;
+    }
+  }
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPair_value_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT char * SWIGSTDCALL CSharp_MetadataPair_value_get(void * jarg1) {
+  char * jresult ;
   indri::parse::MetadataPair *arg1 = (indri::parse::MetadataPair *) 0 ;
-  void *result = 0 ;
+  char *result = 0 ;
   
   arg1 = (indri::parse::MetadataPair *)jarg1; 
-  result = (void *) ((arg1)->value);
-  jresult = (void *)result; 
+  result = (char *) ((arg1)->value);
+  jresult = SWIG_csharp_string_callback(result); 
   return jresult;
 }
 
@@ -2984,6 +3419,25 @@ SWIGEXPORT int SWIGSTDCALL CSharp_MetadataPair_valueLength_get(void * jarg1) {
   result = (int) ((arg1)->valueLength);
   jresult = result; 
   return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MetadataPair() {
+  void * jresult ;
+  indri::parse::MetadataPair *result = 0 ;
+  
+  result = (indri::parse::MetadataPair *)new indri::parse::MetadataPair();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MetadataPair(void * jarg1) {
+  indri::parse::MetadataPair *arg1 = (indri::parse::MetadataPair *) 0 ;
+  
+  arg1 = (indri::parse::MetadataPair *)jarg1; 
+  delete arg1;
+  
 }
 
 
@@ -3348,34 +3802,34 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ParsedDocumentVector(void * jarg1) {
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_Clear(void * jarg1) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
   (arg1)->clear();
 }
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_Add(void * jarg1, void * jarg2) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
-  std::vector<indri::parse::TermExtent >::value_type *arg2 = 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
+  indri::parse::TermExtent *arg2 = 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
-  arg2 = (std::vector<indri::parse::TermExtent >::value_type *)jarg2;
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
+  arg2 = (indri::parse::TermExtent *)jarg2;
   if(!arg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector<indri::parse::TermExtent >::value_type const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::TermExtent & type is null", 0);
     return ;
   } 
-  (arg1)->push_back((std::vector<indri::parse::TermExtent >::value_type const &)*arg2);
+  (arg1)->push_back(*arg2);
 }
 
 
 SWIGEXPORT unsigned long SWIGSTDCALL CSharp_TermExtentVector_size(void * jarg1) {
   unsigned long jresult ;
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
-  std::vector<indri::parse::TermExtent >::size_type result;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
+  size_t result;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
-  result = ((std::vector<indri::parse::TermExtent > const *)arg1)->size();
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
+  result = ((indri::utility::greedy_vector<indri::parse::TermExtent > const *)arg1)->size();
   jresult = result; 
   return jresult;
 }
@@ -3383,31 +3837,31 @@ SWIGEXPORT unsigned long SWIGSTDCALL CSharp_TermExtentVector_size(void * jarg1) 
 
 SWIGEXPORT unsigned long SWIGSTDCALL CSharp_TermExtentVector_capacity(void * jarg1) {
   unsigned long jresult ;
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
-  std::vector<indri::parse::TermExtent >::size_type result;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
+  size_t result;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
-  result = ((std::vector<indri::parse::TermExtent > const *)arg1)->capacity();
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
+  result = ((indri::utility::greedy_vector<indri::parse::TermExtent > const *)arg1)->capacity();
   jresult = result; 
   return jresult;
 }
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_reserve(void * jarg1, unsigned long jarg2) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
-  std::vector<indri::parse::TermExtent >::size_type arg2 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
+  size_t arg2 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
-  arg2 = (std::vector<indri::parse::TermExtent >::size_type)jarg2; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
+  arg2 = (size_t)jarg2; 
   (arg1)->reserve(arg2);
 }
 
 
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_TermExtentVector__SWIG_0() {
   void * jresult ;
-  std::vector<indri::parse::TermExtent > *result = 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *result = 0 ;
   
-  result = (std::vector<indri::parse::TermExtent > *)new std::vector<indri::parse::TermExtent >();
+  result = (indri::utility::greedy_vector<indri::parse::TermExtent > *)new indri::utility::greedy_vector<indri::parse::TermExtent >();
   jresult = (void *)result; 
   return jresult;
 }
@@ -3416,11 +3870,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_TermExtentVector__SWIG_0() {
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_TermExtentVector__SWIG_1(int jarg1) {
   void * jresult ;
   int arg1 ;
-  std::vector<indri::parse::TermExtent > *result = 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *result = 0 ;
   
   arg1 = (int)jarg1; 
   try {
-    result = (std::vector<indri::parse::TermExtent > *)new_std_vector_Sl_indri_parse_TermExtent_Sg___SWIG_1(arg1);
+    result = (indri::utility::greedy_vector<indri::parse::TermExtent > *)new_indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg___SWIG_1(arg1);
   }
   catch(std::out_of_range &_e) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
@@ -3434,14 +3888,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_TermExtentVector__SWIG_1(int jarg1) {
 
 SWIGEXPORT void * SWIGSTDCALL CSharp_TermExtentVector_getitemcopy(void * jarg1, int jarg2) {
   void * jresult ;
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   int arg2 ;
   indri::parse::TermExtent result;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
   arg2 = (int)jarg2; 
   try {
-    result = std_vector_Sl_indri_parse_TermExtent_Sg__getitemcopy(arg1,arg2);
+    result = indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__getitemcopy(arg1,arg2);
   }
   catch(std::out_of_range &_e) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
@@ -3455,16 +3909,16 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_TermExtentVector_getitemcopy(void * jarg1, 
 
 SWIGEXPORT void * SWIGSTDCALL CSharp_TermExtentVector_getitem(void * jarg1, int jarg2) {
   void * jresult ;
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   int arg2 ;
-  std::vector<indri::parse::TermExtent >::value_type *result = 0 ;
+  indri::parse::TermExtent *result = 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
   arg2 = (int)jarg2; 
   try {
     {
-      std::vector<indri::parse::TermExtent >::const_reference _result_ref = std_vector_Sl_indri_parse_TermExtent_Sg__getitem(arg1,arg2);
-      result = (std::vector<indri::parse::TermExtent >::value_type *) &_result_ref;
+      indri::utility::greedy_vector<indri::parse::TermExtent >::const_reference _result_ref = indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__getitem(arg1,arg2);
+      result = (indri::parse::TermExtent *) &_result_ref;
     }
   }
   catch(std::out_of_range &_e) {
@@ -3478,19 +3932,19 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_TermExtentVector_getitem(void * jarg1, int 
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_setitem(void * jarg1, int jarg2, void * jarg3) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   int arg2 ;
-  std::vector<indri::parse::TermExtent >::value_type *arg3 = 0 ;
+  indri::parse::TermExtent *arg3 = 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = (std::vector<indri::parse::TermExtent >::value_type *)jarg3;
+  arg3 = (indri::parse::TermExtent *)jarg3;
   if(!arg3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector<indri::parse::TermExtent >::value_type const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::TermExtent const & type is null", 0);
     return ;
   } 
   try {
-    std_vector_Sl_indri_parse_TermExtent_Sg__setitem(arg1,arg2,(indri::parse::TermExtent const &)*arg3);
+    indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__setitem(arg1,arg2,(indri::parse::TermExtent const &)*arg3);
   }
   catch(std::out_of_range &_e) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
@@ -3501,31 +3955,31 @@ SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_setitem(void * jarg1, int ja
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_AddRange(void * jarg1, void * jarg2) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
-  std::vector<indri::parse::TermExtent > *arg2 = 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg2 = 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
-  arg2 = (std::vector<indri::parse::TermExtent > *)jarg2;
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
+  arg2 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg2;
   if(!arg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector<indri::parse::TermExtent > const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::TermExtent > const & type is null", 0);
     return ;
   } 
-  std_vector_Sl_indri_parse_TermExtent_Sg__AddRange(arg1,(std::vector<indri::parse::TermExtent > const &)*arg2);
+  indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__AddRange(arg1,(indri::utility::greedy_vector<indri::parse::TermExtent > const &)*arg2);
 }
 
 
 SWIGEXPORT void * SWIGSTDCALL CSharp_TermExtentVector_GetRange(void * jarg1, int jarg2, int jarg3) {
   void * jresult ;
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   int arg2 ;
   int arg3 ;
-  std::vector<indri::parse::TermExtent > *result = 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *result = 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   try {
-    result = (std::vector<indri::parse::TermExtent > *)std_vector_Sl_indri_parse_TermExtent_Sg__GetRange(arg1,arg2,arg3);
+    result = (indri::utility::greedy_vector<indri::parse::TermExtent > *)indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__GetRange(arg1,arg2,arg3);
   }
   catch(std::out_of_range &_e) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
@@ -3542,19 +3996,19 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_TermExtentVector_GetRange(void * jarg1, int
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_Insert(void * jarg1, int jarg2, void * jarg3) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   int arg2 ;
-  std::vector<indri::parse::TermExtent >::value_type *arg3 = 0 ;
+  indri::parse::TermExtent *arg3 = 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = (std::vector<indri::parse::TermExtent >::value_type *)jarg3;
+  arg3 = (indri::parse::TermExtent *)jarg3;
   if(!arg3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector<indri::parse::TermExtent >::value_type const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::TermExtent const & type is null", 0);
     return ;
   } 
   try {
-    std_vector_Sl_indri_parse_TermExtent_Sg__Insert(arg1,arg2,(indri::parse::TermExtent const &)*arg3);
+    indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__Insert(arg1,arg2,(indri::parse::TermExtent const &)*arg3);
   }
   catch(std::out_of_range &_e) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
@@ -3565,19 +4019,19 @@ SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_Insert(void * jarg1, int jar
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   int arg2 ;
-  std::vector<indri::parse::TermExtent > *arg3 = 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg3 = 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = (std::vector<indri::parse::TermExtent > *)jarg3;
+  arg3 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg3;
   if(!arg3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector<indri::parse::TermExtent > const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::TermExtent > const & type is null", 0);
     return ;
   } 
   try {
-    std_vector_Sl_indri_parse_TermExtent_Sg__InsertRange(arg1,arg2,(std::vector<indri::parse::TermExtent > const &)*arg3);
+    indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__InsertRange(arg1,arg2,(indri::utility::greedy_vector<indri::parse::TermExtent > const &)*arg3);
   }
   catch(std::out_of_range &_e) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
@@ -3588,13 +4042,13 @@ SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_InsertRange(void * jarg1, in
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_RemoveAt(void * jarg1, int jarg2) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   int arg2 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
   arg2 = (int)jarg2; 
   try {
-    std_vector_Sl_indri_parse_TermExtent_Sg__RemoveAt(arg1,arg2);
+    indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__RemoveAt(arg1,arg2);
   }
   catch(std::out_of_range &_e) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
@@ -3605,15 +4059,15 @@ SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_RemoveAt(void * jarg1, int j
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   int arg2 ;
   int arg3 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   try {
-    std_vector_Sl_indri_parse_TermExtent_Sg__RemoveRange(arg1,arg2,arg3);
+    indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__RemoveRange(arg1,arg2,arg3);
   }
   catch(std::out_of_range &_e) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
@@ -3629,18 +4083,18 @@ SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_RemoveRange(void * jarg1, in
 
 SWIGEXPORT void * SWIGSTDCALL CSharp_TermExtentVector_Repeat(void * jarg1, int jarg2) {
   void * jresult ;
-  std::vector<indri::parse::TermExtent >::value_type *arg1 = 0 ;
+  indri::parse::TermExtent *arg1 = 0 ;
   int arg2 ;
-  std::vector<indri::parse::TermExtent > *result = 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *result = 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent >::value_type *)jarg1;
+  arg1 = (indri::parse::TermExtent *)jarg1;
   if(!arg1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector<indri::parse::TermExtent >::value_type const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::TermExtent const & type is null", 0);
     return 0;
   } 
   arg2 = (int)jarg2; 
   try {
-    result = (std::vector<indri::parse::TermExtent > *)std_vector_Sl_indri_parse_TermExtent_Sg__Repeat((indri::parse::TermExtent const &)*arg1,arg2);
+    result = (indri::utility::greedy_vector<indri::parse::TermExtent > *)indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__Repeat((indri::parse::TermExtent const &)*arg1,arg2);
   }
   catch(std::out_of_range &_e) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
@@ -3653,23 +4107,23 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_TermExtentVector_Repeat(void * jarg1, int j
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_Reverse__SWIG_0(void * jarg1) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
-  std_vector_Sl_indri_parse_TermExtent_Sg__Reverse__SWIG_0(arg1);
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
+  indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__Reverse__SWIG_0(arg1);
 }
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   int arg2 ;
   int arg3 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   try {
-    std_vector_Sl_indri_parse_TermExtent_Sg__Reverse__SWIG_1(arg1,arg2,arg3);
+    indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__Reverse__SWIG_1(arg1,arg2,arg3);
   }
   catch(std::out_of_range &_e) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
@@ -3684,19 +4138,19 @@ SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_Reverse__SWIG_1(void * jarg1
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   int arg2 ;
-  std::vector<indri::parse::TermExtent > *arg3 = 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg3 = 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = (std::vector<indri::parse::TermExtent > *)jarg3;
+  arg3 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg3;
   if(!arg3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::vector<indri::parse::TermExtent > const & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::TermExtent > const & type is null", 0);
     return ;
   } 
   try {
-    std_vector_Sl_indri_parse_TermExtent_Sg__SetRange(arg1,arg2,(std::vector<indri::parse::TermExtent > const &)*arg3);
+    indri_utility_greedy_vector_Sl_indri_parse_TermExtent_Sg__SetRange(arg1,arg2,(indri::utility::greedy_vector<indri::parse::TermExtent > const &)*arg3);
   }
   catch(std::out_of_range &_e) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
@@ -3707,9 +4161,1457 @@ SWIGEXPORT void SWIGSTDCALL CSharp_TermExtentVector_SetRange(void * jarg1, int j
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_delete_TermExtentVector(void * jarg1) {
-  std::vector<indri::parse::TermExtent > *arg1 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
   
-  arg1 = (std::vector<indri::parse::TermExtent > *)jarg1; 
+  arg1 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg1; 
+  delete arg1;
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Clear(void * jarg1) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  (arg1)->clear();
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Add(void * jarg1, void * jarg2) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  indri::parse::MetadataPair *arg2 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (indri::parse::MetadataPair *)jarg2;
+  if(!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::MetadataPair & type is null", 0);
+    return ;
+  } 
+  (arg1)->push_back(*arg2);
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_MetadataPairVector_size(void * jarg1) {
+  unsigned long jresult ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  size_t result;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  result = ((indri::utility::greedy_vector<indri::parse::MetadataPair > const *)arg1)->size();
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_MetadataPairVector_capacity(void * jarg1) {
+  unsigned long jresult ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  size_t result;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  result = ((indri::utility::greedy_vector<indri::parse::MetadataPair > const *)arg1)->capacity();
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_reserve(void * jarg1, unsigned long jarg2) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  size_t arg2 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (size_t)jarg2; 
+  (arg1)->reserve(arg2);
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MetadataPairVector__SWIG_0() {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *result = 0 ;
+  
+  result = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)new indri::utility::greedy_vector<indri::parse::MetadataPair >();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MetadataPairVector__SWIG_1(int jarg1) {
+  void * jresult ;
+  int arg1 ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *result = 0 ;
+  
+  arg1 = (int)jarg1; 
+  try {
+    result = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)new_indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg___SWIG_1(arg1);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_getitemcopy(void * jarg1, int jarg2) {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  int arg2 ;
+  indri::parse::MetadataPair result;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    result = indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__getitemcopy(arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = new indri::parse::MetadataPair((indri::parse::MetadataPair &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_getitem(void * jarg1, int jarg2) {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  int arg2 ;
+  indri::parse::MetadataPair *result = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    {
+      indri::utility::greedy_vector<indri::parse::MetadataPair >::const_reference _result_ref = indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__getitem(arg1,arg2);
+      result = (indri::parse::MetadataPair *) &_result_ref;
+    }
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_setitem(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  int arg2 ;
+  indri::parse::MetadataPair *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::parse::MetadataPair *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::MetadataPair const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__setitem(arg1,arg2,(indri::parse::MetadataPair const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_AddRange(void * jarg1, void * jarg2) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg2 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg2;
+  if(!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::MetadataPair > const & type is null", 0);
+    return ;
+  } 
+  indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__AddRange(arg1,(indri::utility::greedy_vector<indri::parse::MetadataPair > const &)*arg2);
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_GetRange(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *result = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    result = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__GetRange(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Insert(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  int arg2 ;
+  indri::parse::MetadataPair *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::parse::MetadataPair *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::MetadataPair const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__Insert(arg1,arg2,(indri::parse::MetadataPair const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::MetadataPair > const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__InsertRange(arg1,arg2,(indri::utility::greedy_vector<indri::parse::MetadataPair > const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_RemoveAt(void * jarg1, int jarg2) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  int arg2 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__RemoveAt(arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__RemoveRange(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_MetadataPairVector_Repeat(void * jarg1, int jarg2) {
+  void * jresult ;
+  indri::parse::MetadataPair *arg1 = 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *result = 0 ;
+  
+  arg1 = (indri::parse::MetadataPair *)jarg1;
+  if(!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::MetadataPair const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (int)jarg2; 
+  try {
+    result = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__Repeat((indri::parse::MetadataPair const &)*arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Reverse__SWIG_0(void * jarg1) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__Reverse__SWIG_0(arg1);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__Reverse__SWIG_1(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_MetadataPairVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::MetadataPair > const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_MetadataPair_Sg__SetRange(arg1,arg2,(indri::utility::greedy_vector<indri::parse::MetadataPair > const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MetadataPairVector(void * jarg1) {
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg1; 
+  delete arg1;
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_Clear(void * jarg1) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  (arg1)->clear();
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_Add(void * jarg1, void * jarg2) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  indri::parse::TagExtent **arg2 = 0 ;
+  indri::parse::TagExtent *temp2 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  temp2 = (indri::parse::TagExtent *)jarg2;
+  arg2 = &temp2; 
+  (arg1)->push_back(*arg2);
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_TagExtentVector_size(void * jarg1) {
+  unsigned long jresult ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  size_t result;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  result = ((indri::utility::greedy_vector<indri::parse::TagExtent * > const *)arg1)->size();
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_TagExtentVector_capacity(void * jarg1) {
+  unsigned long jresult ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  size_t result;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  result = ((indri::utility::greedy_vector<indri::parse::TagExtent * > const *)arg1)->capacity();
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_reserve(void * jarg1, unsigned long jarg2) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  size_t arg2 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (size_t)jarg2; 
+  (arg1)->reserve(arg2);
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_TagExtentVector__SWIG_0() {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *result = 0 ;
+  
+  result = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)new indri::utility::greedy_vector<indri::parse::TagExtent * >();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_TagExtentVector__SWIG_1(int jarg1) {
+  void * jresult ;
+  int arg1 ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *result = 0 ;
+  
+  arg1 = (int)jarg1; 
+  try {
+    result = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)new_indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg___SWIG_1(arg1);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_TagExtentVector_getitemcopy(void * jarg1, int jarg2) {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  int arg2 ;
+  indri::parse::TagExtent *result = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    result = (indri::parse::TagExtent *)indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__getitemcopy(arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_TagExtentVector_getitem(void * jarg1, int jarg2) {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  int arg2 ;
+  indri::parse::TagExtent **result = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    {
+      indri::utility::greedy_vector<indri::parse::TagExtent * >::const_reference _result_ref = indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__getitem(arg1,arg2);
+      result = (indri::parse::TagExtent **) &_result_ref;
+    }
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)*result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_setitem(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  int arg2 ;
+  indri::parse::TagExtent **arg3 = 0 ;
+  indri::parse::TagExtent *temp3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  temp3 = (indri::parse::TagExtent *)jarg3;
+  arg3 = &temp3; 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__setitem(arg1,arg2,(indri::parse::TagExtent const *&)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_AddRange(void * jarg1, void * jarg2) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg2 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg2;
+  if(!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::TagExtent * > const & type is null", 0);
+    return ;
+  } 
+  indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__AddRange(arg1,(indri::utility::greedy_vector<indri::parse::TagExtent * > const &)*arg2);
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_TagExtentVector_GetRange(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *result = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    result = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__GetRange(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_Insert(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  int arg2 ;
+  indri::parse::TagExtent **arg3 = 0 ;
+  indri::parse::TagExtent *temp3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  temp3 = (indri::parse::TagExtent *)jarg3;
+  arg3 = &temp3; 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__Insert(arg1,arg2,(indri::parse::TagExtent const *&)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::TagExtent * > const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__InsertRange(arg1,arg2,(indri::utility::greedy_vector<indri::parse::TagExtent * > const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_RemoveAt(void * jarg1, int jarg2) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  int arg2 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__RemoveAt(arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__RemoveRange(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_TagExtentVector_Repeat(void * jarg1, int jarg2) {
+  void * jresult ;
+  indri::parse::TagExtent **arg1 = 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *result = 0 ;
+  indri::parse::TagExtent *temp1 = 0 ;
+  
+  temp1 = (indri::parse::TagExtent *)jarg1;
+  arg1 = &temp1; 
+  arg2 = (int)jarg2; 
+  try {
+    result = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__Repeat((indri::parse::TagExtent const *&)*arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_Reverse__SWIG_0(void * jarg1) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__Reverse__SWIG_0(arg1);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__Reverse__SWIG_1(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtentVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::TagExtent * > const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_TagExtent_Sm__Sg__SetRange(arg1,arg2,(indri::utility::greedy_vector<indri::parse::TagExtent * > const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_TagExtentVector(void * jarg1) {
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg1; 
+  delete arg1;
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_Clear(void * jarg1) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  (arg1)->clear();
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_Add(void * jarg1, char * jarg2) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  char **arg2 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = &(jarg2); 
+  (arg1)->push_back(*arg2);
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Char_pVector_size(void * jarg1) {
+  unsigned long jresult ;
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  size_t result;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  result = ((indri::utility::greedy_vector<char * > const *)arg1)->size();
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Char_pVector_capacity(void * jarg1) {
+  unsigned long jresult ;
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  size_t result;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  result = ((indri::utility::greedy_vector<char * > const *)arg1)->capacity();
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_reserve(void * jarg1, unsigned long jarg2) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  size_t arg2 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (size_t)jarg2; 
+  (arg1)->reserve(arg2);
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_Char_pVector__SWIG_0() {
+  void * jresult ;
+  indri::utility::greedy_vector<char * > *result = 0 ;
+  
+  result = (indri::utility::greedy_vector<char * > *)new indri::utility::greedy_vector<char * >();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_Char_pVector__SWIG_1(int jarg1) {
+  void * jresult ;
+  int arg1 ;
+  indri::utility::greedy_vector<char * > *result = 0 ;
+  
+  arg1 = (int)jarg1; 
+  try {
+    result = (indri::utility::greedy_vector<char * > *)new_indri_utility_greedy_vector_Sl_char_Sm__Sg___SWIG_1(arg1);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Char_pVector_getitemcopy(void * jarg1, int jarg2) {
+  char * jresult ;
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  int arg2 ;
+  char *result = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    result = (char *)indri_utility_greedy_vector_Sl_char_Sm__Sg__getitemcopy(arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = SWIG_csharp_string_callback(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_Char_pVector_getitem(void * jarg1, int jarg2) {
+  char * jresult ;
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  int arg2 ;
+  char **result = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    {
+      indri::utility::greedy_vector<char * >::const_reference _result_ref = indri_utility_greedy_vector_Sl_char_Sm__Sg__getitem(arg1,arg2);
+      result = (char **) &_result_ref;
+    }
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = SWIG_csharp_string_callback((const char *)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_setitem(void * jarg1, int jarg2, char * jarg3) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  int arg2 ;
+  char **arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = &(jarg3); 
+  try {
+    indri_utility_greedy_vector_Sl_char_Sm__Sg__setitem(arg1,arg2,(char const *&)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_AddRange(void * jarg1, void * jarg2) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  indri::utility::greedy_vector<char * > *arg2 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (indri::utility::greedy_vector<char * > *)jarg2;
+  if(!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<char * > const & type is null", 0);
+    return ;
+  } 
+  indri_utility_greedy_vector_Sl_char_Sm__Sg__AddRange(arg1,(indri::utility::greedy_vector<char * > const &)*arg2);
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Char_pVector_GetRange(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  indri::utility::greedy_vector<char * > *result = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    result = (indri::utility::greedy_vector<char * > *)indri_utility_greedy_vector_Sl_char_Sm__Sg__GetRange(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_Insert(void * jarg1, int jarg2, char * jarg3) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  int arg2 ;
+  char **arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = &(jarg3); 
+  try {
+    indri_utility_greedy_vector_Sl_char_Sm__Sg__Insert(arg1,arg2,(char const *&)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<char * > *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::utility::greedy_vector<char * > *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<char * > const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_char_Sm__Sg__InsertRange(arg1,arg2,(indri::utility::greedy_vector<char * > const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_RemoveAt(void * jarg1, int jarg2) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  int arg2 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    indri_utility_greedy_vector_Sl_char_Sm__Sg__RemoveAt(arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    indri_utility_greedy_vector_Sl_char_Sm__Sg__RemoveRange(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_Char_pVector_Repeat(char * jarg1, int jarg2) {
+  void * jresult ;
+  char **arg1 = 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<char * > *result = 0 ;
+  
+  arg1 = &(jarg1); 
+  arg2 = (int)jarg2; 
+  try {
+    result = (indri::utility::greedy_vector<char * > *)indri_utility_greedy_vector_Sl_char_Sm__Sg__Repeat((char const *&)*arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_Reverse__SWIG_0(void * jarg1) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  indri_utility_greedy_vector_Sl_char_Sm__Sg__Reverse__SWIG_0(arg1);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    indri_utility_greedy_vector_Sl_char_Sm__Sg__Reverse__SWIG_1(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Char_pVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<char * > *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::utility::greedy_vector<char * > *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<char * > const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_char_Sm__Sg__SetRange(arg1,arg2,(indri::utility::greedy_vector<char * > const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_Char_pVector(void * jarg1) {
+  indri::utility::greedy_vector<char * > *arg1 = (indri::utility::greedy_vector<char * > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<char * > *)jarg1; 
+  delete arg1;
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_Clear(void * jarg1) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  (arg1)->clear();
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_Add(void * jarg1, void * jarg2) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  indri::parse::AttributeValuePair *arg2 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (indri::parse::AttributeValuePair *)jarg2;
+  if(!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::AttributeValuePair & type is null", 0);
+    return ;
+  } 
+  (arg1)->push_back(*arg2);
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_AttributeValuePairVector_size(void * jarg1) {
+  unsigned long jresult ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  size_t result;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  result = ((indri::utility::greedy_vector<indri::parse::AttributeValuePair > const *)arg1)->size();
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned long SWIGSTDCALL CSharp_AttributeValuePairVector_capacity(void * jarg1) {
+  unsigned long jresult ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  size_t result;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  result = ((indri::utility::greedy_vector<indri::parse::AttributeValuePair > const *)arg1)->capacity();
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_reserve(void * jarg1, unsigned long jarg2) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  size_t arg2 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (size_t)jarg2; 
+  (arg1)->reserve(arg2);
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_AttributeValuePairVector__SWIG_0() {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *result = 0 ;
+  
+  result = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)new indri::utility::greedy_vector<indri::parse::AttributeValuePair >();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_AttributeValuePairVector__SWIG_1(int jarg1) {
+  void * jresult ;
+  int arg1 ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *result = 0 ;
+  
+  arg1 = (int)jarg1; 
+  try {
+    result = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)new_indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg___SWIG_1(arg1);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_AttributeValuePairVector_getitemcopy(void * jarg1, int jarg2) {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  int arg2 ;
+  indri::parse::AttributeValuePair result;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    result = indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__getitemcopy(arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = new indri::parse::AttributeValuePair((indri::parse::AttributeValuePair &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_AttributeValuePairVector_getitem(void * jarg1, int jarg2) {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  int arg2 ;
+  indri::parse::AttributeValuePair *result = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    {
+      indri::utility::greedy_vector<indri::parse::AttributeValuePair >::const_reference _result_ref = indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__getitem(arg1,arg2);
+      result = (indri::parse::AttributeValuePair *) &_result_ref;
+    }
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_setitem(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  int arg2 ;
+  indri::parse::AttributeValuePair *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::parse::AttributeValuePair *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::AttributeValuePair const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__setitem(arg1,arg2,(indri::parse::AttributeValuePair const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_AddRange(void * jarg1, void * jarg2) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg2 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg2;
+  if(!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::AttributeValuePair > const & type is null", 0);
+    return ;
+  } 
+  indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__AddRange(arg1,(indri::utility::greedy_vector<indri::parse::AttributeValuePair > const &)*arg2);
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_AttributeValuePairVector_GetRange(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *result = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    result = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__GetRange(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_Insert(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  int arg2 ;
+  indri::parse::AttributeValuePair *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::parse::AttributeValuePair *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::AttributeValuePair const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__Insert(arg1,arg2,(indri::parse::AttributeValuePair const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_InsertRange(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::AttributeValuePair > const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__InsertRange(arg1,arg2,(indri::utility::greedy_vector<indri::parse::AttributeValuePair > const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_RemoveAt(void * jarg1, int jarg2) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  int arg2 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__RemoveAt(arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_RemoveRange(void * jarg1, int jarg2, int jarg3) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__RemoveRange(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_AttributeValuePairVector_Repeat(void * jarg1, int jarg2) {
+  void * jresult ;
+  indri::parse::AttributeValuePair *arg1 = 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *result = 0 ;
+  
+  arg1 = (indri::parse::AttributeValuePair *)jarg1;
+  if(!arg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::parse::AttributeValuePair const & type is null", 0);
+    return 0;
+  } 
+  arg2 = (int)jarg2; 
+  try {
+    result = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__Repeat((indri::parse::AttributeValuePair const &)*arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_Reverse__SWIG_0(void * jarg1) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__Reverse__SWIG_0(arg1);
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_Reverse__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__Reverse__SWIG_1(arg1,arg2,arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  catch(std::invalid_argument &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentException, (&_e)->what(), "");
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePairVector_SetRange(void * jarg1, int jarg2, void * jarg3) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  int arg2 ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg3 = 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg3;
+  if(!arg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "indri::utility::greedy_vector<indri::parse::AttributeValuePair > const & type is null", 0);
+    return ;
+  } 
+  try {
+    indri_utility_greedy_vector_Sl_indri_parse_AttributeValuePair_Sg__SetRange(arg1,arg2,(indri::utility::greedy_vector<indri::parse::AttributeValuePair > const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, 0, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_AttributeValuePairVector(void * jarg1) {
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  
+  arg1 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg1; 
   delete arg1;
   
 }
@@ -3780,6 +5682,292 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_TermExtent(void * jarg1) {
 }
 
 
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtent_name_set(void * jarg1, char * jarg2) {
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  char *arg2 = (char *) 0 ;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  arg2 = jarg2; 
+  {
+    if (arg2) {
+      arg1->name = (char const *) (new char[strlen(arg2)+1]);
+      strcpy((char *) arg1->name,arg2);
+    } else {
+      arg1->name = 0;
+    }
+  }
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_TagExtent_name_get(void * jarg1) {
+  char * jresult ;
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  char *result = 0 ;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  result = (char *) ((arg1)->name);
+  jresult = SWIG_csharp_string_callback(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtent_begin_set(void * jarg1, unsigned int jarg2) {
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  unsigned int arg2 ;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  if (arg1) (arg1)->begin = arg2;
+  
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_TagExtent_begin_get(void * jarg1) {
+  unsigned int jresult ;
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  unsigned int result;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  result = (unsigned int) ((arg1)->begin);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtent_end_set(void * jarg1, unsigned int jarg2) {
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  unsigned int arg2 ;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  if (arg1) (arg1)->end = arg2;
+  
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_TagExtent_end_get(void * jarg1) {
+  unsigned int jresult ;
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  unsigned int result;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  result = (unsigned int) ((arg1)->end);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtent_number_set(void * jarg1, long long jarg2) {
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  INT64 arg2 ;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  arg2 = (INT64)jarg2; 
+  if (arg1) (arg1)->number = arg2;
+  
+}
+
+
+SWIGEXPORT long long SWIGSTDCALL CSharp_TagExtent_number_get(void * jarg1) {
+  long long jresult ;
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  INT64 result;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  result = (INT64) ((arg1)->number);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtent_parent_set(void * jarg1, void * jarg2) {
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  indri::parse::TagExtent *arg2 = (indri::parse::TagExtent *) 0 ;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  arg2 = (indri::parse::TagExtent *)jarg2; 
+  if (arg1) (arg1)->parent = arg2;
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_TagExtent_parent_get(void * jarg1) {
+  void * jresult ;
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  indri::parse::TagExtent *result = 0 ;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  result = (indri::parse::TagExtent *) ((arg1)->parent);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_TagExtent_attributes_set(void * jarg1, void * jarg2) {
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *arg2 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *) 0 ;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  arg2 = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)jarg2; 
+  if (arg1) (arg1)->attributes = *arg2;
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_TagExtent_attributes_get(void * jarg1) {
+  void * jresult ;
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  indri::utility::greedy_vector<indri::parse::AttributeValuePair > *result = 0 ;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  result = (indri::utility::greedy_vector<indri::parse::AttributeValuePair > *)& ((arg1)->attributes);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_TagExtent() {
+  void * jresult ;
+  indri::parse::TagExtent *result = 0 ;
+  
+  result = (indri::parse::TagExtent *)new indri::parse::TagExtent();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_TagExtent(void * jarg1) {
+  indri::parse::TagExtent *arg1 = (indri::parse::TagExtent *) 0 ;
+  
+  arg1 = (indri::parse::TagExtent *)jarg1; 
+  delete arg1;
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePair_attribute_set(void * jarg1, char * jarg2) {
+  indri::parse::AttributeValuePair *arg1 = (indri::parse::AttributeValuePair *) 0 ;
+  char *arg2 = (char *) 0 ;
+  
+  arg1 = (indri::parse::AttributeValuePair *)jarg1; 
+  arg2 = jarg2; 
+  {
+    if (arg2) {
+      arg1->attribute = (char *) (new char[strlen(arg2)+1]);
+      strcpy((char *) arg1->attribute,arg2);
+    } else {
+      arg1->attribute = 0;
+    }
+  }
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_AttributeValuePair_attribute_get(void * jarg1) {
+  char * jresult ;
+  indri::parse::AttributeValuePair *arg1 = (indri::parse::AttributeValuePair *) 0 ;
+  char *result = 0 ;
+  
+  arg1 = (indri::parse::AttributeValuePair *)jarg1; 
+  result = (char *) ((arg1)->attribute);
+  jresult = SWIG_csharp_string_callback(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePair_value_set(void * jarg1, char * jarg2) {
+  indri::parse::AttributeValuePair *arg1 = (indri::parse::AttributeValuePair *) 0 ;
+  char *arg2 = (char *) 0 ;
+  
+  arg1 = (indri::parse::AttributeValuePair *)jarg1; 
+  arg2 = jarg2; 
+  {
+    if (arg2) {
+      arg1->value = (char *) (new char[strlen(arg2)+1]);
+      strcpy((char *) arg1->value,arg2);
+    } else {
+      arg1->value = 0;
+    }
+  }
+}
+
+
+SWIGEXPORT char * SWIGSTDCALL CSharp_AttributeValuePair_value_get(void * jarg1) {
+  char * jresult ;
+  indri::parse::AttributeValuePair *arg1 = (indri::parse::AttributeValuePair *) 0 ;
+  char *result = 0 ;
+  
+  arg1 = (indri::parse::AttributeValuePair *)jarg1; 
+  result = (char *) ((arg1)->value);
+  jresult = SWIG_csharp_string_callback(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePair_begin_set(void * jarg1, unsigned int jarg2) {
+  indri::parse::AttributeValuePair *arg1 = (indri::parse::AttributeValuePair *) 0 ;
+  unsigned int arg2 ;
+  
+  arg1 = (indri::parse::AttributeValuePair *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  if (arg1) (arg1)->begin = arg2;
+  
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_AttributeValuePair_begin_get(void * jarg1) {
+  unsigned int jresult ;
+  indri::parse::AttributeValuePair *arg1 = (indri::parse::AttributeValuePair *) 0 ;
+  unsigned int result;
+  
+  arg1 = (indri::parse::AttributeValuePair *)jarg1; 
+  result = (unsigned int) ((arg1)->begin);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_AttributeValuePair_end_set(void * jarg1, unsigned int jarg2) {
+  indri::parse::AttributeValuePair *arg1 = (indri::parse::AttributeValuePair *) 0 ;
+  unsigned int arg2 ;
+  
+  arg1 = (indri::parse::AttributeValuePair *)jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  if (arg1) (arg1)->end = arg2;
+  
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_AttributeValuePair_end_get(void * jarg1) {
+  unsigned int jresult ;
+  indri::parse::AttributeValuePair *arg1 = (indri::parse::AttributeValuePair *) 0 ;
+  unsigned int result;
+  
+  arg1 = (indri::parse::AttributeValuePair *)jarg1; 
+  result = (unsigned int) ((arg1)->end);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_AttributeValuePair() {
+  void * jresult ;
+  indri::parse::AttributeValuePair *result = 0 ;
+  
+  result = (indri::parse::AttributeValuePair *)new indri::parse::AttributeValuePair();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_AttributeValuePair(void * jarg1) {
+  indri::parse::AttributeValuePair *arg1 = (indri::parse::AttributeValuePair *) 0 ;
+  
+  arg1 = (indri::parse::AttributeValuePair *)jarg1; 
+  delete arg1;
+  
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_ParsedDocument_text_set(void * jarg1, char * jarg2) {
   indri::api::ParsedDocument *arg1 = (indri::api::ParsedDocument *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -3787,7 +5975,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ParsedDocument_text_set(void * jarg1, char * 
   arg1 = (indri::api::ParsedDocument *)jarg1; 
   arg2 = jarg2; 
   {
-    if (arg1->text) delete [] arg1->text;
     if (arg2) {
       arg1->text = (char *) (new char[strlen(arg2)+1]);
       strcpy((char *) arg1->text,arg2);
@@ -3840,7 +6027,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ParsedDocument_content_set(void * jarg1, char
   arg1 = (indri::api::ParsedDocument *)jarg1; 
   arg2 = jarg2; 
   {
-    if (arg1->content) delete [] arg1->content;
     if (arg2) {
       arg1->content = (char *) (new char[strlen(arg2)+1]);
       strcpy((char *) arg1->content,arg2);
@@ -3898,12 +6084,58 @@ SWIGEXPORT char * SWIGSTDCALL CSharp_ParsedDocument_getContent(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ParsedDocument_positions_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ParsedDocument_terms_set(void * jarg1, void * jarg2) {
   indri::api::ParsedDocument *arg1 = (indri::api::ParsedDocument *) 0 ;
-  std::vector<indri::parse::TermExtent > *arg2 = (std::vector<indri::parse::TermExtent > *) 0 ;
+  indri::utility::greedy_vector<char * > *arg2 = (indri::utility::greedy_vector<char * > *) 0 ;
   
   arg1 = (indri::api::ParsedDocument *)jarg1; 
-  arg2 = (std::vector<indri::parse::TermExtent > *)jarg2; 
+  arg2 = (indri::utility::greedy_vector<char * > *)jarg2; 
+  if (arg1) (arg1)->terms = *arg2;
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ParsedDocument_terms_get(void * jarg1) {
+  void * jresult ;
+  indri::api::ParsedDocument *arg1 = (indri::api::ParsedDocument *) 0 ;
+  indri::utility::greedy_vector<char * > *result = 0 ;
+  
+  arg1 = (indri::api::ParsedDocument *)jarg1; 
+  result = (indri::utility::greedy_vector<char * > *)& ((arg1)->terms);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_ParsedDocument_tags_set(void * jarg1, void * jarg2) {
+  indri::api::ParsedDocument *arg1 = (indri::api::ParsedDocument *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *arg2 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *) 0 ;
+  
+  arg1 = (indri::api::ParsedDocument *)jarg1; 
+  arg2 = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)jarg2; 
+  if (arg1) (arg1)->tags = *arg2;
+  
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ParsedDocument_tags_get(void * jarg1) {
+  void * jresult ;
+  indri::api::ParsedDocument *arg1 = (indri::api::ParsedDocument *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TagExtent * > *result = 0 ;
+  
+  arg1 = (indri::api::ParsedDocument *)jarg1; 
+  result = (indri::utility::greedy_vector<indri::parse::TagExtent * > *)& ((arg1)->tags);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_ParsedDocument_positions_set(void * jarg1, void * jarg2) {
+  indri::api::ParsedDocument *arg1 = (indri::api::ParsedDocument *) 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *arg2 = (indri::utility::greedy_vector<indri::parse::TermExtent > *) 0 ;
+  
+  arg1 = (indri::api::ParsedDocument *)jarg1; 
+  arg2 = (indri::utility::greedy_vector<indri::parse::TermExtent > *)jarg2; 
   if (arg1) (arg1)->positions = *arg2;
   
 }
@@ -3912,10 +6144,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ParsedDocument_positions_set(void * jarg1, vo
 SWIGEXPORT void * SWIGSTDCALL CSharp_ParsedDocument_positions_get(void * jarg1) {
   void * jresult ;
   indri::api::ParsedDocument *arg1 = (indri::api::ParsedDocument *) 0 ;
-  std::vector<indri::parse::TermExtent > *result = 0 ;
+  indri::utility::greedy_vector<indri::parse::TermExtent > *result = 0 ;
   
   arg1 = (indri::api::ParsedDocument *)jarg1; 
-  result = (std::vector<indri::parse::TermExtent > *)& ((arg1)->positions);
+  result = (indri::utility::greedy_vector<indri::parse::TermExtent > *)& ((arg1)->positions);
   jresult = (void *)result; 
   return jresult;
 }
@@ -3923,10 +6155,10 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ParsedDocument_positions_get(void * jarg1) 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ParsedDocument_metadata_set(void * jarg1, void * jarg2) {
   indri::api::ParsedDocument *arg1 = (indri::api::ParsedDocument *) 0 ;
-  std::vector<indri::parse::MetadataPair > *arg2 = (std::vector<indri::parse::MetadataPair > *) 0 ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *arg2 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *) 0 ;
   
   arg1 = (indri::api::ParsedDocument *)jarg1; 
-  arg2 = (std::vector<indri::parse::MetadataPair > *)jarg2; 
+  arg2 = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)jarg2; 
   if (arg1) (arg1)->metadata = *arg2;
   
 }
@@ -3935,10 +6167,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ParsedDocument_metadata_set(void * jarg1, voi
 SWIGEXPORT void * SWIGSTDCALL CSharp_ParsedDocument_metadata_get(void * jarg1) {
   void * jresult ;
   indri::api::ParsedDocument *arg1 = (indri::api::ParsedDocument *) 0 ;
-  std::vector<indri::parse::MetadataPair > *result = 0 ;
+  indri::utility::greedy_vector<indri::parse::MetadataPair > *result = 0 ;
   
   arg1 = (indri::api::ParsedDocument *)jarg1; 
-  result = (std::vector<indri::parse::MetadataPair > *)& ((arg1)->metadata);
+  result = (indri::utility::greedy_vector<indri::parse::MetadataPair > *)& ((arg1)->metadata);
   jresult = (void *)result; 
   return jresult;
 }

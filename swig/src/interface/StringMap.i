@@ -10,19 +10,6 @@
 %typemap(jtype) const std::map<std::string,std::string>& "Map"
 %typemap(jstype) const std::map<std::string,std::string>& "Map"
 
-
-
-
-//
-// MetadataPairVector.i
-//
-// 24 August 2004 -- tds
-//
-
-%typemap(jni) const std::vector<indri::parse::MetadataPair>& "jobjectArray"
-%typemap(jtype) const std::vector<indri::parse::MetadataPair>& "Map"
-%typemap(jstype) const std::vector<indri::parse::MetadataPair>& "Map"
-
 %typemap(in) const std::map<std::string,std::string>& ( std::map<std::string,std::string> mapin ) {
   // call map.entrySet()
   jclass mapClazz = jenv->GetObjectClass( $input );

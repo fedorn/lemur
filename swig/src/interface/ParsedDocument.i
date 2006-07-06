@@ -281,11 +281,74 @@
 
 #ifdef SWIGCSHARP
 
+%typemap(csdestruct_derived, methodname="Dispose") std::vector<indri::api::ParsedDocument *>{
+    if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
+      swigCMemOwn = false;
+      for (int i=0; i<Count; i++) {
+        indri_csharpPINVOKE.delete_ParsedDocument(ParsedDocument.getCPtr(getitem(i)));
+    }        
+      $imcall;
+    }
+    swigCPtr = new HandleRef(null, IntPtr.Zero);
+    GC.SuppressFinalize(this);
+  }
+
+%typemap(csdestruct, methodname="Dispose") std::vector<indri::api::ParsedDocument *>{
+    if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
+      swigCMemOwn = false;
+      for (int i=0; i<Count; i++) {
+        indri_csharpPINVOKE.delete_ParsedDocument(ParsedDocument.getCPtr(getitem(i)));
+    }        
+      $imcall;
+    }
+    swigCPtr = new HandleRef(null, IntPtr.Zero);
+    GC.SuppressFinalize(this);
+  }
+
 SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(ParsedDocument, indri::api::ParsedDocument *)
-  %template(ParsedDocumentVector) std::vector<indri::api::ParsedDocument
-*>;
-SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(TermExtent, indri::parse::TermExtent)
-  %template(TermExtentVector) std::vector<indri::parse::TermExtent>;
+
+  %template(ParsedDocumentVector) std::vector<indri::api::ParsedDocument *>;
+
+%include "greedy_vector.i"
+
+SWIG_GREEDY_VECTOR_SPECIALIZE_MINIMUM(TermExtent, indri::parse::TermExtent)
+  %template(TermExtentVector) indri::utility::greedy_vector<indri::parse::TermExtent> ;
+
+SWIG_GREEDY_VECTOR_SPECIALIZE_MINIMUM(MetadataPair, indri::parse::MetadataPair)
+  %template(MetadataPairVector) indri::utility::greedy_vector<indri::parse::MetadataPair> ;
+
+SWIG_GREEDY_VECTOR_SPECIALIZE_MINIMUM(TagExtent, indri::parse::TagExtent *)
+  %template(TagExtentVector) indri::utility::greedy_vector<indri::parse::TagExtent *> ;
+
+// needs more typemaps.
+%typemap(ctype) char *& "char *"
+%typemap(imtype) char *& "string"
+%typemap(cstype) char *& "string"
+%typemap(csin) char *& "$csinput"
+%typemap(csout, excode=SWIGEXCODE) char *& {
+    string ret = $imcall;$excode
+    return ret;
+  }
+
+%typemap(csvarin, excode=SWIGEXCODE2) char *& %{
+    set {
+      $imcall;$excode
+    } %}
+
+%typemap(csvarout, excode=SWIGEXCODE2) char *& %{
+    get {
+      string ret = $imcall;$excode
+      return ret;
+    } %}
+%typemap(in) char *& %{ $1 = &($input); %}
+%typemap(out) char *& %{ $result = SWIG_csharp_string_callback((const char *)$1); %}
+
+SWIG_GREEDY_VECTOR_SPECIALIZE_MINIMUM(string, char *)
+  %template(Char_pVector) indri::utility::greedy_vector<char *> ;
+
+SWIG_GREEDY_VECTOR_SPECIALIZE_MINIMUM(AttributeValuePair, indri::parse::AttributeValuePair)
+  %template(AttributeValuePairVector) indri::utility::greedy_vector<indri::parse::AttributeValuePair> ;
+
 
 namespace indri {
   namespace parse {
@@ -293,8 +356,24 @@ namespace indri {
       int begin;
       int end;
     };
+    struct TagExtent 
+    {
+      const char* name;
+      unsigned int begin;
+      unsigned int end;
+      INT64 number;
+      struct indri::parse::TagExtent *parent;
+      // explicit initial count of two elements.
+      indri::utility::greedy_vector<indri::parse::AttributeValuePair> attributes;
+    };        
+    struct AttributeValuePair {
+      char* attribute;
+      char* value;
+      unsigned int begin;
+      unsigned int end;
+    };
   }
-  // ought to wrap greedy vector too.
+  
   namespace api {
     struct ParsedDocument {  
       char* text;
@@ -304,13 +383,10 @@ namespace indri {
       size_t contentLength;
 
       std::string getContent();
-
-      //      indri::utility::greedy_vector<char*> terms;
-      //      indri::utility::greedy_vector<indri::parse::TagExtent *> tags;
-      // need to support these. bleah.
-      std::vector<indri::parse::TermExtent> positions;
-      // lie to swig...
-      std::vector<indri::parse::MetadataPair> metadata;
+      indri::utility::greedy_vector<char *> terms;
+      indri::utility::greedy_vector<indri::parse::TagExtent *> tags;
+      indri::utility::greedy_vector<indri::parse::TermExtent> positions;
+      indri::utility::greedy_vector<indri::parse::MetadataPair> metadata;
     };
 
   }

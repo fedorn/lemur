@@ -157,8 +157,8 @@ public class IndexEnvironment : IDisposable {
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public int addString(string fileName, string fileClass, MetadataPairVector metadata) {
-    int ret = indri_csharpPINVOKE.IndexEnvironment_addString(swigCPtr, fileName, fileClass, MetadataPairVector.getCPtr(metadata));
+  public int addString(string fileName, string fileClass, MetadataPairSTDVector metadata) {
+    int ret = indri_csharpPINVOKE.IndexEnvironment_addString(swigCPtr, fileName, fileClass, MetadataPairSTDVector.getCPtr(metadata));
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

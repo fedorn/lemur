@@ -11,63 +11,73 @@ namespace Indri {
 using System;
 using System.Runtime.InteropServices;
 
-public class MetadataPair : IDisposable {
+public class AttributeValuePair : IDisposable {
   private HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
-  internal MetadataPair(IntPtr cPtr, bool cMemoryOwn) {
+  internal AttributeValuePair(IntPtr cPtr, bool cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = new HandleRef(this, cPtr);
   }
 
-  internal static HandleRef getCPtr(MetadataPair obj) {
+  internal static HandleRef getCPtr(AttributeValuePair obj) {
     return (obj == null) ? new HandleRef(null, IntPtr.Zero) : obj.swigCPtr;
   }
 
-  ~MetadataPair() {
+  ~AttributeValuePair() {
     Dispose();
   }
 
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
-      indri_csharpPINVOKE.delete_MetadataPair(swigCPtr);
+      indri_csharpPINVOKE.delete_AttributeValuePair(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
     GC.SuppressFinalize(this);
   }
 
-  public string key {
+  public string attribute {
     set {
-      indri_csharpPINVOKE.MetadataPair_key_set(swigCPtr, value);
+      indri_csharpPINVOKE.AttributeValuePair_attribute_set(swigCPtr, value);
     } 
     get {
-      string ret = indri_csharpPINVOKE.MetadataPair_key_get(swigCPtr);
+      string ret = indri_csharpPINVOKE.AttributeValuePair_attribute_get(swigCPtr);
       return ret;
     } 
   }
 
   public string value {
     set {
-      indri_csharpPINVOKE.MetadataPair_value_set(swigCPtr, value);
+      indri_csharpPINVOKE.AttributeValuePair_value_set(swigCPtr, value);
     } 
     get {
-      string ret = indri_csharpPINVOKE.MetadataPair_value_get(swigCPtr);
+      string ret = indri_csharpPINVOKE.AttributeValuePair_value_get(swigCPtr);
       return ret;
     } 
   }
 
-  public int valueLength {
+  public uint begin {
     set {
-      indri_csharpPINVOKE.MetadataPair_valueLength_set(swigCPtr, value);
+      indri_csharpPINVOKE.AttributeValuePair_begin_set(swigCPtr, value);
     } 
     get {
-      int ret = indri_csharpPINVOKE.MetadataPair_valueLength_get(swigCPtr);
+      uint ret = indri_csharpPINVOKE.AttributeValuePair_begin_get(swigCPtr);
       return ret;
     } 
   }
 
-  public MetadataPair() : this(indri_csharpPINVOKE.new_MetadataPair(), true) {
+  public uint end {
+    set {
+      indri_csharpPINVOKE.AttributeValuePair_end_set(swigCPtr, value);
+    } 
+    get {
+      uint ret = indri_csharpPINVOKE.AttributeValuePair_end_get(swigCPtr);
+      return ret;
+    } 
+  }
+
+  public AttributeValuePair() : this(indri_csharpPINVOKE.new_AttributeValuePair(), true) {
   }
 
 }

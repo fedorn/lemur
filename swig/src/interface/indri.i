@@ -26,6 +26,7 @@ typedef long long UINT64;
 %module (directors="1") indri_csharp
 
 %apply const std::string & {std::string &};
+%apply const char * {char *};
 
 %include "std_map.i"
 %include "std_vector.i"
