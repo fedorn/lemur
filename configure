@@ -274,7 +274,7 @@ PACKAGE_STRING='Lemur 4.3'
 PACKAGE_BUGREPORT='project@lemurproject.org'
 
 ac_unique_file="app/src/RetEval.cpp"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX LEX LEXLIB LEX_OUTPUT_ROOT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AR SHARED JAVAC JAR JAVADOC JAVAINC WITH_JAVA PHPCONFIG PHPINCLUDE WITH_PHP MCS SWIG WITH_CSHARP WITH_SWIG PHP_SHARED JAVA_SHARED CSHARP_SHARED PHP_SO JAVA_SO CSHARP_SO MODULES WITH_SUMMARIZATION WITH_DISTRIB WITH_CLUSTER HOST_OS SITESEED LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX LEX LEXLIB LEX_OUTPUT_ROOT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AR SHARED JAVAC JAR JAVADOC JAVAINC JAVAHOME WITH_JAVA PHPCONFIG PHPINCLUDE WITH_PHP MCS SWIG WITH_CSHARP WITH_SWIG PHP_SHARED JAVA_SHARED CSHARP_SHARED PHP_SO JAVA_SO CSHARP_SO MODULES WITH_SUMMARIZATION WITH_DISTRIB WITH_CLUSTER HOST_OS SITESEED LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -5093,6 +5093,7 @@ fi
 
 
 
+
 if test "$enable_php" = "yes" ; then
 
 # Check whether --with-php-config or --without-php-config was given.
@@ -6057,6 +6058,7 @@ s,@JAVAC@,$JAVAC,;t t
 s,@JAR@,$JAR,;t t
 s,@JAVADOC@,$JAVADOC,;t t
 s,@JAVAINC@,$JAVAINC,;t t
+s,@JAVAHOME@,$JAVAHOME,;t t
 s,@WITH_JAVA@,$WITH_JAVA,;t t
 s,@PHPCONFIG@,$PHPCONFIG,;t t
 s,@PHPINCLUDE@,$PHPINCLUDE,;t t
