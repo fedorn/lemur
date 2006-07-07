@@ -127,21 +127,31 @@ $(OBJ)/java/JBuildIndex.o: java/JBuildIndex.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(JAVAINC)
 
 java/lemur_jni.cpp: $(INTERFACES)
+ifneq ("$(SWIG)", "")
 	$(SWIG) -c++ -java -package $(PCK) -o $@ -outdir $(JSRC) $(SRC) 
+endif
 
 $(OBJ)/java/indri_jni.o: java/indri_jni.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(JAVAINC)
 
 java/indri_jni.cpp: $(INTERFACES)
+ifneq ("$(SWIG)", "")
 	$(SWIG) -c++ -java -package $(INDRI_PCK) -o $@ -outdir $(INDRI_JSRC) $(INDRI_SRC) 
+endif
 
 $(CSHARP_CPP): $(INTERFACES)
-	$(SWIG) -c++ -csharp -namespace Lemur -o $@ -outdir csharp $(CSHARPSRC) 
+ifneq ("$(SWIG)", "")
+	$(SWIG) -c++ -csharp -namespace Lemur -o $@ -outdir csharp $(CSHARPSRC)
+endif
+
 $(OUTDIRCSHARP)/lemur_csharp.o: $(CSHARP_CPP)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(INDRI_CSHARP_CPP): $(INTERFACES)
+ifneq ("$(SWIG)", "")
 	$(SWIG) -c++ -csharp -dllimport lemur_csharp -namespace Indri -o $@ -outdir csharp $(INDRI_CSHARPSRC) 
+endif
+
 $(OUTDIRCSHARP)/indri_csharp.o: $(INDRI_CSHARP_CPP)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
@@ -199,7 +209,9 @@ $(OBJ)/java/IndexUI.jar: $(JAVAOBJ) $(MFSTIND) $(DOCDEP)
 
 ## PHP
 php/indri_phpwrap.cpp: $(PHPINTERFACES)
+ifneq ("$(SWIG)", "")
 	$(SWIG) -php4 -c++ -o php/indri_phpwrap.cpp -outdir php $(INCLUDES) $(PHPSRC) 
+endif
 
 $(OUTDIRPHP)/indri_phpwrap.o: php/indri_phpwrap.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(PHPINCLUDE)
