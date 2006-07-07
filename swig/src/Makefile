@@ -4,7 +4,8 @@ include $(LEMURDIR)/MakeDefns
 PACKAGE = lemur_jni
 VERSION = 1.0
 
-LIBNAMES= $(ALLMODULES) antlr xpdf
+LIBNAMES= retrieval langmod index parsing utility
+CONTMODULES=$(LIBNAMES)  contrib/antlr contrib/xpdf
 
 INCPATH = $(patsubst %, -I$(LEMURDIR)/%/include, $(CONTMODULES))
 
@@ -73,10 +74,10 @@ DIRS=
 
 JAVAOBJ = $(patsubst %,$(OUTDIR)/%, $(JAVASRC:.java=.class)) $(patsubst %,$(INDRI_OUTDIR)/%, $(INDRI_JAVASRC:.java=.class)) $(patsubst %,$(OUTDIRUI)/%, $(JAVASRCUI:.java=.class)) $(patsubst %,$(INDRI_OUTDIRUI)/%, $(INDRI_JAVASRCUI:.java=.class))
 
-SOLIB=$(OBJ)/java/lib$(PACKAGE).so
+SOLIB=$(OBJ)/java/lib$(PACKAGE)$(JAVA_SO)
 
 OUTDIRCSHARP=$(OBJ)/csharp
-CSHARP_SO=.so
+
 #naming issues on windows
 CSHARPLIB=$(OUTDIRCSHARP)/liblemur_csharp$(CSHARP_SO)
 CSHARP_DLL=$(OUTDIRCSHARP)/LemurCsharp.dll
@@ -86,7 +87,7 @@ INDRI_PCK=lemurproject.indri
 DOC_PCK=$(PCK) $(INDRI_PCK) $(PCK).ui $(INDRI_PCK).ui
 DOCARGS=-private -author -version
 
-DOC=$(JAVAHOME)/bin/javadoc -classpath java  $(DOCARGS)
+DOC=$(JAVADOC) -classpath java  $(DOCARGS)
 DOCDEP=$(OBJ)/java/docs/index.html
 TARGETS=
 ifeq ($(WITH_SWIG), 1)

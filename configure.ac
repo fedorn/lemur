@@ -162,11 +162,12 @@ else
 fi
 dnl Look for java
 if test "$enable_java" = "yes" ; then
-   AC_ARG_WITH(javahome, [  --with-javahome=path       Set location of JAVAHOME],[JAVAHOME="$withval"; JAVACBIN=$JAVAHOME/bin/javac; JAVAINCDIR=$JAVAHOME/include; JAR=$JAVAHOME/bin/jar], [JAVAHOME=])
+   AC_ARG_WITH(javahome, [  --with-javahome=path       Set location of JAVAHOME],[JAVAHOME="$withval"; JAVACBIN=$JAVAHOME/bin/javac; JAVAINCDIR=$JAVAHOME/include; JAR=$JAVAHOME/bin/jar; JAVADOC=$JAVAHOME/bin/javadoc], [JAVAHOME=])
    
    if test -z "$JAVACBIN" ; then
      AC_PATH_PROGS(JAVAC, javac)
      AC_PATH_PROGS(JAR, jar)
+     AC_PATH_PROGS(JAVADOC, jar)
    else
      JAVAC="$JAVACBIN"
    fi
@@ -206,6 +207,7 @@ dnl now look for <arch>/jni_md.h
 else
    JAVAC=
    JAR=
+   JAVADOC=
    JAVAINC=
    JAVAHOME=
    WITH_JAVA=0
@@ -213,7 +215,7 @@ fi
 AC_SUBST(JAVAC)
 AC_SUBST(JAR)
 AC_SUBST(JAVAINC)
-AC_SUBST(JAVAHOME)
+AC_SUBST(JAVADOC)
 AC_SUBST(WITH_JAVA)
 
 dnl Look for php
