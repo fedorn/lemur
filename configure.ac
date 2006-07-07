@@ -167,7 +167,7 @@ if test "$enable_java" = "yes" ; then
    if test -z "$JAVACBIN" ; then
      AC_PATH_PROGS(JAVAC, javac)
      AC_PATH_PROGS(JAR, jar)
-     AC_PATH_PROGS(JAVADOC, jar)
+     AC_PATH_PROGS(JAVADOC, javadoc)
    else
      JAVAC="$JAVACBIN"
    fi
