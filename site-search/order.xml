@@ -60,6 +60,11 @@
             <boolean name="if-match-return">true</boolean>
             <string name="regexp">.*(?i)/\?[NDMS]=[AD]$</string>
           </newObject>
+          <newObject name="indexdir" class="org.archive.crawler.filter.URIRegExpFilter">
+            <boolean name="enabled">true</boolean>
+            <boolean name="if-match-return">true</boolean>
+            <string name="regexp">.*(?i)/%7e[^/]+/index\.html/.*$</string>
+          </newObject>
         </map>
       </newObject>
       <newObject name="force-accept-filter" class="org.archive.crawler.filter.OrFilter">
@@ -95,7 +100,7 @@
     <newObject name="frontier" class="org.archive.crawler.frontier.BdbFrontier">
       <float name="delay-factor">4.0</float>
       <integer name="max-delay-ms">20000</integer>
-      <integer name="min-delay-ms">1000</integer>
+      <integer name="min-delay-ms">500</integer>
       <integer name="max-retries">10</integer>
       <long name="retry-delay-seconds">30</long>
       <integer name="preference-embed-hops">1</integer>
