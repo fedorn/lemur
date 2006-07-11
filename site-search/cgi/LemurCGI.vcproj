@@ -132,6 +132,9 @@
 				RelativePath=".\DictionaryHash.cpp">
 			</File>
 			<File
+				RelativePath=".\IndriSearchInterface.cpp">
+			</File>
+			<File
 				RelativePath=".\LemurCGI.cpp">
 			</File>
 			<File
@@ -153,6 +156,9 @@
 			</File>
 			<File
 				RelativePath=".\DictionaryHash.h">
+			</File>
+			<File
+				RelativePath=".\IndriSearchInterface.h">
 			</File>
 			<File
 				RelativePath=".\LemurSearchCGIConstants.h">
