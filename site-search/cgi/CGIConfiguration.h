@@ -55,6 +55,10 @@ protected:
   /** current number of indexes */
   int             currentIndicesSize;
 
+  bool  _useQueryLog;
+
+  string queryLogPath;
+
   /** our root paths as defined by the configuration */
   vector<string>  rootPaths;
 
@@ -72,6 +76,10 @@ protected:
 
   /** dictionary hash for any values we may want to temporarily store **/
   DictionaryHash  _kvPairs;
+
+  /** support page rank as a prior **/
+  bool supportPageRank;
+
 
   /** our instance variable */
   static CGIConfiguration *_instance;  
@@ -137,6 +145,11 @@ public:
    */
   int    getNumRootPaths();
 
+
+  bool getSupportPageRankPrior() {
+    return supportPageRank;
+  }  
+
   /**
    * Retrieves a single root path
    * 
@@ -197,6 +210,14 @@ public:
    * @return the value of the key
    */
   string getKVItem(string _key);
+
+  bool useQueryLogging() {
+    return _useQueryLog;
+  }
+
+  string getQueryLogPath() {
+    return queryLogPath;      
+  }
 
 }; // end class CGIConfiguration
 

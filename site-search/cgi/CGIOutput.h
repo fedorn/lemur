@@ -79,9 +79,10 @@ private:
   int     totalResultNum;
   int     currentNumDisplayedResults;
 
-  string loadPageTemplate(string templateFile);
+  char toHex(char c);
+  char fromHex(char c1, char c2);
 
-  void stringReplaceAll(string *s, string before, string after);
+  string loadPageTemplate(string templateFile);
 
   void replaceTemplateCommand(string *templatePage, string variableName, string replacement);
   void replaceCompileDateVersion(string *templatePage);
@@ -107,6 +108,8 @@ public:
    * Destructor
    */
   ~CGIOutput();
+
+  void stringReplaceAll(string *s, string before, string after);
 
   /**
    * Sets our output mode.
@@ -196,7 +199,7 @@ public:
    *
    * @param query the query string
    */
-  void setResultQuery(string query);
+  void setResultQuery(string &query);
 
   /**
    * Sets the result statistics (i.e. result start #, end # and total results) for the page.

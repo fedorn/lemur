@@ -72,6 +72,19 @@ bool CGIConfiguration::readConfigFile(char *filePath) {
     rootAddPath=rootAddPathNode->getValue();
   }
 
+  _useQueryLog=false;
+  const XMLNode *useQueryLogNode=rootNode->getChild("querylog");
+  if (useQueryLogNode) {
+    _useQueryLog=true;
+    queryLogPath=useQueryLogNode->getValue();
+  }
+
+  supportPageRank=false;
+  const XMLNode *useSupportPRNode=rootNode->getChild("supportpagerank");
+  if ((useSupportPRNode) && (useSupportPRNode->getValue()=="true")) {
+    supportPageRank=true;      
+  }  
+
   const XMLNode *rootSupportATNode=rootNode->getChild("supportanchortext");
   if (rootSupportATNode) {
     if (rootSupportATNode->getValue().compare("true")==0) {

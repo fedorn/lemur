@@ -17,7 +17,7 @@ using std::map;
 
 // these are for offline debugging...
 // #define OFFLINEDEBUGGING
-// #define OFFLINEDEBUGGING_QUERY "q=test"
+// #define OFFLINEDEBUGGING_QUERY "q=Paul+Ogilvie"
 
 // our query parameters
 
@@ -286,9 +286,23 @@ void processRequest(CGIOutput *output) {
                 } break;
       case 'q': {
                   // query
-                  db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, startRank, currentQueryType);
+                  if (thisVal=="") {
+                    output->displayDefaultSearchPage();      
+                  } else {
+                    db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, startRank, currentQueryType);
+                  }  
                   hasOutput=true;
                 } break;
+      case 'Q': {
+                  // query w/ extra debugging info
+                  CGIConfiguration::getInstance().putKVItem("displayquerydebug", "true");
+                  if (thisVal=="") {
+                    output->displayDefaultSearchPage();      
+                  } else {
+                    db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, startRank, currentQueryType);
+                  }  
+                  hasOutput=true;
+                } break;  
       case 'e': {
                   // get document from ID string
                   db.getDocXID(&thisVal);

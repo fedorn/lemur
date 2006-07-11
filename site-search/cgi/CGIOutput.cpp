@@ -18,6 +18,25 @@ CGIOutput::~CGIOutput() {
 
 /** private functions **/
 
+char CGIOutput::toHex(char c) {
+  return (c > 9) ? (c+55) : (c+48);      
+}
+
+char CGIOutput::fromHex(char c1, char c2) {
+  char retVal=0;
+  if ((c1 > 47) && (c1 < 58)) {
+    retVal=(c1-48) << 4;      
+  } else {
+    retVal=(c2-55) << 4;
+  }
+  if ((c2 > 47) && (c2 < 58)) {
+    retVal+=(c2-48);      
+  } else {
+    retVal+=(c2-55);
+  }
+  return retVal;
+}
+
 void CGIOutput::outputHTTPHeader(string contentType) {
   if (!haveHeadersBeenSent) {
     if (outputMode!=CGI_OUTPUT_DIAGNOSTIC) {
@@ -65,29 +84,52 @@ void CGIOutput::stringReplaceAll(string *s, string before, string after) {
 }
 
 string CGIOutput::URLEncodeString(string s) {
-  string outputString=s;
+  stringstream outputString;
 
-  stringReplaceAll (&outputString, " ", "+");
-  stringReplaceAll (&outputString, "#", "%23");
-  stringReplaceAll (&outputString, "(", "%28");
-  stringReplaceAll (&outputString, ")", "%29");
-  stringReplaceAll (&outputString, " ", "%20");
-  stringReplaceAll (&outputString, ",", "%2C");
-
-  return outputString;
+  int sLen=s.length();
+  for (int i=0; i < sLen; i++) {
+    char cChar=s[i];
+    if (isalnum(cChar)) {
+      outputString << cChar;      
+    } else {
+      if (isspace(cChar)) {
+        outputString << "+";      
+      } else {
+        outputString << "%" << toHex(cChar >> 4) << toHex(cChar%16);      
+      }
+    }
+  }
+        
+  return outputString.str();
 }
 
 string CGIOutput::URLDecodeString(string s) {
-  string outputString=s;
+  stringstream outputString;
+  int sLen=s.length();
 
-  stringReplaceAll (&outputString, "+", " ");
-  stringReplaceAll (&outputString, "%23", "#");
-  stringReplaceAll (&outputString, "%28", "(");
-  stringReplaceAll (&outputString, "%29", ")");
-  stringReplaceAll (&outputString, "%20", " ");
-  stringReplaceAll (&outputString, "%2C", ",");
+  int cPos=0;
+  while (cPos < sLen) {
+    char cChar=s[cPos];
+    if (cChar=='+') {
+      outputString << " ";
+      cPos++;
+    } else if (cChar=='%') {
+      if ((cPos+2)>=sLen) {
+        outputString << cChar;
+        cPos++;
+      } else {
+        char fDigit=s[cPos+1];
+        char sDigit=s[cPos+2];
+        outputString << fromHex(fDigit, sDigit);
+        cPos+=3;
+      }
+    } else {
+      outputString << cChar;
+      cPos++;
+    }
+  }
 
-  return outputString;
+  return outputString.str();
 }
 
 void CGIOutput::replaceTemplateCommand(string *templatePage, string variableName, string replacement) {
@@ -128,9 +170,11 @@ string CGIOutput::processParameterCommand(string command, string paramValue) {
   if (command=="LemurSearchBox") {
     // display a search box
     stringstream retString;
+    string formValue=queryTerms;
+    stringReplaceAll(&formValue, "\"", "&quot;");
     retString << "<form action=\"" << scriptURL << "\" method=GET>\n"
               << "<input type=\"text\" name=\"q\" size=\"" << actualParamValue << "\""
-              <<  " value=\"" << URLDecodeString(queryTerms) << "\"><input type=\"submit\" value=\"Search\">";
+              <<  " value=\"" << URLDecodeString(formValue) << "\"><input type=\"submit\" value=\"Search\"></form>";
 
     return retString.str();
   }
@@ -308,9 +352,10 @@ void CGIOutput::displayDefaultSearchPage() {
 }
 
 bool CGIOutput::resetResultsPage() {
+   std::string aBlankString="";      
   // reset any statistics
   setResultStatistics(0, 0, 0, 0);
-  setResultQuery("");
+  setResultQuery(aBlankString);
   currentNumDisplayedResults=0;
 
   substitutionValues.clear();
@@ -354,9 +399,10 @@ bool CGIOutput::resetResultsPage() {
   return true;
 }
 
-void CGIOutput::setResultQuery(string query) {
-  queryTerms=query;
-  substitutionValues.put("LemurSearchQueryTerms", query.c_str());
+void CGIOutput::setResultQuery(string &query) {
+  queryTerms="";
+  queryTerms.append(query);
+  substitutionValues.put("LemurSearchQueryTerms", queryTerms.c_str());
 }
 
 void CGIOutput::setResultStatistics(int datasourceID, int start, int end, int total) {
@@ -368,7 +414,11 @@ void CGIOutput::setResultStatistics(int datasourceID, int start, int end, int to
   stringstream tmpBuffer;
 
   tmpBuffer.str("");
-  tmpBuffer << (start+1);
+  if (end==0) {
+    tmpBuffer << "0";      
+  } else {
+    tmpBuffer << (start+1);
+  }  
   substitutionValues.put("LemurSearchResultsStartNum", tmpBuffer.str().c_str());
   tmpBuffer.str("");
   tmpBuffer << end;

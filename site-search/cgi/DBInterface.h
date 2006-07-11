@@ -19,6 +19,8 @@ using std::string;
 #include "Param.hpp"
 #include "LemurIndriIndex.hpp"
 #include "indri/QueryEnvironment.hpp"
+#include "indri/QueryAnnotation.hpp"
+#include "IndriSearchInterface.h"
 
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
@@ -50,6 +52,7 @@ private:
   void displaySearchResults(lemur::api::Index *db, int datasourceID, lemur::parse::StringQuery* q, indri::api::QueryEnvironment *indriEnvironment,
                             lemur::api::IndexedRealVector *results, int listLength, int rankStart);
 
+
   /**
    * Creates a summary string for the result
    *
@@ -63,7 +66,7 @@ private:
    * @param docID the document internal ID
    * @return the original URI
    */
-  string getDocHTTPLink(lemur::api::Index *index, long docID);
+  //string getDocHTTPLink(lemur::api::Index *index, long docID);
 
   /**
    * Returns the Indri index (if any) of where a document is
@@ -107,13 +110,6 @@ private:
    * @return termcount of how many times the term occurs total
    */
   int getTFAnchorTagCount(indri::index::Index *index, long docid, long termid, indri::utility::greedy_vector<indri::index::FieldExtent> *anchorFields);
-
-  /**
-   * Reformulates a free-text query
-   * @param origQuery the original query
-   * @return the (possibly) modified query string
-   */
-  string indriDefaultQueryExpansion(string &origQuery);
 
 
 public:

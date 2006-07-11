@@ -16,89 +16,6 @@ DBInterface::~DBInterface() {
 
 
 /** private functions **/
-lemur::api::Stemmer* DBInterface::getDbStemmer(const lemur::api::Index* ind) {
-  Stemmer* stemmer = NULL;
-  
-  // get our collection properties
-  const lemur::parse::BasicCollectionProps* props = dynamic_cast<const lemur::parse::BasicCollectionProps*> (ind->collectionProps());
-  if (props) {
-    string stype = "";
-    const lemur::parse::Property* p = NULL;
-    
-    // get the stemmer propery...
-    p = props->getProperty(Stemmer::category);
-    if (p) {
-      stype = (char*)p->getValue();
-    }
-
-    // create the stemmer...
-    stemmer = TextHandlerManager::createStemmer(stype);
-  }
-  return stemmer;
-}
-
-lemur::api::Index *DBInterface::openIndex() {
-  Index* db;
-
-  try {
-    db = IndexManager::openIndex(pathToIndex);
-  }
-  catch (...) {
-    db = NULL;
-  }
-
-  return db;
-}
-
-string DBInterface::getDocHTTPLink(lemur::api::Index *index, long docID) {
-  string retString("[no url]");
-
-  if (!index) return retString;
-
-  const DocumentManager* dm = NULL;
-  string idstr;
-  stringstream docidStrStr;
-  docidStrStr << docID;
-
-  if (! (dm = index->docManager (docID))) {
-    return retString;
-  } else {
-
-    idstr = index->document (docID);
-
-    if (idstr == "[OOV]") {
-      return retString;
-    }
-  }
-
-  char *theDoc=dm->getDoc(idstr);
-
-  string docString(theDoc);
-
-  std::string::size_type hdrPos=docString.find("<DOCHDR>");
-  if (hdrPos > 0) {
-    // safely assume it won't be at the beginning...
-    std::string::size_type hdrPosEnd=docString.find("</DOCHDR>", hdrPos);
-    if (hdrPosEnd > hdrPos) {
-      // ensure the end doc header is after the beginning...
-      std::string::size_type httpStartPos=docString.find("http://", hdrPos);
-      if ((httpStartPos > hdrPos) && (httpStartPos < hdrPosEnd)) {
-        // ensure our link is between the DOCHDR tags...
-        // get the string to the end of the line...
-        char *tmpString=strdup(docString.substr(httpStartPos, (hdrPosEnd-httpStartPos)).c_str());
-        if (tmpString) {
-          char *fTok=strtok(tmpString, " \t\n\r");
-          if (fTok) {
-            retString=fTok;
-          } // if (fTok)
-          delete tmpString;
-        } // if (tmpString)
-      } // end if ((httpStartPos > hdrPos) && (httpStartPos < hdrPosEnd))
-    } // end if (hdrPosEnd > hdrPos)
-  } // end if (hdrPos > 0)
-
-  return retString;
-}
 
 indri::index::Index* DBInterface::_indexWithDocument( indri::collection::Repository::index_state& indexes, int documentID ) {
   for( int i=0; i<indexes->size(); i++ ) {
@@ -177,6 +94,93 @@ int DBInterface::getTFAnchorTagCount(indri::index::Index *index, long docid, lon
 
   return retCount;
 }
+
+
+lemur::api::Stemmer* DBInterface::getDbStemmer(const lemur::api::Index* ind) {
+  Stemmer* stemmer = NULL;
+  
+  // get our collection properties
+  const lemur::parse::BasicCollectionProps* props = dynamic_cast<const lemur::parse::BasicCollectionProps*> (ind->collectionProps());
+  if (props) {
+    string stype = "";
+    const lemur::parse::Property* p = NULL;
+    
+    // get the stemmer propery...
+    p = props->getProperty(Stemmer::category);
+    if (p) {
+      stype = (char*)p->getValue();
+    }
+
+    // create the stemmer...
+    stemmer = TextHandlerManager::createStemmer(stype);
+  }
+  return stemmer;
+}
+
+lemur::api::Index *DBInterface::openIndex() {
+  Index* db;
+
+  try {
+    db = IndexManager::openIndex(pathToIndex);
+  }
+  catch (...) {
+    db = NULL;
+  }
+
+  return db;
+}
+
+/* - not used? 
+string DBInterface::getDocHTTPLink(lemur::api::Index *index, long docID) {
+  string retString("[no url]");
+
+  if (!index) return retString;
+
+  const DocumentManager* dm = NULL;
+  string idstr;
+  stringstream docidStrStr;
+  docidStrStr << docID;
+
+  if (! (dm = index->docManager (docID))) {
+    return retString;
+  } else {
+
+    idstr = index->document (docID);
+
+    if (idstr == "[OOV]") {
+      return retString;
+    }
+  }
+
+  char *theDoc=dm->getDoc(idstr);
+
+  string docString(theDoc);
+
+  std::string::size_type hdrPos=docString.find("<DOCHDR>");
+  if (hdrPos > 0) {
+    // safely assume it won't be at the beginning...
+    std::string::size_type hdrPosEnd=docString.find("</DOCHDR>", hdrPos);
+    if (hdrPosEnd > hdrPos) {
+      // ensure the end doc header is after the beginning...
+      std::string::size_type httpStartPos=docString.find("http://", hdrPos);
+      if ((httpStartPos > hdrPos) && (httpStartPos < hdrPosEnd)) {
+        // ensure our link is between the DOCHDR tags...
+        // get the string to the end of the line...
+        char *tmpString=strdup(docString.substr(httpStartPos, (hdrPosEnd-httpStartPos)).c_str());
+        if (tmpString) {
+          char *fTok=strtok(tmpString, " \t\n\r");
+          if (fTok) {
+            retString=fTok;
+          } // if (fTok)
+          delete tmpString;
+        } // if (tmpString)
+      } // end if ((httpStartPos > hdrPos) && (httpStartPos < hdrPosEnd))
+    } // end if (hdrPosEnd > hdrPos)
+  } // end if (hdrPos > 0)
+
+  return retString;
+}
+*/
 
 /** public functions **/
 
@@ -471,197 +475,34 @@ void DBInterface::displaySearchResults(lemur::api::Index *db, int datasourceID, 
     //
     string buf = getSummaryString(dm, db, q, (*results)[i].ind, docext);
 
-    //
-    // if we're using an Indri index - check for metadata fields...
-    //
-    if (indriEnvironment) {
-      std::string thisTitle="";
-      std::string thisURL="";
+    // not using an Indri index - use the old fashioned methods...
+    const lemur::parse::ElemDocMgr* elem = dynamic_cast<const lemur::parse::ElemDocMgr*>(dm);
+    if (elem) {
+      char* ptitle = elem->getElement(docext.c_str(),"TITLE");
+      char* pnotes = elem->getElement(docext.c_str(),"DATE");
+      string notes = "";
 
-      std::vector< lemur::api::DOCID_T > docIDVec;
-      docIDVec.clear(); // just to make sure...
-      docIDVec.push_back((*results)[i].ind);
-      
-      // get a title field (if any)
-      std::vector< std::string > titleStrings=indriEnvironment->documentMetadata(docIDVec, "title");
-      if (titleStrings.size() > 0) {
-        thisTitle=(*(titleStrings.begin()));
+      if (pnotes) {
+        notes = pnotes;
       }
 
-      thisURL=docext;
-
-      // should we strip the root path?
-      if ((CGIConfiguration::getInstance().getStripRootPathFlag()) && (thisURL.find(dataRoot)==0)) {
-        // remove the data root from the docext path...
-        thisURL.erase(0,dataRoot.length());
+      if (!ptitle) {
+        ptitle = elem->getElement(docext.c_str(), "HEADLINE");
       }
 
-      // depending on if we have a title and/or URL, decide how we want to display it
-      if ((thisTitle.length() > 0) && (thisURL.length() > 0)) {
-        output->writeSearchResult(thisURL, docext, thisTitle, buf, (*results)[i].val, datasourceID, (*results)[i].ind);
-      } else if (thisTitle.length() > 0) {
-        output->writeSearchResult("", docext, thisTitle, buf, (*results)[i].val, datasourceID, (*results)[i].ind);
-      } else {
-        output->writeSearchResult("", docext, thisURL, buf, (*results)[i].val, datasourceID, (*results)[i].ind);
-      }
-    } else {
-      // not using an Indri index - use the old fashioned methods...
-      const lemur::parse::ElemDocMgr* elem = dynamic_cast<const lemur::parse::ElemDocMgr*>(dm);
-      if (elem) {
-        char* ptitle = elem->getElement(docext.c_str(),"TITLE");
-        char* pnotes = elem->getElement(docext.c_str(),"DATE");
-        string notes = "";
-
-        if (pnotes) {
-          notes = pnotes;
-        }
-
-        if (!ptitle) {
-          ptitle = elem->getElement(docext.c_str(), "HEADLINE");
-        }
-
-        if (ptitle) {
-          output->writeSearchResult(docext, docext, ptitle, buf, (*results)[i].val, datasourceID, (*results)[i].ind);
-          delete[]ptitle;
-        } else {
-          output->writeSearchResult(docext, docext, docext, buf, (*results)[i].val, datasourceID, (*results)[i].ind);
-        } // end if (ptitle)
+      if (ptitle) {
+        output->writeSearchResult(docext, docext, ptitle, buf, (*results)[i].val, datasourceID, (*results)[i].ind);
+        delete[]ptitle;
       } else {
         output->writeSearchResult(docext, docext, docext, buf, (*results)[i].val, datasourceID, (*results)[i].ind);
-      } // end [else] if (elem)
-    }
-
-
+      } // end if (ptitle)
+    } else {
+      output->writeSearchResult(docext, docext, docext, buf, (*results)[i].val, datasourceID, (*results)[i].ind);
+    } // end [else] if (elem)
   } // for (int i=rankStart;(i<listLength+rankStart) && (i<results.size());i++)
 
   output->outputString("</ol>\n");
   output->displayResultsPageEnding();
-}
-
-string DBInterface::indriDefaultQueryExpansion(string &origQuery) {
-
-  if (CGIConfiguration::getInstance().getKVItem("expandindriquery")!="true") {
-    return origQuery;
-  }
-
-  // don't reformulate if this query contains a query operator
-  if (origQuery.find("#")!=string::npos) {
-    return origQuery;
-  }
-
-  // also - don't reformulate if we find any quotes...
-  if ((origQuery.find("\"")!=string::npos) || (origQuery.find("%22")!=string::npos)) {
-  //  // however, if we do find quotes - wrap the terms in a #1(...)
-    string::size_type qPos=origQuery.find("\"");
-    while (qPos!=string::npos) {
-      origQuery.replace(qPos, 1, " ");      
-      qPos=origQuery.find("\"");
-    }
-   
-    qPos=origQuery.find("%22");
-    while (qPos!=string::npos) {
-      origQuery.replace(qPos, 3, " ");      
-      qPos=origQuery.find("%22");
-    }
-    //return origQuery;      
-    //
-  }
-
-  // remove any oddball punctuation
-  char *removeCopy=new char[origQuery.length() + 2];
-  memset(removeCopy, 0, origQuery.length() + 2);
-  memcpy(removeCopy, origQuery.c_str(), origQuery.length());
-
-  // phase 1 - identify and mark
-  char *rcPtr=removeCopy;
-  while ((rcPtr) && (*rcPtr)) {
-    if (!isspace(*rcPtr) && !isalpha(*rcPtr) && !isdigit(*rcPtr)) {
-      *rcPtr=0x01;      
-    }
-    rcPtr++;
-  }
-
-  // phase 2 - collapse it
-  rcPtr=removeCopy;
-  while ((rcPtr) && (*rcPtr)) {
-    if (*rcPtr==0x01) {      
-      strcpy(rcPtr, rcPtr+1);      
-    } else {
-      rcPtr++;      
-    }
-  }
-
-  origQuery=removeCopy;
-  delete[] removeCopy;
-
-  // wrap a weighted operator around each term
-  // first, split it via whitespace
-  std::vector<char*> queryTermVector;
-  string queryCopy;
-  char *stringCopy=new char[origQuery.length() + 2];
-  memset(stringCopy, 0, origQuery.length() + 2);
-  memcpy(stringCopy, origQuery.c_str(), origQuery.length());
-  char *thisToken=strtok(stringCopy, " \t\n\r\"");
-  while (thisToken) {
-    if (strlen(thisToken)) {      
-      char *thisString=strdup(thisToken);
-      if (thisString) {
-        queryTermVector.push_back(thisString);
-      }  
-    }
-    thisToken=strtok(NULL, " \t\n\r\"");
-  }
-
-  delete[] stringCopy;
-
-  // if we've got more than 4 terms, don't build a complex
-  // query... wrap it with a combine operator and return
-  if ((queryTermVector.size() > 4) || (queryTermVector.size()==0)) {
-    queryTermVector.clear();      
-    stringstream retString;
-    retString << "#combine( " << origQuery << " )";
-    return retString.str();
-  }
-
-  int numTerms=queryTermVector.size();
-
-  stringstream queryT;
-  stringstream queryO;
-  stringstream queryU;
-
-  for (int startPos=0; startPos < numTerms; startPos++) {
-    for (int endPos=startPos; endPos < numTerms; endPos++) {
-      if (startPos==endPos) {
-        queryT << "#wsum( 1.0 " <<  queryTermVector[startPos] << ".(title) 3.0 " << queryTermVector[startPos] << " 1.0 " << queryTermVector[startPos] << ".(heading) ) ";
-        continue;
-      }
-
-      for (int i=startPos; i <= endPos; i++) {
-        stringstream w;
-        w << "#1( " << queryTermVector[i] << " )";
-        queryO << "#wsum( 1.0 " << w.str() << ".(title) 3.0 " << w.str() << " 1.0 " << w.str() << ".(heading) ) ";
-
-        stringstream uw;
-        uw << " #uw" << (4*( endPos - startPos + 1 )) << "( " << queryTermVector[i] << " )";
-        queryU << "#wsum( 1.0 " << uw.str() << ".(title) 3.0 " << uw.str() + " 1.0 " << uw.str() + ".(heading) ) ";
-      } // end for (int i=startPos; i <= endPos; i++)
-    } // end for (int endPos=startPos; endPos < numTerms; endPos++)
-  } // end for (int startPos=0; startPos < numTerms; startPos++)
-
-  stringstream retString;
-  retString << "#weight( ";
-  if (queryT.str().length() > 0) {
-    retString << "0.8 #combine(" << queryT.str() << ") ";
-  }
-  if (queryO.str().length() > 0) {
-    retString << "0.1 #combine(" << queryO.str() << ") ";
-  }
-  if (queryU.str().length() > 0) {
-    retString << "0.1 #combine(" << queryU.str() << ") ";
-  }
-  retString << ")";
-
-  return retString.str();
 }
 
 void DBInterface::search(int datasourceID, string &query, long listLength, long rankStart, QUERY_INTERFACE_TYPE queryType) {
@@ -708,43 +549,13 @@ void DBInterface::search(int datasourceID, string &query, long listLength, long 
 
   if (queryType==QUERY_INTERFACE_INDRI) {
     int maxToRet=DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE;
-    if (maxToRet==0) maxToRet=1000000;
+    if (maxToRet==0) maxToRet=10000;
 
-    string reformulatedQuery=indriDefaultQueryExpansion(query);
 
-    std::vector<indri::api::ScoredExtentResult> _results=indriEnvironment->runQuery(reformulatedQuery, maxToRet);
-    std::vector<indri::api::ScoredExtentResult>::iterator rIter=_results.begin();
+    IndriSearchInterface *indSearch=new IndriSearchInterface(output, db, indriEnvironment, dataRoot);
+    indSearch->performSearch(query, maxToRet, datasourceID, listLength, rankStart);
 
-    results.clear();
-    while (rIter!=_results.end()) {
-      IndexedReal thisRes;
-      thisRes.ind=(*rIter).document;
-      thisRes.val=(*rIter).score;
-      results.push_back(thisRes);
-      rIter++;
-    }
-
-    lemur::parse::StringQuery* q = new lemur::parse::StringQuery(query.c_str());
-    // reset out results page to initialize it...
-    output->resetResultsPage();
-    output->setResultQuery(query);
-
-    results=removeDuplicateResults(results, db);
-
-    // Display results
-    //
-    if (results.size() == 0) {
-      output->setResultStatistics(0, 0, 0, 0);
-      output->displayResultsPageBeginning();
-      output->outputString("No results.");
-      output->displayResultsPageEnding();
-    } else {
-      displaySearchResults(db, datasourceID, q, indriEnvironment, &results, listLength, rankStart);
-    } // end [else] if (results.size() == 0)
-
-    delete(q);
-    results.clear();
-
+    delete indSearch;
    } else if (queryType==QUERY_INTERFACE_INQUERY) {
     // process InQuery query
 
