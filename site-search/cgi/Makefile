@@ -21,7 +21,7 @@ INSTALLDIRS=$(INSTDIR) $(INSTDIR)/templates
 FILES=README README_Templates.txt bin/help-db.html bin/help-qry.html bin/lemur.config bin/lemur100.gif bin/lemur150.gif
 TEMPLATE_FILES=bin/templates/ErrorPage.html bin/templates/GenericPage.html bin/templates/ResultsPage.html bin/templates/SearchPage.html bin/templates/SingleResult.html
  
-OBJS = LemurCGI.o CGIConfiguration.o CGIOutput.o DBInterface.o DictionaryHash.o SingleResultItem.o
+OBJS = LemurCGI.o CGIConfiguration.o CGIOutput.o DBInterface.o IndriSearchInterface.o DictionaryHash.o SingleResultItem.o
 PROG = bin/lemur.cgi
 
 all: $(PROG)
@@ -36,10 +36,11 @@ clean:
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 ## target specific dependencies
-LemurCGI.o: LemurCGI.cpp LemurSearchCGIConstants.h CGIConfiguration.h CGIOutput.h DictionaryHash.h DBInterface.h
+LemurCGI.o: LemurCGI.cpp LemurSearchCGIConstants.h CGIConfiguration.h CGIOutput.h DictionaryHash.h DBInterface.h IndriSearchInterface.h
 CGIConfiguration.o: CGIConfiguration.cpp CGIConfiguration.h LemurSearchCGIConstants.h
 CGIOutput.o: CGIOutput.cpp CGIOutput.h LemurSearchCGIConstants.h CGIConfiguration.h DictionaryHash.h SingleResultItem.h
-DBInterface.o: DBInterface.cpp DBInterface.h CGIOutput.h
+IndriSearchInterface.o: IndriSearchInterface.h CGIOutput.h
+DBInterface.o: DBInterface.cpp DBInterface.h IndriSearchInterface.h CGIOutput.h
 DictionaryHash.o: DictionaryHash.cpp DictionaryHash.h
 SingleResultItem.o: SingleResultItem.cpp SingleResultItem.h LemurSearchCGIConstants.h DictionaryHash.h
 
