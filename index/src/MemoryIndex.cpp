@@ -367,9 +367,6 @@ void indri::index::MemoryIndex::_writeFieldExtents( int documentID, indri::utili
         parentOrdinal = *parentIter;
       } else {
         parentOrdinal = 0;
-        std::cerr << "Could not find a parent for a node, storing as a root" << std::endl;
-//      std::cerr << "Parent: " << extent->parent << " " << extent->parent->name << " " 
-//                << extent->parent->begin << ":" << extent->parent->end << std::endl;
       }
     }
     // set the parent

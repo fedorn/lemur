@@ -361,7 +361,6 @@ indri::index::DocumentStructure::fieldId( const std::string path ) {
     
   
     if( count != seen ) {
-      std::cerr << "Unable to find child: " << typeString <<"[" << count << "] in " << path << std::endl;
       return 0;
     } 
 
