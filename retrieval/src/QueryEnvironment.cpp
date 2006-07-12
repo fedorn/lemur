@@ -837,7 +837,7 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
                                                                                      indri::api::QueryAnnotation** annotation,
                                                                                      const std::string &queryType ) {
   INIT_TIMER
-    QueryParserWrapper *parser = QueryParserFactory::get(q, queryType);
+  QueryParserWrapper *parser = QueryParserFactory::get(q, queryType);
 
   PRINT_TIMER( "Initialization complete" );
 

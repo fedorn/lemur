@@ -56,9 +56,10 @@ tokens {
   SYN = "#syn";
   // numerics
   PRIOR = "#prior";
-  DATEAFTER = "#date:after";
-  DATEBEFORE = "#date:before";
-  DATEBETWEEN = "#date:between";
+  DATEAFTER = "#dateafter";
+  DATEBEFORE = "#datebefore";
+  DATEBETWEEN = "#datebetween";
+  DATEEQUALS = "#dateequals";
   LESS = "#less";
   GREATER = "#greater";
   BETWEEN = "#between";
@@ -121,11 +122,11 @@ protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/' | '=');
 // we allow any Unicode character (composed of high
 // chars) so that we can support UTF-8 input.
 //
-
 protected TEXT_TERM:        ( HIGH_CHAR | SAFE_CHAR )+;
 protected NUMBER:           ( '0'..'9' )+;
 protected NEGATIVE_NUMBER:  DASH ( '0'..'9' )+;
 protected FLOAT:            (DASH)? ( '0'..'9' )+ DOT ( '0'..'9' )+;
+
 
 TERM:     ( (DIGIT)+ (SAFE_LETTER | HIGH_CHAR) ) => TEXT_TERM |
           ( FLOAT ) => FLOAT { $setType(FLOAT); } |
@@ -140,8 +141,8 @@ OPERATOR
   options { testLiterals = true; }:
     ( "#base64quote" ) => ENCODED_QUOTED_TERM { $setType(ENCODED_QUOTED_TERM); } |
     ( "#base64" ) => ENCODED_TERM { $setType(ENCODED_TERM); } |
-    ('#' ASCII_LETTER) => '#' (ASCII_LETTER)* (COLON (ASCII_LETTER)+)? |
-    '#';
+    ('#' ASCII_LETTER) => '#' (ASCII_LETTER)+ |
+    '#' ;
 
 JUNK:      ( TAB | CR | LF | SPACE )
            { $setType(antlr::Token::SKIP); };
@@ -468,8 +469,12 @@ anyField returns [ indri::lang::Field* f ]
   {
     f = 0;
   } :
-  ANY COLON t:TERM {
+  (ANY COLON) => ANY COLON t:TERM {
     f = new Field(t->getText());
+    _nodes.push_back(f);
+  } |
+  (ANY O_PAREN) => ANY O_PAREN tt:TERM C_PAREN {
+    f = new Field(tt->getText());
     _nodes.push_back(f);
   };
 
@@ -504,6 +509,7 @@ unqualifiedTerm returns [ indri::lang::RawExtentNode* re ] :
   | ( DATEBEFORE ) => re=dateBefore
   | ( DATEAFTER ) => re=dateAfter
   | ( DATEBETWEEN ) => re=dateBetween
+  | ( DATEEQUALS ) => re=dateEquals
   | ( O_ANGLE ) => re=synonym_list
   | ( O_BRACE ) => re=synonym_list_brace
   | ( SYN ) => re=synonym_list_alt
@@ -697,6 +703,7 @@ field_restriction returns [ indri::lang::Field* extent ] :
   }
   C_SQUARE;
 
+
 dateBefore returns [ indri::lang::FieldLessNode* extent ] {
     UINT64 d = 0;
     Field* dateField = 0;
@@ -727,9 +734,21 @@ dateBetween returns [ indri::lang::FieldBetweenNode* extent ] {
     Field* dateField = 0;
     extent = 0;
   } :
-  DATEBETWEEN O_PAREN low=date COMMA high=date C_PAREN {
+  DATEBETWEEN O_PAREN low=date high=date C_PAREN {
     dateField = new Field("date");
     extent = new FieldBetweenNode( dateField, low, high );
+    _nodes.push_back( dateField );
+    _nodes.push_back( extent );
+  };
+
+dateEquals returns [ indri::lang::FieldEqualsNode* extent ] {
+    UINT64 d = 0;
+    Field* dateField = 0;
+    extent = 0;
+  } :
+  DATEEQUALS O_PAREN d=date C_PAREN {
+    dateField = new Field("date");
+    extent = new FieldEqualsNode( dateField, d );
     _nodes.push_back( dateField );
     _nodes.push_back( extent );
   };
@@ -751,7 +770,8 @@ dateBetween returns [ indri::lang::FieldBetweenNode* extent ] {
 
 date returns [ UINT64 d ] :
   ( NUMBER SLASH ) => d=slashDate |
-  ( NUMBER ) => d=spaceDate |
+  ( TERM NUMBER ) => d=spaceDate |
+  ( NUMBER TERM ) => d=spaceDate |
   d=dashDate;
   
 dashDate returns [ UINT64 d ] {
@@ -771,16 +791,19 @@ dashDate returns [ UINT64 d ] {
 slashDate returns [ UINT64 d ] {
     d = 0;
   } :
-  month:NUMBER SLASH day:TERM SLASH year:NUMBER {
+  month:NUMBER SLASH day:NUMBER SLASH year:NUMBER {
     d = indri::parse::DateParse::convertDate( year->getText(), month->getText(), day->getText() ); 
   };
   
 spaceDate returns [ UINT64 d ] {
     d = 0;
   } :
-  day:NUMBER month:TERM year:NUMBER {
+    (NUMBER) => day:NUMBER month:TERM year:NUMBER {
     d = indri::parse::DateParse::convertDate( year->getText(), month->getText(), day->getText() );
-  };
+  } | 
+    (TERM) =>  m:TERM dd:NUMBER y:NUMBER {
+    d = indri::parse::DateParse::convertDate( y->getText(), m->getText(), dd->getText() );
+};
 
 // rawText is something that can be considered a query term
 rawText returns [ indri::lang::IndexTerm* t ] {
