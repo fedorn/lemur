@@ -68,7 +68,7 @@ bool indri::file::File::create( const std::string& filename ) {
 
   return true;
 #else 
-  _handle = creat( filename.c_str(), 0600 );
+  _handle = creat( filename.c_str(), 0666 );
 
   if( _handle < 0 )
     LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't create: " + filename );
