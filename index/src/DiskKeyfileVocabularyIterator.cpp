@@ -70,10 +70,27 @@ void indri::index::DiskKeyfileVocabularyIterator::_release() {
 
 void indri::index::DiskKeyfileVocabularyIterator::startIteration() {
   _acquire();
-  int actual;
 
   _bulkIterator->startIteration();
-  nextEntry();
+  //  nextEntry(); // calss nextEntry on the _bulkIterator a second time.
+  if( _bulkIterator->finished() ) {
+    _release();
+    return ;
+  }
+
+  int actual;
+  UINT32 key;
+
+  _bulkIterator->get( key, _compressedData.front(), _compressedData.size(), actual );
+  indri::utility::RVLDecompressStream stream( _compressedData.front(), actual );
+
+  _diskTermData = ::disktermdata_decompress( stream,
+                                            _decompressedData.front(),
+                                            _fieldCount,
+                                            DiskTermData::WithOffsets |
+                                            DiskTermData::WithString );
+  _diskTermData->termID = _baseID + key;
+
 }
 
 //
