@@ -59,13 +59,24 @@ for the Lemur JNI will be installed in
 &lt;install-directory&gt;/share/lemur/JNIdoc. The file index.html points into the
 javadoc generated documentation.
 
-<p>If configured with --enable-java,
+<p>For linux and solaris, if configured with --enable-java,
 the shared library will be installed in
 &lt;install-directory&gt;/lib/liblemur_jni.so and the java class files will be
 installed in &lt;install-directory&gt;/share/lemur/lemur.jar and
 &lt;install-directory&gt;/share/lemur/indri.jar, for the Lemur and Indri
 APIS. You will need to 
 add &lt;install-directory&gt;/lib to your LD_LIBRARY_PATH and add
+the appropriate jar file(s) to your CLASSPATH to use the
+JNI interface.
+
+<p>For OS/X, if configured with --enable-java,
+the shared library will be installed in
+&lt;install-directory&gt;/lib/liblemur_jni.jnilib and the java class
+files will be installed in
+&lt;install-directory&gt;/share/lemur/lemur.jar and
+&lt;install-directory&gt;/share/lemur/indri.jar, for the Lemur and Indri
+APIS. You will need to add &lt;install-directory&gt;/lib to your
+java.library.path on the java command line, using -Djava.library.path=&lt;install-directory&gt;/lib and add 
 the appropriate jar file(s) to your CLASSPATH to use the
 JNI interface.
 
