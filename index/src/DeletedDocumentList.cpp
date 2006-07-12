@@ -26,6 +26,7 @@
 //
 
 indri::index::DeletedDocumentList::DeletedDocumentList() :
+  _modified( false ),
   _readLock( _lock ),
   _writeLock( _lock )
 {
@@ -101,6 +102,7 @@ bool indri::index::DeletedDocumentList::read_transaction::isDeleted( int documen
 //
 
 void indri::index::DeletedDocumentList::markDeleted( int documentID ) {
+  _modified = true;
   indri::thread::ScopedLock l( _writeLock );
 
   if( _bitmap.position() < (documentID/8)+1 ) {
@@ -154,13 +156,15 @@ void indri::index::DeletedDocumentList::read( const std::string& filename ) {
 //
 
 void indri::index::DeletedDocumentList::write( const std::string& filename ) {
-  indri::file::File file;
+  if ( _modified || ! indri::file::Path::exists( filename ) ) {
+    indri::file::File file;
 
-  if( indri::file::Path::exists( filename ) )
-    indri::file::Path::remove( filename );
-  if( !file.create( filename ) )
-    LEMUR_THROW( LEMUR_IO_ERROR, "Unable to create file: "  + filename );
+    if( indri::file::Path::exists( filename ) )
+      indri::file::Path::remove( filename );
+    if( !file.create( filename ) )
+      LEMUR_THROW( LEMUR_IO_ERROR, "Unable to create file: "  + filename );
 
-  file.write( _bitmap.front(), 0, _bitmap.position() );
-  file.close();
+    file.write( _bitmap.front(), 0, _bitmap.position() );
+    file.close();
+  }
 }

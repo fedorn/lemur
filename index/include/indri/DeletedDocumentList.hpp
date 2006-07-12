@@ -34,6 +34,7 @@ namespace indri
     
     class DeletedDocumentList {
     private:
+      bool _modified;
       indri::thread::ReadersWritersLock _lock;
       indri::thread::ReaderLockable _readLock;
       indri::thread::WriterLockable _writeLock;
