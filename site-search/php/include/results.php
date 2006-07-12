@@ -47,7 +47,7 @@ class Results {
       if( ( $prefix != "" && strpos( $url, $prefix ) !== false ) ||
 	  ( $prefix == "" && ( $base == "" ||
 			       ( strpos( $url, $base ) === false &&
-				 strpos( $url, $base_prefix ) === false ) ) ) ) {
+				 ( $base_prefix == "" || strpos( $url, $base_prefix ) === false ) ) ) ) ) {
 	$base = $url;
 	$end = strlen( $base ) - strlen( strrchr( $base, "/" ) ) + 1;
 	if ($end > 7 ) {
