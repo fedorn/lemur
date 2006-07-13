@@ -1,5 +1,5 @@
 #include "IndriSearchInterface.h"
-
+#include <time.h>
 
 IndriSearchInterface::IndriSearchInterface(CGIOutput *_output, lemur::api::Index *_index, indri::api::QueryEnvironment *_queryEnvironment, string _dataRoot) {
   output=_output;
