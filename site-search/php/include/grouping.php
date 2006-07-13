@@ -52,7 +52,7 @@ class Grouping {
 				      $range );
     
     $snippet = indri_buildsnippet( $doc->text, $matches, $doc->positions, $indri_param[ 'snippet_length' ], $range );
-    
+
     $title = substr( $snippet, 0, 50 ) . "...";
     $title = isset($meta["docno"]) ? $meta["docno"] : $title; 
     $title = isset($meta["path"]) ? substr( $meta["path"],
@@ -60,6 +60,7 @@ class Grouping {
 					    strlen($meta["path"]) ) : $title; 
     $title = isset($meta["url"])  ? $meta["url"] : $title;
     $title = isset($meta["title"]) ? $meta["title"] : $title; 
+    $title = preg_replace("/^http:\/\//", "", $title);
     $prefix = "";
     
     $beginlink = isset($meta["url"]) ? ("<a href=\"" . $meta["url"] . "\">") : "";
@@ -75,10 +76,13 @@ class Grouping {
        <div id="snippet">
           <?= $snippet ?>
        </div>
-       <div id="url">
-          <?= $meta["url"] ?><br>
-       </div>
-       [ <a href="<?= $cachedlink ?>">Cached</a> ][ Score = <?= number_format(exp($result->score), 7) ?> ]
+       <span id="url">
+          <?= preg_replace("/^http:\/\//", "", $meta["url"] )?>
+       </span>
+       <span id="cachedlink">
+       <a href="<?= $cachedlink ?>">Cached</a>
+       </span>
+       <!-- [ Score = <?= number_format(exp($result->score), 7) ?> ] -->
 <?php
        if ($this->count > 1) {
      $end = strlen( $this->base[0] ) - strlen( strrchr( $this->base[0], "/" ) ) + 1;
@@ -88,9 +92,11 @@ class Grouping {
           // don't reduce to http://
           $base_prefix = $this->base[0];
      }
-     
-?>
-       [ <a href="query.php?query=<?= indri_escapeurl($_REQUEST['query']) ?>&prefix=<?= indri_escapeurl($base_prefix) ?>">More from <?= $base_prefix ?>...</a> ]
+     $clean_base = preg_replace("/^http:\/\//", "", $base_prefix);
+?>   - 
+        <span id="morelink">
+        <a href="query.php?query=<?= indri_escapeurl($_REQUEST['query']) ?>&prefix=<?= indri_escapeurl($base_prefix) ?>">More from <?= $clean_base ?>...</a>
+       </span>
 <?php
        }
     
@@ -105,6 +111,7 @@ class Grouping {
           // don't reduce to http://
           $base_prefix = $this->base[0];
      }
+     $clean_base = preg_replace("/^http:\/\//", "", $base_prefix);
 ?>
     <div id="indentedresult">
        <div id="indresulttitle">
@@ -113,11 +120,16 @@ class Grouping {
        <div id="snippet">
           <?= $snippet ?>
        </div>
-       <div id="url">
-          <?= $meta["url"] ?><br>
-       </div>
-       [ <a href="<?= $cachedlink ?>">Cached</a> ][ Score = <?= number_format(exp($result->score), 7) ?> ]
-       [ <a href="query.php?query=<?= indri_escapeurl($_REQUEST['query']) ?>&prefix=<?= indri_escapeurl($base_prefix) ?>">More from <?= $base_prefix ?>...</a> ]
+       <span id="url">
+          <?= preg_replace("/^http:\/\//", "", $meta["url"] ) ?>
+       </span>
+       <span id="cachedlink">
+       <a href="<?= $cachedlink ?>">Cached</a>
+       </span>
+       <!-- [ Score = <?= number_format(exp($result->score), 7) ?> ] -->
+       - <span id="morelink">
+       <a href="query.php?query=<?= indri_escapeurl($_REQUEST['query']) ?>&prefix=<?= indri_escapeurl($base_prefix) ?>">More from <?= $clean_base ?>...</a>
+      </span>
    </div>
    <?php } }
 

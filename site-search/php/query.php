@@ -63,7 +63,7 @@ $total_time = $doc_end - $start_time;
   <?php
      if( $prefix != "" ) { ?>
        <br><strong>Using search prefix:</strong>
-       <div id="url"><?= $prefix ?></div>
+       <span id="url"><?= $prefix ?></span>
   <?php } ?>			  
   </div>
 
