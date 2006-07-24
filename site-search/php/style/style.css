@@ -42,9 +42,8 @@
 */
 /*
   background-image: url(../images/indri.png);
-  background-position:0%;
+  background-position:100%;
 */
-
 /* lemur image */
 
   background-image: url(../images/lemur_logo_32.gif);
@@ -159,11 +158,25 @@ a:hover {
   font-size: 1em;
 }
 
+#searchboxquery {
+  margin-top: 14px;
+  margin-bottom: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+#searchbox {
+  border: 1px solid #36c;
+  background-color: rgb( 229, 236, 249);
+}
+
 #indentedresult {
   padding-left: 40px;
 }
 
 #resultbanner {
+  border: 1px solid #36c;
   background-color: rgb( 229, 236, 249);
 }
 #indentedresult a {

@@ -290,7 +290,9 @@ function indri_cleanquery( $query ) {
   if( strpos( $query, "#" ) !== false )
     // don't modify a structured query
     return $query;
-  $query = preg_replace("/[\?;:!,\.\+-]/", "", $query);
+  $query = preg_replace("/['\?;:!,\.\+=<>\(\){}\[\]\*\&\^\%\$~`\\\|]/", "", $query);
+  // spaces for email addresses
+  $query = preg_replace("/[@]/", " ", $query);
   $query = preg_replace('/"([^"]+)"/', "#1(" . '\1' . ")", $query);
   if( strpos( $query, "#" ) !== false )
     // if we added a #1, wrap in a combine.

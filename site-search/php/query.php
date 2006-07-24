@@ -54,6 +54,21 @@ $total_time = $doc_end - $start_time;
 <div id="content">
   <?php include( "include/header.php" ) ?>
 
+<?php
+$cleanQ = $_REQUEST['query'];
+$cleanQ = preg_replace("/'/", "&#39;", $cleanQ);
+$cleanQ = preg_replace("/</", "&lt;", $cleanQ);
+$cleanQ = preg_replace("/>/", "&gt;", $cleanQ);
+
+?>
+
+  <form action="query.php" method="post">
+    <div id="query">
+     <input type=text name="query" size="50" value='<?= $cleanQ ; ?>'>
+ <input type="submit" value="Search <?= $indri_param['sitename']?>">
+    </div> <!-- query -->
+   </form>
+
   <div id="resultbanner">
   Results for <strong><?= $_REQUEST['query']; ?></strong>
     [<strong>query</strong> <? printf("%5.2fs", $query_time ); ?>, 
@@ -79,6 +94,15 @@ $total_time = $doc_end - $start_time;
 
   <?= indri_printlinks( $_REQUEST, $startdoc, count($groupings), $indri_param[ 'page_docs' ], $prefix ) ?>
   </div>
+  <div id="searchbox">
+  <form action="query.php" method="post">
+    <div id="searchboxquery">
+
+     <input type=text name="query" size="50" value='<?= $cleanQ ; ?>'>
+ <input type="submit" value="Search <?= $indri_param['sitename']?>">
+</div>
+   </form>
+</div>
 
   <?php include("include/footer.php"); ?>
   <?php $env->close(); ?>

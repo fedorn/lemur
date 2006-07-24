@@ -8,7 +8,7 @@
 
 //  $indri_param['index'] = "/usr/ind1/tmp2/dfisher/cs-crawl2";
 // swap in new crawl
-  $indri_param['index'] = "/usr/ind1/tmp2/dfisher/cs-crawl-linkz2";
+  $indri_param['index'] = "/usr/ind1/tmp2/dfisher/cs-crawl-linkz";
 
   //
   // document_format: Use 'text' if the document is a text file (or 
