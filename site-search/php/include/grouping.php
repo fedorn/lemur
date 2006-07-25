@@ -59,7 +59,8 @@ class Grouping {
 					    strrpos( $meta["path"], '/' ) + 1,
 					    strlen($meta["path"]) ) : $title; 
     $title = isset($meta["url"])  ? $meta["url"] : $title;
-    $title = isset($meta["title"]) ? $meta["title"] : $title; 
+    $title = (isset($meta["title"]) && strlen($meta["title"]) > 0 ) ? 
+      $meta["title"] : $title; 
     $title = preg_replace("/^http:\/\//", "", $title);
     $prefix = "";
     
