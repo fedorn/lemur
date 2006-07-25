@@ -40,49 +40,32 @@ public class Parameters : IDisposable {
   public Parameters() : this(indri_csharpPINVOKE.new_Parameters(), true) {
   }
 
-  public Parameters get(int index) {
-    Parameters ret = new Parameters(indri_csharpPINVOKE.Parameters_get__SWIG_0(swigCPtr, index), true);
-    return ret;
-  }
-
-  public Parameters get(string name) {
-    Parameters ret = new Parameters(indri_csharpPINVOKE.Parameters_get__SWIG_1(swigCPtr, name), true);
-    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
   public bool get(string name, bool def) {
-    bool ret = indri_csharpPINVOKE.Parameters_get__SWIG_2(swigCPtr, name, def);
+    bool ret = indri_csharpPINVOKE.Parameters_get__SWIG_0(swigCPtr, name, def);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public int get(string name, int def) {
-    int ret = indri_csharpPINVOKE.Parameters_get__SWIG_3(swigCPtr, name, def);
+    int ret = indri_csharpPINVOKE.Parameters_get__SWIG_1(swigCPtr, name, def);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public double get(string name, double def) {
-    double ret = indri_csharpPINVOKE.Parameters_get__SWIG_4(swigCPtr, name, def);
+    double ret = indri_csharpPINVOKE.Parameters_get__SWIG_2(swigCPtr, name, def);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public long get(string name, long def) {
-    long ret = indri_csharpPINVOKE.Parameters_get__SWIG_5(swigCPtr, name, def);
+    long ret = indri_csharpPINVOKE.Parameters_get__SWIG_3(swigCPtr, name, def);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public string get(string name, string def) {
-    string ret = indri_csharpPINVOKE.Parameters_get__SWIG_6(swigCPtr, name, def);
-    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public Parameters append(string path) {
-    Parameters ret = new Parameters(indri_csharpPINVOKE.Parameters_append(swigCPtr, path), true);
+    string ret = indri_csharpPINVOKE.Parameters_get__SWIG_4(swigCPtr, name, def);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -140,6 +123,11 @@ public class Parameters : IDisposable {
     bool ret = indri_csharpPINVOKE.Parameters_exists__SWIG_1(swigCPtr, name);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
+  }
+
+  public void load(string text) {
+    indri_csharpPINVOKE.Parameters_load(swigCPtr, text);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public static Parameters instance() {

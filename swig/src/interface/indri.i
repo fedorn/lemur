@@ -231,7 +231,18 @@ namespace indri{
       /// Retrieve the entry associated with name.
       /// @param name the key value.
       /// @return a Parameters object.
-      Parameters get( const std::string& name );
+      // broken when swig wrapped
+//      Parameters get( const std::string& name );
+
+      /// Create a new empty parameter_value for the key given in path
+      /// @param path the key to create the value for
+      /// @return the Parameters object initialized with the new value.
+      // broken when swig wrapped
+//      Parameters append( const std::string& path );
+
+      /// Set the value of the Parameters object
+      /// @param value the value
+      void set( const std::string& value );
 
       bool get_bool( const std::string& name, bool def );
       /// Retrieve the entry associated with name.
@@ -295,6 +306,8 @@ namespace indri{
       /// @param name the key to probe.
       /// @return true if an entry exists for this key, false otherwise.
       bool exists( const std::string& name );
+      /// load an XML parameters string.
+      void load( const std::string& text );
     };
   }
 }

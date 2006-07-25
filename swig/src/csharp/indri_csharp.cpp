@@ -7270,40 +7270,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_Parameters(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Parameters_get__SWIG_0(void * jarg1, int jarg2) {
-  void * jresult ;
-  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
-  int arg2 ;
-  indri::api::Parameters result;
-  
-  arg1 = (indri::api::Parameters *)jarg1; 
-  arg2 = (int)jarg2; 
-  result = (arg1)->get(arg2);
-  jresult = new indri::api::Parameters((indri::api::Parameters &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Parameters_get__SWIG_1(void * jarg1, char * jarg2) {
-  void * jresult ;
-  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
-  std::string *arg2 = 0 ;
-  indri::api::Parameters result;
-  
-  arg1 = (indri::api::Parameters *)jarg1; 
-  if (!jarg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
-    return 0;
-  }
-  std::string arg2_str(jarg2);
-  arg2 = &arg2_str; 
-  result = (arg1)->get((std::string const &)*arg2);
-  jresult = new indri::api::Parameters((indri::api::Parameters &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Parameters_get__SWIG_2(void * jarg1, char * jarg2, unsigned int jarg3) {
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Parameters_get__SWIG_0(void * jarg1, char * jarg2, unsigned int jarg3) {
   unsigned int jresult ;
   indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
   std::string *arg2 = 0 ;
@@ -7324,7 +7291,7 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Parameters_get__SWIG_2(void * jarg1, 
 }
 
 
-SWIGEXPORT int SWIGSTDCALL CSharp_Parameters_get__SWIG_3(void * jarg1, char * jarg2, int jarg3) {
+SWIGEXPORT int SWIGSTDCALL CSharp_Parameters_get__SWIG_1(void * jarg1, char * jarg2, int jarg3) {
   int jresult ;
   indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
   std::string *arg2 = 0 ;
@@ -7345,7 +7312,7 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Parameters_get__SWIG_3(void * jarg1, char * ja
 }
 
 
-SWIGEXPORT double SWIGSTDCALL CSharp_Parameters_get__SWIG_4(void * jarg1, char * jarg2, double jarg3) {
+SWIGEXPORT double SWIGSTDCALL CSharp_Parameters_get__SWIG_2(void * jarg1, char * jarg2, double jarg3) {
   double jresult ;
   indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
   std::string *arg2 = 0 ;
@@ -7366,7 +7333,7 @@ SWIGEXPORT double SWIGSTDCALL CSharp_Parameters_get__SWIG_4(void * jarg1, char *
 }
 
 
-SWIGEXPORT long long SWIGSTDCALL CSharp_Parameters_get__SWIG_5(void * jarg1, char * jarg2, long long jarg3) {
+SWIGEXPORT long long SWIGSTDCALL CSharp_Parameters_get__SWIG_3(void * jarg1, char * jarg2, long long jarg3) {
   long long jresult ;
   indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
   std::string *arg2 = 0 ;
@@ -7387,7 +7354,7 @@ SWIGEXPORT long long SWIGSTDCALL CSharp_Parameters_get__SWIG_5(void * jarg1, cha
 }
 
 
-SWIGEXPORT char * SWIGSTDCALL CSharp_Parameters_get__SWIG_6(void * jarg1, char * jarg2, char * jarg3) {
+SWIGEXPORT char * SWIGSTDCALL CSharp_Parameters_get__SWIG_4(void * jarg1, char * jarg2, char * jarg3) {
   char * jresult ;
   indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
   std::string *arg2 = 0 ;
@@ -7409,25 +7376,6 @@ SWIGEXPORT char * SWIGSTDCALL CSharp_Parameters_get__SWIG_6(void * jarg1, char *
   arg3 = &arg3_str; 
   result = (arg1)->get((std::string const &)*arg2,(std::string const &)*arg3);
   jresult = SWIG_csharp_string_callback((&result)->c_str()); 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Parameters_append(void * jarg1, char * jarg2) {
-  void * jresult ;
-  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
-  std::string *arg2 = 0 ;
-  indri::api::Parameters result;
-  
-  arg1 = (indri::api::Parameters *)jarg1; 
-  if (!jarg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
-    return 0;
-  }
-  std::string arg2_str(jarg2);
-  arg2 = &arg2_str; 
-  result = (arg1)->append((std::string const &)*arg2);
-  jresult = new indri::api::Parameters((indri::api::Parameters &)result); 
   return jresult;
 }
 
@@ -7602,6 +7550,21 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Parameters_exists__SWIG_1(void * jarg
   result = (bool)(arg1)->exists((std::string const &)*arg2);
   jresult = result; 
   return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Parameters_load(void * jarg1, char * jarg2) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  
+  arg1 = (indri::api::Parameters *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  (arg1)->load((std::string const &)*arg2);
 }
 
 

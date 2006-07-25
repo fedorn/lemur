@@ -1193,8 +1193,8 @@ static zend_function_entry QueryEnvironment_functions[] = {
 static zend_function_entry Parameters_functions[] = {
  ZEND_NAMED_FE(new_parameters,_wrap_new_Parameters, NULL)
  ZEND_NAMED_FE(parameters,_wrap_new_Parameters, NULL)
- ZEND_NAMED_FE(parameters_get,_wrap_Parameters_get, NULL)
- ZEND_NAMED_FE(get,_wrap_Parameters_get, NULL)
+ ZEND_NAMED_FE(parameters_set,_wrap_Parameters_set, NULL)
+ ZEND_NAMED_FE(set,_wrap_Parameters_set, NULL)
  ZEND_NAMED_FE(parameters_get_bool,_wrap_Parameters_get_bool, NULL)
  ZEND_NAMED_FE(get_bool,_wrap_Parameters_get_bool, NULL)
  ZEND_NAMED_FE(parameters_get_int,_wrap_Parameters_get_int, NULL)
@@ -1223,6 +1223,8 @@ static zend_function_entry Parameters_functions[] = {
  ZEND_NAMED_FE(size,_wrap_Parameters_size, NULL)
  ZEND_NAMED_FE(parameters_exists,_wrap_Parameters_exists, NULL)
  ZEND_NAMED_FE(exists,_wrap_Parameters_exists, NULL)
+ ZEND_NAMED_FE(parameters_load,_wrap_Parameters_load, NULL)
+ ZEND_NAMED_FE(load,_wrap_Parameters_load, NULL)
    { NULL, NULL, NULL}
 };
 /* Function entries for QueryExpander */
@@ -3881,10 +3883,9 @@ void __wrap_delete_Parameters(zend_rsrc_list_entry *rsrc, const char *type_name 
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_Parameters_get) {
+ZEND_NAMED_FUNCTION(_wrap_Parameters_set) {
   indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
   std::string *arg2 = 0 ;
-  indri::api::Parameters result;
   std::string temp2 ;
   zval **args[1];
   
@@ -3897,7 +3898,7 @@ ZEND_NAMED_FUNCTION(_wrap_Parameters_get) {
   {
     /* typemap(in) SWIGTYPE * */
     if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_get. Expected SWIGTYPE_p_indri__api__Parameters");
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_set. Expected SWIGTYPE_p_indri__api__Parameters");
     }
   }
   {
@@ -3905,23 +3906,8 @@ ZEND_NAMED_FUNCTION(_wrap_Parameters_get) {
     temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
     arg2 = &temp2;
   }
-  result = (arg1)->get((std::string const &)*arg2);
-  {
-    indri::api::Parameters * resultobj = new indri::api::Parameters((indri::api::Parameters &) result);
-    SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p_indri__api__Parameters, 1);
-  }
-  /* Wrap this return value */
-  {
-    /* ALTERNATIVE Constructor, make an object wrapper */
-    zval *obj, *_cPtr;
-    MAKE_STD_ZVAL(obj);
-    MAKE_STD_ZVAL(_cPtr);
-    *_cPtr = *return_value;
-    INIT_ZVAL(*return_value);
-    object_init_ex(obj,ptr_ce_swig_Parameters);
-    add_property_zval(obj,"_cPtr",_cPtr);
-    *return_value=*obj;
-  }
+  (arg1)->set((std::string const &)*arg2);
+  
   return;
 fail:
   zend_error(ErrorCode(),ErrorMsg());
@@ -4430,6 +4416,37 @@ ZEND_NAMED_FUNCTION(_wrap_Parameters_exists) {
   {
     ZVAL_BOOL(return_value,(result)?1:0);
   }
+  return;
+fail:
+  zend_error(ErrorCode(),ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_Parameters_load) {
+  indri::api::Parameters *arg1 = (indri::api::Parameters *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string temp2 ;
+  zval **args[1];
+  
+  SWIG_ResetError();
+  /* This function uses a this_ptr*/
+  if(((ZEND_NUM_ARGS() )!= 1) || (zend_get_parameters_array_ex(1, args)!= SUCCESS)) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    /* typemap(in) SWIGTYPE * */
+    if(SWIG_ConvertPtr(*&this_ptr, (void **) &arg1, SWIGTYPE_p_indri__api__Parameters, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of Parameters_load. Expected SWIGTYPE_p_indri__api__Parameters");
+    }
+  }
+  {
+    convert_to_string_ex(args[0]);
+    temp2 = std::string(Z_STRVAL_PP(args[0]),Z_STRLEN_PP(args[0]));
+    arg2 = &temp2;
+  }
+  (arg1)->load((std::string const &)*arg2);
+  
   return;
 fail:
   zend_error(ErrorCode(),ErrorMsg());

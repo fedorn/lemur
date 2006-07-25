@@ -169,11 +169,13 @@ namespace indri
       /// Retrieve the n'th entry.
       /// @param index the index of the entry to retrieve.
       /// @return a Parameters object.
-      Parameters get( int index );
+      // broken when swig mapped.
+//      Parameters get( int index );
       /// Retrieve the entry associated with name.
       /// @param name the key value.
       /// @return a Parameters object.
-      Parameters get( const std::string& name );
+      // broken when swig mapped.
+//      Parameters get( const std::string& name );
       /// Retrieve the entry associated with name.
       /// @param name the key value.
       /// @param def the default value for the key
@@ -208,7 +210,8 @@ namespace indri
       /// Create a new empty parameter_value for the key given in path
       /// @param path the key to create the value for
       /// @return the Parameters object initialized with the new value.
-      Parameters append( const std::string& path );
+      // broken when swig mapped.
+//      Parameters append( const std::string& path );
       /// Remove an entry from the table. Does nothing if the key does not
       /// exist.
       /// @param path the key to remove.
@@ -248,6 +251,8 @@ namespace indri
       /// @return true if an entry exists for this key, false otherwise.
       bool exists( const std::string& name );
 
+      /// load an XML parameters string.
+      void load( const std::string& text );
 
       /// Return the singleton instance of the Parameters class.
       static Parameters& instance();

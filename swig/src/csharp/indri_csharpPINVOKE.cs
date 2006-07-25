@@ -1233,28 +1233,19 @@ class indri_csharpPINVOKE {
   public static extern void delete_Parameters(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_get__SWIG_0")]
-  public static extern IntPtr Parameters_get__SWIG_0(HandleRef jarg1, int jarg2);
+  public static extern bool Parameters_get__SWIG_0(HandleRef jarg1, string jarg2, bool jarg3);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_get__SWIG_1")]
-  public static extern IntPtr Parameters_get__SWIG_1(HandleRef jarg1, string jarg2);
+  public static extern int Parameters_get__SWIG_1(HandleRef jarg1, string jarg2, int jarg3);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_get__SWIG_2")]
-  public static extern bool Parameters_get__SWIG_2(HandleRef jarg1, string jarg2, bool jarg3);
+  public static extern double Parameters_get__SWIG_2(HandleRef jarg1, string jarg2, double jarg3);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_get__SWIG_3")]
-  public static extern int Parameters_get__SWIG_3(HandleRef jarg1, string jarg2, int jarg3);
+  public static extern long Parameters_get__SWIG_3(HandleRef jarg1, string jarg2, long jarg3);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_get__SWIG_4")]
-  public static extern double Parameters_get__SWIG_4(HandleRef jarg1, string jarg2, double jarg3);
-
-  [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_get__SWIG_5")]
-  public static extern long Parameters_get__SWIG_5(HandleRef jarg1, string jarg2, long jarg3);
-
-  [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_get__SWIG_6")]
-  public static extern string Parameters_get__SWIG_6(HandleRef jarg1, string jarg2, string jarg3);
-
-  [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_append")]
-  public static extern IntPtr Parameters_append(HandleRef jarg1, string jarg2);
+  public static extern string Parameters_get__SWIG_4(HandleRef jarg1, string jarg2, string jarg3);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_remove")]
   public static extern void Parameters_remove(HandleRef jarg1, string jarg2);
@@ -1288,6 +1279,9 @@ class indri_csharpPINVOKE {
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_exists__SWIG_1")]
   public static extern bool Parameters_exists__SWIG_1(HandleRef jarg1, string jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_load")]
+  public static extern void Parameters_load(HandleRef jarg1, string jarg2);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Parameters_instance")]
   public static extern IntPtr Parameters_instance();
