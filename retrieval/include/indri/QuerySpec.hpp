@@ -2870,7 +2870,7 @@ namespace indri {
 
       bool operator== ( Node& o ) {
         FieldWildcard* other = dynamic_cast<FieldWildcard*>(&o);
-        return other;
+        return other != NULL; // all instances are ==
       }
 
       std::string typeName() const {
@@ -3229,7 +3229,7 @@ namespace indri {
 
       bool operator== ( Node& o ) {
         DocumentStructureNode* other = dynamic_cast<DocumentStructureNode*>(&o);
-        return other; 
+        return other != NULL; // all instances are ==
       }
 
       std::string typeName() const {
