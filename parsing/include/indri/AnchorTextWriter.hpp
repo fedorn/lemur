@@ -63,7 +63,7 @@ namespace indri
 
         // find the third slash, which should occur
         // right after the domain name
-        char* slash = 0;
+        const char* slash = 0;
         if(page)  slash = strchr( page, '/' );
         if(slash) slash = strchr( slash+1, '/' );
         if(slash) slash = strchr( slash+1, '/' );
