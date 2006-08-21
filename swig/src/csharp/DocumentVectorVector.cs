@@ -31,6 +31,9 @@ public class DocumentVectorVector : IDisposable, System.Collections.IEnumerable 
   public virtual void Dispose() {
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
+      for (int i=0; i<Count; i++) {
+        indri_csharpPINVOKE.delete_DocumentVector(DocumentVector.getCPtr(getitem(i)));
+    }        
       indri_csharpPINVOKE.delete_DocumentVectorVector(swigCPtr);
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);

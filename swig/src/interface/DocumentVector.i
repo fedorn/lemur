@@ -118,10 +118,34 @@
 #endif
 
 #ifdef SWIGCSHARP
+%typemap(csdestruct_derived, methodname="Dispose") std::vector<indri::api::DocumentVector *>{
+    if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
+      swigCMemOwn = false;
+      for (int i=0; i<Count; i++) {
+        indri_csharpPINVOKE.delete_DocumentVector(DocumentVector.getCPtr(getitem(i)));
+    }        
+      $imcall;
+    }
+    swigCPtr = new HandleRef(null, IntPtr.Zero);
+    GC.SuppressFinalize(this);
+  }
+
+%typemap(csdestruct, methodname="Dispose") std::vector<indri::api::DocumentVector *>{
+    if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
+      swigCMemOwn = false;
+      for (int i=0; i<Count; i++) {
+        indri_csharpPINVOKE.delete_DocumentVector(DocumentVector.getCPtr(getitem(i)));
+    }        
+      $imcall;
+    }
+    swigCPtr = new HandleRef(null, IntPtr.Zero);
+    GC.SuppressFinalize(this);
+  }
+
 SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(DocumentVector, indri::api::DocumentVector *)
   %template(DocumentVectorVector) std::vector<indri::api::DocumentVector *>;
 SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(Field, indri::api::DocumentVector::Field)
-  //SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(SWIGTYPE_p_indri__api__DocumentVector__Field, indri::api::DocumentVector::Field)
+
   %template(FieldVector) std::vector<indri::api::DocumentVector::Field>;
 
 %typemap(ctype)  indri::api::DocumentVector::Field * "void *"
