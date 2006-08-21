@@ -35,21 +35,39 @@ namespace indri
       };
 
     private:
+      // begin position of the input vector
       _IterType _begin;
+      // end position of the input vector
       _IterType _end;
+
+      // read position (the next location we'll read from in _buildValue)
+      _IterType _read;
+      // current position (the effective location of the iterator, which will be earlier than _read)
       _IterType _current;
 
       value_type _value;
 
-      void _buildValue( _ObjectType object ) {
-        _value.count = 0;
-        _value.object = object;
-                                                        
-        for( ;  _current != _end; _current++ ) {
-          if( (*_current) != object )
-            break;
+      // this starts at the _read pointer location, then counts
+      // all of the objects in this vector that have the same value
+      // as the first object that was read.  Since the vector is in
+      // sorted order, this can be done with a simple forward scan.
 
-          _value.count++;
+      void _buildValue() {
+        assert( _current != _end );
+
+        if( _read == _end ) {
+          _value.count = 0;
+          return;
+        } else {
+          _value.count = 0;
+          _value.object = *_read;
+                                                        
+          for( ; _read != _end; _read++ ) {
+            if( (*_read) != _value.object )
+              break;
+
+            _value.count++;
+          }
         }
       }
 
@@ -58,12 +76,13 @@ namespace indri
         :
         _begin( begin ),
         _end( end ),
-        _current( begin )
+        _current( begin ),
+        _read( begin )
       {
         std::sort( _begin, _end );
 
         if( _current != _end )
-          ++(*this);
+          _buildValue();
       }
 
       const value_type& operator* ( ) {
@@ -72,10 +91,11 @@ namespace indri
 
       const count_iterator& operator++ ( ) {
         assert( _current != _end );
-        _buildValue( *_current );
+        _current = _read;
+        _buildValue();
         return *this;
       }
-                                                                                                                                                    
+
       bool operator!= ( _IterType other ) {
         return _current != other;
       }
