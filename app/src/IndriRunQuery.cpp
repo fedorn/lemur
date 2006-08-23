@@ -200,6 +200,7 @@ as <tt>-fbOrigWeight=number</tt> on the command line.</dd>
 #include "indri/UtilityThread.hpp"
 #include "indri/ScopedLock.hpp"
 #include "indri/delete_range.hpp"
+#include "indri/SnippetBuilder.hpp"
 
 #include <queue>
 
@@ -294,7 +295,7 @@ private:
     }
   }
 
-  void _printResultRegion( std::stringstream& output, int queryIndex ) {
+  void _printResultRegion( std::stringstream& output, int queryIndex, int start, int end  ) {
     std::vector<std::string> documentNames;
     std::vector<indri::api::ParsedDocument*> documents;
 
@@ -306,7 +307,7 @@ private:
     // Fetch document data for printing
     if( _printDocuments || _printPassages || _printSnippets ) {
       // Need document text, so we'll fetch the whole document
-      documents = _environment.documents( resultsSubset );
+      documents = _environment.documents( resultSubset );
       documentNames.clear();
 
       for( unsigned int i=0; i<resultSubset.size(); i++ ) {
