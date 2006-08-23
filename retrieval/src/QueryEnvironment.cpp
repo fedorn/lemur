@@ -59,6 +59,8 @@
 #include "indri/Appliers.hpp"
 #include "indri/TreePrinterWalker.hpp"
 
+#include "indri/SnippetBuilder.hpp"
+
 using namespace lemur::api;
 
 // debug code: should be gone soon
@@ -913,6 +915,185 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
   PRINT_TIMER( "Annotation complete" );
   delete(parser);
   return queryResults;
+}
+
+// put in api?
+static void _getRawNodes( std::set<std::string>& nodeTerms, 
+                   const indri::api::QueryAnnotationNode* node ) {
+  if( node->type == "IndexTerm" ) {
+    nodeTerms.insert( node->queryText );
+  } else {
+    for( int i=0; i<node->children.size(); i++ ) {
+      _getRawNodes( nodeTerms, node->children[i] );
+    }
+  }
+}
+
+indri::api::QueryResults indri::api::QueryEnvironment::runQuery( indri::api::QueryRequest &request ) {
+  // clone _runQuery for timers.
+  // alternatively, skip parse time and use _runQuery directly.
+  indri::api::QueryResults queryResult;  
+  indri::infnet::InferenceNetwork::MAllResults results;
+  indri::api::QueryAnnotation* annotation;
+  std::string queryType = "indri";
+  const float million = 1000000.0;
+  indri::utility::IndriTimer timer; 
+  timer.start();
+
+  // need the other options, formulators in here
+  QueryParserWrapper *parser = QueryParserFactory::get(request.query, queryType);
+
+  indri::lang::ScoredExtentNode* rootNode;
+
+  try {
+    rootNode = parser->query();
+  } catch( antlr::ANTLRException e ) {
+    LEMUR_THROW( LEMUR_PARSE_ERROR, "Couldn't understand this query: " + e.getMessage() );
+  }
+  
+  timer.stop(); 
+  queryResult.parseTime = timer.elapsedTime()/million; 
+  timer.start();
+
+  // push down language models from ExtentRestriction nodes
+  indri::lang::ExtentRestrictionModelAnnotatorCopier restrictionCopier;
+  rootNode = dynamic_cast<indri::lang::ScoredExtentNode*>(rootNode->copy(restrictionCopier));
+
+  // extract the raw scorer nodes from the query tree
+  indri::lang::RawScorerNodeExtractor extractor;
+  rootNode->walk(extractor);
+
+  // copy out a new graph that has context counters in it -- this will be evaluated
+  // so that we can get counts for everything in the query.  We need those counts
+  // so that we can score the query terms correctly.
+  std::vector<indri::lang::RawScorerNode*>& scorerNodes = extractor.getScorerNodes();
+
+  bool noContext = false;
+  if (_parameters.exists("singleBackgroundModel")) {
+    noContext = (bool) _parameters.get("singleBackgroundModel");
+  }
+
+  indri::infnet::InferenceNetwork::MAllResults statisticsResults;
+
+  // 1000 should be resultsRequested?
+  if ( noContext ) {
+    indri::lang::ApplyCopiers<indri::lang::NoContextCountGraphCopier, indri::lang::RawScorerNode> graph( scorerNodes );
+    _sumServerQuery( statisticsResults, graph.roots(), request.resultsRequested + request.startNum );
+  } else {
+    indri::lang::ApplyCopiers<indri::lang::ContextCountGraphCopier, indri::lang::RawScorerNode> graph( scorerNodes );
+    _sumServerQuery( statisticsResults, graph.roots(), request.resultsRequested + request.startNum );
+  }
+
+  // feed the statistics we found back into the query network
+  _copyStatistics( scorerNodes, statisticsResults );
+
+  // annotate the graph with smoothing parameters
+  indri::lang::SmoothingAnnotatorWalker smoother( _parameters );
+  rootNode->walk(smoother);
+
+  // run a scored query (possibly including a document set)
+  std::vector<lemur::api::DOCID_T>* documentSet = NULL;
+  if (request.docSet.size() > 0) documentSet = &request.docSet;
+  
+  std::string accumulatorName;
+  _scoredQuery( results, rootNode, accumulatorName, request.resultsRequested + request.startNum, documentSet );
+  std::vector<indri::api::ScoredExtentResult> queryResults = results[accumulatorName]["scores"];
+  std::stable_sort( queryResults.begin(), queryResults.end(), indri::api::ScoredExtentResult::score_greater() );
+    // prune the list
+  if (request.startNum > 0) {
+    queryResults.erase(queryResults.begin(), queryResults.begin() + request.startNum);
+    }
+
+  if( queryResults.size() > request.resultsRequested )
+    queryResults.resize( request.resultsRequested );
+
+  std::string annotatorName;
+  std::vector<DOCID_T> docSet;
+
+  for( size_t i=0; i<queryResults.size(); i++ ) {
+    docSet.push_back( queryResults[i].document );
+  }
+
+  _annotateQuery( results, docSet, annotatorName, rootNode );
+  annotation = new indri::api::QueryAnnotation( rootNode, results[annotatorName], queryResults );
+  
+  delete(parser);
+
+  timer.stop(); 
+  queryResult.executeTime = timer.elapsedTime()/million; 
+  timer.start();
+
+  // fill in the results bits
+
+  std::vector<indri::api::ScoredExtentResult> _results = annotation->getResults();
+
+  bool html = request.options == QueryRequest::HTMLSnippet;
+  indri::api::SnippetBuilder builder(html);
+  std::vector<indri::api::ParsedDocument*> docs;
+  std::vector<indri::api::ScoredExtentResult> resultSubset;
+
+  // slice these into blocks of 50/100/500?
+  // 1000 is 29M on AP89.
+  for( int start = 0; start < _results.size(); start += 100 ) {
+    int end = std::min<int>( start + 100, _results.size() );
+    resultSubset.assign( _results.begin() + start, _results.begin() + end );
+    docs = documents( resultSubset );
+    indri::utility::greedy_vector<indri::parse::MetadataPair>::iterator iter;
+  
+    for( unsigned int i = 0; i < resultSubset.size(); i++ ) {
+      indri::api::QueryResult res;
+
+      iter = std::find_if( docs[i]->metadata.begin(),
+                           docs[i]->metadata.end(),
+                           indri::parse::MetadataPair::key_equal( "docno" ) );
+
+      if( iter != docs[i]->metadata.end() )
+        res.documentName = (char*) iter->value;
+      else
+        res.documentName = "No docno value";
+
+      res.score = resultSubset[i].score;
+      res.docid = resultSubset[i].document;
+      res.begin = resultSubset[i].begin;
+      res.end = resultSubset[i].end;
+      res.snippet = builder.build( resultSubset[i].document, docs[i], annotation );
+
+      for (unsigned int j = 0; j < request.metadata.size(); j++ ) {
+        std::string &key = request.metadata[j];
+        iter = std::find_if( docs[i]->metadata.begin(),
+                             docs[i]->metadata.end(),
+                             indri::parse::MetadataPair::key_equal( key.c_str() ) );
+
+        if( iter != docs[i]->metadata.end() ) {
+          // values have to be copied so they don't go out of scope.
+          indri::api::MetadataPair meta;
+          meta.key = (*iter).key;
+          meta.value = (char *)(*iter).value;
+          res.metadata.push_back(meta);
+        }
+      }
+      queryResult.results.push_back( res );
+      delete docs[i];
+    }
+  }
+  
+  // estimate the matches.
+  std::set<std::string> queryTerms;
+  _getRawNodes(queryTerms, annotation->getQueryTree());
+  std::set<std::string>::iterator iter;
+  int estCount = 0;
+  for (iter = queryTerms.begin(); iter != queryTerms.end(); iter++) {
+    int count = documentCount(*iter);
+    // argMax over df(t)
+    if (count > estCount) estCount = count;
+  }
+  queryResult.estimatedMatches = estCount;
+
+  timer.stop(); 
+  queryResult.documentsTime = timer.elapsedTime()/million; 
+  timer.start();
+
+  return queryResult;
 }
 
 std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::runQuery( const std::string& query, int resultsRequested, const std::string &queryType ) {

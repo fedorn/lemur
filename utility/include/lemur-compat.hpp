@@ -22,7 +22,9 @@
 #ifdef WIN32
   #include <xutility>
   #include <direct.h>
+  #include <string.h>
   #define LEMUR_MKDIR_NO_MODE
+  #define LEMUR_STRNICMP
 #else
   #include <utility>
   #include <fstream>
@@ -113,7 +115,7 @@ inline int ios_mode_cast( int mode ) {
 
 #ifdef LEMUR_MKDIR_NO_MODE
 inline int mkdir( const char* path, int mode ) {
-  return ::mkdir(path);
+  return ::_mkdir(path);
 }
 #else
 inline int mkdir( const char* path, int mode ) {
@@ -155,13 +157,37 @@ inline UINT64 flipll( UINT64 native ) {
   return result;
 }
 
-#ifdef WIN32
 inline int strncasecmp( const char* one, const char* two, int length ) {
-  return ::strnicmp( one, two, length );
+#ifdef LEMUR_STRNICMP
+  return ::_strnicmp( one, two, length );
+#else
+  return ::strncasecmp( one, two, length );
+#endif
+}
+
+#if defined(WIN32) || defined(__SVR4)
+inline const char* strcasestr( const char* one, const char* two ) {
+  const char* t = two;
+  char oneLower = tolower(*one);
+
+  for( ; *t; t++ ) {
+    if (tolower(*t) == oneLower) {
+#ifdef WIN32
+      int result = ::_strnicmp( one, t, strlen(one) );
+#else
+      int result = strncasecmp( one, t, strlen(one) );
+#endif
+
+      if( result == 0 )
+        return t;
+    }
+  }
+
+  return 0;
 }
 #else
-inline int strncasecmp( const char* one, const char* two, int length ) {
-  return ::strncasecmp( one, two, length );
+inline const char* strcasestr( const char* one, const char* two ) {
+  return ::strcasestr( one, two );
 }
 #endif
 

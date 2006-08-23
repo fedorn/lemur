@@ -341,12 +341,15 @@ INT64 indri::server::LocalQueryServer::documentCount() {
 }
 
 INT64 indri::server::LocalQueryServer::documentCount( const std::string& term ) {
+  std::string stem = _repository.processTerm( term );
   indri::collection::Repository::index_state indexes = _repository.indexes();
   INT64 total = 0;
+  if( stem.length() == 0 ) return total;
   
   for( int i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
-    total += (*indexes)[i]->documentCount( term );
+    //    total += (*indexes)[i]->documentCount( term );
+    total += (*indexes)[i]->documentCount( stem );
   }
   
   return total;

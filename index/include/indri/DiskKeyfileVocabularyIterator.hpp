@@ -44,6 +44,7 @@ namespace indri {
 
       void _acquire();
       void _release();
+      bool _readData();
 
     public:
       DiskKeyfileVocabularyIterator( int baseID, indri::file::BulkTreeReader& bulkTree, indri::thread::Mutex& mutex, int fieldCount );

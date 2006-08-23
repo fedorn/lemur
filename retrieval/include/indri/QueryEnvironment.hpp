@@ -34,6 +34,47 @@ namespace indri
 {
   namespace api 
   {
+
+    typedef struct QueryRequest 
+    {
+      enum Options {
+        HTMLSnippet = 1,
+        TextSnippet = 2
+      };
+      std::string query;
+      std::vector<std::string> formulators;
+      std::vector<std::string>  metadata;
+      std::vector<lemur::api::DOCID_T>  docSet;
+      int resultsRequested;
+      int startNum;
+      enum Options options;
+    } QueryRequest;
+
+    typedef struct MetadataPair 
+    {
+      std::string key;
+      std::string value;
+    } MetadataPair;
+    
+    typedef struct QueryResult
+    {
+      std::string snippet;
+      std::string documentName;
+      lemur::api::DOCID_T docid;
+      double score;
+      int begin;
+      int end;
+      std::vector<indri::api::MetadataPair> metadata;
+    } QueryResult;
+
+    typedef struct QueryResults 
+    {
+      float parseTime;
+      float executeTime;
+      float documentsTime;
+      int estimatedMatches;
+      std::vector<QueryResult> results;
+    } QueryResults;
     
     /*! \brief Principal class for interacting with Indri indexes during retrieval. 
       Provides the API for opening one or more Repository servers, either local
@@ -108,6 +149,8 @@ namespace indri
       /// \brief Remove a local repository
       /// @param pathname the path to the repository.
       void removeIndex( const std::string& pathname );
+
+      QueryResults runQuery(QueryRequest &request);
 
       /// \brief Run an Indri query language query. @see ScoredExtentResult
       /// @param query the query to run

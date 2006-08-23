@@ -321,6 +321,9 @@
 				RelativePath=".\src\SimpleKLRetMethod.cpp">
 			</File>
 			<File
+				RelativePath=".\SnippetBuilder.cpp">
+			</File>
+			<File
 				RelativePath=".\src\StringQuery.cpp">
 			</File>
 			<File
@@ -699,6 +702,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\SmoothingAnnotatorWalker.hpp">
+			</File>
+			<File
+				RelativePath="..\include\indri\SnippetBuilder.hpp">
 			</File>
 			<File
 				RelativePath=".\include\StringQuery.hpp">

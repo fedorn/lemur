@@ -72,33 +72,14 @@ void indri::index::DiskKeyfileVocabularyIterator::startIteration() {
   _acquire();
 
   _bulkIterator->startIteration();
-  //  nextEntry(); // calss nextEntry on the _bulkIterator a second time.
-  if( _bulkIterator->finished() ) {
-    _release();
-    return ;
-  }
-
-  int actual;
-  UINT32 key;
-
-  _bulkIterator->get( key, _compressedData.front(), _compressedData.size(), actual );
-  indri::utility::RVLDecompressStream stream( _compressedData.front(), actual );
-
-  _diskTermData = ::disktermdata_decompress( stream,
-                                            _decompressedData.front(),
-                                            _fieldCount,
-                                            DiskTermData::WithOffsets |
-                                            DiskTermData::WithString );
-  _diskTermData->termID = _baseID + key;
-
+  _readData();
 }
 
 //
-// nextEntry
+// _readData
 //
 
-bool indri::index::DiskKeyfileVocabularyIterator::nextEntry() {
-  _bulkIterator->nextEntry();
+bool indri::index::DiskKeyfileVocabularyIterator::_readData() {
   if( _bulkIterator->finished() ) {
     _release();
     return false;
@@ -116,8 +97,16 @@ bool indri::index::DiskKeyfileVocabularyIterator::nextEntry() {
                                             DiskTermData::WithOffsets |
                                             DiskTermData::WithString );
   _diskTermData->termID = _baseID + key;
-
   return true;
+}
+
+//
+// nextEntry
+//
+
+bool indri::index::DiskKeyfileVocabularyIterator::nextEntry() {
+  _bulkIterator->nextEntry();
+  return _readData();
 }
 
 //

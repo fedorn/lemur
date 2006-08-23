@@ -82,7 +82,8 @@ namespace indri
       }
 
       void indexChanged( indri::index::Index& index ) {
-        // do nothing
+        // reset the _index to make sure we see newly added documents
+        _index = 0;
       }
 
       const std::string& getName() const {
