@@ -257,6 +257,7 @@ private:
 
   bool _printDocuments;
   bool _printPassages;
+  bool _printSnippets;
   bool _printQuery;
 
   std::string _runID;
@@ -265,6 +266,7 @@ private:
 
   indri::query::QueryExpander* _expander;
   std::vector<indri::api::ScoredExtentResult> _results;
+  indri::api::QueryAnnotation* _annotation;
 
   // Runs the query, expanding it if necessary.  Will print output as well if verbose is on.
   void _runQuery( std::stringstream& output, const std::string& query,
@@ -272,8 +274,13 @@ private:
     try {
       if( _printQuery ) output << "# query: " << query << std::endl;
 
-      _results = _environment.runQuery( query, _initialRequested, queryType );
-
+      if( _printSnippets ) {
+        _annotation = _environment.runAnnotatedQuery( query, _initialRequested );
+        _results = _annotation->getResults();
+      } else {
+        _results = _environment.runQuery( query, _initialRequested, queryType );
+      }
+      
       if( _expander ) {
         std::string expandedQuery = _expander->expand( query, _results );
         if( _printQuery ) output << "# expanded: " << expandedQuery << std::endl;
@@ -287,17 +294,22 @@ private:
     }
   }
 
-  void _printResults( std::stringstream& output, int queryIndex ) {
+  void _printResultRegion( std::stringstream& output, int queryIndex ) {
     std::vector<std::string> documentNames;
     std::vector<indri::api::ParsedDocument*> documents;
 
+    std::vector<indri::api::ScoredExtentResult> resultSubset;
+    
+    resultSubset.assign( _results.begin() + start, _results.begin() + end );
+    
+
     // Fetch document data for printing
-    if( _printDocuments || _printPassages ) {
+    if( _printDocuments || _printPassages || _printSnippets ) {
       // Need document text, so we'll fetch the whole document
-      documents = _environment.documents( _results );
+      documents = _environment.documents( resultsSubset );
       documentNames.clear();
 
-      for( unsigned int i=0; i<_results.size(); i++ ) {
+      for( unsigned int i=0; i<resultSubset.size(); i++ ) {
         indri::api::ParsedDocument* doc = documents[i];
         std::string documentName;
 
@@ -329,8 +341,8 @@ private:
     }
     
     // Print results
-    for( unsigned int i=0; i < _results.size(); i++ ) {
-      int rank = i+1;
+    for( unsigned int i=0; i < resultSubset.size(); i++ ) {
+      int rank = start+i+1;
       int queryNumber = queryIndex;
 
       if( _trecFormat ) {
@@ -339,22 +351,22 @@ private:
                 << "Q0 "
                 << documentNames[i] << " "
                 << rank << " "
-                << _results[ i ].score << " "
+                << resultSubset[ i ].score << " "
                 << _runID << std::endl;
       } else if( _inexFormat ) {
 
 	output << "    <result>" << std::endl 
 	       << "      <file>" << documentNames[i] << "</file>" << std::endl 
 	       << "      <path>" << pathNames[i] << "</path>" << std::endl 
-	       << "      <rsv>" << _results[i].score << "</rsv>"  << std::endl 
+	       << "      <rsv>" << resultSubset[i].score << "</rsv>"  << std::endl 
 	       << "    </result>" << std::endl;
       }
       else {
         // score, documentName, firstWord, lastWord
-        output << _results[i].score << "\t"
+        output << resultSubset[i].score << "\t"
                 << documentNames[i] << "\t"
-                << _results[i].begin << "\t"
-                << _results[i].end << std::endl;
+                << resultSubset[i].begin << "\t"
+                << resultSubset[i].end << std::endl;
       }
 
       if( _printDocuments ) {
@@ -362,10 +374,15 @@ private:
       }
 
       if( _printPassages ) {	
-        int byteBegin = documents[i]->positions[ _results[i].begin ].begin;
-        int byteEnd = documents[i]->positions[ _results[i].end-1 ].end;
+        int byteBegin = documents[i]->positions[ resultSubset[i].begin ].begin;
+        int byteEnd = documents[i]->positions[ resultSubset[i].end-1 ].end;
         output.write( documents[i]->text + byteBegin, byteEnd - byteBegin );
         output << std::endl;
+      }
+
+      if( _printSnippets ) {
+        indri::api::SnippetBuilder builder(false);
+        output << builder.build( resultSubset[i].document, documents[i], _annotation ) << std::endl;
       }
 
       if( documents.size() )
@@ -375,6 +392,16 @@ private:
       output << "  </topic>" << std::endl;
     }
   }
+
+  void _printResults( std::stringstream& output, int queryIndex ) {
+    for( int start = 0; start < _results.size(); start += 50 ) {
+      int end = std::min<int>( start + 50, _results.size() );
+      _printResultRegion( output, queryIndex, start, end );
+    }
+    delete _annotation;
+    _annotation = 0;
+  }
+  
 
 public:
   QueryThread( std::queue< query_t* >& queries,
@@ -431,6 +458,8 @@ public:
     _printQuery = _parameters.get( "printQuery", false );
     _printDocuments = _parameters.get( "printDocuments", false );
     _printPassages = _parameters.get( "printPassages", false );
+    _printSnippets = _parameters.get( "printSnippets", false );
+
     if( _parameters.get( "fbDocs", 0 ) != 0 ) {
       _expander = new indri::query::RMExpander( &_environment, _parameters );
     }

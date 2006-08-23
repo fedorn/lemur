@@ -519,11 +519,20 @@ class StatusMonitor : public indri::api::IndexStatus {
   }
 };
 
-static void downcase_string_vector (std::vector<std::string> & vec) {
-  // destructively downcase the strings c_str.  
-  for (int i = 0; i < vec.size(); i++) {
-    std::transform(vec[i].c_str(), vec[i].c_str() + vec[i].length(),
-                   (char *)vec[i].c_str(), ::tolower);
+static std::string downcase_string( const std::string& str ) {
+  std::string result;
+  result.resize( str.size() );
+
+  for( int i=0; i<str.size(); i++ ) {
+    result[i] = tolower(str[i]);
+  }
+ 
+  return result;
+}
+
+static void downcase_string_vector (std::vector<std::string>& vec) {
+  for( int i=0; i<vec.size(); i++ ) {
+    vec[i] = downcase_string( vec[i] );
   }
 }
 
@@ -644,6 +653,47 @@ static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification
   return retval;
 }
 
+//
+// process_numeric_fields
+//
+
+static void process_numeric_fields( indri::api::Parameters parameters, indri::api::IndexEnvironment& env ) {
+  std::string numName = "numeric";
+  std::string subName = "name";
+  indri::api::Parameters slice = parameters["field"];
+  for( int i=0; i<slice.size(); i++ ) {
+    bool isNumeric = slice[i].get(numName, false);
+    if( isNumeric ) {
+      // let user override default NumericFieldAnnotator for parser
+      // enabling numeric fields in offset annotations.
+      std::string parserName = slice[i].get("parserName", "NumericFieldAnnotator");
+      std::string fieldName = slice[i][subName];
+      fieldName = downcase_string( fieldName );
+      env.setNumericField(fieldName, isNumeric, parserName);
+    }
+  }
+}
+
+//
+// process_ordinal_fields
+//
+
+static void process_ordinal_fields( indri::api::Parameters parameters, indri::api::IndexEnvironment& env ) {
+  std::string ordName = "ordinal";
+  std::string subName = "name";
+  indri::api::Parameters slice = parameters["field"];
+  
+  for( int i=0; i<slice.size(); i++ ) {
+    bool isOrdinal = slice[i].get(ordName, false);
+
+    if( isOrdinal ) {
+      std::string fieldName = slice[i][subName];
+      fieldName = downcase_string( fieldName );
+      env.setOrdinalField(fieldName, isOrdinal);
+    }
+  }
+}
+
 void require_parameter( const char* name, indri::api::Parameters& p ) {
   if( !p.exists( name ) ) {
     LEMUR_THROW( LEMUR_MISSING_PARAMETER_ERROR, "Must specify a " + name + " parameter." );
@@ -707,32 +757,8 @@ int main(int argc, char * argv[]) {
     if( copy_parameters_to_string_vector( fields, parameters, "field", &subName ) ) {
       downcase_string_vector(fields);
       env.setIndexedFields(fields);
-      // have to update any numeric fields.
-      std::string numName = "numeric";
-      std::string ordName = "ordinal";
-      indri::api::Parameters slice = parameters["field"];
-      for( int i=0; i<slice.size(); i++ ) {
-        bool isNumeric = slice[i].get(numName, false);
-        if( isNumeric ) {
-          // let user override default NumericFieldAnnotator for parser
-          // enabling numeric fields in offset annotations.
-          std::string parserName = slice[i].get("parserName", "NumericFieldAnnotator");
-          std::string fieldName = slice[i][subName];
-          std::transform(fieldName.c_str(), 
-                         fieldName.c_str() + fieldName.length(),
-                         (char *)fieldName.c_str(), ::tolower);
-
-          env.setNumericField(fieldName, isNumeric, parserName);
-        }
-	bool isOrdinal = slice[i].get(ordName, false);
-	if( isOrdinal ) {
-          std::string fieldName = slice[i][subName];
-          std::transform(fieldName.c_str(), 
-                         fieldName.c_str() + fieldName.length(),
-                         (char *)fieldName.c_str(), ::tolower);
-	  env.setOrdinalField(fieldName, isOrdinal);
-	}
-      }
+      process_numeric_fields( parameters, env );
+      process_ordinal_fields( parameters, env );
     }
     
     if( indri::collection::Repository::exists( repositoryPath ) ) {
@@ -754,7 +780,7 @@ int main(int argc, char * argv[]) {
       // augment field/metadata tags in the environment if needed.
       if( fileClass.length() ) {
         indri::parse::FileClassEnvironmentFactory::Specification *spec = env.getFileClassSpec(fileClass);
-              if( spec ) {
+        if( spec ) {
           // add fields if necessary, only update if changed.
           if( augmentSpec( spec, fields, metadata, metadataForward, metadataBackward ) ) 
             env.addFileClass(*spec);

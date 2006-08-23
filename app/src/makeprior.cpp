@@ -385,6 +385,16 @@ int main( int argc, char** argv ) {
   try {
     indri::api::Parameters& param = indri::api::Parameters::instance();
     param.loadCommandLine( argc, argv );
+
+    if( !param.exists("index") || !param.exists("input") || !param.exists("name") ) {
+      std::cerr << "makeprior usage: " << std::endl
+                << "    makeprior -index=myindex -input=myinputfile -name=priorname" << std::endl
+                << "      myindex: a valid Indri index " << std::endl
+                << "      myinputfile: a two column text file, where the first column contains docno values" << std::endl
+                << "         and the second column contains log probabilities (should be between -infinity and zero)" << std::endl
+                << "      name: the name of this prior (as you will reference it in queries, using the #prior(name) syntax)" << std::endl;
+      exit(-1);
+    }
   
     std::string index = param["index"];
     indri::api::QueryEnvironment env;
