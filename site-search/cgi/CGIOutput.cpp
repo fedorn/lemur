@@ -500,13 +500,7 @@ void CGIOutput::displayIndexListingPage() {
 
   lemurIndexItems << "</PRE>\n";
 
-  substitutionValues.put("LemurCGIItems", lemurIndexItems.str().c_str());
-  substitutionValues.put("LemurSubTitle", "Datasources");
-
-  replaceResultsPageParameters(&genericPage);
-
-  outputHTTPHeader("text/html");
-  cout << genericPage << "\n";
+  displayDataPage(lemurIndexItems.str(), "Index Listing", false);
 }
 
 

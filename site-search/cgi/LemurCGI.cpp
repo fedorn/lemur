@@ -17,7 +17,7 @@ using std::map;
 
 // these are for offline debugging...
 // #define OFFLINEDEBUGGING
-// #define OFFLINEDEBUGGING_QUERY "q=Paul+Ogilvie"
+// #define OFFLINEDEBUGGING_QUERY "va=test"
 
 // our query parameters
 
@@ -239,6 +239,13 @@ void processRequest(CGIOutput *output) {
       case 'D': {
                   // get database statistics
                   if (thisVal.length() > 0) {
+                    if (thisVal[0]=='?') {
+                      // display datasource list and exit...
+                      output->displayIndexListingPage();
+		      hasOutput=true;
+                      break;
+                    }
+
                     int whichDatasource=atoi(thisVal.c_str());
 
                     if (whichDatasource >= CGIConfiguration::getInstance().getNumIndices()) {
@@ -250,8 +257,9 @@ void processRequest(CGIOutput *output) {
                     }
 
                     db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(whichDatasource));
-                    db.displayIndexStatistics();
+                    db.displayIndexStatistics(whichDatasource);
                     db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(datasourceToUse));
+		    hasOutput=true;
                   }
                 } break;
       case 't': {
@@ -333,7 +341,7 @@ void processRequest(CGIOutput *output) {
       case 'v': {
                   // get inverted term list
                   if (CGIConfiguration::getInstance().getSupportAnchorText()) {
-                    if ((thisKey.length()>1) && (thisKey[1]=='a')) {
+                    if ((thisKey.length()==2) && (thisKey[1]=='a')) {
                       db.getTermInvListWithAnchor(&thisVal);
                       hasOutput=true;
                       break;
@@ -345,13 +353,13 @@ void processRequest(CGIOutput *output) {
       case 'V': {
                   // get inverted term list w/ position
                   if (CGIConfiguration::getInstance().getSupportAnchorText()) {
-                    if ((thisKey.length()>1) && (thisKey[1]=='A')) {
+                    if ((thisKey.length()==2) && (thisKey[1]=='A')) {
                       db.getTermInvPosListWithAnchor(&thisVal);
                       hasOutput=true;
                       break;
                     }
                   } // end if (CGIConfiguration::getInstance().getSupportAnchorText())
-                  db.getTermInvList(&thisVal);
+                  db.getTermInvPosList(&thisVal);
                   hasOutput=true;
                 } break;
       default:

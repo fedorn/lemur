@@ -204,7 +204,7 @@ string DBInterface::getIndexPath() {
   return pathToIndex;
 }
 
-void DBInterface::displayIndexStatistics() {
+void DBInterface::displayIndexStatistics(int indexID) {
   Index *db=openIndex();
   if (!db) {
     output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
@@ -231,7 +231,10 @@ void DBInterface::displayIndexStatistics() {
     << "Unique Terms: " << numUniqueTerms << "\n"
     << "Average Document Length: " << avgDocLen << " words\n";
 
-  output->displayDataPage(statsString.str(), "Index Statistics");
+  stringstream iTitle;
+  iTitle << "Index Statistics for Index ID " << indexID;
+
+  output->displayDataPage(statsString.str(), iTitle.str());
 
   delete db;
 }

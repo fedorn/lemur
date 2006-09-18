@@ -154,7 +154,7 @@ public:
   /**
    * Displays the index listing
    */
-  void displayIndexStatistics();
+  void displayIndexStatistics(int indexID);
 
   /**
    * Returns the current data root path (if set)
