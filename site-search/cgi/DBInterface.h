@@ -231,6 +231,22 @@ public:
    */
   void getTermInvPosListWithAnchor(string *term);
 
+  /**
+   * Outputs the inverted list for a given term with potential URL text
+   * and related statistics
+   *
+   * @param term the term string
+   */
+  void getTermInvListWithURL(string *term);
+
+  /**
+   * Outputs the inverted list for a given term with position information
+   * and also potential anchor text, related statistics, and URL
+   * position information
+   *
+   * @param term the term string
+   */
+  void getTermInvPosListWithURL(string *term);
 
   /**
    * Outputs the stemmed version (if any) of the given word

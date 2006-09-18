@@ -127,6 +127,11 @@ void printOutHelp(CGIOutput *output) {
     helpMessage << "VA=term returns the inverted list for term with positions and anchor text term frequencies\n";
   }
 
+  if (CGIConfiguration::getInstance().getSupportURLText()) {
+    helpMessage << "vu=term returns the inverted list for term with URL text term frequencies\n";
+    helpMessage << "VU=term returns the inverted list for term with positions and URL text term frequencies\n";
+  }
+
   helpMessage << "\n";
 
   output->outputString(helpMessage.str());
@@ -347,7 +352,16 @@ void processRequest(CGIOutput *output) {
                       break;
                     }
                   } // end if (CGIConfiguration::getInstance().getSupportAnchorText())
-                  db.getTermInvList(&thisVal);
+
+                  if (CGIConfiguration::getInstance().getSupportURLText()) {
+                    if ((thisKey.length()==2) && (thisKey[1]=='u')) {
+                      db.getTermInvListWithURL(&thisVal);
+                      hasOutput=true;
+                      break;
+                    }
+                  } // end if (CGIConfiguration::getInstance().getSupportURLText())
+
+				  db.getTermInvList(&thisVal);
                   hasOutput=true;
                 } break;
       case 'V': {
@@ -359,6 +373,15 @@ void processRequest(CGIOutput *output) {
                       break;
                     }
                   } // end if (CGIConfiguration::getInstance().getSupportAnchorText())
+
+                  if (CGIConfiguration::getInstance().getSupportURLText()) {
+                    if ((thisKey.length()==2) && (thisKey[1]=='U')) {
+                      db.getTermInvPosListWithURL(&thisVal);
+                      hasOutput=true;
+                      break;
+                    }
+                  } // end if (CGIConfiguration::getInstance().getSupportURLText())
+
                   db.getTermInvPosList(&thisVal);
                   hasOutput=true;
                 } break;
