@@ -195,23 +195,28 @@ void QueryClarity(QueryRep *qr, const string& qid, ResultFile &resFile,
   cout << "query : "<< qid << endl;
   lemur::retrieval::SimpleKLQueryModel *qm = (lemur::retrieval::SimpleKLQueryModel *) qr;
 
-  if (resFile.findResult(qid, res)) {
-    res->Sort();
-    if (SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM1 || 
-        SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM2) {
-      res->LogToPosterior();
-      ignoreWeights = false;
-    }
-    PseudoFBDocs *topDoc = new PseudoFBDocs(*res, 
-                                            RetrievalParameter::fbDocCount,
-                                            ignoreWeights);
-    model->updateQuery(*qr, *topDoc);
-    delete topDoc;
+  if(RetrievalParameter::fbDocCount > 0) {
+    if (resFile.findResult(qid, res)) {
+      res->Sort();
+      if (SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM1 || 
+          SimpleKLParameter::qryPrm.fbMethod == SimpleKLParameter::RM2) {
+        res->LogToPosterior();
+        ignoreWeights = false;
+      }
+      PseudoFBDocs *topDoc = new PseudoFBDocs(*res, 
+                                              RetrievalParameter::fbDocCount,
+                                              ignoreWeights);
+      model->updateQuery(*qr, *topDoc);
+      delete topDoc;
+      os << qid;
+      qm->clarity(os);
+    } else {
+      cerr << "Warning: no feedback documents found for query: "
+           << qid << endl;
+    } 
+  } else {
     os << qid;
     qm->clarity(os);
-  } else {
-    cerr << "Warning: no feedback documents found for query: "
-         << qid << endl;
   }
 }
 
@@ -243,13 +248,6 @@ int AppMain(int argc, char *argv[]) {
       throw Exception("AppMain", "can't open the feedback doc file, check parameter value for feedbackDocuments");
     }
     resFile.load(fbdoc, *ind);
-  } else {
-    cerr << "Warning: no feedback documents specified: "
-         << "check feedbackDocCount parameter." << endl;
-    os.close();
-    delete model;
-    delete ind;
-    return -1;
   }
   // Use either the original query text or the initial query model stored in 
   // LocalParameter::origQuery.

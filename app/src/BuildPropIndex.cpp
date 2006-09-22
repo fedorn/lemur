@@ -11,7 +11,7 @@
 
 /*! \page BuildPropIndex
 <P>
- This application builds an InvFPIndex or KeyfileIncIndex for a collection of documents with properties associated with terms.
+ This application builds a KeyfileIncIndex for a collection of documents with properties associated with terms.
 <P>
 To use it, follow the general steps of running a lemur application.
 <p>
@@ -19,8 +19,7 @@ The parameters are:
 <p>
 <ol>
 <li> <tt>index</tt>: name of the index to create (don't include extension)
-<li> <tt>indexType</tt>:the type of index to create, "key" (KeyfileIncIndex) or "inv" (InvFPIndex). default is inv
-<li> <tt>memory</tt>: memory (in bytes) of InvFPPushIndex cache (def = 96000000).
+<li> <tt>memory</tt>: memory (in bytes) of KeyfileIncIndex cache (def = 128000000).
 <li> <tt>stopwords</tt>: name of file containing the stopword list.
 <li> <tt>acronyms</tt>: name of file containing the acronym list.
 <li> <tt>countStopWords</tt>: If true, count stopwords in document length.
@@ -63,7 +62,6 @@ namespace LocalParameter {
 
   // name (minus extension) of the database
   string index;
-  string indexType;
   // name of file containing stopwords
   string stopwords;
   // name of file containing acronyms
@@ -78,8 +76,7 @@ namespace LocalParameter {
   void get() {
     docFormat = ParamGetString("docFormat");
     index = ParamGetString("index");
-    indexType = ParamGetString("indexType", "inv");
-    memory = ParamGetInt("memory", 96000000);
+    memory = ParamGetInt("memory", 128000000);
     stopwords = ParamGetString("stopwords");
     acronyms = ParamGetString("acronyms");
     dataFiles = ParamGetString("dataFiles");
@@ -97,9 +94,7 @@ void usage(int argc, char ** argv) {
        << endl
        << "Summary of parameters:" << endl << endl
        << "\tindex - name of the index to create (don't include extension)"<< endl
-       << "\tindexType - the type of index, one of key (for KeyfileIncIndex) "
-       << "\tor inv (for InvFPPushIndex) respectively. (def = inv)" << endl
-       << "\tmemory - memory (in bytes) of InvFPPushIndex cache (def = 96000000)." << endl
+       << "\tmemory - memory (in bytes) of KeyfileIncIndex cache (def = 96000000)." << endl
        << "\tstopwords - name of file containing stopword list" << endl
        << "\t            Words in this file should be one per line." << endl
        << "\t            If this parameter is not specified, all words " << endl
@@ -164,15 +159,9 @@ int AppMain(int argc, char * argv[]) {
   Stemmer * stemmer = NULL;
   stemmer = TextHandlerManager::createStemmer(LocalParameter::stemmer);
 
-  // Create the indexer. (Note: this has an InvFPPushIndex that 
-  // it uses to do the indexing, but PropIndexTH implements the
-  // TextHandler class, so that it is compatible with my parser
-  // architecture.  See the TextHandler and InvFPTextHandler classes
-  // for more info.)
   lemur::parse::PropIndexTH indexer(LocalParameter::index, 
                       LocalParameter::memory, 
-                      LocalParameter::countStopWords, 
-                      LocalParameter::indexType);
+                      LocalParameter::countStopWords);
 
   // chain the parser/stopper/stemmer/indexer
   if (stopper) {
@@ -194,7 +183,7 @@ int AppMain(int argc, char * argv[]) {
     }
     ifstream source(LocalParameter::dataFiles.c_str());
     if (!source.is_open()) {
-      throw Exception("PushIndexer","could not open dataFiles specified");
+      throw Exception("BuldPropIndex","could not open dataFiles specified");
     } else {
       string filename;
       while (getline(source, filename)) {

@@ -20,9 +20,8 @@ The parameters are:
 <ol>
 <li> <tt>index</tt>: name of the index table-of-content file without the
 .ifp extension.
-<li> <tt>indexType</tt>: the type of index, key (KeyfileIncIndex), inv (Inv(FP)Index), indri (LemurIndriIndex)
-<li> <tt>memory</tt>: memory (in bytes) of Inv(FP)PushIndex (def = 96000000).
-<li> <tt>position</tt>: store position information (def = 1), applicable only for inv indexes.
+<li> <tt>indexType</tt>: the type of index, key (KeyfileIncIndex), indri (LemurIndriIndex)
+<li> <tt>memory</tt>: memory (in bytes) of KeyfileIncIndex cache (def = 128000000).
 <li> <tt>stopwords</tt>: name of file containing the stopword list.
 <li> <tt>acronyms</tt>: name of file containing the acronym list.
 <li> <tt>countStopWords</tt>: If true, count stopwords in document length.
@@ -55,7 +54,6 @@ The parameters are:
 */
 
 #include "TextHandlerManager.hpp"
-#include "InvFPTextHandler.hpp"
 #include "IndriTextHandler.hpp"
 #include "KeyfileTextHandler.hpp"
 #include "KeyfileIncIndex.hpp"
@@ -80,8 +78,6 @@ namespace LocalParameter {
   string docFormat;
   // whether or not to stem
   string stemmer;
-  //whether to keep positions and dtindex
-  int position;
   // file with source files
   string dataFiles;
 
@@ -90,12 +86,11 @@ namespace LocalParameter {
   void get() {
     index = ParamGetString("index");
     indexType = ParamGetString("indexType");
-    memory = ParamGetInt("memory", 96000000);
+    memory = ParamGetInt("memory", 128000000);
     stopwords = ParamGetString("stopwords");
     acronyms = ParamGetString("acronyms");
     docFormat = ParamGetString("docFormat");
     dataFiles = ParamGetString("dataFiles");
-    position = ParamGetInt("position", 1);
     stemmer = ParamGetString("stemmer");
     countStopWords = (ParamGetString("countStopWords", "false") == "true");
   }
@@ -110,9 +105,9 @@ void usage(int argc, char ** argv) {
        << endl
        << "Summary of parameters:" << endl << endl
        << "\tindex - name of the index (without the index's extension)" << endl
-       << "\tindexType - type of index to build (key,inv,indri)" << endl
-       << "\tmemory - memory (in bytes) of InvFPPushIndex (def = 96000000)" << endl
-       << "\tposition - store position information (def = 1), \tapplicable only to inv index type" << endl
+       << "\tindexType - type of index to build (key,indri)" << endl
+       << "\tmemory - memory (in bytes) of KeyfileIncIndex cache (def = 128000000)" << endl
+
        << "\tstopwords - name of file containing stopword list" << endl
        << "\t            Words in this file should be one per line." << endl
        << "\t            If this parameter is not specified, all words " << endl
@@ -158,7 +153,7 @@ int AppMain(int argc, char * argv[]) {
   }
 
   if (LocalParameter::indexType.empty()) {
-    LEMUR_THROW(LEMUR_MISSING_PARAMETER_ERROR, "Please provide a type for the index you want to build. \nCheck the \"indexType\" parameter. \nValid values are \"inv\",\"key\", or \"indri\" ");
+    LEMUR_THROW(LEMUR_MISSING_PARAMETER_ERROR, "Please provide a type for the index you want to build. \nCheck the \"indexType\" parameter. \nValid values are \"key\", or \"indri\" ");
   }
 
   // Create the appropriate parser and acronyms list if needed
@@ -188,11 +183,6 @@ int AppMain(int argc, char * argv[]) {
     cerr << "WARNING: BuildIndex continuing without stemmer." << endl << "To use a stemmer, check the \"stemmer\" and other supporting parameters." << endl << "See program usage or Lemur documentation for more information.";
   }
 
-  // Create the indexer. (Note: this has an InvFPPushIndex that 
-  // it uses to do the indexing, but InvFPTextHandler implements the
-  // TextHandler class, so that it is compatible with my parser
-  // architecture.  See the TextHandler and InvFPTextHandler classes
-  // for more info.)
   TextHandler* indexer;
   lemur::index::KeyfileIncIndex* index = NULL;
 
@@ -200,18 +190,13 @@ int AppMain(int argc, char * argv[]) {
     indexer = new lemur::parse::IndriTextHandler(LocalParameter::index,
                                    LocalParameter::memory,
                                    parser);
-  } else if (LocalParameter::indexType == "inv") {
-    indexer = new lemur::parse::InvFPTextHandler(LocalParameter::index, 
-                                   LocalParameter::memory, 
-                                   LocalParameter::countStopWords, 
-                                   LocalParameter::position);
   } else if (LocalParameter::indexType == "key") {
     index = new lemur::index::KeyfileIncIndex(LocalParameter::index,
                                 LocalParameter::memory);
     indexer = new lemur::parse::KeyfileTextHandler(index,
                                      LocalParameter::countStopWords);
   } else {
-    LEMUR_THROW(LEMUR_BAD_PARAMETER_ERROR,"Please use a valid value for the required parameter \"IndexType\". \nValid values are \"inv\",\"key\", or \"indri\"See program usage or Lemur documentation for more information.");
+    LEMUR_THROW(LEMUR_BAD_PARAMETER_ERROR,"Please use a valid value for the required parameter \"IndexType\". \nValid values are \"key\" or \"indri\"See program usage or Lemur documentation for more information.");
   }
   
   // chain the parser/stopper/stemmer/indexer

@@ -21,12 +21,11 @@ The parameters are:
 <p>
 <ol>
 <li> <tt>manager</tt>: name of the document manager (without extension). Required. 
-<li> <tt>managerType</tt>: name of the document manager type, one of flat (FlatfileDocMgr) bdm (KeyfileDocMgr) or elem (ElemDocMgr). Required.
+<li> <tt>managerType</tt>: name of the document manager type, one of bdm (KeyfileDocMgr) or elem (ElemDocMgr). Required.
 <li> <tt>index</tt>: name of the index table-of-content file without the
 .ifp extension.
-<li> <tt>indexType</tt>: the type of index, key (KeyfileIncIndex) or inv (Inv(FP)Index).
-<li> <tt>memory</tt>: memory (in bytes) of Inv(FP)PushIndex (def = 96000000).
-<li> <tt>position</tt>: store position information (def = 1), applicable only for inv indexes.
+<li> <tt>indexType</tt>: the type of index, key (KeyfileIncIndex).
+<li> <tt>memory</tt>: memory (in bytes) of KeyfileIncIndex cache size (def = 128000000).
 <li> <tt>stopwords</tt>: name of file containing the stopword list.
 <li> <tt>acronyms</tt>: name of file containing the acronym list.
 <li> <tt>countStopWords</tt>: If true, count stopwords in document length.
@@ -60,7 +59,6 @@ The parameters are:
 
 #include "DocMgrManager.hpp"
 #include "TextHandlerManager.hpp"
-#include "InvFPTextHandler.hpp"
 #include "KeyfileTextHandler.hpp"
 #include "KeyfileIncIndex.hpp"
 #include "Param.hpp"
@@ -85,17 +83,15 @@ namespace LocalParameter {
 
   void get() {
     index = ParamGetString("index");
-    indexType = ParamGetString("indexType", "inv");
+    indexType = ParamGetString("indexType", "key");
     manager = ParamGetString("manager");
-    // default is FlattextDocMgr.
-    mgrType = ParamGetString("managerType", "flat");
-    memory = ParamGetInt("memory", 96000000);
+    mgrType = ParamGetString("managerType", "bdm");
+    memory = ParamGetInt("memory", 128000000);
     stopwords = ParamGetString("stopwords");
     acronyms = ParamGetString("acronyms");
     docFormat = ParamGetString("docFormat");
     stemmer = ParamGetString("stemmer");
     dataFiles = ParamGetString("dataFiles");
-    position = ParamGetInt("position", 1);
     countStopWords = (ParamGetString("countStopWords", "false") == "true");
   }
 };
@@ -109,7 +105,7 @@ void usage(int argc, char ** argv) {
        << endl
        << "Summary of parameters:" << endl << endl
        << "\tmanager -  required name of the document manager (without extension)" << endl    
-       << "\tmanagerType -  required name of the document manager type, one of flat (FlatfileDocMgr) bdm (KeyfileDocMgr) or elem (ElemDocMgr)." << endl    
+       << "\tmanagerType -  required name of the document manager type, one of bdm (KeyfileDocMgr) or elem (ElemDocMgr)." << endl    
        << "\tdocFormat - \"trec\" for standard TREC formatted documents "<< endl
        << "\t            \"web\" for web TREC formatted documents " << endl
        << "\t            \"reuters\" for Reuters XML documents " << endl
@@ -121,9 +117,8 @@ void usage(int argc, char ** argv) {
        << "\tFollowing parameters optional for building index" << endl
        << "\tindex - name of the index (without the extension)" << endl
        << "\tindexType - the type of index, one of key (for KeyfileIncIndex) "
-       << "\tor inv (for Inv(FP)PushIndex) respectively." << endl
-       << "\tmemory - memory (in bytes) of index cache (def = 96000000)" << endl
-       << "\tposition - store position information (def = 1)" << endl
+<< endl
+       << "\tmemory - memory (in bytes) of index cache (def = 128000000)" << endl
        << "\tstopwords - name of file containing stopword list" << endl
        << "\t            Words in this file should be one per line." << endl
        << "\t            If this parameter is not specified, all words " << endl
@@ -178,30 +173,22 @@ int AppMain(int argc, char * argv[]) {
 
     // Create the right type of indexer (DocMgrManager should handle this).
     // Need an abstract class to hang the setDocManager call on here...
-    if (LocalParameter::indexType == "inv") {
-      indexer = new lemur::parse::InvFPTextHandler(LocalParameter::index, 
-                                     LocalParameter::memory, 
-                                     LocalParameter::countStopWords, 
-                                     LocalParameter::position);
-      // register document manager with PushIndex
-      ((lemur::parse::InvFPTextHandler *)indexer)->setDocManager(docmgr->getMyID());
-
-    } else if (LocalParameter::indexType == "key"){
+    if (LocalParameter::indexType == "key"){
       ind = new lemur::index::KeyfileIncIndex(LocalParameter::index,
-                                LocalParameter::memory);
+                                              LocalParameter::memory);
       indexer = new lemur::parse::KeyfileTextHandler((lemur::index::KeyfileIncIndex *)ind,
                                        LocalParameter::countStopWords);
       // register document manager with PushIndex
       ((lemur::parse::KeyfileTextHandler *)indexer)->setDocManager(docmgr->getMyID());
     } else {
-    throw Exception ("BuildDocMgr", "Unknown index type");
+      throw Exception ("BuildDocMgr", "Unknown index type");
     }
     
     
     // chain the document manager(parser)/stopper/stemmer/indexer    
     TextHandler *th = dynamic_cast<TextHandler*> (docmgr);
     if (!th)
-      throw Exception ("BuildDocMgr", "This application currently only supports special DocumentManagers that also behave like TextHandlers, ie FlattextDocMgr, KeyfileDocMgr, ElemDocMgr");
+      throw Exception ("BuildDocMgr", "This application currently only supports special DocumentManagers that also behave like TextHandlers, ie KeyfileDocMgr, ElemDocMgr");
 
     if (stopper != NULL) {
       th->setTextHandler(stopper);
