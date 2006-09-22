@@ -11,7 +11,6 @@
 
 #include "JBuildIndex.h"
 #include "TextHandlerManager.hpp"
-#include "InvFPTextHandler.hpp"
 #include "IndriTextHandler.hpp"
 #include "KeyfileTextHandler.hpp"
 #include "KeyfileIncIndex.hpp"
@@ -36,8 +35,6 @@ namespace BIParam {
   string docFormat;
   // whether or not to stem
   string stemmer;
-  //whether to keep positions and dtindex
-  int position;
   // file with source files
   string dataFiles;
   string manager; // name of document manager
@@ -49,12 +46,11 @@ namespace BIParam {
     indexType = ParamGetString("indexType");
     manager = ParamGetString("manager");
     mgrType = ParamGetString("managerType");
-    memory = ParamGetInt("memory", 96000000);
+    memory = ParamGetInt("memory", 128000000);
     stopwords = ParamGetString("stopwords");
     acronyms = ParamGetString("acronyms");
     docFormat = ParamGetString("docFormat");
     dataFiles = ParamGetString("dataFiles");
-    position = ParamGetInt("position", 1);
     stemmer = ParamGetString("stemmer");
     countStopWords = (ParamGetString("countStopWords", "false") == "true");
   }
@@ -143,27 +139,13 @@ JNIEXPORT void JNICALL Java_lemurproject_lemur_ui_JBuildIndex_buildIndex
 		indexer = new lemur::parse::IndriTextHandler(BIParam::index,
 					BIParam::memory,
 					parser);
-	} else if (BIParam::indexType == "inv") {
-		indexer = new lemur::parse::InvFPTextHandler(BIParam::index, 
-					BIParam::memory, 
-					BIParam::countStopWords, 
-					BIParam::position);
-    if (docmgr)
-      ((lemur::parse::InvFPTextHandler *)indexer)->setDocManager(docmgr->getMyID());
-  } else if (BIParam::indexType == "ifp") {
-		indexer = new lemur::parse::InvFPTextHandler(BIParam::index, 
-					BIParam::memory, 
-					BIParam::countStopWords, 
-					1);
-    if (docmgr)
-      ((lemur::parse::InvFPTextHandler *)indexer)->setDocManager(docmgr->getMyID());
 	} else if (BIParam::indexType == "key") {
 		index = new lemur::index::KeyfileIncIndex(BIParam::index,
 					BIParam::memory);
 		indexer = new lemur::parse::KeyfileTextHandler(index,
 						BIParam::countStopWords);
-    if (docmgr)
-      ((lemur::parse::KeyfileTextHandler *)indexer)->setDocManager(docmgr->getMyID());
+                if (docmgr)
+                  ((lemur::parse::KeyfileTextHandler *)indexer)->setDocManager(docmgr->getMyID());
 	} 
 
 	// chain the parser/stopper/stemmer/indexer

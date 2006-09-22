@@ -323,7 +323,7 @@ public DocumentVector[] documentVectors(int[] documentIDs) throws java.lang.Exce
        @param expression The expression to evaluate, probably an ordered or unordered window expression
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
-public double expressionCount(String expression, String queryType) {
+public double expressionCount(String expression, String queryType) throws java.lang.Exception {
     return indriJNI.QueryEnvironment_expressionCount__SWIG_0(swigCPtr, expression, queryType);
   }
 
@@ -333,7 +333,7 @@ public double expressionCount(String expression, String queryType) {
        @param expression The expression to evaluate, probably an ordered or unordered window expression
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
-public double expressionCount(String expression) {
+public double expressionCount(String expression) throws java.lang.Exception {
     return indriJNI.QueryEnvironment_expressionCount__SWIG_1(swigCPtr, expression);
   }
 
@@ -346,7 +346,7 @@ public double expressionCount(String expression) {
        @param expression The expression to evaluate, probably an ordered or unordered window expression
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
-public ScoredExtentResult[] expressionList(String expression, String queryType) {
+public ScoredExtentResult[] expressionList(String expression, String queryType) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_expressionList__SWIG_0(swigCPtr, expression, queryType);
 }
 
@@ -359,7 +359,7 @@ public ScoredExtentResult[] expressionList(String expression, String queryType) 
        @param expression The expression to evaluate, probably an ordered or unordered window expression
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
-public ScoredExtentResult[] expressionList(String expression) {
+public ScoredExtentResult[] expressionList(String expression) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_expressionList__SWIG_1(swigCPtr, expression);
 }
 

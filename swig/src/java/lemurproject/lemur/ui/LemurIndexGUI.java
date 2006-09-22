@@ -82,9 +82,9 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
     private final static String defaultStopwordFile="properties" + SLASH + "stoplist.dft";
     
     /** Lemur index types */
-    private final static String[] indTypes = {"KeyfileIncIndex", "LemurIndriIndex", "InvFPIndex", "InvIndex"};
+    private final static String[] indTypes = {"KeyfileIncIndex", "LemurIndriIndex"};
     /** Lemur document manager types */
-    private final static String[] mgrTypes = {"Element", "Keyfile", "Flatfile"};
+    private final static String[] mgrTypes = {"Element", "Keyfile"};
     /** Lemur document formats */
     private final static String [] formats = {"trec", "web", "reuters"};
     /** Lemur document formats */
@@ -1245,10 +1245,6 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         String idxname = removeExt(iname.getText());
         printParam(p, "index", idxname);
         printParam(p, "indexType", idx);
-        if (idx.equals("inv"))
-            {
-                printParam(p, "position", "0");
-            }
         if (doDM.isSelected())
             {
                 // needs filter to valid values
@@ -1377,8 +1373,6 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         String retval;
         if (s.equals("KeyfileIncIndex")) retval = "key";
         else if (s.equals("LemurIndriIndex")) retval = "indri";
-        else if (s.equals("InvFPIndex")) retval = "ifp";
-        else if (s.equals("InvIndex")) retval = "inv";
         else retval = "unknown";
         return retval;
     }
@@ -1390,7 +1384,6 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         String s = (String)dmTypeBox.getSelectedItem();
         String retval;
         if (s.equals("Keyfile")) retval = "bdm";
-        else if (s.equals("Flatfile")) retval = "flat";
         else if (s.equals("Element")) retval = "elem";
         else retval = "unknown";
         return retval;

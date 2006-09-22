@@ -9504,7 +9504,14 @@ SWIGEXPORT double SWIGSTDCALL CSharp_QueryEnvironment_expressionCount__SWIG_0(vo
   }
   std::string arg3_str(jarg3);
   arg3 = &arg3_str; 
-  result = (double)(arg1)->expressionCount((std::string const &)*arg2,(std::string const &)*arg3);
+  try {
+    result = (double)(arg1)->expressionCount((std::string const &)*arg2,(std::string const &)*arg3);
+  }
+  catch(lemur::api::Exception &_e) {
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, ("C++ #lemur::api::Exception exception: " + (&_e)->what()).c_str());
+    return 0; 
+  }
+  
   jresult = result; 
   return jresult;
 }
@@ -9523,7 +9530,14 @@ SWIGEXPORT double SWIGSTDCALL CSharp_QueryEnvironment_expressionCount__SWIG_1(vo
   }
   std::string arg2_str(jarg2);
   arg2 = &arg2_str; 
-  result = (double)(arg1)->expressionCount((std::string const &)*arg2);
+  try {
+    result = (double)(arg1)->expressionCount((std::string const &)*arg2);
+  }
+  catch(lemur::api::Exception &_e) {
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, ("C++ #lemur::api::Exception exception: " + (&_e)->what()).c_str());
+    return 0; 
+  }
+  
   jresult = result; 
   return jresult;
 }
@@ -9549,7 +9563,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_QueryEnvironment_expressionList__SWIG_0(voi
   }
   std::string arg3_str(jarg3);
   arg3 = &arg3_str; 
-  result = (arg1)->expressionList((std::string const &)*arg2,(std::string const &)*arg3);
+  try {
+    result = (arg1)->expressionList((std::string const &)*arg2,(std::string const &)*arg3);
+  }
+  catch(lemur::api::Exception &_e) {
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, ("C++ #lemur::api::Exception exception: " + (&_e)->what()).c_str());
+    return 0; 
+  }
+  
   jresult = new std::vector<indri::api::ScoredExtentResult >((std::vector<indri::api::ScoredExtentResult > &)result); 
   return jresult;
 }
@@ -9568,7 +9589,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_QueryEnvironment_expressionList__SWIG_1(voi
   }
   std::string arg2_str(jarg2);
   arg2 = &arg2_str; 
-  result = (arg1)->expressionList((std::string const &)*arg2);
+  try {
+    result = (arg1)->expressionList((std::string const &)*arg2);
+  }
+  catch(lemur::api::Exception &_e) {
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, ("C++ #lemur::api::Exception exception: " + (&_e)->what()).c_str());
+    return 0; 
+  }
+  
   jresult = new std::vector<indri::api::ScoredExtentResult >((std::vector<indri::api::ScoredExtentResult > &)result); 
   return jresult;
 }

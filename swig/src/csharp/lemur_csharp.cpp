@@ -274,6 +274,7 @@ SWIGEXPORT void SWIGSTDCALL SWIGRegisterStringCallback_lemur_csharp(SWIG_CSharpS
   // includes for the lemur classes
   // could be put in the various individual .i files
 #include "IndexManager.hpp"
+#include "BasicCollectionProps.hpp"
 #include "RetMethodManager.hpp"
 #include "StructQueryRetMethod.hpp"
 #include "TextQueryRetMethod.hpp"

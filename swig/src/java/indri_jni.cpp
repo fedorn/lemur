@@ -2609,7 +2609,18 @@ JNIEXPORT jdouble JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1exp
   jenv->ReleaseStringUTFChars(jarg3, arg3_pstr); 
   {
     try {
-      result = (double)(arg1)->expressionCount((std::string const &)*arg2,(std::string const &)*arg3);
+      try {
+        result = (double)(arg1)->expressionCount((std::string const &)*arg2,(std::string const &)*arg3);
+      }
+      catch(lemur::api::Exception &_e) {
+        {
+          jclass excep = jenv->FindClass("java/lang/Exception");
+          if (excep)
+          jenv->ThrowNew(excep, (&_e)->what().c_str());
+          return 0;
+        }
+      }
+      
     } catch( lemur::api::Exception& e ) {
       {
         SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
@@ -2643,7 +2654,18 @@ JNIEXPORT jdouble JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1exp
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
   {
     try {
-      result = (double)(arg1)->expressionCount((std::string const &)*arg2);
+      try {
+        result = (double)(arg1)->expressionCount((std::string const &)*arg2);
+      }
+      catch(lemur::api::Exception &_e) {
+        {
+          jclass excep = jenv->FindClass("java/lang/Exception");
+          if (excep)
+          jenv->ThrowNew(excep, (&_e)->what().c_str());
+          return 0;
+        }
+      }
+      
     } catch( lemur::api::Exception& e ) {
       {
         SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
@@ -2687,7 +2709,18 @@ JNIEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment
   jenv->ReleaseStringUTFChars(jarg3, arg3_pstr); 
   {
     try {
-      result = (arg1)->expressionList((std::string const &)*arg2,(std::string const &)*arg3);
+      try {
+        result = (arg1)->expressionList((std::string const &)*arg2,(std::string const &)*arg3);
+      }
+      catch(lemur::api::Exception &_e) {
+        {
+          jclass excep = jenv->FindClass("java/lang/Exception");
+          if (excep)
+          jenv->ThrowNew(excep, (&_e)->what().c_str());
+          return 0;
+        }
+      }
+      
     } catch( lemur::api::Exception& e ) {
       {
         SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
@@ -2723,7 +2756,18 @@ JNIEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
   {
     try {
-      result = (arg1)->expressionList((std::string const &)*arg2);
+      try {
+        result = (arg1)->expressionList((std::string const &)*arg2);
+      }
+      catch(lemur::api::Exception &_e) {
+        {
+          jclass excep = jenv->FindClass("java/lang/Exception");
+          if (excep)
+          jenv->ThrowNew(excep, (&_e)->what().c_str());
+          return 0;
+        }
+      }
+      
     } catch( lemur::api::Exception& e ) {
       {
         SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 

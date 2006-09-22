@@ -14,7 +14,7 @@
  */
 
 #include "MatchInfo.hpp"
-#include "InvFPIndex.hpp"
+#include "InvFPTermList.hpp"
 #include "StructQueryRep.hpp"
 #include "TextQueryRep.hpp"
 #include "DocMgrManager.hpp"

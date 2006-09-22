@@ -323,7 +323,7 @@ public";
 public";
 #endif
 
-      double expressionCount( const std::string& expression, const std::string &queryType = "indri" );
+      double expressionCount( const std::string& expression, const std::string &queryType = "indri" ) throw (lemur::api::Exception);
 #ifdef SWIGJAVA
       %javamethodmodifiers  "
 /**
@@ -337,7 +337,7 @@ public";
 public";
 #endif
 
-      std::vector<indri::api::ScoredExtentResult> expressionList( const std::string& expression,  const std::string& queryType = "indri" );
+      std::vector<indri::api::ScoredExtentResult> expressionList( const std::string& expression,  const std::string& queryType = "indri" ) throw (lemur::api::Exception);
 
     };
 

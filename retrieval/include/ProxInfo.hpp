@@ -15,7 +15,9 @@
 #ifndef _PROXINFO_HPP_
 #define _PROXINFO_HPP_
 
-#include "InvFPIndex.hpp"
+#include "InvFPDocList.hpp"
+#include "InvFPTypes.hpp"
+
 
 namespace lemur
 {

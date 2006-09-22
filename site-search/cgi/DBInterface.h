@@ -6,6 +6,7 @@ using std::string;
 
 #include "CGIOutput.h"
 #include "Index.hpp"
+#include "BasicCollectionProps.hpp"
 #include "IndexManager.hpp"
 #include "Stemmer.hpp"
 #include "IndexManager.hpp"

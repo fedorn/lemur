@@ -40,10 +40,10 @@ class indriJNI {
   public final static native long QueryEnvironment_documentCount__SWIG_0(long jarg1) throws java.lang.Exception;
   public final static native long QueryEnvironment_documentCount__SWIG_1(long jarg1, String jarg2) throws java.lang.Exception;
   public final static native DocumentVector[] QueryEnvironment_documentVectors(long jarg1, int[] jarg2) throws java.lang.Exception;
-  public final static native double QueryEnvironment_expressionCount__SWIG_0(long jarg1, String jarg2, String jarg3);
-  public final static native double QueryEnvironment_expressionCount__SWIG_1(long jarg1, String jarg2);
-  public final static native ScoredExtentResult[] QueryEnvironment_expressionList__SWIG_0(long jarg1, String jarg2, String jarg3);
-  public final static native ScoredExtentResult[] QueryEnvironment_expressionList__SWIG_1(long jarg1, String jarg2);
+  public final static native double QueryEnvironment_expressionCount__SWIG_0(long jarg1, String jarg2, String jarg3) throws java.lang.Exception;
+  public final static native double QueryEnvironment_expressionCount__SWIG_1(long jarg1, String jarg2) throws java.lang.Exception;
+  public final static native ScoredExtentResult[] QueryEnvironment_expressionList__SWIG_0(long jarg1, String jarg2, String jarg3) throws java.lang.Exception;
+  public final static native ScoredExtentResult[] QueryEnvironment_expressionList__SWIG_1(long jarg1, String jarg2) throws java.lang.Exception;
   public final static native void delete_QueryEnvironment(long jarg1);
   public final static native void delete_QueryExpander(long jarg1);
   public final static native ScoredExtentResult[] QueryExpander_runExpandedQuery__SWIG_0(long jarg1, String jarg2, int jarg3, boolean jarg4);
