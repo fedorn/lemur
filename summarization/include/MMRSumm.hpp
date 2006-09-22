@@ -16,7 +16,7 @@
 #include "Summarizer.hpp"
 #include "Passage.hpp"
 #include "MMRPassage.hpp"
-#include "InvFPIndex.hpp"
+#include "Index.hpp"
 #include <algorithm>
 #include <vector>
 #include <string>
@@ -36,7 +36,7 @@ namespace lemur
 
     private:
       double lambda;
-      const lemur::index::InvFPIndex* idx;
+      const lemur::api::Index* idx;
       int summLen;
       vector<MMRPassage> doc;
       mutable int iterCount;
@@ -117,7 +117,7 @@ namespace lemur
 
     public:
 
-      MMRSumm(const lemur::index::InvFPIndex* inIdx, int inSummLen = 5) :
+      MMRSumm(const lemur::api::Index* inIdx, int inSummLen = 5) :
         idx(inIdx), summLen(inSummLen), iterCount(1), maxSims(-1.0),
         queryPassage(NULL), lambda(1.0) {};
   
@@ -142,11 +142,11 @@ namespace lemur
       virtual void outputSumm(void) const;
 
       void findNextPassage(MMRPassage &psg, 
-                           const lemur::index::InvFPIndex* idx, 
+                           const lemur::api::Index* idx, 
                            const lemur::api::TermInfoList* tList, int eos);
 
       void showPassage(const passageVec* psg, 
-                       const lemur::index::InvFPIndex* idx) const;
+                       const lemur::api::Index* idx) const;
   
       void showMarkedPassages() const ;
 
@@ -154,7 +154,7 @@ namespace lemur
         return (check == EOS);
       }
   
-      int hasEOS(const lemur::index::InvFPIndex* idx, 
+      int hasEOS(const lemur::api::Index* idx, 
                  const lemur::api::TermInfoList* tList) {
         tList->startIteration();
         lemur::api::TermInfo* tEntry;
@@ -170,7 +170,7 @@ namespace lemur
         return (check == TITLE);
       }
   
-      int hasTITLE(const lemur::index::InvFPIndex* idx, 
+      int hasTITLE(const lemur::api::Index* idx, 
                    const lemur::api::TermInfoList* tList) {
         tList->startIteration();
         lemur::api::TermInfo* tEntry;

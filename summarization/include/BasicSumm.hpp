@@ -16,10 +16,10 @@
 #include "Summarizer.hpp"
 #include "Passage.hpp"
 #include "BasicPassage.hpp"
-#include "InvFPIndex.hpp"
+#include "Index.hpp"
 #include <algorithm>
 #include <vector>
-
+#include <cmath>
 using std::vector;
 
 namespace lemur 
@@ -33,14 +33,14 @@ namespace lemur
     class BasicSumm : public Summarizer {
 
     private:
-      const lemur::index::InvFPIndex* idx;
+      const lemur::api::Index* idx;
       int summLen;
       vector<BasicPassage> doc;
       mutable int iterCount;
 
     public:
       /// Constructor takes index information and an option default summary length
-      BasicSumm(const lemur::index::InvFPIndex* inIdx, int inSummLen = 5) :
+      BasicSumm(const lemur::api::Index* inIdx, int inSummLen = 5) :
         idx(inIdx), summLen(inSummLen), iterCount(1) {};      
 
       virtual void summDocument(const string &docID, const int optLen, 
@@ -68,7 +68,7 @@ namespace lemur
       }
 
       /// Determines if any EOS markers are present
-      int hasEOS(const lemur::index::InvFPIndex* idx, 
+      int hasEOS(const lemur::api::Index* idx, 
                  const lemur::api::TermInfoList* tList) {
         tList->startIteration();
         lemur::api::TermInfo* tEntry;
@@ -105,7 +105,7 @@ namespace lemur
 
       /// Locate the next passage in a document by searching for the next EOS or using a max length
       void findNextPassage(BasicPassage &psg, 
-                           const lemur::index::InvFPIndex* idx, 
+                           const lemur::api::Index* idx, 
                            const lemur::api::TermInfoList* tList, int eos) {
         lemur::api::TermInfo* tEntry;
         psg.clear();
@@ -147,7 +147,7 @@ namespace lemur
  
       /// <code>BasicSumm</code>'s method to output a summary (to screen)
       void showPassage(const passageVec* psg, 
-                       const lemur::index::InvFPIndex* idx) const {
+                       const lemur::api::Index* idx) const {
         for (int i=0; i < psg->size(); i++) {
           cout << idx->term((*psg)[i].termID) << " ";
         }

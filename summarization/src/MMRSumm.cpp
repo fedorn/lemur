@@ -91,7 +91,7 @@ int lemur::summarization::MMRSumm::fetchPassages(Passage* psgs,
 }
   
 void lemur::summarization::MMRSumm::findNextPassage(MMRPassage &psg, 
-                                                    const lemur::index::InvFPIndex* idx, 
+                                                    const lemur::api::Index* idx, 
                                                     const TermInfoList* tList, int eos) {
   TermInfo* tEntry;
   psg.clear();
@@ -134,7 +134,7 @@ void lemur::summarization::MMRSumm::findNextPassage(MMRPassage &psg,
 }
   
 void lemur::summarization::MMRSumm::showPassage(const passageVec* psg, 
-                                                const lemur::index::InvFPIndex* idx) const {
+                                                const lemur::api::Index* idx) const {
   for (int i=0; i < psg->size(); i++) {
     cout << idx->term((*psg)[i].termID) << " ";
   }
