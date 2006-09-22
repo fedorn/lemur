@@ -10,12 +10,12 @@
  */
 
 #include "CtfIndexer.hpp"
-
+#include "KeyfileIncIndex.hpp"
 
  
 lemur::distrib::CtfIndexer::CtfIndexer(const string &csName, int bufferSize, 
                                        bool countStopWords) {
-  collsel = new lemur::index::InvPushIndex(csName, bufferSize);
+  collsel = new lemur::index::KeyfileIncIndex(csName, bufferSize);
 
   csdp = new lemur::parse::DocumentProps();
   term = new lemur::index::InvFPTerm();

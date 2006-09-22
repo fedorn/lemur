@@ -10,7 +10,8 @@
 */
 
 #include "TextHandler.hpp"
-#include "InvPushIndex.hpp"
+#include "PushIndex.hpp"
+#include "InvFPTermList.hpp"
 #include "Parser.hpp"
 #include "WordSet.hpp"
 
@@ -38,7 +39,7 @@ namespace lemur
     private:
       int ctfCount;
       bool first;
-      lemur::index::InvPushIndex * collsel;
+      lemur::index::PushIndex * collsel;
       lemur::parse::DocumentProps * csdp;
       lemur::index::InvFPTerm * term;
       bool countStopWds;

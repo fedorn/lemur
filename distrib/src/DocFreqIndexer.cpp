@@ -10,13 +10,13 @@
  */
 
 #include "DocFreqIndexer.hpp"
-
+#include "KeyfileIncIndex.hpp"
 
 
 lemur::distrib::DocFreqIndexer::DocFreqIndexer(const string &csName, const string &cwName, 
                                                const string &ssName, int bufferSize, 
                                                bool countStopWords) {
-  collsel = new lemur::index::InvPushIndex(csName, bufferSize);
+  collsel = new lemur::index::KeyfileIncIndex(csName, bufferSize);
   collWords = fopen(cwName.c_str(), "wb");
   serverSizes = fopen(ssName.c_str(), "wb");
 

@@ -46,7 +46,7 @@ The following is an example of use:
 
 #include "Param.hpp"
 #include "BasicSumm.hpp"
-#include "InvFPIndex.hpp"
+#include "IndexManager.hpp"
 #include <iostream>
 
 using namespace lemur::api;
@@ -69,14 +69,16 @@ void GetAppParam() {
 }
 
 int AppMain(int argc, char* argv[]) {
-  lemur::index::InvFPIndex idx(LocalParameter::index);
+  lemur::api::Index * idx = IndexManager::openIndex(LocalParameter::index);
+
   // Create a basic summarizer
-  lemur::summarization::BasicSumm* s = new lemur::summarization::BasicSumm(&idx);
+  lemur::summarization::BasicSumm* s = new lemur::summarization::BasicSumm(idx);
   // Generate a summary
   // NULL is not valid for an empty string
   //  s->summDocument(LocalParameter::docID, LocalParameter::summLength, NULL);
   s->summDocument(LocalParameter::docID, LocalParameter::summLength, "");
   // Print to stdout
   s->outputSumm();
+  delete(idx);
   return 0;
 }

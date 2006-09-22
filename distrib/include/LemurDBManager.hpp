@@ -16,9 +16,6 @@
 #include "IndexManager.hpp"
 
 #include "DBManager.hpp"
-
-#include "InvFPIndex.hpp"
-
 #include "RetrievalMethod.hpp"
 #include "LemurMemParser.hpp"
 #include "RetMethodManager.hpp"

@@ -44,7 +44,7 @@ The following is an example of use:
 
 #include "Param.hpp"
 #include "MMRSumm.hpp"
-#include "InvFPIndex.hpp"
+#include "IndexManager.hpp"
 #include <iostream>
 
 using namespace lemur::api;
@@ -72,10 +72,10 @@ void GetAppParam()
 
 int AppMain(int argc, char* argv[]) {
 
-  lemur::index::InvFPIndex idx(LocalParameter::index);
+  lemur::api::Index * idx = IndexManager::openIndex(LocalParameter::index);
 
   // Create an MMR summarizer
-  lemur::summarization::MMRSumm* s = new lemur::summarization::MMRSumm(&idx);
+  lemur::summarization::MMRSumm* s = new lemur::summarization::MMRSumm(idx);
 
   if ( !(LocalParameter::query.empty()) ) {
     // generic summary
@@ -86,5 +86,6 @@ int AppMain(int argc, char* argv[]) {
   }
 
   s->outputSumm();
+  delete(idx);
   return 0;
 }
