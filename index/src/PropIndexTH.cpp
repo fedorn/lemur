@@ -10,33 +10,9 @@
 #include "KeyfileIncIndex.hpp"
 
 lemur::parse::PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
-                                       bool countStopWords, int ind) {
+                                       bool countStopWords) {
   // create index and helper objects  
-  if (ind == 1)
-    index = new lemur::index::InvFPPushIndex(filename, bufferSize);
-  // add support for future positional indexes here
-  else 
-    throw lemur::api::Exception("PropIndexTH", "Unknown index type");
-
-  dp = NULL;
-  term = new lemur::index::InvFPTerm();
-  countStopWds = countStopWords;
-  docLength = 0;
-  // set state that is on first doc
-  first = true;
-}
-
-lemur::parse::PropIndexTH::PropIndexTH(const string &filename, int bufferSize,
-                                       bool countStopWords, string ind) {
-  // create index and helper objects  
-  if (ind == "inv")
-    index = new lemur::index::InvFPPushIndex(filename, bufferSize);
-  else if (ind == "key")
-    index = new lemur::index::KeyfileIncIndex(filename, bufferSize);
-  // add support for future positional indexes here
-  else 
-    throw lemur::api::Exception("PropIndexTH", "Unknown index type");
-
+  index = new lemur::index::KeyfileIncIndex(filename, bufferSize);
   dp = NULL;
   term = new lemur::index::InvFPTerm();
   countStopWds = countStopWords;

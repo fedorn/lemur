@@ -10,7 +10,8 @@
 #define _PROPINDEXTH_HPP
 
 #include "TextHandler.hpp"
-#include "InvFPPushIndex.hpp"
+#include "InvFPTermList.hpp"
+#include "PushIndex.hpp"
 namespace lemur 
 {
   namespace parse 
@@ -38,10 +39,12 @@ namespace lemur
   
       /// Create a PropIndexTH with index name filename 
       /// (minus the .ifp extension) and specified buffer size.
+#if 0
       PropIndexTH(const string &filename, int bufferSize, 
                   bool countStopWds = false, int ind = 1);
+#endif
       PropIndexTH(const string &filename, int bufferSize, 
-                  bool countStopWds, string ind);
+                  bool countStopWds);
       ~PropIndexTH();
 
       /// Pushes the doc into the InvFPPushIndex.

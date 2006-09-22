@@ -102,9 +102,6 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\src\BasicIndexWithCat.cpp">
-			</File>
-			<File
 				RelativePath=".\src\CombinedVocabularyIterator.cpp">
 			</File>
 			<File
@@ -150,15 +147,6 @@
 				RelativePath=".\src\DocumentStructure.cpp">
 			</File>
 			<File
-				RelativePath=".\src\IncFPPushIndex.cpp">
-			</File>
-			<File
-				RelativePath=".\src\IncFPTextHandler.cpp">
-			</File>
-			<File
-				RelativePath=".\src\IncPassagePushIndex.cpp">
-			</File>
-			<File
 				RelativePath=".\src\IndexEnvironment.cpp">
 			</File>
 			<File
@@ -180,37 +168,7 @@
 				RelativePath=".\src\InvFPDocList.cpp">
 			</File>
 			<File
-				RelativePath=".\src\InvFPIndex.cpp">
-			</File>
-			<File
-				RelativePath=".\src\InvFPIndexMerge.cpp">
-			</File>
-			<File
-				RelativePath=".\src\InvFPPushIndex.cpp">
-			</File>
-			<File
 				RelativePath=".\src\InvFPTermList.cpp">
-			</File>
-			<File
-				RelativePath=".\src\InvFPTermPropList.cpp">
-			</File>
-			<File
-				RelativePath=".\src\InvFPTextHandler.cpp">
-			</File>
-			<File
-				RelativePath=".\src\InvIndex.cpp">
-			</File>
-			<File
-				RelativePath=".\src\InvIndexMerge.cpp">
-			</File>
-			<File
-				RelativePath=".\src\InvPassagePushIndex.cpp">
-			</File>
-			<File
-				RelativePath=".\src\InvPushIndex.cpp">
-			</File>
-			<File
-				RelativePath=".\src\InvTermList.cpp">
 			</File>
 			<File
 				RelativePath=".\src\KeyfileDocListSegmentReader.cpp">
@@ -256,9 +214,6 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
-				RelativePath=".\include\BasicIndexWithCat.hpp">
-			</File>
 			<File
 				RelativePath=".\include\indri\CombinedVocabularyIterator.hpp">
 			</File>
@@ -335,18 +290,6 @@
 				RelativePath=".\include\indri\FieldStatistics.hpp">
 			</File>
 			<File
-				RelativePath=".\include\IncFPPushIndex.hpp">
-			</File>
-			<File
-				RelativePath=".\include\IncFPTextHandler.hpp">
-			</File>
-			<File
-				RelativePath=".\include\IncPassagePushIndex.hpp">
-			</File>
-			<File
-				RelativePath=".\include\IncPassageTextHandler.hpp">
-			</File>
-			<File
 				RelativePath=".\include\Index.hpp">
 			</File>
 			<File
@@ -357,9 +300,6 @@
 			</File>
 			<File
 				RelativePath=".\include\IndexManager.hpp">
-			</File>
-			<File
-				RelativePath=".\include\IndexWithCat.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\IndexWriter.hpp">
@@ -383,46 +323,16 @@
 				RelativePath=".\include\InvFPDocList.hpp">
 			</File>
 			<File
-				RelativePath=".\include\InvFPIndex.hpp">
-			</File>
-			<File
-				RelativePath=".\include\InvFPIndexMerge.hpp">
-			</File>
-			<File
-				RelativePath=".\include\InvFPPushIndex.hpp">
-			</File>
-			<File
 				RelativePath=".\include\InvFPTerm.hpp">
 			</File>
 			<File
 				RelativePath=".\include\InvFPTermList.hpp">
 			</File>
 			<File
-				RelativePath=".\include\InvFPTermPropList.hpp">
-			</File>
-			<File
-				RelativePath=".\include\InvFPTextHandler.hpp">
-			</File>
-			<File
 				RelativePath=".\include\InvFPTypes.hpp">
 			</File>
 			<File
 				RelativePath=".\include\InvIndex.hpp">
-			</File>
-			<File
-				RelativePath=".\include\InvIndexMerge.hpp">
-			</File>
-			<File
-				RelativePath=".\include\InvPassagePushIndex.hpp">
-			</File>
-			<File
-				RelativePath=".\include\InvPassageTextHandler.hpp">
-			</File>
-			<File
-				RelativePath=".\include\InvPushIndex.hpp">
-			</File>
-			<File
-				RelativePath=".\include\InvTermList.hpp">
 			</File>
 			<File
 				RelativePath=".\include\KeyfileDocListSegmentReader.hpp">
