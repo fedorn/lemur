@@ -8,7 +8,6 @@
 
 #include "DocMgrManager.hpp"
 #include "Param.hpp"
-#include "FlattextDocMgr.hpp"
 #include "KeyfileDocMgr.hpp"
 #include "ElemDocMgr.hpp"
 namespace lemur 
@@ -34,9 +33,7 @@ namespace lemur
         type = ParamGetString("managerType");
       }
       if ((!name.empty()) && (!parsetype.empty()) && (!sources.empty())) {
-        if (type == "flat") {
-          dm = new lemur::parse::FlattextDocMgr(name, parsetype, sources);
-        } else if (type == "bdm") {
+        if (type == "bdm") {
           dm = new lemur::parse::KeyfileDocMgr(name, parsetype, sources);
         } else if (type == "elem") {
           dm = new lemur::parse::ElemDocMgr(name, parsetype, sources);
@@ -49,10 +46,7 @@ namespace lemur
       DocumentManager* dm = NULL;
       int len = name.length();
 
-      // look for name ending in .flat
-      if (len - name.rfind(".flat") == 5)
-        dm = new lemur::parse::FlattextDocMgr(name);
-      else if (len - name.rfind(".bdm") == 4)
+      if (len - name.rfind(".bdm") == 4)
         dm = new lemur::parse::KeyfileDocMgr(name, readOnly);
       else if (len - name.rfind(".elem") == 5)
         dm = new lemur::parse::ElemDocMgr(name, readOnly);
