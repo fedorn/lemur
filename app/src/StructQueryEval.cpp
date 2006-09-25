@@ -14,7 +14,7 @@
 <p> This application runs retrieval experiments to evaluate the
 performance of the structured query model using the inquery retrieval
 method. StructQueryEval requires that its index parameter be a
-positional index (currently one of InvFPIndex or KeyfileIncIndex).
+positional index (KeyfileIncIndex).
 
 <p>Feedback is implemented as a WSUM of the original query combined with
 terms selected from the feedback documents based on belief score. The
@@ -48,8 +48,7 @@ The parameters are:
 <ol>
 
 <li> <tt>index</tt>: The complete name of the index table-of-content file 
-for the database index. This must be a positional index (currently one
-of InvFPIndex or KeyfileIncIndex).
+for the database index. This must be a positional index (currently KeyfileIncIndex).
 
 <li> <tt>textQuery</tt>: the query text stream parsed by ParseInQuery
 

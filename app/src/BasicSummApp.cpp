@@ -20,10 +20,7 @@ To use it, follow the general steps of running a lemur application and
 set the following variables in the parameter file:
 <p>
 <ol>
-
-<li><tt>indexFile</tt>: the path to the index TOC. The index must be an
-InvFPIndex (.ifp).
-
+<li><tt>indexFile</tt>: the path to the index TOC.
 <li><tt>docID</tt>: the external id of the document to summarize.
 <li><tt>summLength</tt>: summary length, default is 5 sentences.
 </ol>
@@ -35,7 +32,7 @@ The following is an example of use:
 
  % cat summparam
 &lt;parameters&gt;
-   &lt;indexFile&gt;idx.ifp&lt;/indexFile&gt;
+   &lt;indexFile&gt;idx.key&lt;/indexFile&gt;
    &lt;docID&gt;WTX001-B01-1&lt;/docID&gt;
 &lt;/parameters&gt;
  % BasicSummApp summparam

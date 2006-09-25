@@ -45,7 +45,7 @@ void usage(int argc, char ** argv) {
        << argv[0] << " paramfile datfile1 datfile2 ... " << endl
        << endl
        << "ParseToFile parses documents and writes output compatible with " << endl
-       << "BuildBasicIndex. The program uses either the TrecParser class, " 
+       << "RetEval (query format). The program uses either the TrecParser class, " 
        << endl
        << "WebParser or Chinese(Char)Parser class to parse." << endl
        << "Summary of parameters:" << endl << endl

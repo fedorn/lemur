@@ -19,7 +19,7 @@ The parameters are:
 <p>
 <ol>
 <li> <tt>index</tt>: name of the index table-of-content file without the
-.ifp extension.
+extension.
 <li> <tt>indexType</tt>: the type of index, key (KeyfileIncIndex), indri (LemurIndriIndex)
 <li> <tt>memory</tt>: memory (in bytes) of KeyfileIncIndex cache (def = 128000000).
 <li> <tt>stopwords</tt>: name of file containing the stopword list.

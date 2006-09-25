@@ -23,7 +23,7 @@ The parameters are:
 <li> <tt>manager</tt>: name of the document manager (without extension). Required. 
 <li> <tt>managerType</tt>: name of the document manager type, one of bdm (KeyfileDocMgr) or elem (ElemDocMgr). Required.
 <li> <tt>index</tt>: name of the index table-of-content file without the
-.ifp extension.
+.extension.
 <li> <tt>indexType</tt>: the type of index, key (KeyfileIncIndex).
 <li> <tt>memory</tt>: memory (in bytes) of KeyfileIncIndex cache size (def = 128000000).
 <li> <tt>stopwords</tt>: name of file containing the stopword list.
@@ -70,7 +70,7 @@ using namespace lemur::api;
 namespace LocalParameter {
   int memory;
   string index;  // optional name (minus extension) of the database
-  string indexType;  // index type (one of key or inv)
+  string indexType;  // index type (one of key)
   string manager; // name of document manager
   string mgrType; // which doc mgr to use
   string stopwords;  // name of file containing stopwords
