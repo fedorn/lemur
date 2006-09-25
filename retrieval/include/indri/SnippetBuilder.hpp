@@ -38,7 +38,7 @@ namespace indri {
                                                           const std::map< std::string, std::vector<indri::api::ScoredExtentResult> >& annotations,
                                                           const std::vector<std::string>& nodeNames );
       
-      std::vector<Region> indri::api::SnippetBuilder::_buildRegions(
+      std::vector<Region> _buildRegions(
         std::vector< std::pair<indri::index::Extent, int> >& extents,
         int positionCount, int matchWidth, int windowWidth );
 
