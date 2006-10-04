@@ -415,7 +415,8 @@ public:
     _queueLock(queueLock),
     _queueEvent(queueEvent),
     _parameters(params),
-    _expander(0)
+    _expander(0),
+    _annotation(0)
   {
   }
 
