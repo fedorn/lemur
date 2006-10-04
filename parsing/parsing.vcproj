@@ -474,6 +474,9 @@
 				RelativePath=".\include\TrecParser.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\URLTextAnnotator.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\UnparsedDocument.hpp">
 			</File>
 			<File

@@ -26,6 +26,7 @@
 #include "indri/Parameters.hpp"
 #include "indri/StemmerFactory.hpp"
 #include "indri/NormalizationTransformation.hpp"
+#include "indri/URLTextAnnotator.hpp"
 #include "indri/UTF8CaseNormalizationTransformation.hpp"
 #include "Exception.hpp"
 #include "indri/Thread.hpp"
@@ -131,6 +132,10 @@ void indri::collection::Repository::_buildFields() {
 //
 
 void indri::collection::Repository::_buildChain( indri::api::Parameters& parameters, indri::api::Parameters* options ) {
+  // Extract url from metadata before case normalizing.
+  // this could be parameterized.
+  _transformations.push_back(new indri::parse::URLTextAnnotator());
+
   bool dontNormalize = parameters.exists( "normalize" ) && ( false == (bool) parameters["normalize"] );
 
   if( dontNormalize == false ) {
