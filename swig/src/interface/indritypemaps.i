@@ -101,6 +101,16 @@ typedef long long UINT64;
 // --- Return value processing -------------------------------------------
 
 %typemap(out) 
+  std::vector< lemur::api::DOCID_T > 
+{
+  std::vector< lemur::api::DOCID_T >::size_type iIndex;
+  array_init(return_value);
+  std::vector< lemur::api::DOCID_T > *resultobj = &result; 
+  for (iIndex=0;iIndex<resultobj->size();iIndex++) 
+    add_next_index_long(return_value,(*resultobj)[iIndex]);
+}
+
+%typemap(out) 
   std::vector< std::string > 
 {
   std::vector< std::string >::size_type iIndex;

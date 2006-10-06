@@ -25,6 +25,7 @@ class indriJNI {
   public final static native void QueryEnvironment_setStopwords(long jarg1, String[] jarg2) throws java.lang.Exception;
   public final static native ScoredExtentResult[] QueryEnvironment_runQuery__SWIG_0(long jarg1, String jarg2, int jarg3) throws java.lang.Exception;
   public final static native ScoredExtentResult[] QueryEnvironment_runQuery__SWIG_1(long jarg1, String jarg2, int[] jarg3, int jarg4) throws java.lang.Exception;
+  public final static native QueryResults QueryEnvironment_runQuery__SWIG_2(long jarg1, QueryRequest jarg2) throws java.lang.Exception;
   public final static native long QueryEnvironment_runAnnotatedQuery__SWIG_0(long jarg1, String jarg2, int jarg3) throws java.lang.Exception;
   public final static native long QueryEnvironment_runAnnotatedQuery__SWIG_1(long jarg1, String jarg2, int[] jarg3, int jarg4) throws java.lang.Exception;
   public final static native ParsedDocument[] QueryEnvironment_documents__SWIG_0(long jarg1, int[] jarg2) throws java.lang.Exception;
@@ -44,6 +45,7 @@ class indriJNI {
   public final static native double QueryEnvironment_expressionCount__SWIG_1(long jarg1, String jarg2) throws java.lang.Exception;
   public final static native ScoredExtentResult[] QueryEnvironment_expressionList__SWIG_0(long jarg1, String jarg2, String jarg3) throws java.lang.Exception;
   public final static native ScoredExtentResult[] QueryEnvironment_expressionList__SWIG_1(long jarg1, String jarg2) throws java.lang.Exception;
+  public final static native int QueryEnvironment_documentLength(long jarg1, int jarg2) throws java.lang.Exception;
   public final static native void delete_QueryEnvironment(long jarg1);
   public final static native void delete_QueryExpander(long jarg1);
   public final static native ScoredExtentResult[] QueryExpander_runExpandedQuery__SWIG_0(long jarg1, String jarg2, int jarg3, boolean jarg4);
@@ -85,7 +87,8 @@ class indriJNI {
   public final static native void IndexEnvironment_close(long jarg1) throws java.lang.Exception;
   public final static native void IndexEnvironment_addFile__SWIG_0(long jarg1, String jarg2) throws java.lang.Exception;
   public final static native void IndexEnvironment_addFile__SWIG_1(long jarg1, String jarg2, String jarg3) throws java.lang.Exception;
-  public final static native int IndexEnvironment_addString(long jarg1, String jarg2, String jarg3, Map jarg4) throws java.lang.Exception;
+  public final static native int IndexEnvironment_addString__SWIG_0(long jarg1, String jarg2, String jarg3, Map jarg4) throws java.lang.Exception;
+  public final static native int IndexEnvironment_addString__SWIG_1(long jarg1, String jarg2, String jarg3, Map jarg4, TagExtent[] jarg5) throws java.lang.Exception;
   public final static native int IndexEnvironment_addParsedDocument(long jarg1, ParsedDocument jarg2) throws java.lang.Exception;
   public final static native int IndexEnvironment_documentsIndexed(long jarg1) throws java.lang.Exception;
   public final static native int IndexEnvironment_documentsSeen(long jarg1) throws java.lang.Exception;

@@ -57,9 +57,9 @@ namespace indri
     template<>
     class GenericHash<const char*> {
     public:
-      int operator() ( const char* const& kp ) const {
+      size_t operator() ( const char* const& kp ) const {
         // attributed to Dan Bernstein, comp.lang.c 
-        int hash = 5381;
+        size_t hash = 5381;
         const char* k = kp;
         char c;
 
@@ -91,13 +91,9 @@ namespace indri
     template<>
     class GenericHash<std::string> {
     public:
-      int operator() ( const std::string key ) const {
-        int hash = 0;
-
-        for(unsigned int i = 0; i < key.length(); i++)
-          hash += (unsigned char)key[i];
-
-        return hash;
+      size_t operator() ( const std::string& key ) const {
+        GenericHash<const char*> charHash;
+        return charHash( key.c_str() );
       }
     };
 
@@ -109,8 +105,7 @@ namespace indri
     template<>
     class GenericComparator<std::string> {
     public:
-      int operator() ( const std::string one, const std::string two ) const {
-
+      int operator() ( const std::string& one, const std::string& two ) const {
         return one.compare(two);
       }
     };

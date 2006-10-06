@@ -1,4 +1,83 @@
+%{
+#include "indri/TagList.hpp"
+%}
+#ifdef SWIGJAVA
 %typemap(javaimports) indri::api::IndexEnvironment "import java.util.Map;"
+%typemap(jni) const std::vector<indri::parse::TagExtent *>& "jobjectArray"
+%typemap(jtype) const std::vector<indri::parse::TagExtent *>& "TagExtent[]"
+%typemap(jstype) const std::vector<indri::parse::TagExtent *>& "TagExtent[]"
+
+%typemap(freearg) const std::vector<indri::parse::TagExtent *>& 
+{
+  for (int i = 0; i < $1->size(); i++) {
+    delete((*$1)[i]);
+  }
+}
+
+%typemap(in) const std::vector<indri::parse::TagExtent *>& ( std::vector<indri::parse::TagExtent *> tein, indri::utility::Buffer tebuf )
+{
+  jsize size = jenv->GetArrayLength($input);
+
+  jclass clazz = jenv->FindClass("lemurproject/indri/TagExtent");
+  jfieldID nameField = jenv->GetFieldID(clazz, "name", "Ljava/lang/String;" );
+  jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
+  jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
+
+  $1 = &tein;
+
+  indri::parse::TagList *tl = new indri::parse::TagList();
+  // addTag, endTag
+  // tags must be sorted with respect to begin
+  for( jsize i=0; i<size; i++ ) {
+    jobject seobj  = jenv->GetObjectArrayElement($input, i);
+    int tBegin = jenv->GetIntField(seobj, beginField);
+    int tEnd = jenv->GetIntField(seobj, endField);
+    jstring text = (jstring)jenv->GetObjectField(seobj, nameField);
+    const char *textChars = jenv->GetStringUTFChars(text, 0);
+    jsize textLength = jenv->GetStringUTFLength(text);
+    char* textPosition = tebuf.write( textLength+1 );
+    strncpy( textPosition, textChars, textLength );
+    textPosition[textLength] = 0;
+    jenv->ReleaseStringUTFChars(text, textChars);
+    const char *tName = textPosition;
+    tl->addTag(tName, tName, tBegin);
+    tl->endTag(tName, tName, tEnd);
+  }
+  indri::utility::greedy_vector<indri::parse::TagExtent *> tags;
+  tl->writeTagList(tags); // sets parents
+  tein.resize(tags.size());
+  for (int i = 0; i < tags.size(); i++)
+    tein[i] = tags[i];
+
+/*
+  for( jsize i=0; i<size; i++ ) {
+    jobject seobj  = jenv->GetObjectArrayElement($input, i);
+    indri::parse::TagExtent *te = new indri::parse::TagExtent;
+
+    te->begin = jenv->GetIntField(seobj, beginField);
+    te->end = jenv->GetIntField(seobj, endField);
+    // may leak...
+    jstring text = (jstring)jenv->GetObjectField(seobj, nameField);
+    const char *textChars = jenv->GetStringUTFChars(text, 0);
+    jsize textLength = jenv->GetStringUTFLength(text);
+    char* textPosition = tebuf.write( textLength+1 );
+    strncpy( textPosition, textChars, textLength );
+    textPosition[textLength] = 0;
+    jenv->ReleaseStringUTFChars(text, textChars);
+    te->name = textPosition;
+
+// need to pass these in. could use index into input for parent.
+    te->number = 0;
+    te->parent = 0;
+    
+    $1->push_back( te );
+  }
+*/
+}
+%typemap(javain) const std::vector<indri::parse::TagExtent *>& "$javainput";
+
+
+#endif
 namespace indri {
   namespace api {
     %feature("director") IndexStatus;
@@ -311,6 +390,12 @@ public";
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
 public";
+#endif
+
+#ifdef SWIGJAVA
+// only for UIMA indexing for now
+int addString( const std::string& documentString, const std::string&
+fileClass, const std::vector<indri::parse::MetadataPair>& metadata, const std::vector<indri::parse::TagExtent *> &tags ) throw (lemur::api::Exception);
 #endif
 
       int addParsedDocument( indri::api::ParsedDocument* document ) throw (lemur::api::Exception);

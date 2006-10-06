@@ -991,6 +991,72 @@ SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
  
   
 
+  jobject queryresults_copy(JNIEnv *jenv, indri::api::QueryResults &results) 
+    {
+      jobject result = NULL;
+      // get java class
+      jclass clazz = jenv->FindClass("lemurproject/indri/QueryResults");
+      jmethodID constructor = jenv->GetMethodID(clazz, "<init>", "()V" );
+      jfieldID parseTimeField = jenv->GetFieldID(clazz, "parseTime", "D" );
+      jfieldID executeTimeField = jenv->GetFieldID(clazz, "executeTime", "D" );
+      jfieldID documentsTimeField = jenv->GetFieldID(clazz, "documentsTime", "D" );
+      jfieldID estMatchesField = jenv->GetFieldID(clazz, "estimatedMatches", "I" );
+      jfieldID resultsField = jenv->GetFieldID(clazz, "results", "[Llemurproject/indri/QueryResult;" );
+
+      result = jenv->NewObject(clazz, constructor);
+      jenv->SetDoubleField(result, parseTimeField, results.parseTime );
+      jenv->SetDoubleField(result, executeTimeField, results.executeTime );
+      jenv->SetDoubleField(result, documentsTimeField, results.documentsTime );
+      jenv->SetIntField(result, estMatchesField, results.estimatedMatches );
+
+      jclass qrClazz = jenv->FindClass("lemurproject/indri/QueryResult");
+      jmethodID qrConstructor = jenv->GetMethodID(qrClazz, "<init>", "()V" );
+      jfieldID snippetField = jenv->GetFieldID(qrClazz, "snippet", "Ljava/lang/String;" );
+      jfieldID docNameField = jenv->GetFieldID(qrClazz, "documentName", "Ljava/lang/String;" );
+      jfieldID scoreField = jenv->GetFieldID(qrClazz, "score", "D" );
+      jfieldID beginField = jenv->GetFieldID(qrClazz, "begin", "I" );
+      jfieldID endField = jenv->GetFieldID(qrClazz, "end", "I" );
+      jfieldID metadataField = jenv->GetFieldID(qrClazz, "metadata", "Ljava/util/Map;" );
+      jobjectArray resultArray = jenv->NewObjectArray(results.results.size(), qrClazz, NULL);
+      jenv->SetObjectField(result, resultsField, resultArray);
+
+      jclass mapClazz = jenv->FindClass("java/util/HashMap");
+      jmethodID mapConstructor = jenv->GetMethodID(mapClazz, "<init>", "()V" );
+      jmethodID putMethod = jenv->GetMethodID(mapClazz, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
+
+      for (jsize i = 0; i < results.results.size(); i++) {
+        jobject qr = jenv->NewObject(qrClazz, qrConstructor);
+        //populate fields
+        jstring snippet = jenv->NewStringUTF(results.results[i].snippet.c_str());
+        jstring documentName = jenv->NewStringUTF(results.results[i].documentName.c_str());;
+        jenv->SetObjectField(qr, snippetField, snippet);
+        jenv->SetObjectField(qr, docNameField, documentName);
+
+        jenv->SetDoubleField(qr, scoreField, results.results[i].score );
+        jenv->SetIntField(qr, beginField, results.results[i].begin );
+        jenv->SetIntField(qr, endField, results.results[i].end );
+
+        // metadata is a Map, bleah... make a hashmap and populate it.
+        jobject mapObject = jenv->NewObject(mapClazz, mapConstructor);
+
+        // copy metadata information
+        for( unsigned int j = 0; j < results.results[i].metadata.size(); j++) {
+          indri::api::MetadataPair& pair = results.results[i].metadata[j];
+          jstring key = jenv->NewStringUTF(pair.key.c_str());
+          jstring value = jenv->NewStringUTF(pair.value.c_str());
+          // put it in the map
+          jenv->CallObjectMethod(mapObject, putMethod, key, value);
+        }
+        jenv->SetObjectField(qr, metadataField, mapObject);
+        jenv->SetObjectArrayElement(resultArray, i, qr);
+      }
+      return result;
+    }
+
+
+#include "indri/TagList.hpp"
+
+
 
 /* ---------------------------------------------------
  * C++ director class methods
@@ -1545,7 +1611,6 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1setSco
   (void)jcls;
   arg1 = *(indri::api::QueryEnvironment **)&jarg1; 
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg2);
     arg2 = &strin2;
     
@@ -1592,7 +1657,6 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1setSto
   (void)jcls;
   arg1 = *(indri::api::QueryEnvironment **)&jarg1; 
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg2);
     arg2 = &strin2;
     
@@ -1736,6 +1800,89 @@ JNIEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment
   }
   {
     jresult = java_build_scoredextentresult( jenv, result );
+  }
+  return jresult;
+}
+
+
+JNIEXPORT jobject JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1runQuery_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2) {
+  jobject jresult = 0 ;
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  indri::api::QueryRequest *arg2 = 0 ;
+  indri::api::QueryResults result;
+  indri::api::QueryRequest req2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::api::QueryEnvironment **)&jarg1; 
+  {
+    arg2 = &req2;
+    jclass qrClazz = jenv->FindClass("lemurproject/indri/QueryRequest");
+    jfieldID queryField = jenv->GetFieldID(qrClazz, "query",  "Ljava/lang/String;");
+    
+    jfieldID formulatorsField = jenv->GetFieldID(qrClazz, "formulators", "[Ljava/lang/String;");
+    jfieldID metadataField = jenv->GetFieldID(qrClazz, "metadata", "[Ljava/lang/String;");
+    jfieldID resultsRequestedField = jenv->GetFieldID(qrClazz, "resultsRequested", "I");
+    jfieldID startNumField = jenv->GetFieldID(qrClazz, "startNum", "I");
+    jfieldID optionsField = jenv->GetFieldID(qrClazz, "options", "I");
+    
+    jstring query = (jstring) jenv->GetObjectField(jarg2, queryField);
+    
+    jobjectArray formulators = (jobjectArray) jenv->GetObjectField(jarg2, formulatorsField);
+    
+    jobjectArray metadata = (jobjectArray) jenv->GetObjectField(jarg2, metadataField);
+    jint resultsRequested = jenv->GetIntField(jarg2, resultsRequestedField);
+    jint startNum = jenv->GetIntField(jarg2, startNumField);
+    jint options = jenv->GetIntField(jarg2, optionsField);
+    
+    // fill in the values
+    const char *queryString = jenv->GetStringUTFChars(query, 0);
+    req2.query = queryString;
+    jenv->ReleaseStringUTFChars(query, queryString);
+    
+    jsize formCount = formulators ? jenv->GetArrayLength(formulators) : 0;
+    for (int i = 0; i < formCount; i++) {
+      jstring form = (jstring) jenv->GetObjectArrayElement(formulators, i);
+      const char *formString = jenv->GetStringUTFChars(form, 0);
+      req2.formulators.push_back(formString);
+      jenv->ReleaseStringUTFChars(form, formString);
+    }
+    
+    jsize metaCount = metadata ? jenv->GetArrayLength(metadata) : 0;
+    for (int i = 0; i < metaCount; i++) {
+      jstring meta = (jstring) jenv->GetObjectArrayElement(metadata, i);
+      const char *metaString =  jenv->GetStringUTFChars(meta, 0);
+      req2.metadata.push_back(metaString);
+      jenv->ReleaseStringUTFChars(meta, metaString);
+    }
+    req2.resultsRequested = resultsRequested;
+    req2.startNum = startNum;
+    req2.options = (indri::api::QueryRequest::Options) options;
+  }
+  {
+    try {
+      try {
+        result = (arg1)->runQuery(*arg2);
+      }
+      catch(lemur::api::Exception &_e) {
+        {
+          jclass excep = jenv->FindClass("java/lang/Exception");
+          if (excep)
+          jenv->ThrowNew(excep, (&_e)->what().c_str());
+          return 0;
+        }
+      }
+      
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  {
+    jresult = queryresults_copy(jenv, result);
   }
   return jresult;
 }
@@ -2143,7 +2290,6 @@ JNIEXPORT jintArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1d
   arg2 = &arg2_str;
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg3);
     arg3 = &strin3;
     
@@ -2212,7 +2358,6 @@ JNIEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment
   arg2 = &arg2_str;
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg3);
     arg3 = &strin3;
     
@@ -2779,6 +2924,43 @@ JNIEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment
   {
     jresult = java_build_scoredextentresult( jenv, result );
   }
+  return jresult;
+}
+
+
+JNIEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jint jresult = 0 ;
+  indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::api::QueryEnvironment **)&jarg1; 
+  arg2 = (int)jarg2; 
+  {
+    try {
+      try {
+        result = (int)(arg1)->documentLength(arg2);
+      }
+      catch(lemur::api::Exception &_e) {
+        {
+          jclass excep = jenv->FindClass("java/lang/Exception");
+          if (excep)
+          jenv->ThrowNew(excep, (&_e)->what().c_str());
+          return 0;
+        }
+      }
+      
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  jresult = (jint)result; 
   return jresult;
 }
 
@@ -3587,7 +3769,6 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFil
   arg8 = &arg8_str;
   jenv->ReleaseStringUTFChars(jarg8, arg8_pstr); 
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg9);
     arg9 = &strin9;
     
@@ -3601,7 +3782,6 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFil
     }
   }
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg10);
     arg10 = &strin10;
     
@@ -3615,7 +3795,6 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFil
     }
   }
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg11);
     arg11 = &strin11;
     
@@ -3629,7 +3808,6 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFil
     }
   }
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg12);
     arg12 = &strin12;
     
@@ -3900,7 +4078,6 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setInd
   (void)jcls;
   arg1 = *(indri::api::IndexEnvironment **)&jarg1; 
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg2);
     arg2 = &strin2;
     
@@ -4045,7 +4222,6 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setMet
   (void)jcls;
   arg1 = *(indri::api::IndexEnvironment **)&jarg1; 
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg2);
     arg2 = &strin2;
     
@@ -4059,7 +4235,6 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setMet
     }
   }
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg3);
     arg3 = &strin3;
     
@@ -4106,7 +4281,6 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setSto
   (void)jcls;
   arg1 = *(indri::api::IndexEnvironment **)&jarg1; 
   {
-    jclass stringClazz = jenv->FindClass("java/lang/String");
     jsize arrayLength = jenv->GetArrayLength(jarg2);
     arg2 = &strin2;
     
@@ -4542,7 +4716,7 @@ JNIEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFil
 }
 
 
-JNIEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addString(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jstring jarg3, jobjectArray jarg4) {
+JNIEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addString_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jstring jarg3, jobjectArray jarg4) {
   jint jresult = 0 ;
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -4674,6 +4848,209 @@ JNIEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addStr
     }
   }
   jresult = (jint)result; 
+  return jresult;
+}
+
+
+JNIEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addString_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jstring jarg3, jobjectArray jarg4, jobjectArray jarg5) {
+  jint jresult = 0 ;
+  indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  std::vector<indri::parse::MetadataPair > *arg4 = 0 ;
+  std::vector<indri::parse::TagExtent * > *arg5 = 0 ;
+  int result;
+  std::vector<indri::parse::MetadataPair > mdin4 ;
+  indri::utility::Buffer mdbuf4 ;
+  std::vector<indri::parse::TagExtent * > tein5 ;
+  indri::utility::Buffer tebuf5 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(indri::api::IndexEnvironment **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return 0;
+  }
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return 0;
+  std::string arg2_str(arg2_pstr);
+  arg2 = &arg2_str;
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  if(!jarg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return 0;
+  }
+  const char *arg3_pstr = (const char *)jenv->GetStringUTFChars(jarg3, 0); 
+  if (!arg3_pstr) return 0;
+  std::string arg3_str(arg3_pstr);
+  arg3 = &arg3_str;
+  jenv->ReleaseStringUTFChars(jarg3, arg3_pstr); 
+  {
+    // call map.entrySet()
+    jclass mapClazz = jenv->GetObjectClass( jarg4 );
+    jmethodID mapEntrySetMethod = jenv->GetMethodID( mapClazz, "entrySet", "()Ljava/util/Set;" );
+    jobject mapEntrySet = jenv->CallObjectMethod( jarg4, mapEntrySetMethod );
+    
+    // call entrySet.toArray()
+    jclass entrySetClazz = jenv->GetObjectClass( mapEntrySet );
+    jmethodID entrySetToArrayMethod = jenv->GetMethodID( entrySetClazz, "toArray", "()[Ljava/lang/Object;" );
+    jobjectArray entryArray = (jobjectArray) jenv->CallObjectMethod( mapEntrySet, entrySetToArrayMethod );
+    
+    // get array length
+    jsize arrayLength = jenv->GetArrayLength( entryArray );
+    arg4 = &mdin4;
+    
+    jclass stringClazz = jenv->FindClass("java/lang/String");
+    unsigned int i;
+    
+    for( i=0; i<arrayLength; i++ ) {
+      jobject mapEntry = jenv->GetObjectArrayElement( entryArray, i );
+      jclass mapEntryClazz = jenv->GetObjectClass( mapEntry );
+      jmethodID mapEntryGetKeyMethod = jenv->GetMethodID( mapEntryClazz, "getKey", "()Ljava/lang/Object;" );
+      jmethodID mapEntryGetValueMethod = jenv->GetMethodID( mapEntryClazz, "getValue", "()Ljava/lang/Object;" );
+      
+      jobject key = jenv->CallObjectMethod( mapEntry, mapEntryGetKeyMethod );
+      jobject value = jenv->CallObjectMethod( mapEntry, mapEntryGetValueMethod );
+      
+      size_t keyOffset = mdbuf4.position();
+      const char* keyChars = jenv->GetStringUTFChars( (jstring) key, 0 );
+      jsize keyLength = jenv->GetStringUTFLength( (jstring) key);
+      std::string keyString = keyChars;
+      char* keyPosition = mdbuf4.write( keyLength+1 );
+      strncpy( keyPosition, keyChars, keyLength );
+      keyPosition[keyLength] = 0;
+      
+      size_t valueOffset = mdbuf4.position();
+      char* valuePosition = 0;
+      jsize valueLength;
+      
+      if( jenv->IsInstanceOf( value, stringClazz ) ) {
+        jstring valueString = (jstring) value;
+        const char* valueChars = jenv->GetStringUTFChars( valueString, 0);
+        valueLength = jenv->GetStringUTFLength( valueString );
+        
+        valuePosition = mdbuf4.write( valueLength+1 );
+        strncpy( valuePosition, valueChars, valueLength );
+        valuePosition[valueLength] = 0;
+        valueLength++;
+        
+        jenv->ReleaseStringUTFChars(valueString, valueChars);
+      } else {
+        // is byte array
+        jbyteArray valueArray = (jbyteArray) value;
+        jbyte* valueBytes = jenv->GetByteArrayElements( valueArray, 0 );
+        valueLength = jenv->GetArrayLength( valueArray );
+        
+        valuePosition = mdbuf4.write( valueLength+1 );
+        memcpy( valuePosition, valueBytes, valueLength );
+        valuePosition[valueLength] = 0;
+        
+        jenv->ReleaseByteArrayElements(valueArray, valueBytes, 0);
+      }
+      
+      indri::parse::MetadataPair pair;
+      pair.key = (char*) keyOffset;
+      pair.value = (char*) valueOffset;
+      pair.valueLength = valueLength;
+      mdin4.push_back(pair);
+      
+      jenv->ReleaseStringUTFChars( (jstring)key, keyChars);
+    }
+    
+    // now we need to fix up the key and value positions
+    for( i=0; i<arrayLength; i++ ) {
+      mdin4[i].key = mdbuf4.front() + (size_t) mdin4[i].key;
+      mdin4[i].value = mdbuf4.front() + (size_t) mdin4[i].value;
+    }
+  }
+  {
+    jsize size = jenv->GetArrayLength(jarg5);
+    
+    jclass clazz = jenv->FindClass("lemurproject/indri/TagExtent");
+    jfieldID nameField = jenv->GetFieldID(clazz, "name", "Ljava/lang/String;" );
+    jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
+    jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
+    
+    arg5 = &tein5;
+    
+    indri::parse::TagList *tl = new indri::parse::TagList();
+    // addTag, endTag
+    // tags must be sorted with respect to begin
+    for( jsize i=0; i<size; i++ ) {
+      jobject seobj  = jenv->GetObjectArrayElement(jarg5, i);
+      int tBegin = jenv->GetIntField(seobj, beginField);
+      int tEnd = jenv->GetIntField(seobj, endField);
+      jstring text = (jstring)jenv->GetObjectField(seobj, nameField);
+      const char *textChars = jenv->GetStringUTFChars(text, 0);
+      jsize textLength = jenv->GetStringUTFLength(text);
+      char* textPosition = tebuf5.write( textLength+1 );
+      strncpy( textPosition, textChars, textLength );
+      textPosition[textLength] = 0;
+      jenv->ReleaseStringUTFChars(text, textChars);
+      const char *tName = textPosition;
+      tl->addTag(tName, tName, tBegin);
+      tl->endTag(tName, tName, tEnd);
+    }
+    indri::utility::greedy_vector<indri::parse::TagExtent *> tags;
+    tl->writeTagList(tags); // sets parents
+    tein5.resize(tags.size());
+    for (int i = 0; i < tags.size(); i++)
+    tein5[i] = tags[i];
+    
+    /*
+      for( jsize i=0; i<size; i++ ) {
+        jobject seobj  = jenv->GetObjectArrayElement(jarg5, i);
+        indri::parse::TagExtent *te = new indri::parse::TagExtent;
+    
+        te->begin = jenv->GetIntField(seobj, beginField);
+        te->end = jenv->GetIntField(seobj, endField);
+        // may leak...
+        jstring text = (jstring)jenv->GetObjectField(seobj, nameField);
+        const char *textChars = jenv->GetStringUTFChars(text, 0);
+        jsize textLength = jenv->GetStringUTFLength(text);
+        char* textPosition = tebuf5.write( textLength+1 );
+        strncpy( textPosition, textChars, textLength );
+        textPosition[textLength] = 0;
+        jenv->ReleaseStringUTFChars(text, textChars);
+        te->name = textPosition;
+    
+    // need to pass these in. could use index into input for parent.
+        te->number = 0;
+        te->parent = 0;
+        
+        arg5->push_back( te );
+      }
+    */
+  }
+  {
+    try {
+      try {
+        result = (int)(arg1)->addString((std::string const &)*arg2,(std::string const &)*arg3,(std::vector<indri::parse::MetadataPair > const &)*arg4,(std::vector<indri::parse::TagExtent * > const &)*arg5);
+      }
+      catch(lemur::api::Exception &_e) {
+        {
+          jclass excep = jenv->FindClass("java/lang/Exception");
+          if (excep)
+          jenv->ThrowNew(excep, (&_e)->what().c_str());
+          return 0;
+        }
+      }
+      
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  jresult = (jint)result; 
+  {
+    for (int i = 0; i < arg5->size(); i++) {
+      delete((*arg5)[i]);
+    }
+  }
   return jresult;
 }
 

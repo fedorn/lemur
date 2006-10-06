@@ -407,6 +407,56 @@ int indri::api::IndexEnvironment::addString( const std::string& documentString, 
 }
 
 //
+// For UIMA with offset annotations
+//
+int indri::api::IndexEnvironment::addString( const std::string& documentString, const std::string&
+fileClass, const std::vector<indri::parse::MetadataPair>& metadata, const std::vector<indri::parse::TagExtent *> &tags ) {
+  indri::parse::UnparsedDocument document;
+  indri::parse::Parser* parser;
+  indri::parse::Tokenizer* tokenizer;
+  indri::parse::DocumentIterator* iterator;
+  indri::parse::Conflater* conflater;
+  indri::parse::OffsetAnnotationAnnotator *annote;
+  std::string docno = "";
+  
+  for ( size_t i=0; i<metadata.size(); i++ ) {
+    const char* attributeName = metadata[i].key;
+    const char* attributeValue = (const char*) metadata[i].value;
+    if ( ! strcmp( attributeName, "docno" ) ) docno = attributeValue;
+  }
+  
+  std::string nothing;
+
+  _documentsSeen++;
+
+  document.text = documentString.c_str();
+  document.textLength = documentString.length() + 1; // for the null
+  document.metadata = metadata;
+  document.content = document.text;
+  document.contentLength = document.textLength - 1;
+  
+  _getParsingContext( &parser, &tokenizer, &iterator, &conflater, fileClass );
+  annote = new indri::parse::OffsetAnnotationAnnotator(conflater);
+  annote->setTags(docno.c_str(), tags);
+  
+  if( parser == 0 ) {
+    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "File class '" + fileClass + "' wasn't recognized." );
+  }
+  indri::parse::TokenizedDocument* tokenized = tokenizer->tokenize( &document );
+
+  ParsedDocument* parsed = parser->parse( tokenized );
+  parsed = annote->transform(parsed);
+  
+  int documentID =_repository.addDocument( parsed );
+
+  _documentsIndexed++;
+  if( _callback ) (*_callback)( indri::api::IndexStatus::DocumentCount, nothing, _error, _documentsIndexed, _documentsSeen );
+
+  return documentID;
+}
+
+
+//
 // addParsedDocument
 //
 

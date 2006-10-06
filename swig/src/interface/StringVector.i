@@ -25,7 +25,20 @@
 }
 
 %typemap(in) const std::vector<std::string>& ( std::vector<std::string> strin ) {
-  jclass stringClazz = jenv->FindClass("java/lang/String");
+  jsize arrayLength = jenv->GetArrayLength($input);
+  $1 = &strin;
+
+  for( unsigned int i=0; i<arrayLength; i++ ) {
+    jstring str = (jstring) jenv->GetObjectArrayElement($input, i);
+    jsize stringLength = jenv->GetStringUTFLength(str);
+    const char* stringChars = jenv->GetStringUTFChars(str, 0);
+    std::string stringCopy;
+    stringCopy.assign( stringChars, stringChars + stringLength );
+    $1->push_back(stringCopy);
+  }
+}
+
+%typemap(in) std::vector<std::string> ( std::vector<std::string> strin ) {
   jsize arrayLength = jenv->GetArrayLength($input);
   $1 = &strin;
 

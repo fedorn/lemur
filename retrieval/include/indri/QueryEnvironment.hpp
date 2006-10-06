@@ -249,6 +249,9 @@ namespace indri
       /// @return total number of documents in the aggregated collection
       INT64 documentCount();
       INT64 documentCount( const std::string& term );
+
+      int documentLength(lemur::api::DOCID_T documentID);
+      
       /// \brief Fetch a document vector for a list of documents. 
       /// Caller responsible for deleting the Vector.
       /// @param documentIDs the vector of document ids.

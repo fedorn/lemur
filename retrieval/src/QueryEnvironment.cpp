@@ -1264,3 +1264,11 @@ std::vector<indri::api::DocumentVector*> indri::api::QueryEnvironment::documentV
   return results;
 }
 
+int indri::api::QueryEnvironment::documentLength(lemur::api::DOCID_T documentID) {
+  int length = 0;
+  int serverCount = _servers.size();
+  DOCID_T id = documentID/serverCount;
+  int serverID = documentID % serverCount;
+  length = _servers[serverID]->documentLength( id );
+  return length;
+}

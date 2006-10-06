@@ -318,6 +318,39 @@ void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnn
   in.close();
 }
 
+void indri::parse::OffsetAnnotationAnnotator::setTags (const char *docno, const std::vector<indri::parse::TagExtent *> &tagset) 
+{
+  // Create new TAG
+
+  std::set<indri::parse::TagExtent*>** p = _annotations.find( docno );
+
+  std::set<indri::parse::TagExtent*>* tags = p ? *p : NULL;
+
+  if ( ! tags ) { 
+
+    tags = new std::set<indri::parse::TagExtent*>;
+    _annotations.insert( docno, tags );
+  }
+
+  for (unsigned int i = 0; i < tagset.size(); i++) {
+    const TagExtent *source = tagset[i];
+    TagExtent* te = new TagExtent;
+    char *myName = new char[strlen(source->name) + 1];
+    strcpy(myName, source->name);
+    _buffers_allocated.push_back( myName );
+    te->name = myName;    
+    te->number = source->number;
+    te->parent = source->parent;
+    te->begin = source->begin;
+    te->end = source->end;
+
+    // Conflate tag if necessary
+    if ( _p_conflater ) _p_conflater->conflate( te );
+          
+    tags->insert( te );
+  }
+}
+
 indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( indri::api::ParsedDocument* document ) {
 
   const char *docno = _getDocno( document ); 

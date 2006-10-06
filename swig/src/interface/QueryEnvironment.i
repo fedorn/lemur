@@ -1,4 +1,8 @@
+#ifdef SWIGJAVA
 %typemap(javaimports) indri::api::QueryEnvironment "import java.util.Map;"
+#endif
+%include "QueryRequest.i"
+%include "QueryResults.i"
 namespace indri {
   namespace api {
     class QueryEnvironment {
@@ -123,6 +127,23 @@ public";
 #endif
 
       std::vector<indri::api::ScoredExtentResult> runQuery( const std::string& query, const std::vector<int>& documentSet, int resultsRequested ) throw (lemur::api::Exception);
+
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+        Run an Indri query request
+       @param request the query request to run
+       @return the QueryResults
+
+
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
+#ifdef SWIGJAVA
+      indri::api::QueryResults runQuery(indri::api::QueryRequest &request) throw (lemur::api::Exception);
+#endif
+
 #ifdef SWIGJAVA
       %javamethodmodifiers  "
 /**
@@ -339,7 +360,17 @@ public";
 
       std::vector<indri::api::ScoredExtentResult> expressionList( const std::string& expression,  const std::string& queryType = "indri" ) throw (lemur::api::Exception);
 
-    };
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+        Return all the length of a document.
+       @param documentID The internal document id.
+       @return the length of the document.
+*/
+public";
+#endif
 
+      int documentLength( int documentID ) throw (lemur::api::Exception);
+    };
   }
 }

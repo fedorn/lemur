@@ -145,6 +145,19 @@ public ScoredExtentResult[] runQuery(String query, int[] documentSet, int result
 
   
 /**
+        Run an Indri query request
+       @param request the query request to run
+       @return the QueryResults
+
+
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public QueryResults runQuery(QueryRequest request) throws java.lang.Exception {
+  return indriJNI.QueryEnvironment_runQuery__SWIG_2(swigCPtr, request);
+}
+
+  
+/**
         Run an Indri query language query.
        @param query the query to run
        @param resultsRequested maximum number of results to return
@@ -362,5 +375,15 @@ public ScoredExtentResult[] expressionList(String expression, String queryType) 
 public ScoredExtentResult[] expressionList(String expression) throws java.lang.Exception {
   return indriJNI.QueryEnvironment_expressionList__SWIG_1(swigCPtr, expression);
 }
+
+  
+/**
+        Return all the length of a document.
+       @param documentID The internal document id.
+       @return the length of the document.
+*/
+public int documentLength(int documentID) throws java.lang.Exception {
+    return indriJNI.QueryEnvironment_documentLength(swigCPtr, documentID);
+  }
 
 }

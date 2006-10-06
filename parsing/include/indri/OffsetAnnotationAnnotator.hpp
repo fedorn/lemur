@@ -249,6 +249,8 @@ namespace indri {
         _cleanup();
       }
 
+      void setTags (const char *docno, const std::vector<indri::parse::TagExtent *> &tagset);
+      
       void setConflater(Conflater* p_conflater) 
       {
         _p_conflater = p_conflater;

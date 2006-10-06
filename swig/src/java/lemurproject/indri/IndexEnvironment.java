@@ -312,7 +312,17 @@ public void addFile(String fileName, String fileClass) throws java.lang.Exceptio
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
 public int addString(String fileName, String fileClass, Map metadata) throws java.lang.Exception {
-    return indriJNI.IndexEnvironment_addString(swigCPtr, fileName, fileClass, metadata);
+    return indriJNI.IndexEnvironment_addString__SWIG_0(swigCPtr, fileName, fileClass, metadata);
+  }
+
+  
+/**
+       add an already parsed document to the index and repository
+       @param document the document to add
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public int addString(String documentString, String fileClass, Map metadata, TagExtent[] tags) throws java.lang.Exception {
+    return indriJNI.IndexEnvironment_addString__SWIG_1(swigCPtr, documentString, fileClass, metadata, tags);
   }
 
   
