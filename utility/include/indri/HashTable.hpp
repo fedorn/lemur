@@ -33,8 +33,8 @@ namespace indri
     template<class _Key>
     class GenericHash { 
     public:
-      int operator() ( const _Key& k ) const {
-        return (int) k;
+      size_t operator() ( const _Key& k ) const {
+        return (size_t) k;
       }
     };
 
@@ -45,8 +45,8 @@ namespace indri
     template<class _Key>
     class GenericComparator {
     public:
-      int operator() ( const _Key& one, const _Key& two ) const {
-        return (int) (one - two);
+      size_t operator() ( const _Key& one, const _Key& two ) const {
+        return (size_t) (one - two);
       }
     };
 
@@ -78,7 +78,7 @@ namespace indri
     template<>
     class GenericComparator<const char*> {
     public:
-      int operator () ( const char* const& one, const char* const& two ) const {
+      size_t operator () ( const char* const& one, const char* const& two ) const {
         return strcmp( one, two );
       }
     };
@@ -105,7 +105,7 @@ namespace indri
     template<>
     class GenericComparator<std::string> {
     public:
-      int operator() ( const std::string& one, const std::string& two ) const {
+      size_t operator() ( const std::string& one, const std::string& two ) const {
         return one.compare(two);
       }
     };
