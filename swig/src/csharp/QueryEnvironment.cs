@@ -208,6 +208,12 @@ public class QueryEnvironment : IDisposable {
     return ret;
   }
 
+  public int documentLength(int documentID) {
+    int ret = indri_csharpPINVOKE.QueryEnvironment_documentLength(swigCPtr, documentID);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
 }
 
 }

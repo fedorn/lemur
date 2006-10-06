@@ -1625,6 +1625,9 @@ class indri_csharpPINVOKE {
   [DllImport("lemur_csharp", EntryPoint="CSharp_QueryEnvironment_expressionList__SWIG_1")]
   public static extern IntPtr QueryEnvironment_expressionList__SWIG_1(HandleRef jarg1, string jarg2);
 
+  [DllImport("lemur_csharp", EntryPoint="CSharp_QueryEnvironment_documentLength")]
+  public static extern int QueryEnvironment_documentLength(HandleRef jarg1, int jarg2);
+
   [DllImport("lemur_csharp", EntryPoint="CSharp_delete_QueryEnvironment")]
   public static extern void delete_QueryEnvironment(HandleRef jarg1);
 
