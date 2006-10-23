@@ -30,8 +30,6 @@ using std::vector;
  * &nbsp;&nbsp;&lt;path&gt;/var/data/mirrored_data/&lt;/path&gt;
  * &nbsp;&lt;/rootpaths&gt;
  * &nbsp;&lt;addtorootpath&gt;path_to_add&lt;/addtorootpath&gt;
- * &nbsp;&lt;supportanchortext&gt;true_or_false&lt;/supportanchortext&gt;
- * &nbsp;&lt;supporturltext&gt;true_or_false&lt;/supporturltext&gt;
  * &nbsp;&lt;indexes&gt;
  * &nbsp;&nbsp;&lt;index&gt;
  * &nbsp;&nbsp;&nbsp;&lt;path&gt;/var/indices/testindex&lt;/path&gt;
@@ -66,12 +64,6 @@ protected:
   /** a string (if any) to add to the front of standard URLs */
   string rootAddPath;
 
-  /** indicates if we want to support anchor text processing for URL data */
-  bool supportAnchorText;
-
-  /** indicates if we want to support URL text processing for URL data */
-  bool supportURLText;
-
   /** our indices */
   vector<db_t*>   indices;
 
@@ -83,7 +75,6 @@ protected:
 
   /** support page rank as a prior **/
   bool supportPageRank;
-
 
   /** our instance variable */
   static CGIConfiguration *_instance;
@@ -168,20 +159,6 @@ public:
    * @return the rootAddPath value
    */
   string getRootAddPath();
-
-  /**
-   * Indicates if we are supporting anchor text or not
-   *
-   * @return true if anchor text is supported
-   */
-  bool getSupportAnchorText();
-
-  /**
-   * Indicates if we are supporting URL text or not
-   *
-   * @return true if URL text is supported
-   */
-  bool getSupportURLText();
 
   /**
    * Retrives the number of indexes configured

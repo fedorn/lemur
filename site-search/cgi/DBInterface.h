@@ -34,22 +34,51 @@ using std::string;
 class DBInterface {
 
 private:
+	/** the path to the index to open */
   string    pathToIndex;
+
+	/** the root of the raw data (optional) */
   string    dataRoot;
+
+	/** the output object */
   CGIOutput *output;
 
+	/**
+	 * retrieves a stemmer object for the specified index
+	 * @param ind the index to get the stemmer for
+	 * @return the stemmer (or NULL if none could be found)
+	 */
   lemur::api::Stemmer* getDbStemmer(const lemur::api::Index* ind);
+
+	/**
+	 * retrieves a stemmed term from an index
+	 * @param term the term to get the stemmed version of
+	 * @param ind the opened index
+	 * @return the stemmed word (if it exists)
+	 */
+  std::string getStemmedTerm(std::string term, const lemur::api::Index* ind);
   
+	/**
+	 * Generalized function to open the index specified by pathToIndex
+	 * @return the opened index (or NULL on error)
+	 */
   lemur::api::Index *openIndex();
 
+	/**
+	 * Attempts to remove duplicate results from a result set
+	 * @param results the original results set
+	 * @param db the opened index
+	 * @return the results set with duplicates removed
+	 */
   lemur::api::IndexedRealVector removeDuplicateResults(lemur::api::IndexedRealVector results, lemur::api::Index *db);
 
   /**
-  * @param datasourceID the index of the database used for this search
-  * @param results pointer to the vector of results
-  * @param listLength the max. number of results to show on this page
-  * @param rankStart the starting number of the first result of the page
-  */
+	 * displays the search results
+   * @param datasourceID the index of the database used for this search
+   * @param results pointer to the vector of results
+   * @param listLength the max. number of results to show on this page
+   * @param rankStart the starting number of the first result of the page
+   */
   void displaySearchResults(lemur::api::Index *db, int datasourceID, lemur::parse::StringQuery* q, indri::api::QueryEnvironment *indriEnvironment,
                             lemur::api::IndexedRealVector *results, int listLength, int rankStart);
 
@@ -112,12 +141,26 @@ private:
    */
   int getTFAnchorTagCount(indri::index::Index *index, long docid, long termid, indri::utility::greedy_vector<indri::index::FieldExtent> *anchorFields);
 
+  /**
+   * Same functionality as getTFAnchorTagCount, but more aptly named.
+	 * Retrieves a term count for a specfic term in a set of fields
+   *
+   * @param index the indri index
+   * @param docid the internal document ID
+   * @param termid the internal term ID
+   * @param fields the field vector to look in
+   * @return termcount of how many times the term occurs total
+   */
+  int getTFFieldTagCount(indri::index::Index *index, long docid, long termid, indri::utility::greedy_vector<indri::index::FieldExtent> *fields);
 
 public:
+
+	/** various query language types */
   enum QUERY_INTERFACE_TYPE {
     QUERY_INTERFACE_INDRI=1,
     QUERY_INTERFACE_INQUERY
   };
+
   /**
    * Basic constructor.
    */
@@ -156,6 +199,11 @@ public:
    * Displays the index listing
    */
   void displayIndexStatistics(int indexID);
+
+  /**
+   * Displays the available fields for an index
+   */
+  void listIndexFields();
 
   /**
    * Returns the current data root path (if set)
@@ -203,6 +251,13 @@ public:
    */
   void getTermCorpusStats(string *term);
 
+
+  /**
+   * Outputs the stemmed version (if any) of the given word
+   * @param term the term string
+   */
+  void getWordStem(string *term);
+
   /**
    * Outputs the basic inverted list for a given term
    * @param term the term string
@@ -216,44 +271,60 @@ public:
   void getTermInvPosList (string *term);
 
   /**
+   * Outputs the basic inverted list for a given term for a field
+   * @param term the term string and a .field notation
+   */
+  void getTermInvListField(string *term);
+
+  /**
+   * Outputs the basic inverted list for a given term for a field
+   * and also potential field related statistics and position information
+   * @param term the term string and a .field notation
+   */
+  void getTermInvPosListField(string *term);
+
+  /**
+	 * Deprecated: use getTermInvListField with a "term.inlink" term
+	 *
    * Outputs the inverted list for a given term with potential anchor text
    * and related statistics
    *
    * @param term the term string
    */
-  void getTermInvListWithAnchor (string *term);
+  // void getTermInvListWithAnchor (string *term);
 
   /**
+	 * Deprecated: use getTermInvPosListField with a "term.inlink" term
+	 *
    * Outputs the inverted list for a given term with position information
    * and also potential anchor text, related statistics, and anchor
    * position information
    *
    * @param term the term string
    */
-  void getTermInvPosListWithAnchor(string *term);
+  // void getTermInvPosListWithAnchor(string *term);
 
   /**
+	 * Deprecated: use getTermInvListField with a "term.url" term
+	 *
    * Outputs the inverted list for a given term with potential URL text
    * and related statistics
    *
    * @param term the term string
    */
-  void getTermInvListWithURL(string *term);
+  // void getTermInvListWithURL(string *term);
 
   /**
+	 * Deprecated: use getTermInvPosListField with a "term.url" term
+	 *
    * Outputs the inverted list for a given term with position information
    * and also potential anchor text, related statistics, and URL
    * position information
    *
    * @param term the term string
    */
-  void getTermInvPosListWithURL(string *term);
+  // void getTermInvPosListWithURL(string *term);
 
-  /**
-   * Outputs the stemmed version (if any) of the given word
-   * @param term the term string
-   */
-  void getWordStem(string *term);
 
 }; // class DBInterface
 

@@ -17,7 +17,7 @@ using std::map;
 
 // these are for offline debugging...
 // #define OFFLINEDEBUGGING
-// #define OFFLINEDEBUGGING_QUERY "va=test"
+// #define OFFLINEDEBUGGING_QUERY "q=cows"
 
 // our query parameters
 
@@ -102,40 +102,73 @@ void printOutHelp(CGIOutput *output) {
               << "?name=value&name=value&....\n\n"
               << "Name=value pairs are processed from left to right, in order\n\n"
               << "NAME=VALUE ARGUMENTS\n"
-              << "c=term prints corpus statistics for term\n"
-              << "d=n sets the database to the n'th database\n"
-              << "d=? lists the available databases\n"
-              << "D=n displays the statistics for the database ID\n"
-              << "e=<string> fetches the document with external id <string>\n"
-              << "g=d sets the CGI interface to Diagnostic mode\n"
-              << "g=i sets the CGI interface to Interactive mode\n"
-              << "g=p sets the CGI interface to Program mode\n"
-              << "h=<anything> prints this help message\n"
-              << "i=<integer> fetches the document with internal id <integer>\n"
-              << "I=<integer> fetches the parsed form of the document with internal id <integer>\n"
-              << "m=<string> shows the lexicalized (stopped, stemmed) form of <string>\n"
-              << "n=x sets the number of documents to retrieve to x\n"
-              << "q=<string> uses the query <string> to search the database\n"
-              << "s=n starts the query results at rank n\n"
-              << "t=<query_type> tells the CGI which type of query interface to use (currently \"indri\" [default] or \"inquery\")\n"
-              << "v=term returns the inverted list for term\n"
-              << "V=term returns the inverted list for term with positions\n"
-              << "x=false if using indri-style queries, this will not expand the query (expansion is turned on by default)\n";
-
-  if (CGIConfiguration::getInstance().getSupportAnchorText()) {
-    helpMessage << "va=term returns the inverted list for term with anchor text term frequencies\n";
-    helpMessage << "VA=term returns the inverted list for term with positions and anchor text term frequencies\n";
-  }
-
-  if (CGIConfiguration::getInstance().getSupportURLText()) {
-    helpMessage << "vu=term returns the inverted list for term with URL text term frequencies\n";
-    helpMessage << "VU=term returns the inverted list for term with positions and URL text term frequencies\n";
-  }
+              << "(c=<term> | termstats=<term>) prints corpus statistics for term\n"
+              << "(d=<n> | datasource=<n>) sets the database to the n'th database\n"
+              << "(d=? | listdatasources) lists the available databases\n"
+              << "(D=<n> | datasourcestats=<n>) displays the statistics for the database ID\n"
+              << "(e=<string> | getdocext=<string>) fetches the document with external id <string>\n"
+              << "(f=? | listfields) lists the available fields for the index\n"
+              << "(g=d | setoutput=debug) sets the CGI interface to Diagnostic mode\n"
+              << "(g=i | setoutput=interactive) sets the CGI interface to Interactive mode\n"
+              << "(g=p | setoutput=program) sets the CGI interface to Program mode\n"
+              << "(h=<anything> | help) prints this help message\n"
+              << "(i=<integer> | getdoc=<integer>) fetches the document with internal id <integer>\n"
+              << "(I=<integer> | getparseddoc=<integer>) fetches the parsed form of the document with internal id <integer>\n"
+              << "(m=<term> | getterm=<term>) shows the lexicalized (stopped, stemmed) form of <term>\n"
+              << "(n=<n> | maxresults=<n>) sets the number of documents to retrieve to <n>\n"
+              << "(q=<string> | query=<string>) uses the query <string> to search the database\n"
+              << "(s=<n> | start=<n>) starts the query results at rank n\n"
+              << "(t=<query_type> | querytype=<query_type>) tells the CGI which type of query interface to use (currently \"indri\" [default] or \"inquery\")\n"
+              << "(v=<term> | invlist=<term>) returns the inverted list for term (use term.field for field specific list)\n"
+              << "(V=<term> | invposlist=<term>) returns the inverted list for term with positions (use term.field for field specific list)\n"
+              << "(x=false | queryexpansion=false) if using indri-style queries, this will not expand the query (expansion is turned on by default)\n";
 
   helpMessage << "\n";
 
   output->outputString(helpMessage.str());
   output->writePlaintextFooter();
+}
+
+std::string keyFirstCharToWholeKey(char keyChar) {
+  switch (keyChar) {
+    case 'c':
+			return "termstats";
+    case 'd':
+			return "datasource";
+    case 'D':
+			return "datasourcestats";
+    case 'e':
+			return "getdocext";
+    case 'f':
+			return "listfields";
+    case 'g':
+			return "setoutput";
+    case 'h':
+			return "help";
+    case 'i':
+			return "getdoc";
+    case 'I':
+			return "getparseddoc";
+    case 'm':
+			return "getterm";
+    case 'n':
+			return "maxresults";
+    case 'q':
+			return "query";
+    case 'Q':
+			return "querydebug";
+    case 's':
+			return "start";
+    case 't':
+			return "querytype";
+    case 'v':
+			return "invlist";
+    case 'V':
+			return "invposlist";
+    case 'x':
+			return "queryexpansion";
+		default: return "";
+	}; // end switch (firstKeyChar)
 }
 
 void processRequest(CGIOutput *output) {
@@ -189,206 +222,141 @@ void processRequest(CGIOutput *output) {
       continue;
     }
 
-    char firstKeyChar=thisKey[0];
+		if (thisKey.length()==1) {
+			// backwards compatibility for single-letter functions
+	    thisKey=keyFirstCharToWholeKey(thisKey[0]);
+		}
 
-    switch (firstKeyChar) {
-      case 'h': {
-                  // print help
+		/* I know, bad programming style follows... */
 
-                  printOutHelp(output);
-                  hasOutput=true;
-                } break;
-      case 'x': {
-                  CGIConfiguration::getInstance().putKVItem("expandindriquery", thisVal);
-                } break;
-      case 'g': {
-                  // set interface mode
-                  if (thisVal.length() > 0) {
-                    switch (thisVal[0]) {
-                    case 'd':
-                      output->setOutputMode(CGI_OUTPUT_DIAGNOSTIC);
-                      break;
-                    case 'p':
-                      output->setOutputMode(CGI_OUTPUT_PROGRAM);
-                      break;
-                    case 'i':
-                      output->setOutputMode(CGI_OUTPUT_INTERACTIVE);
-                      break;
-                    default:
-                      // do nothing.
-                      break;
-                    } // end switch (thisVal[0])
-                  }
-                } break;
-      case 'd': {
-                  // select datasource
-                  if (thisVal.length() > 0) {
-                    if (thisVal[0]=='?') {
-                      // display datasource list and exit...
-                      output->displayIndexListingPage();
-                      return;
-                    }
-
-                    datasourceToUse=atoi(thisVal.c_str());
-                    if (datasourceToUse >= CGIConfiguration::getInstance().getNumIndices()) {
-                      // error out - unknown datasource...
-                      stringstream tmpDSource;
-                      tmpDSource << "Unknown datasource value: d=" << datasourceToUse;
-                      output->writeErrorMessage("Unknown datasource.", tmpDSource.str());
-                      return;
-                    }
-
-                    db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(datasourceToUse));
-                  }
-                } break;
-      case 'D': {
-                  // get database statistics
-                  if (thisVal.length() > 0) {
-                    if (thisVal[0]=='?') {
-                      // display datasource list and exit...
-                      output->displayIndexListingPage();
+		if (thisKey=="termstats") {
+      db.getTermCorpusStats(&thisVal);
+      hasOutput=true;
+		} else if (thisKey=="datasource") {
+      if (thisVal.length() > 0) {
+        if (thisVal[0]=='?') {
+          // display datasource list and exit...
+          output->displayIndexListingPage();
 		      hasOutput=true;
-                      break;
-                    }
+				} else {
+					datasourceToUse=atoi(thisVal.c_str());
+					if (datasourceToUse >= CGIConfiguration::getInstance().getNumIndices()) {
+						// error out - unknown datasource...
+						stringstream tmpDSource;
+						tmpDSource << "Unknown datasource value: d=" << datasourceToUse;
+						output->writeErrorMessage("Unknown datasource.", tmpDSource.str());
+						return;
+					} // end if (datasourceToUse >= CGIConfiguration::getInstance().getNumIndices())
 
-                    int whichDatasource=atoi(thisVal.c_str());
+					db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(datasourceToUse));
+				} // end if (thisVal[0]=='?')
+      } // end if (thisVal.length() > 0)
+		} else if (thisKey=="listdatasources") {
+      output->displayIndexListingPage();
+      hasOutput=true;
+		} else if (thisKey=="datasourcestats") {
+      // get database statistics
+      if (thisVal.length() > 0) {
+        if (thisVal[0]=='?') {
+          // display datasource list and exit...
+          output->displayIndexListingPage();
+					hasOutput=true;
+				} else {
+					int whichDatasource=atoi(thisVal.c_str());
 
-                    if (whichDatasource >= CGIConfiguration::getInstance().getNumIndices()) {
-                      // error out - unknown datasource...
-                      stringstream tmpDSource;
-                      tmpDSource << "Unknown datasource value: D=" << whichDatasource;
-                      output->writeErrorMessage("Unknown datasource.", tmpDSource.str());
-                      return;
-                    }
+					if (whichDatasource >= CGIConfiguration::getInstance().getNumIndices()) {
+						// error out - unknown datasource...
+						stringstream tmpDSource;
+						tmpDSource << "Unknown datasource value: D=" << whichDatasource;
+						output->writeErrorMessage("Unknown datasource.", tmpDSource.str());
+						return;
+					}
 
-                    db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(whichDatasource));
-                    db.displayIndexStatistics(whichDatasource);
-                    db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(datasourceToUse));
-		    hasOutput=true;
-                  }
-                } break;
-      case 't': {
-                  // set query type...
-                  if (thisVal.compare("indri")==0) {
-                    currentQueryType=DBInterface::QUERY_INTERFACE_INDRI;
-                  } else if (thisVal.compare("inquery")==0) {
-                    currentQueryType=DBInterface::QUERY_INTERFACE_INQUERY;
-                  } else {
-                    // ignore it...
-                  }
-                }
-      case 'n': {
-                  // set max # of documents to retrieve per page
-                  maxDocsToRetrievePerPage=atoi(thisVal.c_str());
-                  if (maxDocsToRetrievePerPage < 1) {
-                    maxDocsToRetrievePerPage=DEFAULT_RESULTS_PER_PAGE;
-                  }
-                } break;
-      case 's': {
-                  // query results start rank...
-                  startRank=atoi(thisVal.c_str());
-                  if (startRank < 0) {
-                    startRank=0;
-                  }
+					db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(whichDatasource));
+					db.displayIndexStatistics(whichDatasource);
+					db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(datasourceToUse));
+					hasOutput=true;
+				} //end if (thisVal[0]=='?')
+      } // end if (thisVal.length() > 0)
+		} else if (thisKey=="getdocext") {
+      db.getDocXID(&thisVal);
+      hasOutput=true;
+		} else if (thisKey=="listfields") {
+      db.listIndexFields();
+      hasOutput=true;
+		} else if (thisKey=="setoutput") {
+			if (thisVal=="d" || thisVal=="debug") {
+        output->setOutputMode(CGI_OUTPUT_DIAGNOSTIC);
+			} else if (thisVal=="p" || thisVal=="program") {
+        output->setOutputMode(CGI_OUTPUT_PROGRAM);
+			} else if (thisVal=="i" || thisVal=="interactive") {
+				output->setOutputMode(CGI_OUTPUT_INTERACTIVE);
+			}
+		} else if (thisKey=="help") {
+      printOutHelp(output);
+      hasOutput=true;
+		} else if (thisKey=="getdoc") {
+      long internalID=atol(thisVal.c_str());
+      db.getDocIID(internalID);
+      hasOutput=true;
+		} else if (thisKey=="getparseddoc") {
+			long internalID=atol(thisVal.c_str());
+			db.getParsedDoc(internalID);
+			hasOutput=true;
+		} else if (thisKey=="getterm") {
+      db.getWordStem(&thisVal);
+      hasOutput=true;
+		} else if (thisKey=="maxresults") {
+      // set max # of documents to retrieve per page
+      maxDocsToRetrievePerPage=atoi(thisVal.c_str());
+      if (maxDocsToRetrievePerPage < 1) {
+        maxDocsToRetrievePerPage=DEFAULT_RESULTS_PER_PAGE;
+      }
+		} else if (thisKey=="query") {
+      if (thisVal=="") {
+        output->displayDefaultSearchPage();      
+      } else {
+        db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, startRank, currentQueryType);
+      }  
+      hasOutput=true;
+		} else if (thisKey=="querydebug") {
+      CGIConfiguration::getInstance().putKVItem("displayquerydebug", "true");
+      if (thisVal=="") {
+        output->displayDefaultSearchPage();      
+      } else {
+        db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, startRank, currentQueryType);
+      }  
+      hasOutput=true;
+		} else if (thisKey=="start") {
+      startRank=atoi(thisVal.c_str());
+      if (startRank < 0) {
+        startRank=0;
+      }
 
-                  if (DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE!=0) {
-                    if (startRank > DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE) {
-                      startRank=DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE-1;
-                    }
-                  }
-                } break;
-      case 'q': {
-                  // query
-                  if (thisVal=="") {
-                    output->displayDefaultSearchPage();      
-                  } else {
-                    db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, startRank, currentQueryType);
-                  }  
-                  hasOutput=true;
-                } break;
-      case 'Q': {
-                  // query w/ extra debugging info
-                  CGIConfiguration::getInstance().putKVItem("displayquerydebug", "true");
-                  if (thisVal=="") {
-                    output->displayDefaultSearchPage();      
-                  } else {
-                    db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, startRank, currentQueryType);
-                  }  
-                  hasOutput=true;
-                } break;  
-      case 'e': {
-                  // get document from ID string
-                  db.getDocXID(&thisVal);
-                  hasOutput=true;
-                } break;
-      case 'i': {
-                  // get document from internal ID
-                  long internalID=atol(thisVal.c_str());
-                  db.getDocIID(internalID);
-                  hasOutput=true;
-                } break;
-      case 'I': {
-                  // get parsed document
-                  long internalID=atol(thisVal.c_str());
-                  db.getParsedDoc(internalID);
-                  hasOutput=true;
-                } break;
-      case 'c': {
-                  // term corpus statistics
-                  db.getTermCorpusStats(&thisVal);
-                  hasOutput=true;
-                } break;
-      case 'm': {
-                  // show lexicalized version...
-                  db.getWordStem(&thisVal);
-                  hasOutput=true;
-                } break;
-      case 'v': {
-                  // get inverted term list
-                  if (CGIConfiguration::getInstance().getSupportAnchorText()) {
-                    if ((thisKey.length()==2) && (thisKey[1]=='a')) {
-                      db.getTermInvListWithAnchor(&thisVal);
-                      hasOutput=true;
-                      break;
-                    }
-                  } // end if (CGIConfiguration::getInstance().getSupportAnchorText())
+      if (DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE!=0) {
+        if (startRank > DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE) {
+          startRank=DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE-1;
+        }
+      }
+		} else if (thisKey=="querytype") {
+      // set query type...
+      if (thisVal.compare("indri")==0) {
+        currentQueryType=DBInterface::QUERY_INTERFACE_INDRI;
+      } else if (thisVal.compare("inquery")==0) {
+        currentQueryType=DBInterface::QUERY_INTERFACE_INQUERY;
+      } else {
+        // ignore it...
+      }
+		} else if (thisKey=="invlist") {
+			db.getTermInvListField(&thisVal);
+      hasOutput=true;
+		} else if (thisKey=="invposlist") {
+  		db.getTermInvPosListField(&thisVal);
+      hasOutput=true;
+		} else if (thisKey=="queryexpansion") {
+      CGIConfiguration::getInstance().putKVItem("expandindriquery", thisVal);
+		}
 
-                  if (CGIConfiguration::getInstance().getSupportURLText()) {
-                    if ((thisKey.length()==2) && (thisKey[1]=='u')) {
-                      db.getTermInvListWithURL(&thisVal);
-                      hasOutput=true;
-                      break;
-                    }
-                  } // end if (CGIConfiguration::getInstance().getSupportURLText())
-
-				  db.getTermInvList(&thisVal);
-                  hasOutput=true;
-                } break;
-      case 'V': {
-                  // get inverted term list w/ position
-                  if (CGIConfiguration::getInstance().getSupportAnchorText()) {
-                    if ((thisKey.length()==2) && (thisKey[1]=='A')) {
-                      db.getTermInvPosListWithAnchor(&thisVal);
-                      hasOutput=true;
-                      break;
-                    }
-                  } // end if (CGIConfiguration::getInstance().getSupportAnchorText())
-
-                  if (CGIConfiguration::getInstance().getSupportURLText()) {
-                    if ((thisKey.length()==2) && (thisKey[1]=='U')) {
-                      db.getTermInvPosListWithURL(&thisVal);
-                      hasOutput=true;
-                      break;
-                    }
-                  } // end if (CGIConfiguration::getInstance().getSupportURLText())
-
-                  db.getTermInvPosList(&thisVal);
-                  hasOutput=true;
-                } break;
-      default:
-        // do nothing - skip this one...
-        break;
-     } // end switch (firstKeyChar)
     vIter++;
   } // end while (vIter!=queryParameters.end())
   if (!hasOutput) {

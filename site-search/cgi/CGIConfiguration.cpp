@@ -10,8 +10,6 @@ CGIConfiguration::CGIConfiguration() {
   currentIndicesSize=0;
   rootAddPath="";
   stripRootPath=false;
-  supportAnchorText=false;
-  supportURLText=false;
 }
 
 CGIConfiguration::~CGIConfiguration() {
@@ -86,21 +84,6 @@ bool CGIConfiguration::readConfigFile(char *filePath) {
     supportPageRank=true;      
   }  
 
-  const XMLNode *rootSupportATNode=rootNode->getChild("supportanchortext");
-  if (rootSupportATNode) {
-    if (rootSupportATNode->getValue().compare("true")==0) {
-      supportAnchorText=true;
-    }
-  }
-
-
-  const XMLNode *rootSupportURLNode=rootNode->getChild("supporturltext");
-  if (rootSupportURLNode) {
-    if (rootSupportURLNode->getValue().compare("true")==0) {
-      supportURLText=true;
-    }
-  }
-
   const XMLNode *indexesStart=rootNode->getChild("indexes");
   if (indexesStart) {
     std::vector<XMLNode*> indexes=indexesStart->getChildren();
@@ -145,14 +128,6 @@ string CGIConfiguration::getRootPath(int whichPath) {
 
 string CGIConfiguration::getRootAddPath() {
   return rootAddPath;
-}
-
-bool CGIConfiguration::getSupportAnchorText() {
-  return supportAnchorText;
-}
-
-bool CGIConfiguration::getSupportURLText() {
-  return supportURLText;
 }
 
 int CGIConfiguration::getNumIndices() {
