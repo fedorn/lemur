@@ -192,7 +192,7 @@ namespace indri
           _fetchText( document->tags, document->terms );
           _readDocumentHeader();
         }
-  
+          std::sort( document->tags.begin(), document->tags.end(), indri::parse::LessTagExtent() );
         return document;
       }
 
