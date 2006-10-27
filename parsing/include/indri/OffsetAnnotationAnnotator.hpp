@@ -104,15 +104,15 @@ namespace indri {
       const char *_getDocno( indri::api::ParsedDocument* document ) {
 
         // find DOCNO attribute in document
-
+	const char *retVal = NULL;
         for ( size_t i=0; i<document->metadata.size(); i++ ) {
           const char* attributeName = document->metadata[i].key;
           const char* attributeValue = (const char*) document->metadata[i].value;
 
-          if ( ! strcmp( attributeName, "docno" ) ) return attributeValue;
+          if ( ! strcmp( attributeName, "docno" ) ) retVal = attributeValue;
         }
  
-        return NULL;
+        return retVal;
       }
 
 
