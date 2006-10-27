@@ -285,7 +285,7 @@ bool indri::parse::HTMLParser::normalizeURL(char *s) {
   int dotCleanStart = -1;
 
   if(found_scheme) {
-    if(strcmp(scheme, "http") == 0) {
+    if(strcmp(scheme, "http") == 0 || strcmp(scheme, "https") == 0) {
       if(path_len == 0) {
         memcpy( normurl, scheme, scheme_len );
         memcpy( normurl + scheme_len, "://", 3 );
