@@ -35,6 +35,9 @@ indri::parse::TaggedTextParser::~TaggedTextParser() {
   delete tl;
   delete _metaList;
   delete _p_conflater;
+  for (int t = 0; t < _document.tags.size(); t++) {
+    delete _document.tags[t];
+  }
 
   indri::utility::HashTable<const char*,tag_properties*>::iterator iter;
   for( iter = _tagTable.begin(); iter != _tagTable.end(); iter++ ) {
