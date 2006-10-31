@@ -48,17 +48,24 @@ namespace indri
 
       void _readDocumentHeader() {
         char line[65536];
+        _count = 0;
 
         if( !_in.good() || _in.eof() )
           return;
 
         // DOCNO=
         _in.getline( _docno, sizeof _docno-1 );
+        if( !_in.good() || _in.eof() )
+          return;
+
         // DOCURL=
         _in.getline( line, sizeof line-1 );
+        if( !_in.good() || _in.eof() )
+          return;
 
         // LINKS=
         _in.getline( line, sizeof line-1 );
+
         _count = atoi( line+6 );
       }
 
@@ -66,7 +73,7 @@ namespace indri
         // now, fetch the additional terms
         char line[65536];
         _buffer.clear();
-
+        _buffer.grow(_count*sizeof(line));
         for( int i=0; i<_count; i++ ) {
           // LINK
           _in.getline( line, sizeof line-1 );
@@ -76,6 +83,7 @@ namespace indri
           
           // TEXT=
           _in.getline( line, sizeof line-1 );
+          if (!line[0]) continue;
           int textLen = strlen(line+6);
           strcpy( _buffer.write(textLen+1), line+6 );
           _buffer.unwrite(1);
@@ -107,17 +115,17 @@ namespace indri
             if( beginWord )
               terms.push_back( beginWord );
             beginWord = 0;
-        
-            TagExtent * extent = new TagExtent;
-            extent->name = "inlink";
-            extent->begin = beginIndex;
-            extent->end = terms.size();
-            extent->number = 0;
-            extent->parent = 0;
 
-            assert( extent->begin <= extent->end );
+            if( beginIndex ) {        
+              TagExtent * extent = new TagExtent;
+              extent->name = "inlink";
+              extent->begin = beginIndex;
+              extent->end = terms.size();
+              extent->number = 0;
+              extent->parent = 0;
 
-            if( beginIndex ) {
+              assert( extent->begin <= extent->end );
+
               tags.push_back(extent);
               if( terms.size() > 125000 )
                 break;
@@ -167,7 +175,6 @@ namespace indri
       }
 
       indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document ) {
-
         // surround current text with a mainbody tag
         TagExtent * mainbody = new TagExtent;
         mainbody->begin = 0;
@@ -192,7 +199,7 @@ namespace indri
           _fetchText( document->tags, document->terms );
           _readDocumentHeader();
         }
-          std::sort( document->tags.begin(), document->tags.end(), indri::parse::LessTagExtent() );
+        std::sort( document->tags.begin(), document->tags.end(), indri::parse::LessTagExtent() );
         return document;
       }
 
