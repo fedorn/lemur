@@ -29,6 +29,7 @@
 #include "indri/TagExtent.hpp"
 #include "indri/ParsedDocument.hpp"
 #include <fstream>
+#include <algorithm>
 
 /*! Top level namespace for all indri components. */
 namespace indri
