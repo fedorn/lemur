@@ -390,6 +390,10 @@ void indri::api::Parameters::_loadXML( indri::xml::XMLNode* node ) {
   std::set<std::string> appends;
   indri::xml::XMLNode* current = 0;
 
+  if (node == NULL) {
+    LEMUR_THROW(LEMUR_BAD_PARAMETER_ERROR, "NO XML in parameter text" );
+  }
+  
   // find out which ones are in the XML file, and which ones appear multiple times
   const std::vector<indri::xml::XMLNode*>& children = node->getChildren();
 
