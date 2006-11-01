@@ -19,7 +19,7 @@ This application builds an MMR based summary.
 and set the following variables in the parameter file:
 
 <ol>
-<li><tt>indexFile</tt>: the path to the index TOC.
+<li><tt>index</tt>: the path to the index TOC.
 <li><tt>docID</tt>: the document to summarize.
 <li><tt>query</tt>: A stemmed query to use for q-based summary
 <li><tt>summLength</tt>: summary length. Default is 5 sentences.
@@ -32,7 +32,7 @@ The following is an example of use:
 
  % cat summparam
 &lt;parameters&gt;
-   &lt;indexFile&gt;idx.key&lt;/indexFile&gt;
+   &lt;index&gt;idx.key&lt;/index&gt;
    &lt;docID&gt;WTX001-B01-1&lt;/docID&gt;
 &lt;/parameters&gt;
 
