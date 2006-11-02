@@ -74,7 +74,6 @@ namespace indri
         // now, fetch the additional terms
         char line[65536];
         _buffer.clear();
-        _buffer.grow(_count*sizeof(line));
         for( int i=0; i<_count; i++ ) {
           // LINK
           _in.getline( line, sizeof line-1 );
