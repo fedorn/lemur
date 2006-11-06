@@ -43,9 +43,11 @@ static long byte_position;
 
 \<[^\>]+\>                                             { byte_position += tokleng; return TAG; }
 [&]([a-zA-Z]+|[#]([0-9]+|[xX][a-fA-F0-9]+))[;]         { byte_position += tokleng; return ZAP; /* symbols */ }
-[a-zA-Z0-9'\.]+                                        { byte_position += tokleng; return ASCII_TOKEN; }
+[A-Z0-9]"."([A-Z0-9]".")*                                        { byte_position += tokleng; return ASCII_TOKEN; }
+[a-zA-Z0-9']+                                        { byte_position += tokleng; return ASCII_TOKEN; }
 "-"[0-9]+("."[0-9]+)?                                  { byte_position += tokleng; return ASCII_TOKEN; }
-[a-zA-Z0-9'\.\x80-\xFD]+                               { byte_position += tokleng; return UTF8_TOKEN; }
+[a-zA-Z0-9\x80-\xFD]+                               { byte_position += tokleng; return UTF8_TOKEN; }
+
 [\n]                                                   { byte_position += tokleng; return ZAP; }
 .                                                      { byte_position += tokleng; return ZAP; }
 
@@ -84,7 +86,7 @@ indri::parse::TokenizedDocument* indri::parse::TextTokenizer::tokenize( indri::p
     case UTF8_TOKEN: processUTF8Token(); break;
 
     case TAG: if ( _tokenize_markup ) processTag(); break;
-      
+
     default:
     case ZAP:
       break;
