@@ -106,9 +106,9 @@ void indri::parse::Combiner::_openReadBuckets( std::vector<std::ifstream*>& buck
 }
 
 void indri::parse::Combiner::_readDocBucket( UrlEntryTable& urlTable, std::ifstream& docIn ) {
-  char docno[512];
+  char docno[1024];
   char docurl[65536];
-  char corpusPath[512];
+  char corpusPath[1024];
 
   while( !docIn.eof() ) {
     docIn.getline( docno, sizeof docno-1 );
@@ -244,7 +244,7 @@ void indri::parse::Combiner::combineRedirectDestinationBuckets( const std::strin
 //
 
 void indri::parse::Combiner::hashToBuckets( std::ifstream& in, const std::string& path ) {
-  char docno[512];
+  char docno[1024];
   char docUrl[4096];
   char linkCountText[256];
   char linkUrl[4096];
@@ -599,8 +599,8 @@ void indri::parse::Combiner::sortCorpusFiles( const std::string& outputPath, con
     // store the data in a hash table, keyed on docno
     while( !in.eof() ) {
       char docUrl[4096];
-      char docno[512];
-      char linkCountText[512];
+      char docno[1024];
+      char linkCountText[1024];
       
       char linkFrom[4096];
       char linkDocno[4096];
