@@ -136,7 +136,7 @@ void merge_sorted_runs( indri::file::File& out, std::vector<std::string>& inputs
   
   // merge
   while( files.size() ) {
-    MergeFile& file = *const_cast<MergeFile*>(&files.top());
+    MergeFile file = files.top();
     
     while( file.document > lastDocument+1 ) {
       outb->write( &lowProbability, sizeof(double) );
