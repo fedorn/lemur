@@ -151,6 +151,13 @@ specifying the stopword list to use. Specified as
 &lt;stopper&gt;&lt;word&gt;stopword&lt;/word&gt;&lt;/stopper&gt; and
 as <tt>-stopper.word=stopword</tt> on the command line. This is an
 optional parameter with the default of no stopping.</dd>
+<dt>maxWildcardTerms</dt>
+<dd>
+<i>(optional)</i> An integer specifying the maximum number of wildcard terms that can 
+be generated for a synonym list when searching this index. If this limit
+is reached for a wildcard term, an exception will be thrown. If this parameter
+is not specified, a default of 100 will be used.
+</dd>
 </dl>
 
 <H3>QueryEnvironment Parameters</H3>
@@ -233,6 +240,13 @@ specifying the stopword list to use. Specified as
 &lt;stopper&gt;&lt;word&gt;stopword&lt;/word&gt;&lt;/stopper&gt; and
 as <tt>-stopper.word=stopword</tt> on the command line. This is an
 optional parameter with the default of no stopping.</dd>
+<dt>maxWildcardTerms</dt>
+<dd>
+<i>(optional)</i> An integer specifying the maximum number of wildcard terms that can 
+be generated for a synonym list for this query or set of queries. If this limit
+is reached for a wildcard term, an exception will be thrown. If this parameter
+is not specified, a default of 100 will be used.
+</dd>
 </dl>
 <H4>Formatting Parameters</H4>
 <dl>
@@ -760,6 +774,10 @@ int main(int argc, char * argv[]) {
       process_numeric_fields( parameters, env );
       process_ordinal_fields( parameters, env );
     }
+
+		if (parameters.exists("maxWildcardTerms")) {
+			env.setMaxWildcardTerms((int)parameters.get("maxWildcardTerms"));
+		}
     
     if( indri::collection::Repository::exists( repositoryPath ) ) {
       env.open( repositoryPath, &monitor );

@@ -466,6 +466,10 @@ public:
       _expander = new indri::query::RMExpander( &_environment, _parameters );
     }
 
+		if (_parameters.exists("maxWildcardTerms")) {
+			_environment.setMaxWildcardTerms((int)_parameters.get("maxWildcardTerms"));
+		}
+
     return 0;
   }
 
