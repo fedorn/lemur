@@ -35,7 +35,7 @@ indri::parse::Combiner::url_entry* indri::parse::Combiner::_newUrlEntry( char* u
   int corpusLen = strlen(corpusPath) + 1;
   int docLen = strlen(docNo) + 1;
   int total = urlLen + corpusLen + docLen;
-  
+
   char* buffer = (char*) malloc(total + sizeof(url_entry));
   new(buffer) url_entry;
   url_entry* e = (url_entry*) buffer;
@@ -106,9 +106,9 @@ void indri::parse::Combiner::_openReadBuckets( std::vector<std::ifstream*>& buck
 }
 
 void indri::parse::Combiner::_readDocBucket( UrlEntryTable& urlTable, std::ifstream& docIn ) {
-  char docno[1024];
+  char docno[8192];
   char docurl[65536];
-  char corpusPath[1024];
+  char corpusPath[8192];
 
   while( !docIn.eof() ) {
     docIn.getline( docno, sizeof docno-1 );
@@ -125,7 +125,7 @@ void indri::parse::Combiner::_readDocBucket( UrlEntryTable& urlTable, std::ifstr
 
 int indri::parse::Combiner::hashString( const char* str ) {
   unsigned int hash = 0;
-  
+
   for( unsigned int i=0; str[i]; i++ ) {
     hash *= 31;
     hash += str[i];
@@ -182,7 +182,7 @@ void indri::parse::Combiner::combineRedirectDestinationBucket( const std::string
   // open docs file
   std::ifstream doc;
   std::string docPath = indri::file::Path::combine( tmpPath, "doc" );
-  std::string docFilePath = indri::file::Path::combine( docPath, number ); 
+  std::string docFilePath = indri::file::Path::combine( docPath, number );
   doc.open( docFilePath.c_str(), std::ios::in );
 
   // read docs file
@@ -193,7 +193,7 @@ void indri::parse::Combiner::combineRedirectDestinationBucket( const std::string
   // open targets file
   std::ifstream target;
   std::string targetPath = indri::file::Path::combine( tmpPath, "target" );
-  std::string targetFilePath = indri::file::Path::combine( targetPath, number ); 
+  std::string targetFilePath = indri::file::Path::combine( targetPath, number );
   target.open( targetFilePath.c_str(), std::ios::in );
 
   char aliasLine[65536];
@@ -244,12 +244,12 @@ void indri::parse::Combiner::combineRedirectDestinationBuckets( const std::strin
 //
 
 void indri::parse::Combiner::hashToBuckets( std::ifstream& in, const std::string& path ) {
-  char docno[1024];
+  char docno[8192];
   char docUrl[4096];
   char linkCountText[256];
   char linkUrl[4096];
   char text[65536];
-  
+
   while( !in.eof() ) {
     in.getline( docno, sizeof docno );
     in.getline( docUrl, sizeof docUrl );
@@ -299,7 +299,7 @@ void indri::parse::Combiner::hashToBuckets( std::ifstream& in, const std::string
 void indri::parse::Combiner::createBuckets( const std::string& tmpPath ) {
   std::string docPath = indri::file::Path::combine( tmpPath, "doc" );
   std::string linkPath = indri::file::Path::combine( tmpPath, "link" );
-  
+
   lemur_compat::mkdir( docPath.c_str(), 0755 );
   lemur_compat::mkdir( linkPath.c_str(), 0755 );
 
@@ -354,7 +354,7 @@ void indri::parse::Combiner::closeBuckets() {
 
 void indri::parse::Combiner::_hashToCorpusTable( UrlEntryVectorTable& corpusTable, UrlEntryTable& urlTable ) {
   UrlEntryTable::iterator iter;
-  
+
   for( iter = urlTable.begin(); iter != urlTable.end(); iter++ ) {
     url_entry* entry = (*iter->second);
 
@@ -383,14 +383,14 @@ void indri::parse::Combiner::_writeCorpusTable( UrlEntryVectorTable& corpusTable
 
   for( citer = corpusTable.begin(); citer != corpusTable.end(); citer++ ) {
     std::vector<url_entry*>* entryVec = citer->second;
-    
+
     // open the appropriate file
     std::string corpusPath = (*citer->first);
     std::string anchorPath = indri::file::Path::combine( outputPath, corpusPath );
     std::ofstream out;
     out.open( anchorPath.c_str(), std::ios::out | std::ios::app );
     out.seekp( 0, std::ios::end );
-    
+
     if( !out.good() ) {
       // wasn't able to create this file, so maybe we need to build
       // the directory structure
@@ -427,7 +427,7 @@ void indri::parse::Combiner::_readRedirects( UrlEntryTable& urlTable, const std:
   std::string redirectBucketPath = indri::file::Path::combine( redirectPath, i64_to_string(number) );
   std::ifstream redirectIn;
   redirectIn.open( redirectBucketPath.c_str(), std::ios::in );
-  
+
   char docurl[65536];
   char aliasurl[65536];
   char pathline[4096];
@@ -438,7 +438,7 @@ void indri::parse::Combiner::_readRedirects( UrlEntryTable& urlTable, const std:
     redirectIn.getline( aliasurl, sizeof aliasurl );
     redirectIn.getline( pathline, sizeof pathline );
     redirectIn.getline( docnoline, sizeof docnoline );
-    
+
     if( strcmp( "ALIAS=", aliasurl ) )
       break;
 
@@ -468,7 +468,7 @@ void indri::parse::Combiner::_readLinks( UrlEntryTable& urlTable, std::ifstream&
   char docurl[65536];
   char linktext[65536];
   int linkCount = 0;
-  
+
   // read the incoming link information and match it with document information
   while( !linkIn.eof() && linkIn.good() && linkCount < 250000 ) {
     linkIn.getline( docno, sizeof docno-1 );
@@ -485,7 +485,7 @@ void indri::parse::Combiner::_readLinks( UrlEntryTable& urlTable, std::ifstream&
                          docurl + sizeof "DOCURL=" - 1,
                          linktext + sizeof "TEXT=" - 1 );
     }
-    
+
     linkCount++;
   }
 
@@ -508,9 +508,9 @@ void indri::parse::Combiner::combineBucket( const std::string& outputPath, const
 
   linkIn.open( linkBucketPath.c_str(), std::ios::in );
 
-  do {  
+  do {
     UrlEntryTable urlTable( 5*1024*1024 );
-    
+
     // read document information into the hash table
     std::string docPath = indri::file::Path::combine( tmpPath, "doc" );
     std::string docBucketPath = indri::file::Path::combine( docPath, number );
@@ -520,28 +520,28 @@ void indri::parse::Combiner::combineBucket( const std::string& outputPath, const
     docIn.open( docBucketPath.c_str(), std::ios::in );
     _readDocBucket( urlTable, docIn );
     docIn.close();
-  
+
     // update the hash table based on redirect information
     std::string redirectPath = indri::file::Path::combine( tmpPath, "redirect" );
-  
+
     std::cout << "  reading redirects" << std::endl;
     _readRedirects( urlTable, redirectPath, bucket );
-  
+
     // read some of the links
     std::cout << "  reading links" << std::endl;
     _readLinks( urlTable, linkIn );
-  
+
     std::cout << "  hashing to file buckets" << std::endl;
     // hash all the data into file buckets
     UrlEntryVectorTable corpusTable;
     _hashToCorpusTable( corpusTable, urlTable );
-    
+
     // open each file in turn and write this additional data, then close
     std::cout << "  writing data out to files" << std::endl;
-    _writeCorpusTable( corpusTable, outputPath );  
+    _writeCorpusTable( corpusTable, outputPath );
   }
   while( !linkIn.eof() );
-      
+
   linkIn.close();
 }
 
@@ -587,7 +587,7 @@ void indri::parse::Combiner::sortCorpusFiles( const std::string& outputPath, con
     std::string unsortedPath = *files;
     std::string relativePath = indri::file::Path::relative( preSortPath, unsortedPath );
     std::ifstream in;
-  
+
     UrlEntryTable urlTable;
 
     // open an unsorted file
@@ -599,9 +599,9 @@ void indri::parse::Combiner::sortCorpusFiles( const std::string& outputPath, con
     // store the data in a hash table, keyed on docno
     while( !in.eof() ) {
       char docUrl[4096];
-      char docno[1024];
-      char linkCountText[1024];
-      
+      char docno[8192];
+      char linkCountText[8192];
+
       char linkFrom[4096];
       char linkDocno[4096];
       char linkText[65536];
@@ -609,7 +609,7 @@ void indri::parse::Combiner::sortCorpusFiles( const std::string& outputPath, con
       in.getline( docUrl, sizeof docUrl );
       in.getline( docno, sizeof docno );
       in.getline( linkCountText, sizeof linkCountText );
-      
+
       int linkCount = atoi( linkCountText + sizeof "LINKS=" - 1 );
       assert( linkCount > 0 );
 
