@@ -61,6 +61,15 @@ namespace indri
       bool getIndex( int index, char* key, int& keyActual, int keyLength, char* value, int& valueActual, int valueLength );
       bool findGreater( const char* key, int keyLength, char* value, int& actualLength, int valueBufferLength );
       bool find( const char* key, int keyLength, char* value, int& actualLength, int valueBufferLength );
+
+			/**
+			 * returns the index of the key item (or the index before
+			 * if the key does not exist)
+			 * @param key the key
+			 * @return the index of the key in this block
+			 */
+			int  findIndexOf(const char* key);
+
       void clear();
       char* data();
       static int dataSize();
@@ -117,6 +126,17 @@ namespace indri
     public:
       BulkTreeIterator( File& file );
 
+			/**
+			 * Constructor to point the iterator at 
+			 * a specific entry within the bulk tree.
+			 * If the parameters are out of bounds, then the 
+			 * iterator will point at the beginning of the tree.
+			 * @param file the bulk tree file
+			 * @param whichBlock the starting block
+			 * @param whichPair the starting index pair
+			 */
+      BulkTreeIterator( File& file, UINT64 whichBlock, int whichPair );
+
       void startIteration();
       bool finished();
       bool get( char* key, int keyLength, int& keyActual, char* value, int valueLength, int& valueActual );
@@ -149,6 +169,15 @@ namespace indri
       void close();
 
       BulkTreeIterator* iterator();
+
+			/**
+			 * Fetchs an iterator that is positioned at the
+			 * first position of the key (or at the position where
+			 * the key would be if it does not exist)
+			 * @param key the key to find the first occurence of
+			 * @return an iterator at the position of the first occurance (or NULL on error)
+			 */
+			BulkTreeIterator* findFirst(const char *key);
     };
   }
 }

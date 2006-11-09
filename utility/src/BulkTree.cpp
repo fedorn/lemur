@@ -238,6 +238,15 @@ bool indri::file::BulkBlock::find( const char* key, int keyLength, char* value, 
   return getIndex( index, 0, keyActual, 0, value, actualLength, valueBufferLength );
 }
 
+//
+// findIndexOf
+//
+int indri::file::BulkBlock::findIndexOf(const char* key) {
+	bool exact;
+  return _find( key, strlen(key), exact );
+}
+
+
 bool indri::file::BulkBlock::insertFirstKey( indri::file::BulkBlock& block, UINT32 blockID ) {
   assert( block.count() > 0 );
 
@@ -551,6 +560,44 @@ indri::file::BulkTreeIterator* indri::file::BulkTreeReader::iterator() {
   return new BulkTreeIterator( *_file );
 }
 
+//
+// findFirst
+//
+indri::file::BulkTreeIterator* indri::file::BulkTreeReader::findFirst(const char *key) {
+  indri::file::BulkBlock* block = 0;
+  int rootID = int(_fileLength / BULK_BLOCK_SIZE) - 1;
+
+  if( rootID < 0 )
+    return false;
+
+  int nextID = rootID;
+
+	int keyLength=strlen(key);
+
+  while( true ) {
+    block = _fetch( nextID );
+
+    if( block->leaf() )
+      break;
+
+    int actual;
+    bool result = block->findGreater( key, keyLength, (char*) &nextID, actual, sizeof(nextID) );
+
+    if( !result )
+      return false;
+
+    assert( actual == sizeof(nextID) );
+  }
+
+  // now we're at a leaf
+	// we've got the block ID, now get the index ID of the entry we want.
+	UINT64 thisBlockID=(UINT64)block->getID();
+	int thisPairIndex=block->findIndexOf(key);
+
+	return new BulkTreeIterator(*_file, thisBlockID, thisPairIndex);
+}
+
+
 // ================
 // BulkTreeIterator
 // ----------------
@@ -561,6 +608,27 @@ indri::file::BulkTreeIterator::BulkTreeIterator( File& file ) :
   _pairIndex = -1;
   _blockIndex = 0;
   _fileLength = 0;
+}
+
+indri::file::BulkTreeIterator::BulkTreeIterator( File& file, UINT64 whichBlock, int whichPair ) :
+  _file(file)
+{
+	_pairIndex=whichPair;
+	_blockIndex=whichBlock;
+  _fileLength = _file.size();
+
+	if (finished()) {
+		// we're past the last block!
+		_pairIndex = -1;
+		_blockIndex = 0;
+	} else {
+    _file.read( _block.data(), _blockIndex*indri::file::BulkBlock::dataSize(), indri::file::BulkBlock::dataSize() );
+		if ((_pairIndex < 0) || (_pairIndex >= (_block.count()-1))) {
+			// invalid pair index...
+			_pairIndex = -1;
+			_blockIndex = 0;
+		}
+	}
 }
 
 void indri::file::BulkTreeIterator::startIteration() {
@@ -598,7 +666,9 @@ void indri::file::BulkTreeIterator::nextEntry() {
 bool indri::file::BulkTreeIterator::get( char* key, int keyLength, int& keyActual, char* value, int valueLength, int& valueActual ) {
   if( finished() )
     return false;
-  return _block.getIndex( _pairIndex, key, keyLength, keyActual, value, valueLength, valueActual );
+  
+	// the length / actual items were switched around previously!
+	return _block.getIndex( _pairIndex, key, keyActual, keyLength, value, valueActual, valueLength);
 }
 
 bool indri::file::BulkTreeIterator::get( UINT32& key, char* value, int valueLength, int& valueActual ) {
