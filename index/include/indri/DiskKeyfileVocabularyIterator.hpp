@@ -35,6 +35,8 @@ namespace indri {
       char _data[16*1024];
       int _fieldCount;
 
+			char _termString[1024];
+
       indri::utility::Buffer _compressedData;
       indri::utility::Buffer _decompressedData;
 
@@ -46,12 +48,18 @@ namespace indri {
       void _release();
       bool _readData();
 
+			// this tells us if the last nextEntry() came from 
+			// a start iteration or not - needed for nextEntry(const char*)
+			// call
+			bool _justStartedIteration;
+
     public:
       DiskKeyfileVocabularyIterator( int baseID, indri::file::BulkTreeReader& bulkTree, indri::thread::Mutex& mutex, int fieldCount );
       ~DiskKeyfileVocabularyIterator();
       
       void startIteration();
       bool nextEntry();
+      bool nextEntry(const char *skipTo);
       indri::index::DiskTermData* currentEntry();
       bool finished();
     };

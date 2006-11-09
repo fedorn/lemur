@@ -30,6 +30,12 @@ namespace indri {
       virtual void startIteration() = 0;
       virtual bool finished() = 0;
       virtual bool nextEntry() = 0;
+      virtual bool nextEntry(const char *skipTo) = 0;
+			
+			virtual bool nextEntry(std::string skipTo) {
+				return nextEntry(skipTo.c_str());
+			}
+
       virtual DiskTermData* currentEntry() = 0;
     };
   }

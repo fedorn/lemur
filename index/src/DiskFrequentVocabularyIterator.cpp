@@ -42,6 +42,7 @@ void indri::index::DiskFrequentVocabularyIterator::startIteration() {
   _finished = false;
   _stream.setBuffer( _buffer.front(), _buffer.position() );
   nextEntry();
+	_justStartedIteration=true;
 }
 
 //
@@ -53,12 +54,54 @@ bool indri::index::DiskFrequentVocabularyIterator::nextEntry() {
     _data = ::disktermdata_decompress( _stream, _dataBuffer, _fieldCount, indri::index::DiskTermData::WithOffsets |
                                        indri::index::DiskTermData::WithTermID | 
                                        indri::index::DiskTermData::WithString );
+		_justStartedIteration=false;
+
     return true;
   } else {
     _finished = true;
     return false;
   }
 }
+
+//
+// nextEntry (const char *)
+//
+
+bool indri::index::DiskFrequentVocabularyIterator::nextEntry(const char *skipTo) {
+	// we have to scan through each item here....
+
+	if (!skipTo) {
+		startIteration();
+		return true;
+	}
+
+
+	int entryTermLen=strlen(skipTo);
+	if (!entryTermLen) {
+		startIteration();
+		return true;
+	}
+
+	// start from the current iterator
+  while( !_stream.done() ) {
+
+		if (!_justStartedIteration) {
+			_data = ::disktermdata_decompress( _stream, _dataBuffer, _fieldCount, indri::index::DiskTermData::WithOffsets |
+																				indri::index::DiskTermData::WithTermID | 
+																				indri::index::DiskTermData::WithString );
+		}
+
+		_justStartedIteration=false;
+
+		if (!strncmp(_data->termData->term, skipTo, entryTermLen)) {
+			return true;
+		}
+  } // end while( !_stream.done() )
+
+  _finished = true;
+  return false;
+}
+
 
 //
 // finished

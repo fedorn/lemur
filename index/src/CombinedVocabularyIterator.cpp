@@ -89,6 +89,42 @@ bool indri::index::CombinedVocabularyIterator::nextEntry() {
 }
 
 //
+// nextEntry (const char *)
+//
+
+bool indri::index::CombinedVocabularyIterator::nextEntry(const char *skipTo) {
+	if (!skipTo) {
+		return nextEntry();
+	}
+
+	bool result;
+
+  if( !_usingSecond ) {
+    result = _first->nextEntry(skipTo);
+
+    if( !result ) {
+      _second->startIteration();
+      _usingSecond = true;
+    }
+
+    result = true;
+  } else {
+    result = _second->nextEntry(skipTo);
+  }
+
+  if( _usingSecond ) {
+		result=_second->nextEntry(skipTo);
+		if (result) {
+			DiskTermData* data = _second->currentEntry();
+			if( data )
+				data->termID += _secondBase;
+		}
+  }
+
+  return result;
+}
+
+//
 // currentEntry
 //
 

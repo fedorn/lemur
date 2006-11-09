@@ -39,8 +39,9 @@ namespace indri {
 
       void startIteration();
       bool nextEntry();
+      bool nextEntry(const char *skipTo);
       DiskTermData* currentEntry();
-      bool finished();
+		  bool finished();
     };
   }
 }
