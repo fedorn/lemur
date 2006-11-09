@@ -42,6 +42,7 @@
 #include "indri/ContextCountGraphCopier.hpp"
 #include "indri/SmoothingAnnotatorWalker.hpp"
 #include "indri/ExtentRestrictionModelAnnotatorCopier.hpp"
+#include "indri/WildcardNodeCopier.hpp"
 
 #include "indri/InferenceNetworkBuilder.hpp"
 #include "indri/Packer.hpp"
@@ -52,6 +53,7 @@
 #include "indri/IndriTimer.hpp"
 
 #include "indri/IndexEnvironment.hpp"
+#include "indri/Index.hpp"
 
 #include <set>
 #include <map>
@@ -60,6 +62,8 @@
 #include "indri/TreePrinterWalker.hpp"
 
 #include "indri/SnippetBuilder.hpp"
+
+#include "indri/VocabularyIterator.hpp"
 
 using namespace lemur::api;
 
@@ -140,7 +144,9 @@ void qenv_gather_document_results( const std::vector< std::vector<DOCID_T> >& do
 // QueryEnvironment definition
 //
 
-indri::api::QueryEnvironment::QueryEnvironment() {
+indri::api::QueryEnvironment::QueryEnvironment() :
+	_maxWildcardMatchesPerTerm(indri::index::DEFAULT_MAX_WILDCARD_TERMS)
+{
 }
 
 indri::api::QueryEnvironment::~QueryEnvironment() {
@@ -317,7 +323,17 @@ void indri::api::QueryEnvironment::addIndex( const std::string& pathname ) {
   indri::server::LocalQueryServer *server = new indri::server::LocalQueryServer( *repository ) ;
   _servers.push_back( server );
   _repositoryNameMap[pathname] = std::make_pair(server, repository);
-  
+
+	// get any parameters - right now, its just the max. # of wildcard terms
+	indri::collection::Repository::index_state iState=repository->indexes();
+	indri::collection::Repository::index_vector::iterator iIter=iState->begin();
+	while (iIter!=iState->end()) {
+		indri::index::Index *thisIndex=*iIter;
+		if (_maxWildcardMatchesPerTerm > thisIndex->maxWildcardTermCount()) {
+			_maxWildcardMatchesPerTerm = thisIndex->maxWildcardTermCount();
+		}
+		iIter++;
+	}
 }
 
 //
@@ -850,6 +866,17 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
   } catch( antlr::ANTLRException e ) {
     LEMUR_THROW( LEMUR_PARSE_ERROR, "Couldn't understand this query: " + e.getMessage() );
   }
+
+	// here, walk through the parse tree and get any 
+	// potential wildcard nodes and transform them into synonym lists
+	// default=100, 2nd parameter - need to get dynamically...
+	if (_maxWildcardMatchesPerTerm < 0) {
+		// if it's less than 0, reset it to the default.
+		_maxWildcardMatchesPerTerm=indri::index::DEFAULT_MAX_WILDCARD_TERMS;
+	}
+
+	// now, transform the wildcard nodes.
+	rootNode=findAndTransformWildcardNodes(rootNode);
   
   PRINT_TIMER( "Parsing complete" );
 
@@ -950,6 +977,10 @@ indri::api::QueryResults indri::api::QueryEnvironment::runQuery( indri::api::Que
   } catch( antlr::ANTLRException e ) {
     LEMUR_THROW( LEMUR_PARSE_ERROR, "Couldn't understand this query: " + e.getMessage() );
   }
+
+	// TODO: mhoy : here, walk through the parse tree and get any 
+	// potential wildcard nodes and transform them into synonym lists
+
   
   timer.stop(); 
   queryResult.parseTime = timer.elapsedTime()/million; 
@@ -1271,4 +1302,86 @@ int indri::api::QueryEnvironment::documentLength(lemur::api::DOCID_T documentID)
   int serverID = documentID % serverCount;
   length = _servers[serverID]->documentLength( id );
   return length;
+}
+
+// mhoy - added 10/23/06 for wildcard support
+
+/**
+ * finds any potential wildcard nodes and transforms them into synonym lists
+ * @param currentNode the current node to start with (for recursion)
+ * @param maxItemsPerNode the maximum number of synonyms that can be generated before an exception is thrown
+ */
+indri::lang::ScoredExtentNode* indri::api::QueryEnvironment::findAndTransformWildcardNodes(indri::lang::ScoredExtentNode* currentNode) {
+	if (!currentNode) return currentNode;
+	if (_maxWildcardMatchesPerTerm < 0) return currentNode;
+
+	// use a copier to transform the wildcard nodes to #syn() nodes with 
+	indri::lang::WildcardNodeCopier wildcardCopier(this);
+	return dynamic_cast<indri::lang::ScoredExtentNode*>(currentNode->copy(wildcardCopier));
+}
+
+/**
+ * Gets a list of terms from the opened index(es) that match the wildcardTerm and
+ * returns them as a vector
+ */
+std::vector<std::string> indri::api::QueryEnvironment::getWildcardTermList(std::string wildcardTerm, int maxTermsToGet) {
+	std::vector<std::string> retVec;
+
+	if (maxTermsToGet==0) {
+		maxTermsToGet=_maxWildcardMatchesPerTerm;
+	}
+
+	// first - get the term without the wildcard...
+	std::string::size_type wildcardPos=wildcardTerm.find("*");
+	if (wildcardPos==std::string::npos) {
+		retVec.push_back(wildcardTerm);
+		return retVec;
+	}
+
+	std::string theTerm=wildcardTerm.substr(0, wildcardPos);
+	const char *theTermChar=theTerm.c_str();
+	const char *termCharCopy=strdup(theTermChar);
+  
+	// for each added repository...
+	for (std::vector<indri::collection::Repository*>::iterator rIter=_repositories.begin(); rIter!=_repositories.end(); rIter++) {
+		indri::collection::Repository::index_state state = (*rIter)->indexes();
+
+		// get the index.
+		indri::index::Index* index = (*state)[0];
+
+		// get the vocab. iterator
+		indri::index::VocabularyIterator* iter = index->vocabularyIterator();
+		iter->startIteration();
+
+		// get the next entry that corresponds to our term
+		while (iter->nextEntry(termCharCopy)) {
+			// get the term
+			indri::index::DiskTermData* entry = iter->currentEntry();
+			if (entry) {
+				indri::index::TermData* termData = entry->termData;
+
+				if (strstr(termData->term,theTermChar)==termData->term) {
+					if (retVec.size()==maxTermsToGet) {
+						char maxTermExString[256];
+						sprintf(maxTermExString, "Error in parsing wildcard terms. Too many terms matched %s. Limit is %d.", wildcardTerm.c_str(), maxTermsToGet);
+						LEMUR_THROW( LEMUR_PARSE_ERROR, maxTermExString);
+					}
+
+					std::string thisTermString=termData->term;
+					retVec.push_back(thisTermString);
+				}
+			} // end if (entry)
+		} // end while (iter->nextEntry(termCharCopy))
+	} // end for (std::vector<indri::collection::Repository*>...
+
+	if (termCharCopy)	delete termCharCopy;
+
+	return retVec;
+}
+
+//
+// setMaxWildcardTerms
+//
+void indri::api::QueryEnvironment::setMaxWildcardTerms(int maxTerms) {
+	_maxWildcardMatchesPerTerm = maxTerms;
 }
