@@ -10,7 +10,7 @@
 
 #line 12 "QueryParser.hpp"
 #include <antlr/config.hpp>
-/* $ANTLR 2.7.3 (20060307-1): "indrilang.g" -> "QueryParser.hpp"$ */
+/* $ANTLR 2.7.6 (20061023): "indrilang.g" -> "QueryParser.hpp"$ */
 #include <antlr/TokenStream.hpp>
 #include <antlr/TokenBuffer.hpp>
 #include "QueryLexerTokenTypes.hpp"
@@ -20,7 +20,7 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API QueryParser : public ANTLR_USE_NAMESPACE(antlr)LLkParser, public QueryLexerTokenTypes
 {
-#line 155 "indrilang.g"
+#line 156 "indrilang.g"
 
 private:
   // storage for allocated nodes

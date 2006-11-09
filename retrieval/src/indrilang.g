@@ -122,7 +122,8 @@ protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/' | '=');
 // we allow any Unicode character (composed of high
 // chars) so that we can support UTF-8 input.
 //
-protected TEXT_TERM:        ( HIGH_CHAR | SAFE_CHAR )+;
+// mhoy - modified 10/23/06 - to allow suffix-based wildcard characters...
+protected TEXT_TERM:        ( HIGH_CHAR | SAFE_CHAR ) ( HIGH_CHAR | SAFE_CHAR | STAR )*;
 protected NUMBER:           ( '0'..'9' )+;
 protected NEGATIVE_NUMBER:  DASH ( '0'..'9' )+;
 protected FLOAT:            (DASH)? ( '0'..'9' )+ DOT ( '0'..'9' )+;
