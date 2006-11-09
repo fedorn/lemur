@@ -29,6 +29,7 @@
 #include <string>
 #include "indri/BulkTree.hpp"
 #include "indri/SequentialReadBuffer.hpp"
+#include "indri/Parameters.hpp"
 
 namespace indri {
   namespace index {
@@ -64,6 +65,8 @@ namespace indri {
 
       CorpusStatistics _corpusStatistics;
       void _readManifest( const std::string& manifestPath );
+
+			indri::api::Parameters _manifest;
 
     public:
       DiskIndex() : _lengthsBuffer(_documentLengths) {}
@@ -116,6 +119,12 @@ namespace indri {
 
       indri::thread::Lockable* iteratorLock();
       indri::thread::Lockable* statisticsLock();
+
+			//
+			// properties
+			//
+			int maxWildcardTermCount();
+
     };
   }
 }

@@ -30,10 +30,10 @@
 #include "indri/DiskTermListFileIterator.hpp"
 
 void indri::index::DiskIndex::_readManifest( const std::string& path ) {
-  indri::api::Parameters manifest;
-  manifest.loadFile( path );
+  
+  _manifest.loadFile( path );
 
-  indri::api::Parameters corpus = manifest["corpus"];
+  indri::api::Parameters corpus = _manifest["corpus"];
 
   _corpusStatistics.totalDocuments = (int) corpus["total-documents"];
   _corpusStatistics.totalTerms = (INT64) corpus["total-terms"];
@@ -41,8 +41,8 @@ void indri::index::DiskIndex::_readManifest( const std::string& path ) {
   _infrequentTermBase = (int) corpus["frequent-terms"];
   _documentBase = (int) corpus["document-base"];
 
-  if( manifest.exists("fields") ) {
-    indri::api::Parameters fields = manifest["fields"];
+  if( _manifest.exists("fields") ) {
+    indri::api::Parameters fields = _manifest["fields"];
 
     if( fields.exists("field") ) {
       indri::api::Parameters field = fields["field"];
@@ -525,7 +525,8 @@ indri::index::VocabularyIterator* indri::index::DiskIndex::frequentVocabularyIte
 //
 
 indri::index::VocabularyIterator* indri::index::DiskIndex::infrequentVocabularyIterator() {
-  return new indri::index::DiskKeyfileVocabularyIterator( _infrequentTermBase, _infrequentIdToTerm, _lock, _fieldData.size() );
+	// mhoy - modified 11/06/2006 to return the term->ID btree instead of the ID->term one
+	return new indri::index::DiskKeyfileVocabularyIterator( _infrequentTermBase, _infrequentStringToTerm, _lock, _fieldData.size() );
 }
 
 //
@@ -551,4 +552,20 @@ indri::thread::Lockable* indri::index::DiskIndex::iteratorLock() {
 indri::thread::Lockable* indri::index::DiskIndex::statisticsLock() {
   return &_lock;
 }
+
+//
+// maxWildcardTermCount
+//
+
+int indri::index::DiskIndex::maxWildcardTermCount() {
+	// see if there's an item in the parameters.
+	// if not, return the default
+
+	if (_manifest.exists("maxWildcardTerms")) {
+		return (int)(_manifest.get("maxWildcardTerms"));
+	}
+
+	return _maxWildcardTerms;
+}
+
 

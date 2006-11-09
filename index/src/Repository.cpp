@@ -191,6 +191,11 @@ void indri::collection::Repository::_copyParameters( indri::api::Parameters& opt
     _parameters.set( "stemmer", "" );
     _parameters["stemmer"] = options["stemmer"];
   }
+
+	if ( options.exists("maxWildcardTerms") ) {
+		_parameters.set( "maxWildcardTerms", (int)options.get("maxWildcardTerms"));
+	}
+
 }
 
 //
@@ -879,6 +884,14 @@ indri::index::Index* indri::collection::Repository::_mergeStage( index_state& st
   indexNumber << _indexCount;
   _indexCount++;
 
+	// ensure the indexes have the correct maxWildcardTerm parameters.
+	if (_parameters.exists("maxWildcardTerms")) {
+		int thisWildcardTermCount=(int)_parameters.get("maxWildcardTerms");
+		for (std::vector<indri::index::Index*>::iterator iIter=indexes.begin(); iIter!=indexes.end(); iIter++) {
+			(*iIter)->setMaxWildcardTermCount(thisWildcardTermCount);
+		}
+	}
+
   // make a path, write the index
   std::string indexPath = indri::file::Path::combine( _path, "index" );
   std::string newIndexPath = indri::file::Path::combine( indexPath, indexNumber.str() );
@@ -962,8 +975,10 @@ void indri::collection::Repository::_merge( index_state& state ) {
   if( state->size() <= 2 || 
       ( _mergeMemory( *state ) < memoryBound && 
         _mergeFiles(*state) < MERGE_FILE_LIMIT ) ) {
+					
     indri::index::Index* index = _mergeStage( state );
-    result->push_back( index );
+
+		result->push_back( index );
   } else {
     // divide and conquer
     index_state first = new std::vector<indri::index::Index*>;

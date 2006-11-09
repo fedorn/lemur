@@ -54,6 +54,7 @@ indri::utility::IndriTimer g_t;
 
 IndexWriter::IndexWriter()
 {
+	_maxNumWildcardTerms=indri::index::DEFAULT_MAX_WILDCARD_TERMS;
 }
 
 //
@@ -112,6 +113,7 @@ void IndexWriter::_writeManifest( const std::string& path ) {
     field[i].set("total-terms", (UINT64) _fieldData[i].totalCount);
     field[i].set("byte-offset", (UINT64) _fieldData[i].byteOffset);
   }
+	manifest.set("maxWildcardTerms", _maxNumWildcardTerms);
 
   manifest.writeFile( path );
 }
@@ -133,6 +135,13 @@ void IndexWriter::write( indri::index::Index& index, std::vector<indri::index::I
 void IndexWriter::write( std::vector<Index*>& indexes, std::vector<indri::index::Index::FieldDescription>& fields, const std::string& path ) {
   indri::file::Path::create( path );
   _fields = fields;
+
+	// get the max. wildcard terms from the index(es)
+	_maxNumWildcardTerms=-1;
+	for (std::vector<Index*>::iterator iIter=indexes.begin(); iIter!=indexes.end(); iIter++) {
+		int thisMaxNum=(*iIter)->maxWildcardTermCount();
+		if (thisMaxNum > _maxNumWildcardTerms) _maxNumWildcardTerms=thisMaxNum;
+	}
 
   std::string frequentStringPath = indri::file::Path::combine( path, "frequentString" );
   std::string infrequentStringPath = indri::file::Path::combine( path, "infrequentString" );

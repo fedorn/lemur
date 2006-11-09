@@ -131,7 +131,8 @@ indri::api::IndexEnvironment::IndexEnvironment() :
   _callback(0),
   _options(0),
   _documentsIndexed(0),
-  _documentsSeen(0)
+  _documentsSeen(0),
+	_maxWildcardTerms(indri::index::DEFAULT_MAX_WILDCARD_TERMS)
 {
 }
 
@@ -286,6 +287,7 @@ void indri::api::IndexEnvironment::setMetadataIndexedFields( const std::vector<s
 
 void indri::api::IndexEnvironment::create( const std::string& repositoryPath, indri::api::IndexStatus* callback ) {
   _callback = callback;
+	_parameters.set("maxWildcardTerms", _maxWildcardTerms);
   _repository.create( repositoryPath, &_parameters );
 }
 
