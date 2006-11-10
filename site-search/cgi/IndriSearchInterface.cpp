@@ -315,76 +315,6 @@ std::vector<indri::api::ScoredExtentResult> IndriSearchInterface::indriRemoveDup
   }
   
   return retVector;
-
-  /*
-  // some riduculous seed value...
-  double currentScore=9999999999.999999;
-  while (vIter!=results.end()) {
-    indri::api::ScoredExtentResult thisResult=*vIter;
-    if (thisResult.score!=currentScore) {
-      std::string thisDocIDString=db->document(thisResult.document);
-      output->stringReplaceAll(&thisDocIDString, "%7E", "~");
-    
-      string::size_type thisDocTildePos=thisDocIDString.find("~");
-      bool isOK=true;
-      
-     
-      if (thisDocTildePos!=string::npos) {
-        if (lastDocTildePos==thisDocTildePos) {
-          // so far - it looks the same...
-          // check out the string in the beginning...
-          string beginLastString=lastDocNo.substr(0, lastDocTildePos); 
-          string beginThisString=thisDocIDString.substr(0, thisDocTildePos);
-          if (beginLastString==beginThisString) {
-            // OK - so far, so good - check out the ending of the string...
-            string endLastString="";
-            string endThisString="";
-            endLastString=lastDocNo.substr(lastDocTildePos+1);
-            endThisString=thisDocIDString.substr(thisDocTildePos+1);
-            if (endLastString==endThisString) {
-              // not OK - it's the same...
-              isOK=false;
-            }
-          }
-        } 
-      }
-
-      if (isOK){
-        // further checks for / and /index.htm and /index.html      
-        // first, find the last /
-        string::size_type thisLastSlash=thisDocIDString.rfind("/");
-        if (thisLastSlash!=string::npos) {
-          string endString=thisDocIDString.substr(thisLastSlash+1);
-          if ((endString=="index.htm") || (endString=="index.html") || (endString.length()==0)) {
-            string::size_type lastLastSlash=lastDocNo.rfind("/");
-            if (lastLastSlash!=string::npos) {
-              string lastEndString=lastDocNo.substr(lastLastSlash+1);
-              if ((lastEndString=="index.htm") || (lastEndString=="index.html") || (lastEndString.length()==0)) {
-                // two matching ends - check the front!
-                string firstPartOne=thisDocIDString.substr(0, thisLastSlash);
-                string firstPartTwo=lastDocNo.substr(0, lastLastSlash);
-                if (firstPartOne==firstPartTwo) {
-                  isOK=false;      
-                }
-              }
-            }
-          }
-        }
-      }
-
-      if (isOK) {          
-        retVector.push_back(thisResult);
-        currentScore=thisResult.score;
-      }
-
-      lastDocTildePos=thisDocTildePos;
-      lastDocNo=thisDocIDString;
-    }
-    vIter++;
-  }
-
-  return retVector;
-  */
 }
 
 void IndriSearchInterface::displayIndriSearchResults(lemur::api::Index *db, int datasourceID, lemur::parse::StringQuery* q, indri::api::QueryEnvironment *indriEnvironment,
@@ -712,9 +642,11 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
   string reformulatedQuery=indriDefaultQueryExpansion(query, CGIConfiguration::getInstance().getSupportPageRankPrior());
   CGIConfiguration::getInstance().putKVItem("reformulatedQuery", reformulatedQuery);
 
-  indri::api::QueryAnnotation *qaResults=NULL;
+  // indri::api::QueryAnnotation *qaResults=NULL;
+	std::vector< indri::api::ScoredExtentResult> qResults;
   try {
-    qaResults=queryEnvironment->runAnnotatedQuery(reformulatedQuery, maxNumResults);
+    // qaResults=queryEnvironment->runAnnotatedQuery(reformulatedQuery, maxNumResults);
+		qResults=queryEnvironment->runQuery(reformulatedQuery, maxNumResults);
   } catch (...) {
     output->resetResultsPage();
     output->setResultQuery(origQueryCopy);
@@ -729,7 +661,8 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
     return;
   }
 
-  std::vector<indri::api::ScoredExtentResult> finalResults=indriRemoveDuplicateResults(qaResults->getResults(), index);
+  //std::vector<indri::api::ScoredExtentResult> finalResults=indriRemoveDuplicateResults(qaResults->getResults(), index);
+	std::vector<indri::api::ScoredExtentResult> finalResults=indriRemoveDuplicateResults(qResults, index);
 
   lemur::parse::StringQuery* q = new lemur::parse::StringQuery(query.c_str());
   // reset out results page to initialize it...
@@ -743,7 +676,7 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
 
   // Display results
   //
-  if (qaResults->getResults().size() == 0) {
+  if (finalResults.size() == 0) {
     output->setResultStatistics(0, 0, 0, 0);
     output->displayResultsPageBeginning();
     output->outputString("No results.");
@@ -752,6 +685,19 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
     }
     output->displayResultsPageEnding();
   } else {
+		
+		// get annotations for only those nodes we will be displaying...
+		// create a docID vector...
+		std::vector<lemur::api::DOCID_T> displayNodes;
+		int startItem=rankStart;
+		int endItem=(rankStart+listLength);
+		if (endItem > finalResults.size()) { endItem=finalResults.size(); }
+		for (int i=startItem; i < endItem; i++) {
+			displayNodes.push_back(finalResults[i].document);
+		}
+
+		indri::api::QueryAnnotation *qaResults=queryEnvironment->runAnnotatedQuery(reformulatedQuery, displayNodes, maxNumResults);
+
     std::vector<string> scoreNodes=getRawNodes((indri::api::QueryAnnotationNode*)qaResults->getQueryTree());
     std::map< std::string, std::vector<indri::api::ScoredExtentResult> > resultAnnotations=qaResults->getAnnotations();
     displayIndriSearchResults(index, indexID, q, queryEnvironment, &finalResults, &scoreNodes, &resultAnnotations, listLength, rankStart);

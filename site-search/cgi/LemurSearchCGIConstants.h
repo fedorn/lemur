@@ -28,6 +28,13 @@ typedef struct {
 #define DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE 0
 
 /**
+ * Defines the upper-limit on indri results
+ * if the default is 0 (unlimited) - all indri queries
+ * must have an upper limit.
+ */
+#define DEFAULT_MAX_INDRI_RESULTS	1000
+
+/**
  * Defines the default path to the HTML templates
  */
 #define DEFAULT_TEMPLATE_PATH "./templates/"

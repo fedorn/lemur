@@ -589,7 +589,7 @@ void DBInterface::search(int datasourceID, string &query, long listLength, long 
 
   if (queryType==QUERY_INTERFACE_INDRI) {
     int maxToRet=DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE;
-    if (maxToRet==0) maxToRet=10000;
+    if (maxToRet==0) maxToRet=DEFAULT_MAX_INDRI_RESULTS;
 
 
     IndriSearchInterface *indSearch=new IndriSearchInterface(output, db, indriEnvironment, dataRoot);
