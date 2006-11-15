@@ -32,6 +32,8 @@ lemur::parse::IndriTextHandler::IndriTextHandler(const string &name, int memory,
 }
 
 lemur::parse::IndriTextHandler::~IndriTextHandler() {
+  if (document.terms.size() > 0) // got a new doc with no end doc.
+    handleEndDoc();
   env.close();
   free(curdocno);
 }
@@ -39,8 +41,10 @@ lemur::parse::IndriTextHandler::~IndriTextHandler() {
 char* lemur::parse::IndriTextHandler::handleDoc(char * docno) {
   docbegin = parser->getDocBytePos();
   // stuff document id
-
   if (docno) {
+    if (document.terms.size() > 0) // got a new doc with no end doc.
+      handleEndDoc();
+    
     free(curdocno);
     curdocno = strdup(docno);
     docid.value = curdocno;
@@ -85,10 +89,10 @@ char* lemur::parse::IndriTextHandler::handleEndTag(char* tag, const char* orig, 
 }
 
 void lemur::parse::IndriTextHandler::handleEndDoc() {
-  // make sure we have enough buffer room
+  if (document.terms.size() == 0) return; // no terms
+  // make sure we have enough buffer room  
   int textsize = parser->fileTell()-docbegin;
   char *docsource = new char[textsize+1];
-
   // grab original text
   ifstream read(parser->getParseFile().c_str(), ios::binary);
   if (!read.is_open()) {
