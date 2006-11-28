@@ -50,7 +50,7 @@ namespace indri
       bool _findParents;
 
     public:
-      TagList() : _findParents(true) {
+      TagList() : _findParents(false) {
         clear();
       }
       
@@ -121,7 +121,7 @@ namespace indri
             extent->name = entry.conflation;
             extent->number = 0;
 
-            if ( _findParents && (tags.size() > 0)) {
+            if ( _findParents && (tags.size() > 1)) {
               // find this tag's parent
                 TagExtent * parent = tags.back();
                 while ( parent != NULL && 
