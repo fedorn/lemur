@@ -25,24 +25,19 @@ namespace lemur
 
     class Term {
     public:
-      Term() { term=NULL; termptr=NULL;}
-      virtual ~Term() { free(term); }
+      Term() : termptr(NULL) {}
+      virtual ~Term() { }
       /// return the spelling of the term (read-only)
-      virtual const char* spelling() const { if (term) return term; return termptr; }
+      virtual const char* spelling() const { return termptr; }
       /// set the spelling of the term by pointing to the given parameter
       /// value at str must stay valid for this Term object to stay valid
-      virtual void spelling(const char* str) { free(term); termptr = str; }
+      virtual void spelling(const char* str) { termptr = str; }
       /// set the spelling of the term by pointing to the given parameter
       /// value at str must stay valid for this Term object to stay valid
-      virtual void spelling(const string& str) { free(term); termptr = str.c_str(); }
-      /// set the spelling of the term by making a copy
-      virtual void copyspelling(const char* str) { reset(); term=strdup(str); }
-      /// free the copy of the spelling of the term
-      virtual void freespelling() { free(term); }
+      virtual void spelling(const string& str) { termptr = str.c_str(); }
       /// reset this term representation
-      virtual void reset() { free(term); termptr=NULL; }
+      virtual void reset() { termptr=NULL; }
     protected:
-      char* term;
       const char* termptr;                      
     };
   }
