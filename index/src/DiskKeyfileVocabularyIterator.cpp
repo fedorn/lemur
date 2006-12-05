@@ -39,6 +39,7 @@ indri::index::DiskKeyfileVocabularyIterator::DiskKeyfileVocabularyIterator( int 
 //
 
 indri::index::DiskKeyfileVocabularyIterator::~DiskKeyfileVocabularyIterator() {
+  _release();
   delete _bulkIterator;
 }
 
