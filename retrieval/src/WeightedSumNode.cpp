@@ -57,17 +57,20 @@ double indri::infnet::WeightedSumNode::maximumBackgroundScore() {
 
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedSumNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   double s = 0;
+  bool scored = false;
 
   for( unsigned i=0; i<_children.size(); i++ ) {
     const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, extent, documentLength );
 
     for( unsigned int j=0; j<childResults.size(); j++ ) {
+      scored=true;
       s += _weights[i] * exp( childResults[j].score );
     }
   }
 
   _scores.clear();
-  _scores.push_back( indri::api::ScoredExtentResult( log(s), documentID, extent.begin, extent.end) );
+  if (scored)
+    _scores.push_back( indri::api::ScoredExtentResult( log(s), documentID, extent.begin, extent.end) );
 
   return _scores;
 }

@@ -16,6 +16,7 @@
 // 6 July 2004 -- tds
 //
 
+#include <algorithm>
 #include "indri/FilterRequireNode.hpp"
 #include "lemur-compat.hpp"
 #include "indri/Extent.hpp"
@@ -50,11 +51,28 @@ bool indri::infnet::FilterRequireNode::hasMatch( int documentID ) {
 }
 
 const indri::utility::greedy_vector<bool>& indri::infnet::FilterRequireNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
-  if( _filter->extents().size() ) {
-    return _required->hasMatch( documentID, extents );
-  }
-
+  _matches.clear();
   _matches.resize( extents.size(), false );
+  
+  const indri::utility::greedy_vector<indri::index::Extent>& filtExtents = _filter->extents();
+
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator innerIter = filtExtents.begin();
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator outerIter = extents.begin();
+
+  int i = 0;
+  
+  while( innerIter != filtExtents.end() && outerIter != extents.end() ) {
+    if( outerIter->contains( *innerIter ) ) {
+      _matches[i] = true;
+      outerIter++;
+      i++;
+    } else if( outerIter->begin <= innerIter->begin ) {
+      outerIter++;
+      i++;
+    } else { 
+      innerIter++;
+    }
+  }
   return _matches;
 }
 
@@ -64,19 +82,34 @@ const std::string& indri::infnet::FilterRequireNode::getName() const {
 
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FilterRequireNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   _extents.clear();
+      
+  const indri::utility::greedy_vector<indri::index::Extent>& filtExtents = _filter->extents();
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+  iter = std::lower_bound( filtExtents.begin(), filtExtents.end(), extent, indri::index::Extent::begins_before_less() );
+
   // if the filter applies, return the child score.
-  if (_filter->extents().size() )
-    return _required->score( documentID, extent, documentLength );
-  else
-    return _extents;
+  while( iter != filtExtents.end() ) {
+    if ( extent.contains( *iter ) )
+      return _required->score( documentID, extent, documentLength );
+    iter++;
+  }
+  return _extents;
 }
 
 void indri::infnet::FilterRequireNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   // mark up the filter
   _filter->annotate( annotator, documentID, extent);
   // if the filter applied, mark up the matches.
-  if( _filter->extents().size() ) {
-    _required->annotate( annotator, documentID, extent );
+  const indri::utility::greedy_vector<indri::index::Extent>& filtExtents = _filter->extents();
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+  iter = std::lower_bound( filtExtents.begin(), filtExtents.end(), extent, indri::index::Extent::begins_before_less() );
+
+  while( iter != filtExtents.end() ) {
+    if ( extent.contains( *iter ) ) {
+      _required->annotate( annotator, documentID, extent );
+      return;
+    }
+    iter++;
   }
 }
 

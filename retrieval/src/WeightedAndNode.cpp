@@ -219,12 +219,13 @@ double indri::infnet::WeightedAndNode::maximumScore() {
 indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedAndNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   std::vector<child_type>::iterator iter;
   double score = 0;
-
+  bool scored = false;
   for( iter = _children.begin(); iter != _children.end(); iter++ ) {
     const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = (*iter).node->score( documentID, extent, documentLength );
 
     double childScore = 0;
     for( unsigned int j=0; j<childResults.size(); j++ ) {
+      scored = true;
       childScore += (*iter).weight * childResults[j].score;
     }
 
@@ -232,6 +233,7 @@ indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::We
   }
 
   _scores.clear();
+  if (scored) // dmf 12/03 if no child returned an extent, don't push one
   _scores.push_back( indri::api::ScoredExtentResult(score, documentID, extent.begin, extent.end) );
 
   // advance candidates

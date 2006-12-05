@@ -51,16 +51,32 @@ double indri::infnet::FilterRejectNode::maximumScore() {
 
 bool indri::infnet::FilterRejectNode::hasMatch( int documentID ) {
   // delegate to the children.
-  return (_filter->extents().size() == 0 &&
-          _disallowed->hasMatch( documentID ));
+  return ( _disallowed->hasMatch( documentID ));
 }
 
 const indri::utility::greedy_vector<bool>& indri::infnet::FilterRejectNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
-  if( _filter->extents().size() == 0 ) {
-    return _disallowed->hasMatch( documentID, extents );
-  }
+  _matches.clear();
+  _matches.resize( extents.size(), true ); // all match unless disallowed
+  
+  const indri::utility::greedy_vector<indri::index::Extent>& filtExtents = _filter->extents();
 
-  _matches.resize( extents.size(), false );
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator innerIter = filtExtents.begin();
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator outerIter = extents.begin();
+
+  int i = 0;
+  
+  while( innerIter != filtExtents.end() && outerIter != extents.end() ) {
+    if( outerIter->contains( *innerIter ) ) {
+      _matches[i] = false;
+      outerIter++;
+      i++;
+    } else if( outerIter->begin <= innerIter->begin ) {
+      outerIter++;
+      i++;
+    } else { 
+      innerIter++;
+    }
+  }
   return _matches;
 }
 
@@ -73,14 +89,39 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   // if the filter doesn't apply, return the child score.
   if ( _filter->extents().size() == 0 )
     return _disallowed->score( documentID, extent, documentLength );
-  else
-    return _extents;
+  else {
+    const indri::utility::greedy_vector<indri::index::Extent>& filtExtents = _filter->extents();
+    indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+    iter = std::lower_bound( filtExtents.begin(), filtExtents.end(), extent, indri::index::Extent::begins_before_less() );
+    bool found = false;
+    while( !found && iter != filtExtents.end() ) {
+      found = extent.contains( *iter ) ;
+      iter++;
+    }
+    if (!found)
+      return _disallowed->score( documentID, extent, documentLength );
+    else
+      return _extents;
+  }
 }
 
 void indri::infnet::FilterRejectNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   _filter->annotate( annotator, documentID, extent);
   if( _filter->extents().size() == 0 ) {
     _disallowed->annotate( annotator, documentID, extent );
+  } else {
+    const indri::utility::greedy_vector<indri::index::Extent>& filtExtents = _filter->extents();
+    indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+    iter = std::lower_bound( filtExtents.begin(), filtExtents.end(), extent, indri::index::Extent::begins_before_less() );
+    bool found = false;
+    while( !found && iter != filtExtents.end() ) {
+      found = extent.contains( *iter ) ;
+      iter++;
+    }
+    if (!found) {
+      _disallowed->annotate( annotator, documentID, extent );
+      return;
+    }
   }
 }
 
