@@ -124,10 +124,7 @@ bool indri::index::DiskKeyfileVocabularyIterator::nextEntry() {
 
 bool indri::index::DiskKeyfileVocabularyIterator::nextEntry(const char *skipTo) {
 
-	if (!skipTo) {
-		startIteration();
-    return _readData();
-  }
+	assert(skipTo!=NULL);
 
 	if (_justStartedIteration) {
 		// position the iterator at the first
