@@ -561,11 +561,7 @@ int indri::index::DiskIndex::maxWildcardTermCount() {
 	// see if there's an item in the parameters.
 	// if not, return the default
 
-	if (_manifest.exists("maxWildcardTerms")) {
-		return (int)(_manifest.get("maxWildcardTerms"));
-	}
-
-	return _maxWildcardTerms;
+	return (int)(_manifest.get("maxWildcardTerms", _maxWildcardTerms));
 }
 
 
