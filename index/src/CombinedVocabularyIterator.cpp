@@ -93,9 +93,7 @@ bool indri::index::CombinedVocabularyIterator::nextEntry() {
 //
 
 bool indri::index::CombinedVocabularyIterator::nextEntry(const char *skipTo) {
-	if (!skipTo) {
-		return nextEntry();
-	}
+	assert(skipTo!=NULL);
 
 	bool result;
 
@@ -108,8 +106,6 @@ bool indri::index::CombinedVocabularyIterator::nextEntry(const char *skipTo) {
     }
 
     result = true;
-  } else {
-    result = _second->nextEntry(skipTo);
   }
 
   if( _usingSecond ) {
