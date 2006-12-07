@@ -34,7 +34,7 @@ namespace indri
     class WildcardNodeCopier : public indri::lang::Copier {
     protected:
       std::vector<indri::lang::Node*> _nodes;
-			indri::api::QueryEnvironment *_env;
+			indri::server::LocalQueryServer *_env;
 
       class SingleChildWalker : public indri::lang::Walker {
       private:
@@ -64,8 +64,8 @@ namespace indri
       };
 
     public:
-			WildcardNodeCopier(indri::api::QueryEnvironment *queryEnvironment) : Copier() {
-				_env=queryEnvironment;
+			WildcardNodeCopier(indri::server::LocalQueryServer *env) : Copier() {
+				_env=env;
 			}
 
       ~WildcardNodeCopier() {

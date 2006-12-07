@@ -90,6 +90,9 @@ namespace indri
   
       // document vector
       virtual QueryServerVectorsResponse* documentVectors( const std::vector<int>& documentIDs ) = 0;
+
+			// max wildcard terms 
+			virtual void setMaxWildcardTerms(int maxTerms) = 0;
     };
   }
 }

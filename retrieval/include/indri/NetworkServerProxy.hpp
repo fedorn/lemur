@@ -69,6 +69,8 @@ namespace indri
 
       // document vector
       QueryServerVectorsResponse* documentVectors( const std::vector<int>& documentIDs );
+
+			void setMaxWildcardTerms(int maxTerms);
     };
   }
 }

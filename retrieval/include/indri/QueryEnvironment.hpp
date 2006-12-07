@@ -102,10 +102,6 @@ namespace indri
 
       Parameters _parameters;
 
-			// the default maximum number of wildcard matches per term
-			// before an exception is thrown
-			int _maxWildcardMatchesPerTerm;
-
       void _mergeQueryResults( indri::infnet::InferenceNetwork::MAllResults& results, std::vector<indri::server::QueryServerResponse*>& responses );
       void _copyStatistics( std::vector<indri::lang::RawScorerNode*>& scorerNodes, indri::infnet::InferenceNetwork::MAllResults& statisticsResults );
 
@@ -123,14 +119,6 @@ namespace indri
       void _scoredQuery( indri::infnet::InferenceNetwork::MAllResults& results, indri::lang::Node* queryRoot, std::string& accumulatorName, int resultsRequested, const std::vector<lemur::api::DOCID_T>* documentSet );
 
       QueryEnvironment( QueryEnvironment& other ) {}
-
-			/**
-			 * finds any potential wildcard nodes and transforms them into synonym lists
-			 * @param currentNode the current node to start with (for recursion)
-			 * @param maxItemsPerNode the maximum number of synonyms that can be generated before an exception is thrown
-			 * @return the root node of the parsed query
-			 */
-			indri::lang::ScoredExtentNode* findAndTransformWildcardNodes(indri::lang::ScoredExtentNode* currentNode);
 
     public:
       QueryEnvironment();
@@ -274,20 +262,7 @@ namespace indri
       /// @return DocumentVector pointer for the specified document.
       std::vector<DocumentVector*> documentVectors( const std::vector<lemur::api::DOCID_T>& documentIDs );
 
-
-			/// \briefGets a list of terms from the opened index(es) that match the wildcardTerm
-			/// and returns them as a vector. If the list goes over the
-			/// limit in _maxWildcardMatchesPerTerm an exception will be thrown
-			/// @param wildcardTerm the term to match on
-			/// @return vector of matched terms
-			std::vector<std::string> getWildcardTermList(std::string wildcardTerm, int maxTermsToGet=0);
-
-			///
-			/// \brief sets the maximum number of terms to be generated for a wildcard
-			/// term. If the synonym list is greater than this, an exception will be thrown
-			/// @param maxTerms the maximum number of terms
 			void setMaxWildcardTerms(int maxTerms);
-
     };
   }
 }
