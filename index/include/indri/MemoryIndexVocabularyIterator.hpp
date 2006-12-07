@@ -78,10 +78,7 @@ namespace indri {
       }
 
 			bool nextEntry(const char *skipTo) {
-				if (!skipTo) {
-					startIteration();
-					return true;
-				}
+				assert(skipTo!=NULL);
 
 				int termLength=strlen(skipTo);
 				if (!termLength) {
@@ -96,7 +93,8 @@ namespace indri {
 				_justStartedIteration=false;
 
 				while (_iterator!=_termData.end()) {
-					if (!strncmp((*_iterator)->term, skipTo, termLength)) {
+
+					if (strstr((*_iterator)->term, skipTo)==(*_iterator)->term) {
 						return true;
 					}
 					_iterator++;
