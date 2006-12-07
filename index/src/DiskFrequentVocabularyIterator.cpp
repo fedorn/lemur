@@ -70,11 +70,7 @@ bool indri::index::DiskFrequentVocabularyIterator::nextEntry() {
 bool indri::index::DiskFrequentVocabularyIterator::nextEntry(const char *skipTo) {
 	// we have to scan through each item here....
 
-	if (!skipTo) {
-		startIteration();
-		return true;
-	}
-
+	assert(skipTo!=NULL);
 
 	int entryTermLen=strlen(skipTo);
 	if (!entryTermLen) {
@@ -93,7 +89,7 @@ bool indri::index::DiskFrequentVocabularyIterator::nextEntry(const char *skipTo)
 
 		_justStartedIteration=false;
 
-		if (!strncmp(_data->termData->term, skipTo, entryTermLen)) {
+		if (strstr(_data->termData->term, skipTo)==_data->termData->term) {
 			return true;
 		}
   } // end while( !_stream.done() )
