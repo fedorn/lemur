@@ -622,13 +622,16 @@ indri::file::BulkTreeIterator::BulkTreeIterator( File& file, UINT64 whichBlock, 
 		_pairIndex = -1;
 		_blockIndex = 0;
 	} else {
-    _file.read( _block.data(), _blockIndex*indri::file::BulkBlock::dataSize(), indri::file::BulkBlock::dataSize() );
-		if ((_pairIndex < 0) || (_pairIndex >= (_block.count()-1))) {
+		if ((!readCurrentBlockData()) || (_pairIndex < 0) || (_pairIndex >= (_block.count()-1))) {
 			// invalid pair index...
 			_pairIndex = -1;
 			_blockIndex = 0;
 		}
 	}
+}
+
+bool indri::file::BulkTreeIterator::readCurrentBlockData() {
+	return (_file.read( _block.data(), _blockIndex*indri::file::BulkBlock::dataSize(), indri::file::BulkBlock::dataSize() ) > 0);
 }
 
 void indri::file::BulkTreeIterator::startIteration() {

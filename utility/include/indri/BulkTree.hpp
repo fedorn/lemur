@@ -123,6 +123,8 @@ namespace indri
       int _pairIndex;
       UINT64 _blockIndex;
 
+			bool readCurrentBlockData();
+
     public:
       BulkTreeIterator( File& file );
 
