@@ -66,9 +66,10 @@ namespace lemur
         }
         this->index[sn->idx] = sn;
         countOfIndex[sn->idx] = count;
+        int retval = sn->idx; // grow may void sn
         if (++this->currentSize>this->maxSize) 
           grow((int) (this->currentSize*GROW_FACTOR + 1));
-        return sn->idx;
+        return retval;
       }
   
       int remove(const ObjType& u){

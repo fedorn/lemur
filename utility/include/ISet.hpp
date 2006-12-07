@@ -61,8 +61,9 @@ namespace lemur
         typename PSet<ObjType>::SET_NODE *sn = PSet<ObjType>::internalAdd(u);
         if (sn==0) return -1;
         index[sn->idx] = sn;
+        int retval = sn->idx;
         if (++this->currentSize > this->maxSize) grow((int) (this->currentSize*GROW_FACTOR+1));
-        return sn->idx;
+        return retval; // grow may void sn
       }
 
       int remove(const ObjType& u) { // remove u from set: returns 1 iff u was in set
