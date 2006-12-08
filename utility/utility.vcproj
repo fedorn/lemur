@@ -114,6 +114,9 @@
 				RelativePath=".\src\ByteHash.cpp">
 			</File>
 			<File
+				RelativePath=".\src\compress.c">
+			</File>
+			<File
 				RelativePath=".\src\DirectoryIterator.cpp">
 			</File>
 			<File
@@ -306,6 +309,12 @@
 			</File>
 			<File
 				RelativePath=".\include\ISet.hpp">
+			</File>
+			<File
+				RelativePath=".\include\lemur\integer_types.h">
+			</File>
+			<File
+				RelativePath=".\include\lemur\key_consts.h">
 			</File>
 			<File
 				RelativePath=".\include\keydef.h">

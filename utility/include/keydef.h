@@ -2,15 +2,20 @@
 #define KEYDEF_H
 
 /*                                                               */
-/* Copyright 1984,1985,1986,1988,1989,1990,2003,2004,2005 by Howard Turtle      */
+/* Copyright 1984,1985,1986,1988,1989,1990,2003,2004,2005,       */
+/*   2006 by Howard Turtle                                       */
 /*                                                               */
 
-#ifdef WIN32
+#include <math.h>
+#include "integer_types.h"
+
+/*#ifdef WIN32
 typedef unsigned short     UINT16;
 typedef unsigned int       UINT32;
 typedef unsigned __int64   UINT64;
 #define UINT64_format "%llu"
 #define UINT64_C(c)   c ## ULL
+#define PATH_SEPARATOR '\\'
 typedef struct F_HANDLE F_HANDLE;
 #else
 #include <inttypes.h>
@@ -18,39 +23,48 @@ typedef uint16_t           UINT16;
 typedef uint32_t           UINT32;
 typedef uint64_t           UINT64;
 #define UINT64_format "%" PRIu64
+#define PATH_SEPARATOR '/'
 #define F_HANDLE FILE
 #endif
+*/
 
-/* #define max_long 2147483647UL*/
+#define bits(i) ( (int) (log((double)i-1)/log(2.0)) + 1 )
+#define compressed_bits_per_byte 7
+#define compressed_lc(bits) ( (bits-1) / compressed_bits_per_byte + 1 )
+
 #define keyf 32472                   /* marker for fcb */
-#define current_version 6            /* version of keyed file software */
+#define current_version 7            /* version of keyed file software */
 #define maxkey_lc 512                /* maximum key length */
-#define max_prefix_lc 255            /* max index block prefix */
-/*#define key_ptrs_per_block 1018*/ /*506*/       /* number of key_ptrs in index block */
+#define max_prefix_lc 127            /* max index block prefix */
 #define level_zero 0                 /* level of index leaves */
 #define level_one 1                  /* level immediately above leaves */
-#define min_disk_rec_lc 9            /* records this lc or longer are on disk */
-#define min_buffer_cnt 8             /* default number of buffers allocated */
-#define max_buffer_cnt 16384         /* max buffers allowed */
-#define buf_hash_load_factor 3       /* hash table is>=this times buffers alloc,*/
-#define max_level 32                 /* number of index block levels */
-/*#define max_segment_lc 4194304 */      /* 1024 blocks of 4096 each */
-/*#define max_segment_lc 2*max_long*/      /* max length of a file segment */
-#define file_lc_bits 33              /* max_file_lc assumed to be 2**file_lc_bits - 1 */
-#define max_segments 512             /* max number of file segments */
-#define max_files 10                 /* max number of open files */
-#define max_filename_lc 128          /* max length of a file name */
-#define max_extension_lc 40          /* max length of file name extension */
-#define rec_allocation_unit 8        /* user rec allocation unit */
-#define block_allocation_unit 16     /* index (and freespace) block allocation unit */
-#define user_ix 0
-#define free_rec_ix 1
-#define free_lc_ix 2
-#define max_index 3
+#define min_data_in_index_lc sizeof(UINT32) /* records shorter that this must go in index block */
+#define min_disk_rec_lc min_data_in_index_lc+1 /* records this lc or longer are on disk */
+#define max_data_in_index_lc 128     /* longest record that can go in index block */
+#define seq_threshold             20
+#define min_buffer_cnt             8 /* default number of buffers allocated */
+#define max_buffer_cnt         32768 /* max buffers allowed */
+#define buf_hash_load_factor       3 /* hash table is>=this times buffers alloc,*/
+#define max_level                 32 /* number of index block levels */
+#define file_lc_bits              33 /* <64, max_file_lc = 2**file_lc_bits - 1 */
+#define max_segment              127 /* max number of file segments */
+#define max_files                 10 /* max number of open files */
+#define max_filename_lc          128 /* max length of a file name */
+#define max_extension_lc          40 /* max length of file name extension */
+#define v6_block_lc             4096
+#define block_lc                4096
+#define rec_allocation_unit        8 /* data recs allocated as multiple of this */
+#define block_allocation_unit     16 /* # index (or freespace) blocks to allocate */
+#define user_ix                    0
+#define free_rec_ix                1
+#define free_lc_ix                 2
+#define max_index                  3
+#define cmp_less                   0
+#define cmp_equal                  1
+#define cmp_greater                2
+
 #define freespace_lc_key_lc 14       /* length of a freespace lc key */
 #define freespace_rec_key_lc 10      /* length of a freespace rec key */
-
-#define key_ptrs_per_block ((4096 - (2*sizeof(UINT16) + sizeof(UINT32) + 2*leveln_lc)) / key_ptr_lc)
 
 enum comparison {less,equal,greater};
 
@@ -64,26 +78,58 @@ struct key {
 /* leveln_pntrs point to index blocks and are the pointers stored  */
 /*   in index blocks above level0.  They are always compressed     */
 /*   when stored in index blocks; segment is usually small (less   */
-/*   that max_segments), block is a block number (not a file       */
-/*   offset).  leveln_lc is the uncompressed size of a pointer     */
-/*   when written to disk as part of the fib or an index block.    */
+/*   that max_segment), block is a block number (not a file       */
+/*   offset).  leveln_lc is the size of the pointer on disk.       */
 
 struct leveln_pntr{
   UINT16
-    segment;                    /* in range 0..max_segments  */
+    segment;                    /* in range 0..max_segment  */
   UINT64
     block;
 };
 #define leveln_lc (sizeof(UINT16)+sizeof(UINT64))
+#define compressed_block_lc ( compressed_lc( file_lc_bits - bits(block_lc) ) )
+#define compressed_leveln_lc ( compressed_lc(bits(max_segment)) + compressed_block_lc )
 
 /* level0_pntrs point to (or contain) data records and are only   */
 /*   found in level0 blocks.  Segment is the file segment in      */
 /*   which the record lies (short).  sc is the byte offset in the */
 /*   file at which the record starts, lc is the length of the     */
-/*   record.  If the record will fit in sizeof(UINT32) then it is */
+/*   record.  If the record will fit in sizeof(UINT64) then it is */
 /*   stored in sc rather than on disk.                            */
 
-struct level0_pntr {
+/* Starting with version 7, level0 pntrs are stored differently.  */
+/*   lc is compressed first.  If lc<=f->data_in_index_lc then lc  */
+/*   is followed by the actual data associated with the key       */
+/*   (uncompressed).  If lc>f->data_in_index_lc then lc is        */
+/*   followed by segment and sc that define the disk offset to    */
+/*   the data stored on disk.                                     */
+
+struct disk_offset {
+  UINT16
+    segment;
+  UINT64
+    sc;
+};
+
+typedef union data_or_disk_offset_t {
+  struct disk_offset    offset;
+  unsigned char        data[max_data_in_index_lc];
+} data_or_disk_offset;
+
+struct internal_level0_pntr {
+  UINT16
+    segment;
+  UINT32
+    lc;
+  UINT64
+    sc;
+  unsigned char
+    data_rec[max_data_in_index_lc];
+};
+typedef struct internal_level0_pntr level0_pntr;
+
+struct external_level0_pntr {
   UINT16
     segment;
   UINT32
@@ -91,8 +137,7 @@ struct level0_pntr {
   UINT64
     sc;
 };
-
-typedef struct level0_pntr keyfile_pointer; /* external name for Chiliad use */
+typedef struct internal_level0_pntr keyfile_pointer; /* external name for Chiliad use */
 
 struct key_ptr_t {
   UINT16
@@ -102,6 +147,8 @@ struct key_ptr_t {
 #define key_ptr_lc sizeof(struct key_ptr_t)
 #define keyspace_lc (key_ptr_lc*key_ptrs_per_block)
 
+#define ix_block_header_lc (2*sizeof(UINT16)+ 4 +2*leveln_lc)
+#define key_ptrs_per_block ((block_lc - ix_block_header_lc) / key_ptr_lc)
 struct ix_block {                  /* block is the disk resident image of */
   UINT16                         /*   an index block */
     keys_in_block,
@@ -117,7 +164,9 @@ struct ix_block {                  /* block is the disk resident image of */
   struct key_ptr_t              /* key_ptrs are inserted from 0, keys and */
     keys[key_ptrs_per_block];   /*  file pointers overlay the top end */
 };
-#define ix_block_lc (2*sizeof(UINT16)+4+2*leveln_lc+key_ptrs_per_block*key_ptr_lc)
+typedef struct ix_block block_type_t;
+#define ix_block_lc sizeof(block_type_t)
+
 
 /* Free space management.  Available space is recorded in two separate */
 /*   indexes.  The first (free_rec_ix) records each space in address   */
@@ -128,14 +177,8 @@ struct ix_block {                  /* block is the disk resident image of */
 /*   space of lc or longer (if it exists).  To deallocate, the rec     */
 /*   list searched and any contiguous entries are combined.            */
 
-typedef union ix_or_freespace_block {
-  struct ix_block        ix;
-  /*  struct freespace_block free;*/
-} block_type_t;
-#define block_lc ix_block_lc
-
 typedef union level0orn_pntr {
-  struct level0_pntr     p0;
+  level0_pntr            p0;
   struct leveln_pntr     pn;
 } levelx_pntr;
 
@@ -158,7 +201,10 @@ struct buffer_type {            /* buffer is the memory resident image of */
   int
     older,                      /* index to prev element in LRU list */
     younger,                    /* index to next element in LRU list */
-    hash_next;
+    hash_next,
+    last_ix,
+    search_cnt,
+    compare_cnt;
   struct leveln_pntr
     contents;                   /* block in buffer, nulln_ptr if empty */
   block_type_t
@@ -190,10 +236,13 @@ struct file_information_block {
     last_pntr[max_level][max_index];       /* last pointer at each level */
   UINT64
     max_file_lc,
-    segment_length[max_segments];/* length in bytes of each segment     */
+    segment_length[max_segment];/* length in bytes of each segment     */
+  UINT32
+    data_in_index_lc;
+
 };
-#define fib_lc ((5+max_index)*sizeof(UINT32)+(3*max_level*max_index)*leveln_lc+(max_segments+1)*sizeof(UINT64))
-#define fib_blocks ((fib_lc-1)/block_lc+1)
+#define v6_fib_lc ((5+max_index)*sizeof(UINT32)+(3*max_level*max_index)*leveln_lc+(max_segment+1)*sizeof(UINT64))
+#define fib_lc ((6+max_index)*sizeof(UINT32)+(3*max_level*max_index)*leveln_lc+(max_segment+1)*sizeof(UINT64))
 
 
 /* Segment handling.  A keyed file consist of one or more component files */
@@ -212,7 +261,7 @@ struct file_information_block {
 
 struct fcb {
 
-  unsigned int
+  UINT32
     error_code,
     version,                    /* version of keyed file manager */
     segment_cnt,                /* number of segments in use     */
@@ -225,13 +274,16 @@ struct fcb {
     last_pntr[max_level][max_index];       /* last pointer at each level */
   UINT64
     max_file_lc,                 /* max file lc for file system (2**file_lc_bits - 1)*/
-    segment_length[max_segments];/* length in bytes of each segment     */
+    segment_length[max_segment];/* length in bytes of each segment     */
+  UINT32
+    data_in_index_lc;            /* data recs <= this go in index */
 
     /* end of fib information, temporary information follows */
 
   char
     file_name[max_filename_lc],
-    file_extension[max_extension_lc];
+    file_extension[max_extension_lc],
+    *search_block_caller;       /* pointer to name of caller for debug */
   unsigned char
     byte_swapping_required,     /* true means swap bytes on I/O */
     trace,                      /* true means trace execution */
@@ -248,8 +300,9 @@ struct fcb {
     *open_file[max_files];      /* pointers to open files */
 
   int
-    segment_ix[max_segments],   /* index into open_file[] if segment open */
+    segment_ix[max_segment],   /* index into open_file[] if segment open */
     position_ix[max_index],                /* posn. in level0 blk of last retrieval */
+    seq_cnt[max_index],
     current_age,                /* age of file pool (0..maxint)*/
     buffers_allocated,          /* number of buffers actually allocated */
     buffers_in_use,             /* buffers actually used */
