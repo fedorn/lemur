@@ -942,13 +942,8 @@ void DBInterface::getWordStem(string *term) {
 }
 
 void DBInterface::getTermInvListField(string *term) {
-  // first - get the field (if any)
+  // first - get the field position (if any)
 	string::size_type dotPos=term->find(".", 0);
-	if (dotPos==string::npos) {
-		// no field? use the normal method
-		getTermInvList(term);
-		return;
-	}
 
   Index *db=openIndex();
   if (!db) {
@@ -961,6 +956,14 @@ void DBInterface::getTermInvListField(string *term) {
   try {
     _repository.openRead(pathToIndex);
   } catch (...) {
+		// not an indri repository?
+		// if we don't have a dot position, 
+		// try the normal method...
+		if (dotPos==string::npos) {
+			// no field? use the normal method
+			getTermInvList(term);
+			return;
+		}
     output->writeErrorMessage("Cannot open repository.","Can't open indri repository: " + pathToIndex);
     delete db;
     return;
@@ -969,9 +972,32 @@ void DBInterface::getTermInvListField(string *term) {
 	// our output stream string
   stringstream statsString;
 
+	string theTerm="";
+	string theField="";
+
   // got it - separate the two...
-	string theTerm=term->substr(0, dotPos);
-	string theField=term->substr(dotPos+1);
+	if (dotPos==string::npos) {
+		// no field? use the mainbody field (only if it exists!)
+		theTerm=term->c_str();
+
+		const std::vector< indri::collection::Repository::Field > repFields=_repository.fields();
+		std::vector< indri::collection::Repository::Field >::const_iterator fIter=repFields.begin();
+		for (; (fIter!=repFields.end() && theField.length()==0); fIter++) {
+			if ((*fIter).name=="mainbody") {
+				theField="mainbody";
+			}
+		}
+
+		if (theField.length()==0) {
+			// not found? use the old method...
+			getTermInvList(term);
+			return;
+		}
+    
+	} else {
+		theTerm=term->substr(0, dotPos);
+		theField=term->substr(dotPos+1);
+	}
 
 	// get the stemmed term (if any)
 	string stemmedTerm=getStemmedTerm(theTerm, db);
@@ -1082,11 +1108,6 @@ void DBInterface::getTermInvListField(string *term) {
 void DBInterface::getTermInvPosListField(string *term) {
   // first - get the field (if any)
 	string::size_type dotPos=term->find(".", 0);
-	if (dotPos==string::npos) {
-		// no field? use the normal method
-		getTermInvPosList(term);
-		return;
-	}
 
   Index *db=openIndex();
   if (!db) {
@@ -1099,6 +1120,15 @@ void DBInterface::getTermInvPosListField(string *term) {
   try {
     _repository.openRead(pathToIndex);
   } catch (...) {
+		// not an indri repository?
+		// if we don't have a dot position, 
+		// try the normal method...
+		if (dotPos==string::npos) {
+			// no field? use the normal method
+			getTermInvList(term);
+			return;
+		}
+
     output->writeErrorMessage("Cannot open repository.","Can't open indri repository: " + pathToIndex);
     delete db;
     return;
@@ -1107,9 +1137,32 @@ void DBInterface::getTermInvPosListField(string *term) {
 	// our output stream string
   stringstream statsString;
 
-	// got it - separate the two...
-	string theTerm=term->substr(0, dotPos);
-	string theField=term->substr(dotPos+1);
+	string theTerm="";
+	string theField="";
+
+  // got it - separate the two...
+	if (dotPos==string::npos) {
+		// no field? use the mainbody field (only if it exists!)
+		theTerm=term->c_str();
+
+		const std::vector< indri::collection::Repository::Field > repFields=_repository.fields();
+		std::vector< indri::collection::Repository::Field >::const_iterator fIter=repFields.begin();
+		for (; (fIter!=repFields.end() && theField.length()==0); fIter++) {
+			if ((*fIter).name=="mainbody") {
+				theField="mainbody";
+			}
+		}
+
+		if (theField.length()==0) {
+			// not found? use the old method...
+			getTermInvList(term);
+			return;
+		}
+    
+	} else {
+		theTerm=term->substr(0, dotPos);
+		theField=term->substr(dotPos+1);
+	}
 
 	// get the stemmed term (if any)
 	string stemmedTerm=getStemmedTerm(theTerm, db);
