@@ -72,7 +72,7 @@ namespace indri
         if( !error ) {
           hostent* he = ::gethostbyaddr( (const char*) &sa.sin_addr, sizeof sa.sin_addr.s_addr, AF_INET );
 
-          if( he->h_length ) {
+          if( he && he->h_length ) {
             return he->h_name;
           }
         }
