@@ -49,13 +49,12 @@ void usage() {
 
 int main( int argc, char** argv ) {
   try {
-	// there must be at least two arguments
+		// there must be at least two arguments
     REQUIRE_ARGS(2);
     // but no more than five!
     MAX_ARGS(5);
 
-
-	// open the repository
+		// open the repository
     indri::collection::Repository _repository;
     _repository.openRead(argv[1]);
 
@@ -94,7 +93,7 @@ int main( int argc, char** argv ) {
       documentIDs.clear();
       documentIDs.push_back(docID);
 
-	  // get the document vectors...
+			// get the document vectors...
       indri::server::QueryServerVectorsResponse* response = localServer.documentVectors( documentIDs );
 
       int bodyLength=0;
@@ -116,7 +115,9 @@ int main( int argc, char** argv ) {
       if( response->getResults().size() ) {
         indri::api::DocumentVector* docVector = response->getResults()[0];
 
-        for( int i=0; i<docVector->fields().size(); i++ ) {
+        int i;
+
+        for( i=0; i<docVector->fields().size(); i++ ) {
           const indri::api::DocumentVector::Field& field = docVector->fields()[i];
           if (field.name=="mainbody") {
             bodyFieldStart=field.begin;
@@ -129,15 +130,14 @@ int main( int argc, char** argv ) {
             urlFieldStart=field.begin;
             urlFieldEnd=field.end;
           }
-        }
+        } // end for( i=0; i<docVector->fields().size(); i++ )
+
         if ((urlFieldStart > 0) && (bodyFieldEnd > urlFieldStart)) { bodyFieldEnd=urlFieldStart; }
         if (anchorFieldStart==999999999) { anchorFieldStart=0; }
 
         bodyLength=bodyFieldEnd-bodyFieldStart;
         anchorLength=anchorFieldEnd-anchorFieldStart;
         urlLength=urlFieldEnd-urlFieldStart;
-
-        int i;
 
         // get the body items...
         for (i=bodyFieldStart; i < bodyFieldEnd; i++) {
@@ -150,8 +150,8 @@ int main( int argc, char** argv ) {
             } else {
               bodyTFCount.insert(make_pair(position, 1));
             }
-          }
-        }
+          } // end if (position > 0)
+        } // end for (i=bodyFieldStart; i < bodyFieldEnd; i++)
 
         // get the inlink items...
         for (i=anchorFieldStart; i < anchorFieldEnd; i++) {
@@ -164,8 +164,8 @@ int main( int argc, char** argv ) {
             } else {
               anchorTFCount.insert(make_pair(position, 1));
             }
-          }
-        }
+          } // end if (position > 0)
+        } // end for (i=anchorFieldStart; i < anchorFieldEnd; i++)
 
         // get the url items...
         for (i=urlFieldStart; i < urlFieldEnd; i++) {
@@ -178,8 +178,8 @@ int main( int argc, char** argv ) {
             } else {
               urlTFCount.insert(make_pair(position, 1));
             }
-          }
-        }
+          } // end if (position > 0)
+        } // end for (i=urlFieldStart; i < urlFieldEnd; i++)
 
         // ok - we now have our counts - we can calculate...
         // cos sim. = sqrt(sum(Tf/doclen));
@@ -195,7 +195,7 @@ int main( int argc, char** argv ) {
           if (bodyCalc > 0.0) {
             bodyCalc=sqrt(bodyCalc);
           }
-        }
+        } // end if (bodyLength > 0)
 
         // now, for anchor tags
         double anchorCalc=0.0;
@@ -209,7 +209,7 @@ int main( int argc, char** argv ) {
           if (anchorCalc > 0.0) {
             anchorCalc=sqrt(anchorCalc);
           }
-        }
+        } // end if (anchorLength > 0)
 
         // finally, for the URL
         double urlCalc=0.0;
@@ -223,21 +223,22 @@ int main( int argc, char** argv ) {
           if (urlCalc > 0.0) {
             urlCalc=sqrt(urlCalc);
           }
-        }
+        } // end if (urlLength > 0)
 
         // output our data...
         if (bodyOutfile.is_open()) {
           bodyOutfile << docID << "\t" << bodyCalc << "\n";
-		} else {
-		  std::cout << docID << "\t" << bodyCalc << "\n";
-		}
+				} else {
+					std::cout << docID << "\t" << bodyCalc << "\n";
+				} // end if (bodyOutfile.is_open())
+
         if (anchorOutfile.is_open()) { anchorOutfile << docID << "\t" << anchorCalc << "\n"; }
         if (urlOutfile.is_open()) { urlOutfile << docID << "\t" << urlCalc << "\n"; }
 
         delete docVector;
-      }
-      delete response;
+      } // end if( response->getResults().size() )
 
+      delete response;
     } // end for (DOCID_T docID=1; docID <= docCount; docID++)
 
     if (bodyOutfile.is_open()) { bodyOutfile.close(); }
