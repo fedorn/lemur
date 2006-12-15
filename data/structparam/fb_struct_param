@@ -4,7 +4,7 @@
 <retModel>0</retModel>
 <!--  Basic retrieval parameters  -->
 <!--  database index  -->
-<index>pindex.ifp</index>
+<index>kindex.key</index>
 <!--  query text stream  -->
 <textQuery>struct_query</textQuery>
 <!--  result file  -->

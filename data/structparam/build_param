@@ -1,6 +1,6 @@
 <parameters>
-<index>pindex</index>
-<indexType>inv</indexType>
+<index>kindex</index>
+<indexType>key</indexType>
 <position>1</position>
 <docFormat>web</docFormat>
 <memory>256000000</memory>
