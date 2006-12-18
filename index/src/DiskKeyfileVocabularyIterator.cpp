@@ -161,6 +161,24 @@ bool indri::index::DiskKeyfileVocabularyIterator::nextEntry(const char *skipTo) 
 		return true;
 	}
 
+	// just to be certain - check the next entry...
+	// read the next item...
+	_bulkIterator->nextEntry();
+	if (!_readData()) return false;
+	
+	// ensure we're not finished
+	if (_bulkIterator->finished()) return false;
+
+	// get the next entry...
+	thisEntry=currentEntry();
+	if (!thisEntry) return false;
+
+	// check it.
+	if (strstr(thisEntry->termData->term, skipTo)==thisEntry->termData->term) {
+		return true;
+	}
+
+	// ok - I'm satisfied that we're done...
   return false;
 }
 
