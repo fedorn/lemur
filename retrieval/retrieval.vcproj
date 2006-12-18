@@ -776,9 +776,6 @@
 				RelativePath=".\include\indri\WeightFoldingCopier.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\WildcardNodeCopier.hpp">
-			</File>
-			<File
 				RelativePath=".\include\XLingDocModel.hpp">
 			</File>
 			<File
