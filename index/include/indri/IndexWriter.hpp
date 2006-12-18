@@ -145,8 +145,6 @@ namespace indri {
       std::vector<indri::index::Index::FieldDescription> _fields;
       std::vector<indri::index::FieldStatistics> _fieldData;
 
-			int _maxNumWildcardTerms;
-
       void _writeManifest( const std::string& path );
       void _writeSkip( indri::file::SequentialWriteBuffer* buffer, int document, int length );
       void _writeBatch( indri::file::SequentialWriteBuffer* buffer, int document, int length, indri::utility::Buffer& data );

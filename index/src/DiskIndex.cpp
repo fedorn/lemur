@@ -558,10 +558,7 @@ indri::thread::Lockable* indri::index::DiskIndex::statisticsLock() {
 //
 
 int indri::index::DiskIndex::maxWildcardTermCount() {
-	// see if there's an item in the parameters.
-	// if not, return the default
-
-	return (int)(_manifest.get("maxWildcardTerms", _maxWildcardTerms));
+	return _maxWildcardTerms;
 }
 
 

@@ -287,7 +287,6 @@ void indri::api::IndexEnvironment::setMetadataIndexedFields( const std::vector<s
 
 void indri::api::IndexEnvironment::create( const std::string& repositoryPath, indri::api::IndexStatus* callback ) {
   _callback = callback;
-	_parameters.set("maxWildcardTerms", _maxWildcardTerms);
   _repository.create( repositoryPath, &_parameters );
 }
 
