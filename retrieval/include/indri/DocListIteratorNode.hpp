@@ -42,6 +42,7 @@ namespace indri
 
       int nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
+      void indexChanged( indri::index::Index& index, class InferenceNetwork *network );
 
       void prepare( int documentID );
       const indri::utility::greedy_vector<indri::index::Extent>& extents();

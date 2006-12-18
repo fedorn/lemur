@@ -33,7 +33,6 @@
 #include "indri/CompressedCollection.hpp"
 #include "indri/delete_range.hpp"
 #include "indri/WeightFoldingCopier.hpp"
-#include "indri/WildcardNodeCopier.hpp"
 
 #include "indri/Appliers.hpp"
 #include "indri/ScopedLock.hpp"
@@ -141,17 +140,6 @@ indri::server::LocalQueryServer::LocalQueryServer( indri::collection::Repository
 {
   // if supplied and false, turn off optimization for all queries.
   _optimizeParameter = indri::api::Parameters::instance().get( "optimize", 1 );
-
-	// get any parameters - right now, its just the max. # of wildcard terms
-	indri::collection::Repository::index_state iState=_repository.indexes();
-	indri::collection::Repository::index_vector::iterator iIter=iState->begin();
-	while (iIter!=iState->end()) {
-		indri::index::Index *thisIndex=*iIter;
-		if (_maxWildcardMatchesPerTerm > thisIndex->maxWildcardTermCount()) {
-			_maxWildcardMatchesPerTerm = thisIndex->maxWildcardTermCount();
-		}
-		iIter++;
-	}
 }
 
 //
@@ -371,25 +359,9 @@ indri::server::QueryServerResponse* indri::server::LocalQueryServer::runQuery( s
 
   indri::lang::TreePrinterWalker printer;
 
-	// here, walk through the parse tree and get any 
-	// potential wildcard nodes and transform them into synonym lists
-	// default=100, 2nd parameter - need to get dynamically...
-	if (_maxWildcardMatchesPerTerm < 0) {
-		// if it's less than 0, reset it to the default.
-		_maxWildcardMatchesPerTerm=indri::index::DEFAULT_MAX_WILDCARD_TERMS;
-	}
-
-	std::vector<indri::lang::Node*> wildcardTransformRoots;
-
-	// apply the wildcard copier...
-	for (std::vector<indri::lang::Node*>::iterator rIter=roots.begin(); rIter!=roots.end(); rIter++) {
-		indri::lang::Node* transformedRootNode=findAndTransformWildcardNodes(*rIter);
-		wildcardTransformRoots.push_back(transformedRootNode);
-	}
-
   // use UnnecessaryNodeRemover to get rid of window nodes, ExtentAnd nodes and ExtentOr nodes
   // that only have one child and LengthPrior nodes where the exponent is zero
-  indri::lang::ApplyCopiers<indri::lang::UnnecessaryNodeRemoverCopier> unnecessary( wildcardTransformRoots );
+  indri::lang::ApplyCopiers<indri::lang::UnnecessaryNodeRemoverCopier> unnecessary( roots );
 
   // run the contextsimplecountcollectorcopier to gather easy stats
   indri::lang::ApplyCopiers<indri::lang::ContextSimpleCountCollectorCopier> contexts( unnecessary.roots(), _repository );
@@ -495,94 +467,9 @@ indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::pat
   return new indri::server::LocalQueryServerMetadataResponse( actual );
 }
 
-// mhoy - added 10/23/06 for wildcard support
-
-//
-// findAndTransformWildcardNodes
-//
-//
-// finds any potential wildcard nodes and transforms them into synonym lists
-// @param currentNode the current node to start with (for recursion)
-// @param maxItemsPerNode the maximum number of synonyms that can be generated before an exception is thrown
-//
-indri::lang::Node* indri::server::LocalQueryServer::findAndTransformWildcardNodes(indri::lang::Node* currentNode) {
-	if (!currentNode) return currentNode;
-	if (_maxWildcardMatchesPerTerm < 0) return currentNode;
-
-	// use a copier to transform the wildcard nodes to #syn() nodes with 
-	indri::lang::WildcardNodeCopier wildcardCopier(this);
-	return (currentNode->copy(wildcardCopier));
-}
-
-//
-// getWildcardTermList
-//
-// Gets a list of terms from the opened index(es) that match the wildcardTerm and
-// returns them as a vector
-//
-std::vector<std::string> indri::server::LocalQueryServer::getWildcardTermList(std::string wildcardTerm, int maxTermsToGet) {
-	std::vector<std::string> retVec;
-
-	// if there's no set amount of max terms to get
-	// set the default
-	if (maxTermsToGet==0) {
-		maxTermsToGet=_maxWildcardMatchesPerTerm;
-	}
-
-	// first - ensure there's a wildcard in the term...
-	std::string::size_type wildcardPos=wildcardTerm.find("*");
-	if (wildcardPos==std::string::npos) {
-		// no wildcard character? just return the term.
-		retVec.push_back(wildcardTerm);
-		return retVec;
-	}
-
-	std::string theTerm=wildcardTerm.substr(0, wildcardPos);
-	const char *theTermChar=theTerm.c_str();
-	// why is there a copy here?
-	// const char *termCharCopy=strdup(theTermChar);
-  
-	indri::collection::Repository::index_state state = _repository.indexes();
-
-	// get the index.
-	indri::index::Index* index = (*state)[0];
-
-	// get the vocab. iterator
-	indri::index::VocabularyIterator* iter = index->vocabularyIterator();
-	iter->startIteration();
-
-	// get the next entry that corresponds to our term
-	while (iter->nextEntry(theTermChar)) {
-		// get the term
-		indri::index::DiskTermData* entry = iter->currentEntry();
-		if (entry) {
-			indri::index::TermData* termData = entry->termData;
-
-			if (strstr(termData->term,theTermChar)==termData->term) {
-				if (retVec.size()==maxTermsToGet) {
-					char maxTermExString[256];
-					sprintf(maxTermExString, "Error in parsing wildcard terms. Too many terms matched %s. Limit is %d.", wildcardTerm.c_str(), maxTermsToGet);
-					LEMUR_THROW( LEMUR_PARSE_ERROR, maxTermExString);
-				} // end if (retVec.size()==maxTermsToGet)
-
-				retVec.push_back(termData->term);
-			} // end if (strstr(termData->term,theTermChar)==termData->term)
-		} // end if (entry)
-	} // end while (iter->nextEntry(theTermChar))
-
-	// delete the iterator!
-	// will cause thread locking issues in pthreads
-	// for DiskKeyfileVocabIter if the mutex is not released...
-	delete iter;
-
-	// if (termCharCopy)	delete termCharCopy;
-
-	return retVec;
-}
-
 //
 // setMaxWildcardTerms
 //
 void indri::server::LocalQueryServer::setMaxWildcardTerms(int maxTerms) {
-	_maxWildcardMatchesPerTerm = maxTerms;
+  _maxWildcardMatchesPerTerm = maxTerms;
 }

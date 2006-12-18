@@ -954,9 +954,6 @@ indri::api::QueryResults indri::api::QueryEnvironment::runQuery( indri::api::Que
     LEMUR_THROW( LEMUR_PARSE_ERROR, "Couldn't understand this query: " + e.getMessage() );
   }
 
-	// TODO: mhoy : here, walk through the parse tree and get any 
-	// potential wildcard nodes and transform them into synonym lists
-
   
   timer.stop(); 
   queryResult.parseTime = timer.elapsedTime()/million; 

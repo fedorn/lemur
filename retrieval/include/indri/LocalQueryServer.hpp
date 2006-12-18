@@ -43,19 +43,9 @@ namespace indri
       indri::collection::Repository& _repository;
       indri::lang::ListCache _cache;
 
-      indri::index::Index* _indexWithDocument( indri::collection::Repository::index_state& state, int documentID );
-
-			// the default maximum number of wildcard matches per term
-			// before an exception is thrown
 			int _maxWildcardMatchesPerTerm;
 
-			/**
-			 * finds any potential wildcard nodes and transforms them into synonym lists
-			 * @param currentNode the current node to start with (for recursion)
-			 * @param maxItemsPerNode the maximum number of synonyms that can be generated before an exception is thrown
-			 * @return the root node of the parsed query
-			 */
-			indri::lang::Node* findAndTransformWildcardNodes(indri::lang::Node* currentNode);
+      indri::index::Index* _indexWithDocument( indri::collection::Repository::index_state& state, int documentID );
 
     public:
       LocalQueryServer( indri::collection::Repository& repository );
@@ -96,18 +86,12 @@ namespace indri
       // vector
       QueryServerVectorsResponse* documentVectors( const std::vector<int>& documentIDs );
 
-			/// \briefGets a list of terms from the opened index(es) that match the wildcardTerm
-			/// and returns them as a vector. If the list goes over the
-			/// limit in _maxWildcardMatchesPerTerm an exception will be thrown
-			/// @param wildcardTerm the term to match on
-			/// @return vector of matched terms
-			std::vector<std::string> getWildcardTermList(std::string wildcardTerm, int maxTermsToGet=0);
+      ///
+      /// \brief sets the maximum number of terms to be generated for a wildcard
+      /// term. If the synonym list is greater than this, an exception will be thrown
+      /// @param maxTerms the maximum number of terms
+      void setMaxWildcardTerms(int maxTerms);
 
-			///
-			/// \brief sets the maximum number of terms to be generated for a wildcard
-			/// term. If the synonym list is greater than this, an exception will be thrown
-			/// @param maxTerms the maximum number of terms
-			void setMaxWildcardTerms(int maxTerms);
     };
   }
 }

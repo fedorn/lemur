@@ -3564,7 +3564,101 @@ namespace indri {
 
         return copier.after(this, extentInsideCopy);
       }
+    }; // end ExtentParent
+
+		//
+		// WildcardTerm
+		//
+    class WildcardTerm : public RawExtentNode {
+    private:
+			std::string _normalizedTerm;
+
+			void normalizeTerm() {
+				// remove the wildcard character
+				std::string::size_type wpos=_normalizedTerm.rfind("*");
+				if (wpos!=std::string::npos) {
+          _normalizedTerm=_normalizedTerm.substr(0, wpos);
+				}
+
+				// lowercase the term
+				for (int i=0; i < _normalizedTerm.size(); ++i) {
+					_normalizedTerm[i]=tolower(_normalizedTerm[i]);
+				}
+			}
+
+    public:
+      WildcardTerm() {}
+			WildcardTerm( std::string text) :
+			_normalizedTerm(text)
+      {
+        normalizeTerm();
+      }
+
+      WildcardTerm( Unpacker& unpacker ) {
+        _normalizedTerm = unpacker.getString( "normalizedTerm" );
+      } 
+
+      std::string typeName() const {
+        return "WildcardTerm";
+      }
+
+      std::string queryText() const {
+				return (_normalizedTerm + "*");
+      }
+
+      UINT64 hashCode() const {
+        int accumulator = 7;
+
+        indri::utility::GenericHash<const char*> hash;
+        return accumulator + hash( _normalizedTerm.c_str() );
+      }
+
+			void setTerm( std::string term ) {
+				_normalizedTerm=term;
+				normalizeTerm();
+      }
+
+			std::string getTerm() {
+        return _normalizedTerm;
+      }
+
+      bool operator== ( Node& node ) {
+        WildcardTerm* other = dynamic_cast<WildcardTerm*>(&node);
+
+        if( other == this )
+          return true;
+
+        if( !other )
+          return false;
+
+        if (other->getTerm()==_normalizedTerm) 
+					return true;
+
+				return false;
+      }
+
+      void pack( Packer& packer ) {
+        packer.before(this);
+        packer.put( "normalizedTerm", _normalizedTerm );
+        packer.after(this);
+      }
+
+      void walk( Walker& walker ) {
+        walker.before(this);
+        walker.after(this);
+      }
+
+      Node* copy( Copier& copier ) {
+        copier.before(this);
+        
+        WildcardTerm* duplicate = new WildcardTerm(_normalizedTerm);
+        duplicate->setNodeName( nodeName() );
+
+        return copier.after(this, duplicate);
+      }
     };
+
+
   }
 }
 

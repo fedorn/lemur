@@ -64,6 +64,7 @@ tokens {
   GREATER = "#greater";
   BETWEEN = "#between";
   EQUALS = "#equals";
+  WCARD = "#wildcard";
   
   // pseudo-tokens
   NUMBER;
@@ -122,19 +123,18 @@ protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/' | '=');
 // we allow any Unicode character (composed of high
 // chars) so that we can support UTF-8 input.
 //
-// mhoy - modified 10/23/06 - to allow suffix-based wildcard characters...
-protected TEXT_TERM:        ( HIGH_CHAR | SAFE_CHAR ) ( HIGH_CHAR | SAFE_CHAR | STAR )*;
+
+protected TEXT_TERM:        ( HIGH_CHAR | SAFE_CHAR )+;
 protected NUMBER:           ( '0'..'9' )+;
 protected NEGATIVE_NUMBER:  DASH ( '0'..'9' )+;
 protected FLOAT:            (DASH)? ( '0'..'9' )+ DOT ( '0'..'9' )+;
-
 
 TERM:     ( (DIGIT)+ (SAFE_LETTER | HIGH_CHAR) ) => TEXT_TERM |
           ( FLOAT ) => FLOAT { $setType(FLOAT); } |
           ( NUMBER ) => NUMBER { $setType(NUMBER); } |
           ( NEGATIVE_NUMBER ) => NEGATIVE_NUMBER { $setType(NEGATIVE_NUMBER); } |
           TEXT_TERM;
-          
+
 protected ENCODED_QUOTED_TERM:    "#base64quote"! O_PAREN! (TAB! | SPACE!)* (BASESIXFOUR_CHAR)+ (TAB! | SPACE!)* C_PAREN!;
 protected ENCODED_TERM:           "#base64"! O_PAREN! (TAB! | SPACE!)* (BASESIXFOUR_CHAR)+ (TAB! | SPACE!)* C_PAREN!;
 
@@ -151,6 +151,7 @@ JUNK:      ( TAB | CR | LF | SPACE )
 class QueryParser extends Parser;
 options {
   defaultErrorHandler = false;
+  k=2;
 }
 
 {
@@ -218,18 +219,13 @@ scoredExtentNode [ indri::lang::RawExtentNode * ou ] returns [ indri::lang::Scor
   | s=scoredRaw[ou]
   ;
 
-//
-// There are 4 cases to scoredRaw when where really should only need to be 2,
-// but for some reason I can't make the "( DOT context_list )?" work right.
-//
-
 scoredRaw [ indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* sn ]
   {
     RawExtentNode* raw = 0;
     RawExtentNode* contexts = 0;
     sn = 0;
   } :
-    ( qualifiedTerm DOT ) => raw=qualifiedTerm DOT contexts=context_list[ou]
+  ( qualifiedTerm DOT ) => raw=qualifiedTerm DOT contexts=context_list[ou]
   {
     sn = new indri::lang::RawScorerNode( raw, contexts );
     _nodes.push_back(sn);
@@ -503,7 +499,9 @@ qualifiedTerm returns [ RawExtentNode* t ]
     }
   };
 
-unqualifiedTerm returns [ indri::lang::RawExtentNode* re ] :
+unqualifiedTerm returns [ indri::lang::RawExtentNode* re ] {
+    re = 0;
+  }:
     ( OD ) => re=odNode
   | ( UW ) => re=uwNode
   | ( BAND ) => re=bandNode
@@ -520,7 +518,25 @@ unqualifiedTerm returns [ indri::lang::RawExtentNode* re ] :
   | ( GREATER ) => re=greaterNode
   | ( BETWEEN ) => re=betweenNode
   | ( EQUALS ) => re=equalsNode
-  | re=rawText;
+  | ( WCARD ) => re=wildcardOpNode
+  | ( TERM STAR ) => wterm:TERM STAR {
+      // wildcard support as an unqualified term
+      // i.e. "term*"
+      re=new indri::lang::WildcardTerm( wterm->getText() );
+      _nodes.push_back(re);
+  }
+  | re = rawText;
+
+wildcardOpNode returns [ indri::lang::WildcardTerm* s ] {
+    // wildcard operator "#wildcard( term )"
+    indri::lang::RawExtentNode* term = 0;
+    s = new indri::lang::WildcardTerm;
+    _nodes.push_back(s);
+  } :
+  WCARD
+  O_PAREN
+    ( options { greedy=true; }: t:TERM { s->setTerm(t->getText()); } )
+  C_PAREN;
           
 extentRestriction [ indri::lang::ScoredExtentNode* sn, indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* er ] {
     indri::lang::Field* f = 0;

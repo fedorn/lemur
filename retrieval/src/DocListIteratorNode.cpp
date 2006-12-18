@@ -73,3 +73,6 @@ void indri::infnet::DocListIteratorNode::indexChanged( indri::index::Index& inde
   _list = _network.getDocIterator( _listID );
 }
 
+void indri::infnet::DocListIteratorNode::indexChanged( indri::index::Index& index, class InferenceNetwork *network ) {
+	_list = network->getDocIterator( _listID );
+}

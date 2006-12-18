@@ -101,6 +101,8 @@ indri::lang::Node* indri::lang::Unpacker::_unpack( indri::xml::XMLNode* child ) 
     result = new ExtentChild(*this);
   } else if( type == "ExtentParent" ) {
     result = new ExtentParent(*this);
+  } else if( type == "WildcardTerm" ) {
+    result = new WildcardTerm(*this);
   } else {
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Unknown node type '" + type + "' found during unpacking." );
   }
