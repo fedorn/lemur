@@ -30,10 +30,11 @@
 #include "indri/DiskTermListFileIterator.hpp"
 
 void indri::index::DiskIndex::_readManifest( const std::string& path ) {
-  
-  _manifest.loadFile( path );
 
-  indri::api::Parameters corpus = _manifest["corpus"];
+  indri::api::Parameters manifest;
+  manifest.loadFile( path );
+
+  indri::api::Parameters corpus = manifest["corpus"];
 
   _corpusStatistics.totalDocuments = (int) corpus["total-documents"];
   _corpusStatistics.totalTerms = (INT64) corpus["total-terms"];
@@ -41,8 +42,8 @@ void indri::index::DiskIndex::_readManifest( const std::string& path ) {
   _infrequentTermBase = (int) corpus["frequent-terms"];
   _documentBase = (int) corpus["document-base"];
 
-  if( _manifest.exists("fields") ) {
-    indri::api::Parameters fields = _manifest["fields"];
+  if( manifest.exists("fields") ) {
+    indri::api::Parameters fields = manifest["fields"];
 
     if( fields.exists("field") ) {
       indri::api::Parameters field = fields["field"];
@@ -552,13 +553,3 @@ indri::thread::Lockable* indri::index::DiskIndex::iteratorLock() {
 indri::thread::Lockable* indri::index::DiskIndex::statisticsLock() {
   return &_lock;
 }
-
-//
-// maxWildcardTermCount
-//
-
-int indri::index::DiskIndex::maxWildcardTermCount() {
-	return _maxWildcardTerms;
-}
-
-
