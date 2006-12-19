@@ -262,7 +262,7 @@ namespace indri
       /// @return DocumentVector pointer for the specified document.
       std::vector<DocumentVector*> documentVectors( const std::vector<lemur::api::DOCID_T>& documentIDs );
 
-			void setMaxWildcardTerms(int maxTerms);
+      void setMaxWildcardTerms(int maxTerms);
     };
   }
 }

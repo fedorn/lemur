@@ -632,7 +632,7 @@ indri::server::QueryServerVectorsResponse* indri::server::NetworkServerProxy::do
 // setMaxWildcardTerms
 //
 void indri::server::NetworkServerProxy::setMaxWildcardTerms(int maxTerms) {
-	indri::xml::XMLNode* request = new indri::xml::XMLNode( "max-wildcard-terms", i64_to_string(maxTerms) );
-	INT64 termMax=_numericRequest( request );
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "max-wildcard-terms", i64_to_string(maxTerms) );
+  INT64 termMax=_numericRequest( request );
 }
 

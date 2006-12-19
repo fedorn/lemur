@@ -108,7 +108,7 @@ namespace indri
       void after( indri::lang::ExtentDescendant* extentInside );
       void after( indri::lang::ExtentChild* extentInside );
       void after( indri::lang::ExtentParent* extentInside );
-			void after( indri::lang::WildcardTerm* wildcardTerm );
+      void after( indri::lang::WildcardTerm* wildcardTerm );
     };
   }
 }

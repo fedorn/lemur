@@ -93,9 +93,9 @@ bool indri::index::CombinedVocabularyIterator::nextEntry() {
 //
 
 bool indri::index::CombinedVocabularyIterator::nextEntry(const char *skipTo) {
-	assert(skipTo!=NULL);
+  assert(skipTo!=NULL);
 
-	bool result;
+  bool result;
 
   if( !_usingSecond ) {
     result = _first->nextEntry(skipTo);
@@ -109,12 +109,12 @@ bool indri::index::CombinedVocabularyIterator::nextEntry(const char *skipTo) {
   }
 
   if( _usingSecond ) {
-		result=_second->nextEntry(skipTo);
-		if (result) {
-			DiskTermData* data = _second->currentEntry();
-			if( data )
-				data->termID += _secondBase;
-		}
+    result=_second->nextEntry(skipTo);
+    if (result) {
+      DiskTermData* data = _second->currentEntry();
+      if( data )
+        data->termID += _secondBase;
+    }
   }
 
   return result;

@@ -318,7 +318,7 @@ void IndexWriter::_writeFieldList( indri::file::SequentialWriteBuffer& output, i
   // write a control byte -- numeric fields use 0x02 (DiskDocExtentListIterator)
   // ordinal fields use 0x04 (DiskDocExtentListIterator)
   UINT8 control = (numeric ? 0x02 : 0) |
-                  (ordinal ? 0x04 : 0);
+    (ordinal ? 0x04 : 0);
   output.write( &control, sizeof(UINT8) );
 
   indri::utility::Buffer dataBuffer;
@@ -472,9 +472,9 @@ void IndexWriter::_addInvertedListData( indri::utility::greedy_vector<WriterInde
           DocListIterator::TopDocument topDocument( documentData->document,
                                                     count,
                                                     length );
-            topdocs.push( topDocument );
-            while( topdocs.size() > topdocsCount )
-              topdocs.pop();
+          topdocs.push( topDocument );
+          while( topdocs.size() > topdocsCount )
+            topdocs.pop();
 
           threshold = topdocs.top().count / double(topdocs.top().length);
         }

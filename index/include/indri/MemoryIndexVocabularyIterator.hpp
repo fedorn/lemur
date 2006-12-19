@@ -31,10 +31,10 @@ namespace indri {
       VTermEntry::iterator _iterator;
       DiskTermData _diskTermData;
 
-			// this tells us if the last nextEntry() came from 
-			// a start iteration or not - needed for nextEntry(const char*)
-			// call
-			bool _justStartedIteration;
+      // this tells us if the last nextEntry() came from 
+      // a start iteration or not - needed for nextEntry(const char*)
+      // call
+      bool _justStartedIteration;
       
     public:
       MemoryIndexVocabularyIterator( VTermEntry& termData ) :
@@ -53,7 +53,7 @@ namespace indri {
           _diskTermData.termID = (*_iterator)->termID;
         }
 
-				_justStartedIteration=true;
+        _justStartedIteration=true;
       }
       
       DiskTermData* currentEntry() { 
@@ -77,32 +77,32 @@ namespace indri {
         return true;
       }
 
-			bool nextEntry(const char *skipTo) {
-				assert(skipTo!=NULL);
+      bool nextEntry(const char *skipTo) {
+        assert(skipTo!=NULL);
 
-				int termLength=strlen(skipTo);
-				if (!termLength) {
-					startIteration();
-					return true;
-				}
+        int termLength=strlen(skipTo);
+        if (!termLength) {
+          startIteration();
+          return true;
+        }
 
-				if (!_justStartedIteration) {
+        if (!_justStartedIteration) {
           _iterator++;
-				}
+        }
 
-				_justStartedIteration=false;
+        _justStartedIteration=false;
 
-				while (_iterator!=_termData.end()) {
+        while (_iterator!=_termData.end()) {
 
-					if (strstr((*_iterator)->term, skipTo)==(*_iterator)->term) {
-						return true;
-					}
-					_iterator++;
-				}
+          if (strstr((*_iterator)->term, skipTo)==(*_iterator)->term) {
+            return true;
+          }
+          _iterator++;
+        }
 
-				// return false...
-				return false;
-			}
+        // return false...
+        return false;
+      }
 
       bool finished() {
         return _iterator == _termData.end();

@@ -1169,77 +1169,77 @@ void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ExtentParent* 
 // WildcardTerm
 //
 void indri::infnet::InferenceNetworkBuilder::after( indri::lang::WildcardTerm* wildcardTerm ) {
-	if (_nodeMap.find(wildcardTerm)==_nodeMap.end()) {
-		// we will need to create an ExtentOr for our wildcard terms...
-		// (acts like a #syn operator)
+  if (_nodeMap.find(wildcardTerm)==_nodeMap.end()) {
+    // we will need to create an ExtentOr for our wildcard terms...
+    // (acts like a #syn operator)
 
-		// but first! we need to get a vector
-		// for the children...
-		std::vector<ListIteratorNode*> wildcardChildren;
+    // but first! we need to get a vector
+    // for the children...
+    std::vector<ListIteratorNode*> wildcardChildren;
 
-		// fill the extent or with IndexTerms from the repository
-		// that match our wildcard spec...
-		indri::collection::Repository::index_state theIndexes = _repository.indexes();
-		int numIndexes=theIndexes->size();
+    // fill the extent or with IndexTerms from the repository
+    // that match our wildcard spec...
+    indri::collection::Repository::index_state theIndexes = _repository.indexes();
+    int numIndexes=theIndexes->size();
 
-		std::string normalizedTerm=wildcardTerm->getTerm();
-		
-		for (int i=0; i < numIndexes; i++) {
-			// get the index.
-			indri::index::Index* thisIndex = (*theIndexes)[i];
+    std::string normalizedTerm=wildcardTerm->getTerm();
+                
+    for (int i=0; i < numIndexes; i++) {
+      // get the index.
+      indri::index::Index* thisIndex = (*theIndexes)[i];
 
-			// for each index in the repository...
-			// get a the vocabulary iterator from the index...
-			indri::index::VocabularyIterator *vIter=thisIndex->vocabularyIterator();
+      // for each index in the repository...
+      // get a the vocabulary iterator from the index...
+      indri::index::VocabularyIterator *vIter=thisIndex->vocabularyIterator();
 
-			if (vIter) {
-				vIter->startIteration();
+      if (vIter) {
+        vIter->startIteration();
 
-				// get the next entry that corresponds to our term
-				while (vIter->nextEntry(normalizedTerm)) {
+        // get the next entry that corresponds to our term
+        while (vIter->nextEntry(normalizedTerm)) {
 
-					// get the term
-					indri::index::DiskTermData* entry = vIter->currentEntry();
-					if (entry) {
-						indri::index::TermData* termData = entry->termData;
+          // get the term
+          indri::index::DiskTermData* entry = vIter->currentEntry();
+          if (entry) {
+            indri::index::TermData* termData = entry->termData;
 
-						if (strstr(termData->term, normalizedTerm.c_str())==termData->term) {
-							if (wildcardChildren.size()==thisIndex->maxWildcardTermCount()) {
+            if (strstr(termData->term, normalizedTerm.c_str())==termData->term) {
+              if (wildcardChildren.size()==thisIndex->maxWildcardTermCount()) {
 
-								// be sure to delete the vocabulary iterator when we're done!
-								delete vIter; 
+                // be sure to delete the vocabulary iterator when we're done!
+                delete vIter; 
 
-								char maxTermExString[256];
-								sprintf(maxTermExString, "Error in parsing wildcard terms. Too many terms matched %s*. Limit is %d.", normalizedTerm.c_str(), thisIndex->maxWildcardTermCount());
-								LEMUR_THROW( LEMUR_PARSE_ERROR, maxTermExString);
+                char maxTermExString[256];
+                sprintf(maxTermExString, "Error in parsing wildcard terms. Too many terms matched %s*. Limit is %d.", normalizedTerm.c_str(), thisIndex->maxWildcardTermCount());
+                LEMUR_THROW( LEMUR_PARSE_ERROR, maxTermExString);
 
-							} // end if (wildcardChildren.size()==index.maxWildcardTermCount())
+              } // end if (wildcardChildren.size()==index.maxWildcardTermCount())
 
-							// OK - we have the term... create what amounts to an indexterm...
-							// and add it...
+              // OK - we have the term... create what amounts to an indexterm...
+              // and add it...
 
-							int listID = _network->addDocIterator(termData->term);
-							indri::infnet::DocListIteratorNode *iteratorNode=new DocListIteratorNode("wildcard_child:"+std::string(termData->term), *_network, listID);
-							wildcardChildren.push_back(iteratorNode);
-							_network->addListNode(iteratorNode);
+              int listID = _network->addDocIterator(termData->term);
+              indri::infnet::DocListIteratorNode *iteratorNode=new DocListIteratorNode("wildcard_child:"+std::string(termData->term), *_network, listID);
+              wildcardChildren.push_back(iteratorNode);
+              _network->addListNode(iteratorNode);
 
-						} // end if (strstr(termData->term, _normalizedTerm.c_str())==termData->term)
-					} // end if (entry)
-				} // end while (vIter->nextEntry(normalizedTerm))
+            } // end if (strstr(termData->term, _normalizedTerm.c_str())==termData->term)
+          } // end if (entry)
+        } // end while (vIter->nextEntry(normalizedTerm))
 
-				// be sure to delete the vocabulary iterator when we're done!
-				delete vIter;
+        // be sure to delete the vocabulary iterator when we're done!
+        delete vIter;
 
-			} // end if (vIter)
-		} // end for (int i=0; i < numIndexes; i++)
+      } // end if (vIter)
+    } // end for (int i=0; i < numIndexes; i++)
 
-		// ok - now we can create our ExtentOrNode...
+    // ok - now we can create our ExtentOrNode...
     indri::infnet::ExtentOrNode* wildcardNode = new indri::infnet::ExtentOrNode( wildcardTerm->nodeName(), wildcardChildren );
 
-		// and finally, add it to our network...
+    // and finally, add it to our network...
     _network->addListNode( wildcardNode );
     _nodeMap[wildcardTerm] = wildcardNode;
 
-	}  // end if (_nodeMap.find(wildcardTerm)==_nodeMap.end())
+  }  // end if (_nodeMap.find(wildcardTerm)==_nodeMap.end())
 }
 

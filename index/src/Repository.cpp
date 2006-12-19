@@ -963,10 +963,10 @@ void indri::collection::Repository::_merge( index_state& state ) {
   if( state->size() <= 2 || 
       ( _mergeMemory( *state ) < memoryBound && 
         _mergeFiles(*state) < MERGE_FILE_LIMIT ) ) {
-					
+                                        
     indri::index::Index* index = _mergeStage( state );
 
-		result->push_back( index );
+    result->push_back( index );
   } else {
     // divide and conquer
     index_state first = new std::vector<indri::index::Index*>;

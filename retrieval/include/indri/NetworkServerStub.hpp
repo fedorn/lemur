@@ -65,7 +65,7 @@ namespace indri
 
       void _handlePathNames( indri::xml::XMLNode* request );
 
-			void _handleSetMaxWildcardTerms( indri::xml::XMLNode* request );
+      void _handleSetMaxWildcardTerms( indri::xml::XMLNode* request );
 
     public:
       NetworkServerStub( indri::server::QueryServer* server, NetworkMessageStream* stream );

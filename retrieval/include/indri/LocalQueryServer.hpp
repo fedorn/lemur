@@ -43,7 +43,7 @@ namespace indri
       indri::collection::Repository& _repository;
       indri::lang::ListCache _cache;
 
-			int _maxWildcardMatchesPerTerm;
+      int _maxWildcardMatchesPerTerm;
 
       indri::index::Index* _indexWithDocument( indri::collection::Repository::index_state& state, int documentID );
 

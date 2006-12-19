@@ -42,7 +42,7 @@ void indri::index::DiskFrequentVocabularyIterator::startIteration() {
   _finished = false;
   _stream.setBuffer( _buffer.front(), _buffer.position() );
   nextEntry();
-	_justStartedIteration=true;
+  _justStartedIteration=true;
 }
 
 //
@@ -54,7 +54,7 @@ bool indri::index::DiskFrequentVocabularyIterator::nextEntry() {
     _data = ::disktermdata_decompress( _stream, _dataBuffer, _fieldCount, indri::index::DiskTermData::WithOffsets |
                                        indri::index::DiskTermData::WithTermID | 
                                        indri::index::DiskTermData::WithString );
-		_justStartedIteration=false;
+    _justStartedIteration=false;
 
     return true;
   } else {
@@ -68,30 +68,30 @@ bool indri::index::DiskFrequentVocabularyIterator::nextEntry() {
 //
 
 bool indri::index::DiskFrequentVocabularyIterator::nextEntry(const char *skipTo) {
-	// we have to scan through each item here....
+  // we have to scan through each item here....
 
-	assert(skipTo!=NULL);
+  assert(skipTo!=NULL);
 
-	int entryTermLen=strlen(skipTo);
-	if (!entryTermLen) {
-		startIteration();
-		return true;
-	}
+  int entryTermLen=strlen(skipTo);
+  if (!entryTermLen) {
+    startIteration();
+    return true;
+  }
 
-	// start from the current iterator
+  // start from the current iterator
   while( !_stream.done() ) {
 
-		if (!_justStartedIteration) {
-			_data = ::disktermdata_decompress( _stream, _dataBuffer, _fieldCount, indri::index::DiskTermData::WithOffsets |
-																				indri::index::DiskTermData::WithTermID | 
-																				indri::index::DiskTermData::WithString );
-		}
+    if (!_justStartedIteration) {
+      _data = ::disktermdata_decompress( _stream, _dataBuffer, _fieldCount, indri::index::DiskTermData::WithOffsets |
+                                         indri::index::DiskTermData::WithTermID | 
+                                         indri::index::DiskTermData::WithString );
+    }
 
-		_justStartedIteration=false;
+    _justStartedIteration=false;
 
-		if (strstr(_data->termData->term, skipTo)==_data->termData->term) {
-			return true;
-		}
+    if (strstr(_data->termData->term, skipTo)==_data->termData->term) {
+      return true;
+    }
   } // end while( !_stream.done() )
 
   _finished = true;

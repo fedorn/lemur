@@ -412,8 +412,8 @@ void indri::net::NetworkServerStub::_handlePathNames( indri::xml::XMLNode* reque
 
 void indri::net::NetworkServerStub::_handleSetMaxWildcardTerms( indri::xml::XMLNode* request ) {
   int nTerms = string_to_int( request->getValue() );
-	_server->setMaxWildcardTerms(nTerms);
-	_sendNumericResponse( "max-wildcard-terms", nTerms );
+  _server->setMaxWildcardTerms(nTerms);
+  _sendNumericResponse( "max-wildcard-terms", nTerms );
 }
 
 void indri::net::NetworkServerStub::request( indri::xml::XMLNode* input ) {
@@ -456,8 +456,8 @@ void indri::net::NetworkServerStub::request( indri::xml::XMLNode* input ) {
       _handleDocumentsFromMetadata( input );
     } else if( type == "path-names" ) {
       _handlePathNames( input );
-		} else if( type == "max-wildcard-terms" ) {
-			_handleSetMaxWildcardTerms( input );
+    } else if( type == "max-wildcard-terms" ) {
+      _handleSetMaxWildcardTerms( input );
     } else {
       _stream->error( std::string() + "Unknown XML message type: " + input->getName() );
     }

@@ -120,7 +120,7 @@ indri::api::ParsedDocument* indri::api::IndexEnvironment::_applyAnnotators( std:
                                                                             indri::api::ParsedDocument* parsed ) {
   for( unsigned int i=0; i<annotators.size(); i++ ) {
     if( annotators[i] ) { 
-     parsed = annotators[i]->transform( parsed ); 
+      parsed = annotators[i]->transform( parsed ); 
     }
   }
 
@@ -132,7 +132,7 @@ indri::api::IndexEnvironment::IndexEnvironment() :
   _options(0),
   _documentsIndexed(0),
   _documentsSeen(0),
-	_maxWildcardTerms(indri::index::DEFAULT_MAX_WILDCARD_TERMS)
+  _maxWildcardTerms(indri::index::DEFAULT_MAX_WILDCARD_TERMS)
 {
 }
 
@@ -411,7 +411,7 @@ int indri::api::IndexEnvironment::addString( const std::string& documentString, 
 // For UIMA with offset annotations
 //
 int indri::api::IndexEnvironment::addString( const std::string& documentString, const std::string&
-fileClass, const std::vector<indri::parse::MetadataPair>& metadata, const std::vector<indri::parse::TagExtent *> &tags ) {
+                                             fileClass, const std::vector<indri::parse::MetadataPair>& metadata, const std::vector<indri::parse::TagExtent *> &tags ) {
   indri::parse::UnparsedDocument document;
   indri::parse::Parser* parser;
   indri::parse::Tokenizer* tokenizer;

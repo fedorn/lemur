@@ -35,12 +35,12 @@ namespace indri {
       void _getRawNodes( std::vector<std::string>& nodeNames, const indri::api::QueryAnnotationNode* node );
      
       std::vector< std::pair<indri::index::Extent, int> > _documentMatches( int document, 
-                                                          const std::map< std::string, std::vector<indri::api::ScoredExtentResult> >& annotations,
-                                                          const std::vector<std::string>& nodeNames );
+                                                                            const std::map< std::string, std::vector<indri::api::ScoredExtentResult> >& annotations,
+                                                                            const std::vector<std::string>& nodeNames );
       
       std::vector<Region> _buildRegions(
-        std::vector< std::pair<indri::index::Extent, int> >& extents,
-        int positionCount, int matchWidth, int windowWidth );
+                                        std::vector< std::pair<indri::index::Extent, int> >& extents,
+                                        int positionCount, int matchWidth, int windowWidth );
 
       Region _bestRegion( const std::vector< std::pair<indri::index::Extent, int> >& extents,
                           const std::vector< indri::api::SnippetBuilder::Region >& skipRegions,

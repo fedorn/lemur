@@ -842,7 +842,7 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
                                                                                      indri::api::QueryAnnotation** annotation,
                                                                                      const std::string &queryType ) {
   INIT_TIMER
-  QueryParserWrapper *parser = QueryParserFactory::get(q, queryType);
+    QueryParserWrapper *parser = QueryParserFactory::get(q, queryType);
 
   PRINT_TIMER( "Initialization complete" );
 
@@ -922,7 +922,7 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
 
 // put in api?
 static void _getRawNodes( std::set<std::string>& nodeTerms, 
-                   const indri::api::QueryAnnotationNode* node ) {
+                          const indri::api::QueryAnnotationNode* node ) {
   if( node->type == "IndexTerm" ) {
     nodeTerms.insert( node->queryText );
   } else {
@@ -1003,10 +1003,10 @@ indri::api::QueryResults indri::api::QueryEnvironment::runQuery( indri::api::Que
   _scoredQuery( results, rootNode, accumulatorName, request.resultsRequested + request.startNum, documentSet );
   std::vector<indri::api::ScoredExtentResult> queryResults = results[accumulatorName]["scores"];
   std::stable_sort( queryResults.begin(), queryResults.end(), indri::api::ScoredExtentResult::score_greater() );
-    // prune the list
+  // prune the list
   if (request.startNum > 0) {
     queryResults.erase(queryResults.begin(), queryResults.begin() + request.startNum);
-    }
+  }
 
   if( queryResults.size() > request.resultsRequested )
     queryResults.resize( request.resultsRequested );
