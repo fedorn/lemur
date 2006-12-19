@@ -72,7 +72,3 @@ void indri::infnet::DocListIteratorNode::annotate( Annotator& annotator, int doc
 void indri::infnet::DocListIteratorNode::indexChanged( indri::index::Index& index ) {
   _list = _network.getDocIterator( _listID );
 }
-
-void indri::infnet::DocListIteratorNode::indexChanged( indri::index::Index& index, class InferenceNetwork *network ) {
-  _list = network->getDocIterator( _listID );
-}
