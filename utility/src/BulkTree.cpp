@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // BulkTree
@@ -242,7 +242,7 @@ bool indri::file::BulkBlock::find( const char* key, int keyLength, char* value, 
 // findIndexOf
 //
 int indri::file::BulkBlock::findIndexOf(const char* key) {
-	bool exact;
+  bool exact;
   return _find( key, strlen(key), exact );
 }
 
@@ -572,7 +572,7 @@ indri::file::BulkTreeIterator* indri::file::BulkTreeReader::findFirst(const char
 
   int nextID = rootID;
 
-	int keyLength=strlen(key);
+  int keyLength=strlen(key);
 
   while( true ) {
     block = _fetch( nextID );
@@ -590,11 +590,11 @@ indri::file::BulkTreeIterator* indri::file::BulkTreeReader::findFirst(const char
   }
 
   // now we're at a leaf
-	// we've got the block ID, now get the index ID of the entry we want.
-	UINT64 thisBlockID=(UINT64)block->getID();
-	int thisPairIndex=block->findIndexOf(key);
+  // we've got the block ID, now get the index ID of the entry we want.
+  UINT64 thisBlockID=(UINT64)block->getID();
+  int thisPairIndex=block->findIndexOf(key);
 
-	return new BulkTreeIterator(*_file, thisBlockID, thisPairIndex);
+  return new BulkTreeIterator(*_file, thisBlockID, thisPairIndex);
 }
 
 
@@ -613,25 +613,25 @@ indri::file::BulkTreeIterator::BulkTreeIterator( File& file ) :
 indri::file::BulkTreeIterator::BulkTreeIterator( File& file, UINT64 whichBlock, int whichPair ) :
   _file(file)
 {
-	_pairIndex=whichPair;
-	_blockIndex=whichBlock;
+  _pairIndex=whichPair;
+  _blockIndex=whichBlock;
   _fileLength = _file.size();
 
-	if (finished()) {
-		// we're past the last block!
-		_pairIndex = -1;
-		_blockIndex = 0;
-	} else {
-		if ((!readCurrentBlockData()) || (_pairIndex < 0) || (_pairIndex >= (_block.count()-1))) {
-			// invalid pair index...
-			_pairIndex = -1;
-			_blockIndex = 0;
-		}
-	}
+  if (finished()) {
+    // we're past the last block!
+    _pairIndex = -1;
+    _blockIndex = 0;
+  } else {
+    if ((!readCurrentBlockData()) || (_pairIndex < 0) || (_pairIndex >= (_block.count()-1))) {
+      // invalid pair index...
+      _pairIndex = -1;
+      _blockIndex = 0;
+    }
+  }
 }
 
 bool indri::file::BulkTreeIterator::readCurrentBlockData() {
-	return (_file.read( _block.data(), _blockIndex*indri::file::BulkBlock::dataSize(), indri::file::BulkBlock::dataSize() ) > 0);
+  return (_file.read( _block.data(), _blockIndex*indri::file::BulkBlock::dataSize(), indri::file::BulkBlock::dataSize() ) > 0);
 }
 
 void indri::file::BulkTreeIterator::startIteration() {
@@ -670,8 +670,8 @@ bool indri::file::BulkTreeIterator::get( char* key, int keyLength, int& keyActua
   if( finished() )
     return false;
   
-	// the length / actual items were switched around previously!
-	return _block.getIndex( _pairIndex, key, keyActual, keyLength, value, valueActual, valueLength);
+  // the length / actual items were switched around previously!
+  return _block.getIndex( _pairIndex, key, keyActual, keyLength, value, valueActual, valueLength);
 }
 
 bool indri::file::BulkTreeIterator::get( UINT32& key, char* value, int valueLength, int& valueActual ) {
