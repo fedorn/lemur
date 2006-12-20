@@ -48,16 +48,17 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
     const indri::utility::greedy_vector<indri::index::Extent>& fieldExtentsTmp = _field->matches( tExtent );
     indri::utility::greedy_vector<indri::index::Extent> fieldExtents;
     fieldExtents.append(fieldExtentsTmp.begin(), fieldExtentsTmp.end());
-    
-    //   const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, fieldExtents );
-    //   assert( matches.size() == fieldExtents.size() );
+    //open question whether to score all extents or not -- dmf    
+       const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, fieldExtents );
+       assert( matches.size() == fieldExtents.size() );
     
     indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
     _scores.clear();
     
     for( size_t i = 0; i < fieldExtents.size(); i++ ) {    
-      //     if( !matches[i] )  // We actually want to score all, whether or not they have a query term 
-      //       continue;        // match.  This will give us proper scores when ther eis not a match.
+    //open question whether to score all extents or not -- dmf    
+           if( !matches[i] )  // We actually want to score all, whether or not they have a query term 
+             continue;        // match.  This will give us proper scores when ther eis not a match.
       
       iter = &(fieldExtents[i]);
       
@@ -68,7 +69,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
       int scoreBegin = iter->begin;
       int scoreEnd = iter->end;
 
-//       std::cout << getName() << " " << documentID << " " << begin <<":"<<end << " " << iter->begin <<":"<< iter->end << std::endl;
+      //       std::cout << getName() << " " << documentID << " " << extent.begin <<":"<<extent.end << " " << iter->begin <<":"<< iter->end << std::endl;
       
       const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, (indri::index::Extent&)(*iter), documentLength );
       
@@ -107,25 +108,20 @@ void indri::infnet::ExtentRestrictionNode::annotate( indri::infnet::Annotator& a
     indri::utility::greedy_vector<indri::index::Extent> fieldExtents;
     fieldExtents.append(fieldExtentsTmp.begin(), fieldExtentsTmp.end());
     
-    //   const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, fieldExtents );
-    //   assert( matches.size() == fieldExtents.size() );
+    const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, fieldExtents );
+    assert( matches.size() == fieldExtents.size() );
     
     indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
     _scores.clear();
     
     for( size_t i = 0; i < fieldExtents.size(); i++ ) {    
-      //     if( !matches[i] )  // We actually want to score all, whether or not they have a query term 
-      //       continue;        // match.  This will give us proper scores when ther eis not a match.
+      if( !matches[i] )
+        continue;
       
       iter = &(fieldExtents[i]);
       
       if( iter->end - iter->begin == 0 )
         continue; // this field has no text in it
-      
-      
-      int scoreBegin = iter->begin;
-      int scoreEnd = iter->end;
-
       
       _child->annotate( annotator, documentID, (indri::index::Extent&)(*iter));
       
