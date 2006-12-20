@@ -194,17 +194,17 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
             metadata.push_back( range );
           }
         }
-      }
 
-      if( !strncmp( _endMetadataTag + 1, beginLine + 1, _endMetadataTagLength - 2 ) ) {
-        // all finished
-        // have to skip the first letter because it may have been turned into a null
-
-        if( openTag ) {
-          // some tag was left open, so remove it
-          metadata.erase( metadata.end()-1 );
+        if( !strncmp( _endMetadataTag + 1, beginLine + 1, _endMetadataTagLength - 2 ) ) {
+          // all finished
+          // have to skip the first letter because it may have been turned into a null
+          
+          if( openTag ) {
+            // some tag was left open, so remove it
+            metadata.erase( metadata.end()-1 );
+          }
+          break;
         }
-        break;
       }
     }
   }
