@@ -30,7 +30,6 @@
 #include "indri/DiskTermListFileIterator.hpp"
 
 void indri::index::DiskIndex::_readManifest( const std::string& path ) {
-
   indri::api::Parameters manifest;
   manifest.loadFile( path );
 
@@ -553,3 +552,4 @@ indri::thread::Lockable* indri::index::DiskIndex::iteratorLock() {
 indri::thread::Lockable* indri::index::DiskIndex::statisticsLock() {
   return &_lock;
 }
+

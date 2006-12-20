@@ -29,7 +29,6 @@
 #include <string>
 #include "indri/BulkTree.hpp"
 #include "indri/SequentialReadBuffer.hpp"
-#include "indri/Parameters.hpp"
 
 namespace indri {
   namespace index {
@@ -117,7 +116,6 @@ namespace indri {
 
       indri::thread::Lockable* iteratorLock();
       indri::thread::Lockable* statisticsLock();
-
     };
   }
 }
