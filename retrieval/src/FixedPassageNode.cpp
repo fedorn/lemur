@@ -39,21 +39,26 @@ double indri::infnet::FixedPassageNode::maximumScore() {
   return INDRI_HUGE_SCORE;
 }
 
+//
+// score
+//
+
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FixedPassageNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   // we're going to run through the field list, etc.
   _scores.clear();
 
-  // round down to find where the passage starts
-  int beginPassage = (extent.begin / _increment) * _increment;
+  // find out how to chop up [begin,end] appropriately into passages 
+  _buildSubextents( extent );
+  const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, _subextents );
 
-  for( ; beginPassage < extent.end; beginPassage += _increment ) {
-    int endPassage = beginPassage + _windowSize;
-
-    int scoreBegin = lemur_compat::max( beginPassage, extent.begin );
-    int scoreEnd = lemur_compat::min( endPassage, extent.end );
-
-    indri::index::Extent scoreExtent(scoreBegin, scoreEnd);
-    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, scoreExtent, documentLength );
+  // loop through the subextents, scoring each one
+  for( int i=0; i<_subextents.size(); i++ ) {
+    int scoreBegin = _subextents[i].begin;
+    int scoreEnd = _subextents[i].end;
+    if( !matches[i] )
+      continue;
+  
+    const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, _subextents[i], documentLength );
 
     for( int i=0; i<childResults.size(); i++ ) {
       indri::api::ScoredExtentResult result( childResults[i].score, documentID, scoreBegin, scoreEnd );
@@ -64,51 +69,92 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _scores;
 }
 
+//
+// annotate
+//
+
 void indri::infnet::FixedPassageNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   annotator.add(this, documentID, extent);
 
   // round down to find where the passage starts
-  int beginPassage = (extent.begin / _increment) * _increment;
+  _buildSubextents( extent ); 
+  const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, _subextents );
 
-  for( ; beginPassage < extent.end; beginPassage += _increment ) {
-    int endPassage = beginPassage + _windowSize;
-
-    int scoreBegin = lemur_compat::max( beginPassage, extent.begin );
-    int scoreEnd = lemur_compat::min( endPassage, extent.end );
-
-    indri::index::Extent scoreExtent(scoreBegin, scoreEnd);
-    _child->annotate( annotator, documentID, scoreExtent);
+  for( int i=0; i<_subextents.size(); i++ ) {
+    if (matches[i])
+      _child->annotate( annotator, documentID, _subextents[i] );
   }
 }
+
+//
+// hasMatch
+//
 
 bool indri::infnet::FixedPassageNode::hasMatch( int documentID ) {
   return _child->hasMatch( documentID );
 }
+
+//
+// _addSubextents
+//
+
+void indri::infnet::FixedPassageNode::_addSubextents( const indri::index::Extent& extent ) {
+  int beginPassage = (extent.begin / _increment) * _increment;
+  int endPassage = beginPassage + _windowSize;
+
+  while( beginPassage <= extent.end - _windowSize ) {
+    int begin = lemur_compat::max( beginPassage, extent.begin );
+    int end = lemur_compat::min( endPassage, extent.end );
+
+    _subextents.push_back( indri::index::Extent( begin, end ) );
+
+    beginPassage += _increment;
+    endPassage = beginPassage + _windowSize;
+  }
+
+  // final passage; may overlap more than other passages
+  if( beginPassage < extent.end ) {
+    int begin = lemur_compat::max( extent.end - _windowSize, beginPassage );
+    int end = extent.end; 
+
+    _subextents.push_back( indri::index::Extent( begin, end ) );
+  }
+}
+
+//
+// _buildSubextents
+//
+
+void indri::infnet::FixedPassageNode::_buildSubextents( const indri::index::Extent& extent ) {
+  _subextents.clear();
+  _addSubextents( extent );
+}
+
+//
+// _buildSubextents
+//
+
+void indri::infnet::FixedPassageNode::_buildSubextents( const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+  _subextents.clear();
+
+  for( size_t i=0; i<extents.size(); i++ ) {
+    _addSubextents( extents[i] );
+  }
+}
+
+//
+// hasMatch
+//
 
 const indri::utility::greedy_vector<bool>& indri::infnet::FixedPassageNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   _matches.clear();
   _matches.resize( extents.size(), false );
 
   // to match, we split up each extent into its passage components, then check to see if there are sub-matches there.
-  _subextents.clear();
-
   size_t i=0; 
   size_t j=0;
 
-  for( i=0; i<extents.size(); i++ ) {
-    int beginPassage = (extents[i].begin / _increment) * _increment;
-    int endPassage = beginPassage + _windowSize;
-
-    while( beginPassage < extents[i].end ) {
-      int begin = lemur_compat::max( beginPassage, extents[i].begin );
-      int end = lemur_compat::min( endPassage, extents[i].end );
-
-      _subextents.push_back( indri::index::Extent( begin, end ) );
-
-      beginPassage += _increment;
-      endPassage = beginPassage + _windowSize;
-    }
-  }
+  _buildSubextents( extents );
 
   // now that we have subextents, ask the child for regions that have results
   const indri::utility::greedy_vector<bool>& childMatches = _child->hasMatch( documentID, _subextents );
