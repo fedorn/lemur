@@ -482,11 +482,17 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::UWNode* uwNode 
 void indri::infnet::InferenceNetworkBuilder::after( indri::lang::BAndNode* bandNode ) {
   if( _nodeMap.find( bandNode ) == _nodeMap.end() ) {
     std::vector<ListIteratorNode*> translation = _translate<ListIteratorNode>( bandNode->getChildren() );
+    // replace with an unordered window.
+    /*
     BooleanAndNode* booleanAndNode = new BooleanAndNode( bandNode->nodeName(),
                                                          translation );
 
     _network->addListNode( booleanAndNode );
     _nodeMap[bandNode] = booleanAndNode;
+    */
+    UnorderedWindowNode *unorderedNode = new UnorderedWindowNode( bandNode->nodeName(), translation, -1);
+    _network->addListNode( unorderedNode );
+    _nodeMap[bandNode] = unorderedNode;
   }
 }
 
