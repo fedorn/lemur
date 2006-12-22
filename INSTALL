@@ -159,7 +159,7 @@ to customize its behavior.
   For example, 
   <PRE>
     &lt;parameters&gt;
-      &lt;index&gt;/usr0/mydata/index.ifp&lt;/index&gt;
+      &lt;index&gt;/usr0/mydata/index.key&lt;/index&gt;
     &lt;/parameters&gt;
   </PRE>
    Most applications will display a list of required input variables, 
@@ -171,7 +171,7 @@ if you run it with the "--help" option.
 
   \section sampledata To try the sample data
 
-  - Go to the data directory, run "test_pos_index.sh" which is a 
+  - Go to the data directory, run "test_key_index.sh" which is a 
   self-explanatory shell script that will build an index, run 
   several retrieval algorithms with some sample parameter files, 
   and then evaluate the retrieval performance.

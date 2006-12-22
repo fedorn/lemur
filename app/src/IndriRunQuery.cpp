@@ -101,6 +101,13 @@ specifying the stopword list to use. Specified as
 &lt;stopper&gt;&lt;word&gt;stopword&lt;/word&gt;&lt;/stopper&gt; and
 as <tt>-stopper.word=stopword</tt> on the command line. This is an
 optional parameter with the default of no stopping.</dd>
+<dt>maxWildcardTerms</dt>
+<dd>
+<i>(optional)</i> An integer specifying the maximum number of wildcard terms that can 
+be generated for a synonym list for this query or set of queries. If this limit
+is reached for a wildcard term, an exception will be thrown. If this parameter
+is not specified, a default of 100 will be used.
+</dd>
 </dl>
 <H4>Formatting Parameters</H4>
 <dl>
