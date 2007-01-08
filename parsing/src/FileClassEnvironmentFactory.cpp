@@ -60,6 +60,8 @@ static const char* html_metadata_tags[] = { "title", 0 };
 static const char* html_conflations[] = { "h1", NULL, NULL, "heading", "h2", NULL, NULL, "heading", "h3", NULL, NULL, "heading", "h4", NULL, NULL, "heading", 0, 0, 0, 0 };
 
 static const char* trec_include_tags[] = { "text", "hl", "head", "headline", "title", "ttl", "dd", "date", "lp", "leadpara", 0 };
+static const char* trecalt_include_tags[] = { "text", 0 };
+static const char* trecalt_index_tags[] = { "text", 0 };
 static const char* trec_metadata_tags[] = { "docno", "title", 0 };
 static const char* trec_conflations[] = { "hl", NULL, NULL, "headline", "head", NULL, NULL, "headline", "ttl", NULL, NULL, "title", "dd", NULL, NULL, "date", 0, 0, 0, 0 };
 static const char* trec_index_tags[] = { "hl", "head", "headline", "title", "ttl", "dd", "date", 0 };
@@ -119,6 +121,20 @@ static file_class_environment_spec environments[] = {
     trec_include_tags,    // includeTags
     NULL,                 // excludeTags
     trec_index_tags,      // indexTags
+    trec_metadata_tags,   // metadataTags
+    trec_conflations      // conflations
+  },
+  {
+    "trecalt",           // name
+    "xml",                // parser
+    "word",               // tokenizer
+    "tagged",             // iterator
+    "<DOC>",              // startDocTag
+    "</DOC>\n",             // endDocTag
+    NULL,                 // endMetadataTag
+    trecalt_include_tags,    // includeTags
+    NULL,                 // excludeTags
+    trecalt_index_tags,      // indexTags
     trec_metadata_tags,   // metadataTags
     trec_conflations      // conflations
   },
