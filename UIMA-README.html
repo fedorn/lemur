@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<TITLE>
+UIMA Indri Components
+</TITLE>
+</HEAD>
+<BODY>
+<H1>UIMA Indri Components</H1>
+
+Pear files for Windows XP and linux (x68 Fedora core 3) are available from 
+the <a href="http://uima.lti.cs.cmu.edu/">UIMA component repository</a>.
+The shared library and indri Java wrappers were built with the indri-2.4
+distribution, available from <a href="http://www.lemurproject.org">The Lemur Project</a>.
+ 
+
+<H2>IndriCasConsumer</H2>
+
+<p>
+This component accepts an IndexBuildSpecification, enabling its 
+use as a drop in replacement for the Semantic Search CAS Indexer.
+This component accepts Indri repository construction 
+parameters, enabling direct processing of the raw document text with
+Indri's built in tokenization and stemming algorithms.
+
+<p> 
+This CAS Consumer takes 5 parameters: 
+<ul>
+  <li><code>index</code> - path to directory for repository</li>
+  <li><code>stemmer</code> - optional stemmer to use. One of krovetz, porter</li>
+  <li><code>stopwords</code> - optional file containing a list of stopwords</li>
+  <li><code>memory</code> - optional memory bound for indexing</li>
+  <li><code>buildspec</code> - IndexBuildSpecification url.
+</ul> 
+
+<p>
+An example CPE that uses the uima_examples project is included.
+The descriptor for the CPE is in desc/TestConsumer.xml. The 
+IndexBuildSpecification is in desc/buildspec.xml, and the 
+IndriCasConsumer descriptor is in desc/IndriCasConsumerDescriptor.xml.
+Each indexBuildItem in the IndexBuildSpecification that is either a Breaking
+or Annotation style type will be indexed as a field
+by IndriCasConsumer. Field names are derived by stripping the package name, eg
+com.ibm.uima.tutorial.RoomNumber is indexed as roomnumber. In the example
+IndexBuildSpecification roomnumber, personname, and sentence annotations are
+indexed.
+
+
+<H2>IndriSearch</H2>
+
+<p>
+To support querying an Indri repository within the UIMA framework,
+we have developed an SIAPI compliant query processor,
+suitable for use as a drop in replacement in Semantic Search 
+applications. This component supports the Indri structured query 
+language. The component includes an SIAPI implementation 
+factory, SearchService, Searchable, Query, and Result interface 
+implementations. The IndriSearch application is a modification of
+the UIMA example SemanticSearch application that uses the 
+Indri Searchable. The GUI version could be modified in a similar fashion.
+Future work will add an Annotator for query results.
+
+<H2>Required Resources</H2>
+
+The PEAR files come prepackaged with indri_jni.dll (Windows) libindri_jni.so (Linux)
+in the bin folder. This folder must be on the CLASSPATH. The PEAR files come
+prepackaged with indri.jar in the lib folder. This jar must also be on the
+CLASSPATH.
+	<p>
+	For more information, visit the Lemur Project website at <a href="http://www.lemurproject.org/">http://www.lemurproject.org</a>.
+	</p>
+	<hr />
+	<font size="-1"><a href="http://www.lemurproject.org"><img src="http://www.lemurproject.org/logo/lemur_l_32.gif" border="0" align="left" alt="The Lemur Project" /></a></font>
+	<address><font size="-1">&copy; 2007 - <a href="http://www.lemurproject.org/">&nbsp;The Lemur Project</a></font></address>
+
+
+</BODY>
+</HTML>
