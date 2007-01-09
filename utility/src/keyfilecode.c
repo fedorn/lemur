@@ -4055,7 +4055,8 @@ int create_key(struct fcb *f, char id[], int fcb_lc)
 
 int keyrec_lc(level0_pntr *p)
 {
-  if ( p->segment >= max_segment ) return(-1);
+  if ( p->segment==max_segment && p->sc==0 ) return(p->lc);
+  else if ( p->segment>=max_segment ) return(-1);
   else return(p->lc);
 }
 
