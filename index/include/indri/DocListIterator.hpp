@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -34,17 +34,17 @@ namespace indri {
       struct TopDocument {
         struct less {
           bool operator() ( const TopDocument& one, const TopDocument& two ) const {
-            // trying to avoid fdiv here: would do oneFrac < twoFrac, but that's slower
             double oneFrac = double(one.count) / double(one.length);
-            return (oneFrac * two.length) < two.count;
+            double twoFrac = double(two.count) / double(two.length);
+            return (oneFrac < twoFrac);
           }
         };
 
         struct greater {
           bool operator() ( const TopDocument& one, const TopDocument& two ) const {
-            // trying to avoid fdiv here: would do oneFrac > twoFrac, but that's slower
             double oneFrac = double(one.count) / double(one.length);
-            return (oneFrac * two.length) > two.count;
+            double twoFrac = double(two.count) / double(two.length);
+            return (oneFrac > twoFrac);
           }
         };
 
