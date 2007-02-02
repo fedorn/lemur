@@ -75,7 +75,7 @@ void lemur::distrib::DistSearchMethod::doSingleRetr() {
   DocScoreVector* dscore = new DocScoreVector();
   res->Sort();
   if (returnCount<res->size()){
-    res->assign(res->begin(), res->begin()+returnCount);
+    res->resize(returnCount);
   }
   // convert results from internal to external docids
   indexToID(single, res, dscore);

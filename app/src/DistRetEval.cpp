@@ -218,8 +218,7 @@ int AppMain(int argc, char *argv[]) {
 
     // we want to search only so many databases
    if(rankings.size()>LocalParameter::cutoff)
-     rankings.assign(rankings.begin(), 
-                     rankings.begin()+LocalParameter::cutoff);
+     rankings.resize(LocalParameter::cutoff);
     // set return document counts for each individual databases
     search.setReturnCount(RetrievalParameter::resultCount);
     // search those databases and put the scores into scoreset
