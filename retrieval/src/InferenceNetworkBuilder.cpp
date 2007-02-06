@@ -85,11 +85,12 @@ indri::query::TermScoreFunction* indri::infnet::InferenceNetworkBuilder::_buildT
   return indri::query::TermScoreFunctionFactory::get( smoothing, collectionFrequency );
 }
 
-indri::infnet::InferenceNetworkBuilder::InferenceNetworkBuilder( indri::collection::Repository& repository, indri::lang::ListCache& cache, int resultsRequested ) :
+indri::infnet::InferenceNetworkBuilder::InferenceNetworkBuilder( indri::collection::Repository& repository, indri::lang::ListCache& cache, int resultsRequested, int maxWildcardTerms ) :
   _repository(repository),
   _cache(cache),
   _network( new indri::infnet::InferenceNetwork( repository ) ),
-  _resultsRequested( resultsRequested )
+  _resultsRequested( resultsRequested ),
+  _maxWildcardTerms( maxWildcardTerms )
 {
 }
 
@@ -1210,16 +1211,16 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::WildcardTerm* w
             indri::index::TermData* termData = entry->termData;
 
             if (strstr(termData->term, normalizedTerm.c_str())==termData->term) {
-              if (wildcardChildren.size()==thisIndex->maxWildcardTermCount()) {
+              if (wildcardChildren.size()==_maxWildcardTerms) {
 
                 // be sure to delete the vocabulary iterator when we're done!
                 delete vIter; 
+                //replace with stringstream.
+                std::stringstream  maxTermExString;
+                maxTermExString <<  "Error in parsing wildcard terms. Too many terms matched " << normalizedTerm << "*. Limit is " << _maxWildcardTerms << "." ;
+                LEMUR_THROW( LEMUR_PARSE_ERROR, maxTermExString.str());
 
-                char maxTermExString[256];
-                sprintf(maxTermExString, "Error in parsing wildcard terms. Too many terms matched %s*. Limit is %d.", normalizedTerm.c_str(), thisIndex->maxWildcardTermCount());
-                LEMUR_THROW( LEMUR_PARSE_ERROR, maxTermExString);
-
-              } // end if (wildcardChildren.size()==index.maxWildcardTermCount())
+              } // end if (wildcardChildren.size()==_maxWildcardTerms)
 
               // OK - we have the term... create what amounts to an indexterm...
               // and add it...

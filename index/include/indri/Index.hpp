@@ -35,12 +35,7 @@
 namespace indri {
   namespace index {
 
-    const int DEFAULT_MAX_WILDCARD_TERMS = 100;
-
     class Index {
-    protected:
-      int _maxWildcardTerms;
-
     public:
       /// Field data
       struct FieldDescription {
@@ -52,10 +47,6 @@ namespace indri {
         bool ordinal;
       };
 
-      Index() {
-        _maxWildcardTerms=DEFAULT_MAX_WILDCARD_TERMS;
-      }
-      
       virtual ~Index() {};
 
       //
@@ -110,15 +101,7 @@ namespace indri {
       // Locks
       virtual indri::thread::Lockable* iteratorLock() = 0;
       virtual indri::thread::Lockable* statisticsLock() = 0;
-
-      // properties
                         
-      /// \brief gets the parameterized maximum number of wildcard terms
-      /// before an exception is thrown (default = 100)
-      /// @return max. number of terms
-      virtual int maxWildcardTermCount() { return _maxWildcardTerms; }
-
-      virtual void setMaxWildcardTermCount(int numTerms) { _maxWildcardTerms=numTerms; }
     };
   }
 }

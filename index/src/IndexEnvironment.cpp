@@ -131,8 +131,7 @@ indri::api::IndexEnvironment::IndexEnvironment() :
   _callback(0),
   _options(0),
   _documentsIndexed(0),
-  _documentsSeen(0),
-  _maxWildcardTerms(indri::index::DEFAULT_MAX_WILDCARD_TERMS)
+  _documentsSeen(0)
 {
 }
 

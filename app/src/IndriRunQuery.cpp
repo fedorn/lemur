@@ -458,6 +458,9 @@ public:
       }
     }
 
+    if( _parameters.exists("maxWildcardTerms") )
+        _environment.setMaxWildcardTerms(_parameters.get("maxWildcardTerms", 100));
+
     _requested = _parameters.get( "count", 1000 );
     _initialRequested = _parameters.get( "fbDocs", _requested );
     _runID = _parameters.get( "runID", "indri" );

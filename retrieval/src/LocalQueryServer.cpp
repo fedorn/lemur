@@ -136,7 +136,7 @@ namespace indri
 //
 
 indri::server::LocalQueryServer::LocalQueryServer( indri::collection::Repository& repository ) :
-  _repository(repository), _maxWildcardMatchesPerTerm(indri::index::DEFAULT_MAX_WILDCARD_TERMS)
+  _repository(repository), _maxWildcardMatchesPerTerm(indri::infnet::InferenceNetworkBuilder::DEFAULT_MAX_WILDCARD_TERMS)
 {
   // if supplied and false, turn off optimization for all queries.
   _optimizeParameter = indri::api::Parameters::instance().get( "optimize", 1 );
@@ -390,7 +390,7 @@ indri::server::QueryServerResponse* indri::server::LocalQueryServer::runQuery( s
   */
 
   // build an inference network
-  indri::infnet::InferenceNetworkBuilder builder( _repository, _cache, resultsRequested );
+  indri::infnet::InferenceNetworkBuilder builder( _repository, _cache, resultsRequested, _maxWildcardMatchesPerTerm );
   indri::lang::ApplyWalker<indri::infnet::InferenceNetworkBuilder> buildWalker( networkRoots, &builder );
 
   indri::infnet::InferenceNetwork* network = builder.getNetwork();

@@ -37,7 +37,8 @@ namespace indri
       indri::collection::Repository& _repository;
       indri::lang::ListCache& _cache;
       int _resultsRequested;
-  
+      int _maxWildcardTerms;
+
       template<typename _To, typename _From>
       std::vector<_To*> _translate( const std::vector<_From*>& children ) {
         std::vector<_To*> translation;
@@ -60,7 +61,9 @@ namespace indri
       void _after( indri::lang::ExtentParent* extentInside );
 
     public:
-      InferenceNetworkBuilder( indri::collection::Repository& repository, indri::lang::ListCache& cache, int resultsRequested );
+      static const int DEFAULT_MAX_WILDCARD_TERMS = 100;
+
+      InferenceNetworkBuilder( indri::collection::Repository& repository, indri::lang::ListCache& cache, int resultsRequested, int maxWildcardTerms=DEFAULT_MAX_WILDCARD_TERMS );
       ~InferenceNetworkBuilder();
 
       InferenceNetwork* getNetwork();

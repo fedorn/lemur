@@ -103,7 +103,6 @@ namespace indri
       ParsedDocument* _applyAnnotators( std::vector<indri::parse::Transformation*>& annotators, 
                                         ParsedDocument* parsed ); 
 
-      int _maxWildcardTerms;
 
     public:
       friend class QueryEnvironment;
@@ -266,8 +265,6 @@ namespace indri
       /// skipped.
       int documentsSeen();
 
-      void setMaxWildcardTerms(int maxTerms) { _maxWildcardTerms=maxTerms; }
-      int  getMaxWildcardTerms(int maxTerms) { return _maxWildcardTerms; }
     };
   }
 }
