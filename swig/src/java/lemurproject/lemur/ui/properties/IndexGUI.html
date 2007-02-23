@@ -81,14 +81,6 @@ run time performance for smaller indexes. Stores position information
 for each term. Suitable for use with all retrieval methods. The default
 index type.</dd>
 
-<dt><b>InvFPIndex</b></dt><dd>Flatfile based data files. Requires time and space
-linear in the size of the vocabulary to initially open the
-index. Stores position information for each term. </dd>
-
-<dt><b>InvIndex</b></dt><dd>Flatfile based data files. Requires time and space
-linear in the size of the vocabulary to initially open the
-index. Does not store position information for each term. </dd>
-
 <dt><b>IndriIndex</b></dt><dd>B-tree based data files. Designed for very
 large collections. This GUI uses Lemur parsing (instead of Indri's own custom parsing)
 to build the collection. An Indri document manager is automatically created for every
@@ -106,10 +98,6 @@ retrieve the actual document text (default on).
 access to the document manager with bounded memory usage with a small
 penalty in run time performance for smaller indexes. This is the default
 document manager type.</dd>
-
-<dt><b>Flatfile</b></dt><dd>Flatfile based data files. Requires time and
-space linear in the size of the collection to initially open the
-document manager.</dd>
 
 <dt><b>Element</b></dt><dd>Keyfile document manager that additionally
 stores element information, such as title. Elements can handle nested
