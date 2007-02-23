@@ -128,8 +128,8 @@ public class LemurRet extends JPanel {
         guiSettings.openwin = false;
         guiSettings.highlight = true;
         guiSettings.showmarkup = true;
-        guiSettings.appendfile = false;        // default retrieval method
-        guiSettings.retmethod = INDRI;
+        guiSettings.appendfile = false;        // default retrieval method
+        guiSettings.retmethod = KLDIV;
         guiSettings.numresults = 10;
         // InQuery ret parms
         guiSettings.belief = 0.4;
@@ -312,9 +312,9 @@ public class LemurRet extends JPanel {
         JLabel retl = new JLabel("Search using retrieval method:");
         bottom.add(retl);
         retriBox = new JComboBox();
-        retriBox.addItem(INDRI);        retriBox.addItem(INQUERY);
+        retriBox.addItem(INDRI);        retriBox.addItem(INQUERY);
         retriBox.addItem(OKAPI);
-        retriBox.addItem(KLDIV);        retriBox.addItemListener( new ItemListener() {
+        retriBox.addItem(KLDIV);        retriBox.addItemListener( new ItemListener() {
                 public void itemStateChanged(ItemEvent evt) {
                     ((CardLayout)paramsPane.getLayout()).show(paramsPane, (String)evt.getItem());
                 }
@@ -325,7 +325,7 @@ public class LemurRet extends JPanel {
 
         paramsPane = new JPanel();
         paramsPane.setLayout(new CardLayout());
-        paramsPane.add(createIndriPanel(), INDRI);        paramsPane.add(createInqPanel(),INQUERY);
+        paramsPane.add(createIndriPanel(), INDRI);        paramsPane.add(createInqPanel(),INQUERY);
         paramsPane.add(createKLPanel(),KLDIV);
         paramsPane.add(createOkapiPanel(), OKAPI);
         bottom.add(paramsPane);
@@ -368,40 +368,40 @@ public class LemurRet extends JPanel {
 
     private JPanel createInqPanel() {
         JPanel inq = new JPanel();
-        inq.setPreferredSize(new Dimension(250,75));                inq.setLayout(new GridBagLayout());                GridBagConstraints gbc=new GridBagConstraints();                gbc.anchor=GridBagConstraints.NORTHWEST;        gbc.fill=GridBagConstraints.HORIZONTAL;        gbc.gridx=0;        gbc.gridy=0;        inq.add(new JLabel("Default document belief: "), gbc);        gbc.gridx=1;        beliefF = new JTextField(String.valueOf(guiSettings.belief),3);        beliefF.setHorizontalAlignment(JTextField.RIGHT);        inq.add(beliefF, gbc);
+        inq.setPreferredSize(new Dimension(250,75));                inq.setLayout(new GridBagLayout());                GridBagConstraints gbc=new GridBagConstraints();                gbc.anchor=GridBagConstraints.NORTHWEST;        gbc.fill=GridBagConstraints.HORIZONTAL;        gbc.gridx=0;        gbc.gridy=0;        inq.add(new JLabel("Default document belief: "), gbc);        gbc.gridx=1;        beliefF = new JTextField(String.valueOf(guiSettings.belief),3);        beliefF.setHorizontalAlignment(JTextField.RIGHT);        inq.add(beliefF, gbc);
 
-        gbc.gridx=0;        gbc.gridy=1;        inq.add(new JLabel("Rocchio feedback coefficient: "), gbc);        gbc.gridx=1;        fbcoefF = new JTextField(String.valueOf(guiSettings.fbcoef),3);        fbcoefF.setHorizontalAlignment(JTextField.RIGHT);        inq.add(fbcoefF, gbc);
+        gbc.gridx=0;        gbc.gridy=1;        inq.add(new JLabel("Rocchio feedback coefficient: "), gbc);        gbc.gridx=1;        fbcoefF = new JTextField(String.valueOf(guiSettings.fbcoef),3);        fbcoefF.setHorizontalAlignment(JTextField.RIGHT);        inq.add(fbcoefF, gbc);
 
-        gbc.gridx=0;        gbc.gridy=2;        inq.add(new JLabel("Number of feedback terms:"), gbc);        gbc.gridx=1;        fbtermsF = new JTextField(String.valueOf(guiSettings.fbterms),3);        fbtermsF.setHorizontalAlignment(JTextField.RIGHT);        inq.add(fbtermsF, gbc);
-        return inq;    }
+        gbc.gridx=0;        gbc.gridy=2;        inq.add(new JLabel("Number of feedback terms:"), gbc);        gbc.gridx=1;        fbtermsF = new JTextField(String.valueOf(guiSettings.fbterms),3);        fbtermsF.setHorizontalAlignment(JTextField.RIGHT);        inq.add(fbtermsF, gbc);
+        return inq;    }
 
     private JPanel createKLPanel() {
         JPanel kl = new JPanel();
         kl.setPreferredSize(new Dimension(250,75));
         kl.setLayout(new FlowLayout(FlowLayout.LEFT));
-        JLabel lbl = new JLabel("KL using default parameters:");        kl.add(lbl);
-        lbl = new JLabel(" Dirichlet Prior smoothing method (1000)");        kl.add(lbl);
-        lbl = new JLabel(" Interpolate smoothing strategy");        kl.add(lbl);
-        return kl;    }
+        JLabel lbl = new JLabel("KL using default parameters:");        kl.add(lbl);
+        lbl = new JLabel(" Dirichlet Prior smoothing method (1000)");        kl.add(lbl);
+        lbl = new JLabel(" Interpolate smoothing strategy");        kl.add(lbl);
+        return kl;    }
     private JPanel createIndriPanel() {
         JPanel indr = new JPanel();
-        indr.setPreferredSize(new Dimension(250,75));        indr.setLayout(new FlowLayout(FlowLayout.LEFT));
-        JLabel lbl = new JLabel("No additional parameters.");        indr.add(lbl);
-        lbl = new JLabel(" For more info, see Lemur website");        indr.add(lbl);
-        lbl = new JLabel(" http://www.lemurproject.org");        indr.add(lbl);
-        return indr;    }
+        indr.setPreferredSize(new Dimension(250,75));        indr.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JLabel lbl = new JLabel("No additional parameters.");        indr.add(lbl);
+        lbl = new JLabel(" For more info, see Lemur website");        indr.add(lbl);
+        lbl = new JLabel(" http://www.lemurproject.org");        indr.add(lbl);
+        return indr;    }
     private JPanel createOkapiPanel() {
         JPanel okapi = new JPanel();
         okapi.setPreferredSize(new Dimension(250,125));
-        okapi.setLayout(new GridBagLayout());                GridBagConstraints gbc=new GridBagConstraints();                gbc.anchor=GridBagConstraints.NORTHWEST;        gbc.fill=GridBagConstraints.HORIZONTAL;        gbc.gridx=0;        gbc.gridy=0;        okapi.add(new JLabel("Value for BM25 K1 : "), gbc);
+        okapi.setLayout(new GridBagLayout());                GridBagConstraints gbc=new GridBagConstraints();                gbc.anchor=GridBagConstraints.NORTHWEST;        gbc.fill=GridBagConstraints.HORIZONTAL;        gbc.gridx=0;        gbc.gridy=0;        okapi.add(new JLabel("Value for BM25 K1 : "), gbc);
         gbc.gridx=1;
-        bm25k1F = new JTextField(String.valueOf(guiSettings.bm25k1),3);        bm25k1F.setHorizontalAlignment(JTextField.RIGHT);        okapi.add(bm25k1F, gbc);
-        gbc.gridx=0;        gbc.gridy=1;        okapi.add(new JLabel("Value for BM25 B : "), gbc);        gbc.gridx=1;        bm25bF = new JTextField(String.valueOf(guiSettings.bm25b),3);        bm25bF.setHorizontalAlignment(JTextField.RIGHT);        okapi.add(bm25bF, gbc);
-        gbc.gridx=0;        gbc.gridy=2;        okapi.add(new JLabel("Value for BM25 K3 : "), gbc);        gbc.gridx=1;        bm25k3F = new JTextField(String.valueOf(guiSettings.bm25k3),3);        bm25k3F.setHorizontalAlignment(JTextField.RIGHT);        okapi.add(bm25k3F, gbc);
+        bm25k1F = new JTextField(String.valueOf(guiSettings.bm25k1),3);        bm25k1F.setHorizontalAlignment(JTextField.RIGHT);        okapi.add(bm25k1F, gbc);
+        gbc.gridx=0;        gbc.gridy=1;        okapi.add(new JLabel("Value for BM25 B : "), gbc);        gbc.gridx=1;        bm25bF = new JTextField(String.valueOf(guiSettings.bm25b),3);        bm25bF.setHorizontalAlignment(JTextField.RIGHT);        okapi.add(bm25bF, gbc);
+        gbc.gridx=0;        gbc.gridy=2;        okapi.add(new JLabel("Value for BM25 K3 : "), gbc);        gbc.gridx=1;        bm25k3F = new JTextField(String.valueOf(guiSettings.bm25k3),3);        bm25k3F.setHorizontalAlignment(JTextField.RIGHT);        okapi.add(bm25k3F, gbc);
 
-        gbc.gridx=0;        gbc.gridy=3;        okapi.add(new JLabel("Expanded query term TF weight: "), gbc);        gbc.gridx=1;        bm25qtfF = new JTextField(String.valueOf(guiSettings.bm25qtf),3);        bm25qtfF.setHorizontalAlignment(JTextField.RIGHT);        okapi.add(bm25qtfF, gbc);
+        gbc.gridx=0;        gbc.gridy=3;        okapi.add(new JLabel("Expanded query term TF weight: "), gbc);        gbc.gridx=1;        bm25qtfF = new JTextField(String.valueOf(guiSettings.bm25qtf),3);        bm25qtfF.setHorizontalAlignment(JTextField.RIGHT);        okapi.add(bm25qtfF, gbc);
 
-        gbc.gridx=0;        gbc.gridy=4;        okapi.add(new JLabel("Number of feedback terms: "), gbc);        gbc.gridx=1;        feedbackF = new JTextField(String.valueOf(guiSettings.feedback),3);        feedbackF.setHorizontalAlignment(JTextField.RIGHT);        okapi.add(feedbackF, gbc);
+        gbc.gridx=0;        gbc.gridy=4;        okapi.add(new JLabel("Number of feedback terms: "), gbc);        gbc.gridx=1;        feedbackF = new JTextField(String.valueOf(guiSettings.feedback),3);        feedbackF.setHorizontalAlignment(JTextField.RIGHT);        okapi.add(feedbackF, gbc);
         return okapi;
     }
 
