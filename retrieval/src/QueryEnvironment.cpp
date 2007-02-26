@@ -585,7 +585,7 @@ std::vector<indri::api::ParsedDocument*> indri::api::QueryEnvironment::documents
   indri::server::QueryServerDocumentsResponse* response = 0;
 
   // we have to ask the same query to all nodes, because we don't really know which nodes will have answers.
-  indri::utility::greedy_vector<indri::server::QueryServerDocumentsResponse*> responses;
+  std::vector<indri::server::QueryServerDocumentsResponse*> responses;
 
   // send out requests for processing
   for( unsigned int i=0; i<_servers.size(); i++ ) {
@@ -602,10 +602,8 @@ std::vector<indri::api::ParsedDocument*> indri::api::QueryEnvironment::documents
     std::copy( responseResults.begin(),
                responseResults.end(),
                std::back_inserter( results ) );
-
-    delete response;
   }
-
+  indri::utility::delete_vector_contents<indri::server::QueryServerDocumentsResponse*>( responses );
   return results;
 }
 
@@ -617,7 +615,7 @@ std::vector<DOCID_T> indri::api::QueryEnvironment::documentIDsFromMetadata( cons
   indri::server::QueryServerDocumentIDsResponse* response = 0;
 
   // we have to ask the same query to all nodes, because we don't really know which nodes will have answers.
-  indri::utility::greedy_vector<indri::server::QueryServerDocumentIDsResponse*> responses;
+  std::vector<indri::server::QueryServerDocumentIDsResponse*> responses;
 
   // send out requests for processing
   for( unsigned int i=0; i<_servers.size(); i++ ) {
@@ -635,10 +633,8 @@ std::vector<DOCID_T> indri::api::QueryEnvironment::documentIDsFromMetadata( cons
       DOCID_T converted = (responseResults[j] * _servers.size()) + i;
       results.push_back( converted );
     }
-
-    delete response;
   }
-
+  indri::utility::delete_vector_contents<indri::server::QueryServerDocumentIDsResponse*>( responses );
   return results;
 }
 
