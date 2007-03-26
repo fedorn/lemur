@@ -44,19 +44,20 @@ void indri::net::NetworkServerStub::_decodeMetadataRequest( const class indri::x
 
 void indri::net::NetworkServerStub::_sendDocumentsResponse( indri::server::QueryServerDocumentsResponse* docResponse ) {
   std::vector<indri::api::ParsedDocument*> documents = docResponse->getResults();
-  delete docResponse;
 
   // send them back
-  indri::xml::XMLNode* response = new indri::xml::XMLNode( "documents" );
+ std::auto_ptr<indri::xml::XMLNode> response( new indri::xml::XMLNode( "documents" ) );
   for( unsigned int i=0; i<documents.size(); i++ ) {
     indri::xml::XMLNode* docNode = _encodeDocument( documents[i] );
     response->addChild( docNode );
     delete documents[i];
   }
 
-  _stream->reply( response );
+  _stream->reply( response.get() );
   _stream->replyDone();
-  delete response;
+
+  delete docResponse;
+  //  delete response;
 }
 
 void indri::net::NetworkServerStub::_sendNumericResponse( const char* responseName, UINT64 number ) {
@@ -142,10 +143,10 @@ void indri::net::NetworkServerStub::_handleQuery( indri::xml::XMLNode* request )
 
   indri::server::QueryServerResponse* response = _server->runQuery( nodes, resultsRequested, optimize );
   indri::infnet::InferenceNetwork::MAllResults results = response->getResults();
-  delete response;
 
   QueryResponsePacker packer( results );
   packer.write( _stream );
+  delete response;
 }
 
 void indri::net::NetworkServerStub::_handleDocuments( indri::xml::XMLNode* request ) {
@@ -395,7 +396,6 @@ void indri::net::NetworkServerStub::_handlePathNames( indri::xml::XMLNode* reque
   // get the paths
   indri::server::QueryServerMetadataResponse* pathNameResponse = _server->pathNames( documentIDs, begins, ends );
   std::vector<std::string> pathName = pathNameResponse->getResults();
-  delete pathNameResponse;
 
   // send them back
   indri::xml::XMLNode* response = new indri::xml::XMLNode( "path-names" );
@@ -407,6 +407,7 @@ void indri::net::NetworkServerStub::_handlePathNames( indri::xml::XMLNode* reque
 
   _stream->reply( response );
   _stream->replyDone();
+  delete pathNameResponse;
   delete response;
 }
 
