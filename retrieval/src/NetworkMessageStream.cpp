@@ -77,7 +77,7 @@ void indri::net::NetworkMessageStream::read( MessageStreamHandler& handler ) {
 
   while( endOfLine < 0 && bytesRead != 0 ) {
     _cleanBuffer();
-    int bytesRead = _stream->read( _buffer.front() + _writePosition, _buffer.size() - _writePosition );
+    bytesRead = _stream->read( _buffer.front() + _writePosition, _buffer.size() - _writePosition );
     
     if( bytesRead <= 0 ) {
       bytesRead = 0;
@@ -110,7 +110,7 @@ void indri::net::NetworkMessageStream::read( MessageStreamHandler& handler ) {
       _cleanBuffer();
       _buffer.grow( length );
           int toRead = length - _bufferLength();
-      int bytesRead = _stream->blockingRead( _buffer.front() + _writePosition, length - _bufferLength() );
+      bytesRead = _stream->blockingRead( _buffer.front() + _writePosition, length - _bufferLength() );
 
       if( bytesRead <= 0 ) {
         _stream->close();
@@ -136,7 +136,7 @@ void indri::net::NetworkMessageStream::read( MessageStreamHandler& handler ) {
       _cleanBuffer();
       _buffer.grow( length );
           int toRead = length - _bufferLength();
-      int bytesRead = _stream->blockingRead( _buffer.front() + _writePosition, length  - _bufferLength() );
+      bytesRead = _stream->blockingRead( _buffer.front() + _writePosition, length  - _bufferLength() );
       if( bytesRead <= 0 ) {
         _stream->close();
         return;
@@ -165,7 +165,7 @@ void indri::net::NetworkMessageStream::read( MessageStreamHandler& handler ) {
       _cleanBuffer();
       _buffer.grow( length );
         int toRead = length - _bufferLength();
-      int bytesRead = _stream->blockingRead( _buffer.front() + _writePosition, length - _bufferLength() );
+      bytesRead = _stream->blockingRead( _buffer.front() + _writePosition, length - _bufferLength() );
       if( bytesRead <= 0 ) {
         _stream->close();
         return;
