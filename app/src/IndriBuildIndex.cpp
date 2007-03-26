@@ -136,6 +136,9 @@ numeric data, otherwise the symbol <tt>false</tt>, specified as
 parameter file and as <tt>-field.numeric=true</tt> on the command
 line. This is an optional parameter, defaulting to false. Note that <tt>0</tt>
 can be used for false and <tt>1</tt> can be used for true. </dd>
+<dt>parserName</dt><dd>the name of the parser to use to convert a numeric
+field to an unsigned integer value. The default is NumericFieldAnnotator. If numeric field data is provided via offset annotations, you should use the value OffsetAnnotationAnnotator. If the field contains a formatted date (see <a href="DateFields.html">Date Fields</a>) you should use the value DateFieldAnnotator.
+</dd>
 </dl> 
 </dd>
 <dt>stemmer</dt>
@@ -421,6 +424,9 @@ numeric data, otherwise the symbol <tt>false</tt>, specified as
 parameter file and as <tt>-field.numeric=true</tt> on the command
 line. This is an optional parameter, defaulting to false. Note that <tt>0</tt>
 can be used for false and <tt>1</tt> can be used for true. </dd>
+<dt>parserName</dt><dd>the name of the parser to use to convert a numeric
+field to an unsigned integer value. The default is NumericFieldAnnotator. If numeric field data is provided via offset annotations, you should use the value OffsetAnnotationAnnotator. If the field contains a formatted date (see <a href="DateFields.html">Date Fields</a>) you should use the value DateFieldAnnotator.
+</dd>
 </dl> 
 </dd>
 <dt>stemmer</dt>

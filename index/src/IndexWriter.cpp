@@ -108,6 +108,7 @@ void IndexWriter::_writeManifest( const std::string& path ) {
     field[i].set("isNumeric", _fields[i].numeric);
     field[i].set("isOrdinal", _fields[i].ordinal);
     field[i].set("name", _fields[i].name);
+    if (_fields[i].numeric) field[i].set("parserName", _fields[i].parserName);
     field[i].set("total-documents", (UINT64) _fieldData[i].documentCount);
     field[i].set("total-terms", (UINT64) _fieldData[i].totalCount);
     field[i].set("byte-offset", (UINT64) _fieldData[i].byteOffset);

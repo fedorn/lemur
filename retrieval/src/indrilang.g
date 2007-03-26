@@ -800,7 +800,7 @@ dashDate returns [ UINT64 d ] {
     int secondDash = text.find('-', firstDash+1);
     std::string day = text.substr( 0, firstDash ); 
     std::string month = text.substr( firstDash+1, secondDash-firstDash-1 );
-    std::string year = text.substr( secondDash );
+    std::string year = text.substr( secondDash+1 );
 
     d = indri::parse::DateParse::convertDate( year, month, day ); 
   };

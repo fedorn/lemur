@@ -43,6 +43,8 @@ namespace indri {
         std::string name;
         /// does the field contain numeric data
         bool numeric;
+        /// parser for the numeric field data
+        std::string parserName;
         /// does the field have an ordinal
         bool ordinal;
       };

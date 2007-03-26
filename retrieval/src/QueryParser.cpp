@@ -1,4 +1,4 @@
-/* $ANTLR 2.7.6 (20061023): "indrilang.g" -> "QueryParser.cpp"$ */
+/* $ANTLR 2.7.3 (20060307-1): "indrilang.g" -> "QueryParser.cpp"$ */
 #include "indri/QueryParser.hpp"
 #include <antlr/NoViableAltException.hpp>
 #include <antlr/SemanticException.hpp>
@@ -2536,7 +2536,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 		int secondDash = text.find('-', firstDash+1);
 		std::string day = text.substr( 0, firstDash ); 
 		std::string month = text.substr( firstDash+1, secondDash-firstDash-1 );
-		std::string year = text.substr( secondDash );
+		std::string year = text.substr( secondDash+1 );
 		
 		d = indri::parse::DateParse::convertDate( year, month, day ); 
 		

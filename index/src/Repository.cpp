@@ -23,10 +23,11 @@
 #include "indri/KrovetzStemmerTransformation.hpp"
 #include "indri/StopperTransformation.hpp"
 #include "indri/NumericFieldAnnotator.hpp"
+#include "indri/DateFieldAnnotator.hpp"
+#include "indri/URLTextAnnotator.hpp"
 #include "indri/Parameters.hpp"
 #include "indri/StemmerFactory.hpp"
 #include "indri/NormalizationTransformation.hpp"
-#include "indri/URLTextAnnotator.hpp"
 #include "indri/UTF8CaseNormalizationTransformation.hpp"
 #include "Exception.hpp"
 #include "indri/Thread.hpp"
@@ -98,7 +99,8 @@ std::vector<indri::index::Index::FieldDescription> indri::collection::Repository
     fdesc.name = _fields[i].name;
     fdesc.numeric = _fields[i].numeric;
     fdesc.ordinal = _fields[i].ordinal;
-
+    if (fdesc.numeric) fdesc.parserName = _fields[i].parserName;
+    
     result.push_back(fdesc);
   }
 
@@ -146,6 +148,9 @@ void indri::collection::Repository::_buildChain( indri::api::Parameters& paramet
   for( size_t i=0; i<_fields.size(); i++ ) {
     if( _fields[i].parserName == "NumericFieldAnnotator" ) {
       _transformations.push_back( new indri::parse::NumericFieldAnnotator( _fields[i].name ) );
+    }
+    else if( _fields[i].parserName == "DateFieldAnnotator" ) {
+      _transformations.push_back( new indri::parse::DateFieldAnnotator( _fields[i].name ) );
     }
   }
 

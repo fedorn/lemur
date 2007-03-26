@@ -3,7 +3,7 @@
 
 ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
-/* $ANTLR 2.7.6 (20061023): "indrilang.g" -> "QueryLexerTokenTypes.hpp"$ */
+/* $ANTLR 2.7.3 (20060307-1): "indrilang.g" -> "QueryLexerTokenTypes.hpp"$ */
 
 #ifndef CUSTOM_API
 # define CUSTOM_API
