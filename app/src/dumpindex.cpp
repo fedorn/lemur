@@ -22,17 +22,29 @@
 #include "indri/QueryEnvironment.hpp"
 #include <iostream>
 
+void print_expression_count( const std::string& indexName, const std::string& expression ) {
+  indri::api::QueryEnvironment env;
+
+  // compute the expression list using the QueryEnvironment API
+  env.addIndex( indexName );
+  double result = env.expressionCount( expression );
+  env.close();
+
+  std::cout << expression << ":" << result << std::endl;
+}
+
 void print_expression_list( const std::string& indexName, const std::string& expression ) {
   indri::api::QueryEnvironment env;
 
   // compute the expression list using the QueryEnvironment API
   env.addIndex( indexName );
   std::vector<indri::api::ScoredExtentResult> result = env.expressionList( expression );
+
+
+  std::cout << expression << " " << env.termCount() << " " 
+            << env.documentCount() << std::endl;
+
   env.close();
-
-  std::cout << expression << " " << expression 
-            << env.termCount() << " " << env.documentCount() << std::endl;
-
   // now, print the results in the format:
   // documentID weight begin end
   for( int i=0; i<result.size(); i++ ) {
@@ -422,6 +434,7 @@ void usage() {
   std::cout << "    termpositions (tp)   Term text      Print inverted list for a term, with positions" << std::endl;
   std::cout << "    fieldpositions (fp)  Field name     Print inverted list for a field, with positions" << std::endl;
   std::cout << "    expressionlist (e)   Expression     Print inverted list for an Indri expression, with positions" << std::endl;
+  std::cout << "    count (c)            Expression     Print count of occurrences of an Indri expression" << std::endl;
   std::cout << "    documentid (di)      Field, Value   Print the document IDs of documents having a metadata field matching this value" << std::endl;
   std::cout << "    documentname (dn)    Document ID    Print the text representation of a document ID" << std::endl;
   std::cout << "    documenttext (dt)    Document ID    Print the text of a document" << std::endl;
@@ -460,6 +473,10 @@ int main( int argc, char** argv ) {
       REQUIRE_ARGS(4);
       std::string expression = argv[3];
       print_expression_list( repName, expression );
+    } else if( command == "c" || command == "count" ) {
+      REQUIRE_ARGS(4);
+      std::string expression = argv[3];
+      print_expression_count( repName, expression );
     } else if( command == "dn" || command == "documentname" ) {
       REQUIRE_ARGS(4);
       print_document_name( r, argv[3] );
