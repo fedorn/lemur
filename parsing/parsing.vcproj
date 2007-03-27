@@ -309,6 +309,9 @@
 				RelativePath=".\include\indri\ConflationPattern.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\DateFieldAnnotator.hpp">
+			</File>
+			<File
 				RelativePath=".\include\DocMgrManager.hpp">
 			</File>
 			<File
@@ -474,10 +477,10 @@
 				RelativePath=".\include\TrecParser.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\URLTextAnnotator.hpp">
+				RelativePath=".\include\indri\UnparsedDocument.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\UnparsedDocument.hpp">
+				RelativePath=".\include\indri\URLTextAnnotator.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\UTF8CaseNormalizationTransformation.hpp">
