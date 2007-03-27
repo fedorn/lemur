@@ -761,14 +761,19 @@ void IndexWriter::_writeInvertedLists( std::vector<WriterIndexContext*>& context
 //
 
 int IndexWriter::_lookupTermID( indri::file::BulkTreeReader& keyfile, const char* term ) {
-  char compressedData[16*1024];
-  char uncompressedData[16*1024];
+  int dataSize = ::disktermdata_size(_fields.size());
+  char * compressedData = new char [dataSize];
+  char * uncompressedData = new char [dataSize];
+
   int actual;
 
-  bool result = keyfile.get( term, compressedData, actual, sizeof compressedData );
+  bool result = keyfile.get( term, compressedData, actual, dataSize );
   
-  if( !result )
+  if( !result ) {
+    delete[](compressedData);
+    delete[](uncompressedData);
     return -1;
+  }
 
   indri::utility::RVLDecompressStream stream( compressedData, actual );
   DiskTermData* diskTermData = ::disktermdata_decompress( stream,
@@ -776,7 +781,11 @@ int IndexWriter::_lookupTermID( indri::file::BulkTreeReader& keyfile, const char
                                                           _fields.size(),
                                                           DiskTermData::WithOffsets | DiskTermData::WithTermID );
 
-  return diskTermData->termID;
+  int termid = diskTermData->termID;
+  delete[](compressedData);
+  delete[](uncompressedData);
+
+  return termid;
 }
 
 //

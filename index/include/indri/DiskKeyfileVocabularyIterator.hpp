@@ -32,7 +32,6 @@ namespace indri {
       int _baseID;
       indri::file::BulkTreeReader& _bulkTree;
       indri::file::BulkTreeIterator* _bulkIterator;
-      char _data[16*1024];
       int _fieldCount;
 
       char _termString[1024];

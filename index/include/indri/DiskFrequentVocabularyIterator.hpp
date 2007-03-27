@@ -36,7 +36,7 @@ namespace indri {
       bool _finished;
 
       DiskTermData* _data;
-      char _dataBuffer[16*1024];
+      char *_dataBuffer;
 
       // this tells us if the last nextEntry() came from 
       // a start iteration or not - needed for nextEntry(const char*)
@@ -45,7 +45,7 @@ namespace indri {
 
     public:
       DiskFrequentVocabularyIterator( indri::file::File& frequentTermsData, int fieldCount ); 
-      ~DiskFrequentVocabularyIterator() {};
+      ~DiskFrequentVocabularyIterator() { delete[] _dataBuffer; };
       
       void startIteration();
       bool finished();

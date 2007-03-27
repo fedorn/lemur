@@ -27,6 +27,8 @@ indri::index::DiskFrequentVocabularyIterator::DiskFrequentVocabularyIterator( in
   _fieldCount(fieldCount),
   _stream(0, 0)
 {
+  int dataSize = ::disktermdata_size(_fieldCount);
+  _dataBuffer = new char [dataSize];
 }
 
 //

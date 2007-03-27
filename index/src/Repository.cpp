@@ -43,7 +43,6 @@
 #include <string>
 #include <algorithm>
 
-#define MERGE_FILE_LIMIT 512
 const static int defaultMemory = 100*1024*1024;
 
 //
@@ -857,11 +856,11 @@ UINT64 indri::collection::Repository::_mergeMemory( const std::vector<indri::ind
 // 
 
 unsigned int indri::collection::Repository::_mergeFiles( const std::vector<indri::index::Index*>& indexes ) {
-  // collection 5 + metadata files
+  // collection 3 + metadata forward/backward files
   // repository 2
-  // index/n/ 10 + num fields
-  // so call it (20 + num fields) * (number of indexes.+ 1)
-  unsigned int totalFiles = (20 +  _indexFields.size()) * (indexes.size() + 1);
+  // index/n/ 11
+  // so call it 24 * (number of indexes.+ 1)
+  unsigned int totalFiles = (20 * (indexes.size() + 1));
   return totalFiles;
 }
 

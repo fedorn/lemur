@@ -133,8 +133,8 @@ UINT64 indri::collection::RepositoryMaintenanceThread::work() {
 
         // if the number of open index files is pushing the open file limit,
         // also schedule a merge.
-        unsigned int openFiles = state->size() * _repository.tags().size();
-        bool should_merge = openFiles > 512; // tighten this.
+        unsigned int openFiles = _repository._mergeFiles(*state);
+        bool should_merge = openFiles > MERGE_FILE_LIMIT;
 
         if( should_merge || maintenance_should_merge( state, documentLoad, queryLoad, lastThrashing ) ) {
           _requests.push( MERGE );
