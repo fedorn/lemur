@@ -126,22 +126,28 @@ void indri::index::DiskIndex::close() {
 //
 
 indri::index::DiskTermData* indri::index::DiskIndex::_fetchTermData( int termID ) {
-  char buffer[16*1024];
+  int dataSize = ::disktermdata_size(_fieldData.size());
+  char *buffer = new char [dataSize];
   int actual;
   bool result;
 
   if( termID <= _infrequentTermBase ) {
-    result = _frequentIdToTerm.get( termID, buffer, actual, sizeof buffer );
+    result = _frequentIdToTerm.get( termID, buffer, actual, dataSize );
   } else {
-    result = _infrequentIdToTerm.get( termID - _infrequentTermBase, buffer, actual, sizeof buffer );
+    result = _infrequentIdToTerm.get( termID - _infrequentTermBase, buffer, actual, dataSize );
   }
 
-  if( !result )
+  if( !result ) {
+    delete[](buffer);
     return 0;
+  }
+  
   assert( result );
 
   indri::utility::RVLDecompressStream stream( buffer, actual );
-  return disktermdata_decompress( stream, _fieldData.size(), DiskTermData::WithString | DiskTermData::WithOffsets );
+  indri::index::DiskTermData* dt = disktermdata_decompress( stream, _fieldData.size(), DiskTermData::WithString | DiskTermData::WithOffsets );
+  delete[](buffer);
+  return dt;
 }
 
 //
@@ -149,17 +155,20 @@ indri::index::DiskTermData* indri::index::DiskIndex::_fetchTermData( int termID 
 //
 
 indri::index::DiskTermData* indri::index::DiskIndex::_fetchTermData( const char* term ) {
-  char buffer[16*1024];
+  int dataSize = ::disktermdata_size(_fieldData.size());
+  char *buffer = new char [dataSize];
   int actual;
   int adjust = 0;
 
-  bool result = _frequentStringToTerm.get( term, buffer, actual, sizeof buffer );
+  bool result = _frequentStringToTerm.get( term, buffer, actual, dataSize );
 
   if( !result ) {
-    result = _infrequentStringToTerm.get( term, buffer, actual, sizeof buffer );
+    result = _infrequentStringToTerm.get( term, buffer, actual, dataSize );
 
-    if( !result )
+    if( !result ) {
+      delete[](buffer);
       return 0;
+    }
 
     adjust = _infrequentTermBase;
   }
@@ -170,6 +179,7 @@ indri::index::DiskTermData* indri::index::DiskIndex::_fetchTermData( const char*
                                                                       _fieldData.size(),
                                                                       DiskTermData::WithTermID | DiskTermData::WithOffsets );
   diskTermData->termID += adjust;
+  delete[](buffer);
   return diskTermData;
 }
 
