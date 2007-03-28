@@ -4,6 +4,7 @@ include ../../../MakeDefns
 # library name for a module 
 # "MODULE" defined in the Makefile of a subdirectory
 OBJLIB = lib$(MODULE).a
+INCPATH = -I../include $(patsubst %, -I../../../%/include, $(MODULES))
 CFLAGS += $(INCPATH)
 CXXFLAGS += $(INCPATH)
 
