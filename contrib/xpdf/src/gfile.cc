@@ -26,6 +26,10 @@
 #  if defined(VMS) && (__DECCXX_VER < 50200000)
 #    include <unixlib.h>
 #  endif
+#ifdef HAVE_CONFIG_H
+#include "confdefs.h"
+#endif
+
 #  if HAVE_MKSTEMPS
       extern "C" {
         int mkstemps (char *, int);

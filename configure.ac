@@ -6,7 +6,7 @@ AC_CONFIG_SRCDIR(app/src/RetEval.cpp)
 AC_CONFIG_FILES([MakeDefns Makefile Makefile.app])
 AC_CONFIG_FILES([site-search/build.param site-search/crawl-index site-search/seeds.txt site-search/excluded_hosts], [test -f site-search/crawl-index && chmod +x site-search/crawl-index])
 dnl To use a header file instead of command line -D defs, use
-dnl AC_CONFIG_HEADERS(config.h)
+AC_CONFIG_HEADERS(utility/include/confdefs.h)
 
 dnl canonical host
 AC_CANONICAL_HOST
@@ -21,7 +21,7 @@ AC_CHECK_PROGS(AR, ar gar)
 dnl Checks for libraries.
 AC_CHECK_LIB(m, log)
 AC_CHECK_LIB(pthread, pthread_create)
-AC_SUBST(SHARED)
+
 case $host in
    *-*-solaris*) 
      AC_CHECK_LIB(nsl, gethostbyname)
@@ -45,8 +45,6 @@ case $host in
      ;;
    *-*-darwin*)
      SHARED=
-#SWIG_SHARED = -bundle -bundle_loader /var/tmp/indri-2.2/tmp/php-4.4.2/sapi/cli/php
-# have to fix this for php/java bits.
      PHP_SHARED="-bundle  -undefined suppress -flat_namespace"
      PHP_SO=".so"
      JAVA_SHARED="-dynamiclib -framework JavaVM"
@@ -124,15 +122,17 @@ dnl ########################################################################
 		     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <bits/atomicity.h>]], [[_Atomic_word val; __gnu_cxx::__atomic_add(&val, 1)]])],[P_NEEDS_GNU_CXX_NAMESPACE=1],[])
 		     if test ${P_NEEDS_GNU_CXX_NAMESPACE} = 1 ; then
 			AC_MSG_RESULT(yes)
+		   AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 1, [define if __atomic_add is in __gnu_cxx namespace])
 		     else
 			AC_MSG_RESULT(no)
+		   AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 0, [define if __atomic_add is in __gnu_cxx namespace])
 		     fi
 		   else
 		     AC_MSG_RESULT(no)
+		   AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 0, [define if __atomic_add is in __gnu_cxx namespace])
 		   fi
 		   AC_LANG_POP
-		   AC_DEFINE_UNQUOTED(P_HAS_ATOMIC_INT, ${P_HAS_ATOMIC_INT})
-		   AC_DEFINE_UNQUOTED(P_NEEDS_GNU_CXX_NAMESPACE, ${P_NEEDS_GNU_CXX_NAMESPACE})
+
 
 
 dnl check for optional components.
@@ -271,6 +271,7 @@ AC_SUBST(SWIG)
 AC_SUBST(WITH_CSHARP)
 AC_SUBST(MCS)
 AC_SUBST(WITH_SWIG)
+AC_SUBST(SHARED)
 AC_SUBST(PHP_SHARED)
 AC_SUBST(JAVA_SHARED)
 AC_SUBST(CSHARP_SHARED)
@@ -284,7 +285,7 @@ AC_SUBST(MODULES)
 AC_SUBST(WITH_SUMMARIZATION)
 AC_SUBST(WITH_DISTRIB)
 AC_SUBST(WITH_CLUSTER)
-AC_SUBST(HOST_OS)
+dnl AC_SUBST(HOST_OS)
 
 dnl Base lemur modules
 MODULES="retrieval langmod index parsing utility contrib/antlr contrib/xpdf"
@@ -294,10 +295,10 @@ AC_ARG_ENABLE(distrib,
 if test "$enable_distrib" = "yes" ; then
   MODULES="distrib $MODULES"
   WITH_DISTRIB=1
-  AC_DEFINE(WITH_DISTRIB, 1, [Enable distributed retrieval package])
+dnl  AC_DEFINE(WITH_DISTRIB, 1, [Enable distributed retrieval package])
 else
   WITH_DISTRIB=0
-  AC_DEFINE(WITH_DISTRIB, 0, [Enable distributed retrieval package])
+dnl   AC_DEFINE(WITH_DISTRIB, 0, [Enable distributed retrieval package])
 fi
 
 AC_ARG_ENABLE(summarization,
@@ -306,10 +307,10 @@ AC_ARG_ENABLE(summarization,
 if test "$enable_summarization" = "yes" ; then
   MODULES="summarization $MODULES"
   WITH_SUMMARIZATION=1
-  AC_DEFINE(WITH_SUMMARIZATION, 1, [Enable summarization package])
+dnl   AC_DEFINE(WITH_SUMMARIZATION, 1, [Enable summarization package])
 else
   WITH_SUMMARIZATION=0
-  AC_DEFINE(WITH_SUMMARIZATION, 0, [Enable summarization package])
+dnl  AC_DEFINE(WITH_SUMMARIZATION, 0, [Enable summarization package])
 fi
 
 AC_ARG_ENABLE(assert,
@@ -325,10 +326,10 @@ AC_ARG_ENABLE(cluster,
 if test "$enable_cluster" = "yes" ; then
   MODULES="cluster $MODULES"
   WITH_CLUSTER=1
-  AC_DEFINE(WITH_CLUSTER, 1, [Enable cluster package])
+dnl  AC_DEFINE(WITH_CLUSTER, 1, [Enable cluster package])
 else
   WITH_CLUSTER=0
-  AC_DEFINE(WITH_CLUSTER, 0, [Enable cluster package])
+dnl  AC_DEFINE(WITH_CLUSTER, 0, [Enable cluster package])
 fi
 
 dnl site search parameters

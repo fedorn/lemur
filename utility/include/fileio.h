@@ -48,6 +48,9 @@ size_t file_write( void* buffer, size_t size,
 #define fwrite file_write
 #define FILE F_HANDLE
 #else
+#ifdef HAVE_CONFIG_H
+#include "confdefs.h"
+#endif
 #include <sys/types.h>
 typedef off_t FILE_OFFSET;
 #endif
