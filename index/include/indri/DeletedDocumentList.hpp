@@ -27,6 +27,8 @@
 #include "indri/ReaderLockable.hpp"
 #include "indri/WriterLockable.hpp"
 #include "indri/Buffer.hpp"
+#include "IndexTypes.hpp"
+
 namespace indri
 {
   namespace index
@@ -38,9 +40,11 @@ namespace indri
       indri::thread::ReadersWritersLock _lock;
       indri::thread::ReaderLockable _readLock;
       indri::thread::WriterLockable _writeLock;
+      UINT64 _deletedCount;
 
       indri::utility::Buffer _bitmap;
       void _grow( int documentID );
+      void _calculateDeletedCount();
 
     public:
       class read_transaction {
@@ -53,13 +57,15 @@ namespace indri
         ~read_transaction();
 
         int nextCandidateDocument( int documentID );
-        bool isDeleted( int documentID );
+        bool isDeleted( int documentID ) const;
       };
 
       DeletedDocumentList();
 
+      void append( DeletedDocumentList& other, lemur::api::DOCID_T documentCount );
       void markDeleted( int documentID );
       bool isDeleted( int documentID );
+      UINT64 deletedCount() const;
       read_transaction* getReadTransaction();
 
       void read( const std::string& filename );

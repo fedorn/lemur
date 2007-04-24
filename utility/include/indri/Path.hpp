@@ -33,6 +33,7 @@ namespace indri
       static bool isDirectory( const std::string& path );
       static bool exists( const std::string& path );
       static void remove( const std::string& path );
+      static void rename( const std::string& oldPath, const std::string& newPath );
       static void make( const std::string& path );
 
       static std::string trim( const std::string& path );

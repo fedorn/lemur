@@ -72,7 +72,7 @@ namespace indri {
       void close();
 
       const std::string& path();
-      int documentBase();
+      lemur::api::DOCID_T documentBase();
 
       int field( const char* fieldName );
       int field( const std::string& fieldName );
@@ -85,6 +85,7 @@ namespace indri {
       int documentLength( int documentID );
       UINT64 documentCount();
       UINT64 documentCount( const std::string& term );
+      lemur::api::DOCID_T documentMaximum();
       UINT64 uniqueTermCount();
 
       UINT64 termCount( const std::string& term );

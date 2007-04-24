@@ -495,3 +495,18 @@ int indri::api::IndexEnvironment::documentsSeen() {
   return _documentsSeen;
 }
 
+//
+// compact
+//
+
+void indri::api::IndexEnvironment::compact() {
+  _repository.compact();
+}
+
+//
+// merge
+//
+
+void indri::api::IndexEnvironment::merge( const std::string& outputIndex, const std::vector<std::string>& inputIndexes ) {
+  indri::collection::Repository::merge( outputIndex, inputIndexes );
+}

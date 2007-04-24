@@ -26,11 +26,13 @@
 #include "Keyfile.hpp"
 #include "indri/Buffer.hpp"
 #include "indri/SequentialWriteBuffer.hpp"
+#include "indri/SequentialReadBuffer.hpp"
 #include "indri/HashTable.hpp"
 #include "indri/File.hpp"
 #include "indri/Mutex.hpp"
-// hack around to avoid including zlib.h and
-// get the struct type into the right namespace.
+#include "IndexTypes.hpp"
+#include "indri/DeletedDocumentList.hpp"
+
 typedef struct z_stream_s* z_stream_p;
 
 namespace indri
@@ -42,12 +44,13 @@ namespace indri
     private:
       indri::thread::Mutex _lock;
 
+      std::string _basePath;
       lemur::file::Keyfile _lookup;
       indri::file::File _storage;
       indri::file::SequentialWriteBuffer* _output;
       indri::utility::Buffer _positionsBuffer;
-      //  struct z_stream_s* _stream;
       z_stream_p _stream;
+
       indri::utility::HashTable<const char*, lemur::file::Keyfile*> _reverseLookups;
       indri::utility::HashTable<const char*, lemur::file::Keyfile*> _forwardLookups;
       String_set* _strings;
@@ -59,6 +62,35 @@ namespace indri
       void _writeContentLength( indri::api::ParsedDocument* document, int& keyLength, int& valueLength );
 
       void _readPositions( indri::api::ParsedDocument* document, const void* positionData, int positionDataLength );
+
+      void _removeForwardLookups( indri::index::DeletedDocumentList& deletedList, lemur::file::Keyfile& keyfile );
+      void _removeReverseLookups( indri::index::DeletedDocumentList& deletedList, lemur::file::Keyfile& keyfile );
+
+      void _copyForwardLookup( const std::string& name,
+                               lemur::file::Keyfile& other,
+                               indri::index::DeletedDocumentList& deletedList,
+                               lemur::api::DOCID_T documentOffset );
+
+      void _copyReverseLookup( const std::string& name,
+                               lemur::file::Keyfile& other,
+                               indri::index::DeletedDocumentList& deletedList,
+                               lemur::api::DOCID_T documentOffset );
+
+
+      void _copyStorageEntry( indri::file::SequentialReadBuffer* input,
+                              indri::file::SequentialWriteBuffer* output, 
+                              int key,
+                              UINT64 position,
+                              UINT64 length, 
+                              lemur::file::Keyfile& lookup );
+      void _copyStorageData( indri::file::SequentialReadBuffer* input,
+                             indri::file::SequentialWriteBuffer* output,
+                             indri::index::DeletedDocumentList& deletedList,
+                             lemur::api::DOCID_T documentOffset,
+                             lemur::file::Keyfile& sourceLookup,
+                             lemur::file::Keyfile& destLookup,
+                             UINT64 storageLength );
+      void _copyForwardLookup( const std::string& name, lemur::file::Keyfile& other, lemur::api::DOCID_T documentOffset );
 
     public:
       CompressedCollection();
@@ -78,6 +110,11 @@ namespace indri
       std::vector<int> retrieveIDByMetadatum( const std::string& attributeName, const std::string& value );
 
       void addDocument( int documentID, indri::api::ParsedDocument* document );
+      void compact( indri::index::DeletedDocumentList& deletedList );
+      void append( indri::collection::CompressedCollection& other, indri::index::DeletedDocumentList& deletedList, lemur::api::DOCID_T documentOffset );
+
+      std::vector<std::string> forwardFields();
+      std::vector<std::string> reverseFields();
     };
   }
 }

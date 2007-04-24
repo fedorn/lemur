@@ -44,7 +44,8 @@ indri::index::MemoryIndex::MemoryIndex() :
   _writeLock(_lock),
   _stringToTerm( ONE_MEGABYTE, &_allocator )
 {
-  _baseDocumentID = 0;
+  _corpusStatistics.baseDocument = 0;
+  _corpusStatistics.maximumDocument = 0;
   _termListsBaseOffset = 0;
 }
 
@@ -53,7 +54,8 @@ indri::index::MemoryIndex::MemoryIndex( int docBase ) :
   _writeLock(_lock),
   _stringToTerm( ONE_MEGABYTE, &_allocator )
 {
-  _baseDocumentID = docBase;
+  _corpusStatistics.baseDocument = docBase;
+  _corpusStatistics.maximumDocument = docBase;
   _termListsBaseOffset = 0;
 }
 
@@ -62,7 +64,8 @@ indri::index::MemoryIndex::MemoryIndex( int docBase, const std::vector<Index::Fi
   _writeLock(_lock),
   _stringToTerm( ONE_MEGABYTE, &_allocator )
 {
-  _baseDocumentID = docBase;
+  _corpusStatistics.baseDocument = docBase;
+  _corpusStatistics.maximumDocument = docBase;
   _termListsBaseOffset = 0;
   _fieldData.reserve( fields.size() );
 
@@ -110,7 +113,7 @@ void indri::index::MemoryIndex::close() {
 //
 
 int indri::index::MemoryIndex::documentBase() {
-  return _baseDocumentID;
+  return _corpusStatistics.baseDocument;
 }
 
 //
@@ -118,13 +121,15 @@ int indri::index::MemoryIndex::documentBase() {
 //
 
 int indri::index::MemoryIndex::documentLength( int documentID ) {
-  if( _baseDocumentID > documentID || (documentID - _baseDocumentID) > _documentData.size() )
+  lemur::api::DOCID_T base = _corpusStatistics.baseDocument;
+
+  if( base > documentID || (documentID - base) > _documentData.size() )
     return 0;
 
-  assert( documentID - _baseDocumentID >= 0 );
-  assert( (documentID - _baseDocumentID) < _documentData.size() );
+  assert( documentID - base >= 0 );
+  assert( (documentID - base) < _documentData.size() );
 
-  return _documentData[ documentID - _baseDocumentID ].totalLength;
+  return _documentData[ documentID - base ].totalLength;
 }
 
 //
@@ -203,6 +208,14 @@ UINT64 indri::index::MemoryIndex::documentCount( const std::string& term ) {
     return 0;
 
   return (*entry)->termData->corpus.documentCount;
+}
+
+//
+// documentMaximum
+//
+
+lemur::api::DOCID_T indri::index::MemoryIndex::documentMaximum() {
+  return _corpusStatistics.maximumDocument;
 }
 
 //
@@ -529,8 +542,9 @@ int indri::index::MemoryIndex::addDocument( indri::api::ParsedDocument& document
   term_entry* entries = 0;
 
   // assign a document ID
-  int documentID = _baseDocumentID + _corpusStatistics.totalDocuments;
+  lemur::api::DOCID_T documentID = _corpusStatistics.maximumDocument;
   _corpusStatistics.totalDocuments++;
+  _corpusStatistics.maximumDocument++;
   
   _termList.clear();
 

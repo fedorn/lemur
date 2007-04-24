@@ -155,10 +155,16 @@ void indri::index::DiskDocListIterator::startIteration() {
   // read in the topdocs information
   _readTopdocs();
 
-  // read in the first entry
+  // read in skip data
   _readSkip();
+  
+  // read the first entry, unless there's nothing here
+  if( _list == _listEnd ) {
+    _result = 0;
+  } else {
   _readEntry();
   _result = &_data;
+  }
 }
 
 //

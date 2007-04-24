@@ -38,8 +38,9 @@ void indri::index::DiskIndex::_readManifest( const std::string& path ) {
   _corpusStatistics.totalDocuments = (int) corpus["total-documents"];
   _corpusStatistics.totalTerms = (INT64) corpus["total-terms"];
   _corpusStatistics.uniqueTerms = (int) corpus["unique-terms"];
+  _corpusStatistics.maximumDocument = (lemur::api::DOCID_T) corpus["maximum-document"];
+  _corpusStatistics.baseDocument = (lemur::api::DOCID_T) corpus["document-base"];
   _infrequentTermBase = (int) corpus["frequent-terms"];
-  _documentBase = (int) corpus["document-base"];
 
   if( manifest.exists("fields") ) {
     indri::api::Parameters fields = manifest["fields"];
@@ -196,7 +197,7 @@ const std::string& indri::index::DiskIndex::path() {
 //
 
 int indri::index::DiskIndex::documentBase() {
-  return _documentBase;
+  return _corpusStatistics.baseDocument;
 }
 
 //
@@ -243,7 +244,7 @@ std::string indri::index::DiskIndex::term( int termID ) {
 //
 
 int indri::index::DiskIndex::documentLength( int documentID ) {
-  int documentOffset = documentID - _documentBase;
+  int documentOffset = documentID - _corpusStatistics.baseDocument;
 
   if( documentOffset < 0 || _corpusStatistics.totalDocuments <= documentOffset ) 
     return 0;
@@ -279,6 +280,14 @@ UINT64 indri::index::DiskIndex::documentCount( const std::string& term ) {
   }
 
   return count;
+}
+
+//
+// documentMaximum
+//
+
+lemur::api::DOCID_T indri::index::DiskIndex::documentMaximum() {
+  return _corpusStatistics.maximumDocument;
 }
 
 //

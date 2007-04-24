@@ -265,6 +265,17 @@ namespace indri
       /// skipped.
       int documentsSeen();
 
+      /// Permanently deletes information for documents that have been
+      /// deleted from the index and reclaims used disk space.
+      void compact();
+
+      /// Merges the contents of the indexes referenced in the
+      /// inputIndexes list and creates a new index called outputIndex.
+      /// The final index is compacted (contains no information about deleted documents).
+      ///
+      /// @param outputIndex The pathname to the index to create (should not exist yet).
+      /// @param inputIndexes The pathnames to indexes to merge.  These indexes should not currently be open.
+      static void merge( const std::string& outputIndex, const std::vector<std::string>& inputIndexes );
     };
   }
 }

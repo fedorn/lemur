@@ -357,6 +357,7 @@ void indri::collection::CompressedCollection::create( const std::string& fileNam
   std::string lookupName = indri::file::Path::combine( fileName, "lookup" );
   std::string storageName = indri::file::Path::combine( fileName, "storage" );
 
+  _basePath = fileName;
   _storage.create( storageName );
   _lookup.create( lookupName );
   _output = new indri::file::SequentialWriteBuffer( _storage, 1024*1024 );
@@ -407,6 +408,7 @@ void indri::collection::CompressedCollection::open( const std::string& fileName 
   indri::api::Parameters manifest;
   manifest.loadFile( manifestName );
 
+  _basePath = fileName;
   _storage.open( storageName );
   _lookup.open( lookupName );
   _output = new indri::file::SequentialWriteBuffer( _storage, 1024*1024 );
@@ -461,6 +463,7 @@ void indri::collection::CompressedCollection::openRead( const std::string& fileN
   indri::api::Parameters manifest;
   manifest.loadFile( manifestName );
 
+  _basePath = fileName;
   _storage.openRead( storageName );
   _lookup.openRead( lookupName );
 
@@ -533,6 +536,37 @@ void indri::collection::CompressedCollection::close() {
 }
 
 //
+// keys_to_vector
+//
+
+static std::vector<std::string> keys_to_vector( indri::utility::HashTable<const char*, lemur::file::Keyfile*>& table ) {
+  std::vector<std::string> result;
+  indri::utility::HashTable<const char*, lemur::file::Keyfile*>::iterator iter;
+
+  for( iter = table.begin(); iter != table.end(); iter++ ) {
+    result.push_back( *(iter->first) );
+  }
+
+  return result;
+}
+
+//
+// forwardFields
+//
+
+std::vector<std::string> indri::collection::CompressedCollection::forwardFields() {
+  return keys_to_vector( _forwardLookups );
+}
+
+//
+// reverseFields
+//
+
+std::vector<std::string> indri::collection::CompressedCollection::reverseFields() {
+  return keys_to_vector( _reverseLookups );
+}
+
+//
 // File format is:
 //    key, value
 //    key, value
@@ -574,6 +608,9 @@ void indri::collection::CompressedCollection::addDocument( int documentID, indri
 
     // silently discard any value that is too long to be a key.
     if( metalookup && document->metadata[i].valueLength < lemur::file::Keyfile::MAX_KEY_LENGTH ) {
+      // the key needs to have at least some length
+      assert( document->metadata[i].valueLength > 0 );
+
       // there may be more than one reverse lookup here, so we fetch any old ones:
       indri::utility::greedy_vector<int> documentIDs;
       int dataSize = (*metalookup)->getSize( (const char*)document->metadata[i].value );
@@ -815,3 +852,453 @@ std::vector<indri::api::ParsedDocument*> indri::collection::CompressedCollection
   return documents;
 }
 
+
+
+
+//
+// _removeForwardLookups
+//
+// Remove all mentions of a deleted documents from a particular
+// forward lookup Keyfile.
+//
+
+void indri::collection::CompressedCollection::_removeForwardLookups( indri::index::DeletedDocumentList& deletedList, lemur::file::Keyfile& keyfile ) {
+	indri::index::DeletedDocumentList::read_transaction* transaction = deletedList.getReadTransaction();
+	int nextDeletedDocument = 0;
+	
+  int key;
+  int actual = 0;
+  indri::utility::Buffer value;
+  value.grow();
+  actual = value.size();
+
+  keyfile.setFirst();
+
+  while( keyfile.next( key, value.front(), actual ) ) {
+    if( deletedList.isDeleted( key ) ) {
+      keyfile.remove( key );
+    }
+    actual = value.size();
+  }
+
+  delete transaction;
+}
+
+//
+// keyfile_next
+//
+
+static bool keyfile_next( lemur::file::Keyfile& keyfile, char* key, int keyLength, indri::utility::Buffer& value ) {
+  bool result = false;
+  // clean the key buffer, ensuring it will be null-terminated
+  memset( key, 0, keyLength );
+  int actualValueSize = value.size();
+  value.clear();
+
+  try {
+    result = keyfile.next( key, keyLength, value.front(), actualValueSize );
+  } catch( lemur::api::Exception& ) {
+    int size = keyfile.getSize( key );
+    if( size >= 0 ) {
+      value.grow( size );
+      actualValueSize = value.size();
+      keyfile.get( key, value.front(), actualValueSize, value.size() );
+      result = true;
+    }
+  }
+
+  if( result )
+    value.write( actualValueSize );
+  return result;
+}
+
+//
+// keyfile_next
+//
+
+static bool keyfile_next( lemur::file::Keyfile& keyfile, int& key, indri::utility::Buffer& value ) {
+  bool result = false;
+  int actualValueSize = value.size();
+  value.clear();
+
+  try {
+    result = keyfile.next( key, value.front(), actualValueSize );
+  } catch( lemur::api::Exception& ) {
+    int size = keyfile.getSize( key );
+    if( size >= 0 ) {
+      value.grow( size );
+      actualValueSize = value.size();
+      keyfile.get( key, value.front(), actualValueSize, value.size() );
+      result = true;
+    }
+  }
+
+  if( result )
+    value.write( actualValueSize );
+  return result;
+}
+
+//
+// remove_deleted_entries
+//
+
+static void remove_deleted_entries( indri::utility::Buffer& value, indri::index::DeletedDocumentList& deletedList ) {
+  int idCount = value.position() / sizeof (lemur::api::DOCID_T);
+  int startIDCount = idCount;
+  for( int i = 0; i < idCount; ) {
+    lemur::api::DOCID_T* position = &((lemur::api::DOCID_T*) value.front())[i];
+    lemur::api::DOCID_T document = *position;
+
+    if( deletedList.isDeleted( document ) ) {
+      // remove this documentID by moving all remaining docIDs down
+      ::memmove( position,
+                 position + 1,
+                 sizeof (lemur::api::DOCID_T) * (idCount - i - 1) );
+      idCount--;
+    } else {
+      // move to the next documentID
+      i++;
+    }
+  }
+
+  if( startIDCount > idCount )
+    value.unwrite( (startIDCount - idCount) * sizeof (lemur::api::DOCID_T) );
+}
+
+//
+// keyfile_get
+//
+
+static bool keyfile_get( lemur::file::Keyfile& keyfile, int key, indri::utility::Buffer& value ) {
+  bool result = false;
+  int actualValueSize = value.size();
+  value.clear();
+
+  try {
+    result = keyfile.get( key, value.front(), actualValueSize, value.size() );
+  } catch( lemur::api::Exception& ) {
+    int size = keyfile.getSize( key );
+    if( size >= 0 ) {
+      value.grow( size );
+      actualValueSize = value.size();
+      keyfile.get( key, value.front(), actualValueSize, value.size() );
+      result = true;
+    }
+  }
+
+  if( result )
+    value.write( actualValueSize );
+  return result;
+}
+
+//
+// keyfile_get
+//
+
+
+static bool keyfile_get( lemur::file::Keyfile& keyfile, char* key, indri::utility::Buffer& value ) {
+  bool result = false;
+  int actualValueSize = value.size();
+  value.clear();
+
+  try {
+    result = keyfile.get( key, value.front(), actualValueSize, value.size() );
+  } catch( lemur::api::Exception& ) {
+    int size = keyfile.getSize( key );
+    if( size >= 0 ) {
+      value.grow( size );
+      actualValueSize = value.size();
+      keyfile.get( key, value.front(), actualValueSize, value.size() );
+      result = true;
+    }
+  }
+
+  if( result )
+    value.write( actualValueSize );
+  return result;
+}
+
+//
+// _removeReverseLookups
+//
+// Remove all mentions of a deleted documents from a particular
+// reverse lookup Keyfile.
+//
+
+void indri::collection::CompressedCollection::_removeReverseLookups( indri::index::DeletedDocumentList& deletedList, lemur::file::Keyfile& keyfile ) {
+	indri::index::DeletedDocumentList::read_transaction* transaction = deletedList.getReadTransaction();
+	int nextDeletedDocument = 0;
+  
+  char key[lemur::file::Keyfile::MAX_KEY_LENGTH+1];
+  indri::utility::Buffer value;
+  value.grow();
+  
+  keyfile.setFirst();
+
+  while( keyfile_next( keyfile, key, sizeof key, value ) ) {
+    int initialValueSize = value.position();
+
+    // now we've got the data, so start looking for deleted documents and removing them
+    remove_deleted_entries( value, deletedList );
+
+    // check to see if we deleted anything; if so, change the entry,
+    // using getSize to reset the iteration pointer
+    if( initialValueSize != value.position() ) {
+      if( value.position() == 0 ) {
+        keyfile.remove( key );
+      } else {
+        keyfile.put( key, value.front(), value.position() ); 
+      }
+      keyfile.getSize( key );
+    }
+  }
+	
+	delete transaction;
+}
+
+//
+// _copyStorageEntry
+//
+
+void indri::collection::CompressedCollection::_copyStorageEntry( indri::file::SequentialReadBuffer* input,
+                                                                 indri::file::SequentialWriteBuffer* output,
+                                                                 int key,
+                                                                 UINT64 position,
+                                                                 UINT64 length, 
+                                                                 lemur::file::Keyfile& lookup ) {
+  // store the location of the new file
+  UINT64 outputPosition = output->tell();
+  lookup.put( key, &outputPosition, sizeof outputPosition );
+
+  // copy the data
+  input->seek( position );
+  output->write( input->read( length ), length );
+}
+
+//
+// _copyStorageData
+//
+
+void indri::collection::CompressedCollection::_copyStorageData( indri::file::SequentialReadBuffer* input,
+                                                                indri::file::SequentialWriteBuffer* output,
+                                                                indri::index::DeletedDocumentList& deletedList,
+                                                                lemur::api::DOCID_T documentOffset,
+                                                                lemur::file::Keyfile& sourceLookup,
+                                                                lemur::file::Keyfile& destLookup,
+                                                                UINT64 storageLength ) {
+  lemur::api::DOCID_T key = 0;
+  lemur::api::DOCID_T lastKey = 0;
+  UINT64 location = 0;
+  UINT64 lastLocation = 0;
+  int locationLength = sizeof lastLocation;
+
+  sourceLookup.setFirst();
+
+  if( sourceLookup.next( lastKey, (char*) &lastLocation, locationLength ) ) {
+    locationLength = sizeof lastLocation;
+
+    while( sourceLookup.next( key, (char*) &location, locationLength ) ) {
+      // copy lastKey starting from lastLocation to location to the output file
+      // use tell on the output to load up the lookup.
+
+      if( !deletedList.isDeleted( lastKey ) ) {
+        _copyStorageEntry( input, output, lastKey + documentOffset, lastLocation, location - lastLocation, destLookup );
+      }
+
+      lastKey = key;
+      lastLocation = location;
+      locationLength = sizeof lastLocation;
+    }
+
+    // final key processing
+    if( !deletedList.isDeleted( lastKey ) ) {
+      _copyStorageEntry( input, output, lastKey + documentOffset, lastLocation, storageLength - lastLocation, destLookup );
+    }
+  }
+
+  output->flush();
+}
+
+
+//
+// compact
+//
+
+void indri::collection::CompressedCollection::compact( indri::index::DeletedDocumentList& deletedList ) {
+  if( !_output ) {
+    LEMUR_THROW( LEMUR_IO_ERROR, "Cannot compact collections that are open in read-only mode." );
+  }
+
+  indri::utility::HashTable<const char*, lemur::file::Keyfile*>::iterator iter;
+  indri::thread::ScopedLock l( _lock );
+
+  // remove the forward lookups for each document
+  for( iter = _forwardLookups.begin(); iter != _forwardLookups.end(); iter++ ) {
+    _removeForwardLookups( deletedList, *(*iter->second) );
+  }
+
+  // remove the reverse lookups for each document
+  for( iter = _reverseLookups.begin(); iter != _reverseLookups.end(); iter++ ) {
+    _removeReverseLookups( deletedList, *(*iter->second) );
+  }
+
+  // now, we generate a new Keyfile for lookups
+  lemur::file::Keyfile lookup;
+  std::string newLookupName = indri::file::Path::combine( _basePath, "lookup.new" );
+  std::string newStorageName = indri::file::Path::combine( _basePath, "storage.new" );
+
+  indri::file::File storage;
+  storage.create( newStorageName );
+
+  indri::file::SequentialWriteBuffer* output = new indri::file::SequentialWriteBuffer( storage, 1024*1024 );
+  indri::file::SequentialReadBuffer* input = new indri::file::SequentialReadBuffer( _storage, 1024*1024 );
+
+  // dump all data to disk
+  _output->flush();
+  UINT64 storageLength = _storage.size();
+
+  lookup.create( newLookupName );
+
+  // copy the only the documents that aren't deleted to the new lookup and storage files
+  _copyStorageData( input, output, deletedList, 0, _lookup, lookup, storageLength );
+
+  output->flush();
+  delete output;
+  delete input;
+  storage.close();
+  lookup.close();
+
+  // close the object
+  close();
+
+  // replace the files
+  std::string lookupName = indri::file::Path::combine( _basePath, "lookup" );
+  std::string storageName = indri::file::Path::combine( _basePath, "storage" );
+
+  indri::file::Path::rename( newLookupName, lookupName );
+  indri::file::Path::rename( newStorageName, storageName );
+
+  // open the object again
+  open( _basePath );
+}
+
+//
+// append
+//
+// Starts with another open compressed collection, a deleted document list,
+// and a base document number.  
+//
+
+void indri::collection::CompressedCollection::append( indri::collection::CompressedCollection& other, indri::index::DeletedDocumentList& deletedList, lemur::api::DOCID_T documentOffset ) {
+  if( !_output ) {
+    LEMUR_THROW( LEMUR_IO_ERROR, "Cannot append to collections that are open in read-only mode." );
+  }
+
+  indri::utility::HashTable<const char*, lemur::file::Keyfile*>::iterator iter;
+  indri::thread::ScopedLock l( _lock );
+  _output->flush();
+
+  // copy the forward lookups, modifying the document IDs as they are copied and deleting entries as necessary
+  for( iter = other._forwardLookups.begin(); iter != other._forwardLookups.end(); iter++ ) {
+    std::string lookupName = *iter->first;
+    lemur::file::Keyfile& lookup = *(*iter->second);
+
+    _copyForwardLookup( lookupName, lookup, deletedList, documentOffset );
+  }
+
+  // copy the reverse lookups, modifying the document IDs as they are copied and deleting entries as necessary
+  for( iter = other._reverseLookups.begin(); iter != other._reverseLookups.end(); iter++ ) {
+    std::string lookupName = *iter->first;
+    lemur::file::Keyfile& lookup = *(*iter->second);
+
+    _copyReverseLookup( lookupName, lookup, deletedList, documentOffset );
+  }
+
+  // iterate through the other collection's lookup file, just as in the compact method, but use the document offset
+  // in the new lookup.
+  UINT64 storageLength = other._storage.size();
+  indri::file::SequentialReadBuffer* input = new indri::file::SequentialReadBuffer( other._storage, 1024*1024 );
+
+  // copy the only the documents that aren't deleted to the new lookup and storage files
+  _copyStorageData( input, _output, deletedList, documentOffset, other._lookup, _lookup, storageLength );
+
+  delete input;
+  _output->flush();
+}
+
+//
+// _copyForwardLookup
+//
+
+void indri::collection::CompressedCollection::_copyForwardLookup( const std::string& name,
+                                                                  lemur::file::Keyfile& other,
+                                                                  indri::index::DeletedDocumentList& deletedList,
+                                                                  lemur::api::DOCID_T documentOffset ) {
+  // find forward lookup in local collection, if not found, throw an exception
+  lemur::file::Keyfile** found;
+  found = _forwardLookups.find( name.c_str() );
+
+  if( !found )
+    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Forward lookup '" + name + "' not found in this CompressedCollection." );
+
+	indri::index::DeletedDocumentList::read_transaction* transaction = deletedList.getReadTransaction();
+  lemur::file::Keyfile& local = **found;
+  
+  int key = 0;
+  indri::utility::Buffer value;
+  value.grow();
+
+  other.setFirst();
+
+  while( keyfile_next( other, key, value ) ) {
+    if( !transaction->isDeleted( key ) ) {
+      local.put( key + documentOffset, value.front(), value.position() );
+    }
+  }
+
+  delete transaction;
+}
+
+//
+// _copyReverseLookup
+//
+
+void indri::collection::CompressedCollection::_copyReverseLookup( const std::string& name,
+                                                                  lemur::file::Keyfile& other,
+                                                                  indri::index::DeletedDocumentList& deletedList,
+                                                                  lemur::api::DOCID_T documentOffset ) {
+  char key[lemur::file::Keyfile::MAX_KEY_LENGTH+1];
+  // find reverse lookup in local collection, if not found, throw an exception
+  lemur::file::Keyfile** found;
+  
+  found = _reverseLookups.find( name.c_str() );
+
+  if( !found )
+    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Forward lookup '" + name + "' not found in this CompressedCollection." );
+
+  indri::utility::Buffer value;
+  indri::utility::Buffer localValue;
+  value.grow(16);
+  localValue.grow(16);
+  lemur::file::Keyfile& local = **found;
+  other.setFirst();
+
+  while( keyfile_next( other, key, sizeof key, value ) ) {
+    int initialValueSize = value.position();
+
+    // now we've got the data, so start looking for deleted documents and removing them
+    remove_deleted_entries( value, deletedList );
+
+    // now, update each entry by adding the documentOffset
+    lemur::api::DOCID_T* entries = (lemur::api::DOCID_T*) value.front();
+
+    for( int i = 0; i < value.position() / sizeof (lemur::api::DOCID_T); i++ ) {
+      entries[i] += documentOffset;
+    }
+
+    // append the result to what we already have
+    keyfile_get( local, key, localValue );
+    memcpy( localValue.write( value.position() ), value.front(), value.position() );
+    local.put( key, localValue.front(), localValue.position() );
+  }
+}

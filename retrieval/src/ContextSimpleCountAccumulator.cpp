@@ -76,7 +76,7 @@ const indri::infnet::EvaluatorNode::MResults& indri::infnet::ContextSimpleCountA
 
 void indri::infnet::ContextSimpleCountAccumulator::indexChanged( indri::index::Index& index ) {
   _computeCounts( index );
-  _maximumDocument = index.documentCount() + index.documentBase();
+  _maximumDocument = index.documentMaximum();
 }
 
 void indri::infnet::ContextSimpleCountAccumulator::evaluate( int documentID, int documentLength ) {

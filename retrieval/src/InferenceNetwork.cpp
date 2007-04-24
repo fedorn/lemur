@@ -286,7 +286,7 @@ void indri::infnet::InferenceNetwork::_evaluateIndex( indri::index::Index& index
   indri::index::DeletedDocumentList::read_transaction* deleted = _repository.deletedList().getReadTransaction();
 
   int lastCandidate = MAX_INT32;
-  int collectionSize = index.documentBase() + index.documentCount();
+  int maximumDocument = index.documentMaximum();
   int scoredDocuments = 0;
   int candidate = 0;
 
@@ -303,7 +303,7 @@ void indri::infnet::InferenceNetwork::_evaluateIndex( indri::index::Index& index
       assert( candidate >= index.documentBase() );
 
       // if candidate is MAX_INT32, we're done
-      if( candidate == MAX_INT32 || candidate > collectionSize ) {
+      if( candidate == MAX_INT32 || candidate > maximumDocument ) {
         break;
       }
 
@@ -318,7 +318,7 @@ void indri::infnet::InferenceNetwork::_evaluateIndex( indri::index::Index& index
       scoredDocuments++;
 
       // if that was the last document, we can quit now
-      if( candidate+1 > collectionSize )
+      if( candidate+1 > maximumDocument )
         break;
 
       // move all candidate iterators to candidate+1

@@ -36,16 +36,13 @@ indri::infnet::FieldWildcardNode::~FieldWildcardNode() {
 void indri::infnet::FieldWildcardNode::prepare( int documentID ) {
   _extents.clear();
 
-
   if (documentID <= _index->documentCount()) {
-
     while (_docIterID < documentID) {
       _docIterID++;
       _docIter->nextEntry();
     }
 
     indri::index::TermList * termList = _docIter->currentEntry();
-    //    const indri::index::TermList * termList = _index->termList(documentID);
     indri::utility::greedy_vector<indri::index::FieldExtent> inExtents = termList->fields();
     indri::utility::greedy_vector<indri::index::FieldExtent>::iterator innerIter = inExtents.begin(); 
 
@@ -60,15 +57,13 @@ void indri::infnet::FieldWildcardNode::prepare( int documentID ) {
         _extents.push_back( innerExtent );
         lastBegin = innerExtent.begin;
         lastEnd = innerExtent.end;
-        //      std::cout << "wild " << documentID << " " << innerIter-> number << " " << innerIter->begin << " " << innerIter->end << "\n";
       }
       innerIter++;
     }
-    // delete termList;
-    
   }
+
   _nextDocument = documentID + 1;
-  if (_nextDocument > _index->documentCount()) {
+  if (_nextDocument > _index->documentMaximum()) {
     _nextDocument = MAX_INT32;
   }
 }

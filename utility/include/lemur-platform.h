@@ -55,7 +55,8 @@
   #define LEMUR_POSTALIGN   __attribute__ ((aligned))
 #else
   #define NOGDI
-  #define _WIN32_WINNT 0x0400
+  /* Requires Windows 2000 or later */
+  #define _WIN32_WINNT 0x0500
   #define WIN32_LEAN_AND_MEAN
   #include <windows.h>
   #include <winsock.h>

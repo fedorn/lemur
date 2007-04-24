@@ -426,15 +426,40 @@ void print_repository_stats( indri::collection::Repository& r ) {
   std::cout << std::endl;
 }
 
+void merge_repositories( const std::string& outputPath, int argc, char** argv ) {
+  std::vector<std::string> inputs;
+
+  for( int i=3; i<argc; i++ ) {
+    inputs.push_back( argv[i] );
+  }
+
+  indri::collection::Repository::merge( outputPath, inputs );
+}
+
+void compact_repository( const std::string& repositoryPath ) {
+  indri::collection::Repository r;
+  r.open( repositoryPath );
+  r.compact();
+  r.close();
+}
+
+void delete_document( const std::string& repositoryPath, const char* stringDocumentID ) {
+  lemur::api::DOCID_T documentID = (lemur::api::DOCID_T) string_to_i64( stringDocumentID );
+  indri::collection::Repository r;
+  r.open( repositoryPath );
+  r.deleteDocument( documentID );
+  r.close();
+}
+
 void usage() {
   std::cout << "dumpindex <repository> <command> [ <argument> ]*" << std::endl;
-  std::cout << "Valid commands are: " << std::endl;
+  std::cout << "These commands retrieve data from the repository: " << std::endl;
   std::cout << "    Command              Argument       Description" << std::endl;
   std::cout << "    term (t)             Term text      Print inverted list for a term" << std::endl;
   std::cout << "    termpositions (tp)   Term text      Print inverted list for a term, with positions" << std::endl;
   std::cout << "    fieldpositions (fp)  Field name     Print inverted list for a field, with positions" << std::endl;
   std::cout << "    expressionlist (e)   Expression     Print inverted list for an Indri expression, with positions" << std::endl;
-  std::cout << "    count (c)            Expression     Print count of occurrences of an Indri expression" << std::endl;
+  std::cout << "    xcount (x)           Expression     Print count of occurrences of an Indri expression" << std::endl;
   std::cout << "    documentid (di)      Field, Value   Print the document IDs of documents having a metadata field matching this value" << std::endl;
   std::cout << "    documentname (dn)    Document ID    Print the text representation of a document ID" << std::endl;
   std::cout << "    documenttext (dt)    Document ID    Print the text of a document" << std::endl;
@@ -443,6 +468,10 @@ void usage() {
   std::cout << "    invlist (il)         None           Print the contents of all inverted lists" << std::endl;
   std::cout << "    vocabulary (v)       None           Print the vocabulary of the index" << std::endl;
   std::cout << "    stats (s)                           Print statistics for the Repository" << std::endl;
+  std::cout << "These commands change the data inside the repository:" << std::endl;
+  std::cout << "    compact (c)          None           Compact the repository, releasing space used by deleted documents." << std::endl;
+  std::cout << "    delete (del)         Document ID    Delete the specified document from the repository." << std::endl;
+  std::cout << "    merge (m)            Input indexes  Merges a list of Indri repositories together into one repository." << std::endl;
 }
 
 #define REQUIRE_ARGS(n) { if( argc < n ) { usage(); return -1; } }
@@ -452,65 +481,77 @@ int main( int argc, char** argv ) {
     REQUIRE_ARGS(3);
 
     indri::collection::Repository r;
-    char* repName = argv[1];
-    r.openRead( repName );
-
+    std::string repName = argv[1];
     std::string command = argv[2];
 
-    if( command == "t" || command == "term" ) {
-      REQUIRE_ARGS(4);
-      std::string term = argv[3];
-      print_term_counts( r, term );
-    } else if( command == "tp" || command == "termpositions" ) { 
-      REQUIRE_ARGS(4);
-      std::string term = argv[3];
-      print_term_positions( r, term );
-    } else if( command == "fp" || command == "fieldpositions" ) { 
-      REQUIRE_ARGS(4);
-      std::string field = argv[3];
-      print_field_positions( r, field );
-    } else if( command == "e" || command == "expression" ) {
-      REQUIRE_ARGS(4);
-      std::string expression = argv[3];
-      print_expression_list( repName, expression );
-    } else if( command == "c" || command == "count" ) {
-      REQUIRE_ARGS(4);
-      std::string expression = argv[3];
-      print_expression_count( repName, expression );
-    } else if( command == "dn" || command == "documentname" ) {
-      REQUIRE_ARGS(4);
-      print_document_name( r, argv[3] );
-    } else if( command == "dt" || command == "documenttext" ) {
-      REQUIRE_ARGS(4);
-      print_document_text( r, argv[3] );
-    } else if( command == "dd" || command == "documentdata" ) {
-      REQUIRE_ARGS(4);
-      print_document_data( r, argv[3] );
-    } else if( command == "dv" || command == "documentvector" ) {
-      REQUIRE_ARGS(4);
-      print_document_vector( r, argv[3] );
-    } else if( command == "di" || command == "documentid" ) {
-      REQUIRE_ARGS(5);
-      print_document_id( r, argv[3], argv[4] );
-    } else if( command == "il" || command == "invlist" ) {
+    if( command == "c" || command == "compact" ) {
       REQUIRE_ARGS(3);
-      print_invfile( r );
-    } else if( command == "v" || command == "vocabulary" ) {
-      REQUIRE_ARGS(3);
-      print_vocabulary( r );
-    } else if( command == "vtl" || command == "validate" ) {
-      REQUIRE_ARGS(3);
-      validate(r);
-    } else if( command == "s" || command == "stats" ) {
-      REQUIRE_ARGS(3);
-      print_repository_stats( r );
+      compact_repository( repName );
+    } else if( command == "del" || command == "delete" ) {
+      REQUIRE_ARGS(4);
+      delete_document( repName, argv[3] );
+    } else if( command == "m" || command == "merge" ) {
+      REQUIRE_ARGS(4);
+      merge_repositories( repName, argc, argv );
     } else {
+      r.openRead( repName );
+
+      if( command == "t" || command == "term" ) {
+        REQUIRE_ARGS(4);
+        std::string term = argv[3];
+        print_term_counts( r, term );
+      } else if( command == "tp" || command == "termpositions" ) { 
+        REQUIRE_ARGS(4);
+        std::string term = argv[3];
+        print_term_positions( r, term );
+      } else if( command == "fp" || command == "fieldpositions" ) { 
+        REQUIRE_ARGS(4);
+        std::string field = argv[3];
+        print_field_positions( r, field );
+      } else if( command == "e" || command == "expression" ) {
+        REQUIRE_ARGS(4);
+        std::string expression = argv[3];
+        print_expression_list( repName, expression );
+      } else if( command == "x" || command == "xcount" ) {
+        REQUIRE_ARGS(4);
+        std::string expression = argv[3];
+        print_expression_count( repName, expression );
+      } else if( command == "dn" || command == "documentname" ) {
+        REQUIRE_ARGS(4);
+        print_document_name( r, argv[3] );
+      } else if( command == "dt" || command == "documenttext" ) {
+        REQUIRE_ARGS(4);
+        print_document_text( r, argv[3] );
+      } else if( command == "dd" || command == "documentdata" ) {
+        REQUIRE_ARGS(4);
+        print_document_data( r, argv[3] );
+      } else if( command == "dv" || command == "documentvector" ) {
+        REQUIRE_ARGS(4);
+        print_document_vector( r, argv[3] );
+      } else if( command == "di" || command == "documentid" ) {
+        REQUIRE_ARGS(5);
+        print_document_id( r, argv[3], argv[4] );
+      } else if( command == "il" || command == "invlist" ) {
+        REQUIRE_ARGS(3);
+        print_invfile( r );
+      } else if( command == "v" || command == "vocabulary" ) {
+        REQUIRE_ARGS(3);
+        print_vocabulary( r );
+      } else if( command == "vtl" || command == "validate" ) {
+        REQUIRE_ARGS(3);
+        validate(r);
+      } else if( command == "s" || command == "stats" ) {
+        REQUIRE_ARGS(3);
+        print_repository_stats( r );
+      } else {
+        r.close();
+        usage();
+        return -1;
+      }
+
       r.close();
-      usage();
-      return -1;
     }
 
-    r.close();
     return 0;
   } catch( lemur::api::Exception& e ) {
     LEMUR_ABORT(e);

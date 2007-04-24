@@ -50,8 +50,8 @@ namespace indri {
             return true;
 
           // terms match, so go by document
-          int oneDocument = oneData->iterator->currentEntry()->document;
-          int twoDocument = twoData->iterator->currentEntry()->document;
+          int oneDocument = oneData->iterator->currentEntry() ? oneData->iterator->currentEntry()->document : 0;
+          int twoDocument = twoData->iterator->currentEntry() ? twoData->iterator->currentEntry()->document : 0;
 
           return oneDocument > twoDocument;
         }

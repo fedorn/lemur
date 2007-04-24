@@ -41,9 +41,7 @@ void indri::infnet::DocumentStructureHolderNode::prepare( int documentID ) {
   }
 
 
-  if (documentID <= _index->documentCount()) {
-    
-
+  if (documentID <= _index->documentMaximum()) {
     while (_docIterID < documentID) {
       _docIterID++;
       _docIter->nextEntry();
@@ -52,7 +50,7 @@ void indri::infnet::DocumentStructureHolderNode::prepare( int documentID ) {
     _documentStructure->loadStructure( _docIter->currentEntry()->fields() );
   }
   _nextDocument = documentID + 1;
-  if (_nextDocument > _index->documentCount()) {
+  if (_nextDocument > _index->documentMaximum()) {
     _nextDocument = MAX_INT32;
   }
 }

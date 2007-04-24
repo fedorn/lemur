@@ -23,8 +23,7 @@
 #ifndef WIN32
 #include <pthread.h>
 #else
-#define _WIN32_WINNT 0x0400
-#include <windows.h>
+#include "lemur-platform.h"
 #endif
 
 #include "indri/Lockable.hpp"

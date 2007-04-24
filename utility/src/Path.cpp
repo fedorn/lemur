@@ -64,6 +64,34 @@ void indri::file::Path::create( const std::string& path ) {
   }
 }
 
+void indri::file::Path::rename( const std::string& oldName, const std::string& newName ) {
+#ifndef WIN32
+  int result = ::rename( oldName.c_str(), newName.c_str() );
+
+  if( result != 0 ) {
+    if( errno == EEXIST ) {
+      LEMUR_THROW( LEMUR_IO_ERROR, "The destination file already exists: " + oldName );
+    } else if( errno == EACCES || errno == EPERM ) {
+      LEMUR_THROW( LEMUR_IO_ERROR, "Insufficient permissions to rename: '" + oldName + "' to '" + newName + "'." );
+    } else {
+      LEMUR_THROW( LEMUR_IO_ERROR, "Unable to rename: '" + oldName + "' to '" + newName + "'." );
+    }
+  }
+#else
+  BOOL result;
+
+  if( Path::exists( newName ) ) {
+    result = ReplaceFile( newName.c_str(), oldName.c_str(), NULL, REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL );
+  } else {
+    result = MoveFile( oldName.c_str(), newName.c_str() );
+  }
+
+  if( !result ) {
+    LEMUR_THROW( LEMUR_IO_ERROR, "Unable to rename: '" + oldName + "' to '" + newName + "'." );
+  }
+#endif
+}
+
 void indri::file::Path::remove( const std::string& path ) {
   std::stack<indri::file::DirectoryIterator*> iterators;
   indri::utility::StackDeleter<indri::file::DirectoryIterator> sd( iterators );

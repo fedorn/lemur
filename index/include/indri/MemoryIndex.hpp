@@ -135,7 +135,8 @@ namespace indri {
 
       void close();
 
-      int documentBase();
+      lemur::api::DOCID_T documentBase();
+      lemur::api::DOCID_T documentMaximum();
       
       int term( const std::string& t );
       int term( const char* t );

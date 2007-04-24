@@ -31,6 +31,7 @@
 #include "indri/TermListFileIterator.hpp"
 #include "indri/DocumentDataIterator.hpp"
 #include "indri/Lockable.hpp"
+#include "IndexTypes.hpp"
 
 namespace indri {
   namespace index {
@@ -61,7 +62,9 @@ namespace indri {
       // Counts
       //
       
-      virtual int documentBase() = 0;
+      virtual lemur::api::DOCID_T documentBase() = 0;
+      /// The documentMaximum is at least one greater than the largest documentID used in this index.
+      virtual lemur::api::DOCID_T documentMaximum() = 0;
 
       virtual int term( const char* term ) = 0;
       virtual int term( const std::string& term ) = 0;
@@ -74,6 +77,7 @@ namespace indri {
       virtual int documentLength( int documentID ) = 0;
       virtual UINT64 documentCount() = 0;
       virtual UINT64 documentCount( const std::string& term ) = 0;
+
       virtual UINT64 uniqueTermCount() = 0;
 
       virtual UINT64 termCount( const std::string& term ) = 0;

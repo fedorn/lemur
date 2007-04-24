@@ -19,11 +19,16 @@
 #ifndef INDRI_CORPUSSTATISTICS_HPP
 #define INDRI_CORPUSSTATISTICS_HPP
 
+#include "IndexTypes.hpp"
+
 namespace indri {
   namespace index {
     struct CorpusStatistics {
-      CorpusStatistics() : totalTerms(0), totalDocuments(0), uniqueTerms(0), maximumDocumentLength(0) {}
+      CorpusStatistics() : totalTerms(0), totalDocuments(0), baseDocument(0), maximumDocument(0), uniqueTerms(0), maximumDocumentLength(0) {}
       UINT64 totalTerms;
+      
+      lemur::api::DOCID_T baseDocument;
+      lemur::api::DOCID_T maximumDocument;
       unsigned int totalDocuments;
       unsigned int uniqueTerms;
       UINT64 maximumDocumentLength;

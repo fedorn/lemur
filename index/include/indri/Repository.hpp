@@ -95,6 +95,20 @@ namespace indri
       indri::atomic::value_type _queryLoad[ LOAD_MINUTES * LOAD_MINUTE_FRACTION ];
       indri::atomic::value_type _documentLoad[ LOAD_MINUTES * LOAD_MINUTE_FRACTION ];
 
+      static std::vector<std::string> _fieldNames( indri::api::Parameters& parameters );
+      static std::string _stemmerName( indri::api::Parameters& parameters );
+
+      static void _mergeClosedIndexes( const std::string& outputPath,
+                                       const std::vector<std::string>& repositories,
+                                       const std::vector<indri::collection::Repository::Field>& indexFields,
+                                       const std::vector<lemur::api::DOCID_T>& documentMaximums );
+      static void _writeMergedManifest( const std::string& path, indri::api::Parameters& firstManifest );
+      static void _mergeBitmaps( const std::string& outputPath, const std::vector<std::string>& repositories, const std::vector<lemur::api::DOCID_T>& documentCounts );
+      static void _mergeCompressedCollections( const std::string& outputPath,
+                                                                 const std::vector<std::string>& repositories,
+                                                                 const std::vector<lemur::api::DOCID_T>& documentMaximums );
+      static void _cleanAndCreateDirectory( const std::string& path );
+
       void _writeParameters( const std::string& path );
 
       void _incrementLoad();
@@ -118,7 +132,7 @@ namespace indri
       bool _stateContains( index_state& state, std::vector<indri::index::Index*>& indexes );
       void _swapState( std::vector<indri::index::Index*>& oldIndexes, indri::index::Index* newIndex );
       void _closeIndexes();
-      std::vector<indri::index::Index::FieldDescription> _fieldsForIndex( std::vector<Repository::Field>& _fields );
+      static std::vector<indri::index::Index::FieldDescription> _fieldsForIndex( const std::vector<Repository::Field>& _fields );
       void _merge( index_state& state );
       indri::index::Index* _mergeStage( index_state& state );
       UINT64 _mergeMemory( const std::vector<indri::index::Index*>& indexes );
@@ -189,6 +203,10 @@ namespace indri
       /// Close the repository
       void close();
 
+      /// Compact the repository by removing all information about
+      /// deleted documents from disk.
+      void compact();
+
       /// Indexes in this repository
       index_state indexes();
       
@@ -201,8 +219,11 @@ namespace indri
       /// Write the most recent state out to disk
       void write();
 
-      /// Merge all indexes together
+      /// Merge all internal indexes together
       void merge();
+
+      /// Merge two or more repositories together
+      static void merge( const std::string& outputIndex, const std::vector<std::string>& inputIndexes );
 
       /// List of deleted documents in this repository
       indri::index::DeletedDocumentList& deletedList();
