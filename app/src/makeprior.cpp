@@ -342,7 +342,7 @@ bool extract_compression_table( std::map<double, int>& values, indri::file::File
   mf.buffer = inb;
   mf.length = in.size();
   mf.score = 0;
-  inb->seek( sizeof(UINT32)*8 );
+  inb->seek( sizeof(UINT32)*2 );
 
   while( !mf.finished() && values.size() <= 256 ) {
     mf.readScore();
