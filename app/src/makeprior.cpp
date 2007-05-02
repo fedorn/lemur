@@ -160,7 +160,7 @@ void merge_sorted_runs( indri::file::File& out, std::vector<std::string>& inputs
     itemCount++;
   }
 
-  while( totalDocuments > lastDocument+1 ) {
+  while( totalDocuments > lastDocument ) {
     outb->write( &lowProbability, sizeof(double) );
     lastDocument++;
   }
