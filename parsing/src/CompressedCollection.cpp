@@ -210,9 +210,6 @@ void indri::collection::CompressedCollection::_writePositions( indri::api::Parse
   indri::utility::RVLCompressStream compress( _positionsBuffer );
   int last = 0;
 
-  if( !document->positions.size() )
-    return;
-
   keyLength = sizeof POSITIONS_KEY;
   _stream->next_in = (Bytef*) POSITIONS_KEY;
   _stream->avail_in = keyLength;
