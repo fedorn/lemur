@@ -8,22 +8,22 @@
  * interface file instead. 
  * ----------------------------------------------------------------------------- */
 
-#ifndef SWIG_indri_WRAP_H_
-#define SWIG_indri_WRAP_H_
+#ifndef SWIG_indri_csharp_WRAP_H_
+#define SWIG_indri_csharp_WRAP_H_
 
 struct SwigDirector_IndexStatus : public indri::api::IndexStatus, public Swig::Director {
 
 public:
-    void swig_connect_director(JNIEnv *jenv, jobject jself, jclass jcls, bool swig_mem_own, bool weak_global);
-    SwigDirector_IndexStatus(JNIEnv *jenv);
+    SwigDirector_IndexStatus();
     virtual ~SwigDirector_IndexStatus();
     virtual void status(int code, std::string const &documentPath, std::string const &error, int documentsIndexed, int documentsSeen);
-public:
-    bool swig_overrides(int n) {
-      return (n < 1 ? swig_override[n] : false);
-    }
-protected:
-    bool swig_override[1];
+
+    typedef void (SWIGSTDCALL* SWIG_Callback0_t)(int, char *, char *, int, int);
+    void swig_connect_director(SWIG_Callback0_t callbackstatus);
+
+private:
+    SWIG_Callback0_t swig_callbackstatus;
+    void swig_init_callbacks();
 };
 
 

@@ -281,7 +281,7 @@
 
 #ifdef SWIGCSHARP
 
-%typemap(csdestruct_derived, methodname="Dispose") std::vector<indri::api::ParsedDocument *>{
+%typemap(csdestruct_derived, methodname="Dispose", methodmodifiers="public") std::vector<indri::api::ParsedDocument *>{
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
       for (int i=0; i<Count; i++) {
@@ -293,7 +293,7 @@
     GC.SuppressFinalize(this);
   }
 
-%typemap(csdestruct, methodname="Dispose") std::vector<indri::api::ParsedDocument *>{
+%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") std::vector<indri::api::ParsedDocument *>{
     if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
       swigCMemOwn = false;
       for (int i=0; i<Count; i++) {
