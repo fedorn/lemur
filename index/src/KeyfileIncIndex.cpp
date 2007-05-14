@@ -907,7 +907,8 @@ class reader_less {
 public:
   bool operator () ( const lemur::file::KeyfileDocListSegmentReader* one, 
                      const lemur::file::KeyfileDocListSegmentReader* two ) {
-    return (*one) < (*two);
+    // uses operator< but priority queue expects the test to be >
+    return (*two) < (*one);
   }
 };
 
