@@ -88,6 +88,11 @@ bool lemur::file::KeyfileDocListSegmentReader::operator<( const KeyfileDocListSe
   if( !otherTop )
     return false;
 
+  // if we don't have data but the other object does,
+  // they are bigger (they should go first)
+  if( !thisTop )
+    return true;
+
   lemur::api::TERMID_T termID = const_cast<lemur::index::InvFPDocList*>(thisTop)->termID();
   lemur::api::TERMID_T otherTermID = const_cast<lemur::index::InvFPDocList*>(otherTop)->termID();
 
