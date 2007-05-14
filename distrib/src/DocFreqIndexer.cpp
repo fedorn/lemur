@@ -17,8 +17,8 @@ lemur::distrib::DocFreqIndexer::DocFreqIndexer(const string &csName, const strin
                                                const string &ssName, int bufferSize, 
                                                bool countStopWords) {
   collsel = new lemur::index::KeyfileIncIndex(csName, bufferSize);
-  collWords = fopen(cwName.c_str(), "wb");
-  serverSizes = fopen(ssName.c_str(), "wb");
+  collWords = fopen(cwName.c_str(), "ab");
+  serverSizes = fopen(ssName.c_str(), "ab");
 
   csdp = new lemur::parse::DocumentProps();
   term = new lemur::index::InvFPTerm();
