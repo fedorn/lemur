@@ -1960,15 +1960,20 @@ static void init_key(struct fcb *f, char id[], int lc)
 /*   to disk.                                                          */
 
 static void insert_rec(struct fcb *f, char r[], level0_pntr *p)
-{size_t size,lc; FILE *file;
-
+{
+  size_t size,lc;
+  FILE *file;
   if ( f->read_only ) f->error_code = read_only_err;
   else if ( p->lc<=f->data_in_index_lc ) memcpy(&p->data_rec,r,(size_t)p->lc);
   else {
     file = file_index(f,p->segment);
-    if ( f->error_code!=no_err ) return;
+    if ( file==NULL || f->error_code==segment_open_err ) {
+      set_error(f,move_rec_err,"No file in insert_rec");
+      return;
+    }
     if ( fseeko(file,(FILE_OFFSET)p->sc,0)!=0 ) {
-      f->error_code = seek_err; return;
+      f->error_code = seek_err;
+      return;
     }
     lc = p->lc;
     size = fwrite(r,(size_t) 1,lc,file);
@@ -1977,6 +1982,7 @@ static void insert_rec(struct fcb *f, char r[], level0_pntr *p)
     }
   }
 }
+
 
 
 /*** buffer handling ***/
@@ -3820,12 +3826,24 @@ static boolean allocate_rec(struct fcb *f, unsigned lc, level0_pntr *p)
     rec_allocate_lc = rec_allocation_lc(lc);
     p0.segment = 0; p0.sc = 0; p0.lc = rec_allocate_lc;
     key_lc = pack_lc_key(key,p0);
-    kf_get_rec(f,free_lc_ix,key,key_lc,&dummy_p0,dummy,&dlc,0);
-    err = kf_next_rec(f,free_lc_ix,key,&key_lc,maxkey_lc,&dummy_p0,dummy,&dlc,0);
-    if ( err!=ateof_err ) {
-      if ( err!=no_err ) {
-        set_error1(f,alloc_rec_err,"**Couldn't get free_lc entry, err=",err);
-      }
+    err = kf_get_rec(f,free_lc_ix,key,key_lc,&dummy_p0,dummy,&dlc,0);
+    if ( err==getnokey_err ) {
+      err = kf_next_rec(f,free_lc_ix,key,&key_lc,maxkey_lc,&dummy_p0,dummy,&dlc,0);
+    }
+    if ( err==ateof_err ) {
+      f->error_code = no_err;
+      block_allocate_lc = allocation_lc(lc,(unsigned)(block_allocation_unit*block_lc));
+      have_space = extend_file(f,block_allocate_lc,&pn);
+      p->segment = pn.segment;
+      p->sc = pn.block << f->block_shift;
+      p0.segment = pn.segment;
+      p0.sc = p->sc + rec_allocate_lc;
+      p0.lc = block_allocate_lc - rec_allocate_lc;
+      if ( f->trace_freespace ) printf("new space, block_lc=%d, residual=%d\n",
+        block_allocate_lc,block_allocate_lc-rec_allocate_lc);
+      if ( p0.lc>0 ) insert_freespace_entry(f,&p0);
+    }
+    else if ( err==no_err ) {
       if ( key_lc!=freespace_lc_key_lc )
         set_error1(f,alloc_rec_err,"**Uh Oh. Expected free_lc_key to be 14, is=",key_lc);
       unpack_lc_key(key,&p0);
@@ -3839,18 +3857,7 @@ static boolean allocate_rec(struct fcb *f, unsigned lc, level0_pntr *p)
         if ( p0.lc>0 ) insert_freespace_entry(f,&p0);
       }
     }
-    if ( !have_space ) {
-      block_allocate_lc = allocation_lc(lc,(unsigned)(block_allocation_unit*block_lc));
-      have_space = extend_file(f,block_allocate_lc,&pn);
-      p->segment = pn.segment;
-      p->sc = pn.block << f->block_shift;
-      p0.segment = pn.segment;
-      p0.sc = p->sc + rec_allocate_lc;
-      p0.lc = block_allocate_lc - rec_allocate_lc;
-      if ( f->trace_freespace ) printf("new space, block_lc=%d, residual=%d\n",
-        block_allocate_lc,block_allocate_lc-rec_allocate_lc);
-      if ( p0.lc>0 ) insert_freespace_entry(f,&p0);
-    }
+    else set_error1(f,alloc_rec_err,"**Couldn't get free_lc entry, err=",err);
   }
   return(have_space);
 }
