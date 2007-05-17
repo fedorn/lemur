@@ -155,6 +155,20 @@ specifying the stopword list to use. Specified as
 &lt;stopper&gt;&lt;word&gt;stopword&lt;/word&gt;&lt;/stopper&gt; and
 as <tt>-stopper.word=stopword</tt> on the command line. This is an
 optional parameter with the default of no stopping.</dd>
+<dt>offsetannotationhint</dt>
+<dd>An optional parameter to provide a hint to the indexer to speed
+up indexing of offset annotations when using offset annotation files
+as specified in the &lt;corpus&gt; parameter. Valid values here
+are &quot;unordered&quot; and &quot;ordered&quot;. An &quot;unordered&quot;
+hint (the default) will inform the indexer that the document IDs of the
+annotations are not necessarily in the same order as the documents
+in the corpus. The indexer will adjust its internal memory allocations
+appropriately to pre-allocate enough memory before reading in the annotations
+file. If you are absolutely certain that the annotations in the offset annotation
+file are in the exact same order as the documents, then you can use the &quot;ordered&quot;
+hint. This will tell the indexer to not read in the entire file at once, but rather
+read in the offset annotations file as needed for only the annotations that
+are specified for the currently indexing document ID.</dd>
 </dl>
 
 <H3>QueryEnvironment Parameters</H3>
@@ -734,6 +748,16 @@ int main(int argc, char * argv[]) {
     }
 
     env.setMemory( parameters.get("memory", 100*1024*1024) );
+
+    std::string offsetAnnotationHint=parameters.get("offsetannotationhint", "default");
+    if (offsetAnnotationHint=="ordered") {
+      env.setOffsetAnnotationIndexHint(indri::parse::OAHintOrderedAnnotations);
+    } if (offsetAnnotationHint=="unordered") {
+      env.setOffsetAnnotationIndexHint(indri::parse::OAHintSizeBuffers);
+    } else {
+      env.setOffsetAnnotationIndexHint(indri::parse::OAHintDefault);
+    }
+
     std::string stemmerName = parameters.get("stemmer.name", "");
     if( stemmerName.length() )
       env.setStemmer(stemmerName);

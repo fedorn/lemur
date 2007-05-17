@@ -68,336 +68,189 @@
 #include <queue>
 #include <map>
 
-void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnnotationsFile ) {
-  
-  // Only re-load this data if the new file is *different* from
-  // the old file.
 
-  if ( _offsetAnnotationsFile.compare( offsetAnnotationsFile ) == 0 )
-    return;
+/************************************
+ *  Construction / Destruction 
+ ************************************/
 
-  _offsetAnnotationsFile = offsetAnnotationsFile;
+indri::parse::OffsetAnnotationAnnotator::OffsetAnnotationAnnotator( Conflater* p_conflater ) { 
 
-  if ( ! _first_open ) {
+  _handler = NULL;
+  _p_conflater = p_conflater;
+  _first_open = true;
+  _indexHintType = OAHintDefault;
+	lastReadTag.docno=NULL;
 
-    _cleanup();
-  }
-
-  _first_open = false;
-
-  // Load file, and check consistency.  Ensure that there are no
-  // undefined parent ids.
-
-  char buf[65536]; // these may not be big enough someday.
-  char field[256];
-
-  std::ifstream in;
-  in.open( offsetAnnotationsFile.c_str() );
-
-  int line = 1;
-
-  // Primary parsing loop:
-
-  while ( in.good() || ! in.eof() ) {
-
-    in.getline( buf, sizeof(buf) - 1 );
-
-    if ( buf[0] == '\0' ) break;
-
-    int fieldStart = 0;
-    int fieldCount = 0;
-    int fieldOffset = 0;
-        
-    char* docno = NULL;
-    char* name = NULL;
-    char* s_value = NULL;
-    int type = 0;  // TAG = 1, ATTRIBUTE = 2
-    UINT64 id = 0;
-    UINT64 i_value = 0;
-    UINT64 parent = 0;
-
-    int start = 0;
-    int length = 0;
-
-    int len = 0;
-
-    for ( char *c = buf + fieldStart; *c != '\0' && fieldCount < 8 && 
-            fieldOffset < sizeof(field); 
-          c++, fieldOffset++ ) {
-
-      if ( *c == '\t' ) {
-
-        field[fieldOffset] = '\0';
-              
-        switch ( fieldCount ) {
-
-        case 0: // DOCNO (string)
-          len = strlen( field );
-          docno = new char[len + 1];
-          strncpy( docno, field, len);
-          docno[len] = '\0';
-          _buffers_allocated.push_back( docno );
-          break;
-
-        case 1: // TYPE (flag)
-          if ( *field == 't' || *field == 'T' ) type = 1;
-          else if ( *field == 'a' || *field == 'A' ) type = 2;
-          else {
-            std::cerr << "WARN: Could not understand type specification '" 
-                      << field << "' on line " << line 
-                      << "; ignoring line." << std::endl;
-            line++;
-            fieldCount = 8;
-            continue;
-          }
-          break;
-
-        case 2: // ID (UINT64)
-          id = parse_UINT64( field, fieldOffset );
-          break;
-
-        case 3: // NAME (string)
-          len = strlen( field );
-          name = new char[len + 1];
-          strncpy( name, field, len );
-          name[len] = '\0';
-          // name should be case normalized to lower case.
-          for (char *c = name; *c; c++) *c = tolower(*c);
-          _buffers_allocated.push_back( name );
-          break;
-
-        case 4: // START (int)
-          if ( type == 1 ) {
-            start = atoi( field );
-            if ( start < 0 ) {
-              std::cerr << "WARN: tag named '" << name 
-                        << "' starting at negative byte offest on line " 
-                        << line << "; ignoring line." << std::endl;
-              line++;
-              fieldCount = 8; 
-              continue;
-            }
-          }
-          break;
-
-        case 5: // LENGTH (int)
-          if ( type == 1 ) {
-            length = atoi( field );
-            if ( length <= 0 ) {
-              std::cerr << "WARN: tag named '" << name 
-                        << "' with zero or negative byte length on line " 
-                        << line << "; ignoring line." << std::endl;
-              line++;
-              fieldCount = 8;
-              continue;
-            }
-          }
-          break;
-
-        case 6: // VALUE (UINT64 or string)
-          if ( type == 1 ) i_value = parse_UINT64( field, fieldOffset );
-          else { 
-            len = strlen( field );
-            s_value = new char[len + 1];
-            strncpy( s_value, field, len );
-            s_value[len] = '\0';
-            _buffers_allocated.push_back( s_value );
-          }
-          break;
-
-        case 7: // PARENT (UINT64; 0 indicates no parent );
-          parent = parse_UINT64( field, fieldOffset );
-          break;
-
-        }
-
-        fieldCount++;
-        fieldStart += ( fieldOffset + 1 );
-        fieldOffset = -1;
-
-      } else {
-
-        field[fieldOffset] = *c;
-      }
-    }
-
-    if ( id == parent ) {
-
-      std::cerr << "WARN: id and parent id are equal on line " << line 
-                << "; ignoring line." << std::endl;
-      line++;
-      continue;
-    }
-
-    // Now process the line we just read in.
-
-    if ( type == 1 ) {
-            
-      if ( ! _is_unique_id( id, line ) ) { line++; continue; }
-
-      // Check that parent id is defined
-
-      TagExtent *p_parent = NULL;
-
-      if ( parent != 0 ) {
-
-        p_parent = _getTag( parent );
-
-        if ( p_parent == NULL ) {
-
-          std::cerr << "WARN: Undefined parent id '" << parent 
-                    << "' used on line " << line 
-                    << "; ignoring line" << std::endl;
-
-          line++;
-          continue;
-
-        }
-      }
-
-      // Create new TAG
-
-      std::set<indri::parse::TagExtent*>** p = _annotations.find( docno );
-
-      std::set<indri::parse::TagExtent*>* tags = p ? *p : NULL;
-
-      if ( ! tags ) { 
-
-        tags = new std::set<indri::parse::TagExtent*>;
-        _annotations.insert( docno, tags );
-      }
-
-      TagExtent* te = new TagExtent;
-      te->name = name;
-      te->number = i_value;
-      te->parent = p_parent;
-
-      // Note that this is an abuse of the TagExtent's semantics.  The
-      // begin and end fields are intended to be filled with token
-      // positions, but here we are inserting byte positions.  In the
-      // transform function, all of the annotations for a particular
-      // document will be converted to token extents, en masse.  The
-      // positions vector from the ParsedDocument is required to make
-      // this conversion.
-      te->begin = start;
-      te->end = start + length;
-
-          // Conflate tag if necessary
-      if ( _p_conflater ) _p_conflater->conflate( te );
-          
-      tags->insert( te );
-      _tag_id_map.insert( id, te );
-
-    } else if ( type == 2 ) {
-
-      // Add attribute to existing TAG
-
-      TagExtent* p_te = _getTag( parent );
-
-      if ( p_te == NULL ) {
-
-        std::cerr << "WARN: Attribute for undefined tag id '" << parent
-                  << "' appears on line " << line
-                  << "; ignoring line" << std::endl;
-        line++;
-        continue;
-      }
-
-      AttributeValuePair * avp = new AttributeValuePair;
-      avp->attribute = name;
-      avp->value = s_value;
-
-      p_te->attributes.push_back( *avp );
-      _attribute_id_map.insert( id, avp );
-
-    }
-
-    line++;
-  }
-
-  in.close();
+  // allocate the default buffers
+  lastBufferAllocationSize=16384;
+  _buffers_allocated=new std::vector<char *>(lastBufferAllocationSize);
+  _annotations=new indri::utility::HashTable<const char *,std::set<TagExtent*>*>(lastBufferAllocationSize);
+  _converted_annotations=new indri::utility::HashTable<const char *,std::set<TagExtent*>*>(lastBufferAllocationSize);
+  _tag_id_map=new indri::utility::HashTable<UINT64,TagExtent*>(lastBufferAllocationSize);
+  _attribute_id_map=new indri::utility::HashTable<UINT64,AttributeValuePair*>(lastBufferAllocationSize);
 }
 
-void indri::parse::OffsetAnnotationAnnotator::setTags (const char *docno, const std::vector<indri::parse::TagExtent *> &tagset) 
-{
-  // Create new TAG
+indri::parse::OffsetAnnotationAnnotator::OffsetAnnotationAnnotator() {
 
-  std::set<indri::parse::TagExtent*>** p = _annotations.find( docno );
+  _handler = NULL;
+  _p_conflater = NULL;
+  _first_open = true;
+  _indexHintType = OAHintDefault;
+	lastReadTag.docno=NULL;
 
-  std::set<indri::parse::TagExtent*>* tags = p ? *p : NULL;
-
-  if ( ! tags ) { 
-
-    tags = new std::set<indri::parse::TagExtent*>;
-    _annotations.insert( docno, tags );
-  }
-
-  for (unsigned int i = 0; i < tagset.size(); i++) {
-    const TagExtent *source = tagset[i];
-    TagExtent* te = new TagExtent;
-    char *myName = new char[strlen(source->name) + 1];
-    strcpy(myName, source->name);
-    _buffers_allocated.push_back( myName );
-    te->name = myName;    
-    te->number = source->number;
-    te->parent = source->parent;
-    te->begin = source->begin;
-    te->end = source->end;
-
-    // Conflate tag if necessary
-    if ( _p_conflater ) _p_conflater->conflate( te );
-          
-    tags->insert( te );
-  }
+  // allocate the default buffers
+  lastBufferAllocationSize=16384;
+  _buffers_allocated=new std::vector<char *>(lastBufferAllocationSize);
+  _annotations=new indri::utility::HashTable<const char *,std::set<TagExtent*>*>(lastBufferAllocationSize);
+  _converted_annotations=new indri::utility::HashTable<const char *,std::set<TagExtent*>*>(lastBufferAllocationSize);
+  _tag_id_map=new indri::utility::HashTable<UINT64,TagExtent*>(lastBufferAllocationSize);
+  _attribute_id_map=new indri::utility::HashTable<UINT64,AttributeValuePair*>(lastBufferAllocationSize);
 }
 
-indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( indri::api::ParsedDocument* document ) {
+indri::parse::OffsetAnnotationAnnotator::~OffsetAnnotationAnnotator() {
+  _cleanup();
 
-  const char *docno = _getDocno( document ); 
-  std::set<indri::parse::TagExtent*>** p;
+	// if the file is still open, close it and clean it
+	if (annotationFile.is_open()) {
+		annotationFile.clear();
+		annotationFile.close();
+	}
 
-  // First, check if the annotations for this document have already been
-  // converted to use token extents.
+  delete _buffers_allocated;
+  delete _annotations;
+  delete _converted_annotations;
+  delete _tag_id_map;
+  delete _attribute_id_map;
+}
 
-  p = _converted_annotations.find( docno );
-  std::set<indri::parse::TagExtent*>* converted_tags = p ? *p : NULL;
+/************************************
+ *  Private Functions 
+ ************************************/
 
-  if ( ! converted_tags ) {
+const char *indri::parse::OffsetAnnotationAnnotator::_getDocno( indri::api::ParsedDocument* document ) {
 
-    // We must do the conversion, then.
+  // find DOCNO attribute in document
+  const char *retVal = NULL;
 
-    converted_tags = new std::set<indri::parse::TagExtent*>;
+  for ( size_t i=0; i<document->metadata.size(); i++ ) {
+    const char* attributeName = document->metadata[i].key;
+    const char* attributeValue = (const char*) document->metadata[i].value;
 
-    // Check if we have any annotations for this document
+    if ( ! strcmp( attributeName, "docno" ) ) retVal = attributeValue;
+  }
 
-    p = _annotations.find( docno );
-    std::set<indri::parse::TagExtent*>* raw_tags = p ? *p : NULL;
+  return retVal;
+}
 
-    if ( raw_tags && ! raw_tags->empty() ) {
 
-      // Do the conversion.
-      convert_annotations( raw_tags, converted_tags, document );
+indri::parse::TagExtent *indri::parse::OffsetAnnotationAnnotator::_getTag( UINT64 id ) {
 
+  // return TagExtent corresponding to given id, or NULL if invalid id.
+
+  if ( id == 0 ) return NULL;
+
+  TagExtent** p = _tag_id_map->find( id );
+
+  if ( ! p ) return NULL;
+  else return *p;
+}
+
+indri::parse::AttributeValuePair *indri::parse::OffsetAnnotationAnnotator::_getAttribute( UINT64 id ) {
+
+  // return Attribute corresponding to given id, or NULL if invalid id.
+
+  if ( id == 0 ) return NULL;
+
+  AttributeValuePair** p = _attribute_id_map->find( id );
+
+  if ( ! p ) return NULL;
+  else return *p;
+}
+
+bool indri::parse::OffsetAnnotationAnnotator::_is_unique_id( UINT64 id, int line ) {
+
+  // Make sure ID has not already been used.
+
+  if ( id == 0 ) {
+
+    std::cerr << "WARN: Invalid id '0' used on line " << line 
+              << "; ignoring line." << std::endl;
+    return false;
+  }
+
+  if ( _getTag( id ) || _getAttribute( id ) ) {
+
+    std::cerr << "WARN: Id '" << id << "' redefined on line " << line 
+              << "; ignoring line." << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+UINT64 indri::parse::OffsetAnnotationAnnotator::parse_UINT64( const char *str, int n ) {
+
+  UINT64 result = 0;
+  int i = 0;
+  for ( const char* c = str; i < n && c != '\0'; c++, i++ )
+    result = result * 10 + ( *c - '0' );
+
+  return result;
+}
+
+void indri::parse::OffsetAnnotationAnnotator::_cleanup() {
+  // clear any allocated buffers
+  for ( std::vector<char *>::iterator i = _buffers_allocated->begin();
+        i != _buffers_allocated->end(); i++ )
+    delete[] (*i);
+
+  _buffers_allocated->clear();
+
+  // Cleanup _annotations, _converted_annotations, _tag_id_map,
+  // and _attribute_id_map in preparation for object
+  // destruction, or for an open call on a new offset
+  // annotations file.
+
+  for ( indri::utility::HashTable<const char *,std::set<TagExtent*>*>::iterator i = _annotations->begin(); i != _annotations->end(); i++ ) {
+
+    std::set<TagExtent*>* p_set = *(*i).second;
+
+    for ( std::set<TagExtent*>::iterator j = p_set->begin(); 
+          j != p_set->end(); j++ ) {
+
+      delete (*j); // TagExtent
     }
-
-    // Store newly converted tags back to the converted annotations table. 
-    //    _converted_annotations.insert( docno, converted_tags );
+    delete(p_set);
   }
 
-  // Return right away if there are no annotations for this document.
-  if ( converted_tags->empty() ) return document;
+  _annotations->clear();
 
-  // Add annotations from the offset annotations file to
-  // the ParsedDocument rep.
+  for ( indri::utility::HashTable<const char *,std::set<TagExtent*>*>::iterator i = _converted_annotations->begin(); i != _converted_annotations->end(); i++ ) {
 
-  for ( std::set<TagExtent*>::iterator i = converted_tags->begin(); 
-        i != converted_tags->end(); i++ ) {
-    document->tags.push_back( (*i) );
+    std::set<TagExtent*>* p_set = *(*i).second;
+
+    for ( std::set<TagExtent*>::iterator j = p_set->begin(); 
+          j != p_set->end(); j++ ) {
+
+      delete (*j); // TagExtent
+    }
+    delete (*i).first;
+    delete(p_set);
   }
 
-  converted_tags->clear();
+  _converted_annotations->clear();
 
-  return document;
+  // Note: every TagExtent pointed to by an element of the
+  // _tag_id_map, and every AttributeValuePair pointed to by an
+  // element of the _attribute_id_map will have already been
+  // deleted above.
+
+  _tag_id_map->clear();
+//     for ( indri::utility::HashTable<UINT64,AttributeValuePair*>::iterator i = _attribute_id_map.begin(); i != _attribute_id_map.end(); i++ ) {
+//        delete (*i).second;
+//      }
+  _attribute_id_map->clear();
+
 }
 
 void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indri::parse::TagExtent*>* raw_tags,
@@ -561,3 +414,577 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
   }
 
 }
+
+indri::parse::OffsetAnnotationAnnotator::ReadAnnotationTag indri::parse::OffsetAnnotationAnnotator::parseLine(char *readLine, int lineCounter) {
+  ReadAnnotationTag retTag;
+
+  char field[256];
+
+  int fieldStart = 0;
+  int fieldCount = 0;
+  int fieldOffset = 0;
+
+  /*
+  char* docno = NULL;
+  char* name = NULL;
+  char* s_value = NULL;
+  int type = 0;  // TAG = 1, ATTRIBUTE = 2
+  UINT64 id = 0;
+  UINT64 i_value = 0;
+  UINT64 parent = 0;
+  */
+
+  int len = 0;
+
+  // set the return tag default values
+  retTag.docno=NULL;
+  retTag.name=NULL;
+  retTag.s_value=NULL;
+  retTag.type=0;
+  retTag.id=0;
+  retTag.i_value=0;
+  retTag.parent=0;
+
+  for ( char *c = readLine + fieldStart; *c != '\0' && fieldCount < 8 && fieldOffset < sizeof(field); c++, fieldOffset++ ) {
+
+    if ( *c == '\t' ) {
+
+      field[fieldOffset] = '\0';
+            
+      switch ( fieldCount ) {
+
+      case 0: // DOCNO (string)
+        len = strlen( field );
+        retTag.docno = new char[len + 1];
+        strncpy( retTag.docno, field, len);
+        retTag.docno[len] = '\0';
+        _buffers_allocated->push_back( retTag.docno );
+        break;
+
+      case 1: // TYPE (flag)
+        if ( *field == 't' || *field == 'T' ) retTag.type = 1;
+        else if ( *field == 'a' || *field == 'A' ) retTag.type = 2;
+        else {
+          std::cerr << "WARN: Could not understand type specification '" 
+                    << field << "' on line " << lineCounter 
+                    << "; ignoring line." << std::endl;
+          fieldCount = 8;
+          continue;
+        }
+        break;
+
+      case 2: // ID (UINT64)
+        retTag.id = parse_UINT64( field, fieldOffset );
+        break;
+
+      case 3: // NAME (string)
+        len = strlen( field );
+        retTag.name = new char[len + 1];
+        strncpy( retTag.name, field, len );
+        retTag.name[len] = '\0';
+        // name should be case normalized to lower case.
+        for (char *c = retTag.name; *c; c++) *c = tolower(*c);
+        _buffers_allocated->push_back( retTag.name );
+        break;
+
+      case 4: // START (int)
+        if ( retTag.type == 1 ) {
+          retTag.start = atoi( field );
+          if ( retTag.start < 0 ) {
+            std::cerr << "WARN: tag named '" << retTag.name 
+                      << "' starting at negative byte offest on line " 
+                      << lineCounter << "; ignoring line." << std::endl;
+            fieldCount = 8; 
+            continue;
+          }
+        }
+        break;
+
+      case 5: // LENGTH (int)
+        if ( retTag.type == 1 ) {
+          retTag.length = atoi( field );
+          if ( retTag.length <= 0 ) {
+            std::cerr << "WARN: tag named '" << retTag.name 
+                      << "' with zero or negative byte length on line " 
+                      << lineCounter << "; ignoring line." << std::endl;
+            fieldCount = 8;
+            continue;
+          }
+        }
+        break;
+
+      case 6: // VALUE (UINT64 or string)
+        if ( retTag.type == 1 ) retTag.i_value = parse_UINT64( field, fieldOffset );
+        else { 
+          len = strlen( field );
+          retTag.s_value = new char[len + 1];
+          strncpy( retTag.s_value, field, len );
+          retTag.s_value[len] = '\0';
+          _buffers_allocated->push_back( retTag.s_value );
+        }
+        break;
+
+      case 7: // PARENT (UINT64; 0 indicates no parent );
+        retTag.parent = parse_UINT64( field, fieldOffset );
+        break;
+
+      }
+
+      fieldCount++;
+      fieldStart += ( fieldOffset + 1 );
+      fieldOffset = -1;
+
+    } else {
+
+      field[fieldOffset] = *c;
+    }
+  } // end for ( char *c = buf + fieldStart; *c != '\0' && fieldCount < 8 && 
+
+	lastReadTag=retTag;
+  return retTag;
+}
+
+void indri::parse::OffsetAnnotationAnnotator::readAnnotationTags(const char *docno) {
+
+	char buf[65536]; // these may not be big enough someday.
+
+  // read in the next set of OA tags...
+	// if we've not read in anything - at least read in the first tag...
+
+	if ((lastReadTag.docno==NULL) && (annotationFile.is_open()) && (!annotationFile.eof())) {
+		annotationFile.getline( buf, sizeof(buf) - 1 );
+		ReadAnnotationTag thisTag=parseLine(buf, offsetAnnotationFileLine );
+	}
+
+	// clean any existing annotations
+	_cleanup();
+
+	// keep reading tags until we're not in the expected document
+	while ((lastReadTag.docno!=NULL) && (docno!=NULL)&& (!strcmp(docno, lastReadTag.docno)) && (!annotationFile.eof())) {
+
+		if ( lastReadTag.id == lastReadTag.parent ) {
+
+			std::cerr << "WARN: id and parent id are equal on line " << offsetAnnotationFileLine  
+								<< "; ignoring line." << std::endl;
+			offsetAnnotationFileLine++;
+			continue;
+		}
+
+		// Now process the line we just read in.
+
+		if ( lastReadTag.type == 1 ) {
+	          
+			if ( ! _is_unique_id( lastReadTag.id, offsetAnnotationFileLine  ) ) { offsetAnnotationFileLine ++; continue; }
+
+			// Check that parent id is defined
+
+			TagExtent *p_parent = NULL;
+
+			if ( lastReadTag.parent != 0 ) {
+
+				p_parent = _getTag( lastReadTag.parent );
+
+				if ( p_parent == NULL ) {
+
+					std::cerr << "WARN: Undefined parent id '" << lastReadTag.parent 
+										<< "' used on line " << offsetAnnotationFileLine  
+										<< "; ignoring line" << std::endl;
+
+					offsetAnnotationFileLine ++;
+					continue;
+
+				}
+			}
+
+			// Create new TAG
+
+			std::set<indri::parse::TagExtent*>** p = _annotations->find( lastReadTag.docno );
+
+			std::set<indri::parse::TagExtent*>* tags = p ? *p : NULL;
+
+			if ( ! tags ) { 
+				tags = new std::set<indri::parse::TagExtent*>;
+				_annotations->insert( lastReadTag.docno, tags );
+			}
+
+			TagExtent* te = new TagExtent;
+			te->name = lastReadTag.name;
+			te->number = lastReadTag.i_value;
+			te->parent = p_parent;
+
+			// Note that this is an abuse of the TagExtent's semantics.  The
+			// begin and end fields are intended to be filled with token
+			// positions, but here we are inserting byte positions.  In the
+			// transform function, all of the annotations for a particular
+			// document will be converted to token extents, en masse.  The
+			// positions vector from the ParsedDocument is required to make
+			// this conversion.
+			te->begin = lastReadTag.start;
+			te->end = lastReadTag.start + lastReadTag.length;
+
+					// Conflate tag if necessary
+			if ( _p_conflater ) _p_conflater->conflate( te );
+	        
+			tags->insert( te );
+			_tag_id_map->insert( lastReadTag.id, te );
+
+		} else if ( lastReadTag.type == 2 ) {
+
+			// Add attribute to existing TAG
+
+			TagExtent* p_te = _getTag( lastReadTag.parent );
+
+			if ( p_te == NULL ) {
+
+				std::cerr << "WARN: Attribute for undefined tag id '" << lastReadTag.parent
+									<< "' appears on line " << offsetAnnotationFileLine 
+									<< "; ignoring line" << std::endl;
+				offsetAnnotationFileLine++;
+				continue;
+			}
+
+			AttributeValuePair * avp = new AttributeValuePair;
+			avp->attribute = lastReadTag.name;
+			avp->value = lastReadTag.s_value;
+
+			p_te->attributes.push_back( *avp );
+			_attribute_id_map->insert( lastReadTag.id, avp );
+
+		}
+
+		// if we've made it here, we've had a match - 
+		// get the next line from the file
+		annotationFile.getline( buf, sizeof(buf) - 1 );
+
+		if ( buf[0] == '\0' ) break;
+
+		// parse the line
+		// this will automatically set lastReadTag
+		ReadAnnotationTag thisTag=parseLine(buf, offsetAnnotationFileLine );
+
+		offsetAnnotationFileLine ++;
+	}
+
+	// if we're done - close the file.
+	if (annotationFile.eof()) {
+		annotationFile.clear();
+		annotationFile.close();
+		lastReadTag.docno=NULL;
+	}
+}
+
+/************************************
+ *  Public Functions 
+ ************************************/
+
+void indri::parse::OffsetAnnotationAnnotator::setHint(indri::parse::OffsetAnnotationIndexHint hintType) {
+  _indexHintType=hintType;
+}
+
+void indri::parse::OffsetAnnotationAnnotator::setConflater(Conflater* p_conflater) {
+  _p_conflater = p_conflater;
+}
+
+void indri::parse::OffsetAnnotationAnnotator::setHandler( ObjectHandler<indri::api::ParsedDocument>& handler ) {
+
+  _handler = &handler;
+}
+
+void indri::parse::OffsetAnnotationAnnotator::handle( indri::api::ParsedDocument* document ) {
+
+  _handler->handle( transform( document ) );
+}
+
+void indri::parse::OffsetAnnotationAnnotator::open( const std::string& offsetAnnotationsFile ) {
+  
+  // Only re-load this data if the new file is *different* from
+  // the old file.
+
+  if ( _offsetAnnotationsFile.compare( offsetAnnotationsFile ) == 0 )
+    return;
+
+  _offsetAnnotationsFile = offsetAnnotationsFile;
+
+  if ( ! _first_open ) {
+
+    _cleanup();
+  }
+
+  _first_open = false;
+
+  // Load file, and check consistency.  Ensure that there are no
+  // undefined parent ids.
+
+  char buf[65536]; // these may not be big enough someday.
+
+  annotationFile.open( offsetAnnotationsFile.c_str() );
+	offsetAnnotationFileLine = 1;
+
+  if (!annotationFile.is_open()) {
+    std::cerr << "WARN: Attribute file " << offsetAnnotationsFile
+              << "could not be opened. Ignoring annotations." << std::endl;    
+    _cleanup();
+    return;
+  }
+
+  /*********************
+   
+   New annotation processing:
+
+   switch - to choose 1 of 2 options via parameters:
+
+   1) unsure of order of annotations
+    a) scan through annotations file to get count of annotations
+    b) pre-size the hash table accordingly
+    c) load in normally
+
+   2) order of annotations is in doc order
+    a) open only sets a flag
+    b) add annotations as docId is needed
+    c) close on completion
+
+
+  *******************/
+
+  
+  if (_indexHintType!=OAHintOrderedAnnotations) {
+  // default - unsure of order - 
+  // perform a scan to see how large to set the buffer...
+
+  int lineCounter=0;
+  while ( annotationFile.good() || ! annotationFile.eof() ) {
+    annotationFile.getline( buf, sizeof(buf) - 1 );
+    lineCounter++;
+  }
+  annotationFile.clear();                   // forget we hit the end of file
+  annotationFile.seekg(0, std::ios::beg);   // move to the start of the file
+
+  // pre-allocate maps
+  //_annotations.clear();
+  //_converted_annotations.clear();
+  //_tag_id_map.clear();
+  //_attribute_id_map.clear();
+  // all are type: indri::utility::HashTable
+
+  // reset the buffer sizes (if needed)
+  if (lastBufferAllocationSize < lineCounter) {
+
+    _cleanup();
+
+    delete _buffers_allocated;
+    delete _annotations;
+    delete _converted_annotations;
+    delete _tag_id_map;
+    delete _attribute_id_map;
+
+    lastBufferAllocationSize=lineCounter;
+    _buffers_allocated=new std::vector<char *>(lastBufferAllocationSize);
+    _annotations=new indri::utility::HashTable<const char *,std::set<TagExtent*>*>(lastBufferAllocationSize);
+    _converted_annotations=new indri::utility::HashTable<const char *,std::set<TagExtent*>*>(lastBufferAllocationSize);
+    _tag_id_map=new indri::utility::HashTable<UINT64,TagExtent*>(lastBufferAllocationSize);
+    _attribute_id_map=new indri::utility::HashTable<UINT64,AttributeValuePair*>(lastBufferAllocationSize);
+  }
+
+
+  // Primary parsing loop:
+  while ( annotationFile.good() || ! annotationFile.eof() ) {
+
+    // get the line from the file
+    annotationFile.getline( buf, sizeof(buf) - 1 );
+
+    if ( buf[0] == '\0' ) break;
+
+    // parse the line
+    ReadAnnotationTag thisTag=parseLine(buf, offsetAnnotationFileLine );
+
+    if ( thisTag.id == thisTag.parent ) {
+
+      std::cerr << "WARN: id and parent id are equal on line " << offsetAnnotationFileLine  
+                << "; ignoring line." << std::endl;
+      offsetAnnotationFileLine++;
+      continue;
+    }
+
+    // Now process the line we just read in.
+
+    if ( thisTag.type == 1 ) {
+            
+      if ( ! _is_unique_id( thisTag.id, offsetAnnotationFileLine  ) ) { offsetAnnotationFileLine ++; continue; }
+
+      // Check that parent id is defined
+
+      TagExtent *p_parent = NULL;
+
+      if ( thisTag.parent != 0 ) {
+
+        p_parent = _getTag( thisTag.parent );
+
+        if ( p_parent == NULL ) {
+
+          std::cerr << "WARN: Undefined parent id '" << thisTag.parent 
+                    << "' used on line " << offsetAnnotationFileLine  
+                    << "; ignoring line" << std::endl;
+
+          offsetAnnotationFileLine ++;
+          continue;
+
+        }
+      }
+
+      // Create new TAG
+
+      std::set<indri::parse::TagExtent*>** p = _annotations->find( thisTag.docno );
+
+      std::set<indri::parse::TagExtent*>* tags = p ? *p : NULL;
+
+      if ( ! tags ) { 
+        tags = new std::set<indri::parse::TagExtent*>;
+        _annotations->insert( thisTag.docno, tags );
+      }
+
+      TagExtent* te = new TagExtent;
+      te->name = thisTag.name;
+      te->number = thisTag.i_value;
+      te->parent = p_parent;
+
+      // Note that this is an abuse of the TagExtent's semantics.  The
+      // begin and end fields are intended to be filled with token
+      // positions, but here we are inserting byte positions.  In the
+      // transform function, all of the annotations for a particular
+      // document will be converted to token extents, en masse.  The
+      // positions vector from the ParsedDocument is required to make
+      // this conversion.
+      te->begin = thisTag.start;
+      te->end = thisTag.start + thisTag.length;
+
+          // Conflate tag if necessary
+      if ( _p_conflater ) _p_conflater->conflate( te );
+          
+      tags->insert( te );
+      _tag_id_map->insert( thisTag.id, te );
+
+    } else if ( thisTag.type == 2 ) {
+
+      // Add attribute to existing TAG
+
+      TagExtent* p_te = _getTag( thisTag.parent );
+
+      if ( p_te == NULL ) {
+
+        std::cerr << "WARN: Attribute for undefined tag id '" << thisTag.parent
+                  << "' appears on line " << offsetAnnotationFileLine 
+                  << "; ignoring line" << std::endl;
+        offsetAnnotationFileLine++;
+        continue;
+      }
+
+      AttributeValuePair * avp = new AttributeValuePair;
+      avp->attribute = thisTag.name;
+      avp->value = thisTag.s_value;
+
+      p_te->attributes.push_back( *avp );
+      _attribute_id_map->insert( thisTag.id, avp );
+
+    }
+
+    offsetAnnotationFileLine ++;
+  }
+
+  annotationFile.close();
+  } // end if (_indexHintType!=OAHintOrderedAnnotations)
+}
+
+void indri::parse::OffsetAnnotationAnnotator::setTags (const char *docno, const std::vector<indri::parse::TagExtent *> &tagset) 
+{
+  // Create new TAG
+
+  std::set<indri::parse::TagExtent*>** p = _annotations->find( docno );
+
+  std::set<indri::parse::TagExtent*>* tags = p ? *p : NULL;
+
+  if ( ! tags ) { 
+
+    tags = new std::set<indri::parse::TagExtent*>;
+    _annotations->insert( docno, tags );
+  }
+
+  for (unsigned int i = 0; i < tagset.size(); i++) {
+    const TagExtent *source = tagset[i];
+    TagExtent* te = new TagExtent;
+    char *myName = new char[strlen(source->name) + 1];
+    strcpy(myName, source->name);
+    _buffers_allocated->push_back( myName );
+    te->name = myName;    
+    te->number = source->number;
+    te->parent = source->parent;
+    te->begin = source->begin;
+    te->end = source->end;
+
+    // Conflate tag if necessary
+    if ( _p_conflater ) _p_conflater->conflate( te );
+          
+    tags->insert( te );
+  }
+}
+
+
+indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( indri::api::ParsedDocument* document ) {
+
+  const char *docno = _getDocno( document ); 
+  std::set<indri::parse::TagExtent*>** p;
+
+  //*****************//
+  // check here to see what style we're using:
+  // 1) standard - no changes ("unordered annotations")
+  // 2) ordered annotations - instead of the below "find"
+  //    create a set of annotations by reading the file (if opened)
+	//    for only the matched docno via readAnnotationTags
+
+  if (_indexHintType==OAHintOrderedAnnotations) {
+		readAnnotationTags(docno);
+  }
+
+  // First, check if the annotations for this document have already been
+  // converted to use token extents.
+
+  p = _converted_annotations->find( docno );
+  std::set<indri::parse::TagExtent*>* converted_tags = p ? *p : NULL;
+
+  if ( ! converted_tags ) {
+
+    // We must do the conversion, then.
+
+    converted_tags = new std::set<indri::parse::TagExtent*>;
+
+    // Check if we have any annotations for this document
+
+    p = _annotations->find( docno );
+    std::set<indri::parse::TagExtent*>* raw_tags = p ? *p : NULL;
+
+    if ( raw_tags && ! raw_tags->empty() ) {
+
+      // Do the conversion.
+      convert_annotations( raw_tags, converted_tags, document );
+
+    }
+
+    // Store newly converted tags back to the converted annotations table. 
+    //    _converted_annotations.insert( docno, converted_tags );
+  }
+
+  // Return right away if there are no annotations for this document.
+  if ( converted_tags->empty() ) return document;
+
+  // Add annotations from the offset annotations file to
+  // the ParsedDocument rep.
+
+  for ( std::set<TagExtent*>::iterator i = converted_tags->begin(); 
+        i != converted_tags->end(); i++ ) {
+    document->tags.push_back( (*i) );
+  }
+
+  converted_tags->clear();
+
+  return document;
+}
+

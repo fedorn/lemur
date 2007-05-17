@@ -176,6 +176,10 @@ void indri::api::IndexEnvironment::setStemmer( const std::string& stemmer ) {
   _parameters.set("stemmer.name", stemmer);
 }
 
+void indri::api::IndexEnvironment::setOffsetAnnotationIndexHint(indri::parse::OffsetAnnotationIndexHint hintType) {
+  _oa_annotator.setHint(hintType);
+}
+
 void indri::api::IndexEnvironment::addFileClass( const std::string& name, 
                                                  const std::string& iter,
                                                  const std::string& parser,

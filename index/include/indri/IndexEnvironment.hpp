@@ -210,6 +210,10 @@ namespace indri
       /// @param flag True, if text should be normalized, false otherwise.
       void setNormalization( bool flag );
 
+      /// provides the indexer with the hint strategy to use for speed optimizations for indexing offset annotations
+      /// @param hintType the int type (of OffsetAnnotationIndexHint enum type)
+      void setOffsetAnnotationIndexHint(indri::parse::OffsetAnnotationIndexHint hintType);
+
       /// create a new index and repository
       /// @param repositoryPath the path to the repository
       /// @param callback IndexStatus object to be notified of indexing progress.
