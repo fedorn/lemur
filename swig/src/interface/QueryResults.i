@@ -26,6 +26,7 @@
       jmethodID qrConstructor = jenv->GetMethodID(qrClazz, "<init>", "()V" );
       jfieldID snippetField = jenv->GetFieldID(qrClazz, "snippet", "Ljava/lang/String;" );
       jfieldID docNameField = jenv->GetFieldID(qrClazz, "documentName", "Ljava/lang/String;" );
+      jfieldID docidField = jenv->GetFieldID(qrClazz, "docid", "I" );
       jfieldID scoreField = jenv->GetFieldID(qrClazz, "score", "D" );
       jfieldID beginField = jenv->GetFieldID(qrClazz, "begin", "I" );
       jfieldID endField = jenv->GetFieldID(qrClazz, "end", "I" );
@@ -44,6 +45,7 @@
         jstring documentName = jenv->NewStringUTF(results.results[i].documentName.c_str());;
         jenv->SetObjectField(qr, snippetField, snippet);
         jenv->SetObjectField(qr, docNameField, documentName);
+        jenv->SetIntField(qr, docidField, results.results[i].docid );
 
         jenv->SetDoubleField(qr, scoreField, results.results[i].score );
         jenv->SetIntField(qr, beginField, results.results[i].begin );
