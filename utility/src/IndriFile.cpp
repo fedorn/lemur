@@ -83,7 +83,7 @@ bool indri::file::File::open( const std::string& filename ) {
                           GENERIC_READ | GENERIC_WRITE,
                           0,
                           NULL,
-                          OPEN_EXISTING,
+                          OPEN_ALWAYS,
                           FILE_ATTRIBUTE_NORMAL,
                           NULL );
   
