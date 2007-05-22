@@ -56,7 +56,7 @@ namespace indri
       void _allocate( size_t newSpace ) {
         assert( newSpace > _space );
         _Type* newBuffer = (_Type*) malloc( newSpace * sizeof(_Type) );
-
+        if (newBuffer == NULL) throw new std::bad_alloc();
         if( _size ) {
           // copy to the new buffer, destroying the old copy as we go
           for( size_t i=0; i<_size; i++ ) {
