@@ -60,6 +60,7 @@ and installs it within an Indri Repository.
 #include "indri/SequentialReadBuffer.hpp"
 #include "indri/SequentialWriteBuffer.hpp"
 #include "indri/Path.hpp"
+#include "indri/ScopedLock.hpp"
 #include <queue>
 #include <fstream>
 
@@ -397,6 +398,19 @@ int main( int argc, char** argv ) {
     }
   
     std::string index = param["index"];
+
+    // get the total document count, including deleted documents.
+    indri::collection::Repository* _repository = new indri::collection::Repository();
+    _repository->openRead(index);    
+    indri::collection::Repository::index_state indexes = _repository->indexes();
+    INT64 documentCount = 0;
+  
+    for( int i=0; i<indexes->size(); i++ ) {
+      indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
+      documentCount += (*indexes)[i]->documentCount();
+    }
+    delete _repository;
+    
     indri::api::QueryEnvironment env;
     std::cout << "opening index: " << index << std::endl;
     env.addIndex( index );
@@ -422,7 +436,7 @@ int main( int argc, char** argv ) {
     
     std::cout << "sorting...";
     std::cout.flush();
-    sort_file( uncompressedPrior, unsortedBinary, memory, env.documentCount() );
+    sort_file( uncompressedPrior, unsortedBinary, memory, documentCount );
     std::cout << "finished";
     
     unsortedBinary.close();
