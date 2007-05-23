@@ -235,9 +235,10 @@ void indri::index::DeletedDocumentList::_calculateDeletedCount() {
 
   // scan the bytes, add up the bits
   UINT64 total = 0;
-
+  unsigned char *front = (unsigned char *)_bitmap.front();
   for( int i=0; i<_bitmap.position(); i++ ) {
-    total += bitCount[_bitmap.front()[i]];
+    unsigned char idx = front[i];
+    total += bitCount[idx];
   }
 
   _deletedCount = total;
