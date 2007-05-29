@@ -747,7 +747,7 @@ int main(int argc, char * argv[]) {
       std::cout << INDRI_DISTRIBUTION << std::endl;
     }
 
-    env.setMemory( parameters.get("memory", 100*1024*1024) );
+    env.setMemory( parameters.get("memory", INT64(100*1024*1024)) );
 
     std::string offsetAnnotationHint=parameters.get("offsetannotationhint", "default");
     if (offsetAnnotationHint=="ordered") {
