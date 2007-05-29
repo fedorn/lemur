@@ -227,7 +227,7 @@ namespace indri
         int multiplier = (int) _multiplier( value );
 
         if( multiplier > 1 ) {
-          std::string prefix = value.substr( 0, value.length() );
+          std::string prefix = value.substr( 0, value.length()-1 );
           return multiplier * atoi( prefix.c_str() );
         }
 
@@ -246,7 +246,7 @@ namespace indri
           return _asBoolean(value);
 
         if( multiplier > 1 ) {
-          std::string prefix = value.substr( 0, value.length() );
+          std::string prefix = value.substr( 0, value.length()-1 );
           return multiplier * string_to_i64( prefix.c_str() );
         }
 
