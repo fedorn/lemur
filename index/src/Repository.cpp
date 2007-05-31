@@ -1304,6 +1304,18 @@ std::vector<std::string> indri::collection::Repository::_fieldNames( indri::api:
   }
 
   return fields;
+}   
+
+//
+// makeEmpty
+//
+// Make an empty repository at "path".
+// 
+
+void indri::collection::Repository::makeEmpty( const std::string& path ) {
+  Repository empty;
+  empty.create( path );
+  empty.close();
 }
 
 //
@@ -1326,10 +1338,8 @@ void indri::collection::Repository::merge( const std::string& path, const std::v
 
   // If no indexes are given, make an empty repository and return
   if( inputIndexes.size() == 0 ) {
-    Repository empty;
-    empty.create( path );
-    empty.close();
-    return;
+      makeEmpty( path );
+      return;
   }
 
   std::vector<lemur::api::DOCID_T> documentMaximums;
@@ -1400,16 +1410,33 @@ void indri::collection::Repository::merge( const std::string& path, const std::v
     if( fieldNames != _fieldNames( repositoryManifest ) ) {
       LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Cannot merge repositories that use different fields: " + inputIndexes[i] );
     }
+  } 
+  
+  std::vector<std::string> usableIndexes = inputIndexes;
+  
+  // remove any repositories that have no documents
+  for( int i=0; i<usableIndexes.size(); i++ ) {
+    if( documentMaximums[i] == 0 ) {
+        documentMaximums.erase( documentMaximums.begin() + i );
+        usableIndexes.erase( usableIndexes.begin() + i );
+        i--;
+    }
+  }      
+  
+  // now that we've removed empty indexes, are there any left?
+  if( usableIndexes.size() == 0 ) {
+      makeEmpty( path );
+      return;
   }
 
   // 2. merge the deleted bitmaps
-  _mergeBitmaps( path, inputIndexes, documentMaximums );
+  _mergeBitmaps( path, usableIndexes, documentMaximums );
 
   // 3. merge compressed collections
-  _mergeCompressedCollections( path, inputIndexes, documentMaximums );
+  _mergeCompressedCollections( path, usableIndexes, documentMaximums );
 
   // 4. merge the indexes
-  _mergeClosedIndexes( path, inputIndexes, indexFields, documentMaximums );
+  _mergeClosedIndexes( path, usableIndexes, indexFields, documentMaximums );
 
   // 5. write the manifest file
   _writeMergedManifest( path, firstManifest );

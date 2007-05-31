@@ -220,7 +220,10 @@ namespace indri
       void write();
 
       /// Merge all internal indexes together
-      void merge();
+      void merge(); 
+      
+      /// Make an empty repository directory on disk
+      static void makeEmpty( const std::string& path );
 
       /// Merge two or more repositories together
       static void merge( const std::string& outputIndex, const std::vector<std::string>& inputIndexes );
