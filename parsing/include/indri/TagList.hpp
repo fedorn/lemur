@@ -76,7 +76,7 @@ namespace indri
         t.end = -1;
         t.next = _openList;
         _tags.push_back(t);
-        _openList = _tags.size()-1;
+        _openList = (int)_tags.size()-1;
       }
 
       void endTag(const char *name, const char* conflation, int end) {
@@ -111,7 +111,7 @@ namespace indri
         // look through the tags vector; they're already in sorted order by open
         // position.  Only add closed tags.
 
-        for( unsigned int i=0; i<_tags.size(); i++ ) {
+        for( size_t i=0; i<_tags.size(); i++ ) {
           tag_entry& entry = _tags[i];
 
           if( entry.end >= 0 ) {// data field might be empty at head of doc
@@ -143,7 +143,7 @@ namespace indri
       // in this case, we'll treat the list of tags in this list
       // as if they were offsets into a metadata list
       void writeMetadataList( indri::utility::greedy_vector<MetadataPair>& pairs, indri::utility::Buffer& buffer, const char* docText ) {
-        for( unsigned int i=0; i<_tags.size(); i++ ) {
+        for( size_t i=0; i<_tags.size(); i++ ) {
           tag_entry& entry = _tags[i];
 
           if( entry.end > 0 ) {

@@ -58,7 +58,7 @@ void indri::infnet::WeightedAndNode::_computeQuorum() {
   if( _quorumIndex < 0 )
     _quorumIndex = 0;
 
-  if( _quorumIndex > _children.size()-1 )
+  if( _quorumIndex > (int)_children.size()-1 )
     _recomputeThreshold = DBL_MAX;
   else
     _recomputeThreshold = maximumScore;
@@ -94,7 +94,7 @@ void indri::infnet::WeightedAndNode::indexChanged( indri::index::Index& index ) 
   indri::utility::greedy_vector< indri::utility::greedy_vector<indri::index::DocListIterator::TopDocument>* > lists;
 
   // get all the relevant topdocs lists
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     indri::infnet::TermFrequencyBeliefNode* node = dynamic_cast<indri::infnet::TermFrequencyBeliefNode*>(_children[i].node);
 
     if( node && indri::api::Parameters::instance().get( "topdocs", true ) ) {
@@ -112,7 +112,7 @@ void indri::infnet::WeightedAndNode::indexChanged( indri::index::Index& index ) 
   // TODO: could compute an initial threshold here, but that may not be necessary
   indri::utility::greedy_vector<int> indexes;
 
-  for( unsigned int i=0; i<lists.size(); i++ ) {
+  for( size_t i=0; i<lists.size(); i++ ) {
     if( lists[i]->size() )
       indexes.push_back( 0 );
     else
@@ -123,7 +123,7 @@ void indri::infnet::WeightedAndNode::indexChanged( indri::index::Index& index ) 
     // find the smallest document
     int smallestDocument = MAX_INT32;
 
-    for( unsigned int i=0; i<lists.size(); i++ ) {
+    for( size_t i=0; i<lists.size(); i++ ) {
       indri::utility::greedy_vector<indri::index::DocListIterator::TopDocument>& currentList = *lists[i];      
 
       if( indexes[i] >= 0 )
@@ -136,7 +136,7 @@ void indri::infnet::WeightedAndNode::indexChanged( indri::index::Index& index ) 
     _candidates.push_back( smallestDocument );
 
     // increment indexes
-    for( unsigned int i=0; i<lists.size(); i++ ) {
+    for( size_t i=0; i<lists.size(); i++ ) {
       indri::utility::greedy_vector<indri::index::DocListIterator::TopDocument>& currentList = *lists[i];      
 
       if( indexes[i] >= 0 && currentList[indexes[i]].document == smallestDocument ) {
@@ -149,7 +149,7 @@ void indri::infnet::WeightedAndNode::indexChanged( indri::index::Index& index ) 
     }
   }
 
-  for( int i=0; i<lists.size(); i++ )
+  for( size_t i=0; i<lists.size(); i++ )
     delete lists[i];
 
   // compute quorum
@@ -224,7 +224,7 @@ indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::We
     const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = (*iter).node->score( documentID, extent, documentLength );
 
     double childScore = 0;
-    for( unsigned int j=0; j<childResults.size(); j++ ) {
+    for( size_t j=0; j<childResults.size(); j++ ) {
       scored = true;
       childScore += (*iter).weight * childResults[j].score;
     }
@@ -252,7 +252,7 @@ bool indri::infnet::WeightedAndNode::hasMatch( int documentID ) {
   while( _candidatesIndex < _candidates.size() && _candidates[_candidatesIndex] <= documentID )
     _candidatesIndex++;
 
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     if( _children[i].node->hasMatch( documentID ) )
       return true;
   }
@@ -272,10 +272,10 @@ const indri::utility::greedy_vector<bool>& indri::infnet::WeightedAndNode::hasMa
   _matches.clear();
   _matches.resize( extents.size(), false );
 
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     const indri::utility::greedy_vector<bool>& kidMatches = _children[i].node->hasMatch( documentID, extents );
 
-    for( unsigned int j=0; j<kidMatches.size(); j++ ) {
+    for( size_t j=0; j<kidMatches.size(); j++ ) {
       if( kidMatches[j] ) {
         _matches[j] = true;
       }

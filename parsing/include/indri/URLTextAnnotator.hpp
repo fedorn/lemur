@@ -71,7 +71,7 @@ namespace indri
         *_buffer.write(1) = '\0';
         
         // now we're pointing to the copied urlText, so we can start parsing
-        int urlStart = document->terms.size();
+        int urlStart = (int)document->terms.size();
         char* c = urlText;    
         bool lastSkipped = true; 
         bool foundSlash = false;

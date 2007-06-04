@@ -31,7 +31,7 @@ void indri::parse::HTMLParser::initialize( TokenizedDocument* tokenized, indri::
   bool have_URL = false;
 
   // find the DOCHDR tag, so we can yank out the URL
-  for( unsigned int i=0; i<tokenized->metadata.size(); i++ ) {
+  for( size_t i=0; i<tokenized->metadata.size(); i++ ) {
     if( !strcmp(tokenized->metadata[i].key, "url") ) have_URL = true;
     if( !strcmp(tokenized->metadata[i].key, "dochdr") ) {
       char* beginURL = (char*) tokenized->metadata[i].value;
@@ -63,7 +63,7 @@ void indri::parse::HTMLParser::initialize( TokenizedDocument* tokenized, indri::
     indri::parse::MetadataPair pair;
     pair.key = "url";
     pair.value = url;
-    pair.valueLength = strlen(url)+1;
+    pair.valueLength = (int)strlen(url)+1;
     parsed->metadata.push_back( pair );
   }
 
@@ -129,7 +129,7 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
             // Need to get position of attribute value from
             // AttributeValuePair
 
-            int len = strlen( tmp_buf );
+            int len = (int)strlen( tmp_buf );
             TermExtent extent;
             // Extent stored will be the extent of the URL as it
             // appears in the text, and the normalized form 
@@ -142,9 +142,6 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
             char* write_location = _urlBuffer.write( len + 1 );
             memcpy( write_location, tmp_buf, len + 1 );
             _document.terms.push_back( write_location );
-
-//          std::cout << "Token [" << write_location << "] <" 
-//                    << (*i).begin << ", " << (*i).end << ">" << std::endl;
 
             // decrement number of tokens removed from the stream 
             // so that future field positions line up correctly.
@@ -178,7 +175,7 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
 
         prepURL( (*i).value );
 
-        int len = strlen( (*i).value );
+        int len = (int)strlen( (*i).value );
 
         char tmp_buf[MAX_URL_LENGTH];
         strncpy( tmp_buf, (*i).value, lemur_compat::min<int>( len, MAX_URL_LENGTH - 1) );
@@ -186,7 +183,7 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
 
         normalizeURL( tmp_buf );
         
-        len = strlen( tmp_buf );
+        len = (int)strlen( tmp_buf );
         strncpy( base_url, tmp_buf, lemur_compat::min<int>( len, MAX_URL_LENGTH-1 ) );
         base_url[lemur_compat::min<int>( len, MAX_URL_LENGTH - 1 )] = '\0';
 
@@ -260,7 +257,7 @@ bool indri::parse::HTMLParser::normalizeURL(char *s) {
 
       // extract the path
       for(; *c == '/'; c++); // skip leading slashes
-      path_len = s + strlen(s) - c;
+      path_len = s + (int)strlen(s) - c;
       if(path_len > 0) {
         strncpy(path, c, path_len);
         path[path_len] = '\0';
@@ -331,7 +328,7 @@ bool indri::parse::HTMLParser::normalizeURL(char *s) {
 
   indri::utility::greedy_vector<int,32> slashes;
   indri::utility::greedy_vector<bool,32> usable;
-  int normLength = strlen(normurl);
+  int normLength = (int)strlen(normurl);
 
   // get rid of ".." directories
   if( dotCleanStart >= 0 ) {
@@ -367,11 +364,11 @@ bool indri::parse::HTMLParser::normalizeURL(char *s) {
 
     // some ".." dir was found, so we're going to clean it out
     if( unusableFound ) {
-      for( int i=0; i<(int)usable.size(); i++ ) {
+      for( size_t i=0; i<usable.size(); i++ ) {
         if( !usable[i] ) {
           // search back to find something to mark false
           // to account for this '..'
-          for( int j=i; j>=0; j-- ) {
+          for( int j=(int)i; j>=0; j-- ) {
             if( usable[j] ) {
               usable[j] = false;
               break;
@@ -388,7 +385,7 @@ bool indri::parse::HTMLParser::normalizeURL(char *s) {
       strncpy(tmp_buf, normurl, dotCleanStart);
       tmp_buf[dotCleanStart] = 0;
 
-      for( int i=0; i<(int)usable.size(); i++ ) {
+      for( size_t i=0; i<usable.size(); i++ ) {
         if( usable[i] ) {
           if( slashes.size() == i+1 )
             strcat( tmp_buf, normurl + slashes[i] );
@@ -409,7 +406,7 @@ bool indri::parse::HTMLParser::normalizeURL(char *s) {
 // Remove trailing whitespace by terminating the string.
 void indri::parse::HTMLParser::prepURL( char *s ) {
 
-  int len = strlen( s );
+  int len = (int)strlen( s );
   int i;
 
   for ( i = 0; i < len; i++ ) {

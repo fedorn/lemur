@@ -33,8 +33,8 @@ namespace indri {
       // These fields refer to the tag's extent in the source text,
       // *not* the extent enclosed by an open tag and its matching
       // close tag.
-      unsigned int begin;
-      unsigned int end;
+      int begin;
+      int end;
 
       // Token position of this tag event; for example, if the tag
       // event occured between the 23rd and the 24th tokens extracted

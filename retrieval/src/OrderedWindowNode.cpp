@@ -38,7 +38,7 @@ indri::infnet::OrderedWindowNode::OrderedWindowNode( const std::string& name, co
 int indri::infnet::OrderedWindowNode::nextCandidateDocument() {
   int maxDocument = 0;
 
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     int current = _children[i]->nextCandidateDocument();
     if( current > maxDocument )
       maxDocument = current;
@@ -57,7 +57,7 @@ void indri::infnet::OrderedWindowNode::prepare( int documentID ) {
   //          check the candidate matches with the more frequent ones.
 
   // initialize children indices
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     const indri::utility::greedy_vector<indri::index::Extent>& childPositions = _children[i]->extents();
     _pointers[i].iter = childPositions.begin();
     _pointers[i].end = childPositions.end();
@@ -76,7 +76,7 @@ void indri::infnet::OrderedWindowNode::prepare( int documentID ) {
     bool match = true;
     double weight = 1.0;
 
-    for( unsigned int i=1; i<_pointers.size(); i++ ) {
+    for( size_t i=1; i<_pointers.size(); i++ ) {
       // try to find the first occurrence of this term that might
       // possibly work (has to start after the last one ends; this breaks CMU's #0 property syntax)
       while( _pointers[i].iter->begin < _pointers[i-1].iter->end ) {

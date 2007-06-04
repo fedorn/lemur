@@ -65,7 +65,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   
   if( _list ) {
     const indri::index::DocListIterator::DocumentData* entry = _list->currentEntry();
-    int count = ( entry && entry->document == documentID ) ? entry->positions.size() : 0;
+    int count = ( entry && entry->document == documentID ) ? (int)entry->positions.size() : 0;
     score = _function.scoreOccurrence( count, documentLength );
 
     assert( score <= _maximumScore || _list->topDocuments().size() > 0 );

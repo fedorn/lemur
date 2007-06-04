@@ -35,7 +35,7 @@ indri::xml::XMLNode::XMLNode( const std::string& name, const MAttributes& attrib
 }
 
 indri::xml::XMLNode::~XMLNode() {
-  for( unsigned int i=0; i<_children.size(); i++ )
+  for( size_t i=0; i<_children.size(); i++ )
     delete _children[i];
 }
 
@@ -75,7 +75,7 @@ const std::vector<indri::xml::XMLNode*>& indri::xml::XMLNode::getChildren() cons
 }
 
 const indri::xml::XMLNode* indri::xml::XMLNode::getChild( const std::string& name ) const {
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     if( _children[i]->getName() == name )
       return _children[i];
   }

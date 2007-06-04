@@ -236,7 +236,7 @@ void indri::index::DiskDocListIterator::_readTopdocs() {
   _topdocs.clear();
   _file->read( &topdocsCount, sizeof(UINT32) );
 
-  for( int i=0; i<topdocsCount; i++ ) {
+  for( UINT32 i=0; i<topdocsCount; i++ ) {
     int documentID, count, length;
 
     _file->read( &documentID, sizeof(UINT32) );

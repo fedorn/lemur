@@ -101,7 +101,7 @@ void indri::parse::StopperTransformation::read( const std::vector<char*>& stopwo
 }
 
 void indri::parse::StopperTransformation::read( indri::api::Parameters& stopwords ) {
-  for( int i=0; unsigned(i) < stopwords.size(); i++ ) {
+  for( unsigned int i=0; i < stopwords.size(); i++ ) {
     string_set_add( ( (std::string) stopwords[i] ).c_str(), _table );
   }
 }

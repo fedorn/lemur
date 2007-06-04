@@ -68,7 +68,7 @@ namespace indri
         if(slash) slash = strchr( slash+1, '/' );
         if(slash) slash = strchr( slash+1, '/' );
 
-        int domainLength;
+        size_t domainLength;
         if( slash )
           domainLength = slash - page;
         else
@@ -128,7 +128,7 @@ namespace indri
 
               _out << "LINKURL=" << url << std::endl;
               _out << "TEXT=\"";
-              for( unsigned int j=extent.begin; j < extent.end && textLength < 60000; j++ ) {
+              for( size_t j=extent.begin; int(j) < extent.end && textLength < 60000; j++ ) {
                 if( !document->terms[j] )
                   continue;
 

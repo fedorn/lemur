@@ -48,7 +48,7 @@ indri::index::DocExtentListMemoryBuilder::DocExtentListMemoryBuilder( bool numer
 //
 
 indri::index::DocExtentListMemoryBuilder::~DocExtentListMemoryBuilder() {
-  for( int i=0; i<_lists.size(); i++ ) {
+  for( size_t i=0; i<_lists.size(); i++ ) {
     delete[] _lists[i].base;
   }
 }
@@ -306,7 +306,7 @@ void indri::index::DocExtentListMemoryBuilder::flush() {
   assert( _documentPointer == 0 );
   assert( _locationCountPointer == 0 );
 
-  for( int i=0; i<_lists.size(); i++ ) {
+  for( size_t i=0; i<_lists.size(); i++ ) {
     assert( _lists[i].base <= _lists[i].capacity );
     assert( _lists[i].base <= _lists[i].data );
     assert( _lists[i].data <= _lists[i].capacity );

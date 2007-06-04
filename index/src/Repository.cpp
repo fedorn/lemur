@@ -224,7 +224,7 @@ void indri::collection::Repository::_openIndexes( indri::api::Parameters& params
     if( container.exists( "index" ) ) {
       indri::api::Parameters indexes = container["index"];
 
-      for( int i=0; i<indexes.size(); i++ ) {
+      for( size_t i=0; i<indexes.size(); i++ ) {
         indri::api::Parameters indexSpec = indexes[i];
         indri::index::DiskIndex* diskIndex = new indri::index::DiskIndex();
         std::string indexName = (std::string) indexSpec;
@@ -589,13 +589,13 @@ void indri::collection::Repository::_swapState( std::vector<indri::index::Index*
   index_state oldState = _active;
   _active = new index_vector;
 
-  int i;
+  size_t i;
   // copy all states up to oldIndexes
   for( i=0; i<oldState->size() && (*oldState)[i] != oldIndexes[0]; i++ ) {
     _active->push_back( (*oldState)[i] );
   }
 
-  int firstMatch = i;
+  size_t firstMatch = i;
 
   // verify (in debug builds) that all the indexes match up like they should
   for( ; i<oldState->size() && (i-firstMatch) < oldIndexes.size(); i++ ) {
@@ -620,7 +620,7 @@ void indri::collection::Repository::_swapState( std::vector<indri::index::Index*
 //
 
 void indri::collection::Repository::_removeStates( std::vector<index_state>& toRemove ) {
-  for( int i=0; i<toRemove.size(); i++ ) {
+  for( size_t i=0; i<toRemove.size(); i++ ) {
     std::vector<index_state>::iterator iter;
 
     for( iter = _states.begin(); iter != _states.end(); iter++ ) {
@@ -640,9 +640,9 @@ void indri::collection::Repository::_removeStates( std::vector<index_state>& toR
 
 bool indri::collection::Repository::_stateContains( index_state& state, std::vector<indri::index::Index*>& indexes ) {
   // for every index in this state
-  for( int j=0; j<state->size(); j++ ) {
+  for( size_t j=0; j<state->size(); j++ ) {
     // does it match one of our indexes?
-    for( int k=0; k<indexes.size(); k++ ) {
+    for( size_t k=0; k<indexes.size(); k++ ) {
       if( (*state)[j] == indexes[k] ) {
         return true;
       }
@@ -664,7 +664,7 @@ std::vector<indri::collection::Repository::index_state> indri::collection::Repos
   std::vector<index_state> result;
 
   // for every current state
-  for( int i=0; i<_states.size(); i++ ) {
+  for( size_t i=0; i<_states.size(); i++ ) {
     index_state& state = _states[i];
 
     if( _stateContains( state, indexes ) )
@@ -685,7 +685,7 @@ void indri::collection::Repository::_closeIndexes() {
   // drops all states except active to reference count 0, so they get deleted
   _states.clear();
 
-  for( int i=0; i<_active->size(); i++ ) {
+  for( size_t i=0; i<_active->size(); i++ ) {
     (*_active)[i]->close();
     delete (*_active)[i];
   }
@@ -695,8 +695,8 @@ void indri::collection::Repository::_closeIndexes() {
 }
 
 void print_index_state( std::vector<indri::collection::Repository::index_state>& states ) {
-  for( int i=0; i<states.size(); i++ ) {
-    for( int j=0; j<states[i]->size(); j++ ) {
+  for( size_t i=0; i<states.size(); i++ ) {
+    for( size_t j=0; j<states[i]->size(); j++ ) {
       std::cout << i << " " << (*states[i])[j] << std::endl;
     }
   }
@@ -753,7 +753,7 @@ void indri::collection::Repository::_trim() {
   if( state->size() <= 3 )
     return;
 
-  int count = state->size();
+  size_t count = state->size();
   int position;
 
   // here's how this works:
@@ -766,14 +766,14 @@ void indri::collection::Repository::_trim() {
   //
 
   // have to merge at least the last three indexes
-  int firstDocumentCount = (*state)[count-1]->documentCount();
-  int lastDocumentCount = (*state)[count-3]->documentCount();
+  int firstDocumentCount = (int)(*state)[count-1]->documentCount();
+  int lastDocumentCount = (int)(*state)[count-3]->documentCount();
   int documentCount = 0;
  
   // move back until we find a really big index--don't merge with that one
   for( position = count-4; position>=0; position-- ) {
     // compute the average number of documents in the indexes we've seen so far
-    documentCount = (*state)[position]->documentCount();
+    documentCount = (int)(*state)[position]->documentCount();
 
     // break if we find an index more than 50% larger than the last one 
     if( documentCount > lastDocumentCount*1.5 && 
@@ -854,7 +854,7 @@ unsigned int indri::collection::Repository::_mergeFiles( const std::vector<indri
   // repository 2
   // index/n/ 11
   // so call it 24 * (number of indexes.+ 1)
-  unsigned int totalFiles = (20 * (indexes.size() + 1));
+  unsigned int totalFiles = (unsigned int)(20 * (indexes.size() + 1));
   return totalFiles;
 }
 
@@ -900,7 +900,7 @@ indri::index::Index* indri::collection::Repository::_mergeStage( index_state& st
 
   while( 1 ) {
     bool referencesExist = false;
-    for( int i=0; i<containing.size(); i++ ) {
+    for( size_t i=0; i<containing.size(); i++ ) {
       // we allow one reference in the _states vector, and one in the containing vector
       referencesExist = referencesExist || containing[i].references() > 2;
     }
@@ -914,7 +914,7 @@ indri::index::Index* indri::collection::Repository::_mergeStage( index_state& st
 
   // okay, now nobody is using the state, so we can get rid of those states
   // and the index we wrote
-  for( int i=0; i<indexes.size(); i++ ) {
+  for( size_t i=0; i<indexes.size(); i++ ) {
     indri::index::DiskIndex* diskIndex = dynamic_cast<indri::index::DiskIndex*>(indexes[i]);
     std::string path;
 
@@ -1121,7 +1121,7 @@ void indri::collection::Repository::_writeParameters( const std::string& path ) 
   indri::api::Parameters indexes = _parameters["indexes"];
   indexes.clear();
 
-  for( int i=0; i<_active->size(); i++ ) {
+  for( size_t i=0; i<_active->size(); i++ ) {
     indri::index::DiskIndex* index = dynamic_cast<indri::index::DiskIndex*>((*_active)[i]);
 
     if( index ) {
@@ -1297,7 +1297,7 @@ std::vector<std::string> indri::collection::Repository::_fieldNames( indri::api:
   std::vector<std::string> fields;
 
   if( parameters.exists( "field" ) ) {
-    for( int i=0; i<parameters["field"].size(); i++ ) {
+    for( size_t i=0; i<parameters["field"].size(); i++ ) {
       std::string fieldName = parameters["field"][i];
       fields.push_back( fieldName );
     }
@@ -1367,7 +1367,7 @@ void indri::collection::Repository::merge( const std::string& path, const std::v
   std::vector<std::string> fieldNames = _fieldNames( firstManifest );
 
   // Now, gather information about the indexes
-  for( int i=0; i<inputIndexes.size(); i++ ) {
+  for( size_t i=0; i<inputIndexes.size(); i++ ) {
     indri::api::Parameters repositoryManifest;
     std::string manifestPath = indri::file::Path::combine( inputIndexes[i], "manifest" );
 
@@ -1383,7 +1383,7 @@ void indri::collection::Repository::merge( const std::string& path, const std::v
     }
 
     // Check to make sure there's only one index in there
-    int indexCount = repositoryManifest["indexes.index"].size();
+    size_t indexCount = repositoryManifest["indexes.index"].size();
 
     if( indexCount > 1 ) {
       LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Cannot merge repositories that have unmerged internal indexes: " + inputIndexes[i] );
@@ -1415,7 +1415,7 @@ void indri::collection::Repository::merge( const std::string& path, const std::v
   std::vector<std::string> usableIndexes = inputIndexes;
   
   // remove any repositories that have no documents
-  for( int i=0; i<usableIndexes.size(); i++ ) {
+  for( size_t i=0; i<usableIndexes.size(); i++ ) {
     if( documentMaximums[i] == 0 ) {
         documentMaximums.erase( documentMaximums.begin() + i );
         usableIndexes.erase( usableIndexes.begin() + i );
@@ -1464,7 +1464,7 @@ void indri::collection::Repository::_mergeBitmaps( const std::string& outputPath
   indri::index::DeletedDocumentList deletedList;
   lemur::api::DOCID_T totalDocuments = 0;
 
-  for( int i=0; i<repositories.size(); i++ ) {
+  for( size_t i=0; i<repositories.size(); i++ ) {
     indri::index::DeletedDocumentList localList;
     std::string deletedPath = indri::file::Path::combine( repositories[i], "deleted" );
     localList.read( deletedPath );
@@ -1494,7 +1494,7 @@ void indri::collection::Repository::_mergeClosedIndexes( const std::string& outp
   std::vector<indri::index::Index*> indexes;
   std::vector<indri::index::DeletedDocumentList*> deletedLists;
 
-  for( int i=0; i<repositoryPaths.size(); i++ ) {
+  for( size_t i=0; i<repositoryPaths.size(); i++ ) {
     // open the repository
     Repository* repository = new Repository();
     repository->openRead( repositoryPaths[i] );
@@ -1511,7 +1511,7 @@ void indri::collection::Repository::_mergeClosedIndexes( const std::string& outp
   deletedLists.clear();
   indexes.clear();
 
-  for( int i=0; i<repositories.size(); i++ ) {
+  for( size_t i=0; i<repositories.size(); i++ ) {
     repositories[i]->close();
     delete repositories[i];
   }
@@ -1541,7 +1541,7 @@ void indri::collection::Repository::_mergeCompressedCollections( const std::stri
   collection.create( collectionPath, forwardFields, reverseFields );
   lemur::api::DOCID_T documentOffset = 0;
 
-  for( int i=0; i<repositories.size(); i++ ) {
+  for( size_t i=0; i<repositories.size(); i++ ) {
     CompressedCollection other;
 
     std::string otherCollectionPath = indri::file::Path::combine( repositories[i], "collection" );

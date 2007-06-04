@@ -38,7 +38,7 @@ void indri::net::XMLReplyReceiver::wait( indri::net::NetworkMessageStream* strea
 }
 
 int indri::net::NetworkMessageStream::_findEOL() {
-  for( size_t i=_readPosition; i<_writePosition; i++ ) {
+  for( int i=_readPosition; i<_writePosition; i++ ) {
     if( _buffer.front()[i] == '\n' )
       return int(i);
   }

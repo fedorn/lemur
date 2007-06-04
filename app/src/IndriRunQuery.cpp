@@ -217,7 +217,7 @@ static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, ind
 
   indri::api::Parameters slice = p[parameterName];
   
-  for( int i=0; i<slice.size(); i++ ) {
+  for( size_t i=0; i<slice.size(); i++ ) {
     vec.push_back( slice[i] );
   }
 
@@ -317,7 +317,7 @@ private:
       documents = _environment.documents( resultSubset );
       documentNames.clear();
 
-      for( unsigned int i=0; i<resultSubset.size(); i++ ) {
+      for( size_t i=0; i<resultSubset.size(); i++ ) {
         indri::api::ParsedDocument* doc = documents[i];
         std::string documentName;
 
@@ -349,7 +349,7 @@ private:
     }
     
     // Print results
-    for( unsigned int i=0; i < resultSubset.size(); i++ ) {
+    for( size_t i=0; i < resultSubset.size(); i++ ) {
       int rank = start+i+1;
       int queryNumber = queryIndex;
 
@@ -402,8 +402,8 @@ private:
   }
 
   void _printResults( std::stringstream& output, int queryIndex ) {
-    for( int start = 0; start < _results.size(); start += 50 ) {
-      int end = std::min<int>( start + 50, _results.size() );
+    for( size_t start = 0; start < _results.size(); start += 50 ) {
+      size_t end = std::min<size_t>( start + 50, _results.size() );
       _printResultRegion( output, queryIndex, start, end );
     }
     delete _annotation;
@@ -445,7 +445,7 @@ public:
    if( _parameters.exists( "index" ) ) {
       indri::api::Parameters indexes = _parameters["index"];
 
-      for( unsigned int i=0; i < indexes.size(); i++ ) {
+      for( size_t i=0; i < indexes.size(); i++ ) {
         _environment.addIndex( std::string(indexes[i]) );
       }
     }
@@ -453,7 +453,7 @@ public:
     if( _parameters.exists( "server" ) ) {
       indri::api::Parameters servers = _parameters["server"];
 
-      for( unsigned int i=0; i < servers.size(); i++ ) {
+      for( size_t i=0; i < servers.size(); i++ ) {
         _environment.addServer( std::string(servers[i]) );
       }
     }
@@ -533,7 +533,7 @@ public:
 void push_queue( std::queue< query_t* >& q, indri::api::Parameters& queries,
                  int queryOffset ) {
 
-  for( int i=0; i<queries.size(); i++ ) {
+  for( size_t i=0; i<queries.size(); i++ ) {
     int queryNumber;
     std::string queryText;
     std::string queryType = "indri";
@@ -545,7 +545,7 @@ void push_queue( std::queue< query_t* >& q, indri::api::Parameters& queries,
       queryNumber = (int) queries[i]["number"];
     } else {
       queryText = (std::string) queries[i];
-      queryNumber = queryOffset + i;
+      queryNumber = queryOffset + int(i);
     }
     q.push( new query_t( i, queryNumber, queryText, queryType ) );
   }
@@ -577,7 +577,7 @@ int main(int argc, char * argv[]) {
     indri::api::Parameters parameterQueries = param[ "query" ];
     int queryOffset = param.get( "queryOffset", 0 );
     push_queue( queries, parameterQueries, queryOffset );
-    int queryCount = queries.size();
+    int queryCount = (int)queries.size();
 
     // launch threads
     for( int i=0; i<threadCount; i++ ) {
@@ -635,7 +635,7 @@ int main(int argc, char * argv[]) {
     }
 
     // join all the threads
-    for( int i=0; i<threads.size(); i++ )
+    for( size_t i=0; i<threads.size(); i++ )
       threads[i]->join();
 
     // we've seen all the query output now, so we can quit

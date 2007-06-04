@@ -124,7 +124,7 @@ namespace indri
         // even though we cleared it out.  In that case, make it bigger.
         if( endWrite > endBufferData ) {
           // need to move the buffer pointer to the end, potentially resizing buffer
-          _current.buffer.write( endWrite - endBufferData );
+          _current.buffer.write( size_t(endWrite - endBufferData) );
           endBufferData = _current.filePosition + _current.buffer.position();
         }
 

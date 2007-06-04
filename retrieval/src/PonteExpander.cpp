@@ -78,7 +78,7 @@ std::string indri::query::PonteExpander::expand( std::string originalQuery , std
   std::map<std::string, PonteTerm> query_model;
 
   // initialize all PonteTerm structures
-  for( int i = 0; i < rm_vocab->size(); i++ ) {
+  for( size_t i = 0; i < rm_vocab->size(); i++ ) {
     PonteTerm pterm;
 
     pterm.stem = (*rm_vocab)[i];
@@ -90,7 +90,7 @@ std::string indri::query::PonteExpander::expand( std::string originalQuery , std
   delete rm_vocab;
 
   // gather document vectors / statistics for top fbDocs ranked documents
-  for( int doc = 0; doc < fbDocs && doc < results.size(); doc++ ) {
+  for( size_t doc = 0; (int)doc < fbDocs && doc < results.size(); doc++ ) {
     indri::api::DocumentVector * docVec = docVectors[ doc ];
     indri::utility::greedy_vector<int> positions = docVec->positions();
     const std::vector<std::string>& stems = docVec->stems();

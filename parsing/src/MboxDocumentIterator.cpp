@@ -191,7 +191,7 @@ indri::parse::UnparsedDocument* indri::parse::MboxDocumentIterator::nextDocument
   *_buffer.write(1) = 0;
 
   // fix up existing metadata
-  for( int i=0; i<_document.metadata.size(); i++ ) {
+  for( size_t i=0; i<_document.metadata.size(); i++ ) {
     size_t offset = (size_t) _document.metadata[i].value;
     _document.metadata[i].value = _metaBuffer.front() + offset;
   }
@@ -204,7 +204,7 @@ indri::parse::UnparsedDocument* indri::parse::MboxDocumentIterator::nextDocument
   _document.metadata.push_back( pair );
 
   // copy subject into docno
-  for( int i=0; i<_document.metadata.size(); i++ ) {
+  for( size_t i=0; i<_document.metadata.size(); i++ ) {
     if( !strcmp( "subject", _document.metadata[i].key ) ) {
       pair.key = "docno";
       pair.value = _document.metadata[i].value;

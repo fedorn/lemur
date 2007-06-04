@@ -51,7 +51,7 @@ static bool maintenance_should_merge( indri::collection::Repository::index_state
   bool couldUseMerge = state->size() >= 2;
   bool significantQueryLoad = smoothedQueryLoad > 2;
   bool insignificantDocumentLoad = smoothedDocumentLoad < 1;
-  int indexesToMerge = state->size(); 
+  int indexesToMerge = (int)state->size(); 
   
   // extremely heuristic choice for when indexes should be merged:
   //   we merge if there are a lot of incoming queries relative to

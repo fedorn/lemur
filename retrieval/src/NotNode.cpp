@@ -48,7 +48,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   _extents.clear();
   const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& child = _child->score( documentID, extent, documentLength );
 
-  for( unsigned int i=0; i<child.size(); i++ ) {
+  for( size_t i=0; i<child.size(); i++ ) {
     _extents.push_back( indri::api::ScoredExtentResult( log( 1.0 - exp(child[i].score) ), documentID, extent.begin, extent.end ) );
   }
 

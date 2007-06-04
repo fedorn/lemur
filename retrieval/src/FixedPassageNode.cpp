@@ -52,7 +52,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, _subextents );
 
   // loop through the subextents, scoring each one
-  for( int i=0; i<_subextents.size(); i++ ) {
+  for( size_t i=0; i<_subextents.size(); i++ ) {
     int scoreBegin = _subextents[i].begin;
     int scoreEnd = _subextents[i].end;
     if( !matches[i] )
@@ -60,8 +60,8 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   
     const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, _subextents[i], documentLength );
 
-    for( int i=0; i<childResults.size(); i++ ) {
-      indri::api::ScoredExtentResult result( childResults[i].score, documentID, scoreBegin, scoreEnd );
+    for( size_t j=0; j<childResults.size(); j++ ) {
+      indri::api::ScoredExtentResult result( childResults[j].score, documentID, scoreBegin, scoreEnd );
       _scores.push_back( result );
     }
   }
@@ -80,7 +80,7 @@ void indri::infnet::FixedPassageNode::annotate( indri::infnet::Annotator& annota
   _buildSubextents( extent ); 
   const indri::utility::greedy_vector<bool>& matches = _child->hasMatch( documentID, _subextents );
 
-  for( int i=0; i<_subextents.size(); i++ ) {
+  for( size_t i=0; i<_subextents.size(); i++ ) {
     if (matches[i])
       _child->annotate( annotator, documentID, _subextents[i] );
   }

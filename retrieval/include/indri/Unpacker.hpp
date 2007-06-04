@@ -59,7 +59,7 @@ namespace indri {
         std::vector<T*> result;
         const indri::xml::XMLNode* vector = _current->getChild(name);
 
-        for( unsigned int i=0; i<vector->getChildren().size(); i++ ) {
+        for( size_t i=0; i<vector->getChildren().size(); i++ ) {
           indri::xml::XMLNode* ref = vector->getChildren()[i];
           T* node = dynamic_cast<T*>(_nodes[ref->getValue()]);
           result.push_back(node);

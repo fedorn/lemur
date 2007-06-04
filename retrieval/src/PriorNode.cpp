@@ -50,7 +50,6 @@ const indri::utility::greedy_vector<bool>& indri::infnet::PriorNode::hasMatch( i
 }
 
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::PriorNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
-  int key;
   double score = -1e100;
   
   if( _iterator && !_iterator->finished() )

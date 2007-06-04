@@ -91,8 +91,6 @@ bool indri::index::DiskKeyfileVocabularyIterator::_readData() {
   int actual;
   int actualKeyLen;
 
-  //_bulkIterator->get( _termString, _compressedData.front(), _compressedData.size(), actual );
-        
   memset(_termString, 0, 1024);
   _bulkIterator->get( _termString, 1024, actualKeyLen, _compressedData.front(), _compressedData.size(), actual );
   indri::utility::RVLDecompressStream stream( _compressedData.front(), actual );

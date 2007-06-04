@@ -44,8 +44,8 @@ namespace indri
       };
 
       const char* name;
-      unsigned int begin;
-      unsigned int end;
+      int begin;
+      int end;
       INT64 number;
       TagExtent *parent;
       // explicit initial count of two elements.

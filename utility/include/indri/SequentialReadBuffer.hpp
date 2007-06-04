@@ -21,6 +21,7 @@
 #include "indri/indri-platform.h"
 #include "indri/File.hpp"
 #include "indri/InternalFileBuffer.hpp"
+#include "Exception.hpp"
 
 namespace indri
 {
@@ -78,7 +79,11 @@ namespace indri
           // data isn't in the current buffer
           // this isn't necessarily the most efficient way to do this, but it should work
           cache( _position, std::max( length, _current.buffer.size() ) );
-          assert( _current.buffer.position() + _current.filePosition >= _position + length );
+          // if we get a short read
+          if ( _current.buffer.position() + _current.filePosition < _position + length ) {
+            LEMUR_THROW(LEMUR_IO_ERROR, "read fewer bytes than expected.");
+          }
+          
         }
 
         result = _current.buffer.front() + ( _position - _current.filePosition );

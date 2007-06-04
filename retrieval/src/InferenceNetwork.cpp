@@ -119,7 +119,7 @@ void indri::infnet::InferenceNetwork::_indexChanged( indri::index::Index& index 
   _closeIteratorBound = -1;
 
   // doc iterators
-  for( int i=0; i<_termNames.size(); i++ ) {
+  for( size_t i=0; i<_termNames.size(); i++ ) {
     indri::index::DocListIterator* iterator = index.docListIterator( _termNames[i] );
     if( iterator )
       iterator->startIteration();
@@ -128,7 +128,7 @@ void indri::infnet::InferenceNetwork::_indexChanged( indri::index::Index& index 
   }
 
   // field iterators
-  for( int i=0; i<_fieldNames.size(); i++ ) {
+  for( size_t i=0; i<_fieldNames.size(); i++ ) {
     indri::index::DocExtentListIterator* iterator = index.fieldListIterator( _fieldNames[i] );
     if( iterator )
       iterator->startIteration();
@@ -137,7 +137,7 @@ void indri::infnet::InferenceNetwork::_indexChanged( indri::index::Index& index 
   }
   
   // prior iterators
-  for( int i=0; i<_priorNames.size(); i++ ) {
+  for( size_t i=0; i<_priorNames.size(); i++ ) {
     // TODO: this is wasteful, since the prior is associated with the whole collection,
     // there's no need to fetch it for each index.  but, it's just easier to code it like this for now
     indri::collection::PriorListIterator* iterator = _repository.priorListIterator( _priorNames[i] );
@@ -182,7 +182,7 @@ void indri::infnet::InferenceNetwork::_indexChanged( indri::index::Index& index 
 int indri::infnet::InferenceNetwork::_nextCandidateDocument( indri::index::DeletedDocumentList::read_transaction* deleted ) {
   int candidate = MAX_INT32;
 
-  for( unsigned int i=0; i<_complexEvaluators.size(); i++ ) {
+  for( size_t i=0; i<_complexEvaluators.size(); i++ ) {
     candidate = lemur_compat::min( candidate, _complexEvaluators[i]->nextCandidateDocument() );
   }
 
@@ -196,7 +196,7 @@ int indri::infnet::InferenceNetwork::_nextCandidateDocument( indri::index::Delet
 void indri::infnet::InferenceNetwork::_evaluateDocument( indri::index::Index& index, int document ) {
   int candidateLength = index.documentLength( document );
 
-  for( unsigned int i=0; i<_complexEvaluators.size(); i++ ) {
+  for( size_t i=0; i<_complexEvaluators.size(); i++ ) {
     _complexEvaluators[i]->evaluate( document, candidateLength );
   }
 }
@@ -241,17 +241,17 @@ indri::collection::PriorListIterator* indri::infnet::InferenceNetwork::getPriorI
 
 int indri::infnet::InferenceNetwork::addDocIterator( const std::string& termName ) {
   _termNames.push_back( termName );
-  return _termNames.size()-1;
+  return (int)_termNames.size()-1;
 }
 
 int indri::infnet::InferenceNetwork::addFieldIterator( const std::string& fieldName ) {
   _fieldNames.push_back( fieldName );
-  return _fieldNames.size()-1;
+  return (int)_fieldNames.size()-1;
 }
 
 int indri::infnet::InferenceNetwork::addPriorIterator( const std::string& priorName ) {
   _priorNames.push_back( priorName );
-  return _priorNames.size()-1;
+  return (int)_priorNames.size()-1;
 }
 
 void indri::infnet::InferenceNetwork::addListNode( indri::infnet::ListIteratorNode* listNode ) {
@@ -342,7 +342,7 @@ const indri::infnet::InferenceNetwork::MAllResults& indri::infnet::InferenceNetw
   // fetch the current index state
   indri::collection::Repository::index_state indexes = _repository.indexes();
   
-  for( int i=0; i<indexes->size(); i++ ) {
+  for( size_t i=0; i<indexes->size(); i++ ) {
     indri::index::Index& index = *(*indexes)[i];
     indri::thread::ScopedLock iterators( index.iteratorLock() );
 
@@ -358,7 +358,7 @@ const indri::infnet::InferenceNetwork::MAllResults& indri::infnet::InferenceNetw
   }
 
   _results.clear();
-  for( unsigned int i=0; i<_evaluators.size(); i++ ) {
+  for( size_t i=0; i<_evaluators.size(); i++ ) {
     _results[ _evaluators[i]->getName() ] = _evaluators[i]->getResults();
   }
 

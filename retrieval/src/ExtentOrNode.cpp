@@ -32,7 +32,7 @@ void indri::infnet::ExtentOrNode::prepare( int documentID ) {
   indri::utility::greedy_vector<indri::index::Extent> allExtents;
 
   // put all extents in the same bag
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     _extents.append( _children[i]->extents().begin(), _children[i]->extents().end() );
   }
 
@@ -47,7 +47,7 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
 int indri::infnet::ExtentOrNode::nextCandidateDocument() {
   int candidate = INT_MAX;
   
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     candidate = lemur_compat::min( _children[i]->nextCandidateDocument(), candidate );
   }
 
@@ -61,8 +61,8 @@ const std::string& indri::infnet::ExtentOrNode::getName() const {
 void indri::infnet::ExtentOrNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   annotator.addMatches( _extents, this, documentID, extent );
 
-  for( unsigned int i=0; i<_extents.size(); i++ ) {
-    for( unsigned int j=0; j<_children.size(); j++ ) {
+  for( size_t i=0; i<_extents.size(); i++ ) {
+    for( size_t j=0; j<_children.size(); j++ ) {
       _children[j]->annotate( annotator, documentID, (indri::index::Extent &)_extents[i] );
     }
   }

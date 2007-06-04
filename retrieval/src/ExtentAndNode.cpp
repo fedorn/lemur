@@ -105,7 +105,7 @@ int indri::infnet::ExtentAndNode::nextCandidateDocument() {
   assert( _children.size() );
   int candidate = 0;
 
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     candidate = lemur_compat::max( candidate, _children[i]->nextCandidateDocument() );
   }
 

@@ -74,7 +74,7 @@ inline int indri::file::BulkBlock::_valueEnd( int index ) {
 }
 
 inline bool indri::file::BulkBlock::_canInsert( int keyLength, int dataLength ) {
-  return _remainingCapacity() >= (keyLength + dataLength + 2*sizeof(UINT16));
+  return _remainingCapacity() >= (keyLength + dataLength + 2*int(sizeof(UINT16)));
 }
 
 inline void indri::file::BulkBlock::_storeKeyValueLength( int insertPoint, int keyLength, int valueLength ) {
@@ -243,7 +243,7 @@ bool indri::file::BulkBlock::find( const char* key, int keyLength, char* value, 
 //
 int indri::file::BulkBlock::findIndexOf(const char* key) {
   bool exact;
-  return _find( key, strlen(key), exact );
+  return _find( key, (int)strlen(key), exact );
 }
 
 
@@ -338,7 +338,7 @@ indri::file::BulkBlock* indri::file::BulkBlock::previous() {
 void indri::file::BulkTreeWriter::_flush( int blockIndex ) {
   indri::file::BulkBlock& flusher = *_blocks[blockIndex];
 
-  if( blockIndex < _blocks.size() - 1 ) {
+  if( blockIndex < (int)_blocks.size() - 1 ) {
     indri::file::BulkBlock& parent = *_blocks[blockIndex+1];
     
     if( ! parent.insertFirstKey( flusher, _blockID ) ) {
@@ -358,9 +358,9 @@ void indri::file::BulkTreeWriter::_flush( int blockIndex ) {
 
 void indri::file::BulkTreeWriter::_flushAll() {
   // note: _flushLevel may grow during this loop
-  int originalSize = _blocks.size();
+  int originalSize = (int)_blocks.size();
 
-  for( int i=0; i<_blocks.size(); i++ ) {
+  for( int i=0; i<(int)_blocks.size(); i++ ) {
     bool hasNotBeenFlushed = (i > _flushLevel);
     int count = _blocks[i]->count();
 
@@ -394,7 +394,7 @@ void indri::file::BulkTreeWriter::put( UINT32 key, const char* value, int valueL
 }
 
 void indri::file::BulkTreeWriter::put( const char* key, const char* value, int valueLength ) {
-  put( key, strlen(key), value, valueLength );
+  put( key, (int)strlen(key), value, valueLength );
 }
 
 void indri::file::BulkTreeWriter::put( const char* key, int keyLength, const char* value, int valueLength ) {
@@ -548,7 +548,7 @@ bool indri::file::BulkTreeReader::get( const char* key, int keyLength, char* val
 }
 
 bool indri::file::BulkTreeReader::get( const char* key, char* value, int& actual, int valueLength ) {
-  return get(key, strlen(key), value, actual, valueLength);
+  return get(key, (int)strlen(key), value, actual, valueLength);
 }
 
 bool indri::file::BulkTreeReader::get( UINT32 key, char* value, int& actual, int valueLength ) {
@@ -572,7 +572,7 @@ indri::file::BulkTreeIterator* indri::file::BulkTreeReader::findFirst(const char
 
   int nextID = rootID;
 
-  int keyLength=strlen(key);
+  int keyLength=(int)strlen(key);
 
   while( true ) {
     block = _fetch( nextID );

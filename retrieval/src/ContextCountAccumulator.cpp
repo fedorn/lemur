@@ -84,9 +84,9 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
 
     const indri::utility::greedy_vector<indri::index::Extent>& matches = _matches->extents();
     const indri::utility::greedy_vector<indri::index::Extent>& extents = _context->extents();
-    unsigned int ex = 0;
+    size_t ex = 0;
     int lastEnd = 0;
-    for( unsigned int i=0; i<matches.size() && ex < extents.size(); i++ ) {
+    for( size_t i=0; i<matches.size() && ex < extents.size(); i++ ) {
       // find a context extent that might possibly contain this match
       // here we're relying on the following invariants: 
       //    both arrays are sorted by beginning position
@@ -123,7 +123,7 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
       }
     }
 
-    for( unsigned int i=0; i<extents.size(); i++ ) {
+    for( size_t i=0; i<extents.size(); i++ ) {
       documentContextSize += extents[i].end - extents[i].begin;
     }
 

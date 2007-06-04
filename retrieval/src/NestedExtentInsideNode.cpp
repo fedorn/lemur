@@ -119,7 +119,7 @@ void indri::infnet::NestedExtentInsideNode::annotate( class Annotator& annotator
   indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
   iter = std::lower_bound( _extents.begin(), _extents.end(), range, indri::index::Extent::begins_before_less() );
   
-  for( unsigned int i = iter-_extents.begin(); i<_extents.size() && _extents[i].begin <= extent.end; i++ ) {
+  for( size_t i = iter-_extents.begin(); i<_extents.size() && _extents[i].begin <= extent.end; i++ ) {
     _inner->annotate( annotator, documentID, (indri::index::Extent &)_extents[i] );
     _outer->annotate( annotator, documentID, (indri::index::Extent &)_extents[i] );
   }

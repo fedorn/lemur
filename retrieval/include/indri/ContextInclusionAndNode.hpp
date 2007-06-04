@@ -62,7 +62,7 @@ namespace indri
       std::string _name;
 
       indri::utility::greedy_vector<int> _candidates;
-      int _candidatesIndex;
+      size_t _candidatesIndex;
 
       double _threshold;
       double _recomputeThreshold;

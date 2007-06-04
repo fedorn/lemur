@@ -144,7 +144,7 @@ void indri::index::DeletedDocumentList::append( DeletedDocumentList& other, lemu
 int indri::index::DeletedDocumentList::read_transaction::nextCandidateDocument( int documentID ) {
   _lock.yieldRead();
 
-  while( documentID < _bitmap.position()*8 ) {
+  while( documentID < (int)_bitmap.position()*8 ) {
     char bitmapByte = _bitmap.front()[documentID/8];
     bool marked = (bitmapByte & 1<<(documentID%8)) != 0;
 
@@ -162,7 +162,7 @@ int indri::index::DeletedDocumentList::read_transaction::nextCandidateDocument( 
 //
 
 bool indri::index::DeletedDocumentList::read_transaction::isDeleted( int documentID ) const {
-  if( _bitmap.position() < (documentID/8)+1 )
+  if( (int)_bitmap.position() < (documentID/8)+1 )
     return false;
 
   char bitmapByte = _bitmap.front()[documentID/8];
@@ -179,7 +179,7 @@ void indri::index::DeletedDocumentList::markDeleted( int documentID ) {
   _modified = true;
   indri::thread::ScopedLock l( _writeLock );
 
-  if( _bitmap.position() < (documentID/8)+1 ) {
+  if( (int)_bitmap.position() < (documentID/8)+1 ) {
     _grow( documentID );
   }
 
@@ -197,7 +197,7 @@ void indri::index::DeletedDocumentList::markDeleted( int documentID ) {
 
 bool indri::index::DeletedDocumentList::isDeleted( int documentID ) {
   indri::thread::ScopedLock l( _readLock );
-  if( _bitmap.position() < (documentID/8)+1 )
+  if( (int)_bitmap.position() < (documentID/8)+1 )
     return false;
 
   char bitmapByte = _bitmap.front()[documentID/8];
@@ -236,7 +236,7 @@ void indri::index::DeletedDocumentList::_calculateDeletedCount() {
   // scan the bytes, add up the bits
   UINT64 total = 0;
   unsigned char *front = (unsigned char *)_bitmap.front();
-  for( int i=0; i<_bitmap.position(); i++ ) {
+  for( size_t i=0; i<_bitmap.position(); i++ ) {
     unsigned char idx = front[i];
     total += bitCount[idx];
   }

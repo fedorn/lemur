@@ -29,7 +29,7 @@ indri::parse::NormalizationTransformation::NormalizationTransformation( indri::a
     indri::api::Parameters words = (*acronymList)["word"];
     _acronyms = string_set_create();
     
-    for( int i=0; i<words.size(); i++ ) {
+    for( size_t i=0; i<words.size(); i++ ) {
       std::string acronym;
       acronym = (std::string) words[i];
       string_set_add( acronym.c_str(), _acronyms );

@@ -75,7 +75,7 @@ void delete_query_node( indri::api::QueryAnnotationNode* node, std::set<indri::a
   // query tree may be a dag, so we have to be careful
   deleted.insert(node);
   
-  for( unsigned int i=0; i<node->children.size(); i++ ) {
+  for( size_t i=0; i<node->children.size(); i++ ) {
     indri::api::QueryAnnotationNode* child = node->children[i];
     if( deleted.find(child) != deleted.end() )
       delete_query_node(node->children[i], deleted);

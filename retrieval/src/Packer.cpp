@@ -61,7 +61,7 @@ namespace indri {
     }
 
     void Packer::pack( std::vector<indri::lang::Node*>& roots ) {
-      for( unsigned int i=0; i<roots.size(); i++ ) {
+      for( size_t i=0; i<roots.size(); i++ ) {
         pack( roots[i] );
       }
     }
@@ -140,7 +140,7 @@ namespace indri {
       if( !element->flushed ) { 
         indri::xml::XMLNode* node = new indri::xml::XMLNode( name );
 
-        for( unsigned int i=0; i<value.size(); i++ ) {
+        for( size_t i=0; i<value.size(); i++ ) {
           ::std::stringstream intToString;
           intToString << value[i];
 
@@ -158,7 +158,7 @@ namespace indri {
       if( !element->flushed ) { 
         indri::xml::XMLNode* node = new indri::xml::XMLNode( name );
 
-        for( unsigned int i=0; i<value.size(); i++ ) {
+        for( size_t i=0; i<value.size(); i++ ) {
           ::std::stringstream doubleToString;
           doubleToString << value[i];
 
@@ -176,7 +176,7 @@ namespace indri {
       if( !element->flushed ) { 
         indri::xml::XMLNode* node = new indri::xml::XMLNode( name );
 
-        for( unsigned int i=0; i<value.size(); i++ ) {
+        for( size_t i=0; i<value.size(); i++ ) {
           node->addChild( new indri::xml::XMLNode( "string", value[i] ) );
         }
 
@@ -191,7 +191,7 @@ namespace indri {
       if( !element->flushed ) {
         indri::xml::XMLNode* node = new indri::xml::XMLNode( name );
 
-        for( unsigned int i=0; i<value.size(); i++ ) {
+        for( size_t i=0; i<value.size(); i++ ) {
           indri::xml::XMLNode* child = _getNodeReference( value[i], "noderef" );
           node->addChild(child);
         }
@@ -207,7 +207,7 @@ namespace indri {
       if( !element->flushed ) {
         indri::xml::XMLNode* node = new indri::xml::XMLNode( name );
 
-        for( unsigned int i=0; i<value.size(); i++ ) {
+        for( size_t i=0; i<value.size(); i++ ) {
           indri::xml::XMLNode* child = _getNodeReference( value[i], "noderef" );
           node->addChild(child);
         }

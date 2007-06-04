@@ -43,25 +43,18 @@ const indri::utility::greedy_vector<bool>& indri::infnet::LengthPriorNode::hasMa
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::LengthPriorNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   _scores.clear();
   const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, extent, documentLength );
-  for( unsigned int j=0; j<childResults.size(); j++ ) {
+  for( size_t j=0; j<childResults.size(); j++ ) {
     double score = childResults[j].score ;
     int b = childResults[j].begin;
     int e = childResults[j].end;
     double length = e - b;
 
-    //    std::cout << documentID << " " 
-    //        << b << ":" 
-    //        << e << " " 
-    //        << score << " ";
-
-    
     if ( length > 0 ) {
       score += _exponent * log( length );
     } else {
       score = INDRI_TINY_SCORE;
     }
 
-    //    std::cout << score << std::endl;
     _scores.push_back( indri::api::ScoredExtentResult( score, documentID, b, e ) );  
   }
   return _scores;

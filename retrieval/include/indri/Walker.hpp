@@ -105,7 +105,6 @@ namespace indri {
       virtual void after( class ExtentParent* n );
       virtual void before( class WildcardTerm* n );
       virtual void after( class WildcardTerm* n );
-
    };
  }
 }

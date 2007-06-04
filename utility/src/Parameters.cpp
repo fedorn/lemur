@@ -34,7 +34,7 @@ indri::api::Parameters& indri::api::Parameters::instance() {
 }
 
 void indri::api::Parameters::_parseNextSegment( std::string& segment, int& arrayIndex, int& endOffset, const std::string& path, int beginOffset ) {
-  endOffset = path.find( '.', beginOffset );
+  endOffset = (int)path.find( '.', beginOffset );
   arrayIndex = -1;
 
   if( endOffset < 0 )
@@ -42,13 +42,13 @@ void indri::api::Parameters::_parseNextSegment( std::string& segment, int& array
   else
     segment = path.substr( beginOffset, endOffset );
 
-  int openBracket = segment.find( '[' );
-  int closeBracket = segment.find( ']' );
+  size_t openBracket = segment.find( '[' );
+  size_t closeBracket = segment.find( ']' );
 
   if( openBracket >= 0 && closeBracket > openBracket ) {
     arrayIndex = 0;
 
-    for( int i=openBracket+1; i<closeBracket; i++ ) {
+    for( size_t i=openBracket+1; i<closeBracket; i++ ) {
       arrayIndex *= 10;
       arrayIndex += segment[i] - '0';
     }
@@ -182,7 +182,7 @@ indri::api::Parameters::~Parameters() {
     delete _collection;
 }
 
-indri::api::Parameters indri::api::Parameters::get( int index ) {
+indri::api::Parameters indri::api::Parameters::get( size_t index ) {
   if( ! exists(index) )
     LEMUR_THROW( LEMUR_IO_ERROR, "Required index didn't exist." );
 
@@ -258,7 +258,7 @@ indri::api::Parameters indri::api::Parameters::operator[] ( const std::string& p
   return get(path);
 }
 
-indri::api::Parameters indri::api::Parameters::operator[] ( int index ) {
+indri::api::Parameters indri::api::Parameters::operator[] ( size_t index ) {
   return get(index);
 }
 
@@ -322,7 +322,7 @@ void indri::api::Parameters::set( const std::string& value ) {
 
 void indri::api::Parameters::remove( const std::string& path ) {
   parameter_value* root = _getRoot();
-  int lastDot = path.rfind('.');
+  size_t lastDot = path.rfind('.');
   std::string parentPath;
   std::string subpath = path;
 
@@ -346,7 +346,7 @@ void indri::api::Parameters::remove( const std::string& path ) {
       if( child->array.size() <= 1 && arrayIndex == 0 ) {
         delete child;
         parent->table.erase( segment );
-      } else if( child->array.size() > unsigned(arrayIndex) ) {
+      } else if( child->array.size() > size_t(arrayIndex) ) {
         delete child->array[arrayIndex];
         child->array.erase( child->array.begin() + arrayIndex );
       }
@@ -372,8 +372,8 @@ size_t indri::api::Parameters::size() {
   return 0;
 }
 
-bool indri::api::Parameters::exists( int index ) {
-  return size() > unsigned(index);
+bool indri::api::Parameters::exists( size_t index ) {
+  return size() > index;
 }
 
 bool indri::api::Parameters::exists( const std::string& name ) {
@@ -393,7 +393,7 @@ void indri::api::Parameters::_loadXML( indri::xml::XMLNode* node ) {
   if (node == NULL) {
     LEMUR_THROW(LEMUR_BAD_PARAMETER_ERROR, "NO XML in parameter text" );
   }
-  
+
   // find out which ones are in the XML file, and which ones appear multiple times
   const std::vector<indri::xml::XMLNode*>& children = node->getChildren();
 
@@ -466,7 +466,6 @@ void indri::api::Parameters::loadFile( const std::string& filename ) {
   input.seekg( 0, std::ios::end );
   size_t length = input.tellg();
   input.seekg( 0, std::ios::beg );
-
   // null terminate it to make a string in the XML reader for comment strip
   char* buffer = new char[length + 1];
   buffer[length] = '\0';
@@ -490,7 +489,7 @@ void indri::api::Parameters::loadCommandLine( int argc, char** argv ) {
   for( int i=1; i<argc; i++ ) {
     if( argv[i][0] == '-' ) {
       std::string keyValue = &argv[i][1];
-      int equals = keyValue.find('=');
+      size_t equals = keyValue.find('=');
       std::string key = keyValue.substr( 0, equals );
       std::string value = keyValue.substr( equals+1 );
 

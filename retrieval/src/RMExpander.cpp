@@ -37,7 +37,7 @@ std::string indri::query::RMExpander::expand( std::string originalQuery , std::v
   std::vector< std::pair<std::string, double> > probs;
 
   // gather document vectors / statistics for top fbDocs ranked documents
-  for( int doc = 0; doc < fbDocs; doc++ ) {
+  for( size_t doc = 0; int(doc) < fbDocs; doc++ ) {
     if( doc >= results.size() ) break;
     //std::cerr << "Expanding document " << doc << ", score = " << results[ doc ].score << std::endl;
 

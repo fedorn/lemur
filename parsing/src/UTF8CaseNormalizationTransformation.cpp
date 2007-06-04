@@ -53,7 +53,7 @@ indri::api::ParsedDocument* indri::parse::UTF8CaseNormalizationTransformation::t
   // buffer for any UTF-8 term that needs to be downcased.
   // These buffers are cleaned up on each call to transform.
 
-  for ( int i = 0; i < document->terms.size(); i++ ) {
+  for ( size_t i = 0; i < document->terms.size(); i++ ) {
 
     char *term = document->terms[i];
     if ( ! term ) continue;

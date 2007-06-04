@@ -31,7 +31,7 @@ namespace indri
     private:
       KrovetzStemmer *stemmer;
       char* _stemBuffer;
-      int _stemBufferSize;
+      size_t _stemBufferSize;
       ObjectHandler<indri::api::ParsedDocument>* _handler;
 
       char* _getBuffer( size_t length );

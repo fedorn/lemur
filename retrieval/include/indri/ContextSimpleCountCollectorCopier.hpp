@@ -145,7 +145,7 @@ namespace indri
         if( subtree.isComputable() ) {
           // terms
           std::vector<std::string> terms;
-          for( int i=0; i<subtree.getTerms().size(); i++ ) {
+          for( size_t i=0; i<subtree.getTerms().size(); i++ ) {
             indri::lang::IndexTerm* indexTerm = subtree.getTerms()[i];
             std::string term;
             

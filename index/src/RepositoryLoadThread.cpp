@@ -59,7 +59,7 @@ UINT64 indri::collection::RepositoryLoadThread::work() {
   indri::utility::greedy_vector<indri::index::MemoryIndex*> indexes;
   UINT64 memorySize = 0;
 
-  for( int i=0; i<state->size(); i++ ) {
+  for( size_t i=0; i<state->size(); i++ ) {
     indri::index::MemoryIndex* index = dynamic_cast<indri::index::MemoryIndex*>((*state)[i]);
 
     if( index ) {

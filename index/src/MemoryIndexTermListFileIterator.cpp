@@ -40,7 +40,7 @@ void indri::index::MemoryIndexTermListFileIterator::startIteration() {
 bool indri::index::MemoryIndexTermListFileIterator::nextEntry() {
   _index++;
 
-  if( _index >= _data.size() ) {
+  if( _index >= (int)_data.size() ) {
     _finished = true;  
     return false;
   }
@@ -63,7 +63,7 @@ bool indri::index::MemoryIndexTermListFileIterator::nextEntry() {
 }
 
 bool indri::index::MemoryIndexTermListFileIterator::nextEntry( int documentID ) {
-  if( documentID >= _data.size() ) {
+  if( documentID >= (int)_data.size() ) {
     _finished = true;
     return false;
   }

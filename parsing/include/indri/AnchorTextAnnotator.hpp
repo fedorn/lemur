@@ -84,7 +84,7 @@ namespace indri
           // TEXT=
           _in.getline( line, sizeof line-1 );
           if (!line[0]) continue;
-          int textLen = strlen(line+6);
+          size_t textLen = strlen(line+6);
           strcpy( _buffer.write(textLen+1), line+6 );
           _buffer.unwrite(1);
           
@@ -104,7 +104,7 @@ namespace indri
             beginWord = buffer+i;
 
             if(!beginIndex)
-              beginIndex = terms.size();
+              beginIndex = (int)terms.size();
           } else if( isspace(buffer[i]) ) {
             buffer[i] = 0;
             if( beginWord )
@@ -120,7 +120,7 @@ namespace indri
               TagExtent * extent = new TagExtent;
               extent->name = "inlink";
               extent->begin = beginIndex;
-              extent->end = terms.size();
+              extent->end = (int)terms.size();
               extent->number = 0;
               extent->parent = 0;
 
@@ -178,7 +178,7 @@ namespace indri
         // surround current text with a mainbody tag
         TagExtent * mainbody = new TagExtent;
         mainbody->begin = 0;
-        mainbody->end = document->terms.size();
+        mainbody->end = (int)document->terms.size();
         mainbody->name = "mainbody";
         mainbody->number = 0;
         mainbody->parent = 0;

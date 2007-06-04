@@ -47,7 +47,7 @@ void indri::net::NetworkServerStub::_sendDocumentsResponse( indri::server::Query
 
   // send them back
  std::auto_ptr<indri::xml::XMLNode> response( new indri::xml::XMLNode( "documents" ) );
-  for( unsigned int i=0; i<documents.size(); i++ ) {
+  for( size_t i=0; i<documents.size(); i++ ) {
     indri::xml::XMLNode* docNode = _encodeDocument( documents[i] );
     response->addChild( docNode );
     delete documents[i];
@@ -93,7 +93,7 @@ indri::xml::XMLNode* indri::net::NetworkServerStub::_encodeDocument( const struc
   }
 
   if( document->text ) {
-    std::string text = base64_encode( document->text, document->textLength );
+    std::string text = base64_encode( document->text, (int)document->textLength );
     textNode = new indri::xml::XMLNode( "text", text );
   }
 
@@ -211,8 +211,8 @@ void indri::net::NetworkServerStub::_handleDocumentMetadata( indri::xml::XMLNode
 
   // send them back
   indri::xml::XMLNode* response = new indri::xml::XMLNode( "document-metadata" );
-  for( unsigned int i=0; i<metadata.size(); i++ ) {
-    std::string value = base64_encode( metadata[i].c_str(), metadata[i].length() );
+  for( size_t i=0; i<metadata.size(); i++ ) {
+    std::string value = base64_encode( metadata[i].c_str(), (int)metadata[i].length() );
     indri::xml::XMLNode* datum = new indri::xml::XMLNode( "datum", value );
     response->addChild(datum);
   }
@@ -245,27 +245,27 @@ void indri::net::NetworkServerStub::_handleDocumentVectors( indri::xml::XMLNode*
 
     const std::vector<std::string>& stemsVector = docVector->stems();
 
-    for( unsigned int i=0; i<stemsVector.size(); i++ ) {
-      const std::string& stem = stemsVector[i];
-      std::string encoded = base64_encode( stem.c_str(), stem.length() );
+    for( size_t j=0; j<stemsVector.size(); j++ ) {
+      const std::string& stem = stemsVector[j];
+      std::string encoded = base64_encode( stem.c_str(), (int)stem.length() );
       stems->addChild( new indri::xml::XMLNode( "stem", encoded ) );
     }
 
     const std::vector<int>& positionsVector = docVector->positions();
 
-    for( unsigned int i=0; i<docVector->positions().size(); i++ ) {
-      int position = positionsVector[i];
+    for( size_t j=0; j<docVector->positions().size(); j++ ) {
+      int position = positionsVector[j];
       positions->addChild( new indri::xml::XMLNode( "position", i64_to_string(position) ) );
     }
 
-    for( unsigned int i=0; i<docVector->fields().size(); i++ ) {
+    for( size_t j=0; j<docVector->fields().size(); j++ ) {
       indri::xml::XMLNode* field = new indri::xml::XMLNode( "field" );
 
-      std::string number = i64_to_string( docVector->fields()[i].number );
-      std::string begin = i64_to_string( docVector->fields()[i].begin );
-      std::string end = i64_to_string( docVector->fields()[i].end );
+      std::string number = i64_to_string( docVector->fields()[j].number );
+      std::string begin = i64_to_string( docVector->fields()[j].begin );
+      std::string end = i64_to_string( docVector->fields()[j].end );
 
-      field->addChild( new indri::xml::XMLNode( "name", docVector->fields()[i].name ) );
+      field->addChild( new indri::xml::XMLNode( "name", docVector->fields()[j].name ) );
       field->addChild( new indri::xml::XMLNode( "number", number ) );
       field->addChild( new indri::xml::XMLNode( "begin", begin ) );
       field->addChild( new indri::xml::XMLNode( "end", end ) );
@@ -399,8 +399,8 @@ void indri::net::NetworkServerStub::_handlePathNames( indri::xml::XMLNode* reque
 
   // send them back
   indri::xml::XMLNode* response = new indri::xml::XMLNode( "path-names" );
-  for( unsigned int i=0; i<pathName.size(); i++ ) {
-    std::string value = base64_encode( pathName[i].c_str(), pathName[i].length() );
+  for( size_t i=0; i<pathName.size(); i++ ) {
+    std::string value = base64_encode( pathName[i].c_str(), (int)pathName[i].length() );
     indri::xml::XMLNode* datum = new indri::xml::XMLNode( "name", value );
     response->addChild(datum);
   } 

@@ -65,30 +65,18 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
       if( iter->end - iter->begin == 0 )
         continue; // this field has no text in it
       
-      
       int scoreBegin = iter->begin;
       int scoreEnd = iter->end;
-
-      //       std::cout << getName() << " " << documentID << " " << extent.begin <<":"<<extent.end << " " << iter->begin <<":"<< iter->end << std::endl;
       
       const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, (indri::index::Extent&)(*iter), documentLength );
       
       double fieldWeight = iter->weight;
       
-      for( int i=0; i<childResults.size(); i++ ) {
-        indri::api::ScoredExtentResult result( fieldWeight*childResults[i].score, documentID, scoreBegin, scoreEnd );
+      for( size_t j=0; j<childResults.size(); j++ ) {
+        indri::api::ScoredExtentResult result( fieldWeight*childResults[j].score, documentID, scoreBegin, scoreEnd );
         _scores.push_back( result );
       }
     } 
-
-    // do a bad guess if there's no matching field
-//     if ( _scores.size() == 0 ) {
-//       const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, extent.begin, extent.begin, documentLength );
-//       for( int i=0; i<childResults.size(); i++ ) {
-//      indri::api::ScoredExtentResult result( childResults[i].score, documentID, extent.begin, extent.begin );
-//      _scores.push_back( result );
-//       }
-//     }
   } else {
     return _child->score( documentID, extent, documentLength );    
   }

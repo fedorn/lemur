@@ -567,9 +567,6 @@ void indri::parse::TextTokenizer::writeToken( char* token, int token_len,
   strncpy( write_loc, token, token_len );
   write_loc[token_len] = '\0';
   _document.terms.push_back( write_loc );
-
-//   std::cout << "Token [" << token << "], <" << extent.begin << ", " 
-//          << extent.end << ">" << std::endl;
 }
 
 

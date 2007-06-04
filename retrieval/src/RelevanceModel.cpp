@@ -69,7 +69,7 @@ const std::vector<indri::api::ScoredExtentResult>& indri::query::RelevanceModel:
 //
 
 void indri::query::RelevanceModel::_extractDocuments() {
-  for( int i=0; i<_results.size(); i++ ) {
+  for( size_t i=0; i<_results.size(); i++ ) {
     _documentIDs.push_back( _results[i].document );
   }
 }
@@ -83,7 +83,7 @@ void indri::query::RelevanceModel::_extractDocuments() {
 
 void indri::query::RelevanceModel::_countGrams() {
   // for each query result
-  for( int i=0; i<_results.size(); i++ ) {
+  for( size_t i=0; i<_results.size(); i++ ) {
     // run through the text, extracting n-grams
     indri::api::ScoredExtentResult& result = _results[i];
     indri::api::DocumentVector* v = _vectors[i];
@@ -169,7 +169,7 @@ void indri::query::RelevanceModel::_scoreGrams() {
         std::stringstream s;
         s << "#1( ";
 
-        for( int i=0; i< gram->terms.size(); i++ ) {
+        for( size_t i=0; i< gram->terms.size(); i++ ) {
           s << " \"" << gram->terms[i] << "\"" << std::endl;
         }
 
@@ -184,8 +184,8 @@ void indri::query::RelevanceModel::_scoreGrams() {
     // now, aggregate scores for each retrieved item
     std::vector<indri::api::ScoredExtentResult>::iterator riter;
     double gramScore = 0;
-    int c;
-    int r;
+    size_t c;
+    size_t r;
 
     for( r = 0, c = 0; r < _results.size() && c < gramCounts->counts.size(); r++ ) {
       int contextLength = _results[r].end - _results[r].begin;

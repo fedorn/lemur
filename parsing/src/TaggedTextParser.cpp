@@ -35,7 +35,7 @@ indri::parse::TaggedTextParser::~TaggedTextParser() {
   delete tl;
   delete _metaList;
   delete _p_conflater;
-  for (int t = 0; t < _document.tags.size(); t++) {
+  for (size_t t = 0; t < _document.tags.size(); t++) {
     delete _document.tags[t];
   }
 
@@ -144,7 +144,7 @@ indri::api::ParsedDocument* indri::parse::TaggedTextParser::parse( indri::parse:
   _document.text = document->text;
   _document.textLength = document->textLength;
 
-  for (int t = 0; t < _document.tags.size(); t++) {
+  for (size_t t = 0; t < _document.tags.size(); t++) {
     delete _document.tags[t];
   }
 
@@ -153,6 +153,12 @@ indri::api::ParsedDocument* indri::parse::TaggedTextParser::parse( indri::parse:
   _document.positions.clear();
 
   _document.metadata = document->metadata;
+  // have to process metadata tag conflations.
+  for (size_t idx = 0; idx < _document.metadata.size(); idx++) {
+    _document.metadata[idx].key = _p_conflater->conflate(_document.metadata[idx].key);
+  }
+  
+
   _document.content = document->content;
   _document.contentLength = document->contentLength;
   

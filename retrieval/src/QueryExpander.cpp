@@ -23,7 +23,7 @@ indri::query::QueryExpander::QueryExpander( indri::api::QueryEnvironment * env ,
 
   if( _param.exists( "stopper.word" ) ) {
     indri::api::Parameters words = _param[ "stopper.word" ];
-    for( int i = 0; i < words.size(); i++ )
+    for( size_t i = 0; i < words.size(); i++ )
       _stopwords[ words[i] ] = true;
   }
 }
@@ -50,7 +50,7 @@ std::vector<indri::api::ScoredExtentResult> indri::query::QueryExpander::runExpa
 std::vector<indri::api::DocumentVector*> indri::query::QueryExpander::getDocumentVectors( std::vector<indri::api::ScoredExtentResult>& results, int fbDocs ) {
   // copy results documents into a doc ID vector
   std::vector<int> documentIDs;
-  for( int doc = 0; doc < fbDocs && doc < results.size(); doc++ )
+  for( size_t doc = 0; (int)doc < fbDocs && doc < results.size(); doc++ )
     documentIDs.push_back( results[ doc ].document );
 
   // fetch the document vectors
@@ -69,7 +69,7 @@ std::vector<std::string> * indri::query::QueryExpander::getVocabulary( std::vect
 std::vector<std::string> * indri::query::QueryExpander::getVocabulary( std::vector<indri::api::DocumentVector*>& docVectors ) {
   std::map<std::string, bool> terms;
 
-  for( int doc = 0; doc < docVectors.size(); doc++ ) {
+  for( size_t doc = 0; doc < docVectors.size(); doc++ ) {
     indri::api::DocumentVector * docVec = docVectors[ doc ];
     std::vector<int> term_positions = docVec->positions();
     std::vector<std::string> term_list = docVec->stems();

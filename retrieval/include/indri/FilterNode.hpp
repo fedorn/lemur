@@ -32,7 +32,7 @@ namespace indri
       BeliefNode* _belief;
       std::vector<int> _documents;
       std::string _name;
-      int _index;
+      size_t _index;
 
     public:
       FilterNode( const std::string& name, BeliefNode* child, const std::vector<int>& documents )

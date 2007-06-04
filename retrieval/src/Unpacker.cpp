@@ -37,7 +37,7 @@ namespace indri {
     std::vector<indri::lang::Node*> Unpacker::unpack() {
       std::vector<indri::lang::Node*> result;
 
-      for( unsigned int i=0; i<_root->getChildren().size(); i++ ) {
+      for( size_t i=0; i<_root->getChildren().size(); i++ ) {
         indri::xml::XMLNode* child = _root->getChildren()[i];
         _current = child;
         Node* node = _unpack(child);
@@ -96,7 +96,7 @@ namespace indri {
       std::vector<int> result;
       const indri::xml::XMLNode* vector = _current->getChild(name);
 
-      for( unsigned int i=0; i<vector->getChildren().size(); i++ ) {
+      for( size_t i=0; i<vector->getChildren().size(); i++ ) {
         indri::xml::XMLNode* ref = vector->getChildren()[i];
         std::stringstream s( ref->getValue() );
         int value;
@@ -111,7 +111,7 @@ namespace indri {
       std::vector<double> result;
       const indri::xml::XMLNode* vector = _current->getChild(name);
 
-      for( unsigned int i=0; i<vector->getChildren().size(); i++ ) {
+      for( size_t i=0; i<vector->getChildren().size(); i++ ) {
         indri::xml::XMLNode* ref = vector->getChildren()[i];
         std::stringstream s( ref->getValue() );
         double value;
@@ -126,7 +126,7 @@ namespace indri {
       std::vector<std::string> result;
       const indri::xml::XMLNode* vector = _current->getChild(name);
 
-      for( unsigned int i=0; i<vector->getChildren().size(); i++ ) {
+      for( size_t i=0; i<vector->getChildren().size(); i++ ) {
         indri::xml::XMLNode* ref = vector->getChildren()[i];
         result.push_back( ref->getValue() );
       }

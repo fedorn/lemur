@@ -120,7 +120,7 @@ namespace indri
     public:
       ApplyWalker( std::vector<NodeType*>& roots, T* walker ) {
         _walker = walker;
-        for( int i=0; i<roots.size(); i++ )
+        for( size_t i=0; i<roots.size(); i++ )
           roots[i]->walk(*_walker);
       }
 

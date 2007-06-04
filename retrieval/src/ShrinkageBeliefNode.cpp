@@ -75,10 +75,6 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   indri::index::DocumentStructure * docStruct = _docStructHolder.getDocumentStructure();
   int numNodes = docStruct->nodeCount();
 
-
-  indri::index::DocumentStructure::child_iterator root;
-  indri::index::DocumentStructure::child_iterator rootsEnd;
-
   _buildScoreCache( documentID );
 
   _results.clear();
@@ -170,9 +166,6 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
   int numNodes = docStruct->nodeCount();
 
   int documentLength = docStruct->getIndex()->documentLength( documentID );
-
-  indri::index::DocumentStructure::child_iterator root;
-  indri::index::DocumentStructure::child_iterator rootsEnd;
 
   // build a new cache of scores if needed
   if ( documentID != _documentID ) {
@@ -317,7 +310,7 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
     node = nodesEnd;
     while (node != nodesBegin) {
       node--;
-      size_t i = *node;
+      int i = *node;
 
       // what's left for the original model and the length proportional models
       double remaining = 1;
@@ -388,7 +381,7 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
     _down[0] = _up[0];
     node = nodesBegin;    
     while ( node != nodesEnd ) {
-      size_t i = *node;
+      int i = *node;
       if ( docStruct->parent( i ) == 0 ) {
         if ( _recursive ) {
           _down[i] = (1.0 - _docWeight) * _up[i] 
@@ -440,7 +433,7 @@ const indri::utility::greedy_vector<bool>& indri::infnet::ShrinkageBeliefNode::h
 
   _buildScoreCache( documentID );
 
-  for ( int i = 0 ; i < matchExtents.size() ; i++ ) {
+  for ( size_t i = 0 ; i < matchExtents.size() ; i++ ) {
     const indri::index::Extent * extent =  &(matchExtents[i]);
     std::set<int> leafs;
     if ( extent->ordinal == 0 ) {
@@ -485,9 +478,9 @@ void indri::infnet::ShrinkageBeliefNode::indexChanged( indri::index::Index& inde
 void indri::infnet::ShrinkageBeliefNode::addShrinkageRule( std::string ruleText ) {
 
 
-  int nextComma = 0;
-  int nextColon = 0;
-  int location = 0;
+  size_t nextComma = 0;
+  size_t nextColon = 0;
+  size_t location = 0;
   
   smoothing_rule rule;
   rule.weight = 0;
@@ -531,9 +524,9 @@ void indri::infnet::ShrinkageBeliefNode::addShrinkageRule( std::string ruleText 
 void indri::infnet::ShrinkageBeliefNode::setSmoothing( const std::string & stringSpec ) {
   indri::api::Parameters spec;
 
-  int nextComma = 0;
-  int nextColon = 0;
-  int location = 0;
+  size_t nextComma = 0;
+  size_t nextColon = 0;
+  size_t location = 0;
 
   for( location = 0; location < stringSpec.length(); ) {
     nextComma = stringSpec.find( ',', location );

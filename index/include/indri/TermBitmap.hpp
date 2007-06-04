@@ -74,7 +74,7 @@ namespace indri {
         assert( from >= 0 );
         
         int left = 0;
-        int right = _maps.size()-1;
+        int right = (int)_maps.size()-1;
 
         if( _maps.size() == 0 )
           return 0;

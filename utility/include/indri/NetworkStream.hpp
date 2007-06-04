@@ -116,9 +116,9 @@ namespace indri
         size_t chunkRead = 0;
         int result;
     
-        while( bytesRead < (int) length ) {
+        while( bytesRead < length ) {
           // only try to read 100K at a time.
-          chunkRead = std::min((size_t)1024*100, (length - bytesRead));
+          chunkRead = lemur_compat::min<size_t>((size_t)1024*100, (length - bytesRead));
           result = read( (char*)buffer + bytesRead, chunkRead );
 
           if( result <= 0 ) {

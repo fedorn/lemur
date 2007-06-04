@@ -187,7 +187,7 @@ static int copy_quad( char* buffer ) {
 //
 
 void indri::collection::CompressedCollection::_writeMetadataItem( indri::api::ParsedDocument* document, int i, int& keyLength, int& valueLength ) {
-  keyLength = strlen(document->metadata[i].key) + 1;
+  keyLength = (int)strlen(document->metadata[i].key) + 1;
   _stream->next_in = (Bytef*) document->metadata[i].key;
   _stream->avail_in = strlen(document->metadata[i].key) + 1;
 
@@ -224,7 +224,7 @@ void indri::collection::CompressedCollection::_writePositions( indri::api::Parse
     last = extent.end;
   }
 
-  valueLength = compress.dataSize();
+  valueLength = (int)compress.dataSize();
   _stream->next_in = (Bytef*) compress.data();
   _stream->avail_in = valueLength;
   zlib_deflate( *_stream, _output );
@@ -239,7 +239,7 @@ void indri::collection::CompressedCollection::_writeText( indri::api::ParsedDocu
   _stream->next_in = (Bytef*) TEXT_KEY;
   _stream->avail_in = keyLength;
   zlib_deflate( *_stream, _output );
-  valueLength = document->textLength;
+  valueLength = (int)document->textLength;
   _stream->next_in = (Bytef*) document->text;
   _stream->avail_in = document->textLength;
   zlib_deflate( *_stream, _output );
@@ -268,7 +268,7 @@ void indri::collection::CompressedCollection::_writeContentLength( indri::api::P
   _stream->next_in = (Bytef*) CONTENTLENGTH_KEY;
   _stream->avail_in = keyLength;
   zlib_deflate( *_stream, _output );
-  int diff = document->contentLength;
+  int diff = (int)document->contentLength;
   valueLength = sizeof diff;
   _stream->next_in = (Bytef*) &diff;
   _stream->avail_in = sizeof diff;
@@ -364,7 +364,7 @@ void indri::collection::CompressedCollection::create( const std::string& fileNam
 
   for( size_t i=0; i<forwardIndexedFields.size(); i++ ) {
     std::stringstream metalookupName;
-    metalookupName << "forwardLookup" << i;
+    metalookupName << "forwardLookup" << (int)i;
 
     std::string metalookupPath = indri::file::Path::combine( fileName, metalookupName.str() );
     lemur::file::Keyfile* metalookup = new lemur::file::Keyfile;
@@ -379,7 +379,7 @@ void indri::collection::CompressedCollection::create( const std::string& fileNam
 
   for( size_t i=0; i<reverseIndexedFields.size(); i++ ) {
     std::stringstream metalookupName;
-    metalookupName << "reverseLookup" << i;
+    metalookupName << "reverseLookup" << (int)i;
 
     std::string metalookupPath = indri::file::Path::combine( fileName, metalookupName.str() );
     lemur::file::Keyfile* metalookup = new lemur::file::Keyfile;
@@ -415,7 +415,7 @@ void indri::collection::CompressedCollection::open( const std::string& fileName 
 
     for( size_t i=0; i<forward.size(); i++ ) {
       std::stringstream metalookupName;
-      metalookupName << "forwardLookup" << i;
+      metalookupName << "forwardLookup" << (int)i;
 
       std::string metalookupPath = indri::file::Path::combine( fileName, metalookupName.str() );
       lemur::file::Keyfile* metalookup = new lemur::file::Keyfile;
@@ -434,7 +434,7 @@ void indri::collection::CompressedCollection::open( const std::string& fileName 
 
     for( size_t i=0; i<reverse.size(); i++ ) {
       std::stringstream metalookupName;
-      metalookupName << "reverseLookup" << i;
+      metalookupName << "reverseLookup" << (int)i;
 
       std::string metalookupPath = indri::file::Path::combine( fileName, metalookupName.str() );
       lemur::file::Keyfile* metalookup = new lemur::file::Keyfile;
@@ -469,7 +469,7 @@ void indri::collection::CompressedCollection::openRead( const std::string& fileN
 
     for( size_t i=0; i<forward.size(); i++ ) {
       std::stringstream metalookupName;
-      metalookupName << "forwardLookup" << i;
+      metalookupName << "forwardLookup" << (int)i;
 
       std::string metalookupPath = indri::file::Path::combine( fileName, metalookupName.str() );
       lemur::file::Keyfile* metalookup = new lemur::file::Keyfile;
@@ -486,7 +486,7 @@ void indri::collection::CompressedCollection::openRead( const std::string& fileN
 
     for( size_t i=0; i<reverse.size(); i++ ) {
       std::stringstream metalookupName;
-      metalookupName << "reverseLookup" << i;
+      metalookupName << "reverseLookup" << (int)i;
 
       std::string metalookupPath = indri::file::Path::combine( fileName, metalookupName.str() );
       lemur::file::Keyfile* metalookup = new lemur::file::Keyfile;
@@ -590,7 +590,7 @@ void indri::collection::CompressedCollection::addDocument( int documentID, indri
 
   // first, write the metadata, storing in metalookups as necessary
   for( size_t i=0; i<document->metadata.size(); i++ ) {
-    _writeMetadataItem( document, i, keyLength, valueLength );
+    _writeMetadataItem( document, (int)i, keyLength, valueLength );
 
     lemur::file::Keyfile** metalookup;
     metalookup = _forwardLookups.find( document->metadata[i].key );
@@ -627,7 +627,7 @@ void indri::collection::CompressedCollection::addDocument( int documentID, indri
 
       (*metalookup)->put( (const char*)document->metadata[i].value,
                           &documentIDs.front(),
-                          documentIDs.size() * sizeof(int) );
+                         (int)( documentIDs.size() * sizeof(int)) );
     }
 
     recordOffsets.push_back( recordOffset );
@@ -660,7 +660,7 @@ void indri::collection::CompressedCollection::addDocument( int documentID, indri
   recordOffset += (keyLength + valueLength);
 
   // finally, we have to write out the keys and values
-  recordOffsets.push_back( recordOffsets.size()/2 );
+  recordOffsets.push_back( (UINT32)(recordOffsets.size()/2) );
   _stream->next_in = (Bytef*) &recordOffsets.front();
   _stream->avail_in = recordOffsets.size() * sizeof(UINT32);
   zlib_deflate_finish( *_stream, _output );
@@ -842,7 +842,7 @@ std::vector<indri::api::ParsedDocument*> indri::collection::CompressedCollection
   std::vector<indri::api::ParsedDocument*> documents;
   std::vector<int> results = retrieveIDByMetadatum( attributeName, value );
 
-  for( int i=0; i<results.size(); i++ ) {
+  for( size_t i=0; i<results.size(); i++ ) {
     documents.push_back( retrieve( results[i] ) );
   }
 
@@ -867,7 +867,7 @@ void indri::collection::CompressedCollection::_removeForwardLookups( indri::inde
   int actual = 0;
   indri::utility::Buffer value;
   value.grow();
-  actual = value.size();
+  actual = (int)value.size();
 
   keyfile.setFirst();
 
@@ -875,7 +875,7 @@ void indri::collection::CompressedCollection::_removeForwardLookups( indri::inde
     if( deletedList.isDeleted( key ) ) {
       keyfile.remove( key );
     }
-    actual = value.size();
+    actual = (int)value.size();
   }
 
   delete transaction;
@@ -889,7 +889,7 @@ static bool keyfile_next( lemur::file::Keyfile& keyfile, char* key, int keyLengt
   bool result = false;
   // clean the key buffer, ensuring it will be null-terminated
   memset( key, 0, keyLength );
-  int actualValueSize = value.size();
+  int actualValueSize = (int)value.size();
   value.clear();
 
   try {
@@ -898,8 +898,8 @@ static bool keyfile_next( lemur::file::Keyfile& keyfile, char* key, int keyLengt
     int size = keyfile.getSize( key );
     if( size >= 0 ) {
       value.grow( size );
-      actualValueSize = value.size();
-      keyfile.get( key, value.front(), actualValueSize, value.size() );
+      actualValueSize = (int)value.size();
+      keyfile.get( key, value.front(), actualValueSize, (int)value.size() );
       result = true;
     }
   }
@@ -915,7 +915,7 @@ static bool keyfile_next( lemur::file::Keyfile& keyfile, char* key, int keyLengt
 
 static bool keyfile_next( lemur::file::Keyfile& keyfile, int& key, indri::utility::Buffer& value ) {
   bool result = false;
-  int actualValueSize = value.size();
+  int actualValueSize = (int)value.size();
   value.clear();
 
   try {
@@ -924,8 +924,8 @@ static bool keyfile_next( lemur::file::Keyfile& keyfile, int& key, indri::utilit
     int size = keyfile.getSize( key );
     if( size >= 0 ) {
       value.grow( size );
-      actualValueSize = value.size();
-      keyfile.get( key, value.front(), actualValueSize, value.size() );
+      actualValueSize = (int)value.size();
+      keyfile.get( key, value.front(), actualValueSize, (int)value.size() );
       result = true;
     }
   }
@@ -940,7 +940,7 @@ static bool keyfile_next( lemur::file::Keyfile& keyfile, int& key, indri::utilit
 //
 
 static void remove_deleted_entries( indri::utility::Buffer& value, indri::index::DeletedDocumentList& deletedList ) {
-  int idCount = value.position() / sizeof (lemur::api::DOCID_T);
+  int idCount = (int)value.position() / sizeof (lemur::api::DOCID_T);
   int startIDCount = idCount;
   for( int i = 0; i < idCount; ) {
     lemur::api::DOCID_T* position = &((lemur::api::DOCID_T*) value.front())[i];
@@ -968,17 +968,17 @@ static void remove_deleted_entries( indri::utility::Buffer& value, indri::index:
 
 static bool keyfile_get( lemur::file::Keyfile& keyfile, int key, indri::utility::Buffer& value ) {
   bool result = false;
-  int actualValueSize = value.size();
+  int actualValueSize = (int)value.size();
   value.clear();
 
   try {
-    result = keyfile.get( key, value.front(), actualValueSize, value.size() );
+    result = keyfile.get( key, value.front(), actualValueSize, (int)value.size() );
   } catch( lemur::api::Exception& ) {
     int size = keyfile.getSize( key );
     if( size >= 0 ) {
       value.grow( size );
-      actualValueSize = value.size();
-      keyfile.get( key, value.front(), actualValueSize, value.size() );
+      actualValueSize = (int)value.size();
+      keyfile.get( key, value.front(), actualValueSize, (int)value.size() );
       result = true;
     }
   }
@@ -995,17 +995,17 @@ static bool keyfile_get( lemur::file::Keyfile& keyfile, int key, indri::utility:
 
 static bool keyfile_get( lemur::file::Keyfile& keyfile, char* key, indri::utility::Buffer& value ) {
   bool result = false;
-  int actualValueSize = value.size();
+  int actualValueSize = (int)value.size();
   value.clear();
 
   try {
-    result = keyfile.get( key, value.front(), actualValueSize, value.size() );
+    result = keyfile.get( key, value.front(), actualValueSize, (int)value.size() );
   } catch( lemur::api::Exception& ) {
     int size = keyfile.getSize( key );
     if( size >= 0 ) {
       value.grow( size );
-      actualValueSize = value.size();
-      keyfile.get( key, value.front(), actualValueSize, value.size() );
+      actualValueSize = (int)value.size();
+      keyfile.get( key, value.front(), actualValueSize, (int)value.size() );
       result = true;
     }
   }
@@ -1033,7 +1033,7 @@ void indri::collection::CompressedCollection::_removeReverseLookups( indri::inde
   keyfile.setFirst();
 
   while( keyfile_next( keyfile, key, sizeof key, value ) ) {
-    int initialValueSize = value.position();
+    int initialValueSize = (int)value.position();
 
     // now we've got the data, so start looking for deleted documents and removing them
     remove_deleted_entries( value, deletedList );
@@ -1044,7 +1044,7 @@ void indri::collection::CompressedCollection::_removeReverseLookups( indri::inde
       if( value.position() == 0 ) {
         keyfile.remove( key );
       } else {
-        keyfile.put( key, value.front(), value.position() ); 
+        keyfile.put( key, value.front(), (int)value.position() ); 
       }
       keyfile.getSize( key );
     }
@@ -1249,7 +1249,7 @@ void indri::collection::CompressedCollection::_copyForwardLookup( const std::str
 
   while( keyfile_next( other, key, value ) ) {
     if( !transaction->isDeleted( key ) ) {
-      local.put( key + documentOffset, value.front(), value.position() );
+      local.put( key + documentOffset, value.front(), (int)value.position() );
     }
   }
 
@@ -1281,7 +1281,7 @@ void indri::collection::CompressedCollection::_copyReverseLookup( const std::str
   other.setFirst();
 
   while( keyfile_next( other, key, sizeof key, value ) ) {
-    int initialValueSize = value.position();
+    int initialValueSize = (int)value.position();
 
     // now we've got the data, so start looking for deleted documents and removing them
     remove_deleted_entries( value, deletedList );
@@ -1289,13 +1289,13 @@ void indri::collection::CompressedCollection::_copyReverseLookup( const std::str
     // now, update each entry by adding the documentOffset
     lemur::api::DOCID_T* entries = (lemur::api::DOCID_T*) value.front();
 
-    for( int i = 0; i < value.position() / sizeof (lemur::api::DOCID_T); i++ ) {
+    for( size_t i = 0; i < value.position() / sizeof (lemur::api::DOCID_T); i++ ) {
       entries[i] += documentOffset;
     }
 
     // append the result to what we already have
     keyfile_get( local, key, localValue );
     memcpy( localValue.write( value.position() ), value.front(), value.position() );
-    local.put( key, localValue.front(), localValue.position() );
+    local.put( key, localValue.front(), (int)localValue.position() );
   }
 }

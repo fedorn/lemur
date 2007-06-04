@@ -43,7 +43,7 @@ namespace indri {
 
     public:
       void add( int sequence, const char* term ) {
-        int termLength = strlen( term );
+        size_t termLength = strlen( term );
         char* termSpot = _buffer.write( termLength+1 );
         size_t termOffset = termSpot - _buffer.front();
         strcpy( termSpot, term );
@@ -57,8 +57,8 @@ namespace indri {
 
       void buildMap( std::vector<int>& map, TermRecorder& other, std::vector< std::pair< const char*, int > >* missing = 0 ) {
         map.resize( _pairs.size(), -1 );
-        int i = 0;
-        int j = 0;
+        size_t i = 0;
+        size_t j = 0;
         std::vector< std::pair<size_t, int > >& otherPairs = other._pairs;
 
         // this joins all matching pairs
@@ -95,7 +95,7 @@ namespace indri {
       }
 
       int memorySize() {
-        return _buffer.position() + _pairs.size() * sizeof(std::pair<size_t, int>);
+        return int(_buffer.position() + _pairs.size() * sizeof(std::pair<size_t, int>));
       }
     };
   }

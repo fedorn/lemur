@@ -56,7 +56,7 @@ void indri::collection::PriorListIterator::startIteration() {
   if( _tableLength ) {
     _entryLength = sizeof(UINT8);
   
-    for( int i=0; i<_tableLength; i++ ) {
+    for( UINT32 i=0; i<_tableLength; i++ ) {
       double value;
       _file->read( &value, sizeof(double) );
       _lookup.push_back( value );
@@ -77,7 +77,7 @@ void indri::collection::PriorListIterator::nextEntry() {
   if( _finished )
     return;
     
-  if( _entry.document >= _entryCount ) {
+  if( _entry.document >= (int)_entryCount ) {
     _finished = true;
     return;
   }
@@ -102,7 +102,7 @@ void indri::collection::PriorListIterator::nextEntry() {
 //
 
 void indri::collection::PriorListIterator::nextEntry( int document ) {
-  if( _finished || _entry.document >= _entryCount ) {
+  if( _finished || _entry.document >= (int)_entryCount ) {
     _finished = true;
     return;
   }

@@ -182,12 +182,12 @@ indri::api::ParsedDocument* indri::parse::OffsetMetadataAnnotator::transform( in
   if( !metadata || metadata->size()==0 ) return document;
 
   //add any metadata elements to the document that aren't already there
-  for( unsigned int i=0; i<metadata->size(); i++ ) {
+  for( size_t i=0; i<metadata->size(); i++ ) {
     indri::parse::MetadataPair* newPair = (*metadata)[i];
     const char* newKey = (*metadata)[i]->key;
 
     bool keyAlreadyExists = false;
-    for( unsigned int j=0; j<document->metadata.size(); j++ ) {
+    for( size_t j=0; j<document->metadata.size(); j++ ) {
       //indri::parse::MetadataPair existingPair = document->metadata[j];
       const char* existingKey = document->metadata[j].key;
       if( strcmp( newKey, existingKey ) == 0 ) {
@@ -200,8 +200,6 @@ indri::api::ParsedDocument* indri::parse::OffsetMetadataAnnotator::transform( in
                 << docno << "'.  Skipping..." << std::endl;
     }
     else {
-      //std::cout << "Metadata element '" << newKey << "' added for docno '"
-      //          << docno << "'." << std::endl;
       document->metadata.push_back( *newPair );
     }
   }

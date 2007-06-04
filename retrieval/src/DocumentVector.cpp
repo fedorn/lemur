@@ -32,7 +32,7 @@ void indri::api::DocumentVector::_init( indri::index::Index* index, const indri:
   std::map<int, int> termIDMap;
   _stems.push_back( "[OOV]" );
 
-  for( unsigned int i=0; i<terms.size(); i++ ) {
+  for( size_t i=0; i<terms.size(); i++ ) {
     if( terms[i] == 0 ) {
       _positions.push_back(0);
     } else {
@@ -54,8 +54,8 @@ void indri::api::DocumentVector::_init( indri::index::Index* index, const indri:
         }
 
         _stems.push_back( termString );
-        _positions.push_back(_stems.size()-1);
-        termIDMap[terms[i]] = _stems.size()-1;
+        _positions.push_back((int)_stems.size()-1);
+        termIDMap[terms[i]] = (int)_stems.size()-1;
 
         // put the string in the termStringMap for future DocumentVector builders
         if( termStringMap && siter == termStringMap->end() ) {
@@ -65,7 +65,7 @@ void indri::api::DocumentVector::_init( indri::index::Index* index, const indri:
     }
   }
 
-  for( unsigned int i=0; i<fields.size(); i++ ) {
+  for( size_t i=0; i<fields.size(); i++ ) {
     Field f;
 
     f.name = index->field(fields[i].id);

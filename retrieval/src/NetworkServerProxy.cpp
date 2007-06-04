@@ -95,11 +95,11 @@ namespace indri
                 std::string key = metadata->getChildren()[j]->getChildValue("key");
                 std::string value = metadata->getChildren()[j]->getChildValue("value");           
             
-                metadataKeyOffset.push_back( buffer.position() );
+                metadataKeyOffset.push_back( (int)buffer.position() );
                 strcpy( buffer.write( key.size()+1 ), key.c_str() );
 
-                metadataValueOffset.push_back( buffer.position() );
-                int length = base64_decode( buffer.write( value.size() ), value.size(), value );
+                metadataValueOffset.push_back( (int)buffer.position() );
+                int length = base64_decode( buffer.write( value.size() ), (int)value.size(), value );
                 buffer.unwrite( value.size()-length );
               }
             }
@@ -109,8 +109,8 @@ namespace indri
 
             if( textNode ) {
               text = textNode->getValue();
-              textOffset = buffer.position();
-              int length = base64_decode( buffer.write( text.size() ), text.size(), text );
+              textOffset = (int)buffer.position();
+              int length = base64_decode( buffer.write( text.size() ), (int)text.size(), text );
               buffer.unwrite( text.size()-length );
             }
 
@@ -202,7 +202,7 @@ namespace indri
         indri::xml::XMLNode* reply = r.getReply();
         indri::utility::Buffer metadataBuffer;
 
-        for( unsigned int i=0; i<reply->getChildren().size(); i++ ) {
+        for( size_t i=0; i<reply->getChildren().size(); i++ ) {
           const indri::xml::XMLNode* meta = reply->getChildren()[i];
           const std::string& input = meta->getValue();
 
@@ -254,25 +254,25 @@ namespace indri
 
             indri::api::DocumentVector* result = new indri::api::DocumentVector;
 
-            for( unsigned int i=0; i<stems->getChildren().size(); i++ ) {
+            for( size_t j=0; j<stems->getChildren().size(); j++ ) {
               // have to use base64 coding, in case the stem contains '<', '>', etc.
               std::string stem;
-              base64_decode_string(stem, stems->getChildren()[i]->getValue());
+              base64_decode_string(stem, stems->getChildren()[j]->getValue());
               result->stems().push_back( stem );
             }
 
             std::vector<int>& positionsVector = result->positions();
 
-            for( unsigned int i=0; i<positions->getChildren().size(); i++ ) {
-              const std::string& stringText = positions->getChildren()[i]->getValue();
+            for( size_t j=0; j<positions->getChildren().size(); j++ ) {
+              const std::string& stringText = positions->getChildren()[j]->getValue();
               INT64 position = string_to_i64( stringText );
               positionsVector.push_back( int(position) );
             }
 
             std::vector<indri::api::DocumentVector::Field>& fieldVector = result->fields();
 
-            for( unsigned int i=0; i<fields->getChildren().size(); i++ ) {
-              const indri::xml::XMLNode* field = fields->getChildren()[i];
+            for( size_t j=0; j<fields->getChildren().size(); j++ ) {
+              const indri::xml::XMLNode* field = fields->getChildren()[j];
 
               const indri::xml::XMLNode* nameField = field->getChild("name");
               const indri::xml::XMLNode* numberField = field->getChild("number");
@@ -396,7 +396,7 @@ std::string indri::server::NetworkServerProxy::_stringRequest( indri::xml::XMLNo
 indri::server::QueryServerResponse* indri::server::NetworkServerProxy::runQuery( std::vector<indri::lang::Node*>& roots, int resultsRequested, bool optimize ) {
   indri::lang::Packer packer;
 
-  for( unsigned int i=0; i<roots.size(); i++ ) {
+  for( size_t i=0; i<roots.size(); i++ ) {
     packer.pack( roots[i] );
   }
 
@@ -420,7 +420,7 @@ indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::d
   indri::xml::XMLNode* documents = new indri::xml::XMLNode( "documents" );
 
   // build request
-  for( unsigned int i=0; i<documentIDs.size(); i++ ) {
+  for( size_t i=0; i<documentIDs.size(); i++ ) {
     documents->addChild( new indri::xml::XMLNode( "document", i64_to_string( documentIDs[i] ) ) );
   }
   request->addChild( field );
@@ -443,7 +443,7 @@ indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::p
   indri::xml::XMLNode* documents = new indri::xml::XMLNode( "paths" );
 
   // build request
-  for( unsigned int i=0; i<documentIDs.size(); i++ ) {
+  for( size_t i=0; i<documentIDs.size(); i++ ) {
     documents->addChild( new indri::xml::XMLNode( "document", i64_to_string( documentIDs[i] ) ) );
     documents->addChild( new indri::xml::XMLNode( "begin", i64_to_string( begins[i] ) ) );
     documents->addChild( new indri::xml::XMLNode( "end", i64_to_string( ends[i] ) ) );
@@ -465,7 +465,7 @@ indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::p
 indri::server::QueryServerDocumentsResponse* indri::server::NetworkServerProxy::documents( const std::vector<int>& documentIDs ) {
   indri::xml::XMLNode* docRequest = new indri::xml::XMLNode( "documents" );
 
-  for( unsigned int i=0; i<documentIDs.size(); i++ ) {
+  for( size_t i=0; i<documentIDs.size(); i++ ) {
     docRequest->addChild( new indri::xml::XMLNode("doc", i64_to_string(documentIDs[i])) );
   }
 
@@ -488,7 +488,7 @@ indri::server::QueryServerDocumentsResponse* indri::server::NetworkServerProxy::
 
   // serialize the attributeValues (in a tree called "attributeValues", with members called "attributeValue")
   indri::xml::XMLNode* attributeValuesNode = new indri::xml::XMLNode( "attributeValues" );
-  for( unsigned int i=0; i<attributeValues.size(); i++ ) {
+  for( size_t i=0; i<attributeValues.size(); i++ ) {
     attributeValuesNode->addChild( new indri::xml::XMLNode( "attributeValue", attributeValues[i] ) );
   }
   docRequest->addChild( attributeValuesNode );
@@ -513,7 +513,7 @@ indri::server::QueryServerDocumentIDsResponse* indri::server::NetworkServerProxy
 
   // serialize the attributeValues (in a tree called "attributeValues", with members called "attributeValue")
   indri::xml::XMLNode* attributeValuesNode = new indri::xml::XMLNode( "attributeValues" );
-  for( unsigned int i=0; i<attributeValues.size(); i++ ) {
+  for( size_t i=0; i<attributeValues.size(); i++ ) {
     attributeValuesNode->addChild( new indri::xml::XMLNode( "attributeValue", attributeValues[i] ) );
   }
   docRequest->addChild( attributeValuesNode );

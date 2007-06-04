@@ -38,7 +38,7 @@ namespace indri {
             indri::utility::GenericHash<const char*> h;
             int accumulator = 0;
 
-            for( int i=0; i<one->terms.size(); i++ ) {
+            for( size_t i=0; i<one->terms.size(); i++ ) {
               accumulator *= 7;
               accumulator += h( one->terms[i].c_str() );
             }
@@ -66,7 +66,7 @@ namespace indri {
               }
             }
 
-            for( int i=0; i<one.terms.size(); i++ ) {
+            for( size_t i=0; i<one.terms.size(); i++ ) {
               const std::string& oneString = one.terms[i];
               const std::string& twoString = two.terms[i];
 

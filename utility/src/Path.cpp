@@ -39,7 +39,7 @@ static int path_last_separator( const std::string& path ) {
   int i;
 
   // skip any trailing slashes
-  for( i=path.size()-1; i>=0; i-- ) {
+  for( i=(int)path.size()-1; i>=0; i-- ) {
     if( path[i] != PATH_SEPARATOR )
       break;
   }

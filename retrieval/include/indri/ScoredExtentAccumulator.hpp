@@ -52,7 +52,7 @@ namespace indri
           indri::index::Extent docExtent(0, documentLength);
           const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& documentScores = _belief->score( documentID, docExtent, documentLength );
 
-          for( unsigned int i=0; i<documentScores.size(); i++ ) {
+          for( size_t i=0; i<documentScores.size(); i++ ) {
             _scores.push( documentScores[i] );
           }
 
@@ -86,7 +86,7 @@ namespace indri
 
         // puts scores into the vector in descending order
         scoreVec.reserve( heapCopy.size() );
-        for( int i=(int)heapCopy.size()-1; i>=0; i-- ) {
+        for( size_t i=heapCopy.size()-1; i>=0; i-- ) {
           scoreVec.push_back( heapCopy.top() );
           heapCopy.pop();
         }

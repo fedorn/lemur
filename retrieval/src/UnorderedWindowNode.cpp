@@ -36,7 +36,7 @@ indri::infnet::UnorderedWindowNode::UnorderedWindowNode( const std::string& name
 int indri::infnet::UnorderedWindowNode::nextCandidateDocument() {
   int maxDocument = 0;
 
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     int current = _children[i]->nextCandidateDocument();
     if( current > maxDocument )
       maxDocument = current;
@@ -71,13 +71,13 @@ void indri::infnet::UnorderedWindowNode::prepare( int documentID ) {
   int termsSeen = 0;
 
   // add every term position from every list
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     const indri::utility::greedy_vector<indri::index::Extent>& childPositions = _children[i]->extents();
 
     if( childPositions.size() )
       termsSeen++;
 
-    for( unsigned int j=0; j<childPositions.size(); j++ ) {
+    for( size_t j=0; j<childPositions.size(); j++ ) {
       term_position p;
 
       p.type = i;
@@ -102,15 +102,15 @@ void indri::infnet::UnorderedWindowNode::prepare( int documentID ) {
   std::fill( lastPositions.begin(), lastPositions.end(), -1 );
 
   // determine last pointers
-  for( int i=0; i<allPositions.size(); i++ ) {
+  for( size_t i=0; i<allPositions.size(); i++ ) {
     allPositions[i].last = lastPositions[allPositions[i].type];
     lastPositions[allPositions[i].type] = i;
   }
 
   // loop over all term occurrences
-  for( int i=0; i<allPositions.size(); i++ ) {
+  for( size_t i=0; i<allPositions.size(); i++ ) {
     int termsFound = 1;
-    unsigned int current;
+    size_t current;
     double weight = 1;
 
     for( current=i+1; current < allPositions.size() && termsFound != _children.size(); current++ ) {
@@ -119,7 +119,7 @@ void indri::infnet::UnorderedWindowNode::prepare( int documentID ) {
 
       // if the last time this term appeared was before the beginning of this window,
       // then this is a new term for this window
-      if( allPositions[current].last < i ) {
+      if( (size_t)allPositions[current].last < i ) {
         termsFound++;
         weight *= allPositions[current].weight;
       } 

@@ -308,8 +308,8 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
       }
 
       // ensure tag boundaries are still within the document
-      if (te->end > document->positions.size()) {
-        te->end = document->positions.size();
+      if (te->end > (int)document->positions.size()) {
+        te->end = (int)document->positions.size();
       } 
       if (te->end < 1) {
         te->end = 1;
@@ -367,7 +367,7 @@ void indri::parse::OffsetAnnotationAnnotator::convert_annotations( std::set<indr
       }
 
       // Make sure tag boundaries are within the document
-      if (te->begin >= document->positions.size()) {
+      if (te->begin >= (int)document->positions.size()) {
         te->begin = document->positions.size() - 1;
       } 
       if (te->begin < 0) {
@@ -423,16 +423,6 @@ indri::parse::OffsetAnnotationAnnotator::ReadAnnotationTag indri::parse::OffsetA
   int fieldStart = 0;
   int fieldCount = 0;
   int fieldOffset = 0;
-
-  /*
-  char* docno = NULL;
-  char* name = NULL;
-  char* s_value = NULL;
-  int type = 0;  // TAG = 1, ATTRIBUTE = 2
-  UINT64 id = 0;
-  UINT64 i_value = 0;
-  UINT64 parent = 0;
-  */
 
   int len = 0;
 

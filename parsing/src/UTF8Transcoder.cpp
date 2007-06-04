@@ -135,7 +135,6 @@ void indri::parse::UTF8Transcoder::utf8_decode( const char* buf_in, UINT64** cod
   int i = 0; // index into codes array
   int j = 0; // index into input buf
   UINT64 code = 0;
-  bool code_ok;
   int bytes;
 
   unsigned char* buf = (unsigned char*)buf_in;

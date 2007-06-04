@@ -35,7 +35,7 @@ void indri::infnet::ContextSimpleCountAccumulator::_computeCounts( indri::index:
     _size += index.termCount();
   }
 
-  for( unsigned int i=0; i<_terms.size(); i++ ) {
+  for( size_t i=0; i<_terms.size(); i++ ) {
     if( _terms[i].length() != 0 ) {
       if( _field.size() ) {
         _occurrences += index.fieldTermCount( _field, _terms[i] );

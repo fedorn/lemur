@@ -32,11 +32,11 @@ void indri::infnet::WeightedExtentOrNode::prepare( int documentID ) {
   _extents.clear();
   indri::utility::greedy_vector<indri::index::Extent> allExtents;
 
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     ListIteratorNode* child = _children[i];
     double weight = _weights[i];
     
-    for( unsigned int j=0; j<child->extents().size(); j++ ) {
+    for( size_t j=0; j<child->extents().size(); j++ ) {
       const indri::index::Extent& extent = child->extents()[j];
       _extents.push_back( indri::index::Extent( weight * extent.weight, extent.begin, extent.end ) );
     }
@@ -53,7 +53,7 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Weight
 int indri::infnet::WeightedExtentOrNode::nextCandidateDocument() {
   int candidate = INT_MAX;
   
-  for( unsigned int i=0; i<_children.size(); i++ ) {
+  for( size_t i=0; i<_children.size(); i++ ) {
     candidate = lemur_compat::min( _children[i]->nextCandidateDocument(), candidate );
   }
 
@@ -67,8 +67,8 @@ const std::string& indri::infnet::WeightedExtentOrNode::getName() const {
 void indri::infnet::WeightedExtentOrNode::annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   annotator.addMatches( _extents, this, documentID, extent );
 
-  for( unsigned int i=0; i<_extents.size(); i++ ) {
-    for( unsigned int j=0; j<_children.size(); j++ ) {
+  for( size_t i=0; i<_extents.size(); i++ ) {
+    for( size_t j=0; j<_children.size(); j++ ) {
       _children[j]->annotate( annotator, documentID, _extents[i] );
     }
   }

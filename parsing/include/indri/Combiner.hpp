@@ -73,9 +73,9 @@ namespace indri
             linkinfo.unwrite(1);
           }
 
-          int docnoLen = strlen(docno);
-          int docUrlLen = strlen(linkDocUrl);
-          int textLen = strlen(linkText);
+          int docnoLen = (int)strlen(docno);
+          int docUrlLen = (int)strlen(linkDocUrl);
+          int textLen = (int)strlen(linkText);
 
           int total = docnoLen + sizeof "LINKDOCNO=" + 
             docUrlLen + sizeof "LINKFROM=" +

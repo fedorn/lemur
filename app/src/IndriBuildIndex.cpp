@@ -552,7 +552,7 @@ static std::string downcase_string( const std::string& str ) {
   std::string result;
   result.resize( str.size() );
 
-  for( int i=0; i<str.size(); i++ ) {
+  for( size_t i=0; i<str.size(); i++ ) {
     result[i] = tolower(str[i]);
   }
  
@@ -560,7 +560,7 @@ static std::string downcase_string( const std::string& str ) {
 }
 
 static void downcase_string_vector (std::vector<std::string>& vec) {
-  for( int i=0; i<vec.size(); i++ ) {
+  for( size_t i=0; i<vec.size(); i++ ) {
     vec[i] = downcase_string( vec[i] );
   }
 }
@@ -571,7 +571,7 @@ static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, ind
 
   indri::api::Parameters slice = p[parameterName];
   
-  for( int i=0; i<slice.size(); i++ ) {
+  for( size_t i=0; i<slice.size(); i++ ) {
     if( subName ) {
       if( slice[i].exists(*subName) ) {
         vec.push_back( slice[i][*subName] );
@@ -638,7 +638,7 @@ static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification
   for (i1 = fields.begin(); i1 != fields.end(); i1++) {
     // find any conflated names
     conflations = findConflations(spec, *i1);
-    for (int j = 0; j < conflations.size(); j++) {
+    for (size_t j = 0; j < conflations.size(); j++) {
       // only add the field for indexing if it doesn't already exist
       if (addNew(spec->index, conflations[j], 
                  spec->name, " as an indexed field")) {
@@ -658,7 +658,7 @@ static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification
   for (i1 = metadata.begin(); i1 != metadata.end(); i1++) {
     // find any conflated names
     conflations = findConflations(spec, *i1);
-    for (int j = 0; j < conflations.size(); j++)
+    for (size_t j = 0; j < conflations.size(); j++)
       retval |= addNew(spec->metadata, conflations[j], spec->name,
                        " as a metadata field");
   }
@@ -666,7 +666,7 @@ static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification
   for (i1 = metadataForward.begin(); i1 != metadataForward.end(); i1++) {
     // find any conflated names
     conflations = findConflations(spec, *i1);
-    for (int j = 0; j < conflations.size(); j++) 
+    for (size_t j = 0; j < conflations.size(); j++) 
       retval |= addNew(spec->metadata, conflations[j], spec->name,
                        " as a forward indexed metadata field");
   }
@@ -674,7 +674,7 @@ static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification
   for (i1 = metadataBackward.begin(); i1 != metadataBackward.end(); i1++) {
     // find any conflated names
     conflations = findConflations(spec, *i1);
-    for (int j = 0; j < conflations.size(); j++) 
+    for (size_t j = 0; j < conflations.size(); j++) 
       retval |= addNew(spec->metadata, conflations[j], spec->name,
                        " as a forward indexed metadata field");
   }
@@ -690,7 +690,7 @@ static void process_numeric_fields( indri::api::Parameters parameters, indri::ap
   std::string numName = "numeric";
   std::string subName = "name";
   indri::api::Parameters slice = parameters["field"];
-  for( int i=0; i<slice.size(); i++ ) {
+  for( size_t i=0; i<slice.size(); i++ ) {
     bool isNumeric = slice[i].get(numName, false);
     if( isNumeric ) {
       // let user override default NumericFieldAnnotator for parser
@@ -712,7 +712,7 @@ static void process_ordinal_fields( indri::api::Parameters parameters, indri::ap
   std::string subName = "name";
   indri::api::Parameters slice = parameters["field"];
   
-  for( int i=0; i<slice.size(); i++ ) {
+  for( size_t i=0; i<slice.size(); i++ ) {
     bool isOrdinal = slice[i].get(ordName, false);
 
     if( isOrdinal ) {

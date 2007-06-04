@@ -258,7 +258,6 @@ indri::index::DocumentStructure::findLeaf(int b, int e, int root) {
   if ( begin(root) <= b && end(root) >= e ) {
     leaf = root;
   } 
-  int numChildren;
   child_iterator child = childrenBegin( root );
   child_iterator childEnd = childrenEnd( root );
   while (child < childEnd) {
@@ -320,7 +319,7 @@ indri::index::DocumentStructure::_constructNodePath(std::stringstream & path, in
 
 int
 indri::index::DocumentStructure::fieldId( const std::string path ) {
-  int loc = 0;
+  size_t loc = 0;
   int node = 0;
 
   child_iterator kids = childrenBegin( node );
@@ -429,7 +428,7 @@ indri::index::DocumentStructure::topDownOrder(std::set<int> & roots, indri::util
     r++;
   }
   
-  for (int i = 0; i < order.size() && i < _numNodes; i++) {
+  for (size_t i = 0; i < order.size() && int(i) < _numNodes; i++) {
     // take each node and add its children
     child_iterator begin = childrenBegin( order[i] );
     child_iterator end  = childrenEnd( order[i] ); 

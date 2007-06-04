@@ -45,7 +45,7 @@ namespace indri {
     }
 
     bool BagList::hasMore() const {
-      return _position < _termCounts.size();
+      return _position < (int)_termCounts.size();
     }
 
     lemur::api::TermInfo* BagList::nextEntry() const {
@@ -96,7 +96,7 @@ namespace indri {
 
     lemur::api::POS_T PositionList::beginPosition() const {
       // list may start with stopwords.
-      int p = 0;
+      size_t p = 0;
       while (p < _list->terms().size() && _list->terms()[p] == 0) p++;
       return lemur::api::POS_T(p);
     }
@@ -108,24 +108,24 @@ namespace indri {
     lemur::api::POS_T PositionList::nextPosition( lemur::api::POS_T position ) const {
       // list may contain stopwords
       int p = int(position) + 1;
-      while (_list->terms()[p] == 0 && p < _list->terms().size()) p++;
+      while (_list->terms()[p] == 0 && p < (int)_list->terms().size()) p++;
       return lemur::api::POS_T(p);
     }
 
     void PositionList::startIteration() const {
       // list may start with stopwords.
-      int p = 0;
+      size_t p = 0;
       while (p < _list->terms().size() && _list->terms()[p] == 0) p++;
-      const_cast<PositionList*>(this)->_position = p;
+      const_cast<PositionList*>(this)->_position = (int)p;
     }
 
     bool PositionList::hasMore() const {
       // list may contain stopwords. 
-      while (_position < _list->terms().size() &&
+      while (_position < (int)_list->terms().size() &&
              _list->terms()[_position] == 0) {
         const_cast<PositionList*>(this)->_position++;
       }
-      return _position < _list->terms().size();
+      return _position < (int)_list->terms().size();
     }
 
     lemur::api::TermInfo* PositionList::nextEntry() const {

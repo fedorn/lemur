@@ -46,11 +46,11 @@ indri::parse::TaggedDocumentIterator::~TaggedDocumentIterator() {
 
 void indri::parse::TaggedDocumentIterator::setTags( const char* startDoc, const char* endDoc, const char* endMetadata ) {
   _startDocTag = startDoc;
-  _startDocTagLength = strlen(startDoc);
+  _startDocTagLength = (int)strlen(startDoc);
   _endDocTag = endDoc;
-  _endDocTagLength = strlen(endDoc);
+  _endDocTagLength = (int)strlen(endDoc);
   _endMetadataTag = endMetadata;
-  _endMetadataTagLength = endMetadata ? strlen(endMetadata) : 0;
+  _endMetadataTagLength = endMetadata ? (int)strlen(endMetadata) : 0;
 }
 
 void indri::parse::TaggedDocumentIterator::open( const std::string& filename ) {
@@ -93,7 +93,7 @@ bool indri::parse::TaggedDocumentIterator::_readLine( char*& beginLine, size_t& 
 
   // fetch next document line
   char* buffer = _buffer.write( readAmount );
-  char* result = fgets( buffer, readAmount, _in );
+  char* result = fgets( buffer, (int)readAmount, _in );
  
   if(!result) {
     return false;
@@ -164,7 +164,7 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
             // this is a close tag and it matches the open tag,
             // so tie up loose ends in the previous open tag metadata structure
             *beginLine = 0;
-            metadata.back().endText = _metaBuffer.position() - lineLength;
+            metadata.back().endText = (int)(_metaBuffer.position() - lineLength);
             openTag = false;
           }
         } else {
@@ -179,7 +179,7 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
 
             char* endText = strchr( endTag + 1, '<' );
 
-            if( (endTag - beginLine) < lineLength/2 && endText ) {
+            if( (endTag - beginLine) < (int)lineLength/2 && endText ) {
               // the end tag is also on this line
               range.beginText = endTag + 1 - _metaBuffer.front();
               range.endText = endText - _metaBuffer.front();
@@ -188,7 +188,7 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
             } else {
               // no more text on this line
               openTag = true;
-              range.beginText = _metaBuffer.position();
+              range.beginText = (int)_metaBuffer.position();
             }
 
             metadata.push_back( range );
@@ -210,7 +210,7 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
   }
 
   // from now on, everything is text
-  int startDocument = _buffer.position() - 1;
+  int startDocument = (int)_buffer.position() - 1;
   
   while(true) {
     result = _readLine( beginLine, lineLength );
@@ -219,7 +219,7 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
       LEMUR_THROW( LEMUR_IO_ERROR, "Malformed document: " + _fileName );
     }
 
-    if( lineLength >= _endDocTagLength &&
+    if( (int)lineLength >= _endDocTagLength &&
         !strncmp( beginLine+lineLength-_endDocTagLength, _endDocTag, _endDocTagLength - 1 ) ) {
       //      beginLine[lineLength-_endDocTagLength] = 0;
       _document.content = _buffer.front() + startDocument;

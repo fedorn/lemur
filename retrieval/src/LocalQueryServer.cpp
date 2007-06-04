@@ -139,7 +139,7 @@ indri::server::LocalQueryServer::LocalQueryServer( indri::collection::Repository
   _repository(repository), _maxWildcardMatchesPerTerm(indri::infnet::InferenceNetworkBuilder::DEFAULT_MAX_WILDCARD_TERMS)
 {
   // if supplied and false, turn off optimization for all queries.
-  _optimizeParameter = indri::api::Parameters::instance().get( "optimize", 1 );
+  _optimizeParameter = indri::api::Parameters::instance().get( "optimize", true );
 }
 
 //
@@ -147,7 +147,7 @@ indri::server::LocalQueryServer::LocalQueryServer( indri::collection::Repository
 //
 
 indri::index::Index* indri::server::LocalQueryServer::_indexWithDocument( indri::collection::Repository::index_state& indexes, int documentID ) {
-  for( int i=0; i<indexes->size(); i++ ) {
+  for( size_t i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
     int lowerBound = (*indexes)[i]->documentBase();
     int upperBound = (*indexes)[i]->documentMaximum();
@@ -179,18 +179,18 @@ indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::doc
   std::vector<std::string> result;
 
   std::vector<std::pair<int, int> > docSorted;
-  for( unsigned int i=0; i<documentIDs.size(); i++ ) {
+  for( size_t i=0; i<documentIDs.size(); i++ ) {
     docSorted.push_back( std::make_pair( documentIDs[i], i ) );
   }
   std::sort( docSorted.begin(), docSorted.end() );
 
-  for( unsigned int i=0; i<docSorted.size(); i++ ) {
+  for( size_t i=0; i<docSorted.size(); i++ ) {
     result.push_back( documentMetadatum(docSorted[i].first, attributeName) );
   }
 
   std::vector<std::string> actual;
   actual.resize( documentIDs.size() );
-  for( unsigned int i=0; i<docSorted.size(); i++ ) {
+  for( size_t i=0; i<docSorted.size(); i++ ) {
     actual[docSorted[i].second] = result[i];
   }
 
@@ -199,7 +199,7 @@ indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::doc
 
 indri::server::QueryServerDocumentsResponse* indri::server::LocalQueryServer::documents( const std::vector<int>& documentIDs ) {
   std::vector<indri::api::ParsedDocument*> result;
-  for( unsigned int i=0; i<documentIDs.size(); i++ ) {
+  for( size_t i=0; i<documentIDs.size(); i++ ) {
     result.push_back( document(documentIDs[i]) );
   }
   return new indri::server::LocalQueryServerDocumentsResponse( result );
@@ -209,7 +209,7 @@ indri::server::QueryServerDocumentsResponse* indri::server::LocalQueryServer::do
   indri::collection::CompressedCollection* collection = _repository.collection();
   std::vector<indri::api::ParsedDocument*> result;
   
-  for( unsigned int i=0; i<attributeValues.size(); i++ ) {
+  for( size_t i=0; i<attributeValues.size(); i++ ) {
     std::vector<indri::api::ParsedDocument*> documents = collection->retrieveByMetadatum( attributeName, attributeValues[i] );
     std::copy( documents.begin(), documents.end(), std::back_inserter( result ) );
   }
@@ -221,7 +221,7 @@ indri::server::QueryServerDocumentIDsResponse* indri::server::LocalQueryServer::
   indri::collection::CompressedCollection* collection = _repository.collection();
   std::vector<lemur::api::DOCID_T> result;
   
-  for( unsigned int i=0; i<attributeValues.size(); i++ ) {
+  for( size_t i=0; i<attributeValues.size(); i++ ) {
     std::vector<lemur::api::DOCID_T> documents = collection->retrieveIDByMetadatum( attributeName, attributeValues[i] );
     std::copy( documents.begin(), documents.end(), std::back_inserter( result ) );
   }
@@ -233,7 +233,7 @@ INT64 indri::server::LocalQueryServer::termCount() {
   indri::collection::Repository::index_state indexes = _repository.indexes();
   INT64 total = 0;
 
-  for( int i=0; i<indexes->size(); i++ ) {
+  for( size_t i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
     total += (*indexes)[i]->termCount();
   }
@@ -255,7 +255,7 @@ INT64 indri::server::LocalQueryServer::stemCount( const std::string& stem ) {
   indri::collection::Repository::index_state indexes = _repository.indexes();
   INT64 total = 0;
 
-  for( int i=0; i<indexes->size(); i++ ) {
+  for( size_t i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
     total += (*indexes)[i]->termCount( stem );
   }
@@ -277,7 +277,7 @@ INT64 indri::server::LocalQueryServer::stemFieldCount( const std::string& stem, 
   indri::collection::Repository::index_state indexes = _repository.indexes();
   INT64 total = 0;
 
-  for( int i=0; i<indexes->size(); i++ ) {
+  for( size_t i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
     total += (*indexes)[i]->fieldTermCount( field, stem );
   }
@@ -309,7 +309,7 @@ std::vector<std::string> indri::server::LocalQueryServer::fieldList() {
   std::vector<std::string> result;
   const std::vector<indri::collection::Repository::Field>& fields = _repository.fields();
 
-  for( int i=0; i<fields.size(); i++ ) {
+  for( size_t i=0; i<fields.size(); i++ ) {
     result.push_back( fields[i].name );
   }
 
@@ -332,7 +332,7 @@ INT64 indri::server::LocalQueryServer::documentCount() {
   indri::collection::Repository::index_state indexes = _repository.indexes();
   INT64 total = 0;
   
-  for( int i=0; i<indexes->size(); i++ ) {
+  for( size_t i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
     total += (*indexes)[i]->documentCount();
   }
@@ -347,7 +347,7 @@ INT64 indri::server::LocalQueryServer::documentCount( const std::string& term ) 
   INT64 total = 0;
   if( stem.length() == 0 ) return total;
   
-  for( int i=0; i<indexes->size(); i++ ) {
+  for( size_t i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
     //    total += (*indexes)[i]->documentCount( term );
     total += (*indexes)[i]->documentCount( stem );
@@ -402,7 +402,7 @@ indri::server::QueryServerResponse* indri::server::LocalQueryServer::runQuery( s
 }
 
 indri::server::QueryServerVectorsResponse* indri::server::LocalQueryServer::documentVectors( const std::vector<int>& documentIDs ) {
-  indri::server::LocalQueryServerVectorsResponse* response = new indri::server::LocalQueryServerVectorsResponse( documentIDs.size() );
+  indri::server::LocalQueryServerVectorsResponse* response = new indri::server::LocalQueryServerVectorsResponse( (int)documentIDs.size() );
   indri::collection::Repository::index_state indexes = _repository.indexes();
   std::map<int, std::string> termIDStringMap;
 
@@ -429,12 +429,12 @@ indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::pat
   std::vector<std::string> result;
 
   std::vector<std::pair<int, int> > docSorted;
-  for( unsigned int i=0; i<documentIDs.size(); i++ ) {
+  for( size_t i=0; i<documentIDs.size(); i++ ) {
     docSorted.push_back( std::make_pair( documentIDs[i], i ) );
   }
   std::sort( docSorted.begin(), docSorted.end() );
 
-  for( unsigned int i=0; i<docSorted.size(); i++ ) {
+  for( size_t i=0; i<docSorted.size(); i++ ) {
     indri::collection::Repository::index_state indexes = _repository.indexes();
     bool docStructLoaded = true;
     int documentID = docSorted[i].first;
@@ -461,7 +461,7 @@ indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::pat
 
   std::vector<std::string> actual;
   actual.resize( documentIDs.size() );
-  for( unsigned int i=0; i<docSorted.size(); i++ ) {
+  for( size_t i=0; i<docSorted.size(); i++ ) {
     actual[docSorted[i].second] = result[i];
   }
 

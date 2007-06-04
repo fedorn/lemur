@@ -47,7 +47,7 @@ void print_expression_list( const std::string& indexName, const std::string& exp
   env.close();
   // now, print the results in the format:
   // documentID weight begin end
-  for( int i=0; i<result.size(); i++ ) {
+  for( size_t i=0; i<result.size(); i++ ) {
     std::cout << result[i].document
               << " " 
               << result[i].score
@@ -127,7 +127,7 @@ void print_invfile( indri::collection::Repository& r ) {
       indri::index::DocListIterator::DocumentData* doc = entry->iterator->currentEntry();
 
       std::cout << "\t" << doc->document << " " << doc->positions.size();
-      for( int i=0; i<doc->positions.size(); i++ ) {
+      for( size_t i=0; i<doc->positions.size(); i++ ) {
         std::cout << " " << doc->positions[i];
       }
       std::cout << std::endl;
@@ -196,9 +196,9 @@ void print_field_positions( indri::collection::Repository& r, const std::string&
                 << entry->extents.size() << " "
                 << index->documentLength( entry->document ) << " ";
 
-      int count = entry->extents.size();
+      size_t count = entry->extents.size();
 
-      for( int i=0; i<count; i++ ) {
+      for( size_t i=0; i<count; i++ ) {
         std::cout << " ( " << entry->extents[i].begin << ", " << entry->extents[i].end;
         if( entry->numbers.size() ) {
           std::cout << ", " << entry->numbers[i];
@@ -246,9 +246,9 @@ void print_term_positions( indri::collection::Repository& r, const std::string& 
                 << entry->positions.size() << " "
                 << index->documentLength( entry->document ) << " ";
 
-      int count = entry->positions.size();
+      size_t count = entry->positions.size();
 
-      for( int i=0; i<count; i++ ) {
+      for( size_t i=0; i<count; i++ ) {
         std::cout << entry->positions[i] << " ";
       }
 
@@ -320,7 +320,7 @@ void print_document_data( indri::collection::Repository& r, const char* number )
 
   std::cout << std::endl << "--- Metadata ---" << std::endl << std::endl;
 
-  for( int i=0; i<document->metadata.size(); i++ ) {
+  for( size_t i=0; i<document->metadata.size(); i++ ) {
     if( document->metadata[i].key[0] == '#' )
       continue;
 
@@ -331,7 +331,7 @@ void print_document_data( indri::collection::Repository& r, const char* number )
 
   std::cout << std::endl << "--- Positions ---" << std::endl << std::endl;
 
-  for( int i=0; i<document->positions.size(); i++ ) {
+  for( size_t i=0; i<document->positions.size(); i++ ) {
     std::cout << i << " "
               << document->positions[i].begin << " "
               << document->positions[i].end << std::endl;
@@ -340,7 +340,7 @@ void print_document_data( indri::collection::Repository& r, const char* number )
 
   std::cout << std::endl << "--- Tags ---" << std::endl << std::endl;
 
-  for( int i=0; i<document->tags.size(); i++ ) {
+  for( size_t i=0; i<document->tags.size(); i++ ) {
     std::cout << i << " "
               << document->tags[i]->name << " " 
               << document->tags[i]->begin << " "
@@ -371,14 +371,14 @@ void print_document_vector( indri::collection::Repository& r, const char* number
   
     std::cout << "--- Fields ---" << std::endl;
 
-    for( int i=0; i<docVector->fields().size(); i++ ) {
+    for( size_t i=0; i<docVector->fields().size(); i++ ) {
       const indri::api::DocumentVector::Field& field = docVector->fields()[i];
       std::cout << field.name << " " << field.begin << " " << field.end << " " << field.number << std::endl;
     }
 
     std::cout << "--- Terms ---" << std::endl;
 
-    for( int i=0; i<docVector->positions().size(); i++ ) {
+    for( size_t i=0; i<docVector->positions().size(); i++ ) {
       int position = docVector->positions()[i];
       const std::string& stem = docVector->stems()[position];
 

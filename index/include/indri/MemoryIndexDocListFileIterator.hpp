@@ -47,12 +47,13 @@ namespace indri {
         _alphabetical.clear();
         _alphabetical.reserve( _termData.size() );
 
-        for( int i=0; i<_termData.size(); i++ ) {
+        for( size_t i=0; i<_termData.size(); i++ ) {
           _alphabetical.push_back( _termData[i] );
         }
 
-        std::sort( _alphabetical.begin(), _alphabetical.end(), MemoryIndex::term_entry::term_less() );\
-                                                                                                        _currentTerm = _alphabetical.begin();
+        std::sort( _alphabetical.begin(), _alphabetical.end(), MemoryIndex::term_entry::term_less() );
+
+        _currentTerm = _alphabetical.begin();
         _data.termData = 0;
         _data.iterator = 0;
 

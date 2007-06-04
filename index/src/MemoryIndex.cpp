@@ -123,7 +123,7 @@ int indri::index::MemoryIndex::documentBase() {
 int indri::index::MemoryIndex::documentLength( int documentID ) {
   lemur::api::DOCID_T base = _corpusStatistics.baseDocument;
 
-  if( base > documentID || (documentID - base) > _documentData.size() )
+  if( base > documentID || (documentID - base) > (int)_documentData.size() )
     return 0;
 
   assert( documentID - base >= 0 );
@@ -163,7 +163,7 @@ int indri::index::MemoryIndex::term( const std::string& term ) {
 //
 
 std::string indri::index::MemoryIndex::term( int termID ) {
-  if( termID <= 0 || termID >= _idToTerm.size() )
+  if( termID <= 0 || termID >= (int)_idToTerm.size() )
     return std::string();
 
   term_entry* entry = _idToTerm[ termID ];
@@ -175,7 +175,7 @@ std::string indri::index::MemoryIndex::term( int termID ) {
 //
 
 std::string indri::index::MemoryIndex::field( int fieldID ) {
-  if( fieldID <= 0 || fieldID > _fieldData.size() )
+  if( fieldID <= 0 || fieldID > (int)_fieldData.size() )
     return "";
   
   return _fieldData[fieldID-1].name;
@@ -346,10 +346,10 @@ void indri::index::MemoryIndex::_writeFieldExtents( int documentID, indri::utili
   int offset = fields.size();
   
   // convert to field extents, set ids, and create the node map
-  for( unsigned int i=0; i<indexedTags.size(); i++ ) {
+  for( size_t i=0; i<indexedTags.size(); i++ ) {
     indri::parse::TagExtent * extent = indexedTags[i];
     
-    int ordinal = i + 1;
+    int ordinal = int(i) + 1;
 
     // this is the id for the field type
     int tagId = _fieldID( extent->name );
@@ -368,8 +368,8 @@ void indri::index::MemoryIndex::_writeFieldExtents( int documentID, indri::utili
   }
 
   // set the parent ordinals
-  for( unsigned int i=0; i<indexedTags.size(); i++ ) {
-    indri::parse::TagExtent * extent = indexedTags[i];
+  for( size_t j=0; j<indexedTags.size(); j++ ) {
+    indri::parse::TagExtent * extent = indexedTags[j];
     
     // look up the parent 
     int parentOrdinal = 0;
@@ -383,7 +383,7 @@ void indri::index::MemoryIndex::_writeFieldExtents( int documentID, indri::utili
       }
     }
     // set the parent
-    fields[ offset + i ].parentOrdinal = parentOrdinal;
+    fields[ offset + j ].parentOrdinal = parentOrdinal;
   }
 }
 
@@ -396,7 +396,7 @@ void indri::index::MemoryIndex::_writeDocumentTermList( UINT64& offset, int& byt
   int docDataLength = 10 + 5 * locatedTerms.terms().size() + 2 * sizeof(FieldExtent) * locatedTerms.fields().size();
   
   // find a buffer to store this term list in, making a new one if necessary
-  if( !_termLists.size() || _termLists.back()->size() - _termLists.back()->position() < docDataLength ) {
+  if( !_termLists.size() || _termLists.back()->size() - _termLists.back()->position() < (size_t)docDataLength ) {
     // we need a new Buffer
     if( !_termLists.size() )
       _termListsBaseOffset = 0;
@@ -444,7 +444,7 @@ void indri::index::MemoryIndex::_addOpenTags( indri::utility::greedy_vector<indr
   for( ; extentIndex < extents.size(); extentIndex++ ) {
     indri::parse::TagExtent* extent = extents[extentIndex];
     
-    if( extent->begin > position )
+    if( extent->begin > (int)position )
       break;
     
     int tagId = _fieldID( extent->name );
@@ -462,8 +462,8 @@ void indri::index::MemoryIndex::_addOpenTags( indri::utility::greedy_vector<indr
 //
 
 void indri::index::MemoryIndex::_removeClosedTags( indri::utility::greedy_vector<indri::parse::TagExtent *>& tags, unsigned int position ) {
-  for( unsigned int i=0; i<tags.size(); ) {
-    if( tags[i]->end <= position ) {
+  for( size_t i=0; i<tags.size(); ) {
+    if( tags[i]->end <= int(position) ) {
       tags.erase( tags.begin() + i );
     } else {
       i++;
@@ -678,7 +678,7 @@ indri::index::DocListIterator* indri::index::MemoryIndex::docListIterator( const
 //
 
 indri::index::DocExtentListIterator* indri::index::MemoryIndex::fieldListIterator( int fieldID ) {
-  if( fieldID <= 0 || fieldID > _fieldData.size() )
+  if( fieldID <= 0 || fieldID > (int)_fieldData.size() )
     return 0;
   
   DocExtentListMemoryBuilder* builder = _fieldLists[fieldID-1];
@@ -691,7 +691,7 @@ indri::index::DocExtentListIterator* indri::index::MemoryIndex::fieldListIterato
 
 indri::index::DocExtentListIterator* indri::index::MemoryIndex::fieldListIterator( const std::string& field ) {
   int fieldID = _fieldID( field );
-  if( fieldID <= 0 || fieldID > _fieldData.size() )
+  if( fieldID <= 0 || fieldID > (int)_fieldData.size() )
     return 0;
   
   DocExtentListMemoryBuilder* builder = _fieldLists[fieldID-1];
@@ -704,7 +704,7 @@ indri::index::DocExtentListIterator* indri::index::MemoryIndex::fieldListIterato
 
 const indri::index::TermList* indri::index::MemoryIndex::termList( int documentID ) {
   int documentIndex = documentID - documentBase();
-  if( documentIndex < 0 || documentIndex >= _documentData.size() )
+  if( documentIndex < 0 || documentIndex >= (int)_documentData.size() )
     return 0;
 
   const DocumentData& data = _documentData[documentIndex];

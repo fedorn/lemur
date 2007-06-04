@@ -28,7 +28,7 @@ void indri::infnet::BooleanAndNode::prepare( int documentID ) {
   _extents.clear();
 
   // check for and condition
-  for( int i=0; i<_lists.size(); i++ ) {
+  for( size_t i=0; i<_lists.size(); i++ ) {
     if( _lists[i]->extents().size() == 0 )
       return;
   }
@@ -44,7 +44,7 @@ indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::BooleanAndNo
 int indri::infnet::BooleanAndNode::nextCandidateDocument() {
   int document = _lists[0]->nextCandidateDocument();
 
-  for( int i=1; i<_lists.size(); i++ ) {
+  for( size_t i=1; i<_lists.size(); i++ ) {
     document = lemur_compat::max( document, _lists[i]->nextCandidateDocument() );
   }
     
@@ -57,15 +57,6 @@ const std::string& indri::infnet::BooleanAndNode::getName() const {
 
 void indri::infnet::BooleanAndNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   annotator.addMatches( _extents, this, documentID, extent);
-  /* Should have the same as ODN? Or just the inner loop like OrNode
-  // _children are _lists in this context.
-  for( size_t i=0; i<_extents.size(); i++ ) {
-  for( size_t j=0; j<_children.size(); j++ ) {
-  _children[j]->annotate( annotator, documentID, _extents[i].begin, _extents[i].end );
-  }
-  }
-
-  */
 }
 
 void indri::infnet::BooleanAndNode::indexChanged( indri::index::Index& index ) {

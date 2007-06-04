@@ -48,7 +48,7 @@ void indri::index::DiskIndex::_readManifest( const std::string& path ) {
     if( fields.exists("field") ) {
       indri::api::Parameters field = fields["field"];
 
-      for( int i=0; i<field.size(); i++ ) {
+      for( size_t i=0; i<field.size(); i++ ) {
         bool numeric = field[i].get( "isNumeric", false );
         bool ordinal = field[i].get( "isOrdinal", false );
         int documentCount = field[i].get("total-documents", 0 );
@@ -127,7 +127,7 @@ void indri::index::DiskIndex::close() {
 //
 
 indri::index::DiskTermData* indri::index::DiskIndex::_fetchTermData( int termID ) {
-  int dataSize = ::disktermdata_size(_fieldData.size());
+  int dataSize = ::disktermdata_size((int)_fieldData.size());
   char *buffer = new char [dataSize];
   int actual;
   bool result;
@@ -146,7 +146,7 @@ indri::index::DiskTermData* indri::index::DiskIndex::_fetchTermData( int termID 
   assert( result );
 
   indri::utility::RVLDecompressStream stream( buffer, actual );
-  indri::index::DiskTermData* dt = disktermdata_decompress( stream, _fieldData.size(), DiskTermData::WithString | DiskTermData::WithOffsets );
+  indri::index::DiskTermData* dt = disktermdata_decompress( stream, (int)_fieldData.size(), DiskTermData::WithString | DiskTermData::WithOffsets );
   delete[](buffer);
   return dt;
 }
@@ -156,7 +156,7 @@ indri::index::DiskTermData* indri::index::DiskIndex::_fetchTermData( int termID 
 //
 
 indri::index::DiskTermData* indri::index::DiskIndex::_fetchTermData( const char* term ) {
-  int dataSize = ::disktermdata_size(_fieldData.size());
+  int dataSize = ::disktermdata_size((int)_fieldData.size());
   char *buffer = new char [dataSize];
   int actual;
   int adjust = 0;
@@ -177,7 +177,7 @@ indri::index::DiskTermData* indri::index::DiskIndex::_fetchTermData( const char*
   indri::utility::RVLDecompressStream stream( buffer, actual );
 
   indri::index::DiskTermData* diskTermData = disktermdata_decompress( stream,
-                                                                      _fieldData.size(),
+                                                                      (int)_fieldData.size(),
                                                                       DiskTermData::WithTermID | DiskTermData::WithOffsets );
   diskTermData->termID += adjust;
   delete[](buffer);
@@ -244,7 +244,7 @@ std::string indri::index::DiskIndex::term( int termID ) {
 //
 
 int indri::index::DiskIndex::documentLength( int documentID ) {
-  int documentOffset = documentID - _corpusStatistics.baseDocument;
+  unsigned int documentOffset = documentID - _corpusStatistics.baseDocument;
 
   if( documentOffset < 0 || _corpusStatistics.totalDocuments <= documentOffset ) 
     return 0;
@@ -311,7 +311,7 @@ UINT64 indri::index::DiskIndex::uniqueTermCount() {
 //
 
 std::string indri::index::DiskIndex::field( int fieldID ) {
-  if( fieldID == 0 || fieldID > _fieldData.size() )
+  if( fieldID == 0 || fieldID > (int)_fieldData.size() )
     return "";
 
   return _fieldData[fieldID-1].name;
@@ -322,9 +322,9 @@ std::string indri::index::DiskIndex::field( int fieldID ) {
 //
 
 int indri::index::DiskIndex::field( const char* name ) {
-  for( int i=0; i<_fieldData.size(); i++ ) {
+  for( size_t i=0; i<_fieldData.size(); i++ ) {
     if( _fieldData[i].name == name )
-      return i+1;
+      return int(i)+1;
   }
 
   return 0;
@@ -456,7 +456,7 @@ indri::index::DocListIterator* indri::index::DiskIndex::docListIterator( const s
   // truncate the length argument at 1MB, use it to pick a size for the readbuffer
   length = lemur_compat::min<INT64>( length, 1024*1024 );
 
-  return new DiskDocListIterator( new indri::file::SequentialReadBuffer( _invertedFile, length ), startOffset, _fieldData.size() );
+  return new DiskDocListIterator( new indri::file::SequentialReadBuffer( _invertedFile, length ), startOffset, (int)_fieldData.size() );
 }
 
 //
@@ -464,7 +464,7 @@ indri::index::DocListIterator* indri::index::DiskIndex::docListIterator( const s
 //
 
 indri::index::DocListFileIterator* indri::index::DiskIndex::docListFileIterator( ) {
-  return new DiskDocListFileIterator( _invertedFile, _fieldData.size() );
+  return new DiskDocListFileIterator( _invertedFile, (int)_fieldData.size() );
 }
 
 //
@@ -472,7 +472,7 @@ indri::index::DocListFileIterator* indri::index::DiskIndex::docListFileIterator(
 //
 
 indri::index::DocExtentListIterator* indri::index::DiskIndex::fieldListIterator( int fieldID ) {
-  if( fieldID == 0 || fieldID > _fieldData.size() ) {
+  if( fieldID == 0 || fieldID > (int)_fieldData.size() ) {
     return 0;
   }
 
@@ -536,7 +536,7 @@ indri::index::VocabularyIterator* indri::index::DiskIndex::vocabularyIterator() 
 //
 
 indri::index::VocabularyIterator* indri::index::DiskIndex::frequentVocabularyIterator() {
-  return new indri::index::DiskFrequentVocabularyIterator( _frequentTermsData, _fieldData.size() );
+  return new indri::index::DiskFrequentVocabularyIterator( _frequentTermsData, (int)_fieldData.size() );
 }
 
 //
@@ -545,7 +545,7 @@ indri::index::VocabularyIterator* indri::index::DiskIndex::frequentVocabularyIte
 
 indri::index::VocabularyIterator* indri::index::DiskIndex::infrequentVocabularyIterator() {
   // mhoy - modified 11/06/2006 to return the term->ID btree instead of the ID->term one
-  return new indri::index::DiskKeyfileVocabularyIterator( _infrequentTermBase, _infrequentStringToTerm, _lock, _fieldData.size() );
+  return new indri::index::DiskKeyfileVocabularyIterator( _infrequentTermBase, _infrequentStringToTerm, _lock, (int)_fieldData.size() );
 }
 
 //

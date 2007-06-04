@@ -52,7 +52,7 @@ void indri::infnet::DocListIteratorNode::prepare( int documentID ) {
   
   indri::utility::greedy_vector<int>& positions = info->positions;
 
-  for( int i = 0; i < positions.size(); i++ ) {
+  for( size_t i = 0; i < positions.size(); i++ ) {
     _extents.push_back( indri::index::Extent( positions[i], positions[i]+1 ) );
   }
 }
@@ -72,3 +72,4 @@ void indri::infnet::DocListIteratorNode::annotate( Annotator& annotator, int doc
 void indri::infnet::DocListIteratorNode::indexChanged( indri::index::Index& index ) {
   _list = _network.getDocIterator( _listID );
 }
+

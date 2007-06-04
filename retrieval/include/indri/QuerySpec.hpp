@@ -34,7 +34,7 @@ bool equal( const std::vector<T>& one, const std::vector<T>& two ) {
   if( one.size() != two.size() )
     return false;
 
-  for( unsigned int i=0; i<one.size(); i++ ) {
+  for( size_t i=0; i<one.size(); i++ ) {
     if( *one[i] == *two[i] )
       continue;
 
@@ -50,14 +50,14 @@ bool unordered_equal( std::vector<T>& one, std::vector<T>& two ) {
     return false;
 
   std::vector<T> one_copy;
-  for( unsigned int i=0; i<one.size(); i++ ) {
+  for( size_t i=0; i<one.size(); i++ ) {
     one_copy.push_back( one[i] );
   }
 
   // this algorithm is n^2 as opposed to n log n if
   // we sorted things, but windows tend to be short
-  for( unsigned int i=0; i<two.size(); i++ ) {
-    for( unsigned int j=0; j<one_copy.size(); j++ ) {
+  for( size_t i=0; i<two.size(); i++ ) {
+    for( size_t j=0; j<one_copy.size(); j++ ) {
       if( *one_copy[j] == *two[i] ) {
         // we remove each match--if they all match, the array will be empty
         one_copy.erase( one_copy.begin() + j );
@@ -369,7 +369,7 @@ namespace indri {
 
         qtext << "#wsyn(";
 
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           qtext << " " << _children[i]->queryText();
         }
 
@@ -460,7 +460,7 @@ namespace indri {
       std::string queryText() const {
         std::stringstream qtext;
 
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           if(i>0) qtext << " ";
           qtext << _children[i]->queryText();
         }
@@ -506,7 +506,7 @@ namespace indri {
 
       void walk( Walker& walker ) {
         walker.before(this);
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           _children[i]->walk(walker);
         }
         walker.after(this);
@@ -517,7 +517,7 @@ namespace indri {
         
         ExtentOr* duplicate = new ExtentOr();
         duplicate->setNodeName( nodeName() );
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           indri::lang::Node* childNode = _children[i]->copy(copier);
           duplicate->addChild( dynamic_cast<RawExtentNode*>(childNode) );
         }
@@ -548,7 +548,7 @@ namespace indri {
       std::string queryText() const {
         std::stringstream qtext;
 
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           if(i>0) qtext << ",";
           qtext << _children[i]->queryText();
         }
@@ -594,7 +594,7 @@ namespace indri {
 
       void walk( Walker& walker ) {
         walker.before(this);
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           _children[i]->walk(walker);
         }
         walker.after(this);
@@ -605,7 +605,7 @@ namespace indri {
 
         ExtentAnd* duplicate = new ExtentAnd();
         duplicate->setNodeName( nodeName() );
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           Node* child = _children[i]->copy(copier);
           duplicate->addChild( dynamic_cast<RawExtentNode*>(child) );
         }
@@ -632,7 +632,7 @@ namespace indri {
       std::string queryText() const {
         std::stringstream qtext;
         qtext << "#band(";
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           qtext << _children[i]->queryText() << " ";
         }
         qtext << ")";
@@ -666,7 +666,7 @@ namespace indri {
 
       void walk( Walker& walker ) {
         walker.before(this);
-        for( int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           _children[i]->walk(walker);
         }
         walker.after(this);
@@ -677,7 +677,7 @@ namespace indri {
         BAndNode* duplicate = new BAndNode();
 
         duplicate->setNodeName( nodeName() );
-        for(unsigned int i=0; i<_children.size(); i++) {
+        for(size_t i=0; i<_children.size(); i++) {
           Node* child = _children[i]->copy(copier);
           duplicate->addChild( dynamic_cast<RawExtentNode*>(child) );
         }
@@ -720,7 +720,7 @@ namespace indri {
         else
           qtext << "#uw( ";
           
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           qtext << _children[i]->queryText() << " ";
         }
         qtext << ")";
@@ -783,7 +783,7 @@ namespace indri {
 
       void walk( Walker& walker ) {
         walker.before(this);
-        for(unsigned int i=0; i<_children.size(); i++) {
+        for(size_t i=0; i<_children.size(); i++) {
           _children[i]->walk(walker);
         }
         walker.after(this);
@@ -795,7 +795,7 @@ namespace indri {
         UWNode* duplicate = new UWNode();
         duplicate->setNodeName( nodeName() );
         duplicate->setWindowSize( _windowSize );
-        for(unsigned int i=0; i<_children.size(); i++) {
+        for(size_t i=0; i<_children.size(); i++) {
           Node* child = _children[i]->copy(copier);
           duplicate->addChild( dynamic_cast<RawExtentNode*>(child) );
         }
@@ -837,7 +837,7 @@ namespace indri {
         else
           qtext << "#od( ";
 
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           qtext << _children[i]->queryText() << " ";
         }
         qtext << ")";
@@ -903,7 +903,7 @@ namespace indri {
 
       void walk( Walker& walker ) {
         walker.before(this);
-        for(unsigned int i=0; i<_children.size(); i++) {
+        for(size_t i=0; i<_children.size(); i++) {
           _children[i]->walk(walker);
         }
         walker.after(this);
@@ -915,7 +915,7 @@ namespace indri {
         ODNode* duplicate = new ODNode();
         duplicate->setNodeName( nodeName() );
         duplicate->setWindowSize( _windowSize );
-        for(unsigned int i=0; i<_children.size(); i++) {
+        for(size_t i=0; i<_children.size(); i++) {
           Node* child = _children[i]->copy(copier);
           duplicate->addChild( dynamic_cast<RawExtentNode*>(child) );
         }
@@ -1406,7 +1406,7 @@ namespace indri {
         qtext << _raw->queryText();
         if( _context ) {
           // if we haven't added a period yet, put one in
-          int dot = qtext.str().find('.');
+          int dot = (int)qtext.str().find('.');
           if( dot < 0 )
             qtext << '.';
 
@@ -1648,7 +1648,7 @@ namespace indri {
         qtext << _raw->queryText();
         if( _context ) {
           // if we haven't added a period yet, put one in
-          int dot = qtext.str().find('.');
+          int dot = (int)qtext.str().find('.');
           if( dot < 0 )
             qtext << '.';
 
@@ -1781,7 +1781,7 @@ namespace indri {
       UINT64 _hashCode() const {
         UINT64 accumulator = 0;
 
-        for( int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           accumulator += _children[i]->hashCode();
         }
 
@@ -1792,7 +1792,7 @@ namespace indri {
       void _walk( _ThisType* ptr, Walker& walker ) {
         walker.before(ptr);
 
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           _children[i]->walk(walker);
         }
         
@@ -1805,7 +1805,7 @@ namespace indri {
         
         _ThisType* duplicate = new _ThisType();
         duplicate->setNodeName( nodeName() );
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           duplicate->addChild( dynamic_cast<ScoredExtentNode*>(_children[i]->copy(copier)) );
         } 
 
@@ -1813,7 +1813,7 @@ namespace indri {
       }
 
       void _childText( std::stringstream& qtext ) const {
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           if(i>0) qtext << " ";
           qtext << _children[i]->queryText();
         }
@@ -1843,7 +1843,7 @@ namespace indri {
         std::vector<double> weights = unpacker.getDoubleVector( "weights" );
         std::vector<ScoredExtentNode*> nodes = unpacker.getScoredExtentVector( "children" );
 
-        for( unsigned int i=0; i<weights.size(); i++ ) {
+        for( size_t i=0; i<weights.size(); i++ ) {
           _children.push_back( std::make_pair( weights[i], nodes[i] ) );
         }
       }
@@ -1861,7 +1861,7 @@ namespace indri {
       template<class _ThisType>
       void _walk( _ThisType* ptr, Walker& walker ) {
         walker.before(ptr);
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           _children[i].second->walk(walker);
         }
         walker.after(ptr);
@@ -1873,7 +1873,7 @@ namespace indri {
 
         _ThisType* duplicate = new _ThisType;
         duplicate->setNodeName( nodeName() );
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           double childWeight = _children[i].first;
           Node* childCopy = _children[i].second->copy( copier );
 
@@ -1883,7 +1883,7 @@ namespace indri {
       }
 
       void _childText( std::stringstream& qtext ) const {
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           if(i>0) qtext << " ";
           qtext << _children[i].first
                 << " "
@@ -1910,7 +1910,7 @@ namespace indri {
         std::vector<double> weights;
         std::vector<ScoredExtentNode*> nodes;
 
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           weights.push_back( _children[i].first );
           nodes.push_back( _children[i].second );
         }
@@ -2284,8 +2284,8 @@ namespace indri {
     public:
       FixedPassage( Unpacker& unpacker ) {
         _child = unpacker.getScoredExtentNode("child");
-        _windowSize = unpacker.getInteger("windowSize");
-        _increment = unpacker.getInteger("increment");
+        _windowSize = (int)unpacker.getInteger("windowSize");
+        _increment = (int)unpacker.getInteger("increment");
       }
 
       FixedPassage( ScoredExtentNode* child, int windowSize, int increment ) :
@@ -2547,7 +2547,7 @@ namespace indri {
 
         if( _context ) {
           // if we haven't added a period yet, put one in
-          int dot = qtext.str().find('.');
+          int dot = (int)qtext.str().find('.');
           if( dot < 0 )
             qtext << '.';
 
@@ -3044,7 +3044,7 @@ namespace indri {
       UINT64 _hashCode() const {
         UINT64 accumulator = 0;
 
-        for( int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           accumulator += _children[i]->hashCode();
         }
 
@@ -3055,7 +3055,7 @@ namespace indri {
       void _walk( _ThisType* ptr, Walker& walker ) {
         walker.before(ptr);
 
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           _children[i]->walk(walker);
         }
         
@@ -3068,7 +3068,7 @@ namespace indri {
         
         _ThisType* duplicate = new _ThisType();
         duplicate->setNodeName( nodeName() );
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           bool preserveExtents = false;
           if ( _preserveExtentsChild == _children[i] ) {
             preserveExtents = true;
@@ -3083,7 +3083,7 @@ namespace indri {
         if ( _preserveExtentsChild != 0 ) {
           qtext << _preserveExtentsChild->queryText() << " ";
         }
-        for( unsigned int i=0; i<_children.size(); i++ ) {
+        for( size_t i=0; i<_children.size(); i++ ) {
           if ( _children[i] != _preserveExtentsChild ) {
             if(i>0) qtext << " ";
             qtext << _children[i]->queryText();
@@ -3581,7 +3581,7 @@ namespace indri {
 				}
 
 				// lowercase the term
-				for (int i=0; i < _normalizedTerm.size(); ++i) {
+				for (size_t i=0; i < _normalizedTerm.size(); ++i) {
 					_normalizedTerm[i]=tolower(_normalizedTerm[i]);
 				}
 			}
