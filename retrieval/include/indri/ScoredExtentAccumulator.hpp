@@ -86,7 +86,7 @@ namespace indri
 
         // puts scores into the vector in descending order
         scoreVec.reserve( heapCopy.size() );
-        for( size_t i=heapCopy.size()-1; i>=0; i-- ) {
+        for( int i=heapCopy.size()-1; i>=0; i-- ) {
           scoreVec.push_back( heapCopy.top() );
           heapCopy.pop();
         }

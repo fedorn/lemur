@@ -478,9 +478,9 @@ void indri::infnet::ShrinkageBeliefNode::indexChanged( indri::index::Index& inde
 void indri::infnet::ShrinkageBeliefNode::addShrinkageRule( std::string ruleText ) {
 
 
-  size_t nextComma = 0;
-  size_t nextColon = 0;
-  size_t location = 0;
+  int nextComma = 0;
+  int nextColon = 0;
+  int location = 0;
   
   smoothing_rule rule;
   rule.weight = 0;
@@ -524,9 +524,9 @@ void indri::infnet::ShrinkageBeliefNode::addShrinkageRule( std::string ruleText 
 void indri::infnet::ShrinkageBeliefNode::setSmoothing( const std::string & stringSpec ) {
   indri::api::Parameters spec;
 
-  size_t nextComma = 0;
-  size_t nextColon = 0;
-  size_t location = 0;
+  int nextComma = 0;
+  int nextColon = 0;
+  int location = 0;
 
   for( location = 0; location < stringSpec.length(); ) {
     nextComma = stringSpec.find( ',', location );

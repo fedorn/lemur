@@ -72,9 +72,9 @@ indri::query::TermScoreFunction* indri::query::TermScoreFunctionFactory::get( co
 }
 
 static void termscorefunctionfactory_parse( indri::api::Parameters& converted, const std::string& spec ) {
-  size_t nextComma = 0;
-  size_t nextColon = 0;
-  size_t location = 0;
+  int nextComma = 0;
+  int nextColon = 0;
+  int  location = 0;
 
   for( location = 0; location < spec.length(); ) {
     nextComma = spec.find( ',', location );
