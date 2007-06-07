@@ -15,6 +15,7 @@ lemur::parse::IndriTextHandler::IndriTextHandler(const string &name, int memory,
 
   // shadows attribute from Object.
   env.setMemory(memory);
+  // have to set stopwords somewhere too (for queries)... bleah.
   // Have to force the IndexEnvironment to build a reverse lookup table for 
   // the docno field to support the Index::document(external id) api call
   std::vector<std::string> metadata;
@@ -104,7 +105,9 @@ void lemur::parse::IndriTextHandler::handleEndDoc() {
   // null terminate it
   docsource[textsize] = '\0';
   document.text = docsource;
-  document.textLength = textsize;
+  document.textLength = textsize+1;
+  document.content = document.text;
+  document.contentLength = textsize;
 
   // fix any bad tags
 
