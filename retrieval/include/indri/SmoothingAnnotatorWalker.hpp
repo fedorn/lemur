@@ -46,9 +46,9 @@ namespace indri
         for(size_t i=0; i<rules.size(); i++) {
           std::string ruleText = rules[i];
 
-          size_t nextComma = 0;
-          size_t nextColon = 0;
-          size_t location = 0;
+          int nextComma = 0;
+          int nextColon = 0;
+          int location = 0;
 
           rule_type* rule = new rule_type;
           rule->node = "RawScorerNode";
@@ -170,9 +170,9 @@ namespace indri
         std::string ruleText = _matchSmoothingRule( "LengthPrior", "*", "*" );
         double exponent = 0;
 
-        size_t nextComma = 0;
-        size_t nextColon = 0;
-        size_t location = 0;
+        int nextComma = 0;
+        int nextColon = 0;
+        int location = 0;
         
         for( location = 0; location < ruleText.length(); ) {
           nextComma = ruleText.find( ',', location );
