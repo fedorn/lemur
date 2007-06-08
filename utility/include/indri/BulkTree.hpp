@@ -72,7 +72,7 @@ namespace indri
 
       void clear();
       char* data();
-      static int dataSize();
+      static UINT64 dataSize();
 
       // linked list
       void setID( UINT32 id );

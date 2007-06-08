@@ -264,7 +264,7 @@ inline char* indri::file::BulkBlock::data() {
   return _buffer;
 }
 
-int indri::file::BulkBlock::dataSize() {
+UINT64 indri::file::BulkBlock::dataSize() {
   return BULK_BLOCK_SIZE;
 }
 
