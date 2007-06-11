@@ -175,6 +175,8 @@ public:
    */
   string getIndexPath(int whichIndex);
 
+  string getQueryHost(string indexPath);
+
   /**
    * Retrieves a description tag for an index
    *

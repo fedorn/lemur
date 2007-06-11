@@ -64,6 +64,15 @@ The configuration file is a well-formed XML file with the opening tag
            pointing at where the index is located. Secondly (and optionally),
            a <description> tag can be set to be a description of the pointed
            index.
+
+           optionally, for an <index> item, you can specify an additional 
+           parameter <queryserver> to specify the host and port of an Indri
+           Daemon server to call to processes queries. For example:
+           <queryserver>127.0.0.1:8900</queryserver> 
+           would call the Indri Daemon on the local host at port 8900. Note
+           that this will only affect queries. Any other data (cached versions
+           of documents, corpus statistics, etc.) will still be gathered from
+           the index <path>.
            
 There is also an optional element <rootpaths> that defines if the original
 path in the search result exists, then to strip it out of the URL. This is

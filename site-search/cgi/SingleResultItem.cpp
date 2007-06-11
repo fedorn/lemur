@@ -65,7 +65,13 @@ string SingleResultItem::toString() {
   replaceAll(&outputString, "{%ResURL%}", URLStringToUse);
 
   // ResTitle
-  findAndReplace(&outputString, "title", "{%ResTitle%}");
+  string thisTitle="(no title)";
+  if (variables.get("title")) {
+    thisTitle=variables.get("title");
+    replaceAll(&thisTitle, "<", "&lt;");
+    replaceAll(&thisTitle, ">", "&gt;");
+  }
+  replaceAll(&outputString, "{%ResTitle%}", thisTitle);
 
   // ResSummary
   findAndReplace(&outputString, "summary", "{%ResSummary%}");

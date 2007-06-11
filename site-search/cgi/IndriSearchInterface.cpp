@@ -38,7 +38,7 @@ std::vector<std::string> IndriSearchInterface::getRawNodes(indri::api::QueryAnno
   return retArray;
 }
 
-std::vector<IndriSearchInterface::indriTermMatches> IndriSearchInterface::getMatches(int docID, 
+std::vector<IndriSearchInterface::indriTermMatches> IndriSearchInterface::getMatches(int docID,
                                                                    std::map<std::string, std::vector<indri::api::ScoredExtentResult> > *annotations,
                                                                    std::vector<string> *rawNodes) {
   std::vector<IndriSearchInterface::indriTermMatches> retVec;
@@ -63,7 +63,7 @@ std::vector<IndriSearchInterface::indriTermMatches> IndriSearchInterface::getMat
 
   // sort the array
   std::sort(rawMatches.begin(), rawMatches.end(), sortScoredExtentByPosition());
-  
+
   // remove and coalesce duplicates
   int matchSize=rawMatches.size();
   if (matchSize > 0) {
@@ -89,12 +89,12 @@ string IndriSearchInterface::stripHtmlTags(string inputString) {
   string retString="";
   string::size_type oPos=inputString.find("<");
   if (oPos==string::npos) {
-    return inputString;      
+    return inputString;
   }
 
   string::size_type cPos=inputString.find(">", oPos);
   if (cPos==string::npos) {
-    return inputString;      
+    return inputString;
   }
 
   string::size_type lastPos=0;
@@ -128,7 +128,7 @@ std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api:
   string fullDocText="";
   char *fullDocTextChr=dm->getDoc(docext);
   if (fullDocTextChr) {
-    fullDocText.append(fullDocTextChr);      
+    fullDocText.append(fullDocTextChr);
   }
 
 
@@ -142,7 +142,7 @@ std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api:
     mw = 7;
   } else if( mw > 30 ) {
     mw = 30;
-  }                         
+  }
 
   int matchBegin = matches[0].begin;
   int matchEnd = matches[0].end;
@@ -151,13 +151,13 @@ std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api:
 
   int mwStart=(int)ceil((double)(mw) / 2.0);
   int mwEnd=(int)floor((double)(mw) / 2.0);
-	
+
   int begin = matchBegin - mwStart;
   int end = matchEnd + mwEnd;
 
   if( begin < result.begin )
     begin=result.begin;
-  if( end >= result.end ) 
+  if( end >= result.end )
     end = result.end;
 
   if( result.end - result.begin <= INDRI_SNIPPET_MAX_WINDOWSIZE ) {
@@ -210,7 +210,7 @@ std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api:
     IndriSearchInterface::indriTermMatches thisSegment=segments[i];
     begin=thisSegment.begin;
     end=thisSegment.end;
-    
+
     if ((begin > result.begin) && (i==0))
       outString << "<strong>...</strong>";
 
@@ -225,7 +225,7 @@ std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api:
     for (int j=0; j < thisSegment.internalPositions.size(); j++) {
       int beginMatch=thisSegment.internalPositions[j].begin;
       int endMatch=thisSegment.internalPositions[j].end;
-      
+
       outString << stripHtmlTags(fullDocText.substr(currentByte, termPositions[beginMatch].begin-currentByte)) << "<strong>";
       outString << stripHtmlTags(fullDocText.substr(termPositions[beginMatch].begin, termPositions[endMatch-1].end-termPositions[beginMatch].begin)) << "</strong>";
       currentByte=termPositions[endMatch-1].end;
@@ -265,14 +265,14 @@ std::vector<indri::api::ScoredExtentResult> IndriSearchInterface::indriRemoveDup
       beforeLast=thisDocIDString.substr(0, lastSlash+1);
       afterLast=thisDocIDString.substr(lastSlash+1);
     } else {
-      beforeLast=thisDocIDString;      
+      beforeLast=thisDocIDString;
     }
-    
+
     std::map<std::string, std::vector<std::string> >::iterator mIter=docIDMap.find(beforeLast);
     if (mIter!=docIDMap.end()) {
-      mIter->second.push_back(afterLast);      
+      mIter->second.push_back(afterLast);
     } else {
-      std::vector<std::string> thisMapVec;            
+      std::vector<std::string> thisMapVec;
       thisMapVec.push_back(afterLast);
       docIDMap.insert(make_pair(beforeLast, thisMapVec));
     }
@@ -284,23 +284,23 @@ std::vector<indri::api::ScoredExtentResult> IndriSearchInterface::indriRemoveDup
   std::map<int, int> clearedDocIDs;
   std::map<std::string, std::vector<std::string> >::iterator dmapIter=docIDMap.begin();
   while (dmapIter!=docIDMap.end()) {
-    bool foundIndex=false;      
+    bool foundIndex=false;
     std::vector<std::string>::iterator mapVecIter=dmapIter->second.begin();
     while (mapVecIter!=dmapIter->second.end()) {
       string thisEnd=(*mapVecIter);
       if ((thisEnd=="index.htm") || (thisEnd=="index.html") || (thisEnd=="index.php") || (thisEnd.length()==0)) {
         if (foundIndex==false) {
-          string thisFullDoc=dmapIter->first;      
+          string thisFullDoc=dmapIter->first;
           thisFullDoc.append(thisEnd);
           clearedDocIDs.insert(make_pair(db->document(thisFullDoc), 0));
           foundIndex=true;
         }
       } else {
-        string thisFullDoc=dmapIter->first;      
+        string thisFullDoc=dmapIter->first;
         thisFullDoc.append(thisEnd);
         clearedDocIDs.insert(make_pair(db->document(thisFullDoc), 0));
       }
-      mapVecIter++;      
+      mapVecIter++;
     }
     dmapIter++;
   }
@@ -309,11 +309,11 @@ std::vector<indri::api::ScoredExtentResult> IndriSearchInterface::indriRemoveDup
   vIter=results.begin();
   while (vIter!=results.end()) {
     if (clearedDocIDs.find((*vIter).document)!=clearedDocIDs.end()) {
-      retVector.push_back(*vIter);      
+      retVector.push_back(*vIter);
     }
-    vIter++;      
+    vIter++;
   }
-  
+
   return retVector;
 }
 
@@ -376,7 +376,7 @@ void IndriSearchInterface::displayIndriSearchResults(lemur::api::Index *db, int 
     std::vector< lemur::api::DOCID_T > docIDVec;
     docIDVec.clear(); // just to make sure...
     docIDVec.push_back(thisResult.document);
-    
+
     // get a title field (if any)
     std::vector< std::string > titleStrings=queryEnvironment->documentMetadata(docIDVec, "title");
     if (titleStrings.size() > 0) {
@@ -402,7 +402,7 @@ void IndriSearchInterface::displayIndriSearchResults(lemur::api::Index *db, int 
   } // for (int i=rankStart;(i<listLength+rankStart) && (i<results.size());i++)
 
   output->outputString("</ol>\n");
-  
+
   if (CGIConfiguration::getInstance().getKVItem("displayquerydebug")=="true") {
     output->outputString("<hr />Reformulated Query: " + CGIConfiguration::getInstance().getKVItem("reformulatedQuery") + "<hr />");
   }
@@ -485,7 +485,7 @@ string IndriSearchInterface::indriDefaultQueryExpansion(string &origQuery, bool 
       }
       tmpPlace++;
     }
-    
+
     stringstream wrappedString;
     wrappedString << "#combine( ";
 
@@ -530,11 +530,11 @@ string IndriSearchInterface::indriDefaultQueryExpansion(string &origQuery, bool 
   char *stringCopy=strdup(origQuery.c_str());
   char *thisToken=strtok(stringCopy, " \t\n\r\"");
   while (thisToken) {
-    if (strlen(thisToken)) {      
+    if (strlen(thisToken)) {
       char *thisString=strdup(thisToken);
       if (thisString) {
         queryTermVector.push_back(thisString);
-      }  
+      }
     }
     thisToken=strtok(NULL, " \t\n\r\"");
   }
@@ -544,7 +544,7 @@ string IndriSearchInterface::indriDefaultQueryExpansion(string &origQuery, bool 
   // if we've got more than 4 terms, don't build a complex
   // query... wrap it with a combine operator and return
   if ((queryTermVector.size() > 4) || (queryTermVector.size()==0)) {
-    queryTermVector.clear();      
+    queryTermVector.clear();
     stringstream retString;
     retString << "#combine( " << origQuery << " )";
     return retString.str();
@@ -605,7 +605,7 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
   }
 
   FILE *oQueryLog=NULL;
- 
+
   time_t rawtime;
   struct tm * timeinfo;
 
@@ -636,7 +636,7 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
     logTimeString.append(asctime(timeinfo));
     output->stringReplaceAll(&logTimeString, "\n", "");
 
-    fprintf(oQueryLog, "[%s] Query: %s : ", logTimeString.c_str(), origQueryCopy.c_str());      
+    fprintf(oQueryLog, "[%s] Query: %s : ", logTimeString.c_str(), origQueryCopy.c_str());
   }
 
   string reformulatedQuery=indriDefaultQueryExpansion(query, CGIConfiguration::getInstance().getSupportPageRankPrior());
@@ -655,14 +655,14 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
     output->outputString("The query &quot;&nbsp;<strong>" + origQueryCopy + "</strong>&nbsp;&quot; could not be properly parsed. Please restate the query.");
     output->displayResultsPageEnding();
     if (oQueryLog) {
-      fprintf(oQueryLog, "(exception thrown)\n");      
+      fprintf(oQueryLog, "(exception thrown)\n");
       fclose(oQueryLog);
     }
     return;
   }
 
   //std::vector<indri::api::ScoredExtentResult> finalResults=indriRemoveDuplicateResults(qaResults->getResults(), index);
-	std::vector<indri::api::ScoredExtentResult> finalResults=indriRemoveDuplicateResults(qResults, index);
+  std::vector<indri::api::ScoredExtentResult> finalResults=indriRemoveDuplicateResults(qResults, index);
 
   lemur::parse::StringQuery* q = new lemur::parse::StringQuery(query.c_str());
   // reset out results page to initialize it...
@@ -670,7 +670,7 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
   output->setResultQuery(origQueryCopy);
 
   if (oQueryLog) {
-    fprintf(oQueryLog, "(%d results)\n", finalResults.size());      
+    fprintf(oQueryLog, "(%d results)\n", finalResults.size());
     fclose(oQueryLog);
   }
 
@@ -681,11 +681,11 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
     output->displayResultsPageBeginning();
     output->outputString("No results.");
     if (CGIConfiguration::getInstance().getKVItem("displayquerydebug")=="true") {
-      output->outputString("<hr />Reformulated Query: " + reformulatedQuery + "<hr />"); 
+      output->outputString("<hr />Reformulated Query: " + reformulatedQuery + "<hr />");
     }
     output->displayResultsPageEnding();
   } else {
-		
+
 		// get annotations for only those nodes we will be displaying...
 		// create a docID vector...
 		std::vector<lemur::api::DOCID_T> displayNodes;
@@ -696,15 +696,16 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
 			displayNodes.push_back(finalResults[i].document);
 		}
 
-		indri::api::QueryAnnotation *qaResults=queryEnvironment->runAnnotatedQuery(reformulatedQuery, displayNodes, maxNumResults);
+		indri::api::QueryAnnotation *qaResults=queryEnvironment->runAnnotatedQuery(reformulatedQuery, displayNodes, displayNodes.size());
 
     std::vector<string> scoreNodes=getRawNodes((indri::api::QueryAnnotationNode*)qaResults->getQueryTree());
     std::map< std::string, std::vector<indri::api::ScoredExtentResult> > resultAnnotations=qaResults->getAnnotations();
     displayIndriSearchResults(index, indexID, q, queryEnvironment, &finalResults, &scoreNodes, &resultAnnotations, listLength, rankStart);
+
   } // end [else] if (results.size() == 0)
 
   delete(q);
-  
+
   finalResults.clear();
 }
 

@@ -19,18 +19,18 @@ CGIOutput::~CGIOutput() {
 /** private functions **/
 
 char CGIOutput::toHex(char c) {
-  return (c > 9) ? (c+55) : (c+48);      
+  return (c > 9) ? (c+55) : (c+48);
 }
 
 char CGIOutput::fromHex(char c1, char c2) {
   char retVal=0;
   if ((c1 > 47) && (c1 < 58)) {
-    retVal=(c1-48) << 4;      
+    retVal=(c1-48) << 4;
   } else {
     retVal=(c2-55) << 4;
   }
   if ((c2 > 47) && (c2 < 58)) {
-    retVal+=(c2-48);      
+    retVal+=(c2-48);
   } else {
     retVal+=(c2-55);
   }
@@ -90,16 +90,16 @@ string CGIOutput::URLEncodeString(string s) {
   for (int i=0; i < sLen; i++) {
     char cChar=s[i];
     if (isalnum(cChar)) {
-      outputString << cChar;      
+      outputString << cChar;
     } else {
       if (isspace(cChar)) {
-        outputString << "+";      
+        outputString << "+";
       } else {
-        outputString << "%" << toHex(cChar >> 4) << toHex(cChar%16);      
+        outputString << "%" << toHex(cChar >> 4) << toHex(cChar%16);
       }
     }
   }
-        
+
   return outputString.str();
 }
 
@@ -173,6 +173,7 @@ string CGIOutput::processParameterCommand(string command, string paramValue) {
     string formValue=queryTerms;
     stringReplaceAll(&formValue, "\"", "&quot;");
     retString << "<form action=\"" << scriptURL << "\" method=GET>\n"
+              << "<input type=\"hidden\" name=\"x\" value=\"false\">"
               << "<input type=\"text\" name=\"q\" size=\"" << actualParamValue << "\""
               <<  " value=\"" << URLDecodeString(formValue) << "\"><input type=\"submit\" value=\"Search\"></form>";
 
@@ -352,7 +353,7 @@ void CGIOutput::displayDefaultSearchPage() {
 }
 
 bool CGIOutput::resetResultsPage() {
-   std::string aBlankString="";      
+   std::string aBlankString="";
   // reset any statistics
   setResultStatistics(0, 0, 0, 0);
   setResultQuery(aBlankString);
@@ -415,10 +416,10 @@ void CGIOutput::setResultStatistics(int datasourceID, int start, int end, int to
 
   tmpBuffer.str("");
   if (end==0) {
-    tmpBuffer << "0";      
+    tmpBuffer << "0";
   } else {
     tmpBuffer << (start+1);
-  }  
+  }
   substitutionValues.put("LemurSearchResultsStartNum", tmpBuffer.str().c_str());
   tmpBuffer.str("");
   tmpBuffer << end;

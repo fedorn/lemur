@@ -91,10 +91,16 @@ bool CGIConfiguration::readConfigFile(char *filePath) {
       if ((*vIter)->getName()=="index") {
         const XMLNode *indexPathNode=(*vIter)->getChild("path");
         const XMLNode *descriptionNode=(*vIter)->getChild("description");
+        const XMLNode *queryHostNode=(*vIter)->getChild("queryserver");
         if (indexPathNode) {
           db_t *newIndex=new db_t;
           newIndex->path=indexPathNode->getValue();
           if (descriptionNode) newIndex->name=descriptionNode->getValue();
+          if (queryHostNode) { 
+            newIndex->queryHost=queryHostNode->getValue();
+          } else {
+            newIndex->queryHost="";
+          }
           indices.push_back(newIndex);
         }
       }
@@ -137,6 +143,15 @@ int CGIConfiguration::getNumIndices() {
 string CGIConfiguration::getIndexPath(int whichIndex) {
   if ((whichIndex > -1) && (whichIndex < currentIndicesSize)) {
     return indices[whichIndex]->path;
+  }
+  return "";
+}
+
+string CGIConfiguration::getQueryHost(string indexPath) {
+  for (int i=0; i < currentIndicesSize; i++) {
+    if (indices[i]->path==indexPath) {
+      return indices[i]->queryHost;
+    }
   }
   return "";
 }

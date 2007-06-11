@@ -9,6 +9,8 @@ typedef struct {
   string path;
   /** the description of the index */
   string name;
+  /** the query host (if there is one) */
+  string queryHost;
 } db_t;
 
 /** 

@@ -562,7 +562,13 @@ void DBInterface::search(int datasourceID, string &query, long listLength, long 
   if (indriTestIndexCast) {
     // get the environment and add our index
     indriEnvironment=new indri::api::QueryEnvironment();
-    indriEnvironment->addIndex(pathToIndex.c_str());
+    // if we have a queryserver host - use that instead...
+    std::string getQueryHost=CGIConfiguration::getInstance().getQueryHost(pathToIndex);
+    if (getQueryHost=="") {
+      indriEnvironment->addIndex(pathToIndex.c_str());
+    } else {
+      indriEnvironment->addServer(getQueryHost);
+    }
   } // end if (indriTestIndexCast)
 
   Stopper* stopper = NULL;
@@ -590,7 +596,6 @@ void DBInterface::search(int datasourceID, string &query, long listLength, long 
   if (queryType==QUERY_INTERFACE_INDRI) {
     int maxToRet=DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE;
     if (maxToRet==0) maxToRet=DEFAULT_MAX_INDRI_RESULTS;
-
 
     IndriSearchInterface *indSearch=new IndriSearchInterface(output, db, indriEnvironment, dataRoot);
     indSearch->performSearch(query, maxToRet, datasourceID, listLength, rankStart);
