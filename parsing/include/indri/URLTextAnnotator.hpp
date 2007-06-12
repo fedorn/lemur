@@ -83,7 +83,8 @@ namespace indri
             urlText = c + 2;                            
           }
         }
-            
+        int cnt = 0;
+        
         // now, try to find the 
         for( c = urlText; *c; c++ ) {
           if( *c >= 'A' && *c <= 'Z' ||
@@ -93,6 +94,7 @@ namespace indri
             if( lastSkipped ) {
 	      lastSkipped = false;
               document->terms.push_back( c );
+              cnt++;
             }
           } else if( *c == '/' && remainingStart < 0 ) {
             *c = 0;
@@ -103,7 +105,16 @@ namespace indri
             *c = 0;
           }            
         }
-         
+
+        // put in phony positions entries
+        int tokEnd = document->positions.size() ? document->positions[document->positions.size()-1].end : 0;
+        for (size_t n = document->terms.size()-cnt; n < document->terms.size(); n++) {
+          TermExtent extent;
+          extent.begin = tokEnd++; // hope this doesn't run off the end
+          extent.end = tokEnd;
+          document->positions.push_back( extent );
+        }
+
         // the URL text is now parsed and stored in the document
         // all we need to do now is put some tags around the text.
         TagExtent *url = new TagExtent;

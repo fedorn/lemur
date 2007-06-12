@@ -115,9 +115,10 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
         }
         
         _p_conflater->conflate( te );
-
+        //hack to count number of terms injected
+        int cnt=0;
         if( tagProps && !tagProps->exclude && !_exclude ) {
-
+          
           // Original flag check from TaggedTextParser::writeToken
           if ( ! ( _exclude || ! _include ) ) {
 
@@ -129,32 +130,58 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
             // Need to get position of attribute value from
             // AttributeValuePair
 
-            int len = (int)strlen( tmp_buf );
-            TermExtent extent;
-            // Extent stored will be the extent of the URL as it
-            // appears in the text, and the normalized form 
-            // may exceed this extent.
-            extent.begin = (*i).begin;
-            extent.end = (*i).end;
-            _document.positions.push_back( extent );
+            //strip scheme, tokenize url, inject into positions and terms
 
+            int len = (int)strlen( tmp_buf );
             // Allocate space within HTMLParser's Buffer
             char* write_location = _urlBuffer.write( len + 1 );
             memcpy( write_location, tmp_buf, len + 1 );
-            _document.terms.push_back( write_location );
+            char *c;
+            char *urlText=write_location;
+            bool lastSkipped = true; 
+        
+            // skip the beginning stuff (http://)
+            for( c = urlText; *c; c++ ) {
+              if( *c == '/' && c[1] && c[1] == '/' ) {
+                urlText = c + 2;                            
+              }
+            }
+            for( c = urlText; *c; c++ ) {              
+              if( *c >= 'A' && *c <= 'Z' ||
+                  *c >= 'a' && *c <= 'z' ||
+                  *c >= '0' && *c <= '9' ) 
+                {
+                  if( lastSkipped ) {
+                    lastSkipped = false;
+                    _document.terms.push_back( c );
+                    // decrement number of tokens removed from the stream 
+                    // so that future field positions line up correctly.
+                    tokens_excluded--;
+                    cnt++;
+                  }
+                } else {
+                  lastSkipped = true;
+                  *c = 0;
+                }            
+            }
 
-            // decrement number of tokens removed from the stream 
-            // so that future field positions line up correctly.
-            tokens_excluded--;
-          }
-
+            int tokBegin = (*i).begin;
+            // update the positions.
+            for (size_t n = _document.terms.size()-cnt; n < _document.terms.size(); n++) {
+              // cant be sure there's actually text in document with relative
+              TermExtent extent;
+              extent.begin = tokBegin++;
+              extent.end = tokBegin;
+              _document.positions.push_back( extent );
+            }
+          }          
           addTag( tagProps->name, tagProps->name, te->pos );
-          endTag( tagProps->name, tagProps->name, te->pos + 1 );
+          endTag( tagProps->name, tagProps->name, te->pos + cnt );
         }
         
         tagProps = _anchorTag;
         if( tagProps && !tagProps->exclude && !_exclude )
-          addTag( tagProps->name, tagProps->name, te->pos + 1 );
+          addTag( tagProps->name, tagProps->name, te->pos + cnt );
 
         handled_tag = true;
       }
