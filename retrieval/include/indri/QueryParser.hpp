@@ -13,14 +13,14 @@
 /* $ANTLR 2.7.3 (20060307-1): "indrilang.g" -> "QueryParser.hpp"$ */
 #include <antlr/TokenStream.hpp>
 #include <antlr/TokenBuffer.hpp>
-#include "indri/QueryLexerTokenTypes.hpp"
+#include "QueryLexerTokenTypes.hpp"
 #include <antlr/LLkParser.hpp>
 
 ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API QueryParser : public ANTLR_USE_NAMESPACE(antlr)LLkParser, public QueryLexerTokenTypes
 {
-#line 157 "indrilang.g"
+#line 159 "indrilang.g"
 
 private:
   // storage for allocated nodes
@@ -106,6 +106,12 @@ public:
 	public:  indri::lang::FilReqNode*  filreqNode(
 		 indri::lang::RawExtentNode * ou 
 	);
+	public:  indri::lang::FilReqNode*  scoreifNode(
+		 indri::lang::RawExtentNode * ou 
+	);
+	public:  indri::lang::FilRejNode*  scoreifnotNode(
+		 indri::lang::RawExtentNode * ou 
+	);
 	public:  indri::lang::ScoredExtentNode*  scoredRaw(
 		 indri::lang::RawExtentNode * ou 
 	);
@@ -169,10 +175,10 @@ protected:
 private:
 	static const char* tokenNames[];
 #ifndef NO_STATIC_CONSTS
-	static const int NUM_TOKENS = 66;
+	static const int NUM_TOKENS = 68;
 #else
 	enum {
-		NUM_TOKENS = 66
+		NUM_TOKENS = 68
 	};
 #endif
 	

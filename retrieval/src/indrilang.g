@@ -50,6 +50,8 @@ tokens {
   MAX = "#max";
   FILREQ = "#filreq";
   FILREJ = "#filrej";
+  SCOREIF = "#scoreif";
+  SCOREIFNOT = "#scoreifnot";
   ANY = "#any";
   BAND = "#band";
   WSYN = "#wsyn";
@@ -216,6 +218,8 @@ scoredExtentNode [ indri::lang::RawExtentNode * ou ] returns [ indri::lang::Scor
   | ( PRIOR ) => s=priorNode
   | ( FILREJ ) => s=filrejNode[ou]
   | ( FILREQ ) => s=filreqNode[ou]
+  | ( SCOREIF ) => s=scoreifNode[ou]
+  | ( SCOREIFNOT ) => s=scoreifnotNode[ou]
   | s=scoredRaw[ou]
   ;
 
@@ -457,6 +461,28 @@ filreqNode[ indri::lang::RawExtentNode * ou ] returns [ indri::lang::FilReqNode*
     ScoredExtentNode* required = 0;
   } :
   FILREQ
+  O_PAREN filter=unscoredTerm required=scoredExtentNode[ou] C_PAREN {
+    fq = new FilReqNode( filter, required );
+    _nodes.push_back(fq);
+  }; 
+
+scoreifnotNode [ indri::lang::RawExtentNode * ou ] returns [ indri::lang::FilRejNode* fj ]
+  {
+    RawExtentNode* filter = 0;
+    ScoredExtentNode* disallowed = 0;
+  } :
+  SCOREIFNOT
+  O_PAREN filter=unscoredTerm disallowed=scoredExtentNode[ou] C_PAREN {
+    fj = new FilRejNode( filter, disallowed );
+    _nodes.push_back(fj);
+  }; 
+  
+scoreifNode[ indri::lang::RawExtentNode * ou ] returns [ indri::lang::FilReqNode* fq ]
+  {
+    RawExtentNode* filter = 0;
+    ScoredExtentNode* required = 0;
+  } :
+  SCOREIF
   O_PAREN filter=unscoredTerm required=scoredExtentNode[ou] C_PAREN {
     fq = new FilReqNode( filter, required );
     _nodes.push_back(fq);

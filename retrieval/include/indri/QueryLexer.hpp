@@ -20,7 +20,7 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API QueryLexer : public ANTLR_USE_NAMESPACE(antlr)CharScanner, public QueryLexerTokenTypes
 {
-#line 75 "indrilang.g"
+#line 77 "indrilang.g"
 
 private:
   bool _numbers;
