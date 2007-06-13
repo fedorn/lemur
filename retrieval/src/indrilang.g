@@ -574,7 +574,7 @@ extentRestriction [ indri::lang::ScoredExtentNode* sn, indri::lang::RawExtentNod
     int startWindow;
 
     for( startWindow = 0; startWindow < passageWindowSize->getText().size(); startWindow++ ) {
-      if( isdigit( passageWindowSize->getText()[startWindow] ) )
+      if( isdigit((unsigned char) passageWindowSize->getText()[startWindow] ) )
         break;
     }
   

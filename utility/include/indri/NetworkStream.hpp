@@ -23,6 +23,7 @@
 #include "lemur-compat.hpp"
 #include "indri/indri-platform.h"
 #include <string>
+
 namespace indri
 {
   namespace net
@@ -35,7 +36,11 @@ namespace indri
       struct sockaddr_in _getSockaddr( const char* name, unsigned int port ) {
         long address = 0;
 
+#ifndef WIN32
         if( name && isdigit(name[0]) ) {
+#else
+        if( name && name[0] >= 0 && isdigit(name[0]) ) {
+#endif
           address = inet_addr(name);
         } else {
           hostent* host = gethostbyname(name);

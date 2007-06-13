@@ -83,8 +83,13 @@ int indri::xml::XMLReader::_findNotName( const char* buffer, int start, int fini
 
   for( i=start; i<finish; i++ ) {
     // this isn't unicode-safe, but it should be good for now
+#ifndef WIN32
     if( !isalpha(buffer[i]) && 
         !isdigit(buffer[i]) &&
+#else
+    if( (buffer[i] >= 0 && !isalpha(buffer[i])) && 
+        (buffer[i] >= 0 && !isdigit(buffer[i])) &&
+#endif
         buffer[i] != '-' &&
         buffer[i] != '_' &&
         buffer[i] != ':' &&

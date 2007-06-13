@@ -100,7 +100,11 @@ namespace indri
         char* buffer = _buffer.front();
 
         for( unsigned int i=0; i<_buffer.position(); i++ ) {
+#ifndef WIN32
           if( isalnum(buffer[i]) && !beginWord ) {
+#else
+          if( (buffer[i] >= 0 && isalnum(buffer[i])) && !beginWord ) {
+#endif
             beginWord = buffer+i;
 
             if(!beginIndex)

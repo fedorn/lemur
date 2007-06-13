@@ -1050,7 +1050,7 @@ QueryParser::QueryParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState&
 			int startWindow;
 			
 			for( startWindow = 0; startWindow < passageWindowSize->getText().size(); startWindow++ ) {
-			if( isdigit( passageWindowSize->getText()[startWindow] ) )
+			if( isdigit((unsigned char) passageWindowSize->getText()[startWindow] ) )
 			break;
 			}
 			
