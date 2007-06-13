@@ -68,7 +68,7 @@ void indri::parse::HTMLParser::initialize( TokenizedDocument* tokenized, indri::
   }
 
   _urlBuffer.clear();
-  _urlBuffer.grow( parsed->textLength );
+  _urlBuffer.grow( parsed->textLength * 4 ); // will this be large enough?
 }
 
 void indri::parse::HTMLParser::cleanup( indri::parse::TokenizedDocument* tokenized, indri::api::ParsedDocument* parsed ) {
@@ -437,8 +437,11 @@ void indri::parse::HTMLParser::prepURL( char *s ) {
   int i;
 
   for ( i = 0; i < len; i++ ) {
-
+#ifndef WIN32
     if ( isspace( s[i] ) ) {
+#else
+    if ( s[i] >= 0 && isspace( s[i] ) ) {
+#endif
       s[i] = '\0';
       break;
     }
