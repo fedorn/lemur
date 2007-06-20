@@ -13,6 +13,7 @@
 #include "ArabicStemmer.hpp"
 
 lemur::parse::ArabicStemmer::ArabicStemmer(const string &stemFunc) {
+  iden=identifier;
   stemfunc = stemFunc;
   stemmer = new Arabic_Stemmer(stemFunc);
 }
