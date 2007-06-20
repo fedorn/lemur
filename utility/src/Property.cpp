@@ -111,7 +111,7 @@ void* lemur::parse::Property::allocate( int size ) {
 }
 
 void lemur::parse::Property::setDestructor( void (lemur::parse::Property::*destructor)(void* object) ) {
-  this->destructor = destructor;
+ // this->destructor = destructor; // a std::string can have dtor called multiple times corrupting memory.
 }
 
 void lemur::parse::Property::setType( DataType type ) {
