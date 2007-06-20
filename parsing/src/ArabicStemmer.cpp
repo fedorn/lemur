@@ -22,6 +22,7 @@ lemur::parse::ArabicStemmer::~ArabicStemmer() {
 }  
 
 char * lemur::parse::ArabicStemmer::stemWord(char * word) {
+  if (strlen(word) >= 100) return word;
   // presumes that word < 100 chars.
   stemmer->stemTerm(word, stem);
   if (stem[0])
