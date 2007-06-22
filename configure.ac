@@ -6,7 +6,9 @@ AC_CONFIG_SRCDIR(app/src/RetEval.cpp)
 AC_CONFIG_FILES([MakeDefns Makefile Makefile.app])
 AC_CONFIG_FILES([site-search/build.param site-search/crawl-index site-search/seeds.txt site-search/excluded_hosts], [test -f site-search/crawl-index && chmod +x site-search/crawl-index])
 dnl To use a header file instead of command line -D defs, use
-AC_CONFIG_HEADERS(utility/include/confdefs.h)
+dnl This breaks large file support, even when confdefs.h is properly
+dnl included
+dnl AC_CONFIG_HEADERS(utility/include/confdefs.h)
 
 dnl canonical host
 AC_CANONICAL_HOST
