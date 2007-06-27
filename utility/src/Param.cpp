@@ -192,7 +192,7 @@ namespace lemur
       ps.addKey(s);
       bool retval = true;
       if (p && p->exists((std::string &)s)) {
-        value = p->get((std::string &)s, -1); 
+        value = p->get((std::string &)s, -1.0); 
       } else {
         retval = false;
       }
