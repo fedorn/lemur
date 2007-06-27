@@ -141,11 +141,17 @@ const std::string& indri::infnet::UnorderedWindowNode::getName() const {
 
 void indri::infnet::UnorderedWindowNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
   annotator.addMatches( _extents, this, documentID, extent );
+  indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+  iter = std::lower_bound( _extents.begin(), _extents.end(), extent, indri::index::Extent::begins_before_less() );
 
-  for( size_t i=0; i<_extents.size(); i++ ) {
+  while( iter != _extents.end() ) {
     for( size_t j=0; j<_children.size(); j++ ) {
-      _children[j]->annotate( annotator, documentID, _extents[i] );
+      indri::index::Extent e = (*iter);
+      if (extent.contains(e)) {
+        _children[j]->annotate( annotator, documentID, e );
+      }
     }
+    iter++;
   }
 }
 
