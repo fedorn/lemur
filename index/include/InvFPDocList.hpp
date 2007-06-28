@@ -56,6 +56,7 @@ namespace lemur
       bool append(InvDocList* tail);
 
       virtual lemur::api::DocInfo* nextEntry() const;
+      virtual void nextEntry(lemur::api::DocInfo* info) const;
       virtual void nextEntry(InvFPDocInfo* info) const;
       virtual lemur::api::COUNT_T termCTF() const;
       lemur::api::LOC_T *byteVec(lemur::api::COUNT_T &len);

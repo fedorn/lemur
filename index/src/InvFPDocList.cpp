@@ -75,6 +75,14 @@ lemur::api::DocInfo* lemur::index::InvFPDocList::nextEntry() const{
   return &entry;
 }
 
+void lemur::index::InvFPDocList::nextEntry(lemur::api::DocInfo* info) const{
+  info->docID(*iter);
+  iter++;
+  info->termCount(*iter);
+  iter++;
+  iter+=info->termCount();
+}
+
 void lemur::index::InvFPDocList::nextEntry(InvFPDocInfo* info) const{
   info->docID(*iter);
   iter++;
