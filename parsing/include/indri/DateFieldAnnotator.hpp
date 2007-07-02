@@ -92,16 +92,19 @@ namespace indri
           day = date.substr( 0, firstDash ); 
           month = date.substr( firstDash+1, secondDash-firstDash-1 );
           year = date.substr( secondDash+1 );
-          // hack for 2 digit years in WSJ
-          if (year.length() == 2) year = "19" + year;
+          
           if (firstDash == 4)
             // YYYY-MM-DD or YYYY/MM/DD
             extent->number = indri::parse::DateParse::convertDate( day, month, year );
-          else if (swapMonth)
-            //  Month DD YYYY MM-DD-YY
-            extent->number = indri::parse::DateParse::convertDate( year, day, month );
-          else  
-            extent->number = indri::parse::DateParse::convertDate( year, month, day );
+          else {
+            // hack for 2 digit years in WSJ
+            if (year.length() == 2) year = "19" + year;
+            if (swapMonth)
+              //  Month DD YYYY MM-DD-YY
+              extent->number = indri::parse::DateParse::convertDate( year, day, month );
+            else  
+              extent->number = indri::parse::DateParse::convertDate( year, month, day );
+          }
         }
       }
       
