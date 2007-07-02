@@ -26,7 +26,7 @@
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
-				WarningLevel="2"
+				WarningLevel="1"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
 			<Tool
@@ -66,7 +66,7 @@
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
-				WarningLevel="2"
+				WarningLevel="1"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
@@ -305,13 +305,13 @@
 				RelativePath=".\include\indri\IndriTimer.hpp">
 			</File>
 			<File
+				RelativePath=".\include\lemur\integer_types.h">
+			</File>
+			<File
 				RelativePath=".\include\indri\InternalFileBuffer.hpp">
 			</File>
 			<File
 				RelativePath=".\include\ISet.hpp">
-			</File>
-			<File
-				RelativePath=".\include\lemur\integer_types.h">
 			</File>
 			<File
 				RelativePath=".\include\lemur\key_consts.h">
