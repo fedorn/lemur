@@ -491,8 +491,14 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::BAndNode* bandN
     _network->addListNode( booleanAndNode );
     _nodeMap[bandNode] = booleanAndNode;
     */
-    UnorderedWindowNode *unorderedNode = new UnorderedWindowNode( bandNode->nodeName(), translation, -1);
+    ListIteratorNode* unorderedNode = 0; 
+    if (translation.size() == 1) {
+      unorderedNode = translation.front();
+    }
+    else {
+      unorderedNode = new UnorderedWindowNode( bandNode->nodeName(), translation, -1);
     _network->addListNode( unorderedNode );
+    }
     _nodeMap[bandNode] = unorderedNode;
   }
 }
