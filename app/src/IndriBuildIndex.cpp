@@ -763,6 +763,8 @@ int main(int argc, char * argv[]) {
 
     env.setMemory( parameters.get("memory", INT64(100*1024*1024)) );
 
+    env.setNormalization( parameters.get("normalize", true));
+
     std::string offsetAnnotationHint=parameters.get("offsetannotationhint", "default");
     if (offsetAnnotationHint=="ordered") {
       env.setOffsetAnnotationIndexHint(indri::parse::OAHintOrderedAnnotations);
