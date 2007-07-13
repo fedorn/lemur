@@ -108,7 +108,7 @@ void indri::infnet::UnorderedWindowNode::prepare( int documentID ) {
   }
 
   // loop over all term occurrences
-  for( size_t i=0; i<allPositions.size(); i++ ) {
+  for( int i=0; i<allPositions.size(); i++ ) {
     int termsFound = 1;
     size_t current;
     double weight = 1;
@@ -119,7 +119,7 @@ void indri::infnet::UnorderedWindowNode::prepare( int documentID ) {
 
       // if the last time this term appeared was before the beginning of this window,
       // then this is a new term for this window
-      if( (size_t)allPositions[current].last < i ) {
+      if( allPositions[current].last < i ) {
         termsFound++;
         weight *= allPositions[current].weight;
       } 
