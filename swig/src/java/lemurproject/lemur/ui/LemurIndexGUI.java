@@ -114,7 +114,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
     /** About the indexer. */
     private final static String aboutText = "Lemur Indexer UI 1.0\n" +
         "Copyright (c) 2004 University of Massachusetts\n" +
-        "http://www.cs.cmu.edu/~lemur";
+        "http://www.lemurproject.org";
     /** Index build parameter file name */
     private String paramFileName;
     /** Index build dataFiles parameter file name */
@@ -143,7 +143,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         JPanel panel1 = makePanel("Index");
         panel1.setPreferredSize(new Dimension(600,150));
         indexTypeBox = new JComboBox(indTypes);
-        indexTypeBox.setSelectedIndex(1);
+        indexTypeBox.setSelectedIndex(0);
         indexTypeBox.setToolTipText("Select the index type");
         indexTypeBox.addActionListener(this);
         browse = new JButton("Browse...");
@@ -162,11 +162,12 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         addLabeledRow(panel1, Spring.sum(spring.getConstraint(SpringLayout.SOUTH, indexTypeBox),pad), "Index Name: ", iname, browse);
 
         doDM = new JCheckBox("Build a Document Manager for this index", true);
-        doDM.setEnabled(false);
+        doDM.setEnabled(true);
         doDM.setToolTipText("Build a document manager to retrieve original text for this index");
         doDM.addItemListener(this);
         dmTypeBox = new JComboBox(mgrTypes);
-        dmTypeBox.setEnabled(false);
+        dmTypeBox.setSelectedIndex(0);
+        dmTypeBox.setEnabled(true);
         dmTypeBox.setToolTipText("Select document manager type");
 
         //add DM options
@@ -762,7 +763,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                 abtDialog.getContentPane().setLayout(new FlowLayout());
                 //      ImageIcon logo = new ImageIcon(logoFile);
                 ImageIcon logo = createImageIcon(logoFile);
-                JLabel label = new JLabel("<html><font face=arial size=3 color=#000000><center><h4>Lemur Toolkit GUI</h4>(using Lemur version 4.0)<BR>June 2005<br><br>The Lemur Toolkit was developed <BR>in collaboration between the <br><BR><b>Language Technologies Institute<BR>Carnegie Mellon Univeristy<BR></b>Pittsburgh, PA 15213<br><BR>and<BR><br><b>Center for Intelligent Information Retrieval<BR>University of Massachusetts<BR></b>Amherst, MA 01003<br><BR><BR></font><font face=arial size=3 color=#000000>For more information, visit <BR>www.lemurproject.org</font><html>", logo, JLabel.CENTER);
+                JLabel label = new JLabel("<html><font face=arial size=3 color=#000000><center><h4>Lemur Toolkit GUI</h4>The Lemur Toolkit was developed <BR>in collaboration between the <br><BR><b>Language Technologies Institute<BR>Carnegie Mellon Univeristy<BR></b>Pittsburgh, PA 15213<br><BR>and<BR><br><b>Center for Intelligent Information Retrieval<BR>University of Massachusetts<BR></b>Amherst, MA 01003<br><BR><BR></font><font face=arial size=3 color=#000000>For more information, visit <BR>www.lemurproject.org</font><html>", logo, JLabel.CENTER);
                 label.setVerticalTextPosition(JLabel.BOTTOM);
                 label.setHorizontalTextPosition(JLabel.CENTER);
 
@@ -1090,12 +1091,6 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
 
     private String removeExt(String name) 
     {
-        if (name.endsWith(".ifp"))
-            return name.substring(0,name.lastIndexOf(".ifp"));
-
-        if (name.endsWith(".inv"))
-            return name.substring(0,name.lastIndexOf(".inv"));
-
         if (name.endsWith(".key"))
             return name.substring(0,name.lastIndexOf(".key"));
         // or do nothing

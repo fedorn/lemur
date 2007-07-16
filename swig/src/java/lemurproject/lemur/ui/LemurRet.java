@@ -411,7 +411,7 @@ public class LemurRet extends JPanel {
         //    abtDialog.getContentPane().add(new JLabel(new ImageIcon(System.getProperty("java.class.path")+SLASH+"lti-logo.gif")));
         //    ImageIcon logo = new ImageIcon("lemur_logo.gif");
         ImageIcon logo = createImageIcon("lemur_logo.gif");
-        JLabel label = new JLabel("<html><font face=arial size=3 color=#000000><center><h4>Lemur Toolkit GUI</h4>(using Lemur version 4.0)<BR>June 2005<br><br>The Lemur Toolkit was developed <BR>in collaboration between the <br><BR><b>Language Technologies Institute<BR>Carnegie Mellon Univeristy<BR></b>Pittsburgh, PA 15213<br><BR>and<BR><br><b>Center for Intelligent Information Retrieval<BR>University of Massachusetts<BR></b>Amherst, MA 01003<br><BR><BR></font><font face=arial size=3 color=#000000>For more information, visit <BR>www.lemurproject.org</font><html>", logo, JLabel.CENTER);
+        JLabel label = new JLabel("<html><font face=arial size=3 color=#000000><center><h4>Lemur Toolkit GUI</h4>The Lemur Toolkit was developed <BR>in collaboration between the <br><BR><b>Language Technologies Institute<BR>Carnegie Mellon Univeristy<BR></b>Pittsburgh, PA 15213<br><BR>and<BR><br><b>Center for Intelligent Information Retrieval<BR>University of Massachusetts<BR></b>Amherst, MA 01003<br><BR><BR></font><font face=arial size=3 color=#000000>For more information, visit <BR>www.lemurproject.org</font><html>", logo, JLabel.CENTER);
         label.setVerticalTextPosition(JLabel.BOTTOM);
         label.setHorizontalTextPosition(JLabel.CENTER);
 
@@ -622,13 +622,11 @@ public class LemurRet extends JPanel {
 
     private boolean addIndexAction() {
         JFileChooser fc = new JFileChooser();
-        //    String[] types = {"inv", "ifp", "ind", "key"};
-        String[] types = {"inv", "ifp", "key"};
+        String[] types = {"key"};
         FileExtension ext = new FileExtension(types, "index toc file");
         fc.addChoosableFileFilter(ext);
         fc.setFileFilter(ext);
         fc.setCurrentDirectory( new File(workingDir) );
-        //    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         if (fc.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
@@ -665,8 +663,6 @@ public class LemurRet extends JPanel {
         lastshown = 0;
         maxresults = -1;
         queryResults = new IndexedReal[0];
-        //    queryResults.clear();
-    
         pageAction();
     }
 
