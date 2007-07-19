@@ -1,4 +1,4 @@
-/* $ANTLR 2.7.4: "nexilang.g" -> "NexiParser.cpp"$ */
+/* $ANTLR 2.7.3 (20060307-1): "nexilang.g" -> "NexiParser.cpp"$ */
 #include "indri/NexiParser.hpp"
 #include <antlr/NoViableAltException.hpp>
 #include <antlr/SemanticException.hpp>
@@ -293,20 +293,21 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 	
 	indri::lang::Field * f = 0;
 	indri::lang::ExtentOr * eo = 0;
+	e = 0;
 	
-#line 296 "NexiParser.cpp"
+#line 297 "NexiParser.cpp"
 	
 	switch ( LA(1)) {
 	case WILD:
 	{
 		match(WILD);
 		if ( inputState->guessing==0 ) {
-#line 283 "nexilang.g"
+#line 284 "nexilang.g"
 			
 			e = new indri::lang::FieldWildcard;
 			_nodes.push_back(e);
 			
-#line 308 "NexiParser.cpp"
+#line 309 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -315,13 +316,13 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		fieldName = LT(1);
 		match(TERM);
 		if ( inputState->guessing==0 ) {
-#line 288 "nexilang.g"
+#line 289 "nexilang.g"
 			
 			f = new indri::lang::Field(fieldName->getText());
 			_nodes.push_back(f);
 			e = f;
 			
-#line 323 "NexiParser.cpp"
+#line 324 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -332,7 +333,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		fieldName2 = LT(1);
 		match(TERM);
 		if ( inputState->guessing==0 ) {
-#line 293 "nexilang.g"
+#line 294 "nexilang.g"
 			
 			f = new indri::lang::Field(fieldName2->getText());
 			_nodes.push_back(f);
@@ -341,7 +342,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 			eo->addChild(f);
 			e = eo;
 			
-#line 343 "NexiParser.cpp"
+#line 344 "NexiParser.cpp"
 		}
 		{ // ( ... )+
 		int _cnt74=0;
@@ -351,13 +352,13 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 				fieldName3 = LT(1);
 				match(TERM);
 				if ( inputState->guessing==0 ) {
-#line 301 "nexilang.g"
+#line 302 "nexilang.g"
 					
 					f = new indri::lang::Field(fieldName3->getText());
 					_nodes.push_back(f);
 					eo->addChild(f);
 					
-#line 359 "NexiParser.cpp"
+#line 360 "NexiParser.cpp"
 				}
 			}
 			else {
@@ -381,15 +382,15 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 }
 
  indri::lang::ScoredExtentNode*  NexiParser::clause() {
-#line 311 "nexilang.g"
+#line 312 "nexilang.g"
 	 indri::lang::ScoredExtentNode* s ;
-#line 385 "NexiParser.cpp"
-#line 311 "nexilang.g"
+#line 386 "NexiParser.cpp"
+#line 312 "nexilang.g"
 	
 	indri::lang::ScoredExtentNode * c = 0;
 	indri::lang::UnweightedCombinationNode * l = 0;
 	
-#line 391 "NexiParser.cpp"
+#line 392 "NexiParser.cpp"
 	
 	s=filter();
 	{
@@ -400,13 +401,13 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		l=logical();
 		c=filter();
 		if ( inputState->guessing==0 ) {
-#line 316 "nexilang.g"
+#line 317 "nexilang.g"
 			
 			l->addChild(s);
 			l->addChild(c);
 			s = l;
 			
-#line 408 "NexiParser.cpp"
+#line 409 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -427,14 +428,14 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
  indri::lang::ScoredExtentNode*  NexiParser::termList() {
 #line 227 "nexilang.g"
 	 indri::lang::ScoredExtentNode* q ;
-#line 429 "NexiParser.cpp"
+#line 430 "NexiParser.cpp"
 #line 227 "nexilang.g"
 	
 	indri::lang::CombineNode* c = 0; 
 	indri::lang::ScoredExtentNode* s = 0;
 	
 	
-#line 436 "NexiParser.cpp"
+#line 437 "NexiParser.cpp"
 	
 	q=term();
 	{
@@ -456,7 +457,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 			_nodes.push_back(c);
 			q = c;
 			
-#line 458 "NexiParser.cpp"
+#line 459 "NexiParser.cpp"
 		}
 		{ // ( ... )*
 		for (;;) {
@@ -467,7 +468,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 					
 					c->addChild(s);
 					
-#line 469 "NexiParser.cpp"
+#line 470 "NexiParser.cpp"
 				}
 			}
 			else {
@@ -494,14 +495,14 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 }
 
  indri::lang::ScoredExtentNode*  NexiParser::term() {
-#line 440 "nexilang.g"
+#line 441 "nexilang.g"
 	 indri::lang::ScoredExtentNode* t ;
-#line 498 "NexiParser.cpp"
-#line 440 "nexilang.g"
+#line 499 "NexiParser.cpp"
+#line 441 "nexilang.g"
 	
 	indri::lang::NotNode * n = 0;
 	
-#line 503 "NexiParser.cpp"
+#line 504 "NexiParser.cpp"
 	
 	switch ( LA(1)) {
 	case NUMBER:
@@ -523,14 +524,14 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		match(MINUS);
 		t=unrestrictedTerm();
 		if ( inputState->guessing==0 ) {
-#line 445 "nexilang.g"
+#line 446 "nexilang.g"
 			
 			n = new indri::lang::NotNode;
 			_nodes.push_back(n);
 			n->setChild(t);
 			t = n;
 			
-#line 532 "NexiParser.cpp"
+#line 533 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -543,15 +544,15 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 }
 
  indri::lang::ScoredExtentNode*  NexiParser::filter() {
-#line 334 "nexilang.g"
+#line 335 "nexilang.g"
 	 indri::lang::ScoredExtentNode* s;
-#line 547 "NexiParser.cpp"
-#line 334 "nexilang.g"
+#line 548 "NexiParser.cpp"
+#line 335 "nexilang.g"
 	
 	indri::lang::RawExtentNode * a = 0;
 	indri::lang::RawExtentNode * contexts = 0;  
 	
-#line 553 "NexiParser.cpp"
+#line 554 "NexiParser.cpp"
 	
 	switch ( LA(1)) {
 	case ABOUT:
@@ -563,7 +564,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 	{
 		a=arithmeticClause();
 		if ( inputState->guessing==0 ) {
-#line 339 "nexilang.g"
+#line 340 "nexilang.g"
 			
 			
 			if ( _shrinkage == true ) {
@@ -582,7 +583,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 			s = m;        
 			
 			
-#line 584 "NexiParser.cpp"
+#line 585 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -600,21 +601,21 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 }
 
  indri::lang::UnweightedCombinationNode*  NexiParser::logical() {
-#line 323 "nexilang.g"
+#line 324 "nexilang.g"
 	 indri::lang::UnweightedCombinationNode* s;
-#line 604 "NexiParser.cpp"
+#line 605 "NexiParser.cpp"
 	
 	switch ( LA(1)) {
 	case AND:
 	{
 		match(AND);
 		if ( inputState->guessing==0 ) {
-#line 324 "nexilang.g"
+#line 325 "nexilang.g"
 			
 			s = new indri::lang::CombineNode;
 			_nodes.push_back(s);
 			
-#line 616 "NexiParser.cpp"
+#line 617 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -622,12 +623,12 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 	{
 		match(OR);
 		if ( inputState->guessing==0 ) {
-#line 328 "nexilang.g"
+#line 329 "nexilang.g"
 			
 			s = new indri::lang::OrNode;
 			_nodes.push_back(s);
 			
-#line 629 "NexiParser.cpp"
+#line 630 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -640,17 +641,17 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 }
 
  indri::lang::ScoredExtentNode*  NexiParser::aboutClause() {
-#line 365 "nexilang.g"
+#line 366 "nexilang.g"
 	 indri::lang::ScoredExtentNode* s ;
-#line 644 "NexiParser.cpp"
-#line 365 "nexilang.g"
+#line 645 "NexiParser.cpp"
+#line 366 "nexilang.g"
 	
 	indri::lang::NestedExtentInside * p = 0;
 	indri::lang::ScoredExtentNode * t = 0;
 	indri::lang::RawExtentNode * f = 0;
 	indri::lang::ExtentRestriction * r = 0;
 	
-#line 652 "NexiParser.cpp"
+#line 653 "NexiParser.cpp"
 	
 	match(ABOUT);
 	match(O_PAREN);
@@ -666,7 +667,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		t=termList();
 		}
 		if ( inputState->guessing==0 ) {
-#line 371 "nexilang.g"
+#line 372 "nexilang.g"
 			
 			if (p != 0) { 
 			indri::lang::NestedExtentInside * pt = p;
@@ -684,7 +685,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 			m->addChild(r);
 			s = m;   
 			
-#line 686 "NexiParser.cpp"
+#line 687 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -707,11 +708,11 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 }
 
  indri::lang::RawExtentNode *  NexiParser::arithmeticClause() {
-#line 393 "nexilang.g"
+#line 394 "nexilang.g"
 	 indri::lang::RawExtentNode * s;
-#line 711 "NexiParser.cpp"
+#line 712 "NexiParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  field = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 393 "nexilang.g"
+#line 394 "nexilang.g"
 	
 	indri::lang::Field* f = 0;
 	indri::lang::RawExtentNode* c = 0;
@@ -719,19 +720,19 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 	INT64 n = 0;
 	s = 0;
 	
-#line 721 "NexiParser.cpp"
+#line 722 "NexiParser.cpp"
 	
 	match(42);
 	p=path();
 	field = LT(1);
 	match(TERM);
 	if ( inputState->guessing==0 ) {
-#line 402 "nexilang.g"
+#line 403 "nexilang.g"
 		
 		f = new indri::lang::Field(field->getText());
 		_nodes.push_back(f);
 		
-#line 733 "NexiParser.cpp"
+#line 734 "NexiParser.cpp"
 	}
 	{
 	switch ( LA(1)) {
@@ -740,12 +741,12 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		match(LESS);
 		n=number();
 		if ( inputState->guessing==0 ) {
-#line 406 "nexilang.g"
+#line 407 "nexilang.g"
 			
 			c = new indri::lang::FieldLessNode(f, n);
 			_nodes.push_back(c);
 			
-#line 747 "NexiParser.cpp"
+#line 748 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -754,12 +755,12 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		match(LESSEQ);
 		n=number();
 		if ( inputState->guessing==0 ) {
-#line 410 "nexilang.g"
+#line 411 "nexilang.g"
 			
 			c = new indri::lang::FieldLessNode(f, n + 1);
 			_nodes.push_back(c);
 			
-#line 761 "NexiParser.cpp"
+#line 762 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -768,12 +769,12 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		match(EQUALS);
 		n=number();
 		if ( inputState->guessing==0 ) {
-#line 414 "nexilang.g"
+#line 415 "nexilang.g"
 			
 			c = new indri::lang::FieldEqualsNode(f, n);
 			_nodes.push_back(c);
 			
-#line 775 "NexiParser.cpp"
+#line 776 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -782,12 +783,12 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		match(GREATER);
 		n=number();
 		if ( inputState->guessing==0 ) {
-#line 418 "nexilang.g"
+#line 419 "nexilang.g"
 			
 			c = new indri::lang::FieldGreaterNode(f, n);
 			_nodes.push_back(c);
 			
-#line 789 "NexiParser.cpp"
+#line 790 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -796,12 +797,12 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		match(GREATEREQ);
 		n=number();
 		if ( inputState->guessing==0 ) {
-#line 422 "nexilang.g"
+#line 423 "nexilang.g"
 			
 			c = new indri::lang::FieldGreaterNode(f, n - 1);
 			_nodes.push_back(c);
 			
-#line 803 "NexiParser.cpp"
+#line 804 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -812,7 +813,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 	}
 	}
 	if ( inputState->guessing==0 ) {
-#line 425 "nexilang.g"
+#line 426 "nexilang.g"
 		
 		if (p != 0) {
 		indri::lang::NestedExtentInside * pt = p;
@@ -825,15 +826,15 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		s = c;
 		}
 		
-#line 827 "NexiParser.cpp"
+#line 828 "NexiParser.cpp"
 	}
 	return s;
 }
 
  indri::lang::ScoredExtentNode*  NexiParser::filterParens() {
-#line 360 "nexilang.g"
+#line 361 "nexilang.g"
 	 indri::lang::ScoredExtentNode* s ;
-#line 835 "NexiParser.cpp"
+#line 836 "NexiParser.cpp"
 	
 	match(O_PAREN);
 	s=clause();
@@ -842,39 +843,39 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 }
 
  INT64  NexiParser::number() {
-#line 521 "nexilang.g"
+#line 522 "nexilang.g"
 	 INT64 v ;
-#line 846 "NexiParser.cpp"
+#line 847 "NexiParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  n = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 521 "nexilang.g"
+#line 522 "nexilang.g"
 	
 	v = 0;
 	
-#line 852 "NexiParser.cpp"
+#line 853 "NexiParser.cpp"
 	
 	n = LT(1);
 	match(NUMBER);
 	if ( inputState->guessing==0 ) {
-#line 524 "nexilang.g"
+#line 525 "nexilang.g"
 		
 		v = string_to_i64(n->getText());
 		
-#line 861 "NexiParser.cpp"
+#line 862 "NexiParser.cpp"
 	}
 	return v ;
 }
 
  indri::lang::ScoredExtentNode *  NexiParser::unrestrictedTerm() {
-#line 453 "nexilang.g"
+#line 454 "nexilang.g"
 	 indri::lang::ScoredExtentNode * t ;
-#line 869 "NexiParser.cpp"
-#line 453 "nexilang.g"
+#line 870 "NexiParser.cpp"
+#line 454 "nexilang.g"
 	
 	indri::lang::RawExtentNode * raw = 0;
 	indri::lang::RawExtentNode * contexts = 0;
 	t = 0;
 	
-#line 876 "NexiParser.cpp"
+#line 877 "NexiParser.cpp"
 	
 	switch ( LA(1)) {
 	case NUMBER:
@@ -883,7 +884,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 	{
 		raw=rawText();
 		if ( inputState->guessing==0 ) {
-#line 459 "nexilang.g"
+#line 460 "nexilang.g"
 			
 			if ( _shrinkage == true ) {
 			indri::lang::DocumentStructureNode * d = new indri::lang::DocumentStructureNode;
@@ -895,7 +896,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 			_nodes.push_back( t );
 			}
 			
-#line 897 "NexiParser.cpp"
+#line 898 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -905,7 +906,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		raw=odNode();
 		match(DBL_QUOTE);
 		if ( inputState->guessing==0 ) {
-#line 470 "nexilang.g"
+#line 471 "nexilang.g"
 			
 			
 			if ( _shrinkage == true ) {
@@ -918,7 +919,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 			_nodes.push_back( t );
 			}
 			
-#line 920 "NexiParser.cpp"
+#line 921 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -931,17 +932,17 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 }
 
  indri::lang::RawExtentNode*  NexiParser::rawText() {
-#line 487 "nexilang.g"
+#line 488 "nexilang.g"
 	 indri::lang::RawExtentNode* t ;
-#line 935 "NexiParser.cpp"
+#line 936 "NexiParser.cpp"
 	ANTLR_USE_NAMESPACE(antlr)RefToken  id = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  n = ANTLR_USE_NAMESPACE(antlr)nullToken;
 	ANTLR_USE_NAMESPACE(antlr)RefToken  f = ANTLR_USE_NAMESPACE(antlr)nullToken;
-#line 487 "nexilang.g"
+#line 488 "nexilang.g"
 	
 	t = 0;
 	
-#line 943 "NexiParser.cpp"
+#line 944 "NexiParser.cpp"
 	
 	switch ( LA(1)) {
 	case TERM:
@@ -949,7 +950,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		id = LT(1);
 		match(TERM);
 		if ( inputState->guessing==0 ) {
-#line 490 "nexilang.g"
+#line 491 "nexilang.g"
 			
 			std::string text = id->getText();
 			
@@ -959,7 +960,7 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 			t = new indri::lang::IndexTerm(id->getText());
 			_nodes.push_back(t);
 			
-#line 961 "NexiParser.cpp"
+#line 962 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -968,12 +969,12 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		n = LT(1);
 		match(NUMBER);
 		if ( inputState->guessing==0 ) {
-#line 499 "nexilang.g"
+#line 500 "nexilang.g"
 			
 			t = new indri::lang::IndexTerm(n->getText());
 			_nodes.push_back(t);
 			
-#line 975 "NexiParser.cpp"
+#line 976 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -982,12 +983,12 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		f = LT(1);
 		match(FLOAT);
 		if ( inputState->guessing==0 ) {
-#line 503 "nexilang.g"
+#line 504 "nexilang.g"
 			
 			t = new indri::lang::IndexTerm(f->getText());
 			_nodes.push_back(t);
 			
-#line 989 "NexiParser.cpp"
+#line 990 "NexiParser.cpp"
 		}
 		break;
 	}
@@ -1000,16 +1001,16 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 }
 
  indri::lang::ODNode*  NexiParser::odNode() {
-#line 509 "nexilang.g"
+#line 510 "nexilang.g"
 	 indri::lang::ODNode* od ;
-#line 1004 "NexiParser.cpp"
-#line 509 "nexilang.g"
+#line 1005 "NexiParser.cpp"
+#line 510 "nexilang.g"
 	
 	RawExtentNode* t = 0;
 	od = new indri::lang::ODNode;
 	_nodes.push_back(od);
 	
-#line 1011 "NexiParser.cpp"
+#line 1012 "NexiParser.cpp"
 	
 	{ // ( ... )+
 	int _cnt91=0;
@@ -1017,11 +1018,11 @@ NexiParser::NexiParser(const ANTLR_USE_NAMESPACE(antlr)ParserSharedInputState& s
 		if ((LA(1) == NUMBER || LA(1) == FLOAT || LA(1) == TERM)) {
 			t=rawText();
 			if ( inputState->guessing==0 ) {
-#line 516 "nexilang.g"
+#line 517 "nexilang.g"
 				
 				od->addChild(t);
 				
-#line 1023 "NexiParser.cpp"
+#line 1024 "NexiParser.cpp"
 			}
 		}
 		else {

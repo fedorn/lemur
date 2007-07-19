@@ -1,4 +1,4 @@
-/* $ANTLR 2.7.4: "nexilang.g" -> "NexiLexer.cpp"$ */
+/* $ANTLR 2.7.3 (20060307-1): "nexilang.g" -> "NexiLexer.cpp"$ */
 #include "indri/NexiLexer.hpp"
 #include <antlr/CharBuffer.hpp>
 #include <antlr/TokenStreamException.hpp>
@@ -32,12 +32,12 @@ NexiLexer::NexiLexer(const ANTLR_USE_NAMESPACE(antlr)LexerSharedInputState& stat
 
 void NexiLexer::initLiterals()
 {
+	literals["about"] = 4;
 	literals["|"] = 41;
 	literals[","] = 43;
 	literals["."] = 42;
 	literals["OR"] = 6;
 	literals["AND"] = 5;
-	literals["about"] = 4;
 	literals["*"] = 7;
 }
 

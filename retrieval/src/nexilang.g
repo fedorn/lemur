@@ -279,6 +279,7 @@ field returns [ indri::lang::RawExtentNode * e ]
   { 
     indri::lang::Field * f = 0;
     indri::lang::ExtentOr * eo = 0;
+    e = 0;
   } :
   WILD {
     e = new indri::lang::FieldWildcard;

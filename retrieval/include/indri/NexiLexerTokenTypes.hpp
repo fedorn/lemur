@@ -3,7 +3,7 @@
 
 ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
-/* $ANTLR 2.7.4: "nexilang.g" -> "NexiLexerTokenTypes.hpp"$ */
+/* $ANTLR 2.7.3 (20060307-1): "nexilang.g" -> "NexiLexerTokenTypes.hpp"$ */
 
 #ifndef CUSTOM_API
 # define CUSTOM_API

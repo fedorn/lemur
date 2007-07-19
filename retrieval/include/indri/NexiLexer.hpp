@@ -12,7 +12,7 @@
 
 #line 14 "NexiLexer.hpp"
 #include <antlr/config.hpp>
-/* $ANTLR 2.7.4: "nexilang.g" -> "NexiLexer.hpp"$ */
+/* $ANTLR 2.7.3 (20060307-1): "nexilang.g" -> "NexiLexer.hpp"$ */
 #include <antlr/CommonToken.hpp>
 #include <antlr/InputBuffer.hpp>
 #include <antlr/BitSet.hpp>
