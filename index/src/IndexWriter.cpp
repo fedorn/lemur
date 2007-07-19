@@ -812,6 +812,8 @@ void IndexWriter::_writeInvertedLists( std::vector<WriterIndexContext*>& context
     _corpus.maximumDocument = std::max(contexts[i]->index->documentMaximum(), _corpus.maximumDocument);
   }
 
+    _corpus.maximumDocument = std::max(_corpus.maximumDocument, (lemur::api::DOCID_T)(_corpus.totalDocuments+_documentBase));
+
   indri::utility::greedy_vector<WriterIndexContext*> current;
   indri::index::TermData* termData = ::termdata_create( (int)_fields.size() );
   char termBuffer[lemur::file::Keyfile::MAX_KEY_LENGTH+1] = {0};
