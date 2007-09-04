@@ -428,9 +428,11 @@ void IndexWriter::_writeFieldList( indri::file::SequentialWriteBuffer& output,
       DocExtentListIterator::DocumentExtentData* entry = iterator->currentEntry();
       lemur::api::DOCID_T storedDocument = entry->document + context->documentOffset;
 
-      if( context->deletedList->isDeleted( entry->document ) )
+      if( context->deletedList->isDeleted( entry->document ) ) {
+        iterator->nextEntry();
         continue;
-
+      }
+      
       if( dataBuffer.position() > minimumSkip ) {
         _writeBatch( &output, storedDocument, (int)dataBuffer.position(), dataBuffer );
         lastDocument = 0;
