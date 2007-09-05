@@ -75,8 +75,8 @@ int AppMain(int argc, char* argv[]) {
 
   // Create an MMR summarizer
   lemur::summarization::MMRSumm* s = new lemur::summarization::MMRSumm(idx);
-
-  if ( !(LocalParameter::query.empty()) ) {
+  
+  if ( LocalParameter::query.empty() ) {
     // generic summary
     s->summDocument(LocalParameter::docID, LocalParameter::summLength, "");
   } else {
