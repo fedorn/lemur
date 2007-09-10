@@ -31,7 +31,7 @@ using namespace lemur::cluster;
   <li> index -- the index to use. Default is none.
   <li> clusterIndex -- the name of the cluster database index to use. 
   Default is none.
-  <li> clusterdb_type -- One of flatfile (simple cluster database) or keyfile (btree based).
+  <li> clusterDBType -- One of flatfile (simple cluster database) or keyfile (btree based).
   <li>  clusterType -- Type of cluster to use, either agglomerative or 
   centroid.  Centroid is agglomerative using mean which trades memory use 
   for speed of clustering. Default is centroid.
