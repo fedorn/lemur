@@ -60,7 +60,7 @@ namespace lemur
     public:
       TFIDFDocRep(lemur::api::DOCID_T docID, const lemur::api::Index &dbIndex, double *idfValue,
                   TFIDFParameter::WeightParam &param) : 
-        lemur::api::DocumentRep(docID), ind(dbIndex), prm(param), idf(idfValue) {
+        lemur::api::DocumentRep(docID, dbIndex.docLength(docID)), ind(dbIndex), prm(param), idf(idfValue) {
       }
       virtual ~TFIDFDocRep() { }
       virtual double termWeight(lemur::api::TERMID_T termID, const lemur::api::DocInfo *info) const{ 
