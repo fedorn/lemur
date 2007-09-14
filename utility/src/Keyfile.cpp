@@ -240,7 +240,15 @@ bool lemur::file::Keyfile::get( int key, char** value, int& actualSize ) const {
 bool lemur::file::Keyfile::previous( int& key, char* value, int& valueLength ) {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   int keyLength = 6;
-  bool result = previous( keyBuf, keyLength, value, valueLength ); 
+  bool result = false;
+
+  try {
+    result = previous( keyBuf, keyLength, value, valueLength ); 
+  } catch (lemur::api::Exception &e) {
+    key = _decodeKey( keyBuf );
+    LEMUR_RETHROW( e, "Caught an internal error while trying to fetch previous record with an int key." );
+  }
+  
   if( result )
     key = _decodeKey( keyBuf );
   return result;
@@ -249,7 +257,15 @@ bool lemur::file::Keyfile::previous( int& key, char* value, int& valueLength ) {
 bool lemur::file::Keyfile::next( int& key, char* value, int& valueLength ) {
   char keyBuf[KEYFILE_KEYBUF_SIZE];
   int keyLength = KEYFILE_KEYBUF_SIZE;
-  bool result = next( keyBuf, keyLength, value, valueLength ); 
+  bool result = false ;
+  try {
+    
+    result = next( keyBuf, keyLength, value, valueLength ); 
+  } catch (lemur::api::Exception &e) {
+    key = _decodeKey( keyBuf );
+    LEMUR_RETHROW( e, "Caught an internal error while trying to fetch next record with an int key." );
+  }
+  
   if( result )
     key = _decodeKey( keyBuf );
   return result;
