@@ -60,8 +60,10 @@ indri::index::DeletedDocumentList::read_transaction::~read_transaction() {
 void indri::index::DeletedDocumentList::_grow( int documentID ) {
   // just set an appropriate number of bytes to zero
   int growBytes = (documentID/8)+1 - _bitmap.position();
+  if( growBytes <= 0 )
+    return;
+  
   memset( _bitmap.write( growBytes ), 0, growBytes );
-
   assert( _bitmap.position() > (documentID/8) );
 }
 
@@ -90,7 +92,7 @@ void indri::index::DeletedDocumentList::append( DeletedDocumentList& other, lemu
   // We handle the first byte as a special case, then copy the rest in the loop
   UINT8 otherFirstByte = *(UINT8*)other._bitmap.front();
 
-  size_t otherBytes = other._bitmap.size();
+  size_t otherBytes = other._bitmap.position();
   _grow( documentCount + (otherBytes+1)*8 );
   assert( _bitmap.size() > 0 );
 
