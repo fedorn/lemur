@@ -22,7 +22,7 @@
 // PriorListIterator constructor
 //
 
-indri::collection::PriorListIterator::PriorListIterator( indri::file::SequentialReadBuffer* file ) 
+indri::collection::PriorListIterator::PriorListIterator( indri::file::SequentialReadBuffer* file )
   :
   _file( file )
 {
@@ -43,19 +43,19 @@ indri::collection::PriorListIterator::~PriorListIterator() {
 void indri::collection::PriorListIterator::startIteration() {
   _file->seek( 0 );
   _lookup.clear();
-  
+
   _entryCount = 0;
   _tableLength = 0;
-  
+
   _file->read( &_entryCount, sizeof(UINT32) );
   _file->read( &_tableLength, sizeof(UINT32) );
-  
+
   _finished = ( _entryCount == 0 );
-  
+
   // if there is a lookup table, load it
   if( _tableLength ) {
     _entryLength = sizeof(UINT8);
-  
+
     for( UINT32 i=0; i<_tableLength; i++ ) {
       double value;
       _file->read( &value, sizeof(double) );
@@ -64,10 +64,10 @@ void indri::collection::PriorListIterator::startIteration() {
   } else {
     _entryLength = sizeof(double);
   }
-  
+
   _entry.document = 0;
   nextEntry();
-} 
+}
 
 //
 // nextEntry
@@ -76,7 +76,7 @@ void indri::collection::PriorListIterator::startIteration() {
 void indri::collection::PriorListIterator::nextEntry() {
   if( _finished )
     return;
-    
+
   if( _entry.document >= (int)_entryCount ) {
     _finished = true;
     return;
@@ -85,13 +85,13 @@ void indri::collection::PriorListIterator::nextEntry() {
   if( _tableLength ) {
     UINT8 index;
     _file->read( &index, sizeof(UINT8) );
-    
+
     _entry.document++;
     _entry.score = _lookup[index];
   } else {
     double value;
-    
-    _file->read( &value, sizeof(double) );  
+
+    _file->read( &value, sizeof(double) );
     _entry.document++;
     _entry.score = value;
   }
@@ -106,10 +106,10 @@ void indri::collection::PriorListIterator::nextEntry( int document ) {
     _finished = true;
     return;
   }
-  
+
   _entry.document = document-1;
   _file->seek( 2*sizeof(UINT32) + _tableLength * sizeof(double) + _entryLength * (document-1) );
-  
+
   nextEntry();
 }
 
@@ -120,7 +120,7 @@ void indri::collection::PriorListIterator::nextEntry( int document ) {
 indri::collection::PriorListIterator::Entry* indri::collection::PriorListIterator::currentEntry() {
   if( !_finished )
     return &_entry;
-  
+
   return 0;
 }
 
