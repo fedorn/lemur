@@ -40,6 +40,7 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
+#include <unistd.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -604,7 +605,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp = NULL, *yy_bp = NULL;
+	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
 #line 42 "../src/TextTokenizer.l"
@@ -1120,7 +1121,6 @@ register char *yy_bp;
 #endif	/* ifndef YY_NO_UNPUT */
 
 
-#ifndef YY_NO_INPUT
 #ifdef __cplusplus
 static int yyinput()
 #else
@@ -1192,7 +1192,7 @@ static int input()
 
 	return c;
 	}
-#endif /* YY_NO_INPUT */
+
 
 #ifdef YY_USE_PROTOS
 void yyrestart( FILE *input_file )
@@ -1303,6 +1303,11 @@ YY_BUFFER_STATE b;
 	}
 
 
+#ifndef YY_ALWAYS_INTERACTIVE
+#ifndef YY_NEVER_INTERACTIVE
+extern int isatty YY_PROTO(( int ));
+#endif
+#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -1626,7 +1631,10 @@ int main()
 indri::parse::TokenizedDocument* indri::parse::TextTokenizer::tokenize( indri::parse::UnparsedDocument* document ) {
 
   _termBuffer.clear();
-  _termBuffer.grow( document->textLength );
+  if ( _tokenize_entire_words)
+    _termBuffer.grow( document->textLength );
+  else
+    _termBuffer.grow( document->textLength * 2 ); // extra null per char.
 
   _document.terms.clear();
   _document.tags.clear();

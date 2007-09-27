@@ -56,7 +56,10 @@ static long byte_position;
 indri::parse::TokenizedDocument* indri::parse::TextTokenizer::tokenize( indri::parse::UnparsedDocument* document ) {
 
   _termBuffer.clear();
-  _termBuffer.grow( document->textLength );
+  if ( _tokenize_entire_words)
+    _termBuffer.grow( document->textLength );
+  else
+    _termBuffer.grow( document->textLength * 2 ); // extra null per char.
 
   _document.terms.clear();
   _document.tags.clear();
