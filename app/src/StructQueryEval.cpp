@@ -37,7 +37,7 @@ Scoring is either done over a working set of documents (essentially
 re-ranking), or over the whole collection. This is indicated by the
 parameter "useWorkingSet". When "useWorkingSet" has either a non-zero
 (integer) value or the value <tt>true</tt>, scoring will be on a working set
-specified in a file given by "workSetFile". The file should have three
+specified in a file given by "workingSetFile". The file should have three
 columns. The first is the query id; the second the document id; and the
 last a numerical value, which is ignored. By default, scoring is on the
 whole collection.
