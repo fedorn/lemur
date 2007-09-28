@@ -2352,10 +2352,6 @@ static void delete_keys(struct fcb *f, struct ix_block *b, int ix, int cnt)
       mvc(k.text,b->prefix_lc,buf.keys,b->keys[i].sc,b->keys[i].lc);
     }
 
-    /*buf.keys_in_block = ix;
-printf("**in delete_keys, ix=%d, cnt=%d, buf after reloc is\n",ix,cnt);
-print_index_block(stdout,f,&buf);*/
-
     for (i=ix+cnt; i<b->keys_in_block; i++) {
       plc = copy_ptr(f,b,i,&buf);
       get_nth_key(b,&k,i);
@@ -2369,6 +2365,11 @@ print_index_block(stdout,f,&buf);*/
     mvc(buf.keys,sc,b->keys,sc,buf.chars_in_use);
     b->keys_in_block = b->keys_in_block - cnt;
     b->chars_in_use = buf.chars_in_use;
+  }
+
+  if ( b->keys_in_block==0 ) {
+    b->prefix_lc = 0;
+    b->chars_in_use = 0;
   }
   
   /*printf("**in delete_keys, ix=%d, cnt=%d, b after is\n",ix,cnt);
@@ -2387,72 +2388,72 @@ static int compress_ix_block(struct fcb *f,struct ix_block *b, unsigned prefix_l
 {int i,prefix_difference,pool_sc,old_key_sc,chars_in_use; unsigned expected_pool_lc,pntr_lc,pntr_sc,plc;
 /* UINT16 segment; UINT64 psc;*/
  struct ix_block copy; struct key prefix; char expansion[max_prefix_lc];/* struct leveln_pntr pn;*/
+if ( b->prefix_lc==prefix_lc ) { /* do nothing */ }
+ else {
+   prefix_difference = b->prefix_lc - prefix_lc;
+   expected_pool_lc = ix_pool_lc(b) + (prefix_difference * b->keys_in_block) - prefix_difference;
+   if ( f->trace ) {
+     printf("Compressing ix block from prefix_lc=%d to %d, pool_lc before=%d, after=%d\n",
+            b->prefix_lc,prefix_lc,ix_pool_lc(b),expected_pool_lc);
+     print_index_block(stdout,f,b);
+   }
+   if ( expected_pool_lc>keyspace_lc ) {
+     if ( show_errors ) printf("**overflow in compress_ix_block\n");
+   } 
+   else if (b->keys_in_block==0 ) { /* nothing to compress */
+     b->chars_in_use = 0;
+     b->prefix_lc = 0;
+   }
+   else {
+     pool_sc = keyspace_lc - b->chars_in_use;
+     mvc(b->keys,pool_sc,copy.keys,pool_sc,b->chars_in_use);
+     get_nth_key(b,&prefix,0);
+     if ( prefix.lc<prefix_lc && show_errors )
+       printf("**key used for prefix compression too short, lc=%d, prefix_lc=%d\n",prefix.lc,prefix_lc);
+     b->prefix_lc = prefix_lc;
+     b->chars_in_use = prefix_lc;
+     chars_in_use = b->chars_in_use;
+     mvc(prefix.text,0,b->keys,keyspace_lc-prefix_lc,prefix_lc);
+     if ( prefix_difference>0 ) mvc(prefix.text,prefix_lc,expansion,0,(unsigned)prefix_difference);
+     for (i=0; i<b->keys_in_block; i++) {
 
-  if ( b->prefix_lc==prefix_lc ) { /* do nothing */ }
-  else {
-    prefix_difference = b->prefix_lc - prefix_lc;
-    expected_pool_lc = ix_pool_lc(b) + (prefix_difference * b->keys_in_block) - prefix_difference;
-    if ( f->trace ) {
-      printf("Compressing ix block from prefix_lc=%d to %d, pool_lc before=%d, after=%d\n",
-        b->prefix_lc,prefix_lc,ix_pool_lc(b),expected_pool_lc);
-    }
-    if ( expected_pool_lc>keyspace_lc ) {
-      if ( show_errors ) printf("**overflow in compress_ix_block\n");
-    }
-    else if (b->keys_in_block==0 ) { /* nothing to compress */
-      b->chars_in_use = 0;
-      b->prefix_lc = 0;
-    }
-    else {
-      pool_sc = keyspace_lc - b->chars_in_use;
-      mvc(b->keys,pool_sc,copy.keys,pool_sc,b->chars_in_use);
-      get_nth_key(b,&prefix,0);
-      if ( prefix.lc<prefix_lc && show_errors )
-        printf("**key used for prefix compression too short, lc=%d, prefix_lc=%d\n",prefix.lc,prefix_lc);
-      b->prefix_lc = prefix_lc;
-      b->chars_in_use = prefix_lc;
-      chars_in_use = b->chars_in_use;
-      mvc(prefix.text,0,b->keys,keyspace_lc-prefix_lc,prefix_lc);
-      if ( prefix_difference>0 ) mvc(prefix.text,prefix_lc,expansion,0,(unsigned)prefix_difference);
-      for (i=0; i<b->keys_in_block; i++) {
 
+       old_key_sc = b->keys[i].sc;
+       pntr_sc = old_key_sc + b->keys[i].lc;
 
-        old_key_sc = b->keys[i].sc;
-        pntr_sc = old_key_sc + b->keys[i].lc;
-
-        if ( b->level==0 ) {
-          pntr_lc = uncompress_UINT32(&plc,(char *)copy.keys+pntr_sc);
-          if ( plc<=f->data_in_index_lc ) pntr_lc = pntr_lc + plc;
-          else {
-	    /*	    pntr_lc = pntr_lc + uncompress_UINT16(&segment,(char *)copy.keys+pntr_sc+pntr_lc);
+       if ( b->level==0 ) {
+         pntr_lc = uncompress_UINT32(&plc,(char *)copy.keys+pntr_sc);
+         if ( plc<=f->data_in_index_lc ) pntr_lc = pntr_lc + plc;
+         else {
+           /*	    pntr_lc = pntr_lc + uncompress_UINT16(&segment,(char *)copy.keys+pntr_sc+pntr_lc);
 		    pntr_lc = pntr_lc + uncompress_UINT64(&psc,(char *)copy.keys+pntr_sc+pntr_lc);*/
-	    pntr_lc = pntr_lc + compressed_int_lc((char *)copy.keys+pntr_sc+pntr_lc);
-	    pntr_lc = pntr_lc + compressed_int_lc((char *)copy.keys+pntr_sc+pntr_lc);
-          }
-        }
-        else {
-	  /*	  pntr_lc = uncompressn_pntr(&pn,(char *)copy.keys+pntr_sc);*/
-	  pntr_lc = compressed_int_lc((char *)copy.keys+pntr_sc);
-	  pntr_lc = pntr_lc + compressed_int_lc((char *)copy.keys+pntr_sc+pntr_lc);
-	}
+           pntr_lc = pntr_lc + compressed_int_lc((char *)copy.keys+pntr_sc+pntr_lc);
+           pntr_lc = pntr_lc + compressed_int_lc((char *)copy.keys+pntr_sc+pntr_lc);
+         }
+       }
+       else {
+         /*	  pntr_lc = uncompressn_pntr(&pn,(char *)copy.keys+pntr_sc);*/
+         pntr_lc = compressed_int_lc((char *)copy.keys+pntr_sc);
+         pntr_lc = pntr_lc + compressed_int_lc((char *)copy.keys+pntr_sc+pntr_lc);
+       }
 
-        chars_in_use = chars_in_use + pntr_lc + b->keys[i].lc + prefix_difference;
+       chars_in_use = chars_in_use + pntr_lc + b->keys[i].lc + prefix_difference;
 
-        b->keys[i].sc = keyspace_lc - chars_in_use;
-        b->keys[i].lc = b->keys[i].lc + prefix_difference;
-        if ( prefix_difference>0 ) {
-          mvc(expansion,0,b->keys,b->keys[i].sc,(unsigned)prefix_difference);;
-          mvc(copy.keys,old_key_sc,b->keys,b->keys[i].sc+prefix_difference,b->keys[i].lc+pntr_lc-prefix_difference);
-	}
-        else mvc(copy.keys,old_key_sc-prefix_difference,b->keys,b->keys[i].sc,b->keys[i].lc+pntr_lc);
-      }
-      b->chars_in_use = chars_in_use;
-      /*      if ( ix_pool_lc(b)!=expected_pool_lc && show_errors)
-        printf("**compressed ix block lc=%d doesn't match expected=%d, original prefix_lc=%d, prefix_lc=%d, keys=%d, original pool=%d\n",
-	ix_pool_lc(b),expected_pool_lc,original_prefix_lc,prefix_lc,b->keys_in_block,original_pool_lc);*/
-    }
-  }
-  return(b->chars_in_use);
+       b->keys[i].sc = keyspace_lc - chars_in_use;
+       b->keys[i].lc = b->keys[i].lc + prefix_difference;
+       if ( prefix_difference>0 ) {
+         mvc(expansion,0,b->keys,b->keys[i].sc,(unsigned)prefix_difference);;
+         mvc(copy.keys,old_key_sc,b->keys,b->keys[i].sc+prefix_difference,b->keys[i].lc+pntr_lc-prefix_difference);
+       }
+       else mvc(copy.keys,old_key_sc-prefix_difference,b->keys,b->keys[i].sc,b->keys[i].lc+pntr_lc);
+     }
+     b->chars_in_use = chars_in_use;
+     /*      if ( ix_pool_lc(b)!=expected_pool_lc && show_errors)
+             printf("**compressed ix block lc=%d doesn't match expected=%d, original prefix_lc=%d, prefix_lc=%d, keys=%d, original pool=%d\n",
+             ix_pool_lc(b),expected_pool_lc,original_prefix_lc,prefix_lc,b->keys_in_block,original_pool_lc);*/
+   }
+ }
+ return(b->chars_in_use);
 }
 
 /* check_ix_block_compression checks that the prefix length recorded in */
@@ -2675,8 +2676,8 @@ static boolean move_keys_to_right(struct fcb *f, struct ix_block *mid, struct ix
 
   first = mid->keys_in_block - cnt;
   move_new_key = ix >= (first+insert);
-  /*  printf("  move_keys_to_right, mid/rt_keys=%d/%d, insert=%d, ix=%d, cnt=%d, move_new=%d\n",mid->keys_in_block,
-      rt->keys_in_block,insert,ix,cnt,move_new_key);*/
+  if (f->trace)  printf("  move_keys_to_right, mid/rt_keys=%d/%d, insert=%d, ix=%d, cnt=%d, move_new=%d\n",mid->keys_in_block,
+      rt->keys_in_block,insert,ix,cnt,move_new_key);
   if ( cnt==0 ) { /* do nothing */ }
   else if ( move_new_key ) {
     above_ix_cnt = mid->keys_in_block - (ix+1-insert);
@@ -2738,8 +2739,11 @@ static int choose_key(struct fcb *f, struct ix_block *mid, struct key *new_key,
   levelx_pntr *new_p, int ix, int n, struct key *choice, boolean insert)
 {int lc=0; levelx_pntr px;
 
-  if ( n>=(mid->keys_in_block+insert) && show_errors )
-    printf("**choosing key from rt block, n=%d, ix=%d, keys_in_block=%d\n",n,ix,mid->keys_in_block);
+ if ( n>=(mid->keys_in_block+insert) && show_errors ) {
+   
+   printf("**choosing key from rt block, n=%d, ix=%d, keys_in_block=%d\n",n,ix,mid->keys_in_block);
+ }
+ 
   if ( n<ix ) lc = get_nth_key_and_pntr(f,mid,choice,n,&px);
   else if ( n==ix ) {
     *choice = *new_key;
@@ -2769,7 +2773,7 @@ int *mid_lc_in_out, int *mid_prefix_lc_in_out, int *rt_lc_out, int *rt_prefix_lc
  unsigned rt_lc;
  boolean done=false;
  struct key min_key,max_key,rt_mid_key,move_key;
-
+ 
  /*  if ( insert ) mid_lc = ix_pool_lc_after_insert(f,mid,k,new_p,ix,&mid_prefix_lc);
      else  mid_lc = ix_pool_lc_after_replace(f,mid,k,new_p,ix,&mid_prefix_lc);*/
   mid_lc = *mid_lc_in_out;
@@ -2950,7 +2954,7 @@ struct ix_block *rt, struct key *k, levelx_pntr *new_p, int ix, boolean insert)
  boolean fits,moved_key_left,moved_key_right,key_not_moved;
  struct key mid_max_key,move_key,temp;
  boolean lt_full,rt_full; int needed,min_target;
-
+ 
   if ( f->trace ) {
     print_key(mid->index_type,k,"trying to move to nbrs, key=");
     printf(", lc=%d, pntr_lc=%d, ix=%d, level=%d, insert=%d\n",k->lc,levelx_pntr_lc(f,new_p,mid->level),ix,mid->level,insert);
@@ -2998,6 +3002,7 @@ struct ix_block *rt, struct key *k, levelx_pntr *new_p, int ix, boolean insert)
   if ( lt_cnt==0 ) get_nth_key(lt,&move_key,lt->keys_in_block-1);
   else choose_key(f,mid,k,new_p,ix,lt_cnt-1,&move_key,insert);
   fits = (lt_lc<=keyspace_lc && mid_lc<=keyspace_lc && rt_lc<keyspace_lc);
+
   if ( fits ) {
     /*    key_not_moved = (ix>(lt_cnt-1)) && (ix<=mid->keys_in_block-rt_cnt);*/
     /*    key_not_moved = (ix>(lt_cnt-1)) && (ix<mid->keys_in_block-rt_cnt);*/
@@ -3025,15 +3030,20 @@ struct ix_block *rt, struct key *k, levelx_pntr *new_p, int ix, boolean insert)
       printf("\n");
     }
     get_max_key(mid,&temp);
+
     if ( !eq_key(&temp,&mid_max_key) && show_errors ) {
       print_key(mid->index_type,&temp,"**actual mid max_key=");
       print_key(mid->index_type,&mid_max_key," doesn't match expected=");
       printf("\n");
+      print_index_block(stdout,f,lt);
+      print_index_block(stdout,f,mid);
+      print_index_block(stdout,f,rt);
     }
     if ( ix_pool_lc(lt)!=lt_lc )   shuffle_length_mismatch(lt ,"lt", lt_lc ,k,insert);
     if ( ix_pool_lc(mid)!=mid_lc ) shuffle_length_mismatch(mid,"mid",mid_lc,k,insert);
     if ( ix_pool_lc(rt)!=rt_lc )   shuffle_length_mismatch(rt, "rt", rt_lc, k,insert);
     }
+  
   return(fits);
 }
 
@@ -3149,7 +3159,7 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr *p, int bufix,
  struct leveln_pntr parent,oldb,newb,save_next,leftb,rightb;
  struct key left_max,right_max,original_max_key,old_max,new_max,temp; levelx_pntr leftbx;
  struct ix_block *old_block,*new_block;
-
+ 
   lock_buffer(f,bufix);
   index_type = f->buffer[bufix].b.index_type;
   oldb = f->buffer[bufix].contents;
