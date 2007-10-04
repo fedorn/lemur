@@ -125,6 +125,20 @@ static file_class_environment_spec environments[] = {
     trec_conflations      // conflations
   },
   {
+    "trecchar",           // name
+    "xml",                // parser
+    "char",               // tokenizer
+    "tagged",             // iterator
+    "<DOC>",              // startDocTag
+    "</DOC>\n",             // endDocTag
+    NULL,                 // endMetadataTag
+    trec_include_tags,    // includeTags
+    NULL,                 // excludeTags
+    trec_index_tags,      // indexTags
+    trec_metadata_tags,   // metadataTags
+    trec_conflations      // conflations
+  },
+  {
     "trecalt",           // name
     "xml",                // parser
     "word",               // tokenizer
