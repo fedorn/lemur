@@ -136,6 +136,12 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
             // Allocate space within HTMLParser's Buffer
             char* write_location = _urlBuffer.write( len + 1 );
             memcpy( write_location, tmp_buf, len + 1 );
+            // hack to make whole url available to harvest links
+            _document.terms.push_back( write_location );
+            write_location = _urlBuffer.write( len + 1 );
+            memcpy( write_location, tmp_buf, len + 1 );
+            // end hack -- dmf
+
             char *c;
             char *urlText=write_location;
             bool lastSkipped = true; 
