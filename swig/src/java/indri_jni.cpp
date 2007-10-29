@@ -5140,12 +5140,137 @@ SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addPa
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   indri::api::ParsedDocument *arg2 = (indri::api::ParsedDocument *) 0 ;
   int result;
+  indri::api::ParsedDocument pdoc2 ;
+  indri::utility::Buffer buf2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(indri::api::IndexEnvironment **)&jarg1; 
-  arg2 = *(indri::api::ParsedDocument **)&jarg2; 
+  
+  jni_parseddocument_info info;
+  
+  parseddocument_init( jenv, info );
+  arg2 = &pdoc2;
+  
+  jstring text = (jstring) jenv->GetObjectField(jarg2, info.textField);
+  jobjectArray terms = (jobjectArray) jenv->GetObjectField(jarg2, info.termsField);
+  jobjectArray positions = (jobjectArray) jenv->GetObjectField(jarg2, info.positionsField);
+  jobjectArray metadata = (jobjectArray) jenv->GetObjectField(jarg2, info.metadataField);
+  
+  // store text
+  const char* textString = jenv->GetStringUTFChars(text, 0);
+  jsize textLength = jenv->GetStringUTFLength(text);
+  strcpy( buf2.write(textLength+1), textString );
+  jenv->ReleaseStringUTFChars(text, textString);
+  
+  // content is a copy, have to convert it to an offset/length.
+  jstring content = (jstring) jenv->GetObjectField(jarg2, info.contentField);
+  const char* contentString = jenv->GetStringUTFChars(content, 0);
+  jsize contentLength = jenv->GetStringUTFLength(content);
+  // find the start offset
+  char *cStart = strstr(textString, contentString);
+  // better not be null...
+  int contentDelta = cStart ? cStart - textString : 0;
+  
+  jenv->ReleaseStringUTFChars(content, contentString);
+  
+  // store terms
+  std::vector<int> termPositions;
+  jsize termCount = terms ? jenv->GetArrayLength(terms) : 0;
+  for( int i=0; i<termCount; i++ ) {
+    // get term string
+    jstring term = (jstring) jenv->GetObjectArrayElement(terms, i);
+    
+    if( term != 0 ) {
+      termPositions.push_back( buf2.position() );
+      const char* termString = jenv->GetStringUTFChars(term, 0);
+      jsize termStringLength = jenv->GetStringUTFLength(term);
+      strcpy( buf2.write(termStringLength+1), termString );
+      jenv->ReleaseStringUTFChars(term, termString);
+    } else {
+      termPositions.push_back(-1);
+    }
+  }
+  
+  // store positions (straight to structure, no buffer necessary)
+  jsize positionsCount = positions ? jenv->GetArrayLength(positions) : 0;
+  for( int i=0; i<positionsCount; i++ ) {
+    jobject position = jenv->GetObjectArrayElement(positions, i);
+    indri::parse::TermExtent extent;
+    extent.begin = jenv->GetIntField(position, info.beginField);
+    extent.end = jenv->GetIntField(position, info.endField);
+    pdoc2.positions.push_back(extent);
+  }
+  
+  // store metadata
+  jclass mapClazz = jenv->GetObjectClass(metadata);
+  jmethodID mapEntrySet = jenv->GetMethodID(mapClazz, "entrySet", "()Ljava/util/Set;" );
+  jobject entrySet = jenv->CallObjectMethod(metadata, mapEntrySet);
+  jclass entrySetClazz = jenv->GetObjectClass(entrySet);
+  jmethodID toArray = jenv->GetMethodID(entrySetClazz, "toArray", "()[Ljava/lang/Object;" );
+  jobjectArray metadataArray = (jobjectArray) jenv->CallObjectMethod(entrySet, toArray);
+  
+  jsize metadataCount = metadata ? jenv->GetArrayLength(metadataArray) : 0;
+  std::vector<int> metadataKeyPositions;
+  std::vector<int> metadataValuePositions;
+  std::vector<int> metadataValueLengths;
+  for( int i=0; i<metadataCount; i++ ) {
+    jobject md = jenv->GetObjectArrayElement(metadataArray, i);
+    jclass entryClazz = jenv->GetObjectClass(md);
+    jmethodID mapEntryKey = jenv->GetMethodID(entryClazz, "getKey", "()Ljava/lang/Object;" );
+    jmethodID mapEntryValue = jenv->GetMethodID(entryClazz, "getValue", "()Ljava/lang/Object;" );
+    
+    jstring key = (jstring) jenv->CallObjectMethod(md, mapEntryKey);
+    jobject value = jenv->CallObjectMethod(md, mapEntryValue);
+    
+    metadataValuePositions.push_back( buf2.position() );
+    if( jenv->IsInstanceOf(value, info.byteArrayClazz) ) {
+      // value is raw bytes
+      jbyte* bytes = jenv->GetByteArrayElements( (jbyteArray) value, 0 );
+      jsize bytesLength = jenv->GetArrayLength((jbyteArray)value);
+      memcpy( buf2.write(bytesLength), bytes, bytesLength );
+      jenv->ReleaseByteArrayElements( (jbyteArray)value, bytes, 0 );
+      metadataValueLengths.push_back( buf2.position() );
+    } else if( jenv->IsInstanceOf(value, info.stringClazz) ) {
+      const char* stringChars = jenv->GetStringUTFChars((jstring)value, 0);
+      jsize valueStringLength = jenv->GetStringUTFLength((jstring)value);
+      metadataValueLengths.push_back(valueStringLength+1);
+      strncpy( buf2.write(valueStringLength+1), stringChars, valueStringLength+1 );
+      jenv->ReleaseStringUTFChars((jstring)value, stringChars);
+    }
+    
+    metadataKeyPositions.push_back(buf2.position());
+    const char* keyChars = jenv->GetStringUTFChars(key, 0);
+    int keyLength = jenv->GetStringUTFLength(key);
+    strncpy( buf2.write(keyLength+1), keyChars, keyLength+1 );
+    jenv->ReleaseStringUTFChars((jstring)key, keyChars);
+  }
+  
+  // now, copy term pointers into arrays
+  for( int i=0; i<termPositions.size(); i++ ) {
+    pdoc2.terms.push_back( buf2.front() + termPositions[i] );
+  }
+  
+  // copy metadata pointers
+  for( int i=0; i<metadataKeyPositions.size(); i++ ) {
+    const char* key = buf2.front() + metadataKeyPositions[i];
+    const char* value = buf2.front() + metadataValuePositions[i];
+    int valueLength = metadataValueLengths[i];
+    indri::parse::MetadataPair mPair;
+    mPair.key = key;
+    mPair.value = value;
+    mPair.valueLength = valueLength;
+    pdoc2.metadata.push_back(mPair );
+  }
+  
+  // copy text
+  pdoc2.text = buf2.front();
+  pdoc2.textLength = textLength;
+  // content
+  pdoc2.content = pdoc2.text + contentDelta;
+  pdoc2.contentLength = contentLength;
+  
   {
     try {
       try {

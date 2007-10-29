@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class ParsedDocument {
   public static class TermExtent {
-    TermExtent( int b, int e ) {
+    public TermExtent( int b, int e ) {
       begin = b;
       end = e;
     }
