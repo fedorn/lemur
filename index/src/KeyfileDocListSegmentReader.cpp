@@ -81,28 +81,29 @@ bool lemur::file::KeyfileDocListSegmentReader::operator<( const KeyfileDocListSe
   // if neither object has data, the smaller segment
   // number is 'better'
   if( !thisTop && !otherTop )
-    return segment() > other.segment();
+    return segment() < other.segment();
 
   // if we have data but the other object doesn't,
   // we are bigger (we should go first)
   if( !otherTop )
-    return false;
+    return true;
 
   // if we don't have data but the other object does,
   // they are bigger (they should go first)
   if( !thisTop )
-    return true;
+    return false;
 
   lemur::api::TERMID_T termID = const_cast<lemur::index::InvFPDocList*>(thisTop)->termID();
   lemur::api::TERMID_T otherTermID = const_cast<lemur::index::InvFPDocList*>(otherTop)->termID();
 
   // if our term ids are the same, the smaller segment is 'better'
   if( termID == otherTermID ) {
-    return segment() > other.segment();
+    return segment() < other.segment();
   }
 
   // if our term ids aren't the same, smaller termID is 'better'
-  return termID > otherTermID;
+  //  return termID > otherTermID;
+  return termID < otherTermID;
 }
 
 const lemur::index::InvFPDocList* lemur::file::KeyfileDocListSegmentReader::top() const {
