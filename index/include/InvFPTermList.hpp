@@ -54,6 +54,13 @@ namespace lemur
       /// Get a pointer to the next entry (pointer to a local static memory)
       lemur::api::TermInfo *nextEntry() const;
 
+      /// Gets the number of entries in this list
+      virtual int size();
+
+      /// indexed access to the list. Also sets the iterator to the next item after
+      /// or to the end if invalid.
+      virtual lemur::api::TermInfo* operator[](int index) const;
+
       /// Get the length of this document
       lemur::api::COUNT_T docLength() const{ return length; }
 

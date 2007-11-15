@@ -7,6 +7,8 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
+ *
+ * 26 Sep 2007 - mjh - added call for fieldInfoList
  */
 
 
@@ -15,6 +17,7 @@
 // C. Zhai 02/08/2001
 
 #include "TermInfoList.hpp"
+#include "FieldInfoList.hpp"
 #include "DocInfoList.hpp"
 #include "DocumentManager.hpp"
 #include "CollectionProps.hpp"
@@ -91,11 +94,19 @@ namespace lemur
 
       /// Convert a valid docID to its spelling
       virtual const EXDOCID_T document (DOCID_T docID) const=0;
+
       /// A String identifier for the document manager to get at the source
       /// of the document with this document id
       //  virtual const char* docManager(int docID) { return NULL;}
       virtual const DocumentManager* docManager(DOCID_T docID) const {return NULL;}
 
+      /// Convert a field name to a field ID (for those index types that support fields)
+      virtual const int field(std::string fieldName) const { return 0; }
+      /// Convert a field name to a field ID (for those index types that support fields)
+      virtual const int field(const char *fieldName) const { return 0; }
+
+      /// Convert a field ID to a field name (for those index types that support fields)
+      virtual const std::string field(int fieldID) const { return ""; }
 
       /// Return a string ID for the term lexicon (usually the file name of the lexicon)
       /*! This function should be pure virtual; the default implementation
@@ -138,6 +149,25 @@ namespace lemur
 
       /// returns a new instance of TermInfoList which represents the word entries in a document index, you must delete the instance later. @see TermInfoList
       virtual TermInfoList *termInfoList(DOCID_T docID) const=0;
+
+      /// returns a new instance of FieldInfoList which represents all field entities in a document index, you must delete the instance later. @see FieldInfoList 
+      /// Note that not all index types support fields - those that do should override this method.
+      virtual FieldInfoList *fieldInfoList(DOCID_T docID) const { return NULL; }
+
+      /// returns a new instance of FieldInfoList which represents field entities in a document index for a specific field, you must delete the instance later. @see FieldInfoList 
+      /// Note that not all index types support fields - those that do should override this method.
+      virtual FieldInfoList *fieldInfoList(DOCID_T docID, int fieldID) const { return NULL; }
+
+      //@}
+      
+      /// @name document metadata access
+      //@{
+
+      /// Fetch the named metadata attribute for a list of document ids.
+      virtual std::vector<std::string> documentMetadata(const std::vector< lemur::api::DOCID_T > &documentIDs, const std::string &attributeName) { std::vector<std::string> _blankVector; _blankVector.clear(); return _blankVector; }
+
+      /// Fetch the named metadata attribute for a single document id.
+      virtual std::vector<std::string> documentMetadata(lemur::api::DOCID_T documentID, const std::string &attributeName) { std::vector<std::string> _blankVector; _blankVector.clear(); return _blankVector; }
 
       //@}
 

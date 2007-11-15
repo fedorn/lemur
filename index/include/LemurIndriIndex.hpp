@@ -7,6 +7,8 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
+ *
+ * 26 Sep 2007 - mjh - added calls for field(...) and fieldInfoList(...)
  */
 
 
@@ -107,6 +109,31 @@ namespace lemur
       }
   
       const string &getRepositoryName() const {return _repositoryName;}
+
+      /// Convert a field name to a field ID (for those index types that support fields)
+      const int field(std::string fieldName) const;
+
+      /// Convert a field name to a field ID (for those index types that support fields)
+      const int field(const char *fieldName) const;
+
+      /// Convert a field ID to a field name (for those index types that support fields)
+      const std::string field(int fieldID) const;
+
+      /// returns a new instance of FieldInfoList which represents all field entities in a document index, you must delete the instance later. @see FieldInfoList 
+      /// Note that not all index types support fields - those that do should override this method.
+      virtual lemur::api::FieldInfoList *fieldInfoList(lemur::api::DOCID_T docID) const;
+
+      /// returns a new instance of FieldInfoList which represents field entities in a document index for a specific field, you must delete the instance later. @see FieldInfoList 
+      /// Note that not all index types support fields - those that do should override this method.
+      virtual lemur::api::FieldInfoList *fieldInfoList(lemur::api::
+        DOCID_T docID, int fieldID) const;
+
+      /// Fetch the named metadata attribute for a list of document ids.
+      virtual std::vector<std::string> documentMetadata(const std::vector< lemur::api::DOCID_T > &documentIDs, const std::string &attributeName);
+
+      /// Fetch the named metadata attribute for a single document id.
+      virtual std::vector<std::string> documentMetadata(lemur::api::DOCID_T documentID, const std::string &attributeName);
+
   
     private:
       indri::index::Index* _indexWithDocument( indri::collection::Repository::index_state& indexes, lemur::api::DOCID_T documentID ) const;

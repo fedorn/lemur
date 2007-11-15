@@ -74,6 +74,25 @@ namespace indri {
       return lemur::api::POS_T(int(position)+1);
     }
 
+    /// Gets the number of entries in this list
+    int BagList::size() {
+      return (int)_termCounts.size();
+    }
+
+    /// indexed access to the list. Also sets the iterator to the next item after
+    /// or to the end if invalid.
+    lemur::api::TermInfo* BagList::operator[](int index) const {
+      if ((index < 0) || (index >= _termCounts.size())) {
+        // invalid index - set the iterator to the end...
+        const_cast<BagList*>(this)->_position=(int)_termCounts.size();
+        return NULL;
+      }
+
+      // we're good - return the item at the index
+      const_cast<BagList*>(this)->_position=index;
+      return nextEntry();
+    }
+
     PositionList::PositionList( const TermList* list ) : _list(list) {}
     PositionList::~PositionList() { delete _list; }
       
@@ -132,6 +151,25 @@ namespace indri {
       getElement( &const_cast<PositionList*>(this)->_info, lemur::api::POS_T(_position) );
       const_cast<PositionList*>(this)->_position++;
       return &const_cast<PositionList*>(this)->_info;
+    }
+
+    // Gets the number of entries in this list
+    int PositionList::size() {
+      return (int)_list->terms().size();
+    }
+
+    // indexed access to the list. Also sets the iterator to the next item after
+    // or to the end if invalid.
+    lemur::api::TermInfo* PositionList::operator[](int index) const {
+      if ((index < 0) || (index >= (int)_list->terms().size())) {
+        // invalid - set the iterator return null.
+        const_cast<PositionList*>(this)->_position=(int)_list->terms().size();
+        return NULL;
+      }
+
+      // else - we're good - set the iterator and return next
+      const_cast<PositionList*>(this)->_position=index;
+      return nextEntry();
     }
   }
 }

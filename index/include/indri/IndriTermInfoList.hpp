@@ -41,6 +41,13 @@ namespace indri {
       bool hasMore() const ;
       lemur::api::TermInfo* nextEntry() const ;
 
+      /// Gets the number of entries in this list
+      virtual int size();
+
+      /// indexed access to the list. Also sets the iterator to the next item after
+      /// or to the end if invalid.
+      virtual lemur::api::TermInfo* operator[](int index) const;
+
       // Note: even though we have position information here, I'm not returning it
       //       if you really really want it, put in a feature request or something
       lemur::api::TermInfo* getElement( lemur::api::TermInfo* elem, lemur::api::POS_T position ) const ;
@@ -93,6 +100,14 @@ namespace indri {
       bool hasMore() const ;
 
       lemur::api::TermInfo* nextEntry() const ;
+
+      /// Gets the number of entries in this list
+      virtual int size();
+
+      /// indexed access to the list. Also sets the iterator to the next item after
+      /// or to the end if invalid.
+      virtual lemur::api::TermInfo* operator[](int index) const;
+
     };
   }
 }

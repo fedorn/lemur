@@ -11,6 +11,8 @@
  * dmf 10/18/2002 -- Add binReadC, binWriteC, deletaEncode, deltaDecode
  * to enable compression of termInfoLists. Added constructor taking a
  * vector of LocatedTerms for list construction.
+ *
+ * mjh 9/27/2007 -- added operator[] for indexed access
  */
 
 #include "InvFPTermList.hpp"
@@ -72,6 +74,23 @@ lemur::api::TermInfo* lemur::index::InvFPTermList::nextEntry() const{
 
   index++;
   return &entry;
+}
+
+int lemur::index::InvFPTermList::size() {
+  return (int)listlen;
+}
+
+lemur::api::TermInfo* lemur::index::InvFPTermList::operator[](int index) const {
+  if ((index < 0) || (index >= listlen)) {
+    // invalid - set the iterator appropriately and return NULL;
+    this->index=listlen;
+    return NULL;
+  }
+
+  // we must be at a valid position here...
+  // set the iterator correctly and return nextEntry()
+  this->index=(index+1);
+  return nextEntry();
 }
 
 /// set element from position, returns pointer to the element

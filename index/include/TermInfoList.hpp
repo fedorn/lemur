@@ -108,6 +108,13 @@ namespace lemur
       /// Get a pointer to the next entry (pointer to a local static memory), so do not delete it
       virtual TermInfo *nextEntry()const=0;
 
+      /// Gets the number of entries in this list
+      virtual int size()=0;
+
+      /// indexed access to the list. Also sets the iterator to the next item after
+      /// or to the end if invalid.
+      virtual TermInfo* operator[](int index) const = 0;
+
       // C++ style forward input (readonly) iterator
       /// Iterator class, used for all subclass lists
       class iterator : std::iterator<std::input_iterator_tag, TermInfo> {

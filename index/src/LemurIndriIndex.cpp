@@ -15,6 +15,7 @@
  */
 #include "LemurIndriIndex.hpp"
 #include "InvFPDocList.hpp"
+#include "IndriFieldInfoList.hpp"
 #include "indri/CompressedCollection.hpp"
 #include "indri/ScopedLock.hpp"
 #include "IndriDocMgr.hpp"
@@ -197,3 +198,108 @@ indri::index::Index* lemur::index::LemurIndriIndex::_indexWithDocument( indri::c
   }
   return 0;
 }
+
+// Convert a field name to a field ID (for those index types that support fields)
+const int lemur::index::LemurIndriIndex::field(std::string fieldName) const {
+  indri::collection::Repository::index_state indexes = _repository->indexes();
+  indri::index::Index *thisIndex=(*indexes)[0];
+  return thisIndex->field(fieldName);
+}
+
+// Convert a field name to a field ID (for those index types that support fields)
+const int lemur::index::LemurIndriIndex::field(const char *fieldName) const {
+  indri::collection::Repository::index_state indexes = _repository->indexes();
+  indri::index::Index *thisIndex=(*indexes)[0];
+  return thisIndex->field(fieldName);
+}
+
+// Convert a field ID to a field name (for those index types that support fields)
+const std::string lemur::index::LemurIndriIndex::field(int fieldID) const {
+  indri::collection::Repository::index_state indexes = _repository->indexes();
+  indri::index::Index *thisIndex=(*indexes)[0];
+  return thisIndex->field(fieldID);
+}
+
+// returns a new instance of FieldInfoList which represents all field entities in a document index, you must delete the instance later. @see FieldInfoList 
+// Note that not all index types support fields - those that do should override this method.
+lemur::api::FieldInfoList *lemur::index::LemurIndriIndex::fieldInfoList(lemur::api::DOCID_T docID) const {
+  // get the index for this document
+  indri::collection::Repository::index_state indexes = _repository->indexes();
+  indri::index::Index* index = _indexWithDocument( indexes, docID );
+
+  // ensure we do have an index (i.e. if the docID was invalid...)
+  if (!index) return NULL;
+  
+  // and the indri term-list
+  const indri::index::TermList *tList=index->termList((int)docID);
+
+  // ensure we have a term list!
+  if (!tList) return NULL;
+
+  // create our field info list object
+  lemur::api::IndriFieldInfoList *retVal=new lemur::api::IndriFieldInfoList(tList->fields());
+
+  // and return
+  return retVal;
+}
+
+// returns a new instance of FieldInfoList which represents field entities in a document index for a specific field, you must delete the instance later. @see FieldInfoList 
+// Note that not all index types support fields - those that do should override this method.
+lemur::api::FieldInfoList *lemur::index::LemurIndriIndex::fieldInfoList(lemur::api::DOCID_T docID, int fieldID) const {
+  // get the index for this document
+  indri::collection::Repository::index_state indexes = _repository->indexes();
+  indri::index::Index* index = _indexWithDocument( indexes, docID );
+
+  // ensure we do have an index (i.e. if the docID was invalid...)
+  if (!index) return NULL;
+  
+  // and the indri term-list
+  const indri::index::TermList *tList=index->termList((int)docID);
+
+  // ensure we have a term list!
+  if (!tList) return NULL;
+
+  // create a blank field info list object
+  lemur::api::IndriFieldInfoList *retVal=new lemur::api::IndriFieldInfoList();
+
+  // loop through our fields and insert those that match the field ID
+  const indri::utility::greedy_vector< indri::index::FieldExtent > fieldVec=tList->fields();
+  int numFields=fieldVec.size();
+  for (int i=0; i < numFields; i++) {
+    indri::index::FieldExtent thisField=fieldVec[i];
+    if (thisField.id==fieldID) {
+      retVal->add(thisField);
+    }
+  }
+
+  // and return
+  return retVal;
+}
+
+
+// Fetch the named metadata attribute for a list of document ids.
+std::vector<std::string> lemur::index::LemurIndriIndex::documentMetadata(const std::vector< lemur::api::DOCID_T > &documentIDs, const std::string &attributeName) {
+  std::vector<std::string> retVec;
+  retVec.reserve(documentIDs.size());
+  retVec.clear();
+
+  indri::collection::CompressedCollection* collection = _repository->collection();
+
+  std::vector< lemur::api::DOCID_T >::const_iterator vIter=documentIDs.begin();
+  while (vIter!=documentIDs.end() && collection) {
+    retVec.push_back(collection->retrieveMetadatum( (*vIter), attributeName ) );
+  }
+
+  return retVec;
+}
+
+// Fetch the named metadata attribute for a single document id.
+std::vector<std::string> lemur::index::LemurIndriIndex::documentMetadata(lemur::api::DOCID_T documentID, const std::string &attributeName) {
+  std::vector<std::string> retVec;
+  retVec.clear();
+  indri::collection::CompressedCollection* collection = _repository->collection();
+  retVec.push_back(collection->retrieveMetadatum( documentID, attributeName ));
+  return retVec;
+}
+
+
