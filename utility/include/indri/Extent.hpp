@@ -28,12 +28,27 @@ namespace indri
       int begin;
       int end;
       int ordinal;
+      int parent;
+      UINT64 number;
 
-      Extent() : weight(1), begin(-1), end(-1), ordinal(0) {}
-      Extent( int b, int e ) : weight(1), begin(b), end(e), ordinal(0) {}
-      Extent( int b, int e, int o ) : weight(1), begin(b), end(e), ordinal(o) {}
-      Extent( double w, int b, int e ) : weight(w), begin(b), end(e), ordinal(0) {}
-      Extent( double w, int b, int e, int o) : weight(w), begin(b), end(e), ordinal(o) {}
+      Extent() : weight(1), begin(-1), end(-1), ordinal(0), parent(-1), number(0) {}
+      Extent( int b, int e ) : weight(1), begin(b), end(e), ordinal(0), parent(-1), number(0) {}
+      Extent( int b, int e, int o ) : weight(1), begin(b), end(e), ordinal(o), parent(-1), number(0) {}
+      Extent( int b, int e, int o, int p ) : weight(1), begin(b), end(e), ordinal(o), parent(p), number(0) {}
+      Extent( int b, int e, int o, int p, UINT64 n ) : weight(1), begin(b), end(e), ordinal(o), parent(p), number(n) {}
+      Extent( double w, int b, int e ) : weight(w), begin(b), end(e), ordinal(0), parent(-1), number(0) {}
+      Extent( double w, int b, int e, int o) : weight(w), begin(b), end(e), ordinal(o), parent(-1), number(0) {}
+      Extent( double w, int b, int e, int o, int p) : weight(w), begin(b), end(e), ordinal(o), parent(p), number(0) {}
+      Extent( double w, int b, int e, int o, int p, UINT64 n) : weight(w), begin(b), end(e), ordinal(o), parent(p), number(n) {}
+
+      Extent(const Extent &e) {
+        weight = e.weight;
+        begin = e.begin;
+        end = e.end;
+        ordinal = e.ordinal;
+        parent = e.parent;
+        number = e.number;
+      }
     
       bool contains( const Extent& other ) const {
         return begin <= other.begin && end >= other.end;
