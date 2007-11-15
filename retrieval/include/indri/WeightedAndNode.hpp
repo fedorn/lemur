@@ -70,6 +70,9 @@ namespace indri
       void addChild( double weight, BeliefNode* node );
       void doneAddingChildren();
 
+      // override setSiblingsFlag for child node(s)
+      void setSiblingsFlag(int f);
+
       // SkippingCapableNode
       void setThreshold( double threshold );
 

@@ -34,6 +34,8 @@ indri::infnet::FieldWildcardNode::~FieldWildcardNode() {
 }
 
 void indri::infnet::FieldWildcardNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
 
   if (documentID <= _index->documentCount()) {

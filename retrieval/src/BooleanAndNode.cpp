@@ -27,6 +27,9 @@ indri::infnet::BooleanAndNode::BooleanAndNode( const std::string& name, std::vec
 void indri::infnet::BooleanAndNode::prepare( int documentID ) {
   _extents.clear();
 
+  // initialize the child / sibling pointer
+  initpointer();
+
   // check for and condition
   for( size_t i=0; i<_lists.size(); i++ ) {
     if( _lists[i]->extents().size() == 0 )

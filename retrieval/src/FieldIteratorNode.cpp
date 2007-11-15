@@ -36,6 +36,8 @@ void indri::infnet::FieldIteratorNode::indexChanged( indri::index::Index& index 
 }
 
 void indri::infnet::FieldIteratorNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
   _numbers.clear();
 

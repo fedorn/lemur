@@ -47,6 +47,12 @@ namespace indri
       int nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
       const std::string& getName() const; 
+
+      virtual void setSiblingsFlag(int f){
+        bSiblings=f; // need to set the flag for the current node itself.
+        if (_child) {  _child->setSiblingsFlag(f); }
+      }
+
     };
   }
 }

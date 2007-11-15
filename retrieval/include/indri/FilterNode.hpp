@@ -45,6 +45,11 @@ namespace indri
         std::sort( _documents.begin(), _documents.end() );
       }
 
+      virtual void setSiblingsFlag(int f) {
+        bSiblings=f; // need to set the flag for the current node itself.
+        if (_belief) {  _belief->setSiblingsFlag(f); }
+      }
+
       int nextCandidateDocument() {
         int childNext = _belief->nextCandidateDocument();
 

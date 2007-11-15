@@ -51,6 +51,12 @@ namespace indri
       double maximumScore();
       double maximumBackgroundScore();
       const std::string& getName() const;
+
+      virtual void setSiblingsFlag(int f){
+        bSiblings=f; // need to set the flag for the current node itself.
+        if (_child) {  _child->setSiblingsFlag(f); }
+      }
+
     };
   }
 }

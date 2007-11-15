@@ -28,6 +28,8 @@ indri::infnet::ExtentOrNode::ExtentOrNode( const std::string& name, std::vector<
 }
 
 void indri::infnet::ExtentOrNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
   indri::utility::greedy_vector<indri::index::Extent> allExtents;
 

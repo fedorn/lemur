@@ -28,6 +28,8 @@ indri::infnet::FieldBetweenNode::FieldBetweenNode( const std::string& name, Fiel
 }
 
 void indri::infnet::FieldBetweenNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
   
   if( !_field )

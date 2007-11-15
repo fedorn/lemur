@@ -40,6 +40,9 @@ int indri::infnet::DocListIteratorNode::nextCandidateDocument() {
 }
 
 void indri::infnet::DocListIteratorNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
+
   _extents.clear();
 
   if( !_list )

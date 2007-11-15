@@ -37,7 +37,8 @@ int indri::infnet::NullListNode::nextCandidateDocument() {
 }
 
 void indri::infnet::NullListNode::prepare( int documentID ) {
-  // do nothing
+  // initialize the child / sibling pointer
+  initpointer();
 }
 
 const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::NullListNode::extents() {

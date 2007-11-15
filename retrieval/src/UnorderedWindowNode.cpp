@@ -65,6 +65,8 @@ int indri::infnet::UnorderedWindowNode::nextCandidateDocument() {
 //
 
 void indri::infnet::UnorderedWindowNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
   assert( _children.size() >= 2 );
   indri::utility::greedy_vector<term_position> allPositions;

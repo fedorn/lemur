@@ -47,7 +47,8 @@ namespace indri
         score(0),
         document(0),
         begin(0),
-        end(0)
+        end(0),
+        number(0)
       {
       }
 
@@ -56,7 +57,8 @@ namespace indri
         score( double(s) ),
         document(d),
         begin(0),
-        end(0)
+        end(0),
+        number(0)
       {
       }
 
@@ -65,7 +67,8 @@ namespace indri
         score(s),
         document(d),
         begin(0),
-        end(0)
+        end(0),
+        number(0)
       {
       }
 
@@ -74,7 +77,18 @@ namespace indri
         score(s),
         document(d),
         begin(b),
-        end(e)
+        end(e),
+        number(0)
+      {
+      }
+
+      ScoredExtentResult( double s, int d, int b, int e, UINT64 n)
+        :
+        score(s),
+        document(d),
+        begin(b),
+        end(e),
+        number(n)
       {
       }
 
@@ -83,6 +97,7 @@ namespace indri
         document = other.document;
         begin = other.begin;
         end = other.end;
+        number = other.number;
       }
 
       bool operator< ( const ScoredExtentResult& other ) const {
@@ -98,6 +113,7 @@ namespace indri
       int document;
       int begin;
       int end;
+      UINT64 number; /// future annotation "pointer"
     };
   }
 }

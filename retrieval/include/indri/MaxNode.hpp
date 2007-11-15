@@ -40,6 +40,14 @@ namespace indri
         _children( children ),
         _name( name )
       {
+        // if we have children - set the sibling flag...
+        if (_children.size() > 1) {
+          for (int i=0; i < _children.size(); i++) {
+            if (_children[i]) {
+              _children[i]->setSiblingsFlag(1);
+            }
+          }
+        }
       }
 
       int nextCandidateDocument() {

@@ -34,8 +34,28 @@ namespace indri
       double _threshold;
 
     public:
+
+      virtual void setSiblingsFlag(int f){
+        bSiblings=f; // need to set the flag for the current node itself.
+        if (_child) {  _child->setSiblingsFlag(f); }
+      }
+
       void addChild( BeliefNode* beliefNode ) {
+        // set sibling flag is more than 1 child to speedup
+        if (_children.size() > 1) {
+          beliefNode->setSiblingsFlag(1);
+        }
+
         _children.push_back( beliefNode );
+
+        // if this is the second child, ensure we have set the sibling flag
+        // for the first and second ones (it will skip without this!)
+        if (_children.size()==2) {
+          for (int i=0; i < _children.size(); i++) {
+            _children[i]->setSiblingsFlag(1);
+          }
+        }
+
       }
 
       int nextCandidateDocument() {

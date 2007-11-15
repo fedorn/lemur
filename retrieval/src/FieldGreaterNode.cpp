@@ -27,6 +27,8 @@ indri::infnet::FieldGreaterNode::FieldGreaterNode( const std::string& name, Fiel
 }
 
 void indri::infnet::FieldGreaterNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
 
   if( !_field )

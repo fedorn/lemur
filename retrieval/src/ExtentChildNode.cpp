@@ -32,6 +32,9 @@ indri::infnet::ExtentChildNode::ExtentChildNode( const std::string& name,
 }
 
 void indri::infnet::ExtentChildNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
+
   _extents.clear();
 
   if( !_inner || !_outer )
@@ -41,6 +44,29 @@ void indri::infnet::ExtentChildNode::prepare( int documentID ) {
   const indri::utility::greedy_vector<indri::index::Extent>& outExtents = _outer->extents();
 
   indri::utility::greedy_vector<indri::index::Extent>::const_iterator innerIter = inExtents.begin();
+
+  // if we have child / parent ordinals in the index, we can sort on these
+  // and quickly break out instead of having to go thorugh the whole list.
+  if (innerIter!=inExtents.end() && innerIter->ordinal != 0 && innerIter->parent != -1) {
+    // ordinal & parent fields for extents recorded in index.
+    // this is the fast loop!
+    // should construct hash table from parent id -> child extents if there are
+    // many [./argx] child extent requests in one single query.
+
+    // Count up children and initialize findChildren hash
+    while (innerIter != inExtents.end()){
+      if(innerIter->parent > 0){
+        _extents.push_back(*innerIter);
+      }
+      innerIter++;
+    }
+    // sort by the parent ID
+    sortparent(_extents);
+
+    // quick exit out
+    return;
+  } // end if (innerIter!=inExtents.end() && innerIter->ordinal != 0 && innerIter->parent != -1)
+
   indri::utility::greedy_vector<indri::index::Extent>::const_iterator outerBegin = outExtents.begin();
   indri::utility::greedy_vector<indri::index::Extent>::const_iterator outerEnd = outExtents.end();
 
@@ -169,6 +195,33 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
   
   int begin = extent.begin;
   int end = extent.end;
+
+  // no length? Quick exit
+  if (begin == end || _extents.size()==0) {
+    return _matches;
+  }
+
+  // if the extents are stored, we can quickly gather them
+  // from the table built in prepare()
+  if (extent.ordinal != 0) {
+    // make sure we didn't pass it up...
+    while(_lastpos>0&&_extents[_lastpos-1].parent>=extent.ordinal){
+      _lastpos--;
+    }
+    // make sure we're in the right position
+    while(_lastpos<_extents.size()&&_extents[_lastpos].parent<extent.ordinal){
+      _lastpos++;
+    }
+    // gather the child matches
+    while(_lastpos<_extents.size()&&_extents[_lastpos].parent==extent.ordinal){
+      indri::index::Extent ext(_extents[_lastpos]);
+      ext.weight *= extent.weight;
+      _matches.push_back(ext);
+      _lastpos++;
+    }
+    // quick exit out
+    return _matches;
+  } // end if (extent.ordinal != 0)
   
   indri::index::DocumentStructure * docStruct = _docStructHolder.getDocumentStructure();  
 

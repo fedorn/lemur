@@ -26,6 +26,8 @@ indri::infnet::FieldEqualsNode::FieldEqualsNode( const std::string& name, FieldI
 }
 
 void indri::infnet::FieldEqualsNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
   
   if( !_field )

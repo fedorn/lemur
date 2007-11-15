@@ -56,6 +56,12 @@ namespace indri
       const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
       bool hasMatch( int documentID );
       const std::string& getName() const;
+
+      virtual void setSiblingsFlag(int f){
+        bSiblings=f; // need to set the flag for the current node itself.
+        if (_child) {  _child->setSiblingsFlag(f); }
+      }
+
     };
   }
 }

@@ -55,6 +55,9 @@ namespace indri
       const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
       void addChild( double weight, BeliefNode* child );
       const std::string& getName() const;
+
+      virtual void setSiblingsFlag(int f);
+
     };
   }
 }

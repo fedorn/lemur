@@ -50,6 +50,9 @@ namespace indri
       bool hasMatch( int documentID );
       const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
       const std::string& getName() const;
+
+      /// over-ridden to set child nodes too
+      void setSiblingsFlag(int f);
     };
   }
 }

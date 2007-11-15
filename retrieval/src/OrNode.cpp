@@ -30,7 +30,23 @@ indri::infnet::OrNode::OrNode( const std::string& name, const std::vector<Belief
   _children( children ),
   _name( name )
 {
+  // if we have children - set the sibling flag...
+  if (_children.size() > 1) {
+    for (int i=0; i < _children.size(); i++) {
+      if (_children[i]) {
+        _children[i]->setSiblingsFlag(1);
+      }
+    }
+  }
 }
+
+void indri::infnet::OrNode::setSiblingsFlag(int f){
+  // set flag for child nodes
+  for(int i=0;i<_children.size();i++) {
+    _children[i]->setSiblingsFlag(f);
+  }
+}
+
 
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::OrNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   double notScore = 1;

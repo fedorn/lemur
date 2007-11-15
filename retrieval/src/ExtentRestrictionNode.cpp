@@ -28,6 +28,11 @@ indri::infnet::ExtentRestrictionNode::ExtentRestrictionNode( const std::string& 
 {
 }
 
+void indri::infnet::ExtentRestrictionNode::setSiblingsFlag(int f){
+  bSiblings=f; // need to set the flag for the current node itself.
+  if (_child) {  _child->setSiblingsFlag(f); }
+}
+
 int indri::infnet::ExtentRestrictionNode::nextCandidateDocument() {
   return _child->nextCandidateDocument();
 }
@@ -57,8 +62,10 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
     
     for( size_t i = 0; i < fieldExtents.size(); i++ ) {    
     //open question whether to score all extents or not -- dmf    
-           if( !matches[i] )  // We actually want to score all, whether or not they have a query term 
-             continue;        // match.  This will give us proper scores when ther eis not a match.
+
+      /// score all, but also all siblings if no matches...
+      if( !matches[i] && !bSiblings )  // We actually want to score all, whether or not they have a query term 
+        continue;        // match.  This will give us proper scores when ther eis not a match.
       
       iter = &(fieldExtents[i]);
       
@@ -77,6 +84,18 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
         _scores.push_back( result );
       }
     } 
+
+    // do a bad guess if there's no matching fields but there are siblings
+    if ( _scores.size() == 0 && bSiblings) {
+      indri::index::Extent e( extent );
+      e.end = e.begin;
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, e, documentLength );
+      for( int i=0; i<childResults.size(); i++ ) {
+        indri::api::ScoredExtentResult result( childResults[i].score, documentID, extent.begin, extent.end, 0 );
+        _scores.push_back( result );
+      }
+    }
+
   } else {
     return _child->score( documentID, extent, documentLength );    
   }

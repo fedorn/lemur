@@ -45,6 +45,13 @@ double indri::infnet::WeightedAndNode::_computeMaxScore( unsigned int start ) {
   return maxScoreSum + minScoreSum;
 }
 
+void indri::infnet::WeightedAndNode::setSiblingsFlag(int f){
+  // set flag for child nodes
+  for(int i=0;i<_children.size();i++) {
+    _children[i].node->setSiblingsFlag(f);
+  }
+}
+
 void indri::infnet::WeightedAndNode::_computeQuorum() {
   double maximumScore = -DBL_MAX;
   unsigned int i;
@@ -72,9 +79,23 @@ void indri::infnet::WeightedAndNode::addChild( double weight, BeliefNode* node )
   child.backgroundWeightedScore = node->maximumBackgroundScore() * weight;
   child.maximumWeightedScore = node->maximumScore() * weight;
 
+  // set sibling flag is more than 1 child to speedup
+  if (_children.size() > 1) {
+    child.node->setSiblingsFlag(1);
+  }
+
   _children.push_back( child );
   std::sort( _children.begin(), _children.end(), child_type::maxscore_less() );
   _computeQuorum();
+
+  // if this is the second child, ensure we have set the sibling flag
+  // for the first and second ones (it will skip without this!)
+  if (_children.size()==2) {
+    for (int i=0; i < _children.size(); i++) {
+      _children[i].node->setSiblingsFlag(1);
+    }
+  }
+
 }
 
 struct double_greater {

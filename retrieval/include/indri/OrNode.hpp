@@ -55,6 +55,8 @@ namespace indri
       int nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
 
+      virtual void setSiblingsFlag(int f);
+
       const std::string& getName() const;
     };
   }

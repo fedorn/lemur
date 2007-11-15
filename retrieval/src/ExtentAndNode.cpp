@@ -71,6 +71,9 @@ indri::infnet::ExtentAndNode::ExtentAndNode( const std::string& name, std::vecto
 }
 
 void indri::infnet::ExtentAndNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
+
   _extents.clear();
 
   if( _children.size() == 2 ) {

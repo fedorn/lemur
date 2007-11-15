@@ -30,6 +30,8 @@ indri::infnet::NestedExtentInsideNode::NestedExtentInsideNode( const std::string
 }
 
 void indri::infnet::NestedExtentInsideNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
 
   if( !_inner || !_outer )

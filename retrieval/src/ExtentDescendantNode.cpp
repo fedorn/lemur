@@ -32,6 +32,9 @@ indri::infnet::ExtentDescendantNode::ExtentDescendantNode( const std::string& na
 }
 
 void indri::infnet::ExtentDescendantNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
+
   _extents.clear();
 
   if( !_inner || !_outer )

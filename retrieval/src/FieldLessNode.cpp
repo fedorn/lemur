@@ -27,6 +27,8 @@ indri::infnet::FieldLessNode::FieldLessNode( const std::string& name, FieldItera
 }
 
 void indri::infnet::FieldLessNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
 
   if( !_field )

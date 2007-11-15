@@ -29,6 +29,8 @@ indri::infnet::WeightedExtentOrNode::WeightedExtentOrNode( const std::string& na
 }
 
 void indri::infnet::WeightedExtentOrNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
   indri::utility::greedy_vector<indri::index::Extent> allExtents;
 

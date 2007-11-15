@@ -32,6 +32,10 @@ namespace indri
   {
     
     class BeliefNode : public InferenceNetworkNode {
+    protected:
+      /// flag (and potential counter) for if belief node has siblings
+      int bSiblings;
+
     public:
       virtual double maximumBackgroundScore() = 0;
       virtual double maximumScore() = 0;
@@ -39,6 +43,10 @@ namespace indri
       virtual bool hasMatch( int documentID ) = 0;
       virtual const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) = 0;
       virtual void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent ) = 0;
+
+      /// sets the siblings flag (and counter) if the belief node
+      /// has siblings
+      virtual void setSiblingsFlag(int f) { bSiblings=f; }
     };
   }
 }

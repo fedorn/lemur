@@ -27,6 +27,12 @@ indri::infnet::ExtentEnforcementNode::ExtentEnforcementNode( const std::string& 
 {
 }
 
+
+void indri::infnet::ExtentEnforcementNode::setSiblingsFlag(int f){
+  bSiblings=f; // need to set the flag for the current node itself.
+  if (_child) {  _child->setSiblingsFlag(f); }
+}
+
 int indri::infnet::ExtentEnforcementNode::nextCandidateDocument() {
   return _child->nextCandidateDocument();
 }

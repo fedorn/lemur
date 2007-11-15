@@ -35,6 +35,14 @@ int indri::infnet::WeightedSumNode::nextCandidateDocument() {
   return candidate;
 }
 
+void indri::infnet::WeightedSumNode::setSiblingsFlag(int f){
+  // set flag for child nodes
+  for(int i=0;i<_children.size();i++) {
+    _children[i]->setSiblingsFlag(f);
+  }
+}
+
+
 double indri::infnet::WeightedSumNode::maximumScore() {
   double s = 0;
 
@@ -114,8 +122,22 @@ const indri::utility::greedy_vector<bool>& indri::infnet::WeightedSumNode::hasMa
 }
 
 void indri::infnet::WeightedSumNode::addChild( double weight, BeliefNode* child ) {
+  // set sibling flag is more than 1 child to speedup
+  if (_children.size() > 1) {
+    child->setSiblingsFlag(1);
+  }
+
   _children.push_back(child);
   _weights.push_back(weight);
+
+  // if this is the second child, ensure we have set the sibling flag
+  // for the first and second ones (it will skip without this!)
+  if (_children.size()==2) {
+    for (int i=0; i < _children.size(); i++) {
+      _children[i]->setSiblingsFlag(1);
+    }
+  }
+
 }
 
 const std::string& indri::infnet::WeightedSumNode::getName() const {

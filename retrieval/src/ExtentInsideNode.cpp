@@ -28,6 +28,8 @@ indri::infnet::ExtentInsideNode::ExtentInsideNode( const std::string& name, List
 }
 
 void indri::infnet::ExtentInsideNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
 
   if( !_inner || !_outer )

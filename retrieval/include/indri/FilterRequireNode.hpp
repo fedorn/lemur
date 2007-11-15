@@ -50,6 +50,12 @@ namespace indri
 
       const std::string& getName() const;
       void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
+
+      virtual void setSiblingsFlag(int f){
+        bSiblings=f; // need to set the flag for the current node itself.
+        if (_required) {  _required->setSiblingsFlag(f); }
+      }
+
     };
   }
 }

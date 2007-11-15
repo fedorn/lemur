@@ -52,6 +52,10 @@ namespace indri
       bool hasMatch( int documentID );
       const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
       const std::string& getName() const;
+
+      /// sets the siblings flag (and counter) if the belief node
+      /// has siblings
+      void setSiblingsFlag(int f);
     };
   }
 }

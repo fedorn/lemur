@@ -48,6 +48,8 @@ int indri::infnet::OrderedWindowNode::nextCandidateDocument() {
 }
 
 void indri::infnet::OrderedWindowNode::prepare( int documentID ) {
+  // initialize the child / sibling pointer
+  initpointer();
   _extents.clear();
   assert( _children.size() >= 2 );
 
