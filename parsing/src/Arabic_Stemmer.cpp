@@ -239,6 +239,7 @@ namespace lemur
         // can't ever be true with 8-bit unsigned char
         if (*i > 256) 
           *i &= 0xff ;
+        if (*i <= 'z') *o++ = *i; else
         if (NormChar[*i])
           *o++ = NormChar[*i] ;
         i++;
