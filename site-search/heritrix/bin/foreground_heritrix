@@ -36,4 +36,4 @@ then
     HERITRIX_HOME=`cd "$PRGDIR/.." ; pwd`
 fi
 
-FOREGROUND='true' $HERITRIX_HOME/bin/heritrix $@
+FOREGROUND='true' /bin/sh $HERITRIX_HOME/bin/heritrix $@

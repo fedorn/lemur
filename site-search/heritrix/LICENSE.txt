@@ -4,7 +4,8 @@ the terms of the GNU Lesser Public license (LGPL) reproduced below.
 Heritrix includes the libraries it depends upon.  The libraries used can be
 found under the 'lib' directory and are listed here,
 http://crawler.archive.org/dependencies.html. The accompanying project.xml
-dependencies section, also available online at http://cvs.sourceforge.net/viewcvs.py/archive-crawler/ArchiveOpenCrawler/project.xml?rev=1,
+dependencies section, also available online at,
+https://archive-crawler.svn.sourceforge.net/svnroot/archive-crawler/trunk/heritrix/project.xml,
 points to each libraries' license and notes copyright where pertinent.
 
 

@@ -39,13 +39,14 @@ open( BADLINES, ">badloglines.log" ) or die "Can't create badloglines.log in cur
 
 while ( my $line = <CRAWL> ) {
   my (
-    $time, $result, $size,   $url, $hoppath, $refer,
-    $mime, $thread, $dltime, $c1,  $c2,      $overflow
+    $time, $result, $size,   $url,  $hoppath,   $refer,
+    $mime, $thread, $dltime, $sha1, $sourcetag, $annot,
+    $overflow
     )
     = split /\s+/, $line;
 
 # if there are more or less than 11 fields, one of the fields has a space in it, so skip parsing it
-  if ( ( $overflow ne "" ) || ( $c2 eq "" ) ) {
+  if ( ( $overflow ne "" ) || ( $annot eq "" ) ) {
     print BADLINES $line;
     next;
   }
@@ -80,12 +81,24 @@ while ( my $line = <CRAWL> ) {
     $doccount++;
   }
 }
-
+my $htotalsize = sprintf("%.2f", $totalsize/1024/1024/1024); 
 #determine time taken for crawl
-my ( $syear, $smonth, $sday, $shour, $smin, $ssec, $sms ) =
+my ( $syear, $smonth, $sday, $shour, $smin, $ssec, $sms );
+( $syear, $smonth, $sday, $shour, $smin, $ssec, $sms ) =
+  ( $starttime =~ /(....)-(..)-(..)T(..):(..):(..).(...)Z/ );
+if (!defined $syear) {
+  ( $syear, $smonth, $sday, $shour, $smin, $ssec, $sms ) =
   ( $starttime =~ /(....)(..)(..)(..)(..)(..)(...)/ );
-my ( $eyear, $emonth, $eday, $ehour, $emin, $esec, $ems ) =
+}
+
+  
+my ( $eyear, $emonth, $eday, $ehour, $emin, $esec, $ems ); 
+( $eyear, $emonth, $eday, $ehour, $emin, $esec, $ems ) =
+  ( $currenttime =~ /(....)-(..)-(..)T(..):(..):(..).(...)Z/ );
+if (!defined $eyear) {
+  ( $eyear, $emonth, $eday, $ehour, $emin, $esec, $ems ) =
   ( $currenttime =~ /(....)(..)(..)(..)(..)(..)(...)/ );
+}
 my ( $days, $hours, $minutes, $seconds ) = Delta_DHMS(
   $syear, $smonth, $sday, $shour, $smin, $ssec,
   $eyear, $emonth, $eday, $ehour, $emin, $esec
@@ -103,52 +116,52 @@ sub print_crawl_report {
     "h${minutes}m${seconds}s\n";
   print NEWCRAWL "Total Hosts Crawled: ", scalar keys %$hosts, "\n";
   print NEWCRAWL "Total Documents Crawled: ",      $doccount,  "\n";
-  print NEWCRAWL "Total Raw Data Size in Bytes: ", $totalsize, "\n";
+  print NEWCRAWL "Total Raw Data Size in Bytes: $totalsize ($htotalsize GB)\n";
   close NEWCRAWL;
 }
 
 sub print_hosts_report {
   open( NEWHOSTS, "> hosts-report.txt.new" ) or die $!;
-  print NEWHOSTS "[host]", " " x 49, "[#urls]      [#bytes]\n";
+  print NEWHOSTS "[#urls] [#bytes] [host]\n";
 
   # sort from most frequent to least frequent host
   my @sortedhosts =
     sort { $hosts->{$b}{count} <=> $hosts->{$a}{count} } keys %$hosts;
   foreach my $host (@sortedhosts) {
-    printf NEWHOSTS (
-      "%-50s%12d%14d\n", $host,
+    printf NEWHOSTS ("%s %s %s\n",
       $hosts->{$host}{count},
-      $hosts->{$host}{size}
+      $hosts->{$host}{size},
+      $host
     );
   }
 }
 
 sub print_mimetype_report {
   open( NEWMIMES, "> mimetype-report.txt.new" ) or die $!;
-  print NEWMIMES "[mime-types]", " " x 43, "[#urls]      [#bytes]\n";
+  print NEWMIMES "[#urls] [#bytes] [mime-types]\n";
 
   # sort from most frequent to least frequent mime-type
   my @sortedmimes =
     sort { $mimes->{$b}{count} <=> $mimes->{$a}{count} } keys %$mimes;
   foreach my $mime (@sortedmimes) {
-    printf NEWMIMES (
-      "%-50s%12d%14d\n", $mime,
+    printf NEWMIMES ("%s %s %s\n",
       $mimes->{$mime}{count},
-      $mimes->{$mime}{size}
+      $mimes->{$mime}{size},
+      $mime
     );
   }
 }
 
 sub print_response_report {
   open( NEWRESPONSES, "> responsecode-report.txt.new" ) or die $!;
-  print NEWRESPONSES "[rescode]", " " x 7, "[#urls]\n";
+  print NEWRESPONSES "[rescode] [#urls]\n";
 
   # sort from most frequent to least frequent response code
   my @sortedresps =
     sort { $responses->{$b}{count} <=> $responses->{$a}{count} }
     keys %$responses;
   foreach my $res (@sortedresps) {
-    printf NEWRESPONSES ( "%-15s%8d\n", $res, $responses->{$res}{count} );
+    printf NEWRESPONSES ( "%s %s\n", $res, $responses->{$res}{count} );
   }
 }
 
@@ -159,18 +172,15 @@ sub print_seeds_report {
   my @sortedurls =
     sort { $seedresponses->{$a} cmp $seedresponses->{$b} || $a cmp $b }
     keys %$seedresponses;
-  print NEWSEEDS "[seeds]", " " x 149, "[res-code] [status]\n";
+  print NEWSEEDS "[res-code] [status] [seeds]\n";
   foreach my $url (@sortedurls) {
-    print NEWSEEDS $url,
-      " " x ( 166 - length($url) - length( $seedresponses->{$url} ) ),
-      $seedresponses->{$url};
-
     # if anything but a heritrix error
     if ( $seedresponses->{$url} > 0 ) {
-      print NEWSEEDS " CRAWLED\n";
+      print NEWSEEDS "$seedresponses->{$url} CRAWLED $url\n";
     }
     else {
-      print NEWSEEDS " NOTCRAWLED\n";
+      print NEWSEEDS "$seedresponses->{$url} NOTCRAWLED $url\n";
     }
   }
 }
+

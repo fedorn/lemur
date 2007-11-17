@@ -29,5 +29,5 @@ then
     HERITRIX_HOME=`cd "$PRGDIR/.." ; pwd`
 fi
 
-FOREGROUND='true' CLASS_MAIN='org.archive.io.arc.ARCReader' JMX_OPTS=' ' \
+FOREGROUND='true' CLASS_MAIN='org.archive.io.arc.ARCReader' JMX_OFF='off' \
     $HERITRIX_HOME/bin/heritrix $@
