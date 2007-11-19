@@ -22,6 +22,7 @@
 #include <string>
 #include "indri/XMLNode.hpp"
 #include "indri/delete_range.hpp"
+#include "Exception.hpp"
 namespace indri
 {
   namespace api
@@ -220,7 +221,8 @@ namespace indri
       /// @return the value of the parameter as an int
       operator int () {
         const std::string& value = _getRoot()->getValue();
-
+        if (value.length() == 0)
+          LEMUR_THROW(LEMUR_BAD_PARAMETER_ERROR, "Empty parameter text" );
         if( _isBoolean(value) )
           return _asBoolean(value);
 
