@@ -16,7 +16,6 @@ int next_rec     (void *f, char *key, int *key_lc, int max_key_lc,
                           void *rec, int *rec_lc, int max_rec_lc);
 int prev_rec     (void *f, char *key, int *key_lc, int max_key_lc,
                           void *rec, int *rec_lc, int max_rec_lc);
-int copy_rec     (void *f, void *pointer, void *rec, int *lc, int max_lc);
 int get_subrec   (void *f, void *pointer, int offset, int bytes_to_read,
                            void *rec, int *bytes_actually_read, int max_lc);
 int open_key     (void *f, char *id, int fcb_lc, int read_only);

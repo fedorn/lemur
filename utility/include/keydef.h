@@ -3,7 +3,7 @@
 
 /*                                                               */
 /* Copyright 1984,1985,1986,1988,1989,1990,2003,2004,2005,       */
-/*   2006 by Howard Turtle                                       */
+/*   2006, 2007 by Howard Turtle                                 */
 /*                                                               */
 
 #include <math.h>
@@ -32,29 +32,35 @@ typedef uint64_t           UINT64;
 #define compressed_bits_per_byte 7
 #define compressed_lc(bits) ( (bits-1) / compressed_bits_per_byte + 1 )
 
-#define keyf 32472                   /* marker for fcb */
-#define current_version 7            /* version of keyed file software */
-#define maxkey_lc 512                /* maximum key length */
-#define max_prefix_lc 127            /* max index block prefix */
-#define level_zero 0                 /* level of index leaves */
-#define level_one 1                  /* level immediately above leaves */
-#define min_data_in_index_lc sizeof(UINT32) /* records shorter that this must go in index block */
-#define min_disk_rec_lc min_data_in_index_lc+1 /* records this lc or longer are on disk */
-#define max_data_in_index_lc 128     /* longest record that can go in index block */
+#define eqn_pntr(p1,p2) ((p1.block==p2.block) && (p1.segment==p2.segment))
+#define lt_pntr(p1,p2) ((p1.segment<p2.segment) || ((p1.segment==p2.segment) && (p1.block<p2.block)))
+#define null_pntr(p1) ((p1.segment==max_segment) && (p1.block==0))
+#define mvc(t1,sc1,t2,sc2,lc) memmove((unsigned char *)t2+sc2,(unsigned char *)t1+sc1,(size_t)lc)
+
+#define keyf                   32472 /* marker for fcb */
+#define current_version            7 /* version of keyed file software */
+#define current_sub_version        0
+#define maxkey_lc                512 /* maximum key length */
+#define max_prefix_lc            127 /* max index block prefix */
+#define level_zero                 0 /* level of index leaves */
+#define level_one                  1 /* level immediately above leaves */
+#define min_data_in_index_lc       6 /* records <= this go in index block */
+#define max_data_in_index_lc     128 /* longest record that can go in index block */
 #define seq_threshold             20
 #define min_buffer_cnt             8 /* default number of buffers allocated */
-#define max_buffer_cnt         32768 /* max buffers allowed */
+/*#define max_buffer_cnt         32768*/ /* max buffers allowed */
 #define buf_hash_load_factor       3 /* hash table is>=this times buffers alloc,*/
 #define max_level                 32 /* number of index block levels */
-#define file_lc_bits              33 /* <64, max_file_lc = 2**file_lc_bits - 1 */
+#define file_lc_bits              31 /* <64, max_file_lc = 2**file_lc_bits - 1 */
 #define max_segment              127 /* max number of file segments */
 #define max_files                 10 /* max number of open files */
 #define max_filename_lc          128 /* max length of a file name */
 #define max_extension_lc          40 /* max length of file name extension */
-#define v6_block_lc             4096
+/*#define v6_block_lc             4096*/
 #define block_lc                4096
 #define rec_allocation_unit        8 /* data recs allocated as multiple of this */
 #define block_allocation_unit     16 /* # index (or freespace) blocks to allocate */
+#define max_allocation_depth       4
 #define user_ix                    0
 #define free_rec_ix                1
 #define free_lc_ix                 2
@@ -63,6 +69,7 @@ typedef uint64_t           UINT64;
 #define cmp_equal                  1
 #define cmp_greater                2
 
+#define UINT32_lc      (unsigned)sizeof(UINT32)
 #define freespace_lc_key_lc 14       /* length of a freespace lc key */
 #define freespace_rec_key_lc 10      /* length of a freespace rec key */
 
@@ -139,16 +146,11 @@ struct external_level0_pntr {
 };
 typedef struct internal_level0_pntr keyfile_pointer; /* external name for Chiliad use */
 
-struct key_ptr_t {
-  UINT16
-    sc,                         /* start character of key */
-    lc;                         /* lc of key, does not include pointer */
-};
-#define key_ptr_lc sizeof(struct key_ptr_t)
-#define keyspace_lc (key_ptr_lc*key_ptrs_per_block)
 
 #define ix_block_header_lc (2*sizeof(UINT16)+ 4 +2*leveln_lc)
-#define key_ptrs_per_block ((block_lc - ix_block_header_lc) / key_ptr_lc)
+#define key_ptrs_per_block ((block_lc - ix_block_header_lc) / sizeof(UINT16))
+#define keyspace_lc (sizeof(UINT16)*key_ptrs_per_block)
+
 struct ix_block {                  /* block is the disk resident image of */
   UINT16                         /*   an index block */
     keys_in_block,
@@ -161,7 +163,7 @@ struct ix_block {                  /* block is the disk resident image of */
     level;                      /* level of block */
   struct leveln_pntr
     next,prev;
-  struct key_ptr_t              /* key_ptrs are inserted from 0, keys and */
+  UINT16                        /* key_ptrs are inserted from 0, keys and */
     keys[key_ptrs_per_block];   /*  file pointers overlay the top end */
 };
 typedef struct ix_block block_type_t;
@@ -192,7 +194,7 @@ typedef union level0orn_pntr {
 /*   k.  If there are multiple buffers containing blocks with hash    */
 /*   value k then they are linked using hash_next.                    */
 
-struct buffer_type {            /* buffer is the memory resident image of */
+struct buffer_struct {            /* buffer is the memory resident image of */
                                 /* a disk block */
   unsigned char
     lock_cnt,
@@ -202,16 +204,27 @@ struct buffer_type {            /* buffer is the memory resident image of */
     older,                      /* index to prev element in LRU list */
     younger,                    /* index to next element in LRU list */
     hash_next,
-    last_ix,
-    search_cnt,
-    compare_cnt;
+    search_cnt;
   struct leveln_pntr
     contents;                   /* block in buffer, nulln_ptr if empty */
   block_type_t
     b;
 };
-#define buffer_lc sizeof(struct buffer_type)
+typedef struct buffer_struct buffer_t;
+#define buffer_lc sizeof(buffer_t)
 #define hash_entries_per_buf (buffer_lc / sizeof(int))
+
+struct buffer_pool_struct {
+  int
+    buffers_allocated,          /* number of buffers allocated */
+    buffers_in_use,             /* buffers actually used */
+    *buf_hash_table,            /* pointer to base of buffer hash table */
+    buf_hash_entries;           /* size of buf_hash_table              */
+  buffer_t
+    buffer[min_buffer_cnt];    /* should be at end of fcb so we can extend */
+};
+typedef struct buffer_pool_struct buffer_pool_t;
+#define min_buffer_pool_lc (sizeof(buffer_pool_t) + min_buffer_cnt*sizeof(buffer_t))
 
 
 /* File information block.  The following information is stored at the */
@@ -219,13 +232,14 @@ struct buffer_type {            /* buffer is the memory resident image of */
 /*   fixed for all keyed files but the information is kept in the fcb  */
 /*   in whatever form fits the architecture at hand.  Note that this   */
 /*   struct is never actually used -- it's here to document the        */
-/*   structure of the fib.  fib_lc is the length of the fib on disk -- */
+/*   structure of the fib.  fib_lc_on_disk is the length of the fib on disk -- */
 /*   it doesn't include alignment padding inserted by a compiler.      */
 
 struct file_information_block {
   UINT32
     error_code,
     version,                    /* version of keyed file manager */
+    sub_version,
     segment_cnt,                /* number of segments in use     */
     primary_level[max_index],              /* level of primary index block */
     marker,
@@ -241,8 +255,7 @@ struct file_information_block {
     data_in_index_lc;
 
 };
-#define v6_fib_lc ((5+max_index)*sizeof(UINT32)+(3*max_level*max_index)*leveln_lc+(max_segment+1)*sizeof(UINT64))
-#define fib_lc ((6+max_index)*sizeof(UINT32)+(3*max_level*max_index)*leveln_lc+(max_segment+1)*sizeof(UINT64))
+#define fib_lc_on_disk ((7+max_index)*sizeof(UINT32)+(3*max_level*max_index)*leveln_lc+(max_segment+1)*sizeof(UINT64))
 
 
 /* Segment handling.  A keyed file consist of one or more component files */
@@ -264,6 +277,7 @@ struct fcb {
   UINT32
     error_code,
     version,                    /* version of keyed file manager */
+    sub_version,
     segment_cnt,                /* number of segments in use     */
     primary_level[max_index],              /* level of primary index block */
     marker,
@@ -297,22 +311,22 @@ struct fcb {
     youngest_buffer,            /* last buffer in LRU buffer list */
     block_shift;                /* log2(block_lc) */
   F_HANDLE
+    *log_file,
     *open_file[max_files];      /* pointers to open files */
 
   int
     segment_ix[max_segment],   /* index into open_file[] if segment open */
     position_ix[max_index],                /* posn. in level0 blk of last retrieval */
     seq_cnt[max_index],
-    current_age,                /* age of file pool (0..maxint)*/
-    buffers_allocated,          /* number of buffers actually allocated */
-    buffers_in_use,             /* buffers actually used */
-    *buf_hash_table,            /* pointer to base of buffer hash table */
-    buf_hash_entries;           /* size of buf_hash_table              */
+    current_age;                /* age of file pool (0..maxint)*/
   struct leveln_pntr
     mru_at_level[max_level][max_index],    /* most recently used block at each level*/
     position[max_index];                   /* level0 block of last retrieval */
-  struct buffer_type
-    buffer[min_buffer_cnt];     /* should be at end of fcb so we can extend */
+
+  buffer_pool_t
+    buffer_pool;     /* should be at end of fcb so we can extend */
+  /*  buffer_t
+      buffer[min_buffer_cnt];*/
 };
 #define min_fcb_lc sizeof(struct fcb)
 
