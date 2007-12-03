@@ -71,19 +71,13 @@ bool indri::parse::TaggedDocumentIterator::_readLine( char*& beginLine, size_t& 
   lineLength = 0;
   size_t actual;
 
-  // if the buffer gets bigger than 100M, we probably aren't reading
-  // what we ought to be.
-  if( _buffer.size() > 1024*1024*100 ) {
-      LEMUR_THROW( LEMUR_IO_ERROR, "TaggedDocumentIterator::_readLine: buffer too large (> 100M). Check corpus.class.");
-  }
-
   // make a buffer of a reasonable size so we're not always allocating
   if( _buffer.size() < 1024*1024 )
     _buffer.grow( 1024*1024 );
-
-  if( _buffer.size()/2 < _buffer.position() )
-    _buffer.grow( 2*_buffer.size() );
-
+  // if we're running out of room, add 25MB
+  if( (_buffer.size() -  _buffer.position()) < 512*1024 ) {
+    _buffer.grow( _buffer.size() + 1024*1024*25 );
+  }
   if( _buffer.position() ) {
     // get rid of null terminator from previous call
     _buffer.unwrite(1);
