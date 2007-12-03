@@ -201,12 +201,14 @@ void indri::query::RelevanceModel::_scoreGrams() {
 
       // determine the score for this term
       if( function != 0 ) {
-        termScore = function->scoreOccurrence( occurrences, contextLength );
+        // log probability here
+        termScore = exp(function->scoreOccurrence( occurrences, contextLength ));
       } else {
         termScore = occurrences / double(contextLength);
       }
-
-      gramScore += documentScore * termScore;
+      //RMExpander weights this by 1/fbDocs
+      //      gramScore += documentScore * termScore;
+      gramScore += (1.0/_documents) * documentScore * termScore;
     }
 
     gram->weight = gramScore;
@@ -238,6 +240,25 @@ void indri::query::RelevanceModel::generate( const std::string& query ) {
   try {
     // run the query, get the document vectors
     _results = _environment.runQuery( query, _documents );
+    _grams.clear();
+    _extractDocuments();
+    _vectors = _environment.documentVectors( _documentIDs );
+
+    _countGrams();
+    _scoreGrams();
+    _sortGrams();
+  } catch( lemur::api::Exception& e ) {
+    LEMUR_RETHROW( e, "Couldn't generate relevance model for '" + query + "' because: " );
+  }
+}
+
+//
+// generate
+//
+
+void indri::query::RelevanceModel::generate( const std::string& query, const std::vector<indri::api::ScoredExtentResult>& results  ) {
+  try {
+    _results = results;
     _grams.clear();
     _extractDocuments();
     _vectors = _environment.documentVectors( _documentIDs );

@@ -15,10 +15,11 @@
 // 18 Aug 2004 -- dam
 //
 
-#include "indri/RMExpander.hpp"
 #include <math.h>
 #include <stdio.h>
 #include <sstream>
+#include "indri/RMExpander.hpp"
+#include "indri/RelevanceModel.hpp"
 
 indri::query::RMExpander::RMExpander( indri::api::QueryEnvironment * env , indri::api::Parameters& param ) : indri::query::QueryExpander( env, param ) { }
 
@@ -28,48 +29,46 @@ std::string indri::query::RMExpander::expand( std::string originalQuery , std::v
   double fbOrigWt = _param.get( "fbOrigWeight", 0.5 );
   double mu = _param.get( "fbMu", 0 );
 
-  std::vector<indri::api::DocumentVector*> docVectors = getDocumentVectors( results, fbDocs );
-  std::vector<std::string> * rm_vocab = getVocabulary( docVectors );
-  size_t vocabSize = rm_vocab->size();
-  UINT64 colLen = _env->termCount();
+  std::string rmSmoothing = "";
+  if (mu != 0) // specify dirichlet smoothing
+    rmSmoothing = "dirichlet:" + _param.get( "fbMu");
 
-  std::map<std::string, double> query_model;
+  // this should be a parameter, have to change the generation to
+  // account for phrases then.
+  int maxGrams = 1;
+  
+  indri::query::RelevanceModel rm(*_env, rmSmoothing, maxGrams, fbDocs);
+  rm.generate( originalQuery, results );
+
+  const std::vector<indri::query::RelevanceModel::Gram*>& grams = rm.getGrams();
   std::vector< std::pair<std::string, double> > probs;
-
-  // gather document vectors / statistics for top fbDocs ranked documents
-  for( size_t doc = 0; int(doc) < fbDocs; doc++ ) {
-    if( doc >= results.size() ) break;
-    //std::cerr << "Expanding document " << doc << ", score = " << results[ doc ].score << std::endl;
-
-    indri::api::DocumentVector * docVec = docVectors[ doc ];
-    std::vector<int> term_positions = docVec->positions();
-    std::vector<std::string> term_list = docVec->stems();
-
-    size_t docLen = term_positions.size();
-
-    // add in "seen" proportion of term probability
-    std::vector<int>::iterator pos_iter;
-    for( pos_iter = term_positions.begin() ; pos_iter != term_positions.end() ; ++pos_iter )
-      query_model[ term_list[ *pos_iter ] ] += ( 1.0 / fbDocs ) * exp( results[ doc ].score ) / ( docLen + mu );
-
-    // add in "unseen" proportion of term probability
-    if( mu != 0.0 ) {
-      std::vector<std::string>::iterator vocab_iter;
-      for( vocab_iter = rm_vocab->begin() ; vocab_iter != rm_vocab->end() ; ++vocab_iter )
-        query_model[ *vocab_iter ] += ( 1.0 / fbDocs ) * exp( results[ doc ].score ) * ( mu * double( getCF( *vocab_iter ) )/double(colLen) ) / ( docLen + mu );
-    }
-    
-    delete docVec;
+  // sorted grams came from rm
+  for( size_t j=0; j<grams.size(); j++ ) {
+    double w = grams[j]->weight;
+    // multi terms need to be handled if maxGrams becomes a parameter
+    std::string &term = grams[j]->terms[0]; 
+    probs.push_back( std::pair<std::string, double>( term, w ) );    
   }
-
-  // sort terms based on P( w | \theta_Q )
-  std::vector<std::string>::iterator vocab_iter;
-  for( vocab_iter = rm_vocab->begin() ; vocab_iter != rm_vocab->end() ; ++vocab_iter )
-    probs.push_back( std::pair<std::string, double>( *vocab_iter , query_model[ *vocab_iter ] ) );    
-
-  std::sort( probs.begin() , probs.end() , QueryExpanderSort() );
-  delete rm_vocab;
-
+  std::string expQuery;
+  
+  // if this was an extent restricted query, move the restriction outside
+  // the expansion.
+  // For field restrictions, it could be left nested, FixedPassageNode
+  // restrictions can not be nested in the query.
+  int openBrace = originalQuery.find('[');
+  if ( openBrace != std::string::npos) {
+    int closeBrace = originalQuery.find(']');
+    int firstParen = originalQuery.find('('); // must be one if '['
+    if ( openBrace < firstParen ) {
+      std::string qCopy = originalQuery;
+      // get the restriction
+      std::string restrict = originalQuery.substr(openBrace+1, 
+                                                  closeBrace-openBrace-1);
+      // remove the inner restriction
+      qCopy.erase(openBrace, closeBrace-openBrace+1);
+      expQuery = buildQuery( qCopy, fbOrigWt, probs, fbTerms );
+      return "#combine[" + restrict + "]( " + expQuery + " )";
+    }
+  }
   return buildQuery( originalQuery, fbOrigWt, probs, fbTerms );
 }
-
