@@ -178,7 +178,12 @@ const indri::utility::greedy_vector<bool>& indri::infnet::FixedPassageNode::hasM
     assert( _subextents[i].end <= extents[j].end );
 
     if( childMatches[i] ) {
-      _matches[i] = true;
+      _matches[j] = true; 
+      // one match is sufficient, advance extents
+      j++;
+    } else {
+      // it will never match, advance _subextents
+      i++;
     }
   }
 
