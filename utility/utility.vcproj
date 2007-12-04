@@ -129,6 +129,9 @@
 				RelativePath=".\src\FileTreeIterator.cpp">
 			</File>
 			<File
+				RelativePath=".\src\fn_f.c">
+			</File>
+			<File
 				RelativePath=".\src\IndriFile.cpp">
 			</File>
 			<File
@@ -278,10 +281,10 @@
 				RelativePath=".\include\indri\Extent.hpp">
 			</File>
 			<File
-				RelativePath=".\include\File.hpp">
+				RelativePath=".\include\indri\File.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\File.hpp">
+				RelativePath=".\include\File.hpp">
 			</File>
 			<File
 				RelativePath=".\include\fileio.h">
@@ -333,6 +336,9 @@
 			</File>
 			<File
 				RelativePath=".\include\keyref.h">
+			</File>
+			<File
+				RelativePath=".\include\kf6ref.h">
 			</File>
 			<File
 				RelativePath=".\include\lemur-compat.hpp">
