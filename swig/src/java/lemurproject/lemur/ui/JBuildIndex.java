@@ -1,7 +1,12 @@
 package lemurproject.lemur.ui;
 
-import javax.swing.JTextArea;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Vector;
 
+import javax.swing.JTextArea;
+import lemurproject.indri.*;
 
 public class JBuildIndex extends Thread {
     static {
@@ -11,17 +16,23 @@ public class JBuildIndex extends Thread {
     private JTextArea messages;
     private String param;
     private LemurIndexGUI parent;
+    private boolean _useIndriBuilder;
 
     public JBuildIndex(LemurIndexGUI gui, JTextArea mesgarea) 
     {
         messages = mesgarea;
         param = "";
         parent = gui;
+        _useIndriBuilder=false;
     }
 
     public void setParam(String pfile) 
     {
         param = pfile;
+    }
+    
+    public void useIndriBuilder(boolean isIndriIndex) {
+    	_useIndriBuilder=isIndriIndex;
     }
 
     public void run() {
@@ -36,8 +47,12 @@ public class JBuildIndex extends Thread {
                 //System.out.println(ex);
                 // ignore
             } try {
-                this.buildIndex(param);			
-                parent.buildDone();
+            	if (_useIndriBuilder) {
+                    parent.buildFailed();
+            	} else {
+            		this.buildIndex(param);			
+            		parent.buildDone();
+            	}
             } catch (Exception e) {
                 displayMessage("ERROR WHILE BUILDING: \n" + e.toString());
                 parent.buildFailed();
@@ -57,7 +72,7 @@ public class JBuildIndex extends Thread {
             {
             }
     }
-
+    
     public native void buildIndex(String paramsfile);
 
 }

@@ -18,8 +18,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import java.util.prefs.Preferences;
+//import java.util.prefs.Preferences;
 
+import lemurproject.indri.IndexEnvironment;
+import lemurproject.indri.IndexStatus;
+import lemurproject.indri.Specification;
+import lemurproject.indri.IndexStatus.action_code;
 import lemurproject.lemur.*;
 
 /**
@@ -31,10 +35,12 @@ import lemurproject.lemur.*;
  *  incremental indexing,additional error checks
  *  
  *  mjh - 5/26/06 - modified various defaults, HCI issues
+ *  
+ *  mjh - 11/21/07 - Added indri indexing and field support
  */
 
 public class LemurIndexGUI extends JPanel implements ActionListener,
-                                                     ItemListener, CaretListener
+                                                     ItemListener, CaretListener, TableModelListener
 {
     private final static String SLASH = System.getProperty("file.separator");
     private final static String DMNAME = "dm";
@@ -93,7 +99,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
     private final static String [] lims =
     {
         "  64 MB", "  96 MB", " 128 MB",
-        " 256 MB", " 512 MB", "1024 MB"};
+        " 256 MB", " 512 MB", "768 MB", "1024 MB"};
     /** Lemur stemmer types */
     private final static String[] sTypes = {"Krovetz", "Porter"};
     /** Arabic stemmer functions */
@@ -113,8 +119,9 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
     private ImageIcon lemurIcon;
     /** About the indexer. */
     private final static String aboutText = "Lemur Indexer UI 1.0\n" +
-        "Copyright (c) 2004 University of Massachusetts\n" +
-        "http://www.lemurproject.org";
+        "Copyright (c) 2004-2007 The Lemur Project\n" +
+        "University of Massachusetts and Carnegie Mellon University\n" +
+        "http://www.lemurproject.org/";
     /** Index build parameter file name */
     private String paramFileName;
     /** Index build dataFiles parameter file name */
@@ -126,7 +133,22 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
 
     /** Frame for help window */
     private JFrame helpFrame, parent;
+    
+    /** Fields and Metadata items */
+    private JPanel indexFieldPanel;
+    private JTable fieldTable;
+    private FieldTableModel fieldTableModel;
+    private JButton btnAddField;
+    private JButton btnRemoveField;
+    private JTable offsetAnnotationFileTable;
+    private OffsetAnnotationTableModel offsetAnnotationFilesTableModel;
+    private JTextField txtMetadataFields;
+    private JTextField txtPathToHarvestLinks;
+    private JButton btnHarvestLinks;
 
+    private static String[] fieldColumnTooltips={"The field name to index", "Is the field numeric?"};
+    private static String[] annotationsColumnTooltips={"The datafile for the annotations", "The path to the annotation file(s)"};
+    
     /** Get the ball rolling. */
     public LemurIndexGUI (JFrame f)
     {
@@ -143,7 +165,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         JPanel panel1 = makePanel("Index");
         panel1.setPreferredSize(new Dimension(600,150));
         indexTypeBox = new JComboBox(indTypes);
-        indexTypeBox.setSelectedIndex(0);
+        indexTypeBox.setSelectedIndex(1);
         indexTypeBox.setToolTipText("Select the index type");
         indexTypeBox.addActionListener(this);
         browse = new JButton("Browse...");
@@ -247,7 +269,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         memoryLim.setToolTipText("How much memory to use while indexing. " +
                                  "A rule of thumb is no more than 3/4 of " +
                                  "your physical memory");
-        memoryLim.setSelectedIndex(2); // 128 MB
+        memoryLim.setSelectedIndex(4); // 512 MB
 
         languageBox = new JComboBox(languages);
         languageBox.addActionListener(this);
@@ -264,6 +286,130 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         bigpanel.add(p3);
         tabbedPane.addTab("Build Options", icon, bigpanel, "Index Options");
 
+        
+        // begin index field / metadata tab
+        indexFieldPanel=makePanel("Fields / Metadata");
+        indexFieldPanel.setLayout(new java.awt.GridBagLayout());
+        
+        java.awt.GridBagConstraints gbc=new java.awt.GridBagConstraints();
+
+        // fields table
+        JPanel fieldsPanel=makePanel("Fields");
+        fieldsPanel.setLayout(new java.awt.BorderLayout());
+        fieldTableModel=new lemurproject.lemur.ui.FieldTableModel();
+        fieldTable=new JTable(fieldTableModel) {
+        protected javax.swing.table.JTableHeader createDefaultTableHeader() {
+            return new javax.swing.table.JTableHeader(columnModel) {
+              public String getToolTipText(java.awt.event.MouseEvent e) {
+                String tip=null;
+                java.awt.Point p=e.getPoint();
+                int index=columnModel.getColumnIndexAtX(p.x);
+                int realIndex=columnModel.getColumn(index).getModelIndex();
+                return fieldColumnTooltips[realIndex];
+              }
+            };
+          }
+        };
+  
+        fieldTable.getModel().addTableModelListener(this);
+        fieldTable.getColumnModel().setColumnSelectionAllowed(false);
+        fieldTable.setPreferredScrollableViewportSize(new Dimension(fieldTable.getPreferredScrollableViewportSize().width, 100));
+        JScrollPane fieldTableScroll=new JScrollPane(fieldTable);
+        fieldsPanel.add(fieldTableScroll, java.awt.BorderLayout.CENTER);
+
+        JPanel fieldButtonPanel=new JPanel();
+        btnAddField=new JButton("Add Field");
+        btnAddField.setToolTipText("Adds a new (blank) field for indexing");
+        btnAddField.addActionListener(this);
+        fieldButtonPanel.add(btnAddField);
+        btnRemoveField=new JButton("Remove Field");
+        btnRemoveField.setToolTipText("Removes the currently selected field item");
+        btnRemoveField.addActionListener(this);
+        fieldButtonPanel.add(btnRemoveField);
+        fieldsPanel.add(fieldButtonPanel, java.awt.BorderLayout.SOUTH);
+
+        //addLabeledRow(indexFieldPanel, pad, "Fields: ",fieldsPanel);
+        gbc.fill=GridBagConstraints.BOTH;
+        gbc.gridx=0; gbc.gridy=0;
+        indexFieldPanel.add(fieldsPanel, gbc);
+
+        // offset annotation files table
+        JPanel offsetAnnotationFilePanel=makePanel("Offset Annotation Files");
+        offsetAnnotationFilePanel.setLayout(new java.awt.BorderLayout());
+        offsetAnnotationFilesTableModel=new lemurproject.lemur.ui.OffsetAnnotationTableModel();
+        offsetAnnotationFileTable=new JTable(offsetAnnotationFilesTableModel) {
+        protected javax.swing.table.JTableHeader createDefaultTableHeader() {
+            return new javax.swing.table.JTableHeader(columnModel) {
+              public String getToolTipText(java.awt.event.MouseEvent e) {
+                String tip=null;
+                java.awt.Point p=e.getPoint();
+                int index=columnModel.getColumnIndexAtX(p.x);
+                int realIndex=columnModel.getColumn(index).getModelIndex();
+                return annotationsColumnTooltips[realIndex];
+              }
+            };
+          }
+        };
+        offsetAnnotationFileTable.getModel().addTableModelListener(this);
+        javax.swing.table.TableColumn offsetFileColumn=offsetAnnotationFileTable.getColumnModel().getColumn(1);
+        offsetFileColumn.setCellEditor(new lemurproject.lemur.ui.OffsetAnnotationFileCellEditor());
+        offsetAnnotationFileTable.getColumnModel().setColumnSelectionAllowed(false);
+        offsetAnnotationFileTable.setPreferredScrollableViewportSize(new Dimension(offsetAnnotationFileTable.getPreferredScrollableViewportSize().width, 100));
+        JScrollPane offsetFileTableScroll=new JScrollPane(offsetAnnotationFileTable);
+        offsetAnnotationFilePanel.add(offsetFileTableScroll, java.awt.BorderLayout.CENTER);
+
+        //gbc.fill=GridBagConstraints.BOTH;
+        //gbc.gridx=0; gbc.gridy=1;
+        //indexFieldPanel.add(offsetAnnotationFilePanel, gbc);
+        //addLabeledRow(indexFieldPanel, pad, "Annotation Files: ",offsetAnnotationFilePanel);
+        gbc.fill=GridBagConstraints.BOTH;
+        gbc.gridx=0; gbc.gridy=1;
+        indexFieldPanel.add(offsetAnnotationFilePanel, gbc);
+        
+        JPanel metadataPanel=makePanel("Metadata");
+        metadataPanel.setLayout(new java.awt.BorderLayout());
+        JLabel lblMetadata=new JLabel("Metadata Fields:");
+        metadataPanel.add(lblMetadata, java.awt.BorderLayout.WEST);
+        txtMetadataFields=new JTextField();
+        txtMetadataFields.setToolTipText("A comma-delimited list of metadata fields to add to the index");
+        metadataPanel.add(txtMetadataFields, java.awt.BorderLayout.CENTER);
+        //indexFieldPanel.add(metadataPanel);
+        gbc.fill=GridBagConstraints.BOTH;
+        gbc.gridx=0; gbc.gridy=2;
+        indexFieldPanel.add(metadataPanel, gbc);
+        
+        JPanel pnlHarvestLinks=makePanel("Anchor Text Links");
+        pnlHarvestLinks.setLayout(new java.awt.BorderLayout());
+        JLabel lblHarvestLinks=new JLabel("Path to Anchor Text:");
+        pnlHarvestLinks.add(lblHarvestLinks, java.awt.BorderLayout.WEST);
+        txtPathToHarvestLinks=new JTextField();
+        txtPathToHarvestLinks.setToolTipText("<html><i>(optional)</i> Path to the sorted output<br>" +
+                "from the HarvestLinks program to<br>" +
+                "include anchor text links (trecweb only)<br>" + 
+                "<i>(leave blank for none)</i></html>"
+                );
+        pnlHarvestLinks.add(txtPathToHarvestLinks, java.awt.BorderLayout.CENTER);
+        btnHarvestLinks=new JButton("Browse");
+        btnHarvestLinks.addActionListener(this);
+        pnlHarvestLinks.add(btnHarvestLinks, java.awt.BorderLayout.EAST);
+        gbc.fill=GridBagConstraints.BOTH;
+        gbc.gridx=0; gbc.gridy=3;
+        indexFieldPanel.add(pnlHarvestLinks, gbc);
+        
+        
+        //makeCompactGrid(indexFieldPanel, 3, 1, 3, 3, 3, 3);
+
+        // and, resize the offset annotation columns to ensure we get a horiz. scrollbar.
+        int columnPrefWidth=(offsetAnnotationFileTable.getPreferredScrollableViewportSize().width / 2);
+        for (int i=0; i < offsetAnnotationFileTable.getColumnCount(); i++) {
+          javax.swing.table.TableColumn thisColumn=offsetAnnotationFileTable.getColumnModel().getColumn(i);
+          thisColumn.setPreferredWidth(columnPrefWidth);
+          thisColumn.setWidth(columnPrefWidth);
+        }
+        offsetAnnotationFileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        
+        tabbedPane.addTab("Fields / Metadata", indexFieldPanel);
+        
         JPanel panel2 = makePanel("Term Processing");
         spring = (SpringLayout)panel2.getLayout();
         doStop = new JCheckBox("Omit stopwords");
@@ -364,6 +510,8 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         add(tabbedPane, BorderLayout.NORTH);
         add(buttons, BorderLayout.CENTER);
         add(status, BorderLayout.SOUTH);
+        
+        setIndexTypeSupported(false);
 
         builder = new JBuildIndex(this, messages);
         builder.start();
@@ -560,7 +708,44 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
             }
     }
 
-    //Listeners
+    // sets various UI options based on the index type
+    // note - supported=true -> keyFile ; supported=false -> Indri
+    private void setIndexTypeSupported(boolean supported) {
+        doAcro.setEnabled(supported);
+        if (!supported)
+            {
+                doAcro.setSelected(false);
+                doDM.setSelected(false);
+            }
+        acroList.setEnabled(supported);
+        acroBrowse.setEnabled(supported);
+
+        doDM.setEnabled(supported);
+        dmTypeBox.setEnabled(supported);
+        
+        // Indri-style index?
+        if (!supported) {
+        	// fill in the offset annotation table items
+        	java.util.Vector datafileNames=new java.util.Vector();
+            Enumeration e = cfModel.elements();
+            while (e.hasMoreElements()) {
+                datafileNames.add((String) e.nextElement());
+            }
+            offsetAnnotationFilesTableModel.setFileNames(datafileNames);
+            txtPathToHarvestLinks.setEnabled(false);
+            if (docFormat.getSelectedItem().equals("web")) {
+              txtPathToHarvestLinks.setEnabled(true);
+            }
+        }
+        
+        tabbedPane.setEnabledAt(1, !supported);
+    }
+    
+    //================================
+    //================================
+    //   Listeners
+    //================================
+    //================================
     /** Omnibus for responding to user actions. */
     public void actionPerformed(ActionEvent e)
     {
@@ -613,8 +798,14 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                     {
                         File [] files = fc.getSelectedFiles();
-                        for (int i = 0; i < files.length; i++)
-                            cfModel.addElement(files[i].getAbsolutePath());
+                        for (int i = 0; i < files.length; i++) {
+                        	String thisPath=files[i].getAbsolutePath();
+                            cfModel.addElement(thisPath);
+                            // if it's an indri index - add it to the offset annotation pathnames
+                            if (indexTypeBox.getSelectedItem().equals("LemurIndriIndex")) {
+                            	offsetAnnotationFilesTableModel.addFilename(thisPath);
+                            }
+                        }
                     }
                 fc.setMultiSelectionEnabled(false);
                 fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -643,19 +834,20 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         else if (source == indexTypeBox)
             {
                 String type = (String)indexTypeBox.getSelectedItem();
-                boolean supported = !type.equals("LemurIndriIndex");
-                doAcro.setEnabled(supported);
-                if (!supported)
-                    {
-                        doAcro.setSelected(false);
-                        doDM.setSelected(false);
-                    }
-                acroList.setEnabled(supported);
-                acroBrowse.setEnabled(supported);
-
-                doDM.setEnabled(supported);
-                dmTypeBox.setEnabled(supported);
+                setIndexTypeSupported(!type.equals("LemurIndriIndex"));
             }
+        else if (source ==  docFormat) 
+        {
+          if (docFormat.getSelectedItem().equals("web")) {
+            if (indexTypeBox.getSelectedItem().equals("LemurIndriIndex")) {
+             txtPathToHarvestLinks.setEnabled(true);
+            } else {
+               txtPathToHarvestLinks.setEnabled(false);
+            }
+          } else {
+            txtPathToHarvestLinks.setEnabled(false);
+          }
+        }
         else if (source == languageBox)
             {
                 String lang = (String)languageBox.getSelectedItem();
@@ -708,13 +900,18 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                         return;
                     }
                 // flip to status tab
-                tabbedPane.setSelectedIndex(2);
+                tabbedPane.setSelectedIndex(3);
                 // start a new thread to run in so messages will be updated.
                 Runnable r = new Runnable()
                     {
                         public void run()
                         {
-                            buildIndex();
+                            boolean isIndriIndex = ((String)indexTypeBox.getSelectedItem()).equals("LemurIndriIndex");
+                            if (isIndriIndex) {
+                            	buildIndriIndex();
+                            } else {
+                            	buildIndex();
+                            }
                             ensureMessagesVisible();
                         }
                     };
@@ -735,6 +932,10 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                 for (int i = 0; i < selected.length; i++)
                     {
                         cfModel.removeElement(selected[i]);
+                        // remove any from field / offset annotation list
+                        if (indexTypeBox.getSelectedItem().equals("LemurIndriIndex") && (offsetAnnotationFilesTableModel.containsFilename((String)selected[i]))) {
+                        	offsetAnnotationFilesTableModel.removeFilename((String)selected[i]);
+                        }                        
                     }
             }
         else if (source == fOpen)
@@ -773,6 +974,45 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                 abtDialog.setSize(new Dimension(300,400));
                 abtDialog.show();
             }
+        else if (source == btnAddField) 
+        {
+        	// add a field item
+        	fieldTableModel.addNewField();
+        } 
+        else if (source==btnRemoveField) 
+        {
+        	int selectedRow=fieldTable.getSelectedRow();
+        	if (selectedRow > -1) {
+	        	fieldTableModel.removeField(selectedRow);
+        	}
+        }
+        else if (source == btnHarvestLinks) 
+        {
+          if (docFormat.getSelectedItem().equals("web")) {
+            JFileChooser fileChooser=new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+            fileChooser.setMultiSelectionEnabled(false);
+            int retVal=fileChooser.showOpenDialog(this);
+            if (retVal==JFileChooser.APPROVE_OPTION) {
+              java.io.File selectedFile=fileChooser.getSelectedFile();
+              String fullPath=selectedFile.getAbsolutePath();
+
+              // if user double clicked a directory to select,
+              // we get the directory name as the selected file
+              // in the intended directory.
+              // so check that the file exists and is a directory.
+              // if not, try the parent directory.
+              if (!selectedFile.exists()) {
+                java.io.File parentFile=selectedFile.getParentFile();
+                if (parentFile!=null) {
+                  fullPath=parentFile.getAbsolutePath();
+                }
+              } // end if (!selectedFile.exists())
+              txtPathToHarvestLinks.setText(fullPath);
+            } // end if (retVal==JFileChooser.APPROVE_OPTION)
+          }
+        }
+        
         // at least one datafile and a name entered.
         boolean enabled = (cfModel.getSize() > 0 &&
                            iname.getText().length() > 0);
@@ -780,6 +1020,18 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         // fSave.setEnabled(enabled);
     }
 
+    /** Listens for table model changes */
+	public void tableChanged(TableModelEvent e) {
+		if (e.getSource()==offsetAnnotationFilesTableModel) 
+		{
+			// offset annotations table changes
+		}
+		else if (e.getSource()==fieldTableModel) 
+		{
+			// fields table
+		}
+	}
+    
     /** Listens to the check boxes. */
     public void itemStateChanged(ItemEvent e)
     {
@@ -1174,6 +1426,9 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                 bl.interrupt();
                 return; // bail
             }
+        
+        String indexType = (String)indexTypeBox.getSelectedItem();
+      	builder.useIndriBuilder(indexType.equals("LemurIndriIndex"));
         builder.setParam(paramFileName);
         synchronized(builder)
             {
@@ -1591,4 +1846,394 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
             }
         }
     }
+    
+    /** helper functions for indri build index */
+    private long encodeIndriMem() {
+    	String s = ((String)memoryLim.getSelectedItem()).trim();
+    	int space = s.indexOf(' ');
+    	s = s.substring(0, space) + "000000";
+    	long retval = 0;
+    	try {
+    	    retval = Long.parseLong(s);
+    	} catch (Exception e) {
+    	}
+    	return retval;
+        }
+    
+    /** Create the datafiles list of strings.
+	@return The list of files
+    */
+    
+    private Vector dataFilesOffsetFiles=null;
+    
+    private String[] formatDataFiles() {
+		// handle directories, recursion, filename patterns	
+		Vector accumulator = new Vector();
+		String [] retval = new String[0];
+		
+		// vector for listing any offset annotation files for the items
+		dataFilesOffsetFiles=new Vector();
+			
+		FileFilter filt = null;
+		final String regexp = filterString.getText();
+		if (regexp.length() > 0) {
+		    final String filtString = encodeRegexp(regexp);
+		    filt = new FileFilter() {
+			    public boolean accept(File thisfile) {
+				String name = thisfile.getName();
+				return (thisfile.isDirectory() ||
+					name.matches(filtString));
+			    }
+			};
+		}
+    
+		Enumeration e = cfModel.elements();
+	    HashMap offsetFiles=offsetAnnotationFilesTableModel.getAllValues();
+		
+		while (e.hasMoreElements()) {
+		    String s = (String) e.nextElement();
+		    
+		    String thisOffsetFile="";
+		    if (offsetFiles.containsKey(s)) {
+		    	thisOffsetFile=(String)offsetFiles.get(s);
+		    }
+		    
+		    File file = new File(s);
+		    formatDataFiles(file, filt, accumulator, thisOffsetFile);		
+		}
+		retval = (String[]) accumulator.toArray(retval);
+		return retval;
+    }
+
+    /** Accumulate filenames for the input list.
+	If the File is a directory, iterate over all of the files
+	in that directory that satisfy the filter. If recurse into
+	subdirectories is selected and the File is a directory, 
+	invoke recursivly on on all directories within the directory.
+	@param accum Vector to accumulate file names recusively.
+	@param file a File (either a file or directory)
+	@param f the filename filter to apply.
+    */
+	
+    private void formatDataFiles(File file, FileFilter f, Vector accum, String offsetFile) {
+		if (file.isDirectory()) {
+		    // handle directory
+		    File [] files = file.listFiles(f);
+		    for (int i = 0; i < files.length; i++) {
+				if (files[i].isDirectory()) {
+				    if (doRecurse.isSelected()) {
+				    	formatDataFiles(files[i], f, accum, offsetFile);
+				    }
+				} else {
+				    accum.add(files[i].getAbsolutePath());
+					if (dataFilesOffsetFiles!=null) {
+						dataFilesOffsetFiles.add(offsetFile);					
+					}
+				}
+		    }
+		} else {
+		    accum.add(file.getAbsolutePath());
+			if (dataFilesOffsetFiles!=null) {
+				dataFilesOffsetFiles.add(offsetFile);					
+			}
+		}
+    }
+    
+    
+    /** Ask the IndexEnvironment to add the files.*/
+    private void buildIndriIndex() {
+        Cursor wait = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
+        Cursor def = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+        setCursor(wait);
+        messages.setCursor(wait);
+        // if iname is not an absolute path, rewrite it to be so.
+        File idx = new File(iname.getText());
+        iname.setText(idx.getAbsolutePath());
+        messages.append("Building " + iname.getText() + "...\n"); 
+        status.setText("Building " + iname.getText() + "..."); 
+        bl = blinker(status.getText(), 
+                            "Finished building " + iname.getText());
+        // construct IndexEnvironment
+        // set parameters
+        // go.
+        IndexEnvironment env = new IndexEnvironment();
+        IndexStatus stat = new UIIndexStatus();
+        int totalDocumentsIndexed=0;
+        try {
+
+          // memory
+          env.setMemory(encodeIndriMem());
+
+          //String [] fields = indFields.getText().split(",");;
+          // set the field definitions from the table
+          java.util.Vector fieldVec=new java.util.Vector();
+          java.util.Vector numericFields=new java.util.Vector();
+          int numFields=fieldTable.getModel().getRowCount();
+          for (int f=0; f < numFields; f++) {
+                  String thisFieldName=((String)fieldTable.getModel().getValueAt(f, 0)).trim();
+                  Boolean thisFieldNumeric=(Boolean)fieldTable.getModel().getValueAt(f, 1);
+                  if ((thisFieldName.length() > 0) && (!fieldVec.contains(thisFieldName))) {
+                          fieldVec.add(thisFieldName);
+                          if (thisFieldNumeric.booleanValue()) {
+                                  numericFields.add(thisFieldName);
+                          }
+                  }
+          }
+
+          String[] fields=new String[fieldVec.size()];
+          for (int f=0; f < fieldVec.size(); f++) {
+                  fields[f]=(String)fieldVec.get(f);
+          }
+          env.setIndexedFields(fields);
+
+          // now, if there's any numeric fields, we need to set those...
+          for (int f=0; f < numericFields.size(); f++) {
+                  String thisNumericField=(String)numericFields.get(f);
+                  env.setNumericField(thisNumericField, true);
+          }
+
+          String [] metafields = txtMetadataFields.getText().split(",");
+          for (int i=0; i < metafields.length; i++) {
+            metafields[i]=metafields[i].trim();
+          }
+
+          // TODO: 
+          // this needs to address the forward/backward/metadata distinction.
+          env.setMetadataIndexedFields(metafields, metafields);	
+
+          if (doStop.isSelected()) {
+            String stops = stopwordlist.getText();
+            if (! stops.equals("")) {
+                // load the stopwords into an array.
+                String [] stopwordArray = new String[0];
+                Vector tmp = new Vector();
+                try {
+                    BufferedReader buf = new BufferedReader(new FileReader(stops));
+                    String line;
+                    while((line = buf.readLine()) != null) {
+                        tmp.add(line.trim());
+                    }
+                    buf.close();
+                } catch (IOException ex) {
+                    // unlikely.
+                    showException(ex);
+                }
+                stopwordArray = (String[]) tmp.toArray(stopwordArray);
+                env.setStopwords(stopwordArray);
+            }
+          }
+
+          if (doStem.isSelected()) {
+              String stemmer = (String)stemmers.getSelectedItem();
+              env.setStemmer(stemmer);
+          }
+          // add an empty string option
+          String fileClass = (String)docFormat.getSelectedItem();
+          // augment the environment as required
+          // transform the selected file class into ones Indri can understand
+          if (fileClass.equals("trec")) {
+            fileClass="trectext";
+          } else if (fileClass.equals("web")) {
+            fileClass="trecweb";
+          } else if (fileClass.equals("reuters")) {
+            fileClass="trectext";
+          }
+          Specification spec = env.getFileClassSpec(fileClass);
+          java.util.Vector vec = new java.util.Vector();
+          java.util.Vector incs = null;
+          if (spec.include.length > 0)
+              incs = new java.util.Vector();
+
+          for (int i = 0; i < spec.index.length; i++)
+              vec.add(spec.index[i]);
+
+          // indexed fields
+          for (int i = 0; i < fields.length; i++) {
+              if (vec.indexOf(fields[i]) == -1)
+                  vec.add(fields[i]);
+              // add to include tags only if there were some already.
+              if (incs != null && incs.indexOf(fields[i]) == -1)
+                  incs.add(fields[i]);
+          }
+
+          if (vec.size() > spec.index.length) {
+              // we added something.
+              spec.index = new String[vec.size()];
+              vec.copyInto(spec.index);
+          }
+          /* FIXME: forward/backward and plain metadata have to address the
+             issue of inserting entries for all names that conflate to a given
+             name.
+           */
+          
+          // metadata fields.
+          vec.clear();
+          for (int i = 0; i < spec.metadata.length; i++)
+              vec.add(spec.metadata[i]);
+          for (int i = 0; i < metafields.length; i++) {	    
+              if (vec.indexOf(metafields[i]) == -1)
+                  vec.add(metafields[i]);
+              // add to include tags only if there were some already.
+              if (incs != null && incs.indexOf(metafields[i]) == -1)
+                  incs.add(metafields[i]);
+          }
+
+          if (vec.size() > spec.metadata.length) {
+              // we added something.
+              spec.metadata = new String[vec.size()];
+              vec.copyInto(spec.metadata);
+          }
+          
+          // update include if needed.
+          if (incs != null && incs.size() > spec.include.length) {
+              spec.include = new String[incs.size()];
+              incs.copyInto(spec.include);
+          }
+
+          // update the environment.
+          env.addFileClass(spec);
+          
+          if (fileClass.equals("trecweb")) {
+            String pathHarvestLinks=txtPathToHarvestLinks.getText().trim();
+            if (pathHarvestLinks.length() > 0) {
+              env.setAnchorTextPath(pathHarvestLinks);
+            }
+          }
+
+          String [] datafiles = formatDataFiles();
+          String [] dummyStringArray=new String[0];
+          String [] offsetFiles=(String[])dataFilesOffsetFiles.toArray(dummyStringArray);
+
+          // create a new empty index (after parameters have been set).
+          //if (appendIndex)
+          //    env.open(iname.getText(), stat);
+          //else 
+           env.create(iname.getText(), stat);
+
+          // don't let 'em quit easy while it is running.
+          fQuit.setEnabled(false);
+          stop.setEnabled(false);
+          // do the building.
+          for (int i = 0; i < datafiles.length; i++){
+              String fname = datafiles[i];
+
+              // if the fileClass is null, use 
+              // env.addFile(fname);
+
+              // is there an offsetAnnotation file for this?
+              if ((offsetFiles.length > i) && (offsetFiles[i].length() > 0)) {
+                  env.setOffsetAnnotationsPath(offsetFiles[i]);
+              }
+
+              env.addFile(fname, fileClass);
+              totalDocumentsIndexed=env.documentsIndexed();
+              ensureMessagesVisible();
+          }
+          env.close();
+        } catch (Exception e) {
+          // a lemur exception was tossed.
+          messages.append("ERROR building " + iname.getText() + "\n" + e + "\n");
+        }
+        
+        // now they can quit.
+        fQuit.setEnabled(true);
+        stop.setEnabled(true);
+        blinking = false;
+        bl.interrupt();
+        setCursor(def);
+        messages.setCursor(def);
+        status.setText("Finished building " + iname.getText());
+        messages.append("Finished building " + iname.getText() + "\n");
+        messages.append("Total Documents Indexed: " + totalDocumentsIndexed + "\n\n");
+        ensureMessagesVisible();
+    }
+    
+    class UIIndexStatus extends IndexStatus {
+    	
+      public void status(int code, String documentFile, String error, 
+    			   int documentsIndexed, int documentsSeen) {
+              if (code == action_code.FileOpen.swigValue()) {
+            messages.append("Documents: " + documentsIndexed + "\n");
+            messages.append("Opened " + documentFile + "\n");
+              } else if (code == action_code.FileSkip.swigValue()) {
+            messages.append("Skipped " + documentFile + "\n");
+              } else if (code == action_code.FileError.swigValue()) {
+            messages.append("Error in " + documentFile + " : " + error + 
+                "\n");
+              } else if (code == action_code.DocumentCount.swigValue()) {
+            if( (documentsIndexed % 500) == 0)
+                messages.append( "Documents: " + documentsIndexed + "\n" );
+              }
+              int len = messages.getText().length();
+              try {
+            messages.scrollRectToVisible(messages.modelToView(len));
+              } catch (javax.swing.text.BadLocationException ex) {
+            // don't care.
+              }
+        }
+      }
+
+    /* Used by makeCompactGrid. */
+    private  SpringLayout.Constraints getConstraintsForCell(
+                                                int row, int col,
+                                                Container parent,
+                                                int cols) {
+        SpringLayout layout = (SpringLayout) parent.getLayout();
+        Component c = parent.getComponent(row * cols + col);
+        return layout.getConstraints(c);
+    }
+
+    protected void makeCompactGrid(Container parent,
+                                       int rows, int cols,
+                                       int initialX, int initialY,
+                                       int xPad, int yPad) {
+        SpringLayout layout;
+        try {
+            layout = (SpringLayout)parent.getLayout();
+        } catch (ClassCastException exc) {
+            System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
+            return;
+        }
+
+        //Align all cells in each column and make them the same width.
+        Spring x = Spring.constant(initialX);
+        for (int c = 0; c < cols; c++) {
+            Spring width = Spring.constant(0);
+            for (int r = 0; r < rows; r++) {
+                width = Spring.max(width,
+                                   getConstraintsForCell(r, c, parent, cols).
+                                       getWidth());
+            }
+            for (int r = 0; r < rows; r++) {
+                SpringLayout.Constraints constraints =
+                        getConstraintsForCell(r, c, parent, cols);
+                constraints.setX(x);
+                constraints.setWidth(width);
+            }
+            x = Spring.sum(x, Spring.sum(width, Spring.constant(xPad)));
+        }
+
+        //Align all cells in each row and make them the same height.
+        Spring y = Spring.constant(initialY);
+        for (int r = 0; r < rows; r++) {
+            Spring height = Spring.constant(0);
+            for (int c = 0; c < cols; c++) {
+                height = Spring.max(height,
+                                    getConstraintsForCell(r, c, parent, cols).
+                                        getHeight());
+            }
+            for (int c = 0; c < cols; c++) {
+                SpringLayout.Constraints constraints =
+                        getConstraintsForCell(r, c, parent, cols);
+                constraints.setY(y);
+                constraints.setHeight(height);
+            }
+            y = Spring.sum(y, Spring.sum(height, Spring.constant(yPad)));
+        }
+
+        //Set the parent's size.
+        SpringLayout.Constraints pCons = layout.getConstraints(parent);
+        pCons.setConstraint(SpringLayout.SOUTH, y);
+        pCons.setConstraint(SpringLayout.EAST, x);
+    }    
 }
