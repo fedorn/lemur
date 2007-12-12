@@ -83,7 +83,7 @@ public class IndexUI extends JPanel implements ActionListener,
     /** Fields and Metadata items */
     private JPanel indexFieldPanel;
     private JTable fieldTable;
-    private lemurproject.lemur.ui.FieldTableModel fieldTableModel;
+    private FieldTableModel fieldTableModel;
     private JButton btnAddField;
     private JButton btnRemoveField;
     private JTable offsetAnnotationFileTable;
@@ -316,7 +316,7 @@ public class IndexUI extends JPanel implements ActionListener,
   JPanel fieldsPanel=makePanel();
 
   fieldsPanel.setLayout(new java.awt.BorderLayout());
-  fieldTableModel=new lemurproject.lemur.ui.FieldTableModel();
+  fieldTableModel=new FieldTableModel();
   fieldTable=new JTable(fieldTableModel) {
   protected javax.swing.table.JTableHeader createDefaultTableHeader() {
       return new javax.swing.table.JTableHeader(columnModel) {
