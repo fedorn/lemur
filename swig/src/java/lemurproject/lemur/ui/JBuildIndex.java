@@ -16,14 +16,12 @@ public class JBuildIndex extends Thread {
     private JTextArea messages;
     private String param;
     private LemurIndexGUI parent;
-    private boolean _useIndriBuilder;
 
     public JBuildIndex(LemurIndexGUI gui, JTextArea mesgarea) 
     {
         messages = mesgarea;
         param = "";
         parent = gui;
-        _useIndriBuilder=false;
     }
 
     public void setParam(String pfile) 
@@ -31,10 +29,6 @@ public class JBuildIndex extends Thread {
         param = pfile;
     }
     
-    public void useIndriBuilder(boolean isIndriIndex) {
-    	_useIndriBuilder=isIndriIndex;
-    }
-
     public void run() {
         while (true) {
             try {
@@ -47,12 +41,8 @@ public class JBuildIndex extends Thread {
                 //System.out.println(ex);
                 // ignore
             } try {
-            	if (_useIndriBuilder) {
-                    parent.buildFailed();
-            	} else {
             		this.buildIndex(param);			
             		parent.buildDone();
-            	}
             } catch (Exception e) {
                 displayMessage("ERROR WHILE BUILDING: \n" + e.toString());
                 parent.buildFailed();

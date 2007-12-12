@@ -25,6 +25,7 @@ import lemurproject.indri.IndexStatus;
 import lemurproject.indri.Specification;
 import lemurproject.indri.IndexStatus.action_code;
 import lemurproject.lemur.*;
+import lemurproject.indri.ui.*;
 
 /**
    User interface for building Lemur indexes.
@@ -296,7 +297,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         // fields table
         JPanel fieldsPanel=makePanel("Fields");
         fieldsPanel.setLayout(new java.awt.BorderLayout());
-        fieldTableModel=new lemurproject.lemur.ui.FieldTableModel();
+        fieldTableModel=new FieldTableModel();
         fieldTable=new JTable(fieldTableModel) {
         protected javax.swing.table.JTableHeader createDefaultTableHeader() {
             return new javax.swing.table.JTableHeader(columnModel) {
@@ -336,7 +337,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         // offset annotation files table
         JPanel offsetAnnotationFilePanel=makePanel("Offset Annotation Files");
         offsetAnnotationFilePanel.setLayout(new java.awt.BorderLayout());
-        offsetAnnotationFilesTableModel=new lemurproject.lemur.ui.OffsetAnnotationTableModel();
+        offsetAnnotationFilesTableModel=new OffsetAnnotationTableModel();
         offsetAnnotationFileTable=new JTable(offsetAnnotationFilesTableModel) {
         protected javax.swing.table.JTableHeader createDefaultTableHeader() {
             return new javax.swing.table.JTableHeader(columnModel) {
@@ -352,7 +353,7 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         };
         offsetAnnotationFileTable.getModel().addTableModelListener(this);
         javax.swing.table.TableColumn offsetFileColumn=offsetAnnotationFileTable.getColumnModel().getColumn(1);
-        offsetFileColumn.setCellEditor(new lemurproject.lemur.ui.OffsetAnnotationFileCellEditor());
+        offsetFileColumn.setCellEditor(new OffsetAnnotationFileCellEditor());
         offsetAnnotationFileTable.getColumnModel().setColumnSelectionAllowed(false);
         offsetAnnotationFileTable.setPreferredScrollableViewportSize(new Dimension(offsetAnnotationFileTable.getPreferredScrollableViewportSize().width, 100));
         JScrollPane offsetFileTableScroll=new JScrollPane(offsetAnnotationFileTable);
@@ -723,8 +724,15 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
         doDM.setEnabled(supported);
         dmTypeBox.setEnabled(supported);
         
-        // Indri-style index?
-        if (!supported) {
+        // only allow field index access on indri type
+        tabbedPane.setEnabledAt(1, false);
+        
+        // Indri-style index? only also support english for fields
+        String lang = (String)languageBox.getSelectedItem();
+        if (!supported && (lang.equals("English"))) {
+          // allow access to the fields
+          tabbedPane.setEnabledAt(1, true);
+          
         	// fill in the offset annotation table items
         	java.util.Vector datafileNames=new java.util.Vector();
             Enumeration e = cfModel.elements();
@@ -738,7 +746,6 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
             }
         }
         
-        tabbedPane.setEnabledAt(1, !supported);
     }
     
     //================================
@@ -838,7 +845,8 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
             }
         else if (source ==  docFormat) 
         {
-          if (docFormat.getSelectedItem().equals("web")) {
+          String selectedDocFormat=(String)docFormat.getSelectedItem();
+          if ((selectedDocFormat!=null) && (selectedDocFormat.equals("web"))) {
             if (indexTypeBox.getSelectedItem().equals("LemurIndriIndex")) {
              txtPathToHarvestLinks.setEnabled(true);
             } else {
@@ -885,6 +893,8 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                         stemFuncs.setVisible(false);
                         arstem.setVisible(false);
                     }
+                String indexType = (String)indexTypeBox.getSelectedItem();
+                setIndexTypeSupported(!indexType.equals("LemurIndriIndex"));
             }
         else if (source == stemmers)
             {
@@ -906,7 +916,10 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                     {
                         public void run()
                         {
-                            boolean isIndriIndex = ((String)indexTypeBox.getSelectedItem()).equals("LemurIndriIndex");
+                          
+                            String lang = (String)languageBox.getSelectedItem();
+                            String indexType=(String)indexTypeBox.getSelectedItem();
+                            boolean isIndriIndex =(indexType.equals("LemurIndriIndex") && lang.equals("English"));
                             if (isIndriIndex) {
                             	buildIndriIndex();
                             } else {
@@ -1427,8 +1440,6 @@ public class LemurIndexGUI extends JPanel implements ActionListener,
                 return; // bail
             }
         
-        String indexType = (String)indexTypeBox.getSelectedItem();
-      	builder.useIndriBuilder(indexType.equals("LemurIndriIndex"));
         builder.setParam(paramFileName);
         synchronized(builder)
             {
