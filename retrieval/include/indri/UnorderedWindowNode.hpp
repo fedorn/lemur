@@ -14,6 +14,7 @@
 // UnorderedWindowNode
 //
 // 26 January 2004 -- tds
+// 11 December 2007 -- mjh - added child sort
 //
 
 #ifndef INDRI_UNORDEREDWINDOWNODE_HPP
@@ -26,7 +27,15 @@ namespace indri
 {
   namespace infnet
   {
-    
+
+    // comparison operation used in child sorting
+    // for ascending order by # of extents in each child
+    inline bool UWNodeChildLess(indri::infnet::ListIteratorNode* _child1, indri::infnet::ListIteratorNode* _child2) {
+      const indri::utility::greedy_vector<indri::index::Extent>& childPositions1 = _child1->extents();
+      const indri::utility::greedy_vector<indri::index::Extent>& childPositions2 = _child2->extents();
+      return (childPositions1.size() < childPositions2.size());
+    }
+
     class UnorderedWindowNode : public ListIteratorNode {
     private:
       struct term_position {
@@ -45,6 +54,7 @@ namespace indri
       std::vector<ListIteratorNode*> _children;
       indri::utility::greedy_vector<indri::index::Extent> _extents;
       std::string _name;
+      bool _childrenAlreadySorted;
 
     public:
       UnorderedWindowNode( const std::string& name, std::vector<ListIteratorNode*>& children );

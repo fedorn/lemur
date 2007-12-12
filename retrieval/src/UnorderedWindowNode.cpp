@@ -22,6 +22,7 @@
 indri::infnet::UnorderedWindowNode::UnorderedWindowNode( const std::string& name, std::vector<indri::infnet::ListIteratorNode*>& children ) :
   _name(name),
   _children(children),
+  _childrenAlreadySorted(false),
   _windowSize(-1) // unlimited window size
 {
 }
@@ -29,6 +30,7 @@ indri::infnet::UnorderedWindowNode::UnorderedWindowNode( const std::string& name
 indri::infnet::UnorderedWindowNode::UnorderedWindowNode( const std::string& name, std::vector<indri::infnet::ListIteratorNode*>& children, int windowSize ) :
   _name(name),
   _children(children),
+  _childrenAlreadySorted(false),
   _windowSize(windowSize)
 {
 }
@@ -72,12 +74,24 @@ void indri::infnet::UnorderedWindowNode::prepare( int documentID ) {
   indri::utility::greedy_vector<term_position> allPositions;
   int termsSeen = 0;
 
+  // sort the children by size if not already sorted
+  if (!_childrenAlreadySorted) {
+    std::sort(_children.begin(), _children.end(), indri::infnet::UWNodeChildLess);
+    _childrenAlreadySorted=true;
+  }
+
   // add every term position from every list
   for( size_t i=0; i<_children.size(); i++ ) {
     const indri::utility::greedy_vector<indri::index::Extent>& childPositions = _children[i]->extents();
 
-    if( childPositions.size() )
+    if( childPositions.size() ) {
       termsSeen++;
+    } else {
+      // every item must have at least one child!
+      // if we have an extent w/out one, we can
+      // exit early
+      return;
+    }
 
     for( size_t j=0; j<childPositions.size(); j++ ) {
       term_position p;
