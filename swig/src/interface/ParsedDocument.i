@@ -148,7 +148,7 @@
   const char* contentString = jenv->GetStringUTFChars(content, 0);
   jsize contentLength = jenv->GetStringUTFLength(content);
   // find the start offset
-  char *cStart = strstr(textString, contentString);
+  const char *cStart = strstr(textString, contentString);
   // better not be null...
   int contentDelta = cStart ? cStart - textString : 0;
 
