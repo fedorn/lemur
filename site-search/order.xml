@@ -192,7 +192,6 @@
         <string name="http-proxy-host"></string>
         <string name="http-proxy-port"></string>
         <string name="default-encoding">ISO-8859-1</string>
-        <boolean name="sha1-content">true</boolean>
         <boolean name="send-connection-close">true</boolean>
         <boolean name="send-referer">true</boolean>
         <boolean name="send-range">false</boolean>
@@ -248,7 +247,6 @@
         </map>
         <boolean name="override-logger">false</boolean>
         <boolean name="seed-redirects-new-seed">true</boolean>
-        <boolean name="scope-embedded-links">true</boolean>
         <map name="scope-rejected-url-filters">
         </map>
       </newObject>
