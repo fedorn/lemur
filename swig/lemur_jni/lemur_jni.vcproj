@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;C:\j2sdk1.4.2_05\include\win32;C:\j2sdk1.4.2_05\include"
+				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;&quot;C:\Program Files\Java\jdk1.5.0_07\include\win32&quot;;&quot;C:\Program Files\Java\jdk1.5.0_07\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LEMUR_JNI_EXPORTS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -70,7 +70,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;C:\j2sdk1.4.2_05\include\win32;C:\j2sdk1.4.2_05\include"
+				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;&quot;C:\Program Files\Java\jdk1.5.0_07\include\win32&quot;;&quot;C:\Program Files\Java\jdk1.5.0_07\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LEMUR_JNI_EXPORTS"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
