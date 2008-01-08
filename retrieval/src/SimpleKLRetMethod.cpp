@@ -87,7 +87,7 @@ void lemur::retrieval::SimpleKLQueryModel::load(istream &is)
   while (count-- >0) {
     is >> wd >> pr;
     TERMID_T id = ind.term(wd);
-    setCount(id, pr);
+    if (id != 0) setCount(id, pr); // don't load OOV terms
   }
   colQueryLikelihood();
   colKLComputed = false;
