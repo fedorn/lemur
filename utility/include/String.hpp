@@ -33,6 +33,8 @@ namespace lemur
       friend ostream &operator<<(ostream &os, const String &ts);
       friend istream &operator>>(istream &is, String &ts);
     };
+    ostream &operator<<(ostream &os, const String &ts);
+    istream &operator>>(istream &is, String &ts);
   }
 }
 
