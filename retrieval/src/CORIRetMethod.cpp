@@ -41,11 +41,8 @@ lemur::retrieval::CORIDocRep::termWeight(lemur::api::TERMID_T termID, const lemu
   if (dfSmooth != NULL) {
     cout<<"smooth:"<<endl;
     if (df > 0) {
-      //      df = dfSmooth->seenProb(df, termID) * ind.docLength(info->docID());
       df = dfSmooth->seenProb(df, termID) * docLength;
     } else {
-      //      df = dfSmooth->unseenCoeff() * collLM->prob(termID) * 
-      //        ind.docLength(info->docID());
       df = dfSmooth->unseenCoeff() * collLM->prob(termID) * docLength;
     }
   }
@@ -54,12 +51,6 @@ lemur::retrieval::CORIDocRep::termWeight(lemur::api::TERMID_T termID, const lemu
   double i = log (c05/ cf) / idiv;
   double p = (1-MINBELIEF) * t * i;
   
-  //  cout << ind.term(termID) << " " << ind.document(info->docID())
-  //       << " " << df << " " << cf << endl;
-  if (t>1){
-    cout << ind.term(termID) << " " << ind.document(info->docID())
-         << " " << df << " " << cf << endl;
-  }
   return p;
 }
 
@@ -89,8 +80,10 @@ void lemur::retrieval::CORIRetMethod::scoreCollection(const lemur::api::QueryRep
   rmax = 0;
   double qw = 0;
   while (textQry->hasMore()) {
-    lemur::api::TERMID_T qtid = textQry->nextTerm()->id();
-    rmax += (1-MINBELIEF)*(log(c05 / ind.docCount(qtid)) / idiv);
+    lemur::api::QueryTerm *qt = textQry->nextTerm();
+    lemur::api::TERMID_T qtid = qt->id();
+    // have to adjust for query term weight
+    rmax += (1-MINBELIEF)*(log(c05 / ind.docCount(qtid)) / idiv)*qt->weight();
   }
 
   for (int i=0;i<results.size();i++) {
@@ -122,7 +115,6 @@ lemur::retrieval::CORIRetMethod::CORIRetMethod(const lemur::api::Index & dbIndex
     tfbaseline=DOCTFBASELINE;
   }
 
-  //cout<<tffactor<<"  "<<tfbaseline<<endl;
   lemur::api::COUNT_T dc = ind.docCount();
 
   cwRatio = new double[dc];
