@@ -368,7 +368,7 @@ int AppMain(int argc, char *argv[]) {
   resFile.openForWrite(result, *ind);
 
   ifstream *workSetStr;
-  ResultFile *docPool;
+  ResultFile *docPool = NULL;
   if (RetrievalParameter::useWorkingSet) {
     workSetStr = new ifstream(RetrievalParameter::workSetFile.c_str(), ios::in);
     if (workSetStr->fail()) {
