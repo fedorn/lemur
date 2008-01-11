@@ -189,7 +189,8 @@ void indri::query::RelevanceModel::_scoreGrams() {
 
     for( r = 0, c = 0; r < _results.size() && c < gramCounts->counts.size(); r++ ) {
       int contextLength = _results[r].end - _results[r].begin;
-      double documentScore = exp( _results[r].score );
+      // has been converted to a posterior probability.
+      double documentScore = _results[r].score;
       double termScore = 0;
       double occurrences = 0;
 
@@ -232,6 +233,32 @@ void indri::query::RelevanceModel::_sortGrams() {
   std::sort( _grams.begin(), _grams.end(), Gram::weight_greater() );
 }
 
+// In:  log(x1) log(x2) ... log(xN)
+// Out: x1/sum, x2/sum, ... xN/sum
+//
+// Extra care is taken to make sure we don't overflow
+// machine precision when taking exp (log x)
+// This is done by adding a constant K which cancels out
+// Right now K is set to maximally preserve the highest value
+// but could be altered to a min or average, or whatever...
+
+static void _logtoposterior(std::vector<indri::api::ScoredExtentResult> &res) {
+  
+  std::vector<indri::api::ScoredExtentResult>::iterator iter;
+  iter = res.begin();
+  double K = (*iter).score;
+  // first is max
+  double sum=0;
+
+  for (iter = res.begin(); iter != res.end(); iter++) {
+    sum += (*iter).score=exp(K+(*iter).score);
+  }
+  for (iter = res.begin(); iter != res.end(); iter++) {
+    (*iter).score/=sum;
+  }
+}
+
+
 //
 // generate
 //
@@ -240,6 +267,7 @@ void indri::query::RelevanceModel::generate( const std::string& query ) {
   try {
     // run the query, get the document vectors
     _results = _environment.runQuery( query, _documents );
+    _logtoposterior(_results);
     _grams.clear();
     _extractDocuments();
     _vectors = _environment.documentVectors( _documentIDs );
@@ -259,6 +287,7 @@ void indri::query::RelevanceModel::generate( const std::string& query ) {
 void indri::query::RelevanceModel::generate( const std::string& query, const std::vector<indri::api::ScoredExtentResult>& results  ) {
   try {
     _results = results;
+    _logtoposterior(_results);
     _grams.clear();
     _extractDocuments();
     _vectors = _environment.documentVectors( _documentIDs );
