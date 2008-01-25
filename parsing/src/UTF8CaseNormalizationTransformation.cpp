@@ -90,17 +90,20 @@ indri::api::ParsedDocument* indri::parse::UTF8CaseNormalizationTransformation::t
                              NULL, NULL );
 
     int buf_index = 0;
+    int byte_offset = 0;
     for ( int j = 0; j < len && unicode_chars[j]; j++ ) {
 
       UINT64* x = _downcase.find( unicode_chars[j] );
       if ( x ) unicode_chars[j] = *x;
-              
+
       // Re-encode and copy into new buffer
       _transcoder.utf8_encode( unicode_chars[j],  
-                               new_term + buf_index, NULL );
+                               new_term + buf_index, &byte_offset );
+      buf_index += byte_offset;
     }
-          
-    term = new_term;
+
+    // put it in the document
+    document->terms[i] = new_term;
     delete[] unicode_chars;
   }
 
