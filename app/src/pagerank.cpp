@@ -56,7 +56,7 @@ This data file is suitable for input to the makeprior application.</dd>
 #include <time.h>
 #include "indri/Parameters.hpp"
 
-#include "lemur/Exception.hpp"
+#include "Exception.hpp"
 #include "indri/PageRank.hpp"
 
 int main( int argc, char** argv ) {
