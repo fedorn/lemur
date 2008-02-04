@@ -184,6 +184,9 @@
 				RelativePath=".\src\OffsetMetadataAnnotator.cpp">
 			</File>
 			<File
+				RelativePath=".\src\PageRank.cpp">
+			</File>
+			<File
 				RelativePath=".\src\Parser.cpp">
 			</File>
 			<File
@@ -388,6 +391,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\OffsetMetadataAnnotator.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\PageRank.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\ParsedDocument.hpp">
