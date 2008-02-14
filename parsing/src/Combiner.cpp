@@ -112,9 +112,10 @@ void indri::parse::Combiner::_readDocBucket( UrlEntryTable& urlTable, std::ifstr
 
   while( !docIn.eof() ) {
     docIn.getline( docno, sizeof docno-1 );
+    if (docIn.eof()) break;
     docIn.getline( docurl, sizeof docurl-1 );
     docIn.getline( corpusPath, sizeof corpusPath-1 );
-
+    
     url_entry* e = _newUrlEntry( docurl + sizeof "DOCURL="-1,
                                  corpusPath + sizeof "CORPUSPATH="-1,
                                  docno + sizeof "DOCNO="-1 );
@@ -152,7 +153,7 @@ void indri::parse::Combiner::hashRedirectTargets( const std::string& bucketPath,
 
   while( !in.eof() ) {
     in.getline( redirectsLine, sizeof redirectsLine );
-
+    if (in.eof()) break;
     char* space = strchr( redirectsLine, ' ' );
 
     if( !space )
@@ -201,6 +202,7 @@ void indri::parse::Combiner::combineRedirectDestinationBucket( const std::string
 
   while( !target.eof() ) {
     target.getline( linktoLine, sizeof linktoLine );
+    if (target.eof()) break;
     target.getline( aliasLine, sizeof aliasLine );
     char* linkUrl = linktoLine + sizeof "LINKTO=" - 1;
     char* aliasUrl = aliasLine + sizeof "ALIAS=" - 1;
@@ -252,6 +254,7 @@ void indri::parse::Combiner::hashToBuckets( std::ifstream& in, const std::string
 
   while( !in.eof() ) {
     in.getline( docno, sizeof docno );
+    if (in.eof()) break;
     in.getline( docUrl, sizeof docUrl );
     in.getline( linkCountText, sizeof linkCountText );
 
@@ -435,6 +438,7 @@ void indri::parse::Combiner::_readRedirects( UrlEntryTable& urlTable, const std:
 
   while( !redirectIn.eof() && redirectIn.good() ) {
     redirectIn.getline( docurl, sizeof docurl );
+    if (redirectIn.eof()) break;
     redirectIn.getline( aliasurl, sizeof aliasurl );
     redirectIn.getline( pathline, sizeof pathline );
     redirectIn.getline( docnoline, sizeof docnoline );
@@ -471,11 +475,13 @@ void indri::parse::Combiner::_readLinks( UrlEntryTable& urlTable, std::ifstream&
 
   // read the incoming link information and match it with document information
   while( !linkIn.eof() && linkIn.good() && linkCount < 250000 ) {
+
     linkIn.getline( docno, sizeof docno-1 );
+    if (linkIn.eof() ) break;
     linkIn.getline( docurl, sizeof docurl-1 );
     linkIn.getline( linkurl, sizeof linkurl-1 );
     linkIn.getline( linktext, sizeof linktext-1 );
-
+    
     char* url = linkurl + sizeof "LINKURL=" - 1;
     url_entry** entry = urlTable.find( url );
 
@@ -607,6 +613,7 @@ void indri::parse::Combiner::sortCorpusFiles( const std::string& outputPath, con
       char linkText[65536];
 
       in.getline( docUrl, sizeof docUrl );
+      if (in.eof()) break;
       in.getline( docno, sizeof docno );
       in.getline( linkCountText, sizeof linkCountText );
 
@@ -682,7 +689,7 @@ void indri::parse::Combiner::sortCorpusFiles( const std::string& outputPath, con
     while( !in.eof() && in.good() ) {
       char docno[65536];
       in.getline( docno, sizeof docno );
-
+      if (in.eof()) break;
       // only interested in DOCNO lines
       if( strncmp( docno, "DOCNO=", sizeof "DOCNO="-1 ) != 0 )
         continue;
