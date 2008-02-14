@@ -140,8 +140,8 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
             _document.terms.push_back( write_location );
             write_location = _urlBuffer.write( len + 1 );
             memcpy( write_location, tmp_buf, len + 1 );
+            cnt++; tokens_excluded--;
             // end hack -- dmf
-
             char *c;
             char *urlText=write_location;
             bool lastSkipped = true; 
@@ -242,8 +242,8 @@ bool indri::parse::HTMLParser::normalizeURL(char *s) {
 
   // remove the fragment identifier, query information and parameter information
   char *c;
-  for(c = s; *c != '\0' && *c != '#' && *c != '?' && *c != ';'; c++);
-  *c = '\0';
+  //  for(c = s; *c != '\0' && *c != '#' && *c != '?' && *c != ';'; c++);
+  //  *c = '\0';
 
   // extract scheme, if given
   bool found_scheme = false;
