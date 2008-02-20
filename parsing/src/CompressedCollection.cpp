@@ -603,10 +603,8 @@ void indri::collection::CompressedCollection::addDocument( int documentID, indri
 
     metalookup = _reverseLookups.find( document->metadata[i].key );
 
-    // silently discard any value that is too long to be a key.
-    if( metalookup && document->metadata[i].valueLength < lemur::file::Keyfile::MAX_KEY_LENGTH ) {
-      // the key needs to have at least some length
-      assert( document->metadata[i].valueLength > 0 );
+    // silently discard any value that is too short or too long to be a key.
+    if( metalookup && document->metadata[i].valueLength < lemur::file::Keyfile::MAX_KEY_LENGTH && document->metadata[i].valueLength > 1 ) {
 
       // there may be more than one reverse lookup here, so we fetch any old ones:
       indri::utility::greedy_vector<int> documentIDs;
@@ -819,7 +817,7 @@ std::vector<int> indri::collection::CompressedCollection::retrieveIDByMetadatum(
   std::vector<int> results;
 
   // if we have a lookup, find the associated documentIDs for this value
-  if( metalookup ) {
+  if( metalookup && value.size() > 0) {
     int actual = 0;
     int dataSize = (*metalookup)->getSize( value.c_str() );
 
