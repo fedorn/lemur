@@ -1,7 +1,7 @@
 #!/bin/sh
 ## Edit this to point to your version of trec_eval
 ## if not found, it will be set to echo
-TREC_EVAL=/usr/mel0/tmp1/dfisher/trec_eval/trec_eval
+TREC_EVAL=/Users/dfisher/Development/trec_eval.8.1/trec_eval
 if test ! -x $TREC_EVAL ; then
   TREC_EVAL="echo not found: $TREC_EVAL"
 fi

@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Name: ireval
+Main-Class: ireval.Main
+Specification-Title:  ireval
+Specification-Vendor: Lemur Project
+Specification-Version: 0.6
+Package-Title: ireval
+Package-Vendor: Lemur Project
