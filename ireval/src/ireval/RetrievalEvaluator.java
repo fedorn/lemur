@@ -371,7 +371,7 @@ public class RetrievalEvaluator {
     }           
     
     protected double normalizationTermNDCG( int documentsRetrieved ) {
-        TreeMap<Integer, Integer> relevanceCounts = new TreeMap();
+        TreeMap<Integer, Integer> relevanceCounts = new TreeMap<Integer, Integer>();
         
         // the normalization term represents the highest possible DCG score
         // that could possibly be attained.  we compute this by taking the relevance
