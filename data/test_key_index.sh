@@ -1,10 +1,8 @@
 #!/bin/sh
 ## Edit this to point to your version of trec_eval
 ## if not found, it will be set to echo
-TREC_EVAL=/Users/dfisher/Development/trec_eval.8.1/trec_eval
-if test ! -x $TREC_EVAL ; then
-  TREC_EVAL="echo not found: $TREC_EVAL"
-fi
+IREVAL=../ireval/obj/ireval.jar
+TREC_EVAL="java -jar $IREVAL"
 
 #######################################################################
 # THIS IS THE TEST SCRIPT FOR THE POSITION INDEXER                    #
@@ -48,36 +46,36 @@ cp keyparam/*_param .
 
 # simple TFIDF retrieval example
 ../app/obj/RetEval simple_tfidf_param
-$TREC_EVAL -o -q qrel res.simple_tfidf  > pr.simple_tfidf
+$TREC_EVAL  res.simple_tfidf  qrel > pr.simple_tfidf
 
 # TFIDF feedback retrieval example
 ../app/obj/RetEval fb_tfidf_param
-$TREC_EVAL -o -q qrel res.fb_tfidf > pr.fb_tfidf
+$TREC_EVAL  res.fb_tfidf qrel > pr.fb_tfidf
 
 # simple Okapi retrieval example
 ../app/obj/RetEval simple_okapi_param
-$TREC_EVAL -o -q qrel res.simple_okapi  > pr.simple_okapi
+$TREC_EVAL  res.simple_okapi  qrel > pr.simple_okapi
 
 # TFIDF feedback retrieval example
 ../app/obj/RetEval fb_okapi_param
-$TREC_EVAL -o -q qrel res.fb_okapi > pr.fb_okapi
+$TREC_EVAL  res.fb_okapi qrel > pr.fb_okapi
 
 # simple language model (KL-divergence) retrieval example, using JM smoothing
 ../app/obj/RetEval simple_kl_jm_param
-$TREC_EVAL -o -q qrel res.simple_kl_jm  > pr.simple_kl_jm
+$TREC_EVAL  res.simple_kl_jm  qrel > pr.simple_kl_jm
 
 # simple language model (KL-divergence) retrieval example, using Dirichlet smoothing
 ../app/obj/RetEval simple_kl_dir_param
-$TREC_EVAL -o -q qrel res.simple_kl_dir > pr.simple_kl_dir
+$TREC_EVAL  res.simple_kl_dir qrel > pr.simple_kl_dir
 
 # simple language model (KL-divergence) retrieval example, using absolute discounting smoothing
 ../app/obj/RetEval simple_kl_abs_param
-$TREC_EVAL -o -q qrel res.simple_kl_abs > pr.simple_kl_abs
+$TREC_EVAL  res.simple_kl_abs qrel > pr.simple_kl_abs
 
 
 # Language model (KL-divergence) feedback retrieval example, using collection mixture method and Dirichlet smoothing
 ../app/obj/RetEval mixfb_kl_dir_param
-$TREC_EVAL -o -q qrel res.mixfb_kl_dir  > pr.mixfb_kl_dir
+$TREC_EVAL  res.mixfb_kl_dir  qrel > pr.mixfb_kl_dir
 
 ######################################################################
 #								     #
@@ -97,7 +95,7 @@ $TREC_EVAL -o -q qrel res.mixfb_kl_dir  > pr.mixfb_kl_dir
 
 # Then evaluate it with Dirichlet smoothing
 ../app/obj/QueryModelEval mixfb_model_eval_param
-$TREC_EVAL -o -q qrel res.mixfb_kl > pr.mixfb_kl
+$TREC_EVAL  res.mixfb_kl qrel > pr.mixfb_kl
 
 
 ######################################################################
@@ -112,15 +110,15 @@ awk '{print $1, $3, $5;}'  < res.simple_tfidf > res_simple_tfidf
 
 # This re-ranks res_simple_tfidf with the tf-idf method  
 ../app/obj/RetEval rerank_tfidf_param
-$TREC_EVAL -o -q qrel res.rerank_simple_tfidf > pr.rerank_simple_tfidf
+$TREC_EVAL  res.rerank_simple_tfidf qrel > pr.rerank_simple_tfidf
 
 # This re-ranks res_simple_tfidf with KL-div.+ Dirichlet. Note how this improves the precision
 ../app/obj/RetEval rerank_simple_kl_dir_param
-$TREC_EVAL -o -q qrel res.rerank_simple_kl_dir > pr.rerank_simple_kl_dir
+$TREC_EVAL  res.rerank_simple_kl_dir qrel > pr.rerank_simple_kl_dir
 
 # This re-ranks the res_simple_tfidf with tfidf+Rocchio pseudo feedback
 ../app/obj/RetEval rerank_fb_tfidf_param
-$TREC_EVAL -o -q qrel  res.rerank_fb_tfidf > pr.rerank_fb_tfidf
+$TREC_EVAL   res.rerank_fb_tfidf qrel > pr.rerank_fb_tfidf
 
 ######################################################################
 #								     #
@@ -131,7 +129,7 @@ $TREC_EVAL -o -q qrel  res.rerank_fb_tfidf > pr.rerank_fb_tfidf
 # This performs relevance feedback using the mixture model approach
 # You can use any other retrieval methods
 ../app/obj/RelFBEval mixrelfb_kl_dir_param
-$TREC_EVAL -o -q qrel  res.mixrelfb_kl_dir > pr.mixrelfb_kl_dir
+$TREC_EVAL   res.mixrelfb_kl_dir qrel > pr.mixrelfb_kl_dir
 
 
 
@@ -151,7 +149,7 @@ $TREC_EVAL -o -q qrel  res.mixrelfb_kl_dir > pr.mixrelfb_kl_dir
 
 # Then use the expanded query "query_it" to retrieve documents 
 ../app/obj/QueryModelEval mixrelfb_it_eval_param
-$TREC_EVAL -o -q qrel res.mixrelfb_it > pr.mixrelfb_it
+$TREC_EVAL  res.mixrelfb_it qrel > pr.mixrelfb_it
 
 
 
@@ -172,7 +170,7 @@ $TREC_EVAL -o -q qrel res.mixrelfb_it > pr.mixrelfb_it
 # We have let the Dirichlet prior parameter set to the estimated
 # value in the parameter file "twostage_param"
 ../app/obj/TwoStageRetEval twostage_param
-$TREC_EVAL -o -q qrel res.twostage > pr.twostage
+$TREC_EVAL  res.twostage qrel > pr.twostage
 
 
 

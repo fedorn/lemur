@@ -1,10 +1,8 @@
 #!/bin/sh
 ## Edit this to point to your version of trec_eval
 ## if not found, it will be set to echo
-TREC_EVAL=/usr/mel0/tmp1/dfisher/trec_eval/trec_eval
-if test ! -x $TREC_EVAL ; then
-  TREC_EVAL="echo not found: $TREC_EVAL"
-fi
+IREVAL=../ireval/obj/ireval.jar
+TREC_EVAL="java -jar $IREVAL"
 
 #######################################################################
 # THIS IS THE TEST SCRIPT FOR THE INDRI QUERY LANGUAGE                #
@@ -33,4 +31,4 @@ $OBJ/IndriBuildIndex build_param smallstop_param
 
 # simple query retrieval example
 $OBJ/IndriRunQuery ret_param indriparam/query.indri > res.indri
-$TREC_EVAL -o -q qrel res.indri  > pr.indri
+$TREC_EVAL  res.indri qrel  > pr.indri

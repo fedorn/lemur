@@ -1,11 +1,8 @@
 #!/bin/sh
 ## Edit this to point to your version of trec_eval
 ## if not found, it will be set to echo
-TREC_EVAL=/usr/mel0/tmp1/dfisher/trec_eval/trec_eval
-if test ! -x $TREC_EVAL ; then
-  TREC_EVAL="echo not found: $TREC_EVAL"
-fi
-
+IREVAL=../ireval/obj/ireval.jar
+TREC_EVAL="java -jar $IREVAL"
 
 #######################################################################
 # THIS IS THE TEST SCRIPT FOR STRUCTURED QUERIES                      #
@@ -41,11 +38,11 @@ cp structparam/*_param .
 
 # simple structured query retrieval example
 ../app/obj/StructQueryEval simple_struct_param
-$TREC_EVAL -o -q qrel res.simple_struct  > pr.simple_struct
+$TREC_EVAL  res.simple_struct qrel > pr.simple_struct
 
 # simple structured query retrieval with pseudofeedback example
 ../app/obj/StructQueryEval fb_struct_param
-$TREC_EVAL -o -q qrel res.fb_struct  > pr.fb_struct
+$TREC_EVAL  res.fb_struct qrel  > pr.fb_struct
 
 
 
