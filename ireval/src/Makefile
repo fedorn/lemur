@@ -24,7 +24,7 @@ $(DIRS):
 	$(INSTALL_DIR) $@
 
 $(OUTDIR)/%.class:$(JSRC)/%.java
-	$(JAVAC) -d $(OBJ) $<
+	$(JAVAC) -Xlint:unchecked -d $(OBJ) $<
 
 $(DOCDEP): $(JAVASRC)
 	$(DOC) -d $(OBJ)/javadoc -doctitle "Ireval" -windowtitle "Ireval" $(DOC_PCK)
@@ -37,18 +37,14 @@ clean:
 	rm -rf $(OBJ)
 
 
-install_dirs: $(pkgdatadir) $(pkgdatadir)/JNIdoc $(libdir)
-$(pkgdatadir) $(pkgdatadir)/JNIdoc $(libdir):
+install_dirs: $(pkgdatadir) $(pkgdatadir)/ireval_doc $(libdir)
+$(pkgdatadir) $(pkgdatadir)/ireval_doc $(libdir):
 	$(INSTALL_DIR) $@
 
 install: install_dirs install_data install_docs
-#fixme
+
 install_docs:
-ifeq ($(WITH_SWIG), 1)
-  ifeq ($(WITH_JAVA), 1)
-	cp -pr $(OBJ)/java/docs/* $(pkgdatadir)/JNIdoc
-  endif
-endif
+	cp -pr $(OBJ)/javadoc/* $(pkgdatadir)/ireval_doc
 
 install_data:
 	$(INSTALL_DATA)  $(JARFILES) $(pkgdatadir)
