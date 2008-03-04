@@ -36,7 +36,7 @@ lemur::index::LemurIndriIndex::~LemurIndriIndex() {
 bool lemur::index::LemurIndriIndex::open(const std::string& indexName) {
   // Have to remove the trailing ".ind" from the name.
   //
-  _repositoryName = indri::file::Path::basename(indexName);
+  _repositoryName = indexName; //indri::file::Path::basename(indexName);
   _repository->openRead( _repositoryName, NULL );
   _docMgr = new lemur::parse::IndriDocMgr(*_repository, _repositoryName);
   return true;
