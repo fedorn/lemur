@@ -1,22 +1,25 @@
 LEMURDIR = ../..
 include $(LEMURDIR)/MakeDefns
-
-PACKAGE=ireval
-VERSION=1.0
-OBJ=../obj
-OUTDIR=$(OBJ)/$(PACKAGE)
-JSRC=$(PACKAGE)
-JAVASRC = $(wildcard $(JSRC)/*.java)
-JAVAOBJ = $(patsubst %,$(OBJ)/%, $(JAVASRC:.java=.class))
-MFST=manifest.mf
-JARFILES=$(OBJ)/ireval.jar
-JAVADIRS = $(OBJ) $(OBJ)/javadoc
-PCK=$(PACKAGE)
-DOC_PCK=$(PCK) $(PCK).stat
-DOCARGS=-private -author -version
-DOC=$(JAVADOC)   $(DOCARGS)
-DOCDEP=$(OBJ)/javadoc/index.html
-DIRS += $(JAVADIRS)
+# if WITH_JAVA is 0, nothing will be made.
+# run configure with --enable-java to set the values for JAVAC and JAR
+ifeq ($(WITH_JAVA), 1)
+  PACKAGE=ireval
+  VERSION=1.0
+  OBJ=../obj
+  OUTDIR=$(OBJ)/$(PACKAGE)
+  JSRC=$(PACKAGE)
+  JAVASRC = $(wildcard $(JSRC)/*.java)
+  JAVAOBJ = $(patsubst %,$(OBJ)/%, $(JAVASRC:.java=.class))
+  MFST=manifest.mf
+  JARFILES=$(OBJ)/ireval.jar
+  JAVADIRS = $(OBJ) $(OBJ)/javadoc
+  PCK=$(PACKAGE)
+  DOC_PCK=$(PCK) $(PCK).stat
+  DOCARGS=-private -author -version
+  DOC=$(JAVADOC)   $(DOCARGS)
+  DOCDEP=$(OBJ)/javadoc/index.html
+  DIRS += $(JAVADIRS)
+endif
 
 all: $(DIRS) $(JARFILES)
 
