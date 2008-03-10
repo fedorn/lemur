@@ -527,6 +527,7 @@ qualifiedTerm returns [ RawExtentNode* t ]
 
 unqualifiedTerm returns [ indri::lang::RawExtentNode* re ] {
     re = 0;
+    indri::lang::IndexTerm* t = 0;
   }:
     ( OD ) => re=odNode
   | ( UW ) => re=uwNode
@@ -545,23 +546,47 @@ unqualifiedTerm returns [ indri::lang::RawExtentNode* re ] {
   | ( BETWEEN ) => re=betweenNode
   | ( EQUALS ) => re=equalsNode
   | ( WCARD ) => re=wildcardOpNode
-  | ( TERM STAR ) => wterm:TERM STAR {
+  | ( TERM STAR ) => t=rawText STAR {
       // wildcard support as an unqualified term
       // i.e. "term*"
-      re=new indri::lang::WildcardTerm( wterm->getText() );
+      re=new indri::lang::WildcardTerm( t->getText() );
+      _nodes.push_back(re);
+  }
+  | ( NUMBER STAR ) => t=rawText STAR {
+      // wildcard support as an unqualified term
+      // i.e. "term*"
+      re=new indri::lang::WildcardTerm( t->getText() );
+      _nodes.push_back(re);
+  }
+  | ( FLOAT STAR ) => t=rawText STAR {
+      // wildcard support as an unqualified term
+      // i.e. "term*"
+      re=new indri::lang::WildcardTerm( t->getText() );
+      _nodes.push_back(re);
+  }
+  | ( NEGATIVE_NUMBER STAR ) => t=rawText STAR {
+      // wildcard support as an unqualified term
+      // i.e. "term*"
+      re=new indri::lang::WildcardTerm( t->getText() );
+      _nodes.push_back(re);
+  }
+  | ( TEXT_TERM STAR ) => t=rawText STAR {
+      // wildcard support as an unqualified term
+      // i.e. "term*"
+      re=new indri::lang::WildcardTerm( t->getText() );
       _nodes.push_back(re);
   }
   | re = rawText;
 
 wildcardOpNode returns [ indri::lang::WildcardTerm* s ] {
     // wildcard operator "#wildcard( term )"
-    indri::lang::RawExtentNode* term = 0;
+    indri::lang::IndexTerm* t = 0;
     s = new indri::lang::WildcardTerm;
     _nodes.push_back(s);
   } :
   WCARD
   O_PAREN
-    ( options { greedy=true; }: t:TERM { s->setTerm(t->getText()); } )
+    ( options { greedy=true; }: t=rawText { s->setTerm(t->getText()); } )
   C_PAREN;
           
 extentRestriction [ indri::lang::ScoredExtentNode* sn, indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* er ] {
