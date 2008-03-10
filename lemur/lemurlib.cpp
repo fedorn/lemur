@@ -12,6 +12,9 @@
 	Force aggregation of the component libraries into a unified lemur.lib.
 */
 #ifdef WIN32
+#pragma comment (lib, "zlib.lib")
+#pragma comment (lib, "xpdf.lib")
+#pragma comment (lib, "antlr.lib")
 #pragma comment (lib, "utility.lib")
 #pragma comment (lib, "parsing.lib")
 #pragma comment (lib, "index.lib")
