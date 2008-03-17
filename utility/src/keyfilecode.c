@@ -1674,13 +1674,14 @@ static unsigned ix_entry_lc(struct fcb *f, struct key *k, levelx_pntr *p, unsign
   return(lc + UINT32_lc_if_compressed(lc) + levelx_pntr_lc(f,p,level));
 }
 
-
 /* ix_entries_lc returns the encoded length of the index entries  */
 /*   in positions start..(start+cnt-1) if they were encoded using */
-/*   prefix_lc.                                                  */
+/*   prefix_lc.  Note that this version should only be used when  */
+/*   it is known that all of the keys will be of                  */
+/*   length>=prefix_lc.  */
 
 static unsigned ix_entries_lc(struct fcb *f, struct ix_block *b, int start, int cnt, unsigned prefix_lc)
-{int i,entry_lc=0,lc,prefix_difference; UINT16 key_lc;
+{int i,entry_lc=0,lc,new_key_lc,prefix_difference; UINT16 key_lc;
 
   prefix_difference = b->prefix_lc - prefix_lc;
 
@@ -1689,21 +1690,23 @@ static unsigned ix_entries_lc(struct fcb *f, struct ix_block *b, int start, int 
 
   for (i=0; i<cnt; i++) {
     lc = uncompress_key_lc(&key_lc,(unsigned char *)b->keys+b->keys[start+i]);
-    key_lc = key_lc + prefix_difference;
-    entry_lc = entry_lc + key_lc + UINT32_lc_if_compressed(key_lc) + nth_pntr_lc(f,b,start+i);
+    new_key_lc = key_lc + prefix_difference;
+    if ( new_key_lc<0 ) new_key_lc = 0;
+    entry_lc = entry_lc + new_key_lc + UINT32_lc_if_compressed((UINT32)new_key_lc) + nth_pntr_lc(f,b,start+i);
   }
   return(entry_lc);
 }
 
 /* new_chars_in_use returns the length of the key/pointer entries */
-/*   (not including the keys array) if the   */
+/*   in b (not including the keys array) if the   */
 /*   prefix is changed to prefix_lc.  It's the original   */
 /*   lc + the difference in the total key length + the       */
 /*   stored prefix difference + any change in the compressed key  */
-/*   lengths.                                                     */
+/*   lengths.  Note that this version should only be used when it */
+/*   is known that all keys are of length>=prefix_lc.             */
 
 static unsigned new_chars_in_use(struct ix_block *b, int prefix_lc)
-{int i,expected_lc,lc,prefix_difference; UINT16 key_lc;
+{int i,expected_lc,new_key_lc,lc,prefix_difference; UINT16 key_lc;
 
   expected_lc = b->chars_in_use;
   prefix_difference = b->prefix_lc - prefix_lc;
@@ -1711,12 +1714,13 @@ static unsigned new_chars_in_use(struct ix_block *b, int prefix_lc)
     expected_lc = expected_lc + (prefix_difference * b->keys_in_block) - prefix_difference;
     for (i=0; i<b->keys_in_block; i++) {
       lc = uncompress_key_lc(&key_lc,(unsigned char *)b->keys+b->keys[i]);
-      expected_lc = expected_lc + (UINT32_lc_if_compressed((UINT32)(key_lc+prefix_difference)) - lc);
+      new_key_lc = key_lc + prefix_difference;
+      if ( new_key_lc<0 ) new_key_lc = 0;
+      expected_lc = expected_lc + (UINT32_lc_if_compressed((UINT32)(new_key_lc)) - lc);
     }
   }
   return(expected_lc);
 }
-
 /* ix_pool_lc_after_insert returns the size that an ix_pool would */
 /*   be if key k and pointer p were inserted in entry ix of block */
 /*   b.  If the insertion is at either the beginning or end of    */
@@ -1725,32 +1729,33 @@ static unsigned new_chars_in_use(struct ix_block *b, int prefix_lc)
 /*   prefix_lc of the block after insertion is returned in        */
 /*   new_prefix_lc.                                               */
 
+
 static int ix_pool_lc_after_insert(struct fcb *f, struct ix_block *b, struct key *k,
   levelx_pntr *p, int ix, unsigned *new_prefix_lc)
-{int needed,pool_lc,prefix_difference=0,save_pool_lc; struct key min,max;
+{int needed,pool_lc,save_pool_lc; struct key min,max;
 
-  needed = k->lc - b->prefix_lc + levelx_pntr_lc(f,p,b->level) +
-    UINT32_lc_if_compressed((UINT32)k->lc) + sizeof(UINT16);
-
-  pool_lc = ix_pool_lc(b) + needed;
-  save_pool_lc = pool_lc;
-  if ( ix==0 ) {
+  if ( b->keys_in_block==0 ) *new_prefix_lc = 0;
+  else if ( ix==0 ) {
     get_max_key(b,&max);
-    prefix_difference = b->prefix_lc - find_prefix_lc(k,&max);
-    pool_lc = pool_lc + (prefix_difference * (b->keys_in_block+1)) - prefix_difference;
+    *new_prefix_lc = find_prefix_lc(k,&max);
   }
   else if ( ix==b->keys_in_block ) {
     get_nth_key(b,&min,0);
-    prefix_difference = b->prefix_lc - find_prefix_lc(&min,k);
-    pool_lc = pool_lc + (prefix_difference * (b->keys_in_block+1)) - prefix_difference;
+    *new_prefix_lc = find_prefix_lc(&min,k);
   }
-  /*  if ( f->trace ) {
+  else *new_prefix_lc = b->prefix_lc;
+
+  needed = ix_entry_lc(f,k,p,*new_prefix_lc,b->level) + sizeof(UINT16);
+  save_pool_lc = ix_pool_lc(b) + needed;
+  pool_lc = new_chars_in_use(b,(int)*new_prefix_lc) + (b->keys_in_block * sizeof(UINT16)) + needed;
+
+  if ( f->trace ) {
     fprintf(f->log_file,"  ix_pool_aft_insrt, need=%d, k->lc=%d, orig ix_pool=%d, prefix_lc=%d/%d, ",
-      needed,k->lc,ix_pool_lc(b),b->prefix_lc,b->prefix_lc-prefix_difference);
+      needed,k->lc,ix_pool_lc(b),b->prefix_lc,*new_prefix_lc);
     fprintf(f->log_file,"keys_in_block=%d, ix=%d\n  pool before prefix adjustment=%d, after=%d\n",
       b->keys_in_block,ix,save_pool_lc,pool_lc);
-      }*/
-  *new_prefix_lc = b->prefix_lc - prefix_difference;
+  }
+
   return( pool_lc );
 }
 
@@ -1764,36 +1769,41 @@ static int ix_pool_lc_after_insert(struct fcb *f, struct ix_block *b, struct key
 
 static int ix_pool_lc_after_replace(struct fcb *f, struct ix_block *b, struct key *k, levelx_pntr *p,
   int ix, unsigned *new_prefix_lc)
-{int pool_lc,difference,pntr_difference,key_difference,prefix_difference=0,new_key_lc,save_pool_lc;
-struct key min,max; struct leveln_pntr pn;
+{int i,pool_lc; struct key min,max;
 
-  if ( b->level==0 ) pntr_difference = level0_pntr_lc(f,&(p->p0)) - unpack0_lc(f,b,ix);
-  else pntr_difference = leveln_pntr_lc(&(p->pn)) - unpackn_ptr(b,ix,&pn);
-
-  new_key_lc = k->lc - b->prefix_lc + UINT32_lc_if_compressed((UINT32)(k->lc-b->prefix_lc));
-  key_difference =  new_key_lc - key_entry_lc(b,ix);;
-
-  difference =  key_difference + pntr_difference;
-
-  pool_lc = ix_pool_lc(b) + difference;
-  save_pool_lc = pool_lc;
-  if ( ix==0 ) {
+  if ( b->keys_in_block<=1 ) *new_prefix_lc = 0;
+  else if ( ix==0 ) {
     get_max_key(b,&max);
-    prefix_difference = b->prefix_lc - find_prefix_lc(k,&max);
-    pool_lc = pool_lc + (prefix_difference * b->keys_in_block) - prefix_difference;
+    *new_prefix_lc = find_prefix_lc(k,&max);
   }
   else if ( ix==b->keys_in_block-1 ) {
     get_nth_key(b,&min,0);
-    prefix_difference = b->prefix_lc - find_prefix_lc(&min,k);
-    pool_lc = pool_lc + (prefix_difference * b->keys_in_block) - prefix_difference;
+    *new_prefix_lc = find_prefix_lc(&min,k);
   }
+  else *new_prefix_lc = b->prefix_lc;
+
+  if ( *new_prefix_lc==b->prefix_lc ) {
+    pool_lc = ix_pool_lc(b) - ix_entries_lc(f,b,ix,1,*new_prefix_lc)
+               + ix_entry_lc(f,k,p,*new_prefix_lc,b->level);
+  }
+  else {
+    pool_lc = *new_prefix_lc + (b->keys_in_block * sizeof(UINT16));
+    for (i=0; i<b->keys_in_block; i++) {
+      if ( i==ix ) {
+        pool_lc = pool_lc + ix_entry_lc(f,k,p,*new_prefix_lc,b->level);
+      }
+      else {
+        pool_lc = pool_lc + ix_entries_lc(f,b,i,1,*new_prefix_lc);
+      }
+    }
+  }
+
   if ( f->trace ) {
-    fprintf(f->log_file,"  ix_pool_aft_repl, diff=%d, k->lc=%d, orig ix_pool(b)=%d, prefix_lc=%d/%d",
-      difference,k->lc,ix_pool_lc(b),b->prefix_lc,b->prefix_lc-prefix_difference);
-    fprintf(f->log_file,", keys_in_block=%d, ix=%d\n",b->keys_in_block,ix);
-    fprintf(f->log_file,"  insert pool before prefix adjustment=%d, after=%d\n",save_pool_lc,pool_lc);
+    fprintf(f->log_file,"  ix_pool_aft_repl, k->lc=%d, orig ix_pool(b)=%d, prefix_lc=%d/%d",
+      k->lc,ix_pool_lc(b),b->prefix_lc,*new_prefix_lc);
+    fprintf(f->log_file,", keys_in_block=%d, ix=%d, pool_lc=%d\n",b->keys_in_block,ix,pool_lc);
   }
-  *new_prefix_lc = b->prefix_lc - prefix_difference;
+
   return( pool_lc );
 }
 
