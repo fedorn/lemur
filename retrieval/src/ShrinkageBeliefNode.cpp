@@ -227,7 +227,7 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
 
       // push new document node extents on that we may need
       while ( docNode < numNodes && docStruct->begin( docNode ) <= innerIter->begin ) {      
-        indri::index::Extent extent( 1, docStruct->begin( docNode ), docStruct->end( docNode ), docNode );
+        indri::index::Extent extent( 1.0, docStruct->begin( docNode ), docStruct->end( docNode ), docNode );
         // only insert if needed
         if ( extent.end >= innerIter->begin ) {
           activeOuterExtents.insert( extent );
