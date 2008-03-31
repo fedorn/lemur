@@ -926,7 +926,7 @@ void NexiLexer::mTERM(bool _createToken) {
 	if ( synPredMatched44 ) {
 		mFLOAT(false);
 		if ( inputState->guessing==0 ) {
-#line 110 "nexilang.g"
+#line 111 "nexilang.g"
 			_ttype = FLOAT;
 #line 930 "NexiLexer.cpp"
 		}
@@ -985,7 +985,7 @@ void NexiLexer::mTERM(bool _createToken) {
 			if ( synPredMatched46 ) {
 				mNUMBER(false);
 				if ( inputState->guessing==0 ) {
-#line 111 "nexilang.g"
+#line 112 "nexilang.g"
 					_ttype = NUMBER;
 #line 989 "NexiLexer.cpp"
 				}
@@ -1124,7 +1124,7 @@ void NexiLexer::mJUNK(bool _createToken) {
 	}
 	}
 	if ( inputState->guessing==0 ) {
-#line 124 "nexilang.g"
+#line 125 "nexilang.g"
 		_ttype = antlr::Token::SKIP;
 #line 1128 "NexiLexer.cpp"
 	}

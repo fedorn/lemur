@@ -490,11 +490,12 @@ rawText returns [ indri::lang::RawExtentNode* t ] {
   } :
   id:TERM {
     std::string text = id->getText();
-
-//     std::string::iterator c = text.begin();
-//     while (c != text.end()) { *c = tolower(*c); c++; }
-
     t = new indri::lang::IndexTerm(id->getText());
+    _nodes.push_back(t);
+  } |
+  ab:ABOUT {
+    std::string text = ab->getText();
+    t = new indri::lang::IndexTerm(ab->getText());
     _nodes.push_back(t);
   } |
   n:NUMBER {

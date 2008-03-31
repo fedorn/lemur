@@ -22,7 +22,7 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API NexiParser : public ANTLR_USE_NAMESPACE(antlr)LLkParser, public NexiLexerTokenTypes
 {
-#line 131 "nexilang.g"
+#line 132 "nexilang.g"
 
 private:
   // storage for allocated nodes
@@ -100,6 +100,8 @@ private:
 	
 	static const unsigned long _tokenSet_0_data_[];
 	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_0;
+	static const unsigned long _tokenSet_1_data_[];
+	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_1;
 };
 
 ANTLR_END_NAMESPACE
