@@ -15,7 +15,7 @@
 // 24 February 2004 -- tds
 //
 // 18 August 2004 -- dam
-// incorporated multiple query, query expansion, and TREC output support 
+// incorporated multiple query, query expansion, and TREC output support
 //
 //
 // Indri local machine query application
@@ -31,7 +31,7 @@ adding a suffix. Valid values are (case insensitive) K = 1000, M =
 1000000, G = 1000000000. So 100M would be equivalent to 100000000. The
 value should contain only decimal digits and the optional
 suffix. Specified as &lt;memory&gt;100M&lt;/memory&gt; in the parameter
-file and as <tt>-memory=100M</tt> on the command line. </dd> 
+file and as <tt>-memory=100M</tt> on the command line. </dd>
 <dt>index</dt>
 <dd> path to an Indri Repository. Specified as
 &lt;index&gt;/path/to/repository&lt;/index&gt; in the parameter file and
@@ -57,7 +57,7 @@ multiple times.
 </dd>
 <dt>rule</dt>
 <dd>specifies the smoothing rule (TermScoreFunction) to apply. Format of
-the rule is:<br> 
+the rule is:<br>
 
 <tt>   ( key ":" value ) [ "," key ":" value ]* </tt>
 <p>
@@ -70,11 +70,11 @@ Here's an example rule in command line format:<br>
 </tt>
 
 <p>This corresponds to Jelinek-Mercer smoothing with background lambda
-equal to 0.2, only for items in a title field. 
+equal to 0.2, only for items in a title field.
 
 <p>If nothing is listed for a key, all values are assumed.
 So, a rule that does not specify a field matches all fields.  This makes
-<tt>-rule=method:linear,collectionLambda:0.2</tt> a valid rule. 
+<tt>-rule=method:linear,collectionLambda:0.2</tt> a valid rule.
 
 <p>Valid keys:
 <dl>
@@ -91,7 +91,7 @@ So, a rule that does not specify a field matches all fields.  This makes
 collectionLambda=0.4, documentLambda=0.0),  collectionLambda is also
 known as just "lambda", either will work </dt>
 <dt>   twostage</dt><dd> (also 'two-stage', 'two') (default mu=2500,
-lambda=0.4)</dd> 
+lambda=0.4)</dd>
 </dl>
 If the rule doesn't parse correctly, the default is Dirichlet, mu=2500.
 </dd>
@@ -103,7 +103,7 @@ as <tt>-stopper.word=stopword</tt> on the command line. This is an
 optional parameter with the default of no stopping.</dd>
 <dt>maxWildcardTerms</dt>
 <dd>
-<i>(optional)</i> An integer specifying the maximum number of wildcard terms that can 
+<i>(optional)</i> An integer specifying the maximum number of wildcard terms that can
 be generated for a synonym list for this query or set of queries. If this limit
 is reached for a wildcard term, an exception will be thrown. If this parameter
 is not specified, a default of 100 will be used.
@@ -157,12 +157,12 @@ Specified as &lt;inex&gt;&lt;description&gt;some description&lt;/description&gt;
 <dl>
 <dt>fbDocs</dt>
 <dd>an integer specifying the number of documents to use for
-feedback. Specified as 
+feedback. Specified as
 &lt;fbDocs&gt;number&lt;/fbDocs&gt; in the parameter file and
 as <tt>-fbDocs=number</tt> on the command line.</dd>
 <dt>fbTerms</dt>
 <dd>an integer specifying the number of terms to use for
-feedback. Specified as 
+feedback. Specified as
 &lt;fbTerms&gt;number&lt;/fbTerms&gt; in the parameter file and
 as <tt>-fbTerms=number</tt> on the command line.</dd>
 <dt>fbMu</dt>
@@ -216,7 +216,7 @@ static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, ind
     return false;
 
   indri::api::Parameters slice = p[parameterName];
-  
+
   for( size_t i=0; i<slice.size(); i++ ) {
     vec.push_back( slice[i] );
   }
@@ -231,21 +231,21 @@ struct query_t {
     }
   };
 
-  query_t( int _index, int _number, const std::string& _text, const std::string &queryType ) :
+  query_t( int _index, std::string _number, const std::string& _text, const std::string &queryType ) :
     index( _index ),
     number( _number ),
     text( _text ), qType(queryType)
   {
   }
 
-  query_t( int _index, int _number, const std::string& _text ) :
+  query_t( int _index, std::string _number, const std::string& _text ) :
     index( _index ),
     number( _number ),
     text( _text )
   {
   }
 
-  int number;
+  std::string number;
   int index;
   std::string text;
   std::string qType;
@@ -288,7 +288,7 @@ private:
       } else {
         _results = _environment.runQuery( query, _initialRequested, queryType );
       }
-      
+
       if( _expander ) {
         std::string expandedQuery = _expander->expand( query, _results );
         if( _printQuery ) output << "# expanded: " << expandedQuery << std::endl;
@@ -302,14 +302,14 @@ private:
     }
   }
 
-  void _printResultRegion( std::stringstream& output, int queryIndex, int start, int end  ) {
+  void _printResultRegion( std::stringstream& output, std::string queryIndex, int start, int end  ) {
     std::vector<std::string> documentNames;
     std::vector<indri::api::ParsedDocument*> documents;
 
     std::vector<indri::api::ScoredExtentResult> resultSubset;
-    
+
     resultSubset.assign( _results.begin() + start, _results.begin() + end );
-    
+
 
     // Fetch document data for printing
     if( _printDocuments || _printPassages || _printSnippets ) {
@@ -335,23 +335,23 @@ private:
       // We only want document names, so the documentMetadata call may be faster
       documentNames = _environment.documentMetadata( resultSubset, "docno" );
     }
-    
+
     std::vector<std::string> pathNames;
     if ( _inexFormat ) {
       // output topic header
       output << "  <topic topic-id=\"" << queryIndex << "\">" << std::endl
-	     << "    <collections>" << std::endl
-	     << "      <collection>ieee</collection>" << std::endl
-	     << "    </collections>" << std::endl;
+       << "    <collections>" << std::endl
+       << "      <collection>ieee</collection>" << std::endl
+       << "    </collections>" << std::endl;
 
       // retrieve path names
       pathNames = _environment.pathNames( _results );
     }
-    
+
     // Print results
     for( size_t i=0; i < resultSubset.size(); i++ ) {
       int rank = start+i+1;
-      int queryNumber = queryIndex;
+      std::string queryNumber = queryIndex;
 
       if( _trecFormat ) {
         // TREC formatted output: queryNumber, Q0, documentName, rank, score, runID
@@ -363,11 +363,11 @@ private:
                 << _runID << std::endl;
       } else if( _inexFormat ) {
 
-	output << "    <result>" << std::endl 
-	       << "      <file>" << documentNames[i] << "</file>" << std::endl 
-	       << "      <path>" << pathNames[i] << "</path>" << std::endl 
-	       << "      <rsv>" << resultSubset[i].score << "</rsv>"  << std::endl 
-	       << "    </result>" << std::endl;
+  output << "    <result>" << std::endl
+         << "      <file>" << documentNames[i] << "</file>" << std::endl
+         << "      <path>" << pathNames[i] << "</path>" << std::endl
+         << "      <rsv>" << resultSubset[i].score << "</rsv>"  << std::endl
+         << "    </result>" << std::endl;
       }
       else {
         // score, documentName, firstWord, lastWord
@@ -381,7 +381,7 @@ private:
         output << documents[i]->text << std::endl;
       }
 
-      if( _printPassages ) {	
+      if( _printPassages ) {
         int byteBegin = documents[i]->positions[ resultSubset[i].begin ].begin;
         int byteEnd = documents[i]->positions[ resultSubset[i].end-1 ].end;
         output.write( documents[i]->text + byteBegin, byteEnd - byteBegin );
@@ -401,15 +401,15 @@ private:
     }
   }
 
-  void _printResults( std::stringstream& output, int queryIndex ) {
+  void _printResults( std::stringstream& output, std::string queryNumber ) {
     for( size_t start = 0; start < _results.size(); start += 50 ) {
       size_t end = std::min<size_t>( start + 50, _results.size() );
-      _printResultRegion( output, queryIndex, start, end );
+      _printResultRegion( output, queryNumber, start, end );
     }
     delete _annotation;
     _annotation = 0;
   }
-  
+
 
 public:
   QueryThread( std::queue< query_t* >& queries,
@@ -437,7 +437,7 @@ public:
     std::vector<std::string> stopwords;
     if( copy_parameters_to_string_vector( stopwords, _parameters, "stopper.word" ) )
       _environment.setStopwords(stopwords);
-    
+
     std::vector<std::string> smoothingRules;
     if( copy_parameters_to_string_vector( smoothingRules, _parameters, "rule" ) )
       _environment.setScoringRules( smoothingRules );
@@ -476,9 +476,9 @@ public:
       _expander = new indri::query::RMExpander( &_environment, _parameters );
     }
 
-		if (_parameters.exists("maxWildcardTerms")) {
-			_environment.setMaxWildcardTerms((int)_parameters.get("maxWildcardTerms"));
-		}
+    if (_parameters.exists("maxWildcardTerms")) {
+      _environment.setMaxWildcardTerms((int)_parameters.get("maxWildcardTerms"));
+    }
 
     return 0;
   }
@@ -534,7 +534,7 @@ void push_queue( std::queue< query_t* >& q, indri::api::Parameters& queries,
                  int queryOffset ) {
 
   for( size_t i=0; i<queries.size(); i++ ) {
-    int queryNumber;
+    std::string queryNumber;
     std::string queryText;
     std::string queryType = "indri";
     if( queries[i].exists( "type" ) )
@@ -542,10 +542,11 @@ void push_queue( std::queue< query_t* >& q, indri::api::Parameters& queries,
 
     if( queries[i].exists( "number" ) ) {
       queryText = (std::string) queries[i]["text"];
-      queryNumber = (int) queries[i]["number"];
+      queryNumber = (std::string) queries[i]["number"];
     } else {
       queryText = (std::string) queries[i];
-      queryNumber = queryOffset + int(i);
+      int thisQuery=queryOffset + int(i);
+      queryNumber = "" + thisQuery;
     }
     q.push( new query_t( i, queryNumber, queryText, queryType ) );
   }
@@ -563,7 +564,7 @@ int main(int argc, char * argv[]) {
     if( !param.exists( "query" ) )
       LEMUR_THROW( LEMUR_MISSING_PARAMETER_ERROR, "Must specify at least one query." );
 
-    if( !param.exists("index") && !param.exists("server") ) 
+    if( !param.exists("index") && !param.exists("server") )
       LEMUR_THROW( LEMUR_MISSING_PARAMETER_ERROR, "Must specify a server or index to query against." );
 
     int threadCount = param.get( "threads", 1 );
@@ -591,18 +592,18 @@ int main(int argc, char * argv[]) {
     if( inexFormat ) {
       std::string participantID = param.get( "inex.participantID", "1");
       std::string runID = param.get( "runID", "indri" );
-      std::string inexTask = param.get( "inex.task", "CO.Thorough" );     
+      std::string inexTask = param.get( "inex.task", "CO.Thorough" );
       std::string inexTopicPart = param.get( "inex.topicPart", "T" );
       std::string description = param.get( "inex.description", "" );
       std::string queryType = param.get("inex.query", "automatic");
-      std::cout << "<inex-submission participant-id=\"" << participantID 
-		<< "\" run-id=\"" << runID 
-		<< "\" task=\"" << inexTask 
-		<< "\" query=\"" << queryType 
-		<< "\" topic-part=\"" << inexTopicPart 
-		<< "\">" << std::endl
-		<< "  <description>" << std::endl << description 
-		<< std::endl << "  </description>" << std::endl;
+      std::cout << "<inex-submission participant-id=\"" << participantID
+    << "\" run-id=\"" << runID
+    << "\" task=\"" << inexTask
+    << "\" query=\"" << queryType
+    << "\" topic-part=\"" << inexTopicPart
+    << "\">" << std::endl
+    << "  <description>" << std::endl << description
+    << std::endl << "  </description>" << std::endl;
     }
 
     // acquire the lock.
@@ -611,16 +612,16 @@ int main(int argc, char * argv[]) {
     // process output as it appears on the queue
     while( query < queryCount ) {
       query_t* result = NULL;
-      
+
       // wait for something to happen
       queueEvent.wait( queueLock );
-          
+
       while( output.size() && output.top()->index == query ) {
         result = output.top();
         output.pop();
 
         queueLock.unlock();
-          
+
         std::cout << result->text;
         delete result;
         query++;
