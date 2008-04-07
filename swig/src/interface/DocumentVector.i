@@ -25,6 +25,8 @@
     jfieldID beginField = jenv->GetFieldID( fieldClazz, "begin", "I" );
     jfieldID endField = jenv->GetFieldID( fieldClazz, "end", "I" );
     jfieldID numberField = jenv->GetFieldID( fieldClazz, "number", "J" );
+    jfieldID ordinalField = jenv->GetFieldID( fieldClazz, "ordinal", "I" );
+    jfieldID parentOrdinalField = jenv->GetFieldID( fieldClazz, "parentOrdinal", "I" );
     jfieldID nameField = jenv->GetFieldID( fieldClazz, "name", "Ljava/lang/String;" );
 
     jfieldID stemsField = jenv->GetFieldID( docVectorClazz, "stems", "[Ljava/lang/String;" );
@@ -66,6 +68,8 @@
     
       jenv->SetIntField( f, beginField, vec->fields()[i].begin );
       jenv->SetIntField( f, endField, vec->fields()[i].end );
+      jenv->SetIntField( f, ordinalField, vec->fields()[i].ordinal );
+      jenv->SetIntField( f, parentOrdinalField, vec->fields()[i].parentOrdinal );
       jenv->SetLongField( f, numberField, vec->fields()[i].number );
       jenv->SetObjectField( f, nameField, name );
   
@@ -172,6 +176,8 @@ namespace indri {
       int begin;
       int end;
       INT64 number;
+      int ordinal;
+      int parentOrdinal;
     };
 
     class DocumentVector {

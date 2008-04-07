@@ -11,6 +11,8 @@ public class DocumentVector {
     public int begin;
     public int end;
     public long number;
+    public int ordinal;
+    public int parentOrdinal;
     public String name;
   };
 

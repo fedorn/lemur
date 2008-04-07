@@ -80,7 +80,15 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
       double fieldWeight = iter->weight;
       
       for( size_t j=0; j<childResults.size(); j++ ) {
-        indri::api::ScoredExtentResult result( fieldWeight*childResults[j].score, documentID, scoreBegin, scoreEnd );
+        // indri::api::ScoredExtentResult result( fieldWeight*childResults[j].score, documentID, scoreBegin, scoreEnd );
+        indri::api::ScoredExtentResult result(childResults[j]);
+        result.score*=fieldWeight;
+        result.document=documentID;
+        result.begin=scoreBegin;
+        result.end=scoreEnd;
+        result.ordinal=iter->ordinal;
+        result.parentOrdinal=iter->parent;
+
         _scores.push_back( result );
       }
     } 
@@ -91,7 +99,11 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
       e.end = e.begin;
       const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, e, documentLength );
       for( int i=0; i<childResults.size(); i++ ) {
-        indri::api::ScoredExtentResult result( childResults[i].score, documentID, extent.begin, extent.end, 0 );
+        // indri::api::ScoredExtentResult result( childResults[i].score, documentID, extent.begin, extent.end, 0 );
+        indri::api::ScoredExtentResult result( childResults[i] );
+        result.document=documentID;
+        result.begin=extent.begin;
+        result.end=extent.end;
         _scores.push_back( result );
       }
     }

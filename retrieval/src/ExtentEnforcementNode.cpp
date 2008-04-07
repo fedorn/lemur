@@ -68,7 +68,10 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
     double fieldWeight = iter->weight;
 
     for( size_t j=0; j<childResults.size(); j++ ) {
-      indri::api::ScoredExtentResult result( fieldWeight*childResults[j].score, documentID, childResults[j].begin, childResults[j].end );
+      // indri::api::ScoredExtentResult result( fieldWeight*childResults[j].score, documentID, childResults[j].begin, childResults[j].end );
+      indri::api::ScoredExtentResult result(childResults[j]);
+      result.score*=fieldWeight;
+      result.document=documentID;
       _scores.push_back( result );
     }
   }

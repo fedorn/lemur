@@ -22,11 +22,12 @@
 namespace indri {
   namespace index {
     struct FieldStatistics {
-      FieldStatistics( const std::string& _name, bool numeric, bool ordinal )
+      FieldStatistics( const std::string& _name, bool numeric, bool ordinal, bool parental )
         :
         name(_name),
         isNumeric(numeric),
         isOrdinal(ordinal),
+        isParental(parental),
         totalCount(0),
         documentCount(0),
         lastDocument(0),
@@ -35,11 +36,12 @@ namespace indri {
       {
       }
 
-      FieldStatistics( const std::string& _name, bool numeric, bool ordinal, UINT64 _totalCount, unsigned int _documentCount, UINT64 _byteOffset )
+      FieldStatistics( const std::string& _name, bool numeric, bool ordinal, bool parental, UINT64 _totalCount, unsigned int _documentCount, UINT64 _byteOffset )
         :
         name(_name),
         isNumeric(numeric),
         isOrdinal(ordinal),
+        isParental(parental),
         totalCount(_totalCount),
         documentCount(_documentCount),
         lastDocument(0),
@@ -62,6 +64,7 @@ namespace indri {
       std::string name;
       bool isNumeric;
       bool isOrdinal;
+      bool isParental;
       UINT64 totalCount;
       unsigned int documentCount;
       UINT64 byteOffset;

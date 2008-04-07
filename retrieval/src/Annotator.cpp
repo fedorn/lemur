@@ -26,11 +26,9 @@ indri::infnet::Annotator::Annotator( const std::string& name, BeliefNode* belief
 }
 
 void indri::infnet::Annotator::add( InferenceNetworkNode* node, int documentID, indri::index::Extent &extent ) {
-  indri::api::ScoredExtentResult a;
+  indri::api::ScoredExtentResult a(extent);
 
   a.document = documentID;
-  a.begin = extent.begin;
-  a.end = extent.end;
   a.score = 0;
 
   std::set<indri::api::ScoredExtentResult, indri::api::ScoredExtentResult::score_greater> &nodeSeen = _seen[node->getName()];

@@ -72,8 +72,8 @@ indri::index::MemoryIndex::MemoryIndex( int docBase, const std::vector<Index::Fi
   for( size_t i=0; i<fields.size(); i++ ) {
     int fieldID = i+1;
 
-    _fieldData.push_back( FieldStatistics( fields[i].name, fields[i].numeric, fields[i].ordinal, 0, 0, 0 ) );
-    _fieldLists.push_back( new DocExtentListMemoryBuilder( fields[i].numeric, fields[i].ordinal ) );
+    _fieldData.push_back( FieldStatistics( fields[i].name, fields[i].numeric, fields[i].ordinal, fields[i].parental, 0, 0, 0 ) );
+    _fieldLists.push_back( new DocExtentListMemoryBuilder( fields[i].numeric, fields[i].ordinal, fields[i].parental ) );
     _fieldLookup.insert( _fieldData.back().name.c_str(), fieldID );
   }
 }
@@ -363,8 +363,8 @@ void indri::index::MemoryIndex::_writeFieldExtents( int documentID, indri::utili
     // add his field to the field list for the document
     fields.push_back( converted );
 
-    // add this location to the inverted list for fields
-    _fieldLists[tagId - 1]->addLocation( documentID, extent->begin, extent->end, extent->number, ordinal );
+    // add this location to the inverted list for fields - deferred to below - 
+    // _fieldLists[tagId - 1]->addLocation( documentID, extent->begin, extent->end, extent->number, ordinal );
   }
 
   // set the parent ordinals
@@ -383,7 +383,12 @@ void indri::index::MemoryIndex::_writeFieldExtents( int documentID, indri::utili
       }
     }
     // set the parent
+    int ordinal = fields[ offset + j ].ordinal;
+    int tagId = fields[ offset + j ].id;
     fields[ offset + j ].parentOrdinal = parentOrdinal;
+
+    // add this location to the inverted list for fields
+    _fieldLists[tagId - 1]->addLocation( documentID, extent->begin, extent->end, extent->number, ordinal, parentOrdinal );
   }
 }
 

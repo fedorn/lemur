@@ -139,6 +139,9 @@ typedef long long UINT64;
     add_property_long(obj,"document",r->document);
     add_property_long(obj,"begin",r->begin);
     add_property_long(obj,"end",r->end);
+    add_property_long(obj,"number", r->number);
+    add_property_long(obj,"ordinal", r->ordinal);
+    add_property_long(obj,"parentOrdinal", r->parentOrdinal);
     add_property_zval(obj,"_cPtr",_cPtr);
     add_next_index_zval(return_value, obj);
   }
@@ -226,6 +229,9 @@ typedef long long UINT64;
     add_property_long(obj,"document",r->document);
     add_property_long(obj,"begin",r->begin);
     add_property_long(obj,"end",r->end);
+    add_property_long(obj,"number", r->number);
+    add_property_long(obj,"ordinal", r->ordinal);
+    add_property_long(obj,"parentOrdinal", r->parentOrdinal);
     add_property_zval(obj,"_cPtr",_cPtr);
     add_next_index_zval(return_value, obj);
   }
@@ -268,6 +274,9 @@ typedef long long UINT64;
       add_property_long(obj,"document",r->document);
       add_property_long(obj,"begin",r->begin);
       add_property_long(obj,"end",r->end);
+      add_property_long(obj,"number", r->number);
+      add_property_long(obj,"ordinal", r->ordinal);
+      add_property_long(obj,"parentOrdinal", r->parentOrdinal);
       add_property_zval(obj,"_cPtr",_cPtr);
       add_next_index_zval(seRes, obj);
     }

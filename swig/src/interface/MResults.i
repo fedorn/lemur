@@ -29,6 +29,9 @@
   jfieldID beginField = jenv->GetFieldID(seClazz, "begin", "I" );
   jfieldID endField = jenv->GetFieldID(seClazz, "end", "I" );
   jfieldID documentField = jenv->GetFieldID(seClazz, "document", "I" );
+  jfieldID numberField = jenv->GetFieldID(seClazz, "number", "J");
+  jfieldID ordField = jenv->GetFieldID(seClazz, "ordinal", "I");
+  jfieldID pOrdField = jenv->GetFieldID(seClazz, "parentOrdinal", "I");
 
   for( iter = $1->begin(); iter != $1->end(); iter++ ) {
     std::vector<indri::api::ScoredExtentResult>& vec = iter->second;
@@ -45,6 +48,9 @@
       jenv->SetIntField(ser, beginField, vec[i].begin );
       jenv->SetIntField(ser, endField, vec[i].end );
       jenv->SetIntField(ser, documentField, vec[i].document );
+      jenv->SetLongField(ser, numberField, vec[i].number);
+      jenv->SetIntField(ser, ordField, vec[i].ordinal);
+      jenv->SetIntField(ser, pOrdField, vec[i].parentOrdinal);
 
       // add this object to the array
       jenv->SetObjectArrayElement(array, i, ser);

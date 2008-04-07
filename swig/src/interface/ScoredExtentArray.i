@@ -35,6 +35,9 @@
     jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
     jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
     jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+    jfieldID numberField = jenv->GetFieldID(clazz, "number", "J");
+    jfieldID ordField = jenv->GetFieldID(clazz, "ordinal", "I");
+    jfieldID pOrdField = jenv->GetFieldID(clazz, "parentOrdinal", "I");
 
     for( jsize i=0; i<input.size(); i++ ) {
       // make a new scored extent result object
@@ -45,6 +48,9 @@
       jenv->SetIntField(ser, beginField, input[i].begin );
       jenv->SetIntField(ser, endField, input[i].end );
       jenv->SetIntField(ser, documentField, input[i].document );
+      jenv->SetLongField(ser, numberField, input[i].number);
+      jenv->SetIntField(ser, ordField, input[i].ordinal);
+      jenv->SetIntField(ser, pOrdField, input[i].parentOrdinal);
 
       jenv->SetObjectArrayElement(result, i, ser);
     }
@@ -71,6 +77,9 @@
   jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
   jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
   jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+  jfieldID numberField = jenv->GetFieldID(clazz, "number", "J");
+  jfieldID ordField = jenv->GetFieldID(clazz, "ordinal", "I");
+  jfieldID pOrdField = jenv->GetFieldID(clazz, "parentOrdinal", "I");
   $1 = &resin;
 
   for( jsize i=0; i<size; i++ ) {
@@ -81,6 +90,9 @@
     ser.end = jenv->GetIntField(seobj, endField);
     ser.document = jenv->GetIntField(seobj, documentField);
     ser.score = jenv->GetDoubleField(seobj, scoreField);
+    ser.number = jenv->GetLongField(seobj, numberField);
+    ser.ordinal = jenv->GetIntField(seobj, ordField);
+    ser.parentOrdinal = jenv->GetIntField(seobj, pOrdField);
 
     $1->push_back( ser );
   }
@@ -96,6 +108,9 @@
   jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
   jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
   jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+  jfieldID numberField = jenv->GetFieldID(clazz, "number", "J");
+  jfieldID ordField = jenv->GetFieldID(clazz, "ordinal", "I");
+  jfieldID pOrdField = jenv->GetFieldID(clazz, "parentOrdinal", "I");
   $1 = &resin;
 
   for( jsize i=0; i<size; i++ ) {
@@ -106,6 +121,9 @@
     ser.end = jenv->GetIntField(seobj, endField);
     ser.document = jenv->GetIntField(seobj, documentField);
     ser.score = jenv->GetDoubleField(seobj, scoreField);
+    ser.number = jenv->GetLongField(seobj, numberField);
+    ser.ordinal = jenv->GetIntField(seobj, ordField);
+    ser.parentOrdinal = jenv->GetIntField(seobj, pOrdField);
 
     $1->push_back( ser );
   }
@@ -132,6 +150,9 @@ namespace indri {
       int document;
       int begin;
       int end;
+      INT64 number;
+      int ordinal;
+      int parentOrdinal;
     };
   }
 }

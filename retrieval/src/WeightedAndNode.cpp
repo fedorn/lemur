@@ -254,8 +254,13 @@ indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::We
   }
 
   _scores.clear();
-  if (scored) // dmf 12/03 if no child returned an extent, don't push one
-  _scores.push_back( indri::api::ScoredExtentResult(score, documentID, extent.begin, extent.end) );
+  if (scored) {
+    // dmf 12/03 if no child returned an extent, don't push one
+    indri::api::ScoredExtentResult result(extent);
+    result.score=score;
+    result.document=documentID;
+    _scores.push_back( result );
+  }
 
   // advance candidates
   while( _candidatesIndex < _candidates.size() && _candidates[_candidatesIndex] <= documentID )

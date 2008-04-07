@@ -264,11 +264,15 @@ void indri::net::NetworkServerStub::_handleDocumentVectors( indri::xml::XMLNode*
       std::string number = i64_to_string( docVector->fields()[j].number );
       std::string begin = i64_to_string( docVector->fields()[j].begin );
       std::string end = i64_to_string( docVector->fields()[j].end );
+      std::string ordinal = i64_to_string( docVector->fields()[j].ordinal );
+      std::string pOrdinal = i64_to_string( docVector->fields()[j].parentOrdinal );
 
       field->addChild( new indri::xml::XMLNode( "name", docVector->fields()[j].name ) );
       field->addChild( new indri::xml::XMLNode( "number", number ) );
       field->addChild( new indri::xml::XMLNode( "begin", begin ) );
       field->addChild( new indri::xml::XMLNode( "end", end ) );
+      field->addChild( new indri::xml::XMLNode( "ordinal", ordinal ) );
+      field->addChild( new indri::xml::XMLNode( "parentOrdinal", pOrdinal ) );
 
       fields->addChild( field );
     }

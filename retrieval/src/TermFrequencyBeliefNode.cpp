@@ -73,7 +73,11 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   } else {
     score = _function.scoreOccurrence( 0, documentLength );
   }
-    _extents.push_back( indri::api::ScoredExtentResult( score, documentID, extent.begin, extent.end ) );
+  
+  indri::api::ScoredExtentResult result(extent);
+  result.score=score;
+  result.document=documentID;
+  _extents.push_back( result );
 
   return _extents;
 }

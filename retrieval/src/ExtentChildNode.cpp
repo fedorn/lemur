@@ -131,23 +131,35 @@ void indri::infnet::ExtentChildNode::prepare( int documentID ) {
           std::set<int>::iterator ancestor = _ancestors.begin();
           std::set<int>::iterator ancestorsEnd = _ancestors.end();
           while ( ancestor != ancestorsEnd && !found ) {
-            if ( *ancestor == docStruct->parent( innerIter->ordinal ) ) {
+            int parent = innerIter->parent;
+            if ( parent == -1 ) {
+              parent = docStruct->parent( innerIter->ordinal );
+            }
+            if ( *ancestor == parent ) {
               found = true;
               indri::index::Extent extent( innerIter->weight * outerIter->weight, 
                                            innerIter->begin,
                                            innerIter->end,
-                                           innerIter->ordinal );     
+                                           innerIter->ordinal,
+                                           parent,
+                                           innerIter->number );     
                 
               _extents.push_back( extent );
             }
             ancestor++;
           }
         } else {
-          if ( outerIter->ordinal == docStruct->parent( innerIter->ordinal ) ) {
+          int parent = innerIter->parent;
+          if ( parent == -1 ) {
+            parent = docStruct->parent( innerIter->ordinal );
+          }
+          if ( outerIter->ordinal == parent ) {
             indri::index::Extent extent( innerIter->weight * outerIter->weight, 
                                          innerIter->begin,
                                          innerIter->end,
-                                         innerIter->ordinal );    
+                                         innerIter->ordinal,
+                                         parent,
+                                         innerIter->number );    
             _extents.push_back( extent );
           }
         }
@@ -258,13 +270,17 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
                 ancestor++;
               }      
       } else {
-              std::set<int>::iterator ancestor = ancestorsBegin;
-              while ( !match && ancestor != ancestorsEnd ) { 
-                if ( *ancestor == docStruct->parent( _extents[i].ordinal ) ) {
-                  match = true;
-                }
-                ancestor++;
-              }
+        int parent = _extents[i].parent;
+        if (parent == -1) {
+          parent = docStruct->parent( _extents[i].ordinal );
+        }
+        std::set<int>::iterator ancestor = ancestorsBegin;
+        while ( !match && ancestor != ancestorsEnd ) { 
+          if ( *ancestor == parent ) {
+            match = true;
+          }
+          ancestor++;
+        }
       }
       if ( match ) {
             _matches.push_back(_extents[i]);
@@ -293,9 +309,13 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
                 leaf++;
               }             
       } else {
-              if ( extent.ordinal == docStruct->parent( _extents[i].ordinal ) ) {
-                match = true;
-              }      
+        int parent = _extents[i].parent;
+        if (parent == -1) {
+          parent = docStruct->parent( _extents[i].ordinal );
+        }
+        if ( extent.ordinal == parent ) {
+          match = true;
+        }      
       }
       if ( match ) {
         _matches.push_back(_extents[i]);
@@ -305,3 +325,4 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
 
   return _matches;
 }
+

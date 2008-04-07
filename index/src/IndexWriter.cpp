@@ -109,6 +109,7 @@ void IndexWriter::_writeManifest( const std::string& path ) {
 
     field[i].set("isNumeric", _fields[i].numeric);
     field[i].set("isOrdinal", _fields[i].ordinal);
+    field[i].set("isParental", _fields[i].parental);
     field[i].set("name", _fields[i].name);
     if (_fields[i].numeric) field[i].set("parserName", _fields[i].parserName);
     field[i].set("total-documents", (UINT64) _fieldData[i].documentCount);
@@ -318,7 +319,7 @@ void IndexWriter::_writeFieldLists( std::vector<WriterIndexContext*>& contexts, 
     for( size_t i=0; i<contexts.size(); i++ )
       iterators.push_back( contexts[i]->index->fieldListIterator( fieldID ) ); 
 
-    _fieldData.push_back( FieldStatistics( _fields[field].name, _fields[field].numeric, _fields[field].ordinal, 0, 0, fieldsOutput->tell() ) );
+    _fieldData.push_back( FieldStatistics( _fields[field].name, _fields[field].numeric, _fields[field].ordinal, _fields[field].parental, 0, 0, fieldsOutput->tell() ) );
     _writeFieldList( *fieldsOutput, (int)field, iterators, contexts );
   }
 
@@ -400,11 +401,13 @@ void IndexWriter::_writeFieldList( indri::file::SequentialWriteBuffer& output,
                                    std::vector<WriterIndexContext*>& contexts ) {
   bool numeric = _fields[fieldIndex].numeric;
   bool ordinal = _fields[fieldIndex].ordinal;
+  bool parental = _fields[fieldIndex].parental;
 
   // write a control byte -- numeric fields use 0x02 (DiskDocExtentListIterator)
   // ordinal fields use 0x04 (DiskDocExtentListIterator)
   UINT8 control = (numeric ? 0x02 : 0) |
-    (ordinal ? 0x04 : 0);
+                  (ordinal ? 0x04 : 0) |
+                  (parental ? 0x08 : 0);
   output.write( &control, sizeof(UINT8) );
 
   indri::utility::Buffer dataBuffer;
@@ -466,6 +469,10 @@ void IndexWriter::_writeFieldList( indri::file::SequentialWriteBuffer& output,
         if ( ordinal ) {
           stream << (extent.ordinal - lastOrdinal);
           lastOrdinal = extent.ordinal;
+        }
+
+        if ( parental) {
+          stream << extent.parent;
         }
 
         if( entry->numbers.size() )

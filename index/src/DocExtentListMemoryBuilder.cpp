@@ -26,7 +26,7 @@ const size_t PLENTY_OF_SPACE = 30; // docID, count, begin, end: 5 bytes each; nu
 // DocExtentListMemoryBuilder constructor
 //
 
-indri::index::DocExtentListMemoryBuilder::DocExtentListMemoryBuilder( bool numeric, bool ordinal ) :
+indri::index::DocExtentListMemoryBuilder::DocExtentListMemoryBuilder( bool numeric, bool ordinal, bool parental ) :
   _documentFrequency(0),
   _extentFrequency(0),
   _list(0),
@@ -39,7 +39,8 @@ indri::index::DocExtentListMemoryBuilder::DocExtentListMemoryBuilder( bool numer
   _documentPointer(0),
   _locationCountPointer(0),
   _numeric(numeric),
-  _ordinal(ordinal)
+  _ordinal(ordinal),
+  _parental(parental)
 {
 }
 
@@ -161,11 +162,12 @@ void indri::index::DocExtentListMemoryBuilder::_terminateDocument() {
 // _safeAddLocation
 //
 
-void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( int documentID, int begin, int end, INT64 number, int ordinal ) {
+void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( int documentID, int begin, int end, INT64 number, int ordinal, int parent ) {
   assert( !_locationCountPointer || _listBegin < _locationCountPointer );
   assert( !_locationCountPointer || _listEnd > _locationCountPointer );
   assert( !_locationCountPointer || _list > _locationCountPointer );
   assert( !_ordinal || ordinal > 0 );
+  assert( !_parental || parent >= 0 );
 
   bool hasPointer = _locationCountPointer ? true : false;
   int lastdoc = _lastDocument;
@@ -196,6 +198,10 @@ void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( int documentID,
     _list = lemur::utility::RVLCompress::compress_int( _list, ordinal - _lastOrdinal );
     _lastOrdinal = ordinal;
   }
+
+  if( _parental) {
+    _list = lemur::utility::RVLCompress::compress_int( _list, parent );
+  }
   
   if( _numeric )
     _list = lemur::utility::RVLCompress::compress_longlong( _list, number );
@@ -211,7 +217,7 @@ void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( int documentID,
 // _compressedSize
 //
 
-size_t indri::index::DocExtentListMemoryBuilder::_compressedSize( int documentID, int begin, int end, INT64 number, int ordinal ) {
+size_t indri::index::DocExtentListMemoryBuilder::_compressedSize( int documentID, int begin, int end, INT64 number, int ordinal, int parent ) {
   size_t size = 0;
 
   if( _lastDocument != documentID ) {
@@ -223,6 +229,9 @@ size_t indri::index::DocExtentListMemoryBuilder::_compressedSize( int documentID
     if( _ordinal )
       size += lemur::utility::RVLCompress::compressedSize( ordinal );
 
+    if ( _parental ) 
+      size += lemur::utility::RVLCompress::compressedSize( parent );
+
     if( _numeric )
       size += lemur::utility::RVLCompress::compressedSize( number );
   } else {
@@ -231,6 +240,9 @@ size_t indri::index::DocExtentListMemoryBuilder::_compressedSize( int documentID
 
     if( _ordinal )
       size += lemur::utility::RVLCompress::compressedSize( ordinal - _lastOrdinal );
+
+    if ( _parental ) 
+      size += lemur::utility::RVLCompress::compressedSize( parent );
 
     if( _numeric )
       size += lemur::utility::RVLCompress::compressedSize( number );
@@ -243,7 +255,7 @@ size_t indri::index::DocExtentListMemoryBuilder::_compressedSize( int documentID
 // _growAddLocation
 //
 
-void indri::index::DocExtentListMemoryBuilder::_growAddLocation( int documentID, int begin, int end, INT64 number, int ordinal, size_t newDataSize ) {
+void indri::index::DocExtentListMemoryBuilder::_growAddLocation( int documentID, int begin, int end, INT64 number, int ordinal, int parent, size_t newDataSize ) {
   // have to copy the last document if it's not complete, or if there's not enough room to complete it
   bool documentMismatch = (_lastDocument != documentID);
   bool terminateSpace = (lemur::utility::RVLCompress::compressedSize( _extentFrequency - _lastExtentFrequency ) - 1) <= _listEnd - _list;
@@ -256,27 +268,27 @@ void indri::index::DocExtentListMemoryBuilder::_growAddLocation( int documentID,
   _grow();
 
   assert( newDataSize <= size_t(_listEnd - _list) );
-  _safeAddLocation( documentID, begin, end, number, ordinal );
+  _safeAddLocation( documentID, begin, end, number, ordinal, parent );
 }
 
 //
 // addLocation
 //
 
-void indri::index::DocExtentListMemoryBuilder::addLocation( int documentID, int begin, int end, INT64 number, int ordinal ) {
+void indri::index::DocExtentListMemoryBuilder::addLocation( int documentID, int begin, int end, INT64 number, int ordinal, int parent ) {
   size_t remaining = _listEnd - _list;
   assert( _listEnd >= _list );
 
   if( remaining >= PLENTY_OF_SPACE ) {
     // common case -- lots of memory; just compress the posting and shove it in
-    _safeAddLocation( documentID, begin, end, number, ordinal );
+    _safeAddLocation( documentID, begin, end, number, ordinal, parent );
   } else {
-    size_t size = _compressedSize( documentID, begin, end, number, ordinal );
+    size_t size = _compressedSize( documentID, begin, end, number, ordinal, parent );
 
     if( remaining >= size ) {
-      _safeAddLocation( documentID, begin, end, number, ordinal );
+      _safeAddLocation( documentID, begin, end, number, ordinal, parent );
     } else {
-      _growAddLocation( documentID, begin, end, number, ordinal, size );
+      _growAddLocation( documentID, begin, end, number, ordinal, parent, size );
     }
   }
 

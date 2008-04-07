@@ -37,6 +37,17 @@ namespace indri
         int begin;
         int end;
         INT64 number;
+        int ordinal;
+        int parentOrdinal;
+
+        Field() { }
+        Field(const indri::index::FieldExtent &f) {
+          begin=f.begin;
+          end=f.end;
+          number=f.number;
+          ordinal=f.ordinal;
+          parentOrdinal=f.parentOrdinal;
+        }
       };
 
     private:

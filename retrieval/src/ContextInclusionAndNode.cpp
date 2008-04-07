@@ -234,8 +234,11 @@ indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::Co
       for( size_t j=0; j<childResults.size(); j++ ) {
         double childScore = (*iter).weight * childResults[j].score;
 
-        _scores.push_back( indri::api::ScoredExtentResult(childScore, documentID,
-                                                          childResults[j].begin, childResults[j].end) );
+        indri::api::ScoredExtentResult thisResult(childResults[j]);
+        thisResult.score=childScore;
+        thisResult.document=documentID;
+
+        _scores.push_back( thisResult );
       }
     } else {
       double childScore = 0;

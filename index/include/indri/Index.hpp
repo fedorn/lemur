@@ -48,6 +48,8 @@ namespace indri {
         std::string parserName;
         /// does the field have an ordinal
         bool ordinal;
+        /// does the field have its parent
+        bool parental;
       };
 
       virtual ~Index() {};

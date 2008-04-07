@@ -133,8 +133,10 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
     //            << std::endl;    
     //     std::cout << "\t" << getName() << " " << extent.begin << ":" << extent.end << " " << score << " " << "Default!" << std::endl;
 
-    _results.push_back( indri::api::ScoredExtentResult( score, documentID, 
-                                                        extent.begin, extent.end )); // , extent.ordinal ));
+    indri::api::ScoredExtentResult result(extent);
+    result.score=score;
+    result.document=documentID;
+    _results.push_back(result);
   }
   return _results;
 }

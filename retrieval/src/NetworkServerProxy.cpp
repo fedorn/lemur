@@ -278,6 +278,8 @@ namespace indri
               const indri::xml::XMLNode* numberField = field->getChild("number");
               const indri::xml::XMLNode* beginField = field->getChild("begin");
               const indri::xml::XMLNode* endField = field->getChild("end");
+              const indri::xml::XMLNode* ordinalField = field->getChild("ordinal");
+              const indri::xml::XMLNode* pOrdinalField = field->getChild("parentOrdinal");
 
               indri::api::DocumentVector::Field f;
 
@@ -285,6 +287,8 @@ namespace indri
               f.number = string_to_i64( numberField->getValue() );
               f.begin = int(string_to_i64( beginField->getValue() ));
               f.end = int(string_to_i64( endField->getValue() ));
+              f.ordinal = int(string_to_i64( ordinalField->getValue() ));
+              f.parentOrdinal = int(string_to_i64( pOrdinalField->getValue() ));
 
               fieldVector.push_back(f);
             }

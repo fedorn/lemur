@@ -77,8 +77,12 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   }
 
   _scores.clear();
-  if (scored)
-    _scores.push_back( indri::api::ScoredExtentResult( log(s), documentID, extent.begin, extent.end) );
+  if (scored) {
+    indri::api::ScoredExtentResult result(extent);
+    result.score=log(s);
+    result.document=documentID;
+    _scores.push_back( result );
+  }
 
   return _scores;
 }

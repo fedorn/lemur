@@ -33,6 +33,7 @@ namespace indri {
       UINT64 _startOffset;
       bool _numeric;
       bool _ordinal;
+      bool _parental;
 
       DocumentExtentData _data;
       bool _finished;

@@ -62,7 +62,7 @@ namespace indri
         listName = name.substr( name.find(':')+1 );
     
         indri::api::ScoredExtentResult aligned;
-        int count = length / (sizeof(INT32)*3 + sizeof(double));
+        int count = length / (sizeof(INT32)*5 + sizeof(double) + sizeof(INT64));
         std::vector<indri::api::ScoredExtentResult>& resultVector = _results[nodeName][listName];
     
         const char* p = (const char*) buffer;
@@ -81,10 +81,22 @@ namespace indri
           memcpy( &aligned.end, p, sizeof(INT32) );
           p += sizeof(INT32);
 
+          memcpy( &aligned.number, p, sizeof(UINT64) );
+          p += sizeof(INT64);
+
+          memcpy( &aligned.ordinal, p, sizeof(INT32) );
+          p += sizeof(INT32);
+
+          memcpy( &aligned.parentOrdinal, p, sizeof(INT32) );
+          p += sizeof(INT32);
+
           aligned.begin = ntohl(aligned.begin);
           aligned.end = ntohl(aligned.end);
           aligned.document = ntohl(aligned.document);
           aligned.score = lemur_compat::ntohd(aligned.score);
+          aligned.number = lemur_compat::ntohll(aligned.number);
+          aligned.ordinal = ntohl(aligned.ordinal);
+          aligned.parentOrdinal = ntohl(aligned.parentOrdinal);
 
           resultVector.push_back(aligned);
         }

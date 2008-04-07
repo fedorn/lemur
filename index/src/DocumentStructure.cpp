@@ -34,6 +34,7 @@ indri::index::DocumentStructure::loadStructure(const indri::utility::greedy_vect
   _nodes[0].numChildren = 0;
   _nodes[0].parent = -1;
   _nodes[0].children = 0;
+  _nodes[0].number=0;
 
   // no fields? no data.
   if (_numNodes==0) return;
@@ -53,6 +54,8 @@ indri::index::DocumentStructure::loadStructure(const indri::utility::greedy_vect
     int id = fields[i].ordinal;   
     int parent = fields[i].parentOrdinal;
 
+    UINT64 number=fields[i].number;
+
     //    assert( id == i + 1 );
 
     _nodes[id].begin = begin;
@@ -62,6 +65,7 @@ indri::index::DocumentStructure::loadStructure(const indri::utility::greedy_vect
     _nodes[id].length = length;
     _nodes[id].totalLength = length;
     _nodes[id].numChildren = 0;
+    _nodes[id].number=number;
     _nodes[id].parent = parent;
     _nodes[id].children = 0;
 
@@ -167,6 +171,13 @@ indri::index::DocumentStructure::type(int node) {
   return 0;
 }
 
+UINT64 
+indri::index::DocumentStructure::number(int node) {
+  if (node > 0 && node <= _numNodes) {
+    return _nodes[node].number;
+  }
+  return 0;
+}
 
 indri::index::DocumentStructure::child_iterator
 indri::index::DocumentStructure::childrenBegin( int node ) {

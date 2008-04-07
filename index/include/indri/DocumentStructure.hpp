@@ -25,6 +25,8 @@ typedef struct ninf {
 
   int begin;
   int end;
+
+  UINT64 number;
   
   int length;
   int totalLength;
@@ -81,6 +83,7 @@ public:
   int end(int node);
   int accumulatedLength(int node);
   int type(int node);
+  UINT64 number(int node);
 
   typedef indri::utility::greedy_vector<int>::iterator child_iterator;
   // Gets the start of a list containing children of a node.  childrenBegin( 0 )

@@ -61,6 +61,7 @@ void indri::index::DiskDocExtentListIterator::startIteration() {
 
   _numeric = (control & 0x02) ? true : false;
   _ordinal = (control & 0x04) ? true : false;
+  _parental = (control & 0x08) ? true : false;
 
   // clear out all the internal data
   _data.document = 0;
@@ -181,6 +182,7 @@ void indri::index::DiskDocExtentListIterator::_readEntry() {
   int lastStart = 0;
   INT64 number;
   int ordinal = 0;
+  int parent = -1;
   int deltaOrdinal = 0;
 
   for( int i=0; i<numPositions; i++ ) {
@@ -202,10 +204,16 @@ void indri::index::DiskDocExtentListIterator::_readEntry() {
     }
     extent.ordinal = ordinal;
 
-    _data.extents.push_back( extent );
+    if (_parental) {
+      _list = lemur::utility::RVLCompress::decompress_int( _list, parent );
+    }
+    extent.parent=parent;
+
     if( _numeric ) {
       _list = lemur::utility::RVLCompress::decompress_longlong( _list, number );
       _data.numbers.push_back( number );
+      extent.number=number;
     }
+    _data.extents.push_back( extent );
   }
 }

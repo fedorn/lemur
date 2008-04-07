@@ -49,7 +49,8 @@ namespace indri
             const std::vector<indri::api::ScoredExtentResult>& resultList = nodeIter->second;
 
             // send each chunk of 100 results in a separate chunk
-            const char resultSize = 20;
+            // const char resultSize = 20;
+            const char resultSize=(sizeof(INT32)*5 + sizeof(double) + sizeof(INT64));
             char networkResults[resultSize * 100];
             size_t resultsSent = 0;
 
@@ -64,11 +65,17 @@ namespace indri
                 byteSwapped.end = htonl(unswapped.end);
                 byteSwapped.document = htonl(unswapped.document );
                 byteSwapped.score = lemur_compat::htond(unswapped.score);
+                byteSwapped.number = lemur_compat::htonll(unswapped.number);
+                byteSwapped.ordinal = htonl(unswapped.ordinal);
+                byteSwapped.parentOrdinal = htonl(unswapped.parentOrdinal);
 
                 memcpy( networkResults + i*resultSize, &byteSwapped.score, sizeof(double) );
                 memcpy( networkResults + i*resultSize + 8, &byteSwapped.document, sizeof(INT32) );
                 memcpy( networkResults + i*resultSize + 12, &byteSwapped.begin, sizeof(INT32) );
                 memcpy( networkResults + i*resultSize + 16, &byteSwapped.end, sizeof(INT32) );
+                memcpy( networkResults + i*resultSize + 20, &byteSwapped.number, sizeof(INT64) );
+                memcpy( networkResults + i*resultSize + 28, &byteSwapped.ordinal, sizeof(INT32) );
+                memcpy( networkResults + i*resultSize + 32, &byteSwapped.parentOrdinal, sizeof(INT32) );
               }
 
               stream->reply( resultName, networkResults, int(sendChunk * resultSize) );

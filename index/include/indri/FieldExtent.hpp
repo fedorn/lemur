@@ -26,7 +26,21 @@ namespace indri {
   namespace index {
     struct FieldExtent {
       FieldExtent() {};
-      FieldExtent( int _id, int _begin, int _end, INT64 _number, int _ordinal = 0, int _parentOrdinal = 0) : id(_id), begin(_begin), end(_end), number(_number), ordinal(_ordinal), parentOrdinal(_parentOrdinal) {}
+
+      FieldExtent( int _id, int _begin, int _end, INT64 _number, int _ordinal = 0, int _parentOrdinal = 0) : 
+        id(_id), begin(_begin), end(_end), 
+        number(_number), ordinal(_ordinal), 
+        parentOrdinal(_parentOrdinal) 
+      {
+      }
+
+      FieldExtent(const FieldExtent &f) :
+        id(f.id), begin(f.begin), end(f.end),
+        number(f.number), ordinal(f.ordinal),
+        parentOrdinal(f.parentOrdinal)
+      {
+      }
+
       unsigned int id;
       unsigned int begin;
       unsigned int end;

@@ -66,12 +66,9 @@ void indri::api::DocumentVector::_init( indri::index::Index* index, const indri:
   }
 
   for( size_t i=0; i<fields.size(); i++ ) {
-    Field f;
+    Field f(fields[i]);
 
     f.name = index->field(fields[i].id);
-    f.number = fields[i].number;
-    f.begin = fields[i].begin;
-    f.end = fields[i].end;
 
     _fields.push_back(f);
   }

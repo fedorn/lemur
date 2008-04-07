@@ -260,6 +260,27 @@ void indri::api::IndexEnvironment::setOrdinalField( const std::string& fieldName
   field.set( "ordinal", isOrdinal );
 }
 
+void indri::api::IndexEnvironment::setParentalField( const std::string& fieldName, bool isParental ) {
+  bool existingFields = _parameters.exists( "field" );
+  
+  if ( existingFields ) {
+    Parameters fields = _parameters["field"];
+
+    for( int i=0; i<fields.size(); i++ ) {
+      std::string parameterFieldName = fields[i]["name"];
+
+      if( parameterFieldName == fieldName ) {
+        fields[i].set( "parental", isParental );
+        return;
+      }
+    }
+  }
+  Parameters field = _parameters.append("field");
+  field.set( "name", fieldName );
+  field.set( "parental", isParental );
+}
+
+
 //
 // setMetadataIndexedFields
 //

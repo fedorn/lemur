@@ -50,7 +50,9 @@ void indri::infnet::ListAccumulator::evaluate( int documentID, int documentLengt
   const indri::utility::greedy_vector<indri::index::Extent>& extents = _counted.extents();
   
   for( size_t i=0; i<extents.size(); i++ ) {
-    _resultVector->push_back( indri::api::ScoredExtentResult( extents[i].weight, documentID, extents[i].begin, extents[i].end ) );
+    indri::api::ScoredExtentResult result(extents[i]);
+    result.document=documentID;
+    _resultVector->push_back( result );
   }
 }
 

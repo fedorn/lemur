@@ -14,5 +14,8 @@ public class ScoredExtentResult {
   public int document;
   public int begin;
   public int end;
+  public long number;
+  public int ordinal;
+  public int parentOrdinal;
 }
 

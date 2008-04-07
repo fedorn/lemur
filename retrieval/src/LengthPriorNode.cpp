@@ -44,6 +44,8 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   _scores.clear();
   const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, extent, documentLength );
   for( size_t j=0; j<childResults.size(); j++ ) {
+    indri::api::ScoredExtentResult result(childResults[j]);
+
     double score = childResults[j].score ;
     int b = childResults[j].begin;
     int e = childResults[j].end;
@@ -55,7 +57,12 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
       score = INDRI_TINY_SCORE;
     }
 
-    _scores.push_back( indri::api::ScoredExtentResult( score, documentID, b, e ) );  
+    result.score=score;
+    result.document=documentID;
+    result.begin=b;
+    result.end=e;
+
+    _scores.push_back( result );  
   }
   return _scores;
 }

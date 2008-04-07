@@ -49,7 +49,10 @@ const indri::utility::greedy_vector<bool>& indri::infnet::NullScorerNode::hasMat
 
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::NullScorerNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   _scores.clear();
-  _scores.push_back( indri::api::ScoredExtentResult( _maximumScore, documentID, extent.begin, extent.end ) );
+  indri::api::ScoredExtentResult result(extent);
+  result.score=_maximumScore;
+  result.document=documentID;
+  _scores.push_back( result );
 
   return _scores;
 }

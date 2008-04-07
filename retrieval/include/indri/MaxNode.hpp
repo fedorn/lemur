@@ -87,23 +87,23 @@ namespace indri
         int maxBegin = -1;
         int maxEnd = -1;
 
+        indri::api::ScoredExtentResult maxResult((double)-1.0, -1);
+
         for( unsigned int i=0; i<_children.size(); i++ ) {
           const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, extent, extent.end);
-
-          for( unsigned int j=0; j<childResults.size(); j++ ) {
-            if ( maxScore < childResults[j].score ) {
-              maxScore = childResults[j].score;
-              maxI = i;
-              maxJ = j;
-              maxBegin = childResults[j].begin;
-              maxEnd = childResults[j].end;
+  
+          if (childResults.size() > 0) {
+            for( unsigned int j=0; j<childResults.size(); j++ ) {
+              if ( maxResult.score < childResults[j].score ) {
+                maxResult=childResults[j];
+              }
             }
           }
         }
 
         indri::index::Extent childExtent;
-        childExtent.begin=maxBegin;
-        childExtent.end=maxEnd;
+        childExtent.begin=maxResult.begin;
+        childExtent.end=maxResult.end;
         _children[maxI]->annotate( annotator, documentID, childExtent );
       }
 

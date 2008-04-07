@@ -98,6 +98,7 @@ std::vector<indri::index::Index::FieldDescription> indri::collection::Repository
     fdesc.name = _fields[i].name;
     fdesc.numeric = _fields[i].numeric;
     fdesc.ordinal = _fields[i].ordinal;
+    fdesc.parental = _fields[i].parental;
     if (fdesc.numeric) fdesc.parserName = _fields[i].parserName;
     
     result.push_back(fdesc);
@@ -121,6 +122,7 @@ void indri::collection::Repository::_buildFields() {
       field.numeric = fields[i].get( "numeric", false ) ? true : false;
       field.parserName = fields[i].get( "parserName", "" );
       field.ordinal = fields[i].get( "ordinal", false ) ? true : false;
+      field.parental = fields[i].get( "parental", false ) ? true : false;
       _fields.push_back(field);
     }
   }

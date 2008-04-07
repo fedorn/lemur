@@ -20,6 +20,7 @@
 #define INDRI_SCOREDEXTENTRESULT_HPP
 
 #include "lemur-platform.h"
+#include "indri/Extent.hpp"
 namespace indri 
 {
   namespace api 
@@ -48,7 +49,9 @@ namespace indri
         document(0),
         begin(0),
         end(0),
-        number(0)
+        number(0),
+        ordinal(0),
+        parentOrdinal(0)
       {
       }
 
@@ -58,7 +61,9 @@ namespace indri
         document(d),
         begin(0),
         end(0),
-        number(0)
+        number(0),
+        ordinal(0),
+        parentOrdinal(0)
       {
       }
 
@@ -68,7 +73,9 @@ namespace indri
         document(d),
         begin(0),
         end(0),
-        number(0)
+        number(0),
+        ordinal(0),
+        parentOrdinal(0)
       {
       }
 
@@ -78,7 +85,9 @@ namespace indri
         document(d),
         begin(b),
         end(e),
-        number(0)
+        number(0),
+        ordinal(0),
+        parentOrdinal(0)
       {
       }
 
@@ -88,7 +97,33 @@ namespace indri
         document(d),
         begin(b),
         end(e),
-        number(n)
+        number(n),
+        ordinal(0),
+        parentOrdinal(0)
+      {
+      }
+
+      ScoredExtentResult( double s, int d, int b, int e, UINT64 n, int o)
+        :
+        score(s),
+        document(d),
+        begin(b),
+        end(e),
+        number(n),
+        ordinal(o),
+        parentOrdinal(0)
+      {
+      }
+
+      ScoredExtentResult( double s, int d, int b, int e, UINT64 n, int o, int p)
+        :
+        score(s),
+        document(d),
+        begin(b),
+        end(e),
+        number(n),
+        ordinal(o),
+        parentOrdinal(p)
       {
       }
 
@@ -98,6 +133,18 @@ namespace indri
         begin = other.begin;
         end = other.end;
         number = other.number;
+        ordinal = other.ordinal;
+        parentOrdinal = other.parentOrdinal;
+      }
+
+      ScoredExtentResult( const indri::index::Extent &extent) {
+        score = extent.weight;
+        document = 0;
+        begin = extent.begin;
+        end = extent.end;
+        number = extent.number;
+        ordinal = extent.ordinal;
+        parentOrdinal = extent.parent;
       }
 
       bool operator< ( const ScoredExtentResult& other ) const {
@@ -106,7 +153,20 @@ namespace indri
 
       bool operator== ( const ScoredExtentResult& other ) const {
         return ( document == other.document && score == other.score
-                 && begin == other.begin && end == other.end );
+                 && begin == other.begin && end == other.end 
+                 && number == other.number
+                 && ordinal==other.ordinal && parentOrdinal==other.parentOrdinal );
+      }
+
+      const ScoredExtentResult &operator=(const ScoredExtentResult& other) {
+        score = other.score;
+        document = other.document;
+        begin = other.begin;
+        end = other.end;
+        number = other.number;
+        ordinal = other.ordinal;
+        parentOrdinal = other.parentOrdinal;
+        return *this;
       }
 
       double score;
@@ -114,6 +174,8 @@ namespace indri
       int begin;
       int end;
       UINT64 number; /// future annotation "pointer"
+      int ordinal;
+      int parentOrdinal;
     };
   }
 }

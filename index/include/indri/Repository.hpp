@@ -50,6 +50,7 @@ namespace indri
         std::string parserName;
         bool numeric;
         bool ordinal;
+        bool parental;
       };
 
       typedef std::vector<indri::index::Index*> index_vector;

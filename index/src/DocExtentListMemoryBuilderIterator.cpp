@@ -45,17 +45,18 @@ void indri::index::DocExtentListMemoryBuilderIterator::startIteration() {
 
 void indri::index::DocExtentListMemoryBuilderIterator::reset( DocExtentListMemoryBuilder& builder ) {
   builder.flush();
-  reset( builder._lists, builder._numeric, builder._ordinal );
+  reset( builder._lists, builder._numeric, builder._ordinal, builder._parental );
 }
 
 //
 // reset
 //
 
-void indri::index::DocExtentListMemoryBuilderIterator::reset( const indri::utility::greedy_vector< DocExtentListMemoryBuilderSegment, 4 >& lists, bool numeric, bool ordinal ) {
+void indri::index::DocExtentListMemoryBuilderIterator::reset( const indri::utility::greedy_vector< DocExtentListMemoryBuilderSegment, 4 >& lists, bool numeric, bool ordinal, bool parental ) {
   _lists = &lists;
   _numeric = numeric;
   _ordinal = ordinal;
+  _parental = parental;
 
   _current = _lists->begin();
   
@@ -81,7 +82,7 @@ void indri::index::DocExtentListMemoryBuilderIterator::reset( const indri::utili
 
 indri::index::DocExtentListMemoryBuilderIterator::DocExtentListMemoryBuilderIterator( const class DocExtentListMemoryBuilder& builder )
 {
-  reset( builder._lists, builder._numeric, builder._ordinal );
+  reset( builder._lists, builder._numeric, builder._ordinal, builder._parental );
 }
 
 //
@@ -116,11 +117,13 @@ bool indri::index::DocExtentListMemoryBuilderIterator::nextEntry() {
 
     int deltaPosition;
     int ordinal = 0;
+    int parent = 0;
     int deltaOrdinal;
     Extent extent;
     extent.begin = 0;
     extent.end = 0;
     extent.ordinal = 0;
+    extent.parent = -1;
     extent.weight = 1;
 
     for( int i=0; i<extents; i++ ) {
@@ -135,6 +138,11 @@ bool indri::index::DocExtentListMemoryBuilderIterator::nextEntry() {
         _list = lemur::utility::RVLCompress::decompress_int( _list, deltaOrdinal );
         ordinal = ordinal + deltaOrdinal;
         extent.ordinal = ordinal;
+      }
+
+      if( _parental ) {
+        _list = lemur::utility::RVLCompress::decompress_int( _list, parent );
+        extent.parent = parent;
       }
 
       _data.extents.push_back( extent );

@@ -125,7 +125,10 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   score = _scoreFunction.scoreOccurrence( occurrences, contextSize, documentOccurrences, documentLength );
 
   _scores.clear();
-  _scores.push_back( indri::api::ScoredExtentResult( score, documentID, extent.begin, extent.end ) );
+  indri::api::ScoredExtentResult result(extent);
+  result.score=score;
+  result.document=documentID;
+  _scores.push_back( result );
 
   return _scores;
 }
