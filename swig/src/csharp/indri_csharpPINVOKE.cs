@@ -1226,6 +1226,24 @@ class indri_csharpPINVOKE {
   [DllImport("lemur_csharp", EntryPoint="CSharp_ScoredExtentResult_end_get")]
   public static extern int ScoredExtentResult_end_get(HandleRef jarg1);
 
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ScoredExtentResult_number_set")]
+  public static extern void ScoredExtentResult_number_set(HandleRef jarg1, long jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ScoredExtentResult_number_get")]
+  public static extern long ScoredExtentResult_number_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ScoredExtentResult_ordinal_set")]
+  public static extern void ScoredExtentResult_ordinal_set(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ScoredExtentResult_ordinal_get")]
+  public static extern int ScoredExtentResult_ordinal_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ScoredExtentResult_parentOrdinal_set")]
+  public static extern void ScoredExtentResult_parentOrdinal_set(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ScoredExtentResult_parentOrdinal_get")]
+  public static extern int ScoredExtentResult_parentOrdinal_get(HandleRef jarg1);
+
   [DllImport("lemur_csharp", EntryPoint="CSharp_new_ScoredExtentResult")]
   public static extern IntPtr new_ScoredExtentResult();
 
@@ -1441,6 +1459,18 @@ class indri_csharpPINVOKE {
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Field_number_get")]
   public static extern long Field_number_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Field_ordinal_set")]
+  public static extern void Field_ordinal_set(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Field_ordinal_get")]
+  public static extern int Field_ordinal_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Field_parentOrdinal_set")]
+  public static extern void Field_parentOrdinal_set(HandleRef jarg1, int jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_Field_parentOrdinal_get")]
+  public static extern int Field_parentOrdinal_get(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_new_Field")]
   public static extern IntPtr new_Field();

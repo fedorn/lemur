@@ -81,6 +81,26 @@ public class Field : IDisposable {
     } 
   }
 
+  public int ordinal {
+    set {
+      indri_csharpPINVOKE.Field_ordinal_set(swigCPtr, value);
+    } 
+    get {
+      int ret = indri_csharpPINVOKE.Field_ordinal_get(swigCPtr);
+      return ret;
+    } 
+  }
+
+  public int parentOrdinal {
+    set {
+      indri_csharpPINVOKE.Field_parentOrdinal_set(swigCPtr, value);
+    } 
+    get {
+      int ret = indri_csharpPINVOKE.Field_parentOrdinal_get(swigCPtr);
+      return ret;
+    } 
+  }
+
   public Field() : this(indri_csharpPINVOKE.new_Field(), true) {
   }
 

@@ -456,6 +456,9 @@ SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
     jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
     jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
     jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+    jfieldID numberField = jenv->GetFieldID(clazz, "number", "J");
+    jfieldID ordField = jenv->GetFieldID(clazz, "ordinal", "I");
+    jfieldID pOrdField = jenv->GetFieldID(clazz, "parentOrdinal", "I");
 
     for( jsize i=0; i<input.size(); i++ ) {
       // make a new scored extent result object
@@ -466,6 +469,9 @@ SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
       jenv->SetIntField(ser, beginField, input[i].begin );
       jenv->SetIntField(ser, endField, input[i].end );
       jenv->SetIntField(ser, documentField, input[i].document );
+      jenv->SetLongField(ser, numberField, input[i].number);
+      jenv->SetIntField(ser, ordField, input[i].ordinal);
+      jenv->SetIntField(ser, pOrdField, input[i].parentOrdinal);
 
       jenv->SetObjectArrayElement(result, i, ser);
     }
@@ -719,6 +725,8 @@ SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
     jfieldID beginField = jenv->GetFieldID( fieldClazz, "begin", "I" );
     jfieldID endField = jenv->GetFieldID( fieldClazz, "end", "I" );
     jfieldID numberField = jenv->GetFieldID( fieldClazz, "number", "J" );
+    jfieldID ordinalField = jenv->GetFieldID( fieldClazz, "ordinal", "I" );
+    jfieldID parentOrdinalField = jenv->GetFieldID( fieldClazz, "parentOrdinal", "I" );
     jfieldID nameField = jenv->GetFieldID( fieldClazz, "name", "Ljava/lang/String;" );
 
     jfieldID stemsField = jenv->GetFieldID( docVectorClazz, "stems", "[Ljava/lang/String;" );
@@ -760,6 +768,8 @@ SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
     
       jenv->SetIntField( f, beginField, vec->fields()[i].begin );
       jenv->SetIntField( f, endField, vec->fields()[i].end );
+      jenv->SetIntField( f, ordinalField, vec->fields()[i].ordinal );
+      jenv->SetIntField( f, parentOrdinalField, vec->fields()[i].parentOrdinal );
       jenv->SetLongField( f, numberField, vec->fields()[i].number );
       jenv->SetObjectField( f, nameField, name );
   
@@ -1251,6 +1261,9 @@ SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indriJNI_QueryAnnotation_1get
     jfieldID beginField = jenv->GetFieldID(seClazz, "begin", "I" );
     jfieldID endField = jenv->GetFieldID(seClazz, "end", "I" );
     jfieldID documentField = jenv->GetFieldID(seClazz, "document", "I" );
+    jfieldID numberField = jenv->GetFieldID(seClazz, "number", "J");
+    jfieldID ordField = jenv->GetFieldID(seClazz, "ordinal", "I");
+    jfieldID pOrdField = jenv->GetFieldID(seClazz, "parentOrdinal", "I");
     
     for( iter = result->begin(); iter != result->end(); iter++ ) {
       std::vector<indri::api::ScoredExtentResult>& vec = iter->second;
@@ -1267,6 +1280,9 @@ SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indriJNI_QueryAnnotation_1get
         jenv->SetIntField(ser, beginField, vec[i].begin );
         jenv->SetIntField(ser, endField, vec[i].end );
         jenv->SetIntField(ser, documentField, vec[i].document );
+        jenv->SetLongField(ser, numberField, vec[i].number);
+        jenv->SetIntField(ser, ordField, vec[i].ordinal);
+        jenv->SetIntField(ser, pOrdField, vec[i].parentOrdinal);
         
         // add this object to the array
         jenv->SetObjectArrayElement(array, i, ser);
@@ -2101,6 +2117,9 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
     jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
     jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
     jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+    jfieldID numberField = jenv->GetFieldID(clazz, "number", "J");
+    jfieldID ordField = jenv->GetFieldID(clazz, "ordinal", "I");
+    jfieldID pOrdField = jenv->GetFieldID(clazz, "parentOrdinal", "I");
     arg2 = &resin2;
     
     for( jsize i=0; i<size; i++ ) {
@@ -2111,6 +2130,9 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
       ser.end = jenv->GetIntField(seobj, endField);
       ser.document = jenv->GetIntField(seobj, documentField);
       ser.score = jenv->GetDoubleField(seobj, scoreField);
+      ser.number = jenv->GetLongField(seobj, numberField);
+      ser.ordinal = jenv->GetIntField(seobj, ordField);
+      ser.parentOrdinal = jenv->GetIntField(seobj, pOrdField);
       
       arg2->push_back( ser );
     }
@@ -2241,6 +2263,9 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
     jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
     jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
     jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+    jfieldID numberField = jenv->GetFieldID(clazz, "number", "J");
+    jfieldID ordField = jenv->GetFieldID(clazz, "ordinal", "I");
+    jfieldID pOrdField = jenv->GetFieldID(clazz, "parentOrdinal", "I");
     arg2 = &resin2;
     
     for( jsize i=0; i<size; i++ ) {
@@ -2251,6 +2276,9 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
       ser.end = jenv->GetIntField(seobj, endField);
       ser.document = jenv->GetIntField(seobj, documentField);
       ser.score = jenv->GetDoubleField(seobj, scoreField);
+      ser.number = jenv->GetLongField(seobj, numberField);
+      ser.ordinal = jenv->GetIntField(seobj, ordField);
+      ser.parentOrdinal = jenv->GetIntField(seobj, pOrdField);
       
       arg2->push_back( ser );
     }
@@ -3158,6 +3186,9 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_QueryExpander_1expan
     jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
     jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
     jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+    jfieldID numberField = jenv->GetFieldID(clazz, "number", "J");
+    jfieldID ordField = jenv->GetFieldID(clazz, "ordinal", "I");
+    jfieldID pOrdField = jenv->GetFieldID(clazz, "parentOrdinal", "I");
     arg3 = &resin3;
     
     for( jsize i=0; i<size; i++ ) {
@@ -3168,6 +3199,9 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_QueryExpander_1expan
       ser.end = jenv->GetIntField(seobj, endField);
       ser.document = jenv->GetIntField(seobj, documentField);
       ser.score = jenv->GetDoubleField(seobj, scoreField);
+      ser.number = jenv->GetLongField(seobj, numberField);
+      ser.ordinal = jenv->GetIntField(seobj, ordField);
+      ser.parentOrdinal = jenv->GetIntField(seobj, pOrdField);
       
       arg3->push_back( ser );
     }
@@ -3252,6 +3286,9 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_RMExpander_1expand(J
     jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
     jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
     jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+    jfieldID numberField = jenv->GetFieldID(clazz, "number", "J");
+    jfieldID ordField = jenv->GetFieldID(clazz, "ordinal", "I");
+    jfieldID pOrdField = jenv->GetFieldID(clazz, "parentOrdinal", "I");
     arg3 = &resin3;
     
     for( jsize i=0; i<size; i++ ) {
@@ -3262,6 +3299,9 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_RMExpander_1expand(J
       ser.end = jenv->GetIntField(seobj, endField);
       ser.document = jenv->GetIntField(seobj, documentField);
       ser.score = jenv->GetDoubleField(seobj, scoreField);
+      ser.number = jenv->GetLongField(seobj, numberField);
+      ser.ordinal = jenv->GetIntField(seobj, ordField);
+      ser.parentOrdinal = jenv->GetIntField(seobj, pOrdField);
       
       arg3->push_back( ser );
     }
@@ -3367,6 +3407,9 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_PonteExpander_1expan
     jfieldID beginField = jenv->GetFieldID(clazz, "begin", "I" );
     jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
     jfieldID documentField = jenv->GetFieldID(clazz, "document", "I" );
+    jfieldID numberField = jenv->GetFieldID(clazz, "number", "J");
+    jfieldID ordField = jenv->GetFieldID(clazz, "ordinal", "I");
+    jfieldID pOrdField = jenv->GetFieldID(clazz, "parentOrdinal", "I");
     arg3 = &resin3;
     
     for( jsize i=0; i<size; i++ ) {
@@ -3377,6 +3420,9 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_PonteExpander_1expan
       ser.end = jenv->GetIntField(seobj, endField);
       ser.document = jenv->GetIntField(seobj, documentField);
       ser.score = jenv->GetDoubleField(seobj, scoreField);
+      ser.number = jenv->GetLongField(seobj, numberField);
+      ser.ordinal = jenv->GetIntField(seobj, ordField);
+      ser.parentOrdinal = jenv->GetIntField(seobj, pOrdField);
       
       arg3->push_back( ser );
     }

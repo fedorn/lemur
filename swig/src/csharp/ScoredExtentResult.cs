@@ -79,6 +79,36 @@ public class ScoredExtentResult : IDisposable {
     } 
   }
 
+  public long number {
+    set {
+      indri_csharpPINVOKE.ScoredExtentResult_number_set(swigCPtr, value);
+    } 
+    get {
+      long ret = indri_csharpPINVOKE.ScoredExtentResult_number_get(swigCPtr);
+      return ret;
+    } 
+  }
+
+  public int ordinal {
+    set {
+      indri_csharpPINVOKE.ScoredExtentResult_ordinal_set(swigCPtr, value);
+    } 
+    get {
+      int ret = indri_csharpPINVOKE.ScoredExtentResult_ordinal_get(swigCPtr);
+      return ret;
+    } 
+  }
+
+  public int parentOrdinal {
+    set {
+      indri_csharpPINVOKE.ScoredExtentResult_parentOrdinal_set(swigCPtr, value);
+    } 
+    get {
+      int ret = indri_csharpPINVOKE.ScoredExtentResult_parentOrdinal_get(swigCPtr);
+      return ret;
+    } 
+  }
+
   public ScoredExtentResult() : this(indri_csharpPINVOKE.new_ScoredExtentResult(), true) {
   }
 

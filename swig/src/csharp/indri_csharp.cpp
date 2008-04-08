@@ -7335,6 +7335,75 @@ SWIGEXPORT int SWIGSTDCALL CSharp_ScoredExtentResult_end_get(void * jarg1) {
 }
 
 
+SWIGEXPORT void SWIGSTDCALL CSharp_ScoredExtentResult_number_set(void * jarg1, long long jarg2) {
+  indri::api::ScoredExtentResult *arg1 = (indri::api::ScoredExtentResult *) 0 ;
+  INT64 arg2 ;
+  
+  arg1 = (indri::api::ScoredExtentResult *)jarg1; 
+  arg2 = (INT64)jarg2; 
+  if (arg1) (arg1)->number = arg2;
+  
+}
+
+
+SWIGEXPORT long long SWIGSTDCALL CSharp_ScoredExtentResult_number_get(void * jarg1) {
+  long long jresult ;
+  indri::api::ScoredExtentResult *arg1 = (indri::api::ScoredExtentResult *) 0 ;
+  INT64 result;
+  
+  arg1 = (indri::api::ScoredExtentResult *)jarg1; 
+  result = (INT64) ((arg1)->number);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_ScoredExtentResult_ordinal_set(void * jarg1, int jarg2) {
+  indri::api::ScoredExtentResult *arg1 = (indri::api::ScoredExtentResult *) 0 ;
+  int arg2 ;
+  
+  arg1 = (indri::api::ScoredExtentResult *)jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->ordinal = arg2;
+  
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_ScoredExtentResult_ordinal_get(void * jarg1) {
+  int jresult ;
+  indri::api::ScoredExtentResult *arg1 = (indri::api::ScoredExtentResult *) 0 ;
+  int result;
+  
+  arg1 = (indri::api::ScoredExtentResult *)jarg1; 
+  result = (int) ((arg1)->ordinal);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_ScoredExtentResult_parentOrdinal_set(void * jarg1, int jarg2) {
+  indri::api::ScoredExtentResult *arg1 = (indri::api::ScoredExtentResult *) 0 ;
+  int arg2 ;
+  
+  arg1 = (indri::api::ScoredExtentResult *)jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->parentOrdinal = arg2;
+  
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_ScoredExtentResult_parentOrdinal_get(void * jarg1) {
+  int jresult ;
+  indri::api::ScoredExtentResult *arg1 = (indri::api::ScoredExtentResult *) 0 ;
+  int result;
+  
+  arg1 = (indri::api::ScoredExtentResult *)jarg1; 
+  result = (int) ((arg1)->parentOrdinal);
+  jresult = result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_ScoredExtentResult() {
   void * jresult ;
   indri::api::ScoredExtentResult *result = 0 ;
@@ -8507,6 +8576,52 @@ SWIGEXPORT long long SWIGSTDCALL CSharp_Field_number_get(void * jarg1) {
   
   arg1 = (indri::api::Field *)jarg1; 
   result = (INT64) ((arg1)->number);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Field_ordinal_set(void * jarg1, int jarg2) {
+  indri::api::Field *arg1 = (indri::api::Field *) 0 ;
+  int arg2 ;
+  
+  arg1 = (indri::api::Field *)jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->ordinal = arg2;
+  
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Field_ordinal_get(void * jarg1) {
+  int jresult ;
+  indri::api::Field *arg1 = (indri::api::Field *) 0 ;
+  int result;
+  
+  arg1 = (indri::api::Field *)jarg1; 
+  result = (int) ((arg1)->ordinal);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Field_parentOrdinal_set(void * jarg1, int jarg2) {
+  indri::api::Field *arg1 = (indri::api::Field *) 0 ;
+  int arg2 ;
+  
+  arg1 = (indri::api::Field *)jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->parentOrdinal = arg2;
+  
+}
+
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Field_parentOrdinal_get(void * jarg1) {
+  int jresult ;
+  indri::api::Field *arg1 = (indri::api::Field *) 0 ;
+  int result;
+  
+  arg1 = (indri::api::Field *)jarg1; 
+  result = (int) ((arg1)->parentOrdinal);
   jresult = result; 
   return jresult;
 }
