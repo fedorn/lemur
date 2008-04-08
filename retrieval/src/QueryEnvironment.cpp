@@ -314,13 +314,17 @@ void indri::api::QueryEnvironment::_mergeServerQuery( indri::infnet::InferenceNe
 //
 
 void indri::api::QueryEnvironment::addIndex( const std::string& pathname ) {
-  indri::collection::Repository* repository = new indri::collection::Repository();
-  repository->openRead( pathname, &_parameters );
-  _repositories.push_back( repository );
-
-  indri::server::LocalQueryServer *server = new indri::server::LocalQueryServer( *repository ) ;
-  _servers.push_back( server );
-  _repositoryNameMap[pathname] = std::make_pair(server, repository);
+  std::map<std::string, std::pair<indri::server::QueryServer *, indri::collection::Repository *> >::iterator iter;
+  iter = _repositoryNameMap.find(pathname);
+  if (iter == _repositoryNameMap.end()) { // only add if not present
+    indri::collection::Repository* repository = new indri::collection::Repository();
+    repository->openRead( pathname, &_parameters );
+    _repositories.push_back( repository );
+    
+    indri::server::LocalQueryServer *server = new indri::server::LocalQueryServer( *repository ) ;
+    _servers.push_back( server );
+    _repositoryNameMap[pathname] = std::make_pair(server, repository);
+  } // else, could throw an Exception, as it is a logical error.
 }
 
 //
@@ -372,28 +376,33 @@ void indri::api::QueryEnvironment::removeIndex( const std::string& pathname ) {
 //
 
 void indri::api::QueryEnvironment::addServer( const std::string& hostname ) {
-  indri::net::NetworkStream* stream = new indri::net::NetworkStream;
-  unsigned int port = INDRID_PORT;
-  std::string host = hostname;
-  int colon = (int)hostname.find(':');
+  std::map<std::string, std::pair<indri::server::QueryServer *, indri::net::NetworkStream *> >::iterator iter;
+  iter = _serverNameMap.find(hostname);
+  if (iter == _serverNameMap.end()) { // only add if not present
 
-  if( colon > 0 ) {
-    host = hostname.substr( 0, colon );
-    port = atoi( hostname.substr( colon+1 ).c_str() );
+    indri::net::NetworkStream* stream = new indri::net::NetworkStream;
+    unsigned int port = INDRID_PORT;
+    std::string host = hostname;
+    int colon = (int)hostname.find(':');
+
+    if( colon > 0 ) {
+      host = hostname.substr( 0, colon );
+      port = atoi( hostname.substr( colon+1 ).c_str() );
+    }
+
+    if( !stream->connect( host.c_str(), port ) ) {
+      delete stream;
+      throw Exception( "QueryEnvironment", "Failed to connect to server" );
+    }
+
+    _streams.push_back( stream );
+    indri::net::NetworkMessageStream* messageStream = new indri::net::NetworkMessageStream( stream );
+    indri::server::NetworkServerProxy* proxy = new indri::server::NetworkServerProxy( messageStream );
+
+    _messageStreams.push_back( messageStream );
+    _servers.push_back( proxy );
+    _serverNameMap[hostname] = std::make_pair(proxy, stream);
   }
-
-  if( !stream->connect( host.c_str(), port ) ) {
-    delete stream;
-    throw Exception( "QueryEnvironment", "Failed to connect to server" );
-  }
-
-  _streams.push_back( stream );
-  indri::net::NetworkMessageStream* messageStream = new indri::net::NetworkMessageStream( stream );
-  indri::server::NetworkServerProxy* proxy = new indri::server::NetworkServerProxy( messageStream );
-
-  _messageStreams.push_back( messageStream );
-  _servers.push_back( proxy );
-  _serverNameMap[hostname] = std::make_pair(proxy, stream);
 }
 
 //
