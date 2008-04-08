@@ -40,7 +40,8 @@ static long byte_position;
 
 %}
 %%
-
+"<!--"(.|\n)*"-->" { byte_position += tokleng; return ZAP; }
+"<!"[^\>]*">" { byte_position += tokleng; return ZAP; }
 \<[a-zA-Z/][^\>]*\>                                             { byte_position += tokleng; return TAG; }
 [&]([a-zA-Z]+|[#]([0-9]+|[xX][a-fA-F0-9]+))[;]         { byte_position += tokleng; return ZAP; /* symbols */ }
 [A-Z0-9]"."([A-Z0-9]".")*                                        { byte_position += tokleng; return ASCII_TOKEN; }
