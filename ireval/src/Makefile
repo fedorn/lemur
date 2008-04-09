@@ -47,7 +47,10 @@ $(pkgdatadir) $(pkgdatadir)/ireval_doc $(libdir):
 install: install_dirs install_data install_docs
 
 install_docs:
+ifeq ($(WITH_JAVA), 1)
 	cp -pr $(OBJ)/javadoc/* $(pkgdatadir)/ireval_doc
-
+endif
 install_data:
+ifeq ($(WITH_JAVA), 1)
 	$(INSTALL_DATA)  $(JARFILES) $(pkgdatadir)
+endif
