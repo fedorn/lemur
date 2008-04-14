@@ -48,11 +48,11 @@ CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(CXXLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $($@_LIBPATH) $($@_LIBFLAGS) -o $@
+LINK = $(CXXLD) $(AM_CFLAGS)  $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 indrisoapd$(EXEEXT): $(indriapi_DEPENDENCIES) $(BUILT_SOURCES)  $(indriapi_OBJECTS)
 	@rm -f indrisoapd$(EXEEXT)
-	$(LINK) $(indriapi_OBJECTS) $(indriapi_LDFLAGS) $(indriapi_LDADD) $(LIBS)
+	$(LINK) $(indriapi_OBJECTS) $(indriapi_LDFLAGS) $(indriapi_LDADD) $($@_LIBPATH) $($@_LIBFLAGS) $(LIBS)
 
 %.o: ../src/%.c
 	$(COMPILE) -c $<
