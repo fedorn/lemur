@@ -3,7 +3,7 @@ include MakeDefns
 LIBDIRS = @MODULES@
 
 # application directories
-APPDIRS = app
+APPDIRS = @APPDIRS@
 
 DIRS = $(LIBDIRS) $(APPDIRS)
 
