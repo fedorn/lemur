@@ -52,7 +52,7 @@ LINK = $(CXXLD) $(AM_CFLAGS)  $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 indrisoapd$(EXEEXT): $(indriapi_DEPENDENCIES) $(BUILT_SOURCES)  $(indriapi_OBJECTS)
 	@rm -f indrisoapd$(EXEEXT)
-	$(LINK) $(indriapi_OBJECTS) $(indriapi_LDFLAGS) $(indriapi_LDADD) $($@_LIBPATH) $($@_LIBFLAGS) $(LIBS)
+	$(LINK) $(indriapi_OBJECTS) $(indriapi_LDFLAGS) $($@_LIBPATH) $($@_LIBFLAGS) $(indriapi_LDADD) $(LIBS)
 
 %.o: ../src/%.c
 	$(COMPILE) -c $<
