@@ -1,0 +1,5 @@
+<parameters>
+<port>9696</port>
+<readwrite>true</readwrite>
+<index>/path/to/index</index>
+</parameters>

@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="indrisoap"
+ targetNamespace="http://lemurproject.org/indrisoap.wsdl"
+ xmlns:tns="http://lemurproject.org/indrisoap.wsdl"
+ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+ xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:indrisoap="urn:IndriSoap"
+ xmlns:SOAP="http://schemas.xmlsoap.org/wsdl/soap/"
+ xmlns:MIME="http://schemas.xmlsoap.org/wsdl/mime/"
+ xmlns:DIME="http://schemas.xmlsoap.org/ws/2002/04/dime/wsdl/"
+ xmlns:WSDL="http://schemas.xmlsoap.org/wsdl/"
+ xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+<types>
+
+ <schema targetNamespace="urn:IndriSoap"
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:indrisoap="urn:IndriSoap"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified">
+  <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+  <simpleType name="Options">
+   <restriction base="xsd:string">
+    <enumeration value="HTMLSnippet"/><!-- enum const = 1 -->
+    <enumeration value="TextSnippet"/><!-- enum const = 2 -->
+   </restriction>
+  </simpleType>
+  <complexType name="MetadataPair">
+   <sequence>
+     <element name="key" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="value" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="ArrayOfMetadataPair">
+   <complexContent>
+    <restriction base="SOAP-ENC:Array">
+     <sequence>
+      <element name="item" type="indrisoap:MetadataPair" minOccurs="0" maxOccurs="unbounded"/>
+     </sequence>
+     <attribute ref="SOAP-ENC:arrayType" WSDL:arrayType="indrisoap:MetadataPair[]"/>
+    </restriction>
+   </complexContent>
+  </complexType>
+  <complexType name="ArrayOfstring">
+   <complexContent>
+    <restriction base="SOAP-ENC:Array">
+     <sequence>
+      <element name="item" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+     </sequence>
+     <attribute ref="SOAP-ENC:arrayType" WSDL:arrayType="xsd:string[]"/>
+    </restriction>
+   </complexContent>
+  </complexType>
+  <complexType name="ArrayOfint">
+   <complexContent>
+    <restriction base="SOAP-ENC:Array">
+     <sequence>
+      <element name="item" type="xsd:int" minOccurs="0" maxOccurs="unbounded"/>
+     </sequence>
+     <attribute ref="SOAP-ENC:arrayType" WSDL:arrayType="xsd:int[]"/>
+    </restriction>
+   </complexContent>
+  </complexType>
+  <complexType name="QueryRequest">
+   <annotation>
+    <documentation>contains the parameters for running a query.</documentation>
+   </annotation>
+   <sequence>
+     <element name="query" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="formulators" type="indrisoap:ArrayOfstring" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="metadata" type="indrisoap:ArrayOfstring" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="docSet" type="indrisoap:ArrayOfint" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="resultsRequested" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="startNum" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="options" type="indrisoap:Options" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="Result">
+   <annotation>
+    <documentation>of a query request.</documentation>
+   </annotation>
+   <sequence>
+     <element name="snippet" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="documentName" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="cachedURL" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="docid" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="score" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="begin" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="end" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="metadata" type="indrisoap:ArrayOfMetadataPair" minOccurs="1" maxOccurs="1" nillable="false"/>
+   </sequence>
+  </complexType>
+  <complexType name="ArrayOfResult">
+   <complexContent>
+    <restriction base="SOAP-ENC:Array">
+     <sequence>
+      <element name="item" type="indrisoap:Result" minOccurs="0" maxOccurs="unbounded"/>
+     </sequence>
+     <attribute ref="SOAP-ENC:arrayType" WSDL:arrayType="indrisoap:Result[]"/>
+    </restriction>
+   </complexContent>
+  </complexType>
+  <complexType name="QueryResponse">
+   <annotation>
+    <documentation>collection of query results</documentation>
+   </annotation>
+   <sequence>
+     <element name="parseTime" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+     <element name="executeTime" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+     <element name="documentsTime" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+     <element name="estimatedMatches" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="results" type="indrisoap:ArrayOfResult" minOccurs="1" maxOccurs="1" nillable="false"/>
+   </sequence>
+  </complexType>
+  <complexType name="Field">
+   <annotation>
+    <documentation>an indri field</documentation>
+   </annotation>
+   <sequence>
+     <element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="begin" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="end" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="number" type="xsd:long" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="ArrayOfField">
+   <complexContent>
+    <restriction base="SOAP-ENC:Array">
+     <sequence>
+      <element name="item" type="indrisoap:Field" minOccurs="0" maxOccurs="unbounded"/>
+     </sequence>
+     <attribute ref="SOAP-ENC:arrayType" WSDL:arrayType="indrisoap:Field[]"/>
+    </restriction>
+   </complexContent>
+  </complexType>
+  <complexType name="DocumentVector">
+   <annotation>
+    <documentation>an indri document vector</documentation>
+   </annotation>
+   <sequence>
+     <element name="stems" type="indrisoap:ArrayOfstring" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="positions" type="indrisoap:ArrayOfint" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="fields" type="indrisoap:ArrayOfField" minOccurs="1" maxOccurs="1" nillable="false"/>
+   </sequence>
+  </complexType>
+  <complexType name="ArrayOfDocumentVector">
+   <complexContent>
+    <restriction base="SOAP-ENC:Array">
+     <sequence>
+      <element name="item" type="indrisoap:DocumentVector" minOccurs="0" maxOccurs="unbounded"/>
+     </sequence>
+     <attribute ref="SOAP-ENC:arrayType" WSDL:arrayType="indrisoap:DocumentVector[]"/>
+    </restriction>
+   </complexContent>
+  </complexType>
+ </schema>
+
+</types>
+
+<message name="doRunQueryRequest">
+ <part name="request" type="indrisoap:QueryRequest"/>
+</message>
+
+<message name="doRunQueryResponse">
+ <part name="return" type="indrisoap:QueryResponse"/>
+</message>
+
+<message name="doDocumentVectorsRequest">
+ <part name="ids" type="indrisoap:ArrayOfint"/>
+</message>
+
+<message name="doDocumentVectorsResponse">
+ <part name="response" type="indrisoap:ArrayOfDocumentVector"/>
+</message>
+
+<message name="doAddDocument">
+ <part name="doc" type="xsd:string"/>
+ <part name="fileClass" type="xsd:string"/>
+ <part name="meta" type="indrisoap:ArrayOfMetadataPair"/>
+</message>
+
+<message name="doAddDocumentResponse">
+ <part name="docid" type="xsd:int"/>
+</message>
+
+<message name="doDeleteDocument">
+ <part name="doc" type="xsd:int"/>
+</message>
+
+<message name="doDeleteDocumentResponse">
+</message>
+
+<portType name="indrisoapPortType">
+ <operation name="doRunQueryRequest">
+  <documentation>returns the result of running a QueryRequest.</documentation>
+  <input message="tns:doRunQueryRequest"/>
+  <output message="tns:doRunQueryResponse"/>
+ </operation>
+ <operation name="doDocumentVectors">
+  <documentation>fetch</documentation>
+  <input message="tns:doDocumentVectorsRequest"/>
+  <output message="tns:doDocumentVectorsResponse"/>
+ </operation>
+ <operation name="doAddDocument">
+  <documentation>add</documentation>
+  <input message="tns:doAddDocument"/>
+  <output message="tns:doAddDocumentResponse"/>
+ </operation>
+ <operation name="doDeleteDocument">
+  <documentation>delete</documentation>
+  <input message="tns:doDeleteDocument"/>
+  <output message="tns:doDeleteDocumentResponse"/>
+ </operation>
+</portType>
+
+<binding name="indrisoap" type="tns:indrisoapPortType">
+ <SOAP:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+ <operation name="doRunQueryRequest">
+  <SOAP:operation style="rpc" soapAction=""/>
+  <input>
+     <SOAP:body use="encoded" namespace="urn:IndriSoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+  </input>
+  <output>
+     <SOAP:body use="encoded" namespace="urn:IndriSoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+  </output>
+ </operation>
+ <operation name="doDocumentVectors">
+  <SOAP:operation style="rpc" soapAction=""/>
+  <input>
+     <SOAP:body use="encoded" namespace="urn:IndriSoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+  </input>
+  <output>
+     <SOAP:body use="encoded" namespace="urn:IndriSoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+  </output>
+ </operation>
+ <operation name="doAddDocument">
+  <SOAP:operation style="rpc" soapAction=""/>
+  <input>
+     <SOAP:body use="encoded" namespace="urn:IndriSoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+  </input>
+  <output>
+     <SOAP:body use="encoded" namespace="urn:IndriSoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+  </output>
+ </operation>
+ <operation name="doDeleteDocument">
+  <SOAP:operation style="rpc" soapAction=""/>
+  <input>
+     <SOAP:body use="encoded" namespace="urn:IndriSoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+  </input>
+  <output>
+     <SOAP:body use="encoded" namespace="urn:IndriSoap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+  </output>
+ </operation>
+</binding>
+
+<service name="indrisoap">
+ <documentation>Provide indexing and querying of an indri Repository.</documentation>
+ <port name="indrisoap" binding="tns:indrisoap">
+  <SOAP:address location="http://lemurproject.org:9696"/>
+ </port>
+</service>
+
+</definitions>

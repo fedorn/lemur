@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <schema targetNamespace="urn:IndriSoap"
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:indrisoap="urn:IndriSoap"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified">
+  <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+  <complexType name="MetadataPair">
+   <sequence>
+     <element name="key" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="value" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="QueryRequest">
+   <annotation>
+    <documentation>contains the parameters for running a query.</documentation>
+   </annotation>
+   <sequence>
+     <element name="query" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="formulators" type="indrisoap:ArrayOfstring" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="metadata" type="indrisoap:ArrayOfstring" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="docSet" type="indrisoap:ArrayOfint" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="resultsRequested" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="startNum" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="options" type="indrisoap:Options" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="Result">
+   <annotation>
+    <documentation>of a query request.</documentation>
+   </annotation>
+   <sequence>
+     <element name="snippet" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="documentName" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="cachedURL" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="docid" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="score" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="begin" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="end" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="metadata" type="indrisoap:ArrayOfMetadataPair" minOccurs="1" maxOccurs="1" nillable="false"/>
+   </sequence>
+  </complexType>
+  <complexType name="QueryResponse">
+   <annotation>
+    <documentation>collection of query results</documentation>
+   </annotation>
+   <sequence>
+     <element name="parseTime" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+     <element name="executeTime" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+     <element name="documentsTime" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+     <element name="estimatedMatches" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="results" type="indrisoap:ArrayOfResult" minOccurs="1" maxOccurs="1" nillable="false"/>
+   </sequence>
+  </complexType>
+  <complexType name="Field">
+   <annotation>
+    <documentation>an indri field</documentation>
+   </annotation>
+   <sequence>
+     <element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="begin" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="end" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="number" type="xsd:long" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="DocumentVector">
+   <annotation>
+    <documentation>an indri document vector</documentation>
+   </annotation>
+   <sequence>
+     <element name="stems" type="indrisoap:ArrayOfstring" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="positions" type="indrisoap:ArrayOfint" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="fields" type="indrisoap:ArrayOfField" minOccurs="1" maxOccurs="1" nillable="false"/>
+   </sequence>
+  </complexType>
+ </schema>
+

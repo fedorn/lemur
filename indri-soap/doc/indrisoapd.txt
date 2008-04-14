@@ -1,0 +1,108 @@
+Delete is done with internal docid (as returned from running a
+query). The parameter file requires:
+
+<readwrite>true</readwrite>
+
+to enable the add and delete calls. If the parameter file contains more than
+one index, readwrite is automatically set to false.
+
+Terminate the server with Ctrl-C (SIGINT). It has an interrupt handler that
+will cleanly close the index before terminating.
+The server provides the following:
+
+QueryResponse doRunQueryRequest( QueryRequest request )
+int doAddDocument( string docText, string fileClass, MetadataPair[] metadata
+)
+void doDeleteDocument ( int docid )
+DocumentVector[] doDocumentVectors ( int[] ids )
+
+If the server is read-only, the add/delete document calls will throw an
+exception.
+
+In add document, fileClass can be any indri fileClass (html and xml have
+been tested).
+
+If bad things (tm) happen on the server side (a lemur exception was caught),
+the API calls will throw an exception.
+
+QueryRequest contains:
+string query;         // the query string
+string[] formulators; // currently unused, to be developed
+string[] metadata;    // list of metadata fields to retrieve for each
+document, eg title
+int[] docSet;         // working set for the retrieval
+int resultsRequested; // how many documents to retrieve
+int startNum;         // offset into the retrieved list, enables next N
+results
+Options options;      // snippet generation options. One of HTMLSnippet or
+TextSnippet
+
+QueryResponse contains:
+float parseTime;      // time to parse the query, in seconds
+float executeTime;    // time to execute the query, in seconds
+float documentsTime;  // time to process the documents for snippets, in
+seconds
+int estimatedMatches; // approximate matches. argmax_{t in Q} df(t)
+Result[] results;     // the scored results for the query
+
+Result contains:
+string snippet;            // the snippet, either HTML <strong> or UPCASE
+markup
+string documentName;       // the external document id
+string cachedURL;          // url suitable for GET to fetch document content
+int docid;                 // the internal document id (use for delete)
+double score;              // the score
+int begin;                 // extent begin
+int end;                   // extent end
+MetadataPair[] metadata;   // Metadata elements from the request, eg title
+
+C# that interacts with the server looks like this:
+
+//query:
+
+org.lemurproject.indrisoap soap = new org.lemurproject.indrisoap();
+org.lemurproject.QueryRequest req = new
+TestSoap.org.lemurproject.QueryRequest();
+req.query = query;
+req.startNum = 0;
+req.resultsRequested = 5;
+req.options = org.lemurproject.Options.HTMLSnippet; 
+req.metadata = new string[] {"headline", "docno"}; 
+req.formulators = new string[0];
+org.lemurproject.QueryResponse resp = null;
+resp = soap.doRunQueryRequest(req);
+float totalTime = resp.parseTime + resp.documentsTime + resp.executeTime;
+TimeSpan ts = TimeSpan.FromSeconds(totalTime);
+Console.WriteLine("matches: " + resp.estimatedMatches + "\n[p: " +  
+                  TimeSpan.FromSeconds(resp.parseTime) + " e: " +
+                  TimeSpan.FromSeconds(resp.executeTime) + " d: " + 
+                  TimeSpan.FromSeconds(resp.documentsTime) + " t: " + ts +
+"]");
+org.lemurproject.Result[] results = resp.results; 
+for (int i = 0; i < results.Length; i++) {
+   org.lemurproject.Result s = results[i];
+   Console.WriteLine(s.documentName + ":" + s.score + "\n" + s.snippet);
+}
+
+//delete:
+
+org.lemurproject.Result s = results[0];
+soap.doDeleteDocument(s.docid);
+
+//add:
+
+string newDoc="<html><body>should george bush be impeached?</body></html>";
+string newDocID="GeorgeBush The Monkey";
+string fileClass = "html";
+org.lemurproject.MetadataPair[] meta = new
+org.lemurproject.MetadataPair[3];
+meta[0] = new org.lemurproject.MetadataPair();
+meta[1] = new org.lemurproject.MetadataPair();
+meta[2] = new org.lemurproject.MetadataPair();
+meta[0].key = "docno";
+meta[0].value = newDocID;
+meta[1].key = "title";
+meta[1].value = "Should be impeached?";
+meta[2].key = "url";
+meta[2].value = "http://www.whitehouse.gov";
+int newID = soap.doAddDocument(newDoc, fileClass, meta);
