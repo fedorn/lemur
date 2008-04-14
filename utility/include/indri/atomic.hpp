@@ -21,9 +21,6 @@
 #ifndef WIN32
 #include <bits/atomicity.h>
 #endif
-#ifdef HAVE_CONFIG_H
-#include "confdefs.h"
-#endif
 
 namespace indri {
   /*! \brief Atomic actions for thread support */

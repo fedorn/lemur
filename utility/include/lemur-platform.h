@@ -15,9 +15,6 @@
 /*** Begin C-only section ***/
 
 #ifndef WIN32
-#ifdef HAVE_CONFIG_H
-#include "confdefs.h"
-#endif
   /* G++ support */
   #include <stddef.h>
   #include <limits.h>
