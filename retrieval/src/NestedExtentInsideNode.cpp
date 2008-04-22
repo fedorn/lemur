@@ -115,20 +115,27 @@ const std::string& indri::infnet::NestedExtentInsideNode::getName() const {
 }
 
 void indri::infnet::NestedExtentInsideNode::annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent ) {
-  annotator.addMatches( _extents, this, documentID, extent );
+  if (! _lastExtent.contains(extent)) {
+    // if the last extent we annotated contains this one, there is no work
+    // to do.
+    _lastExtent = extent;
+    annotator.addMatches( _extents, this, documentID, extent );
 
-  indri::index::Extent range( extent.begin, extent.end );
-  indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
-  iter = std::lower_bound( _extents.begin(), _extents.end(), range, indri::index::Extent::begins_before_less() );
+    indri::index::Extent range( extent.begin, extent.end );
+    indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+    iter = std::lower_bound( _extents.begin(), _extents.end(), range, indri::index::Extent::begins_before_less() );
   
-  for( size_t i = iter-_extents.begin(); i<_extents.size() && _extents[i].begin <= extent.end; i++ ) {
-    _inner->annotate( annotator, documentID, (indri::index::Extent &)_extents[i] );
-    _outer->annotate( annotator, documentID, (indri::index::Extent &)_extents[i] );
+    for( size_t i = iter-_extents.begin(); i<_extents.size() && _extents[i].begin <= extent.end; i++ ) {
+      _inner->annotate( annotator, documentID, (indri::index::Extent &)_extents[i] );
+      _outer->annotate( annotator, documentID, (indri::index::Extent &)_extents[i] );
+    }
   }
 }
 
+
 void indri::infnet::NestedExtentInsideNode::indexChanged( indri::index::Index& index ) {
-  // do nothing
+  _lastExtent.begin = -1;
+  _lastExtent.end = -1;
 }
 
 

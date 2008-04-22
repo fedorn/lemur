@@ -117,21 +117,27 @@ const std::string& indri::infnet::OrderedWindowNode::getName() const {
 }
 
 void indri::infnet::OrderedWindowNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
-  annotator.addMatches( _extents, this, documentID, extent );
-  indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
-  iter = std::lower_bound( _extents.begin(), _extents.end(), extent, indri::index::Extent::begins_before_less() );
+  if (! _lastExtent.contains(extent)) {
+    // if the last extent we annotated contains this one, there is no work
+    // to do.
+    _lastExtent = extent;
+    annotator.addMatches( _extents, this, documentID, extent );
+    indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
+    iter = std::lower_bound( _extents.begin(), _extents.end(), extent, indri::index::Extent::begins_before_less() );
 
-  while( iter != _extents.end() ) {
-    for( size_t j=0; j<_children.size(); j++ ) {
-      indri::index::Extent e = (*iter);
-      if (extent.contains(e)) {
-        _children[j]->annotate( annotator, documentID, e );
+    while( iter != _extents.end() ) {
+      for( size_t j=0; j<_children.size(); j++ ) {
+        indri::index::Extent e = (*iter);
+        if (extent.contains(e)) {
+          _children[j]->annotate( annotator, documentID, e );
+        }
       }
+      iter++;
     }
-    iter++;
   }
 }
 
 void indri::infnet::OrderedWindowNode::indexChanged( indri::index::Index& index ) {
-  // do nothing
+  _lastExtent.begin = -1;
+  _lastExtent.end = -1;
 }

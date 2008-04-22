@@ -34,6 +34,7 @@ namespace indri
       // stores last successful position of the matches(extent)
       // search; linear search assuming ascending order
       int _lastpos; 
+      indri::index::Extent _lastExtent;
 
     public:
       /// initializes the last position pointer for matching child siblings

@@ -69,10 +69,17 @@ const std::string& indri::infnet::DocListIteratorNode::getName() const {
 }
 
 void indri::infnet::DocListIteratorNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
-  annotator.addMatches( _extents, this, documentID, extent );
+  if (! _lastExtent.contains(extent)) {
+    // if the last extent we annotated contains this one, there is no work
+    // to do.
+    _lastExtent = extent;
+    annotator.addMatches( _extents, this, documentID, extent );
+  }
 }
 
 void indri::infnet::DocListIteratorNode::indexChanged( indri::index::Index& index ) {
   _list = _network.getDocIterator( _listID );
+  _lastExtent.begin = -1;
+  _lastExtent.end = -1;
 }
 
