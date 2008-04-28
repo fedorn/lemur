@@ -219,7 +219,7 @@ namespace indri
                noun (a type of racket used in lacrosse), but the verb is much more
                common */
 	
-            if ((lookup(word))  && !((word[j] == 's') && (word[j-1] == 's')))
+            if ((lookup(word))  && j>0 && !((word[j] == 's') && (word[j-1] == 's')))
               return;
 	
             /* try removing the "es" */
@@ -381,7 +381,7 @@ namespace indri
            footstampe; however, decoupled -> decoupl).  We can prevent almost all
            of the incorrect stems if we try to do some prefix analysis first */
     
-        if (cons(j) && cons(j-1)) {
+        if (j>0 && cons(j) && cons(j-1)) {
           k = j;
           word[k+1] = '\0';
           return;
@@ -576,12 +576,12 @@ namespace indri
         k = j;
         if (lookup(word))
           return;
-        if ((word[j-1] == 'a') && (word[j] == 'l'))    /* always convert -ally to -al */
+        if (j>0 && (word[j-1] == 'a') && (word[j] == 'l'))    /* always convert -ally to -al */
           return;
         word[j+1] = 'l';
         k = old_k;
     
-        if ((word[j-1] == 'a') && (word[j] == 'b')) {  /* always convert -ably to -able */
+        if (j>0 && (word[j-1] == 'a') && (word[j] == 'b')) {  /* always convert -ably to -able */
           word[j+2] = 'e';
           k = j+2;
           return;
@@ -642,7 +642,7 @@ namespace indri
         word[j+3] = '\0';
         k = old_k;
     
-        if ((word[j-1] == 'i') && (word[j] == 'c'))  {
+        if (j>0 && (word[j-1] == 'i') && (word[j] == 'c'))  {
           word[j-1] = '\0';          /* try removing -ical  */
           k = j-2;
           if (lookup(word))
@@ -695,7 +695,7 @@ namespace indri
         word[j+1] = 'i';
         word[j+2] = 'v';
     
-        if ((word[j-1] == 'a') && (word[j] == 't'))  {
+        if (j>0 && (word[j-1] == 'a') && (word[j] == 't'))  {
           word[j-1] = 'e';       /* try removing -ative and adding -e */
           word[j] = '\0';        /* (e.g., determinative -> determine) */
           k = j-1;
@@ -796,7 +796,7 @@ namespace indri
         k = old_k;
     
         /* the -ability and -ibility endings are highly productive, so just accept them */
-        if ((word[j-1] == 'i') && (word[j] == 'l'))  {   
+        if (j>0 && (word[j-1] == 'i') && (word[j] == 'l'))  {   
           word[j-1] = 'l';          /* convert to -ble */
           word[j] = 'e';
           word[j+1] = '\0';
@@ -806,7 +806,7 @@ namespace indri
     
     
         /* ditto for -ivity */
-        if ((word[j-1] == 'i') && (word[j] == 'v'))  {
+        if (j>0 && (word[j-1] == 'i') && (word[j] == 'v'))  {
           word[j+1] = 'e';         /* convert to -ive */
           word[j+2] = '\0';
           k = j+1;
@@ -814,7 +814,7 @@ namespace indri
         }
     
         /* ditto for -ality */
-        if ((word[j-1] == 'a') && (word[j] == 'l'))  {
+        if (j>0 && (word[j-1] == 'a') && (word[j] == 'l'))  {
           word[j+1] = '\0';
           k = j;
           return;
