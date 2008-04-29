@@ -132,6 +132,9 @@
 				RelativePath=".\src\fn_f.c">
 			</File>
 			<File
+				RelativePath=".\src\HarvestSortMerge.cpp">
+			</File>
+			<File
 				RelativePath=".\src\IndriFile.cpp">
 			</File>
 			<File
@@ -181,6 +184,12 @@
 			</File>
 			<File
 				RelativePath=".\src\RVLCompress.cpp">
+			</File>
+			<File
+				RelativePath=".\src\SHA1.cpp">
+			</File>
+			<File
+				RelativePath=".\src\SortMergeTextFiles.cpp">
 			</File>
 			<File
 				RelativePath=".\src\string-set.c">
@@ -281,10 +290,10 @@
 				RelativePath=".\include\indri\Extent.hpp">
 			</File>
 			<File
-				RelativePath=".\include\indri\File.hpp">
+				RelativePath=".\include\File.hpp">
 			</File>
 			<File
-				RelativePath=".\include\File.hpp">
+				RelativePath=".\include\indri\File.hpp">
 			</File>
 			<File
 				RelativePath=".\include\fileio.h">
@@ -294,6 +303,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\greedy_vector">
+			</File>
+			<File
+				RelativePath=".\include\HarvestSortMerge.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\HashTable.hpp">
@@ -438,6 +450,12 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\SequentialWriteBuffer.hpp">
+			</File>
+			<File
+				RelativePath=".\include\SHA1.hpp">
+			</File>
+			<File
+				RelativePath=".\include\SortMergeTextFiles.hpp">
 			</File>
 			<File
 				RelativePath=".\include\string-set.h">
