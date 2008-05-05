@@ -20,7 +20,7 @@ cd crawl
 # run crawl in foreground, no ui
 $HERITRIX -n order.xml || exit 1
 test -d linkz || mkdir linkz
-$HARVEST -corpus=corpus -output=linkz -redirect=/dev/null || exit 1
+$HARVEST -corpus=corpus -output=linkz || exit 1
 test -d index || mkdir index
 $BUILD build.param ../stopwords  || exit 1
 # make the index files world and group readable
