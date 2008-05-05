@@ -546,7 +546,9 @@ void push_queue( std::queue< query_t* >& q, indri::api::Parameters& queries,
     } else {
       queryText = (std::string) queries[i];
       int thisQuery=queryOffset + int(i);
-      queryNumber = "" + thisQuery;
+      std::stringstream s;
+      s << thisQuery;
+      queryNumber = s.str();
     }
     q.push( new query_t( i, queryNumber, queryText, queryType ) );
   }
