@@ -578,15 +578,16 @@ void usage() {
 }
 
 int main(int argc, char * argv[]) {
-  if (argc < 3) {
-    usage();
-    exit(1);
-  }
 
   try {
     indri::api::Parameters& parameters = indri::api::Parameters::instance();
     parameters.loadCommandLine( argc, argv );
-
+    // check for required parameters
+    if (! parameters.exists("corpus") || ! parameters.exists("output")) {
+      usage();
+      exit (1);
+    }
+    
     if( parameters.get( "version", 0 ) ) {
       std::cout << INDRI_DISTRIBUTION << std::endl;
     }
