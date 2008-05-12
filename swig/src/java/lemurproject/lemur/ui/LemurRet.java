@@ -1,5 +1,5 @@
 /*==========================================================================
- * Copyright (c) 2004 Carnegie Mellon University.  All Rights Reserved.
+ * Copyright (c) 2004-2008 Carnegie Mellon University.  All Rights Reserved.
  *
  * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
  * is subject to the terms of the software license set forth in the LICENSE
@@ -10,6 +10,8 @@
  */
 package lemurproject.lemur.ui;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.event.*;
@@ -40,16 +42,28 @@ public class LemurRet extends JPanel {
     JDialog setDialog;
     JComboBox indexBox;
     JTextField queryField;
+    
+    JCheckBox chkUseEvalPanel;
 
     String workingDir;
     Color relColor, novelColor;
 
     JPanel resultsPane;
+    
+    JPanel pnlResults;
     JEditorPane resultsDisplay;
+    
+    JTable tblEvalResults;
+    JButton btnSaveEvalResults;
+    
     JLabel status;
     //  Vector queryResults = new Vector();
-    IndexedReal[] queryResults;
+    IndexedReal[] queryResults=new IndexedReal[0];
     
+    // keeps track of any eval scores 
+    // - 1 for each queryResult item
+    // null indicates that the item was not scored
+    Double[] evalScores=new Double[0];
     
     // keep track of which index we just searched (combo box might change)
     String searchIndex, searchQuery;
@@ -174,6 +188,28 @@ public class LemurRet extends JPanel {
         resdocTPane = new JTextPane();
         resdocDialog = createDocDisplay(resdocTPane);
         resdocDialog.setVisible(false);
+        
+        parent.addComponentListener(new ComponentListener() {
+          public void componentResized(ComponentEvent e) {
+            setEvalTableColumnSizes();
+          }
+          public void componentMoved(ComponentEvent e) { }
+          public void componentShown(ComponentEvent e) {
+            setEvalTableColumnSizes();
+          }
+          public void componentHidden(ComponentEvent e) { }
+        });
+        parent.addWindowListener(new WindowListener() {
+          public void windowClosing(WindowEvent e) {
+            checkSaveEvalResults(true);
+          }
+          public void windowOpened(WindowEvent e) { }
+          public void windowClosed(WindowEvent e) { }
+          public void windowIconified(WindowEvent e) { }
+          public void windowDeiconified(WindowEvent e) { }
+          public void windowActivated(WindowEvent e) { }
+          public void windowDeactivated(WindowEvent e) { }
+        });
     }
 
     /****************** Create Panels *********************/
@@ -502,7 +538,48 @@ public class LemurRet extends JPanel {
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gb.setConstraints(searchBtn, gbc);
         panel.add(searchBtn);
-
+        
+        JSeparator sepEval=new JSeparator(JSeparator.HORIZONTAL);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.weightx = 1;
+        gbc.insets = new Insets(5,5,5,5);
+        gb.setConstraints(sepEval, gbc);
+        panel.add(sepEval);
+        
+        chkUseEvalPanel=new JCheckBox("Use Evaluation Panel for Results?");
+        chkUseEvalPanel.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            chkUseEvalPanel_OnChange();          
+          }          
+        });
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1;
+        gbc.insets = new Insets(5,5,5,5);
+        gb.setConstraints(chkUseEvalPanel, gbc);
+        
+        panel.add(chkUseEvalPanel);
+        
+        btnSaveEvalResults=new JButton("Save and Clear Scores");
+        btnSaveEvalResults.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            if (checkSaveEvalResults(false)) {
+              btnSaveEvalResults.setVisible(false);
+            }
+          }
+        });
+        btnSaveEvalResults.setVisible(false);
+        gbc.anchor=GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.weightx = 1;
+        gbc.insets = new Insets(5,5,5,5);
+        gb.setConstraints(btnSaveEvalResults, gbc);
+        panel.add(btnSaveEvalResults);
+        
         return panel;
     }
 
@@ -564,6 +641,25 @@ public class LemurRet extends JPanel {
         gb.setConstraints(nextBtn, gbc);
         panel.add(nextBtn);
 
+        pnlResults=new JPanel(new CardLayout());
+        pnlResults.addComponentListener(new java.awt.event.ComponentListener() {
+          public void componentResized(ComponentEvent e) {
+            setEvalTableColumnSizes();
+          }
+
+          public void componentMoved(ComponentEvent e) {
+            // -- nothing
+          }
+
+          public void componentShown(ComponentEvent e) {
+            setEvalTableColumnSizes();
+          }
+
+          public void componentHidden(ComponentEvent e) {
+            // -- nothing
+          }
+        });
+    
         resultsDisplay = new JEditorPane();
         resultsDisplay.setEditable(false);
         resultsDisplay.setContentType("text/html");
@@ -577,12 +673,85 @@ public class LemurRet extends JPanel {
 
         JScrollPane scroller = new JScrollPane(resultsDisplay);
         scroller.getViewport().setPreferredSize(new Dimension(575, 450));
+        pnlResults.add(scroller, "regular");
+        
+        EvalTableModel mdlEvalResults=new EvalTableModel();
+        tblEvalResults=new JTable(mdlEvalResults);
+
+        for (int i=0; i < 5; i++) {
+          javax.swing.table.TableColumn thisCol=tblEvalResults.getColumnModel().getColumn(i);
+          switch (i) {
+            case 0: thisCol.setCellRenderer(new EvalDefaultCell()); break;
+            case 1: {
+              EvalTableScoreCell editorCell=new EvalTableScoreCell();
+              editorCell.addCellEditorListener(new javax.swing.event.CellEditorListener() {
+                public void editingStopped(ChangeEvent e) {
+                  int selectedRowEdit=tblEvalResults.getSelectedRow();
+                  int thisIndex=(firstshown-1+selectedRowEdit);
+                  if ((thisIndex >= 0) && (thisIndex < queryResults.length)) {
+                    EvalTableModel mdlEvalResults=(EvalTableModel)tblEvalResults.getModel();
+                    String thisValString=(String)mdlEvalResults.getValueAt(selectedRowEdit, 1);
+                    if (thisValString.length()==0) {
+                      evalScores[thisIndex]=null;
+                    } else {
+                      evalScores[thisIndex]=Double.parseDouble(thisValString);
+                    }
+                  }
+                  // see if we need to show the scores button
+                  if (hasEvalResults()) {
+                      btnSaveEvalResults.setVisible(true);
+                  } else {
+                      btnSaveEvalResults.setVisible(false);
+                  }
+                }
+                public void editingCanceled(ChangeEvent e) { }
+              });
+              thisCol.setCellEditor(editorCell); 
+            } break;
+            case 2: thisCol.setCellRenderer(new EvalDefaultCell()); break;
+            case 3: thisCol.setCellRenderer(new EvalTableTitleCell()); break;
+            case 4: thisCol.setCellRenderer(new EvalSnippetCell()); break;
+            default: // nothing
+          }
+        }
+        
+        tblEvalResults.setEnabled(true);
+        tblEvalResults.setColumnSelectionAllowed(false);
+        tblEvalResults.setRowSelectionAllowed(false);
+        tblEvalResults.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblEvalResults.addMouseListener(new MouseListener() {
+          public void mouseClicked(MouseEvent e) {
+            int rowIndex=tblEvalResults.rowAtPoint(e.getPoint());
+            int columnIndex=tblEvalResults.columnAtPoint(e.getPoint());
+            if (columnIndex==3) {
+              String hrefAtRow=(String)((EvalTableModel)tblEvalResults.getModel()).getValueAt(rowIndex, columnIndex);
+              // extract the hrefValue
+              int hrefPos=hrefAtRow.indexOf("href=\"");
+              if (hrefPos > 0) {
+                int closingQuote=hrefAtRow.indexOf("\"", hrefPos+6);
+                if (closingQuote > 0) {
+                  String hrefSub=hrefAtRow.substring(hrefPos+6, closingQuote);
+                  linkClickAction(hrefSub);
+                }
+              }
+            }
+          }
+          public void mousePressed(MouseEvent e) { }
+          public void mouseReleased(MouseEvent e) { }
+          public void mouseEntered(MouseEvent e) { }
+          public void mouseExited(MouseEvent e) { }
+        });
+        JScrollPane scpResults=new JScrollPane(tblEvalResults);
+        scpResults.getViewport().setPreferredSize(new Dimension(575, 450));
+        pnlResults.add(scpResults, "eval");
+        
+        
         gbc.insets = new Insets(1,1,1,1);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridheight = GridBagConstraints.REMAINDER;
         gbc.weighty = 1;
-        gb.setConstraints(scroller, gbc);
-        panel.add(scroller);
+        gb.setConstraints(pnlResults, gbc);
+        panel.add(pnlResults);
 
         return panel;
     }
@@ -657,13 +826,47 @@ public class LemurRet extends JPanel {
     }
 
     private void searchAction() {
-        searchIndex = (String)indexBox.getSelectedItem();
-        searchQuery = queryField.getText();
-        firstshown = 1;
-        lastshown = 0;
-        maxresults = -1;
-        queryResults = new IndexedReal[0];
-        pageAction();
+        // first - check and see if we have any previous
+        // eval scores to save...
+        if (checkSaveEvalResults(true)) {
+           btnSaveEvalResults.setVisible(false);
+          searchIndex = (String)indexBox.getSelectedItem();
+          searchQuery = queryField.getText();
+          firstshown = 1;
+          lastshown = 0;
+          maxresults = -1;
+          queryResults = new IndexedReal[0];
+          evalScores=new Double[0];
+          pageAction();
+        }
+    }
+    
+    private void setEvalTableColumnSizes() {
+        tblEvalResults.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        
+        for (int i=0; i < 5; i++) {
+          javax.swing.table.TableColumn thisCol=tblEvalResults.getColumnModel().getColumn(i);
+          switch (i) {
+            case 0: { thisCol.setPreferredWidth(70); } break;
+            case 1: { thisCol.setPreferredWidth(100); } break;
+            case 2: { thisCol.setPreferredWidth(70); } break;
+            case 3: { thisCol.setPreferredWidth(120); } break;
+            case 4: { thisCol.setPreferredWidth(pnlResults.getWidth()-380); } break; 
+            default:
+              // nothing;
+          }
+        }
+        tblEvalResults.setRowHeight(64);
+    }
+    
+    private void chkUseEvalPanel_OnChange() { 
+      CardLayout resultsLayout=(CardLayout)(pnlResults.getLayout());
+      if (chkUseEvalPanel.isSelected()) {
+        resultsLayout.show(pnlResults, "eval");
+      } else {
+        resultsLayout.show(pnlResults, "regular");
+      }
+      setEvalTableColumnSizes();
     }
 
     private void nextPageAction() {
@@ -688,13 +891,21 @@ public class LemurRet extends JPanel {
         try {
             if ((maxresults < 0) && queryResults.length < firstshown + guiSettings.numresults)
                 queryResults = sendQuery(searchQuery);
+            
+                // if this is a brand new search - set up the 
+                // eval scores array
+                if (evalScores.length==0 && queryResults.length>0) {
+                  evalScores=new Double[queryResults.length];
+                }
         } catch (Exception e) {
             errorMsg(parent, "An error occurred while searching.\n\n" + e.toString());
         }
         status.setText("Displaying...");
         status.update(status.getGraphics());
-  
+        
         showResults(formatResults(queryResults));
+        
+        setEvalTableColumnSizes();
     }
 
     private void setParamValues() {
@@ -762,7 +973,7 @@ public class LemurRet extends JPanel {
         feedbackF.setText(String.valueOf(guiSettings.feedback));
     }
 
-    private void linkClickAction(String href) {
+    public void linkClickAction(String href) {
 
         try {
             if (href.startsWith("file:document:")) {
@@ -986,17 +1197,25 @@ public class LemurRet extends JPanel {
             nextBtn.setEnabled(false);
 
         resultsPane.setVisible(true);
+        
+        setEvalTableColumnSizes();
     }
 
     private String formatResults(IndexedReal[] results) {
         StringBuffer buf = new StringBuffer();
+
+        EvalTableModel mdlEvalTable=(EvalTableModel)tblEvalResults.getModel();
+        mdlEvalTable.clearAll();
 
         try {
             //    System.out.println("Getting dM for "+searchIndex);
             DocumentManager dm = index.docManager(1); /// first doc
 
             buf.append("<ol style='list-style: outside; margin-left: 35;'>");
+            mdlEvalTable.setRankOffset(firstshown);
             for (int i=firstshown-1;i<results.length && i<firstshown+guiSettings.numresults-1;i++) {
+                mdlEvalTable.addItem(queryResults[i], getTitle(queryResults[i]), getSnippet(queryResults[i]), evalScores[i]);
+              
                 String docid = (index.document(results[i].ind));
                 //System.out.println("DEBUG: "+docid);
                 lastshown=i+1;
@@ -1080,13 +1299,100 @@ public class LemurRet extends JPanel {
                 buf.append("</i><br>&nbsp;");
             }
             buf.append("</ol>");
-
+            
+            tblEvalResults.setModel(mdlEvalTable);
+            tblEvalResults.repaint();
         }
         catch (Exception e) {
             errorMsg(parent, "An error occurred while displaying the results.\n\n" + e.toString());
         }
-
         return buf.toString();
+    }
+    
+    private String getTitle(IndexedReal result) {
+      String retVal="(no title)";
+      try {
+        DocumentManager dm = index.docManager(1); /// first doc
+        String docid = (index.document(result.ind));
+        retVal="<a href=\"file:document:" + docid + "\">";
+        String title = dm.docElement(docid,"TITLE");
+        if (title == null)
+            title = dm.docElement(docid,"HEADLINE");
+        if (title != null) {
+            if (title.length() > 100) title = title.substring(0, 100);
+        } else {
+            title=docid;
+        }
+        retVal+=title+"</a>";
+      } catch (Exception ex) {
+        return "(error getting title)";
+      }
+      return retVal;
+    }
+    
+    private String getSnippet(IndexedReal result) {
+      StringBuffer buf = new StringBuffer();
+      try {
+        DocumentManager dm = index.docManager(1); /// first doc
+        String docid = (index.document(result.ind));
+        // Get the matches from MatchInfo
+        String doc = dm.getDoc(docid);
+        Query qry = Query.makeQuery(stripOpQuery(searchQuery));
+        TMatch[] docmatches = MatchInfo.getMatches(index, qry, index.document(docid));
+        if (docmatches.length > 0) {
+            // Display first three matches with passage30 for each, try to break on whitespace
+            int start, end;  // bounds of passage
+            int first, last; // occurrences of whitespace
+            int finalpassage = docmatches.length - 1;
+            if (finalpassage > 3) finalpassage = 3;
+            // rethink this.
+            for (int m=0; m < finalpassage; m++) {
+                start = docmatches[m].start - 30;
+                end = docmatches[m].end + 30;
+                if (start < 0)
+                    start = 0;
+                if (end >= doc.length())
+                    end = doc.length() - 1;
+                first = start;
+                last = end;
+                for (int w = (docmatches[m].start + start) / 2; w > start; w--) {
+                    if (doc.charAt(w) == ' ') 
+                        first = w;
+                }
+                for (int w = (docmatches[m].end + end) / 2; w < end; w++) {
+                    if (doc.charAt(w) == ' ') 
+                        last = w;
+                }
+
+                docmatches[m].start = first;
+                docmatches[m].end = last;
+            }
+            
+            buf.append("...");
+            if (finalpassage > 1) {
+                // Combine overlapping passages
+                for (int m=1; m < finalpassage; m++) {
+                    // fixme
+                    if (false /*&& docmatches[m*2-1] >= docmatches[m*2]*/) 
+                        docmatches[m*2] = docmatches[m*2-2];
+                    else {
+                        // no overlap so display previous passage
+                        String passage = doc.substring(docmatches[m].start,docmatches[m].end);
+                        passage = passage.replaceAll("<","&lt;");
+                        passage = passage.replaceAll(">","&gt;");
+                        buf.append(passage + "...");
+                    }
+                }
+            }
+            // Display last passage (max third)
+            String passage = doc.substring(docmatches[finalpassage].start,docmatches[finalpassage].end);
+            passage = passage.replaceAll("<","&lt;");
+            passage = passage.replaceAll(">","&gt;");
+            buf.append(passage + "...<BR>");
+        }
+      } catch (Exception e) {
+      }
+      return buf.toString();
     }
 
     private IndexedReal[] sendQuery(String query) {
@@ -1151,6 +1457,69 @@ public class LemurRet extends JPanel {
             // We now know how many documents there are
             maxresults = res.length;
         return res;
+    }
+    
+    private boolean checkSaveEvalResults(boolean showPrompt) {
+      // first - check and see if any results exist to save
+      boolean hasResults=hasEvalResults();
+      if (!hasResults) { return true; }
+      
+      // prompt the user to see if they want to save or not
+      int valSaveEval=JOptionPane.NO_OPTION;
+      if (showPrompt) {
+        valSaveEval=JOptionPane.showConfirmDialog(
+            this,
+            "You have eval scores entered that are not saved. Would you\n" +
+            "like to save them now? (Note that if they are not saved, they\n" + 
+            "will be lost)",
+            "Save Eval Scores?",
+            JOptionPane.YES_NO_OPTION
+            );
+      }
+      if (!showPrompt || valSaveEval==JOptionPane.YES_OPTION) {
+        // bring up eval score save dialog box
+        EvalScoreSaveDialog dlgSaveScores=new EvalScoreSaveDialog(parent);
+            
+        String[] resultIDs=pullResultIDs();
+        dlgSaveScores.showDialogBox(resultIDs, evalScores);
+        if (dlgSaveScores.okWasClicked()) {
+          dlgSaveScores.setVisible(false);
+
+          // clear the scores
+          for (int i=0; (i < evalScores.length && hasResults); i++) {
+            evalScores[i]=null;
+          }
+          
+          ((EvalTableModel)tblEvalResults.getModel()).clearScores();
+          
+          return true;
+        }
+        return false;
+      }
+      return true;
+    }
+    
+    private boolean hasEvalResults() {
+      boolean hasResults=false;
+      for (int i=0; (i < evalScores.length && !hasResults); i++) {
+        if (evalScores[i]!=null) { return true; }
+      }
+      return hasResults;
+    }
+    
+    private String[] pullResultIDs() {
+      String[] retVal=new String[queryResults.length];
+      if (queryResults.length > 0) {
+        try {
+          DocumentManager dm = index.docManager(1); /// first doc
+          for (int i=0; i < queryResults.length; i++) {
+            retVal[i]=(index.document(queryResults[i].ind));
+          }
+        } catch (Exception ex) {
+          retVal=new String[0];
+        }
+      }
+      return retVal;
     }
 
     /** Returns an ImageIcon, or null if the path was invalid.
