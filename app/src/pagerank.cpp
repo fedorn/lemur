@@ -59,6 +59,12 @@ This data file is suitable for input to the makeprior application.</dd>
 #include "Exception.hpp"
 #include "indri/PageRank.hpp"
 
+void require_parameter( const char* name, indri::api::Parameters& p ) {
+  if( !p.exists( name ) ) {
+    LEMUR_THROW( LEMUR_MISSING_PARAMETER_ERROR, "Must specify a " + name + " parameter." );
+  }
+}
+
 int main( int argc, char** argv ) {
   try {
     indri::api::Parameters& parameters = indri::api::Parameters::instance();
@@ -67,6 +73,9 @@ int main( int argc, char** argv ) {
     if( parameters.get( "version", false ) ) {
       std::cout << INDRI_DISTRIBUTION << std::endl;
     }
+    require_parameter( "corpus", parameters );
+    require_parameter( "links", parameters );
+    require_parameter( "output", parameters );
 
     std::string corpusPath = parameters[ "corpus" ];
     std::string linkPath = parameters[ "links" ];
@@ -92,7 +101,7 @@ int main( int argc, char** argv ) {
       std::string ranksFile = outputFile + ".ranks";
       pr.writeRanks( outputFile, ranksFile );
     }
-    // don't really neat the outputFile
+    // don't really need the outputFile
     ::remove(outputFile.c_str());
   }
   catch( lemur::api::Exception& e ) {
