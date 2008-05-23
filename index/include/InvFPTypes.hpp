@@ -22,7 +22,7 @@ namespace lemur
   namespace index
   {
     
-#define IND_VERSION "4.6"
+#define IND_VERSION "4.7"
 
     // suffixes for filenames
 #define INVINDEX  ".invf"
