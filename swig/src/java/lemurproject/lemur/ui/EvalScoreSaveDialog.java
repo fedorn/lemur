@@ -236,6 +236,75 @@ public class EvalScoreSaveDialog extends JDialog {
     return _okWasClicked;
   }
   
+  // hash of queryID->HashMap(DocID, Score)
+  public java.util.HashMap loadedEvalFile=null;
+  
+  public boolean loadEvalFile(String evalFilePath) {
+    boolean retVal=true;
+    
+    if (loadedEvalFile!=null) {
+      loadedEvalFile.clear();
+      loadedEvalFile=null;
+    }
+    
+    java.io.BufferedReader reader=null;
+    try {
+      reader = new java.io.BufferedReader(new java.io.FileReader(evalFilePath));
+      String lastLine="";
+      String thisLine=reader.readLine();
+      while (thisLine!=null) {
+        if (thisLine.length() > 0) {
+          String[] splitPieces=thisLine.split("\t", 4);
+          if (splitPieces.length==4) {
+            // out.println(thisQueryID + "\t0\t" + resultIDs[i] + "\t" + roundVal);
+            String thisQueryID=splitPieces[0];
+            String thisResultID=splitPieces[2];
+            Double thisScore=null;
+            try {
+              thisScore=new Double(splitPieces[3]);
+            } catch (java.lang.NumberFormatException ex) {
+              thisScore=null;
+            }
+            
+            if (loadedEvalFile==null) { 
+              loadedEvalFile=new java.util.HashMap();
+            }
+            
+            java.util.HashMap queryMap=(java.util.HashMap)loadedEvalFile.get(thisQueryID);
+            if (queryMap==null) {
+              queryMap=new java.util.HashMap();
+            }
+            queryMap.put(thisResultID, thisScore);
+            loadedEvalFile.put(thisQueryID, queryMap);
+          } // end if (splitPieces.length==4)
+        } // end if (thisLine.length() > 0)
+        thisLine=reader.readLine();
+      } // end while(thisLine!=null)
+    } catch (FileNotFoundException ex) {
+      JOptionPane.showMessageDialog(this, "An FileNotFound Exception occured while loading eval file:\n" + ex.getMessage(), "FileNotFound Exception", JOptionPane.ERROR_MESSAGE);
+      if (loadedEvalFile!=null) {
+        loadedEvalFile.clear();
+        loadedEvalFile=null;
+      }
+      retVal=false;
+    } catch (IOException ioEx) {
+      JOptionPane.showMessageDialog(this, "An IO Exception occured while trying while loading eval file:\n" + ioEx.getMessage(), "I/O Exception", JOptionPane.ERROR_MESSAGE);
+      if (loadedEvalFile!=null) {
+        loadedEvalFile.clear();
+        loadedEvalFile=null;
+      }
+      retVal=false;
+    } finally {
+      if (reader!=null) {
+        try {
+          reader.close();
+        } catch (IOException ex) {
+        }
+      }
+    }
+    return retVal;
+  }
+  
   public boolean saveResults() {
     boolean retVal=true;
     int thisQueryID=100;
@@ -304,6 +373,26 @@ public class EvalScoreSaveDialog extends JDialog {
             }
           }
         }
+      } else {
+        // appending, but not continuing query ID
+        // ensure we don't have conflicting query IDs
+        if (loadEvalFile(fileName) && (loadedEvalFile!=null)) {
+          String workingQueryID="" + thisQueryID;
+          while (loadedEvalFile.containsKey(workingQueryID)) {
+            workingQueryID=JOptionPane.showInputDialog(this, "The QueryID you have entered already exists in the file.\nPlease choose a different ID:", "QueryID Exists", JOptionPane.WARNING_MESSAGE);
+            if (workingQueryID==null) {
+              // cancel was pressed
+              return false;
+            }
+          }
+          int newQueryID=thisQueryID;
+          try {
+            newQueryID=Integer.parseInt(workingQueryID);
+          } catch (NumberFormatException nEx) {
+            newQueryID=thisQueryID;
+          }
+          thisQueryID=newQueryID;
+        } // end if (loadEvalFile(fileName))
       }
     }
     

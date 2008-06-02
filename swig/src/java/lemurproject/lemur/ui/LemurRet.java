@@ -55,6 +55,7 @@ public class LemurRet extends JPanel {
     
     JTable tblEvalResults;
     JButton btnSaveEvalResults;
+    JPanel pnlSaveAndLoadScores;
     
     JLabel status;
     //  Vector queryResults = new Vector();
@@ -563,6 +564,9 @@ public class LemurRet extends JPanel {
         
         panel.add(chkUseEvalPanel);
         
+        pnlSaveAndLoadScores=new JPanel();
+        pnlSaveAndLoadScores.setLayout(new BorderLayout());
+        
         btnSaveEvalResults=new JButton("Save and Clear Scores");
         btnSaveEvalResults.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -572,13 +576,26 @@ public class LemurRet extends JPanel {
           }
         });
         btnSaveEvalResults.setVisible(false);
+        pnlSaveAndLoadScores.add(btnSaveEvalResults, BorderLayout.WEST);
+        
+        JButton btnLoadEvalScores=new JButton("Load Eval Scores");
+        btnLoadEvalScores.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            doLoadEvalScores();
+          }
+        });
+        btnLoadEvalScores.setVisible(true);
+        pnlSaveAndLoadScores.add(btnLoadEvalScores, BorderLayout.EAST);
+        
         gbc.anchor=GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.weightx = 1;
         gbc.insets = new Insets(5,5,5,5);
-        gb.setConstraints(btnSaveEvalResults, gbc);
-        panel.add(btnSaveEvalResults);
+        gb.setConstraints(pnlSaveAndLoadScores, gbc);
+        panel.add(pnlSaveAndLoadScores);
+        
+        pnlSaveAndLoadScores.setVisible(false);
         
         return panel;
     }
@@ -863,8 +880,12 @@ public class LemurRet extends JPanel {
       CardLayout resultsLayout=(CardLayout)(pnlResults.getLayout());
       if (chkUseEvalPanel.isSelected()) {
         resultsLayout.show(pnlResults, "eval");
+        if (evalScores!=null && (evalScores.length > 0)) {
+          pnlSaveAndLoadScores.setVisible(true);
+        }
       } else {
         resultsLayout.show(pnlResults, "regular");
+        pnlSaveAndLoadScores.setVisible(false);
       }
       setEvalTableColumnSizes();
     }
@@ -907,7 +928,57 @@ public class LemurRet extends JPanel {
         
         setEvalTableColumnSizes();
     }
-
+    
+    private void doLoadEvalScores() {
+      // show the load dialog box
+      JFileChooser fileChooser=new JFileChooser();
+      fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      fileChooser.setMultiSelectionEnabled(false);
+      int retVal=fileChooser.showOpenDialog(this);
+      if (retVal==JFileChooser.APPROVE_OPTION) {
+        java.io.File selectedFile=fileChooser.getSelectedFile();
+        String fullPath=selectedFile.getAbsolutePath();
+        EvalScoreSaveDialog dlgSaveScores=new EvalScoreSaveDialog(parent);
+        if (dlgSaveScores.loadEvalFile(fullPath)) {
+          if (dlgSaveScores.loadedEvalFile==null || (dlgSaveScores.loadedEvalFile.size()==0)) {
+            JOptionPane.showMessageDialog(parent, "No scores were loaded", "No scores loaded...", JOptionPane.INFORMATION_MESSAGE);
+            return;
+          }
+          
+          java.util.Set keySet=dlgSaveScores.loadedEvalFile.keySet();
+          String[] queryIDs=(String[])keySet.toArray(new String[keySet.size()]);
+          
+          EvalLoadScoreDialog dlgLoad=new EvalLoadScoreDialog(parent, true, queryIDs);
+          dlgLoad.setVisible(true);
+          
+          if (dlgLoad.OKWasPressed) {
+            int numScoresSet=0;
+            java.util.HashMap queryMap=(java.util.HashMap)dlgSaveScores.loadedEvalFile.get(dlgLoad.selectedValue);
+            try {
+              for (int i=0; (i < queryResults.length) && (i < evalScores.length) && (queryMap!=null); i++) {
+                String thisDocID = (index.document(queryResults[i].ind));
+                Double thisVal=(Double)queryMap.get(thisDocID);
+                if (thisVal!=null) {
+                  evalScores[i]=thisVal;
+                  numScoresSet++;
+                } // end if (thisVal!=null)
+              } // end for (int i=0; (i < evalScores.length) && (queryMap!=null); i++)
+            } catch (java.lang.Exception ex) {
+              numScoresSet=0;
+            }
+            
+            if (numScoresSet==0) {
+              JOptionPane.showMessageDialog(parent, "No matching doc IDs found for loaded eval scores", "No Matching Scores", JOptionPane.WARNING_MESSAGE);
+            } else {
+              showResults(formatResults(queryResults));
+            }
+            
+          } // end if (dlgLoad.OKWasPressed)
+          
+        }
+      } // end if (retVal==JFileChooser.APPROVE_OPTION)
+    }
+    
     private void setParamValues() {
         guiSettings.loadind = loadCheck.isSelected();
         guiSettings.openwin = openCheck.isSelected();
