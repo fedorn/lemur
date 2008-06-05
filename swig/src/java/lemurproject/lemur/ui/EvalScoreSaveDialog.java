@@ -32,6 +32,7 @@ public class EvalScoreSaveDialog extends JDialog {
   private javax.swing.JCheckBox chkConstrainIntScores;
   private javax.swing.JCheckBox chkOverwriteFile;
   private javax.swing.JLabel jLabel1;     // text "Filename"
+  private javax.swing.JLabel lblWarningFloatScores; 
   private javax.swing.JLabel jLabel3;     // text "Run ID (optional)"
   private javax.swing.JSeparator jSeparator1;
   private javax.swing.JPanel pnlButtons;
@@ -128,8 +129,28 @@ public class EvalScoreSaveDialog extends JDialog {
     pnlRunID.add(jLabel3, java.awt.BorderLayout.WEST);
     pnlRunID.add(txtRunID, java.awt.BorderLayout.CENTER);
     
+    JPanel pnlConstraints=new JPanel();
+    pnlConstraints.setLayout(new BorderLayout());
+
+    lblWarningFloatScores=new JLabel("<html>* <b><i>Warning</i></b>: Some evaluation programs may not accept<p>floating point judgment scores.</html>");
+    pnlConstraints.add(lblWarningFloatScores, BorderLayout.SOUTH);
+    lblWarningFloatScores.setVisible(false);
+    
     chkConstrainIntScores.setText("Constrain Scores to Integer Values (using rounding)?");
-    pnlRunID.add(chkConstrainIntScores, java.awt.BorderLayout.SOUTH);
+    chkConstrainIntScores.setSelected(true);
+    chkConstrainIntScores.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          JCheckBox chkObject=(JCheckBox)e.getSource();
+          if (chkObject.isSelected()) {
+            lblWarningFloatScores.setVisible(false);
+          } else {
+            lblWarningFloatScores.setVisible(true);
+          }
+        }          
+    });
+    pnlConstraints.add(chkConstrainIntScores, BorderLayout.CENTER);
+    
+    pnlRunID.add(pnlConstraints, java.awt.BorderLayout.SOUTH);
     
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
@@ -273,7 +294,6 @@ public class EvalScoreSaveDialog extends JDialog {
   
   public boolean saveResults() {
     boolean retVal=true;
-    // int thisQueryID=100;
     
     // are we creating a new file, or does one exist?
     String fileName=txtFilename.getText().trim();
@@ -287,19 +307,16 @@ public class EvalScoreSaveDialog extends JDialog {
     String[] queryIDs=(String[])queryIDSet.toArray(new String[queryIDSet.size()]);
 
     // and sort them
-    java.util.Arrays.sort(queryIDs);
-
-    // get the query ID if the user filled it in
-    /*
-    try {
-      String queryIDText=txtQueryID.getText().trim();
-      if ((queryIDText.length() > 0) && !chkContinueQueryID.isSelected()) {
-        thisQueryID=Integer.parseInt(queryIDText);
-      }
-    } catch (NumberFormatException ex) {
-      thisQueryID=100;
-    }
-     */
+    java.util.Arrays.sort(queryIDs, new java.util.Comparator<String>() {
+              public int compare(String a, String b) {
+                  try {
+                      Integer a1 = new Integer(a);
+                      Integer b1 = new Integer(b);
+                      return a1.compareTo(b1);
+                  } catch (NumberFormatException e) {
+                      // not an integer
+                      return a.compareTo(b);
+     }}}); 
 
     // if it exists, are we overwriting?
     if (fileExists && chkOverwriteFile.isSelected()) {
@@ -362,7 +379,16 @@ public class EvalScoreSaveDialog extends JDialog {
         queryIDSet=resultsToSave.keySet();
         queryIDs=(String[])queryIDSet.toArray(new String[queryIDSet.size()]);
         // and sort them
-        java.util.Arrays.sort(queryIDs);
+        java.util.Arrays.sort(queryIDs, new java.util.Comparator<String>() {
+                  public int compare(String a, String b) {
+                      try {
+                          Integer a1 = new Integer(a);
+                          Integer b1 = new Integer(b);
+                          return a1.compareTo(b1);
+                      } catch (NumberFormatException e) {
+                          // not an integer
+                          return a.compareTo(b);
+         }}}); 
         
       } // end if (loadEvalFile(fileName))
     } // end if (fileExists && chkOverwriteFile.isSelected())
@@ -390,6 +416,7 @@ public class EvalScoreSaveDialog extends JDialog {
       
       // now we can just write these out...
       for (int i=0; i < queryIDs.length; i++) {
+        // replace any whitespace in the query ID with underscores
         writeOutQuery(queryIDs[i], useRounding, out);
       }
       

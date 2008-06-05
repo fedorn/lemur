@@ -766,10 +766,11 @@ public class LemurRet extends JPanel {
                       }
                       // set that we've changed at least one qrel
                       qrelsWereChanged=true;
+                      qrelsCanBeSaved=true;
                     }
                   }
                   // see if we need to show the scores button
-                  if (qrelsWereChanged && hasEvalResults()) {
+                  if (qrelsCanBeSaved) {
                       btnSaveEvalResults.setVisible(true);
                   } else {
                       btnSaveEvalResults.setVisible(false);
@@ -900,7 +901,6 @@ public class LemurRet extends JPanel {
         // first - check and see if we have any previous
         // eval scores to save...
         if (checkSaveEvalResults(true)) {
-          btnSaveEvalResults.setVisible(false);
           searchIndex = (String)indexBox.getSelectedItem();
           searchQuery = queryField.getText();
           firstshown = 1;
@@ -1094,22 +1094,13 @@ public class LemurRet extends JPanel {
     private void doAddNewQueryID() {
       // popup dialog box for new query ID
       String newQueryID=JOptionPane.showInputDialog(parent, 
-              "Enter new Query ID:\n(Note, this will clear any existing judgments\n and make the new QueryID the active one)", 
+              "Enter new Query ID:\n(Note, this will clear any existing judgments\n and make the new QueryID the active one.)", 
               "Enter Query ID", 
               JOptionPane.QUESTION_MESSAGE);
       
       if (newQueryID==null) { return; }
       
-      // ensure it's numeric
-      try {
-        int intQueryID=Integer.parseInt(newQueryID);
-      } catch (java.lang.NumberFormatException ex) {
-        JOptionPane.showMessageDialog(parent, 
-                "The new Query ID must be an integer value", 
-                "Invalid Query ID", 
-                JOptionPane.ERROR_MESSAGE);
-        return;
-      }
+      newQueryID=newQueryID.replaceAll("\\s", "_");
       
       if (loadedQrels==null) {
         loadedQrels=new java.util.HashMap();
@@ -1133,7 +1124,16 @@ public class LemurRet extends JPanel {
       String[] queryIDs=(String[])keySet.toArray(new String[keySet.size()]);
 
       // sort the set in alpha-numeric order
-      java.util.Arrays.sort(queryIDs);
+      java.util.Arrays.sort(queryIDs, new java.util.Comparator<String>() {
+                public int compare(String a, String b) {
+                    try {
+                        Integer a1 = new Integer(a);
+                        Integer b1 = new Integer(b);
+                        return a1.compareTo(b1);
+                    } catch (NumberFormatException e) {
+                        // not an integer
+                        return a.compareTo(b);
+       }}}); 
 
       // add in the "-- none --" to the top
       java.util.ArrayList qList=new java.util.ArrayList(Arrays.asList(queryIDs));
@@ -1181,13 +1181,23 @@ public class LemurRet extends JPanel {
             return;
           }
 
+          qrelsCanBeSaved=false;
           loadedQrels=dlgSaveScores.loadedEvalFile;
 
           java.util.Set keySet=loadedQrels.keySet();
           String[] queryIDs=(String[])keySet.toArray(new String[keySet.size()]);
 
           // sort the set in alpha-numeric order
-          java.util.Arrays.sort(queryIDs);
+          java.util.Arrays.sort(queryIDs, new java.util.Comparator<String>() {
+                    public int compare(String a, String b) {
+                        try {
+                            Integer a1 = new Integer(a);
+                            Integer b1 = new Integer(b);
+                            return a1.compareTo(b1);
+                        } catch (NumberFormatException e) {
+                            // not an integer
+                            return a.compareTo(b);
+           }}}); 
           
           // add in the "-- none --" to the top
           java.util.ArrayList qList=new java.util.ArrayList(Arrays.asList(queryIDs));
