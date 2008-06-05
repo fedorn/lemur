@@ -47,8 +47,14 @@ public class Main {
             String unused = fields[1];
             String docno = fields[2];
             String judgment = fields[3];
+            int jVal = 0;
+            try {
+                jVal = Integer.valueOf( judgment );
+            } catch (NumberFormatException e) {
+                jVal = (int)Math.round(Double.valueOf( judgment ));
+            }
             
-            Judgment j = new Judgment( docno, Integer.valueOf( judgment ) );
+            Judgment j = new Judgment( docno, jVal );
             
             if( recentQuery == null || !recentQuery.equals( number ) ) {
                 if( !judgments.containsKey( number ) ) {
