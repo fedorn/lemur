@@ -918,9 +918,10 @@ public class LemurRet extends JPanel {
       if (qrelsChangedCurrentID) {
         int whichQueryIndex=cboCurrentlyLoadedQueries.getSelectedIndex();
         if (whichQueryIndex > 0) {
-          if (!shouldWeUpdateScores(whichQueryIndex)) {
-            return;
-          }
+          // if (!shouldWeUpdateScores(whichQueryIndex)) {
+          shouldWeUpdateScores(whichQueryIndex);
+          //  return;
+          // }
         }
       }
 
@@ -931,8 +932,10 @@ public class LemurRet extends JPanel {
       maxresults = -1;
       queryResults = new IndexedReal[0];
       clearEvalResults();
+
       // set the query ID to -- no query selected --
-      cboCurrentlyLoadedQueries.setSelectedIndex(0);
+      // cboCurrentlyLoadedQueries.setSelectedIndex(0);
+      
       pageAction();
       setScoresForQuery();
     }
@@ -1072,9 +1075,9 @@ public class LemurRet extends JPanel {
       }
       
       if (numScoresSet>0) {
-        qrelsChangedGlobally=true;
-        qrelsChangedCurrentID=false;
-        btnSaveEvalResults.setVisible(true);
+        // qrelsChangedGlobally=true;
+        // qrelsChangedCurrentID=false;
+        // btnSaveEvalResults.setVisible(true);
         showResults(formatResults(queryResults));
       }
       
