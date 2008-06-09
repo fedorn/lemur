@@ -60,8 +60,11 @@ public class LemurRet extends JPanel {
     JComboBox cboCurrentlyLoadedQueries;
     JPanel pnlSaveAndLoadScores;
     
-    boolean qrelsWereChanged=false;
-    boolean qrelsCanBeSaved=false;
+    boolean qrelsChangedGlobally=false;
+    boolean qrelsChangedCurrentID=false;
+    
+    //boolean qrelsWereChanged=false;
+    //boolean qrelsCanBeSaved=false;
     java.util.HashMap loadedQrels=null;
     
     JLabel status;
@@ -577,7 +580,7 @@ public class LemurRet extends JPanel {
         btnSaveEvalResults=new JButton("Save Judgment Scores");
         btnSaveEvalResults.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            if (checkSaveEvalResults(false)) {
+            if (checkSaveEvalResults(false) && !qrelsChangedGlobally) {
               btnSaveEvalResults.setVisible(false);
             }
           }
@@ -612,9 +615,11 @@ public class LemurRet extends JPanel {
             if (newItemIndex==oldItemIndex) { return; }
             
             // if we have scores that have changed - prompt the user to update
-            if (qrelsWereChanged && oldItemIndex > 0) {
+            
+            if (qrelsChangedCurrentID && oldItemIndex > 0) {
               shouldWeUpdateScores(oldItemIndex);
             }
+            // qrelsChangedCurrentID=false;
             loadInNewScores(newItemIndex);
             
             oldItemIndex=newItemIndex;
@@ -754,26 +759,36 @@ public class LemurRet extends JPanel {
                   if ((thisIndex >= 0) && (thisIndex < queryResults.length)) {
                     EvalTableModel mdlEvalResults=(EvalTableModel)tblEvalResults.getModel();
                     String thisValString=(String)mdlEvalResults.getValueAt(selectedRowEdit, 1);
-                    if (cboCurrentlyLoadedQueries.getSelectedIndex() < 1) {
-                      // we must have a current query ID!
-                      JOptionPane.showMessageDialog(parent, "You must have a query ID selected to enter a score.", "No Query ID selected", JOptionPane.ERROR_MESSAGE);
-                      mdlEvalResults.setEvalScore(selectedRowEdit, evalScores[thisIndex]);
-                    } else {
-                      if (thisValString.length()==0) {
-                        evalScores[thisIndex]=null;
-                      } else {
-                        evalScores[thisIndex]=Double.parseDouble(thisValString);
-                      }
-                      // set that we've changed at least one qrel
-                      qrelsWereChanged=true;
-                      qrelsCanBeSaved=true;
+                    Double newValue=null;
+                    if (thisValString.length() > 0) {
+                      newValue=Double.parseDouble(thisValString);
                     }
+                    
+                    boolean scoreChanged=false;
+                    if (newValue!=evalScores[thisIndex]) {
+                      scoreChanged=true;
+                      if (newValue!=null && evalScores[thisIndex]!=null) {
+                        scoreChanged=(!newValue.equals(evalScores[thisIndex]));
+                      }
+                    }
+                    
+                    if (scoreChanged) {
+                      if (cboCurrentlyLoadedQueries.getSelectedIndex() < 1) {
+                        // we must have a current query ID!
+                        JOptionPane.showMessageDialog(parent, "You must have a query ID selected to enter a score.", "No Query ID selected", JOptionPane.ERROR_MESSAGE);
+                        mdlEvalResults.setEvalScore(selectedRowEdit, evalScores[thisIndex]);
+                      } else {
+                        evalScores[thisIndex]=newValue;
+
+                        // set that we've changed at least one qrel
+                      qrelsChangedCurrentID=true;
+                      
+                      } // end if (cboCurrentlyLoadedQueries.getSelectedIndex() < 1)
+                    } // end if(scoreChanged)
                   }
                   // see if we need to show the scores button
-                  if (qrelsCanBeSaved) {
+                  if (qrelsChangedCurrentID) {
                       btnSaveEvalResults.setVisible(true);
-                  } else {
-                      btnSaveEvalResults.setVisible(false);
                   }
                 }
                 public void editingCanceled(ChangeEvent e) { }
@@ -898,19 +913,28 @@ public class LemurRet extends JPanel {
     }
 
     private void searchAction() {
-        // first - check and see if we have any previous
-        // eval scores to save...
-        if (checkSaveEvalResults(true)) {
-          searchIndex = (String)indexBox.getSelectedItem();
-          searchQuery = queryField.getText();
-          firstshown = 1;
-          lastshown = 0;
-          maxresults = -1;
-          queryResults = new IndexedReal[0];
-          clearEvalResults();
-          pageAction();
-          setScoresForQuery();
+      // first - check and see if we have any previous
+      // eval scores to save...
+      if (qrelsChangedCurrentID) {
+        int whichQueryIndex=cboCurrentlyLoadedQueries.getSelectedIndex();
+        if (whichQueryIndex > 0) {
+          if (!shouldWeUpdateScores(whichQueryIndex)) {
+            return;
+          }
         }
+      }
+
+      searchIndex = (String)indexBox.getSelectedItem();
+      searchQuery = queryField.getText();
+      firstshown = 1;
+      lastshown = 0;
+      maxresults = -1;
+      queryResults = new IndexedReal[0];
+      clearEvalResults();
+      // set the query ID to -- no query selected --
+      cboCurrentlyLoadedQueries.setSelectedIndex(0);
+      pageAction();
+      setScoresForQuery();
     }
     
     private void setEvalTableColumnSizes() {
@@ -983,9 +1007,10 @@ public class LemurRet extends JPanel {
         setEvalTableColumnSizes();
     }
     
-    private void shouldWeUpdateScores(int oldIdIndex) {
-      if (loadedQrels==null) { return; }
+    private boolean shouldWeUpdateScores(int oldIdIndex) {
+      if (loadedQrels==null) { return false; }
       
+      boolean retVal=false;
       int updateScores=JOptionPane.showConfirmDialog(parent, "Judgments have been modified.\nDo you want to save these?", "Judgments Modified", JOptionPane.YES_NO_OPTION);
       if (updateScores==JOptionPane.YES_OPTION) {
         String oldQueryID=(String)cboCurrentlyLoadedQueries.getItemAt(oldIdIndex);
@@ -1010,7 +1035,10 @@ public class LemurRet extends JPanel {
         }
         
         loadedQrels.put(oldQueryID, mappedScores);
+        retVal=true;
+        qrelsChangedGlobally=true;
       }
+      return retVal;
     }
     
     private void setScoresForQuery() {
@@ -1044,8 +1072,9 @@ public class LemurRet extends JPanel {
       }
       
       if (numScoresSet>0) {
-        qrelsWereChanged=false;
-        qrelsCanBeSaved=true;
+        qrelsChangedGlobally=true;
+        qrelsChangedCurrentID=false;
+        btnSaveEvalResults.setVisible(true);
         showResults(formatResults(queryResults));
       }
       
@@ -1082,10 +1111,13 @@ public class LemurRet extends JPanel {
         numScoresSet=0;
       }
 
+      // upon load - clear our flags
+      qrelsChangedCurrentID=false;
+      if (!qrelsChangedGlobally) {
+        btnSaveEvalResults.setVisible(false);
+      }
+      
       if (numScoresSet>0) {
-        qrelsWereChanged=false;
-        qrelsCanBeSaved=true;
-
         showResults(formatResults(queryResults));
       }
       
@@ -1159,7 +1191,10 @@ public class LemurRet extends JPanel {
       for (int i=0; i < evalScores.length; i++) {
         evalScores[i]=null;
       }
-      qrelsWereChanged=false;
+      qrelsChangedCurrentID=false;
+      if (!qrelsChangedGlobally) {
+        btnSaveEvalResults.setVisible(false);
+      }
       if (evalScores.length > 0) {
         showResults(formatResults(queryResults));
       }
@@ -1181,7 +1216,11 @@ public class LemurRet extends JPanel {
             return;
           }
 
-          qrelsCanBeSaved=false;
+          // upon load - clear our flags
+          qrelsChangedGlobally=false;
+          qrelsChangedCurrentID=false;
+          btnSaveEvalResults.setVisible(false);
+          
           loadedQrels=dlgSaveScores.loadedEvalFile;
 
           java.util.Set keySet=loadedQrels.keySet();
@@ -1208,38 +1247,6 @@ public class LemurRet extends JPanel {
           cboCurrentlyLoadedQueries.setModel(new javax.swing.DefaultComboBoxModel(queryIDs));
           clearEvalResults();
           cboCurrentlyLoadedQueries.setSelectedIndex(0);
-          
-          
-          // EvalLoadScoreDialog dlgLoad=new EvalLoadScoreDialog(parent, true, queryIDs);
-          // dlgLoad.setVisible(true);
-          
-          /*
-          if (dlgLoad.OKWasPressed) {
-            int numScoresSet=0;
-            java.util.HashMap queryMap=(java.util.HashMap)dlgSaveScores.loadedEvalFile.get(dlgLoad.selectedValue);
-            try {
-              for (int i=0; (i < queryResults.length) && (i < evalScores.length) && (queryMap!=null); i++) {
-                String thisDocID = (index.document(queryResults[i].ind));
-                Double thisVal=(Double)queryMap.get(thisDocID);
-                if (thisVal!=null) {
-                  evalScores[i]=thisVal;
-                  numScoresSet++;
-                } // end if (thisVal!=null)
-              } // end for (int i=0; (i < evalScores.length) && (queryMap!=null); i++)
-            } catch (java.lang.Exception ex) {
-              numScoresSet=0;
-            }
-            
-            if (numScoresSet==0) {
-              JOptionPane.showMessageDialog(parent, "No matching doc IDs found for loaded eval scores", "No Matching Scores", JOptionPane.WARNING_MESSAGE);
-            } else {
-              qrelsWereChanged=false;
-              showResults(formatResults(queryResults));
-            }
-            
-          } // end if (dlgLoad.OKWasPressed)
-          */
-          
         }
       } // end if (retVal==JFileChooser.APPROVE_OPTION)
     }
@@ -1796,25 +1803,21 @@ public class LemurRet extends JPanel {
     }
     
     private boolean checkSaveEvalResults(boolean showPrompt) {
-      // ensure that at least one qrel was modified
-      if (!qrelsCanBeSaved) { return true; }
-      
+
       // check to make sure if we have any items to save
       // to memory before saving to disk
-      if (qrelsWereChanged) {
+      if (qrelsChangedCurrentID) {
         int whichQueryIndex=cboCurrentlyLoadedQueries.getSelectedIndex();
         if (whichQueryIndex > 0) {
-          shouldWeUpdateScores(whichQueryIndex);
+          if (!shouldWeUpdateScores(whichQueryIndex)) {
+            return false;
+          }
         }
       }
       
+      // ensure that at least one qrel was modified
+      if (!qrelsChangedGlobally) { return true; }
 
-      // first - check and see if any results exist to save
-      boolean hasResults=hasEvalResults();
-
-      // ensure we have results
-      if (!hasResults) { return true; }
-      
       // prompt the user to see if they want to save or not
       int valSaveEval=JOptionPane.NO_OPTION;
       if (showPrompt) {
@@ -1842,8 +1845,9 @@ public class LemurRet extends JPanel {
           //}
           
           // ((EvalTableModel)tblEvalResults.getModel()).clearScores();
-          qrelsWereChanged=false;
-          qrelsCanBeSaved=false;
+          qrelsChangedCurrentID=false;
+          qrelsChangedGlobally=false;
+          btnSaveEvalResults.setVisible(false);
           
           return true;
         }
