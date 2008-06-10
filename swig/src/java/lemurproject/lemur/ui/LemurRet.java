@@ -617,7 +617,7 @@ public class LemurRet extends JPanel {
             // if we have scores that have changed - prompt the user to update
             
             if (qrelsChangedCurrentID && oldItemIndex > 0) {
-              shouldWeUpdateScores(oldItemIndex);
+              shouldWeUpdateScores(oldItemIndex, true);
             }
             // qrelsChangedCurrentID=false;
             loadInNewScores(newItemIndex);
@@ -919,7 +919,7 @@ public class LemurRet extends JPanel {
         int whichQueryIndex=cboCurrentlyLoadedQueries.getSelectedIndex();
         if (whichQueryIndex > 0) {
           // if (!shouldWeUpdateScores(whichQueryIndex)) {
-          shouldWeUpdateScores(whichQueryIndex);
+          shouldWeUpdateScores(whichQueryIndex, true);
           //  return;
           // }
         }
@@ -1010,12 +1010,15 @@ public class LemurRet extends JPanel {
         setEvalTableColumnSizes();
     }
     
-    private boolean shouldWeUpdateScores(int oldIdIndex) {
+    private boolean shouldWeUpdateScores(int oldIdIndex, boolean showPrompt) {
       if (loadedQrels==null) { return false; }
       
       boolean retVal=false;
-      int updateScores=JOptionPane.showConfirmDialog(parent, "Judgments have been modified.\nDo you want to save these?", "Judgments Modified", JOptionPane.YES_NO_OPTION);
-      if (updateScores==JOptionPane.YES_OPTION) {
+      int updateScores=JOptionPane.NO_OPTION;
+      if (showPrompt) {
+        updateScores=JOptionPane.showConfirmDialog(parent, "Judgments have been modified.\nDo you want to save these?", "Judgments Modified", JOptionPane.YES_NO_OPTION);
+      }
+      if (!showPrompt || updateScores==JOptionPane.YES_OPTION) {
         String oldQueryID=(String)cboCurrentlyLoadedQueries.getItemAt(oldIdIndex);
         java.util.HashMap mappedScores=(java.util.HashMap)loadedQrels.get(oldQueryID);
         if (mappedScores==null) {
@@ -1812,7 +1815,7 @@ public class LemurRet extends JPanel {
       if (qrelsChangedCurrentID) {
         int whichQueryIndex=cboCurrentlyLoadedQueries.getSelectedIndex();
         if (whichQueryIndex > 0) {
-          if (!shouldWeUpdateScores(whichQueryIndex)) {
+          if (!shouldWeUpdateScores(whichQueryIndex, false)) {
             return false;
           }
         }
