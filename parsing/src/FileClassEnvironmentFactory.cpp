@@ -65,9 +65,10 @@ static const char* trecalt_index_tags[] = { "text", 0 };
 static const char* trec_metadata_tags[] = { "docno", "title", 0 };
 static const char* trec_conflations[] = { "hl", NULL, NULL, "headline", "head", NULL, NULL, "headline", "ttl", NULL, NULL, "title", "dd", NULL, NULL, "date", "date_time", NULL, NULL, "date", 0, 0, 0, 0 };
 static const char* trec_index_tags[] = { "hl", "head", "headline", "title", "ttl", "dd", "date_time", "date", 0 };
+static const char* html_exclude_tags[] = { "script", 0};
 
 static file_class_environment_spec environments[] = {
-  { 
+  {
     "html",               // name
     "html",               // parser
     "word",               // tokenizer
@@ -76,7 +77,7 @@ static file_class_environment_spec environments[] = {
     NULL,                 // endDocTag
     NULL,                 // endMetadataTag
     NULL,                 // includeTags
-    NULL,                 // excludeTags
+    html_exclude_tags,    // excludeTags
     html_index_tags,      // indexTags
     html_metadata_tags,   // metadataTags
     html_conflations      // conflations
@@ -104,12 +105,12 @@ static file_class_environment_spec environments[] = {
     "</DOC>\n",             // endDocTag
     "</DOCHDR>",          // endMetadataTag
     NULL,                 // includeTags
-    NULL,                 // excludeTags
+    html_exclude_tags,    // excludeTags
     html_index_tags,      // indexTags
     html_metadata_tags,   // metadataTags
     html_conflations      // conflations
   },
-  
+
   {
     "trectext",           // name
     "xml",                // parser
@@ -256,7 +257,7 @@ static void copy_string_tuples_to_map( std::map<indri::parse::ConflationPattern*
 
       indri::parse::ConflationPattern* key =
         new indri::parse::ConflationPattern;
-      
+
       key->tag_name = array[i];
       key->attribute_name = array[i + 1];
       key->value = array[i + 2];
@@ -266,8 +267,8 @@ static void copy_string_tuples_to_map( std::map<indri::parse::ConflationPattern*
      }
    }
 }
- 
-static void cleanup_conflations_map( std::map<indri::parse::ConflationPattern*,std::string>& 
+
+static void cleanup_conflations_map( std::map<indri::parse::ConflationPattern*,std::string>&
                                      conflations ) {
 
   for ( std::map<indri::parse::ConflationPattern*,std::string>::iterator i =
@@ -276,7 +277,7 @@ static void cleanup_conflations_map( std::map<indri::parse::ConflationPattern*,s
 }
 
 
-indri::parse::FileClassEnvironmentFactory::~FileClassEnvironmentFactory() { 
+indri::parse::FileClassEnvironmentFactory::~FileClassEnvironmentFactory() {
   std::map<std::string, indri::parse::FileClassEnvironmentFactory::Specification*>::iterator iter;
 
   for( iter = _userTable.begin(); iter != _userTable.end(); iter++ ) {
@@ -370,7 +371,7 @@ indri::parse::FileClassEnvironmentFactory::Specification* indri::parse::FileClas
 
     newSpec->name = spec->name;
     newSpec->iterator = spec->iterator;
-    newSpec->parser = spec->parser;    
+    newSpec->parser = spec->parser;
     newSpec->tokenizer = spec->tokenizer;
     newSpec->index = indexTags;
     newSpec->metadata = metadataTags;
@@ -410,7 +411,7 @@ indri::parse::FileClassEnvironment* indri::parse::FileClassEnvironmentFactory::g
   return 0;
 }
 
-void indri::parse::FileClassEnvironmentFactory::addFileClass( const std::string& name, 
+void indri::parse::FileClassEnvironmentFactory::addFileClass( const std::string& name,
                                                               const std::string& iterator,
                                                               const std::string& parser,
                                                               const std::string& tokenizer,
@@ -421,7 +422,7 @@ void indri::parse::FileClassEnvironmentFactory::addFileClass( const std::string&
                                                               const std::vector<std::string>& exclude,
                                                               const std::vector<std::string>&
                                                               index,
-                                                              const std::vector<std::string>& metadata, 
+                                                              const std::vector<std::string>& metadata,
                                                               const std::map<indri::parse::ConflationPattern*,std::string>& conflations )
 {
   indri::parse::FileClassEnvironmentFactory::Specification* spec = new indri::parse::FileClassEnvironmentFactory::Specification;
