@@ -238,7 +238,7 @@ lemur::api::FieldInfoList *lemur::index::LemurIndriIndex::fieldInfoList(lemur::a
 
   // create our field info list object
   lemur::api::IndriFieldInfoList *retVal=new lemur::api::IndriFieldInfoList(tList->fields());
-
+  delete tList;
   // and return
   return retVal;
 }
@@ -271,7 +271,7 @@ lemur::api::FieldInfoList *lemur::index::LemurIndriIndex::fieldInfoList(lemur::a
       retVal->add(thisField);
     }
   }
-
+  delete tList;
   // and return
   return retVal;
 }
