@@ -41,6 +41,8 @@ ALLSRC= $(wildcard $(JSRC)/*.java) $(wildcard $(JSRCUI)/*.java) $(wildcard $(IND
 
 OUTDIRPROP=$(OUTDIR)/ui/properties
 PROPS = $(patsubst %,$(OUTDIRPROP)/%, $(notdir $(wildcard $(JSRCUI)/properties/*)))
+PROPS += $(patsubst %,$(OUTDIRPROP)/docs/%, $(notdir $(wildcard $(JSRCUI)/properties/docs/*)))
+PROPS += $(patsubst %,$(OUTDIRPROP)/docs/images/%, $(notdir $(wildcard $(JSRCUI)/properties/docs/images/*)))
 
 INDRI_OUTDIRPROP=$(INDRI_OUTDIR)/ui/properties
 INDRI_PROPS = $(patsubst %,$(INDRI_OUTDIRPROP)/%, $(notdir $(wildcard $(INDRI_JSRCUI)/properties/*)))
@@ -68,7 +70,7 @@ PHPINTERFACES = $(PHPSRC) interface/indritypemaps.i
 OUTDIRPHP=$(OBJ)/php
 PHPLIB=$(OUTDIRPHP)/libindri_php$(PHP_SO)
 
-JAVADIRS = $(OUTDIR) $(INDRI_OUTDIR) $(OUTDIRUI) $(INDRI_OUTDIRUI) $(OUTDIRPROP) $(INDRI_OUTDIRPROP) $(OBJ)/java/docs
+JAVADIRS = $(OUTDIR) $(INDRI_OUTDIR) $(OUTDIRUI) $(INDRI_OUTDIRUI) $(OUTDIRPROP)/docs/images $(INDRI_OUTDIRPROP) $(OBJ)/java/docs
 
 DIRS=
 
@@ -107,7 +109,6 @@ endif
 .PHONY: java-lib php-lib csharp-lib
 
 all: $(TARGETS)
-
 
 java-lib: $(JAVADIRS) $(PROPS) $(INDRI_PROPS) $(SOLIB) $(JARFILES)
 
@@ -174,6 +175,12 @@ $(INDRI_OUTDIR)/%.class:$(INDRI_JSRC)/%.java
 	$(JAVAC) -classpath java -d $(OBJ)/java $<
 
 $(OUTDIRPROP)/%:$(JSRCUI)/properties/%
+	if test -f $< ; then $(INSTALL_DATA) $< $@ ; fi
+
+$(OUTDIRPROP)/docs/%:$(JSRCUI)/properties/docs/%
+	if test -f $< ; then $(INSTALL_DATA) $< $@ ; fi
+
+$(OUTDIRPROP)/docs/images/%:$(JSRCUI)/properties/docs/images/%
 	if test -f $< ; then $(INSTALL_DATA) $< $@ ; fi
 
 $(INDRI_OUTDIRPROP)/%:$(INDRI_JSRCUI)/properties/%
