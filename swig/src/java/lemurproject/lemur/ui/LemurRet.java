@@ -42,40 +42,40 @@ public class LemurRet extends JPanel {
     JDialog setDialog;
     JComboBox indexBox;
     JTextField queryField;
-    
+
     JCheckBox chkUseEvalPanel;
 
     String workingDir;
     Color relColor, novelColor;
 
     JPanel resultsPane;
-    
+
     JPanel pnlResults;
     JEditorPane resultsDisplay;
-    
+
     JTable tblEvalResults;
     JButton btnSaveEvalResults;
     JButton btnLoadEvalScores;
     JButton btnAddNewQueryID;
     JComboBox cboCurrentlyLoadedQueries;
     JPanel pnlSaveAndLoadScores;
-    
+
     boolean qrelsChangedGlobally=false;
     boolean qrelsChangedCurrentID=false;
-    
+
     //boolean qrelsWereChanged=false;
     //boolean qrelsCanBeSaved=false;
     java.util.HashMap loadedQrels=null;
-    
+
     JLabel status;
     //  Vector queryResults = new Vector();
     IndexedReal[] queryResults=new IndexedReal[0];
-    
-    // keeps track of any eval scores 
+
+    // keeps track of any eval scores
     // - 1 for each queryResult item
     // null indicates that the item was not scored
     Double[] evalScores=new Double[0];
-    
+
     // keep track of which index we just searched (combo box might change)
     String searchIndex, searchQuery;
 
@@ -107,7 +107,7 @@ public class LemurRet extends JPanel {
     Index index;
     ArrayAccumulator accum = null;
     RetrievalMethod model = null;
-    
+
     public LemurRet(JFrame f) {
         super(true);
         parent = f;
@@ -199,7 +199,7 @@ public class LemurRet extends JPanel {
         resdocTPane = new JTextPane();
         resdocDialog = createDocDisplay(resdocTPane);
         resdocDialog.setVisible(false);
-        
+
         parent.addComponentListener(new ComponentListener() {
           public void componentResized(ComponentEvent e) {
             setEvalTableColumnSizes();
@@ -304,10 +304,11 @@ public class LemurRet extends JPanel {
             });
 
         JMenuItem helpman = new JMenuItem("Help");
-        helpman.setEnabled(false);
+        // helpman.setEnabled(false);
         helpman.setMnemonic('H');
         helpman.addActionListener( new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                  showHelpScreen();
                 }
             });
 
@@ -462,7 +463,7 @@ public class LemurRet extends JPanel {
         label.setVerticalTextPosition(JLabel.BOTTOM);
         label.setHorizontalTextPosition(JLabel.CENTER);
 
-        abtDialog.getContentPane().add(label);    
+        abtDialog.getContentPane().add(label);
         abtDialog.getContentPane().setBackground(Color.white);
         abtDialog.setResizable(false);
         return abtDialog;
@@ -549,7 +550,7 @@ public class LemurRet extends JPanel {
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gb.setConstraints(searchBtn, gbc);
         panel.add(searchBtn);
-        
+
         JSeparator sepEval=new JSeparator(JSeparator.HORIZONTAL);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -558,12 +559,12 @@ public class LemurRet extends JPanel {
         gbc.insets = new Insets(5,5,5,5);
         gb.setConstraints(sepEval, gbc);
         panel.add(sepEval);
-        
+
         chkUseEvalPanel=new JCheckBox("Use Evaluation Panel for Results?");
         chkUseEvalPanel.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            chkUseEvalPanel_OnChange();          
-          }          
+            chkUseEvalPanel_OnChange();
+          }
         });
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -571,12 +572,12 @@ public class LemurRet extends JPanel {
         gbc.weightx = 1;
         gbc.insets = new Insets(5,5,5,5);
         gb.setConstraints(chkUseEvalPanel, gbc);
-        
+
         panel.add(chkUseEvalPanel);
-        
+
         pnlSaveAndLoadScores=new JPanel();
         pnlSaveAndLoadScores.setLayout(new BorderLayout());
-        
+
         btnSaveEvalResults=new JButton("Save Judgment Scores");
         btnSaveEvalResults.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -587,7 +588,7 @@ public class LemurRet extends JPanel {
         });
         btnSaveEvalResults.setVisible(false);
         pnlSaveAndLoadScores.add(btnSaveEvalResults, BorderLayout.WEST);
-        
+
         btnLoadEvalScores=new JButton("Load Judgment Scores");
         btnLoadEvalScores.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -596,14 +597,14 @@ public class LemurRet extends JPanel {
         });
         btnLoadEvalScores.setVisible(true);
         pnlSaveAndLoadScores.add(btnLoadEvalScores, BorderLayout.EAST);
-        
+
         JPanel pnlLoadedQueries=new JPanel();
         pnlLoadedQueries.setLayout(new BorderLayout());
-        
+
         JLabel lblLoadedQueries=new JLabel("Active Query ID:");
         lblLoadedQueries.setHorizontalAlignment(JLabel.RIGHT);
         pnlLoadedQueries.add(lblLoadedQueries, BorderLayout.WEST);
-        
+
         cboCurrentlyLoadedQueries=new JComboBox();
         cboCurrentlyLoadedQueries.addItem("-- none --");
         cboCurrentlyLoadedQueries.addActionListener(new ActionListener() {
@@ -613,20 +614,20 @@ public class LemurRet extends JPanel {
             JComboBox cb=(JComboBox)e.getSource();
             int newItemIndex=cb.getSelectedIndex();
             if (newItemIndex==oldItemIndex) { return; }
-            
+
             // if we have scores that have changed - prompt the user to update
-            
+
             if (qrelsChangedCurrentID && oldItemIndex > 0) {
               shouldWeUpdateScores(oldItemIndex, true);
             }
             // qrelsChangedCurrentID=false;
             loadInNewScores(newItemIndex);
-            
+
             oldItemIndex=newItemIndex;
           }
         });
         pnlLoadedQueries.add(cboCurrentlyLoadedQueries, BorderLayout.CENTER);
-        
+
         btnAddNewQueryID=new JButton("New Query ID");
         btnAddNewQueryID.setFont(new java.awt.Font("SansSerif", 0, 9));
         btnAddNewQueryID.addActionListener(new ActionListener() {
@@ -635,9 +636,9 @@ public class LemurRet extends JPanel {
           }
         });
         pnlLoadedQueries.add(btnAddNewQueryID, BorderLayout.EAST);
-        
+
         pnlSaveAndLoadScores.add(pnlLoadedQueries, BorderLayout.SOUTH);
-        
+
         gbc.anchor=GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -645,9 +646,9 @@ public class LemurRet extends JPanel {
         gbc.insets = new Insets(5,5,5,5);
         gb.setConstraints(pnlSaveAndLoadScores, gbc);
         panel.add(pnlSaveAndLoadScores);
-        
+
         pnlSaveAndLoadScores.setVisible(false);
-        
+
         return panel;
     }
 
@@ -727,7 +728,7 @@ public class LemurRet extends JPanel {
             // -- nothing
           }
         });
-    
+
         resultsDisplay = new JEditorPane();
         resultsDisplay.setEditable(false);
         resultsDisplay.setContentType("text/html");
@@ -742,7 +743,7 @@ public class LemurRet extends JPanel {
         JScrollPane scroller = new JScrollPane(resultsDisplay);
         scroller.getViewport().setPreferredSize(new Dimension(575, 450));
         pnlResults.add(scroller, "regular");
-        
+
         EvalTableModel mdlEvalResults=new EvalTableModel();
         tblEvalResults=new JTable(mdlEvalResults);
 
@@ -763,7 +764,7 @@ public class LemurRet extends JPanel {
                     if (thisValString.length() > 0) {
                       newValue=Double.parseDouble(thisValString);
                     }
-                    
+
                     boolean scoreChanged=false;
                     if (newValue!=evalScores[thisIndex]) {
                       scoreChanged=true;
@@ -771,7 +772,7 @@ public class LemurRet extends JPanel {
                         scoreChanged=(!newValue.equals(evalScores[thisIndex]));
                       }
                     }
-                    
+
                     if (scoreChanged) {
                       if (cboCurrentlyLoadedQueries.getSelectedIndex() < 1) {
                         // we must have a current query ID!
@@ -782,7 +783,7 @@ public class LemurRet extends JPanel {
 
                         // set that we've changed at least one qrel
                       qrelsChangedCurrentID=true;
-                      
+
                       } // end if (cboCurrentlyLoadedQueries.getSelectedIndex() < 1)
                     } // end if(scoreChanged)
                   }
@@ -793,7 +794,7 @@ public class LemurRet extends JPanel {
                 }
                 public void editingCanceled(ChangeEvent e) { }
               });
-              thisCol.setCellEditor(editorCell); 
+              thisCol.setCellEditor(editorCell);
             } break;
             case 2: thisCol.setCellRenderer(new EvalDefaultCell()); break;
             case 3: thisCol.setCellRenderer(new EvalTableTitleCell()); break;
@@ -801,7 +802,7 @@ public class LemurRet extends JPanel {
             default: // nothing
           }
         }
-        
+
         tblEvalResults.setEnabled(true);
         tblEvalResults.setColumnSelectionAllowed(false);
         tblEvalResults.setRowSelectionAllowed(false);
@@ -831,8 +832,8 @@ public class LemurRet extends JPanel {
         JScrollPane scpResults=new JScrollPane(tblEvalResults);
         scpResults.getViewport().setPreferredSize(new Dimension(575, 450));
         pnlResults.add(scpResults, "eval");
-        
-        
+
+
         gbc.insets = new Insets(1,1,1,1);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridheight = GridBagConstraints.REMAINDER;
@@ -903,8 +904,8 @@ public class LemurRet extends JPanel {
                 // index open threw, shouldn't
                 return false;
             }
-            
-            
+
+
             index.setProps();
             return true;
         } else {
@@ -935,14 +936,14 @@ public class LemurRet extends JPanel {
 
       // set the query ID to -- no query selected --
       // cboCurrentlyLoadedQueries.setSelectedIndex(0);
-      
+
       pageAction();
       setScoresForQuery();
     }
-    
+
     private void setEvalTableColumnSizes() {
         tblEvalResults.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        
+
         for (int i=0; i < 5; i++) {
           javax.swing.table.TableColumn thisCol=tblEvalResults.getColumnModel().getColumn(i);
           switch (i) {
@@ -950,15 +951,15 @@ public class LemurRet extends JPanel {
             case 1: { thisCol.setPreferredWidth(100); } break;
             case 2: { thisCol.setPreferredWidth(70); } break;
             case 3: { thisCol.setPreferredWidth(120); } break;
-            case 4: { thisCol.setPreferredWidth(pnlResults.getWidth()-380); } break; 
+            case 4: { thisCol.setPreferredWidth(pnlResults.getWidth()-380); } break;
             default:
               // nothing;
           }
         }
         tblEvalResults.setRowHeight(64);
     }
-    
-    private void chkUseEvalPanel_OnChange() { 
+
+    private void chkUseEvalPanel_OnChange() {
       CardLayout resultsLayout=(CardLayout)(pnlResults.getLayout());
       if (chkUseEvalPanel.isSelected()) {
         resultsLayout.show(pnlResults, "eval");
@@ -992,27 +993,27 @@ public class LemurRet extends JPanel {
         try {
             if ((maxresults < 0) && queryResults.length < firstshown + guiSettings.numresults)
                 queryResults = sendQuery(searchQuery);
-            
-                // if this is a brand new search - set up the 
+
+                // if this is a brand new search - set up the
                 // eval scores array
                 if (evalScores.length==0 && queryResults.length>0) {
                   clearEvalResults();
                 }
-            
+
         } catch (Exception e) {
             errorMsg(parent, "An error occurred while searching.\n\n" + e.toString());
         }
         status.setText("Displaying...");
         status.update(status.getGraphics());
-        
+
         showResults(formatResults(queryResults));
-        
+
         setEvalTableColumnSizes();
     }
-    
+
     private boolean shouldWeUpdateScores(int oldIdIndex, boolean showPrompt) {
       if (loadedQrels==null) { return false; }
-      
+
       boolean retVal=false;
       int updateScores=JOptionPane.NO_OPTION;
       if (showPrompt) {
@@ -1024,7 +1025,7 @@ public class LemurRet extends JPanel {
         if (mappedScores==null) {
           mappedScores=new java.util.HashMap();
         }
-        
+
         try {
           for (int i=0; (i < queryResults.length) && (i < evalScores.length) && (mappedScores!=null); i++) {
             String thisDocID = (index.document(queryResults[i].ind));
@@ -1039,27 +1040,27 @@ public class LemurRet extends JPanel {
           } // end for (int i=0; (i < evalScores.length) && (queryMap!=null); i++)
         } catch (java.lang.Exception ex) {
         }
-        
+
         loadedQrels.put(oldQueryID, mappedScores);
         retVal=true;
         qrelsChangedGlobally=true;
       }
       return retVal;
     }
-    
+
     private void setScoresForQuery() {
       int idIndex=cboCurrentlyLoadedQueries.getSelectedIndex();
-      
+
       if (idIndex < 1) { return; }
       // clear any eval scores
       clearEvalResults();
-      
+
       String newQueryID=(String)cboCurrentlyLoadedQueries.getItemAt(idIndex);
       java.util.HashMap queryMap=(java.util.HashMap)loadedQrels.get(newQueryID);
       if (queryMap==null) {
         return;
       }
-      
+
       int numScoresSet=0;
       try {
         for (int i=0; (i < queryResults.length) && (i < evalScores.length) && (queryMap!=null); i++) {
@@ -1076,22 +1077,22 @@ public class LemurRet extends JPanel {
       } catch (java.lang.Exception ex) {
         numScoresSet=0;
       }
-      
+
       if (numScoresSet>0) {
         // qrelsChangedGlobally=true;
         // qrelsChangedCurrentID=false;
         // btnSaveEvalResults.setVisible(true);
         showResults(formatResults(queryResults));
       }
-      
+
     }
-    
+
     private void loadInNewScores(int newIdIndex) {
       if (loadedQrels==null) { return; }
-      
+
       // clear any eval scores
       clearEvalResults();
-      
+
       if (newIdIndex==0) { return; }
 
       String newQueryID=(String)cboCurrentlyLoadedQueries.getItemAt(newIdIndex);
@@ -1099,7 +1100,7 @@ public class LemurRet extends JPanel {
       if (queryMap==null) {
         return;
       }
-      
+
       int numScoresSet=0;
       try {
         for (int i=0; (i < queryResults.length) && (i < evalScores.length) && (queryMap!=null); i++) {
@@ -1122,41 +1123,41 @@ public class LemurRet extends JPanel {
       if (!qrelsChangedGlobally) {
         btnSaveEvalResults.setVisible(false);
       }
-      
+
       if (numScoresSet>0) {
         showResults(formatResults(queryResults));
       }
-      
+
     }
-    
+
     private void doAddNewQueryID() {
       // popup dialog box for new query ID
-      String newQueryID=JOptionPane.showInputDialog(parent, 
-              "Enter new Query ID:\n(Note, this will clear any existing judgments\n and make the new QueryID the active one.)", 
-              "Enter Query ID", 
+      String newQueryID=JOptionPane.showInputDialog(parent,
+              "Enter new Query ID:\n(Note, this will clear any existing judgments\n and make the new QueryID the active one.)",
+              "Enter Query ID",
               JOptionPane.QUESTION_MESSAGE);
-      
+
       if (newQueryID==null) { return; }
-      
+
       newQueryID=newQueryID.replaceAll("\\s", "_");
-      
+
       if (loadedQrels==null) {
         loadedQrels=new java.util.HashMap();
       }
-      
+
       // ensure it doesn't already exist in loaded queries
       java.util.HashMap checkExisting=(java.util.HashMap)loadedQrels.get(newQueryID);
       if (checkExisting!=null) {
         // already exists
-        JOptionPane.showMessageDialog(parent, 
+        JOptionPane.showMessageDialog(parent,
                 "The new Query ID you entered already exists!",
-                "Query ID Exists", 
+                "Query ID Exists",
                 JOptionPane.WARNING_MESSAGE);
         return;
       }
-      
+
       loadedQrels.put(newQueryID, new java.util.HashMap());
-      
+
       // reset the combo box and make this one active
       java.util.Set keySet=loadedQrels.keySet();
       String[] queryIDs=(String[])keySet.toArray(new String[keySet.size()]);
@@ -1171,7 +1172,7 @@ public class LemurRet extends JPanel {
                     } catch (NumberFormatException e) {
                         // not an integer
                         return a.compareTo(b);
-       }}}); 
+       }}});
 
       // add in the "-- none --" to the top
       java.util.ArrayList qList=new java.util.ArrayList(Arrays.asList(queryIDs));
@@ -1180,14 +1181,14 @@ public class LemurRet extends JPanel {
 
       // set the scores in the cboLoadedQueries
       cboCurrentlyLoadedQueries.setModel(new javax.swing.DefaultComboBoxModel(queryIDs));
-      
+
       for (int i=0; i < queryIDs.length; i++) {
         if (newQueryID.compareTo(queryIDs[i])==0) {
           cboCurrentlyLoadedQueries.setSelectedIndex(i);
           return;
         }
       }
-      
+
       // clear any eval scores
       clearEvalResults();
     }
@@ -1205,7 +1206,7 @@ public class LemurRet extends JPanel {
         showResults(formatResults(queryResults));
       }
     }
-    
+
     private void doLoadEvalScores() {
       // show the load dialog box
       JFileChooser fileChooser=new JFileChooser();
@@ -1226,7 +1227,7 @@ public class LemurRet extends JPanel {
           qrelsChangedGlobally=false;
           qrelsChangedCurrentID=false;
           btnSaveEvalResults.setVisible(false);
-          
+
           loadedQrels=dlgSaveScores.loadedEvalFile;
 
           java.util.Set keySet=loadedQrels.keySet();
@@ -1242,13 +1243,13 @@ public class LemurRet extends JPanel {
                         } catch (NumberFormatException e) {
                             // not an integer
                             return a.compareTo(b);
-           }}}); 
-          
+           }}});
+
           // add in the "-- none --" to the top
           java.util.ArrayList qList=new java.util.ArrayList(Arrays.asList(queryIDs));
           qList.add(0, "-- none --");
           queryIDs=(String[])qList.toArray(new String[qList.size()]);
-                    
+
           // set the scores in the cboLoadedQueries
           cboCurrentlyLoadedQueries.setModel(new javax.swing.DefaultComboBoxModel(queryIDs));
           clearEvalResults();
@@ -1256,7 +1257,7 @@ public class LemurRet extends JPanel {
         }
       } // end if (retVal==JFileChooser.APPROVE_OPTION)
     }
-    
+
     private void setParamValues() {
         guiSettings.loadind = loadCheck.isSelected();
         guiSettings.openwin = openCheck.isSelected();
@@ -1356,7 +1357,7 @@ public class LemurRet extends JPanel {
                     if (guiSettings.highlight)
                         if (matches.length > 0)
                             highlightText(docDisplay, matches);
-                        else 
+                        else
                             // do what we can
                             highlightText(docDisplay, searchQuery);
                     JScrollPane scroller = new JScrollPane(docDisplay);
@@ -1377,7 +1378,7 @@ public class LemurRet extends JPanel {
                     if (guiSettings.highlight)
                         if (matches.length > 0)
                             highlightText(resdocTPane, matches);
-                        else 
+                        else
                             highlightText(resdocTPane, searchQuery);
                     resdocDialog.setVisible(true); // jdk 1.5 replaces .show()
                 }
@@ -1419,7 +1420,7 @@ public class LemurRet extends JPanel {
     private void highlightText(JTextPane docDisplay, String searchQuery) {
         // use component default selection color
         DefaultHighlighter.DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(null);
-	
+
         Highlighter hl = docDisplay.getHighlighter();
         try {
             Document doc = docDisplay.getDocument();
@@ -1451,7 +1452,7 @@ public class LemurRet extends JPanel {
     private String stripOpQuery(String opquery) {
         StringTokenizer stok = new StringTokenizer(opquery, "() ");
         String token;
-        String stripped = "";   
+        String stripped = "";
         while (stok.hasMoreTokens()) {
             token = stok.nextToken();
             if (!token.startsWith("#")) {
@@ -1517,7 +1518,7 @@ public class LemurRet extends JPanel {
         } catch (Exception e) {
             errorMsg(parent, "Sorry, error writing document id to file: " + e);
         }
-        
+
     }
 
     private void showResults(String res) {
@@ -1535,7 +1536,7 @@ public class LemurRet extends JPanel {
             countertext += " &nbsp <font size=2></font></html>";
         }
         status.setText(countertext);
-    
+
         if (firstshown == 1)
             prevBtn.setEnabled(false);
         else
@@ -1546,7 +1547,7 @@ public class LemurRet extends JPanel {
             nextBtn.setEnabled(false);
 
         resultsPane.setVisible(true);
-        
+
         setEvalTableColumnSizes();
     }
 
@@ -1564,7 +1565,7 @@ public class LemurRet extends JPanel {
             mdlEvalTable.setRankOffset(firstshown);
             for (int i=firstshown-1;i<results.length && i<firstshown+guiSettings.numresults-1;i++) {
                 mdlEvalTable.addItem(queryResults[i], getTitle(queryResults[i]), getSnippet(queryResults[i]), evalScores[i]);
-              
+
                 String docid = (index.document(results[i].ind));
                 //System.out.println("DEBUG: "+docid);
                 lastshown=i+1;
@@ -1604,11 +1605,11 @@ public class LemurRet extends JPanel {
                         first = start;
                         last = end;
                         for (int w = (docmatches[m].start + start) / 2; w > start; w--) {
-                            if (doc.charAt(w) == ' ') 
+                            if (doc.charAt(w) == ' ')
                                 first = w;
                         }
                         for (int w = (docmatches[m].end + end) / 2; w < end; w++) {
-                            if (doc.charAt(w) == ' ') 
+                            if (doc.charAt(w) == ' ')
                                 last = w;
                         }
 
@@ -1620,7 +1621,7 @@ public class LemurRet extends JPanel {
                         // Combine overlapping passages
                         for (int m=1; m < finalpassage; m++) {
                             // fixme
-                            if (false /*&& docmatches[m*2-1] >= docmatches[m*2]*/) 
+                            if (false /*&& docmatches[m*2-1] >= docmatches[m*2]*/)
                                 docmatches[m*2] = docmatches[m*2-2];
                             else {
                                 // no overlap so display previous passage
@@ -1648,7 +1649,7 @@ public class LemurRet extends JPanel {
                 buf.append("</i><br>&nbsp;");
             }
             buf.append("</ol>");
-            
+
             tblEvalResults.setModel(mdlEvalTable);
             tblEvalResults.repaint();
         }
@@ -1657,7 +1658,7 @@ public class LemurRet extends JPanel {
         }
         return buf.toString();
     }
-    
+
     private String getTitle(IndexedReal result) {
       String retVal="(no title)";
       try {
@@ -1678,7 +1679,7 @@ public class LemurRet extends JPanel {
       }
       return retVal;
     }
-    
+
     private String getSnippet(IndexedReal result) {
       StringBuffer buf = new StringBuffer();
       try {
@@ -1705,24 +1706,24 @@ public class LemurRet extends JPanel {
                 first = start;
                 last = end;
                 for (int w = (docmatches[m].start + start) / 2; w > start; w--) {
-                    if (doc.charAt(w) == ' ') 
+                    if (doc.charAt(w) == ' ')
                         first = w;
                 }
                 for (int w = (docmatches[m].end + end) / 2; w < end; w++) {
-                    if (doc.charAt(w) == ' ') 
+                    if (doc.charAt(w) == ' ')
                         last = w;
                 }
 
                 docmatches[m].start = first;
                 docmatches[m].end = last;
             }
-            
+
             buf.append("...");
             if (finalpassage > 1) {
                 // Combine overlapping passages
                 for (int m=1; m < finalpassage; m++) {
                     // fixme
-                    if (false /*&& docmatches[m*2-1] >= docmatches[m*2]*/) 
+                    if (false /*&& docmatches[m*2-1] >= docmatches[m*2]*/)
                         docmatches[m*2] = docmatches[m*2-2];
                     else {
                         // no overlap so display previous passage
@@ -1760,34 +1761,34 @@ public class LemurRet extends JPanel {
         if (model == null) {
             // if params change, have to remake the model.
             try {
-                
+
                 if (retmethod.equals("inq_struct")) {
-                    lemur.ParamSet("defaultBelief", 
+                    lemur.ParamSet("defaultBelief",
                                    Double.toString(guiSettings.belief));
-                    lemur.ParamSet("feedbackPosCoeff", 
+                    lemur.ParamSet("feedbackPosCoeff",
                                    Double.toString(guiSettings.fbcoef));
-                    lemur.ParamSet("feedbackTermCount", 
+                    lemur.ParamSet("feedbackTermCount",
                                    Integer.toString(guiSettings.fbterms));
                 } else if (retmethod.equals("okapi")) {
                     lemur.ParamSet("BM25K1", Double.toString(guiSettings.bm25k1));
                     lemur.ParamSet("BM25B", Double.toString(guiSettings.bm25b));
                     lemur.ParamSet("BM25K3", Double.toString(guiSettings.bm25k3));
                     lemur.ParamSet("BM25QTF", Double.toString(guiSettings.bm25qtf));
-                    lemur.ParamSet("feedbackTermCount", 
+                    lemur.ParamSet("feedbackTermCount",
                                    Integer.toString(guiSettings.feedback));
                 }
             } catch (Exception e) {
-                errorMsg(parent, "Unable to set parameters " + e);  
+                errorMsg(parent, "Unable to set parameters " + e);
                 return null;
             }
-            
+
             try {
                 accum = new ArrayAccumulator(index.docCount());
             } catch (Exception e) {
-                errorMsg(parent, "Unable to get docCount " + e);  
+                errorMsg(parent, "Unable to get docCount " + e);
                 return null;
             }
-            try {            
+            try {
                 model = RetMethodManager.createModel(index, accum, retmethod);
             } catch (Exception e) {
                 errorMsg(parent, "Unable to create retrieval model: " + e);
@@ -1801,13 +1802,13 @@ public class LemurRet extends JPanel {
             errorMsg(parent, "Unable to run query: " + e);
             return null;
         }
-        
+
         if (res.length < firstshown + guiSettings.numresults)
             // We now know how many documents there are
             maxresults = res.length;
         return res;
     }
-    
+
     private boolean checkSaveEvalResults(boolean showPrompt) {
 
       // check to make sure if we have any items to save
@@ -1820,7 +1821,7 @@ public class LemurRet extends JPanel {
           }
         }
       }
-      
+
       // ensure that at least one qrel was modified
       if (!qrelsChangedGlobally) { return true; }
 
@@ -1830,7 +1831,7 @@ public class LemurRet extends JPanel {
         valSaveEval=JOptionPane.showConfirmDialog(
             this,
             "You have judgment scores and queries entered that are not saved. Would you\n" +
-            "like to save them now? (Note that if they are not saved, they\n" + 
+            "like to save them now? (Note that if they are not saved, they\n" +
             "will be lost)",
             "Save Eval Scores?",
             JOptionPane.YES_NO_OPTION
@@ -1839,7 +1840,7 @@ public class LemurRet extends JPanel {
       if (!showPrompt || valSaveEval==JOptionPane.YES_OPTION) {
         // bring up eval score save dialog box
         EvalScoreSaveDialog dlgSaveScores=new EvalScoreSaveDialog(parent);
-            
+
         String[] resultIDs=pullResultIDs();
         dlgSaveScores.showDialogBox(loadedQrels);
         if (dlgSaveScores.okWasClicked()) {
@@ -1849,19 +1850,19 @@ public class LemurRet extends JPanel {
           // for (int i=0; (i < evalScores.length && hasResults); i++) {
           //  evalScores[i]=null;
           //}
-          
+
           // ((EvalTableModel)tblEvalResults.getModel()).clearScores();
           qrelsChangedCurrentID=false;
           qrelsChangedGlobally=false;
           btnSaveEvalResults.setVisible(false);
-          
+
           return true;
         }
         return false;
       }
       return true;
     }
-    
+
     private boolean hasEvalResults() {
       boolean hasResults=false;
       for (int i=0; (i < evalScores.length && !hasResults); i++) {
@@ -1869,7 +1870,7 @@ public class LemurRet extends JPanel {
       }
       return hasResults;
     }
-    
+
     private String[] pullResultIDs() {
       String[] retVal=new String[queryResults.length];
       if (queryResults.length > 0) {
@@ -1920,7 +1921,7 @@ public class LemurRet extends JPanel {
         frame.pack();
         frame.setVisible(true);
     }
-    
+
     /******************** MAIN *****************************/
     public static void main(String[] args) {
 	//Schedule a job for the event-dispatching thread:
@@ -1932,5 +1933,12 @@ public class LemurRet extends JPanel {
 	    });
         /*******************************************************/
     }
+
+    private void showHelpScreen() {
+      // bring up the help dialog box
+      LemurRetHelp helpScreen=new LemurRetHelp();
+      helpScreen.displayHelp();
+    }
+
 }
 

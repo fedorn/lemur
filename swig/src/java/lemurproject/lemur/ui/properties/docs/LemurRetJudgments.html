@@ -1,0 +1,141 @@
+<html>
+<head>
+  <title>Lemur RetEval Help - Judgment Scoring</title>
+  <style type="text/css">
+html, body {
+  height: 100%;
+}
+
+* {
+  padding: 0px;
+  margin: 0px;
+  font-size: 100%;
+  border: 0px;
+}
+
+/* general elements */
+
+body {
+background: #FFFFFF;
+  font-family: Verdana, Arial, sans-serif;
+  color: #000000;
+  text-align: left;
+  font-size: 12px;
+}
+
+p {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+h1 {
+  font-size: 18px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  font-weight: bold;
+  color: #3333AA;
+  text-align: center;
+}
+
+h2 {
+  font-size: 14px;
+  margin-top: 4px;
+  color: #3333AA;
+  margin-bottom: 4px;
+}
+
+hr {
+  width: 99%;
+  height: 2px;
+  color: #0000CC;
+  background-color: #0000CC;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+a:link {
+  text-decoration: none;
+  color: #0000FF;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #0000FF;
+}
+
+a:hover, a:active {
+  text-decoration: underline;
+  color: #0000FF;
+}
+
+ul {
+  list-style-type: disc;
+  list-style-position: outside;
+  margin-left: 20px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-left: 20px;
+}
+
+li {
+  margin-bottom: 2px;
+}
+
+  </style>
+</head>
+<body>
+
+<h1>Lemur Retrieval GUI - Judgment Scoring</h1>
+
+<hr>
+
+<p style="font-size: 9px;">
+  [<a href="LemurRet.html">&laquo; Back to Main</a>]
+
+<hr>
+
+<p>
+  By checking the &quot;Use Evaluation Panel for Results?&quot; checkbox when you have
+  query results, you can use the evaluation jugment scoring display to create
+  relevance judgements for queries and document sets. A sample view of the display
+  is shown below:<br>
+  <img src="images/t_EnteringScores.jpg" border="0">
+  
+<p>
+  When the panel is displayed, you have the option to use the &quot;Load Judgment Scores&quot;
+  button to load in previously saved qrel judgments (that are compatible with the standardized
+  TRECEval format). Once loaded, you can select the query ID to operate on via the drop-down
+  list under the load button. If no queries are loaded, you can create a new query ID to 
+  work with via the &quot;New Query ID&quot; button.
+  
+<p>
+  When issuing a query while having a query ID selected, any previously loaded judgment scores
+  that match document IDs in the result set will have their judgment scores set. To edit or
+  add a new score to a document, click in the &quot;Eval. Score&quot; cell for that result item
+  and enter the score. The edit box will accept floating point numbers only (if you require the use
+  of integer relevance judgments, when you save the file, you will have the option to save
+  all scores as integers instead of floating point numbers).
+  
+<p>
+  If you modify any judgmnent scores for a query ID, the &quot;Save Judgment Scores&quot; button
+  will appear to allow you to save the current set of scores at any given time. If you move to a
+  newly selected query ID (or choose to not use one) and have modified scores, the system will
+  prompt you to commit any changes to modified scores for the current query ID.
+  
+<p>
+  When you are ready to save your judgment scores, press the Save button, and the Save Dialog will
+  appear (as shown below):<br>
+  <img src="images/SaveEvalScores.jpg" border="0">
+  
+<p>
+  Enter (or browse) for the filename you wish to save to. By default, the system will append to
+  any existing file (overwriting any matching query IDs that already exist that you have loaded),
+  but you can also choose to overwrite the file entirely.
+  
+<p>
+  You also have the option of choosing a RunID for the batch, and the option to save the scores
+  as integerial values (on by default) as opposed to floating point numeric values.
+
+</body>
+</html>
+

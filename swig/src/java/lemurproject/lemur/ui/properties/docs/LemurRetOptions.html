@@ -1,0 +1,128 @@
+<html>
+<head>
+  <title>Lemur RetEval Help - Options</title>
+  <style type="text/css">
+html, body {
+  height: 100%;
+}
+
+* {
+  padding: 0px;
+  margin: 0px;
+  font-size: 100%;
+  border: 0px;
+}
+
+/* general elements */
+
+body {
+background: #FFFFFF;
+  font-family: Verdana, Arial, sans-serif;
+  color: #000000;
+  text-align: left;
+  font-size: 12px;
+}
+
+p {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+h1 {
+  font-size: 18px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  font-weight: bold;
+  color: #3333AA;
+  text-align: center;
+}
+
+h2 {
+  font-size: 14px;
+  margin-top: 4px;
+  color: #3333AA;
+  margin-bottom: 4px;
+}
+
+hr {
+  width: 99%;
+  height: 2px;
+  color: #0000CC;
+  background-color: #0000CC;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+a:link {
+  text-decoration: none;
+  color: #0000FF;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #0000FF;
+}
+
+a:hover, a:active {
+  text-decoration: underline;
+  color: #0000FF;
+}
+
+ul {
+  list-style-type: disc;
+  list-style-position: outside;
+  margin-left: 20px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-left: 20px;
+}
+
+li {
+  margin-bottom: 2px;
+}
+
+  </style>
+</head>
+<body>
+
+<h1>Lemur Retrieval GUI - Options</h1>
+
+<hr>
+
+<p style="font-size: 9px;">
+  [<a href="LemurRet.html">&laquo; Back to Main</a>]
+
+<hr>
+
+<p>
+  The base options screen (shown below) has several options. In the general settings, you can choose
+  to have any currently opened indexes automatically load the next time the program starts. Also, by
+  default, when you click on a document to display it, it will open in the same window as any previous
+  documents - you can choose to display each document in its own window by check the box entitled 
+  &quot;Open each document in its own window&quot;
+  
+<p>
+  Futhermore, you can choose to highlight the matched query terms and display HTML markup tags within the
+  search results and documents window as well. Finally, in the general options, you can also choose
+  to append to existing files when exporting results, rather than the default of overwriting the file.<br>
+  <img src="images/t_OptionsScreen.jpg" border="0">
+
+<p>
+  In the &quot;Retrieval&quot; options, you can set the number of results per page, as well as the 
+  retrieval method to use while searching.
+  
+<p>
+  There are four different retrieval models to choose from:
+  <ul>
+    <li>KL-Divergence (using Dirichelp Prior smoothing)</li>
+    <li>Okapi (with settable parameters for BM25 settings and query expansion)</li>
+    <li>InQuery (for structured queries, with settable options)</li>
+    <li>Indri Query Language (for Indri Style Queries)</li>
+  </ul>
+  
+<p>
+  Note that only the Indri-Style indexes can be used with the Indri Query Language option above
+
+</body>
+</html>
+
