@@ -110,32 +110,30 @@ AC_CHECK_FUNCS(mkstemp)
 AC_CHECK_FUNCS(mkstemps)
 
 dnl ########################################################################
-    dnl see if using GNU glibc++, because then we have atomic integer operations
+dnl see if using GNU glibc++, because then we have atomic integer operations
 
     P_HAS_ATOMIC_INT=0
     P_NEEDS_GNU_CXX_NAMESPACE=0
-    AC_MSG_CHECKING(if atomic integer available)
     AC_LANG_PUSH([C++])
-
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <bits/atomicity.h>]], [[_Atomic_word val;]])],[P_HAS_ATOMIC_INT=1],[])
-		   if test ${P_HAS_ATOMIC_INT} = 1 ; then
-		     AC_MSG_RESULT(yes)
-		     AC_MSG_CHECKING(if __atomic_add is in __gnu_cxx namespace)
-		     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <bits/atomicity.h>]], [[_Atomic_word val; __gnu_cxx::__atomic_add(&val, 1)]])],[P_NEEDS_GNU_CXX_NAMESPACE=1],[])
-		     if test ${P_NEEDS_GNU_CXX_NAMESPACE} = 1 ; then
-			AC_MSG_RESULT(yes)
-		   AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 1, [define if __atomic_add is in __gnu_cxx namespace])
-		     else
-			AC_MSG_RESULT(no)
-		   AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 0, [define if __atomic_add is in __gnu_cxx namespace])
-		     fi
-		   else
-		     AC_MSG_RESULT(no)
-		   AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 0, [define if __atomic_add is in __gnu_cxx namespace])
-		   fi
-		   AC_LANG_POP
-
-
+    AC_CHECK_HEADERS([bits/atomicity.h], P_HAS_ATOMIC_INT=1)
+    AC_CHECK_HEADERS([ext/atomicity.h], P_NEEDS_GNU_CXX_NAMESPACE=1)
+    AC_LANG_POP
+# should abort if neither is found.
+    AC_LANG_PUSH([C++])
+   if test ${P_HAS_ATOMIC_INT} = 1 ; then
+     AC_MSG_CHECKING(if __atomic_add is in __gnu_cxx namespace)
+     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <bits/atomicity.h>]], [[_Atomic_word val; __gnu_cxx::__atomic_add(&val, 1)]])],[P_NEEDS_GNU_CXX_NAMESPACE=1],[])
+     if test ${P_NEEDS_GNU_CXX_NAMESPACE} = 1 ; then
+	AC_MSG_RESULT(yes)
+        AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 1, [define if __atomic_add is in __gnu_cxx namespace])
+     else
+	AC_MSG_RESULT(no)
+        AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 0, [define if __atomic_add is in __gnu_cxx namespace])
+     fi
+   else
+     AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 0, [define if __atomic_add is in __gnu_cxx namespace])
+   fi
+   AC_LANG_POP
 
 dnl check for optional components.
 

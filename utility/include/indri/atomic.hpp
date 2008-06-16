@@ -19,7 +19,12 @@
 #define INDRI_ATOMIC_HPP
 
 #ifndef WIN32
+#if HAVE_BITS_ATOMICITY_H
 #include <bits/atomicity.h>
+#endif
+#if HAVE_EXT_ATOMICITY_H
+#include <ext/atomicity.h>
+#endif
 #endif
 
 namespace indri {
