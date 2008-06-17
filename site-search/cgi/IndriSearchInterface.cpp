@@ -1,5 +1,7 @@
 #include "IndriSearchInterface.h"
 #include <time.h>
+#include <cctype>
+#include <algorithm>
 
 IndriSearchInterface::IndriSearchInterface(CGIOutput *_output, lemur::api::Index *_index, indri::api::QueryEnvironment *_queryEnvironment, string _dataRoot) {
   output=_output;
@@ -114,7 +116,7 @@ string IndriSearchInterface::stripHtmlTags(string inputString) {
 
 std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api::DocumentManager* dm,
                                                       lemur::api::Index *db, lemur::parse::StringQuery* q,
-                                                      indri::api::ScoredExtentResult &result, std::vector<string> *nodes,
+                                                      indri::api::ScoredExtentResult &result, std::vector<std::string> *nodes,
                                                       std::map< std::string, std::vector<indri::api::ScoredExtentResult> > *annotations,
                                                       string docext) {
 
@@ -242,77 +244,231 @@ std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api:
   return outString.str();
 }
 
+void IndriSearchInterface::findAndReplace(std::string &source, const std::string &find, const std::string &replace) {
+  size_t f;
+  for (; (f=source.find(find))!=std::string::npos;) {
+    source.replace(f, find.length(), replace);
+  }
+}
+
+std::string IndriSearchInterface::getASCIIFromPercentEncoding(std::string inputSequence) {
+  if (inputSequence.length() < 3) { return inputSequence; }
+  if (inputSequence[0]!='%') { return inputSequence; }
+
+  char retChar;
+  char firstNibble=inputSequence[1];
+  char secondNibble=inputSequence[2];
+
+  if ((firstNibble >='0') && (firstNibble <= '9')) {
+    retChar=(firstNibble-'0')*16;
+  } else if ((firstNibble >='a') && (firstNibble <= 'f')) {
+    retChar=((firstNibble-'a')+10)*16;
+  } else if ((firstNibble >='A') && (firstNibble <= 'F')) {
+    retChar=((firstNibble-'A')+10)*16;
+  } else {
+    // invalid
+    return inputSequence;
+  }
+
+  if ((secondNibble >='0') && (secondNibble <= '9')) {
+    retChar+=(secondNibble-'0');
+  } else if ((secondNibble >='a') && (secondNibble <= 'f')) {
+    retChar+=((secondNibble-'a')+10);
+  } else if ((secondNibble >='A') && (secondNibble <= 'F')) {
+    retChar+=((secondNibble-'A')+10);
+  } else {
+    // invalid
+    return inputSequence;
+  }
+
+  if (retChar < 32) { retChar=' '; }
+  if (retChar > 127) { retChar=' '; }
+
+  std::string retString;
+  retString=retChar;
+
+  return retString;
+}
+
+std::string IndriSearchInterface::normalizeURL(std::string inputURL) {
+  // intermediate - get the protocol, domain, port, path, file, and any parameters
+  std::string urlProtocol;
+  std::string urlDomain;
+  std::string urlPort;
+  std::string urlPath;
+  std::string urlFile;
+  std::string urlParameters;
+
+  std::string thisURL=inputURL;
+
+  // get protocol
+  size_t endUrlProtocol=thisURL.find_first_of("://");
+  if (endUrlProtocol==std::string::npos) {
+    // assume http
+    urlProtocol="http";
+  } else {
+    urlProtocol=thisURL.substr(0, endUrlProtocol);
+    thisURL=thisURL.substr(endUrlProtocol + 3);
+  }
+
+  // get domain - first check for a port
+  size_t possiblePortSep=thisURL.find_first_of(":");
+  if (possiblePortSep!=std::string::npos) {
+    // see if there's a / before the port - if so, not a port...
+    size_t firstSlash=thisURL.find_first_of("/");
+    if (firstSlash!=std::string::npos && (firstSlash < possiblePortSep)) {
+      // no port - just get the domain
+      urlDomain=thisURL.substr(0, firstSlash);
+      urlPort="";
+      thisURL=thisURL.substr(firstSlash+1);
+    } else {
+      // we're good - assume the items before the : are the domain
+      // and port after :, but before next /
+      urlDomain=thisURL.substr(0, possiblePortSep);
+      if (firstSlash==std::string::npos) {
+        // no slash -
+        urlPort=thisURL.substr(possiblePortSep+1);
+        thisURL="";
+      } else {
+        urlPort=thisURL.substr(possiblePortSep+1);
+        urlPort=urlPort.substr(0, urlPort.find_first_of("/"));
+        thisURL=thisURL.substr(firstSlash+1);
+      }
+    }
+  } else {
+    // no port - find the first /
+    urlPort="";
+    size_t firstSlash=thisURL.find_first_of("/");
+    if (firstSlash!=std::string::npos) {
+      urlDomain=thisURL.substr(0, firstSlash);
+      thisURL=thisURL.substr(firstSlash+1);
+    } else {
+      urlDomain=thisURL;
+      thisURL="";
+    }
+  }
+
+  // get the path (if any)
+  size_t lastSlash=thisURL.find_last_of("/");
+  if (lastSlash!=std::string::npos) {
+    urlPath=thisURL.substr(0, lastSlash);
+    thisURL=thisURL.substr(lastSlash+1);
+  } else {
+    urlPath="";
+  }
+
+  // get the filename
+  size_t paramSep=thisURL.find_first_of("?");
+  if (paramSep!=std::string::npos) {
+    urlFile=thisURL.substr(0, paramSep);
+    urlParameters=thisURL.substr(paramSep+1);
+  } else {
+    // no parameters found
+    urlFile=thisURL;
+    urlParameters="";
+  }
+
+  // step 1 - lowercase protocol and domain
+  
+  std::transform(urlProtocol.begin(), urlProtocol.end(), urlProtocol.begin(), (int(*)(int))std::tolower);
+  std::transform(urlDomain.begin(), urlDomain.end(), urlDomain.begin(), (int(*)(int))std::tolower);
+
+  // step 2 - look for default directory index and remove it if it exists
+  std::string tempFilename=urlFile;
+  std::transform(tempFilename.begin(), tempFilename.end(), tempFilename.begin(), (int(*)(int))std::tolower);
+  if ((tempFilename=="index.htm") ||
+      (tempFilename=="index.html") ||
+      (tempFilename=="index.php") ||
+      (tempFilename=="index.phtml") ||
+      (tempFilename=="default.asp") ||
+      (tempFilename=="default.aspx")) {
+    urlFile="";
+  }
+
+  // step 3 - transform escape sequences in the path, filename, and parameters
+  size_t pctPlace=urlPath.find_first_of("%");
+  while (pctPlace!=std::string::npos) {
+    std::string pctItem=urlPath.substr(pctPlace, 3);
+    findAndReplace(urlPath, pctItem, getASCIIFromPercentEncoding(pctItem));
+    pctPlace=urlPath.find_first_of("%");
+  }
+  pctPlace=urlFile.find_first_of("%");
+  while (pctPlace!=std::string::npos) {
+    std::string pctItem=urlFile.substr(pctPlace, 3);
+    findAndReplace(urlFile, pctItem, getASCIIFromPercentEncoding(pctItem));
+    pctPlace=urlFile.find_first_of("%");
+  }
+  pctPlace=urlParameters.find_first_of("%");
+  while (pctPlace!=std::string::npos) {
+    std::string pctItem=urlParameters.substr(pctPlace, 3);
+    findAndReplace(urlParameters, pctItem, getASCIIFromPercentEncoding(pctItem));
+    pctPlace=urlParameters.find_first_of("%");
+  }
+
+  // step 4 - recombine final URL
+  std::string retURL;
+  if (urlProtocol.length() > 0) {
+    retURL=urlProtocol + "://";
+  } else {
+    retURL="http://";
+  }
+
+  retURL+=urlDomain;
+
+  if (urlPort.length() > 0) {
+    if (urlPort!="80") {
+      retURL+=":" + urlPort;
+    }
+  }
+
+  retURL += "/";
+
+  if (urlPath.length() > 0) {
+    retURL += urlPath + "/";
+  }
+
+  retURL += urlFile;
+
+  if (urlParameters.length() > 0) {
+    retURL += "?" + urlParameters;
+  }
+
+  return retURL;
+}
+
 std::vector<indri::api::ScoredExtentResult> IndriSearchInterface::indriRemoveDuplicateResults(std::vector<indri::api::ScoredExtentResult> results, lemur::api::Index *db) {
   std::vector<indri::api::ScoredExtentResult> retVector;
-
   std::vector<indri::api::ScoredExtentResult>::iterator vIter=results.begin();
+  std::map<std::string, int> seenIDs; // map of normalized URL, document ID
+  std::map<int, int> vecPositions; // map of vectorPosition, document ID
 
-  std::string lastDocNo="";
-  string::size_type lastDocTildePos=string::npos;
+  retVector.clear();
+  seenIDs.clear();
+  vecPositions.clear();
 
-  // first - push all results IDs into a map of before the last / and after
-  std::map<std::string, std::vector<std::string> > docIDMap;
+  // do our normalization / de-duplication
+  int vecPosition=0;
   while (vIter!=results.end()) {
-    std::string thisDocIDString=db->document((*vIter).document);
-    // normalize it...
-    // should I use URL Decode here???
-    output->stringReplaceAll(&thisDocIDString, "%7E", "~");
-
-    string beforeLast="";
-    string afterLast="";
-    string::size_type lastSlash=thisDocIDString.rfind("/");
-    if (lastSlash!=string::npos) {
-      beforeLast=thisDocIDString.substr(0, lastSlash+1);
-      afterLast=thisDocIDString.substr(lastSlash+1);
-    } else {
-      beforeLast=thisDocIDString;
+    std::string thisURL=db->document((*vIter).document);
+    thisURL=normalizeURL(thisURL);
+    if (seenIDs.find(thisURL)==seenIDs.end()) {
+      seenIDs.insert(make_pair(thisURL, (*vIter).document));
+      vecPositions.insert(make_pair(vecPosition, (*vIter).document));
     }
-
-    std::map<std::string, std::vector<std::string> >::iterator mIter=docIDMap.find(beforeLast);
-    if (mIter!=docIDMap.end()) {
-      mIter->second.push_back(afterLast);
-    } else {
-      std::vector<std::string> thisMapVec;
-      thisMapVec.push_back(afterLast);
-      docIDMap.insert(make_pair(beforeLast, thisMapVec));
-    }
-
     vIter++;
-  }
+    vecPosition++;
+  } // end while (vIter!=results.end())
 
-  // now loop and push OK ones into a map...
-  std::map<int, int> clearedDocIDs;
-  std::map<std::string, std::vector<std::string> >::iterator dmapIter=docIDMap.begin();
-  while (dmapIter!=docIDMap.end()) {
-    bool foundIndex=false;
-    std::vector<std::string>::iterator mapVecIter=dmapIter->second.begin();
-    while (mapVecIter!=dmapIter->second.end()) {
-      string thisEnd=(*mapVecIter);
-      if ((thisEnd=="index.htm") || (thisEnd=="index.html") || (thisEnd=="index.php") || (thisEnd.length()==0)) {
-        if (foundIndex==false) {
-          string thisFullDoc=dmapIter->first;
-          thisFullDoc.append(thisEnd);
-          clearedDocIDs.insert(make_pair(db->document(thisFullDoc), 0));
-          foundIndex=true;
-        }
-      } else {
-        string thisFullDoc=dmapIter->first;
-        thisFullDoc.append(thisEnd);
-        clearedDocIDs.insert(make_pair(db->document(thisFullDoc), 0));
-      }
-      mapVecIter++;
-    }
-    dmapIter++;
-  }
-
-  // now, go through and generate our output set.
+  // generate the output results set
   vIter=results.begin();
+  vecPosition=0;
   while (vIter!=results.end()) {
-    if (clearedDocIDs.find((*vIter).document)!=clearedDocIDs.end()) {
+    if (vecPositions.find(vecPosition)!=vecPositions.end()) {
       retVector.push_back(*vIter);
     }
     vIter++;
-  }
+    vecPosition++;
+  } // end while (vIter!=results.end())
 
   return retVector;
 }
@@ -592,9 +748,25 @@ string IndriSearchInterface::indriDefaultQueryExpansion(string &origQuery, bool 
   */
 }
 
+std::vector<std::string> IndriSearchInterface::getRawScoringNodes(const indri::api::QueryAnnotationNode *node) {
+  std::vector<std::string> retVec;
+  if (node->type=="RawScorerNode") {
+    retVec.push_back(node->name);
+  } else {
+    std::vector<indri::api::QueryAnnotationNode*>::const_iterator cIter=node->children.begin();
+    while (cIter!=node->children.end()) {
+      std::vector<std::string> childResults=getRawScoringNodes(*cIter);
+      retVec.insert(retVec.end(), childResults.begin(), childResults.end());
+      cIter++;
+    }
+  }
+  return retVec;
+}
 
 void IndriSearchInterface::performSearch(string &query, int maxNumResults, int indexID, int listLength, int rankStart) {
   if (!output) return;
+
+  // ensure we have an index and a query environment
   if (!index) {
     output->writeErrorMessage("No index?", "No index set on call to IndriSearchInterface::performSearch()");
     return;
@@ -612,10 +784,12 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
   time ( &rawtime );
   timeinfo = localtime ( &rawtime );
 
+  // see if we need to perform logging...
   if (CGIConfiguration::getInstance().useQueryLogging()) {
     oQueryLog=fopen(CGIConfiguration::getInstance().getQueryLogPath().c_str(), "a");
   }
 
+  // set our environment scoring rules
   std::vector<std::string> scoringRules;
   scoringRules.push_back("method:dirichlet,mu:250,field:mainbody,operator:term");
   scoringRules.push_back("method:dirichlet,mu:1000,field:mainbody,operator:window");
@@ -627,6 +801,7 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
   scoringRules.push_back("method:dirichlet,mu:80,field:heading,operator:window");
   queryEnvironment->setScoringRules(scoringRules);
 
+  // clean up our query string if needed...
   string origQueryCopy="";
   origQueryCopy.append(query);
   origQueryCopy=output->URLDecodeString(origQueryCopy);
@@ -639,14 +814,17 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
     fprintf(oQueryLog, "[%s] Query: %s : ", logTimeString.c_str(), origQueryCopy.c_str());
   }
 
+  // expand the query if we can...
   string reformulatedQuery=indriDefaultQueryExpansion(query, CGIConfiguration::getInstance().getSupportPageRankPrior());
   CGIConfiguration::getInstance().putKVItem("reformulatedQuery", reformulatedQuery);
 
-  // indri::api::QueryAnnotation *qaResults=NULL;
+  indri::api::QueryAnnotation *qaResults=NULL;
 	std::vector< indri::api::ScoredExtentResult> qResults;
+  
+  // run the query...
   try {
-    // qaResults=queryEnvironment->runAnnotatedQuery(reformulatedQuery, maxNumResults);
-		qResults=queryEnvironment->runQuery(reformulatedQuery, maxNumResults);
+    int totalNumResults=MIN(maxNumResults, (rankStart+1000));
+    qaResults=queryEnvironment->runAnnotatedQuery(reformulatedQuery, totalNumResults);
   } catch (...) {
     output->resetResultsPage();
     output->setResultQuery(origQueryCopy);
@@ -661,8 +839,12 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
     return;
   }
 
-  //std::vector<indri::api::ScoredExtentResult> finalResults=indriRemoveDuplicateResults(qaResults->getResults(), index);
-  std::vector<indri::api::ScoredExtentResult> finalResults=indriRemoveDuplicateResults(qResults, index);
+  // ok - we should now have a set of annotated results...
+  // let's remove any duplicates...
+  std::vector<indri::api::ScoredExtentResult> finalResults=indriRemoveDuplicateResults(qaResults->getResults(), index);
+
+  // get our raw scoring nodes from the annotation tree...
+  std::vector<std::string> rawScoringNodeNames=getRawScoringNodes(qaResults->getQueryTree());
 
   lemur::parse::StringQuery* q = new lemur::parse::StringQuery(query.c_str());
   // reset out results page to initialize it...
@@ -688,19 +870,110 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
 
 		// get annotations for only those nodes we will be displaying...
 		// create a docID vector...
-		std::vector<lemur::api::DOCID_T> displayNodes;
+		// std::vector<lemur::api::DOCID_T> displayNodes;
+
 		int startItem=rankStart;
 		int endItem=(rankStart+listLength);
 		if (endItem > finalResults.size()) { endItem=finalResults.size(); }
-		for (int i=startItem; i < endItem; i++) {
-			displayNodes.push_back(finalResults[i].document);
-		}
 
-		indri::api::QueryAnnotation *qaResults=queryEnvironment->runAnnotatedQuery(reformulatedQuery, displayNodes, displayNodes.size());
+		// for (int i=startItem; i < endItem; i++) {
+		//	displayNodes.push_back(finalResults[i].document);
+		// }
 
-    std::vector<string> scoreNodes=getRawNodes((indri::api::QueryAnnotationNode*)qaResults->getQueryTree());
-    std::map< std::string, std::vector<indri::api::ScoredExtentResult> > resultAnnotations=qaResults->getAnnotations();
-    displayIndriSearchResults(index, indexID, q, queryEnvironment, &finalResults, &scoreNodes, &resultAnnotations, listLength, rankStart);
+		// indri::api::QueryAnnotation *qaResults=queryEnvironment->runAnnotatedQuery(reformulatedQuery, displayNodes, displayNodes.size());
+
+    // std::vector<string> scoreNodes=getRawNodes((indri::api::QueryAnnotationNode*)qaResults->getQueryTree());
+    // std::map< std::string, std::vector<indri::api::ScoredExtentResult> > resultAnnotations=qaResults->getAnnotations();
+    // displayIndriSearchResults(index, indexID, q, queryEnvironment, &finalResults, &scoreNodes, &resultAnnotations, listLength, rankStart);
+
+    // start the page...
+    output->setMaxResultsPerPage(listLength);
+
+    //
+    //  If someone tries to go past the end of the list, don't.
+    //
+    if (rankStart >= finalResults.size()) {
+      rankStart = finalResults.size() - 1;
+    }
+
+    int maxResultsToGet=finalResults.size();
+    if (DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE!=0) {
+      maxResultsToGet=MIN(finalResults.size(), DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE);
+    }
+
+    output->setResultStatistics(  indexID, rankStart,
+                                  MIN(rankStart+listLength, maxResultsToGet),
+                                  maxResultsToGet
+                                );
+
+    output->displayResultsPageBeginning();
+
+    stringstream htmlListStart;
+    htmlListStart << "<ol type=1 start=\"" << (rankStart + 1) << "\">\n";
+    output->outputString(htmlListStart.str());
+
+    std::map< std::string, std::vector<indri::api::ScoredExtentResult> > annotations=qaResults->getAnnotations();
+
+    for (int i=rankStart;(i<listLength+rankStart) && (i<maxResultsToGet);i++) {
+
+      indri::api::ScoredExtentResult thisResult=finalResults[i];
+      //
+      // get DocMgr
+      //
+
+      const lemur::api::DocumentManager* dm = index->docManager(thisResult.document);
+
+      //
+      // fetch possible title
+      //
+      string docext = index->document(thisResult.document);
+
+      //
+      // Get the summary item (if any)
+      //
+      string buf = getScoredExtentSummaryString(dm, index, q, thisResult, &rawScoringNodeNames, &annotations, docext);
+
+      //
+      // if we're using an Indri index - check for metadata fields...
+      //
+      std::string thisTitle="";
+      std::string thisURL="";
+
+      std::vector< lemur::api::DOCID_T > docIDVec;
+      docIDVec.clear(); // just to make sure...
+      docIDVec.push_back(thisResult.document);
+
+      // get a title field (if any)
+      std::vector< std::string > titleStrings=queryEnvironment->documentMetadata(docIDVec, "title");
+      if (titleStrings.size() > 0) {
+        thisTitle=(*(titleStrings.begin()));
+      }
+
+      thisURL=docext;
+
+      // should we strip the root path?
+      if ((CGIConfiguration::getInstance().getStripRootPathFlag()) && (thisURL.find(dataRoot)==0)) {
+        // remove the data root from the docext path...
+        thisURL.erase(0,dataRoot.length());
+      }
+
+      // depending on if we have a title and/or URL, decide how we want to display it
+      if ((thisTitle.length() > 0) && (thisURL.length() > 0)) {
+        output->writeSearchResult(thisURL, docext, thisTitle, buf, thisResult.score, indexID, thisResult.document);
+      } else if (thisTitle.length() > 0) {
+        output->writeSearchResult("", docext, thisTitle, buf, thisResult.score, indexID, thisResult.document);
+      } else {
+        output->writeSearchResult("", docext, thisURL, buf, thisResult.score, indexID, thisResult.document);
+      }
+    } // for (int i=rankStart;(i<listLength+rankStart) && (i<results.size());i++)
+
+    output->outputString("</ol>\n");
+
+    if (CGIConfiguration::getInstance().getKVItem("displayquerydebug")=="true") {
+      output->outputString("<hr />Reformulated Query: " + CGIConfiguration::getInstance().getKVItem("reformulatedQuery") + "<hr />");
+    }
+
+    output->displayResultsPageEnding();
 
   } // end [else] if (results.size() == 0)
 

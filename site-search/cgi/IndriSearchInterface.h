@@ -67,7 +67,13 @@ private:
 
   string replaceAllByChr(string inputString, string characters);
 
+  void findAndReplace(std::string &source, const std::string &find, const std::string &replace);
+
   string stripHtmlTags(string inputString);
+
+  std::string getASCIIFromPercentEncoding(std::string inputSequence);
+
+  std::string normalizeURL(std::string inputURL);
 
   void addToStringVector(std::vector<std::string> *origVec, std::vector<std::string> *addVec);
 
@@ -86,6 +92,8 @@ private:
                                            indri::api::ScoredExtentResult &result, std::vector<string> *nodes,
                                            std::map< std::string, std::vector<indri::api::ScoredExtentResult> > *annotations,
                                            string docext);
+
+  std::vector<std::string> getRawScoringNodes(const indri::api::QueryAnnotationNode *node);
 
   /**
    * Reformulates a free-text query
