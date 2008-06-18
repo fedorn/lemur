@@ -131,7 +131,11 @@ dnl see if using GNU glibc++, because then we have atomic integer operations
         AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 0, [define if __atomic_add is in __gnu_cxx namespace])
      fi
    else
+    if test ${P_NEEDS_GNU_CXX_NAMESPACE} = 1 ; then
+        AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 1, [define if __atomic_add is in __gnu_cxx namespace])
+    else
      AC_DEFINE(P_NEEDS_GNU_CXX_NAMESPACE, 0, [define if __atomic_add is in __gnu_cxx namespace])
+    fi
    fi
    AC_LANG_POP
 

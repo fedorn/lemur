@@ -6291,11 +6291,19 @@ _ACEOF
 
      fi
    else
+    if test ${P_NEEDS_GNU_CXX_NAMESPACE} = 1 ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define P_NEEDS_GNU_CXX_NAMESPACE 1
+_ACEOF
+
+    else
 
 cat >>confdefs.h <<\_ACEOF
 #define P_NEEDS_GNU_CXX_NAMESPACE 0
 _ACEOF
 
+    fi
    fi
    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
