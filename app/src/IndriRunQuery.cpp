@@ -345,7 +345,7 @@ private:
        << "    </collections>" << std::endl;
 
       // retrieve path names
-      pathNames = _environment.pathNames( _results );
+      pathNames = _environment.pathNames( resultSubset );
     }
 
     // Print results
