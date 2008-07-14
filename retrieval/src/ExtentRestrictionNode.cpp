@@ -49,7 +49,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   // we're going to run through the field list, etc.
   if ( _field != NULL ) {
 
-    indri::index::Extent tExtent(extent.begin, extent.end);
+    indri::index::Extent tExtent(extent);
     const indri::utility::greedy_vector<indri::index::Extent>& fieldExtentsTmp = _field->matches( tExtent );
     indri::utility::greedy_vector<indri::index::Extent> fieldExtents;
     fieldExtents.append(fieldExtentsTmp.begin(), fieldExtentsTmp.end());
@@ -122,7 +122,7 @@ void indri::infnet::ExtentRestrictionNode::annotate( indri::infnet::Annotator& a
 
   if ( _field != NULL) {
 
-    indri::index::Extent tExtent(extent.begin, extent.end);
+    indri::index::Extent tExtent(extent);
     const indri::utility::greedy_vector<indri::index::Extent>& fieldExtentsTmp = _field->matches( tExtent );
     indri::utility::greedy_vector<indri::index::Extent> fieldExtents;
     fieldExtents.append(fieldExtentsTmp.begin(), fieldExtentsTmp.end());
