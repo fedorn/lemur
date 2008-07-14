@@ -26,6 +26,7 @@
 #include "indri/greedy_vector"
 #include "indri/delete_range.hpp"
 #include "indri/Parameters.hpp"
+#include "indri/ExtentRestrictionNode.hpp"
 
 double indri::infnet::WeightedAndNode::_computeMaxScore( unsigned int start ) {
   // first, find the maximum score of the first few columns
@@ -80,6 +81,12 @@ void indri::infnet::WeightedAndNode::addChild( double weight, BeliefNode* node )
   child.maximumWeightedScore = node->maximumScore() * weight;
 
   // set sibling flag is more than 1 child to speedup
+  ExtentRestrictionNode* ernode=dynamic_cast<indri::infnet::ExtentRestrictionNode *>(node); //lezhao
+  if (ernode) {
+    //lezhao: ExtentRestrictionNode inside a #combine node, need to score unmatched extents!
+    node->setSiblingsFlag(1); 
+  }
+
   if (_children.size() > 1) {
     child.node->setSiblingsFlag(1);
   }

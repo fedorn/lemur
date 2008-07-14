@@ -22,6 +22,8 @@
 #include "indri/BeliefNode.hpp"
 #include "indri/ScoredExtentResult.hpp"
 #include "indri/Annotator.hpp"
+#include "indri/ExtentRestrictionNode.hpp"
+
 namespace indri
 {
   namespace infnet
@@ -48,6 +50,16 @@ namespace indri
             }
           }
         }
+
+
+        if(_children.size() == 1) { 
+          ExtentRestrictionNode* ernode=dynamic_cast<indri::infnet::ExtentRestrictionNode *>(_children[0]);
+          if(ernode) {
+            // ExtentRestrictionNode inside a #combine node, need to score unmatched extents!
+            _children[0]->setSiblingsFlag(1); 
+          }
+        }
+
       }
 
       int nextCandidateDocument() {
