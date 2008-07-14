@@ -243,7 +243,7 @@ void indri::query::RelevanceModel::_sortGrams() {
 // but could be altered to a min or average, or whatever...
 
 static void _logtoposterior(std::vector<indri::api::ScoredExtentResult> &res) {
-  
+  if (res.size() == 0) return;
   std::vector<indri::api::ScoredExtentResult>::iterator iter;
   iter = res.begin();
   double K = (*iter).score;
@@ -275,6 +275,8 @@ void indri::query::RelevanceModel::generate( const std::string& query ) {
     _countGrams();
     _scoreGrams();
     _sortGrams();
+    for (unsigned int i = 0; i < _vectors.size(); i++)
+      delete _vectors[i];
   } catch( lemur::api::Exception& e ) {
     LEMUR_RETHROW( e, "Couldn't generate relevance model for '" + query + "' because: " );
   }
@@ -295,6 +297,8 @@ void indri::query::RelevanceModel::generate( const std::string& query, const std
     _countGrams();
     _scoreGrams();
     _sortGrams();
+    for (unsigned int i = 0; i < _vectors.size(); i++)
+      delete _vectors[i];
   } catch( lemur::api::Exception& e ) {
     LEMUR_RETHROW( e, "Couldn't generate relevance model for '" + query + "' because: " );
   }
