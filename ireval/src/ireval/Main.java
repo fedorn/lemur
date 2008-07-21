@@ -124,8 +124,17 @@ public class Main {
     
     public static SetRetrievalEvaluator create( TreeMap< String, ArrayList<Document> > allRankings, TreeMap< String, ArrayList<Judgment> > allJudgments ) {
         // Map query numbers into Integer to get proper sorting.
-        TreeMap< Integer, RetrievalEvaluator > evaluators = new TreeMap<Integer, RetrievalEvaluator>();
-        
+        TreeMap< String, RetrievalEvaluator > evaluators = new TreeMap<String, RetrievalEvaluator>(new java.util.Comparator<String>() {
+                public int compare(String a, String b) {
+                    try {
+                        Integer a1 = new Integer(a);
+                        Integer b1 = new Integer(b);
+                        return a1.compareTo(b1);
+                    } catch (NumberFormatException e) {
+                        // not an integer
+                        return a.compareTo(b);
+                    }}});
+
         for( String query : allRankings.keySet() ) {
             ArrayList<Judgment> judgments = allJudgments.get( query );
             ArrayList<Document> ranking = allRankings.get( query );
@@ -135,7 +144,7 @@ public class Main {
             }
             
             RetrievalEvaluator evaluator = new RetrievalEvaluator( query, ranking, judgments );
-            evaluators.put( Integer.valueOf(query), evaluator );
+            evaluators.put( query, evaluator );
         }
         
         return new SetRetrievalEvaluator( evaluators.values() );
