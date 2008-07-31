@@ -257,8 +257,6 @@ static void harvest_anchor_text( const std::string& corpusPath,
 
     for( ; files != indri::file::FileTreeIterator::end(); files++ ) {
       std::string filePath = *files;
-      //std::string relative = indri::file::Path::relative( corpusPath, filePath );
-      //std::string anchorText = indri::file::Path::combine( harvestPath, relative );
       std::cout << "harvesting " << filePath << std::endl;
 
       std::string finalHarvestPath=getFinalHarvestPath(corpusPath, filePath, harvestPath);
@@ -272,24 +270,18 @@ static void harvest_anchor_text( const std::string& corpusPath,
       docOrderFilename += indri::file::Path::filename(filePath);
       linkFileFilename += indri::file::Path::filename(filePath);
 
-      // std::string linkFilePath = indri::file::Path::combine( harvestPath, linkFileFilename );
-      // std::string docOrderPath = indri::file::Path::combine( harvestPath, docOrderFilename );
       std::string linkFilePath = indri::file::Path::combine( finalHarvestDirectory, linkFileFilename );
       std::string docOrderPath = indri::file::Path::combine( finalHarvestDirectory, docOrderFilename );
 
       // every 100 files, reset the tokenizer for memory's sake...
-      // and close / re-open the keyfile
       if ((fCounter % 100)==0) {
-        // docUrlNoKeyfile.close();
         if (tokenizer) { delete tokenizer; }
-        // docUrlNoKeyfile.open(docUrlNoKeyfilePath.c_str(), (20*1024*1024));
         tokenizer = indri::parse::TokenizerFactory::get( "word" );
       }
 
       try {
-        //indri::parse::Tokenizer* tokenizer = indri::parse::TokenizerFactory::get( "word" );
+        // now harvest the anchor text in the file
         harvest_anchor_text_file( *files, linkFilePath, docOrderPath, redirectKeyfile, parser, tokenizer, &docUrlNoKeyfile );
-        //if (tokenizer) { delete tokenizer; }
       } catch( lemur::api::Exception& e ) {
         std::cout << e.what() << std::endl;
       }
@@ -306,11 +298,9 @@ static void harvest_anchor_text( const std::string& corpusPath,
     std::string linkFilePath = indri::file::Path::combine( harvestPath, linkFileFilename );
     std::string docOrderPath = indri::file::Path::combine( harvestPath, docOrderFilename );
 
-    //indri::parse::Tokenizer* tokenizer = indri::parse::TokenizerFactory::get( "word" );
     harvest_anchor_text_file( corpusPath, linkFilePath, docOrderPath, redirectKeyfile, parser, tokenizer, &docUrlNoKeyfile );
-    //if (tokenizer) { delete tokenizer; }
   }
-  // close the doc keyfile
+  // close the doc keyfile and cleanup
   docUrlNoKeyfile.close();
   if (tokenizer) { delete tokenizer; }
   if (redirectKeyfile) {
@@ -324,6 +314,12 @@ void combineOutputFile(const std::string& corpusFile, const std::string& sortedP
                        lemur::file::Keyfile *urlKeyfile, FILE *sortedDestFile,
                        lemur::file::Keyfile *docNoKeyfile)
 {
+
+  if (sortedDestFile==NULL) {
+    std::cerr << "NULL sorted destination file specified for combineOutputFile. Exiting." << std::endl;
+    return;
+  }
+
   std::cout << "-- combining " << indri::file::Path::filename(corpusFile) << std::endl;
 
   // reset the file pointer...
@@ -335,6 +331,11 @@ void combineOutputFile(const std::string& corpusFile, const std::string& sortedP
 
   // open the docOrder file
   FILE *docOrder=fopen(docOrderPath.c_str(), "r");
+
+  if (docOrder==NULL) {
+    std::cerr << "Error opening document order file '" << docOrderPath << "'. File cannot be opened." << std::endl;
+    return;
+  }
 
   // reset the buffer size to 64k
   setvbuf(docOrder, NULL, _IOFBF, 65536);
@@ -465,6 +466,11 @@ void combineSortedFiles(const std::string& corpusPath, const std::string& harves
 
   FILE *_sortIn;
   _sortIn=fopen(outputSortedLinkFile.c_str(), "r");
+  // ensure we have a sorted file!
+  if (_sortIn==NULL) {
+    std::cerr << "Error opening sorted link file '" << outputSortedLinkFile << "'. File cannot be opened." << std::endl;
+    return;
+  }
   // reset the buffer size to 64k
   setvbuf(_sortIn, NULL, _IOFBF, 65536);
 
@@ -535,11 +541,9 @@ void combineSortedFiles(const std::string& corpusPath, const std::string& harves
 
       std::string docOrderFilename("docOrder-");
       docOrderFilename += indri::file::Path::filename(filePath);
-      //std::string docOrderPath = indri::file::Path::combine( harvestPath, docOrderFilename );
       std::string docOrderPath = indri::file::Path::combine( finalHarvestDirectory, docOrderFilename );
 
       try {
-        // combineOutputFile(*files, sortedPath, outputSortedLinkFile, docOrderPath, &urlKeyfile, _sortIn, docNoKeyfile);
         combineOutputFile(*files, finalSortedDirectory, outputSortedLinkFile, docOrderPath, &urlKeyfile, _sortIn, docNoKeyfile);
       } catch( lemur::api::Exception& e ) {
         std::cout << e.what() << std::endl;
@@ -606,22 +610,17 @@ int main(int argc, char * argv[]) {
     if( parameters.get( "delete", 1 ) ) {
       if( indri::file::Path::isDirectory( harvestPath ) )
         indri::file::Path::remove( harvestPath );
-      // if( indri::file::Path::isDirectory( bucketPath ) )
-      //   indri::file::Path::remove( bucketPath );
       if( indri::file::Path::isDirectory( preSortPath ) )
         indri::file::Path::remove( preSortPath );
       if( indri::file::Path::isDirectory( sortedPath ) )
         indri::file::Path::remove( sortedPath );
 
       indri::file::Path::make( harvestPath );
-      // indri::file::Path::make( bucketPath );
       indri::file::Path::make( preSortPath );
       indri::file::Path::make( sortedPath );
     }
 
     std::string docUrlNoKeyfilePath=indri::file::Path::combine(preSortPath, "docUrlNo.key");
-    // lemur::file::Keyfile docUrlNoKeyfile;
-    // docUrlNoKeyfile.create(docUrlNoKeyfilePath.c_str());
 
     g_timer.start();
 
