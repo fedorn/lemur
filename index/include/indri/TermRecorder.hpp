@@ -15,12 +15,12 @@
 // 14 January 2005 -- tds
 //
 
+#ifndef INDRI_TERMRECORDER_HPP
+#define INDRI_TERMRECORDER_HPP
 #include "indri/Buffer.hpp"
 #include <vector>
 #include <utility>
-
-#ifndef INDRI_TERMRECORDER_HPP
-#define INDRI_TERMRECORDER_HPP
+#include <algorithm>
 
 namespace indri {
   namespace index {

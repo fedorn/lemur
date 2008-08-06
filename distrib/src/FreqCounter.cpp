@@ -21,7 +21,7 @@
 #include <sys/time.h>
 #endif
 #include <cctype>
-
+#include <climits>
 using namespace lemur::api;
 
 

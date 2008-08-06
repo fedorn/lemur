@@ -16,7 +16,7 @@
 
 #include "common_headers.hpp"
 #include "IndexTypes.hpp"
-
+#include <cstring>
 namespace lemur 
 {
   namespace index

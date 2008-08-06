@@ -13,6 +13,7 @@ Written by Nick Dufresne (nickd@cs.brandeis.edu)
 08/01/2005 -- rewrite as standalone thread safe clase.	
 */
 #include <string>
+#include <cstring>
 #include <set>
 
 namespace lemur

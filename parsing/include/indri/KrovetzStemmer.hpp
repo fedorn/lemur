@@ -14,10 +14,21 @@
 // 07/29/2005
 #ifndef _KROVETZ_STEMMER_H_
 #define _KROVETZ_STEMMER_H_
+#include <cstring>
 #ifdef WIN32
 #include <hash_map>
 #else
+// Move this somewhere
+#ifndef HAVE_GCC_VERSION
+#define HAVE_GCC_VERSION(MAJOR, MINOR) \
+  (__GNUC__ > (MAJOR) || (__GNUC__ == (MAJOR) && __GNUC_MINOR__ >= (MINOR)))
+#endif /* ! HAVE_GCC_VERSION */
+#if HAVE_GCC_VERSION(4,3)
+// if GCC 4.3+
+#include <tr1/unordered_map>
+#else
 #include <ext/hash_map>
+#endif
 // 3.3 does not use __gnu_cxx, 3.4+ does.
 using namespace __gnu_cxx;
 #endif
@@ -135,7 +146,11 @@ namespace indri
           return strcmp(s1, s2) == 0;
         }
       };
+#if HAVE_GCC_VERSION(4,3)
+      typedef std::tr1::unordered_map<const char *, dictEntry, std::tr1::hash<const char *>, eqstr> dictTable;
+#else
       typedef hash_map<const char *, dictEntry, hash<const char *>, eqstr> dictTable;
+#endif
 #endif
       dictTable dictEntries;
       // this needs to be a bounded size cache.

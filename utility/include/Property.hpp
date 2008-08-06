@@ -14,6 +14,7 @@
 #define INITBUFFSIZE 128
 #define INITNAMESIZE 32
 #include "common_headers.hpp"
+#include <cstring>
 namespace lemur
 {
   namespace parse 

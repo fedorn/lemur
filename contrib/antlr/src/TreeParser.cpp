@@ -10,6 +10,7 @@
 #include "antlr/MismatchedTokenException.hpp"
 #include <iostream>
 #include <stdio.h>
+#include <cstdlib>
 
 #ifdef ANTLR_CXX_SUPPORTS_NAMESPACE
 namespace antlr {

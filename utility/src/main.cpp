@@ -15,6 +15,7 @@
 #include "Exception.hpp"
 #include "Param.hpp"
 #include "common_headers.hpp"
+#include <cstring>
 
 int main(int argc, char *argv[])
 {

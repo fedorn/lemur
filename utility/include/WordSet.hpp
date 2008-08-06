@@ -9,11 +9,11 @@
  *==========================================================================
  */
 
-#include "Exception.hpp"
-#include <set>
 #ifndef _WORDSET_HPP
 #define _WORDSET_HPP
-
+#include "Exception.hpp"
+#include <set>
+#include<cstring>
 #include "common_headers.hpp"
 namespace lemur 
 {

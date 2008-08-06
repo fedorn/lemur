@@ -12,6 +12,7 @@
 #include "antlr/MismatchedTokenException.hpp"
 //#include "antlr/ASTFactory.hpp"
 #include <iostream>
+#include <cstdlib>
 
 #ifdef ANTLR_CXX_SUPPORTS_NAMESPACE
 namespace antlr {
