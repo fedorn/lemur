@@ -496,6 +496,75 @@ are specified for the currently indexing document ID.</dd>
 #include "indri/SequentialWriteBuffer.hpp"
 
 #include <math.h>
+
+#include "indri/Repository.hpp"
+#include "indri/CompressedCollection.hpp"
+#include "indri/ScopedLock.hpp"
+#include "indri/DirectoryIterator.hpp"
+#include "indri/Path.hpp"
+
+// Recover a repository that crashed during build to be consistent with
+// its latest checkpoint. If it can't be recovered, create an empty one.
+static bool _recoverRepository(const std::string &path) {
+  indri::collection::Repository repo;
+  try {
+    repo.open(path);
+  } catch (lemur::api::Exception &ex) {
+    // failed to open, can't fix it, recreate.
+    return false;
+  }
+  
+  // count up the documents that made it to disk
+  indri::collection::Repository::index_state indexes = repo.indexes();
+  INT64 total = 0;
+  for( size_t i = 0; i < indexes->size(); i++ ) {
+    indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
+    total += (*indexes)[i]->documentCount();
+  }
+  total -= repo.deletedList().deletedCount();
+
+  // identify the docids that are in the collection but not in a disk index
+  indri::collection::CompressedCollection *col = repo.collection();
+  indri::index::DeletedDocumentList del;
+  bool marked = false;
+  int numMarked = 0;
+  for (int i = (int)total + 1; col->exists(i); i++) {
+      del.markDeleted(i);
+      marked = true;
+      numMarked++;
+  }
+  // compact to delete the data associated with the unindexed docids.
+  if (marked) {
+    try {
+      std::cerr << "Reovering Repository: " << path << "\nDeleting " 
+                << numMarked << " uncommitted documents." << std::endl;
+      col->compact(del);
+      // check for any partial disk indexes (crash during write)
+      // and remove them
+      std::string indexPath = indri::file::Path::combine( path, "index" );
+      indri::file::DirectoryIterator idirs( indexPath );
+      while (! (idirs == indri::file::DirectoryIterator::end())) {
+        // iterate over the subdirectories, removing any that don't have a 
+        // manifest file.
+        std::string current = *idirs;
+        std::string manifest = indri::file::Path::combine(current, "manifest");
+        if (!indri::file::Path::exists(manifest)) {
+          std::cerr << "Removing corrupted index directory: " << current 
+                    << std::endl;
+          indri::file::Path::remove(current);
+          }
+        idirs++;
+      }
+    } catch (lemur::api::Exception &e) {
+      // no recovery possible here...
+      LEMUR_ABORT(e);
+    }
+  }
+  repo.close();
+  // successfully opened and closed
+  return true;
+}
+
 static indri::utility::IndriTimer g_timer;
 
 static void buildindex_start_time() {
@@ -536,7 +605,7 @@ class StatusMonitor : public indri::api::IndexStatus {
         break;
 
       case indri::api::IndexStatus::FileClose:
-        buildindex_print_status( "Documents: ", documentsParsed );
+        buildindex_print_status( "Documents parsed: ", documentsSeen, " Documents indexed: ", documentsParsed );
         buildindex_print_event( "" );
         event << "Closed " << documentFile;
         buildindex_print_event( event.str() ); 
@@ -554,9 +623,10 @@ class StatusMonitor : public indri::api::IndexStatus {
 
       default:
       case indri::api::IndexStatus::DocumentCount:
-        if( !(documentsParsed % 500) )
-          buildindex_print_status( "Documents: ", documentsParsed );
+        if( !(documentsSeen % 500) ) {
+          buildindex_print_status( "Documents parsed: ", documentsSeen, " Documents indexed: ", documentsParsed );
           buildindex_flush_status();
+        }
         break;
     }
   }
@@ -835,8 +905,17 @@ int main(int argc, char * argv[]) {
     }
 
     if( indri::collection::Repository::exists( repositoryPath ) ) {
-      env.open( repositoryPath, &monitor );
-      buildindex_print_event( std::string() + "Opened repository " + repositoryPath );
+      // check if the repository was corrupted by an indexing crash
+      // if so, recover it and continue.
+      if (_recoverRepository(repositoryPath)) {
+        env.open( repositoryPath, &monitor );
+        buildindex_print_event( std::string() + "Opened repository " + repositoryPath ); 
+      } else  {
+        //  failed to open it, needs to be created from scratch.
+        // create will remove any cruft.
+        env.create( repositoryPath, &monitor );
+        buildindex_print_event( std::string() + "Created repository " + repositoryPath );
+      }
     } else {
       env.create( repositoryPath, &monitor );
       buildindex_print_event( std::string() + "Created repository " + repositoryPath );

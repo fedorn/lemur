@@ -736,6 +736,7 @@ void indri::collection::Repository::_write() {
   state = 0;
 
   _merge( lastState );
+  _checkpoint();
 }
 
 //
@@ -803,6 +804,7 @@ void indri::collection::Repository::_trim() {
   // memory to merge everything together.  That's okay,
   // because we were just trimming.
   _merge( substate );
+  _checkpoint();
 }
 
 //
@@ -884,6 +886,7 @@ indri::index::Index* indri::collection::Repository::_mergeStage( index_state& st
   std::string indexPath = indri::file::Path::combine( _path, "index" );
   std::string newIndexPath = indri::file::Path::combine( indexPath, indexNumber.str() );
   indri::index::IndexWriter writer;
+  
   writer.write( indexes, _indexFields, _deletedList, newIndexPath );
 
   // open the index we just wrote
@@ -1029,6 +1032,7 @@ void indri::collection::Repository::_merge() {
       (mergers->size() == 1 && dynamic_cast<indri::index::MemoryIndex*>((*mergers)[0]));
 
   }
+  _checkpoint();
 }
 
 //
@@ -1173,6 +1177,29 @@ void indri::collection::Repository::close() {
     _parameters.clear(); // close/reopen will cause duplicated entries.
     _fields.clear();
     indri::utility::delete_vector_contents( _transformations );
+  }
+}
+
+//
+// checkpoint
+//
+
+void indri::collection::Repository::_checkpoint() {
+  // Write manifest and deleted list. Close and reopen collection.
+  // Enable opening the checkpoint as a valid index.
+  if( _collection ) {    
+    std::string manifest = "manifest";
+    std::string paramPath = indri::file::Path::combine( _path, manifest );
+    std::string deletedPath = indri::file::Path::combine( _path, "deleted" );
+    std::string collectionPath = indri::file::Path::combine( _path, "collection" );
+    if( !_readOnly ) {
+      _collection->reopen(collectionPath);
+
+      if( indri::file::Path::exists( deletedPath ) )
+        lemur_compat::remove( deletedPath.c_str() );
+      _deletedList.write( deletedPath );
+      _writeParameters( paramPath );
+    }
   }
 }
 

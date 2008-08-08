@@ -111,7 +111,7 @@ namespace indri
       static void _cleanAndCreateDirectory( const std::string& path );
 
       void _writeParameters( const std::string& path );
-
+      void _checkpoint();
       void _incrementLoad();
       void _countDocumentAdd();
       Load _computeLoad( indri::atomic::value_type* loadArray );

@@ -99,11 +99,11 @@ namespace indri
       void create( const std::string& fileName );
       void create( const std::string& fileName, const std::vector<std::string>& indexedFields );
       void create( const std::string& fileName, const std::vector<std::string>& forwardIndexedFields, const std::vector<std::string>& reverseIndexedFields );
-
+      void reopen( const std::string& fileName );
       void open( const std::string& fileName );
       void openRead( const std::string& fileName );
       void close();
-
+      bool exists(int documentID);
       indri::api::ParsedDocument* retrieve( int documentID );
       std::string retrieveMetadatum( int documentID, const std::string& attributeName );
       std::vector<indri::api::ParsedDocument*> retrieveByMetadatum( const std::string& attributeName, const std::string& value );

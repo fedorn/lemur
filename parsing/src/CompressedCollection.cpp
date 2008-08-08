@@ -393,6 +393,12 @@ void indri::collection::CompressedCollection::create( const std::string& fileNam
   manifest.writeFile( manifestName );
 }
 
+void indri::collection::CompressedCollection::reopen( const std::string& fileName ) {
+  indri::thread::ScopedLock l( _lock );
+  close();
+  open(fileName);
+}
+
 //
 // open
 //
@@ -668,6 +674,14 @@ void indri::collection::CompressedCollection::addDocument( int documentID, indri
 }
 
 
+bool indri::collection::CompressedCollection::exists( int documentID) {
+  indri::thread::ScopedLock l( _lock );
+
+  UINT64 offset;
+  int actual;
+  return _lookup.get( documentID, &offset, actual, sizeof offset );
+}
+
 indri::api::ParsedDocument* indri::collection::CompressedCollection::retrieve( int documentID ) {
   indri::thread::ScopedLock l( _lock );
 
@@ -872,6 +886,9 @@ void indri::collection::CompressedCollection::_removeForwardLookups( indri::inde
   while( keyfile.next( key, value.front(), actual ) ) {
     if( deletedList.isDeleted( key ) ) {
       keyfile.remove( key );
+      // using getSize to reset the iteration pointer
+      // otherwise it will restart on the first key.
+      keyfile.getSize( key );
     }
     actual = (int)value.size();
   }
