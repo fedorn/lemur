@@ -16,6 +16,7 @@
 //
 
 #include "indri/IndexEnvironment.hpp"
+#include "indri/CompressedCollection.hpp"
 #include "Exception.hpp"
 #include "indri/AnchorTextAnnotator.hpp"
 #include "indri/TaggedDocumentIterator.hpp"
@@ -374,10 +375,26 @@ void indri::api::IndexEnvironment::addFile( const std::string& fileName, const s
         tokenized = tokenizer->tokenize( document );
         parsed = parser->parse( tokenized );
         parsed = _applyAnnotators( annotators, parsed );
-
-        _repository.addDocument( parsed );
-
-        _documentsIndexed++;
+        // can't know for sure that we have the docno element until after
+        // the annotators have been applied
+        // check if this document is in the index already
+        // find the docno
+        std::string docIDStr = "";
+        for( size_t i=0; i<parsed->metadata.size(); i++ ) {
+          const char * key = parsed->metadata[i].key;
+          if( !strcmp( key, "docno" ) ) {
+            docIDStr = (const char *)parsed->metadata[i].value;
+            break;
+          }
+        }
+        // look up the id.
+        std::vector<int> ids = _repository.collection()->retrieveIDByMetadatum("docno", docIDStr);
+        // if not found, add the document.
+        if (ids.size() == 0)  {
+            _repository.addDocument( parsed );
+            _documentsIndexed++;
+        } // else mention the dupe?
+        
         if( _callback ) (*_callback)( indri::api::IndexStatus::DocumentCount, fileName, _error, _documentsIndexed, _documentsSeen );
       }
 
