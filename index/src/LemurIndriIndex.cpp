@@ -143,6 +143,7 @@ lemur::api::COUNT_T lemur::index::LemurIndriIndex::docLength( lemur::api::DOCID_
 }
 
 lemur::api::DocInfoList* lemur::index::LemurIndriIndex::docInfoList(lemur::api::TERMID_T termID) const { 
+  if (termID == 0) return NULL; //OOV
   // make a DocInfoList to copy the data into.
   // string length of term does not matter.
   InvFPDocList *newList = new InvFPDocList(termID, 0);
@@ -150,6 +151,7 @@ lemur::api::DocInfoList* lemur::index::LemurIndriIndex::docInfoList(lemur::api::
   for( int i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
     indri::index::DocListIterator *dlist = (*indexes)[i]->docListIterator(termID);
+    if (dlist == NULL) continue; // skip this index
     dlist->startIteration();
     while (! dlist->finished()) {
       indri::index::DocListIterator::DocumentData* data = dlist->currentEntry();
