@@ -1,7 +1,7 @@
 %option noyywrap
 %option never-interactive
 %option prefix="tok"
-
+%option nounistd
 %{
 
 /*==========================================================================
@@ -39,8 +39,13 @@ static long byte_position;
 #define UTF8_TOKEN    4
 
 %}
+%start COMMENT
 %%
-"<!--"(.|\n)*"-->" { byte_position += tokleng; return ZAP; }
+
+"<!--" { BEGIN(COMMENT); byte_position += tokleng; return ZAP; }
+<COMMENT>[^-]+ { byte_position += tokleng; return ZAP; }
+<COMMENT>"-->" { BEGIN(INITIAL); byte_position += tokleng; return ZAP; }
+<COMMENT>"-" { byte_position += tokleng; return ZAP; }
 "<!"[^\>]*">" { byte_position += tokleng; return ZAP; }
 \<[a-zA-Z/][^\>]*\>                                             { byte_position += tokleng; return TAG; }
 [&]([a-zA-Z]+|[#]([0-9]+|[xX][a-fA-F0-9]+))[;]         { byte_position += tokleng; return ZAP; /* symbols */ }
@@ -99,7 +104,7 @@ indri::parse::TokenizedDocument* indri::parse::TextTokenizer::tokenize( indri::p
 
   }
 
-  tok_delete_buffer( yy_current_buffer );
+  tok_delete_buffer( YY_CURRENT_BUFFER );
 
   return &_document;
 }
