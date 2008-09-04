@@ -1,7 +1,7 @@
 %option noyywrap
 %option never-interactive
 %option prefix="tok"
-%option nounistd
+
 %{
 
 /*==========================================================================

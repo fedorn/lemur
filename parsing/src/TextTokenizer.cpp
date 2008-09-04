@@ -542,7 +542,6 @@ int tok_flex_debug = 0;
 #define YY_RESTORE_YY_MORE_OFFSET
 char *toktext;
 #line 1 "../src/TextTokenizer.l"
-#define YY_NO_UNISTD_H 1
 #line 6 "../src/TextTokenizer.l"
 
 /*==========================================================================
@@ -580,18 +579,11 @@ static long byte_position;
 #define UTF8_TOKEN    4
 
 
-#line 584 "../src/TextTokenizer.cpp"
+#line 583 "../src/TextTokenizer.cpp"
 
 #define INITIAL 0
 #define COMMENT 1
 
-#ifndef YY_NO_UNISTD_H
-/* Special case for "unistd.h", since it is non-ANSI. We include it way
- * down here because we want the user's section 1 to have been scanned first.
- * The user has a chance to override it with an option.
- */
-#include <unistd.h>
-#endif
 
 #ifndef YY_EXTRA_TYPE
 #define YY_EXTRA_TYPE void *
@@ -737,7 +729,7 @@ YY_DECL
 #line 43 "../src/TextTokenizer.l"
 
 
-#line 741 "../src/TextTokenizer.cpp"
+#line 740 "../src/TextTokenizer.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -890,7 +882,7 @@ YY_RULE_SETUP
 #line 60 "../src/TextTokenizer.l"
 ECHO;
 	YY_BREAK
-#line 894 "../src/TextTokenizer.cpp"
+#line 893 "../src/TextTokenizer.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
 	yyterminate();
