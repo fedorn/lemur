@@ -81,6 +81,23 @@ void indri::query::RelevanceModel::_extractDocuments() {
 // gram occurs in each query result.
 //
 
+bool isValidWord(const string & word)
+{
+  size_t length = word.size();
+  const char * chArray = word.c_str();
+  size_t pos = 0;
+
+  while (pos < length)
+  { 
+    if(isalnum((unsigned char)*(chArray+pos)) == 0)
+    {
+      return false;
+    }
+    pos ++;
+  }
+  return true;
+}
+
 void indri::query::RelevanceModel::_countGrams() {
   // for each query result
   for( size_t i=0; i<_results.size(); i++ ) {
@@ -102,7 +119,7 @@ void indri::query::RelevanceModel::_countGrams() {
 
         // build the gram
         for( int k = 0; k < n; k++ ) {
-          if( positions[ k + j ] == 0 ) {
+          if( positions[ k + j ] == 0 || (! isValidWord(stems[ positions[ k + j ] ])) ) {
             containsOOV = true;
             break;
           }
