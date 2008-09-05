@@ -963,8 +963,11 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
   }
 
   // Return right away if there are no annotations for this document.
-  if ( converted_tags->empty() ) return document;
-
+  if ( converted_tags->empty() ) {
+    //never inserted in _converted_annotations, delete it
+    delete(converted_tags);
+    return document;
+  }
   // Add annotations from the offset annotations file to
   // the ParsedDocument rep.
 
@@ -974,7 +977,8 @@ indri::api::ParsedDocument* indri::parse::OffsetAnnotationAnnotator::transform( 
   }
 
   converted_tags->clear();
-
+  //never inserted in _converted_annotations, delete it
+  delete(converted_tags);
   return document;
 }
 
