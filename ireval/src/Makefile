@@ -16,7 +16,7 @@ ifeq ($(WITH_JAVA), 1)
   PCK=$(PACKAGE)
   DOC_PCK=$(PCK) $(PCK).stat
   DOCARGS=-private -author -version
-  DOC=$(JAVADOC)   $(DOCARGS)
+  DOC=$(JAVADOC)   -classpath . $(DOCARGS)
   DOCDEP=$(OBJ)/javadoc/index.html
   DIRS += $(JAVADIRS)
 endif
@@ -27,7 +27,7 @@ $(DIRS):
 	$(INSTALL_DIR) $@
 
 $(OUTDIR)/%.class:$(JSRC)/%.java
-	$(JAVAC) -Xlint:unchecked -d $(OBJ) $<
+	$(JAVAC) -classpath . -Xlint:unchecked -d $(OBJ) $<
 
 $(DOCDEP): $(JAVASRC)
 	$(DOC) -d $(OBJ)/javadoc -doctitle "Ireval" -windowtitle "Ireval" $(DOC_PCK)
