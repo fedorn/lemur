@@ -511,7 +511,7 @@ indri::collection::PriorListIterator* indri::collection::Repository::priorListIt
 // addDocument
 //
 
-int indri::collection::Repository::addDocument( indri::api::ParsedDocument* document ) {
+int indri::collection::Repository::addDocument( indri::api::ParsedDocument* document, bool inCollection ) {
   if( _readOnly )
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "addDocument: Cannot add documents to a repository that is opened for read-only access." ); 
 
@@ -534,7 +534,7 @@ int indri::collection::Repository::addDocument( indri::api::ParsedDocument* docu
   }
 
   int documentID = dynamic_cast<indri::index::MemoryIndex*>(state->back())->addDocument( *document );
-  _collection->addDocument( documentID, document );
+  if (inCollection) _collection->addDocument( documentID, document );
 
   _countDocumentAdd();
   return documentID;

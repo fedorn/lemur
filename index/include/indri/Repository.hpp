@@ -169,7 +169,8 @@ namespace indri
       }
       /// add a parsed document to the repository.
       /// @param document the document to add.
-      int addDocument( indri::api::ParsedDocument* document );
+      /// @param inCollection if true, add the document to the CompressedCollection.
+      int addDocument( indri::api::ParsedDocument* document, bool inCollection  = true );
       /// delete a document from the repository
       /// @param documentID the internal ID of the document to delete
       void deleteDocument( int documentID );
