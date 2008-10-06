@@ -60,36 +60,36 @@ public class SetRetrievalComparator {
     }
 
     public int countTreatmentBetter() {
-      int better = 0;
+        int better = 0;
 
-      for( int i=0; i<baseline.length; i++ ) {
-        if( baseline[i] < treatment[i] )
-          better++;
-      }
+        for( int i=0; i<baseline.length; i++ ) {
+            if( baseline[i] < treatment[i] )
+                better++;
+        }
 
-      return better;
+        return better;
     }
 
     public int countBaselineBetter() {
-      int better = 0;
+        int better = 0;
 
-      for( int i=0; i<baseline.length; i++ ) {
-        if( baseline[i] > treatment[i] )
-          better++;
-      }
+        for( int i=0; i<baseline.length; i++ ) {
+            if( baseline[i] > treatment[i] )
+                better++;
+        }
 
-      return better;
+        return better;
     }
 
     public int countEqual() {
-      int same = 0;
+        int same = 0;
 
-      for( int i=0; i<baseline.length; i++ ) {
-        if( baseline[i] == treatment[i] )
-          same++;
-      }
+        for( int i=0; i<baseline.length; i++ ) {
+            if( baseline[i] == treatment[i] )
+                same++;
+        }
 
-      return same;
+        return same;
     }
     
     public double pairedTTest() {       

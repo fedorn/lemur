@@ -15,6 +15,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -99,8 +101,16 @@ public class Main {
             String rank = fields[3];
             String score = fields[4];
             String runtag = fields[5];
+            // lemur can output nan (or NaN)
+            double scoreNumber;
+            try {
+                scoreNumber = Double.valueOf( score );
+            } catch (NumberFormatException ex) {
+                scoreNumber = 0.0;
+            }
             
-            Document document = new Document( docno, Integer.valueOf( rank ), Double.valueOf( score ) );
+            
+            Document document = new Document( docno, Integer.valueOf( rank ), scoreNumber );
             
             if( recentQuery == null || !recentQuery.equals( number ) ) {
                 if( !ranking.containsKey( number ) ) {
@@ -149,92 +159,121 @@ public class Main {
         
         return new SetRetrievalEvaluator( evaluators.values() );
     }
-    
-    /**
-     * When run as a standalone application, this returns output 
-     * very similar to that of trec_eval.  The first argument is 
-     * the ranking file, and the second argument is the judgments
-     * file, both in standard TREC format.
-     */
-    public static void singleEvaluation( SetRetrievalEvaluator setEvaluator ) {
-        String formatString = "%2$-15s\t%1$s\t";
-        
-        // print trec_eval relational-style output
-        for( RetrievalEvaluator evaluator : setEvaluator.getEvaluators() ) {
-            String query = evaluator.queryName();
-            
-            // counts
-            System.out.format( formatString + "%3$d\n",        query, "num_ret",     evaluator.retrievedDocuments().size() );
-            System.out.format( formatString + "%3$d\n",        query, "num_rel",     evaluator.relevantDocuments().size() );
-            System.out.format( formatString + "%3$d\n",        query, "num_rel_ret", evaluator.relevantRetrievedDocuments().size() );
 
-            // aggregate measures
-            System.out.format( formatString + "%3$6.4f\n",     query, "map",         evaluator.averagePrecision() );
-            System.out.format( formatString + "%3$6.4f\n",     query, "ndcg",        evaluator.normalizedDiscountedCumulativeGain() );
-            System.out.format( formatString + "%3$6.4f\n",     query, "ndcg15",      evaluator.normalizedDiscountedCumulativeGain( 15 ) );
-            System.out.format( formatString + "%3$6.4f\n",     query, "R-prec",      evaluator.rPrecision() );
-            System.out.format( formatString + "%3$6.4f\n",     query, "bpref",       evaluator.binaryPreference() );
-            System.out.format( formatString + "%3$6.4f\n",     query, "recip_rank",  evaluator.reciprocalRank() );
-            
-            // precision at fixed points
-            int[] fixedPoints = { 5, 10, 15, 20, 30, 100, 200, 500, 1000 };
-            
-            for( int i=0; i<fixedPoints.length; i++ ) {
-                int point = fixedPoints[i];
-                System.out.format( formatString + "%3$6.4f\n", query, "P" + point,   evaluator.precision( fixedPoints[i] ) );
+    /**
+     * Returns an output string very similar to that of trec_eval.  
+     */
+
+    public static String singleQuery( String query, RetrievalEvaluator evaluator ) {
+        StringWriter s = new StringWriter();
+        PrintWriter out = new PrintWriter(s);
+        String formatString = "%2$-25s\t%1$5s\t";
+        // print trec_eval relational-style output
+        // counts
+        out.format( formatString + "%3$6d\n",        query, "num_ret",     evaluator.retrievedDocuments().size() );
+        out.format( formatString + "%3$6d\n",        query, "num_rel",     evaluator.relevantDocuments().size() );
+        out.format( formatString + "%3$6d\n",        query, "num_rel_ret", evaluator.relevantRetrievedDocuments().size() );
+
+        // aggregate measures
+        out.format( formatString + "%3$6.4f\n",     query, "map",         evaluator.averagePrecision() );
+        out.format( formatString + "%3$6.4f\n",     query, "ndcg",        evaluator.normalizedDiscountedCumulativeGain() );
+        out.format( formatString + "%3$6.4f\n",     query, "ndcg15",      evaluator.normalizedDiscountedCumulativeGain( 15 ) );
+        out.format( formatString + "%3$6.4f\n",     query, "R-prec",      evaluator.rPrecision() );
+        out.format( formatString + "%3$6.4f\n",     query, "bpref",       evaluator.binaryPreference() );
+        out.format( formatString + "%3$6.4f\n",     query, "recip_rank",  evaluator.reciprocalRank() );
+
+        // precision at fixed points
+        int[] fixedPoints = RetrievalEvaluator.getFixedPoints();
+        double [] vals = evaluator.precisionAtFixedPoints();
+        for( int i=0; i<fixedPoints.length; i++ ) {
+            int point = fixedPoints[i];
+            out.format( formatString + "%3$6.4f\n", query, "P" + point,  vals[i] );
+        }
+        double[] precs = evaluator.interpolatedPrecision();
+        double prec = 0;
+        for( int i=0; i<precs.length; i++ ) {
+            out.format( "at %3$3.2f%2$-18s\t%1$5s\t%4$6.4f\n", query, " ", prec, precs[i]  );
+            prec += 0.1;
+        }
+        out.format("\n");
+        return s.toString();
+    }
+
+    /**
+     * Returns an output string very similar to that of trec_eval.  
+     */
+    public static String singleEvaluation( SetRetrievalEvaluator setEvaluator, boolean showIndividual ) {
+        StringWriter s = new StringWriter();
+        PrintWriter out = new PrintWriter(s);
+        String formatString = "%2$-25s\t%1$5s\t";
+        // print trec_eval relational-style output
+        if (showIndividual) {
+            for( RetrievalEvaluator evaluator : setEvaluator.getEvaluators() ) {
+                String query = evaluator.queryName();
+                out.print(singleQuery(query, evaluator));
             }
         }
-        
         // print summary data
-        System.out.format( formatString + "%3$d\n",      "all", "num_q",     setEvaluator.getEvaluators().size() );
-        System.out.format( formatString + "%3$d\n",      "all", "num_ret",     setEvaluator.numberRetrieved() );
-        System.out.format( formatString + "%3$d\n",      "all", "num_rel",     setEvaluator.numberRelevant() );
-        System.out.format( formatString + "%3$d\n",      "all", "num_rel_ret", setEvaluator.numberRelevantRetrieved() );
-        
-        System.out.format( formatString + "%3$6.4f\n",   "all", "map",         setEvaluator.meanAveragePrecision() );
-            System.out.format( formatString + "%3$6.4f\n",     "all", "gm_ap",         setEvaluator.geometricMeanAveragePrecision() );
-        System.out.format( formatString + "%3$6.4f\n",   "all", "ndcg",        setEvaluator.meanNormalizedDiscountedCumulativeGain() );
-        System.out.format( formatString + "%3$6.4f\n",   "all", "R-prec",      setEvaluator.meanRPrecision() );
-        System.out.format( formatString + "%3$6.4f\n",   "all", "bpref",       setEvaluator.meanBinaryPreference() );
-        System.out.format( formatString + "%3$6.4f\n",   "all", "recip_rank",  setEvaluator.meanReciprocalRank() );
-        
+        out.format( formatString + "%3$6d\n",      "all", "num_q",     setEvaluator.getEvaluators().size() );
+        out.format( formatString + "%3$6d\n",      "all", "num_ret",     setEvaluator.numberRetrieved() );
+        out.format( formatString + "%3$6d\n",      "all", "num_rel",     setEvaluator.numberRelevant() );
+        out.format( formatString + "%3$6d\n",      "all", "num_rel_ret", setEvaluator.numberRelevantRetrieved() );
+
+        out.format( formatString + "%3$6.4f\n",   "all", "map",         setEvaluator.meanAveragePrecision() );
+        out.format( formatString + "%3$6.4f\n",   "all", "gm_ap",         setEvaluator.geometricMeanAveragePrecision() );
+        out.format( formatString + "%3$6.4f\n",   "all", "ndcg",        setEvaluator.meanNormalizedDiscountedCumulativeGain() );
+        out.format( formatString + "%3$6.4f\n",   "all", "R-prec",      setEvaluator.meanRPrecision() );
+        out.format( formatString + "%3$6.4f\n",   "all", "bpref",       setEvaluator.meanBinaryPreference() );
+        out.format( formatString + "%3$6.4f\n",   "all", "recip_rank",  setEvaluator.meanReciprocalRank() );
+
         // precision at fixed points
-        int[] fixedPoints = { 5, 10, 15, 20, 30, 100, 200, 500, 1000 };
+        int[] fixedPoints = SetRetrievalEvaluator.getFixedPoints();
+        double [] precs = setEvaluator.precisionAtFixedPoints();
 
         for( int i=0; i<fixedPoints.length; i++ ) {
             int point = fixedPoints[i];
-            System.out.format( formatString + "%3$6.4f\n", "all", "P" + point,   setEvaluator.meanPrecision( fixedPoints[i] ) );
+            out.format( formatString + "%3$6.4f\n", "all", "P" + point,   precs[i] );
         }
+        double prec = 0;
+        precs = setEvaluator.interpolatedPrecision();
+        for( int i=0; i<precs.length; i++ ) {
+            out.format( "at %3$3.2f%2$-18s\t%1$5s\t%4$6.4f\n", "all", " ", prec, precs[i]  );
+            prec += 0.1;
+        }
+        out.format("\n");
+        return s.toString();
     }
 
-    /**
-     * Compares two ranked lists with statistical tests on most major metrics.
-     */
+    public static String comparisonEvaluation( SetRetrievalEvaluator baseline, SetRetrievalEvaluator treatment, String baselineName, String treatmentName ) {
 
-    
-    public static void comparisonEvaluation( SetRetrievalEvaluator baseline, SetRetrievalEvaluator treatment ) {
-        String[] metrics = { "averagePrecision", "ndcg", "bpref", "P10", "P20" };
-        String formatString = "%1$-20s%2$-12s%3$6.4f\n";
-        String integerFormatString = "%1$-20s%2$-12s%3$d\n";
-        
+        StringWriter s = new StringWriter();
+        PrintWriter out = new PrintWriter(s);
+        String[] metrics = { "averagePrecision", "rPrecision", "ndcg", "bpref", "P5", "P10", "P20" };
+        String formatString = "%1$-20s%2$-30s%3$6.4f\n";
+        String integerFormatString = "%1$-20s%2$-30s%3$6d\n";
+        out.println("Comparing baseline: " + baselineName + " to treatment: " + treatmentName + "\n");
+        if (treatment == null) return "NOPE";
         for( String metric : metrics ) {
             Map<String, Double> baselineMetric = baseline.evaluateAll( metric );
             Map<String, Double> treatmentMetric = treatment.evaluateAll( metric );
-            
+
             SetRetrievalComparator comparator = new SetRetrievalComparator( baselineMetric, treatmentMetric );
 
-            System.out.format( formatString, metric, "baseline", comparator.meanBaselineMetric() );
-            System.out.format( formatString, metric, "treatment", comparator.meanTreatmentMetric() );
-            
-            System.out.format( integerFormatString, metric, "basebetter", comparator.countBaselineBetter() );
-            System.out.format( integerFormatString, metric, "treatbetter", comparator.countTreatmentBetter() );
-            System.out.format( integerFormatString, metric, "equal", comparator.countEqual() );
-            
-            System.out.format( formatString, metric, "ttest", comparator.pairedTTest() );
-            System.out.format( formatString, metric, "randomized", comparator.randomizedTest() );
-            System.out.format( formatString, metric, "signtest", comparator.signTest() );
+            out.format( formatString, metric, baselineName, comparator.meanBaselineMetric() );
+            out.format( formatString, metric, treatmentName, comparator.meanTreatmentMetric() );
+
+            out.format( integerFormatString, metric, "basebetter", comparator.countBaselineBetter() );
+            out.format( integerFormatString, metric, "treatbetter", comparator.countTreatmentBetter() );
+            out.format( integerFormatString, metric, "equal", comparator.countEqual() );
+
+            out.format( formatString, metric, "ttest", comparator.pairedTTest() );
+            out.format( formatString, metric, "randomized", comparator.randomizedTest() );
+            out.format( formatString, metric, "signtest", comparator.signTest() );
         }
+
+        return s.toString();
     }
+
     
     public static void usage( ) {
         System.err.println( "ireval: " );
@@ -255,13 +294,14 @@ public class Main {
                 SetRetrievalEvaluator baseline = create( baselineRanking, judgments );
                 SetRetrievalEvaluator treatment = create( treatmentRanking, judgments );
 
-                comparisonEvaluation( baseline, treatment );
+                // adjust these to file names.
+                System.out.println(comparisonEvaluation( baseline, treatment, "baseline", "treatment" ));
             } else if( args.length == 2 ) {
                 TreeMap< String, ArrayList<Document> > ranking = loadRanking( args[0] );
                 TreeMap< String, ArrayList<Judgment> > judgments = loadJudgments( args[1] );
 
                 SetRetrievalEvaluator setEvaluator = create( ranking, judgments );
-                singleEvaluation( setEvaluator );
+                System.out.println(singleEvaluation( setEvaluator, true ));
             } else {
                 usage();
             }

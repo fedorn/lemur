@@ -194,6 +194,48 @@ public class RetrievalEvaluator {
         return _queryName;
     }
     
+    private static int[] fixedPoints = { 5, 10, 15, 20, 30, 100, 200, 500, 1000 };
+    public  static int[] getFixedPoints(){return fixedPoints;}
+    private double[] _pFP = null;
+	
+    public double[] precisionAtFixedPoints(){
+    	if (_pFP == null ) {
+            // precision at fixed points
+            _pFP = new double [fixedPoints.length];
+            int i = 0;
+            for( int point : fixedPoints ) {
+                _pFP[i++] = precision( point );
+            }
+    	}
+        return _pFP;
+    }
+    private double[] _ip = null;
+    public double[] interpolatedPrecision(){
+    	if (_ip == null) {
+            int size = _relevant.size();
+            _ip = new double[11];
+            int [] cuts = new int[11];
+            cuts[0] = 0;
+            for (int i = 1; i < 11; i++) {				
+                cuts[i] = ((size * i) + 9)/10;
+                _ip[i] = 0;
+            }
+            int current_cut = 10;
+            int relRet = _relevantRetrieved.size();
+            while (cuts[current_cut] > relRet) current_cut--;
+            double prec = 0;
+            for (int i = relRet-1; i>=0; i--) {
+                int rank = _relevantRetrieved.get(i).rank;
+                double newprec = precision(rank);
+                prec = Math.max(prec, newprec);
+                while (current_cut >= 0 && cuts[current_cut] == (i+1)) {
+                    _ip[current_cut--] = prec;
+                }
+            }
+            _ip[0] = prec;
+    	}
+        return _ip;
+    }
     /**
      * Returns the precision of the retrieval at a given number of documents retrieved.
      * The precision is the number of relevant documents retrieved
@@ -450,7 +492,7 @@ public class RetrievalEvaluator {
         // if the high document had rank == documentsRetrieved, we would
         // have already returned, either at the top, or at the return middle statement
         assert _relevantRetrieved.get( low ).rank <= documentsRetrieved &&
-                _relevantRetrieved.get( high ).rank > documentsRetrieved;
+            _relevantRetrieved.get( high ).rank > documentsRetrieved;
         
         return low + 1;
     }

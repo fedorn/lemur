@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Name: ireval
+Main-Class: ireval.IREvalGui
+Specification-Title:  ireval
+Specification-Vendor: Lemur Project
+Specification-Version: 0.6
+Package-Title: ireval
+Package-Vendor: Lemur Project
+Class-path: jcommon-1.0.14.jar jfreechart-1.0.11.jar

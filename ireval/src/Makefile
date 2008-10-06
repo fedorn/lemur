@@ -12,22 +12,26 @@ ifeq ($(WITH_JAVA), 1)
   JAVAOBJ = $(patsubst %,$(OBJ)/%, $(JAVASRC:.java=.class))
   MFST=manifest.mf
   JARFILES=$(OBJ)/ireval.jar
+  GUIMFST=IrEvalGUI.mf
+  JARGUI=$(OBJ)/irevalGUI.jar
   JAVADIRS = $(OBJ) $(OBJ)/javadoc
   PCK=$(PACKAGE)
   DOC_PCK=$(PCK) $(PCK).stat
   DOCARGS=-private -author -version
-  DOC=$(JAVADOC)   -classpath . $(DOCARGS)
+  DOC=$(JAVADOC)   -classpath .:$(CHART) $(DOCARGS)
   DOCDEP=$(OBJ)/javadoc/index.html
   DIRS += $(JAVADIRS)
+  CHART=jfreechart-1.0.11.jar:jcommon-1.0.14.jar
+  JFREEJARS=jfreechart-1.0.11.jar jcommon-1.0.14.jar
 endif
 
-all: $(DIRS) $(JARFILES)
+all: $(DIRS) $(JARFILES) $(JARGUI)
 
 $(DIRS):
 	$(INSTALL_DIR) $@
 
 $(OUTDIR)/%.class:$(JSRC)/%.java
-	$(JAVAC) -classpath . -Xlint:unchecked -d $(OBJ) $<
+	$(JAVAC) -classpath .:$(CHART) -Xlint:unchecked -d $(OBJ) $<
 
 $(DOCDEP): $(JAVASRC)
 	$(DOC) -d $(OBJ)/javadoc -doctitle "Ireval" -windowtitle "Ireval" $(DOC_PCK)
@@ -35,6 +39,9 @@ $(DOCDEP): $(JAVASRC)
 $(JARFILES): $(JAVAOBJ) $(MFST) $(DOCDEP)
 	rm -f $@
 	cd $(OBJ); $(JAR) cmf ../src/$(MFST) ireval.jar ireval javadoc
+$(JARGUI): $(JAVAOBJ) $(GUIMFST) $(DOCDEP)
+	rm -f $@
+	cd $(OBJ); $(JAR) cmf ../src/$(GUIMFST) irevalGUI.jar ireval javadoc
 
 clean:
 	rm -rf $(OBJ)
@@ -52,5 +59,5 @@ ifeq ($(WITH_JAVA), 1)
 endif
 install_data:
 ifeq ($(WITH_JAVA), 1)
-	$(INSTALL_DATA)  $(JARFILES) $(pkgdatadir)
+	$(INSTALL_DATA)  $(JARFILES) $(JARGUI) $(JFREEJARS) $(pkgdatadir)
 endif

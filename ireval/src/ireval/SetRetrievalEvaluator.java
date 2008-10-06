@@ -41,6 +41,26 @@ public class SetRetrievalEvaluator {
         return _evaluators;
     }
     
+    public static int[] getFixedPoints(){return RetrievalEvaluator.getFixedPoints();}
+    public double[] precisionAtFixedPoints(){
+    	// precision at fixed points
+    	int []fixedPoints = RetrievalEvaluator.getFixedPoints();
+        double[] retVal = new double [fixedPoints.length];
+        int i = 0;
+        for( int point : fixedPoints ) {
+            retVal[i++] = meanPrecision( point );
+        }
+        return retVal;
+    }
+    public double[] interpolatedPrecision(){
+    	double[] precs = {0,0,0,0,0,0,0,0,0,0,0};
+    	for (RetrievalEvaluator evaluator : _evaluators) {
+            double[] vals = evaluator.interpolatedPrecision();
+            for (int j = 0; j < vals.length; j++) precs[j] += vals[j];
+    	}
+    	for (int j = 0; j < precs.length; j++) precs[j] /= _evaluators.size();
+    	return precs;
+    }
     /**
      * Returns the mean average precision; the mean of the average
      * precision values for all queries.
@@ -195,7 +215,7 @@ public class SetRetrievalEvaluator {
         
         return result;
     }
-    
+
     /**
      * The number of documents retrieved for all queries.
      */
