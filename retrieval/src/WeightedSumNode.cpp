@@ -64,15 +64,21 @@ double indri::infnet::WeightedSumNode::maximumBackgroundScore() {
 }
 
 const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedSumNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+  double sumWeight = 0;
+  
   double s = 0;
   bool scored = false;
-
+  std::vector< indri::utility::greedy_vector<indri::api::ScoredExtentResult> > scores;
   for( unsigned i=0; i<_children.size(); i++ ) {
     const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, extent, documentLength );
-
+    scores.push_back(childResults);
+    sumWeight += _weights[i] * childResults.size();
+  }
+  for( unsigned i=0; i<_children.size(); i++ ) {
+    indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = scores[i];
     for( size_t j=0; j<childResults.size(); j++ ) {
       scored=true;
-      s += _weights[i] * exp( childResults[j].score );
+      s += _weights[i] * exp( childResults[j].score )/sumWeight;
     }
   }
 

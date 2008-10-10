@@ -247,16 +247,23 @@ double indri::infnet::WeightedAndNode::maximumScore() {
 indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedAndNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
   std::vector<child_type>::iterator iter;
   double score = 0;
+  double sumWeight = 0;
   bool scored = false;
+  std::vector< indri::utility::greedy_vector<indri::api::ScoredExtentResult> > scores;
   for( iter = _children.begin(); iter != _children.end(); iter++ ) {
     const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = (*iter).node->score( documentID, extent, documentLength );
-
+    scores.push_back(childResults);
+    sumWeight += (*iter).weight * childResults.size();
+  }
+  int i = 0;
+  for( iter = _children.begin(); iter != _children.end(); iter++ ) {
     double childScore = 0;
+    indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = scores[i];
     for( size_t j=0; j<childResults.size(); j++ ) {
       scored = true;
-      childScore += (*iter).weight * childResults[j].score;
+      childScore += (*iter).weight * childResults[j].score/sumWeight;
     }
-
+    i++;
     score += childScore;
   }
 
