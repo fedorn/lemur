@@ -68,7 +68,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   
   double s = 0;
   bool scored = false;
-  std::vector< indri::utility::greedy_vector<indri::api::ScoredExtentResult> > scores;
+  indri::utility::greedy_vector< indri::utility::greedy_vector<indri::api::ScoredExtentResult> > scores;
   for( unsigned i=0; i<_children.size(); i++ ) {
     const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, extent, documentLength );
     scores.push_back(childResults);

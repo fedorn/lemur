@@ -249,7 +249,7 @@ indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::We
   double score = 0;
   double sumWeight = 0;
   bool scored = false;
-  std::vector< indri::utility::greedy_vector<indri::api::ScoredExtentResult> > scores;
+  indri::utility::greedy_vector< indri::utility::greedy_vector<indri::api::ScoredExtentResult> > scores;
   for( iter = _children.begin(); iter != _children.end(); iter++ ) {
     const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = (*iter).node->score( documentID, extent, documentLength );
     scores.push_back(childResults);
