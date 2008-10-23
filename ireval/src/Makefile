@@ -7,14 +7,16 @@ ifeq ($(WITH_JAVA), 1)
   VERSION=1.0
   OBJ=../obj
   OUTDIR=$(OBJ)/$(PACKAGE)
+  OUTDIRPROP=$(OUTDIR)/properties
   JSRC=$(PACKAGE)
   JAVASRC = $(wildcard $(JSRC)/*.java)
   JAVAOBJ = $(patsubst %,$(OBJ)/%, $(JAVASRC:.java=.class))
+  PROPS = $(patsubst %,$(OUTDIRPROP)/%, $(notdir $(wildcard $(JSRC)/properties/*)))
   MFST=manifest.mf
   JARFILES=$(OBJ)/ireval.jar
   GUIMFST=IrEvalGUI.mf
   JARGUI=$(OBJ)/irevalGUI.jar
-  JAVADIRS = $(OBJ) $(OBJ)/javadoc
+  JAVADIRS = $(OBJ) $(OBJ)/javadoc $(OUTDIRPROP)
   PCK=$(PACKAGE)
   DOC_PCK=$(PCK) $(PCK).stat
   DOCARGS=-private -author -version
@@ -25,10 +27,13 @@ ifeq ($(WITH_JAVA), 1)
   JFREEJARS=jfreechart-1.0.11.jar jcommon-1.0.14.jar
 endif
 
-all: $(DIRS) $(JARFILES) $(JARGUI)
+all: $(DIRS) $(PROPS) $(JARFILES) $(JARGUI)
 
 $(DIRS):
 	$(INSTALL_DIR) $@
+
+$(OUTDIRPROP)/%:$(JSRC)/properties/%
+	if test -f $< ; then $(INSTALL_DATA) $< $@ ; fi
 
 $(OUTDIR)/%.class:$(JSRC)/%.java
 	$(JAVAC) -classpath .:$(CHART) -Xlint:unchecked -d $(OBJ) $<
