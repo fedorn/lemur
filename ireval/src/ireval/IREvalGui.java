@@ -1,10 +1,5 @@
-/**
- * 
- */
 package ireval;
 
-import ireval.RetrievalEvaluator;
-import ireval.SetRetrievalEvaluator;
 import ireval.RetrievalEvaluator.Document;
 import ireval.RetrievalEvaluator.Judgment;
 
@@ -18,27 +13,37 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.datatransfer.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -57,38 +62,24 @@ import org.jfree.data.xy.XYSeriesCollection;
  * @author dfisher
  *
  */
-/**
- * @author dfisher
- *
- */
-/**
- * @author dfisher
- *
- */
 public class IREvalGui {
 	/**
 	 * The main frame
 	 */
 	private JFrame frame;
+
+	private JTable resultsTable;
+	private DefaultTableModel resultsTableModel;
+
 	/**
 	 * Relevance judgments filename
 	 */
 	private JTextField qrel;
+
 	/**
-	 * Baseline results filename
+	 * List of query ids available for single evaluation
 	 */
-	private JTextField baselineResults;
-	
-	/**
-	 * Treatment results filenames list
-	 */
-	private JList treatments;
-    /** Underlying list model for the treatment filenames */
-    private DefaultListModel treatmentModel;
- 	/**
- 	 * List of query ids available for single evaluation
- 	 */
- 	private JComboBox queries;
+	private JComboBox queries;
 	/**
 	 * The main output pane.
 	 */
@@ -113,6 +104,7 @@ public class IREvalGui {
 	 * Show the P@N graph button
 	 */
 	private JButton pAtButton;
+	private JButton evaluateButton;
 
 	/**
 	 * The currently selected directory for the file chooser.
@@ -137,18 +129,15 @@ public class IREvalGui {
 	 */
 	private TreeMap< String, ArrayList<Judgment> > judgments;
 	/**
-	 * The mapping of query ids to results for the baseline set.
-	 */
-	private TreeMap< String, ArrayList<Document> > baselineRanks;
-	/**
 	 * The collection of mappings of query ids to results for the
 	 * treatment sets.
 	 */
-	private Vector<TreeMap< String, ArrayList<Document> > > ranksList;
+	private HashMap< String, TreeMap<String, ArrayList<Document>>> ranksMap;
 	/**
-	 * The collection of evaluators for the treatments sets.
+	 * The collection of evaluators for the results sets.
 	 */
-	private Vector<SetRetrievalEvaluator> treatmentsVector;
+	private HashMap<String, SetRetrievalEvaluator> treatmentsMap;
+
 	/**
 	 * The evaluator for the baseline set.
 	 */
@@ -170,46 +159,76 @@ public class IREvalGui {
 		baselineRanksFile = "";
 		judgmentsFile ="";
 		baselineEvaluator = null;
-		ranksList = new Vector<TreeMap< String, ArrayList<Document> > >();
-		treatmentsVector = new Vector<SetRetrievalEvaluator>();
-		
+		judgments = null;
+		currentEvaluator = null;
+		ranksMap = new HashMap< String, TreeMap<String, ArrayList<Document>>>();
+		treatmentsMap = new HashMap< String, SetRetrievalEvaluator>();
 	}
 	/**
 	 * Add a result set to the collection of treatments.
 	 * Load the rankings and install the mapping into the
 	 * ranksList.
 	 */
-	private void addTreatment() {
-		String treatment = chooseFile();
-		if (treatment.length() == 0) {
-			return;
-		}
-		try {
-			// load the rankings
-			frame.setCursor(waitCursor);
-			outputPane.setCursor(waitCursor);
-			ranksList.add(ireval.Main.loadRanking(treatment));
-			frame.setCursor(defaultCursor);
-			outputPane.setCursor(defaultCursor);
+	private void addTreatment() {    	
+		Runnable r = new Runnable() {
+			public void run () {
+				Vector<String> treatments = chooseFiles();
+				if (treatments.size() == 0) {
+					return;
+				}
+				String[] treat = new String[1];
+				frame.setCursor(waitCursor);
+				outputPane.setCursor(waitCursor);
+				for (String treatment : treatments) {
+					try {
+						// load the rankings
+						ranksMap.put(treatment, ireval.Main.loadRanking(treatment) );
+					} catch (Exception e){
+						frame.setCursor(defaultCursor);
+						outputPane.setCursor(defaultCursor);
+						outputPane.setText(e.getMessage());
+						return;
+					} catch (OutOfMemoryError error) {
+						frame.setCursor(defaultCursor);
+						outputPane.setCursor(defaultCursor);
+						outputPane.setText("Out of memory error loading: " + treatment);
+						return;		
+					}
+					// add it to the list
+					treat[0] = treatment;
+					resultsTableModel.addRow(treat);
+				}
+				rpButton.setEnabled(judgments != null);
+				pAtButton.setEnabled(judgments != null);
+				queries.setEnabled(judgments != null);	
+				evaluateButton.setEnabled(judgments != null);	
 
-		} catch (Exception e){
-			frame.setCursor(defaultCursor);
-			outputPane.setCursor(defaultCursor);
-			outputPane.setText(e.getMessage());
-			return;
-		}
-		// add it to the list
-		treatmentModel.addElement(treatment);
+				frame.setCursor(defaultCursor);
+				outputPane.setCursor(defaultCursor);
+			}
+		};
+		Thread t = new Thread(r);
+		t.start();
 	}
-	
+
 	/**
 	 * Remove a treatment set from the collection of treatments.
 	 */
 	private void removeTreatment() {
-		int idx = treatments.getSelectedIndex();
-		if (idx == -1) return; // none selected
-		ranksList.removeElementAt(idx);
-		treatmentModel.remove(idx);
+		int[] rows = resultsTable.getSelectedRows();
+		if (rows.length == 0) return; // none selected
+		for (int idx : rows) {
+			String item = (String)resultsTable.getValueAt(idx, 0);
+			ranksMap.remove(item);
+			treatmentsMap.remove(item);
+			resultsTableModel.removeRow(idx);
+		}
+		if (ranksMap.size() == 0) {
+			rpButton.setEnabled(false);
+			pAtButton.setEnabled(false);
+			queries.setEnabled(false);
+			evaluateButton.setEnabled(false);
+		}
 	}
 
 	/**
@@ -219,13 +238,16 @@ public class IREvalGui {
 	 * and each treatment for all queries.
 	 */
 	private void showPlotRP(){
-		String baseline = new File(baselineResults.getText()).getName();
 		double[] precs;
 		double prec = 0.0;
 		XYSeriesCollection dataset = new XYSeriesCollection();
-		XYSeries series = new XYSeries(baseline);
-
-		if (currentEvaluator != null) { 
+		XYSeries series;
+		int []rows = resultsTable.getSelectedRows();
+		int idx;
+		if (currentEvaluator != null) {
+			if (rows.length == 0) idx = 0; else idx = rows[0];
+			String baseline = new File((String)resultsTable.getValueAt(idx,0)).getName();
+			series = new XYSeries(baseline);
 			precs = currentEvaluator.interpolatedPrecision();
 			for (int i = 0; i < precs.length; i++) {
 				series.add( prec, precs[i]);
@@ -233,26 +255,23 @@ public class IREvalGui {
 			}
 			dataset.addSeries(series);
 		} else {
-		precs = baselineEvaluator.interpolatedPrecision();
-		for (int i = 0; i < precs.length; i++) {
-			series.add( prec, precs[i]);
-			prec += 0.1;
-		}
-		dataset.addSeries(series);
-		// do the treatments...
-		int counter = 0;
-		for (SetRetrievalEvaluator eval : treatmentsVector) {
-			prec = 0.0;
-			String treatment = new File((String)treatmentModel.getElementAt(counter)).getName();
-			precs = eval.interpolatedPrecision();
-			series = new XYSeries(treatment);
-			for (int i = 0; i < precs.length; i++) {
-				series.add( prec, precs[i]);
-				prec += 0.1;
+			// do the treatments...
+			// need to take into account selected elements.
+			SetRetrievalEvaluator eval;
+			// rework this to use the map
+			if (rows.length == 0) {rows = new int[1]; rows[0] = 0;}
+			for ( int counter : rows) {
+				prec = 0.0;
+				String treatment = (String)resultsTableModel.getValueAt(counter,0);
+				eval = treatmentsMap.get(treatment);
+				precs = eval.interpolatedPrecision();
+				series = new XYSeries(basename(treatment));
+				for (int i = 0; i < precs.length; i++) {
+					series.add( prec, precs[i]);
+					prec += 0.1;
+				}
+				dataset.addSeries(series);
 			}
-			dataset.addSeries(series);
-			counter++;
-		}
 		}
 		String label = "Interpolated Recall - Precision";
 		if (queryID.length() > 0) label += " query:" + queryID;
@@ -262,7 +281,7 @@ public class IREvalGui {
 		// show the points too
 		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
 		renderer.setBaseShapesVisible(true);
-		
+
 		plot.setBackgroundPaint(Color.WHITE);
 		plot.setDomainGridlinePaint(Color.BLACK);
 		plot.setRangeGridlinePaint(Color.BLACK);
@@ -280,7 +299,6 @@ public class IREvalGui {
 		range.setLowerBound(-0.05);
 		range.setUpperBound(1.05);
 		JFrame f = new JFrame("Interpolated Recall - Precision");
-		//f.setLocationRelativeTo(frame);
 		f.setLocationByPlatform(true);
 		ChartPanel p = new ChartPanel(chart);
 		p.setPreferredSize(new Dimension(600,600));
@@ -297,11 +315,15 @@ public class IREvalGui {
 	 */
 	private void showPlotPatN(){
 		DefaultCategoryDataset series = new DefaultCategoryDataset();
-		String baseline = new File(baselineResults.getText()).getName();
 		int[] fixedPoints = SetRetrievalEvaluator.getFixedPoints();
 		double [] precs;
+		int []rows = resultsTable.getSelectedRows();
+		int idx;
 
 		if (currentEvaluator != null) {
+			if (rows.length == 0) idx = 0; else idx = rows[0];
+
+			String baseline = new File((String)resultsTable.getValueAt(idx,0)).getName();
 			// show for the current query only
 			precs = currentEvaluator.precisionAtFixedPoints();
 			for (int i = 0; i < precs.length; i++) {
@@ -310,20 +332,15 @@ public class IREvalGui {
 
 		} else {
 			// show for the baseline (and treatments)
-			precs = baselineEvaluator.precisionAtFixedPoints();
-			for (int i = 0; i < precs.length; i++) {
-				series.addValue(precs[i], baseline, new Integer(fixedPoints[i]));
-			}
-			
-			// do the treatments...
-			int counter = 0;
-			for (SetRetrievalEvaluator eval : treatmentsVector) {
-				String treatment = new File((String)treatmentModel.getElementAt(counter)).getName();
+			if (rows.length == 0) {rows = new int[1]; rows[0] = 0;}
+			SetRetrievalEvaluator eval;
+			for ( int counter : rows) {
+				String treatment = (String)resultsTableModel.getValueAt(counter,0);
+				eval = treatmentsMap.get(treatment);
 				precs = eval.precisionAtFixedPoints();
 				for (int i = 0; i < precs.length; i++) {
-					series.addValue(precs[i], treatment, new Integer(fixedPoints[i]));
+					series.addValue(precs[i], basename(treatment), new Integer(fixedPoints[i]));
 				}
-				counter++;
 			}
 		}
 		String label = "Precision at N";
@@ -331,7 +348,6 @@ public class IREvalGui {
 		JFreeChart chart = ChartFactory.createBarChart(label,
 				"N", "precision", series, PlotOrientation.VERTICAL, true, true, false);
 		JFrame f = new JFrame("Precision @ N");
-		//f.setLocationRelativeTo(frame);
 		f.setLocationByPlatform(true);
 		ChartPanel p = new ChartPanel(chart);
 		p.setPreferredSize(new Dimension(600,600));
@@ -347,7 +363,7 @@ public class IREvalGui {
 	 * the RetrievalEvaluator for the query.
 	 * @return the formatted output of the evaluation
 	 */
-	public String singleQuery( String query, SetRetrievalEvaluator setEvaluator ) {
+	private String singleQuery( String query, SetRetrievalEvaluator setEvaluator ) {
 		for( RetrievalEvaluator evaluator : setEvaluator.getEvaluators() ) {
 			if (query.equals(evaluator.queryName())) {
 				currentEvaluator = evaluator;
@@ -364,6 +380,7 @@ public class IREvalGui {
 	 */
 	private String chooseFile() {
 		fileChooser.setCurrentDirectory(new File(workingDir));
+		fileChooser.setMultiSelectionEnabled(false);
 		if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			workingDir = file.getPath();
@@ -372,11 +389,25 @@ public class IREvalGui {
 			return "";
 		}
 	}
+
+	private Vector<String> chooseFiles() {
+		fileChooser.setCurrentDirectory(new File(workingDir));
+		fileChooser.setMultiSelectionEnabled(true);
+		Vector<String> names = new Vector<String>();
+		if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+			File[] files = fileChooser.getSelectedFiles();
+			for (File file : files ) {
+				workingDir = file.getPath();
+				names.add(file.getAbsolutePath());
+			}
+		} 
+		return names;
+	}
 	/**
 	 * Updates the contents of the query id drop down list.
 	 */
 	private void updateQueryIds() {
-		// update the combo box; Ought to make a model...
+		// update the combo box;
 		String[] queryIDs=(String[])judgments.keySet().toArray(new String[judgments.keySet().size()]);
 
 		// sort the set in alpha-numeric order
@@ -395,7 +426,151 @@ public class IREvalGui {
 		queries.addItem("-all-");
 		for (String q : queryIDs)
 			queries.addItem(q);
-		queries.setEnabled(true);	
+	}
+
+	private void loadQrel() {
+		String fname = chooseFile();
+		qrel.setText(fname);
+		if (!fname.equals(judgmentsFile)) {
+			baselineEvaluator = null;
+			judgments = null;
+			outputPane.setText(""); // output is voided
+			queryID = "";
+			queries.setEnabled(false);
+			rpButton.setEnabled(false);
+			pAtButton.setEnabled(false);
+			evaluateButton.setEnabled(false);
+			try {
+				frame.setCursor(waitCursor);
+				outputPane.setCursor(waitCursor);
+				judgments = ireval.Main.loadJudgments(fname);
+				judgmentsFile = fname;
+				updateQueryIds();
+				frame.setCursor(defaultCursor);
+				outputPane.setCursor(defaultCursor);
+			} catch (FileNotFoundException e1) {
+				frame.setCursor(defaultCursor);
+				outputPane.setCursor(defaultCursor);
+				outputPane.setText(e1.getMessage());
+			} catch (IOException e1) {
+				frame.setCursor(defaultCursor);
+				outputPane.setCursor(defaultCursor);
+				outputPane.setText(e1.getMessage());
+			}
+			queries.setEnabled(ranksMap.size() > 0);
+			rpButton.setEnabled(ranksMap.size() > 0);
+			pAtButton.setEnabled(ranksMap.size() > 0);
+			evaluateButton.setEnabled(ranksMap.size() > 0);
+
+		}
+	}
+
+	private String basename(String fname) {
+		return new File(fname).getName();
+	}
+
+	private void doEvaluate() {
+		frame.setCursor(waitCursor);
+		outputPane.setCursor(waitCursor);
+		// do we have to change the judgments?
+		String fname = qrel.getText();
+		if (!fname.equals(judgmentsFile)) {
+			judgments = null;
+			baselineEvaluator = null; // evaluator is voided
+			treatmentsMap.clear(); // all evaluators are voided.
+			try {
+				judgments = ireval.Main.loadJudgments(fname);
+				judgmentsFile = fname;
+				updateQueryIds();
+			} catch (FileNotFoundException e1) {
+				frame.setCursor(defaultCursor);
+				outputPane.setCursor(defaultCursor);
+				outputPane.setText(e1.getMessage());
+				return;
+			} catch (IOException e1) {
+				frame.setCursor(defaultCursor);
+				outputPane.setCursor(defaultCursor);
+				outputPane.setText(e1.getMessage());
+				return;
+			}
+		}
+		if (judgments == null) {
+			// bad things here...
+			outputPane.setText("No judgments!");
+			frame.setCursor(defaultCursor);
+			outputPane.setCursor(defaultCursor);
+			return;
+		}
+		currentEvaluator = null;
+		queryID = "";
+		if (treatmentsMap.size() != ranksMap.size()) {
+			treatmentsMap.clear();
+			for (String treat : ranksMap.keySet()) {
+				treatmentsMap.put(treat, ireval.Main.create(ranksMap.get(treat), judgments));
+			}       	
+		}
+
+		if (ranksMap.size() == 1) {
+			queries.setEnabled(false);
+			queries.setSelectedIndex(0);
+			queries.setEnabled(true);
+			rpButton.setEnabled(true);
+			pAtButton.setEnabled(true);
+			// do we have to change the baseline results?
+			fname = (String) resultsTable.getValueAt(0,0);
+			if (!fname.equals(baselineRanksFile)) {
+				baselineEvaluator = null; // evaluator is voided
+				baselineRanksFile = fname;
+			}
+
+			if (baselineEvaluator == null) {
+				baselineEvaluator = treatmentsMap.get(baselineRanksFile);
+			}
+			String evalOut = ireval.Main.singleEvaluation(baselineEvaluator, false);
+			outputPane.setText(evalOut);
+			outputPane.setCaretPosition(0);
+		} else {
+			queries.setEnabled(false);
+			queries.setSelectedIndex(0);
+			rpButton.setEnabled(true);
+			pAtButton.setEnabled(true);
+			SetRetrievalEvaluator eval2 ;
+			String treatment ;			
+			String baselineName;
+
+			int idx = resultsTable.getSelectedRow();
+			int []rows = resultsTable.getSelectedRows();
+			if (rows.length == 0 || rows.length == 1) {
+				if (idx == -1) idx = 0; // none selected, take first
+				// otherwise, treat the single selection as the baseline.
+				baselineName = (String)resultsTable.getValueAt(idx,0);
+				baselineEvaluator = treatmentsMap.get(baselineName);
+				queries.setEnabled(true);
+
+				String evalOut = ireval.Main.singleEvaluation(baselineEvaluator, false );
+				outputPane.setText(evalOut);
+				outputPane.setCaretPosition(0);
+			} else {
+				// if there are more than two, do pairwise, treating first
+				// as the baseline.
+				baselineName = (String)resultsTable.getValueAt(rows[0],0);
+				baselineEvaluator = treatmentsMap.get(baselineName);
+				StringBuffer evalOut = new StringBuffer();
+				for (int i = 1; i < rows.length; i++) {
+					idx = rows[i];
+					treatment = (String)resultsTable.getValueAt(idx,0);			
+					eval2 = treatmentsMap.get(treatment);
+
+					evalOut.append(comparisonEvaluation(baselineEvaluator, eval2, basename(baselineName), basename(treatment)));
+					evalOut.append("\n");
+				}
+				outputPane.setText(evalOut.toString());
+				outputPane.setCaretPosition(0);
+
+			}
+		}
+		frame.setCursor(defaultCursor);
+		outputPane.setCursor(defaultCursor);
 	}
 
 	/**
@@ -405,18 +580,25 @@ public class IREvalGui {
 		try {
 			UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 		} catch (Exception e) { }
+		String logoFile = "properties/lemur_logo.gif";
+		String iconFile = "properties/icon.gif";
+		ImageIcon lemurIcon = createImageIcon(iconFile);
 
 		frame = new JFrame();
 		frame.setLocation(30,30);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setIconImage(lemurIcon.getImage());
 		frame.setTitle("IREval");
 		JPanel panel = new JPanel();
+
+		ImageIcon logo = createImageIcon(logoFile);
+		JLabel logoLabel = new JLabel(logo, JLabel.CENTER);
 		// Layout
 		GridBagLayout gb = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
 		panel.setLayout(gb);
 
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets = new Insets(5,5,5,5);
 		gbc.weightx = 0;
 		gbc.weighty = 1;
@@ -425,13 +607,15 @@ public class IREvalGui {
 		JLabel lbl = new JLabel("Judgments");
 		gb.setConstraints(lbl, gbc);
 		panel.add(lbl);
+		gbc.anchor = GridBagConstraints.WEST;
+
 		gbc.gridx = 1;
 		gbc.gridwidth = 2;
-		// needs a change listener so the field can be cleared...
-		qrel = new JTextField(25);
+		qrel = new JTextField(32);
+		qrel.setEditable(false);
 		gb.setConstraints(qrel, gbc);
 		panel.add(qrel);
-		JButton b1 = new JButton("   load qrels");
+		JButton b1 = new JButton("   Load Qrels");
 		b1.setToolTipText("Open a file chooser to select a qrels file.");
 		gbc.gridx = 3;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -439,114 +623,54 @@ public class IREvalGui {
 		panel.add(b1);
 		b1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String fname = chooseFile();
-				qrel.setText(fname);
-				if (!fname.equals(judgmentsFile)) {
-					baselineEvaluator = null;
-					judgments = null;
-					treatmentsVector.clear();
-					outputPane.setText(""); // output is voided
-					queryID = "";
-					queries.setVisible(false);
-					rpButton.setVisible(false);
-					pAtButton.setVisible(false);
-					try {
-						frame.setCursor(waitCursor);
-						outputPane.setCursor(waitCursor);
-						judgments = ireval.Main.loadJudgments(fname);
-						judgmentsFile = fname;
-						updateQueryIds();
-						frame.setCursor(defaultCursor);
-						outputPane.setCursor(defaultCursor);
-					} catch (FileNotFoundException e1) {
-						frame.setCursor(defaultCursor);
-						outputPane.setCursor(defaultCursor);
-						outputPane.setText(e1.getMessage());
-					} catch (IOException e1) {
-						frame.setCursor(defaultCursor);
-						outputPane.setCursor(defaultCursor);
-						outputPane.setText(e1.getMessage());
-					}
-				}
-			}
-		}
-		);
+				loadQrel();
+			}});
 
-		lbl = new JLabel("Results");
+		lbl = new JLabel("Baseline");
 		gbc.gridy = 1;
 		gbc.gridx = 0;
 		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.EAST;
 		gb.setConstraints(lbl, gbc);
 		panel.add(lbl);
-		baselineResults = new JTextField(25);
-		gbc.gridy = 1;
-		gbc.gridx = 1;
-		gbc.gridwidth = 2;
-		gb.setConstraints(baselineResults, gbc);
-		panel.add(baselineResults);
-		JButton b2 = new JButton("load results");
-		b2.setToolTipText("Open a file choose to select a result set.");
-		gbc.gridy = 1;
-		gbc.gridx = 3;
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		gb.setConstraints(b2, gbc);
-		panel.add(b2);
-		b2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String fname = chooseFile();
-				baselineResults.setText(fname);
-				if (!fname.equals(baselineRanksFile)) {
-					baselineEvaluator = null; // evaluator is voided
-					outputPane.setText(""); // output is voided
-					queryID = "";
-					queries.setVisible(false);
-					rpButton.setVisible(false);
-					pAtButton.setVisible(false);
-					try {
-						frame.setCursor(waitCursor);
-						outputPane.setCursor(waitCursor);
-						baselineRanks = ireval.Main.loadRanking(fname);
-						baselineRanksFile = fname;
-						frame.setCursor(defaultCursor);
-						outputPane.setCursor(defaultCursor);
-					} catch (FileNotFoundException e1) {
-						frame.setCursor(defaultCursor);
-						outputPane.setCursor(defaultCursor);
-						outputPane.setText(e1.getMessage());
-					} catch (IOException e1) {
-						frame.setCursor(defaultCursor);
-						outputPane.setCursor(defaultCursor);
-						outputPane.setText(e1.getMessage());
-					}
-				}
-			}
+		String [] colNames = {"Result Set"};
+		resultsTableModel = new DefaultTableModel(colNames,0);
+		resultsTable = new JTable(resultsTableModel);
+		resultsTable.setDragEnabled(true);
+		resultsTable.setTransferHandler(new TableTransferHandler());
+		//resultsTable.setFillsViewportHeight(true); // jdk 1.6
+		resultsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
-	}
-		);
-		treatmentModel = new DefaultListModel();
-		treatments = new JList(treatmentModel);
-		treatments.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		treatments.setVisibleRowCount(3);
-		JScrollPane listScrollPane = new JScrollPane(treatments);
-		listScrollPane.setPreferredSize(new Dimension(400, 60));
-		
+		resultsTable.getTableHeader().setToolTipText("<html>Select one element for a single evaluation. Select a two or more elements for a pairwise evaluation.<br>When multiple elements are selected, the first in the listing is treated as the baseline.<br>Result sets can be reordered by dragging.</html>");
+
+		DefaultTableCellRenderer renderer =
+			new DefaultTableCellRenderer();
+
+		renderer.setToolTipText("<html>Select one element for a single evaluation. Select a two or more elements for a pairwise evaluation.<br>When multiple elements are selected, the first in the listing is treated as the baseline.<br>Result sets can be reordered by dragging.</html>");
+		TableColumn column = resultsTable.getColumnModel().getColumn(0);
+		column.setCellRenderer(renderer);
+		JScrollPane listScrollPane = new JScrollPane(resultsTable);
+		listScrollPane.setPreferredSize(new Dimension(400, 100));
 
 		lbl = new JLabel("Results");
 		gbc.gridy = 2;
 		gbc.gridx = 0;
 		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+
 		gb.setConstraints(lbl, gbc);
 		panel.add(lbl);
-		gbc.gridy = 2;
+		gbc.gridy = 1;
 		gbc.gridx = 1;
 		gbc.gridwidth = 2;
 		gbc.gridheight = 2;
+		gbc.anchor = GridBagConstraints.WEST;
 		gb.setConstraints(listScrollPane, gbc);
 		panel.add(listScrollPane);
 
-		JButton b4 = new JButton("load results");
-		b4.setToolTipText("Open a file chooser to select a result set.");
-		gbc.gridy = 2;
+		JButton b4 = new JButton("Load Results");
+		b4.setToolTipText("Open a file chooser to select one or more result sets.");
+		gbc.gridy = 1;
 		gbc.gridx = 3;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.gridheight = 1;
@@ -555,13 +679,11 @@ public class IREvalGui {
 		b4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				addTreatment();
-			}
-		}
-		);
+			}});
 
-		JButton b5 = new JButton("remove selected");
-		b4.setToolTipText("remove the selected element..");
-		gbc.gridy = 3;
+		JButton b5 = new JButton("Remove Results");
+		b5.setToolTipText("Remove the selected result sets..");
+		gbc.gridy = 2;
 		gbc.gridx = 3;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.gridheight = 1;
@@ -570,176 +692,120 @@ public class IREvalGui {
 		b5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				removeTreatment();
-			}
-		}
-		);
-
-		JButton b3 = new JButton("evaluate results");
-		b3.setToolTipText("Run a summary evaluation.");
-		//b3.setEnabled(false); // have to interact with listeners on the text fields.
-		gbc.gridy = 4;
-		gbc.gridx = 0;
-		gbc.gridwidth = 1;
-		gb.setConstraints(b3, gbc);
-		panel.add(b3);
-		b3.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				frame.setCursor(waitCursor);
-				outputPane.setCursor(waitCursor);
-				// do we have to change the judgments?
-				String fname = qrel.getText();
-				if (!fname.equals(judgmentsFile)) {
-					judgments = null;
-					try {
-						judgments = ireval.Main.loadJudgments(fname);
-						judgmentsFile = fname;
-						updateQueryIds();
-					} catch (FileNotFoundException e1) {
-						frame.setCursor(defaultCursor);
-						outputPane.setCursor(defaultCursor);
-						outputPane.setText(e1.getMessage());
-						return;
-					} catch (IOException e1) {
-						frame.setCursor(defaultCursor);
-						outputPane.setCursor(defaultCursor);
-						outputPane.setText(e1.getMessage());
-						return;
-					}
-				}
-				
-				// do we have to change the baseline results?
-				fname = baselineResults.getText();
-				if (!fname.equals(baselineRanksFile)) {
-					baselineEvaluator = null; // evaluator is voided
-					baselineRanks = null;
-					try {
-						baselineRanks = ireval.Main.loadRanking(fname);
-						baselineRanksFile = fname;
-					} catch (FileNotFoundException e1) {
-						frame.setCursor(defaultCursor);
-						outputPane.setCursor(defaultCursor);
-						outputPane.setText(e1.getMessage());
-						return;
-					} catch (IOException e1) {
-						frame.setCursor(defaultCursor);
-						outputPane.setCursor(defaultCursor);
-						outputPane.setText(e1.getMessage());
-						return;
-					}
-				}
-					// Still have to check, in case values were typed/pasted in.
-				currentEvaluator = null;
-				if (judgments == null) {
-					// bad things here...
-					outputPane.setText("No judgments!");
-					frame.setCursor(defaultCursor);
-					outputPane.setCursor(defaultCursor);
-					return;
-				}
-				if (baselineRanks == null) {
-					// bad things here
-					outputPane.setText("No baseline result set!");
-					frame.setCursor(defaultCursor);
-					outputPane.setCursor(defaultCursor);
-					return;
-				}
-				if (baselineEvaluator == null) {
-					baselineEvaluator = ireval.Main.create(baselineRanks, judgments);
-				}
-				if (ranksList.size() == 0) {
-					queries.setEnabled(false);
-					queries.setSelectedIndex(0);
-					queries.setEnabled(true);
-
-					queries.setVisible(true);
-					rpButton.setVisible(true); // have to do this other places
-					pAtButton.setVisible(true);
-					String evalOut = ireval.Main.singleEvaluation(baselineEvaluator, false);
-					outputPane.setText(evalOut);
-				} else {
-					treatmentsVector.clear();
-					for (int i = 0; i < ranksList.size(); i++)
-						treatmentsVector.add(ireval.Main.create(ranksList.get(i), judgments));
-					queries.setVisible(false);
-					rpButton.setVisible(true); // have to do this other places
-					pAtButton.setVisible(true);
-					int idx = treatments.getSelectedIndex();
-					if (idx == -1) idx = 0; // none selected, take first
-					// or could do all pairwise.
-					SetRetrievalEvaluator eval2 = treatmentsVector.get(idx);
-					String treatment = new File((String)treatmentModel.getElementAt(idx)).getName();			
-					String baselineName = new File(baselineResults.getText()).getName();
-
-					String evalOut = ireval.Main.comparisonEvaluation(baselineEvaluator, eval2, baselineName, treatment );
-					outputPane.setText(evalOut);
-				}
-				frame.setCursor(defaultCursor);
-				outputPane.setCursor(defaultCursor);
-			}
-		}
-		);
-		queries = new JComboBox();
-		queries.setToolTipText("Select an individual query to evaluate.");
-		queries.setVisible(false);
-		queries.setEnabled(false);
+			}});
+		JPanel pnl = new JPanel();
+		GridBagLayout gb1 = new GridBagLayout();
+		GridBagConstraints gbc1 = new GridBagConstraints();
+		pnl.setLayout(gb1);
+		evaluateButton = new JButton("Evaluate Result Sets");
+		evaluateButton.setToolTipText("Run a summary evaluation.");
+		evaluateButton.setEnabled(false);
 		gbc.gridy = 4;
 		gbc.gridx = 1;
-		gb.setConstraints(queries, gbc);
-		panel.add(queries);
-		queries.addActionListener(new ActionListener() {
-			int oldItemIndex=-1;
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		gb.setConstraints(pnl, gbc);
+
+		panel.add(pnl);
+		gbc1.gridy = 0;
+		gbc1.gridx = 0;
+		gbc1.gridwidth = 1;
+		gb1.setConstraints(evaluateButton, gbc1);
+		pnl.add(evaluateButton);
+		evaluateButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				// modify the scores when changed...
+				doEvaluate();
+			}});
+		queries = new JComboBox();
+		queries.setToolTipText("Select an individual query to evaluate.");
+		queries.setEnabled(false);
+		gbc1.gridy = 0;
+		gbc1.gridx = 3;
+		gbc1.gridwidth = 1;
+		gb1.setConstraints(queries, gbc1);
+
+		pnl.add(queries);
+		queries.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				JComboBox cb=(JComboBox)e.getSource();
 				if (!cb.isEnabled()) return;
 				int newItemIndex=cb.getSelectedIndex();
-				if (newItemIndex==oldItemIndex) { return; }
 				queryID = (String) cb.getItemAt(newItemIndex);
-				oldItemIndex=newItemIndex;
-				// need to handle eval == null case
 				frame.setCursor(waitCursor);
 				outputPane.setCursor(waitCursor);
+				if (treatmentsMap.size() != ranksMap.size()) {
+					treatmentsMap.clear();
+					for (String treat : ranksMap.keySet()) {
+						treatmentsMap.put(treat, ireval.Main.create(ranksMap.get(treat), judgments));
+					}       	
+				}
+				// do we have to change the baseline results?
+				int row = resultsTable.getSelectedRow();
+				if (row == -1) row = 0;
+				String fname = (String) resultsTable.getValueAt(row,0);
+				if (!fname.equals(baselineRanksFile)) {
+					baselineEvaluator = null; // evaluator is voided
+					baselineRanksFile = fname;
+				}
+
+				if (baselineEvaluator == null) {
+					baselineEvaluator = treatmentsMap.get(baselineRanksFile);
+				}
 				if (queryID.equals("-all-")) {
 					currentEvaluator = null;
 					queryID = "";
 					String evalOut = ireval.Main.singleEvaluation(baselineEvaluator, true);
 					outputPane.setText(evalOut);
+
 				} else {
 					String s = singleQuery(queryID, baselineEvaluator);
 					outputPane.setText(s);
 				}
+				outputPane.setCaretPosition(0);
 				frame.setCursor(defaultCursor);
 				outputPane.setCursor(defaultCursor);
 			}});
 
 		rpButton = new JButton("R/P");
 		rpButton.setToolTipText("Display the Interpolated Recall -- Precision graph.");
-		gbc.gridy = 4;
-		gbc.gridx = 2;
-		gb.setConstraints(rpButton, gbc);
-		rpButton.setVisible(false);
-		panel.add(rpButton);
+		rpButton.setEnabled(false);
+		gbc1.gridy = 0;
+		gbc1.gridx = 1;
+		gbc.gridwidth = 1;
+		gb1.setConstraints(rpButton, gbc1);
+
+		pnl.add(rpButton);
 		rpButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
+				if (treatmentsMap.size() != ranksMap.size()) {
+					treatmentsMap.clear();
+					for (String treat : ranksMap.keySet()) {
+						treatmentsMap.put(treat, ireval.Main.create(ranksMap.get(treat), judgments));
+					}       	
+				}
 				showPlotRP();
-			}
-		});
+			}});
 
 		pAtButton = new JButton("P@N");
 		pAtButton.setToolTipText("Display the P@N histogram.");
-		gbc.gridy = 4;
-		gbc.gridx = 3;
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		gb.setConstraints(pAtButton, gbc);
-		pAtButton.setVisible(false);
-		panel.add(pAtButton);
+		pAtButton.setEnabled(false);
+		gbc1.gridy = 0;
+		gbc1.gridx = 2;
+		gb1.setConstraints(pAtButton, gbc1);
+
+		pnl.add(pAtButton);
 		pAtButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
+				if (treatmentsMap.size() != ranksMap.size()) {
+					treatmentsMap.clear();
+					for (String treat : ranksMap.keySet()) {
+						treatmentsMap.put(treat, ireval.Main.create(ranksMap.get(treat), judgments));
+					}       	
+				}
 				showPlotPatN();
-			}
-		});
+			}});
 
 		outputPane = new JTextPane();
+		outputPane.setEditable(false);
 		outputPane.setFont(new Font("Monospaced", Font.PLAIN, 14));
 		outputPane.setPreferredSize(new Dimension(600, 600));
 		JScrollPane sp = new JScrollPane(outputPane);
@@ -747,13 +813,72 @@ public class IREvalGui {
 		gbc.gridy = 5;
 		gbc.gridx = 0;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gb.setConstraints(sp, gbc);
 		panel.add(sp);
+		gbc.gridy = 6;
+		gbc.fill = GridBagConstraints.NONE;
+		gb.setConstraints(logoLabel, gbc);
+		panel.add(logoLabel);
+
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.getContentPane().add("Center", panel);
 		frame.pack();
 		frame.setVisible(true);
 	}
+
+	/** Returns an ImageIcon, or null if the path was invalid.
+        @param path the image file to load.
+        @return an ImageIcon, or null if the path was invalid.
+	 */
+	protected static ImageIcon createImageIcon(String path) {
+		java.net.URL imgURL = ireval.Main.class.getResource(path);
+		if (imgURL != null) {
+			return new ImageIcon(imgURL);
+		} else {
+			return null;
+		}
+	}
+
+
+	private String comparisonEvaluation( SetRetrievalEvaluator baseline, SetRetrievalEvaluator treatment, 
+				String baselineName, String treatmentName ) {
+
+		StringWriter s = new StringWriter();
+		PrintWriter out = new PrintWriter(s);
+		String[] metrics = { "averagePrecision", "rPrecision", "ndcg", "bpref", "P5", "P10", "P20" };
+		String[] metricLabels = { "Average Precision", "R-Precision", "NDCG", "bpref", "P@5", "P@10", "P@20" };
+
+		String formatString = "%1$-30s%2$6.4f\n";
+		String integerFormatString = "%1$-30s%2$6d\n";
+		out.println("Comparing baseline: " + baselineName + " to treatment: " + treatmentName + "\n");
+		if (treatment == null) return "NOPE";
+		int i = 0;
+		for( String metric : metrics ) {
+			Map<String, Double> baselineMetric = baseline.evaluateAll( metric );
+			Map<String, Double> treatmentMetric = treatment.evaluateAll( metric );
+
+			SetRetrievalComparator comparator = new SetRetrievalComparator( baselineMetric, treatmentMetric );
+			out.println("\t\t" + metricLabels[i]);
+			out.format( formatString, baselineName, comparator.meanBaselineMetric() );
+			out.format( formatString, treatmentName, comparator.meanTreatmentMetric() );
+
+			out.format( integerFormatString, baselineName + " better", comparator.countBaselineBetter() );
+			out.format( integerFormatString, treatmentName + " better", comparator.countTreatmentBetter() );
+			out.format( integerFormatString, "No difference", comparator.countEqual() );
+
+			out.format( formatString, "t-test", comparator.pairedTTest() );
+			out.format( formatString, "randomized", comparator.randomizedTest() );
+			out.format( formatString, "sign test", comparator.signTest() );
+			out.println("____________________________________");
+			i++;
+		}
+
+		return s.toString();
+	}
+
+
+
 
 	/** Creates the IREval GUI and starts it.
 	 * @param args unused
@@ -767,5 +892,141 @@ public class IREvalGui {
 				ir.createAndShowGUI();
 			}
 		});
+	}
+}
+
+abstract class StringTransferHandler extends TransferHandler {
+
+	protected abstract String exportString(JComponent c);
+
+	protected abstract void importString(JComponent c, String str);
+
+	protected abstract void cleanup(JComponent c, boolean remove);
+
+	protected Transferable createTransferable(JComponent c) {
+		return new StringSelection(exportString(c));
+	}
+
+	public int getSourceActions(JComponent c) {
+		return COPY_OR_MOVE;
+	}
+
+	public boolean importData(JComponent c, Transferable t) {
+		if (canImport(c, t.getTransferDataFlavors())) {
+			try {
+				String str = (String) t.getTransferData(DataFlavor.stringFlavor);
+				importString(c, str);
+				return true;
+			} catch (UnsupportedFlavorException ufe) {
+			} catch (IOException ioe) {
+			}
+		}
+
+		return false;
+	}
+
+	protected void exportDone(JComponent c, Transferable data, int action) {
+		cleanup(c, action == MOVE);
+	}
+
+	public boolean canImport(JComponent c, DataFlavor[] flavors) {
+		for (int i = 0; i < flavors.length; i++) {
+			if (DataFlavor.stringFlavor.equals(flavors[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
+
+class TableTransferHandler extends StringTransferHandler {
+	private static final long serialVersionUID = 1L;
+
+	private int[] rows = null;
+
+	private int addIndex = -1; //Location where items were added
+
+	private int addCount = 0; //Number of items added.
+
+	protected String exportString(JComponent c) {
+		JTable table = (JTable) c;
+		rows = table.getSelectedRows();
+		int colCount = table.getColumnCount();
+
+		StringBuffer buff = new StringBuffer();
+
+		for (int i = 0; i < rows.length; i++) {
+			for (int j = 0; j < colCount; j++) {
+				Object val = table.getValueAt(rows[i], j);
+				buff.append(val == null ? "" : val.toString());
+				if (j != colCount - 1) {
+					buff.append(",");
+				}
+			}
+			if (i != rows.length - 1) {
+				buff.append("\n");
+			}
+		}
+
+		return buff.toString();
+	}
+
+	protected void importString(JComponent c, String str) {
+		JTable target = (JTable) c;
+		DefaultTableModel model = (DefaultTableModel) target.getModel();
+		int index = target.getSelectedRow();
+
+		//Prevent the user from dropping data back on itself.
+		//For example, if the user is moving rows #4,#5,#6 and #7 and
+		//attempts to insert the rows after row #5, this would
+		//be problematic when removing the original rows.
+		//So this is not allowed.
+		if (rows != null && index >= rows[0] - 1
+				&& index <= rows[rows.length - 1]) {
+			rows = null;
+			return;
+		}
+
+		int max = model.getRowCount();
+		if (index < 0) {
+			index = max;
+		} else {
+			index++;
+			if (index > max) {
+				index = max;
+			}
+		}
+		addIndex = index;
+		String[] values = str.split("\n");
+		addCount = values.length;
+		int colCount = target.getColumnCount();
+		for (int i = 0; i < values.length && i < colCount; i++) {
+			model.insertRow(index++, values[i].split(","));
+		}
+	}
+
+	protected void cleanup(JComponent c, boolean remove) {
+		JTable source = (JTable) c;
+		if (remove && rows != null) {
+			DefaultTableModel model = (DefaultTableModel) source.getModel();
+
+			//If we are moving items around in the same table, we
+			//need to adjust the rows accordingly, since those
+			//after the insertion point have moved.
+			if (addCount > 0) {
+				for (int i = 0; i < rows.length; i++) {
+					if (rows[i] > addIndex) {
+						rows[i] += addCount;
+					}
+				}
+			}
+			for (int i = rows.length - 1; i >= 0; i--) {
+				model.removeRow(rows[i]);
+			}
+		}
+		rows = null;
+		addCount = 0;
+		addIndex = -1;
 	}
 }
