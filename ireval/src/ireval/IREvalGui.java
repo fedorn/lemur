@@ -186,7 +186,7 @@ public class IREvalGui {
 					} catch (Exception e){
 						frame.setCursor(defaultCursor);
 						outputPane.setCursor(defaultCursor);
-						outputPane.setText(e.getMessage());
+						outputPane.setText("Unable to load: " + treatment + " " + e.toString());
 						return;
 					} catch (OutOfMemoryError error) {
 						frame.setCursor(defaultCursor);
@@ -430,7 +430,6 @@ public class IREvalGui {
 
 	private void loadQrel() {
 		String fname = chooseFile();
-		qrel.setText(fname);
 		if (!fname.equals(judgmentsFile)) {
 			baselineEvaluator = null;
 			judgments = null;
@@ -444,6 +443,7 @@ public class IREvalGui {
 				frame.setCursor(waitCursor);
 				outputPane.setCursor(waitCursor);
 				judgments = ireval.Main.loadJudgments(fname);
+				qrel.setText(fname);
 				judgmentsFile = fname;
 				updateQueryIds();
 				frame.setCursor(defaultCursor);
@@ -456,6 +456,10 @@ public class IREvalGui {
 				frame.setCursor(defaultCursor);
 				outputPane.setCursor(defaultCursor);
 				outputPane.setText(e1.getMessage());
+			} catch (Exception e2) {
+				frame.setCursor(defaultCursor);
+				outputPane.setCursor(defaultCursor);
+				outputPane.setText("Unable to load: " + fname + " " + e2.toString());		
 			}
 			queries.setEnabled(ranksMap.size() > 0);
 			rpButton.setEnabled(ranksMap.size() > 0);
