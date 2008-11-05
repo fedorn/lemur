@@ -25,12 +25,13 @@
 #include "indri/Buffer.hpp"
 #include "indri/RVLCompressStream.hpp"
 #include "indri/RVLDecompressStream.hpp"
+#include "IndexTypes.hpp"
 
 namespace indri {
   namespace index {
     class TermList {
     private:
-      indri::utility::greedy_vector<int> _terms;
+      indri::utility::greedy_vector<lemur::api::TERMID_T> _terms;
       indri::utility::greedy_vector<FieldExtent> _fields;
 
     public:
@@ -43,15 +44,15 @@ namespace indri {
         _fields.push_back( field );
       }
       
-      void addTerm( const int termID ) {
+      void addTerm( const lemur::api::TERMID_T termID ) {
         _terms.push_back( termID );
       }
       
-      indri::utility::greedy_vector<int>& terms() {
+      indri::utility::greedy_vector<lemur::api::TERMID_T>& terms() {
         return _terms;
       }
       
-      const indri::utility::greedy_vector<int>& terms() const {
+      const indri::utility::greedy_vector<lemur::api::TERMID_T>& terms() const {
         return _terms;
       }
       
@@ -74,7 +75,7 @@ namespace indri {
                >> fieldCount;
         
         for( int i=0; i<termCount; i++ ) {
-          int termID;
+          lemur::api::TERMID_T termID;
           stream >> termID;
 
           assert( termID >= 0 );

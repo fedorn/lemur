@@ -21,6 +21,8 @@
 
 #include "lemur-platform.h"
 #include "indri/Extent.hpp"
+#include "IndexTypes.hpp"
+
 namespace indri 
 {
   namespace api 
@@ -55,7 +57,7 @@ namespace indri
       {
       }
 
-      ScoredExtentResult( UINT64 s, int d )
+      ScoredExtentResult( UINT64 s, lemur::api::DOCID_T d )
         :
         score( double(s) ),
         document(d),
@@ -67,7 +69,7 @@ namespace indri
       {
       }
 
-      ScoredExtentResult( double s, int d )
+      ScoredExtentResult( double s, lemur::api::DOCID_T d )
         :
         score(s),
         document(d),
@@ -79,7 +81,7 @@ namespace indri
       {
       }
 
-      ScoredExtentResult( double s, int d, int b, int e )
+      ScoredExtentResult( double s, lemur::api::DOCID_T d, int b, int e )
         :
         score(s),
         document(d),
@@ -91,7 +93,7 @@ namespace indri
       {
       }
 
-      ScoredExtentResult( double s, int d, int b, int e, UINT64 n)
+      ScoredExtentResult( double s, lemur::api::DOCID_T d, int b, int e, UINT64 n)
         :
         score(s),
         document(d),
@@ -103,7 +105,7 @@ namespace indri
       {
       }
 
-      ScoredExtentResult( double s, int d, int b, int e, UINT64 n, int o)
+      ScoredExtentResult( double s, lemur::api::DOCID_T d, int b, int e, UINT64 n, int o)
         :
         score(s),
         document(d),
@@ -115,7 +117,7 @@ namespace indri
       {
       }
 
-      ScoredExtentResult( double s, int d, int b, int e, UINT64 n, int o, int p)
+      ScoredExtentResult( double s, lemur::api::DOCID_T d, int b, int e, UINT64 n, int o, int p)
         :
         score(s),
         document(d),
@@ -170,7 +172,7 @@ namespace indri
       }
 
       double score;
-      int document;
+      lemur::api::DOCID_T document;
       int begin;
       int end;
       UINT64 number; /// future annotation "pointer"

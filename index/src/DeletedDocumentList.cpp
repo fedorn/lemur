@@ -57,7 +57,7 @@ indri::index::DeletedDocumentList::read_transaction::~read_transaction() {
 // grow
 //
 
-void indri::index::DeletedDocumentList::_grow( int documentID ) {
+void indri::index::DeletedDocumentList::_grow( lemur::api::DOCID_T documentID ) {
   // just set an appropriate number of bytes to zero
   int growBytes = (documentID/8)+1 - _bitmap.position();
   if( growBytes <= 0 )
@@ -83,7 +83,7 @@ UINT64 indri::index::DeletedDocumentList::deletedCount() const {
 // deleted list _before_ the new list is appended.
 //
 
-void indri::index::DeletedDocumentList::append( DeletedDocumentList& other, lemur::api::DOCID_T documentCount ) {
+void indri::index::DeletedDocumentList::append( DeletedDocumentList& other, int documentCount ) {
   indri::thread::ScopedLock l( _writeLock );
 
   if( other._bitmap.size() == 0 )
@@ -143,10 +143,10 @@ void indri::index::DeletedDocumentList::append( DeletedDocumentList& other, lemu
 // nextDocument
 //
 
-int indri::index::DeletedDocumentList::read_transaction::nextCandidateDocument( int documentID ) {
+lemur::api::DOCID_T indri::index::DeletedDocumentList::read_transaction::nextCandidateDocument( lemur::api::DOCID_T documentID ) {
   _lock.yieldRead();
 
-  while( documentID < (int)_bitmap.position()*8 ) {
+  while( documentID < (lemur::api::DOCID_T)_bitmap.position()*8 ) {
     char bitmapByte = _bitmap.front()[documentID/8];
     bool marked = (bitmapByte & 1<<(documentID%8)) != 0;
 
@@ -163,8 +163,8 @@ int indri::index::DeletedDocumentList::read_transaction::nextCandidateDocument( 
 // isDeleted
 //
 
-bool indri::index::DeletedDocumentList::read_transaction::isDeleted( int documentID ) const {
-  if( (int)_bitmap.position() < (documentID/8)+1 )
+bool indri::index::DeletedDocumentList::read_transaction::isDeleted( lemur::api::DOCID_T documentID ) const {
+  if( (lemur::api::DOCID_T)_bitmap.position() < (documentID/8)+1 )
     return false;
 
   char bitmapByte = _bitmap.front()[documentID/8];
@@ -177,11 +177,11 @@ bool indri::index::DeletedDocumentList::read_transaction::isDeleted( int documen
 // markDeleted
 //
 
-void indri::index::DeletedDocumentList::markDeleted( int documentID ) {
+void indri::index::DeletedDocumentList::markDeleted( lemur::api::DOCID_T documentID ) {
   _modified = true;
   indri::thread::ScopedLock l( _writeLock );
 
-  if( (int)_bitmap.position() < (documentID/8)+1 ) {
+  if( (lemur::api::DOCID_T)_bitmap.position() < (documentID/8)+1 ) {
     _grow( documentID );
   }
 
@@ -197,9 +197,9 @@ void indri::index::DeletedDocumentList::markDeleted( int documentID ) {
 // isDeleted
 //
 
-bool indri::index::DeletedDocumentList::isDeleted( int documentID ) {
+bool indri::index::DeletedDocumentList::isDeleted( lemur::api::DOCID_T documentID ) {
   indri::thread::ScopedLock l( _readLock );
-  if( (int)_bitmap.position() < (documentID/8)+1 )
+  if( (lemur::api::DOCID_T)_bitmap.position() < (documentID/8)+1 )
     return false;
 
   char bitmapByte = _bitmap.front()[documentID/8];

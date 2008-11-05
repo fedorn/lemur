@@ -27,7 +27,7 @@ indri::infnet::FieldBetweenNode::FieldBetweenNode( const std::string& name, Fiel
   _high = high;
 }
 
-void indri::infnet::FieldBetweenNode::prepare( int documentID ) {
+void indri::infnet::FieldBetweenNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
@@ -49,7 +49,7 @@ indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::FieldBetween
   return _extents;
 }
 
-int indri::infnet::FieldBetweenNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::FieldBetweenNode::nextCandidateDocument() {
   return _field->nextCandidateDocument();
 }
 
@@ -57,7 +57,7 @@ const std::string& indri::infnet::FieldBetweenNode::getName() const {
   return _name;
 }
 
-void indri::infnet::FieldBetweenNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::FieldBetweenNode::annotate( class indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.addMatches( _extents, this, documentID, extent );
 }
 

@@ -32,7 +32,7 @@ indri::infnet::FilterRejectNode::FilterRejectNode( const std::string& name,
 }
 
 
-int indri::infnet::FilterRejectNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::FilterRejectNode::nextCandidateDocument() {
   // it'd be nice to use the information from _filter to 
   // skip documents in the case when _filter->nextCandidate..() == _disallowed->nextCandidate...()
   // but we don't know for sure that _filter will match: we only know that it might match.
@@ -49,12 +49,12 @@ double indri::infnet::FilterRejectNode::maximumScore() {
   return _disallowed->maximumScore();
 }
 
-bool indri::infnet::FilterRejectNode::hasMatch( int documentID ) {
+bool indri::infnet::FilterRejectNode::hasMatch( lemur::api::DOCID_T documentID ) {
   // delegate to the children.
   return ( _disallowed->hasMatch( documentID ));
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::FilterRejectNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::FilterRejectNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   _matches.clear();
   _matches.resize( extents.size(), true ); // all match unless disallowed
   
@@ -84,7 +84,7 @@ const std::string& indri::infnet::FilterRejectNode::getName() const {
   return _name;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FilterRejectNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FilterRejectNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   _extents.clear();
   // if the filter doesn't apply, return the child score.
   if ( _filter->extents().size() == 0 )
@@ -105,7 +105,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   }
 }
 
-void indri::infnet::FilterRejectNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::FilterRejectNode::annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   _filter->annotate( annotator, documentID, extent);
   if( _filter->extents().size() == 0 ) {
     _disallowed->annotate( annotator, documentID, extent );

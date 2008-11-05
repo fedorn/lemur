@@ -43,7 +43,7 @@ namespace indri
       UINT64 _deletedCount;
 
       indri::utility::Buffer _bitmap;
-      void _grow( int documentID );
+      void _grow( lemur::api::DOCID_T documentID );
       void _calculateDeletedCount();
 
     public:
@@ -56,15 +56,15 @@ namespace indri
         read_transaction( DeletedDocumentList& list );
         ~read_transaction();
 
-        int nextCandidateDocument( int documentID );
-        bool isDeleted( int documentID ) const;
+        lemur::api::DOCID_T nextCandidateDocument( lemur::api::DOCID_T documentID );
+        bool isDeleted( lemur::api::DOCID_T documentID ) const;
       };
 
       DeletedDocumentList();
 
-      void append( DeletedDocumentList& other, lemur::api::DOCID_T documentCount );
-      void markDeleted( int documentID );
-      bool isDeleted( int documentID );
+      void append( DeletedDocumentList& other, int documentCount );
+      void markDeleted( lemur::api::DOCID_T documentID );
+      bool isDeleted( lemur::api::DOCID_T documentID );
       UINT64 deletedCount() const;
       read_transaction* getReadTransaction();
 

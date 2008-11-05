@@ -79,10 +79,10 @@ void indri::infnet::ContextSimpleCountAccumulator::indexChanged( indri::index::I
   _maximumDocument = index.documentMaximum();
 }
 
-void indri::infnet::ContextSimpleCountAccumulator::evaluate( int documentID, int documentLength ) {
+void indri::infnet::ContextSimpleCountAccumulator::evaluate( lemur::api::DOCID_T documentID, int documentLength ) {
   // do nothing
 }
 
-int indri::infnet::ContextSimpleCountAccumulator::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::ContextSimpleCountAccumulator::nextCandidateDocument() {
   return MAX_INT32;
 }

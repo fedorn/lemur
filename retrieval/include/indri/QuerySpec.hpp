@@ -2387,10 +2387,10 @@ namespace indri {
     class FilterNode : public ScoredExtentNode {
     private:
       ScoredExtentNode* _child;
-      std::vector<int> _documents;
+      std::vector<lemur::api::DOCID_T> _documents;
 
     public:
-      FilterNode( ScoredExtentNode* child, std::vector<int>& documents ) : 
+      FilterNode( ScoredExtentNode* child, std::vector<lemur::api::DOCID_T>& documents ) : 
         _child(child),
         _documents(documents)
       {
@@ -2398,7 +2398,7 @@ namespace indri {
 
       FilterNode( Unpacker& unpacker ) {
         _child = unpacker.getScoredExtentNode( "child" );
-        _documents = unpacker.getIntVector( "documents" );
+        _documents = unpacker.getDocIdVector( "documents" );
       }
 
       std::string typeName() const {
@@ -2409,7 +2409,7 @@ namespace indri {
         return _child;
       }
 
-      const std::vector<int>& getDocuments() const {
+      const std::vector<lemur::api::DOCID_T>& getDocuments() const {
         return _documents;
       }
 

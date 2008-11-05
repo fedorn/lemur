@@ -25,11 +25,11 @@ indri::infnet::WeightedSumNode::WeightedSumNode( const std::string& name ) : _na
 {
 }
 
-int indri::infnet::WeightedSumNode::nextCandidateDocument() {
-  int candidate = MAX_INT32;
+lemur::api::DOCID_T indri::infnet::WeightedSumNode::nextCandidateDocument() {
+  lemur::api::DOCID_T candidate = MAX_INT32;
 
   for( size_t i=0; i<_children.size(); i++ ) {
-    candidate = lemur_compat::min<int>( _children[i]->nextCandidateDocument(), candidate );
+    candidate = lemur_compat::min<lemur::api::DOCID_T>( _children[i]->nextCandidateDocument(), candidate );
   }
 
   return candidate;
@@ -63,7 +63,7 @@ double indri::infnet::WeightedSumNode::maximumBackgroundScore() {
   return log(s);
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedSumNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedSumNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   double sumWeight = 0;
   
   double s = 0;
@@ -93,7 +93,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _scores;
 }
 
-void indri::infnet::WeightedSumNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::WeightedSumNode::annotate( indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.add(this, documentID, extent);
 
   for( unsigned i=0; i<_children.size(); i++ ) {
@@ -101,7 +101,7 @@ void indri::infnet::WeightedSumNode::annotate( indri::infnet::Annotator& annotat
   }
 }
 
-bool indri::infnet::WeightedSumNode::hasMatch( int documentID ) {
+bool indri::infnet::WeightedSumNode::hasMatch( lemur::api::DOCID_T documentID ) {
   for( size_t i=0; i<_children.size(); i++ ) {
     if( _children[i]->hasMatch( documentID ) )
       return true;
@@ -114,7 +114,7 @@ bool indri::infnet::WeightedSumNode::hasMatch( int documentID ) {
 // hasMatch
 //
 
-const indri::utility::greedy_vector<bool>& indri::infnet::WeightedSumNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::WeightedSumNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   _matches.clear();
   _matches.resize( extents.size(), false );
 

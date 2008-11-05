@@ -83,13 +83,13 @@ namespace indri
       }
 
       /// sets up as much as we can with just the document ID
-      virtual void prepare( int documentID ) = 0;
+      virtual void prepare( lemur::api::DOCID_T documentID ) = 0;
 
       /// returns a list of intervals describing positions of children
       virtual const indri::utility::greedy_vector<indri::index::Extent>& extents() = 0;
 
       /// annotate any results from this node from position begin to position end
-      virtual void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent ) = 0;
+      virtual void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) = 0;
 
       // Moved work of identifying matches of an extent from ExtentRestriction to here.
       // This allows the computation for the list of matches for an extent to be 

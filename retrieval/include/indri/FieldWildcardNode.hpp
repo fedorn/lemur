@@ -34,7 +34,7 @@ namespace indri {
       indri::utility::greedy_vector<indri::index::Extent> _extents;
       std::string _name;
       indri::index::Index * _index;
-      int _nextDocument;
+      lemur::api::DOCID_T _nextDocument;
       indri::index::TermListFileIterator * _docIter;
       int _docIterID;
       
@@ -42,11 +42,11 @@ namespace indri {
       FieldWildcardNode( const std::string& name );
       ~FieldWildcardNode( );
       
-      void prepare( int documentID );
+      void prepare( lemur::api::DOCID_T documentID );
       const indri::utility::greedy_vector<indri::index::Extent>& extents();
-      int nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument();
       const std::string& getName() const;
-      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
+      void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
 
       void indexChanged( indri::index::Index& index);
     };

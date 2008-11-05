@@ -28,7 +28,7 @@ indri::infnet::WeightedExtentOrNode::WeightedExtentOrNode( const std::string& na
 {
 }
 
-void indri::infnet::WeightedExtentOrNode::prepare( int documentID ) {
+void indri::infnet::WeightedExtentOrNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
@@ -52,8 +52,8 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Weight
   return _extents;
 }
 
-int indri::infnet::WeightedExtentOrNode::nextCandidateDocument() {
-  int candidate = INT_MAX;
+lemur::api::DOCID_T indri::infnet::WeightedExtentOrNode::nextCandidateDocument() {
+  lemur::api::DOCID_T candidate = INT_MAX;
   
   for( size_t i=0; i<_children.size(); i++ ) {
     candidate = lemur_compat::min( _children[i]->nextCandidateDocument(), candidate );
@@ -66,7 +66,7 @@ const std::string& indri::infnet::WeightedExtentOrNode::getName() const {
   return _name;
 }
 
-void indri::infnet::WeightedExtentOrNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::WeightedExtentOrNode::annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   if (! _lastExtent.contains(extent)) {
     // if the last extent we annotated contains this one, there is no work
     // to do.

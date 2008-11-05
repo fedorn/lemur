@@ -62,7 +62,7 @@ bool indri::index::MemoryIndexTermListFileIterator::nextEntry() {
   return true;
 }
 
-bool indri::index::MemoryIndexTermListFileIterator::nextEntry( int documentID ) {
+bool indri::index::MemoryIndexTermListFileIterator::nextEntry( lemur::api::DOCID_T documentID ) {
   if( documentID >= (int)_data.size() ) {
     _finished = true;
     return false;

@@ -48,7 +48,7 @@ void indri::infnet::OrNode::setSiblingsFlag(int f){
 }
 
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::OrNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::OrNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   double notScore = 1;
 
   for( size_t i=0; i<_children.size(); i++ ) {
@@ -69,7 +69,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _scores;
 }
 
-void indri::infnet::OrNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::OrNode::annotate( class indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.add(this, documentID, extent);
 
   for( size_t i=0; i<_children.size(); i++ ) {
@@ -97,7 +97,7 @@ double indri::infnet::OrNode::maximumBackgroundScore() {
   return log( 1. - notScore );
 }
 
-bool indri::infnet::OrNode::hasMatch( int documentID ) {
+bool indri::infnet::OrNode::hasMatch( lemur::api::DOCID_T documentID ) {
   for( size_t i=0; i<_children.size(); i++ ) {
     if( _children[i]->hasMatch( documentID ) )
       return true;
@@ -106,7 +106,7 @@ bool indri::infnet::OrNode::hasMatch( int documentID ) {
   return false;
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::OrNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::OrNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   _matches.clear();
   _matches.resize( extents.size(), false );
 
@@ -123,11 +123,11 @@ const indri::utility::greedy_vector<bool>& indri::infnet::OrNode::hasMatch( int 
   return _matches;
 }
 
-int indri::infnet::OrNode::nextCandidateDocument() {
-  int nextCandidate = MAX_INT32;
+lemur::api::DOCID_T indri::infnet::OrNode::nextCandidateDocument() {
+  lemur::api::DOCID_T nextCandidate = MAX_INT32;
   
   for( size_t i=0; i<_children.size(); i++ ) {
-    nextCandidate = lemur_compat::min<int>( nextCandidate, _children[i]->nextCandidateDocument() );
+    nextCandidate = lemur_compat::min<lemur::api::DOCID_T>( nextCandidate, _children[i]->nextCandidateDocument() );
   }
 
   return nextCandidate;

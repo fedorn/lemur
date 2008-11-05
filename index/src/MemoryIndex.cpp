@@ -49,7 +49,7 @@ indri::index::MemoryIndex::MemoryIndex() :
   _termListsBaseOffset = 0;
 }
 
-indri::index::MemoryIndex::MemoryIndex( int docBase ) :
+indri::index::MemoryIndex::MemoryIndex( lemur::api::DOCID_T docBase ) :
   _readLock(_lock),
   _writeLock(_lock),
   _stringToTerm( ONE_MEGABYTE, &_allocator )
@@ -59,7 +59,7 @@ indri::index::MemoryIndex::MemoryIndex( int docBase ) :
   _termListsBaseOffset = 0;
 }
 
-indri::index::MemoryIndex::MemoryIndex( int docBase, const std::vector<Index::FieldDescription>& fields ) :
+indri::index::MemoryIndex::MemoryIndex( lemur::api::DOCID_T docBase, const std::vector<Index::FieldDescription>& fields ) :
   _readLock(_lock),
   _writeLock(_lock),
   _stringToTerm( ONE_MEGABYTE, &_allocator )
@@ -112,7 +112,7 @@ void indri::index::MemoryIndex::close() {
 // documentBase
 //
 
-int indri::index::MemoryIndex::documentBase() {
+lemur::api::DOCID_T indri::index::MemoryIndex::documentBase() {
   return _corpusStatistics.baseDocument;
 }
 
@@ -120,7 +120,7 @@ int indri::index::MemoryIndex::documentBase() {
 // documentLength
 //
 
-int indri::index::MemoryIndex::documentLength( int documentID ) {
+int indri::index::MemoryIndex::documentLength( lemur::api::DOCID_T documentID ) {
   lemur::api::DOCID_T base = _corpusStatistics.baseDocument;
 
   if( base > documentID || (documentID - base) > (int)_documentData.size() )
@@ -136,7 +136,7 @@ int indri::index::MemoryIndex::documentLength( int documentID ) {
 // term
 //
 
-int indri::index::MemoryIndex::term( const char* term ) {
+lemur::api::TERMID_T indri::index::MemoryIndex::term( const char* term ) {
   term_entry** entry = _stringToTerm.find( term );
 
   if( entry )
@@ -149,7 +149,7 @@ int indri::index::MemoryIndex::term( const char* term ) {
 // term
 //
 
-int indri::index::MemoryIndex::term( const std::string& term ) {
+lemur::api::TERMID_T indri::index::MemoryIndex::term( const std::string& term ) {
   term_entry** entry = _stringToTerm.find( term.c_str() );
 
   if( entry )
@@ -162,7 +162,7 @@ int indri::index::MemoryIndex::term( const std::string& term ) {
 // term
 //
 
-std::string indri::index::MemoryIndex::term( int termID ) {
+std::string indri::index::MemoryIndex::term( lemur::api::TERMID_T termID ) {
   if( termID <= 0 || termID >= (int)_idToTerm.size() )
     return std::string();
 
@@ -334,7 +334,7 @@ int indri::index::MemoryIndex::_fieldID( const std::string& fieldName ) {
 // _writeFieldExtents
 //
 
-void indri::index::MemoryIndex::_writeFieldExtents( int documentID, indri::utility::greedy_vector<indri::parse::TagExtent *>& indexedTags ) {
+void indri::index::MemoryIndex::_writeFieldExtents( lemur::api::DOCID_T documentID, indri::utility::greedy_vector<indri::parse::TagExtent *>& indexedTags ) {
   indri::utility::HashTable< indri::parse::TagExtent *, int> tagIdMap;
   
   // sort fields
@@ -396,7 +396,7 @@ void indri::index::MemoryIndex::_writeFieldExtents( int documentID, indri::utili
 // _writeDocumentTermList
 //
 
-void indri::index::MemoryIndex::_writeDocumentTermList( UINT64& offset, int& byteLength, int documentID, int documentLength, indri::index::TermList& locatedTerms ) {
+void indri::index::MemoryIndex::_writeDocumentTermList( UINT64& offset, int& byteLength, lemur::api::DOCID_T documentID, int documentLength, indri::index::TermList& locatedTerms ) {
   indri::utility::Buffer* addBuffer = 0;
   int docDataLength = 10 + 5 * locatedTerms.terms().size() + 2 * sizeof(FieldExtent) * locatedTerms.fields().size();
   
@@ -491,7 +491,7 @@ indri::index::MemoryIndex::term_entry* indri::index::MemoryIndex::_lookupTerm( c
 
   // this is a term we haven't seen before
   _corpusStatistics.uniqueTerms++;
-  int termID = _corpusStatistics.uniqueTerms;
+  lemur::api::TERMID_T termID = _corpusStatistics.uniqueTerms;
   
   // create a term data structure
   TermData* termData = termdata_construct( _allocator.allocate( termdata_size( _fieldData.size() ) ),
@@ -535,7 +535,7 @@ void indri::index::MemoryIndex::_destroyTerms() {
 // addDocument
 //
 
-int indri::index::MemoryIndex::addDocument( indri::api::ParsedDocument& document ) {
+lemur::api::DOCID_T indri::index::MemoryIndex::addDocument( indri::api::ParsedDocument& document ) {
   indri::thread::ScopedLock sl( _writeLock );
   
   unsigned int position = 0;
@@ -654,7 +654,7 @@ int indri::index::MemoryIndex::addDocument( indri::api::ParsedDocument& document
 // docListIterator
 //
 
-indri::index::DocListIterator* indri::index::MemoryIndex::docListIterator( int termID ) {
+indri::index::DocListIterator* indri::index::MemoryIndex::docListIterator( lemur::api::TERMID_T termID ) {
   assert( termID >= 0 );
   assert( termID < _corpusStatistics.uniqueTerms );
   
@@ -707,7 +707,7 @@ indri::index::DocExtentListIterator* indri::index::MemoryIndex::fieldListIterato
 // termList
 //
 
-const indri::index::TermList* indri::index::MemoryIndex::termList( int documentID ) {
+const indri::index::TermList* indri::index::MemoryIndex::termList( lemur::api::DOCID_T documentID ) {
   int documentIndex = documentID - documentBase();
   if( documentIndex < 0 || documentIndex >= (int)_documentData.size() )
     return 0;

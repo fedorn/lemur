@@ -76,7 +76,7 @@ namespace indri {
         }
 
         char* term;
-        int termID;
+        lemur::api::TERMID_T termID;
         TermData* termData;
         term_entry* next;
         indri::index::DocListMemoryBuilder list;
@@ -90,7 +90,7 @@ namespace indri {
       indri::thread::WriterLockable _writeLock;
 
       CorpusStatistics _corpusStatistics;
-      int _baseDocumentID;
+      lemur::api::DOCID_T _baseDocumentID;
       
       // document buffers
       indri::index::TermList _termList;
@@ -118,8 +118,8 @@ namespace indri {
                          unsigned int& extentIndex, 
                          unsigned int position );
       void _removeClosedTags( indri::utility::greedy_vector<indri::parse::TagExtent *>& tags, unsigned int position );
-      void _writeFieldExtents( int documentID, indri::utility::greedy_vector<indri::parse::TagExtent *>& indexedTags );
-      void _writeDocumentTermList( UINT64& offset, int& byteLength, int documentID, int documentLength, indri::index::TermList& locatedTerms );
+      void _writeFieldExtents( lemur::api::DOCID_T documentID, indri::utility::greedy_vector<indri::parse::TagExtent *>& indexedTags );
+      void _writeDocumentTermList( UINT64& offset, int& byteLength, lemur::api::DOCID_T documentID, int documentLength, indri::index::TermList& locatedTerms );
       void _writeDocumentStatistics( UINT64 offset, int byteLength, int indexedLength, int totalLength, int uniqueTerms );
       term_entry* _lookupTerm( const char* term );
       void _destroyTerms();
@@ -129,8 +129,8 @@ namespace indri {
 
     public:
       MemoryIndex();
-      MemoryIndex( int docBase );
-      MemoryIndex( int docBase, const std::vector<Index::FieldDescription>& fields );
+      MemoryIndex( lemur::api::DOCID_T docBase );
+      MemoryIndex( lemur::api::DOCID_T docBase, const std::vector<Index::FieldDescription>& fields );
       ~MemoryIndex();
 
       void close();
@@ -138,15 +138,15 @@ namespace indri {
       lemur::api::DOCID_T documentBase();
       lemur::api::DOCID_T documentMaximum();
       
-      int term( const std::string& t );
-      int term( const char* t );
-      std::string term( int termID );
+      lemur::api::TERMID_T term( const std::string& t );
+      lemur::api::TERMID_T term( const char* t );
+      std::string term( lemur::api::TERMID_T termID );
 
       int field( const char* fieldName );
       int field( const std::string& fieldName );
       std::string field( int fieldID );
 
-      int documentLength( int documentID );
+      int documentLength( lemur::api::DOCID_T documentID );
       UINT64 documentCount();
       UINT64 documentCount( const std::string& term );
       UINT64 uniqueTermCount();
@@ -160,12 +160,12 @@ namespace indri {
       UINT64 fieldDocumentCount( const std::string& field );
       UINT64 fieldDocumentCount( const std::string& field, const std::string& term );
       
-      DocListIterator* docListIterator( int termID );
+      DocListIterator* docListIterator( lemur::api::TERMID_T termID );
       DocListIterator* docListIterator( const std::string& term );
       DocListFileIterator* docListFileIterator();
       DocExtentListIterator* fieldListIterator( int fieldID );
       DocExtentListIterator* fieldListIterator( const std::string& field );
-      const TermList* termList( int documentID );
+      const TermList* termList( lemur::api::DOCID_T documentID );
       TermListFileIterator* termListFileIterator();
 
       VocabularyIterator* vocabularyIterator();
@@ -177,7 +177,7 @@ namespace indri {
       indri::thread::Lockable* iteratorLock();
       indri::thread::Lockable* statisticsLock();
 
-      int addDocument( indri::api::ParsedDocument& document );
+      lemur::api::DOCID_T addDocument( indri::api::ParsedDocument& document );
       size_t memorySize();
     };
   }

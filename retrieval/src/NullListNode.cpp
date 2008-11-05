@@ -32,11 +32,11 @@ const std::string& indri::infnet::NullListNode::getName() const {
   return _name;
 }
 
-int indri::infnet::NullListNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::NullListNode::nextCandidateDocument() {
   return MAX_INT32;
 }
 
-void indri::infnet::NullListNode::prepare( int documentID ) {
+void indri::infnet::NullListNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
 }
@@ -45,7 +45,7 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::NullLi
   return _extents;
 }
 
-void indri::infnet::NullListNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::NullListNode::annotate( class indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   // do nothing
 }
 

@@ -40,13 +40,13 @@ namespace indri
     public:
       DocListIteratorNode( const std::string& name, class InferenceNetwork& network, int listID );
 
-      int nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
       void indexChanged( indri::index::Index& index, class InferenceNetwork *network );
 
-      void prepare( int documentID );
+      void prepare( lemur::api::DOCID_T documentID );
       const indri::utility::greedy_vector<indri::index::Extent>& extents();
-      const std::string& getName() const;  void annotate( Annotator& annotator, int documentID, indri::index::Extent &extent );
+      const std::string& getName() const;  void annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
     };
   }
 }

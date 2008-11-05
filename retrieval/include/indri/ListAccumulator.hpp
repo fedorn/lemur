@@ -49,8 +49,8 @@ namespace indri
       const EvaluatorNode::MResults& getResults();
 
       const std::string& getName() const;
-      void evaluate( int documentID, int documentLength );
-      int nextCandidateDocument();
+      void evaluate( lemur::api::DOCID_T documentID, int documentLength );
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
     };
   }

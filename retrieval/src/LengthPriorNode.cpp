@@ -28,19 +28,19 @@ indri::infnet::LengthPriorNode::LengthPriorNode( const std::string& name, Belief
 indri::infnet::LengthPriorNode::~LengthPriorNode() {
 }
 
-int indri::infnet::LengthPriorNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::LengthPriorNode::nextCandidateDocument() {
   return _child->nextCandidateDocument();
 }
 
-bool indri::infnet::LengthPriorNode::hasMatch( int documentID ) {
+bool indri::infnet::LengthPriorNode::hasMatch( lemur::api::DOCID_T documentID ) {
   return _child->hasMatch( documentID );
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::LengthPriorNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::LengthPriorNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   return _child->hasMatch( documentID, extents );
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::LengthPriorNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::LengthPriorNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   _scores.clear();
   const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _child->score( documentID, extent, documentLength );
   for( size_t j=0; j<childResults.size(); j++ ) {
@@ -67,7 +67,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _scores;
 }
 
-void indri::infnet::LengthPriorNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::LengthPriorNode::annotate( class indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.add( this, documentID, extent); 
   _child->annotate( annotator, documentID, extent );
 

@@ -27,7 +27,7 @@ indri::infnet::ExtentOrNode::ExtentOrNode( const std::string& name, std::vector<
 {
 }
 
-void indri::infnet::ExtentOrNode::prepare( int documentID ) {
+void indri::infnet::ExtentOrNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
@@ -46,8 +46,8 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
   return _extents;
 }
 
-int indri::infnet::ExtentOrNode::nextCandidateDocument() {
-  int candidate = INT_MAX;
+lemur::api::DOCID_T indri::infnet::ExtentOrNode::nextCandidateDocument() {
+  lemur::api::DOCID_T candidate = INT_MAX;
   
   for( size_t i=0; i<_children.size(); i++ ) {
     candidate = lemur_compat::min( _children[i]->nextCandidateDocument(), candidate );
@@ -60,7 +60,7 @@ const std::string& indri::infnet::ExtentOrNode::getName() const {
   return _name;
 }
 
-void indri::infnet::ExtentOrNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::ExtentOrNode::annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   if (! _lastExtent.contains(extent)) {
     // if the last extent we annotated contains this one, there is no work
     // to do.

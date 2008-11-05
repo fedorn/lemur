@@ -37,12 +37,12 @@ namespace indri
       bool isStopword() const;
       const std::string& getName() const;
 
-      int nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
 
-      void prepare( int documentID );
+      void prepare( lemur::api::DOCID_T documentID );
       const indri::utility::greedy_vector<indri::index::Extent>& extents();
-      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
+      void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
     };
   }
 }

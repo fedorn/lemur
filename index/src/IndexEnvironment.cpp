@@ -388,7 +388,7 @@ void indri::api::IndexEnvironment::addFile( const std::string& fileName, const s
           }
         }
         // look up the id.
-        std::vector<int> ids = _repository.collection()->retrieveIDByMetadatum("docno", docIDStr);
+        std::vector<lemur::api::DOCID_T> ids = _repository.collection()->retrieveIDByMetadatum("docno", docIDStr);
         // if not found, add the document.
         if (ids.size() == 0)  {
             _repository.addDocument( parsed );
@@ -416,7 +416,7 @@ void indri::api::IndexEnvironment::addFile( const std::string& fileName, const s
 // addString
 //
 
-int indri::api::IndexEnvironment::addString( const std::string& documentString, const std::string& fileClass, const std::vector<indri::parse::MetadataPair>& metadata ) {
+lemur::api::DOCID_T indri::api::IndexEnvironment::addString( const std::string& documentString, const std::string& fileClass, const std::vector<indri::parse::MetadataPair>& metadata ) {
   indri::parse::UnparsedDocument document;
   indri::parse::Parser* parser;
   indri::parse::Tokenizer* tokenizer;
@@ -440,7 +440,7 @@ int indri::api::IndexEnvironment::addString( const std::string& documentString, 
   indri::parse::TokenizedDocument* tokenized = tokenizer->tokenize( &document );
 
   ParsedDocument* parsed = parser->parse( tokenized );
-  int documentID =_repository.addDocument( parsed );
+  lemur::api::DOCID_T documentID =_repository.addDocument( parsed );
 
   _documentsIndexed++;
   if( _callback ) (*_callback)( indri::api::IndexStatus::DocumentCount, nothing, _error, _documentsIndexed, _documentsSeen );
@@ -451,7 +451,7 @@ int indri::api::IndexEnvironment::addString( const std::string& documentString, 
 //
 // For UIMA with offset annotations
 //
-int indri::api::IndexEnvironment::addString( const std::string& documentString, const std::string&
+lemur::api::DOCID_T indri::api::IndexEnvironment::addString( const std::string& documentString, const std::string&
                                              fileClass, const std::vector<indri::parse::MetadataPair>& metadata, const std::vector<indri::parse::TagExtent *> &tags ) {
   indri::parse::UnparsedDocument document;
   indri::parse::Parser* parser;
@@ -489,7 +489,7 @@ int indri::api::IndexEnvironment::addString( const std::string& documentString, 
   ParsedDocument* parsed = parser->parse( tokenized );
   parsed = annote->transform(parsed);
   
-  int documentID =_repository.addDocument( parsed );
+  lemur::api::DOCID_T documentID =_repository.addDocument( parsed );
 
   _documentsIndexed++;
   if( _callback ) (*_callback)( indri::api::IndexStatus::DocumentCount, nothing, _error, _documentsIndexed, _documentsSeen );
@@ -502,11 +502,11 @@ int indri::api::IndexEnvironment::addString( const std::string& documentString, 
 // addParsedDocument
 //
 
-int indri::api::IndexEnvironment::addParsedDocument( ParsedDocument* document ) {
+lemur::api::DOCID_T indri::api::IndexEnvironment::addParsedDocument( ParsedDocument* document ) {
   std::string nothing;
 
   _documentsSeen++;
-  int documentID = _repository.addDocument( document );
+  lemur::api::DOCID_T documentID = _repository.addDocument( document );
   _documentsIndexed++;
   if( _callback ) (*_callback)( indri::api::IndexStatus::DocumentCount, nothing, _error, _documentsIndexed, _documentsSeen );
   
@@ -517,7 +517,7 @@ int indri::api::IndexEnvironment::addParsedDocument( ParsedDocument* document ) 
 // deleteDocument
 //
 
-void indri::api::IndexEnvironment::deleteDocument( int documentID ) {
+void indri::api::IndexEnvironment::deleteDocument( lemur::api::DOCID_T documentID ) {
   _repository.deleteDocument( documentID );
 }
 

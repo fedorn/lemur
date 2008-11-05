@@ -35,11 +35,11 @@ indri::infnet::UnorderedWindowNode::UnorderedWindowNode( const std::string& name
 {
 }
 
-int indri::infnet::UnorderedWindowNode::nextCandidateDocument() {
-  int maxDocument = 0;
+lemur::api::DOCID_T indri::infnet::UnorderedWindowNode::nextCandidateDocument() {
+  lemur::api::DOCID_T maxDocument = 0;
 
   for( size_t i=0; i<_children.size(); i++ ) {
-    int current = _children[i]->nextCandidateDocument();
+    lemur::api::DOCID_T current = _children[i]->nextCandidateDocument();
     if( current > maxDocument )
       maxDocument = current;
   }
@@ -66,7 +66,7 @@ int indri::infnet::UnorderedWindowNode::nextCandidateDocument() {
 // as the first term.  That covers all possibilities.
 //
 
-void indri::infnet::UnorderedWindowNode::prepare( int documentID ) {
+void indri::infnet::UnorderedWindowNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
@@ -155,7 +155,7 @@ const std::string& indri::infnet::UnorderedWindowNode::getName() const {
   return _name;
 }
 
-void indri::infnet::UnorderedWindowNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::UnorderedWindowNode::annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   if (! _lastExtent.contains(extent)) {
     // if the last extent we annotated contains this one, there is no work
     // to do.

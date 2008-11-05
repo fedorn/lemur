@@ -127,7 +127,7 @@ void indri::index::DiskIndex::close() {
 // _fetchTermData
 //
 
-indri::index::DiskTermData* indri::index::DiskIndex::_fetchTermData( int termID ) {
+indri::index::DiskTermData* indri::index::DiskIndex::_fetchTermData( lemur::api::TERMID_T termID ) {
   int dataSize = ::disktermdata_size((int)_fieldData.size());
   char *buffer = new char [dataSize];
   int actual;
@@ -197,7 +197,7 @@ const std::string& indri::index::DiskIndex::path() {
 // documentBase
 //
 
-int indri::index::DiskIndex::documentBase() {
+lemur::api::DOCID_T indri::index::DiskIndex::documentBase() {
   return _corpusStatistics.baseDocument;
 }
 
@@ -205,10 +205,10 @@ int indri::index::DiskIndex::documentBase() {
 // term
 //
 
-int indri::index::DiskIndex::term( const char* t ) 
+lemur::api::TERMID_T indri::index::DiskIndex::term( const char* t ) 
 {
   indri::index::DiskTermData* diskTermData = _fetchTermData( t );
-  int termID = 0;
+  lemur::api::TERMID_T termID = 0;
   if( diskTermData ) {
     termID = diskTermData->termID;
     ::disktermdata_delete( diskTermData );
@@ -220,7 +220,7 @@ int indri::index::DiskIndex::term( const char* t )
 // term
 //
 
-int indri::index::DiskIndex::term( const std::string& t ) {
+lemur::api::TERMID_T indri::index::DiskIndex::term( const std::string& t ) {
   return term( t.c_str() );
 }
 
@@ -228,7 +228,7 @@ int indri::index::DiskIndex::term( const std::string& t ) {
 // term
 //
 
-std::string indri::index::DiskIndex::term( int termID ) {
+std::string indri::index::DiskIndex::term( lemur::api::TERMID_T termID ) {
   std::string result;
   indri::index::DiskTermData* diskTermData = _fetchTermData( termID );
 
@@ -244,7 +244,7 @@ std::string indri::index::DiskIndex::term( int termID ) {
 // documentLength
 //
 
-int indri::index::DiskIndex::documentLength( int documentID ) {
+int indri::index::DiskIndex::documentLength( lemur::api::DOCID_T documentID ) {
   unsigned int documentOffset = documentID - _corpusStatistics.baseDocument;
 
   if( documentOffset < 0 || _corpusStatistics.totalDocuments <= documentOffset ) 
@@ -420,7 +420,7 @@ UINT64 indri::index::DiskIndex::fieldDocumentCount( const std::string& f, const 
 // docListIterator
 //
 
-indri::index::DocListIterator* indri::index::DiskIndex::docListIterator( int termID ) {
+indri::index::DocListIterator* indri::index::DiskIndex::docListIterator( lemur::api::TERMID_T termID ) {
   // find out where the iterator starts and ends
   DiskTermData* data = _fetchTermData( termID );
 
@@ -498,7 +498,7 @@ indri::index::DocExtentListIterator* indri::index::DiskIndex::fieldListIterator(
 // termListFileIterator
 //
 
-const indri::index::TermList* indri::index::DiskIndex::termList( int documentID ) {
+const indri::index::TermList* indri::index::DiskIndex::termList( lemur::api::DOCID_T documentID ) {
   indri::index::DocumentData documentData;
 
   // read the appropriate offset information from the disk document statistics file

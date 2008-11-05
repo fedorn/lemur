@@ -47,7 +47,7 @@ namespace indri {
 
       void startIteration();
       bool nextEntry();
-      bool nextEntry( int documentID );
+      bool nextEntry( lemur::api::DOCID_T documentID );
       bool finished();
       TermList* currentEntry();
     };

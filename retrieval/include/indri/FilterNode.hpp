@@ -30,12 +30,12 @@ namespace indri
     class FilterNode : public BeliefNode {
     private:
       BeliefNode* _belief;
-      std::vector<int> _documents;
+      std::vector<lemur::api::DOCID_T> _documents;
       std::string _name;
       size_t _index;
 
     public:
-      FilterNode( const std::string& name, BeliefNode* child, const std::vector<int>& documents )
+      FilterNode( const std::string& name, BeliefNode* child, const std::vector<lemur::api::DOCID_T>& documents )
         :
         _documents(documents)
       {
@@ -50,8 +50,8 @@ namespace indri
         if (_belief) {  _belief->setSiblingsFlag(f); }
       }
 
-      int nextCandidateDocument() {
-        int childNext = _belief->nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument() {
+        lemur::api::DOCID_T childNext = _belief->nextCandidateDocument();
 
         while( _index < _documents.size() && _documents[_index] < childNext )
           _index++;
@@ -62,11 +62,11 @@ namespace indri
         return _documents[_index];
       }
 
-      void annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+      void annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
         return _belief->annotate( annotator, documentID, extent );
       }
 
-      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength ) {
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
         return _belief->score( documentID, extent, documentLength );
       }
 
@@ -78,11 +78,11 @@ namespace indri
         return _belief->maximumBackgroundScore();
       }
 
-      bool hasMatch( int documentID ) {
+      bool hasMatch( lemur::api::DOCID_T documentID ) {
         return _belief->hasMatch( documentID );
       }
 
-      const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+      const indri::utility::greedy_vector<bool>& hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
         return _belief->hasMatch( documentID, extents );
       }
 

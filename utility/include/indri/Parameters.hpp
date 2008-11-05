@@ -364,6 +364,10 @@ namespace indri
       /// Set the value  for the given key.
       /// @param name the key
       /// @param value the value
+      void set( const std::string& name, INT64 value );
+      /// Set the value  for the given key.
+      /// @param name the key
+      /// @param value the value
       void set( const std::string& name, double value );
       /// Set the value of the Parameters object
       /// @param value the value

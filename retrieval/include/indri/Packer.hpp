@@ -20,6 +20,7 @@
 #define INDRI_PACKER_HPP
 
 #include "indri/XMLNode.hpp"
+#include "IndexTypes.hpp"
 #include <stack>
 #include <vector>
 #include <string>
@@ -68,7 +69,7 @@ namespace indri {
       void put( const char* name, INT64 value );
       void put( const char* name, double value );
       void put( const char* name, const std::string& value );
-      void put( const char* name, const std::vector<int>& value );
+      void put( const char* name, const std::vector<lemur::api::DOCID_T>& value );
       void put( const char* name, const std::vector<double>& value );
       void put( const char* name, const std::vector<std::string>& value );
       void put( const char* name, const std::vector<RawExtentNode*>& value );

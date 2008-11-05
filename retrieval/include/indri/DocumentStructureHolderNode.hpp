@@ -34,9 +34,9 @@ namespace indri {
     class DocumentStructureHolderNode : public InferenceNetworkNode {
     private:
       indri::index::Index * _index;
-      int _nextDocument;
+      lemur::api::DOCID_T _nextDocument;
       indri::index::TermListFileIterator * _docIter;
-      int _docIterID;
+      lemur::api::DOCID_T  _docIterID;
       std::string _name;
       indri::index::DocumentStructure * _documentStructure;
 
@@ -44,8 +44,8 @@ namespace indri {
       DocumentStructureHolderNode( const std::string& name );
       ~DocumentStructureHolderNode();
       
-      void prepare( int documentID );
-      int nextCandidateDocument();
+      void prepare( lemur::api::DOCID_T documentID );
+      lemur::api::DOCID_T nextCandidateDocument();
       const std::string& getName() const;
       indri::index::DocumentStructure * getDocumentStructure();
      

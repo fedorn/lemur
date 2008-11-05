@@ -58,8 +58,8 @@ namespace indri {
           const indri::index::DocListIterator::DocumentData* oneData = one->iterator->currentEntry()->iterator->currentEntry();
           const indri::index::DocListIterator::DocumentData* twoData = two->iterator->currentEntry()->iterator->currentEntry();
 
-          int oneDocument = oneData ? oneData->document + one->documentOffset : 0;
-          int twoDocument = twoData ? twoData->document + two->documentOffset : 0;
+          lemur::api::DOCID_T oneDocument = oneData ? oneData->document + one->documentOffset : 0;
+          lemur::api::DOCID_T twoDocument = twoData ? twoData->document + two->documentOffset : 0;
 
           return oneDocument > twoDocument;
         }
@@ -96,7 +96,7 @@ namespace indri {
 
         newlyFrequent = new indri::index::TermRecorder;
         oldFrequent = new indri::index::TermRecorder;
-        oldInfrequent = new indri::utility::HashTable<int, int>;
+        oldInfrequent = new indri::utility::HashTable<lemur::api::TERMID_T, lemur::api::TERMID_T>;
 
         // DEBUG
         sequenceCount = 0;
@@ -123,7 +123,7 @@ namespace indri {
       int sequenceCount;
       indri::index::TermRecorder* newlyFrequent;
       indri::index::TermRecorder* oldFrequent;
-      indri::utility::HashTable<int, int>* oldInfrequent;
+      indri::utility::HashTable<lemur::api::TERMID_T, lemur::api::TERMID_T>* oldInfrequent;
 
       indri::index::DeletedDocumentList* deletedList;
       lemur::api::DOCID_T documentOffset;
@@ -173,14 +173,14 @@ namespace indri {
       indri::utility::Buffer _termDataBuffer;
 
       int _isFrequentCount;
-      int _documentBase;
+      lemur::api::DOCID_T _documentBase;
       indri::index::CorpusStatistics _corpus;
       std::vector<indri::index::Index::FieldDescription> _fields;
       std::vector<indri::index::FieldStatistics> _fieldData;
 
       void _writeManifest( const std::string& path );
-      void _writeSkip( indri::file::SequentialWriteBuffer* buffer, int document, int length );
-      void _writeBatch( indri::file::SequentialWriteBuffer* buffer, int document, int length, indri::utility::Buffer& data );
+      void _writeSkip( indri::file::SequentialWriteBuffer* buffer, lemur::api::DOCID_T document, int length );
+      void _writeBatch( indri::file::SequentialWriteBuffer* buffer, lemur::api::DOCID_T document, int length, indri::utility::Buffer& data );
 
       void _writeFieldLists( std::vector<WriterIndexContext*>& contexts, const std::string& path );
       void _writeFieldList( indri::file::SequentialWriteBuffer& output, int fieldIndex, std::vector<indri::index::DocExtentListIterator*>& iterators, std::vector<WriterIndexContext*>& contexts );
@@ -198,7 +198,7 @@ namespace indri {
       void _addInvertedListData( indri::utility::greedy_vector<WriterIndexContext*>& lists, indri::index::TermData* termData, indri::utility::Buffer& listBuffer, UINT64& endOffset );
       void _storeMatchInformation( indri::utility::greedy_vector<WriterIndexContext*>& lists, int sequence, indri::index::TermData* termData, UINT64 startOffset, UINT64 endOffset );
 
-      int _lookupTermID( indri::file::BulkTreeReader& keyfile, const char* term );
+      lemur::api::TERMID_T _lookupTermID( indri::file::BulkTreeReader& keyfile, const char* term );
 
       void _buildIndexContexts( std::vector<WriterIndexContext*>& contexts, std::vector<indri::index::Index*>& indexes, indri::index::DeletedDocumentList& deletedList );
       void _buildIndexContexts( std::vector<WriterIndexContext*>& contexts, std::vector<indri::index::Index*>& indexes, std::vector<indri::index::DeletedDocumentList*>& deletedLists, const std::vector<lemur::api::DOCID_T>& documentOffsets );
@@ -216,7 +216,7 @@ namespace indri {
       indri::index::TermTranslator* _buildTermTranslator( indri::file::BulkTreeReader& newInfrequentTerms,
                                                           indri::file::BulkTreeReader& newFrequentTerms,
                                                           indri::index::TermRecorder& oldFrequentTermsRecorder,
-                                                          indri::utility::HashTable<int, int>* oldInfrequent,
+                                                          indri::utility::HashTable<lemur::api::TERMID_T, lemur::api::TERMID_T>* oldInfrequent,
                                                           indri::index::TermRecorder& newFrequentTermsRecorder,
                                                           indri::index::Index* index,
                                                           indri::index::TermBitmap* bitmap );

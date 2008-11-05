@@ -30,7 +30,7 @@ indri::infnet::FilterRequireNode::FilterRequireNode( const std::string& name,
   _required = required;
 }
 
-int indri::infnet::FilterRequireNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::FilterRequireNode::nextCandidateDocument() {
   // both terms have to appear before this matches, so we take the max
   return lemur_compat::max( _filter->nextCandidateDocument(),
                             _required->nextCandidateDocument() );
@@ -45,12 +45,12 @@ double indri::infnet::FilterRequireNode::maximumScore() {
   return _required->maximumScore();
 }
 
-bool indri::infnet::FilterRequireNode::hasMatch( int documentID ) {
+bool indri::infnet::FilterRequireNode::hasMatch( lemur::api::DOCID_T documentID ) {
   // delegate to the children.
   return (_filter->extents().size() && _required->hasMatch( documentID ));
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::FilterRequireNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::FilterRequireNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   _matches.clear();
   _matches.resize( extents.size(), false );
   
@@ -80,7 +80,7 @@ const std::string& indri::infnet::FilterRequireNode::getName() const {
   return _name;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FilterRequireNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FilterRequireNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   _extents.clear();
       
   const indri::utility::greedy_vector<indri::index::Extent>& filtExtents = _filter->extents();
@@ -96,7 +96,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _extents;
 }
 
-void indri::infnet::FilterRequireNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::FilterRequireNode::annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   // mark up the filter
   _filter->annotate( annotator, documentID, extent);
   // if the filter applied, mark up the matches.

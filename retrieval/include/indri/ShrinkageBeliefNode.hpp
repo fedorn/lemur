@@ -48,7 +48,7 @@ namespace indri
       indri::utility::greedy_vector<double> _up;
       indri::utility::greedy_vector<double> _base;
       indri::utility::greedy_vector<double> _counts;
-      int _documentID;
+      lemur::api::DOCID_T _documentID;
 
 
       typedef struct sr {
@@ -87,7 +87,7 @@ namespace indri
       std::set<int> _roots;
       indri::utility::greedy_vector<int> _topDownOrder;
 
-      void _buildScoreCache( int documentID );
+      void _buildScoreCache( lemur::api::DOCID_T documentID );
 
     public:
       ShrinkageBeliefNode( const std::string& name,
@@ -97,14 +97,14 @@ namespace indri
                            double maximumBackgroundScore,
                            double maximumScore );
 
-      int nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
       double maximumBackgroundScore();
       double maximumScore();
-      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength );
-      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
-      bool hasMatch( int documentID );
-      const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength );
+      void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
+      bool hasMatch( lemur::api::DOCID_T documentID );
+      const indri::utility::greedy_vector<bool>& hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
       const std::string& getName() const;
       void addShrinkageRule( std::string rule );
       // so that we can know collection/document lambdas of linear interpolation

@@ -37,7 +37,7 @@ namespace indri
 
       // Called once for every document ID returned by nextCandidateDocument().
       // May be called for documents other than those returned by nextCandidateDocument().
-      virtual void evaluate( int documentID, int documentLength ) = 0;
+      virtual void evaluate( lemur::api::DOCID_T documentID, int documentLength ) = 0;
       virtual const MResults& getResults() = 0;
     };
   }

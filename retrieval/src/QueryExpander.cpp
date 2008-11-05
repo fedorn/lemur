@@ -49,7 +49,7 @@ std::vector<indri::api::ScoredExtentResult> indri::query::QueryExpander::runExpa
 
 std::vector<indri::api::DocumentVector*> indri::query::QueryExpander::getDocumentVectors( std::vector<indri::api::ScoredExtentResult>& results, int fbDocs ) {
   // copy results documents into a doc ID vector
-  std::vector<int> documentIDs;
+  std::vector<lemur::api::DOCID_T> documentIDs;
   for( size_t doc = 0; (int)doc < fbDocs && doc < results.size(); doc++ )
     documentIDs.push_back( results[ doc ].document );
 

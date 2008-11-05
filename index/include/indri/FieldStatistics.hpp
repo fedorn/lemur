@@ -50,7 +50,7 @@ namespace indri {
       {
       }
 
-      void addOccurrence( int documentID ) {
+      void addOccurrence( lemur::api::DOCID_T documentID ) {
         if( documentID != lastDocument ) {
           lastCount = 0;
           lastDocument = documentID;
@@ -69,7 +69,7 @@ namespace indri {
       unsigned int documentCount;
       UINT64 byteOffset;
 
-      int lastDocument;
+      lemur::api::DOCID_T lastDocument;
       int lastCount;
     };
   }

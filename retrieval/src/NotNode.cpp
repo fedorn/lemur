@@ -27,7 +27,7 @@ indri::infnet::NotNode::NotNode( const std::string& name, BeliefNode* child )
 }
 
 // for convenience, the not node never actually matches
-int indri::infnet::NotNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::NotNode::nextCandidateDocument() {
   return MAX_INT32;
 }
 
@@ -44,7 +44,7 @@ double indri::infnet::NotNode::maximumScore() {
   return 0.0;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::NotNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::NotNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   _extents.clear();
   const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& child = _child->score( documentID, extent, documentLength );
 
@@ -60,11 +60,11 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _extents;
 }
 
-bool indri::infnet::NotNode::hasMatch( int documentID ) {
+bool indri::infnet::NotNode::hasMatch( lemur::api::DOCID_T documentID ) {
   return !_child->hasMatch( documentID );
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::NotNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::NotNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   // flip the return vector
   _matches.resize( extents.size(), false );
   const indri::utility::greedy_vector<bool>& childMatches = _child->hasMatch( documentID, extents );
@@ -78,7 +78,7 @@ const indri::utility::greedy_vector<bool>& indri::infnet::NotNode::hasMatch( int
   return _matches;
 }
 
-void indri::infnet::NotNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::NotNode::annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.add( this, documentID, extent);
   _child->annotate( annotator, documentID, extent );
 }

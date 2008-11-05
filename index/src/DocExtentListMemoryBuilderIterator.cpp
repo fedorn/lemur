@@ -89,7 +89,7 @@ indri::index::DocExtentListMemoryBuilderIterator::DocExtentListMemoryBuilderIter
 // nextEntry
 //
 
-bool indri::index::DocExtentListMemoryBuilderIterator::nextEntry( int documentID ) {
+bool indri::index::DocExtentListMemoryBuilderIterator::nextEntry( lemur::api::DOCID_T documentID ) {
   do {
     if( _data.document >= documentID )
       return true;

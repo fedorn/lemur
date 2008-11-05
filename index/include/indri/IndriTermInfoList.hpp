@@ -28,7 +28,7 @@ namespace indri {
     class BagList : public lemur::api::TermInfoList {
     private:
       const class TermList* _list;
-      std::vector< std::pair<int, int> > _termCounts;
+      std::vector< std::pair<lemur::api::TERMID_T, int> > _termCounts;
       lemur::api::TermInfo _info;
       int _position;
 

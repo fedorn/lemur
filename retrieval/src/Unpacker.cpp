@@ -107,6 +107,21 @@ namespace indri {
       return result;
     }
 
+    ::std::vector<lemur::api::DOCID_T> Unpacker::getDocIdVector( const char* name ) {
+      std::vector<lemur::api::DOCID_T> result;
+      const indri::xml::XMLNode* vector = _current->getChild(name);
+
+      for( size_t i=0; i<vector->getChildren().size(); i++ ) {
+        indri::xml::XMLNode* ref = vector->getChildren()[i];
+        std::stringstream s( ref->getValue() );
+        lemur::api::DOCID_T value;
+        s >> value;
+        result.push_back( value );
+      }
+
+      return result;
+    }
+
     ::std::vector<double> Unpacker::getDoubleVector( const char* name ) {
       std::vector<double> result;
       const indri::xml::XMLNode* vector = _current->getChild(name);

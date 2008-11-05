@@ -45,14 +45,14 @@ namespace indri
       OrNode( const std::string& name );
       OrNode( const std::string& name, const std::vector<BeliefNode*>& children );
 
-      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength );
-      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength );
+      void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
       double maximumScore();
       double maximumBackgroundScore();
   
-      bool hasMatch( int documentID );
-      const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
-      int nextCandidateDocument();
+      bool hasMatch( lemur::api::DOCID_T documentID );
+      const indri::utility::greedy_vector<bool>& hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
 
       virtual void setSiblingsFlag(int f);

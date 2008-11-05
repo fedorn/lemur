@@ -45,7 +45,7 @@ namespace indri
 
       int _maxWildcardMatchesPerTerm;
 
-      indri::index::Index* _indexWithDocument( indri::collection::Repository::index_state& state, int documentID );
+      indri::index::Index* _indexWithDocument( indri::collection::Repository::index_state& state, lemur::api::DOCID_T documentID );
 
     public:
       LocalQueryServer( indri::collection::Repository& repository );
@@ -54,24 +54,24 @@ namespace indri
       QueryServerResponse* runQuery( std::vector<indri::lang::Node*>& roots, int resultsRequested, bool optimize );
 
       // single document queries
-      indri::api::ParsedDocument* document( int documentID );
-      std::string documentMetadatum( int documentID, const std::string& attributeName );
+      indri::api::ParsedDocument* document( lemur::api::DOCID_T documentID );
+      std::string documentMetadatum( lemur::api::DOCID_T documentID, const std::string& attributeName );
 
       QueryServerDocumentIDsResponse* documentIDsFromMetadata( const std::string& attributeName, const std::vector<std::string>& attributeValues );
       QueryServerDocumentsResponse* documentsFromMetadata( const std::string& attributeName, const std::vector<std::string>& attributeValues );
 
       // batch queries
-      QueryServerDocumentsResponse* documents( const std::vector<int>& documentIDs );
-      QueryServerMetadataResponse* documentMetadata( const std::vector<int>& documentIDs, const std::string& attributeName );
+      QueryServerDocumentsResponse* documents( const std::vector<lemur::api::DOCID_T>& documentIDs );
+      QueryServerMetadataResponse* documentMetadata( const std::vector<lemur::api::DOCID_T>& documentIDs, const std::string& attributeName );
 
-      QueryServerMetadataResponse* pathNames( const std::vector<int>& documentIDs, const std::vector<int>& pathBegins, const std::vector<int>& pathEnds );
+      QueryServerMetadataResponse* pathNames( const std::vector<lemur::api::DOCID_T>& documentIDs, const std::vector<int>& pathBegins, const std::vector<int>& pathEnds );
 
       // terms
       INT64 termCount();
       INT64 termCount( const std::string& term );
       INT64 stemCount( const std::string& stem );
-      std::string termName( int term );
-      int termID( const std::string& term );
+      std::string termName( lemur::api::TERMID_T term );
+      lemur::api::TERMID_T termID( const std::string& term );
   
       // fields
       std::vector<std::string> fieldList();
@@ -79,12 +79,12 @@ namespace indri
       INT64 stemFieldCount( const std::string& stem, const std::string& field );
 
       // documents
-      int documentLength( int documentID );
+      int documentLength( lemur::api::DOCID_T documentID );
       INT64 documentCount();
       INT64 documentCount( const std::string& term );
 
       // vector
-      QueryServerVectorsResponse* documentVectors( const std::vector<int>& documentIDs );
+      QueryServerVectorsResponse* documentVectors( const std::vector<lemur::api::DOCID_T>& documentIDs );
 
       ///
       /// \brief sets the maximum number of terms to be generated for a wildcard

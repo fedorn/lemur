@@ -101,8 +101,8 @@ void indri::collection::PriorListIterator::nextEntry() {
 // nextEntry
 //
 
-void indri::collection::PriorListIterator::nextEntry( int document ) {
-  if( _finished || _entry.document >= (int)_entryCount ) {
+void indri::collection::PriorListIterator::nextEntry( lemur::api::DOCID_T document ) {
+  if( _finished || _entry.document >= (lemur::api::DOCID_T)_entryCount ) {
     _finished = true;
     return;
   }

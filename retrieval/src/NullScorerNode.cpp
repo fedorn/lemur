@@ -27,7 +27,7 @@ indri::infnet::NullScorerNode::NullScorerNode( const std::string& name, indri::q
 {
 }
 
-int indri::infnet::NullScorerNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::NullScorerNode::nextCandidateDocument() {
   return MAX_INT32;
 }
 
@@ -39,15 +39,15 @@ double indri::infnet::NullScorerNode::maximumBackgroundScore() {
   return _maximumBackgroundScore;
 }
 
-bool indri::infnet::NullScorerNode::hasMatch( int documentID ) {
+bool indri::infnet::NullScorerNode::hasMatch( lemur::api::DOCID_T documentID ) {
   return false;
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::NullScorerNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::NullScorerNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   return _matches;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::NullScorerNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::NullScorerNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   _scores.clear();
   indri::api::ScoredExtentResult result(extent);
   result.score=_maximumScore;
@@ -57,7 +57,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _scores;
 }
 
-void indri::infnet::NullScorerNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::NullScorerNode::annotate( indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   // no need to annotate; there will never be any matches
 }
 

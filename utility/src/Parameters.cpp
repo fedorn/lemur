@@ -293,6 +293,11 @@ void indri::api::Parameters::set( const std::string& key, UINT64 value ) {
   set( key, v );
 }
 
+void indri::api::Parameters::set( const std::string& key, INT64 value ) {
+  std::string v = i64_to_string(value);
+  set( key, v );
+}
+
 void indri::api::Parameters::set( const std::string& key, int value ) {
   std::stringstream s;
   s << value;

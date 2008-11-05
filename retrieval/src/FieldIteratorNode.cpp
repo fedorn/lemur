@@ -35,7 +35,7 @@ void indri::infnet::FieldIteratorNode::indexChanged( indri::index::Index& index 
     _list->startIteration();
 }
 
-void indri::infnet::FieldIteratorNode::prepare( int documentID ) {
+void indri::infnet::FieldIteratorNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
@@ -61,7 +61,7 @@ const indri::utility::greedy_vector<INT64>& indri::infnet::FieldIteratorNode::nu
   return _numbers;
 }
 
-int indri::infnet::FieldIteratorNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::FieldIteratorNode::nextCandidateDocument() {
   if( !_list )
     return MAX_INT32;
 
@@ -78,7 +78,7 @@ const std::string& indri::infnet::FieldIteratorNode::getName() const {
   return _name;
 }
 
-void indri::infnet::FieldIteratorNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::FieldIteratorNode::annotate( indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.addMatches( _extents, this, documentID, extent );
 }
 

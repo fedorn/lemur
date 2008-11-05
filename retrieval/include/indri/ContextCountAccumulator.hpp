@@ -61,8 +61,8 @@ public:
       const std::string& getName() const;
 
       const EvaluatorNode::MResults& getResults();
-      void evaluate( int documentID, int documentLength );
-      int nextCandidateDocument();
+      void evaluate( lemur::api::DOCID_T documentID, int documentLength );
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
     };
   }

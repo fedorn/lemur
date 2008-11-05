@@ -59,7 +59,7 @@ namespace lemur
       virtual const string &getMyID() const {return _name; }  
 
     private:
-      indri::index::Index* _indexWithDocument( indri::collection::Repository::index_state& indexes, int documentID ) const ;
+      indri::index::Index* _indexWithDocument( indri::collection::Repository::index_state& indexes, lemur::api::DOCID_T documentID ) const ;
   
       indri::collection::Repository &_repository;
       string _name;

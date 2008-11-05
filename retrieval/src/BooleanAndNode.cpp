@@ -24,7 +24,7 @@ indri::infnet::BooleanAndNode::BooleanAndNode( const std::string& name, std::vec
 {
 }
 
-void indri::infnet::BooleanAndNode::prepare( int documentID ) {
+void indri::infnet::BooleanAndNode::prepare( lemur::api::DOCID_T documentID ) {
   _extents.clear();
 
   // initialize the child / sibling pointer
@@ -44,8 +44,8 @@ indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::BooleanAndNo
   return _extents;
 }
 
-int indri::infnet::BooleanAndNode::nextCandidateDocument() {
-  int document = _lists[0]->nextCandidateDocument();
+lemur::api::DOCID_T indri::infnet::BooleanAndNode::nextCandidateDocument() {
+  lemur::api::DOCID_T document = _lists[0]->nextCandidateDocument();
 
   for( size_t i=1; i<_lists.size(); i++ ) {
     document = lemur_compat::max( document, _lists[i]->nextCandidateDocument() );
@@ -58,7 +58,7 @@ const std::string& indri::infnet::BooleanAndNode::getName() const {
   return _name;
 }
 
-void indri::infnet::BooleanAndNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::BooleanAndNode::annotate( class indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.addMatches( _extents, this, documentID, extent);
 }
 

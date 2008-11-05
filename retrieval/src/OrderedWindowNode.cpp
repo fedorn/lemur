@@ -35,11 +35,11 @@ indri::infnet::OrderedWindowNode::OrderedWindowNode( const std::string& name, co
   _pointers.resize(children.size());
 }
 
-int indri::infnet::OrderedWindowNode::nextCandidateDocument() {
-  int maxDocument = 0;
+lemur::api::DOCID_T indri::infnet::OrderedWindowNode::nextCandidateDocument() {
+  lemur::api::DOCID_T maxDocument = 0;
 
   for( size_t i=0; i<_children.size(); i++ ) {
-    int current = _children[i]->nextCandidateDocument();
+    lemur::api::DOCID_T current = _children[i]->nextCandidateDocument();
     if( current > maxDocument )
       maxDocument = current;
   }
@@ -47,7 +47,7 @@ int indri::infnet::OrderedWindowNode::nextCandidateDocument() {
   return maxDocument;
 }
 
-void indri::infnet::OrderedWindowNode::prepare( int documentID ) {
+void indri::infnet::OrderedWindowNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
@@ -116,7 +116,7 @@ const std::string& indri::infnet::OrderedWindowNode::getName() const {
   return _name;
 }
 
-void indri::infnet::OrderedWindowNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::OrderedWindowNode::annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   if (! _lastExtent.contains(extent)) {
     // if the last extent we annotated contains this one, there is no work
     // to do.

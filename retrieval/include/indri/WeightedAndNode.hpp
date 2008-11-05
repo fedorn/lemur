@@ -55,7 +55,7 @@ namespace indri
       indri::utility::greedy_vector<bool> _matches;
       std::string _name;
 
-      indri::utility::greedy_vector<int> _candidates;
+      indri::utility::greedy_vector<lemur::api::DOCID_T> _candidates;
       size_t _candidatesIndex;
 
       double _threshold;
@@ -77,14 +77,14 @@ namespace indri
       void setThreshold( double threshold );
 
       // InferenceNetworkNode interface
-      int nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
       double maximumScore();
       double maximumBackgroundScore();
-      indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength );
-      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
-      bool hasMatch( int documentID );
-      const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
+      indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength );
+      void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
+      bool hasMatch( lemur::api::DOCID_T documentID );
+      const indri::utility::greedy_vector<bool>& hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
       const std::string& getName() const;
     };
   }

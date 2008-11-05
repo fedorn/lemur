@@ -151,9 +151,9 @@ void indri::net::NetworkServerStub::_handleQuery( indri::xml::XMLNode* request )
 
 void indri::net::NetworkServerStub::_handleDocuments( indri::xml::XMLNode* request ) {
   // rip out all the docIDs:
-  std::vector<int> documentIDs;
+  std::vector<lemur::api::DOCID_T> documentIDs;
   for( size_t i=0; i<request->getChildren().size(); i++ ) {
-    documentIDs.push_back( (int) string_to_i64( request->getChildren()[i]->getValue() ) );
+    documentIDs.push_back( (lemur::api::DOCID_T) string_to_i64( request->getChildren()[i]->getValue() ) );
   }
 
   // get the documents
@@ -194,14 +194,14 @@ void indri::net::NetworkServerStub::_handleDocumentIDsFromMetadata( indri::xml::
 }
 
 void indri::net::NetworkServerStub::_handleDocumentMetadata( indri::xml::XMLNode* request ) {
-  std::vector<int> documentIDs;
+  std::vector<lemur::api::DOCID_T> documentIDs;
   std::string fieldAttributeName = "field";
   std::string field = request->getChild( fieldAttributeName )->getValue();
 
   const indri::xml::XMLNode* documents = request->getChild("documents");
 
   for( size_t i=0; i<documents->getChildren().size(); i++ ) {
-    documentIDs.push_back( (int) string_to_i64( documents->getChildren()[i]->getValue() ) );
+    documentIDs.push_back( (lemur::api::DOCID_T) string_to_i64( documents->getChildren()[i]->getValue() ) );
   }
 
   // get the documents
@@ -227,9 +227,9 @@ void indri::net::NetworkServerStub::_handleDocumentVectors( indri::xml::XMLNode*
   indri::xml::XMLNode* response = new indri::xml::XMLNode( "document-vector" );
 
   // convert doc IDs into an array
-  std::vector<int> documentIDs;
+  std::vector<lemur::api::DOCID_T> documentIDs;
   for( size_t i=0; i<request->getChildren().size(); i++ ) {
-    documentIDs.push_back( (int) string_to_i64( request->getChildren()[i]->getValue() ) );
+    documentIDs.push_back( (lemur::api::DOCID_T) string_to_i64( request->getChildren()[i]->getValue() ) );
   }
 
   // get the document vectors from the index
@@ -309,7 +309,7 @@ void indri::net::NetworkServerStub::_handleTermCountText( indri::xml::XMLNode* r
 }
 
 void indri::net::NetworkServerStub::_handleTermName( indri::xml::XMLNode* request ) {
-  std::string name = _server->termName( string_to_int( request->getValue() ) );
+  std::string name = _server->termName( string_to_i64( request->getValue() ) );
   indri::xml::XMLNode* response = new indri::xml::XMLNode( "term-name", name );
   _stream->reply( response );
   _stream->replyDone();
@@ -317,7 +317,7 @@ void indri::net::NetworkServerStub::_handleTermName( indri::xml::XMLNode* reques
 }
 
 void indri::net::NetworkServerStub::_handleTermID( indri::xml::XMLNode* request ) {
-  int termID = _server->termID( request->getValue().c_str() );
+  lemur::api::TERMID_T termID = _server->termID( request->getValue().c_str() );
   _sendNumericResponse( "term-id", termID );
 }
 
@@ -365,7 +365,7 @@ void indri::net::NetworkServerStub::_handleFieldList( indri::xml::XMLNode* reque
 }
 
 void indri::net::NetworkServerStub::_handleDocumentLength( indri::xml::XMLNode* request ) {
-  int documentID = string_to_int( request->getValue() );
+  lemur::api::DOCID_T documentID = string_to_i64( request->getValue() );
 
   INT64 length = _server->documentLength( documentID );
   _sendNumericResponse( "document-length", length );
@@ -383,7 +383,7 @@ void indri::net::NetworkServerStub::_handleDocumentTermCount( indri::xml::XMLNod
 }
 
 void indri::net::NetworkServerStub::_handlePathNames( indri::xml::XMLNode* request ) {
-  std::vector<int> documentIDs;
+  std::vector<lemur::api::DOCID_T> documentIDs;
   std::vector<int> begins;
   std::vector<int> ends;
 
@@ -392,7 +392,7 @@ void indri::net::NetworkServerStub::_handlePathNames( indri::xml::XMLNode* reque
 
   for( size_t i=0; i<paths->getChildren().size(); i++ ) {
     const indri::xml::XMLNode * path = paths->getChildren()[i];
-    documentIDs.push_back( (int) string_to_i64( path->getChild("document")->getValue() ) );
+    documentIDs.push_back( (lemur::api::DOCID_T) string_to_i64( path->getChild("document")->getValue() ) );
     begins.push_back( (int) string_to_i64( path->getChild("begin")->getValue() ) );
     ends.push_back( (int) string_to_i64( path->getChild("end")->getValue() ) );    
   }

@@ -47,7 +47,7 @@ namespace indri
           _skipping = dynamic_cast<SkippingCapableNode*>(belief);
       }
 
-      void evaluate( int documentID, int documentLength ) {
+      void evaluate( lemur::api::DOCID_T documentID, int documentLength ) {
         if( _belief->hasMatch( documentID ) ) {
           indri::index::Extent docExtent(0, documentLength);
           const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& documentScores = _belief->score( documentID, docExtent, documentLength );
@@ -66,7 +66,7 @@ namespace indri
         }
       }
   
-      int nextCandidateDocument() {
+      lemur::api::DOCID_T nextCandidateDocument() {
         return _belief->nextCandidateDocument();
       }
 

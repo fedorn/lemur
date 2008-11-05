@@ -28,7 +28,7 @@ indri::infnet::DocListIteratorNode::DocListIteratorNode( const std::string& name
 {
 }
 
-int indri::infnet::DocListIteratorNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::DocListIteratorNode::nextCandidateDocument() {
   if( _list ) {
     indri::index::DocListIterator::DocumentData* info = _list->currentEntry();
     if( info ) { 
@@ -39,7 +39,7 @@ int indri::infnet::DocListIteratorNode::nextCandidateDocument() {
   return MAX_INT32;
 }
 
-void indri::infnet::DocListIteratorNode::prepare( int documentID ) {
+void indri::infnet::DocListIteratorNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
 
@@ -68,7 +68,7 @@ const std::string& indri::infnet::DocListIteratorNode::getName() const {
   return _name;
 }
 
-void indri::infnet::DocListIteratorNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::DocListIteratorNode::annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   if (! _lastExtent.contains(extent)) {
     // if the last extent we annotated contains this one, there is no work
     // to do.

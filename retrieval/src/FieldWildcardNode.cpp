@@ -33,7 +33,7 @@ indri::infnet::FieldWildcardNode::~FieldWildcardNode() {
   delete _docIter;
 }
 
-void indri::infnet::FieldWildcardNode::prepare( int documentID ) {
+void indri::infnet::FieldWildcardNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
@@ -74,7 +74,7 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::FieldW
   return _extents;
 }
 
-int indri::infnet::FieldWildcardNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::FieldWildcardNode::nextCandidateDocument() {
   return _nextDocument;
 }
 
@@ -82,7 +82,7 @@ const std::string& indri::infnet::FieldWildcardNode::getName() const {
   return _name;
 }
 
-void indri::infnet::FieldWildcardNode::annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::FieldWildcardNode::annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.addMatches( _extents, this, documentID, extent );
 }
 

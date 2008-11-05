@@ -59,7 +59,7 @@ indri::infnet::ShrinkageBeliefNode::ShrinkageBeliefNode( const std::string& name
   _maximumScore = INDRI_HUGE_SCORE;
 }
 
-int indri::infnet::ShrinkageBeliefNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::ShrinkageBeliefNode::nextCandidateDocument() {
   return _list.nextCandidateDocument();
 }
 
@@ -71,7 +71,7 @@ double indri::infnet::ShrinkageBeliefNode::maximumScore() {
   return _maximumScore;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ShrinkageBeliefNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ShrinkageBeliefNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   indri::index::DocumentStructure * docStruct = _docStructHolder.getDocumentStructure();
   int numNodes = docStruct->nodeCount();
 
@@ -141,7 +141,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _results;
 }
 
-void indri::infnet::ShrinkageBeliefNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::ShrinkageBeliefNode::annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
 
  
   const indri::utility::greedy_vector<indri::index::Extent>& extents = _list.extents();
@@ -158,12 +158,12 @@ void indri::infnet::ShrinkageBeliefNode::annotate( Annotator& annotator, int doc
   }
 }
 
-bool indri::infnet::ShrinkageBeliefNode::hasMatch( int documentID ) {
+bool indri::infnet::ShrinkageBeliefNode::hasMatch( lemur::api::DOCID_T documentID ) {
   return _list.extents().size() > 0;
 }
 
 
-void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
+void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( lemur::api::DOCID_T documentID ) {
   indri::index::DocumentStructure * docStruct = _docStructHolder.getDocumentStructure();
   int numNodes = docStruct->nodeCount();
 
@@ -425,7 +425,7 @@ void indri::infnet::ShrinkageBeliefNode::_buildScoreCache( int documentID ) {
 
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::ShrinkageBeliefNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& matchExtents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::ShrinkageBeliefNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& matchExtents ) {
   //  std::cout << this << " Matching " << documentID << std::endl;
   _matches.clear();
   // Allows matches elsewhere in the document as shrinkage may give a reasonably large belief

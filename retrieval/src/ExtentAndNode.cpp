@@ -70,7 +70,7 @@ indri::infnet::ExtentAndNode::ExtentAndNode( const std::string& name, std::vecto
 {
 }
 
-void indri::infnet::ExtentAndNode::prepare( int documentID ) {
+void indri::infnet::ExtentAndNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
 
@@ -104,9 +104,9 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
   return _extents;
 }
 
-int indri::infnet::ExtentAndNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::ExtentAndNode::nextCandidateDocument() {
   assert( _children.size() );
-  int candidate = 0;
+  lemur::api::DOCID_T candidate = 0;
 
   for( size_t i=0; i<_children.size(); i++ ) {
     candidate = lemur_compat::max( candidate, _children[i]->nextCandidateDocument() );
@@ -119,7 +119,7 @@ const std::string& indri::infnet::ExtentAndNode::getName() const {
   return _name;
 }
 
-void indri::infnet::ExtentAndNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent) {
+void indri::infnet::ExtentAndNode::annotate( indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent) {
   annotator.addMatches( _extents, this, documentID, extent);
 }
 

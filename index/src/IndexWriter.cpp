@@ -61,8 +61,8 @@ IndexWriter::IndexWriter()
 // _writeSkip
 //
 
-void IndexWriter::_writeSkip( indri::file::SequentialWriteBuffer* buffer, int document, int length ) {
-  buffer->write( &document, sizeof(int) );
+void IndexWriter::_writeSkip( indri::file::SequentialWriteBuffer* buffer, lemur::api::DOCID_T document, int length ) {
+  buffer->write( &document, sizeof(lemur::api::DOCID_T) );
   buffer->write( &length, sizeof(int) );
 }
 
@@ -70,7 +70,7 @@ void IndexWriter::_writeSkip( indri::file::SequentialWriteBuffer* buffer, int do
 // _writeBatch
 //
 
-void IndexWriter::_writeBatch( indri::file::SequentialWriteBuffer* buffer, int document, int length, indri::utility::Buffer& data ) {
+void IndexWriter::_writeBatch( indri::file::SequentialWriteBuffer* buffer, lemur::api::DOCID_T document, int length, indri::utility::Buffer& data ) {
   assert( length < 100*1000*1000 );
   _writeSkip( buffer, document, length );
   if( data.position() != 0 ) {
@@ -517,7 +517,7 @@ void IndexWriter::_addInvertedListData( indri::utility::greedy_vector<WriterInde
   bool hasTopdocs = termData->corpus.documentCount > TOPDOCS_DOCUMENT_COUNT;
   bool isFrequent = termData->corpus.totalCount > FREQUENT_TERM_COUNT;
   int topdocsCount = hasTopdocs ? int(termData->corpus.documentCount * 0.01) : 0;
-  int topdocsSpace = hasTopdocs ? ((topdocsCount*3*sizeof(UINT32)) + sizeof(int)) : 0;
+  int topdocsSpace = hasTopdocs ? (topdocsCount*(sizeof(lemur::api::DOCID_T) + (2*sizeof(UINT32))) + sizeof(int)) : 0;
 
   // write a control byte
   char control = (hasTopdocs ? 0x01 : 0) | (isFrequent ? 0x02 : 0);
@@ -537,7 +537,7 @@ void IndexWriter::_addInvertedListData( indri::utility::greedy_vector<WriterInde
 
   double threshold = 0;
 
-  int lastDocument = 0;
+  lemur::api::DOCID_T lastDocument = 0;
   int positions = 0;
   int docs = 0;
 
@@ -604,7 +604,7 @@ void IndexWriter::_addInvertedListData( indri::utility::greedy_vector<WriterInde
       assert( storedDocument > lastDocument || lastDocument == 0 );
 
       // write this entry out to the list
-      stream << storedDocument - lastDocument;
+      stream << int(storedDocument - lastDocument);
       stream << (int) documentData->positions.size();
       lastDocument = storedDocument;
 
@@ -633,7 +633,7 @@ void IndexWriter::_addInvertedListData( indri::utility::greedy_vector<WriterInde
     // where fraction = c(w;D)/|D|
     while( topdocs.size() ) {
       DocListIterator::TopDocument topDocument = topdocs.top();
-      _invertedOutput->write( &topDocument.document, sizeof(int) );
+      _invertedOutput->write( &topDocument.document, sizeof(lemur::api::DOCID_T) );
       _invertedOutput->write( &topDocument.count, sizeof(int) );
       _invertedOutput->write( &topDocument.length, sizeof(int) );
       topdocs.pop();
@@ -700,7 +700,7 @@ void IndexWriter::_storeFrequentTerms() {
 
   // store in the tree and in a flat file
   for( size_t i=0; i<_topTerms.size(); i++ ) {
-    int termID = int(i)+1;
+    lemur::api::TERMID_T termID = lemur::api::TERMID_T(i)+1;
     _topTerms[i]->termID = termID;
     _storeIdEntry( _frequentTerms, _topTerms[i] );
 
@@ -868,7 +868,7 @@ void IndexWriter::_writeInvertedLists( std::vector<WriterIndexContext*>& context
 // _lookupTermID
 //
 
-int IndexWriter::_lookupTermID( indri::file::BulkTreeReader& keyfile, const char* term ) {
+lemur::api::TERMID_T IndexWriter::_lookupTermID( indri::file::BulkTreeReader& keyfile, const char* term ) {
   int dataSize = ::disktermdata_size((int)_fields.size());
   char * compressedData = new char [dataSize];
   char * uncompressedData = new char [dataSize];
@@ -889,7 +889,7 @@ int IndexWriter::_lookupTermID( indri::file::BulkTreeReader& keyfile, const char
                                                           (int)_fields.size(),
                                                           DiskTermData::WithOffsets | DiskTermData::WithTermID );
 
-  int termid = diskTermData->termID;
+  lemur::api::TERMID_T termid = diskTermData->termID;
   delete[](compressedData);
   delete[](uncompressedData);
 
@@ -903,7 +903,7 @@ int IndexWriter::_lookupTermID( indri::file::BulkTreeReader& keyfile, const char
 indri::index::TermTranslator* IndexWriter::_buildTermTranslator( indri::file::BulkTreeReader& newInfrequentTerms,
                                                                  indri::file::BulkTreeReader& newFrequentTerms,
                                                                  TermRecorder& oldFrequentTermsRecorder,
-                                                                 indri::utility::HashTable<int, int>* oldInfrequentHashTable,
+                                                                 indri::utility::HashTable<lemur::api::TERMID_T, lemur::api::TERMID_T>* oldInfrequentHashTable,
                                                                  TermRecorder& newFrequentTermsRecorder,
                                                                  Index* index,
                                                                  TermBitmap* bitmap )
@@ -914,9 +914,9 @@ indri::index::TermTranslator* IndexWriter::_buildTermTranslator( indri::file::Bu
   int becameFrequent = 0;
 
   // 1. map frequent terms to frequent terms
-  std::vector<int>* frequent = new std::vector<int>;
+  std::vector<lemur::api::TERMID_T>* frequent = new std::vector<lemur::api::TERMID_T>;
 
-  std::vector< std::pair<const char*, int> > missing;
+  std::vector< std::pair<const char*, lemur::api::TERMID_T> > missing;
   oldFrequentTermsRecorder.sort();
   newFrequentTermsRecorder.sort();
 
@@ -925,16 +925,16 @@ indri::index::TermTranslator* IndexWriter::_buildTermTranslator( indri::file::Bu
     frequent->resize(1);
   (*frequent)[0] = 0;
 
-  std::vector< std::pair< size_t, int > >& pairs = oldFrequentTermsRecorder.pairs();
+  std::vector< std::pair< size_t, lemur::api::TERMID_T > >& pairs = oldFrequentTermsRecorder.pairs();
 
   for( size_t i=0; i<pairs.size(); i++ ) {
-    int oldFrequentTermID = pairs[i].second;
+    lemur::api::TERMID_T oldFrequentTermID = pairs[i].second;
     const char* oldFrequentTerm = oldFrequentTermsRecorder.buffer().front() + pairs[i].first;
 
-    if( (int)frequent->size() <= oldFrequentTermID )
+    if( (lemur::api::TERMID_T)frequent->size() <= oldFrequentTermID )
       frequent->resize( oldFrequentTermID+1, -1 );
     
-    int mapping = _lookupTermID( newFrequentTerms, oldFrequentTerm );
+    lemur::api::TERMID_T mapping = _lookupTermID( newFrequentTerms, oldFrequentTerm );
     assert( mapping <= _isFrequentCount );
 
     if( mapping < 0 ) {
@@ -952,13 +952,13 @@ indri::index::TermTranslator* IndexWriter::_buildTermTranslator( indri::file::Bu
   }
 
   // 3. map old infrequent terms to new frequent terms
-  std::vector< std::pair< size_t, int > >& newlyFrequentPairs = newFrequentTermsRecorder.pairs();
+  std::vector< std::pair< size_t, lemur::api::TERMID_T > >& newlyFrequentPairs = newFrequentTermsRecorder.pairs();
 
   for( size_t i=0; i<newlyFrequentPairs.size(); i++ ) {
     // lookup newlyInfrequentTerms[i]
     const char* term = newlyFrequentPairs[i].first + newFrequentTermsRecorder.buffer().front();
-    int newTermID = _lookupTermID( newFrequentTerms, term );
-    int oldTermID = newlyFrequentPairs[i].second; 
+    lemur::api::TERMID_T newTermID = _lookupTermID( newFrequentTerms, term );
+    lemur::api::TERMID_T oldTermID = newlyFrequentPairs[i].second; 
     oldInfrequentHashTable->insert( oldTermID, newTermID );
     becameFrequent++;
 
@@ -1025,8 +1025,8 @@ void IndexWriter::_writeDirectLists( WriterIndexContext* context,
     TermList* list = iterator->currentEntry();
     assert( list );
 
-    int currentTerm;
-    int translated;
+    lemur::api::TERMID_T currentTerm;
+    lemur::api::TERMID_T translated;
     bool deleted = context->deletedList->isDeleted( document );
 
     // if the document is not deleted, copy it

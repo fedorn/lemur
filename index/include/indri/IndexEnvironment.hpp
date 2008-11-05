@@ -250,22 +250,22 @@ namespace indri
       /// @param documentString the document to add
       /// @param fileClass the file class to add (eg trecweb).
       /// @param metadata the metadata pairs associated with the string.
-      int addString( const std::string& documentString, 
+      lemur::api::DOCID_T addString( const std::string& documentString, 
                      const std::string& fileClass, 
                      const std::vector<indri::parse::MetadataPair>& metadata );
 
-      int addString( const std::string& documentString, 
+      lemur::api::DOCID_T addString( const std::string& documentString, 
                      const std::string& fileClass, 
                      const std::vector<indri::parse::MetadataPair>& metadata, 
                      const std::vector<indri::parse::TagExtent *> &tags );
       
       /// add an already parsed document to the index and repository
       /// @param document the document to add
-      int addParsedDocument( ParsedDocument* document );
+      lemur::api::DOCID_T addParsedDocument( ParsedDocument* document );
 
       /// Delete an existing document.
       /// @param documentID The document to delete.
-      void deleteDocument( int documentID );
+      void deleteDocument( lemur::api::DOCID_T documentID );
 
       /// Returns the number of documents indexed so far in this session.
       int documentsIndexed();

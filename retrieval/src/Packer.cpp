@@ -133,7 +133,7 @@ namespace indri {
         element->xmlNode->addAttribute( name, value );
     }
 
-    void Packer::put( const char* name, const ::std::vector<int>& value ) {
+    void Packer::put( const char* name, const ::std::vector<lemur::api::DOCID_T>& value ) {
       assert( _stack.size() );
       node_element* element = _stack.top();
 
@@ -144,7 +144,7 @@ namespace indri {
           ::std::stringstream intToString;
           intToString << value[i];
 
-          node->addChild( new indri::xml::XMLNode( "int", intToString.str() ) );
+          node->addChild( new indri::xml::XMLNode( "DOCID_T", intToString.str() ) );
         }
 
         element->xmlNode->addChild( node );

@@ -26,7 +26,7 @@ indri::infnet::CachedFrequencyBeliefNode::CachedFrequencyBeliefNode( const std::
   _iter = _list->entries.begin();
 }
 
-int indri::infnet::CachedFrequencyBeliefNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::CachedFrequencyBeliefNode::nextCandidateDocument() {
   return _iter < _list->entries.end() ? _iter->document : MAX_INT32;
 }
 
@@ -38,7 +38,7 @@ double indri::infnet::CachedFrequencyBeliefNode::maximumScore() {
   return _maximumScore;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::CachedFrequencyBeliefNode::score( int documentID, int begin, int end, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::CachedFrequencyBeliefNode::score( lemur::api::DOCID_T documentID, int begin, int end, int documentLength ) {
   assert( begin == 0 && end == documentLength ); // FrequencyListCopier ensures this condition
   const indri::index::DocumentContextCount* entry = _iter < _list->entries.end() ? _iter : 0;
   _extents.clear();
@@ -65,11 +65,11 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _extents;
 }
 
-bool indri::infnet::CachedFrequencyBeliefNode::hasMatch( int documentID ) {
+bool indri::infnet::CachedFrequencyBeliefNode::hasMatch( lemur::api::DOCID_T documentID ) {
   return ( _iter < _list->entries.end() && _iter->document == documentID );
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::CachedFrequencyBeliefNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::CachedFrequencyBeliefNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   // bogus result
   _matches.resize( extents.size(), false );
   return _matches;
@@ -79,7 +79,7 @@ const std::string& indri::infnet::CachedFrequencyBeliefNode::getName() const {
   return _name;
 }
 
-void indri::infnet::CachedFrequencyBeliefNode::annotate( indri::infnet::Annotator& annotator, int documentID, int begin, int end ) {
+void indri::infnet::CachedFrequencyBeliefNode::annotate( indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, int begin, int end ) {
   // can't annotate -- don't have position info
 }
 

@@ -25,7 +25,7 @@ indri::infnet::FieldEqualsNode::FieldEqualsNode( const std::string& name, FieldI
   _constant = constant;
 }
 
-void indri::infnet::FieldEqualsNode::prepare( int documentID ) {
+void indri::infnet::FieldEqualsNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
@@ -47,7 +47,7 @@ indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::FieldEqualsN
   return _extents;
 }
 
-int indri::infnet::FieldEqualsNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::FieldEqualsNode::nextCandidateDocument() {
   return _field->nextCandidateDocument();
 }
 
@@ -55,7 +55,7 @@ const std::string& indri::infnet::FieldEqualsNode::getName() const {
   return _name;
 }
 
-void indri::infnet::FieldEqualsNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::FieldEqualsNode::annotate( class indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.addMatches( _extents, this, documentID, extent );
 }
 

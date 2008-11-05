@@ -193,7 +193,7 @@ bool indri::index::DiskDocListIterator::nextEntry() {
 // nextEntry
 //
 
-bool indri::index::DiskDocListIterator::nextEntry( int documentID ) {
+bool indri::index::DiskDocListIterator::nextEntry( lemur::api::DOCID_T documentID ) {
   // skip ahead as much as possible
   while( _skipDocument > 0 && _skipDocument <= documentID ) {
     _readSkip();
@@ -237,9 +237,10 @@ void indri::index::DiskDocListIterator::_readTopdocs() {
   _file->read( &topdocsCount, sizeof(UINT32) );
 
   for( UINT32 i=0; i<topdocsCount; i++ ) {
-    int documentID, count, length;
+    lemur::api::DOCID_T documentID;
+    UINT32 count, length;
 
-    _file->read( &documentID, sizeof(UINT32) );
+    _file->read( &documentID, sizeof(lemur::api::DOCID_T) );
     _file->read( &count, sizeof(UINT32) );
     _file->read( &length, sizeof(UINT32) );
 
@@ -258,7 +259,7 @@ void indri::index::DiskDocListIterator::_readTopdocs() {
 inline void indri::index::DiskDocListIterator::_readSkip() {
   int skipLength; 
 
-  _file->read( &_skipDocument, sizeof(int) );
+  _file->read( &_skipDocument, sizeof(lemur::api::DOCID_T) );
   _file->read( &skipLength, sizeof(int) );
 
   assert( _skipDocument > -2 );

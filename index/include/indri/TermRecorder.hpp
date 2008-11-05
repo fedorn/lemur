@@ -33,13 +33,13 @@ namespace indri {
           _base = base;
         }
 
-        bool operator () ( const std::pair<size_t, int>& one, const std::pair<size_t, int>& two ) {
+        bool operator () ( const std::pair<size_t, lemur::api::TERMID_T>& one, const std::pair<size_t, lemur::api::TERMID_T>& two ) {
           return strcmp( _base + one.first, _base + two.first ) < 0;
         }
       };
 
       indri::utility::Buffer _buffer;
-      std::vector< std::pair<size_t, int> > _pairs;
+      std::vector< std::pair<size_t, lemur::api::TERMID_T> > _pairs;
 
     public:
       void add( int sequence, const char* term ) {
@@ -55,11 +55,11 @@ namespace indri {
         std::sort( _pairs.begin(), _pairs.end(), less( _buffer.front() ) );
       }
 
-      void buildMap( std::vector<int>& map, TermRecorder& other, std::vector< std::pair< const char*, int > >* missing = 0 ) {
+      void buildMap( std::vector<lemur::api::TERMID_T>& map, TermRecorder& other, std::vector< std::pair< const char*, lemur::api::TERMID_T > >* missing = 0 ) {
         map.resize( _pairs.size(), -1 );
         size_t i = 0;
         size_t j = 0;
-        std::vector< std::pair<size_t, int > >& otherPairs = other._pairs;
+        std::vector< std::pair<size_t, lemur::api::TERMID_T > >& otherPairs = other._pairs;
 
         // this joins all matching pairs
         while( i < otherPairs.size() && j < _pairs.size() ) {
@@ -86,7 +86,7 @@ namespace indri {
         }
       }
 
-      std::vector< std::pair<size_t, int> >& pairs() {
+      std::vector< std::pair<size_t, lemur::api::TERMID_T> >& pairs() {
         return _pairs;
       }
 
@@ -95,7 +95,7 @@ namespace indri {
       }
 
       int memorySize() {
-        return int(_buffer.position() + _pairs.size() * sizeof(std::pair<size_t, int>));
+        return int(_buffer.position() + _pairs.size() * sizeof(std::pair<size_t, lemur::api::TERMID_T>));
       }
     };
   }

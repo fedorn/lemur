@@ -146,11 +146,11 @@ indri::server::LocalQueryServer::LocalQueryServer( indri::collection::Repository
 // _indexWithDocument
 //
 
-indri::index::Index* indri::server::LocalQueryServer::_indexWithDocument( indri::collection::Repository::index_state& indexes, int documentID ) {
+indri::index::Index* indri::server::LocalQueryServer::_indexWithDocument( indri::collection::Repository::index_state& indexes, lemur::api::DOCID_T documentID ) {
   for( size_t i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
-    int lowerBound = (*indexes)[i]->documentBase();
-    int upperBound = (*indexes)[i]->documentMaximum();
+    lemur::api::DOCID_T lowerBound = (*indexes)[i]->documentBase();
+    lemur::api::DOCID_T upperBound = (*indexes)[i]->documentMaximum();
     
     if( lowerBound <= documentID && upperBound > documentID ) {
       return (*indexes)[i];
@@ -164,21 +164,21 @@ indri::index::Index* indri::server::LocalQueryServer::_indexWithDocument( indri:
 // document
 //
 
-indri::api::ParsedDocument* indri::server::LocalQueryServer::document( int documentID ) {
+indri::api::ParsedDocument* indri::server::LocalQueryServer::document( lemur::api::DOCID_T documentID ) {
   indri::collection::CompressedCollection* collection = _repository.collection();
   indri::api::ParsedDocument* document = collection->retrieve( documentID );
   return document;
 }
 
-std::string indri::server::LocalQueryServer::documentMetadatum( int documentID, const std::string& attributeName ) {
+std::string indri::server::LocalQueryServer::documentMetadatum( lemur::api::DOCID_T documentID, const std::string& attributeName ) {
   indri::collection::CompressedCollection* collection = _repository.collection();
   return collection->retrieveMetadatum( documentID, attributeName );
 }
 
-indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::documentMetadata( const std::vector<int>& documentIDs, const std::string& attributeName ) {
+indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::documentMetadata( const std::vector<lemur::api::DOCID_T>& documentIDs, const std::string& attributeName ) {
   std::vector<std::string> result;
 
-  std::vector<std::pair<int, int> > docSorted;
+  std::vector<std::pair<lemur::api::DOCID_T, int> > docSorted;
   for( size_t i=0; i<documentIDs.size(); i++ ) {
     docSorted.push_back( std::make_pair( documentIDs[i], i ) );
   }
@@ -197,7 +197,7 @@ indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::doc
   return new indri::server::LocalQueryServerMetadataResponse( actual );
 }
 
-indri::server::QueryServerDocumentsResponse* indri::server::LocalQueryServer::documents( const std::vector<int>& documentIDs ) {
+indri::server::QueryServerDocumentsResponse* indri::server::LocalQueryServer::documents( const std::vector<lemur::api::DOCID_T>& documentIDs ) {
   std::vector<indri::api::ParsedDocument*> result;
   for( size_t i=0; i<documentIDs.size(); i++ ) {
     result.push_back( document(documentIDs[i]) );
@@ -285,14 +285,14 @@ INT64 indri::server::LocalQueryServer::stemFieldCount( const std::string& stem, 
   return total;
 }
 
-std::string indri::server::LocalQueryServer::termName( int term ) {
+std::string indri::server::LocalQueryServer::termName( lemur::api::TERMID_T term ) {
   indri::collection::Repository::index_state indexes = _repository.indexes();
   indri::index::Index* index = (*indexes)[0];
   indri::thread::ScopedLock lock( index->statisticsLock() );
   return index->term( term );
 }
 
-int indri::server::LocalQueryServer::termID( const std::string& term ) {
+lemur::api::TERMID_T indri::server::LocalQueryServer::termID( const std::string& term ) {
   indri::collection::Repository::index_state indexes = _repository.indexes();
   indri::index::Index* index = (*indexes)[0];
   std::string processed = _repository.processTerm( term );
@@ -316,7 +316,7 @@ std::vector<std::string> indri::server::LocalQueryServer::fieldList() {
   return result;
 }
 
-int indri::server::LocalQueryServer::documentLength( int documentID ) {
+int indri::server::LocalQueryServer::documentLength( lemur::api::DOCID_T documentID ) {
   indri::collection::Repository::index_state indexes = _repository.indexes();
   indri::index::Index* index = _indexWithDocument( indexes, documentID );
 
@@ -401,7 +401,7 @@ indri::server::QueryServerResponse* indri::server::LocalQueryServer::runQuery( s
   return new indri::server::LocalQueryServerResponse( result );
 }
 
-indri::server::QueryServerVectorsResponse* indri::server::LocalQueryServer::documentVectors( const std::vector<int>& documentIDs ) {
+indri::server::QueryServerVectorsResponse* indri::server::LocalQueryServer::documentVectors( const std::vector<lemur::api::DOCID_T>& documentIDs ) {
   indri::server::LocalQueryServerVectorsResponse* response = new indri::server::LocalQueryServerVectorsResponse( (int)documentIDs.size() );
   indri::collection::Repository::index_state indexes = _repository.indexes();
   std::map<int, std::string> termIDStringMap;
@@ -422,13 +422,13 @@ indri::server::QueryServerVectorsResponse* indri::server::LocalQueryServer::docu
   return response;
 }
 
-indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::pathNames( const std::vector<int>& documentIDs, const std::vector<int>& pathBegins, const std::vector<int>& pathEnds ) {
+indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::pathNames( const std::vector<lemur::api::DOCID_T>& documentIDs, const std::vector<int>& pathBegins, const std::vector<int>& pathEnds ) {
 
   int lastDoc = 0;
   indri::index::DocumentStructure docStruct;
   std::vector<std::string> result;
 
-  std::vector<std::pair<int, int> > docSorted;
+  std::vector<std::pair<lemur::api::DOCID_T, int> > docSorted;
   for( size_t i=0; i<documentIDs.size(); i++ ) {
     docSorted.push_back( std::make_pair( documentIDs[i], i ) );
   }
@@ -437,7 +437,7 @@ indri::server::QueryServerMetadataResponse* indri::server::LocalQueryServer::pat
   for( size_t i=0; i<docSorted.size(); i++ ) {
     indri::collection::Repository::index_state indexes = _repository.indexes();
     bool docStructLoaded = true;
-    int documentID = docSorted[i].first;
+    lemur::api::DOCID_T documentID = docSorted[i].first;
     if ( documentID != lastDoc ) {
       indri::index::Index * index = _indexWithDocument(indexes, documentID);
       const indri::index::TermList * termList = index->termList( documentID );

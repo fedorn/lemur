@@ -112,7 +112,7 @@ indri::infnet::NestedListBeliefNode::NestedListBeliefNode( const std::string& na
   _maximumScore = INDRI_HUGE_SCORE;
 }
 
-int indri::infnet::NestedListBeliefNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::NestedListBeliefNode::nextCandidateDocument() {
   return _list.nextCandidateDocument();
 }
 
@@ -124,7 +124,7 @@ double indri::infnet::NestedListBeliefNode::maximumScore() {
   return _maximumScore;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::NestedListBeliefNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::NestedListBeliefNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   int contextSize = _contextLength( extent.begin, extent.end );
   double occurrences = _contextOccurrences( extent.begin, extent.end );
   double documentOccurrences = _raw ? _documentOccurrences() : occurrences;
@@ -141,7 +141,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _scores;
 }
 
-void indri::infnet::NestedListBeliefNode::annotate( Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::NestedListBeliefNode::annotate( Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   const indri::utility::greedy_vector<indri::index::Extent>& extents = _list.extents();
 
   indri::index::Extent range( extent.begin, extent.end );
@@ -159,11 +159,11 @@ void indri::infnet::NestedListBeliefNode::annotate( Annotator& annotator, int do
   }
 }
 
-bool indri::infnet::NestedListBeliefNode::hasMatch( int documentID ) {
+bool indri::infnet::NestedListBeliefNode::hasMatch( lemur::api::DOCID_T documentID ) {
   return _list.extents().size() > 0;
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::NestedListBeliefNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& matchExtents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::NestedListBeliefNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& matchExtents ) {
   const indri::utility::greedy_vector<indri::index::Extent>& extents = _list.extents();
   _matches.clear();
   _matches.resize( matchExtents.size(), false );

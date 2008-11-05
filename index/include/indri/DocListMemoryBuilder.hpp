@@ -61,7 +61,7 @@ namespace indri {
 
       void startIteration();
       bool finished();
-      bool nextEntry( int documentID );
+      bool nextEntry( lemur::api::DOCID_T documentID );
       bool nextEntry();
       TermData* termData();
       DocListIterator::DocumentData* currentEntry();

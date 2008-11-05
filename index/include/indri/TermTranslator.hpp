@@ -32,8 +32,8 @@ namespace indri {
       int _previousTermCount;
       int _currentTermCount;
 
-      std::vector<int>* _frequentMap;
-      indri::utility::HashTable<int, int>* _wasInfrequentMap;
+      std::vector<lemur::api::TERMID_T>* _frequentMap;
+      indri::utility::HashTable<lemur::api::TERMID_T, lemur::api::TERMID_T>* _wasInfrequentMap;
 
     public:
       ~TermTranslator() {
@@ -44,8 +44,8 @@ namespace indri {
                       int currentFrequentCount,
                       int previousTermCount,
                       int currentTermCount,
-                      std::vector<int>* frequentMap,
-                      indri::utility::HashTable<int, int>* wasInfrequentMap,
+                      std::vector<lemur::api::TERMID_T>* frequentMap,
+                      indri::utility::HashTable<lemur::api::TERMID_T, lemur::api::TERMID_T>* wasInfrequentMap,
                       TermBitmap* bitmap ) 
         :
         _bitmap(bitmap),
@@ -63,11 +63,11 @@ namespace indri {
         _currentTermCount = currentTermCount;
       }
 
-      int operator() ( int termID ) {
+      lemur::api::TERMID_T operator() ( lemur::api::TERMID_T termID ) {
         assert( termID >= 0 );
         assert( termID <= _previousTermCount );
-        int result = 0;
-        int* value;
+        lemur::api::TERMID_T result = 0;
+        lemur::api::TERMID_T* value;
 
         if( termID <= _previousFrequentCount ) {
           // common case, termID is a frequent term

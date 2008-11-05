@@ -56,10 +56,10 @@ namespace indri {
       indri::file::SequentialReadBuffer _lengthsBuffer;
 
       std::vector<FieldStatistics> _fieldData;
-      int _documentBase;
+      lemur::api::DOCID_T  _documentBase;
       int _infrequentTermBase;
 
-      indri::index::DiskTermData* _fetchTermData( int termID );
+      indri::index::DiskTermData* _fetchTermData( lemur::api::TERMID_T termID );
       indri::index::DiskTermData* _fetchTermData( const char* termString );
 
       CorpusStatistics _corpusStatistics;
@@ -78,11 +78,11 @@ namespace indri {
       int field( const std::string& fieldName );
       std::string field( int fieldID );
 
-      int term( const char* term );
-      int term( const std::string& term );
-      std::string term( int termID );
+      lemur::api::TERMID_T term( const char* term );
+      lemur::api::TERMID_T term( const std::string& term );
+      std::string term( lemur::api::TERMID_T termID );
 
-      int documentLength( int documentID );
+      int documentLength( lemur::api::DOCID_T documentID );
       UINT64 documentCount();
       UINT64 documentCount( const std::string& term );
       lemur::api::DOCID_T documentMaximum();
@@ -101,12 +101,12 @@ namespace indri {
       // Lists
       //
       
-      DocListIterator* docListIterator( int termID );
+      DocListIterator* docListIterator( lemur::api::TERMID_T termID );
       DocListIterator* docListIterator( const std::string& term );
       DocListFileIterator* docListFileIterator();
       DocExtentListIterator* fieldListIterator( int fieldID );
       DocExtentListIterator* fieldListIterator( const std::string& field );
-      const TermList* termList( int documentID );
+      const TermList* termList( lemur::api::DOCID_T documentID );
       TermListFileIterator* termListFileIterator();
 
       VocabularyIterator* vocabularyIterator();

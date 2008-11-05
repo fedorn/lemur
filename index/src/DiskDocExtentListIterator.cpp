@@ -102,7 +102,7 @@ bool indri::index::DiskDocExtentListIterator::nextEntry() {
 // nextEntry
 //
 
-bool indri::index::DiskDocExtentListIterator::nextEntry( int documentID ) {
+bool indri::index::DiskDocExtentListIterator::nextEntry( lemur::api::DOCID_T documentID ) {
   // skip ahead as much as possible
   while( _skipDocument > 0 && _skipDocument <= documentID ) {
     _readSkip();

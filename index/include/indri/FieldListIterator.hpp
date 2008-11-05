@@ -25,7 +25,7 @@ namespace indri {
   namespace index {
 
     struct FieldExtentInfo {
-      int documentID;
+      lemur::api::DOCID_T documentID;
       indri::utility::greedy_vector<indri::index::Extent> extents;
       indri::utility::greedy_vector<INT64> numbers;
     };
@@ -35,7 +35,7 @@ namespace indri {
       virtual void startIteration();
       virtual FieldExtentInfo* currentEntry();
       virtual bool nextEntry();
-      virtual bool nextEntry( int documentID );
+      virtual bool nextEntry( lemur::api::DOCID_T documentID );
     };
   }
 }

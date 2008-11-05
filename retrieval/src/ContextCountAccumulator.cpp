@@ -65,7 +65,7 @@ const indri::infnet::ListIteratorNode* indri::infnet::ContextCountAccumulator::g
   return _matches;
 }
 
-void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int documentLength ) {
+void indri::infnet::ContextCountAccumulator::evaluate( lemur::api::DOCID_T documentID, int documentLength ) {
   double documentOccurrences = 0; 
   double documentContextSize = 0;
 
@@ -133,8 +133,8 @@ void indri::infnet::ContextCountAccumulator::evaluate( int documentID, int docum
 }
 
 
-int indri::infnet::ContextCountAccumulator::nextCandidateDocument() {
-  int candidate = _matches->nextCandidateDocument();
+lemur::api::DOCID_T indri::infnet::ContextCountAccumulator::nextCandidateDocument() {
+  lemur::api::DOCID_T candidate = _matches->nextCandidateDocument();
 
   if( _context ) {
     candidate = lemur_compat::min( candidate, _context->nextCandidateDocument() );

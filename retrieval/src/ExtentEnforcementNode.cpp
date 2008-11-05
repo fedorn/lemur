@@ -33,7 +33,7 @@ void indri::infnet::ExtentEnforcementNode::setSiblingsFlag(int f){
   if (_child) {  _child->setSiblingsFlag(f); }
 }
 
-int indri::infnet::ExtentEnforcementNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::ExtentEnforcementNode::nextCandidateDocument() {
   return _child->nextCandidateDocument();
 }
 
@@ -45,7 +45,7 @@ double indri::infnet::ExtentEnforcementNode::maximumScore() {
   return INDRI_HUGE_SCORE;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ExtentEnforcementNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::ExtentEnforcementNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   // we're going to run through the field list, etc.
   indri::index::Extent tExtent( extent.begin, extent.end );
   const indri::utility::greedy_vector<indri::index::Extent>& fieldExtentsTmp = _field->matches( tExtent );
@@ -79,7 +79,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _scores;
 }
 
-void indri::infnet::ExtentEnforcementNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::ExtentEnforcementNode::annotate( indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
 
   annotator.add(this, documentID, extent);
   // we're going to run through the field list, etc.
@@ -113,7 +113,7 @@ void indri::infnet::ExtentEnforcementNode::annotate( indri::infnet::Annotator& a
 // hasMatch
 //
 
-bool indri::infnet::ExtentEnforcementNode::hasMatch( int documentID ) {
+bool indri::infnet::ExtentEnforcementNode::hasMatch( lemur::api::DOCID_T documentID ) {
   return _child->hasMatch( documentID );
 }
 
@@ -121,7 +121,7 @@ bool indri::infnet::ExtentEnforcementNode::hasMatch( int documentID ) {
 // hasMatch
 // 
 
-const indri::utility::greedy_vector<bool>& indri::infnet::ExtentEnforcementNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::ExtentEnforcementNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   // just delegate -- not perfect, but close
    _matches.clear();
    _matches.resize( extents.size(), false );

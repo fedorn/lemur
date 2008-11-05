@@ -36,14 +36,14 @@ namespace indri
 
     public:
       WeightedExtentOrNode( const std::string& name, std::vector<ListIteratorNode*>& children, const std::vector<double>& weights );
-      void prepare( int documentID );
+      void prepare( lemur::api::DOCID_T documentID );
       const indri::utility::greedy_vector<indri::index::Extent>& extents();
   
       void indexChanged( indri::index::Index& index );
-      int nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument();
 
       const std::string& getName() const;
-      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
+      void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
     };
   }
 }

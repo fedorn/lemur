@@ -32,7 +32,7 @@ const static int CLOSE_ITERATOR_RANGE = 5000;
 // _moveDocListIterators
 //
 
-inline void indri::infnet::InferenceNetwork::_moveDocListIterators( int candidate ) {
+inline void indri::infnet::InferenceNetwork::_moveDocListIterators( lemur::api::DOCID_T candidate ) {
   if( _closeIterators.size() && candidate < _closeIteratorBound ) {
     // we're close to this document, so only advance the iterators that are close
     indri::utility::greedy_vector<indri::index::DocListIterator*>::iterator iter;
@@ -63,7 +63,7 @@ inline void indri::infnet::InferenceNetwork::_moveDocListIterators( int candidat
 // _moveToDocument
 //
 
-void indri::infnet::InferenceNetwork::_moveToDocument( int candidate ) {
+void indri::infnet::InferenceNetwork::_moveToDocument( lemur::api::DOCID_T candidate ) {
   // move all document iterators
   _moveDocListIterators( candidate );
 
@@ -179,8 +179,8 @@ void indri::infnet::InferenceNetwork::_indexChanged( indri::index::Index& index 
 // _nextCandidateDocument
 //
 
-int indri::infnet::InferenceNetwork::_nextCandidateDocument( indri::index::DeletedDocumentList::read_transaction* deleted ) {
-  int candidate = MAX_INT32;
+lemur::api::DOCID_T indri::infnet::InferenceNetwork::_nextCandidateDocument( indri::index::DeletedDocumentList::read_transaction* deleted ) {
+  lemur::api::DOCID_T candidate = MAX_INT32; // 64
 
   for( size_t i=0; i<_complexEvaluators.size(); i++ ) {
     candidate = lemur_compat::min( candidate, _complexEvaluators[i]->nextCandidateDocument() );
@@ -193,7 +193,7 @@ int indri::infnet::InferenceNetwork::_nextCandidateDocument( indri::index::Delet
 // _evaluateDocument
 //
 
-void indri::infnet::InferenceNetwork::_evaluateDocument( indri::index::Index& index, int document ) {
+void indri::infnet::InferenceNetwork::_evaluateDocument( indri::index::Index& index, lemur::api::DOCID_T document ) {
   int candidateLength = index.documentLength( document );
 
   for( size_t i=0; i<_complexEvaluators.size(); i++ ) {
@@ -285,10 +285,10 @@ const std::vector<indri::infnet::EvaluatorNode*>& indri::infnet::InferenceNetwor
 void indri::infnet::InferenceNetwork::_evaluateIndex( indri::index::Index& index ) {
   indri::index::DeletedDocumentList::read_transaction* deleted = _repository.deletedList().getReadTransaction();
 
-  int lastCandidate = MAX_INT32;
-  int maximumDocument = index.documentMaximum();
+  lemur::api::DOCID_T lastCandidate = MAX_INT32; // 64
+  lemur::api::DOCID_T maximumDocument = index.documentMaximum();
   int scoredDocuments = 0;
-  int candidate = 0;
+  lemur::api::DOCID_T candidate = 0;
 
   // don't need to do anything unless there are some
   // evaluators in the network that need full evaluation

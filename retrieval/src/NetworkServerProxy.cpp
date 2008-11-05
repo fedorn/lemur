@@ -418,7 +418,7 @@ indri::server::QueryServerResponse* indri::server::NetworkServerProxy::runQuery(
 // documentMetadata
 //
 
-indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::documentMetadata( const std::vector<int>& documentIDs, const std::string& attributeName ) {
+indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::documentMetadata( const std::vector<lemur::api::DOCID_T>& documentIDs, const std::string& attributeName ) {
   indri::xml::XMLNode* request = new indri::xml::XMLNode( "document-metadata" );
   indri::xml::XMLNode* field = new indri::xml::XMLNode( "field", attributeName );
   indri::xml::XMLNode* documents = new indri::xml::XMLNode( "documents" );
@@ -442,7 +442,7 @@ indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::d
 // pathNames
 //
 
-indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::pathNames( const std::vector<int>& documentIDs, const std::vector<int>& begins, const std::vector<int>& ends ) {
+indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::pathNames( const std::vector<lemur::api::DOCID_T>& documentIDs, const std::vector<int>& begins, const std::vector<int>& ends ) {
   indri::xml::XMLNode* request = new indri::xml::XMLNode( "path-names" );
   indri::xml::XMLNode* documents = new indri::xml::XMLNode( "paths" );
 
@@ -466,7 +466,7 @@ indri::server::QueryServerMetadataResponse* indri::server::NetworkServerProxy::p
 // documents
 //
 
-indri::server::QueryServerDocumentsResponse* indri::server::NetworkServerProxy::documents( const std::vector<int>& documentIDs ) {
+indri::server::QueryServerDocumentsResponse* indri::server::NetworkServerProxy::documents( const std::vector<lemur::api::DOCID_T>& documentIDs ) {
   indri::xml::XMLNode* docRequest = new indri::xml::XMLNode( "documents" );
 
   for( size_t i=0; i<documentIDs.size(); i++ ) {
@@ -554,12 +554,12 @@ INT64 indri::server::NetworkServerProxy::stemCount( const std::string& term ) {
   return _numericRequest( request );
 }
 
-std::string indri::server::NetworkServerProxy::termName( int term ) {
+std::string indri::server::NetworkServerProxy::termName( lemur::api::TERMID_T term ) {
   indri::xml::XMLNode* request = new indri::xml::XMLNode( "term-name", i64_to_string(term) );
   return _stringRequest( request );
 }
 
-int indri::server::NetworkServerProxy::termID( const std::string& term ) {
+lemur::api::TERMID_T indri::server::NetworkServerProxy::termID( const std::string& term ) {
   indri::xml::XMLNode* request = new indri::xml::XMLNode( "term-id", term );
   return _numericRequest( request );
 }
@@ -603,7 +603,7 @@ std::vector<std::string> indri::server::NetworkServerProxy::fieldList() {
   return result;
 }
 
-int indri::server::NetworkServerProxy::documentLength( int documentID ) {
+int indri::server::NetworkServerProxy::documentLength( lemur::api::DOCID_T documentID ) {
   indri::xml::XMLNode* request = new indri::xml::XMLNode( "document-length", i64_to_string(documentID) );
   return (int) _numericRequest( request );
 }
@@ -618,7 +618,7 @@ INT64 indri::server::NetworkServerProxy::documentCount( const std::string& term 
   return _numericRequest( request );
 }
 
-indri::server::QueryServerVectorsResponse* indri::server::NetworkServerProxy::documentVectors( const std::vector<int>& documentIDs ) {
+indri::server::QueryServerVectorsResponse* indri::server::NetworkServerProxy::documentVectors( const std::vector<lemur::api::DOCID_T>& documentIDs ) {
   indri::xml::XMLNode* request = new indri::xml::XMLNode( "document-vectors" );
 
   for( size_t i=0; i<documentIDs.size(); i++ ) {

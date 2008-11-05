@@ -44,17 +44,17 @@ namespace indri
     public:
       FixedPassageNode( const std::string& name, BeliefNode* child, int windowSize, int increment );
 
-      int nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
 
       double maximumScore();
       double maximumBackgroundScore();
 
-      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength );
-      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength );
+      void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
 
-      const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
-      bool hasMatch( int documentID );
+      const indri::utility::greedy_vector<bool>& hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
+      bool hasMatch( lemur::api::DOCID_T documentID );
       const std::string& getName() const;
 
       virtual void setSiblingsFlag(int f){

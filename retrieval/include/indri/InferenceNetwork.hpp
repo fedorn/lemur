@@ -67,11 +67,11 @@ namespace indri
       void _indexChanged( indri::index::Index& index );
       void _indexFinished( indri::index::Index& index );
 
-      void _moveToDocument( int candidate );
-      void _moveDocListIterators( int candidate );
+      void _moveToDocument( lemur::api::DOCID_T candidate );
+      void _moveDocListIterators( lemur::api::DOCID_T candidate );
 
-      int _nextCandidateDocument( indri::index::DeletedDocumentList::read_transaction* deleted );
-      void _evaluateDocument( indri::index::Index& index, int document );
+      lemur::api::DOCID_T _nextCandidateDocument( indri::index::DeletedDocumentList::read_transaction* deleted );
+      void _evaluateDocument( indri::index::Index& index, lemur::api::DOCID_T document );
       void _evaluateIndex( indri::index::Index& index );
 
     public:

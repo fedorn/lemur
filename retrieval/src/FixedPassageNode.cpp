@@ -27,7 +27,7 @@ indri::infnet::FixedPassageNode::FixedPassageNode( const std::string& name, indr
 {
 }
 
-int indri::infnet::FixedPassageNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::FixedPassageNode::nextCandidateDocument() {
   return _child->nextCandidateDocument();
 }
 
@@ -43,7 +43,7 @@ double indri::infnet::FixedPassageNode::maximumScore() {
 // score
 //
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FixedPassageNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::FixedPassageNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   // we're going to run through the field list, etc.
   _scores.clear();
 
@@ -77,7 +77,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
 // annotate
 //
 
-void indri::infnet::FixedPassageNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::FixedPassageNode::annotate( indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.add(this, documentID, extent);
 
   // round down to find where the passage starts
@@ -94,7 +94,7 @@ void indri::infnet::FixedPassageNode::annotate( indri::infnet::Annotator& annota
 // hasMatch
 //
 
-bool indri::infnet::FixedPassageNode::hasMatch( int documentID ) {
+bool indri::infnet::FixedPassageNode::hasMatch( lemur::api::DOCID_T documentID ) {
   return _child->hasMatch( documentID );
 }
 
@@ -150,7 +150,7 @@ void indri::infnet::FixedPassageNode::_buildSubextents( const indri::utility::gr
 // hasMatch
 //
 
-const indri::utility::greedy_vector<bool>& indri::infnet::FixedPassageNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::FixedPassageNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   _matches.clear();
   _matches.resize( extents.size(), false );
 

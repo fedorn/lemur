@@ -23,6 +23,7 @@
 #include "indri/DocExtentListIterator.hpp"
 #include <utility>
 #include "RVLCompress.hpp"
+#include "IndexTypes.hpp"
 
 namespace indri {
   namespace index {
@@ -58,7 +59,7 @@ namespace indri {
       
       void startIteration();
       bool finished() const;
-      bool nextEntry( int documentID );
+      bool nextEntry( lemur::api::DOCID_T documentID );
       bool nextEntry();
       indri::index::DocExtentListIterator::DocumentExtentData* currentEntry();
     };
@@ -77,7 +78,7 @@ namespace indri {
       char* _listEnd;
 
       int _lastLocation;
-      int _lastDocument;
+      lemur::api::DOCID_T _lastDocument;
       int _lastOrdinal;
       int _lastExtentFrequency;
 
@@ -88,9 +89,9 @@ namespace indri {
       bool _ordinal;
       bool _parental;
 
-      inline size_t _compressedSize( int documentID, int begin, int end, INT64 number, int ordinal, int parent );
-      inline void _safeAddLocation( int documentID, int begin, int end, INT64 number, int ordinal, int parent );
-      void _growAddLocation( int documentID, int begin, int end, INT64 number, int ordinal, int parent, size_t newDataSize );
+      inline size_t _compressedSize( lemur::api::DOCID_T documentID, int begin, int end, INT64 number, int ordinal, int parent );
+      inline void _safeAddLocation( lemur::api::DOCID_T documentID, int begin, int end, INT64 number, int ordinal, int parent );
+      void _growAddLocation( lemur::api::DOCID_T documentID, int begin, int end, INT64 number, int ordinal, int parent, size_t newDataSize );
       size_t _roundUp( size_t amount );
       void _grow();
       void _terminateDocument();
@@ -99,7 +100,7 @@ namespace indri {
       DocExtentListMemoryBuilder( bool numeric, bool ordinal, bool parental );
       ~DocExtentListMemoryBuilder();
 
-      void addLocation( int documentID, int begin, int end, INT64 number = 0, int ordinal = 0, int parent = 0 );
+      void addLocation( lemur::api::DOCID_T documentID, int begin, int end, INT64 number = 0, int ordinal = 0, int parent = 0 );
 
       void clear();
       bool empty();

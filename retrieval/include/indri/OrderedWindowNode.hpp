@@ -60,13 +60,13 @@ namespace indri
       OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children );
       OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children, int windowSize );
 
-      int nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
 
-      void prepare( int documentID );
+      void prepare( lemur::api::DOCID_T documentID );
       const indri::utility::greedy_vector<indri::index::Extent>& extents();
       const std::string& getName() const ;
-      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
+      void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
     };
   }
 }

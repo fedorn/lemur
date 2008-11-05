@@ -200,7 +200,7 @@ static void _buildDocumentVectorsResponse(struct soap* soap,
 
 int indrisoap__doDocumentVectors(struct soap* soap, struct intArray ids, 
                                  struct DocumentVectorArray &response) {
-  std::vector<int> docs;
+  std::vector<lemur::api::DOCID_T> docs;
   for (int i = 0; i < ids.__size; i++)
     docs.push_back(ids.__ptr[i]);
   std::vector<indri::api::DocumentVector*> _results;
@@ -321,7 +321,7 @@ int http_get(struct soap *soap)
     }
   }
 
-  std::vector<int> docs;
+  std::vector<lemur::api::DOCID_T> docs;
   docs.push_back(docid);
   std::vector<indri::api::ParsedDocument*> documents;
   try {    

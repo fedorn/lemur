@@ -46,7 +46,7 @@ const indri::infnet::EvaluatorNode::MResults& indri::infnet::ListAccumulator::ge
 void indri::infnet::ListAccumulator::indexChanged( indri::index::Index& index ) {
 }
 
-void indri::infnet::ListAccumulator::evaluate( int documentID, int documentLength ) {
+void indri::infnet::ListAccumulator::evaluate( lemur::api::DOCID_T documentID, int documentLength ) {
   const indri::utility::greedy_vector<indri::index::Extent>& extents = _counted.extents();
   
   for( size_t i=0; i<extents.size(); i++ ) {
@@ -56,7 +56,7 @@ void indri::infnet::ListAccumulator::evaluate( int documentID, int documentLengt
   }
 }
 
-int indri::infnet::ListAccumulator::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::ListAccumulator::nextCandidateDocument() {
   return _counted.nextCandidateDocument();
 }
 

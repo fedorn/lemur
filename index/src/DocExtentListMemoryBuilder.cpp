@@ -162,7 +162,7 @@ void indri::index::DocExtentListMemoryBuilder::_terminateDocument() {
 // _safeAddLocation
 //
 
-void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( int documentID, int begin, int end, INT64 number, int ordinal, int parent ) {
+void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( lemur::api::DOCID_T documentID, int begin, int end, INT64 number, int ordinal, int parent ) {
   assert( !_locationCountPointer || _listBegin < _locationCountPointer );
   assert( !_locationCountPointer || _listEnd > _locationCountPointer );
   assert( !_locationCountPointer || _list > _locationCountPointer );
@@ -170,7 +170,7 @@ void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( int documentID,
   assert( !_parental || parent >= 0 );
 
   bool hasPointer = _locationCountPointer ? true : false;
-  int lastdoc = _lastDocument;
+  lemur::api::DOCID_T lastdoc = _lastDocument;
 
   // if this is a new document, put a document header in (and terminate the old one)
   if( _lastDocument != documentID ) {
@@ -217,7 +217,7 @@ void indri::index::DocExtentListMemoryBuilder::_safeAddLocation( int documentID,
 // _compressedSize
 //
 
-size_t indri::index::DocExtentListMemoryBuilder::_compressedSize( int documentID, int begin, int end, INT64 number, int ordinal, int parent ) {
+size_t indri::index::DocExtentListMemoryBuilder::_compressedSize( lemur::api::DOCID_T documentID, int begin, int end, INT64 number, int ordinal, int parent ) {
   size_t size = 0;
 
   if( _lastDocument != documentID ) {
@@ -255,7 +255,7 @@ size_t indri::index::DocExtentListMemoryBuilder::_compressedSize( int documentID
 // _growAddLocation
 //
 
-void indri::index::DocExtentListMemoryBuilder::_growAddLocation( int documentID, int begin, int end, INT64 number, int ordinal, int parent, size_t newDataSize ) {
+void indri::index::DocExtentListMemoryBuilder::_growAddLocation( lemur::api::DOCID_T documentID, int begin, int end, INT64 number, int ordinal, int parent, size_t newDataSize ) {
   // have to copy the last document if it's not complete, or if there's not enough room to complete it
   bool documentMismatch = (_lastDocument != documentID);
   bool terminateSpace = (lemur::utility::RVLCompress::compressedSize( _extentFrequency - _lastExtentFrequency ) - 1) <= _listEnd - _list;
@@ -275,7 +275,7 @@ void indri::index::DocExtentListMemoryBuilder::_growAddLocation( int documentID,
 // addLocation
 //
 
-void indri::index::DocExtentListMemoryBuilder::addLocation( int documentID, int begin, int end, INT64 number, int ordinal, int parent ) {
+void indri::index::DocExtentListMemoryBuilder::addLocation( lemur::api::DOCID_T documentID, int begin, int end, INT64 number, int ordinal, int parent ) {
   size_t remaining = _listEnd - _list;
   assert( _listEnd >= _list );
 

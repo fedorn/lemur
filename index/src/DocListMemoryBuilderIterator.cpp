@@ -91,7 +91,7 @@ indri::index::DocListMemoryBuilderIterator::DocListMemoryBuilderIterator( class 
 // nextEntry
 //
 
-bool indri::index::DocListMemoryBuilderIterator::nextEntry( int documentID ) {
+bool indri::index::DocListMemoryBuilderIterator::nextEntry( lemur::api::DOCID_T documentID ) {
   do {
     if( _data.document >= documentID )
       return true;

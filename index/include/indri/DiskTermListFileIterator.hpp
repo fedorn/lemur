@@ -21,6 +21,7 @@
 #include "indri/TermListFileIterator.hpp"
 #include "indri/SequentialReadBuffer.hpp"
 #include "indri/TermList.hpp"
+#include "IndexTypes.hpp"
 
 namespace indri {
   namespace index {
@@ -39,7 +40,7 @@ namespace indri {
       void startIteration();
       TermList* currentEntry();
       bool nextEntry();
-      bool nextEntry( int documentID );
+      bool nextEntry( lemur::api::DOCID_T documentID );
       bool finished();
     };
   }

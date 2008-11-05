@@ -62,17 +62,17 @@ namespace indri
 
       }
 
-      int nextCandidateDocument() {
-        int candidate = MAX_INT32;
+      lemur::api::DOCID_T nextCandidateDocument() {
+        lemur::api::DOCID_T candidate = MAX_INT32;
 
         for( unsigned int i=0; i<_children.size(); i++ ) {
-          candidate = lemur_compat::min<int>( candidate, _children[i]->nextCandidateDocument() );
+          candidate = lemur_compat::min<lemur::api::DOCID_T>( candidate, _children[i]->nextCandidateDocument() );
         }
 
         return candidate;
       }
 
-      indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength ) {
+      indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
         double maxScore = INDRI_TINY_SCORE;
 
         for( unsigned int i=0; i<_children.size(); i++ ) {
@@ -89,7 +89,7 @@ namespace indri
         return _scores;
       }
 
-      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+      void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
         annotator.add( this, documentID, extent);
 
         // find the maximum score here, then descend only into that one
@@ -139,7 +139,7 @@ namespace indri
         return maxScore;
       }
 
-      bool hasMatch( int documentID ) {
+      bool hasMatch( lemur::api::DOCID_T documentID ) {
         for( unsigned int i=0; i<_children.size(); i++ ) {
           if( _children[i]->hasMatch( documentID ) )
             return true;
@@ -148,7 +148,7 @@ namespace indri
         return false;
       }
 
-      const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+      const indri::utility::greedy_vector<bool>& hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
         _matches.clear();
         _matches.resize( extents.size(), false );
 

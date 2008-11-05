@@ -28,7 +28,7 @@ namespace indri {
     private:
       const char* _list;
       const char* _listEnd;
-      int _skipDocument;
+      lemur::api::DOCID_T _skipDocument;
 
       indri::file::SequentialReadBuffer* _file;
       UINT64 _startOffset;
@@ -59,7 +59,7 @@ namespace indri {
 
       void startIteration();
       bool nextEntry();
-      bool nextEntry( int documentID );
+      bool nextEntry( lemur::api::DOCID_T documentID );
       DocumentData* currentEntry();
       bool finished();
       bool isFrequent() const;

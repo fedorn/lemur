@@ -34,7 +34,7 @@ indri::infnet::DocumentStructureHolderNode::~DocumentStructureHolderNode() {
   delete _docIter;
 }
 
-void indri::infnet::DocumentStructureHolderNode::prepare( int documentID ) {
+void indri::infnet::DocumentStructureHolderNode::prepare( lemur::api::DOCID_T documentID ) {
 
   if ( _documentStructure == 0 ) {
     _documentStructure = new indri::index::DocumentStructure( *_index );
@@ -56,7 +56,7 @@ void indri::infnet::DocumentStructureHolderNode::prepare( int documentID ) {
 }
 
 
-int indri::infnet::DocumentStructureHolderNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::DocumentStructureHolderNode::nextCandidateDocument() {
   return _nextDocument;
 }
 

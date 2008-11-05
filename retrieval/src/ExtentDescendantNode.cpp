@@ -31,7 +31,7 @@ indri::infnet::ExtentDescendantNode::ExtentDescendantNode( const std::string& na
 {
 }
 
-void indri::infnet::ExtentDescendantNode::prepare( int documentID ) {
+void indri::infnet::ExtentDescendantNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
 
@@ -98,7 +98,7 @@ const indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::Extent
   return _extents;
 }
 
-int indri::infnet::ExtentDescendantNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::ExtentDescendantNode::nextCandidateDocument() {
   return lemur_compat::max( _inner->nextCandidateDocument(), _outer->nextCandidateDocument() );
 }
 
@@ -106,7 +106,7 @@ const std::string& indri::infnet::ExtentDescendantNode::getName() const {
   return _name;
 }
 
-void indri::infnet::ExtentDescendantNode::annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::ExtentDescendantNode::annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   if (! _lastExtent.contains(extent)) {
     // if the last extent we annotated contains this one, there is no work
     // to do.

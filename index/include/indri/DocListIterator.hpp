@@ -21,13 +21,14 @@
 
 #include "indri/greedy_vector"
 #include "indri/TermData.hpp"
+#include "IndexTypes.hpp"
 
 namespace indri {
   namespace index {
     class DocListIterator {
     public:
       struct DocumentData {
-        int document;
+        lemur::api::DOCID_T document;
         indri::utility::greedy_vector<int> positions;
       };
 
@@ -54,14 +55,14 @@ namespace indri {
           }
         };
 
-        TopDocument( int _document, int _count, int _length ) :
+        TopDocument( lemur::api::DOCID_T _document, int _count, int _length ) :
           document(_document),
           count(_count),
           length(_length)
         {
         }
 
-        int document;
+        lemur::api::DOCID_T document;
         int count;
         int length;
       };
@@ -85,7 +86,7 @@ namespace indri {
 
       // find the first document that contains this term that has an id >= documentID.
       // returns false if no such document exists.
-      virtual bool nextEntry( int documentID ) = 0;
+      virtual bool nextEntry( lemur::api::DOCID_T documentID ) = 0;
 
       // returns true if the iterator has no more entries
       virtual bool finished() = 0;

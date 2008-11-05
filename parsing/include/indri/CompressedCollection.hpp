@@ -103,13 +103,13 @@ namespace indri
       void open( const std::string& fileName );
       void openRead( const std::string& fileName );
       void close();
-      bool exists(int documentID);
-      indri::api::ParsedDocument* retrieve( int documentID );
-      std::string retrieveMetadatum( int documentID, const std::string& attributeName );
+      bool exists(lemur::api::DOCID_T documentID);
+      indri::api::ParsedDocument* retrieve( lemur::api::DOCID_T documentID );
+      std::string retrieveMetadatum( lemur::api::DOCID_T documentID, const std::string& attributeName );
       std::vector<indri::api::ParsedDocument*> retrieveByMetadatum( const std::string& attributeName, const std::string& value );
-      std::vector<int> retrieveIDByMetadatum( const std::string& attributeName, const std::string& value );
+      std::vector<lemur::api::DOCID_T> retrieveIDByMetadatum( const std::string& attributeName, const std::string& value );
 
-      void addDocument( int documentID, indri::api::ParsedDocument* document );
+      void addDocument( lemur::api::DOCID_T documentID, indri::api::ParsedDocument* document );
       void compact( indri::index::DeletedDocumentList& deletedList );
       void append( indri::collection::CompressedCollection& other, indri::index::DeletedDocumentList& deletedList, lemur::api::DOCID_T documentOffset );
 

@@ -20,6 +20,7 @@
 #define INDRI_TERMFIELDSTATISTICS_HPP
 
 #include "lemur-compat.hpp"
+#include "IndexTypes.hpp"
 
 namespace indri {
   namespace index {
@@ -33,12 +34,12 @@ namespace indri {
       unsigned int documentCount;
 
       /// last document this term/field combination was seen in (used at index time)
-      unsigned int lastDocument;
+      lemur::api::DOCID_T lastDocument;
 
       /// number of times that this term/field combination was seen in <lastDocument>
       unsigned int lastCount;
 
-      void addOccurrence( int documentID ) {
+      void addOccurrence( lemur::api::DOCID_T documentID ) {
         if( lastDocument != documentID ) {
           lastDocument = documentID;
           lastCount = 0;

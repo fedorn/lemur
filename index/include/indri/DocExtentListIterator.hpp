@@ -21,6 +21,7 @@
 #include "indri/Extent.hpp"
 #include "indri/indri-platform.h"
 #include "indri/greedy_vector"
+#include "IndexTypes.hpp"
 
 namespace indri {
   namespace index {
@@ -37,7 +38,7 @@ namespace indri {
       virtual void startIteration() = 0;
       virtual bool finished() const = 0;
       virtual bool nextEntry() = 0;
-      virtual bool nextEntry( int documentID ) = 0;
+      virtual bool nextEntry( lemur::api::DOCID_T documentID ) = 0;
       virtual DocumentExtentData* currentEntry() = 0;
     };
   }

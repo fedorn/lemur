@@ -37,7 +37,7 @@ const indri::utility::greedy_vector<indri::index::DocListIterator::TopDocument>&
   return _emptyTopdocs;
 }
 
-int indri::infnet::TermFrequencyBeliefNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::TermFrequencyBeliefNode::nextCandidateDocument() {
   if( _list ) {
     const indri::index::DocListIterator::DocumentData* entry = _list->currentEntry();
     
@@ -57,7 +57,7 @@ double indri::infnet::TermFrequencyBeliefNode::maximumScore() {
   return _maximumScore;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::TermFrequencyBeliefNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::TermFrequencyBeliefNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   assert( extent.begin == 0 && extent.end == documentLength ); // FrequencyListCopier ensures this condition
   _extents.clear();
 
@@ -82,7 +82,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _extents;
 }
 
-bool indri::infnet::TermFrequencyBeliefNode::hasMatch( int documentID ) {
+bool indri::infnet::TermFrequencyBeliefNode::hasMatch( lemur::api::DOCID_T documentID ) {
   if( _list ) {
     const indri::index::DocListIterator::DocumentData* entry = _list->currentEntry();
     return ( entry && entry->document == documentID );
@@ -91,7 +91,7 @@ bool indri::infnet::TermFrequencyBeliefNode::hasMatch( int documentID ) {
   return false;
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::TermFrequencyBeliefNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::TermFrequencyBeliefNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   assert( false && "A TermFrequencyBeliefNode should never be asked for position information" );  
   
   _matches.resize( extents.size(), false );
@@ -133,6 +133,6 @@ void indri::infnet::TermFrequencyBeliefNode::indexChanged( indri::index::Index& 
   }
 }
 
-void indri::infnet::TermFrequencyBeliefNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::TermFrequencyBeliefNode::annotate( indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   // can't annotate -- don't have position info
 }

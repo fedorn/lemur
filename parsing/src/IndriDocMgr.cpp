@@ -22,11 +22,11 @@
 // _indexWithDocument
 //
 
-indri::index::Index* lemur::parse::IndriDocMgr::_indexWithDocument( indri::collection::Repository::index_state& indexes, int documentID ) const {
+indri::index::Index* lemur::parse::IndriDocMgr::_indexWithDocument( indri::collection::Repository::index_state& indexes, lemur::api::DOCID_T documentID ) const {
   for( int i=0; i<indexes->size(); i++ ) {
     indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
-    int lowerBound = (*indexes)[i]->documentBase();
-    int upperBound = (*indexes)[i]->documentBase() + (*indexes)[i]->documentCount();
+    lemur::api::DOCID_T lowerBound = (*indexes)[i]->documentBase();
+    lemur::api::DOCID_T upperBound = (*indexes)[i]->documentBase() + (*indexes)[i]->documentCount();
     
     if( lowerBound <= documentID && upperBound > documentID ) {
       return (*indexes)[i];
@@ -37,7 +37,7 @@ indri::index::Index* lemur::parse::IndriDocMgr::_indexWithDocument( indri::colle
 
 // caller delete[]s
 char *lemur::parse::IndriDocMgr::getDoc(const lemur::api::EXDOCID_T &docID) const {
-  std::vector<int> ids = _repository.collection()->retrieveIDByMetadatum("docno", docID);
+  std::vector<lemur::api::DOCID_T> ids = _repository.collection()->retrieveIDByMetadatum("docno", docID);
   lemur::api::DOCID_T docid = ids[0];
   indri::api::ParsedDocument *doc = _repository.collection()->retrieve(docid);
   const char *txt = doc->text;
@@ -50,7 +50,7 @@ char *lemur::parse::IndriDocMgr::getDoc(const lemur::api::EXDOCID_T &docID) cons
 
 vector<lemur::parse::Match> lemur::parse::IndriDocMgr::getOffsets(const lemur::api::EXDOCID_T &docID) const {
   vector<Match> offsets;
-  std::vector<int> ids = _repository.collection()->retrieveIDByMetadatum("docno", docID);
+  std::vector<lemur::api::DOCID_T> ids = _repository.collection()->retrieveIDByMetadatum("docno", docID);
   lemur::api::DOCID_T docid = ids[0];
   indri::api::ParsedDocument *doc = _repository.collection()->retrieve(docid);
   indri::collection::Repository::index_state indexes = _repository.indexes();
@@ -58,7 +58,7 @@ vector<lemur::parse::Match> lemur::parse::IndriDocMgr::getOffsets(const lemur::a
   if (index) {
     indri::thread::ScopedLock lock( index->statisticsLock() );
     const indri::index::TermList* termList = index->termList( docid );
-    const indri::utility::greedy_vector<int>& terms = termList->terms();
+    const indri::utility::greedy_vector<lemur::api::TERMID_T>& terms = termList->terms();
     indri::utility::greedy_vector<indri::parse::TermExtent> pos = doc->positions;  
     unsigned int len = pos.size();
     offsets.resize(len);

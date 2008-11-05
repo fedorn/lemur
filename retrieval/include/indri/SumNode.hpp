@@ -58,9 +58,9 @@ namespace indri
 
       }
 
-      int nextCandidateDocument() {
+      lemur::api::DOCID_T nextCandidateDocument() {
         std::vector<BeliefNode*>::iterator iter;
-        int next = MAX_INT32;
+        lemur::api::DOCID_T next = MAX_INT32;
 
         for( iter = _children.begin(); iter != _children.end(); iter++ ) {
           next = lemur_compat::min( next, (*iter)->nextCandidateDocument() );
@@ -80,7 +80,7 @@ namespace indri
         return score;
       }
 
-      double score( int documentID, int documentLength ) {
+      double score( lemur::api::DOCID_T documentID, int documentLength ) {
         std::vector<BeliefNode*>::iterator iter;
         double score = 0;
 

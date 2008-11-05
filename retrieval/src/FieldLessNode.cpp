@@ -26,7 +26,7 @@ indri::infnet::FieldLessNode::FieldLessNode( const std::string& name, FieldItera
   _name = name;
 }
 
-void indri::infnet::FieldLessNode::prepare( int documentID ) {
+void indri::infnet::FieldLessNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
@@ -48,7 +48,7 @@ indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::FieldLessNod
   return _extents;
 }
 
-int indri::infnet::FieldLessNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::FieldLessNode::nextCandidateDocument() {
   return _field->nextCandidateDocument();
 }
 
@@ -56,7 +56,7 @@ const std::string& indri::infnet::FieldLessNode::getName() const {
   return _name;
 }
 
-void indri::infnet::FieldLessNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::FieldLessNode::annotate( class indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.addMatches( _extents, this, documentID, extent );
 }
 

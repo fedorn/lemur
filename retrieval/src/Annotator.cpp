@@ -25,7 +25,7 @@ indri::infnet::Annotator::Annotator( const std::string& name, BeliefNode* belief
 {
 }
 
-void indri::infnet::Annotator::add( InferenceNetworkNode* node, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::Annotator::add( InferenceNetworkNode* node, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   indri::api::ScoredExtentResult a(extent);
 
   a.document = documentID;
@@ -40,7 +40,7 @@ void indri::infnet::Annotator::add( InferenceNetworkNode* node, int documentID, 
   _annotations[node->getName()].push_back(a);
 }
 
-void indri::infnet::Annotator::addMatches( indri::utility::greedy_vector<indri::index::Extent>& extents, InferenceNetworkNode* node, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::Annotator::addMatches( indri::utility::greedy_vector<indri::index::Extent>& extents, InferenceNetworkNode* node, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   indri::index::Extent range( extent.begin, extent.end );
 
   indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
@@ -57,12 +57,12 @@ void indri::infnet::Annotator::addMatches( indri::utility::greedy_vector<indri::
   }
 }
 
-void indri::infnet::Annotator::evaluate( int documentID, int documentLength ) {
+void indri::infnet::Annotator::evaluate( lemur::api::DOCID_T documentID, int documentLength ) {
   indri::index::Extent tmpExtent(0, documentLength);
   _belief->annotate( *this, documentID, tmpExtent );
 }
 
-int indri::infnet::Annotator::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::Annotator::nextCandidateDocument() {
   return _belief->nextCandidateDocument();
 }
 

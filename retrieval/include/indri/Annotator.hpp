@@ -44,11 +44,11 @@ namespace indri
 
     public:
       Annotator( const std::string& name, BeliefNode* belief );
-      void add( InferenceNetworkNode* node, int documentID, indri::index::Extent &extent );
-      void addMatches( indri::utility::greedy_vector<indri::index::Extent>& extents, InferenceNetworkNode* node, int documentID, indri::index::Extent &extent );
-      void evaluate( int documentID, int documentLength );
+      void add( InferenceNetworkNode* node, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
+      void addMatches( indri::utility::greedy_vector<indri::index::Extent>& extents, InferenceNetworkNode* node, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
+      void evaluate( lemur::api::DOCID_T documentID, int documentLength );
   
-      int nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
 
       EvaluatorNode::MResults& getResults();

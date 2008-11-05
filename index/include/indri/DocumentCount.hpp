@@ -25,23 +25,23 @@ namespace indri
     struct DocumentCount {
       DocumentCount() {}
 
-      DocumentCount( int document, int count ) {
+      DocumentCount( lemur::api::DOCID_T document, int count ) {
         this->document = document;
         this->count = count;
       }
 
-      int document;
+      lemur::api::DOCID_T document;
       int count;
     };
 
     struct DocumentContextCount {
-      DocumentContextCount( int document, int count, int contextSize ) {
+      DocumentContextCount( lemur::api::DOCID_T document, int count, int contextSize ) {
         this->document = document;
         this->count = count;
         this->contextSize = contextSize;
       }
 
-      int document;
+      lemur::api::DOCID_T document;
       int count;
       int contextSize;
     };

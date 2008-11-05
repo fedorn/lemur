@@ -35,21 +35,21 @@ indri::infnet::PriorNode::PriorNode( const std::string& name,
 indri::infnet::PriorNode::~PriorNode() {
 }
 
-int indri::infnet::PriorNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::PriorNode::nextCandidateDocument() {
   return MAX_INT32;
 }
 
-bool indri::infnet::PriorNode::hasMatch( int documentID ) {
+bool indri::infnet::PriorNode::hasMatch( lemur::api::DOCID_T documentID ) {
   // priors don't match; they only boost or cut
   return false;
 }
 
-const indri::utility::greedy_vector<bool>& indri::infnet::PriorNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::PriorNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   _matches.resize( extents.size(), false );
   return _matches;
 }
 
-const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::PriorNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::PriorNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   double score = -1e100;
   
   if( _iterator && !_iterator->finished() )
@@ -63,7 +63,7 @@ const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infn
   return _scores;
 }
 
-void indri::infnet::PriorNode::annotate( class indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::PriorNode::annotate( class indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   score( documentID, extent, extent.end );
   
   for( unsigned int i=0; i<_scores.size(); i++ ) {

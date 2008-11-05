@@ -577,7 +577,7 @@ std::vector<std::string> indri::collection::CompressedCollection::reverseFields(
 // key0, value0, key1, value1 ... , numPairs
 //
 
-void indri::collection::CompressedCollection::addDocument( int documentID, indri::api::ParsedDocument* document ) {
+void indri::collection::CompressedCollection::addDocument( lemur::api::DOCID_T documentID, indri::api::ParsedDocument* document ) {
   indri::thread::ScopedLock l( _lock );
   
   _stream->zalloc = zlib_alloc;
@@ -613,25 +613,25 @@ void indri::collection::CompressedCollection::addDocument( int documentID, indri
     if( metalookup && document->metadata[i].valueLength < lemur::file::Keyfile::MAX_KEY_LENGTH && document->metadata[i].valueLength > 1 ) {
 
       // there may be more than one reverse lookup here, so we fetch any old ones:
-      indri::utility::greedy_vector<int> documentIDs;
+      indri::utility::greedy_vector<lemur::api::DOCID_T> documentIDs;
       int dataSize = (*metalookup)->getSize( (const char*)document->metadata[i].value );
 
       if( dataSize >= 0 ) {
         int actual = 0;
 
-        documentIDs.resize( dataSize / sizeof(int) );
+        documentIDs.resize( dataSize / sizeof(lemur::api::DOCID_T) );
         (*metalookup)->get( (const char*)document->metadata[i].value,
                             &documentIDs.front(),
                             actual,
                             dataSize );
-        assert( actual == documentIDs.size() * sizeof(int) );
+        assert( actual == documentIDs.size() * sizeof(lemur::api::DOCID_T) );
       }
 
       documentIDs.push_back( documentID );
 
       (*metalookup)->put( (const char*)document->metadata[i].value,
                           &documentIDs.front(),
-                         (int)( documentIDs.size() * sizeof(int)) );
+                         (int)( documentIDs.size() * sizeof(lemur::api::DOCID_T)) );
     }
 
     recordOffsets.push_back( recordOffset );
@@ -674,7 +674,7 @@ void indri::collection::CompressedCollection::addDocument( int documentID, indri
 }
 
 
-bool indri::collection::CompressedCollection::exists( int documentID) {
+bool indri::collection::CompressedCollection::exists( lemur::api::DOCID_T documentID) {
   indri::thread::ScopedLock l( _lock );
 
   UINT64 offset;
@@ -682,7 +682,7 @@ bool indri::collection::CompressedCollection::exists( int documentID) {
   return _lookup.get( documentID, &offset, actual, sizeof offset );
 }
 
-indri::api::ParsedDocument* indri::collection::CompressedCollection::retrieve( int documentID ) {
+indri::api::ParsedDocument* indri::collection::CompressedCollection::retrieve( lemur::api::DOCID_T documentID ) {
   indri::thread::ScopedLock l( _lock );
 
   UINT64 offset;
@@ -777,7 +777,7 @@ indri::api::ParsedDocument* indri::collection::CompressedCollection::retrieve( i
 // retrieveMetadatum
 //
 
-std::string indri::collection::CompressedCollection::retrieveMetadatum( int documentID, const std::string& attributeName ) {
+std::string indri::collection::CompressedCollection::retrieveMetadatum( lemur::api::DOCID_T documentID, const std::string& attributeName ) {
   indri::thread::ScopedLock l( _lock );
 
   lemur::file::Keyfile** metalookup = _forwardLookups.find( attributeName.c_str() );
@@ -823,12 +823,12 @@ std::string indri::collection::CompressedCollection::retrieveMetadatum( int docu
 // retrieveIDByMetadatum 
 //
 
-std::vector<int> indri::collection::CompressedCollection::retrieveIDByMetadatum( const std::string& attributeName, const std::string& value ) {
+std::vector<lemur::api::DOCID_T> indri::collection::CompressedCollection::retrieveIDByMetadatum( const std::string& attributeName, const std::string& value ) {
   indri::thread::ScopedLock l( _lock );
 
   // find the lookup associated with this field
   lemur::file::Keyfile** metalookup = _reverseLookups.find( attributeName.c_str() );
-  std::vector<int> results;
+  std::vector<lemur::api::DOCID_T> results;
 
   // if we have a lookup, find the associated documentIDs for this value
   if( metalookup && value.size() > 0) {
@@ -837,9 +837,9 @@ std::vector<int> indri::collection::CompressedCollection::retrieveIDByMetadatum(
 
     if( dataSize > 0 ) {
       int actual = 0;
-      results.resize( dataSize / sizeof(int), 0 );
+      results.resize( dataSize / sizeof(lemur::api::DOCID_T), 0 );
       (*metalookup)->get( value.c_str(), &results.front(), actual, dataSize );
-      assert( actual == results.size() * sizeof(int) );
+      assert( actual == results.size() * sizeof(lemur::api::DOCID_T) );
     }
   }
 
@@ -852,7 +852,7 @@ std::vector<int> indri::collection::CompressedCollection::retrieveIDByMetadatum(
 
 std::vector<indri::api::ParsedDocument*> indri::collection::CompressedCollection::retrieveByMetadatum( const std::string& attributeName, const std::string& value ) {
   std::vector<indri::api::ParsedDocument*> documents;
-  std::vector<int> results = retrieveIDByMetadatum( attributeName, value );
+  std::vector<lemur::api::DOCID_T> results = retrieveIDByMetadatum( attributeName, value );
 
   for( size_t i=0; i<results.size(); i++ ) {
     documents.push_back( retrieve( results[i] ) );
@@ -873,7 +873,7 @@ std::vector<indri::api::ParsedDocument*> indri::collection::CompressedCollection
 
 void indri::collection::CompressedCollection::_removeForwardLookups( indri::index::DeletedDocumentList& deletedList, lemur::file::Keyfile& keyfile ) {
 	indri::index::DeletedDocumentList::read_transaction* transaction = deletedList.getReadTransaction();
-	int nextDeletedDocument = 0;
+	lemur::api::DOCID_T nextDeletedDocument = 0;
 	
   int key;
   int actual = 0;
@@ -1039,7 +1039,7 @@ static bool keyfile_get( lemur::file::Keyfile& keyfile, char* key, indri::utilit
 
 void indri::collection::CompressedCollection::_removeReverseLookups( indri::index::DeletedDocumentList& deletedList, lemur::file::Keyfile& keyfile ) {
 	indri::index::DeletedDocumentList::read_transaction* transaction = deletedList.getReadTransaction();
-	int nextDeletedDocument = 0;
+	lemur::api::DOCID_T nextDeletedDocument = 0;
   
   char key[lemur::file::Keyfile::MAX_KEY_LENGTH+1];
   indri::utility::Buffer value;

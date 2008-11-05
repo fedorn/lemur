@@ -47,15 +47,15 @@ namespace indri
                                  double maximumBackgroundScore,
                                  double maximumScore );
 
-      int nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
 
       double maximumBackgroundScore();
       double maximumScore();
-      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, int begin, int end, int documentLength );
-      void annotate( class Annotator& annotator, int documentID, int begin, int end );
-      bool hasMatch( int documentID );
-      const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
+      const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( lemur::api::DOCID_T documentID, int begin, int end, int documentLength );
+      void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, int begin, int end );
+      bool hasMatch( lemur::api::DOCID_T documentID );
+      const indri::utility::greedy_vector<bool>& hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents );
       
       const std::string& getName() const;
     };

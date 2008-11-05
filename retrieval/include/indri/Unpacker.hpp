@@ -22,6 +22,7 @@
 #include <string>
 #include <map>
 #include "indri/XMLNode.hpp"
+#include "IndexTypes.hpp"
 
 namespace indri {
   namespace lang {
@@ -49,6 +50,8 @@ namespace indri {
       std::vector<ScoredExtentNode*> getScoredExtentVector( const char* name );
       std::vector<std::string> getStringVector( const char* name );
       std::vector<int> getIntVector( const char* name );
+      std::vector<lemur::api::DOCID_T> getDocIdVector( const char* name );
+      
       std::vector<double> getDoubleVector( const char* name ) ;
       ScoredExtentNode* getScoredExtentNode( const char* name );
       bool getBoolean( const char* name );

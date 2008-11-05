@@ -50,7 +50,7 @@ namespace indri {
       bool finished() const;
       void startIteration();
       bool nextEntry();
-      bool nextEntry( int documentID );
+      bool nextEntry( lemur::api::DOCID_T documentID );
       DocumentExtentData* currentEntry();
     };
   }

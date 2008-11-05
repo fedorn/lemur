@@ -21,6 +21,8 @@
 
 #include "indri/ObjectHandler.hpp"
 #include "indri/ParsedDocument.hpp"
+#include "IndexTypes.hpp"
+
 namespace indri
 {
   namespace collection
@@ -29,8 +31,8 @@ namespace indri
     class Collection {
     public:
       virtual ~Collection() {};
-      virtual void addDocument( int documentID, indri::api::ParsedDocument* document ) = 0;
-      virtual indri::api::ParsedDocument* retrieve( int documentID ) = 0;
+      virtual void addDocument( lemur::api::DOCID_T documentID, indri::api::ParsedDocument* document ) = 0;
+      virtual indri::api::ParsedDocument* retrieve( lemur::api::DOCID_T  documentID ) = 0;
     };
   }
 }

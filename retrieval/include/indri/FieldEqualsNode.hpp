@@ -36,14 +36,14 @@ namespace indri
     public:
       FieldEqualsNode( const std::string& name, class FieldIteratorNode* iterator, INT64 constant );
 
-      void prepare( int documentID );
+      void prepare( lemur::api::DOCID_T documentID );
       indri::utility::greedy_vector<indri::index::Extent>& extents();
   
-      int nextCandidateDocument();
+      lemur::api::DOCID_T nextCandidateDocument();
       void indexChanged( indri::index::Index& index );
 
       const std::string& getName() const;
-      void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent );
+      void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent );
     };
   }
 }

@@ -68,15 +68,15 @@ namespace indri {
       /// The documentMaximum is at least one greater than the largest documentID used in this index.
       virtual lemur::api::DOCID_T documentMaximum() = 0;
 
-      virtual int term( const char* term ) = 0;
-      virtual int term( const std::string& term ) = 0;
-      virtual std::string term( int termID ) = 0;
+      virtual lemur::api::TERMID_T term( const char* term ) = 0;
+      virtual lemur::api::TERMID_T term( const std::string& term ) = 0;
+      virtual std::string term( lemur::api::TERMID_T termID ) = 0;
 
       virtual int field( const char* fieldName ) = 0;
       virtual int field( const std::string& fieldName ) = 0;
       virtual std::string field( int fieldID ) = 0;
 
-      virtual int documentLength( int documentID ) = 0;
+      virtual int documentLength( lemur::api::DOCID_T documentID ) = 0;
       virtual UINT64 documentCount() = 0;
       virtual UINT64 documentCount( const std::string& term ) = 0;
 
@@ -92,12 +92,12 @@ namespace indri {
       virtual UINT64 fieldDocumentCount( const std::string& field, const std::string& term ) = 0;
 
       // Lists
-      virtual DocListIterator* docListIterator( int termID ) = 0;
+      virtual DocListIterator* docListIterator( lemur::api::TERMID_T termID ) = 0;
       virtual DocListIterator* docListIterator( const std::string& term ) = 0;
       virtual DocListFileIterator* docListFileIterator() = 0;
       virtual DocExtentListIterator* fieldListIterator( int fieldID ) = 0;
       virtual DocExtentListIterator* fieldListIterator( const std::string& field ) = 0;
-      virtual const TermList* termList( int documentID ) = 0;
+      virtual const TermList* termList( lemur::api::DOCID_T documentID ) = 0;
       virtual TermListFileIterator* termListFileIterator() = 0;
       virtual DocumentDataIterator* documentDataIterator() = 0;
 

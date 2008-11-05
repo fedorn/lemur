@@ -39,10 +39,10 @@ namespace indri
     public:
       virtual double maximumBackgroundScore() = 0;
       virtual double maximumScore() = 0;
-      virtual const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( int documentID, indri::index::Extent &extent, int documentLength ) = 0;
-      virtual bool hasMatch( int documentID ) = 0;
-      virtual const indri::utility::greedy_vector<bool>& hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) = 0;
-      virtual void annotate( class Annotator& annotator, int documentID, indri::index::Extent &extent ) = 0;
+      virtual const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) = 0;
+      virtual bool hasMatch( lemur::api::DOCID_T documentID ) = 0;
+      virtual const indri::utility::greedy_vector<bool>& hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) = 0;
+      virtual void annotate( class Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) = 0;
 
       /// sets the siblings flag (and counter) if the belief node
       /// has siblings

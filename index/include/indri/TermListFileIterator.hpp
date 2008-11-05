@@ -19,6 +19,7 @@
 #define INDRI_TERMLISTFILEITERATOR_HPP
 
 #include "indri/TermList.hpp"
+#include "IndexTypes.hpp"
 
 namespace indri {
   namespace index {
@@ -28,7 +29,7 @@ namespace indri {
       
       virtual void startIteration() = 0;
       virtual bool nextEntry() = 0;
-      virtual bool nextEntry( int documentID ) = 0;
+      virtual bool nextEntry( lemur::api::DOCID_T documentID ) = 0;
       virtual bool finished() = 0;
       virtual TermList* currentEntry() = 0;
     };

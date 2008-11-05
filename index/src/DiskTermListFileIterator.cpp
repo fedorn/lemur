@@ -71,7 +71,7 @@ bool indri::index::DiskTermListFileIterator::nextEntry() {
 // nextEntry
 //
 
-bool indri::index::DiskTermListFileIterator::nextEntry( int documentID ) {
+bool indri::index::DiskTermListFileIterator::nextEntry( lemur::api::DOCID_T documentID ) {
   UINT32 length;
 
   if( _currentDocument >= documentID )

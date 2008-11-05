@@ -26,7 +26,7 @@ indri::infnet::FieldGreaterNode::FieldGreaterNode( const std::string& name, Fiel
   _constant = constant;
 }
 
-void indri::infnet::FieldGreaterNode::prepare( int documentID ) {
+void indri::infnet::FieldGreaterNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
@@ -48,7 +48,7 @@ indri::utility::greedy_vector<indri::index::Extent>& indri::infnet::FieldGreater
   return _extents;
 }
 
-int indri::infnet::FieldGreaterNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::FieldGreaterNode::nextCandidateDocument() {
   return _field->nextCandidateDocument();
 }
 
@@ -56,7 +56,7 @@ const std::string& indri::infnet::FieldGreaterNode::getName() const {
   return _name;
 }
 
-void indri::infnet::FieldGreaterNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::FieldGreaterNode::annotate( indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   annotator.addMatches( _extents, this, documentID, extent );
 }
 

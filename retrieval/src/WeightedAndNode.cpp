@@ -149,7 +149,7 @@ void indri::infnet::WeightedAndNode::indexChanged( indri::index::Index& index ) 
 
   while( true ) {
     // find the smallest document
-    int smallestDocument = MAX_INT32;
+    lemur::api::DOCID_T smallestDocument = MAX_INT32;
 
     for( size_t i=0; i<lists.size(); i++ ) {
       indri::utility::greedy_vector<indri::index::DocListIterator::TopDocument>& currentList = *lists[i];      
@@ -193,10 +193,10 @@ void indri::infnet::WeightedAndNode::setThreshold( double threshold ) {
   }
 }
   
-int indri::infnet::WeightedAndNode::nextCandidateDocument() {
+lemur::api::DOCID_T indri::infnet::WeightedAndNode::nextCandidateDocument() {
   std::vector<child_type>::iterator iter;
-  int minDocument = MAX_INT32;
-  int currentCandidate;
+  lemur::api::DOCID_T minDocument = MAX_INT32;
+  lemur::api::DOCID_T currentCandidate;
 
   if( _candidatesIndex < _candidates.size() ) {
     minDocument = _candidates[_candidatesIndex];
@@ -213,7 +213,7 @@ int indri::infnet::WeightedAndNode::nextCandidateDocument() {
   return minDocument;
 }
 
-void indri::infnet::WeightedAndNode::annotate( indri::infnet::Annotator& annotator, int documentID, indri::index::Extent &extent ) {
+void indri::infnet::WeightedAndNode::annotate( indri::infnet::Annotator& annotator, lemur::api::DOCID_T documentID, indri::index::Extent &extent ) {
   std::vector<child_type>::iterator iter;
   annotator.add( this, documentID, extent );
 
@@ -244,7 +244,7 @@ double indri::infnet::WeightedAndNode::maximumScore() {
   return maximum;
 }
 
-indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedAndNode::score( int documentID, indri::index::Extent &extent, int documentLength ) {
+indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::WeightedAndNode::score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
   std::vector<child_type>::iterator iter;
   double score = 0;
   double sumWeight = 0;
@@ -287,7 +287,7 @@ indri::utility::greedy_vector<indri::api::ScoredExtentResult>& indri::infnet::We
 // hasMatch
 //
 
-bool indri::infnet::WeightedAndNode::hasMatch( int documentID ) {
+bool indri::infnet::WeightedAndNode::hasMatch( lemur::api::DOCID_T documentID ) {
   // advance candidates
   while( _candidatesIndex < _candidates.size() && _candidates[_candidatesIndex] <= documentID )
     _candidatesIndex++;
@@ -304,7 +304,7 @@ bool indri::infnet::WeightedAndNode::hasMatch( int documentID ) {
 // hasMatch
 //
 
-const indri::utility::greedy_vector<bool>& indri::infnet::WeightedAndNode::hasMatch( int documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
+const indri::utility::greedy_vector<bool>& indri::infnet::WeightedAndNode::hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
   // advance candidates
   while( _candidatesIndex < _candidates.size() && _candidates[_candidatesIndex] <= documentID )
     _candidatesIndex++;

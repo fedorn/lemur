@@ -20,13 +20,14 @@
 
 #include "indri/SequentialReadBuffer.hpp"
 #include "indri/greedy_vector"
+#include "IndexTypes.hpp"
 
 namespace indri {
   namespace collection {
     class PriorListIterator {
     public:
       struct Entry {
-        int document;
+        lemur::api::DOCID_T document;
         double score;
       };
     
@@ -46,7 +47,7 @@ namespace indri {
     
       void startIteration();
       void nextEntry();
-      void nextEntry( int document );
+      void nextEntry( lemur::api::DOCID_T document );
       Entry* currentEntry();
       bool finished();
     };
