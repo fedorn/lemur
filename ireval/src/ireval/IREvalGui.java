@@ -41,6 +41,8 @@ import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -299,6 +301,9 @@ public class IREvalGui {
 		range.setLowerBound(-0.05);
 		range.setUpperBound(1.05);
 		JFrame f = new JFrame("Interpolated Recall - Precision");
+		String iconFile = "properties/icon.gif";
+		ImageIcon lemurIcon = createImageIcon(iconFile);
+		f.setIconImage(lemurIcon.getImage());
 		f.setLocationByPlatform(true);
 		ChartPanel p = new ChartPanel(chart);
 		p.setPreferredSize(new Dimension(600,600));
@@ -348,6 +353,9 @@ public class IREvalGui {
 		JFreeChart chart = ChartFactory.createBarChart(label,
 				"N", "precision", series, PlotOrientation.VERTICAL, true, true, false);
 		JFrame f = new JFrame("Precision @ N");
+		String iconFile = "properties/icon.gif";
+		ImageIcon lemurIcon = createImageIcon(iconFile);
+		f.setIconImage(lemurIcon.getImage());
 		f.setLocationByPlatform(true);
 		ChartPanel p = new ChartPanel(chart);
 		p.setPreferredSize(new Dimension(600,600));
@@ -644,7 +652,23 @@ public class IREvalGui {
 		resultsTable.setTransferHandler(new TableTransferHandler());
 		//resultsTable.setFillsViewportHeight(true); // jdk 1.6
 		resultsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		resultsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			public void  valueChanged(ListSelectionEvent event){
+				if (event.getValueIsAdjusting()) {
+					return;
+				}
+				int []rows = resultsTable.getSelectedRows();
+				// ought to check that it can be enabled.
+				if (rows.length == 1) {
+					queries.setEnabled(false);
+					queries.setSelectedIndex(0);
+					queries.setEnabled(true);
 
+				} else {
+					queries.setEnabled(false);
+				}
+			}
+		});
 		resultsTable.getTableHeader().setToolTipText("<html>Select one element for a single evaluation. Select a two or more elements for a pairwise evaluation.<br>When multiple elements are selected, the first in the listing is treated as the baseline.<br>Result sets can be reordered by dragging.</html>");
 
 		DefaultTableCellRenderer renderer =
