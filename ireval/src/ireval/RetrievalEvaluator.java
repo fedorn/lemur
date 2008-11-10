@@ -434,7 +434,6 @@ public class RetrievalEvaluator {
         }                                                                                          
                 
         double normalizer = 0;
-        int countsSoFar = 0;
         int documentsProcessed = 0; 
         
         for( Integer negativeRelevanceValue : relevanceCounts.keySet() ) {        
@@ -443,7 +442,7 @@ public class RetrievalEvaluator {
             relevanceCount = Math.min( relevanceCount, documentsRetrieved - documentsProcessed );
             
             for( int i = 1; i <= relevanceCount; i++ ) {
-                normalizer += (Math.pow(2, relevanceValue) - 1.0) / Math.log( 1 + i + countsSoFar ); 
+                normalizer += (Math.pow(2, relevanceValue) - 1.0) / Math.log( 1 + i + documentsProcessed ); 
             }
             
             documentsProcessed += relevanceCount;
