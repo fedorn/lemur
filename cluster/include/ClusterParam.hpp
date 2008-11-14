@@ -48,7 +48,7 @@ namespace ClusterParam {
   /// get the parameters off of the stack.
   static void get() {
     databaseIndex = lemur::api::ParamGetString("index","");
-    clusterIndex = lemur::api::ParamGetString("clusterIndex","");
+    clusterIndex = lemur::api::ParamGetString("clusterIndex","clusterIndex");
     clusterDBType = lemur::api::ParamGetString("clusterDBType","flatfile");
     string clusterTypeString = lemur::api::ParamGetString("clusterType",
                                                           "centroid");
