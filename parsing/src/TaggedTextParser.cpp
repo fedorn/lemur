@@ -176,6 +176,17 @@ indri::api::ParsedDocument* indri::parse::TaggedTextParser::parse( indri::parse:
     document->tags.begin();
 
   initialize(document, &_document);
+
+  // Add a global parent element for all tags.
+  // parameters need to be set for this in the FCE
+  TagEvent globalTag;  
+  globalTag.name = "document";
+  globalTag.open_tag = true;
+  globalTag.pos = 0; // start at the beginning
+  globalTag.begin = 0;
+  globalTag.end = 0;
+  handleTag(&globalTag);
+
   while ( i != document->positions.end() ) {
 
     // As it iterates through the token events, Parser must also run
@@ -233,6 +244,12 @@ indri::api::ParsedDocument* indri::parse::TaggedTextParser::parse( indri::parse:
     handleTag( &(*k) );
     k++;
   }
+  // close the global document tag;
+  globalTag.open_tag = false;
+  globalTag.pos = token_pos;
+  globalTag.begin = _document.textLength;
+  globalTag.end = _document.textLength;
+  handleTag(&globalTag);
   
   // Tag lists are actually written in the cleanup function:
   cleanup(document, &_document);

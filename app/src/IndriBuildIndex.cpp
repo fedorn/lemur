@@ -894,7 +894,14 @@ int main(int argc, char * argv[]) {
 
     env.setMetadataIndexedFields( metadataForward, metadataBackward );
     
-    std::vector<std::string> fields;
+    // "document" is a special field.
+    // automagically add it as an indexed field.
+    indri::api::Parameters field = parameters.append("field");
+    field.set( "name", "document" );
+    field.set( "ordinal", true );
+    field.set("parental", true);
+
+    std::vector<std::string> fields;    
     std::string subName = "name";
     if( copy_parameters_to_string_vector( fields, parameters, "field", &subName ) ) {
       downcase_string_vector(fields);
