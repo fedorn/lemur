@@ -195,7 +195,7 @@ class lemur_csharpPINVOKE {
   public static extern int TermInfo_count(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_TermInfo_positions")]
-  public static extern int[] TermInfo_positions(HandleRef jarg1);
+  public static extern IntPtr TermInfo_positions(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_TermInfo_position")]
   public static extern int TermInfo_position(HandleRef jarg1);
@@ -225,7 +225,7 @@ class lemur_csharpPINVOKE {
   public static extern int DocInfo_termCount(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_DocInfo_positions")]
-  public static extern int[] DocInfo_positions(HandleRef jarg1);
+  public static extern IntPtr DocInfo_positions(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_delete_DocInfo")]
   public static extern void delete_DocInfo(HandleRef jarg1);

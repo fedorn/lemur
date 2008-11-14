@@ -23,18 +23,28 @@
 #endif
 
 #ifdef SWIGCSHARP
-// need the right intermediate type here.
 %typemap(ctype) const lemur::api::LOC_T* "int *"
-%typemap(imtype) const lemur::api::LOC_T* "int[]"
+%typemap(imtype) const lemur::api::LOC_T* "IntPtr"
 %typemap(cstype) const lemur::api::LOC_T* "int[]"
 
 %typemap(out) const lemur::api::LOC_T* {
-  $result = $1;
+  int * val = $1;
+  std::vector<int> *retval = new std::vector<int>();
+  int count = arg1->termCount();
+  for (int i = 0; i < count; i++) retval->push_back(val[i]);
+  $result = (int *)retval;
 }
 
 %typemap(csout, excode=SWIGEXCODE) const lemur::api::LOC_T* {
-  int[] ret= $imcall;$excode
-                       return ret;
+  IntPtr ret = $imcall;$excode
+  Indri.IntVector retvector = new Indri.IntVector(ret, true);
+  int cnt = termCount();
+  int[] retval = new int[cnt];
+  int i = 0;
+  foreach (int val in retvector) {
+      retval[i++] = val;
+  }
+  return retval;
 }
 #endif
 

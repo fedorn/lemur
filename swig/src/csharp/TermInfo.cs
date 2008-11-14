@@ -53,8 +53,15 @@ public class TermInfo : IDisposable {
   }
 
   public int[] positions() {
-  int[] ret = lemur_csharpPINVOKE.TermInfo_positions(swigCPtr);
-                        return ret;
+  IntPtr ret = lemur_csharpPINVOKE.TermInfo_positions(swigCPtr);
+  Indri.IntVector retvector = new Indri.IntVector(ret, true);
+  int cnt = count();
+  int[] retval = new int[cnt];
+  int i = 0;
+  foreach (int val in retvector) {
+      retval[i++] = val;
+  }
+  return retval;
 }
 
   public int position() {

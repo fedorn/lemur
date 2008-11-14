@@ -656,7 +656,11 @@ SWIGEXPORT int * SWIGSTDCALL CSharp_TermInfo_positions(void * jarg1) {
   arg1 = (lemur::api::TermInfo *)jarg1; 
   result = (lemur::api::LOC_T *)((lemur::api::TermInfo const *)arg1)->positions();
   {
-    jresult = result;
+    int * val = result;
+    std::vector<int> *retval = new std::vector<int>();
+    int count = arg1->count();
+    for (int i = 0; i < count; i++) retval->push_back(val[i]);
+    jresult = (int *)retval;
   }
   return jresult;
 }
@@ -768,7 +772,11 @@ SWIGEXPORT int * SWIGSTDCALL CSharp_DocInfo_positions(void * jarg1) {
   arg1 = (lemur::api::DocInfo *)jarg1; 
   result = (lemur::api::LOC_T *)((lemur::api::DocInfo const *)arg1)->positions();
   {
-    jresult = result;
+    int * val = result;
+    std::vector<int> *retval = new std::vector<int>();
+    int count = arg1->termCount();
+    for (int i = 0; i < count; i++) retval->push_back(val[i]);
+    jresult = (int *)retval;
   }
   return jresult;
 }
