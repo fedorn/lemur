@@ -47,7 +47,8 @@ indri::query::TermScoreFunction* indri::query::TermScoreFunctionFactory::get( co
   if( method == "dirichlet" || method == "d" || method == "dir" ) {
     // dirichlet -- takes parameter "mu"
     double mu = spec.get( "mu", 2500 );
-    return new indri::query::DirichletTermScoreFunction( mu, collectionFrequency );
+    double docmu=spec.get("documentMu",1e30);
+    return new indri::query::DirichletTermScoreFunction( mu, collectionFrequency, docmu );
   } else if( method == "linear" || method == "jm" || method == "jelinek-mercer" ) {
     // jelinek-mercer -- can take parameters collectionLambda (or just lambda) and documentLambda
     double documentLambda = spec.get( "documentLambda", 0.0 );

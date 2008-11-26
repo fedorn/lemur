@@ -29,14 +29,16 @@ namespace indri
     class DirichletTermScoreFunction : public TermScoreFunction {
     private:
       double _mu;
+      double _docmu;
       double _collectionFrequency;
       double _muTimesCollectionFrequency;
 
     public:
-      DirichletTermScoreFunction( double mu, double collectionFrequency ) {
+      DirichletTermScoreFunction( double mu, double collectionFrequency, double docmu=1e30 ) {
         _collectionFrequency = collectionFrequency;
         _mu = mu;
         _muTimesCollectionFrequency = _mu * _collectionFrequency;
+        _docmu = docmu;
       }
 
       double scoreOccurrence( double occurrences, int contextSize ) {
@@ -45,8 +47,15 @@ namespace indri
       }
 
       double scoreOccurrence( double occurrences, int contextSize, double documentOccurrences, int documentLength ) {
-        // can't two-level smooth with dirichlet
-        return scoreOccurrence( occurrences, contextSize );
+//two level Dir Smoothing!
+//        tf_E + documentMu*P(t|D)
+//P(t|E)= ------------------------
+//         extentlen + documentMu
+//                 mu*P(t|C) + tf_D
+//where P(t|D)= ---------------------
+//                  doclen + mu
+        double seen = (occurrences+_docmu*(_muTimesCollectionFrequency+documentOccurrences)/(documentLength+_mu))/(contextSize+_docmu);
+        return log(seen);
       }
     };
   }
