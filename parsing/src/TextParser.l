@@ -79,7 +79,7 @@ indri::api::ParsedDocument* indri::parse::TextParser::parse( indri::parse::Token
   while( textparserlex() )
     writeToken( textparsertext );
 
-  textparser_delete_buffer(yy_current_buffer);
+  textparser_delete_buffer(YY_CURRENT_BUFFER);
   
   return &_document;
 }
