@@ -15,6 +15,8 @@ lemur::parse::IndriTextHandler::IndriTextHandler(const string &name, int memory,
 
   // shadows attribute from Object.
   env.setMemory(memory);
+  // lemur parsers do normalization, so turn it off.
+  env.setNormalization(false);
   // have to set stopwords somewhere too (for queries)... bleah.
   // Have to force the IndexEnvironment to build a reverse lookup table for 
   // the docno field to support the Index::document(external id) api call
