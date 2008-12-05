@@ -64,6 +64,7 @@ distclean:
 	rm -rf $(CLEANFILES) $(PROGRAMS) $(DEPDIR) *.o
 clean:
 	rm -rf $(PROGRAMS) *.o
+	$(MAKE) -C $(gsoap_dir) clean
 
 $(gsoap_dir)/config.h:
 	cd $(gsoap_dir) ; ./configure
