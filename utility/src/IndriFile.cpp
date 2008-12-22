@@ -15,6 +15,7 @@
 // 15 November 2004 -- tds
 //
 
+#include <cstdlib>
 #include <string>
 #include "indri/indri-platform.h"
 #include "indri/File.hpp"

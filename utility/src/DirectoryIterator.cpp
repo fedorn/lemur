@@ -22,6 +22,7 @@
 #include "indri/Path.hpp"
 #include <vector>
 #include <iostream>
+#include <cstdlib>
 
 // static construction
 indri::file::DirectoryIterator indri::file::DirectoryIterator::_end;

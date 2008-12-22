@@ -35,6 +35,7 @@
 
 #include <stdio.h>
 #include <cstring>
+#include <cstdlib>
 
 #ifdef max
 #undef max
