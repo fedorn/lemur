@@ -204,13 +204,12 @@ JNIEXPORT void JNICALL Java_lemurproject_lemur_ui_JBuildIndex_buildIndex
   }
 
   // free memory
+	delete(indexer);
 	delete(stopper);
 	delete(stemmer);
 	delete(parser);
-	delete(indexer);
-  delete(docmgr);
 	if (index)
 		delete(index);
-
+  delete(docmgr);
   ParamPopFile();
 }
