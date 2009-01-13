@@ -30,7 +30,7 @@
 
 #define COMBINER_WRITE_BUFFER_SIZE (1*1024*1024)
 
-indri::parse::Combiner::url_entry* indri::parse::Combiner::_newUrlEntry( char* url, char* corpusPath, char* docNo ) {
+indri::parse::Combiner::url_entry* indri::parse::Combiner::_newUrlEntry( const char* url, const char* corpusPath, const char* docNo ) {
   int urlLen = (int)strlen(url) + 1;
   int corpusLen = (int)strlen(corpusPath) + 1;
   int docLen = (int)strlen(docNo) + 1;

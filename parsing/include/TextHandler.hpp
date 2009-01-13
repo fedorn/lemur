@@ -99,7 +99,7 @@ namespace lemur
       }
 
       virtual void foundToken(TokenType type, 
-                              char * token = NULL, 
+                              const char * token = NULL, 
                               const char * orig = NULL,
                               lemur::parse::PropertyList * properties = NULL) {
         char * t = NULL;
@@ -195,7 +195,7 @@ namespace lemur
         foundToken(ENDDOC);
       }
       /// Found a word
-      virtual void foundSymbol(char * sym) {
+      virtual void foundSymbol(const char * sym) {
         foundToken(SYMBOLTOK, sym, sym);
       }  
       // Kept for backwords compatability

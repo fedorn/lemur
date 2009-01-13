@@ -2538,7 +2538,7 @@ void lemur::parse::InqArabicParser::finishing_nesting_qnote(int top) {
 }
 
 
-void lemur::parse::InqArabicParser::parseNestingOp(char *op) {
+void lemur::parse::InqArabicParser::parseNestingOp(const char *op) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) textHandler->foundSymbol(op);
@@ -2565,7 +2565,7 @@ void lemur::parse::InqArabicParser::finishing_prox_qnote(int top) {
   }
 }
 
-void lemur::parse::InqArabicParser::parseProxOp(char *op, char *size) {
+void lemur::parse::InqArabicParser::parseProxOp(const char *op, const char *size) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) {
@@ -2582,7 +2582,7 @@ void lemur::parse::InqArabicParser::parseProxOp(char *op, char *size) {
   return;
 }
 
-void lemur::parse::InqArabicParser::parsePassageOp(char *op, char *size) {
+void lemur::parse::InqArabicParser::parsePassageOp(const char *op, const char *size) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) {
@@ -2599,7 +2599,7 @@ void lemur::parse::InqArabicParser::parsePassageOp(char *op, char *size) {
   return;
 }
 
-void lemur::parse::InqArabicParser::parseSynOp(char *op) {
+void lemur::parse::InqArabicParser::parseSynOp(const char *op) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) {
@@ -2615,7 +2615,7 @@ void lemur::parse::InqArabicParser::parseSynOp(char *op) {
   return;
 }
 
-void lemur::parse::InqArabicParser::parsePropOp(char *op) {
+void lemur::parse::InqArabicParser::parsePropOp(const char *op) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) {
@@ -2631,7 +2631,7 @@ void lemur::parse::InqArabicParser::parsePropOp(char *op) {
   return;
 }
 
-void lemur::parse::InqArabicParser::parseTermOp(char *op) {
+void lemur::parse::InqArabicParser::parseTermOp(const char *op) {
   if (state) {
     int nxtok=InqArabiclex();
     if (textHandler != NULL) textHandler->foundSymbol(op);

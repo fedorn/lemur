@@ -94,7 +94,7 @@ namespace indri
       typedef indri::utility::HashTable<char*, url_entry*, strhash, strcompst> UrlEntryTable;
       typedef indri::utility::HashTable<char*, std::vector<url_entry*>, strhash, strcompst> UrlEntryVectorTable;
 
-      url_entry* _newUrlEntry( char* url, char* corpusPath, char* docNo );
+      url_entry* _newUrlEntry( const char* url, const char* corpusPath, const char* docNo );
       void _deleteUrlEntry( void* buffer );
   
       void _readLinks( UrlEntryTable& urlTable, std::ifstream& linkIn );

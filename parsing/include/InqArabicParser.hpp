@@ -43,17 +43,17 @@ namespace lemur
       /// parse nested proximity query nodes until the next enclosing RIGHT_PAREN
       void finishing_prox_qnote(int top);
       /// begin parsing nested query nodes
-      void parseNestingOp(char *op);
+      void parseNestingOp(const char *op);
       /// parse proximity operator node
-      void parseProxOp(char *op, char *size);
+      void parseProxOp(const char *op, const char *size);
       /// parse passage operator node
-      void parsePassageOp(char *op, char *size);
+      void parsePassageOp(const char *op, const char *size);
       /// parse synonym operator node
-      void parseSynOp(char *op);
+      void parseSynOp(const char *op);
       /// parse property operator node
-      void parsePropOp(char *op);
+      void parsePropOp(const char *op);
       /// parse term node
-      void parseTermOp(char *op);
+      void parseTermOp(const char *op);
       /// parse query node
       void parseQryNode(int tok);
       /// parse proximity query node

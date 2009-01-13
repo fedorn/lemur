@@ -57,9 +57,9 @@ namespace lemur
       static const int Norm3Char[256];
       static const int NormChar[256];
       static const int isWhitespace[256];
-      static char *stopwords[];
-      static char *suffixes[];
-      static char *defarticles[];
+      static const char *stopwords[];
+      static const char *suffixes[];
+      static const char *defarticles[];
       int is_whitespace (const char c);
       void remove_definite_articles(char *word, char *result);
       void remove_all_suffixes(char *word, char *result, size_t lenlimit);

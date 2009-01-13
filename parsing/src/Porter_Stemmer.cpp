@@ -67,7 +67,7 @@ namespace indri
       return true;
     }
 
-    bool Porter_Stemmer::ends(char * s) {
+    bool Porter_Stemmer::ends(const char * s) {
       int length = s[0];
       if (s[length] != b[k]) return false; /* tiny speed-up */
       if (length > k-k0+1) return false;
@@ -76,13 +76,13 @@ namespace indri
       return true;
     }
 
-    void Porter_Stemmer::setto(char * s) {
+    void Porter_Stemmer::setto(const char * s) {
       int length = s[0];
       memmove(b+j+1,s+1,length);
       k = j+length;
     }
 
-    void Porter_Stemmer::r(char * s) { if (m() > 0) setto(s); }
+    void Porter_Stemmer::r(const char * s) { if (m() > 0) setto(s); }
 
     void Porter_Stemmer::step1ab() {
       if (b[k] == 's') {

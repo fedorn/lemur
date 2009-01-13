@@ -301,7 +301,7 @@ void lemur::parse::InQueryOpParser::finishing_nesting_qnote(int top) {
 }
 
 
-void lemur::parse::InQueryOpParser::parseNestingOp(char *op) {
+void lemur::parse::InQueryOpParser::parseNestingOp(const char *op) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) textHandler->foundSymbol(op);
@@ -328,7 +328,7 @@ void lemur::parse::InQueryOpParser::finishing_prox_qnote(int top) {
   }
 }
 
-void lemur::parse::InQueryOpParser::parseProxOp(char *op, char *size) {
+void lemur::parse::InQueryOpParser::parseProxOp(const char *op, const char *size) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) {
@@ -345,7 +345,7 @@ void lemur::parse::InQueryOpParser::parseProxOp(char *op, char *size) {
   return;
 }
 
-void lemur::parse::InQueryOpParser::parsePassageOp(char *op, char *size) {
+void lemur::parse::InQueryOpParser::parsePassageOp(const char *op, const char *size) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) {
@@ -362,7 +362,7 @@ void lemur::parse::InQueryOpParser::parsePassageOp(char *op, char *size) {
   return;
 }
 
-void lemur::parse::InQueryOpParser::parseSynOp(char *op) {
+void lemur::parse::InQueryOpParser::parseSynOp(const char *op) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) {
@@ -378,7 +378,7 @@ void lemur::parse::InQueryOpParser::parseSynOp(char *op) {
   return;
 }
 
-void lemur::parse::InQueryOpParser::parsePropOp(char *op) {
+void lemur::parse::InQueryOpParser::parsePropOp(const char *op) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) {
@@ -394,7 +394,7 @@ void lemur::parse::InQueryOpParser::parsePropOp(char *op) {
   return;
 }
 
-void lemur::parse::InQueryOpParser::parseTermOp(char *op) {
+void lemur::parse::InQueryOpParser::parseTermOp(const char *op) {
   if (state) {
     int nxtok=InQuerylex();
     if (textHandler != NULL) textHandler->foundSymbol(op);

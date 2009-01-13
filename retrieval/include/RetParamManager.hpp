@@ -51,7 +51,7 @@ namespace RetrievalParameter {
 
   //@}
 
-  static string getLower(char *parm, char *def) {
+  static string getLower(const char *parm, const char *def) {
     std::string tmpString = lemur::api::ParamGetString(parm, def);
     // make it all lowercase
     for (int i = 0; i < tmpString.length(); i++)

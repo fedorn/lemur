@@ -22,11 +22,11 @@ namespace lemur
   namespace parse 
   {    
     // data tables
-    char *Arabic_Stemmer::defarticles[] = {"Çá", "æÇá","ÈÇá", "ßÇá", 
+    const char *Arabic_Stemmer::defarticles[] = {"Çá", "æÇá","ÈÇá", "ßÇá", 
                                            "ÝÇá", "áá", "\0"};
-    char *Arabic_Stemmer::suffixes[] = {"åÇ","Çä","ÇÊ","æä","íä","íå","íÉ",
+    const char *Arabic_Stemmer::suffixes[] = {"åÇ","Çä","ÇÊ","æä","íä","íå","íÉ",
                                         "å","É","í","\0"};  
-    char *Arabic_Stemmer::stopwords[] = 
+    const char *Arabic_Stemmer::stopwords[] = 
       { "Çä","ÈÚÏ", "ÖÏ", "íáí", "Çáì", "Ýí", "ãä", "ÍÊì", "æåæ", "íßæä",
         "Èå", "æáíÓ", "ÃÍÏ", "Úáì", "æßÇä", "Êáß", "ßÐáß", "ÇáÊí", "æÈíä",
         "ÝíåÇ", "ÚáíåÇ", "Åä", "æÚáì", "áßä", "Úä", "ãÓÇÁ", "áíÓ", "ãäÐ",
@@ -175,7 +175,7 @@ namespace lemur
     void Arabic_Stemmer::remove_definite_articles(char *word, char *result) {
       size_t len;
       size_t wordlen=strlen(word);
-      char **nextart=defarticles ;
+      const char **nextart=defarticles ;
       strcpy(result,word);
 
       for ( ; (len=strlen(*nextart)) > 0 ; nextart++) {
@@ -197,7 +197,7 @@ namespace lemur
                              size_t lenlimit) /* min size for remainder */ {
       size_t suflen;
       size_t wordlen=strlen(word);
-      char **nextsuf=suffixes ;
+      const char **nextsuf=suffixes ;
 
       if (wordlen==0) {
         result[0] = '\0';

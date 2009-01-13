@@ -71,7 +71,7 @@ namespace lemur
 
     class Exception {
     public:
-      Exception(char *throwerString=" unknown thrower", char *whatString="unknown exception") {
+      Exception(const char *throwerString=" unknown thrower", const char *whatString="unknown exception") {
         _what = throwerString;
         _what += ": ";
         _what += whatString;

@@ -101,16 +101,16 @@ namespace indri
 
       /* ends(s) is TRUE <=> k0,...k ends with the string s. */
 
-      bool ends(char * s);
+      bool ends(const char * s);
 
       /* setto(s) sets (j+1),...k to the characters in the string s, readjusting
          k. */
 
-      void setto(char * s);
+      void setto(const char * s);
 
       /* r(s) is used further down. */
 
-      void r(char * s);
+      void r(const char * s);
 
       /* step1ab() gets rid of plurals and -ed or -ing. e.g.
 
