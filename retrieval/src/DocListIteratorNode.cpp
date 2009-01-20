@@ -44,6 +44,8 @@ void indri::infnet::DocListIteratorNode::prepare( lemur::api::DOCID_T documentID
   initpointer();
 
   _extents.clear();
+  _lastExtent.begin = -1;
+  _lastExtent.end = -1;
 
   if( !_list )
     return;

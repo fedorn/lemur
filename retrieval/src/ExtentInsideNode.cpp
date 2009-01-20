@@ -31,6 +31,8 @@ void indri::infnet::ExtentInsideNode::prepare( lemur::api::DOCID_T documentID ) 
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
+  _lastExtent.begin = -1;
+  _lastExtent.end = -1;
 
   if( !_inner || !_outer )
     return;

@@ -32,6 +32,9 @@ void indri::infnet::WeightedExtentOrNode::prepare( lemur::api::DOCID_T documentI
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
+  _lastExtent.begin = -1;
+  _lastExtent.end = -1;
+
   indri::utility::greedy_vector<indri::index::Extent> allExtents;
 
   for( size_t i=0; i<_children.size(); i++ ) {

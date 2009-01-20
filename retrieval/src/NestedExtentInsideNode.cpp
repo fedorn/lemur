@@ -33,6 +33,8 @@ void indri::infnet::NestedExtentInsideNode::prepare( lemur::api::DOCID_T documen
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
+  _lastExtent.begin = -1;
+  _lastExtent.end = -1;
 
   if( !_inner || !_outer )
     return;

@@ -36,6 +36,8 @@ void indri::infnet::ExtentDescendantNode::prepare( lemur::api::DOCID_T documentI
   initpointer();
 
   _extents.clear();
+  _lastExtent.begin = -1;
+  _lastExtent.end = -1;
 
   if( !_inner || !_outer )
     return;

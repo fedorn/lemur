@@ -31,6 +31,9 @@ void indri::infnet::ExtentOrNode::prepare( lemur::api::DOCID_T documentID ) {
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
+  _lastExtent.begin = -1;
+  _lastExtent.end = -1;
+
   indri::utility::greedy_vector<indri::index::Extent> allExtents;
 
   // put all extents in the same bag

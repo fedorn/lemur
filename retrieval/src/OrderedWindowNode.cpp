@@ -51,6 +51,9 @@ void indri::infnet::OrderedWindowNode::prepare( lemur::api::DOCID_T documentID )
   // initialize the child / sibling pointer
   initpointer();
   _extents.clear();
+  _lastExtent.begin = -1;
+  _lastExtent.end = -1;
+
   assert( _children.size() >= 2 );
 
   // TODO: could make this faster:
