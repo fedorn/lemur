@@ -106,7 +106,8 @@ void indri::query::RelevanceModel::_countGrams() {
     indri::api::DocumentVector* v = _vectors[i];
     std::vector<int>& positions = v->positions();
     std::vector<std::string>& stems = v->stems();
-
+    if (result.end == 0) result.end = positions.size();
+    
     // for each word position in the text
     for( int j = result.begin; j < result.end; j++ ) {
       int maxGram = std::min( _maxGrams, result.end - j );
