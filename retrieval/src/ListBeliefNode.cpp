@@ -177,7 +177,7 @@ const indri::utility::greedy_vector<bool>& indri::infnet::ListBeliefNode::hasMat
     assert( matchExtents[j].end >= extents[i].end );
 
     _matches[j] = true;
-    i++;
+    //    i++; // don't consume the extent on a match, bug 2549304
     j++;
   }
 
