@@ -33,7 +33,8 @@ namespace indri
       std::vector<lemur::api::DOCID_T> _documents;
       std::string _name;
       size_t _index;
-
+      indri::utility::greedy_vector<bool> _matches;
+      
     public:
       FilterNode( const std::string& name, BeliefNode* child, const std::vector<lemur::api::DOCID_T>& documents )
         :
@@ -41,7 +42,7 @@ namespace indri
       {
         _name = name;
         _belief = child;
-        _index = 0;
+        _index = -1;
         std::sort( _documents.begin(), _documents.end() );
       }
 
@@ -51,12 +52,9 @@ namespace indri
       }
 
       lemur::api::DOCID_T nextCandidateDocument() {
-        lemur::api::DOCID_T childNext = _belief->nextCandidateDocument();
-
-        while( _index < _documents.size() && _documents[_index] < childNext )
           _index++;
     
-        if( _index == _documents.size() )
+        if( _index >= _documents.size() )
           return MAX_INT32;
 
         return _documents[_index];
@@ -79,16 +77,18 @@ namespace indri
       }
 
       bool hasMatch( lemur::api::DOCID_T documentID ) {
-        return _belief->hasMatch( documentID );
+        return _documents[_index] == documentID;
       }
 
       const indri::utility::greedy_vector<bool>& hasMatch( lemur::api::DOCID_T documentID, const indri::utility::greedy_vector<indri::index::Extent>& extents ) {
-        return _belief->hasMatch( documentID, extents );
-      }
+        _matches.clear();
+        _matches.resize( extents.size(),  _documents[_index] == documentID);
+        return _matches;
+    }
 
       void indexChanged( indri::index::Index& index ) {
         // reset the _index to make sure we see newly added documents
-        _index = 0;
+        _index = -1;
       }
 
       const std::string& getName() const {
