@@ -32,7 +32,7 @@ namespace indri
       BeliefNode* _belief;
       std::vector<lemur::api::DOCID_T> _documents;
       std::string _name;
-      size_t _index;
+      int  _index;
       indri::utility::greedy_vector<bool> _matches;
       
     public:
