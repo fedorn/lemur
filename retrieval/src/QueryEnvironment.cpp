@@ -831,7 +831,7 @@ double indri::api::QueryEnvironment::expressionCount( const std::string& express
   roots.push_back( contextCounter );
 
   indri::infnet::InferenceNetwork::MAllResults statisticsResults;
-  _sumServerQuery( statisticsResults, roots, 1000 );
+  _sumServerQuery( statisticsResults, roots, MAX_INT32 ); // 1000
   
   std::vector<ScoredExtentResult>& occurrencesList = statisticsResults[ contextCounter->nodeName() ][ "occurrences" ];
   delete parser;
@@ -883,10 +883,10 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
 
   if ( noContext ) {
     indri::lang::ApplyCopiers<indri::lang::NoContextCountGraphCopier, indri::lang::RawScorerNode> graph( scorerNodes );
-    _sumServerQuery( statisticsResults, graph.roots(), 1000 );
+    _sumServerQuery( statisticsResults, graph.roots(), resultsRequested ); //1000
   } else {
     indri::lang::ApplyCopiers<indri::lang::ContextCountGraphCopier, indri::lang::RawScorerNode> graph( scorerNodes );
-    _sumServerQuery( statisticsResults, graph.roots(), 1000 );
+    _sumServerQuery( statisticsResults, graph.roots(), resultsRequested ); //1000
   }
 
   PRINT_TIMER( "Statistics complete" );
