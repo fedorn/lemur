@@ -64,6 +64,9 @@ UINT64 indri::collection::RepositoryLoadThread::work() {
 
     if( index ) {
       memorySize += index->memorySize();
+    } else {
+      // account for the size of the DiskIndexes (~22M max)
+      memorySize += lemur_compat::min<size_t>(4*((*state)[i]->documentCount()),indri::index::DiskIndex::MAX_DOCLENGTHS_CACHE);
     }
   }
 
