@@ -48,11 +48,11 @@ static bool maintenance_should_merge( indri::collection::Repository::index_state
   float addRatio = smoothedDocumentLoad / (smoothedQueryLoad+1); 
 
   bool hasntThrashedRecently = lastThrashing > THRASHING_MERGE_DELAY;
-  bool couldUseMerge = state->size() >= 2;
   bool significantQueryLoad = smoothedQueryLoad > 2;
   bool insignificantDocumentLoad = smoothedDocumentLoad < 1;
   int indexesToMerge = (int)state->size(); 
-  
+  bool couldUseMerge = indexesToMerge >= 3; // trim expects 3
+
   // extremely heuristic choice for when indexes should be merged:
   //   we merge if there are a lot of incoming queries relative to
   //   the amount of documents added; and this
@@ -122,6 +122,10 @@ UINT64 indri::collection::RepositoryMaintenanceThread::work() {
       if( index ) {
         // if the index is too big, we'd better get to work
         memorySize = index->memorySize();
+	// account for the size of the DiskIndexes (~22M)
+        for( size_t i=0; i<state->size()-1; i++ ) {
+          memorySize += lemur_compat::min<size_t>(4*((*state)[i]->documentCount()),indri::index::DiskIndex::MAX_DOCLENGTHS_CACHE);
+        }
 
         if( _memory < memorySize ) {
           _requests.push( WRITE );
@@ -137,7 +141,8 @@ UINT64 indri::collection::RepositoryMaintenanceThread::work() {
         bool should_merge = openFiles > MERGE_FILE_LIMIT;
 
         if( should_merge || maintenance_should_merge( state, documentLoad, queryLoad, lastThrashing ) ) {
-          _requests.push( MERGE );
+	  // do a trim, final close will merge down to a single disk index.
+          _requests.push( TRIM );
         } else if( maintenance_should_trim( state, documentLoad, queryLoad, lastThrashing ) ) {
           _requests.push( TRIM );
         }
@@ -165,7 +170,7 @@ UINT64 indri::collection::RepositoryMaintenanceThread::work() {
   
     // unlock request queue
   }
-
+  // may want to reset the thrashing flag after trim/write
   _repository._setThrashing( false );
 
   if( merge ) {
