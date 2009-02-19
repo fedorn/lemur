@@ -117,6 +117,12 @@ namespace indri {
 
       indri::thread::Lockable* iteratorLock();
       indri::thread::Lockable* statisticsLock();
+      // cache limit
+      enum {
+        /// Maximum size of the cache for the document lengths file.
+        // 250,000 documents/megabyte.
+        MAX_DOCLENGTHS_CACHE = 20*1024*1024
+      };
     };
   }
 }

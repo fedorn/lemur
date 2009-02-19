@@ -100,7 +100,9 @@ void indri::index::DiskIndex::open( const std::string& base, const std::string& 
   _directFile.openRead( directFilePath );
   _fieldsFile.openRead( fieldsFilePath );
 
-  _lengthsBuffer.cache( 0, _documentLengths.size() );
+  size_t cacheSize = lemur_compat::min<size_t>(_documentLengths.size(), MAX_DOCLENGTHS_CACHE);
+  //  _lengthsBuffer.cache( 0, _documentLengths.size() );
+  _lengthsBuffer.cache( 0, cacheSize );
 }
 
 //
