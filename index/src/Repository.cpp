@@ -778,9 +778,8 @@ void indri::collection::Repository::_trim() {
     // compute the average number of documents in the indexes we've seen so far
     documentCount = (int)(*state)[position]->documentCount();
 
-    // break if we find an index more than 50% larger than the last one 
-    if( documentCount > lastDocumentCount*1.5 && 
-        documentCount > firstDocumentCount*4 )
+    // break if we find an index more than twice as large as the preceding one.
+    if( documentCount > lastDocumentCount*2.0 )
       {
         position++;
         break;
@@ -855,10 +854,13 @@ UINT64 indri::collection::Repository::_mergeMemory( const std::vector<indri::ind
 
 unsigned int indri::collection::Repository::_mergeFiles( const std::vector<indri::index::Index*>& indexes ) {
   // collection 3 + metadata forward/backward files
+  // can count numF/B direct on create, as collection on open
+  // estimate as 16 for the nonce.
+  // note that 1B documents use 14 keyfile segments just for forward docno.
   // repository 2
   // index/n/ 11
-  // so call it 24 * (number of indexes.+ 1)
-  unsigned int totalFiles = (unsigned int)(20 * (indexes.size() + 1));
+  // so call it 11 * (number of indexes.+ 1) + 21
+  unsigned int totalFiles = (unsigned int)(11 * (indexes.size() + 1)) + 21;
   return totalFiles;
 }
 
