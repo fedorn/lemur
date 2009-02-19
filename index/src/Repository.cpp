@@ -1079,8 +1079,11 @@ std::string indri::collection::Repository::processTerm( const std::string& term 
   indri::api::ParsedDocument original;
   indri::api::ParsedDocument* document;
   std::string result;
-  char termBuffer[256];
-  assert( term.length() < sizeof termBuffer );
+  char termBuffer[lemur::file::Keyfile::MAX_KEY_LENGTH];
+  if( term.length() >= lemur::file::Keyfile::MAX_KEY_LENGTH ) {
+    return term;
+  }
+  //  assert( term.length() < sizeof termBuffer );
   strcpy( termBuffer, term.c_str() );
 
   original.text = termBuffer;
