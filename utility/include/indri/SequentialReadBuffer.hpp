@@ -63,7 +63,8 @@ namespace indri
           memcpy( buffer, _current.buffer.front() + position - _current.filePosition, length );
           return length;
         } else {
-          return _file.read( buffer, position, length );
+          seek(position);
+          return read( buffer, length );
         }
       }
 
