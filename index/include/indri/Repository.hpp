@@ -27,7 +27,8 @@
 #include "indri/DeletedDocumentList.hpp"
 #include "indri/PriorListIterator.hpp"
 #include <string>
-#define MERGE_FILE_LIMIT 512
+// 512 -- syslimit can be 1024
+#define MERGE_FILE_LIMIT 768 
 namespace indri
 {
   /// document manager and ancillary collection components.
