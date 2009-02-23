@@ -126,17 +126,6 @@ double lemur::retrieval::IndriRetMethod::scoreDoc(const QueryRep &qry, DOCID_T d
 
 // RM expand
 void lemur::retrieval::IndriRetMethod::updateQuery(QueryRep &qryRep, const DocIDSet &relDocs) {
-  /*
-    indri::query::RMExpander rm;
-    Convert DocIDSet to std::vector<ScoredExtentResult> (document & score).
-    std::string expandedQuery = rm.expand( originalQuery , results );
-
-    update Qry to hold expanded string
-    const IndriQueryModel *tq = dynamic_cast<const IndriQueryModel *>(&qryRep);
-    tq->updateQuery(expandedQuery);
-  */
-
-  indri::query::RMExpander rm(env, *params);
 
   std::vector<ScoredExtentResult> results;
   //Convert DocIDSet (document & score).
@@ -150,8 +139,19 @@ void lemur::retrieval::IndriRetMethod::updateQuery(QueryRep &qryRep, const DocID
     res.score = relPr;
     results.push_back(res);
   }
+  // have to handle fbDocs == -1 for RelFBEval case
+  int fbDocs = params->get( "fbDocs" , 10 );
+  if (fbDocs == -1) {
+    fbDocs = results.size();
+  }
+  if (((int)results.size()) > fbDocs) {
+      results.resize(fbDocs);
+  }
+  // make sure RMExpander has the right value for number of documents.
+  params->set("fbDocs", (int)results.size());
   const IndriQueryModel *tq = dynamic_cast<const IndriQueryModel *>(&qryRep);
   const string originalQuery = tq->getQuery();
+  indri::query::RMExpander rm(env, *params);
   std::string expandedQuery = rm.expand( originalQuery , results );
   tq->updateQuery(expandedQuery);
 }
