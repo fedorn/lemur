@@ -67,10 +67,11 @@ indri::api::ParsedDocument* indri::parse::UTF8CaseNormalizationTransformation::t
       if ( (unsigned char)*c > 0x7F ) { utf_8_detected = true; break; }
 
     if ( ! utf_8_detected ) { // In-place ASCII downcase
-
+      // performed by NormalizationTransformation
+      /*
       for ( char *c = term; *c != '\0'; c++ )
         *c = tolower( *c );
-
+        */
       continue;
 
     }
