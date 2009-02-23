@@ -198,6 +198,8 @@ void indri::index::DeletedDocumentList::markDeleted( lemur::api::DOCID_T documen
 //
 
 bool indri::index::DeletedDocumentList::isDeleted( lemur::api::DOCID_T documentID ) {
+  if ( _deletedCount == 0 ) return false;
+
   indri::thread::ScopedLock l( _readLock );
   if( (lemur::api::DOCID_T)_bitmap.position() < (documentID/8)+1 )
     return false;
