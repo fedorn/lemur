@@ -52,9 +52,6 @@ indri::parse::StopperTransformation::StopperTransformation( indri::api::Paramete
 }
 
 indri::parse::StopperTransformation::~StopperTransformation() {
-  for (dictTable::iterator iter = _table.begin(); iter != _table.end(); iter++) {
-    free (*iter);
-  }
 }
 
 void indri::parse::StopperTransformation::read( const std::string& filename ) {
