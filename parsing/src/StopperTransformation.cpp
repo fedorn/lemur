@@ -18,47 +18,43 @@
 
 
 #include "indri/StopperTransformation.hpp"
-#include "string-set.h"
 #include "Exception.hpp"
 #include <fstream>
 #include <iostream>
 
 indri::parse::StopperTransformation::StopperTransformation() :
-  _table( string_set_create() ),
   _handler(0)
 {
 }
 
 indri::parse::StopperTransformation::StopperTransformation( const std::vector<char*>& stopwords ) :
-  _table( string_set_create() ),
   _handler(0)
 {
   read( stopwords );
 }
 
 indri::parse::StopperTransformation::StopperTransformation( const std::vector<const char*>& stopwords ) :
-  _table( string_set_create() ),
   _handler(0)
 {
   read( stopwords );
 }
 
 indri::parse::StopperTransformation::StopperTransformation( const std::vector<std::string>& stopwords ) :
-  _table( string_set_create() ),
   _handler(0)
 {
   read( stopwords );
 }
 
 indri::parse::StopperTransformation::StopperTransformation( indri::api::Parameters& stopwords ) :
-  _table( string_set_create() ),
   _handler(0)
 {
   read( stopwords );
 }
 
 indri::parse::StopperTransformation::~StopperTransformation() {
-  string_set_delete( _table );
+  for (dictTable::iterator iter = _table.begin(); iter != _table.end(); iter++) {
+    free (*iter);
+  }
 }
 
 void indri::parse::StopperTransformation::read( const std::string& filename ) {
@@ -76,7 +72,7 @@ void indri::parse::StopperTransformation::read( const std::string& filename ) {
     
     // skip blank lines
     if( strlen(buffer) )
-      string_set_add( buffer, _table );
+      _table.insert(strdup(buffer));
   }
 
   in.close();
@@ -84,25 +80,25 @@ void indri::parse::StopperTransformation::read( const std::string& filename ) {
 
 void indri::parse::StopperTransformation::read( const std::vector<std::string>& stopwords ) {
   for( size_t i=0; i<stopwords.size(); i++ ) {
-    string_set_add( stopwords[i].c_str(), _table );
+    _table.insert(strdup(stopwords[i].c_str()));
   }
 }
 
 void indri::parse::StopperTransformation::read( const std::vector<const char*>& stopwords ) {
   for( size_t i=0; i<stopwords.size(); i++ ) {
-    string_set_add( stopwords[i], _table );
+    _table.insert(strdup(stopwords[i]));
   }
 }
 
 void indri::parse::StopperTransformation::read( const std::vector<char*>& stopwords ) {
   for( size_t i=0; i<stopwords.size(); i++ ) {
-    string_set_add( stopwords[i], _table );
+    _table.insert(strdup(stopwords[i]));
   }
 }
 
 void indri::parse::StopperTransformation::read( indri::api::Parameters& stopwords ) {
   for( unsigned int i=0; i < stopwords.size(); i++ ) {
-    string_set_add( ( (std::string) stopwords[i] ).c_str(), _table );
+    _table.insert(strdup(((std::string) stopwords[i] ).c_str()));
   }
 }
 
@@ -110,7 +106,7 @@ indri::api::ParsedDocument* indri::parse::StopperTransformation::transform( indr
   indri::utility::greedy_vector<char*>& terms = document->terms;
 
   for( size_t i=0; i<terms.size(); i++ ) {
-    if( terms[i] && string_set_lookup( terms[i], _table ) != 0 ) {
+    if( terms[i] && (_table.find(terms[i]) != _table.end()) ) {
       terms[i] = 0;
     }
   }
