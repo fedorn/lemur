@@ -1442,17 +1442,33 @@ static int input (void );
  */
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
-	errno=0; \
-	while ( (result = read( fileno(textparserin), (char *) buf, max_size )) < 0 ) \
-	{ \
-		if( errno != EINTR) \
+	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
+		int c = '*'; \
+		size_t n; \
+		for ( n = 0; n < max_size && \
+			     (c = getc( textparserin )) != EOF && c != '\n'; ++n ) \
+			buf[n] = (char) c; \
+		if ( c == '\n' ) \
+			buf[n++] = (char) c; \
+		if ( c == EOF && ferror( textparserin ) ) \
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
-			break; \
+		result = n; \
 		} \
+	else \
+		{ \
 		errno=0; \
-		clearerr(textparserin); \
-	}\
+		while ( (result = fread(buf, 1, max_size, textparserin))==0 && ferror(textparserin)) \
+			{ \
+			if( errno != EINTR) \
+				{ \
+				YY_FATAL_ERROR( "input in flex scanner failed" ); \
+				break; \
+				} \
+			errno=0; \
+			clearerr(textparserin); \
+			} \
+		}\
 \
 
 #endif
@@ -1514,7 +1530,7 @@ YY_DECL
 #line 32 "../src/TextParser.l"
 
 
-#line 1518 "../src/TextParser.cpp"
+#line 1534 "../src/TextParser.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -1636,7 +1652,7 @@ YY_RULE_SETUP
 #line 44 "../src/TextParser.l"
 ECHO;
 	YY_BREAK
-#line 1640 "../src/TextParser.cpp"
+#line 1656 "../src/TextParser.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

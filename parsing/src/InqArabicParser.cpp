@@ -16553,17 +16553,33 @@ static int input (void );
  */
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
-	errno=0; \
-	while ( (result = read( fileno(InqArabicin), (char *) buf, max_size )) < 0 ) \
-	{ \
-		if( errno != EINTR) \
+	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
+		int c = '*'; \
+		size_t n; \
+		for ( n = 0; n < max_size && \
+			     (c = getc( InqArabicin )) != EOF && c != '\n'; ++n ) \
+			buf[n] = (char) c; \
+		if ( c == '\n' ) \
+			buf[n++] = (char) c; \
+		if ( c == EOF && ferror( InqArabicin ) ) \
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
-			break; \
+		result = n; \
 		} \
+	else \
+		{ \
 		errno=0; \
-		clearerr(InqArabicin); \
-	}\
+		while ( (result = fread(buf, 1, max_size, InqArabicin))==0 && ferror(InqArabicin)) \
+			{ \
+			if( errno != EINTR) \
+				{ \
+				YY_FATAL_ERROR( "input in flex scanner failed" ); \
+				break; \
+				} \
+			errno=0; \
+			clearerr(InqArabicin); \
+			} \
+		}\
 \
 
 #endif
@@ -16626,7 +16642,7 @@ YY_DECL
 
 
 
-#line 16630 "../src/InqArabicParser.cpp"
+#line 16646 "../src/InqArabicParser.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -16999,7 +17015,7 @@ YY_RULE_SETUP
 #line 282 "../src/InqArabicParser.l"
 ECHO;
 	YY_BREAK
-#line 17003 "../src/InqArabicParser.cpp"
+#line 17019 "../src/InqArabicParser.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(LIT):
 case YY_STATE_EOF(OP):

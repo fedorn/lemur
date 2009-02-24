@@ -3530,17 +3530,33 @@ static int input (void );
  */
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
-	errno=0; \
-	while ( (result = read( fileno(reutersin), (char *) buf, max_size )) < 0 ) \
-	{ \
-		if( errno != EINTR) \
+	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
+		int c = '*'; \
+		size_t n; \
+		for ( n = 0; n < max_size && \
+			     (c = getc( reutersin )) != EOF && c != '\n'; ++n ) \
+			buf[n] = (char) c; \
+		if ( c == '\n' ) \
+			buf[n++] = (char) c; \
+		if ( c == EOF && ferror( reutersin ) ) \
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
-			break; \
+		result = n; \
 		} \
+	else \
+		{ \
 		errno=0; \
-		clearerr(reutersin); \
-	}\
+		while ( (result = fread(buf, 1, max_size, reutersin))==0 && ferror(reutersin)) \
+			{ \
+			if( errno != EINTR) \
+				{ \
+				YY_FATAL_ERROR( "input in flex scanner failed" ); \
+				break; \
+				} \
+			errno=0; \
+			clearerr(reutersin); \
+			} \
+		}\
 \
 
 #endif
@@ -3602,7 +3618,7 @@ YY_DECL
 #line 49 "../src/ReutersParser.l"
 
 
-#line 3606 "../src/ReutersParser.cpp"
+#line 3622 "../src/ReutersParser.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -3782,7 +3798,7 @@ YY_RULE_SETUP
 #line 72 "../src/ReutersParser.l"
 ECHO;
 	YY_BREAK
-#line 3786 "../src/ReutersParser.cpp"
+#line 3802 "../src/ReutersParser.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

@@ -2606,6 +2606,14 @@ static long byte_position;
 #define INITIAL 0
 #define COMMENT 1
 
+#ifndef YY_NO_UNISTD_H
+/* Special case for "unistd.h", since it is non-ANSI. We include it way
+ * down here because we want the user's section 1 to have been scanned first.
+ * The user has a chance to override it with an option.
+ */
+#include <unistd.h>
+#endif
+
 #ifndef YY_EXTRA_TYPE
 #define YY_EXTRA_TYPE void *
 #endif
@@ -2662,17 +2670,33 @@ static int input (void );
  */
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
-	errno=0; \
-	while ( (result = read( fileno(tokin), (char *) buf, max_size )) < 0 ) \
-	{ \
-		if( errno != EINTR) \
+	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
+		int c = '*'; \
+		size_t n; \
+		for ( n = 0; n < max_size && \
+			     (c = getc( tokin )) != EOF && c != '\n'; ++n ) \
+			buf[n] = (char) c; \
+		if ( c == '\n' ) \
+			buf[n++] = (char) c; \
+		if ( c == EOF && ferror( tokin ) ) \
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
-			break; \
+		result = n; \
 		} \
+	else \
+		{ \
 		errno=0; \
-		clearerr(tokin); \
-	}\
+		while ( (result = fread(buf, 1, max_size, tokin))==0 && ferror(tokin)) \
+			{ \
+			if( errno != EINTR) \
+				{ \
+				YY_FATAL_ERROR( "input in flex scanner failed" ); \
+				break; \
+				} \
+			errno=0; \
+			clearerr(tokin); \
+			} \
+		}\
 \
 
 #endif
@@ -2734,7 +2758,7 @@ YY_DECL
 #line 43 "../src/TextTokenizer.l"
 
 
-#line 2738 "../src/TextTokenizer.cpp"
+#line 2762 "../src/TextTokenizer.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -2879,7 +2903,7 @@ YY_RULE_SETUP
 #line 60 "../src/TextTokenizer.l"
 ECHO;
 	YY_BREAK
-#line 2883 "../src/TextTokenizer.cpp"
+#line 2907 "../src/TextTokenizer.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
 	yyterminate();

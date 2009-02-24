@@ -4488,17 +4488,33 @@ static int input (void );
  */
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
-	errno=0; \
-	while ( (result = read( fileno(Chinesein), (char *) buf, max_size )) < 0 ) \
-	{ \
-		if( errno != EINTR) \
+	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
+		int c = '*'; \
+		size_t n; \
+		for ( n = 0; n < max_size && \
+			     (c = getc( Chinesein )) != EOF && c != '\n'; ++n ) \
+			buf[n] = (char) c; \
+		if ( c == '\n' ) \
+			buf[n++] = (char) c; \
+		if ( c == EOF && ferror( Chinesein ) ) \
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
-			break; \
+		result = n; \
 		} \
+	else \
+		{ \
 		errno=0; \
-		clearerr(Chinesein); \
-	}\
+		while ( (result = fread(buf, 1, max_size, Chinesein))==0 && ferror(Chinesein)) \
+			{ \
+			if( errno != EINTR) \
+				{ \
+				YY_FATAL_ERROR( "input in flex scanner failed" ); \
+				break; \
+				} \
+			errno=0; \
+			clearerr(Chinesein); \
+			} \
+		}\
 \
 
 #endif
@@ -4560,7 +4576,7 @@ YY_DECL
 #line 58 "../src/ChineseParser.l"
 
 
-#line 4564 "../src/ChineseParser.cpp"
+#line 4580 "../src/ChineseParser.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -4780,7 +4796,7 @@ YY_RULE_SETUP
 #line 89 "../src/ChineseParser.l"
 ECHO;
 	YY_BREAK
-#line 4784 "../src/ChineseParser.cpp"
+#line 4800 "../src/ChineseParser.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(SKIP):
 	yyterminate();

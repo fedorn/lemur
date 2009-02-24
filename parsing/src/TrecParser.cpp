@@ -5188,17 +5188,33 @@ static int input (void );
  */
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
-	errno=0; \
-	while ( (result = read( fileno(trecin), (char *) buf, max_size )) < 0 ) \
-	{ \
-		if( errno != EINTR) \
+	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
+		int c = '*'; \
+		size_t n; \
+		for ( n = 0; n < max_size && \
+			     (c = getc( trecin )) != EOF && c != '\n'; ++n ) \
+			buf[n] = (char) c; \
+		if ( c == '\n' ) \
+			buf[n++] = (char) c; \
+		if ( c == EOF && ferror( trecin ) ) \
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
-			break; \
+		result = n; \
 		} \
+	else \
+		{ \
 		errno=0; \
-		clearerr(trecin); \
-	}\
+		while ( (result = fread(buf, 1, max_size, trecin))==0 && ferror(trecin)) \
+			{ \
+			if( errno != EINTR) \
+				{ \
+				YY_FATAL_ERROR( "input in flex scanner failed" ); \
+				break; \
+				} \
+			errno=0; \
+			clearerr(trecin); \
+			} \
+		}\
 \
 
 #endif
@@ -5260,7 +5276,7 @@ YY_DECL
 #line 54 "../src/TrecParser.l"
 
 
-#line 5264 "../src/TrecParser.cpp"
+#line 5280 "../src/TrecParser.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -5521,7 +5537,7 @@ YY_RULE_SETUP
 #line 95 "../src/TrecParser.l"
 ECHO;
 	YY_BREAK
-#line 5525 "../src/TrecParser.cpp"
+#line 5541 "../src/TrecParser.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

@@ -56,7 +56,7 @@ endif
 
 # generating C++ with flex
 ../src/%.cpp: ../src/%.l
-	$(LEX) -8 -f -o$@ $<
+	$(LEX) -8 -Cf -o$@ $<
 
 # how to make a library from object files
 $(OBJLIB): $(OBJ)
