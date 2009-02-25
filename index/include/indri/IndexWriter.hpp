@@ -220,6 +220,11 @@ namespace indri {
                                                           indri::index::TermRecorder& newFrequentTermsRecorder,
                                                           indri::index::Index* index,
                                                           indri::index::TermBitmap* bitmap );
+      
+      // buffers for _lookupTermID
+      char *_compressedData;
+      char *_uncompressedData;
+      int _dataSize;
 
       enum {
         TOPDOCS_DOCUMENT_COUNT = 1000,

@@ -225,6 +225,10 @@ void IndexWriter::write( std::vector<Index*>& indexes,
                          indri::index::DeletedDocumentList& deletedList,
                          const std::string& path ) {
   _fields = fields;
+  _dataSize = ::disktermdata_size((int)_fields.size());
+  _compressedData = new char [_dataSize];
+  _uncompressedData = new char [_dataSize];
+
   _constructFiles( path );
 
   std::vector<WriterIndexContext*> contexts;
@@ -243,6 +247,9 @@ void IndexWriter::write( std::vector<Index*>& indexes,
   _writeDirectLists( contexts );
   LOGMESSAGE( "Direct Lists Complete" );
 
+  delete[](_compressedData);
+  delete[](_uncompressedData);
+
   indri::utility::delete_vector_contents( contexts );
   _closeFiles( path );
 }
@@ -257,6 +264,10 @@ void IndexWriter::write( std::vector<indri::index::Index*>& indexes,
                          const std::vector<lemur::api::DOCID_T>& documentMaximums,
                          const std::string& path ) {
   _fields = fields;
+  _dataSize = ::disktermdata_size((int)_fields.size());
+  _compressedData = new char [_dataSize];
+  _uncompressedData = new char [_dataSize];
+
   _constructFiles( path );
 
   std::vector<WriterIndexContext*> contexts;
@@ -273,6 +284,9 @@ void IndexWriter::write( std::vector<indri::index::Index*>& indexes,
   _openTermsReaders( path );
   _writeDirectLists( contexts );
   LOGMESSAGE( "Direct Lists Complete" );
+
+  delete[](_compressedData);
+  delete[](_uncompressedData);
 
   indri::utility::delete_vector_contents( contexts );
   _closeFiles( path );
@@ -869,30 +883,20 @@ void IndexWriter::_writeInvertedLists( std::vector<WriterIndexContext*>& context
 //
 
 lemur::api::TERMID_T IndexWriter::_lookupTermID( indri::file::BulkTreeReader& keyfile, const char* term ) {
-  int dataSize = ::disktermdata_size((int)_fields.size());
-  char * compressedData = new char [dataSize];
-  char * uncompressedData = new char [dataSize];
-
   int actual;
-
-  bool result = keyfile.get( term, compressedData, actual, dataSize );
+  bool result = keyfile.get( term, _compressedData, actual, _dataSize );
   
   if( !result ) {
-    delete[](compressedData);
-    delete[](uncompressedData);
     return -1;
   }
 
-  indri::utility::RVLDecompressStream stream( compressedData, actual );
+  indri::utility::RVLDecompressStream stream( _compressedData, actual );
   DiskTermData* diskTermData = ::disktermdata_decompress( stream,
-                                                          uncompressedData,
+                                                          _uncompressedData,
                                                           (int)_fields.size(),
-                                                          DiskTermData::WithOffsets | DiskTermData::WithTermID );
+                                                          DiskTermData::WithTermID );
 
   lemur::api::TERMID_T termid = diskTermData->termID;
-  delete[](compressedData);
-  delete[](uncompressedData);
-
   return termid;
 }
 
