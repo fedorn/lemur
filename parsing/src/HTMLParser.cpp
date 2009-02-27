@@ -41,6 +41,7 @@ void indri::parse::HTMLParser::initialize( TokenizedDocument* tokenized, indri::
       url[length] = 0;
 
       strncpy( base_url, url, sizeof url-1 );
+      base_url[length] = 0;
       char* lastSlash = strrchr( base_url, '/' );
       if( lastSlash ) *lastSlash = 0;
       break;
