@@ -112,7 +112,7 @@ indri::api::ParsedDocument* indri::parse::KrovetzStemmerTransformation::_restart
 indri::api::ParsedDocument* indri::parse::KrovetzStemmerTransformation::_processTerms( indri::api::ParsedDocument* document, size_t start, char* stem, const char* end ) {
   indri::utility::greedy_vector<char*>& terms = document->terms;
 
-  for( size_t i=0; i<terms.size(); i++ ) {
+  for( size_t i=start; i<terms.size(); i++ ) {
     char* term = terms[i];
 
     if( !term )
