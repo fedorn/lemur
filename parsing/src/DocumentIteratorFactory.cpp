@@ -20,6 +20,7 @@
 
 #include "indri/PDFDocumentExtractor.hpp"
 #include "indri/TaggedDocumentIterator.hpp"
+#include "indri/WARCDocumentIterator.hpp"
 #include "indri/TextDocumentExtractor.hpp"
 #include "indri/MboxDocumentIterator.hpp"
 
@@ -34,6 +35,7 @@
 #include "Exception.hpp"
 
 #define TYPE_TAGGED   ( "Tagged Document Collection" )
+#define TYPE_WARC     ( "WARC Document Collection" )
 #define TYPE_PDF      ( "Adobe PDF" )
 #define TYPE_WORD     ( "Microsoft Word" )
 #define TYPE_PPT      ( "Microsoft PowerPoint" )
@@ -49,6 +51,8 @@ indri::parse::DocumentIterator* indri::parse::DocumentIteratorFactory::get( cons
     indri::parse::TaggedDocumentIterator* iter = new indri::parse::TaggedDocumentIterator();
     iter->setTags( startDocTag, endDocTag, startMetadataTag );
     result = iter;
+  } else if( preferred == TYPE_WARC ) {
+    result = new indri::parse::WARCDocumentIterator();
   } else if( preferred == TYPE_PDF ) {
     result = new indri::parse::PDFDocumentExtractor();
   } else if( preferred == TYPE_TEXT ) {
@@ -77,6 +81,8 @@ indri::parse::DocumentIterator* indri::parse::DocumentIteratorFactory::get( cons
 std::string indri::parse::DocumentIteratorFactory::preferredName( const std::string& type ) {
   if( type == "tagged" || type == TYPE_TAGGED ) {
     return TYPE_TAGGED;
+  } else if( type == "warc" || type == TYPE_WARC ) {
+    return TYPE_WARC;
   } else if( type == "pdf" || type == "adobe pdf" || type == TYPE_PDF ) {
     return TYPE_PDF;
   } else if( type == "doc" || type == "msword" || type == "word" || type == "microsoft word" || type == TYPE_WORD ) {

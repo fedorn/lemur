@@ -253,6 +253,9 @@
 				RelativePath=".\src\UTF8Transcoder.cpp">
 			</File>
 			<File
+				RelativePath=".\src\WARCDocumentIterator.cpp">
+			</File>
+			<File
 				RelativePath=".\src\WebParser.cpp">
 			</File>
 			<File
@@ -499,6 +502,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\UTF8Transcoder.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\WARCDocumentIterator.hpp">
 			</File>
 			<File
 				RelativePath=".\include\WebParser.hpp">
