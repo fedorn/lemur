@@ -74,18 +74,26 @@ namespace indri
 
       indri::utility::greedy_vector<indri::api::ScoredExtentResult>& score( lemur::api::DOCID_T documentID, indri::index::Extent &extent, int documentLength ) {
         double maxScore = INDRI_TINY_SCORE;
-
+        bool scored = false;
+        
         for( unsigned int i=0; i<_children.size(); i++ ) {
           const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, extent, documentLength );
 
           for( unsigned int j=0; j<childResults.size(); j++ ) {
             maxScore = lemur_compat::max<double>( maxScore, childResults[j].score );
+            scored = true;
           }
         }
 
         _scores.clear();
-        _scores.push_back( indri::api::ScoredExtentResult( maxScore, documentID, extent.begin, extent.end ) );
-
+        if (scored) 
+          {
+            indri::api::ScoredExtentResult result(extent);
+            result.score = maxScore;
+            result.document = documentID;
+            _scores.push_back( result );
+          }
+        
         return _scores;
       }
 
