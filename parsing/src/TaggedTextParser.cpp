@@ -246,7 +246,7 @@ indri::api::ParsedDocument* indri::parse::TaggedTextParser::parse( indri::parse:
   }
   // close the global document tag;
   globalTag.open_tag = false;
-  globalTag.pos = token_pos;
+  globalTag.pos = _document.positions.size();
   globalTag.begin = _document.textLength;
   globalTag.end = _document.textLength;
   handleTag(&globalTag);
@@ -313,7 +313,7 @@ void indri::parse::TaggedTextParser::handleTag( TagEvent* te ) {
     
     // index the tags if necessary
     // this may be an end include tag, so we allow oldInclude
-    if( tagProps->index && !_exclude && (_include || oldInclude) ) {
+    if( (tagProps->index && !_exclude && (_include || oldInclude)) || tagProps == _findTag("document") ) {
       if( atEnd ) {
         endTag( original_name, tagProps->name, te->pos );
       } else {
