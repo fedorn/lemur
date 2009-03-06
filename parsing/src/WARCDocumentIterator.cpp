@@ -31,8 +31,6 @@ indri::parse::WARCDocumentIterator::WARCDocumentIterator() {
   _warcMeta = "warc";
   _dochdr = "dochdr";
   _docnoString = "docno";
-  _warcHead = "WARC";
-  _warcHeadLength = strlen(_warcHead);
   _recordID = "WARC-Record-ID:";
   _recordIDLength = (int)strlen(_recordID);
   _contentLength = "Content-Length:";
@@ -155,19 +153,10 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
   // parse the length (atoi)
   // read until an empty line
   // read length bytes into content.
+  // read two newlines
   std::string uuid;
   std::string trecDocno = "";
   int contentLength = 0;
-  // Skip any blank lines until the next WARC
-  do {
-    result = _readLine( beginLine, lineLength );
-  } while( result && strncmp( _warcHead, beginLine, _warcHeadLength ) );
-  
-  if( !result ) {
-    // didn't find a begin tag, so we're done
-    return 0;
-  }
-
 
   std::string uri;
   do {
@@ -176,7 +165,7 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
     if (!strncmp(_trecID, beginLine, _trecIDLength)) {
         // have a trec id to use
         trecDocno.assign(beginLine + _trecIDLength + 1, 
-                         lineLength - (_trecIDLength + 1));
+                         lineLength - (_trecIDLength + 2));
 
       } else if (!strncmp(_recordID, beginLine, _recordIDLength)) {
       // parse out the uuid
@@ -260,13 +249,14 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
       // bad things
       LEMUR_THROW(LEMUR_IO_ERROR, "Short read." );
     }
-  
+  // prune the second trailing newline that follows a record;
+  fseek(_in, 1 , SEEK_CUR);
   // terminate the string
   *_buffer.write(1) = 0;
 
   _document.content = _buffer.front() + startDocument;
   _document.contentLength = contentLength;
-  _document.text = _buffer.front(); // strip WARC?
+  _document.text = _buffer.front();
   _document.textLength = _buffer.position();
   return &_document;
 }

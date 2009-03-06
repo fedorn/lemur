@@ -37,12 +37,10 @@ namespace indri
       indri::utility::Buffer _buffer;
       indri::utility::Buffer _metaBuffer;
       std::string _fileName;
-      const char * _warcHead;
       const char * _recordID;
       const char * _contentLength;
       const char *_targetURI;
       const char *_trecID;
-      int _warcHeadLength;
       int _recordIDLength;
       int _contentLengthLength;
       int _targetURILength;
