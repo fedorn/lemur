@@ -31,12 +31,16 @@ indri::parse::WARCDocumentIterator::WARCDocumentIterator() {
   _warcMeta = "warc";
   _dochdr = "dochdr";
   _docnoString = "docno";
+  _warcHead = "WARC";
+  _warcHeadLength = strlen(_warcHead);
   _recordID = "WARC-Record-ID:";
-  _contentLength = "Content-Length:";
   _recordIDLength = (int)strlen(_recordID);
+  _contentLength = "Content-Length:";
   _contentLengthLength = (int)strlen(_contentLength);
   _targetURI = "WARC-Target-URI:";
   _targetURILength = strlen(_targetURI);
+  _trecID = "WARC-TREC-ID:";
+  _trecIDLength = strlen(_trecID);
 }
 
 indri::parse::WARCDocumentIterator::~WARCDocumentIterator() {
@@ -152,12 +156,29 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
   // read until an empty line
   // read length bytes into content.
   std::string uuid;
+  std::string trecDocno = "";
   int contentLength = 0;
+  // Skip any blank lines until the next WARC
+  do {
+    result = _readLine( beginLine, lineLength );
+  } while( result && strncmp( _warcHead, beginLine, _warcHeadLength ) );
+  
+  if( !result ) {
+    // didn't find a begin tag, so we're done
+    return 0;
+  }
+
+
   std::string uri;
   do {
     result = _readLine( beginLine, lineLength );
     if (! result) break;
-    if (!strncmp(_recordID, beginLine, _recordIDLength)) {
+    if (!strncmp(_trecID, beginLine, _trecIDLength)) {
+        // have a trec id to use
+        trecDocno.assign(beginLine + _trecIDLength + 1, 
+                         lineLength - (_trecIDLength + 1));
+
+      } else if (!strncmp(_recordID, beginLine, _recordIDLength)) {
       // parse out the uuid
       // strip ' <urn:uuid:' from the front
       // strip '>\n' from the back.
@@ -189,7 +210,10 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
   // add a tag for DOCNO
   // may want a different strategy for getting docnos.
   // these be ugly.
-  sprintf(_docno, "%s-%s", _warcUUID.c_str(), uuid.c_str());
+  if (trecDocno.size() > 0) 
+    sprintf(_docno, "%s", trecDocno.c_str());
+  else
+    sprintf(_docno, "%s-%s", _warcUUID.c_str(), uuid.c_str());
   indri::parse::MetadataPair docnoMetadata;
   docnoMetadata.key = _docnoString;
   docnoMetadata.value = _docno;
