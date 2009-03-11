@@ -611,27 +611,31 @@ void indri::collection::CompressedCollection::addDocument( lemur::api::DOCID_T d
 
     // silently discard any value that is too short or too long to be a key.
     if( metalookup && document->metadata[i].valueLength < lemur::file::Keyfile::MAX_KEY_LENGTH && document->metadata[i].valueLength > 1 ) {
+      try {
+        // there may be more than one reverse lookup here, so we fetch any old ones:
+        indri::utility::greedy_vector<lemur::api::DOCID_T> documentIDs;
+        int dataSize = (*metalookup)->getSize( (const char*)document->metadata[i].value );
 
-      // there may be more than one reverse lookup here, so we fetch any old ones:
-      indri::utility::greedy_vector<lemur::api::DOCID_T> documentIDs;
-      int dataSize = (*metalookup)->getSize( (const char*)document->metadata[i].value );
+        if( dataSize >= 0 ) {
+          int actual = 0;
 
-      if( dataSize >= 0 ) {
-        int actual = 0;
+          documentIDs.resize( dataSize / sizeof(lemur::api::DOCID_T) );
+          (*metalookup)->get( (const char*)document->metadata[i].value,
+                              &documentIDs.front(),
+                              actual,
+                              dataSize );
+          assert( actual == documentIDs.size() * sizeof(lemur::api::DOCID_T) );
+        }
 
-        documentIDs.resize( dataSize / sizeof(lemur::api::DOCID_T) );
-        (*metalookup)->get( (const char*)document->metadata[i].value,
+        documentIDs.push_back( documentID );
+
+        (*metalookup)->put( (const char*)document->metadata[i].value,
                             &documentIDs.front(),
-                            actual,
-                            dataSize );
-        assert( actual == documentIDs.size() * sizeof(lemur::api::DOCID_T) );
+                            (int)( documentIDs.size() * sizeof(lemur::api::DOCID_T)) );
+
+      } catch (lemur::api::Exception e) {
+        // silently discard any value is a bad key.
       }
-
-      documentIDs.push_back( documentID );
-
-      (*metalookup)->put( (const char*)document->metadata[i].value,
-                          &documentIDs.front(),
-                         (int)( documentIDs.size() * sizeof(lemur::api::DOCID_T)) );
     }
 
     recordOffsets.push_back( recordOffset );
