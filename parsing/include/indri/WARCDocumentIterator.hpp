@@ -21,6 +21,7 @@
 
 #include <string>
 #include <fstream>
+#include "zlib.h"
 #include "indri/DocumentIterator.hpp"
 #include "indri/Buffer.hpp"
 #include "indri/UnparsedDocument.hpp"
@@ -33,7 +34,7 @@ namespace indri
     class WARCDocumentIterator : public DocumentIterator {
     private:
       UnparsedDocument _document;
-      FILE* _in;
+      gzFile _gzin;
       indri::utility::Buffer _buffer;
       indri::utility::Buffer _metaBuffer;
       std::string _fileName;

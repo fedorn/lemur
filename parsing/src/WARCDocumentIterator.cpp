@@ -22,7 +22,7 @@
 #include "indri/XMLNode.hpp"
 
 indri::parse::WARCDocumentIterator::WARCDocumentIterator() {
-  _in = 0;
+  _gzin = 0;
   _metaBuffer.grow (512 * 1024);
   _recordID = 0;
   _contentLength = 0;
@@ -47,8 +47,11 @@ indri::parse::WARCDocumentIterator::~WARCDocumentIterator() {
 
 void indri::parse::WARCDocumentIterator::open( const std::string& filename ) {
   _fileName = filename;
-  _in = fopen( filename.c_str(), "r" );
-  if( !_in )
+  // see if it is a .gz file
+  // if so, use gzseek, gzopen, gzgets
+  // actually, these will read uncompressed files too.... hmmmm....
+    _gzin = gzopen(filename.c_str(), "rb");
+  if( !_gzin)
     LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't open file " + filename + "." );
 
   // Consume the first WARC record (type warcinfo)
@@ -79,19 +82,19 @@ void indri::parse::WARCDocumentIterator::open( const std::string& filename ) {
       // parse out the content length;
       contentLength = atoi(beginLine + _contentLengthLength) + 1;
     }
-  } while (result && (strlen(beginLine) > 1)) ;
+  } while (result && (!contentLength || (strlen(beginLine) > 1))) ;
   
   if (result) {
     // consume (and discard) the record.
-    fseek(_in, contentLength, SEEK_CUR);
+    gzseek(_gzin, contentLength, SEEK_CUR);
   }
   // file pointer is now positioned to read the first response record.
 }
 
 void indri::parse::WARCDocumentIterator::close() {
-  if( _in )
-    fclose( _in );
-  _in = 0;
+  if (_gzin)
+    gzclose(_gzin);
+  _gzin = 0;
 }
 
 bool indri::parse::WARCDocumentIterator::_readLine( char*& beginLine, 
@@ -114,8 +117,8 @@ bool indri::parse::WARCDocumentIterator::_readLine( char*& beginLine,
 
   // fetch next document line
   char* buffer = _buffer.write( readAmount );
-  char* result = fgets( buffer, (int)readAmount, _in );
- 
+  char* result;
+  result = gzgets( _gzin , buffer, (int)readAmount);
   if(!result) {
     return false;
   }
@@ -178,7 +181,7 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
       uri.assign(beginLine + _targetURILength + 1, 
                  lineLength - (_targetURILength + 1));
     }
-  } while( result && (strlen(beginLine) > 1) );
+  } while( result && (uri.size() == 0 || strlen(beginLine) > 1) );
   
   if( !result ) {
     // didn't find a record, so we're done
@@ -242,15 +245,16 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
   // from now on, everything is text
   int startDocument = (int)_buffer.position() - 1;
   _buffer.unwrite(1);
-  int numRead = fread(_buffer.write(contentLength), sizeof(char), 
-                      contentLength, _in);
+  int numRead;
+  numRead = gzread(_gzin, _buffer.write(contentLength), contentLength);
+    
   if (numRead != contentLength) 
     {
       // bad things
       LEMUR_THROW(LEMUR_IO_ERROR, "Short read." );
     }
   // prune the second trailing newline that follows a record;
-  fseek(_in, 1 , SEEK_CUR);
+    gzseek(_gzin, 1, SEEK_CUR);
   // terminate the string
   *_buffer.write(1) = 0;
 
