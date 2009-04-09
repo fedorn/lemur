@@ -301,14 +301,14 @@ void indri::parse::TextTokenizer::processTag() {
 
             bool quoted = true;
 
-            if ( *c == '"' ) { c++; offset++; }
+            if ( *c == '"' || *c == '\'' ) { c++; offset++; }
             else quoted = false;
 
             // Attribute value starts here.
 
             i = 0;
             if ( quoted ) 
-              while ( c[i] != '"' && c[i] != '>' ) i++;
+              while ( c[i] != '"' && c[i] != '>' && c[i] != '\'') i++;
             else
 #ifndef WIN32
               while ( ! isspace( c[i] ) && c[i] != '>' ) i++;
