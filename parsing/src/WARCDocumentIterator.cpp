@@ -19,7 +19,6 @@
 #include "indri/WARCDocumentIterator.hpp"
 #include <iostream>
 #include "Exception.hpp"
-#include "indri/XMLNode.hpp"
 
 indri::parse::WARCDocumentIterator::WARCDocumentIterator() {
   _gzin = 0;
@@ -47,9 +46,6 @@ indri::parse::WARCDocumentIterator::~WARCDocumentIterator() {
 
 void indri::parse::WARCDocumentIterator::open( const std::string& filename ) {
   _fileName = filename;
-  // see if it is a .gz file
-  // if so, use gzseek, gzopen, gzgets
-  // actually, these will read uncompressed files too.... hmmmm....
     _gzin = gzopen(filename.c_str(), "rb");
   if( !_gzin)
     LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't open file " + filename + "." );
@@ -149,14 +145,13 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
   // should verify the WARC-Type is response
   // if not, the record should be skipped (are there any?)
   // read the WARC-Target-URI to get the url for the front of the DOCHDR.
-
-  // read until an empty line
-  // read the DOCHDR metadata
   // read until the Content-Length line.
   // parse the length (atoi)
-  // read until an empty line
+
   // read length bytes into content.
+  // mark off the http header
   // read two newlines
+
   std::string uuid;
   std::string trecDocno = "";
   int contentLength = 0;
@@ -164,7 +159,7 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
   std::string uri;
   do {
     result = _readLine( beginLine, lineLength );
-    if (! result) break;
+    if (! result) return 0;
     if (!strncmp(_trecID, beginLine, _trecIDLength)) {
         // have a trec id to use
         trecDocno.assign(beginLine + _trecIDLength + 1, 
@@ -180,13 +175,13 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
       // save the url to put into the dochdr field for HTMLParser
       uri.assign(beginLine + _targetURILength + 1, 
                  lineLength - (_targetURILength + 1));
+    } else if (!strncmp(_contentLength, beginLine, _contentLengthLength)) {
+      // parse out the content length;
+      contentLength = atoi(beginLine + _contentLengthLength);
     }
-  } while( result && (uri.size() == 0 || strlen(beginLine) > 1) );
+
+  } while( !contentLength || strlen(beginLine) > 1 );
   
-  if( !result ) {
-    // didn't find a record, so we're done
-    return 0;
-  }
   // copy whatever we've read so far into the _metaBuffer.
   memcpy( _metaBuffer.write(_buffer.position()), _buffer.front(), 
           _buffer.position() * sizeof(char));
@@ -200,8 +195,6 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
   _document.metadata.push_back(warcMetadata);
 
   // add a tag for DOCNO
-  // may want a different strategy for getting docnos.
-  // these be ugly.
   if (trecDocno.size() > 0) 
     sprintf(_docno, "%s", trecDocno.c_str());
   else
@@ -221,44 +214,41 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
   memcpy( _metaBuffer.write(uri.size()), uri.c_str(), 
           uri.size() * sizeof(char));
   dochdrMetadata.valueLength = uri.size();
-  do {
-    result = _readLine( beginLine, lineLength );
-    if (! result) break;
-    if (!strncmp(_contentLength, beginLine, _contentLengthLength)) {
-      // parse out the content length;
-      contentLength = atoi(beginLine + _contentLengthLength) + 1;
-    }
-    // copy to the metadata buffer
-    memcpy( _metaBuffer.write(lineLength), beginLine, 
-            lineLength * sizeof(char) );
-    dochdrMetadata.valueLength += lineLength;
-  } while( result && (strlen(beginLine) > 1) );
-  
-  if( !result ) {
-    // didn't find a record, so we're done
-    return 0;
-  }
-  *_metaBuffer.write(1) = 0; // terminate it.
-  dochdrMetadata.valueLength += 1; // add the terminator
-  _document.metadata.push_back(dochdrMetadata);
 
-  // from now on, everything is text
+  // read they bytes
   int startDocument = (int)_buffer.position() - 1;
   _buffer.unwrite(1);
   int numRead;
   numRead = gzread(_gzin, _buffer.write(contentLength), contentLength);
     
-  if (numRead != contentLength) 
-    {
-      // bad things
-      LEMUR_THROW(LEMUR_IO_ERROR, "Short read." );
-    }
-  // prune the second trailing newline that follows a record;
-    gzseek(_gzin, 1, SEEK_CUR);
+  if (numRead != contentLength) {
+    // bad things
+    LEMUR_THROW(LEMUR_IO_ERROR, "Short read." );
+  }
+  // copy until the two sequential empty lines into metabuffer
+  int newlines = 0;
+  char * header = _buffer.front() + startDocument;
+  for ( numRead = 0; 
+        newlines != 2 && (numRead + startDocument)  <_buffer.position();
+        numRead++)
+    if (header[numRead] == '\n') newlines++; else newlines = 0;
+
+  if (newlines != 2) {
+    // didn't find a record, so we're done
+    return 0;
+  }
+
+  memcpy( _metaBuffer.write(numRead), header, numRead * sizeof(char) );
+  dochdrMetadata.valueLength += numRead;
+
+  *_metaBuffer.write(1) = 0; // terminate it.
+  dochdrMetadata.valueLength += 1; // add the terminator
+  _document.metadata.push_back(dochdrMetadata);
+
   // terminate the string
   *_buffer.write(1) = 0;
 
-  _document.content = _buffer.front() + startDocument;
+  _document.content = _buffer.front() + startDocument + numRead;
   _document.contentLength = contentLength;
   _document.text = _buffer.front();
   _document.textLength = _buffer.position();
