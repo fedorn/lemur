@@ -145,6 +145,10 @@ void indri::api::IndexEnvironment::setNormalization( bool flag ) {
   _parameters.set( "normalize", flag );
 }
 
+void indri::api::IndexEnvironment::setStoreDocs( bool flag ) {
+  _parameters.set( "storeDocs", flag );
+}
+
 void indri::api::IndexEnvironment::setMemory( UINT64 memory ) {
   _parameters.set("memory", memory);
 }

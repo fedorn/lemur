@@ -349,7 +349,9 @@ void indri::collection::CompressedCollection::create( const std::string& fileNam
 // create
 //
 
-void indri::collection::CompressedCollection::create( const std::string& fileName, const std::vector<std::string>& forwardIndexedFields, const std::vector<std::string>& reverseIndexedFields ) {
+void indri::collection::CompressedCollection::create( const std::string& fileName, const std::vector<std::string>& forwardIndexedFields, const std::vector<std::string>& reverseIndexedFields, bool storeDocs ) {
+  _storeDocs = storeDocs;
+  
   std::string manifestName = indri::file::Path::combine( fileName, "manifest" );
   std::string lookupName = indri::file::Path::combine( fileName, "lookup" );
   std::string storageName = indri::file::Path::combine( fileName, "storage" );
@@ -596,7 +598,8 @@ void indri::collection::CompressedCollection::addDocument( lemur::api::DOCID_T d
 
   // first, write the metadata, storing in metalookups as necessary
   for( size_t i=0; i<document->metadata.size(); i++ ) {
-    _writeMetadataItem( document, (int)i, keyLength, valueLength );
+    if ( _storeDocs )
+      _writeMetadataItem( document, (int)i, keyLength, valueLength );
 
     lemur::file::Keyfile** metalookup;
     metalookup = _forwardLookups.find( document->metadata[i].key );
@@ -637,44 +640,47 @@ void indri::collection::CompressedCollection::addDocument( lemur::api::DOCID_T d
         // silently discard any value is a bad key.
       }
     }
-
-    recordOffsets.push_back( recordOffset );
-    recordOffsets.push_back( recordOffset + keyLength );
-    recordOffset += (keyLength + valueLength);
+    if ( _storeDocs ) {
+      recordOffsets.push_back( recordOffset );
+      recordOffsets.push_back( recordOffset + keyLength );
+      recordOffset += (keyLength + valueLength);
+    }
   }
 
   // then, write the term positions, after compressing them (delta encoding only, perhaps?)
-  _writePositions( document, keyLength, valueLength );
-  recordOffsets.push_back( recordOffset );
-  recordOffsets.push_back( recordOffset + keyLength );
-  recordOffset += (keyLength + valueLength);
+  if ( _storeDocs ) {
+    _writePositions( document, keyLength, valueLength );
+    recordOffsets.push_back( recordOffset );
+    recordOffsets.push_back( recordOffset + keyLength );
+    recordOffset += (keyLength + valueLength);
+    
+    // then, write the text out
+    _writeText( document, keyLength, valueLength );
+    recordOffsets.push_back( recordOffset );
+    recordOffsets.push_back( recordOffset + keyLength );
+    recordOffset += (keyLength + valueLength);
+    
+    // then, write the content offset out
+    _writeContent( document, keyLength, valueLength );
+    recordOffsets.push_back( recordOffset );
+    recordOffsets.push_back( recordOffset + keyLength );
+    recordOffset += (keyLength + valueLength);
+    
+    // then, write the content length out
+    _writeContentLength( document, keyLength, valueLength );
+    recordOffsets.push_back( recordOffset );
+    recordOffsets.push_back( recordOffset + keyLength );
+    recordOffset += (keyLength + valueLength);
 
-  // then, write the text out
-  _writeText( document, keyLength, valueLength );
-  recordOffsets.push_back( recordOffset );
-  recordOffsets.push_back( recordOffset + keyLength );
-  recordOffset += (keyLength + valueLength);
-
-  // then, write the content offset out
-  _writeContent( document, keyLength, valueLength );
-  recordOffsets.push_back( recordOffset );
-  recordOffsets.push_back( recordOffset + keyLength );
-  recordOffset += (keyLength + valueLength);
-
-  // then, write the content length out
-  _writeContentLength( document, keyLength, valueLength );
-  recordOffsets.push_back( recordOffset );
-  recordOffsets.push_back( recordOffset + keyLength );
-  recordOffset += (keyLength + valueLength);
-
-  // finally, we have to write out the keys and values
-  recordOffsets.push_back( (UINT32)(recordOffsets.size()/2) );
-  _stream->next_in = (Bytef*) &recordOffsets.front();
-  _stream->avail_in = recordOffsets.size() * sizeof(UINT32);
-  zlib_deflate_finish( *_stream, _output );
-
+    // finally, we have to write out the keys and values
+    recordOffsets.push_back( (UINT32)(recordOffsets.size()/2) );
+    _stream->next_in = (Bytef*) &recordOffsets.front();
+    _stream->avail_in = recordOffsets.size() * sizeof(UINT32);
+    zlib_deflate_finish( *_stream, _output );
+  
   // store this data under the document ID
   _lookup.put( documentID, &offset, sizeof offset );
+  }
 }
 
 

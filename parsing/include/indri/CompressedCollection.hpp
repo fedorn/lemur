@@ -92,13 +92,14 @@ namespace indri
                              UINT64 storageLength );
       void _copyForwardLookup( const std::string& name, lemur::file::Keyfile& other, lemur::api::DOCID_T documentOffset );
 
+      bool _storeDocs;      
     public:
       CompressedCollection();
       ~CompressedCollection();
 
       void create( const std::string& fileName );
       void create( const std::string& fileName, const std::vector<std::string>& indexedFields );
-      void create( const std::string& fileName, const std::vector<std::string>& forwardIndexedFields, const std::vector<std::string>& reverseIndexedFields );
+      void create( const std::string& fileName, const std::vector<std::string>& forwardIndexedFields, const std::vector<std::string>& reverseIndexedFields,  bool storeDocs = true );
       void reopen( const std::string& fileName );
       void open( const std::string& fileName );
       void openRead( const std::string& fileName );
