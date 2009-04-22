@@ -148,6 +148,20 @@ public class Main {
         for( String query : allRankings.keySet() ) {
             ArrayList<Judgment> judgments = allJudgments.get( query );
             ArrayList<Document> ranking = allRankings.get( query );
+
+            /* resort ranking on score, renumber ranks */
+            java.util.Collections.sort(ranking, new java.util.Comparator<Document>() {
+                    public int compare(Document a, Document b) 
+                    {
+                        if (a.score < b.score) return 1;
+                        if (a.score == b.score) return 0;
+                        return -1;
+                    }
+                });
+            int i = 1;
+            for (Document d : ranking) {
+                d.rank = i++;
+            }
             
             if( judgments == null || ranking == null ) {
                 continue;
