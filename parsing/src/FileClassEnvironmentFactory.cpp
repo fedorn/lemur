@@ -111,6 +111,20 @@ static file_class_environment_spec environments[] = {
     html_conflations      // conflations
   },
   {
+    "warcchar",               // name
+    "html",               // parser
+    "char",               // tokenizer
+    "warc",             // iterator
+    NULL,              // startDocTag
+    NULL,             // endDocTag
+    NULL,          // endMetadataTag
+    NULL,                 // includeTags
+    html_exclude_tags,    // excludeTags
+    html_index_tags,      // indexTags
+    html_metadata_tags,   // metadataTags
+    html_conflations      // conflations
+  },
+  {
     "trecweb",            // name
     "html",               // parser
     "word",               // tokenizer
