@@ -96,13 +96,13 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
           return;
 
         // URL has already been extracted and is stored in (*i).value
-        
+
         prepURL( (*i).value );
 
-        char tmp_buf[MAX_URL_LENGTH];
+        char tmp_buf[MAX_URL_LENGTH*4];
         strncpy( tmp_buf, (*i).value, lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 ) );
         tmp_buf[lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 )] = '\0';
-
+        
         bool relative = normalizeURL( tmp_buf );
 
         // if special url tags are requested, we'll
@@ -211,7 +211,7 @@ void indri::parse::HTMLParser::handleTag( TagEvent* te ) {
 
         int len = (int)strlen( (*i).value );
 
-        char tmp_buf[MAX_URL_LENGTH];
+        char tmp_buf[MAX_URL_LENGTH*4];
         strncpy( tmp_buf, (*i).value, lemur_compat::min<int>( len, MAX_URL_LENGTH - 1) );
         tmp_buf[lemur_compat::min<int>( strlen( (*i).value ), MAX_URL_LENGTH - 1 )] = '\0';
 
@@ -336,7 +336,7 @@ bool indri::parse::HTMLParser::normalizeURL(char *s) {
   }
   // relative url
   else {
-    char tmp_buf[MAX_URL_LENGTH];
+    char tmp_buf[MAX_URL_LENGTH*4];
     strncpy(tmp_buf, s, MAX_URL_LENGTH-1);
     tmp_buf[MAX_URL_LENGTH-1] = 0;
     if(*s == '/') {
@@ -414,7 +414,7 @@ bool indri::parse::HTMLParser::normalizeURL(char *s) {
       // now that we've marked the usable spots, we just have to copy
       // the url parts we want
 
-      char tmp_buf[MAX_URL_LENGTH];
+      char tmp_buf[MAX_URL_LENGTH*4];
       tmp_buf[0] = 0;
       strncpy(tmp_buf, normurl, dotCleanStart);
       tmp_buf[dotCleanStart] = 0;
