@@ -14,7 +14,7 @@
 
 <p>
 The HarvestLinks application extracts all links (and link text) from a collection
-of web pages. It can be used to gather anchor text and in-links for HTML and TREC Web data.
+of web pages. It can be used to gather anchor text and in-links for HTML and TREC Web data. The default file class is trecweb. To process WARC files, such as those distributed with ClueWeb09, use the optional parameter <b>class</b>.
 This in turn can be added to an index in the form of &quot;inlink&quot; fields for use for
 direct retrieval or for page-rank calculations.
 </p>
@@ -54,6 +54,9 @@ This will allow you to perform retrieval tasks on the anchor text.
 <li>
   <b>corpus: (<i>required</i>)</b> The path to the directory holding the
   corpus files you're trying to index
+</li>
+<li>
+  <b>class: (<i>optionl</i>)</b> The file class of the corpus. One of trecweb (the default) or warc.
 </li>
 <li>
   <b>output: (<i>required</i>)</b> The path to a directory where the link
@@ -104,6 +107,7 @@ This will allow you to perform retrieval tasks on the anchor text.
 #include "indri/TokenizedDocument.hpp"
 #include "indri/ParsedDocument.hpp"
 #include "indri/TaggedDocumentIterator.hpp"
+#include "indri/WARCDocumentIterator.hpp"
 #include "indri/TaggedTextParser.hpp"
 #include "indri/HTMLParser.hpp"
 #include "indri/TokenizerFactory.hpp"
@@ -193,33 +197,46 @@ static void harvest_anchor_text_file( const std::string& path,
                                       lemur::file::Keyfile *redirectKeyfile,
                                       indri::parse::HTMLParser& parser,
                                       indri::parse::Tokenizer *tokenizer,
-                                      lemur::file::Keyfile *keyfile)
+                                      lemur::file::Keyfile *keyfile,
+                                      const std::string& fileClass)
 {
-  indri::parse::TaggedDocumentIterator iterator;
-  iterator.open( path );
-  iterator.setTags(
-    "<DOC>",       // startDocTag
-    "</DOC>\n",    // endDocTag
-    "</DOCHDR>"    // endMetadataTag
-  );
-
+  indri::parse::DocumentIterator *iterator = 0;
+  
+  if (fileClass == "trecweb") {
+    
+    iterator = new indri::parse::TaggedDocumentIterator();
+    ((indri::parse::TaggedDocumentIterator *)iterator)->setTags(
+                                                              "<DOC>",       // startDocTag
+                                                              "</DOC>\n",    // endDocTag
+                                                              "</DOCHDR>"    // endMetadataTag
+                                                              );
+  } else if (fileClass == "warc") {
+    iterator = new  indri::parse::WARCDocumentIterator();
+  } else {
+    LEMUR_THROW( LEMUR_BAD_PARAMETER_ERROR, "Unrecognized class paramter: " + 
+                 fileClass);
+  }
+  
+  
+  iterator->open( path );  
   indri::parse::UnparsedDocument *unparsed=NULL;
   indri::parse::TokenizedDocument* tokenized;
   indri::parse::AnchorTextHarvester writer(linkFilePath, docOrderPath, keyfile, redirectKeyfile);
 
-  while( (unparsed = iterator.nextDocument()) != 0 ) {
+  while( (unparsed = iterator->nextDocument()) != 0 ) {
     tokenized = tokenizer->tokenize( unparsed );
     indri::api::ParsedDocument* parsed = parser.parse( tokenized );
     writer.handle(parsed);
   }
 
   // close up everything
-  iterator.close();
-
+  iterator->close();
+  delete iterator;
   harvestedLinkPaths.push_back(linkFilePath);
 }
 
 static void harvest_anchor_text( const std::string& corpusPath,
+                                 const std::string& fileClass,
                                  const std::string& harvestPath,
                                  const std::string& docUrlNoKeyfilePath,
                                  const std::string& preSortPath,
@@ -281,7 +298,7 @@ static void harvest_anchor_text( const std::string& corpusPath,
 
       try {
         // now harvest the anchor text in the file
-        harvest_anchor_text_file( *files, linkFilePath, docOrderPath, redirectKeyfile, parser, tokenizer, &docUrlNoKeyfile );
+        harvest_anchor_text_file( *files, linkFilePath, docOrderPath, redirectKeyfile, parser, tokenizer, &docUrlNoKeyfile, fileClass );
       } catch( lemur::api::Exception& e ) {
         std::cout << e.what() << std::endl;
       }
@@ -298,7 +315,7 @@ static void harvest_anchor_text( const std::string& corpusPath,
     std::string linkFilePath = indri::file::Path::combine( harvestPath, linkFileFilename );
     std::string docOrderPath = indri::file::Path::combine( harvestPath, docOrderFilename );
 
-    harvest_anchor_text_file( corpusPath, linkFilePath, docOrderPath, redirectKeyfile, parser, tokenizer, &docUrlNoKeyfile );
+    harvest_anchor_text_file( corpusPath, linkFilePath, docOrderPath, redirectKeyfile, parser, tokenizer, &docUrlNoKeyfile, fileClass );
   }
   // close the doc keyfile and cleanup
   docUrlNoKeyfile.close();
@@ -597,6 +614,7 @@ int main(int argc, char * argv[]) {
     }
 
     std::string corpusPath = parameters["corpus"];
+    std::string fileClass = parameters.get("class", "trecweb");
     std::string outputPath = parameters["output"];
     std::string redirectPath = parameters.get("redirect", "");
 
@@ -628,7 +646,7 @@ int main(int argc, char * argv[]) {
     if( parameters.get( "harvest", 1 ) ) {
       g_timer.printElapsedSeconds(std::cout);
       std::cout << " Phase 1: Harvesting anchor URLs and text..." << std::endl;
-      harvest_anchor_text( corpusPath, harvestPath, docUrlNoKeyfilePath, preSortPath, redirectPath);
+      harvest_anchor_text( corpusPath, fileClass, harvestPath, docUrlNoKeyfilePath, preSortPath, redirectPath);
     }
 
     // re-open the keyfile for the document URLs - read only
