@@ -513,7 +513,8 @@ void combineSortedFiles(const std::string& corpusPath, const std::string& harves
       (*currentChar)=0;
     }
     if (strcmp(currentLine, lastString)) {
-
+      try {
+        
       // they differ - we're starting a new destination URL
       if (strlen(currentLine) > 511) {
         // need a SHA1 / Hex hash on currentLine - and we can remove the 511 max restriction
@@ -526,6 +527,10 @@ void combineSortedFiles(const std::string& corpusPath, const std::string& harves
       strncpy(lastString, currentLine, lemur::file::FileMergeThread::MAX_INPUT_LINESIZE-1);
       lastString[lemur::file::FileMergeThread::MAX_INPUT_LINESIZE-1]=0;
       ++linkCounter;
+      } catch ( lemur::api::Exception& e ) {
+        std::cerr << "BAD KEY: previous: " << lastString << " current: " << currentLine << std::endl;
+      }
+      
       lineBuffer.clear();
       if (!(linkCounter % 5000)) {
         cout << "-- found " << linkCounter << " unique links...\r";
