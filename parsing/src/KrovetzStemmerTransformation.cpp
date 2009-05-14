@@ -139,7 +139,8 @@ indri::api::ParsedDocument* indri::parse::KrovetzStemmerTransformation::transfor
   indri::utility::greedy_vector<char*>& terms = document->terms;
 
   // this is the minimum amount of space we're willing to start with, but we may get more
-  int bufferLength = document->textLength * 2 + KSTEM_MAX_WORD_LENGTH + KSTEM_EXTRA_SPACE;
+  //  int bufferLength = document->textLength * 2 + KSTEM_MAX_WORD_LENGTH + KSTEM_EXTRA_SPACE;
+  int bufferLength = document->terms.size() * KSTEM_MAX_WORD_LENGTH + KSTEM_EXTRA_SPACE;
   char* stem = _getBuffer( bufferLength );
   const char* end = _getBufferEnd() - KSTEM_MAX_WORD_LENGTH;
 
