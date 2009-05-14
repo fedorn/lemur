@@ -179,6 +179,9 @@ namespace indri
       }
 
       indri::api::ParsedDocument* transform( indri::api::ParsedDocument* document ) {
+        _buffer.clear();
+        _buffer.grow(2*1024*1024);
+
         // surround current text with a mainbody tag
         TagExtent * mainbody = new TagExtent;
         mainbody->begin = 0;
