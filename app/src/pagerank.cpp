@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 //
 // pagerank
 //
@@ -34,14 +34,22 @@ in the parameter file and as
 
 <dt>output</dt>
 <dd>basename for the output files.</dd>
+<dt>index</dt>
+<dd>index to use to get the collection size and internal document ids.
+Default is none. When none the corpus is scanned to count the number 
+of documents and the string document ids are used.</d>
 <dt>docs</dt>
-<dd>Number of documents to process per iteration. Default 1000.</dd>
+<dd>Number of documents to process per iteration. Default 1000. This
+parameter is ignored if an index parameter is provided, all docs
+will be used for each iteration.</dd>
 
 <dt>iters</dt>
-<dd>Number of iterations to use estimating the PageRank. Default 10</dd>
+<dd>Number of iterations to use estimating the PageRank. Default is 10 if
+no index parameter is provided, otherwise 100.</dd>
 
 <dt>c</dt>
-<dd> Dampening parameter. Default 0.5</dd>
+<dd> Dampening parameter. Default 0.5 if no index parameter is provided,
+otherwise 0.85</dd>
 
 <dt>writeRaw</dt>
 <dd>Write the raw PageRank scores to &lt;output&gt;.raw </dd>
@@ -55,7 +63,8 @@ This data file is suitable for input to the makeprior application.</dd>
 
 #include <time.h>
 #include "indri/Parameters.hpp"
-
+#include "indri/Repository.hpp"
+#include "indri/LocalQueryServer.hpp"
 #include "Exception.hpp"
 #include "indri/PageRank.hpp"
 
@@ -80,29 +89,40 @@ int main( int argc, char** argv ) {
     std::string corpusPath = parameters[ "corpus" ];
     std::string linkPath = parameters[ "links" ];
     std::string outputFile = parameters[ "output" ];
-
-    int docsPerIter = parameters.get( "docs", 1000 );
-    int maxIters = parameters.get( "iters", 10 );
-    double c = parameters.get( "c", 0.5 );
-
-    indri::parse::PageRank pr( corpusPath, linkPath );
-    pr.computePageRank( outputFile, maxIters, docsPerIter, c );
-
+    std::string indexPath = parameters.get("index", "");
+    UINT64 colLen = 0;
+    
+    indri::parse::PageRank *pr = 0;
+    
+    if (indexPath.size() > 0) {
+      int maxIters = parameters.get( "iters", 100 );
+      double c = parameters.get( "c", 0.85 );
+      pr = new indri::parse::PageRank ( corpusPath, linkPath, indexPath );
+      pr->indexPageRank(outputFile, maxIters, c);
+    } else {
+      int docsPerIter = parameters.get( "docs", 1000 );
+      int maxIters = parameters.get( "iters", 10 );
+      double c = parameters.get( "c", 0.5 );
+      pr = new indri::parse::PageRank( corpusPath, linkPath, colLen );
+      pr->computePageRank( outputFile, maxIters, docsPerIter, c );
+    }
+    
     if( parameters.get( "writeRaw", false ) ) {
       std::string rawFile = outputFile + ".raw";
-      pr.writeRaw( outputFile, rawFile );
+      pr->writeRaw( outputFile, rawFile );
     }
     // default is to produce a prior file for makeprior.
     if( parameters.get( "writePriors", true ) ) {
       std::string priorFile = outputFile + ".prior";
-      pr.writePriors( outputFile, priorFile );
+      pr->writePriors( outputFile, priorFile );
     }
     if( parameters.get( "writeRanks", false ) ) {
       std::string ranksFile = outputFile + ".ranks";
-      pr.writeRanks( outputFile, ranksFile );
+      pr->writeRanks( outputFile, ranksFile );
     }
     // don't really need the outputFile
     ::remove(outputFile.c_str());
+    delete pr;
   }
   catch( lemur::api::Exception& e ) {
     LEMUR_ABORT(e);

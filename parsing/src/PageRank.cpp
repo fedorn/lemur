@@ -1,5 +1,5 @@
 /*==========================================================================
- * Copyright (c) 2002-2008 University of Massachusetts.  All Rights Reserved.
+ * Copyright (c) 2002-2008 University of Massachusetts.  All Rights Reserved
  *
  * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
  * is subject to the terms of the software license set forth in the LICENSE
@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 //
 // PageRank
 //
@@ -16,6 +16,11 @@
 //
 
 #include "indri/PageRank.hpp"
+#include "indri/CompressedCollection.hpp"
+#include "indri/SequentialReadBuffer.hpp"
+#include "indri/SequentialWriteBuffer.hpp"
+#include "indri/IndriTimer.hpp"
+
 #include <algorithm>
 const double
 indri::parse::PageRank::_intToProb[11] = {log(2.21916E-10), 
@@ -131,7 +136,7 @@ void indri::parse::PageRank::_computeOutDegrees( Links& links ) {
     in.open( path.c_str() );
 
     // fill in the links structure for the documents currently under consideration
-    while( !in.eof() ) {
+    while( in.good() && !in.eof() ) {
       in.getline( docno, sizeof docno );
       in.getline( docUrl, sizeof docUrl );
       in.getline( linkCountText, sizeof linkCountText );
@@ -187,7 +192,7 @@ void indri::parse::PageRank::_doPageRankIter( const int docsPerIter, const std::
     in.open( linkFile.c_str() );
 
     // grab the doc ids of the source documents we're interested in
-    while( !in.eof() ) {
+    while( in.good() && !in.eof() ) {
       in.getline( docno, sizeof docno );
       in.getline( docUrl, sizeof docUrl );
       in.getline( linkCountText, sizeof linkCountText );
@@ -264,7 +269,7 @@ void indri::parse::PageRank::_loadRanks( const std::string& dest,
   char docBuf[4096];
   float prBuf;
   // read in the values
-  while( !in.eof() ) {
+  while( in.good() && !in.eof() ) {
     in.read( (char *)&lengthBuf, sizeof( int ) ); // get length of document name
     in.read( docBuf, lengthBuf ); // get document name
     in.read( (char *)&prBuf, sizeof( float ) ); // read page rank
@@ -283,11 +288,27 @@ void indri::parse::PageRank::writeRaw( const std::string& dest, const std::strin
   std::ofstream out(rawFile.c_str(), std::ios::out);
   out.setf( std::ios_base::fixed );
   out.precision( 32 );
-
-  std::vector<pagerank> pageranks;
-  _loadRanks(dest, pageranks);
-  for (int i = 0; i < pageranks.size(); i++) {
-    out << pageranks[i].doc << " " << pageranks[i].val<< std::endl;
+  if (prTable != 0) {
+    // we had an index
+    lemur::api::DOCID_T docid;
+    std::vector<prEntry> pageranks;
+    for (docid = 1; docid < _colLen; docid++) {
+      indri::parse::prEntry p;
+      p.doc = docid;
+      p.val = prTable[docid];
+      pageranks.push_back(p);
+    }
+    _ranks2int(pageranks);
+    for (int i = 0; i < pageranks.size(); i++) {
+      std::string docno = _repository.collection()->retrieveMetadatum(pageranks[i].doc, "docno");
+      out << docno << " " << pageranks[i].val<< std::endl;
+    }
+  }  else {
+    std::vector<pagerank> pageranks;
+    _loadRanks(dest, pageranks);
+    for (int i = 0; i < pageranks.size(); i++) {
+      out << pageranks[i].doc << " " << pageranks[i].val<< std::endl;
+    }
   }
 }
 
@@ -296,32 +317,67 @@ void indri::parse::PageRank::writeRanks( const std::string& dest, const std::str
   std::ofstream out(ranksFile.c_str(), std::ios::out);
   out.setf( std::ios_base::fixed );
   out.precision( 13 );
-
-  std::vector<pagerank> pageranks;
-  _loadRanks(dest, pageranks);
-  // bin the values to integer page ranks
-  _raw2int(pageranks);
-  for (int i = 0; i < pageranks.size(); i++) {
-    out << pageranks[i].doc << " " << pageranks[i].int_val<< std::endl;
+  if (prTable != 0) {
+    // we had an index
+    lemur::api::DOCID_T docid;
+    std::vector<prEntry> pageranks;
+    for (docid = 1; docid < _colLen; docid++) {
+      indri::parse::prEntry p;
+      p.doc = docid;
+      p.val = prTable[docid];
+      pageranks.push_back(p);
+    }
+    _ranks2int(pageranks);
+    for (int i = 0; i < pageranks.size(); i++) {
+      std::string docno = _repository.collection()->retrieveMetadatum(pageranks[i].doc, "docno");
+      out << docno << " " << pageranks[i].int_val<< std::endl;
+    }
+  }  else {
+    std::vector<pagerank> pageranks;
+    _loadRanks(dest, pageranks);
+    // bin the values to integer page ranks
+    _raw2int(pageranks);
+    for (int i = 0; i < pageranks.size(); i++) {
+      out << pageranks[i].doc << " " << pageranks[i].int_val<< std::endl;
+    }
+    out.close();
   }
-  out.close();
+  
 }
 
 void indri::parse::PageRank::writePriors( const std::string& dest, const std::string &priorFile ) {
   std::ofstream out(priorFile.c_str(), std::ios::out);
   out.setf( std::ios_base::fixed );
   out.precision( 13 );
+  if (prTable != 0) {
+    // we had an index
+    lemur::api::DOCID_T docid;
+    std::vector<prEntry> pageranks;
+    for (docid = 1; docid < _colLen; docid++) {
+      indri::parse::prEntry p;
+      p.doc = docid;
+      p.val = prTable[docid];
+      pageranks.push_back(p);
+    }
+    _ranks2int(pageranks);
+    for (int i = 0; i < pageranks.size(); i++) {
+      std::string docno = _repository.collection()->retrieveMetadatum(pageranks[i].doc, "docno");
+      out << docno << " " << _intToProb[pageranks[i].int_val]<< std::endl;
+    }
+  }  else {
 
-  std::vector<pagerank> pageranks;
-  _loadRanks(dest, pageranks);
-  // sort the ranks
-  std::sort(pageranks.begin(), pageranks.end(), pagerank::pagerank_greater());
-  // bin the values to integer page ranks
-  _raw2int(pageranks);
-  // assign log probabilities to the bins.
-  for (int i = 0; i < pageranks.size(); i++) {
-    out << pageranks[i].doc << " " << _intToProb[pageranks[i].int_val]<< std::endl;
+    std::vector<pagerank> pageranks;
+    _loadRanks(dest, pageranks);
+    // sort the ranks
+    std::sort(pageranks.begin(), pageranks.end(), pagerank::pagerank_greater());
+    // bin the values to integer page ranks
+    _raw2int(pageranks);
+    // assign log probabilities to the bins.
+    for (int i = 0; i < pageranks.size(); i++) {
+      out << pageranks[i].doc << " " << _intToProb[pageranks[i].int_val]<< std::endl;
+    }
   }
+  
   out.close();
 }
 
@@ -343,4 +399,157 @@ void indri::parse::PageRank::computePageRank( const std::string& outputFile, con
 
   // delete the temp file
   ::remove( _tmpFile.c_str() );
+}
+
+void indri::parse::PageRank::_ranks2int(std::vector<prEntry> &ranks)
+{
+  // Metzler's rawToInt.pl
+  // sort the raw scores
+  std::sort(ranks.begin(), ranks.end(), prEntry::prEntry_greater());
+  int numDocs = ranks.size();
+  // max page rank, could be a parameter.
+  // if changed, the _intToProb table will need to change.
+  int max_pr = 10;
+  int rank = max_pr;
+  double B = pow((numDocs + 1.0),(1.0/max_pr));
+  int baseNum = int(B - 1);
+  int num = baseNum;
+  for (int i = 0; i < ranks.size(); i++) {
+    if (num > 0) {
+      ranks[i].int_val = rank;
+      num--;
+    }
+    if (num == 0) {
+      baseNum = int(ceil(B*baseNum));
+      num = baseNum;
+      if (rank > 1) rank--; // don't allow rank 0
+    }
+  }
+}
+
+void indri::parse::PageRank::indexPageRank( const std::string& outputFile, 
+                                            const int maxIters, 
+                                            const double c ) {
+  _c = c;
+  // make sure we don't leak...
+  delete prTable;
+  // prTable |C| * sizeof(float)  
+  prTable = new float[_colLen];
+  // outlinksTable |C| * sizeof(unsigned int)
+  unsigned int *outlinksTable = new unsigned int[_colLen];
+  // ivlIndex |C| * sizeoff(UINT64)
+  INT64 * ivlIndex = new INT64[_colLen];
+  
+  // create ivlFile (count, docno_1...docno_count)
+  std::string ivlPath = outputFile + ".ivl";
+  indri::file::File ivlFile;
+  ivlFile.create(ivlPath);
+  indri::file::SequentialWriteBuffer *ivlWriteBuffer;
+  ivlWriteBuffer = new indri::file::SequentialWriteBuffer(ivlFile, 1024*1024);
+  
+  // initialize pr (( 1.0 - _c ) / (double)_colLen;, default value)
+  // initialize outlinksTable
+  // initialize ivlIndex
+  float defaultPR = ( 1.0 - _c ) / (double)_colLen;
+  for (int i = 1; i < _colLen; i++) {
+    prTable[i] = defaultPR;
+    outlinksTable[i] = 0;
+    ivlIndex[i] = -1;
+  }
+
+  // read harvestlinks files
+  // build ivl
+  // update outcount
+
+  char docno[512];
+  char docUrl[4096];
+  char linkCountText[256];
+  char linkDocno[512];
+  char text[65536];
+  lemur::api::DOCID_T docid;
+  std::vector<lemur::api::DOCID_T> docids;
+  std::vector<lemur::api::DOCID_T> linkids;
+
+  indri::file::FileTreeIterator input( _corpusPath );
+  for( ; input != indri::file::FileTreeIterator::end(); input++ ) {
+    std::string filePath = *input;
+    std::ifstream in;
+    std::string relative = indri::file::Path::relative( _corpusPath, filePath );
+    std::string linkFile = indri::file::Path::combine( _linkPath, relative );
+    in.open( linkFile.c_str() );
+
+    // grab the doc ids of the source documents we're interested in
+    while( in.good() && !in.eof() ) {
+      in.getline( docno, sizeof docno );
+      in.getline( docUrl, sizeof docUrl );
+      in.getline( linkCountText, sizeof linkCountText );
+
+      if( strncmp( docno, "DOC", 3 ) != 0 )
+        break;
+
+      int linkCount = atoi( linkCountText + sizeof "LINKS=" - 1 );
+      docids = _repository.collection()->retrieveIDByMetadatum("docno", docno + 6);
+      docid = docids[0];
+      docids.clear();
+      linkids.clear();
+      
+      for( int i = 0; i < linkCount; i++ ) {
+        in.getline( linkDocno, sizeof linkDocno );
+        in.getline( text, sizeof text ); // ignore LINKFROM
+        in.getline( text, sizeof text ); // ignore TEXT
+        docids = _repository.collection()->retrieveIDByMetadatum("docno", linkDocno + 10);
+        linkids.push_back(docids[0]);
+        docids.clear();
+      }
+      
+      // get the ivlOffset
+      ivlIndex[docid] = ivlWriteBuffer->tell();
+      // stick them in the list and update outcount
+      char * spot = ivlWriteBuffer->write(linkids.size() * sizeof(lemur::api::DOCID_T) + sizeof(int));
+      memcpy(spot, &linkCount, sizeof(int));
+      spot += sizeof(int);
+      for (int i = 0; i < linkCount; i++) {
+        lemur::api::DOCID_T doc = linkids[i];
+        memcpy(spot, &doc, sizeof(lemur::api::DOCID_T));
+        spot += sizeof(lemur::api::DOCID_T);
+        outlinksTable[doc]++;
+      }
+    }
+    in.close();
+  }
+  ivlWriteBuffer->flush();
+  delete ivlWriteBuffer;
+  ivlFile.close();
+  ivlFile.openRead(ivlPath);
+  indri::file::SequentialReadBuffer *ivlReadBuffer;
+  ivlReadBuffer = new indri::file::SequentialReadBuffer(ivlFile);
+  
+  // iterate on pr
+  for (int i = 0; i < maxIters; i++) {
+    for (docid = 1; docid < _colLen; docid++) {
+      INT64 offset = ivlIndex[docid];
+      float pr = 0;
+      if (offset >= 0) {
+        int count;
+        ivlReadBuffer->read(&count, offset, sizeof(count));        
+        lemur::api::DOCID_T *linkdocs = new lemur::api::DOCID_T[count];
+        ivlReadBuffer->read(linkdocs, offset + sizeof(count), 
+                            count * sizeof(lemur::api::DOCID_T));
+        for (int j = 0; j < count; j++) {
+          lemur::api::DOCID_T link = linkdocs[j];
+          // avoid creating NaNs/inf
+          pr += prTable[link]/(outlinksTable[link] ? outlinksTable[link] : 1.0);
+        }
+        prTable[docid] = (1.0 - _c) + _c * pr;
+        delete linkdocs;
+      }
+    }
+  }
+
+  // clean up
+  delete outlinksTable;
+  delete ivlIndex;
+  delete ivlReadBuffer;
+  ivlFile.close();
+  lemur_compat::remove( ivlPath.c_str() );
 }
