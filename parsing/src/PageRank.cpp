@@ -292,7 +292,7 @@ void indri::parse::PageRank::writeRaw( const std::string& dest, const std::strin
     // we had an index
     lemur::api::DOCID_T docid;
     std::vector<prEntry> pageranks;
-    for (docid = 1; docid < _colLen; docid++) {
+    for (docid = 1; docid <= _colLen; docid++) {
       indri::parse::prEntry p;
       p.doc = docid;
       p.val = prTable[docid];
@@ -321,7 +321,7 @@ void indri::parse::PageRank::writeRanks( const std::string& dest, const std::str
     // we had an index
     lemur::api::DOCID_T docid;
     std::vector<prEntry> pageranks;
-    for (docid = 1; docid < _colLen; docid++) {
+    for (docid = 1; docid <= _colLen; docid++) {
       indri::parse::prEntry p;
       p.doc = docid;
       p.val = prTable[docid];
@@ -353,7 +353,7 @@ void indri::parse::PageRank::writePriors( const std::string& dest, const std::st
     // we had an index
     lemur::api::DOCID_T docid;
     std::vector<prEntry> pageranks;
-    for (docid = 1; docid < _colLen; docid++) {
+    for (docid = 1; docid <= _colLen; docid++) {
       indri::parse::prEntry p;
       p.doc = docid;
       p.val = prTable[docid];
@@ -434,11 +434,11 @@ void indri::parse::PageRank::indexPageRank( const std::string& outputFile,
   // make sure we don't leak...
   delete prTable;
   // prTable |C| * sizeof(float)  
-  prTable = new float[_colLen];
+  prTable = new float[_colLen+1];
   // outlinksTable |C| * sizeof(unsigned int)
-  unsigned int *outlinksTable = new unsigned int[_colLen];
+  unsigned int *outlinksTable = new unsigned int[_colLen+1];
   // ivlIndex |C| * sizeoff(UINT64)
-  INT64 * ivlIndex = new INT64[_colLen];
+  INT64 * ivlIndex = new INT64[_colLen+1];
   
   // create ivlFile (count, docno_1...docno_count)
   std::string ivlPath = outputFile + ".ivl";
@@ -451,7 +451,7 @@ void indri::parse::PageRank::indexPageRank( const std::string& outputFile,
   // initialize outlinksTable
   // initialize ivlIndex
   float defaultPR = ( 1.0 - _c ) / (double)_colLen;
-  for (int i = 1; i < _colLen; i++) {
+  for (int i = 1; i <= _colLen; i++) {
     prTable[i] = defaultPR;
     outlinksTable[i] = 0;
     ivlIndex[i] = -1;
@@ -526,7 +526,7 @@ void indri::parse::PageRank::indexPageRank( const std::string& outputFile,
   
   // iterate on pr
   for (int i = 0; i < maxIters; i++) {
-    for (docid = 1; docid < _colLen; docid++) {
+    for (docid = 1; docid <= _colLen; docid++) {
       INT64 offset = ivlIndex[docid];
       float pr = 0;
       if (offset >= 0) {
