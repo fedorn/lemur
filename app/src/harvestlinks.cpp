@@ -279,7 +279,7 @@ static void harvest_anchor_text( const std::string& corpusPath,
       std::string finalHarvestPath=getFinalHarvestPath(corpusPath, filePath, harvestPath);
       std::string finalHarvestDirectory=indri::file::Path::directory(finalHarvestPath);
       if (!indri::file::Path::isDirectory( finalHarvestDirectory )) {
-        indri::file::Path::create(finalHarvestDirectory);
+        indri::file::Path::make(finalHarvestDirectory);
       }
 
       std::string docOrderFilename("docOrder-");
@@ -551,13 +551,13 @@ void combineSortedFiles(const std::string& corpusPath, const std::string& harves
       std::string finalHarvestPath=getFinalHarvestPath(corpusPath, filePath, harvestPath);
       std::string finalHarvestDirectory=indri::file::Path::directory(finalHarvestPath);
       if (!indri::file::Path::isDirectory( finalHarvestDirectory )) {
-        indri::file::Path::create(finalHarvestDirectory);
+        indri::file::Path::make(finalHarvestDirectory);
       }
 
       std::string finalSortedPath=getFinalHarvestPath(corpusPath, filePath, sortedPath);
       std::string finalSortedDirectory=indri::file::Path::directory(finalSortedPath);
       if (!indri::file::Path::isDirectory( finalSortedDirectory )) {
-        indri::file::Path::create(finalSortedDirectory);
+        indri::file::Path::make(finalSortedDirectory);
       }
 
 
