@@ -15,7 +15,6 @@
  */
 
 #include "IndriDocMgr.hpp"
-#include "indri/IndriTermInfoList.hpp"
 #include "indri/CompressedCollection.hpp"
 #include "indri/ScopedLock.hpp"
 //
