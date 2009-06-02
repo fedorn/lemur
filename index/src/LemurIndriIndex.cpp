@@ -19,7 +19,7 @@
 #include "indri/CompressedCollection.hpp"
 #include "indri/ScopedLock.hpp"
 #include "IndriDocMgr.hpp"
-#include "indri/IndriTermInfoList.hpp"
+#include "InvFPTermList.hpp"
 #include "indri/Index.hpp"
 #include "indri/Path.hpp"
 
@@ -165,14 +165,8 @@ lemur::api::DocInfoList* lemur::index::LemurIndriIndex::docInfoList(lemur::api::
 }
 
 lemur::api::TermInfoList* lemur::index::LemurIndriIndex::termInfoList(lemur::api::DOCID_T docID) const { 
-  indri::collection::Repository::index_state indexes = _repository->indexes();
-  indri::index::Index* index = _indexWithDocument( indexes, docID );
-  lemur::api::TermInfoList *list = NULL;
-  if( index ) {
-    indri::thread::ScopedLock lock( index->statisticsLock() );
-    const indri::index::TermList* termList = index->termList( docID );
-    list = new indri::index::BagList(termList);
-  }
+  lemur::index::InvFPTermList *list = (lemur::index::InvFPTermList *)termInfoListSeq(docID);
+  list->countTerms();
   return list;
 }
 
@@ -183,7 +177,19 @@ lemur::api::TermInfoList* lemur::index::LemurIndriIndex::termInfoListSeq(lemur::
   if( index ) {
     indri::thread::ScopedLock lock( index->statisticsLock() );
     const indri::index::TermList* termList = index->termList( docID );
-    list = new indri::index::PositionList(termList);
+    indri::utility::greedy_vector<lemur::api::TERMID_T> termIDs = termList->terms();
+    std::vector<lemur::index::LocatedTerm> locs;
+    
+    // indri indexes stopwords as [OOV], so skip those
+    for( int i = 0; i < termIDs.size(); i++) {
+      if (termIDs[i] != 0) {
+        lemur::index::LocatedTerm lt;
+        lt.term = termIDs[i];
+        lt.loc = i;
+        locs.push_back(lt);
+      }
+    }
+    list = new lemur::index::InvFPTermList(docID, locs.size(), locs);
   }
   return list;
 }
