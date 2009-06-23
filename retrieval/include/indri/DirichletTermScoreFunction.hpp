@@ -34,7 +34,7 @@ namespace indri
       double _muTimesCollectionFrequency;
 
     public:
-      DirichletTermScoreFunction( double mu, double collectionFrequency, double docmu=1e30 ) {
+      DirichletTermScoreFunction( double mu, double collectionFrequency, double docmu=-1.0 ) {
         _collectionFrequency = collectionFrequency;
         _mu = mu;
         _muTimesCollectionFrequency = _mu * _collectionFrequency;
@@ -54,8 +54,14 @@ namespace indri
 //                 mu*P(t|C) + tf_D
 //where P(t|D)= ---------------------
 //                  doclen + mu
-        double seen = (occurrences+_docmu*(_muTimesCollectionFrequency+documentOccurrences)/(documentLength+_mu))/(contextSize+_docmu);
-        return log(seen);
+        // if the _docmu parameter is the default, do collection level
+        // smoothing only.
+        if (_docmu < 0)
+          return scoreOccurrence(occurrences, contextSize);
+        else {
+          double seen = (occurrences+_docmu*(_muTimesCollectionFrequency+documentOccurrences)/(double(documentLength)+_mu))/(double(contextSize)+_docmu);
+          return log(seen);
+        }
       }
     };
   }
