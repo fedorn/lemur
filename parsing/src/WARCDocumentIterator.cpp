@@ -249,7 +249,7 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
   *_buffer.write(1) = 0;
 
   _document.content = _buffer.front() + startDocument + numRead;
-  _document.contentLength = contentLength;
+  _document.contentLength = _buffer.position() - startDocument - numRead - 1;
   _document.text = _buffer.front();
   _document.textLength = _buffer.position();
   return &_document;
