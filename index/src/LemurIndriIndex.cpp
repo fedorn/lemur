@@ -67,7 +67,7 @@ const lemur::api::TERM_T lemur::index::LemurIndriIndex::term(lemur::api::TERMID_
 
 lemur::api::DOCID_T lemur::index::LemurIndriIndex::document(const lemur::api::EXDOCID_T &docIDStr) const { 
   std::vector<lemur::api::DOCID_T> ids = _repository->collection()->retrieveIDByMetadatum("docno", docIDStr);
-  lemur::api::DOCID_T docid = -1;
+  lemur::api::DOCID_T docid = 0;
   if (ids.size() > 0) 
     docid = ids[0];
   return docid;
