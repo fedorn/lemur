@@ -18,6 +18,7 @@
 
 #ifndef INDRI_EXTENT_HPP
 #define INDRI_EXTENT_HPP
+#include "lemur-platform.h"
 namespace indri
 {
   namespace index
