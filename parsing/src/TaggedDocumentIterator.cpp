@@ -55,7 +55,7 @@ void indri::parse::TaggedDocumentIterator::setTags( const char* startDoc, const 
 
 void indri::parse::TaggedDocumentIterator::open( const std::string& filename ) {
   _fileName = filename;
-  _in = fopen( filename.c_str(), "r" );
+  _in = fopen( filename.c_str(), "rb" );
 
   if( !_in )
     LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't open file " + filename + "." );
