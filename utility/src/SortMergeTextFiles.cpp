@@ -84,7 +84,7 @@ void lemur::file::SortMergeTextFiles::_doSingleFileMergesort(std::string &inputF
   _inputBuffer.clear();
 
   FILE* _in;
-  _in = fopen( inputFile.c_str(), "r" );
+  _in = fopen( inputFile.c_str(), "rb" );
 
   if( !_in ) {
     LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't open file " + inputFile + "." );
@@ -381,7 +381,7 @@ UINT64 lemur::file::FileMergeThread::work() {
 
 UINT64 lemur::file::FileMergeThread::initialize() {
   for (int i=0; i < numInputFiles; i++) {
-    inputFile[i]=fopen(filePath[i].c_str(), "r");
+    inputFile[i]=fopen(filePath[i].c_str(), "rb");
     if (!inputFile[i]) {
       LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't open temp file " + filePath[i] + "." );
     }

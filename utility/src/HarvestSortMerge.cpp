@@ -28,7 +28,7 @@ void lemur::file::HarvestSortMerge::_doSingleFileMergesort(std::string &inputFil
   _inputBuffer.clear();
 
   FILE* _in;
-  _in = fopen( inputFile.c_str(), "r" );
+  _in = fopen( inputFile.c_str(), "rb" );
 
   if( !_in ) {
     LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't open file " + inputFile + "." );

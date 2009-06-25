@@ -152,7 +152,7 @@ static lemur::file::Keyfile *createRedirectKeyfile(const std::string& redirectKe
     keyfile->create(redirectKeyfilePath.c_str());
 
     // open our redirect file path
-    FILE *_in=fopen(redirectPath.c_str(), "r");
+    FILE *_in=fopen(redirectPath.c_str(), "rb");
     if (_in) {
       char *currentLine;
       size_t currentLineLen;
@@ -347,7 +347,7 @@ void combineOutputFile(const std::string& corpusFile, const std::string& sortedP
   std::ofstream outfile(outputFilePath.c_str());
 
   // open the docOrder file
-  FILE *docOrder=fopen(docOrderPath.c_str(), "r");
+  FILE *docOrder=fopen(docOrderPath.c_str(), "rb");
 
   if (docOrder==NULL) {
     std::cerr << "Error opening document order file '" << docOrderPath << "'. File cannot be opened." << std::endl;
@@ -482,7 +482,7 @@ void combineSortedFiles(const std::string& corpusPath, const std::string& harves
   urlKeyfile.create(keyfileTempPath.c_str(), (20*1024*1024));
 
   FILE *_sortIn;
-  _sortIn=fopen(outputSortedLinkFile.c_str(), "r");
+  _sortIn=fopen(outputSortedLinkFile.c_str(), "rb");
   // ensure we have a sorted file!
   if (_sortIn==NULL) {
     std::cerr << "Error opening sorted link file '" << outputSortedLinkFile << "'. File cannot be opened." << std::endl;
