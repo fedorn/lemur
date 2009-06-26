@@ -18,7 +18,7 @@
 
 #ifndef INDRI_TRECDOCUMENTITERATOR_HPP
 #define INDRI_TRECDOCUMENTITERATOR_HPP
-
+#include "zlib.h"
 #include "indri/DocumentIterator.hpp"
 #include "indri/Buffer.hpp"
 #include "indri/UnparsedDocument.hpp"
@@ -32,7 +32,7 @@ namespace indri
     class TaggedDocumentIterator : public DocumentIterator {
     private:
       UnparsedDocument _document;
-      FILE* _in;
+      gzFile _in;
       indri::utility::Buffer _buffer;
       indri::utility::Buffer _metaBuffer;
       std::string _lastMetadataTag;

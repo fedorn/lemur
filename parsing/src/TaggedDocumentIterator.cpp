@@ -55,7 +55,7 @@ void indri::parse::TaggedDocumentIterator::setTags( const char* startDoc, const 
 
 void indri::parse::TaggedDocumentIterator::open( const std::string& filename ) {
   _fileName = filename;
-  _in = fopen( filename.c_str(), "rb" );
+  _in = gzopen( filename.c_str(), "rb" );
 
   if( !_in )
     LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't open file " + filename + "." );
@@ -63,7 +63,7 @@ void indri::parse::TaggedDocumentIterator::open( const std::string& filename ) {
 
 void indri::parse::TaggedDocumentIterator::close() {
   if( _in )
-    fclose( _in );
+    gzclose( _in );
   _in = 0;
 }
 
@@ -87,7 +87,7 @@ bool indri::parse::TaggedDocumentIterator::_readLine( char*& beginLine, size_t& 
 
   // fetch next document line
   char* buffer = _buffer.write( readAmount );
-  char* result = fgets( buffer, (int)readAmount, _in );
+  char* result = gzgets( _in, buffer, (int)readAmount );
  
   if(!result) {
     return false;
