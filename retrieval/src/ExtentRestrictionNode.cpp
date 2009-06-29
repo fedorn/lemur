@@ -26,6 +26,7 @@ indri::infnet::ExtentRestrictionNode::ExtentRestrictionNode( const std::string& 
   _field(field),
  _matches()
 {
+  bSiblings = 1;
 }
 
 void indri::infnet::ExtentRestrictionNode::setSiblingsFlag(int f){
