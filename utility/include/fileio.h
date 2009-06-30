@@ -12,6 +12,7 @@
 #define FILEIO_H
 
 #ifdef WIN32
+#pragma warning( disable : 4133 )
   #define NOGDI
   #define _WIN32_WINNT 0x0400
   #define WIN32_LEAN_AND_MEAN
