@@ -160,9 +160,6 @@
 				RelativePath=".\src\InQueryOpParser.cpp">
 			</File>
 			<File
-				RelativePath=".\src\IntervalTree.cpp">
-			</File>
-			<File
 				RelativePath=".\src\KeyfileDocMgr.cpp">
 			</File>
 			<File
@@ -364,9 +361,6 @@
 			</File>
 			<File
 				RelativePath=".\include\InQueryOpParser.hpp">
-			</File>
-			<File
-				RelativePath=".\include\indri\IntervalTree.hpp">
 			</File>
 			<File
 				RelativePath=".\include\KeyfileDocMgr.hpp">
