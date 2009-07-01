@@ -61,7 +61,6 @@
 #include <fstream>
 #include "indri/TagExtent.hpp"
 #include "indri/ParsedDocument.hpp"
-#include "indri/IntervalTree.hpp"
 #include <vector>
 #include <string.h>
 #include <string>
