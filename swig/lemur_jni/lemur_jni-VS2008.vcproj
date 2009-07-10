@@ -121,6 +121,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="3"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include\win32&quot;;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LEMUR_JNI_EXPORTS"
 				RuntimeLibrary="2"

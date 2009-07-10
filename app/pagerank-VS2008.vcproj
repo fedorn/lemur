@@ -120,6 +120,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="3"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="..\utility\include;..\index\include;..\parsing\include;..\langmod\include;..\retrieval\include;..\cluster\include;..\distrib\include;..\summarization\include;..\contrib\xpdf\include;..\contrib\zlib\include;..\contrib\antlr\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
