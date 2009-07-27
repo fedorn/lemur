@@ -52,13 +52,13 @@ namespace indri
       ObjectHandler<indri::api::ParsedDocument>* _handler;
 #ifdef WIN32
       struct ltstr {
-        bool operator()(char* s1, char* s2) const {
-          return strcmp(s1, s2) < 0;
+        bool operator()( const char* s1,  const char* s2) const {
+          return (strcmp(s1, s2) < 0);
         }
       };
       //studio 7 hash_set provides hash_compare, rather than hash
       // needing an < predicate, rather than an == predicate.
-      typedef stdext::hash_set<char *, stdext::hash_compare<char *, ltstr> > dictTable;
+      typedef stdext::hash_set< const char *, stdext::hash_compare< const char *, ltstr> > dictTable;
 #else
       struct eqstr {
         bool operator()(char* s1, char* s2) const {
