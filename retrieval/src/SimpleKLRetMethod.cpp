@@ -639,7 +639,6 @@ void lemur::retrieval::SimpleKLRetMethod::computeRM2FBModel(SimpleKLQueryModel &
     // P(q|w) = SUM_d P(q|d) P(w|d) p(d)
     dCounter->nextCount(wd, P_w);
     for (int j = 0; j < numQTerms; j++) {
-      P_Q_w=1.0;
       TERMID_T qtID = qTerms[j]; // TERM_ID
       relDocs.startIteration();
       while (relDocs.hasMore()) {
