@@ -31,7 +31,7 @@ std::string indri::query::RMExpander::expand( std::string originalQuery , std::v
 
   std::string rmSmoothing = "";
   if (mu != 0) // specify dirichlet smoothing
-    rmSmoothing = "dirichlet:" + (std::string)_param.get( "fbMu");
+    rmSmoothing = "method:dirichlet,mu:" + (std::string)_param.get( "fbMu", "0");
 
   // this should be a parameter, have to change the generation to
   // account for phrases then.
