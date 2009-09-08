@@ -1095,8 +1095,8 @@ std::string indri::collection::Repository::processTerm( const std::string& term 
 
   original.terms.push_back( termBuffer );
   document = &original;
-  
-  for( size_t i=0; i<_transformations.size(); i++ ) {
+  indri::thread::ScopedLock lock( _addLock );
+    for( size_t i=0; i<_transformations.size(); i++ ) {
     document = _transformations[i]->transform( document );    
   }
   
