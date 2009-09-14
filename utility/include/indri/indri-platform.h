@@ -32,7 +32,7 @@
 #endif /* __APPLE__ */
 
 #define INDRID_PORT ( 16743 )
-#define INDRI_DISTRIBUTION "Indri development release 2.10"
+#define INDRI_DISTRIBUTION "Indri development release 2.11"
 
 #endif /* INDRI_PLATFORM_H */
 
