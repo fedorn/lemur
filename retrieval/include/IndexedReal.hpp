@@ -78,14 +78,18 @@ namespace lemur
       class IndexedRealAscending {
       public:
         bool operator()(const IndexedReal & a, const IndexedReal & b) {
-          return a.val < b.val;  // based on the real value
+          if (a.val != b.val)
+            return a.val < b.val;  // based on the real value
+          return a.ind < b.ind;
         }
       };
 
       class IndexedRealDescending { 
       public: 
         bool operator()(const IndexedReal & a, const IndexedReal & b) {
-          return a.val > b.val;  // based on the real value
+          if (a.val != b.val)
+            return a.val > b.val;  // based on the real value
+          return a.ind > b.ind;
         }
       };
 
