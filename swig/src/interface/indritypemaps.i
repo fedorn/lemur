@@ -1,4 +1,4 @@
-#ifdef SWIGPHP4
+#ifdef SWIGPHP5
 // typemaps for indri types.
 typedef long long INT64;
 typedef long long UINT64;
@@ -43,7 +43,8 @@ typedef long long UINT64;
 
 %typemap(in) 
   std::vector< indri::api::ScoredExtentResult > *,
-  std::vector< indri::api::ScoredExtentResult > &
+  std::vector< indri::api::ScoredExtentResult > &,
+  const std::vector< indri::api::ScoredExtentResult > &
 {
   int iStatus;
   ulong iIndex;
@@ -129,12 +130,15 @@ typedef long long UINT64;
   for (iIndex=0;iIndex<resultobj->size();iIndex++)  {
     zval *obj, *_cPtr;
     MAKE_STD_ZVAL(obj);
+    zend_class_entry *ce = zend_fetch_class("ScoredExtentResult",
+  sizeof("ScoredExtentResult") - 1, ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
     MAKE_STD_ZVAL(_cPtr);
     indri::api::ScoredExtentResult *r = new indri::api::ScoredExtentResult((*resultobj)[iIndex]);
     SWIG_SetPointerZval(obj, (void *)r, SWIGTYPE_p_indri__api__ScoredExtentResult, 1);
     *_cPtr = *obj;
     INIT_ZVAL(*obj);
-    object_init_ex(obj,ptr_ce_swig_ScoredExtentResult);
+    object_init_ex(obj,ce);
+    add_property_zval(obj,"_cPtr",_cPtr);
     add_property_double(obj,"score",r->score);
     add_property_long(obj,"document",r->document);
     add_property_long(obj,"begin",r->begin);
@@ -142,7 +146,6 @@ typedef long long UINT64;
     add_property_long(obj,"number", r->number);
     add_property_long(obj,"ordinal", r->ordinal);
     add_property_long(obj,"parentOrdinal", r->parentOrdinal);
-    add_property_zval(obj,"_cPtr",_cPtr);
     add_next_index_zval(return_value, obj);
   }
 }
@@ -153,6 +156,11 @@ typedef long long UINT64;
   std::vector< indri::api::ParsedDocument * >::size_type iIndex;
   array_init(return_value);
   std::vector< indri::api::ParsedDocument * > *resultobj = &result; 
+    zend_class_entry *ce = zend_fetch_class("ParsedDocument",
+  sizeof("ParsedDocument") - 1, ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+    zend_class_entry *tce = zend_fetch_class("TermExtent",
+  sizeof("TermExtent") - 1, ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+
   for (iIndex=0;iIndex<resultobj->size();iIndex++)  {
     zval *obj, *_cPtr;
     MAKE_STD_ZVAL(obj);
@@ -161,7 +169,8 @@ typedef long long UINT64;
     SWIG_SetPointerZval(obj, (void *)r, SWIGTYPE_p_indri__api__ParsedDocument, 1);
     *_cPtr = *obj;
     INIT_ZVAL(*obj);
-    object_init_ex(obj,ptr_ce_swig_ParsedDocument);
+    object_init_ex(obj,ce);
+    add_property_zval(obj,"_cPtr",_cPtr);
     // ignore other elements.
     add_property_string(obj,"text",(char *)(r->text), 1);
     add_property_long(obj,"textLength",r->textLength);
@@ -184,7 +193,7 @@ typedef long long UINT64;
       SWIG_SetPointerZval(pos, (void *)t, SWIGTYPE_p_indri__parse__TermExtent, 1);
       *_ptr = *pos;
       INIT_ZVAL(*pos);
-      object_init_ex(pos,ptr_ce_swig_TermExtent);
+      object_init_ex(pos,tce);
       add_property_zval(pos,"_cPtr",_ptr);
       add_property_long(pos,"begin", iter->begin);
       add_property_long(pos,"end",iter->end);
@@ -203,8 +212,6 @@ typedef long long UINT64;
     }
 
     add_property_zval(obj,"metadata",pairs);
-
-    add_property_zval(obj,"_cPtr",_cPtr);
     add_next_index_zval(return_value, obj);
   }
 }
@@ -216,6 +223,9 @@ typedef long long UINT64;
   std::vector< indri::api::ScoredExtentResult >::size_type iIndex;
   array_init(return_value);
   std::vector< indri::api::ScoredExtentResult > *resultobj = result; 
+    zend_class_entry *ce = zend_fetch_class("ScoredExtentResult",
+  sizeof("ScoredExtentResult") - 1, ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+
   for (iIndex=0;iIndex<resultobj->size();iIndex++)  {
     zval *obj, *_cPtr, *retval;
     MAKE_STD_ZVAL(obj);
@@ -224,7 +234,8 @@ typedef long long UINT64;
     SWIG_SetPointerZval(obj, (void *)r, SWIGTYPE_p_indri__api__ScoredExtentResult, 1);
     *_cPtr = *obj;
     INIT_ZVAL(*obj);
-    object_init_ex(obj,ptr_ce_swig_ScoredExtentResult);
+    object_init_ex(obj,ce);
+    add_property_zval(obj,"_cPtr",_cPtr);
     add_property_double(obj,"score",r->score);
     add_property_long(obj,"document",r->document);
     add_property_long(obj,"begin",r->begin);
@@ -232,7 +243,6 @@ typedef long long UINT64;
     add_property_long(obj,"number", r->number);
     add_property_long(obj,"ordinal", r->ordinal);
     add_property_long(obj,"parentOrdinal", r->parentOrdinal);
-    add_property_zval(obj,"_cPtr",_cPtr);
     add_next_index_zval(return_value, obj);
   }
 }
@@ -255,6 +265,9 @@ typedef long long UINT64;
   const indri::infnet::EvaluatorNode::MResults & matches = *result; 
   indri::infnet::EvaluatorNode::MResults::iterator iter;
   std::vector< indri::api::ScoredExtentResult >::size_type iIndex;
+    zend_class_entry *ce = zend_fetch_class("ScoredExtentResult",
+  sizeof("ScoredExtentResult") - 1, ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+
   for( iter = $1->begin(); iter != $1->end(); iter++ ) {
     zval *seRes;
     MAKE_STD_ZVAL(seRes);
@@ -269,7 +282,8 @@ typedef long long UINT64;
       SWIG_SetPointerZval(obj, (void *)r, SWIGTYPE_p_indri__api__ScoredExtentResult, 1);
       *_cPtr = *obj;
       INIT_ZVAL(*obj);
-      object_init_ex(obj,ptr_ce_swig_ScoredExtentResult);
+      object_init_ex(obj,ce);
+      add_property_zval(obj,"_cPtr",_cPtr);
       add_property_double(obj,"score",r->score);
       add_property_long(obj,"document",r->document);
       add_property_long(obj,"begin",r->begin);
@@ -277,13 +291,27 @@ typedef long long UINT64;
       add_property_long(obj,"number", r->number);
       add_property_long(obj,"ordinal", r->ordinal);
       add_property_long(obj,"parentOrdinal", r->parentOrdinal);
-      add_property_zval(obj,"_cPtr",_cPtr);
       add_next_index_zval(seRes, obj);
     }
     add_assoc_zval(return_value, key, seRes);
   }
 }
 
+
+%typemap(out) indri::api::QueryAnnotation * {
+    zval *retval = 0, *_cPtr;
+    zend_class_entry *ce = zend_fetch_class("QueryAnnotation",
+  sizeof("QueryAnnotation") - 1, ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+
+    MAKE_STD_ZVAL(_cPtr);
+    MAKE_STD_ZVAL(retval);
+    SWIG_SetPointerZval(retval, $1,SWIGTYPE_p_indri__api__QueryAnnotation, 1);
+    *_cPtr = *retval;
+    INIT_ZVAL(*retval);
+    object_init_ex(retval,ce);
+    add_property_zval(retval,"_cPtr",_cPtr);
+    *($result) = *retval;
+}
 
 %typemap(out) indri::api::QueryAnnotationNode * {
   zval *tmp = php_makeQueryAnnotationNode($1);
@@ -296,12 +324,15 @@ typedef long long UINT64;
 
   zval *php_makeQueryAnnotationNode(indri::api::QueryAnnotationNode *inNode) {
     zval *retval = 0, *_cPtr;
+    zend_class_entry *ce = zend_fetch_class("QueryAnnotationNode",
+  sizeof("QueryAnnotationNode") - 1, ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+
     MAKE_STD_ZVAL(_cPtr);
     MAKE_STD_ZVAL(retval);
     SWIG_SetPointerZval(retval, (void *)inNode,SWIGTYPE_p_indri__api__QueryAnnotationNode, 0);
     *_cPtr = *retval;
     INIT_ZVAL(*retval);
-    object_init_ex(retval,ptr_ce_swig_QueryAnnotationNode);
+    object_init_ex(retval,ce);
     add_property_zval(retval,"_cPtr",_cPtr);
     // don't deref NULL
     if (inNode) {

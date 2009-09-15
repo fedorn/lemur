@@ -43,7 +43,7 @@
 }
 
 #endif
-#ifdef SWIGPHP4
+#ifdef SWIGPHP5
 // need separate map for individual methods.
 %define setEx(method) 
   %exception method {

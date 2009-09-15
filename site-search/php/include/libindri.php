@@ -16,7 +16,7 @@ Unable to load library: <?= $indri_param['library'] ?>
 <?php
   return;
 }
-
+include ( "libindri_php.php"); // wrapper class definitions
 // library loaded, run the bits.
 // increase the memory limit for the script.
 ini_set("memory_limit", $indri_param[ 'memory_limit' ] );

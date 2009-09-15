@@ -10,28 +10,32 @@
 
 
 
-#ifndef PHP_INDRI_H
-#define PHP_INDRI_H
+#ifndef PHP_LIBINDRI_PHP_H
+#define PHP_LIBINDRI_PHP_H
 
-extern zend_module_entry indri_module_entry;
-#define phpext_indri_ptr &indri_module_entry
+extern zend_module_entry libindri_php_module_entry;
+#define phpext_libindri_php_ptr &libindri_php_module_entry
 
 #ifdef PHP_WIN32
-# define PHP_INDRI_API __declspec(dllexport)
+# define PHP_LIBINDRI_PHP_API __declspec(dllexport)
 #else
-# define PHP_INDRI_API
+# define PHP_LIBINDRI_PHP_API
 #endif
 
 #ifdef ZTS
 #include "TSRM.h"
 #endif
 
-PHP_MINIT_FUNCTION(indri);
-PHP_MSHUTDOWN_FUNCTION(indri);
-PHP_RINIT_FUNCTION(indri);
-PHP_RSHUTDOWN_FUNCTION(indri);
-PHP_MINFO_FUNCTION(indri);
+PHP_MINIT_FUNCTION(libindri_php);
+PHP_MSHUTDOWN_FUNCTION(libindri_php);
+PHP_RINIT_FUNCTION(libindri_php);
+PHP_RSHUTDOWN_FUNCTION(libindri_php);
+PHP_MINFO_FUNCTION(libindri_php);
 
+ZEND_NAMED_FUNCTION(_wrap_TermExtent_begin_set);
+ZEND_NAMED_FUNCTION(_wrap_TermExtent_begin_get);
+ZEND_NAMED_FUNCTION(_wrap_TermExtent_end_set);
+ZEND_NAMED_FUNCTION(_wrap_TermExtent_end_get);
 ZEND_NAMED_FUNCTION(_wrap_new_TermExtent);
 ZEND_NAMED_FUNCTION(_wrap_new_ScoredExtentResult);
 ZEND_NAMED_FUNCTION(_wrap_ParsedDocument_getContent);
@@ -40,7 +44,6 @@ ZEND_NAMED_FUNCTION(_wrap_new_QueryAnnotationNode);
 ZEND_NAMED_FUNCTION(_wrap_QueryAnnotation_getQueryTree);
 ZEND_NAMED_FUNCTION(_wrap_QueryAnnotation_getAnnotations);
 ZEND_NAMED_FUNCTION(_wrap_QueryAnnotation_getResults);
-ZEND_NAMED_FUNCTION(_wrap_new_QueryAnnotation);
 ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_addServer);
 ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_addIndex);
 ZEND_NAMED_FUNCTION(_wrap_QueryEnvironment_close);
@@ -87,9 +90,8 @@ ZEND_NAMED_FUNCTION(_wrap_Parameters_exists);
 ZEND_NAMED_FUNCTION(_wrap_Parameters_load);
 ZEND_NAMED_FUNCTION(_wrap_QueryExpander_runExpandedQuery);
 ZEND_NAMED_FUNCTION(_wrap_QueryExpander_expand);
-ZEND_NAMED_FUNCTION(_wrap_new_QueryExpander);
 ZEND_NAMED_FUNCTION(_wrap_new_RMExpander);
 ZEND_NAMED_FUNCTION(_wrap_RMExpander_expand);
 ZEND_NAMED_FUNCTION(_wrap_new_PonteExpander);
 ZEND_NAMED_FUNCTION(_wrap_PonteExpander_expand);
-#endif /* PHP_INDRI_H */
+#endif /* PHP_LIBINDRI_PHP_H */
