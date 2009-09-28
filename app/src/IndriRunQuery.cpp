@@ -338,12 +338,6 @@ private:
 
     std::vector<std::string> pathNames;
     if ( _inexFormat ) {
-      // output topic header
-      output << "  <topic topic-id=\"" << queryIndex << "\">" << std::endl
-       << "    <collections>" << std::endl
-       << "      <collection>ieee</collection>" << std::endl
-       << "    </collections>" << std::endl;
-
       // retrieve path names
       pathNames = _environment.pathNames( resultSubset );
     }
@@ -396,15 +390,22 @@ private:
       if( documents.size() )
         delete documents[i];
     }
-    if( _inexFormat ) {
-      output << "  </topic>" << std::endl;
-    }
   }
 
   void _printResults( std::stringstream& output, std::string queryNumber ) {
+    if (_inexFormat) {
+      // output topic header
+      output << "  <topic topic-id=\"" << queryNumber << "\">" << std::endl
+             << "    <collections>" << std::endl
+             << "      <collection>ieee</collection>" << std::endl
+             << "    </collections>" << std::endl;
+    }
     for( size_t start = 0; start < _results.size(); start += 50 ) {
       size_t end = std::min<size_t>( start + 50, _results.size() );
       _printResultRegion( output, queryNumber, start, end );
+    }
+    if( _inexFormat ) {
+      output << "  </topic>" << std::endl;
     }
     delete _annotation;
     _annotation = 0;
