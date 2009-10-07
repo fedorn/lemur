@@ -4563,6 +4563,40 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setNo
 }
 
 
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setStoreDocs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(indri::api::IndexEnvironment **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  {
+    try {
+      try {
+        (arg1)->setStoreDocs(arg2);
+      }
+      catch(lemur::api::Exception &_e) {
+        {
+          jclass excep = jenv->FindClass("java/lang/Exception");
+          if (excep)
+          jenv->ThrowNew(excep, (&_e)->what().c_str());
+          return ;
+        }
+      }
+      
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return ;
+    }
+  }
+}
+
+
 SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1create_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3, jobject jarg3_) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;

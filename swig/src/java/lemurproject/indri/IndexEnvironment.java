@@ -227,6 +227,17 @@ public void setNormalization(boolean normalize) throws java.lang.Exception {
 
   
 /**
+       set the storeDocs flag
+       @param flag, false to not store documents in the compressed
+              collection, true to do so (default) 
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void setStoreDocs(boolean flag) throws java.lang.Exception {
+    indriJNI.IndexEnvironment_setStoreDocs(swigCPtr, this, flag);
+  }
+
+  
+/**
        create a new index and repository
        @param repositoryPath the path to the repository
        @param callback IndexStatus object to be notified of indexing progress.

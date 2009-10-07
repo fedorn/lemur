@@ -1763,6 +1763,9 @@ class indri_csharpPINVOKE {
   [DllImport("lemur_csharp", EntryPoint="CSharp_IndexEnvironment_setNormalization")]
   public static extern void IndexEnvironment_setNormalization(HandleRef jarg1, bool jarg2);
 
+  [DllImport("lemur_csharp", EntryPoint="CSharp_IndexEnvironment_setStoreDocs")]
+  public static extern void IndexEnvironment_setStoreDocs(HandleRef jarg1, bool jarg2);
+
   [DllImport("lemur_csharp", EntryPoint="CSharp_IndexEnvironment_create__SWIG_0")]
   public static extern void IndexEnvironment_create__SWIG_0(HandleRef jarg1, string jarg2, HandleRef jarg3);
 

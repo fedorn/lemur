@@ -10465,6 +10465,23 @@ SWIGEXPORT void SWIGSTDCALL CSharp_IndexEnvironment_setNormalization(void * jarg
 }
 
 
+SWIGEXPORT void SWIGSTDCALL CSharp_IndexEnvironment_setStoreDocs(void * jarg1, unsigned int jarg2) {
+  indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
+  bool arg2 ;
+  
+  arg1 = (indri::api::IndexEnvironment *)jarg1; 
+  arg2 = jarg2 ? true : false; 
+  try {
+    (arg1)->setStoreDocs(arg2);
+  }
+  catch(lemur::api::Exception &_e) {
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, ("C++ #lemur::api::Exception exception: " + (&_e)->what()).c_str());
+    return ; 
+  }
+  
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_IndexEnvironment_create__SWIG_0(void * jarg1, char * jarg2, void * jarg3) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;

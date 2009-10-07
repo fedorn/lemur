@@ -80,6 +80,7 @@ class indriJNI {
   public final static native void IndexEnvironment_setStemmer(long jarg1, IndexEnvironment jarg1_, String jarg2) throws java.lang.Exception;
   public final static native void IndexEnvironment_setMemory(long jarg1, IndexEnvironment jarg1_, long jarg2) throws java.lang.Exception;
   public final static native void IndexEnvironment_setNormalization(long jarg1, IndexEnvironment jarg1_, boolean jarg2) throws java.lang.Exception;
+  public final static native void IndexEnvironment_setStoreDocs(long jarg1, IndexEnvironment jarg1_, boolean jarg2) throws java.lang.Exception;
   public final static native void IndexEnvironment_create__SWIG_0(long jarg1, IndexEnvironment jarg1_, String jarg2, long jarg3, IndexStatus jarg3_) throws java.lang.Exception;
   public final static native void IndexEnvironment_create__SWIG_1(long jarg1, IndexEnvironment jarg1_, String jarg2) throws java.lang.Exception;
   public final static native void IndexEnvironment_open__SWIG_0(long jarg1, IndexEnvironment jarg1_, String jarg2, long jarg3, IndexStatus jarg3_) throws java.lang.Exception;

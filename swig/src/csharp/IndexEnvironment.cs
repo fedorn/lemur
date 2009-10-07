@@ -124,6 +124,11 @@ public class IndexEnvironment : IDisposable {
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
+  public void setStoreDocs(bool flag) {
+    indri_csharpPINVOKE.IndexEnvironment_setStoreDocs(swigCPtr, flag);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
+  }
+
   public void create(string repositoryPath, IndexStatus callback) {
     indri_csharpPINVOKE.IndexEnvironment_create__SWIG_0(swigCPtr, repositoryPath, IndexStatus.getCPtr(callback));
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
