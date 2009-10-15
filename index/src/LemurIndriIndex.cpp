@@ -190,6 +190,7 @@ lemur::api::TermInfoList* lemur::index::LemurIndriIndex::termInfoListSeq(lemur::
       }
     }
     list = new lemur::index::InvFPTermList(docID, locs.size(), locs);
+    delete(termList);
   }
   return list;
 }
