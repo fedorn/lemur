@@ -35,8 +35,8 @@ void lemur::file::HarvestSortMerge::_doSingleFileMergesort(std::string &inputFil
   }
 
   // reset the buffer size
-  setvbuf(_in, NULL, _IOFBF, 65536);
-
+  //  setvbuf(_in, NULL, _IOFBF, 65536);
+  setvbuf(_in, NULL, _IOFBF, 5*1024*1024);
   std::vector<std::string> outputChunks;
 
   int countInputRecords=0;

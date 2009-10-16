@@ -44,8 +44,8 @@ namespace indri
       // docOrder file (document URL->DOCNO)
       std::ofstream _docOrder;
 
-      char linkFileOutBuffer[lemur::file::FileMergeThread::MAX_INPUT_LINESIZE];
-      char docOrderOutBuffer[lemur::file::FileMergeThread::MAX_INPUT_LINESIZE];
+      char linkFileOutBuffer[5*1024*1024];
+      char docOrderOutBuffer[3*1024*1024];
 
       lemur::file::Keyfile *_docNoKeyfile;
       lemur::file::Keyfile *_redirectKeyfile;

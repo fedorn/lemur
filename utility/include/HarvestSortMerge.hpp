@@ -14,7 +14,7 @@ namespace lemur {
     protected:
       lemur::file::Keyfile *_docNoKeyfile;
 
-      virtual void _doSingleFileMergesort(std::string &inputFile, std::string &outputFile, std::vector<std::string> &chunkList, int chunkRecordSize=16384);
+      virtual void _doSingleFileMergesort(std::string &inputFile, std::string &outputFile, std::vector<std::string> &chunkList, int chunkRecordSize=16384*100);
 
     public:
       HarvestSortMerge(std::string &outputFilePath, std::string &tempDirectory, lemur::file::Keyfile *docNoKeyfile, int numMergeThreads=4, bool displayStatus=false);

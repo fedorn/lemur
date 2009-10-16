@@ -66,7 +66,7 @@ std::string lemur::file::SortMergeTextFiles::_flushChunks(std::string& basePathn
 
   std::ofstream outfile(chunkPathname.str().c_str());
   for (std::vector<std::string>::iterator vIter=inMemRecords->begin(); vIter!=inMemRecords->end(); vIter++) {
-    outfile << (*vIter).c_str() << std::endl;
+    outfile << (*vIter).c_str() << "\n"; //std::endl;
   }
   outfile.flush();
   outfile.close();
@@ -91,8 +91,9 @@ void lemur::file::SortMergeTextFiles::_doSingleFileMergesort(std::string &inputF
   }
 
   // reset the buffer size
-  setvbuf(_in, NULL, _IOFBF, 65536);
-
+  //  setvbuf(_in, NULL, _IOFBF, 65536);
+  char _buf[5*1024*1024];
+  setvbuf(_in, _buf, _IOFBF, 5*1024*1024);
   std::vector<std::string> outputChunks;
 
   int countInputRecords=0;
@@ -273,6 +274,7 @@ int lemur::file::SortMergeTextFiles::sort(std::vector<std::string> &inputFilePat
     std::string thisTempFile=indri::file::Path::combine(_tempDirectory, thisInputFilename);
     if (_displayStatus) {
       std::cout << "-- sorting input file " << inputFileCounter << " of " << inputFileCount << "\r";
+      std::cout.flush();
       ++inputFileCounter;
     }
     // std::vector<std::string> chunkList;
@@ -360,7 +362,7 @@ UINT64 lemur::file::FileMergeThread::work() {
 
     int whichBuffer=chooseNextBuffer();
     if (whichBuffer > -1) {
-      outfile << _buffer[whichBuffer] << std::endl;
+      outfile << _buffer[whichBuffer] << "\n"; //std::endl;
       ++recordCounter;
       if (!fgets(_buffer[whichBuffer], MAX_INPUT_LINESIZE, inputFile[whichBuffer])) {
         fileDone[whichBuffer]=true;
@@ -386,10 +388,11 @@ UINT64 lemur::file::FileMergeThread::initialize() {
       LEMUR_THROW( LEMUR_IO_ERROR, "Couldn't open temp file " + filePath[i] + "." );
     }
     // reset the buffer size to 64k
-    setvbuf(inputFile[i], NULL, _IOFBF, 65536);
+    //    setvbuf(inputFile[i], NULL, _IOFBF, 5*1024*1024);
+    //    setvbuf(inputFile[i], NULL, _IOFBF, 1*1024*1024);
   }
   outfile.open(outputFilePath.c_str());
-  outfile.rdbuf()->pubsetbuf(this->_outputBuffer, MAX_INPUT_LINESIZE);
+  outfile.rdbuf()->pubsetbuf(this->_outputBuffer, 5*1024*1024);
 
   recordCounter=0;
 

@@ -21,8 +21,10 @@ AnchorTextHarvester::AnchorTextHarvester( const std::string &linkFilePath,
   _linkFile.open(linkFilePath.c_str(), std::ios::out);
   _docOrder.open(docOrderPath.c_str(), std::ios::out);
 
-  _linkFile.rdbuf()->pubsetbuf(this->linkFileOutBuffer, lemur::file::FileMergeThread::MAX_INPUT_LINESIZE);
-  _docOrder.rdbuf()->pubsetbuf(this->docOrderOutBuffer, lemur::file::FileMergeThread::MAX_INPUT_LINESIZE);
+  //  _linkFile.rdbuf()->pubsetbuf(this->linkFileOutBuffer, lemur::file::FileMergeThread::MAX_INPUT_LINESIZE);
+  //  _docOrder.rdbuf()->pubsetbuf(this->docOrderOutBuffer, lemur::file::FileMergeThread::MAX_INPUT_LINESIZE);
+  _linkFile.rdbuf()->pubsetbuf(this->linkFileOutBuffer, 5*1024*1024);
+  _docOrder.rdbuf()->pubsetbuf(this->docOrderOutBuffer, 3*1024*1024);
 }
 
 AnchorTextHarvester::~AnchorTextHarvester() {
@@ -89,7 +91,7 @@ void AnchorTextHarvester::handle( indri::api::ParsedDocument* document ) {
   // print output
 
   // first - our document / page so we can sort it by url
-  _docOrder << page << '\t' << docno << std::endl;
+  _docOrder << page << '\t' << docno << "\n"; //std::endl;
 
   // tag this to our docno keyfile
   // account for the trailing \0
@@ -103,9 +105,9 @@ void AnchorTextHarvester::handle( indri::api::ParsedDocument* document ) {
     _docNoKeyfile->put(page, docno, strlen(docno)+1);
   }
 
-  // _out << "DOCNO=" << docno << std::endl;
-  // _out << "DOCURL=" << page << std::endl;
-  // _out << "LINKS=" << count << std::endl;
+  // _out << "DOCNO=" << docno << "\n"; //std::endl;
+  // _out << "DOCURL=" << page << "\n"; //std::endl;
+  // _out << "LINKS=" << count << "\n"; //std::endl;
 
   // write out the docno and URL for the doc order file
   // _docOrder << docno << "\t" << page << std::endl;
@@ -171,7 +173,7 @@ void AnchorTextHarvester::handle( indri::api::ParsedDocument* document ) {
         _linkFile << document->terms[j] << " ";
       } // end for( size_t j=extent.begin; int(j) < extent.end && textLength < 60000; j++ )
 
-      _linkFile << std::endl;
+      _linkFile << "\n"; //std::endl;
 
       // only do the same link once
       url = 0;
