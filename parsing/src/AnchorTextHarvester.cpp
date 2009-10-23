@@ -18,8 +18,8 @@ AnchorTextHarvester::AnchorTextHarvester( const std::string &linkFilePath,
 
   _docNoKeyfile=docNoKeyfile;
   _redirectKeyfile=redirectKeyfile;
-  _linkFile.open(linkFilePath.c_str(), std::ios::out);
-  _docOrder.open(docOrderPath.c_str(), std::ios::out);
+  _linkFile.open(linkFilePath.c_str(), std::ios::out | std::ios::binary);
+  _docOrder.open(docOrderPath.c_str(), std::ios::out | std::ios::binary);
 
   //  _linkFile.rdbuf()->pubsetbuf(this->linkFileOutBuffer, lemur::file::FileMergeThread::MAX_INPUT_LINESIZE);
   //  _docOrder.rdbuf()->pubsetbuf(this->docOrderOutBuffer, lemur::file::FileMergeThread::MAX_INPUT_LINESIZE);

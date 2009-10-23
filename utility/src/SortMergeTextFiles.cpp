@@ -1,3 +1,15 @@
+/*==========================================================================
+ * Copyright (c) 2004-2008 Carnegie Mellon University and University of
+ * Massachusetts.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software, and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
+
 #include "SortMergeTextFiles.hpp"
 #include "indri/Path.hpp"
 #include "Exception.hpp"
@@ -64,7 +76,7 @@ std::string lemur::file::SortMergeTextFiles::_flushChunks(std::string& basePathn
   time(&rawtime);
   chunkPathname << basePathname << "." << (rawtime+clock()) << "_" << currentChunkNumber << ".mchunk";
 
-  std::ofstream outfile(chunkPathname.str().c_str());
+  std::ofstream outfile(chunkPathname.str().c_str(), std::ios::out | std::ios::binary);
   for (std::vector<std::string>::iterator vIter=inMemRecords->begin(); vIter!=inMemRecords->end(); vIter++) {
     outfile << (*vIter).c_str() << "\n"; //std::endl;
   }
@@ -92,8 +104,7 @@ void lemur::file::SortMergeTextFiles::_doSingleFileMergesort(std::string &inputF
 
   // reset the buffer size
   //  setvbuf(_in, NULL, _IOFBF, 65536);
-  char _buf[5*1024*1024];
-  setvbuf(_in, _buf, _IOFBF, 5*1024*1024);
+  setvbuf(_in, NULL, _IOFBF, 5*1024*1024);
   std::vector<std::string> outputChunks;
 
   int countInputRecords=0;
@@ -389,10 +400,10 @@ UINT64 lemur::file::FileMergeThread::initialize() {
     }
     // reset the buffer size to 64k
     //    setvbuf(inputFile[i], NULL, _IOFBF, 5*1024*1024);
-    //    setvbuf(inputFile[i], NULL, _IOFBF, 1*1024*1024);
+    setvbuf(inputFile[i], NULL, _IOFBF, 1*1024*1024);
   }
-  outfile.open(outputFilePath.c_str());
-  outfile.rdbuf()->pubsetbuf(this->_outputBuffer, 5*1024*1024);
+  outfile.open(outputFilePath.c_str(), std::ios::out | std::ios::binary);
+  outfile.rdbuf()->pubsetbuf(this->_outputBuffer, sizeof(this->_outputBuffer));
 
   recordCounter=0;
 

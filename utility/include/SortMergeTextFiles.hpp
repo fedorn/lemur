@@ -1,3 +1,14 @@
+/*==========================================================================
+ * Copyright (c) 2004-2008 Carnegie Mellon University and University of
+ * Massachusetts.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software, and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 
 #ifndef _SORTMERGETEXTFILES_HPP
 #define _SORTMERGETEXTFILES_HPP
@@ -42,7 +53,7 @@ namespace lemur {
       char _buffer[MAX_INPUT_FILES][MAX_INPUT_LINESIZE];
       bool fileDone[MAX_INPUT_FILES];
       //      char _outputBuffer[lemur::file::FileMergeThread::MAX_INPUT_LINESIZE];
-      char _outputBuffer[5*1024*1024];
+      char _outputBuffer[2*1024*1024];
 
       int numInputFiles;
 
@@ -81,7 +92,7 @@ namespace lemur {
       std::vector<std::string> _doMidFinalMerge(std::vector<std::string> &inputList, std::string &outputPathBase, int &recordCounter);
       int _doFinalMergesortFiles(std::vector<std::string> &inputFiles, std::string &outputFile);
 
-      virtual void _doSingleFileMergesort(std::string &inputFile, std::string &outputFile, std::vector<std::string> &chunkList, int chunkRecordSize=16384*100);
+      virtual void _doSingleFileMergesort(std::string &inputFile, std::string &outputFile, std::vector<std::string> &chunkList, int chunkRecordSize=16384*10);
 
     public:
       SortMergeTextFiles(std::string &outputFilePath, std::string &tempDirectory, int numMergeThreads=4, bool displayStatus=false);

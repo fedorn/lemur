@@ -1,6 +1,16 @@
-#include "HarvestSortMerge.hpp"
+/*==========================================================================
+ * Copyright (c) 2004-2008 Carnegie Mellon University and University of
+ * Massachusetts.  All Rights Reserved.
+ *
+ * Use of the Lemur Toolkit for Language Modeling and Information Retrieval
+ * is subject to the terms of the software license set forth in the LICENSE
+ * file included with this software, and also available at
+ * http://www.lemurproject.org/license.html
+ *
+ *==========================================================================
+*/
 
-//      lemur::file::Keyfile *_docNoKeyfile
+#include "HarvestSortMerge.hpp"
 
 lemur::file::HarvestSortMerge::HarvestSortMerge(std::string &outputFilePath, std::string &tempDirectory,
                                                 lemur::file::Keyfile *docNoKeyfile, int numMergeThreads,
@@ -65,7 +75,9 @@ void lemur::file::HarvestSortMerge::_doSingleFileMergesort(std::string &inputFil
       // see if our destination URL is in the keyfile
       // ensure we're not over the 511+\0 size limit!
       if (linePieces[0].length() > 511) {
-        linePieces[0]=linePieces[0].substr(0, 511);
+		  char hashBuffer[128];
+		  SHA1Hasher.hashStringToHex(linePieces[0].c_str(), hashBuffer, 128);
+		  linePieces[0] = hashBuffer;
       }
       if ((linePieces.size() > 0) && (_docNoKeyfile->getSize(linePieces[0].c_str()) > -1)) {
         inMemoryChunk.push_back(std::string(thisLine));
