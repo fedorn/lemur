@@ -12,6 +12,7 @@
 
 #include <map>
 #include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #ifdef HAS_NOT_CCTYPE_H
 #include <ctype.h>
