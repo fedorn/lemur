@@ -60,6 +60,7 @@ namespace indri
       void _handleStemFieldCount( indri::xml::XMLNode* request );
       void _handleDocumentCount( indri::xml::XMLNode* request );
       void _handleDocumentTermCount( indri::xml::XMLNode* request );
+      void _handleDocumentStemCount( indri::xml::XMLNode* request );
       void _handleDocumentLength( indri::xml::XMLNode* request );
       void _handleFieldList( indri::xml::XMLNode* request );
 

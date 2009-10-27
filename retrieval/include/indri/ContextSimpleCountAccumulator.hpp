@@ -36,6 +36,8 @@ namespace indri
       UINT64 _occurrences;
       UINT64 _size;
       lemur::api::DOCID_T _maximumDocument;
+      int _documentOccurrences;
+      int _documentCount;
 
       EvaluatorNode::MResults _results;
 
@@ -49,6 +51,10 @@ namespace indri
 
       const std::string& getName() const;
       const EvaluatorNode::MResults& getResults();
+
+      int getDocumentOccurrences() const ;
+      int getDocumentCount() const ;
+
       void indexChanged( indri::index::Index& index );
       void evaluate( lemur::api::DOCID_T documentID, int documentLength );
       lemur::api::DOCID_T nextCandidateDocument();

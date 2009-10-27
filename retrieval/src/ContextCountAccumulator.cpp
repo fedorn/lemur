@@ -28,7 +28,9 @@ indri::infnet::ContextCountAccumulator::ContextCountAccumulator( const std::stri
   _matches(matches),
   _context(context),
   _occurrences(0),
-  _contextSize(0)
+  _contextSize(0),
+  _documentOccurrences(0),
+  _documentCount(0)
 {
 }
 
@@ -47,13 +49,23 @@ double indri::infnet::ContextCountAccumulator::getContextSize() const {
   return _contextSize;
 }
 
+int indri::infnet::ContextCountAccumulator::getDocumentOccurrences() const {
+  return _documentOccurrences;
+}
+
+int indri::infnet::ContextCountAccumulator::getDocumentCount() const {
+  return _documentCount;
+}
+    
 const indri::infnet::EvaluatorNode::MResults& indri::infnet::ContextCountAccumulator::getResults() {
   // we must be finished, so now is a good time to add our results to the ListCache
   _results.clear();
 
   _results[ "occurrences" ].push_back( indri::api::ScoredExtentResult( _occurrences, 0 ) );
   _results[ "contextSize" ].push_back( indri::api::ScoredExtentResult( _contextSize, 0 ) );
-
+  _results[ "documentOccurrences" ].push_back( indri::api::ScoredExtentResult(UINT64(_documentOccurrences), 0 ) );
+  _results[ "documentCount" ].push_back( indri::api::ScoredExtentResult( UINT64(_documentCount), 0 ) );
+   
   return _results;
 }
 
@@ -79,6 +91,8 @@ void indri::infnet::ContextCountAccumulator::evaluate( lemur::api::DOCID_T docum
         lastEnd = extent.end;
       }
     }
+    if (_matches->extents().size() > 0)
+      _documentOccurrences++;
     _occurrences += documentOccurrences;
   } else {
 
@@ -127,6 +141,9 @@ void indri::infnet::ContextCountAccumulator::evaluate( lemur::api::DOCID_T docum
       documentContextSize += extents[i].end - extents[i].begin;
     }
 
+    if (documentOccurrences > 0)
+      _documentOccurrences++;
+    
     _occurrences += documentOccurrences;
     _contextSize += documentContextSize;
   }
@@ -151,6 +168,7 @@ void indri::infnet::ContextCountAccumulator::indexChanged( indri::index::Index& 
   if( ! _context ) {
     _contextSize += index.termCount();
   }
+  _documentCount += index.documentCount();
 }
 
 

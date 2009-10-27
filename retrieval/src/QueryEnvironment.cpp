@@ -64,6 +64,8 @@
 
 #include "indri/VocabularyIterator.hpp"
 
+#include "indri/QueryTFWalker.hpp"
+
 using namespace lemur::api;
 
 // debug code: should be gone soon
@@ -89,7 +91,7 @@ namespace indri
       void defaultBefore( indri::lang::Node* n ) {
         for( int i=0; i<tabs; i++ )
           std::cout << "\t";
-        std::cout << n->typeName() << " " << n->queryText() << std::endl;
+        std::cout << n->typeName() << " " << n->nodeName() << " " << n->queryText() << std::endl;
         tabs++;
       }
 
@@ -143,8 +145,7 @@ void qenv_gather_document_results( const std::vector< std::vector<DOCID_T> >& do
 // QueryEnvironment definition
 //
 
-indri::api::QueryEnvironment::QueryEnvironment()
-{
+indri::api::QueryEnvironment::QueryEnvironment() : _baseline(false) { 
 }
 
 indri::api::QueryEnvironment::~QueryEnvironment() {
@@ -166,6 +167,12 @@ void indri::api::QueryEnvironment::setScoringRules( const std::vector<std::strin
   }
 }
 
+void indri::api::QueryEnvironment::setBaseline( const std::string& baseline ) {
+  std::string rule = "method:" + baseline;
+  _parameters.set("rule", rule);
+  _baseline = true;
+}
+
 void indri::api::QueryEnvironment::setStopwords( const std::vector<std::string>& stopwords ) {
   _parameters.set("stopper","");
   Parameters p = _parameters.get("stopper");
@@ -178,11 +185,15 @@ void indri::api::QueryEnvironment::_copyStatistics( std::vector<indri::lang::Raw
   for( size_t i=0; i<scorerNodes.size(); i++ ) {
     std::vector<ScoredExtentResult>& occurrencesList = statisticsResults[ scorerNodes[i]->nodeName() ][ "occurrences" ];
     std::vector<ScoredExtentResult>& contextSizeList = statisticsResults[ scorerNodes[i]->nodeName() ][ "contextSize" ];
+    std::vector<ScoredExtentResult>& documentOccurrencesList = statisticsResults[ scorerNodes[i]->nodeName() ][ "documentOccurrences" ];
+    std::vector<ScoredExtentResult>& documentCountList = statisticsResults[ scorerNodes[i]->nodeName() ][ "documentCount" ];
 
     double occurrences = occurrencesList[0].score;
     double contextSize = contextSizeList[0].score;
+    int documentOccurrences = int(documentOccurrencesList[0].score);
+    int documentCount = int(documentCountList[0].score);
 
-    scorerNodes[i]->setStatistics( occurrences, contextSize );
+    scorerNodes[i]->setStatistics( occurrences, contextSize, documentOccurrences, documentCount );
   }
 }
 
@@ -826,7 +837,7 @@ double indri::api::QueryEnvironment::expressionCount( const std::string& express
   indri::lang::ContextCounterNode* contextCounter = new indri::lang::ContextCounterNode( rootScorer->getRawExtent(),
                                                                                          rootScorer->getContext() );
   contextCounter->setNodeName( rootScorer->nodeName() );
-  
+
   std::vector<indri::lang::Node*> roots;
   roots.push_back( contextCounter );
 
@@ -845,13 +856,16 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
                                                                                      int resultsRequested,
                                                                                      const std::vector<DOCID_T>* documentSet,
                                                                                      indri::api::QueryAnnotation** annotation,
-                                                                                     const std::string &queryType ) {
+                                                                                     const std::string &queryType) {
   INIT_TIMER
     QueryParserWrapper *parser = QueryParserFactory::get(q, queryType);
 
   PRINT_TIMER( "Initialization complete" );
 
   indri::lang::ScoredExtentNode* rootNode;
+
+  std::vector<indri::lang::Node*> nodes;
+  indri::utility::VectorDeleter<indri::lang::Node*> nd(nodes);
 
   try {
     rootNode = parser->query();
@@ -861,6 +875,41 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
 
   PRINT_TIMER( "Parsing complete" );
 
+  if (_baseline) {
+    // Replace with a PlusNode
+    indri::lang::UnweightedCombinationNode* rootScorer = dynamic_cast<indri::lang::UnweightedCombinationNode*>(rootNode);
+    indri::lang::RawScorerNode* rawScorer = dynamic_cast<indri::lang::RawScorerNode*>(rootNode);
+    indri::lang::WeightedCombinationNode* weightScorer = dynamic_cast<indri::lang::WeightedCombinationNode*>(rootNode);
+    if (rootScorer == NULL && rawScorer == NULL) 
+      {
+        if (weightScorer == NULL) 
+          {
+            LEMUR_THROW( LEMUR_PARSE_ERROR, "Can't run baseline on this query: " + q + "\nindri query language operators are not allowed." );
+          } else {
+          indri::lang::WPlusNode * plusNode = new indri::lang::WPlusNode();
+          plusNode->setNodeName(weightScorer->nodeName());
+          const std::vector< std::pair<double, indri::lang::ScoredExtentNode*> >& children = weightScorer->getChildren();
+          for (int i = 0; i < children.size(); i++) {
+            plusNode->addChild(children[i].first, children[i].second);
+          }
+          rootNode = plusNode;
+          nodes.push_back(plusNode);
+          }
+      }
+    
+    if (rootScorer) {
+      indri::lang::PlusNode * plusNode = new indri::lang::PlusNode();
+      plusNode->setNodeName(rootScorer->nodeName());
+      const std::vector<indri::lang::ScoredExtentNode *> & children = rootScorer->getChildren();
+      for (int i = 0; i < children.size(); i++) {
+        plusNode->addChild(children[i]);
+      }
+      rootNode = plusNode;
+      nodes.push_back(plusNode);
+    }
+    // if a RawScorerNode, just leave it
+  }
+  
   // push down language models from ExtentRestriction nodes
   indri::lang::ExtentRestrictionModelAnnotatorCopier restrictionCopier;
   rootNode = dynamic_cast<indri::lang::ScoredExtentNode*>(rootNode->copy(restrictionCopier));
@@ -880,7 +929,7 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
   }
 
   indri::infnet::InferenceNetwork::MAllResults statisticsResults;
-
+            
   if ( noContext ) {
     indri::lang::ApplyCopiers<indri::lang::NoContextCountGraphCopier, indri::lang::RawScorerNode> graph( scorerNodes );
     _sumServerQuery( statisticsResults, graph.roots(), resultsRequested ); //1000
@@ -898,6 +947,12 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
   indri::lang::SmoothingAnnotatorWalker smoother( _parameters );
   rootNode->walk(smoother);
 
+  if (_baseline) {
+    // update the qtf in the smoothing rules
+    indri::lang::QueryTFWalker qtfWalker(_servers);
+    rootNode->walk(qtfWalker);
+  }
+  
   // run a scored query (possibly including a document set)
   std::string accumulatorName;
   _scoredQuery( results, rootNode, accumulatorName, resultsRequested, documentSet );
@@ -1111,7 +1166,7 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::runQue
   return queryResult;
 }
 
-std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::runQuery( const std::string& query, const std::vector<DOCID_T>& documentSet, int resultsRequested, const std::string &queryType ) {
+std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::runQuery( const std::string& query, const std::vector<DOCID_T>& documentSet, int resultsRequested, const std::string &queryType) {
   indri::infnet::InferenceNetwork::MAllResults results;
   std::vector<indri::api::ScoredExtentResult> queryResult = _runQuery( results, query, resultsRequested, &documentSet, 0, queryType );
   return queryResult;
@@ -1239,6 +1294,16 @@ INT64 indri::api::QueryEnvironment::documentCount( const std::string& term ) {
 
   for( size_t i=0; i<_servers.size(); i++ ) {
     totalDocumentCount += _servers[i]->documentCount( term );
+  }
+
+  return totalDocumentCount;
+}
+
+INT64 indri::api::QueryEnvironment::documentStemCount( const std::string& term ) {
+  INT64 totalDocumentCount = 0;
+
+  for( size_t i=0; i<_servers.size(); i++ ) {
+    totalDocumentCount += _servers[i]->documentStemCount( term );
   }
 
   return totalDocumentCount;

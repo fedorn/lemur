@@ -1372,6 +1372,8 @@ namespace indri {
       double _occurrences; // number of occurrences within this context
       double _contextSize; // number of terms that occur within this context
       double _maximumContextFraction;
+      int _documentOccurrences; // number of documents we occur in
+      int _documentCount; // total number of documents
 
       RawExtentNode* _raw;
       RawExtentNode* _context;
@@ -1384,6 +1386,8 @@ namespace indri {
 
         _occurrences = 0;
         _contextSize = 0;
+        _documentOccurrences = 0;
+        _documentCount = 0;
         _smoothing = smoothing;
       }
 
@@ -1393,6 +1397,8 @@ namespace indri {
 
         _occurrences = unpacker.getDouble( "occurrences" );
         _contextSize = unpacker.getDouble( "contextSize" );
+        _documentOccurrences = unpacker.getInteger( "documentOccurrences" );
+        _documentCount = unpacker.getInteger( "documentCount" );
         _smoothing = unpacker.getString( "smoothing" );
       }
 
@@ -1440,13 +1446,23 @@ namespace indri {
         return _contextSize;
       }
 
+      int getDocumentOccurrences() const {
+        return _documentOccurrences;
+      }
+
+      int getDocumentCount() const {
+        return _documentCount;
+      }
+      
       const std::string& getSmoothing() const {
         return _smoothing;
       }
 
-      void setStatistics( double occurrences, double contextSize ) {
+      void setStatistics( double occurrences, double contextSize, int documentOccurrences, int documentCount ) {
         _occurrences = occurrences;
         _contextSize = contextSize;
+        _documentOccurrences = documentOccurrences;
+        _documentCount = documentCount;
       }
 
       void setContext( RawExtentNode* context ) {
@@ -1476,6 +1492,8 @@ namespace indri {
 
         packer.put( "occurrences", _occurrences );
         packer.put( "contextSize", _contextSize );
+        packer.put( "documentOccurrences", _documentOccurrences );
+        packer.put( "documentCount", _documentCount );
         packer.put( "smoothing", _smoothing );
         packer.after(this);
       }
@@ -1506,6 +1524,8 @@ namespace indri {
     private:
       double _occurrences; // number of occurrences within this context
       double _contextSize; // number of terms that occur within this context
+      int _documentOccurrences; // number of documents we occur in
+      int _documentCount; // total number of documents
 
       std::string _text;
       std::string _smoothing;
@@ -1515,6 +1535,8 @@ namespace indri {
       TermFrequencyScorerNode( const std::string& text, bool stemmed ) {
         _occurrences = 0;
         _contextSize = 0;
+        _documentOccurrences = 0;
+        _documentCount = 0;
         _smoothing = "";
         _text = text;
         _stemmed = stemmed;
@@ -1523,6 +1545,8 @@ namespace indri {
       TermFrequencyScorerNode( Unpacker& unpacker ) {
         _occurrences = unpacker.getDouble( "occurrences" );
         _contextSize = unpacker.getDouble( "contextSize" );
+        _documentOccurrences = unpacker.getInteger( "documentOccurrences" );
+        _documentCount = unpacker.getInteger( "documentCount" );
         _smoothing = unpacker.getString( "smoothing" );
         _text = unpacker.getString( "text" );
         _stemmed = unpacker.getBoolean( "stemmed" );
@@ -1569,13 +1593,23 @@ namespace indri {
         return _contextSize;
       }
 
+      int getDocumentOccurrences() const {
+        return _documentOccurrences;
+      }
+
+      int getDocumentCount() const {
+        return _documentCount;
+      }
+
       const std::string& getSmoothing() const {
         return _smoothing;
       }
 
-      void setStatistics( double occurrences, double contextSize ) {
+      void setStatistics( double occurrences, double contextSize, int documentOccurrences, int documentCount ) {
         _occurrences = occurrences;
         _contextSize = contextSize;
+        _documentOccurrences = documentOccurrences;
+        _documentCount = documentCount;
       }
 
       void setSmoothing( const std::string& smoothing ) {
@@ -1586,6 +1620,8 @@ namespace indri {
         packer.before(this);
         packer.put( "occurrences", _occurrences );
         packer.put( "contextSize", _contextSize );
+        packer.put( "documentOccurrences", _documentOccurrences );
+        packer.put( "documentCount", _documentCount );
         packer.put( "text", _text );
         packer.put( "stemmed", _stemmed );
         packer.put( "smoothing", _smoothing );
@@ -2513,13 +2549,17 @@ namespace indri {
       bool _hasContextSize;
       double _occurrences;
       double _contextSize;
+      int _documentOccurrences; // number of documents we occur in
+      int _documentCount; // total number of documents
 
     public:
       ContextCounterNode( RawExtentNode* raw, RawExtentNode* context ) :
         _hasCounts(false),
         _hasContextSize(false),
         _occurrences(0),
-        _contextSize(0)
+        _contextSize(0),
+        _documentOccurrences(0),
+        _documentCount(0)
       {
         _raw = raw;
         _context = context;
@@ -2530,6 +2570,8 @@ namespace indri {
         _context = unpacker.getRawExtentNode( "context" );
         _occurrences = unpacker.getDouble( "occurrences" );
         _contextSize = unpacker.getDouble( "contextSize" );
+        _documentOccurrences = unpacker.getInteger( "documentOccurrences" );
+        _documentCount = unpacker.getInteger( "documentCount" );
 
         _hasCounts = unpacker.getBoolean( "hasCounts" );
         _hasContextSize = unpacker.getBoolean( "hasContextSize" );
@@ -2584,6 +2626,8 @@ namespace indri {
         packer.put( "context", _context );
         packer.put( "occurrences", _occurrences );
         packer.put( "contextSize", _contextSize );
+        packer.put( "documentOccurrences", _documentOccurrences );
+        packer.put( "documentCount", _documentCount );
 
         packer.put( "hasCounts", _hasCounts );
         packer.put( "hasContextSize", _hasContextSize );
@@ -2623,16 +2667,27 @@ namespace indri {
         return _contextSize;
       }
 
+      int getDocumentOccurrences() const {
+        return _documentOccurrences;
+      }
+
+      int getDocumentCount() const {
+        return _documentCount;
+      }
+
       void setContextSize( double contextSize ) {
         _contextSize = contextSize;
         _hasContextSize = true;
       }
 
       void setCounts( double occurrences,
-                      double contextSize ) {
+                      double contextSize, int documentOccurrences, 
+                      int documentCount ) {
         _hasCounts = true;
         _occurrences = occurrences;
         setContextSize( contextSize );
+        _documentOccurrences = documentOccurrences;
+        _documentCount = documentCount;
       }
     };
 
@@ -2646,6 +2701,8 @@ namespace indri {
       bool _hasContextSize;
       double _occurrences;
       double _contextSize;
+      int _documentOccurrences; // number of documents we occur in
+      int _documentCount; // total number of documents
 
     public:
       ContextSimpleCounterNode( const std::vector<std::string>& terms, const std::string& field, const std::string& context ) :
@@ -2655,7 +2712,9 @@ namespace indri {
         _contextSize(0),
         _terms(terms),
         _field(field),
-        _context(context)
+        _context(context),
+        _documentOccurrences(0),
+        _documentCount(0)
       {
       }
 
@@ -2666,6 +2725,8 @@ namespace indri {
         _terms = unpacker.getStringVector( "terms" );
         _field = unpacker.getString( "field" );
         _context = unpacker.getString( "context" );
+        _documentOccurrences = unpacker.getInteger( "documentOccurrences" );
+        _documentCount = unpacker.getInteger( "documentCount" );
 
         _hasCounts = unpacker.getBoolean( "hasCounts" );
         _hasContextSize = unpacker.getBoolean( "hasContextSize" );
@@ -2689,6 +2750,8 @@ namespace indri {
         packer.before(this);
         packer.put( "occurrences", _occurrences );
         packer.put( "contextSize", _contextSize );
+        packer.put( "documentOccurrences", _documentOccurrences );
+        packer.put( "documentCount", _documentCount );
 
         packer.put( "terms", _terms );
         packer.put( "field", _field );
@@ -2726,6 +2789,14 @@ namespace indri {
         return _contextSize;
       }
 
+      int getDocumentOccurrences() const {
+        return _documentOccurrences;
+      }
+
+      int getDocumentCount() const {
+        return _documentCount;
+      }
+
       const std::vector<std::string>& terms() const {
         return _terms;
       }
@@ -2744,10 +2815,13 @@ namespace indri {
       }
 
       void setCounts( double occurrences,
-                      double contextSize ) {
+                      double contextSize, int documentOccurrences, 
+                      int documentCount ) {
         _hasCounts = true;
         _occurrences = occurrences;
         setContextSize( contextSize );
+        _documentOccurrences = documentOccurrences;
+        _documentCount = documentCount;
       }
     };
 
@@ -3655,6 +3729,72 @@ namespace indri {
         duplicate->setNodeName( nodeName() );
 
         return copier.after(this, duplicate);
+      }
+    };
+
+    class PlusNode : public UnweightedCombinationNode {
+    public:
+      PlusNode() {}
+      PlusNode( Unpacker& unpacker ) {
+        _unpack( unpacker );
+      }
+
+      std::string typeName() const {
+        return "PlusNode";
+      }
+
+      std::string queryText() const {
+        std::stringstream qtext;
+        qtext << "#plus(";
+        _childText(qtext);
+        qtext << ")";
+
+        return qtext.str();
+      } 
+
+      UINT64 hashCode() const {
+        return 259 + _hashCode();
+      }
+
+      void walk( Walker& walker ) {
+        _walk( this, walker );
+      }
+      
+      Node* copy( Copier& copier ) {
+        return _copy( this, copier );
+      }
+    };
+
+    class WPlusNode : public WeightedCombinationNode {
+    public:
+      WPlusNode() {}
+      WPlusNode( Unpacker& unpacker ) {
+        _unpack( unpacker );
+      }
+
+      std::string typeName() const {
+        return "WPlusNode";
+      }
+
+      std::string queryText() const {
+        std::stringstream qtext;
+        qtext << "#wplus(";
+        _childText(qtext);
+        qtext << ")";
+
+        return qtext.str();
+      } 
+
+      UINT64 hashCode() const {
+        return 261 + _hashCode();
+      }
+
+      void walk( Walker& walker ) {
+        _walk( this, walker );
+      }
+      
+      Node* copy( Copier& copier ) {
+        return _copy( this, copier );
       }
     };
 

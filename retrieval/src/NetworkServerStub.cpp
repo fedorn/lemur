@@ -382,6 +382,12 @@ void indri::net::NetworkServerStub::_handleDocumentTermCount( indri::xml::XMLNod
   _sendNumericResponse( "document-term-count", count );
 }
 
+void indri::net::NetworkServerStub::_handleDocumentStemCount( indri::xml::XMLNode* request ) {
+  const std::string& term = request->getValue();
+  INT64 count = _server->documentStemCount( term );
+  _sendNumericResponse( "document-stem-count", count );
+}
+
 void indri::net::NetworkServerStub::_handlePathNames( indri::xml::XMLNode* request ) {
   std::vector<lemur::api::DOCID_T> documentIDs;
   std::vector<int> begins;
@@ -455,6 +461,8 @@ void indri::net::NetworkServerStub::request( indri::xml::XMLNode* input ) {
       _handleDocumentCount( input );
     } else if( type == "document-term-count" ) {
       _handleDocumentTermCount( input );
+    } else if( type == "document-stem-count" ) {
+      _handleDocumentStemCount( input );
     } else if( type == "docids-from-metadata" ) {
       _handleDocumentIDsFromMetadata( input );
     } else if( type == "documents-from-metadata" ) {

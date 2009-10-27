@@ -87,6 +87,7 @@ namespace indri
       virtual int documentLength( lemur::api::DOCID_T documentID ) = 0;
       virtual INT64 documentCount() = 0;
       virtual INT64 documentCount( const std::string& term ) = 0;
+      virtual INT64 documentStemCount( const std::string& term ) = 0;
   
       // document vector
       virtual QueryServerVectorsResponse* documentVectors( const std::vector<lemur::api::DOCID_T>& documentIDs ) = 0;

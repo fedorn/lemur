@@ -66,6 +66,7 @@ namespace indri
       int documentLength( lemur::api::DOCID_T documentID );
       INT64 documentCount();
       INT64 documentCount( const std::string& term );
+      INT64 documentStemCount( const std::string& term );
 
       // document vector
       QueryServerVectorsResponse* documentVectors( const std::vector<lemur::api::DOCID_T>& documentIDs );

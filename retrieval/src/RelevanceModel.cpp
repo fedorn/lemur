@@ -196,7 +196,8 @@ void indri::query::RelevanceModel::_scoreGrams() {
       }
 
       double gramFrequency = gramCount / collectionCount;
-      function = indri::query::TermScoreFunctionFactory::get( _smoothing, gramFrequency );
+      //      function = indri::query::TermScoreFunctionFactory::get( _smoothing, gramFrequency );
+      function = indri::query::TermScoreFunctionFactory::get( _smoothing, gramCount, collectionCount, 0 , 0 );
     }
 
     // now, aggregate scores for each retrieved item

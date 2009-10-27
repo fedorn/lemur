@@ -105,6 +105,10 @@ namespace indri {
       virtual class Node* after( class ExtentParent* oldNode, class ExtentParent* newNode );
       virtual void before( class WildcardTerm* oldNode );
       virtual class Node* after( class WildcardTerm* oldNode, class WildcardTerm* newNode );
+      virtual void before( class PlusNode* oldNode );
+      virtual class Node* after( class PlusNode* oldNode, class PlusNode* newNode );
+      virtual void before( class WPlusNode* oldNode );
+      virtual class Node* after( class WPlusNode* oldNode, class WPlusNode* newNode );
    };
  }
 }

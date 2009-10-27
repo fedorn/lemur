@@ -139,7 +139,8 @@ namespace indri
       std::vector<indri::net::NetworkMessageStream*> _messageStreams;
 
       Parameters _parameters;
-
+      bool _baseline;
+      
       void _mergeQueryResults( indri::infnet::InferenceNetwork::MAllResults& results, std::vector<indri::server::QueryServerResponse*>& responses );
       void _copyStatistics( std::vector<indri::lang::RawScorerNode*>& scorerNodes, indri::infnet::InferenceNetwork::MAllResults& statisticsResults );
 
@@ -153,7 +154,7 @@ namespace indri
                                                              int resultsRequested,
                                                              const std::vector<lemur::api::DOCID_T>* documentIDs,
                                                              QueryAnnotation** annotation,
-                                                             const std::string &queryType = "indri"  );
+                                                             const std::string &queryType = "indri" );
       void _scoredQuery( indri::infnet::InferenceNetwork::MAllResults& results, indri::lang::Node* queryRoot, std::string& accumulatorName, int resultsRequested, const std::vector<lemur::api::DOCID_T>* documentSet );
 
       QueryEnvironment( QueryEnvironment& other ) {}
@@ -166,6 +167,7 @@ namespace indri
       void setMemory( UINT64 memory );
       /// \brief Set whether there should be one single background model or context sensitive models
       /// @param background true for one background model false for context sensitive models
+      void setBaseline(const std::string &baseline);
       void setSingleBackgroundModel( bool background );
       /// \brief Set the scoring rules
       /// @param rules the vector of scoring rules.
@@ -308,6 +310,11 @@ namespace indri
       /// @return total number of documents containing term in the aggregated collection
       INT64 documentCount( const std::string& term );
 
+      /// \brief Return total number of documents containing stem in the collection.
+      /// @param stem the prestemmed term to count documents for.
+      /// @return total number of documents containing stem in the aggregated collection
+      INT64 documentStemCount( const std::string& stem );
+
       /// \brief Return the length of a document.
       /// @param documentID the document id.
       /// @return length of the document, documentID
@@ -323,6 +330,9 @@ namespace indri
       /// @param maxTerms the maximum number of terms to expand a wildcard
       /// operator argument (default 100).
       void setMaxWildcardTerms(int maxTerms);
+      const std::vector<indri::server::QueryServer*>& getServers() const { return _servers;
+      }
+      
     };
   }
 }

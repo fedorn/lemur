@@ -104,6 +104,10 @@ namespace indri {
    void Walker::after( class ExtentParent* n ) { defaultAfter( n ); }
    void Walker::before( class WildcardTerm* n ) { defaultBefore( n ); }
    void Walker::after( class WildcardTerm* n ) { defaultAfter( n ); }
+   void Walker::before( class PlusNode* n ) { defaultBefore( n ); }
+   void Walker::after( class PlusNode* n ) { defaultAfter( n ); }
+   void Walker::before( class WPlusNode* n ) { defaultBefore( n ); }
+   void Walker::after( class WPlusNode* n ) { defaultAfter( n ); }
  }
 }
 

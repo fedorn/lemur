@@ -127,7 +127,7 @@ namespace indri
 
           scorerNode->setNodeName( oldNode->nodeName() );
           scorerNode->setSmoothing( oldNode->getSmoothing() );
-          scorerNode->setStatistics( oldNode->getOccurrences(), oldNode->getContextSize() );
+          scorerNode->setStatistics( oldNode->getOccurrences(), oldNode->getContextSize(), oldNode->getDocumentOccurrences(), oldNode->getDocumentCount() );
 
           delete newNode;
           result = defaultAfter( oldNode, scorerNode );

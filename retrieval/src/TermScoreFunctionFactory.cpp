@@ -39,10 +39,17 @@ static void termscorefunctionfactory_parse( indri::api::Parameters& converted, c
 // it is finished with it.
 //
 
-indri::query::TermScoreFunction* indri::query::TermScoreFunctionFactory::get( const std::string& stringSpec, double collectionFrequency ) {
+indri::query::TermScoreFunction* indri::query::TermScoreFunctionFactory::get( const std::string& stringSpec, double occurrences, double contextSize, int documentOccurrences, int documentCount ) {
   indri::api::Parameters spec;
   termscorefunctionfactory_parse( spec, stringSpec );
   std::string method = spec.get( "method", "dirichlet" );
+
+  // this is something that never happens in our collection, so we assume that it
+  // happens somewhat less often than 1./collectionSize.  I picked 1/(2*collectionSize)
+  // because it seemed most appropriate (from InferenceNetworkBuilder)
+
+  double collectionFrequency = occurrences ? (occurrences/contextSize) :
+    (collectionFrequency = 1.0 / double(contextSize*2.));
 
   if( method == "dirichlet" || method == "d" || method == "dir" ) {
     // dirichlet -- takes parameter "mu"
@@ -66,6 +73,31 @@ indri::query::TermScoreFunction* indri::query::TermScoreFunctionFactory::get( co
     double lambda = spec.get( "lambda", 0.4 );
     
     return new indri::query::TwoStageTermScoreFunction( mu, lambda, collectionFrequency );
+  } else if ( method == "tfidf" ) {
+    double k1 = spec.get( "k1", 1.2 );
+    double b = spec.get( "b", 0.75 );
+    int qtf = spec.get("qtf", 1);
+    double idf = log( ( documentCount + 1 ) / ( documentOccurrences + 0.5 ) );
+    double  avgDocLength = contextSize / double(documentCount);
+    if (spec.exists("qtw")) {
+      double weight = spec.get("qtw", 1.0);
+      return new indri::query::TFIDFTermScoreFunction( idf, avgDocLength, weight, k1, b, false );
+      } else {
+      return new indri::query::TFIDFTermScoreFunction( idf, avgDocLength, qtf, k1, b, false );
+    }
+  } else if ( method == "okapi" ) {
+    double k1 = spec.get( "k1", 1.2 );
+    double b = spec.get( "b", 0.75 );
+    double k3 = spec.get( "k3", 7 );
+    int qtf = spec.get("qtf", 1);
+    double idf = log( ( documentCount - documentOccurrences + 0.5 ) / ( documentOccurrences + 0.5 ) );
+    double  avgDocLength = contextSize / double(documentCount);
+    if (spec.exists("qtw")) {
+      double weight = spec.get("qtw", 1.0);
+      return new indri::query::TFIDFTermScoreFunction( idf, avgDocLength, weight, k1, b, true, k3 );
+      } else {
+      return new indri::query::TFIDFTermScoreFunction( idf, avgDocLength, qtf, k1, b, true, k3 );
+    }
   }
 
   // if nothing else worked, we'll use dirichlet with mu=2500

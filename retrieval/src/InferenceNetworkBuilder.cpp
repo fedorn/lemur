@@ -50,6 +50,8 @@
 #include "indri/FixedPassageNode.hpp"
 #include "indri/FilterNode.hpp"
 #include "indri/NullListNode.hpp"
+#include "indri/PlusNode.hpp"
+#include "indri/WPlusNode.hpp"
 #include "indri/TermScoreFunctionFactory.hpp"
 #include "indri/TermFrequencyBeliefNode.hpp"
 #include "indri/CachedFrequencyBeliefNode.hpp"
@@ -70,19 +72,9 @@
 
 #include <stdexcept>
 
-indri::query::TermScoreFunction* indri::infnet::InferenceNetworkBuilder::_buildTermScoreFunction( const std::string& smoothing, double occurrences, double contextSize ) const {
+indri::query::TermScoreFunction* indri::infnet::InferenceNetworkBuilder::_buildTermScoreFunction( const std::string& smoothing, double occurrences, double contextSize, int documentOccurrences, int documentCount ) const {
   double collectionFrequency;
-
-  if( occurrences ) {
-    collectionFrequency = double(occurrences) / double(contextSize);
-  } else {
-    // this is something that never happens in our collection, so we assume that it
-    // happens somewhat less often than 1./collectionSize.  I picked 1/(2*collectionSize)
-    // because it seemed most appropriate
-    collectionFrequency = 1.0 / double(contextSize*2.);
-  }
-
-  return indri::query::TermScoreFunctionFactory::get( smoothing, collectionFrequency );
+  return indri::query::TermScoreFunctionFactory::get( smoothing, occurrences, contextSize, documentOccurrences, documentCount );
 }
 
 indri::infnet::InferenceNetworkBuilder::InferenceNetworkBuilder( indri::collection::Repository& repository, indri::lang::ListCache& cache, int resultsRequested, int maxWildcardTerms ) :
@@ -699,7 +691,9 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::TermFrequencySc
 
     function = _buildTermScoreFunction( termScorerNode->getSmoothing(),
                                         termScorerNode->getOccurrences(),
-                                        termScorerNode->getContextSize() );
+                                        termScorerNode->getContextSize(),
+                                        termScorerNode->getDocumentOccurrences(),
+                                        termScorerNode->getDocumentCount());
 
     if( termScorerNode->getOccurrences() > 0 ) {
       bool stopword = false;
@@ -748,8 +742,10 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::RawScorerNode* 
 
     function = _buildTermScoreFunction( rawScorerNode->getSmoothing(),
                                         rawScorerNode->getOccurrences(),
-                                        rawScorerNode->getContextSize() );
-
+                                        rawScorerNode->getContextSize(),
+                                        rawScorerNode->getDocumentOccurrences(),
+                                        rawScorerNode->getDocumentCount() );
+    
     if( rawScorerNode->getOccurrences() > 0 && iterator != 0 ) {
       ListIteratorNode* rawIterator = 0;
       ListIteratorNode* context = dynamic_cast<ListIteratorNode*>(untypedContextNode);
@@ -905,6 +901,29 @@ void indri::infnet::InferenceNetworkBuilder::after( indri::lang::CombineNode* co
   }
 }
 
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::PlusNode* plusNode ) {
+  if( _nodeMap.find( plusNode ) == _nodeMap.end() ) {
+    const std::vector<indri::lang::ScoredExtentNode*>& children = plusNode->getChildren();
+    std::vector<BeliefNode*> translation = _translate<BeliefNode,indri::lang::ScoredExtentNode>( children );
+    PlusNode* plus = new PlusNode( plusNode->nodeName(), translation );
+    _network->addBeliefNode( plus );
+    _nodeMap[plusNode] = plus;
+  }
+}
+
+void indri::infnet::InferenceNetworkBuilder::after( indri::lang::WPlusNode* plusNode ) {
+  if( _nodeMap.find( plusNode ) == _nodeMap.end() ) {
+    const std::vector< std::pair<double, indri::lang::ScoredExtentNode*> >& children = plusNode->getChildren();
+    WPlusNode* plus = new WPlusNode( plusNode->nodeName() );
+    for( size_t i=0; i<children.size(); i++ ) {
+    plus->addChild( children[i].first,
+                    dynamic_cast<BeliefNode*>( _nodeMap[children[i].second] ));
+    }
+    _network->addBeliefNode( plus );
+    _nodeMap[plusNode] = plus;
+  }
+}
+
 
 //
 // FieldWildcard
@@ -953,7 +972,9 @@ void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::NestedRawScore
 
     function = _buildTermScoreFunction( rawScorerNode->getSmoothing(),
                                         rawScorerNode->getOccurrences(),
-                                        rawScorerNode->getContextSize() );
+                                        rawScorerNode->getContextSize(),
+                                        rawScorerNode->getDocumentOccurrences(),
+                                        rawScorerNode->getDocumentCount() );
 
     if( rawScorerNode->getOccurrences() > 0 && iterator != 0 ) {
       ListIteratorNode* rawIterator = 0;
@@ -1074,7 +1095,8 @@ void indri::infnet::InferenceNetworkBuilder::_after( indri::lang::ShrinkageScore
 
     function = _buildTermScoreFunction( shrinkScorerNode->getSmoothing(),
                                         shrinkScorerNode->getOccurrences(),
-                                        shrinkScorerNode->getContextSize());
+                                        shrinkScorerNode->getContextSize(),
+                                        0, 0);
 
     if( shrinkScorerNode->getOccurrences() > 0 && iterator != 0 ) {
       

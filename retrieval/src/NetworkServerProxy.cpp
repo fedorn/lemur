@@ -618,6 +618,11 @@ INT64 indri::server::NetworkServerProxy::documentCount( const std::string& term 
   return _numericRequest( request );
 }
 
+INT64 indri::server::NetworkServerProxy::documentStemCount( const std::string& term ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "document-stem-count", term );
+  return _numericRequest( request );
+}
+
 indri::server::QueryServerVectorsResponse* indri::server::NetworkServerProxy::documentVectors( const std::vector<lemur::api::DOCID_T>& documentIDs ) {
   indri::xml::XMLNode* request = new indri::xml::XMLNode( "document-vectors" );
 
