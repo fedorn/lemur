@@ -420,7 +420,11 @@ void combineOutputFile(const std::string& corpusFile, const std::string& sortedP
       // get dest URL from link files
       //long linkFilePosStart; // need to use off_t, fseeko (_fseeki64)
 #ifdef WIN32
+#if MSC_VER >= 1400 /* VS2003, 32-bit only */
 	  _int64 linkFilePosStart;
+#else
+	  long linkFilePosStart;
+#endif
 #else
 	  off_t linkFilePosStart;
 #endif
@@ -435,7 +439,11 @@ void combineOutputFile(const std::string& corpusFile, const std::string& sortedP
 
         // set our sorted file pointer
 #ifdef WIN32
+#if MSC_VER >= 1400
         _fseeki64(sortedDestFile, linkFilePosStart, SEEK_SET);
+#else
+		fseek(sortedDestFile, linkFilePosStart, SEEK_SET);
+#endif
 #else
 		fseeko(sortedDestFile, linkFilePosStart, SEEK_SET);
 #endif
@@ -527,7 +535,11 @@ void combineSortedFiles(const std::string& corpusPath, const std::string& harves
   char *currentLine;
   size_t currentLineLen;
 #ifdef WIN32
+#if MSC_VER >= 1400
   _int64 lastFilePos=0;
+#else
+  long lastFilePos=0;
+#endif
 #else
   off_t  lastFilePos=0;
 #endif
@@ -572,7 +584,11 @@ void combineSortedFiles(const std::string& corpusPath, const std::string& harves
       }
     }
 #ifdef WIN32
+#if MSC_VER >= 1400 /*VS 2003 -- 32-bit only files */
     lastFilePos=_ftelli64(_sortIn); // need to use ftello (_ftelli64)
+#else
+	lastFilePos=ftell(_sortIn);
+#endif
 #else
     lastFilePos=ftello(_sortIn); // need to use ftello (_ftelli64)
 #endif
