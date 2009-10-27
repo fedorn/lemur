@@ -264,6 +264,9 @@
 				RelativePath=".\src\Packer.cpp">
 			</File>
 			<File
+				RelativePath=".\src\PlusNode.cpp">
+			</File>
+			<File
 				RelativePath=".\src\PonteExpander.cpp">
 			</File>
 			<File
@@ -345,6 +348,9 @@
 				RelativePath=".\src\TextQueryRetMethod.cpp">
 			</File>
 			<File
+				RelativePath=".\src\TFIDFExpander.cpp">
+			</File>
+			<File
 				RelativePath=".\src\TFIDFRetMethod.cpp">
 			</File>
 			<File
@@ -370,6 +376,9 @@
 			</File>
 			<File
 				RelativePath=".\src\WeightedSumNode.cpp">
+			</File>
+			<File
+				RelativePath=".\src\WPlusNode.cpp">
 			</File>
 			<File
 				RelativePath=".\src\XLingRetMethod.cpp">
@@ -602,6 +611,9 @@
 				RelativePath=".\include\PassageRep.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\PlusNode.hpp">
+			</File>
+			<File
 				RelativePath=".\include\indri\PonteExpander.hpp">
 			</File>
 			<File
@@ -648,6 +660,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\QuerySpec.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\QueryTFWalker.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\RawScorerNodeExtractor.hpp">
@@ -737,6 +752,9 @@
 				RelativePath=".\include\TextQueryRetMethod.hpp">
 			</File>
 			<File
+				RelativePath=".\include\indri\TFIDFExpander.hpp">
+			</File>
+			<File
 				RelativePath=".\include\TFIDFRetMethod.hpp">
 			</File>
 			<File
@@ -771,6 +789,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\WeightFoldingCopier.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\WPlusNode.hpp">
 			</File>
 			<File
 				RelativePath=".\include\XLingDocModel.hpp">
