@@ -585,6 +585,9 @@ int main(int argc, char * argv[]) {
     if( !param.exists("index") && !param.exists("server") )
       LEMUR_THROW( LEMUR_MISSING_PARAMETER_ERROR, "Must specify a server or index to query against." );
 
+    if (param.exists("baseline") && param.exists("rule"))
+      LEMUR_THROW( LEMUR_BAD_PARAMETER_ERROR, "Smoothing rules may not be specified when running a baseline." );
+
     int threadCount = param.get( "threads", 1 );
     std::queue< query_t* > queries;
     std::priority_queue< query_t*, std::vector< query_t* >, query_t::greater > output;
