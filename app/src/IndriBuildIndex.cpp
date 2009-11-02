@@ -151,6 +151,10 @@ insensitive). Specified as
 as <tt>-stemmer.name=stemmername</tt> on the command line. This is an
 optional parameter with the default of no stemming.
 </dd>
+<dt>normalize</dt>
+<dd><tt>true</tt> to perform case normalization when indexing, false to 
+index with mixed case. Default <tt>true</tt>
+</dd>
 <dt>stopper</dt>
 <dd>a complex element containing one or more subelements named word,
 specifying the stopword list to use. Specified as
@@ -454,6 +458,10 @@ insensitive). Specified as
 &lt;stemmer&gt;&lt;name&gt;stemmername&lt;/name&gt;&lt;/stemmer&gt; and
 as <tt>-stemmer.name=stemmername</tt> on the command line. This is an
 optional parameter with the default of no stemming.
+</dd>
+<dt>normalize</dt>
+<dd><tt>true</tt> to perform case normalization when indexing, false to 
+index with mixed case. Default <tt>true</tt>
 </dd>
 <dt>stopper</dt>
 <dd>a complex element containing one or more subelements named word,
