@@ -906,14 +906,14 @@ int main(int argc, char * argv[]) {
       metadataBackward.push_back(docno);
 
     env.setMetadataIndexedFields( metadataForward, metadataBackward );
-    
+#if 0    
     // "document" is a special field.
     // automagically add it as an indexed field.
     indri::api::Parameters field = parameters.append("field");
     field.set( "name", "document" );
     field.set( "ordinal", true );
     field.set("parental", true);
-
+#endif
     std::vector<std::string> fields;    
     std::string subName = "name";
     if( copy_parameters_to_string_vector( fields, parameters, "field", &subName ) ) {
