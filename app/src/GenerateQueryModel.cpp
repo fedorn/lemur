@@ -236,7 +236,7 @@ int AppMain(int argc, char *argv[]) {
 
   lemur::retrieval::ArrayAccumulator accumulator(ind->docCount());
 
-  ifstream fbdoc(LocalParameter::feedbackDocuments, ios::in);
+  ifstream fbdoc(LocalParameter::feedbackDocuments, ios::in | ios::binary);
   if (fbdoc.fail()) {
     throw Exception("AppMain", "can't open the feedback doc file, check parameter value for feedbackDocuments");
   }

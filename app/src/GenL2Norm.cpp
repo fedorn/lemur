@@ -66,7 +66,7 @@ int AppMain(int argc, char *argv[]) {
   for (i=1; i<=dbIndex->termCountUnique(); i++) {
     idfV[i] = log((dbIndex->docCount()+1)/(0.5+dbIndex->docCount(i)));
   }
-  ofs.open(LocalParameter::L2File.c_str(), ios::out);
+  ofs.open(LocalParameter::L2File.c_str(), ios::out | std::ios::binary);
   for (i = 1; i <= dbIndex->docCount(); i++) {
     TermInfoList *qList = dbIndex->termInfoList(i);
     TermInfo *qInfo;

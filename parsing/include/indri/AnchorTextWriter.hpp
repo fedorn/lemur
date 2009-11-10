@@ -36,7 +36,7 @@ namespace indri
       AnchorTextWriter( const std::string& outputPath ) {
         std::string directory = indri::file::Path::directory( outputPath );
         indri::file::Path::make( directory );
-        _out.open( outputPath.c_str(), std::ios::out );
+        _out.open( outputPath.c_str(), std::ios::out | std::ios::binary);
       }
 
       ~AnchorTextWriter() {

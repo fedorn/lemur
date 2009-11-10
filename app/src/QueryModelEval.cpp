@@ -111,7 +111,7 @@ int AppMain(int argc, char *argv[]) {
   ifstream *workSetStr;
   ResultFile *docPool;
   if (RetrievalParameter::useWorkingSet) {
-    workSetStr = new ifstream(RetrievalParameter::workSetFile.c_str(), ios::in);
+    workSetStr = new ifstream(RetrievalParameter::workSetFile.c_str(), ios::in | ios::binary);
     if (workSetStr->fail()) {
       throw Exception("RetEval", "can't open working set file");
     }
@@ -119,7 +119,7 @@ int AppMain(int argc, char *argv[]) {
     docPool->openForRead(*workSetStr, *ind);
   }
 
-  ifstream qmodel(LocalParameter::queryModel.c_str(), ios::in);
+  ifstream qmodel(LocalParameter::queryModel.c_str(), ios::in | ios::binary);
 
   lemur::retrieval::ArrayAccumulator accumulator(ind->docCount());
 

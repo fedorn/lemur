@@ -56,7 +56,7 @@ bool lemur::dictionary::PDict::open(const string &dictName) {
   ifstream tocStream;
   name = dictName;
   string toc = name + ".dict";
-  tocStream.open(toc.c_str(), ios::in);
+  tocStream.open(toc.c_str(), ios::in | std::ios::binary);
   if (! tocStream.fail()) {
     // read toc items and init stats.
     stats.dictSize = 0;
@@ -107,7 +107,7 @@ bool lemur::dictionary::PDict::create(const string &dictName) {
 void lemur::dictionary::PDict::writeTOC() const {
   string toc = name + ".dict";
   ofstream tocStream;
-  tocStream.open(toc.c_str(), ios::out);
+  tocStream.open(toc.c_str(), ios::out| std::ios::binary);
   tocStream << "source " << stats.sourceSize << endl;
   tocStream << "target " << stats.targetSize << endl;
   tocStream << "entries " << stats.dictSize << endl;

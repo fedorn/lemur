@@ -243,7 +243,7 @@ int AppMain(int argc, char *argv[]) {
   model->setQueryModelParam(SimpleKLParameter::qryPrm);
 
   if(RetrievalParameter::fbDocCount > 0) {
-    ifstream fbdoc(LocalParameter::feedbackDocuments.c_str(), ios::in);
+    ifstream fbdoc(LocalParameter::feedbackDocuments.c_str(), ios::in | ios::binary);
     if (fbdoc.fail()) {
       throw Exception("AppMain", "can't open the feedback doc file, check parameter value for feedbackDocuments");
     }

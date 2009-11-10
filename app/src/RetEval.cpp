@@ -299,7 +299,7 @@ int AppMain(int argc, char *argv[]) {
   ifstream *workSetStr;
   ResultFile *docPool;
   if (RetrievalParameter::useWorkingSet) {
-    workSetStr = new ifstream(RetrievalParameter::workSetFile.c_str(), ios::in);
+    workSetStr = new ifstream(RetrievalParameter::workSetFile.c_str(), ios::in | ios::binary);
     if (workSetStr->fail()) {
       throw Exception("RetEval", "can't open working set file");
     }

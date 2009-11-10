@@ -64,7 +64,7 @@ void indri::parse::Combiner::_openWriteBuckets( std::vector<std::stringstream*>&
 
     std::string binpath = indri::file::Path::combine( path, number );
     std::ofstream* bucket = new std::ofstream;
-    bucket->open( binpath.c_str(), std::ios::out | std::ios::app );
+    bucket->open( binpath.c_str(), std::ios::out | std::ios::app | std::ios::binary );
     buffers.push_back( new std::stringstream() );
     buckets.push_back( bucket );
   }
@@ -100,7 +100,7 @@ void indri::parse::Combiner::_openReadBuckets( std::vector<std::ifstream*>& buck
 
     std::string binpath = indri::file::Path::combine( path, number );
     std::ifstream* bucket = new std::ifstream;
-    bucket->open( binpath.c_str(), std::ios::in );
+    bucket->open( binpath.c_str(), std::ios::in | std::ios::binary);
     buckets.push_back( bucket );
   }
 }
@@ -147,7 +147,7 @@ void indri::parse::Combiner::hashRedirectTargets( const std::string& bucketPath,
 
   // open the redirects file
   std::ifstream in;
-  in.open( redirectsPath.c_str(), std::ios::in );
+  in.open( redirectsPath.c_str(), std::ios::in | std::ios::binary );
 
   char redirectsLine[65536];
 
@@ -184,7 +184,7 @@ void indri::parse::Combiner::combineRedirectDestinationBucket( const std::string
   std::ifstream doc;
   std::string docPath = indri::file::Path::combine( tmpPath, "doc" );
   std::string docFilePath = indri::file::Path::combine( docPath, number );
-  doc.open( docFilePath.c_str(), std::ios::in );
+  doc.open( docFilePath.c_str(), std::ios::in | std::ios::binary);
 
   // read docs file
   UrlEntryTable table;
@@ -195,7 +195,7 @@ void indri::parse::Combiner::combineRedirectDestinationBucket( const std::string
   std::ifstream target;
   std::string targetPath = indri::file::Path::combine( tmpPath, "target" );
   std::string targetFilePath = indri::file::Path::combine( targetPath, number );
-  target.open( targetFilePath.c_str(), std::ios::in );
+  target.open( targetFilePath.c_str(), std::ios::in | std::ios::binary);
 
   char aliasLine[65536];
   char linktoLine[65536];
@@ -311,13 +311,13 @@ void indri::parse::Combiner::createBuckets( const std::string& tmpPath ) {
 
     std::string docBinPath = indri::file::Path::combine( docPath, number );
     std::ofstream* docBucket = new std::ofstream;
-    docBucket->open( docBinPath.c_str(), std::ios::out );
+    docBucket->open( docBinPath.c_str(), std::ios::out | std::ios::binary);
     _docBucketFiles.push_back( docBucket );
     _docBuckets.push_back( new std::stringstream() );
 
     std::string linkBinPath = indri::file::Path::combine( linkPath, number );
     std::ofstream* linkBucket = new std::ofstream;
-    linkBucket->open( linkBinPath.c_str(), std::ios::out );
+    linkBucket->open( linkBinPath.c_str(), std::ios::out | std::ios::binary );
     _linkBucketFiles.push_back( linkBucket );
     _linkBuckets.push_back( new std::stringstream() );
   }
@@ -391,7 +391,7 @@ void indri::parse::Combiner::_writeCorpusTable( UrlEntryVectorTable& corpusTable
     std::string corpusPath = (*citer->first);
     std::string anchorPath = indri::file::Path::combine( outputPath, corpusPath );
     std::ofstream out;
-    out.open( anchorPath.c_str(), std::ios::out | std::ios::app );
+    out.open( anchorPath.c_str(), std::ios::out | std::ios::app | std::ios::binary);
     out.seekp( 0, std::ios::end );
 
     if( !out.good() ) {
@@ -400,7 +400,7 @@ void indri::parse::Combiner::_writeCorpusTable( UrlEntryVectorTable& corpusTable
       out.clear();
       std::string parent = indri::file::Path::directory( anchorPath );
       indri::file::Path::make( parent );
-      out.open( anchorPath.c_str(), std::ios::out | std::ios::app );
+      out.open( anchorPath.c_str(), std::ios::out | std::ios::app | std::ios::binary);
       out.seekp( 0, std::ios::end );
     }
 
@@ -429,7 +429,7 @@ void indri::parse::Combiner::_writeCorpusTable( UrlEntryVectorTable& corpusTable
 void indri::parse::Combiner::_readRedirects( UrlEntryTable& urlTable, const std::string& redirectPath, int number ) {
   std::string redirectBucketPath = indri::file::Path::combine( redirectPath, i64_to_string(number) );
   std::ifstream redirectIn;
-  redirectIn.open( redirectBucketPath.c_str(), std::ios::in );
+  redirectIn.open( redirectBucketPath.c_str(), std::ios::in | std::ios::binary);
 
   char docurl[65536];
   char aliasurl[65536];
@@ -512,7 +512,7 @@ void indri::parse::Combiner::combineBucket( const std::string& outputPath, const
   std::string linkBucketPath = indri::file::Path::combine( linkPath, number );
   std::ifstream linkIn;
 
-  linkIn.open( linkBucketPath.c_str(), std::ios::in );
+  linkIn.open( linkBucketPath.c_str(), std::ios::in | std::ios::binary );
 
   do {
     UrlEntryTable urlTable( 5*1024*1024 );
@@ -523,7 +523,7 @@ void indri::parse::Combiner::combineBucket( const std::string& outputPath, const
     std::ifstream docIn;
 
     std::cout << "  reading documents" << std::endl;
-    docIn.open( docBucketPath.c_str(), std::ios::in );
+    docIn.open( docBucketPath.c_str(), std::ios::in | std::ios::binary);
     _readDocBucket( urlTable, docIn );
     docIn.close();
 
@@ -668,19 +668,19 @@ void indri::parse::Combiner::sortCorpusFiles( const std::string& outputPath, con
 
     std::string inputFilePath;
     inputFilePath = indri::file::Path::combine( inputPath, relativePath );
-    in.open( inputFilePath.c_str(), std::ios::in );
+    in.open( inputFilePath.c_str(), std::ios::in | std::ios::binary);
 
     std::ofstream out;
     std::string outFilePath;
     outFilePath = indri::file::Path::combine( outputPath, relativePath );
 
-    out.open( outFilePath.c_str(), std::ios::out );
+    out.open( outFilePath.c_str(), std::ios::out | std::ios::binary);
 
     if( !out.good() ) {
       out.clear();
       std::string parent = indri::file::Path::directory( outFilePath );
       indri::file::Path::make( parent );
-      out.open( outFilePath.c_str(), std::ios::out );
+      out.open( outFilePath.c_str(), std::ios::out | std::ios::binary);
     }
 
     int totalDocuments = 0;

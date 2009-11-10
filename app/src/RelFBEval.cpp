@@ -370,7 +370,7 @@ int AppMain(int argc, char *argv[]) {
   ifstream *workSetStr;
   ResultFile *docPool = NULL;
   if (RetrievalParameter::useWorkingSet) {
-    workSetStr = new ifstream(RetrievalParameter::workSetFile.c_str(), ios::in);
+    workSetStr = new ifstream(RetrievalParameter::workSetFile.c_str(), ios::in | ios::binary);
     if (workSetStr->fail()) {
       throw Exception("RelFBEval", "can't open working set file");
     }
@@ -382,7 +382,7 @@ int AppMain(int argc, char *argv[]) {
 
   ifstream *judgmentStr;
   ResultFile *judgments;
-  judgmentStr = new ifstream(LocalParameter::feedbackDocuments.c_str(), ios::in);
+  judgmentStr = new ifstream(LocalParameter::feedbackDocuments.c_str(), ios::in | ios::binary);
   if (judgmentStr->fail()) {
       throw Exception("RelFBEval", "can't open judgment file");
   }

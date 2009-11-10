@@ -285,7 +285,7 @@ void indri::parse::PageRank::_loadRanks( const std::string& dest,
 }
 
 void indri::parse::PageRank::writeRaw( const std::string& dest, const std::string &rawFile ) {
-  std::ofstream out(rawFile.c_str(), std::ios::out);
+  std::ofstream out(rawFile.c_str(), std::ios::out | std::ios::binary);
   out.setf( std::ios_base::fixed );
   out.precision( 32 );
   if (prTable != 0) {
@@ -314,7 +314,7 @@ void indri::parse::PageRank::writeRaw( const std::string& dest, const std::strin
 
 // merge these two
 void indri::parse::PageRank::writeRanks( const std::string& dest, const std::string &ranksFile ) {
-  std::ofstream out(ranksFile.c_str(), std::ios::out);
+  std::ofstream out(ranksFile.c_str(), std::ios::out| std::ios::binary);
   out.setf( std::ios_base::fixed );
   out.precision( 13 );
   if (prTable != 0) {
@@ -346,7 +346,7 @@ void indri::parse::PageRank::writeRanks( const std::string& dest, const std::str
 }
 
 void indri::parse::PageRank::writePriors( const std::string& dest, const std::string &priorFile ) {
-  std::ofstream out(priorFile.c_str(), std::ios::out);
+  std::ofstream out(priorFile.c_str(), std::ios::out| std::ios::binary);
   out.setf( std::ios_base::fixed );
   out.precision( 13 );
   if (prTable != 0) {

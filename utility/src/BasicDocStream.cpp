@@ -64,7 +64,7 @@ void lemur::parse::BasicTokenDoc::readID()
 lemur::parse::BasicDocStream::BasicDocStream (const string &inputFile)
 {
   strcpy(file, inputFile.c_str());
-  ifs = new ifstream(file, ios::in);
+  ifs = new ifstream(file, ios::in | ios::binary);
   if (ifs->fail() ) {
     throw lemur::api::Exception("BasicDocStream", "can't open BasicDocStream source file");
   }
@@ -90,7 +90,7 @@ bool lemur::parse::BasicDocStream::hasMore()
 void lemur::parse::BasicDocStream::startDocIteration()
 {
   ifs->close();
-  ifs->open(file);
+  ifs->open(file, std::ios::in | std::ios::binary);
   ifs->seekg(0);
   ifs->clear(); 
   nextTokenRead =false;

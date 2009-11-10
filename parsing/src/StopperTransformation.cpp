@@ -57,7 +57,7 @@ indri::parse::StopperTransformation::~StopperTransformation() {
 void indri::parse::StopperTransformation::read( const std::string& filename ) {
   std::ifstream in;
 
-  in.open( filename.c_str(), std::ios::in );
+  in.open( filename.c_str(), std::ios::in | std::ios::binary);
   if( !in.good() )
     LEMUR_THROW( LEMUR_IO_ERROR, "Stopper was unable to open the stopwords file named: " + filename );
 
