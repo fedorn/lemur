@@ -53,12 +53,17 @@ class lemurJNI {
   public final static native long Index_termInfoList(long jarg1, Index jarg1_, int jarg2) throws java.lang.Exception;
   public final static native long Index_termInfoListSeq(long jarg1, Index jarg1_, int jarg2) throws java.lang.Exception;
   public final static native void Index_setProps(long jarg1, Index jarg1_);
+  public final static native void delete_Index(long jarg1);
   public final static native long IndexManager_openIndex(String jarg1) throws java.lang.Exception;
+  public final static native long new_QueryRep();
+  public final static native void delete_QueryRep(long jarg1);
   public final static native long Query_makeQuery__SWIG_0(String jarg1, String jarg2, String jarg3, String jarg4, String jarg5) throws java.lang.Exception;
   public final static native long Query_makeQuery__SWIG_1(String jarg1, String jarg2, String jarg3, String jarg4) throws java.lang.Exception;
   public final static native long Query_makeQuery__SWIG_2(String jarg1, String jarg2, String jarg3) throws java.lang.Exception;
   public final static native long Query_makeQuery__SWIG_3(String jarg1, String jarg2) throws java.lang.Exception;
   public final static native long Query_makeQuery__SWIG_4(String jarg1) throws java.lang.Exception;
+  public final static native long new_Query();
+  public final static native void delete_Query(long jarg1);
   public final static native void RetrievalMethod_scoreCollection(long jarg1, RetrievalMethod jarg1_, long jarg2, QueryRep jarg2_, IndexedReal[] jarg3) throws java.lang.Exception;
   public final static native void RetrievalMethod_updateQuery(long jarg1, RetrievalMethod jarg1_, long jarg2, QueryRep jarg2_, long jarg3, WeightedIDSet jarg3_) throws java.lang.Exception;
   public final static native void delete_RetrievalMethod(long jarg1);

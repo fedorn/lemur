@@ -58,13 +58,11 @@ namespace lemur {
   }
   
   namespace api {
-    %nodefault QueryRep;
     
     class QueryRep 
     {
     };
 
-    %nodefault Query;
     // needs a downcast typemap?
     class Query
     {

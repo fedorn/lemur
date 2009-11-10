@@ -21,10 +21,14 @@ public class Query {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
+  protected void finalize() {
+    delete();
+  }
+
   public synchronized void delete() {
     if(swigCPtr != 0 && swigCMemOwn) {
       swigCMemOwn = false;
-      throw new UnsupportedOperationException("C++ destructor does not have public access");
+      lemurJNI.delete_Query(swigCPtr);
     }
     swigCPtr = 0;
   }
@@ -97,6 +101,10 @@ public static Query makeQuery(String query, String stopfile) throws java.lang.Ex
 public static Query makeQuery(String query) throws java.lang.Exception {
     long cPtr = lemurJNI.Query_makeQuery__SWIG_4(query);
     return (cPtr == 0) ? null : new Query(cPtr, true);
+  }
+
+  public Query() {
+    this(lemurJNI.new_Query(), true);
   }
 
 }

@@ -24,11 +24,15 @@ public class Query : IDisposable {
     return (obj == null) ? new HandleRef(null, IntPtr.Zero) : obj.swigCPtr;
   }
 
+  ~Query() {
+    Dispose();
+  }
+
   public virtual void Dispose() {
     lock(this) {
       if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
         swigCMemOwn = false;
-        throw new MethodAccessException("C++ destructor does not have public access");
+        lemur_csharpPINVOKE.delete_Query(swigCPtr);
       }
       swigCPtr = new HandleRef(null, IntPtr.Zero);
       GC.SuppressFinalize(this);
@@ -68,6 +72,9 @@ public class Query : IDisposable {
     Query ret = (cPtr == IntPtr.Zero) ? null : new Query(cPtr, true);
     if (lemur_csharpPINVOKE.SWIGPendingException.Pending) throw lemur_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
+  }
+
+  public Query() : this(lemur_csharpPINVOKE.new_Query(), true) {
   }
 
 }

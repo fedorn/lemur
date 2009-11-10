@@ -1618,6 +1618,26 @@ SWIGEXPORT void JNICALL Java_lemurproject_lemur_lemurJNI_Index_1setProps(JNIEnv 
 }
 
 
+SWIGEXPORT void JNICALL Java_lemurproject_lemur_lemurJNI_delete_1Index(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  lemur::api::Index *arg1 = (lemur::api::Index *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(lemur::api::Index **)&jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return ;
+    }
+  }
+}
+
+
 SWIGEXPORT jlong JNICALL Java_lemurproject_lemur_lemurJNI_IndexManager_1openIndex(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jlong jresult = 0 ;
   std::string *arg1 = 0 ;
@@ -1658,6 +1678,48 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_lemur_lemurJNI_IndexManager_1openInde
   }
   *(lemur::api::Index **)&jresult = result; 
   return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_lemurproject_lemur_lemurJNI_new_1QueryRep(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  lemur::api::QueryRep *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    try {
+      result = (lemur::api::QueryRep *)new lemur::api::QueryRep();
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  *(lemur::api::QueryRep **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_lemurproject_lemur_lemurJNI_delete_1QueryRep(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  lemur::api::QueryRep *arg1 = (lemur::api::QueryRep *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(lemur::api::QueryRep **)&jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return ;
+    }
+  }
 }
 
 
@@ -1968,6 +2030,48 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_lemur_lemurJNI_Query_1makeQuery_1_1SW
   }
   *(lemur::api::Query **)&jresult = result; 
   return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_lemurproject_lemur_lemurJNI_new_1Query(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  lemur::api::Query *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    try {
+      result = (lemur::api::Query *)new lemur::api::Query();
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return 0;
+    }
+  }
+  *(lemur::api::Query **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_lemurproject_lemur_lemurJNI_delete_1Query(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  lemur::api::Query *arg1 = (lemur::api::Query *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(lemur::api::Query **)&jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return ;
+    }
+  }
 }
 
 

@@ -1,7 +1,6 @@
 namespace lemur {
   namespace api {
 
-    %nodefault Index;
     // these need to delete themselves.
     %newobject Index::termInfoList;
     %newobject Index::termInfoListSeq;

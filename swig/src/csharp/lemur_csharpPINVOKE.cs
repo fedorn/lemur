@@ -389,6 +389,9 @@ class lemur_csharpPINVOKE {
   [DllImport("lemur_csharp", EntryPoint="CSharp_Index_setProps")]
   public static extern void Index_setProps(HandleRef jarg1);
 
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_Index")]
+  public static extern void delete_Index(HandleRef jarg1);
+
   [DllImport("lemur_csharp", EntryPoint="CSharp_IndexManager_openIndex")]
   public static extern IntPtr IndexManager_openIndex(string jarg1);
 
@@ -397,6 +400,12 @@ class lemur_csharpPINVOKE {
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_delete_IndexManager")]
   public static extern void delete_IndexManager(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_QueryRep")]
+  public static extern IntPtr new_QueryRep();
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_QueryRep")]
+  public static extern void delete_QueryRep(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Query_makeQuery__SWIG_0")]
   public static extern IntPtr Query_makeQuery__SWIG_0(string jarg1, string jarg2, string jarg3, string jarg4, string jarg5);
@@ -412,6 +421,12 @@ class lemur_csharpPINVOKE {
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_Query_makeQuery__SWIG_4")]
   public static extern IntPtr Query_makeQuery__SWIG_4(string jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_new_Query")]
+  public static extern IntPtr new_Query();
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_delete_Query")]
+  public static extern void delete_Query(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_RetrievalMethod_scoreCollection")]
   public static extern void RetrievalMethod_scoreCollection(HandleRef jarg1, HandleRef jarg2, HandleRef jarg3);

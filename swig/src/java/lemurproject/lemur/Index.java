@@ -21,10 +21,14 @@ public class Index {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
+  protected void finalize() {
+    delete();
+  }
+
   public synchronized void delete() {
     if(swigCPtr != 0 && swigCMemOwn) {
       swigCMemOwn = false;
-      throw new UnsupportedOperationException("C++ destructor does not have public access");
+      lemurJNI.delete_Index(swigCPtr);
     }
     swigCPtr = 0;
   }

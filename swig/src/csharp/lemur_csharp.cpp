@@ -1681,6 +1681,14 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Index_setProps(void * jarg1) {
 }
 
 
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_Index(void * jarg1) {
+  lemur::api::Index *arg1 = (lemur::api::Index *) 0 ;
+  
+  arg1 = (lemur::api::Index *)jarg1; 
+  delete arg1;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_IndexManager_openIndex(char * jarg1) {
   void * jresult ;
   std::string *arg1 = 0 ;
@@ -1719,6 +1727,24 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_IndexManager(void * jarg1) {
   lemur::api::IndexManager *arg1 = (lemur::api::IndexManager *) 0 ;
   
   arg1 = (lemur::api::IndexManager *)jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_QueryRep() {
+  void * jresult ;
+  lemur::api::QueryRep *result = 0 ;
+  
+  result = (lemur::api::QueryRep *)new lemur::api::QueryRep();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_QueryRep(void * jarg1) {
+  lemur::api::QueryRep *arg1 = (lemur::api::QueryRep *) 0 ;
+  
+  arg1 = (lemur::api::QueryRep *)jarg1; 
   delete arg1;
 }
 
@@ -1905,6 +1931,24 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Query_makeQuery__SWIG_4(char * jarg1) {
   
   jresult = (void *)result; 
   return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_Query() {
+  void * jresult ;
+  lemur::api::Query *result = 0 ;
+  
+  result = (lemur::api::Query *)new lemur::api::Query();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_Query(void * jarg1) {
+  lemur::api::Query *arg1 = (lemur::api::Query *) 0 ;
+  
+  arg1 = (lemur::api::Query *)jarg1; 
+  delete arg1;
 }
 
 

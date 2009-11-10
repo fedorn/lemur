@@ -24,15 +24,22 @@ public class QueryRep : IDisposable {
     return (obj == null) ? new HandleRef(null, IntPtr.Zero) : obj.swigCPtr;
   }
 
+  ~QueryRep() {
+    Dispose();
+  }
+
   public virtual void Dispose() {
     lock(this) {
       if(swigCPtr.Handle != IntPtr.Zero && swigCMemOwn) {
         swigCMemOwn = false;
-        throw new MethodAccessException("C++ destructor does not have public access");
+        lemur_csharpPINVOKE.delete_QueryRep(swigCPtr);
       }
       swigCPtr = new HandleRef(null, IntPtr.Zero);
       GC.SuppressFinalize(this);
     }
+  }
+
+  public QueryRep() : this(lemur_csharpPINVOKE.new_QueryRep(), true) {
   }
 
 }
