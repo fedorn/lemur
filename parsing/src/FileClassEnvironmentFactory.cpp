@@ -55,6 +55,8 @@ struct file_class_environment_spec {
 // case.  Values specified here can be in mixed case, since values are
 // matched in a case-sensitive manner.
 
+static const char* pdf_index_tags[] = { "title", "author", 0 };
+static const char* pdf_metadata_tags[] = { "title", "author", 0 };
 static const char* html_index_tags[] = { "title", "h1", "h2", "h3", "h4", 0 };
 static const char* html_metadata_tags[] = { "title", 0 };
 //static const char* html_conflations[] = { "h1", NULL, NULL, "heading", "h2", NULL, NULL, "heading", "h3", NULL, NULL, "heading", "h4", NULL, NULL, "heading", "bloghpno", NULL, NULL, "docno", 0, 0, 0, 0 };
@@ -231,7 +233,7 @@ static file_class_environment_spec environments[] = {
 
   {
     "pdf",                // name
-    "text",               // parser
+    "html",               // parser
     "word",               // tokenizer
     "pdf",                // iterator
     NULL,                 // startDocTag
@@ -239,8 +241,8 @@ static file_class_environment_spec environments[] = {
     NULL,                 // endMetadataTag
     NULL,                 // includeTags
     NULL,                 // excludeTags
-    NULL,                 // indexTags
-    NULL,                 // metadataTags
+    pdf_index_tags,       // indexTags
+    pdf_metadata_tags,    // metadataTags
     NULL                  // conflations
   },
 

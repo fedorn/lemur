@@ -23,6 +23,9 @@
 #include "indri/Buffer.hpp"
 #include "indri/UnparsedDocument.hpp"
 #include "indri/DocumentIterator.hpp"
+#include "indri/XMLReader.hpp"
+#include "indri/XMLNode.hpp"
+#include "indri/XMLWriter.hpp"
 #include <string>
 namespace indri
 {
@@ -40,7 +43,13 @@ namespace indri
 
       void open( const std::string& filename );
       UnparsedDocument* nextDocument();
+	  void appendPdfMetaData(indri::xml::XMLNode* node);
+	  void seekValue(indri::xml::XMLNode* node, std::string &metaTag);
       void close();
+	private:
+	  std::string _title;
+	  std::string _author;
+
     };
   }
 }
