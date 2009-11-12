@@ -983,14 +983,32 @@ int main(int argc, char * argv[]) {
         for( ; files != indri::file::FileTreeIterator::end(); files++ ) {
           if( fileClass.length() )
             env.addFile( *files, fileClass );
-          else
+          else {
+            std::string extension = indri::file::Path::extension( *files );
+            indri::parse::FileClassEnvironmentFactory::Specification *spec = env.getFileClassSpec(extension);
+            if( spec ) {
+              // add fields if necessary, only update if changed.
+              if( augmentSpec( spec, fields, metadata, metadataForward, metadataBackward ) ) 
+                env.addFileClass(*spec);
+              delete(spec);
+            }
             env.addFile( *files );
+          }
         }
       } else {
         if( fileClass.length() )
           env.addFile( corpusPath, fileClass );
-        else
+        else {
+          std::string extension = indri::file::Path::extension( corpusPath );
+          indri::parse::FileClassEnvironmentFactory::Specification *spec = env.getFileClassSpec(extension);
+          if( spec ) {
+            // add fields if necessary, only update if changed.
+            if( augmentSpec( spec, fields, metadata, metadataForward, metadataBackward ) ) 
+              env.addFileClass(*spec);
+            delete(spec);
+          }
           env.addFile( corpusPath );
+        }
       }
     }
 
