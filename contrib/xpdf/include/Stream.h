@@ -19,9 +19,6 @@
 #include "gtypes.h"
 #include "Object.h"
 
-#ifndef NO_DECRYPTION
-class Decrypt;
-#endif
 class BaseStream;
 
 //------------------------------------------------------------------------
@@ -38,6 +35,22 @@ enum StreamKind {
   strJBIG2,
   strJPX,
   strWeird			// internal-use stream types
+};
+
+enum StreamColorSpaceMode {
+  streamCSNone,
+  streamCSDeviceGray,
+  streamCSDeviceRGB,
+  streamCSDeviceCMYK
+};
+
+//------------------------------------------------------------------------
+
+// This is in Stream.h instead of Decrypt.h to avoid really annoying
+// include file dependency loops.
+enum CryptAlgorithm {
+  cryptRC4,
+  cryptAES
 };
 
 //------------------------------------------------------------------------
@@ -96,20 +109,26 @@ public:
   // Get the BaseStream of this stream.
   virtual BaseStream *getBaseStream() = 0;
 
+  // Get the stream after the last decoder (this may be a BaseStream
+  // or a DecryptStream).
+  virtual Stream *getUndecodedStream() = 0;
+
   // Get the dictionary associated with this stream.
   virtual Dict *getDict() = 0;
 
   // Is this an encoding filter?
   virtual GBool isEncoder() { return gFalse; }
 
+  // Get image parameters which are defined by the stream contents.
+  virtual void getImageParams(int *bitsPerComponent,
+			      StreamColorSpaceMode *csMode) {}
+
+  // Return the next stream in the "stack".
+  virtual Stream *getNextStream() { return NULL; }
+
   // Add filters to this stream according to the parameters in <dict>.
   // Returns the new stream.
   Stream *addFilters(Object *dict);
-
-  // Tell this stream to ignore any length limitation -- this only
-  // applies to BaseStream subclasses, and is used as a hack to work
-  // around broken PDF files with incorrect stream lengths.
-  virtual void ignoreLength() {}
 
 private:
 
@@ -134,23 +153,13 @@ public:
   virtual void setPos(Guint pos, int dir = 0) = 0;
   virtual GBool isBinary(GBool last = gTrue) { return last; }
   virtual BaseStream *getBaseStream() { return this; }
+  virtual Stream *getUndecodedStream() { return this; }
   virtual Dict *getDict() { return dict.getDict(); }
+  virtual GString *getFileName() { return NULL; }
 
   // Get/set position of first byte of stream within the file.
   virtual Guint getStart() = 0;
   virtual void moveStart(int delta) = 0;
-
-#ifndef NO_DECRYPTION
-  // Set decryption for this stream.
-  virtual void doDecryption(Guchar *fileKey, int keyLength,
-			    int objNum, int objGen);
-#endif
-
-#ifndef NO_DECRYPTION
-protected:
-
-  Decrypt *decrypt;
-#endif
 
 private:
 
@@ -172,8 +181,9 @@ public:
   virtual int getPos() { return str->getPos(); }
   virtual void setPos(Guint pos, int dir = 0);
   virtual BaseStream *getBaseStream() { return str->getBaseStream(); }
+  virtual Stream *getUndecodedStream() { return str->getUndecodedStream(); }
   virtual Dict *getDict() { return str->getDict(); }
-  virtual void ignoreLength() { str->ignoreLength(); }
+  virtual Stream *getNextStream() { return str; }
 
 protected:
 
@@ -233,6 +243,8 @@ public:
 
   ~StreamPredictor();
 
+  GBool isOk() { return ok; }
+
   int lookChar();
   int getChar();
 
@@ -250,6 +262,7 @@ private:
   int rowBytes;			// bytes per line
   Guchar *predLine;		// line buffer
   int predIdx;			// current index in predLine
+  GBool ok;
 };
 
 //------------------------------------------------------------------------
@@ -275,7 +288,6 @@ public:
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr & 0xff); }
   virtual int getPos() { return bufPos + (bufPtr - buf); }
   virtual void setPos(Guint pos, int dir = 0);
-  virtual void ignoreLength() { limited = gFalse; }
   virtual Guint getStart() { return start; }
   virtual void moveStart(int delta);
 
@@ -317,10 +329,6 @@ public:
   virtual void setPos(Guint pos, int dir = 0);
   virtual Guint getStart() { return start; }
   virtual void moveStart(int delta);
-#ifndef NO_DECRYPTION
-  virtual void doDecryption(Guchar *fileKey, int keyLength,
-			    int objNum, int objGen);
-#endif
 
 private:
 
@@ -531,7 +539,7 @@ private:
   short getWhiteCode();
   short getBlackCode();
   short lookBits(int n);
-  void eatBits(int n) { inputBits -= n; }
+  void eatBits(int n) { if ((inputBits -= n) < 0) inputBits = 0; }
 };
 
 //------------------------------------------------------------------------
@@ -567,10 +575,11 @@ struct DCTHuffTable {
 class DCTStream: public FilterStream {
 public:
 
-  DCTStream(Stream *strA);
+  DCTStream(Stream *strA, int colorXformA);
   virtual ~DCTStream();
   virtual StreamKind getKind() { return strDCT; }
   virtual void reset();
+  virtual void close();
   virtual int getChar();
   virtual int lookChar();
   virtual GString *getPSFilter(int psLevel, char *indent);
@@ -587,11 +596,13 @@ private:
   DCTCompInfo compInfo[4];	// info for each component
   DCTScanInfo scanInfo;		// info for the current scan
   int numComps;			// number of components in image
-  int colorXform;		// need YCbCr-to-RGB transform?
+  int colorXform;		// color transform: -1 = unspecified
+				//                   0 = none
+				//                   1 = YUV/YUVK -> RGB/CMYK
   GBool gotJFIFMarker;		// set if APP0 JFIF marker was present
   GBool gotAdobeMarker;		// set if APP14 Adobe marker was present
   int restartInterval;		// restart interval, in MCUs
-  Guchar quantTables[4][64];	// quantization tables
+  Gushort quantTables[4][64];	// quantization tables
   int numQuantTables;		// number of quantization tables
   DCTHuffTable dcHuffTables[4];	// DC Huffman tables
   DCTHuffTable acHuffTables[4];	// AC Huffman tables
@@ -616,7 +627,7 @@ private:
 				DCTHuffTable *acHuffTable,
 				int *prevDC, int data[64]);
   void decodeImage();
-  void transformDataUnit(Guchar *quantTable,
+  void transformDataUnit(Gushort *quantTable,
 			 int dataIn[64], Guchar dataOut[64]);
   int readHuffSym(DCTHuffTable *table);
   int readAmp(int size);
@@ -700,6 +711,10 @@ private:
     lengthDecode[flateMaxLitCodes-257];
   static FlateDecode		// distance decoding info
     distDecode[flateMaxDistCodes];
+  static FlateHuffmanTab	// fixed literal code table
+    fixedLitCodeTab;
+  static FlateHuffmanTab	// fixed distance code table
+    fixedDistCodeTab;
 
   void readSome();
   GBool startBlock();

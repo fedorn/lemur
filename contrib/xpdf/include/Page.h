@@ -33,6 +33,7 @@ public:
   PDFRectangle(double x1A, double y1A, double x2A, double y2A)
     { x1 = x1A; y1 = y1A; x2 = x2A; y2 = y2A; }
   GBool isValid() { return x1 != 0 || y1 != 0 || x2 != 0 || y2 != 0; }
+  void clipTo(PDFRectangle *rect);
 };
 
 //------------------------------------------------------------------------
@@ -51,7 +52,6 @@ public:
   ~PageAttrs();
 
   // Accessors.
-  PDFRectangle *getBox() { return limitToCropBox ? &cropBox : &mediaBox; }
   PDFRectangle *getMediaBox() { return &mediaBox; }
   PDFRectangle *getCropBox() { return &cropBox; }
   GBool isCropped() { return haveCropBox; }
@@ -83,7 +83,6 @@ private:
   PDFRectangle mediaBox;
   PDFRectangle cropBox;
   GBool haveCropBox;
-  GBool limitToCropBox;
   PDFRectangle bleedBox;
   PDFRectangle trimBox;
   PDFRectangle artBox;
@@ -114,12 +113,18 @@ public:
   GBool isOk() { return ok; }
 
   // Get page parameters.
-  PDFRectangle *getBox() { return attrs->getBox(); }
+  int getNum() { return num; }
   PDFRectangle *getMediaBox() { return attrs->getMediaBox(); }
   PDFRectangle *getCropBox() { return attrs->getCropBox(); }
   GBool isCropped() { return attrs->isCropped(); }
-  double getWidth() { return attrs->getBox()->x2 - attrs->getBox()->x1; }
-  double getHeight() { return attrs->getBox()->y2 - attrs->getBox()->y1; }
+  double getMediaWidth() 
+    { return attrs->getMediaBox()->x2 - attrs->getMediaBox()->x1; }
+  double getMediaHeight()
+    { return attrs->getMediaBox()->y2 - attrs->getMediaBox()->y1; }
+  double getCropWidth() 
+    { return attrs->getCropBox()->x2 - attrs->getCropBox()->x1; }
+  double getCropHeight()
+    { return attrs->getCropBox()->y2 - attrs->getCropBox()->y1; }
   PDFRectangle *getBleedBox() { return attrs->getBleedBox(); }
   PDFRectangle *getTrimBox() { return attrs->getTrimBox(); }
   PDFRectangle *getArtBox() { return attrs->getArtBox(); }
@@ -137,23 +142,37 @@ public:
   // Get annotations array.
   Object *getAnnots(Object *obj) { return annots.fetch(xref, obj); }
 
+  // Return a list of links.
+  Links *getLinks(Catalog *catalog);
+
   // Get contents.
   Object *getContents(Object *obj) { return contents.fetch(xref, obj); }
 
   // Display a page.
   void display(OutputDev *out, double hDPI, double vDPI,
-	       int rotate, GBool crop,
-	       Links *links, Catalog *catalog,
+	       int rotate, GBool useMediaBox, GBool crop,
+	       GBool printing, Catalog *catalog,
 	       GBool (*abortCheckCbk)(void *data) = NULL,
 	       void *abortCheckCbkData = NULL);
 
   // Display part of a page.
   void displaySlice(OutputDev *out, double hDPI, double vDPI,
-		    int rotate, GBool crop,
+		    int rotate, GBool useMediaBox, GBool crop,
 		    int sliceX, int sliceY, int sliceW, int sliceH,
-		    Links *links, Catalog *catalog,
+		    GBool printing, Catalog *catalog,
 		    GBool (*abortCheckCbk)(void *data) = NULL,
 		    void *abortCheckCbkData = NULL);
+
+  void makeBox(double hDPI, double vDPI, int rotate,
+	       GBool useMediaBox, GBool upsideDown,
+	       double sliceX, double sliceY, double sliceW, double sliceH,
+	       PDFRectangle *box, GBool *crop);
+
+  void processLinks(OutputDev *out, Catalog *catalog);
+
+  // Get the page's default CTM.
+  void getDefaultCTM(double *ctm, double hDPI, double vDPI,
+		     int rotate, GBool useMediaBox, GBool upsideDown);
 
 private:
 

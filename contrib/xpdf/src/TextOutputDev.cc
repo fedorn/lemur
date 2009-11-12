@@ -30,6 +30,7 @@
 #include "UnicodeMap.h"
 #include "UnicodeTypeTable.h"
 #include "GfxState.h"
+#include "Link.h"
 #include "TextOutputDev.h"
 
 #ifdef MACOS
@@ -106,11 +107,63 @@
 // multiplied by this constant.
 #define maxWideCharSpacingMul 1.3
 
+// Upper limit on spacing between characters in a word.
+#define maxWideCharSpacing 0.4
+
 // Max difference in primary,secondary coordinates (as a fraction of
 // the font size) allowed for duplicated text (fake boldface, drop
 // shadows) which is to be discarded.
 #define dupMaxPriDelta 0.1
 #define dupMaxSecDelta 0.2
+
+// Max width of underlines (in points).
+#define maxUnderlineWidth 3
+
+// Min distance between baseline and underline (in points).
+//~ this should be font-size-dependent
+#define minUnderlineGap -2
+
+// Max distance between baseline and underline (in points).
+//~ this should be font-size-dependent
+#define maxUnderlineGap 4
+
+// Max horizontal distance between edge of word and start of underline
+// (in points).
+//~ this should be font-size-dependent
+#define underlineSlack 1
+
+// Max distance between edge of text and edge of link border
+#define hyperlinkSlack 2
+
+//------------------------------------------------------------------------
+// TextUnderline
+//------------------------------------------------------------------------
+
+class TextUnderline {
+public:
+
+  TextUnderline(double x0A, double y0A, double x1A, double y1A)
+    { x0 = x0A; y0 = y0A; x1 = x1A; y1 = y1A; horiz = y0 == y1; }
+  ~TextUnderline() {}
+
+  double x0, y0, x1, y1;
+  GBool horiz;
+};
+
+//------------------------------------------------------------------------
+// TextLink
+//------------------------------------------------------------------------
+
+class TextLink {
+public:
+
+  TextLink(int xMinA, int yMinA, int xMaxA, int yMaxA, Link *linkA)
+    { xMin = xMinA; yMin = yMinA; xMax = xMaxA; yMax = yMaxA; link = linkA; }
+  ~TextLink() {}
+
+  int xMin, yMin, xMax, yMax;
+  Link *link;
+};
 
 //------------------------------------------------------------------------
 // TextFontInfo
@@ -122,6 +175,7 @@ TextFontInfo::TextFontInfo(GfxState *state) {
   fontName = (gfxFont && gfxFont->getOrigName())
                  ? gfxFont->getOrigName()->copy()
                  : (GString *)NULL;
+  flags = gfxFont ? gfxFont->getFlags() : 0;
 #endif
 }
 
@@ -221,10 +275,13 @@ TextWord::TextWord(GfxState *state, int rotA, double x0, double y0,
   } else {
     state->getFillRGB(&rgb);
   }
-  colorR = rgb.r;
-  colorG = rgb.g;
-  colorB = rgb.b;
+  colorR = colToDbl(rgb.r);
+  colorG = colToDbl(rgb.g);
+  colorB = colToDbl(rgb.b);
 #endif
+
+  underlined = gFalse;
+  link = NULL;
 }
 
 TextWord::~TextWord() {
@@ -236,8 +293,8 @@ void TextWord::addChar(GfxState *state, double x, double y,
 		       double dx, double dy, Unicode u) {
   if (len == size) {
     size += 16;
-    text = (Unicode *)grealloc(text, size * sizeof(Unicode));
-    edge = (double *)grealloc(edge, (size + 1) * sizeof(double));
+    text = (Unicode *)greallocn(text, size, sizeof(Unicode));
+    edge = (double *)greallocn(edge, size + 1, sizeof(double));
   }
   text[len] = u;
   switch (rot) {
@@ -290,8 +347,8 @@ void TextWord::merge(TextWord *word) {
   }
   if (len + word->len > size) {
     size = len + word->len;
-    text = (Unicode *)grealloc(text, size * sizeof(Unicode));
-    edge = (double *)grealloc(edge, (size + 1) * sizeof(double));
+    text = (Unicode *)greallocn(text, size, sizeof(Unicode));
+    edge = (double *)greallocn(edge, size + 1, sizeof(double));
   }
   for (i = 0; i < word->len; ++i) {
     text[len + i] = word->text[i];
@@ -376,6 +433,39 @@ GString *TextWord::getText() {
   return s;
 }
 
+void TextWord::getCharBBox(int charIdx, double *xMinA, double *yMinA,
+			   double *xMaxA, double *yMaxA) {
+  if (charIdx < 0 || charIdx >= len) {
+    return;
+  }
+  switch (rot) {
+  case 0:
+    *xMinA = edge[charIdx];
+    *xMaxA = edge[charIdx + 1];
+    *yMinA = yMin;
+    *yMaxA = yMax;
+    break;
+  case 1:
+    *xMinA = xMin;
+    *xMaxA = xMax;
+    *yMinA = edge[charIdx];
+    *yMaxA = edge[charIdx + 1];
+    break;
+  case 2:
+    *xMinA = edge[charIdx + 1];
+    *xMaxA = edge[charIdx];
+    *yMinA = yMin;
+    *yMaxA = yMax;
+    break;
+  case 3:
+    *xMinA = xMin;
+    *xMaxA = xMax;
+    *yMinA = edge[charIdx + 1];
+    *yMaxA = edge[charIdx];
+    break;
+  }
+}
+
 #endif // TEXTOUT_WORD_LIST
 
 //------------------------------------------------------------------------
@@ -426,15 +516,15 @@ void TextPool::addWord(TextWord *word) {
   if (minBaseIdx > maxBaseIdx) {
     minBaseIdx = wordBaseIdx - 128;
     maxBaseIdx = wordBaseIdx + 128;
-    pool = (TextWord **)gmalloc((maxBaseIdx - minBaseIdx + 1) *
-				sizeof(TextWord *));
+    pool = (TextWord **)gmallocn(maxBaseIdx - minBaseIdx + 1,
+				 sizeof(TextWord *));
     for (baseIdx = minBaseIdx; baseIdx <= maxBaseIdx; ++baseIdx) {
       pool[baseIdx - minBaseIdx] = NULL;
     }
   } else if (wordBaseIdx < minBaseIdx) {
     newMinBaseIdx = wordBaseIdx - 128;
-    newPool = (TextWord **)gmalloc((maxBaseIdx - newMinBaseIdx + 1) *
-				   sizeof(TextWord *));
+    newPool = (TextWord **)gmallocn(maxBaseIdx - newMinBaseIdx + 1,
+				    sizeof(TextWord *));
     for (baseIdx = newMinBaseIdx; baseIdx < minBaseIdx; ++baseIdx) {
       newPool[baseIdx - newMinBaseIdx] = NULL;
     }
@@ -445,8 +535,8 @@ void TextPool::addWord(TextWord *word) {
     minBaseIdx = newMinBaseIdx;
   } else if (wordBaseIdx > maxBaseIdx) {
     newMaxBaseIdx = wordBaseIdx + 128;
-    pool = (TextWord **)grealloc(pool, (newMaxBaseIdx - minBaseIdx + 1) *
-				         sizeof(TextWord *));
+    pool = (TextWord **)greallocn(pool, newMaxBaseIdx - minBaseIdx + 1,
+				  sizeof(TextWord *));
     for (baseIdx = maxBaseIdx + 1; baseIdx <= newMaxBaseIdx; ++baseIdx) {
       pool[baseIdx - minBaseIdx] = NULL;
     }
@@ -634,6 +724,9 @@ void TextLine::coalesce(UnicodeMap *uMap) {
       space = maxCharSpacing * words->fontSize;
     } else {
       space = maxWideCharSpacingMul * minSpace;
+      if (space > maxWideCharSpacing * words->fontSize) {
+	space = maxWideCharSpacing * words->fontSize;
+      }
     }
 
     // merge words
@@ -645,8 +738,9 @@ void TextLine::coalesce(UnicodeMap *uMap) {
 	word0 = word1;
 	word1 = word1->next;
       } else if (word0->font == word1->font &&
+		 word0->underlined == word1->underlined &&
 		 fabs(word0->fontSize - word1->fontSize) <
-		 maxWordFontSizeDelta * words->fontSize &&
+		   maxWordFontSizeDelta * words->fontSize &&
 		 word1->charPos == word0->charPos + word0->charLen) {
 	word0->merge(word1);
 	word0->next = word1->next;
@@ -668,8 +762,8 @@ void TextLine::coalesce(UnicodeMap *uMap) {
       ++len;
     }
   }
-  text = (Unicode *)gmalloc(len * sizeof(Unicode));
-  edge = (double *)gmalloc((len + 1) * sizeof(double));
+  text = (Unicode *)gmallocn(len, sizeof(Unicode));
+  edge = (double *)gmallocn(len + 1, sizeof(double));
   i = 0;
   for (word1 = words; word1; word1 = word1->next) {
     for (j = 0; j < word1->len; ++j) {
@@ -685,7 +779,7 @@ void TextLine::coalesce(UnicodeMap *uMap) {
   }
 
   // compute convertedLen and set up the col array
-  col = (int *)gmalloc((len + 1) * sizeof(int));
+  col = (int *)gmallocn(len + 1, sizeof(int));
   convertedLen = 0;
   for (i = 0; i < len; ++i) {
     col[i] = convertedLen;
@@ -723,6 +817,8 @@ public:
   static int cmpYXPrimaryRot(const void *p1, const void *p2);
   static int cmpYXLineRot(const void *p1, const void *p2);
   static int cmpXYLineRot(const void *p1, const void *p2);
+  static int cmpXYColumnPrimaryRot(const void *p1, const void *p2);
+  static int cmpXYColumnLineRot(const void *p1, const void *p2);
 };
 
 void TextLineFrag::init(TextLine *lineA, int startA, int lenA) {
@@ -869,22 +965,22 @@ int TextLineFrag::cmpYXPrimaryRot(const void *p1, const void *p2) {
   cmp = 0; // make gcc happy
   switch (frag1->line->blk->page->primaryRot) {
   case 0:
-    if ((cmp = frag1->yMin - frag2->yMin) == 0) {
+    if (fabs(cmp = frag1->yMin - frag2->yMin) < 0.01) {
       cmp = frag1->xMin - frag2->xMin;
     }
     break;
   case 1:
-    if ((cmp = frag2->xMax - frag1->xMax) == 0) {
+    if (fabs(cmp = frag2->xMax - frag1->xMax) < 0.01) {
       cmp = frag1->yMin - frag2->yMin;
     }
     break;
   case 2:
-    if ((cmp = frag2->yMin - frag1->yMin) == 0) {
+    if (fabs(cmp = frag2->yMin - frag1->yMin) < 0.01) {
       cmp = frag2->xMax - frag1->xMax;
     }
     break;
   case 3:
-    if ((cmp = frag1->xMax - frag2->xMax) == 0) {
+    if (fabs(cmp = frag1->xMax - frag2->xMax) < 0.01) {
       cmp = frag2->yMax - frag1->yMax;
     }
     break;
@@ -952,6 +1048,54 @@ int TextLineFrag::cmpXYLineRot(const void *p1, const void *p2) {
     break;
   }
   return cmp < 0 ? -1 : cmp > 0 ? 1 : 0;
+}
+
+int TextLineFrag::cmpXYColumnPrimaryRot(const void *p1, const void *p2) {
+  TextLineFrag *frag1 = (TextLineFrag *)p1;
+  TextLineFrag *frag2 = (TextLineFrag *)p2;
+  double cmp;
+
+  // if columns overlap, compare y values
+  if (frag1->col < frag2->col + (frag2->line->col[frag2->start + frag2->len] -
+				 frag2->line->col[frag2->start]) &&
+      frag2->col < frag1->col + (frag1->line->col[frag1->start + frag1->len] -
+				 frag1->line->col[frag1->start])) {
+    cmp = 0; // make gcc happy
+    switch (frag1->line->blk->page->primaryRot) {
+    case 0: cmp = frag1->yMin - frag2->yMin; break;
+    case 1: cmp = frag2->xMax - frag1->xMax; break;
+    case 2: cmp = frag2->yMin - frag1->yMin; break;
+    case 3: cmp = frag1->xMax - frag2->xMax; break;
+    }
+    return cmp < 0 ? -1 : cmp > 0 ? 1 : 0;
+  }
+
+  // otherwise, compare starting column
+  return frag1->col - frag2->col;
+}
+
+int TextLineFrag::cmpXYColumnLineRot(const void *p1, const void *p2) {
+  TextLineFrag *frag1 = (TextLineFrag *)p1;
+  TextLineFrag *frag2 = (TextLineFrag *)p2;
+  double cmp;
+
+  // if columns overlap, compare y values
+  if (frag1->col < frag2->col + (frag2->line->col[frag2->start + frag2->len] -
+				 frag2->line->col[frag2->start]) &&
+      frag2->col < frag1->col + (frag1->line->col[frag1->start + frag1->len] -
+				 frag1->line->col[frag1->start])) {
+    cmp = 0; // make gcc happy
+    switch (frag1->line->rot) {
+    case 0: cmp = frag1->yMin - frag2->yMin; break;
+    case 1: cmp = frag2->xMax - frag1->xMax; break;
+    case 2: cmp = frag2->yMin - frag1->yMin; break;
+    case 3: cmp = frag1->xMax - frag2->xMax; break;
+    }
+    return cmp < 0 ? -1 : cmp > 0 ? 1 : 0;
+  }
+
+  // otherwise, compare starting column
+  return frag1->col - frag2->col;
 }
 
 //------------------------------------------------------------------------
@@ -1190,7 +1334,7 @@ void TextBlock::coalesce(UnicodeMap *uMap) {
   }
 
   // sort lines into xy order for column assignment
-  lineArray = (TextLine **)gmalloc(nLines * sizeof(TextLine *));
+  lineArray = (TextLine **)gmallocn(nLines, sizeof(TextLine *));
   for (line = lines, i = 0; line; line = line->next, ++i) {
     lineArray[i] = line;
   }
@@ -1538,7 +1682,7 @@ TextWordList::TextWordList(TextPage *text, GBool physLayout) {
 	}
       }
     }
-    wordArray = (TextWord **)gmalloc(nWords * sizeof(TextWord *));
+    wordArray = (TextWord **)gmallocn(nWords, sizeof(TextWord *));
     i = 0;
     for (flow = text->flows; flow; flow = flow->next) {
       for (blk = flow->blocks; blk; blk = blk->next) {
@@ -1612,6 +1756,8 @@ TextPage::TextPage(GBool rawOrderA) {
   fonts = new GList();
   lastFindXMin = lastFindYMin = 0;
   haveLastFind = gFalse;
+  underlines = new GList();
+  links = new GList();
 }
 
 TextPage::~TextPage() {
@@ -1624,6 +1770,8 @@ TextPage::~TextPage() {
     }
   }
   delete fonts;
+  deleteGList(underlines, TextUnderline);
+  deleteGList(links, TextLink);
 }
 
 void TextPage::startPage(GfxState *state) {
@@ -1757,7 +1905,7 @@ void TextPage::updateFont(GfxState *state) {
 }
 
 void TextPage::beginWord(GfxState *state, double x0, double y0) {
-  double *txtm, *ctm, *fontm;
+  double *fontm;
   double m[4], m2[4];
   int rot;
 
@@ -1770,12 +1918,7 @@ void TextPage::beginWord(GfxState *state, double x0, double y0) {
   }
 
   // compute the rotation
-  txtm = state->getTextMat();
-  ctm = state->getCTM();
-  m[0] = txtm[0] * ctm[0] + txtm[1] * ctm[2];
-  m[1] = txtm[0] * ctm[1] + txtm[1] * ctm[3];
-  m[2] = txtm[2] * ctm[0] + txtm[3] * ctm[2];
-  m[3] = txtm[2] * ctm[1] + txtm[3] * ctm[3];
+  state->getFontTransMat(&m[0], &m[1], &m[2], &m[3]);
   if (state->getFont()->getType() == fontType3) {
     fontm = state->getFont()->getFontMatrix();
     m2[0] = fontm[0] * m[0] + fontm[1] * m[2];
@@ -1798,22 +1941,10 @@ void TextPage::beginWord(GfxState *state, double x0, double y0) {
 
 void TextPage::addChar(GfxState *state, double x, double y,
 		       double dx, double dy,
-		       CharCode c, Unicode *u, int uLen) {
-  double x1, y1, w1, h1, dx2, dy2, base, sp;
+		       CharCode c, int nBytes, Unicode *u, int uLen) {
+  double x1, y1, w1, h1, dx2, dy2, base, sp, delta;
+  GBool overlap;
   int i;
-
-  // if the previous char was a space, addChar will have called
-  // endWord, so we need to start a new word
-  if (!curWord) {
-    beginWord(state, x, y);
-  }
-
-  // throw away chars that aren't inside the page bounds
-  state->transform(x, y, &x1, &y1);
-  if (x1 < 0 || x1 > pageWidth ||
-      y1 < 0 || y1 > pageHeight) {
-    return;
-  }
 
   // subtract char and word spacing from the dx,dy values
   sp = state->getCharSpace();
@@ -1825,89 +1956,114 @@ void TextPage::addChar(GfxState *state, double x, double y,
   dy -= dy2;
   state->transformDelta(dx, dy, &w1, &h1);
 
+  // throw away chars that aren't inside the page bounds
+  // (and also do a sanity check on the character size)
+  state->transform(x, y, &x1, &y1);
+  if (x1 + w1 < 0 || x1 > pageWidth ||
+      y1 + h1 < 0 || y1 > pageHeight ||
+      w1 > pageWidth || h1 > pageHeight) {
+    charPos += nBytes;
+    return;
+  }
+
   // check the tiny chars limit
   if (!globalParams->getTextKeepTinyChars() &&
       fabs(w1) < 3 && fabs(h1) < 3) {
     if (++nTinyChars > 50000) {
+      charPos += nBytes;
       return;
     }
   }
 
   // break words at space character
   if (uLen == 1 && u[0] == (Unicode)0x20) {
-    ++curWord->charLen;
-    ++charPos;
+    if (curWord) {
+      ++curWord->charLen;
+    }
+    charPos += nBytes;
     endWord();
     return;
   }
 
   // start a new word if:
-  // (1) this character's baseline doesn't match the current word's
-  //     baseline, or
-  // (2) there is space between the end of the current word and this
-  //     character, or
-  // (3) this character overlaps the previous one (duplicated text), or
-  // (4) the previous character was an overlap (we want each duplicated
-  //     characters to be in a word by itself)
-  base = sp = 0; // make gcc happy
-  if (curWord->len > 0) {
+  // (1) this character doesn't fall in the right place relative to
+  //     the end of the previous word (this places upper and lower
+  //     constraints on the position deltas along both the primary
+  //     and secondary axes), or
+  // (2) this character overlaps the previous one (duplicated text), or
+  // (3) the previous character was an overlap (we want each duplicated
+  //     character to be in a word by itself at this stage),
+  // (4) the font size has changed
+  if (curWord && curWord->len > 0) {
+    base = sp = delta = 0; // make gcc happy
     switch (curWord->rot) {
     case 0:
       base = y1;
       sp = x1 - curWord->xMax;
+      delta = x1 - curWord->edge[curWord->len - 1];
       break;
     case 1:
       base = x1;
       sp = y1 - curWord->yMax;
+      delta = y1 - curWord->edge[curWord->len - 1];
       break;
     case 2:
       base = y1;
       sp = curWord->xMin - x1;
+      delta = curWord->edge[curWord->len - 1] - x1;
       break;
     case 3:
       base = x1;
       sp = curWord->yMin - y1;
+      delta = curWord->edge[curWord->len - 1] - y1;
       break;
     }
-    if (fabs(base - curWord->base) > 0.5 ||
-	sp > minWordBreakSpace * curWord->fontSize ||
+    overlap = fabs(delta) < dupMaxPriDelta * curWord->fontSize &&
+              fabs(base - curWord->base) < dupMaxSecDelta * curWord->fontSize;
+    if (overlap || lastCharOverlap ||
 	sp < -minDupBreakOverlap * curWord->fontSize ||
-	lastCharOverlap) {
-      lastCharOverlap = gTrue;
+	sp > minWordBreakSpace * curWord->fontSize ||
+	fabs(base - curWord->base) > 0.5 ||
+	curFontSize != curWord->fontSize) {
       endWord();
-      beginWord(state, x, y);
-    } else {
-      lastCharOverlap = gFalse;
     }
+    lastCharOverlap = overlap;
   } else {
     lastCharOverlap = gFalse;
   }
 
-  // page rotation and/or transform matrices can cause text to be
-  // drawn in reverse order -- in this case, swap the begin/end
-  // coordinates and break text into individual chars
-  if ((curWord->rot == 0 && w1 < 0) ||
-      (curWord->rot == 1 && h1 < 0) ||
-      (curWord->rot == 2 && w1 > 0) ||
-      (curWord->rot == 3 && h1 > 0)) {
-    endWord();
-    beginWord(state, x + dx, y + dy);
-    x1 += w1;
-    y1 += h1;
-    w1 = -w1;
-    h1 = -h1;
-  }
-
-  // add the characters to the current word
   if (uLen != 0) {
+    // start a new word if needed
+    if (!curWord) {
+      beginWord(state, x, y);
+    }
+
+    // page rotation and/or transform matrices can cause text to be
+    // drawn in reverse order -- in this case, swap the begin/end
+    // coordinates and break text into individual chars
+    if ((curWord->rot == 0 && w1 < 0) ||
+	(curWord->rot == 1 && h1 < 0) ||
+	(curWord->rot == 2 && w1 > 0) ||
+	(curWord->rot == 3 && h1 > 0)) {
+      endWord();
+      beginWord(state, x + dx, y + dy);
+      x1 += w1;
+      y1 += h1;
+      w1 = -w1;
+      h1 = -h1;
+    }
+
+    // add the characters to the current word
     w1 /= uLen;
     h1 /= uLen;
+    for (i = 0; i < uLen; ++i) {
+      curWord->addChar(state, x1 + i*w1, y1 + i*h1, w1, h1, u[i]);
+    }
   }
-  for (i = 0; i < uLen; ++i) {
-    curWord->addChar(state, x1 + i*w1, y1 + i*h1, w1, h1, u[i]);
+  if (curWord) {
+    curWord->charLen += nBytes;
   }
-  ++curWord->charLen;
-  ++charPos;
+  charPos += nBytes;
 }
 
 void TextPage::endWord() {
@@ -1945,7 +2101,15 @@ void TextPage::addWord(TextWord *word) {
   }
 }
 
-void TextPage::coalesce(GBool physLayout) {
+void TextPage::addUnderline(double x0, double y0, double x1, double y1) {
+  underlines->append(new TextUnderline(x0, y0, x1, y1));
+}
+
+void TextPage::addLink(int xMin, int yMin, int xMax, int yMax, Link *link) {
+  links->append(new TextLink(xMin, yMin, xMax, yMax, link));
+}
+
+void TextPage::coalesce(GBool physLayout, GBool doHTML) {
   UnicodeMap *uMap;
   TextPool *pool;
   TextWord *word0, *word1, *word2;
@@ -1953,7 +2117,9 @@ void TextPage::coalesce(GBool physLayout) {
   TextBlock *blkList, *blkStack, *blk, *lastBlk, *blk0, *blk1;
   TextBlock **blkArray;
   TextFlow *flow, *lastFlow;
-  int rot, poolMinBaseIdx, baseIdx, startBaseIdx;
+  TextUnderline *underline;
+  TextLink *link;
+  int rot, poolMinBaseIdx, baseIdx, startBaseIdx, endBaseIdx;
   double minBase, maxBase, newMinBase, newMaxBase;
   double fontSize, colSpace1, colSpace2, lineSpace, intraLineSpace, blkSpace;
   GBool found;
@@ -1981,9 +2147,9 @@ void TextPage::coalesce(GBool physLayout) {
     pool = pools[rot];
     for (baseIdx = pool->minBaseIdx; baseIdx <= pool->maxBaseIdx; ++baseIdx) {
       for (word0 = pool->getPool(baseIdx); word0; word0 = word0->next) {
-	printf("    word: x=%.2f..%.2f y=%.2f..%.2f base=%.2f fontSize=%.2f '",
+	printf("    word: x=%.2f..%.2f y=%.2f..%.2f base=%.2f fontSize=%.2f rot=%d link=%p '",
 	       word0->xMin, word0->xMax, word0->yMin, word0->yMax,
-	       word0->base, word0->fontSize);
+	       word0->base, word0->fontSize, rot*90, word0->link);
 	for (i = 0; i < word0->len; ++i) {
 	  fputc(word0->text[i] & 0xff, stdout);
 	}
@@ -1993,6 +2159,150 @@ void TextPage::coalesce(GBool physLayout) {
   }
   printf("\n");
 #endif
+
+#if 0 //~ for debugging
+  for (i = 0; i < underlines->getLength(); ++i) {
+    underline = (TextUnderline *)underlines->get(i);
+    printf("underline: x=%g..%g y=%g..%g horiz=%d\n",
+	   underline->x0, underline->x1, underline->y0, underline->y1,
+	   underline->horiz);
+  }
+#endif
+
+  if (doHTML) {
+
+    //----- handle underlining
+    for (i = 0; i < underlines->getLength(); ++i) {
+      underline = (TextUnderline *)underlines->get(i);
+      if (underline->horiz) {
+	// rot = 0
+	if (pools[0]->minBaseIdx <= pools[0]->maxBaseIdx) {
+	  startBaseIdx = pools[0]->getBaseIdx(underline->y0 + minUnderlineGap);
+	  endBaseIdx = pools[0]->getBaseIdx(underline->y0 + maxUnderlineGap);
+	  for (j = startBaseIdx; j <= endBaseIdx; ++j) {
+	    for (word0 = pools[0]->getPool(j); word0; word0 = word0->next) {
+	      //~ need to check the y value against the word baseline
+	      if (underline->x0 < word0->xMin + underlineSlack &&
+		  word0->xMax - underlineSlack < underline->x1) {
+		word0->underlined = gTrue;
+	      }
+	    }
+	  }
+	}
+
+	// rot = 2
+	if (pools[2]->minBaseIdx <= pools[2]->maxBaseIdx) {
+	  startBaseIdx = pools[2]->getBaseIdx(underline->y0 - maxUnderlineGap);
+	  endBaseIdx = pools[2]->getBaseIdx(underline->y0 - minUnderlineGap);
+	  for (j = startBaseIdx; j <= endBaseIdx; ++j) {
+	    for (word0 = pools[2]->getPool(j); word0; word0 = word0->next) {
+	      if (underline->x0 < word0->xMin + underlineSlack &&
+		  word0->xMax - underlineSlack < underline->x1) {
+		word0->underlined = gTrue;
+	      }
+	    }
+	  }
+	}
+      } else {
+	// rot = 1
+	if (pools[1]->minBaseIdx <= pools[1]->maxBaseIdx) {
+	  startBaseIdx = pools[1]->getBaseIdx(underline->x0 - maxUnderlineGap);
+	  endBaseIdx = pools[1]->getBaseIdx(underline->x0 - minUnderlineGap);
+	  for (j = startBaseIdx; j <= endBaseIdx; ++j) {
+	    for (word0 = pools[1]->getPool(j); word0; word0 = word0->next) {
+	      if (underline->y0 < word0->yMin + underlineSlack &&
+		  word0->yMax - underlineSlack < underline->y1) {
+		word0->underlined = gTrue;
+	      }
+	    }
+	  }
+	}
+
+	// rot = 3
+	if (pools[3]->minBaseIdx <= pools[3]->maxBaseIdx) {
+	  startBaseIdx = pools[3]->getBaseIdx(underline->x0 + minUnderlineGap);
+	  endBaseIdx = pools[3]->getBaseIdx(underline->x0 + maxUnderlineGap);
+	  for (j = startBaseIdx; j <= endBaseIdx; ++j) {
+	    for (word0 = pools[3]->getPool(j); word0; word0 = word0->next) {
+	      if (underline->y0 < word0->yMin + underlineSlack &&
+		  word0->yMax - underlineSlack < underline->y1) {
+		word0->underlined = gTrue;
+	      }
+	    }
+	  }
+	}
+      }
+    }
+
+    //----- handle links
+    for (i = 0; i < links->getLength(); ++i) {
+      link = (TextLink *)links->get(i);
+
+      // rot = 0
+      if (pools[0]->minBaseIdx <= pools[0]->maxBaseIdx) {
+	startBaseIdx = pools[0]->getBaseIdx(link->yMin);
+	endBaseIdx = pools[0]->getBaseIdx(link->yMax);
+	for (j = startBaseIdx; j <= endBaseIdx; ++j) {
+	  for (word0 = pools[0]->getPool(j); word0; word0 = word0->next) {
+	    if (link->xMin < word0->xMin + hyperlinkSlack &&
+		word0->xMax - hyperlinkSlack < link->xMax &&
+		link->yMin < word0->yMin + hyperlinkSlack &&
+		word0->yMax - hyperlinkSlack < link->yMax) {
+	      word0->link = link->link;
+	    }
+	  }
+	}
+      }
+
+      // rot = 2
+      if (pools[2]->minBaseIdx <= pools[2]->maxBaseIdx) {
+	startBaseIdx = pools[2]->getBaseIdx(link->yMin);
+	endBaseIdx = pools[2]->getBaseIdx(link->yMax);
+	for (j = startBaseIdx; j <= endBaseIdx; ++j) {
+	  for (word0 = pools[2]->getPool(j); word0; word0 = word0->next) {
+	    if (link->xMin < word0->xMin + hyperlinkSlack &&
+		word0->xMax - hyperlinkSlack < link->xMax &&
+		link->yMin < word0->yMin + hyperlinkSlack &&
+		word0->yMax - hyperlinkSlack < link->yMax) {
+	      word0->link = link->link;
+	    }
+	  }
+	}
+      }
+
+      // rot = 1
+      if (pools[1]->minBaseIdx <= pools[1]->maxBaseIdx) {
+	startBaseIdx = pools[1]->getBaseIdx(link->xMin);
+	endBaseIdx = pools[1]->getBaseIdx(link->xMax);
+	for (j = startBaseIdx; j <= endBaseIdx; ++j) {
+	  for (word0 = pools[1]->getPool(j); word0; word0 = word0->next) {
+	    if (link->yMin < word0->yMin + hyperlinkSlack &&
+		word0->yMax - hyperlinkSlack < link->yMax &&
+		link->xMin < word0->xMin + hyperlinkSlack &&
+		word0->xMax - hyperlinkSlack < link->xMax) {
+	      word0->link = link->link;
+	    }
+	  }
+	}
+      }
+
+      // rot = 3
+      if (pools[3]->minBaseIdx <= pools[3]->maxBaseIdx) {
+	startBaseIdx = pools[3]->getBaseIdx(link->xMin);
+	endBaseIdx = pools[3]->getBaseIdx(link->xMax);
+	for (j = startBaseIdx; j <= endBaseIdx; ++j) {
+	  for (word0 = pools[3]->getPool(j); word0; word0 = word0->next) {
+	    if (link->yMin < word0->yMin + hyperlinkSlack &&
+		word0->yMax - hyperlinkSlack < link->yMax &&
+		link->xMin < word0->xMin + hyperlinkSlack &&
+		word0->xMax - hyperlinkSlack < link->xMax) {
+	      word0->link = link->link;
+	    }
+	  }
+	}
+      }
+    }
+  }
 
   //----- assemble the blocks
 
@@ -2365,7 +2675,7 @@ void TextPage::coalesce(GBool physLayout) {
   //----- column assignment
 
   // sort blocks into xy order for column assignment
-  blocks = (TextBlock **)gmalloc(nBlocks * sizeof(TextBlock *));
+  blocks = (TextBlock **)gmallocn(nBlocks, sizeof(TextBlock *));
   for (blk = blkList, i = 0; blk; blk = blk->next, ++i) {
     blocks[i] = blk;
   }
@@ -2382,6 +2692,8 @@ void TextPage::coalesce(GBool physLayout) {
       case 0:
 	if (blk0->xMin > blk1->xMax) {
 	  col2 = blk1->col + blk1->nColumns + 3;
+	} else if (blk1->xMax == blk1->xMin) {
+	  col2 = blk1->col;
 	} else {
 	  col2 = blk1->col + (int)(((blk0->xMin - blk1->xMin) /
 				    (blk1->xMax - blk1->xMin)) *
@@ -2391,6 +2703,8 @@ void TextPage::coalesce(GBool physLayout) {
       case 1:
 	if (blk0->yMin > blk1->yMax) {
 	  col2 = blk1->col + blk1->nColumns + 3;
+	} else if (blk1->yMax == blk1->yMin) {
+	  col2 = blk1->col;
 	} else {
 	  col2 = blk1->col + (int)(((blk0->yMin - blk1->yMin) /
 				    (blk1->yMax - blk1->yMin)) *
@@ -2400,6 +2714,8 @@ void TextPage::coalesce(GBool physLayout) {
       case 2:
 	if (blk0->xMax < blk1->xMin) {
 	  col2 = blk1->col + blk1->nColumns + 3;
+	} else if (blk1->xMin == blk1->xMax) {
+	  col2 = blk1->col;
 	} else {
 	  col2 = blk1->col + (int)(((blk0->xMax - blk1->xMax) /
 				    (blk1->xMin - blk1->xMax)) *
@@ -2409,6 +2725,8 @@ void TextPage::coalesce(GBool physLayout) {
       case 3:
 	if (blk0->yMax < blk1->yMin) {
 	  col2 = blk1->col + blk1->nColumns + 3;
+	} else if (blk1->yMin == blk1->yMax) {
+	  col2 = blk1->col;
 	} else {
 	  col2 = blk1->col + (int)(((blk0->yMax - blk1->yMax) /
 				    (blk1->yMin - blk1->yMax)) *
@@ -2492,7 +2810,7 @@ void TextPage::coalesce(GBool physLayout) {
   // build the flows
   //~ this needs to be adjusted for writing mode (vertical text)
   //~ this also needs to account for right-to-left column ordering
-  blkArray = (TextBlock **)gmalloc(nBlocks * sizeof(TextBlock *));
+  blkArray = (TextBlock **)gmallocn(nBlocks, sizeof(TextBlock *));
   memcpy(blkArray, blocks, nBlocks * sizeof(TextBlock *));
   flows = lastFlow = NULL;
   firstBlkIdx = 0;
@@ -2613,13 +2931,14 @@ void TextPage::coalesce(GBool physLayout) {
 GBool TextPage::findText(Unicode *s, int len,
 			 GBool startAtTop, GBool stopAtBottom,
 			 GBool startAtLast, GBool stopAtLast,
+			 GBool caseSensitive, GBool backward,
 			 double *xMin, double *yMin,
 			 double *xMax, double *yMax) {
   TextBlock *blk;
   TextLine *line;
+  Unicode *s2, *txt;
   Unicode *p;
-  Unicode u1, u2;
-  int m, i, j, k;
+  int txtSize, m, i, j, k;
   double xStart, yStart, xStop, yStop;
   double xMin0, yMin0, xMax0, yMax0;
   double xMin1, yMin1, xMax1, yMax1;
@@ -2630,6 +2949,19 @@ GBool TextPage::findText(Unicode *s, int len,
   if (rawOrder) {
     return gFalse;
   }
+
+  // convert the search string to uppercase
+  if (!caseSensitive) {
+    s2 = (Unicode *)gmallocn(len, sizeof(Unicode));
+    for (i = 0; i < len; ++i) {
+      s2[i] = unicodeToUpper(s[i]);
+    }
+  } else {
+    s2 = s;
+  }
+
+  txt = NULL;
+  txtSize = 0;
 
   xStart = yStart = xStop = yStop = 0;
   if (startAtLast && haveLastFind) {
@@ -2651,51 +2983,57 @@ GBool TextPage::findText(Unicode *s, int len,
   xMin0 = xMax0 = yMin0 = yMax0 = 0; // make gcc happy
   xMin1 = xMax1 = yMin1 = yMax1 = 0; // make gcc happy
 
-  for (i = 0; i < nBlocks; ++i) {
+  for (i = backward ? nBlocks - 1 : 0;
+       backward ? i >= 0 : i < nBlocks;
+       i += backward ? -1 : 1) {
     blk = blocks[i];
 
     // check: is the block above the top limit?
-    if (!startAtTop && blk->yMax < yStart) {
+    if (!startAtTop && (backward ? blk->yMin > yStart : blk->yMax < yStart)) {
       continue;
     }
 
     // check: is the block below the bottom limit?
-    if (!stopAtBottom && blk->yMin > yStop) {
+    if (!stopAtBottom && (backward ? blk->yMax < yStop : blk->yMin > yStop)) {
       break;
     }
 
     for (line = blk->lines; line; line = line->next) {
 
       // check: is the line above the top limit?
-      if (!startAtTop && line->yMin < yStart) {
+      if (!startAtTop &&
+	  (backward ? line->yMin > yStart : line->yMin < yStart)) {
 	continue;
       }
 
       // check: is the line below the bottom limit?
-      if (!stopAtBottom && line->yMin > yStop) {
+      if (!stopAtBottom &&
+	  (backward ? line->yMin < yStop : line->yMin > yStop)) {
 	continue;
       }
 
-      // search each position in this line
+      // convert the line to uppercase
       m = line->len;
-      for (j = 0, p = line->text; j <= m - len; ++j, ++p) {
+      if (!caseSensitive) {
+	if (m > txtSize) {
+	  txt = (Unicode *)greallocn(txt, m, sizeof(Unicode));
+	  txtSize = m;
+	}
+	for (k = 0; k < m; ++k) {
+	  txt[k] = unicodeToUpper(line->text[k]);
+	}
+      } else {
+	txt = line->text;
+      }
+
+      // search each position in this line
+      j = backward ? m - len : 0;
+      p = txt + j;
+      while (backward ? j >= 0 : j <= m - len) {
 
 	// compare the strings
 	for (k = 0; k < len; ++k) {
-#if 1 //~ this lowercases Latin A-Z only -- this will eventually be
-      //~ extended to handle other character sets
-	  if (p[k] >= 0x41 && p[k] <= 0x5a) {
-	    u1 = p[k] + 0x20;
-	  } else {
-	    u1 = p[k];
-	  }
-	  if (s[k] >= 0x41 && s[k] <= 0x5a) {
-	    u2 = s[k] + 0x20;
-	  } else {
-	    u2 = s[k];
-	  }
-#endif
-	  if (u1 != u2) {
+	  if (p[k] != s2[k]) {
 	    break;
 	  }
 	}
@@ -2728,21 +3066,50 @@ GBool TextPage::findText(Unicode *s, int len,
 	    yMax1 = line->edge[j];
 	    break;
 	  }
-	  if ((startAtTop ||
-	       yMin1 > yStart || (yMin1 == yStart && xMin1 > xStart)) &&
-	      (stopAtBottom ||
-	       yMin1 < yStop || (yMin1 == yStop && xMin1 < yStop))) {
-	    if (!found || yMin1 < yMin0 || (yMin1 == yMin0 && xMin1 < xMin0)) {
-	      xMin0 = xMin1;
-	      xMax0 = xMax1;
-	      yMin0 = yMin1;
-	      yMax0 = yMax1;
-	      found = gTrue;
+	  if (backward) {
+	    if ((startAtTop ||
+		 yMin1 < yStart || (yMin1 == yStart && xMin1 < xStart)) &&
+		(stopAtBottom ||
+		 yMin1 > yStop || (yMin1 == yStop && xMin1 > xStop))) {
+	      if (!found ||
+		  yMin1 > yMin0 || (yMin1 == yMin0 && xMin1 > xMin0)) {
+		xMin0 = xMin1;
+		xMax0 = xMax1;
+		yMin0 = yMin1;
+		yMax0 = yMax1;
+		found = gTrue;
+	      }
+	    }
+	  } else {
+	    if ((startAtTop ||
+		 yMin1 > yStart || (yMin1 == yStart && xMin1 > xStart)) &&
+		(stopAtBottom ||
+		 yMin1 < yStop || (yMin1 == yStop && xMin1 < xStop))) {
+	      if (!found ||
+		  yMin1 < yMin0 || (yMin1 == yMin0 && xMin1 < xMin0)) {
+		xMin0 = xMin1;
+		xMax0 = xMax1;
+		yMin0 = yMin1;
+		yMax0 = yMax1;
+		found = gTrue;
+	      }
 	    }
 	  }
 	}
+	if (backward) {
+	  --j;
+	  --p;
+	} else {
+	  ++j;
+	  ++p;
+	}
       }
     }
+  }
+
+  if (!caseSensitive) {
+    gfree(s2);
+    gfree(txt);
   }
 
   if (found) {
@@ -2772,7 +3139,7 @@ GString *TextPage::getText(double xMin, double yMin,
   char space[8], eol[16];
   int spaceLen, eolLen;
   int lastRot;
-  double x, y;
+  double x, y, delta;
   int col, idx0, idx1, i, j;
   GBool multiLine, oneRot;
 
@@ -2806,7 +3173,7 @@ GString *TextPage::getText(double xMin, double yMin,
 
   // collect the line fragments that are in the rectangle
   fragsSize = 256;
-  frags = (TextLineFrag *)gmalloc(fragsSize * sizeof(TextLineFrag));
+  frags = (TextLineFrag *)gmallocn(fragsSize, sizeof(TextLineFrag));
   nFrags = 0;
   lastRot = -1;
   oneRot = gTrue;
@@ -2908,7 +3275,7 @@ GString *TextPage::getText(double xMin, double yMin,
 	    if (nFrags == fragsSize) {
 	      fragsSize *= 2;
 	      frags = (TextLineFrag *)
-		          grealloc(frags, fragsSize * sizeof(TextLineFrag));
+		          greallocn(frags, fragsSize, sizeof(TextLineFrag));
 	    }
 	    frags[nFrags].init(line, idx0, idx1 - idx0 + 1);
 	    ++nFrags;
@@ -2938,6 +3305,17 @@ GString *TextPage::getText(double xMin, double yMin,
     } else {
       qsort(frags, nFrags, sizeof(TextLineFrag),
 	    &TextLineFrag::cmpYXPrimaryRot);
+    }
+    i = 0;
+    while (i < nFrags) {
+      delta = maxIntraLineDelta * frags[i].line->words->fontSize;
+      for (j = i+1;
+	   j < nFrags && fabs(frags[j].base - frags[i].base) < delta;
+	   ++j) ;
+      qsort(frags + i, j - i, sizeof(TextLineFrag),
+	    oneRot ? &TextLineFrag::cmpXYColumnLineRot
+	           : &TextLineFrag::cmpXYColumnPrimaryRot);
+      i = j;
     }
 
     col = 0;
@@ -3077,7 +3455,8 @@ void TextPage::dump(void *outputStream, TextOutputFunc outputFunc,
   int spaceLen, eolLen, eopLen;
   GBool pageBreaks;
   GString *s;
-  int col, i, d, n;
+  double delta;
+  int col, i, j, d, n;
 
   // get the output encoding
   if (!(uMap = globalParams->getTextEncoding())) {
@@ -3126,15 +3505,15 @@ void TextPage::dump(void *outputStream, TextOutputFunc outputFunc,
 
     // collect the line fragments for the page and sort them
     fragsSize = 256;
-    frags = (TextLineFrag *)gmalloc(fragsSize * sizeof(TextLineFrag));
+    frags = (TextLineFrag *)gmallocn(fragsSize, sizeof(TextLineFrag));
     nFrags = 0;
     for (i = 0; i < nBlocks; ++i) {
       blk = blocks[i];
       for (line = blk->lines; line; line = line->next) {
 	if (nFrags == fragsSize) {
 	  fragsSize *= 2;
-	  frags = (TextLineFrag *)grealloc(frags,
-					   fragsSize * sizeof(TextLineFrag));
+	  frags = (TextLineFrag *)greallocn(frags,
+					    fragsSize, sizeof(TextLineFrag));
 	}
 	frags[nFrags].init(line, 0, line->len);
 	frags[nFrags].computeCoords(gTrue);
@@ -3142,6 +3521,30 @@ void TextPage::dump(void *outputStream, TextOutputFunc outputFunc,
       }
     }
     qsort(frags, nFrags, sizeof(TextLineFrag), &TextLineFrag::cmpYXPrimaryRot);
+    i = 0;
+    while (i < nFrags) {
+      delta = maxIntraLineDelta * frags[i].line->words->fontSize;
+      for (j = i+1;
+	   j < nFrags && fabs(frags[j].base - frags[i].base) < delta;
+	   ++j) ;
+      qsort(frags + i, j - i, sizeof(TextLineFrag),
+	    &TextLineFrag::cmpXYColumnPrimaryRot);
+      i = j;
+    }
+
+#if 0 // for debugging
+    printf("*** line fragments ***\n");
+    for (i = 0; i < nFrags; ++i) {
+      frag = &frags[i];
+      printf("frag: x=%.2f..%.2f y=%.2f..%.2f base=%.2f '",
+	     frag->xMin, frag->xMax, frag->yMin, frag->yMax, frag->base);
+      for (n = 0; n < frag->len; ++n) {
+	fputc(frag->line->text[frag->start + n] & 0xff, stdout);
+      }
+      printf("'\n");
+    }
+    printf("\n");
+#endif
 
     // generate output
     col = 0;
@@ -3221,7 +3624,6 @@ void TextPage::dump(void *outputStream, TextOutputFunc outputFunc,
   // end of page
   if (pageBreaks) {
     (*outputFunc)(outputStream, eop, eopLen);
-    (*outputFunc)(outputStream, eol, eolLen);
   }
 
   uMap->decRefCnt();
@@ -3423,6 +3825,7 @@ TextOutputDev::TextOutputDev(char *fileName, GBool physLayoutA,
   text = NULL;
   physLayout = physLayoutA;
   rawOrder = rawOrderA;
+  doHTML = gFalse;
   ok = gTrue;
 
   // open file
@@ -3457,6 +3860,7 @@ TextOutputDev::TextOutputDev(TextOutputFunc func, void *stream,
   needClose = gFalse;
   physLayout = physLayoutA;
   rawOrder = rawOrderA;
+  doHTML = gFalse;
   text = new TextPage(rawOrderA);
   ok = gTrue;
 }
@@ -3479,7 +3883,7 @@ void TextOutputDev::startPage(int pageNum, GfxState *state) {
 
 void TextOutputDev::endPage() {
   text->endPage();
-  text->coalesce(physLayout);
+  text->coalesce(physLayout, doHTML);
   if (outputStream) {
     text->dump(outputStream, outputFunc, physLayout);
   }
@@ -3498,17 +3902,166 @@ void TextOutputDev::endString(GfxState *state) {
 void TextOutputDev::drawChar(GfxState *state, double x, double y,
 			     double dx, double dy,
 			     double originX, double originY,
-			     CharCode c, Unicode *u, int uLen) {
-  text->addChar(state, x, y, dx, dy, c, u, uLen);
+			     CharCode c, int nBytes, Unicode *u, int uLen) {
+  text->addChar(state, x, y, dx, dy, c, nBytes, u, uLen);
+}
+
+void TextOutputDev::stroke(GfxState *state) {
+  GfxPath *path;
+  GfxSubpath *subpath;
+  double x[2], y[2];
+
+  if (!doHTML) {
+    return;
+  }
+  path = state->getPath();
+  if (path->getNumSubpaths() != 1) {
+    return;
+  }
+  subpath = path->getSubpath(0);
+  if (subpath->getNumPoints() != 2) {
+    return;
+  }
+  state->transform(subpath->getX(0), subpath->getY(0), &x[0], &y[0]);
+  state->transform(subpath->getX(1), subpath->getY(1), &x[1], &y[1]);
+
+  // look for a vertical or horizontal line
+  if (x[0] == x[1] || y[0] == y[1]) {
+    text->addUnderline(x[0], y[0], x[1], y[1]);
+  }
+}
+
+void TextOutputDev::fill(GfxState *state) {
+  GfxPath *path;
+  GfxSubpath *subpath;
+  double x[5], y[5];
+  double rx0, ry0, rx1, ry1, t;
+  int i;
+
+  if (!doHTML) {
+    return;
+  }
+  path = state->getPath();
+  if (path->getNumSubpaths() != 1) {
+    return;
+  }
+  subpath = path->getSubpath(0);
+  if (subpath->getNumPoints() != 5) {
+    return;
+  }
+  for (i = 0; i < 5; ++i) {
+    if (subpath->getCurve(i)) {
+      return;
+    }
+    state->transform(subpath->getX(i), subpath->getY(i), &x[i], &y[i]);
+  }
+
+  // look for a rectangle
+  if (x[0] == x[1] && y[1] == y[2] && x[2] == x[3] && y[3] == y[4] &&
+      x[0] == x[4] && y[0] == y[4]) {
+    rx0 = x[0];
+    ry0 = y[0];
+    rx1 = x[2];
+    ry1 = y[1];
+  } else if (y[0] == y[1] && x[1] == x[2] && y[2] == y[3] && x[3] == x[4] &&
+	     x[0] == x[4] && y[0] == y[4]) {
+    rx0 = x[0];
+    ry0 = y[0];
+    rx1 = x[1];
+    ry1 = y[2];
+  } else {
+    return;
+  }
+  if (rx1 < rx0) {
+    t = rx0;
+    rx0 = rx1;
+    rx1 = t;
+  }
+  if (ry1 < ry0) {
+    t = ry0;
+    ry0 = ry1;
+    ry1 = t;
+  }
+
+  // skinny horizontal rectangle
+  if (ry1 - ry0 < rx1 - rx0) {
+    if (ry1 - ry0 < maxUnderlineWidth) {
+      ry0 = 0.5 * (ry0 + ry1);
+      text->addUnderline(rx0, ry0, rx1, ry0);
+    }
+
+  // skinny vertical rectangle
+  } else {
+    if (rx1 - rx0 < maxUnderlineWidth) {
+      rx0 = 0.5 * (rx0 + rx1);
+      text->addUnderline(rx0, ry0, rx0, ry1);
+    }
+  }
+}
+
+void TextOutputDev::eoFill(GfxState *state) {
+  if (!doHTML) {
+    return;
+  }
+  fill(state);
+}
+
+void TextOutputDev::processLink(Link *link, Catalog *catalog) {
+  double x1, y1, x2, y2;
+  int xMin, yMin, xMax, yMax, x, y;
+
+  if (!doHTML) {
+    return;
+  }
+  link->getRect(&x1, &y1, &x2, &y2);
+  cvtUserToDev(x1, y1, &x, &y);
+  xMin = xMax = x;
+  yMin = yMax = y;
+  cvtUserToDev(x1, y2, &x, &y);
+  if (x < xMin) {
+    xMin = x;
+  } else if (x > xMax) {
+    xMax = x;
+  }
+  if (y < yMin) {
+    yMin = y;
+  } else if (y > yMax) {
+    yMax = y;
+  }
+  cvtUserToDev(x2, y1, &x, &y);
+  if (x < xMin) {
+    xMin = x;
+  } else if (x > xMax) {
+    xMax = x;
+  }
+  if (y < yMin) {
+    yMin = y;
+  } else if (y > yMax) {
+    yMax = y;
+  }
+  cvtUserToDev(x2, y2, &x, &y);
+  if (x < xMin) {
+    xMin = x;
+  } else if (x > xMax) {
+    xMax = x;
+  }
+  if (y < yMin) {
+    yMin = y;
+  } else if (y > yMax) {
+    yMax = y;
+  }
+  text->addLink(xMin, yMin, xMax, yMax, link);
 }
 
 GBool TextOutputDev::findText(Unicode *s, int len,
 			      GBool startAtTop, GBool stopAtBottom,
 			      GBool startAtLast, GBool stopAtLast,
+			      GBool caseSensitive, GBool backward,
 			      double *xMin, double *yMin,
 			      double *xMax, double *yMax) {
   return text->findText(s, len, startAtTop, stopAtBottom,
-			startAtLast, stopAtLast, xMin, yMin, xMax, yMax);
+			startAtLast, stopAtLast, caseSensitive, backward,
+			xMin, yMin, xMax, yMax);
 }
 
 GString *TextOutputDev::getText(double xMin, double yMin,
@@ -3527,3 +4080,11 @@ TextWordList *TextOutputDev::makeWordList() {
   return text->makeWordList(physLayout);
 }
 #endif
+
+TextPage *TextOutputDev::takeText() {
+  TextPage *ret;
+
+  ret = text;
+  text = new TextPage(rawOrder);
+  return ret;
+}

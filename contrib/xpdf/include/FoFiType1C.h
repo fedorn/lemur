@@ -51,6 +51,9 @@ struct Type1CTopDict {
   int paintType;
   int charstringType;
   double fontMatrix[6];
+  GBool hasFontMatrix;		// CID fonts are allowed to put their
+				//   FontMatrix in the FD instead of the
+				//   top dict
   int uniqueID;
   double fontBBox[4];
   double strokeWidth;
@@ -73,6 +76,8 @@ struct Type1CTopDict {
 #define type1CMaxStemSnap   12
 
 struct Type1CPrivateDict {
+  double fontMatrix[6];
+  GBool hasFontMatrix;
   int blueValues[type1CMaxBlueValues];
   int nBlueValues;
   int otherBlues[type1CMaxOtherBlues];
@@ -152,8 +157,9 @@ public:
   // file.  This is only useful with 8-bit fonts.  If <newEncoding> is
   // not NULL, it will be used in place of the encoding in the Type 1C
   // font.  If <ascii> is true the eexec section will be hex-encoded,
-  // otherwise it will be left as binary data.
-  void convertToType1(char **newEncoding, GBool ascii,
+  // otherwise it will be left as binary data.  If <psName> is non-NULL,
+  // it will be used as the PostScript font name.
+  void convertToType1(char *psName, char **newEncoding, GBool ascii,
 		      FoFiOutputFunc outputFunc, void *outputStream);
 
   // Convert to a Type 0 CIDFont, suitable for embedding in a
@@ -221,6 +227,7 @@ private:
   int nOps;			// number of operands
   int nHints;			// number of hints for the current glyph
   GBool firstOp;		// true if we haven't hit the first op yet
+  GBool openPath;		// true if there is an unclosed path
 };
 
 #endif

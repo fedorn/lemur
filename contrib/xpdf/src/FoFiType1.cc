@@ -75,7 +75,7 @@ char **FoFiType1::getEncoding() {
 void FoFiType1::writeEncoded(char **newEncoding,
 			     FoFiOutputFunc outputFunc, void *outputStream) {
   char buf[512];
-  char *line;
+  char *line, *line2, *p;
   int i;
 
   // copy everything up to the encoding
@@ -101,16 +101,57 @@ void FoFiType1::writeEncoded(char **newEncoding,
   }
   (*outputFunc)(outputStream, "readonly def\n", 13);
   
-  // copy everything after the encoding
+  // find the end of the encoding data
+  //~ this ought to parse PostScript tokens
   if (!strncmp(line, "/Encoding StandardEncoding def", 30)) {
     line = getNextLine(line);
   } else {
-    for (line = getNextLine(line);
-	 line && strncmp(line, "readonly def", 12);
-	 line = getNextLine(line)) ;
+    // skip "/Encoding" + one whitespace char,
+    // then look for 'def' preceded by PostScript whitespace
+    p = line + 10;
+    line = NULL;
+    for (; p < (char *)file + len; ++p) {
+      if ((*p == ' ' || *p == '\t' || *p == '\x0a' ||
+	   *p == '\x0d' || *p == '\x0c' || *p == '\0') &&
+	  p + 4 <= (char *)file + len &&
+	  !strncmp(p + 1, "def", 3)) {
+	line = p + 4;
+	break;
+      }
+    }
   }
+
+  // some fonts have two /Encoding entries in their dictionary, so we
+  // check for a second one here
   if (line) {
-    (*outputFunc)(outputStream, line, ((char *)file + len) - line);
+    for (line2 = line, i = 0;
+	 i < 20 && line2 && strncmp(line2, "/Encoding", 9);
+	 line2 = getNextLine(line2), ++i) ;
+    if (i < 20 && line2) {
+      (*outputFunc)(outputStream, line, line2 - line);
+      if (!strncmp(line2, "/Encoding StandardEncoding def", 30)) {
+	line = getNextLine(line2);
+      } else {
+	// skip "/Encoding" + one whitespace char,
+	// then look for 'def' preceded by PostScript whitespace
+	p = line2 + 10;
+	line = NULL;
+	for (; p < (char *)file + len; ++p) {
+	  if ((*p == ' ' || *p == '\t' || *p == '\x0a' ||
+	       *p == '\x0d' || *p == '\x0c' || *p == '\0') &&
+	      p + 4 <= (char *)file + len &&
+	      !strncmp(p + 1, "def", 3)) {
+	    line = p + 4;
+	    break;
+	  }
+	}
+      }
+    }
+
+    // copy everything after the encoding
+    if (line) {
+      (*outputFunc)(outputStream, line, ((char *)file + len) - line);
+    }
   }
 }
 
@@ -139,6 +180,7 @@ void FoFiType1::parse() {
   for (i = 1, line = (char *)file;
        i <= 100 && line && (!name || !encoding);
        ++i) {
+
     // get font name
     if (!name && !strncmp(line, "/FontName", 9)) {
       strncpy(buf, line, 255);
@@ -155,16 +197,13 @@ void FoFiType1::parse() {
       encoding = fofiType1StandardEncoding;
     } else if (!encoding &&
 	       !strncmp(line, "/Encoding 256 array", 19)) {
-      encoding = (char **)gmalloc(256 * sizeof(char *));
+      encoding = (char **)gmallocn(256, sizeof(char *));
       for (j = 0; j < 256; ++j) {
 	encoding[j] = NULL;
       }
-      line = getNextLine(line);
-      for (j = 0; j < 300 && line; ++j) {
-	line1 = getNextLine(line);
-
-  if (!line1) break; // 03-17-2006 - MJH - added to check.
-
+      for (j = 0, line = getNextLine(line);
+	   j < 300 && line && (line1 = getNextLine(line));
+	   ++j, line = line1) {
 	if ((n = line1 - line) > 255) {
 	  n = 255;
 	}
@@ -177,8 +216,15 @@ void FoFiType1::parse() {
 	  if (*p2) {
 	    c = *p2;
 	    *p2 = '\0';
-	    if ((code = atoi(p)) < 256) {
-	      *p2 = c;
+	    code = atoi(p);
+	    *p2 = c;
+	    if (code == 8 && *p2 == '#') {
+	      code = 0;
+	      for (++p2; *p2 >= '0' && *p2 <= '7'; ++p2) {
+		code = code * 8 + (*p2 - '0');
+	      }
+	    }
+	    if (code < 256) {
 	      for (p = p2; *p == ' ' || *p == '\t'; ++p) ;
 	      if (*p == '/') {
 		++p;
@@ -194,15 +240,12 @@ void FoFiType1::parse() {
 	    break;
 	  }
 	}
-	line = line1;
       }
       //~ check for getinterval/putinterval junk
 
     } else {
       line = getNextLine(line);
     }
-
-    ++i;
   }
 
   parsed = gTrue;

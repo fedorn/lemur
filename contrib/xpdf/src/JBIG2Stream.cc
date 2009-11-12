@@ -13,6 +13,7 @@
 #endif
 
 #include <stdlib.h>
+#include <limits.h>
 #include "GList.h"
 #include "Error.h"
 #include "JArithmeticDecoder.h"
@@ -681,7 +682,13 @@ JBIG2Bitmap::JBIG2Bitmap(Guint segNumA, int wA, int hA):
   w = wA;
   h = hA;
   line = (wA + 7) >> 3;
-  data = (Guchar *)gmalloc(h * line);
+  if (w <= 0 || h <= 0 || line <= 0 || h >= (INT_MAX - 1) / line) {
+    data = NULL;
+    return;
+  }
+  // need to allocate one extra guard byte for use in combine()
+  data = (Guchar *)gmalloc(h * line + 1);
+  data[h * line] = 0;
 }
 
 JBIG2Bitmap::JBIG2Bitmap(Guint segNumA, JBIG2Bitmap *bitmap):
@@ -690,8 +697,14 @@ JBIG2Bitmap::JBIG2Bitmap(Guint segNumA, JBIG2Bitmap *bitmap):
   w = bitmap->w;
   h = bitmap->h;
   line = bitmap->line;
-  data = (Guchar *)gmalloc(h * line);
+  if (w <= 0 || h <= 0 || line <= 0 || h >= (INT_MAX - 1) / line) {
+    data = NULL;
+    return;
+  }
+  // need to allocate one extra guard byte for use in combine()
+  data = (Guchar *)gmalloc(h * line + 1);
   memcpy(data, bitmap->data, h * line);
+  data[h * line] = 0;
 }
 
 JBIG2Bitmap::~JBIG2Bitmap() {
@@ -716,16 +729,18 @@ JBIG2Bitmap *JBIG2Bitmap::getSlice(Guint x, Guint y, Guint wA, Guint hA) {
 }
 
 void JBIG2Bitmap::expand(int newH, Guint pixel) {
-  if (newH <= h) {
+  if (newH <= h || line <= 0 || newH >= (INT_MAX - 1) / line) {
     return;
   }
-  data = (Guchar *)grealloc(data, newH * line);
+  // need to allocate one extra guard byte for use in combine()
+  data = (Guchar *)grealloc(data, newH * line + 1);
   if (pixel) {
     memset(data + h * line, 0xff, (newH - h) * line);
   } else {
     memset(data + h * line, 0x00, (newH - h) * line);
   }
   h = newH;
+  data[h * line] = 0;
 }
 
 void JBIG2Bitmap::clearToZero() {
@@ -933,6 +948,10 @@ void JBIG2Bitmap::combine(JBIG2Bitmap *bitmap, int x, int y,
       }
 
       // right-most byte
+      // note: this last byte (src1) may not actually be used, depending
+      // on the values of s1, m1, and m2 - and in fact, it may be off
+      // the edge of the source bitmap, which means we need to allocate
+      // one extra guard byte at the end of each bitmap
       dest = *destPtr;
       src0 = src1;
       src1 = *srcPtr++;
@@ -993,7 +1012,7 @@ JBIG2SymbolDict::JBIG2SymbolDict(Guint segNumA, Guint sizeA):
   JBIG2Segment(segNumA)
 {
   size = sizeA;
-  bitmaps = (JBIG2Bitmap **)gmalloc(size * sizeof(JBIG2Bitmap *));
+  bitmaps = (JBIG2Bitmap **)gmallocn(size, sizeof(JBIG2Bitmap *));
   genericRegionStats = NULL;
   refinementRegionStats = NULL;
 }
@@ -1037,7 +1056,7 @@ JBIG2PatternDict::JBIG2PatternDict(Guint segNumA, Guint sizeA):
   JBIG2Segment(segNumA)
 {
   size = sizeA;
-  bitmaps = (JBIG2Bitmap **)gmalloc(size * sizeof(JBIG2Bitmap *));
+  bitmaps = (JBIG2Bitmap **)gmallocn(size, sizeof(JBIG2Bitmap *));
 }
 
 JBIG2PatternDict::~JBIG2PatternDict() {
@@ -1080,7 +1099,7 @@ JBIG2CodeTable::~JBIG2CodeTable() {
 // JBIG2Stream
 //------------------------------------------------------------------------
 
-JBIG2Stream::JBIG2Stream(Stream *strA, Object *globalsStream):
+JBIG2Stream::JBIG2Stream(Stream *strA, Object *globalsStreamA):
   FilterStream(strA)
 {
   pageBitmap = NULL;
@@ -1105,22 +1124,15 @@ JBIG2Stream::JBIG2Stream(Stream *strA, Object *globalsStream):
   huffDecoder = new JBIG2HuffmanDecoder();
   mmrDecoder = new JBIG2MMRDecoder();
 
-  segments = globalSegments = new GList();
-  if (globalsStream->isStream()) {
-    curStr = globalsStream->getStream();
-    curStr->reset();
-    arithDecoder->setStream(curStr);
-    huffDecoder->setStream(curStr);
-    mmrDecoder->setStream(curStr);
-    readSegments();
-  }
-
-  segments = NULL;
+  globalsStreamA->copy(&globalsStream);
+  segments = globalSegments = NULL;
   curStr = NULL;
   dataPtr = dataEnd = NULL;
 }
 
 JBIG2Stream::~JBIG2Stream() {
+  close();
+  globalsStream.free();
   delete arithDecoder;
   delete genericRegionStats;
   delete refinementRegionStats;
@@ -1140,28 +1152,25 @@ JBIG2Stream::~JBIG2Stream() {
   delete iaidStats;
   delete huffDecoder;
   delete mmrDecoder;
-  if (pageBitmap) {
-    delete pageBitmap;
-  }
-  if (segments) {
-    deleteGList(segments, JBIG2Segment);
-  }
-  if (globalSegments) {
-    deleteGList(globalSegments, JBIG2Segment);
-  }
   delete str;
 }
 
 void JBIG2Stream::reset() {
-  if (pageBitmap) {
-    delete pageBitmap;
-    pageBitmap = NULL;
+  // read the globals stream
+  globalSegments = new GList();
+  if (globalsStream.isStream()) {
+    segments = globalSegments;
+    curStr = globalsStream.getStream();
+    curStr->reset();
+    arithDecoder->setStream(curStr);
+    huffDecoder->setStream(curStr);
+    mmrDecoder->setStream(curStr);
+    readSegments();
+    curStr->close();
   }
-  if (segments) {
-    deleteGList(segments, JBIG2Segment);
-  }
-  segments = new GList();
 
+  // read the main stream
+  segments = new GList();
   curStr = str;
   curStr->reset();
   arithDecoder->setStream(curStr);
@@ -1173,8 +1182,25 @@ void JBIG2Stream::reset() {
     dataPtr = pageBitmap->getDataPtr();
     dataEnd = dataPtr + pageBitmap->getDataSize();
   } else {
-    dataPtr = NULL;
+    dataPtr = dataEnd = NULL;
   }
+}
+
+void JBIG2Stream::close() {
+  if (pageBitmap) {
+    delete pageBitmap;
+    pageBitmap = NULL;
+  }
+  if (segments) {
+    deleteGList(segments, JBIG2Segment);
+    segments = NULL;
+  }
+  if (globalSegments) {
+    deleteGList(globalSegments, JBIG2Segment);
+    globalSegments = NULL;
+  }
+  dataPtr = dataEnd = NULL;
+  FilterStream::close();
 }
 
 int JBIG2Stream::getChar() {
@@ -1233,7 +1259,7 @@ void JBIG2Stream::readSegments() {
     }
 
     // referred-to segment numbers
-    refSegs = (Guint *)gmalloc(nRefSegs * sizeof(Guint));
+    refSegs = (Guint *)gmallocn(nRefSegs, sizeof(Guint));
     if (segNum <= 256) {
       for (i = 0; i < nRefSegs; ++i) {
 	if (!readUByte(&refSegs[i])) {
@@ -1273,7 +1299,9 @@ void JBIG2Stream::readSegments() {
     // read the segment data
     switch (segType) {
     case 0:
-      readSymbolDictSeg(segNum, segLength, refSegs, nRefSegs);
+      if (!readSymbolDictSeg(segNum, segLength, refSegs, nRefSegs)) {
+	goto syntaxError;
+      }
       break;
     case 4:
       readTextRegionSeg(segNum, gFalse, gFalse, segLength, refSegs, nRefSegs);
@@ -1350,14 +1378,18 @@ void JBIG2Stream::readSegments() {
 
   return;
 
+ syntaxError:
+  gfree(refSegs);
+  return;
+
  eofError2:
   gfree(refSegs);
  eofError1:
   error(getPos(), "Unexpected EOF in JBIG2 stream");
 }
 
-void JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
-				    Guint *refSegs, Guint nRefSegs) {
+GBool JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
+				     Guint *refSegs, Guint nRefSegs) {
   JBIG2SymbolDict *symbolDict;
   JBIG2HuffmanTable *huffDHTable, *huffDWTable;
   JBIG2HuffmanTable *huffBMSizeTable, *huffAggInstTable;
@@ -1451,8 +1483,11 @@ void JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
   }
 
   // get the input symbol bitmaps
-  bitmaps = (JBIG2Bitmap **)gmalloc((numInputSyms + numNewSyms) *
-				    sizeof(JBIG2Bitmap *));
+  bitmaps = (JBIG2Bitmap **)gmallocn(numInputSyms + numNewSyms,
+				     sizeof(JBIG2Bitmap *));
+  for (i = 0; i < numInputSyms + numNewSyms; ++i) {
+    bitmaps[i] = NULL;
+  }
   k = 0;
   inputSymbolDict = NULL;
   for (i = 0; i < nRefSegs; ++i) {
@@ -1527,7 +1562,7 @@ void JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
   // allocate symbol widths storage
   symWidths = NULL;
   if (huff && !refAgg) {
-    symWidths = (Guint *)gmalloc(numNewSyms * sizeof(Guint));
+    symWidths = (Guint *)gmallocn(numNewSyms, sizeof(Guint));
   }
 
   symHeight = 0;
@@ -1539,6 +1574,10 @@ void JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
       huffDecoder->decodeInt(&dh, huffDHTable);
     } else {
       arithDecoder->decodeInt(&dh, iadhStats);
+    }
+    if (dh < 0 && (Guint)-dh >= symHeight) {
+      error(getPos(), "Bad delta-height value in JBIG2 symbol dictionary");
+      goto syntaxError;
     }
     symHeight += dh;
     symWidth = 0;
@@ -1557,6 +1596,10 @@ void JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
 	if (!arithDecoder->decodeInt(&dw, iadwStats)) {
 	  break;
 	}
+      }
+      if (dw < 0 && (Guint)-dw >= symWidth) {
+	error(getPos(), "Bad delta-height value in JBIG2 symbol dictionary");
+	goto syntaxError;
       }
       symWidth += dw;
 
@@ -1690,10 +1733,23 @@ void JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
   // store the new symbol dict
   segments->append(symbolDict);
 
-  return;
+  return gTrue;
+
+ syntaxError:
+  for (i = 0; i < numNewSyms; ++i) {
+    if (bitmaps[numInputSyms + i]) {
+      delete bitmaps[numInputSyms + i];
+    }
+  }
+  gfree(bitmaps);
+  if (symWidths) {
+    gfree(symWidths);
+  }
+  return gFalse;
 
  eofError:
   error(getPos(), "Unexpected EOF in JBIG2 stream");
+  return gFalse;
 }
 
 void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
@@ -1773,11 +1829,14 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
   codeTables = new GList();
   numSyms = 0;
   for (i = 0; i < nRefSegs; ++i) {
-    seg = findSegment(refSegs[i]);
-    if (seg->getType() == jbig2SegSymbolDict) {
-      numSyms += ((JBIG2SymbolDict *)seg)->getSize();
-    } else if (seg->getType() == jbig2SegCodeTable) {
-      codeTables->append(seg);
+    if ((seg = findSegment(refSegs[i]))) {
+      if (seg->getType() == jbig2SegSymbolDict) {
+	numSyms += ((JBIG2SymbolDict *)seg)->getSize();
+      } else if (seg->getType() == jbig2SegCodeTable) {
+	codeTables->append(seg);
+      }
+    } else {
+      error(getPos(), "Invalid segment reference in JBIG2 text region");
     }
   }
   symCodeLen = 0;
@@ -1788,14 +1847,15 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
   }
 
   // get the symbol bitmaps
-  syms = (JBIG2Bitmap **)gmalloc(numSyms * sizeof(JBIG2Bitmap *));
+  syms = (JBIG2Bitmap **)gmallocn(numSyms, sizeof(JBIG2Bitmap *));
   kk = 0;
   for (i = 0; i < nRefSegs; ++i) {
-    seg = findSegment(refSegs[i]);
-    if (seg->getType() == jbig2SegSymbolDict) {
-      symbolDict = (JBIG2SymbolDict *)seg;
-      for (k = 0; k < symbolDict->getSize(); ++k) {
-	syms[kk++] = symbolDict->getBitmap(k);
+    if ((seg = findSegment(refSegs[i]))) {
+      if (seg->getType() == jbig2SegSymbolDict) {
+	symbolDict = (JBIG2SymbolDict *)seg;
+	for (k = 0; k < symbolDict->getSize(); ++k) {
+	  syms[kk++] = symbolDict->getBitmap(k);
+	}
       }
     }
   }
@@ -1888,8 +1948,8 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
     runLengthTab[35].prefixLen = 0;
     runLengthTab[35].rangeLen = jbig2HuffmanEOT;
     huffDecoder->buildTable(runLengthTab, 35);
-    symCodeTab = (JBIG2HuffmanTable *)gmalloc((numSyms + 1) *
-					      sizeof(JBIG2HuffmanTable));
+    symCodeTab = (JBIG2HuffmanTable *)gmallocn(numSyms + 1,
+					       sizeof(JBIG2HuffmanTable));
     for (i = 0; i < numSyms; ++i) {
       symCodeTab[i].val = i;
       symCodeTab[i].rangeLen = 0;
@@ -2052,85 +2112,90 @@ JBIG2Bitmap *JBIG2Stream::readTextRegion(GBool huff, GBool refine,
 	symID = arithDecoder->decodeIAID(symCodeLen, iaidStats);
       }
 
-      // get the symbol bitmap
-      symbolBitmap = NULL;
-      if (refine) {
-	if (huff) {
-	  ri = (int)huffDecoder->readBit();
-	} else {
-	  arithDecoder->decodeInt(&ri, iariStats);
-	}
+      if (symID >= (Guint)numSyms) {
+	error(getPos(), "Invalid symbol number in JBIG2 text region");
       } else {
-	ri = 0;
-      }
-      if (ri) {
-	if (huff) {
-	  huffDecoder->decodeInt(&rdw, huffRDWTable);
-	  huffDecoder->decodeInt(&rdh, huffRDHTable);
-	  huffDecoder->decodeInt(&rdx, huffRDXTable);
-	  huffDecoder->decodeInt(&rdy, huffRDYTable);
-	  huffDecoder->decodeInt(&bmSize, huffRSizeTable);
-	  huffDecoder->reset();
-	  arithDecoder->start();
-	} else {
-	  arithDecoder->decodeInt(&rdw, iardwStats);
-	  arithDecoder->decodeInt(&rdh, iardhStats);
-	  arithDecoder->decodeInt(&rdx, iardxStats);
-	  arithDecoder->decodeInt(&rdy, iardyStats);
-	}
-	refDX = ((rdw >= 0) ? rdw : rdw - 1) / 2 + rdx;
-	refDY = ((rdh >= 0) ? rdh : rdh - 1) / 2 + rdy;
 
-	symbolBitmap =
-	  readGenericRefinementRegion(rdw + syms[symID]->getWidth(),
-				      rdh + syms[symID]->getHeight(),
-				      templ, gFalse, syms[symID],
-				      refDX, refDY, atx, aty);
-	//~ do we need to use the bmSize value here (in Huffman mode)?
-      } else {
-	symbolBitmap = syms[symID];
-      }
+	// get the symbol bitmap
+	symbolBitmap = NULL;
+	if (refine) {
+	  if (huff) {
+	    ri = (int)huffDecoder->readBit();
+	  } else {
+	    arithDecoder->decodeInt(&ri, iariStats);
+	  }
+	} else {
+	  ri = 0;
+	}
+	if (ri) {
+	  if (huff) {
+	    huffDecoder->decodeInt(&rdw, huffRDWTable);
+	    huffDecoder->decodeInt(&rdh, huffRDHTable);
+	    huffDecoder->decodeInt(&rdx, huffRDXTable);
+	    huffDecoder->decodeInt(&rdy, huffRDYTable);
+	    huffDecoder->decodeInt(&bmSize, huffRSizeTable);
+	    huffDecoder->reset();
+	    arithDecoder->start();
+	  } else {
+	    arithDecoder->decodeInt(&rdw, iardwStats);
+	    arithDecoder->decodeInt(&rdh, iardhStats);
+	    arithDecoder->decodeInt(&rdx, iardxStats);
+	    arithDecoder->decodeInt(&rdy, iardyStats);
+	  }
+	  refDX = ((rdw >= 0) ? rdw : rdw - 1) / 2 + rdx;
+	  refDY = ((rdh >= 0) ? rdh : rdh - 1) / 2 + rdy;
 
-      // combine the symbol bitmap into the region bitmap
-      //~ something is wrong here - refCorner shouldn't degenerate into
-      //~   two cases
-      bw = symbolBitmap->getWidth() - 1;
-      bh = symbolBitmap->getHeight() - 1;
-      if (transposed) {
-	switch (refCorner) {
-	case 0: // bottom left
-	  bitmap->combine(symbolBitmap, tt, s, combOp);
-	  break;
-	case 1: // top left
-	  bitmap->combine(symbolBitmap, tt, s, combOp);
-	  break;
-	case 2: // bottom right
-	  bitmap->combine(symbolBitmap, tt - bw, s, combOp);
-	  break;
-	case 3: // top right
-	  bitmap->combine(symbolBitmap, tt - bw, s, combOp);
-	  break;
+	  symbolBitmap =
+	    readGenericRefinementRegion(rdw + syms[symID]->getWidth(),
+					rdh + syms[symID]->getHeight(),
+					templ, gFalse, syms[symID],
+					refDX, refDY, atx, aty);
+	  //~ do we need to use the bmSize value here (in Huffman mode)?
+	} else {
+	  symbolBitmap = syms[symID];
 	}
-	s += bh;
-      } else {
-	switch (refCorner) {
-	case 0: // bottom left
-	  bitmap->combine(symbolBitmap, s, tt - bh, combOp);
-	  break;
-	case 1: // top left
-	  bitmap->combine(symbolBitmap, s, tt, combOp);
-	  break;
-	case 2: // bottom right
-	  bitmap->combine(symbolBitmap, s, tt - bh, combOp);
-	  break;
-	case 3: // top right
-	  bitmap->combine(symbolBitmap, s, tt, combOp);
-	  break;
+
+	// combine the symbol bitmap into the region bitmap
+	//~ something is wrong here - refCorner shouldn't degenerate into
+	//~   two cases
+	bw = symbolBitmap->getWidth() - 1;
+	bh = symbolBitmap->getHeight() - 1;
+	if (transposed) {
+	  switch (refCorner) {
+	  case 0: // bottom left
+	    bitmap->combine(symbolBitmap, tt, s, combOp);
+	    break;
+	  case 1: // top left
+	    bitmap->combine(symbolBitmap, tt, s, combOp);
+	    break;
+	  case 2: // bottom right
+	    bitmap->combine(symbolBitmap, tt - bw, s, combOp);
+	    break;
+	  case 3: // top right
+	    bitmap->combine(symbolBitmap, tt - bw, s, combOp);
+	    break;
+	  }
+	  s += bh;
+	} else {
+	  switch (refCorner) {
+	  case 0: // bottom left
+	    bitmap->combine(symbolBitmap, s, tt - bh, combOp);
+	    break;
+	  case 1: // top left
+	    bitmap->combine(symbolBitmap, s, tt, combOp);
+	    break;
+	  case 2: // bottom right
+	    bitmap->combine(symbolBitmap, s, tt - bh, combOp);
+	    break;
+	  case 3: // top right
+	    bitmap->combine(symbolBitmap, s, tt, combOp);
+	    break;
+	  }
+	  s += bw;
 	}
-	s += bw;
-      }
-      if (ri) {
-	delete symbolBitmap;
+	if (ri) {
+	  delete symbolBitmap;
+	}
       }
 
       // next instance
@@ -2245,6 +2310,14 @@ void JBIG2Stream::readHalftoneRegionSeg(Guint segNum, GBool imm,
       !readUWord(&stepX) || !readUWord(&stepY)) {
     goto eofError;
   }
+  if (w == 0 || h == 0 || w >= INT_MAX / h) {
+    error(getPos(), "Bad bitmap size in JBIG2 halftone segment");
+    return;
+  }
+  if (gridH == 0 || gridW >= INT_MAX / gridH) {
+    error(getPos(), "Bad grid size in JBIG2 halftone segment");
+    return;
+  }
 
   // get pattern dictionary
   if (nRefSegs != 1) {
@@ -2286,9 +2359,9 @@ void JBIG2Stream::readHalftoneRegionSeg(Guint segNum, GBool imm,
     skipBitmap = new JBIG2Bitmap(0, gridW, gridH);
     skipBitmap->clearToZero();
     for (m = 0; m < gridH; ++m) {
-      xx = gridX + m * stepY;
-      yy = gridY + m * stepX;
       for (n = 0; n < gridW; ++n) {
+	xx = gridX + m * stepY + n * stepX;
+	yy = gridY + m * stepX - n * stepY;
 	if (((xx + (int)patW) >> 8) <= 0 || (xx >> 8) >= (int)w ||
 	    ((yy + (int)patH) >> 8) <= 0 || (yy >> 8) >= (int)h) {
 	  skipBitmap->setPixel(n, m);
@@ -2298,7 +2371,7 @@ void JBIG2Stream::readHalftoneRegionSeg(Guint segNum, GBool imm,
   }
 
   // read the gray-scale image
-  grayImg = (Guint *)gmalloc(gridW * gridH * sizeof(Guint));
+  grayImg = (Guint *)gmallocn(gridW * gridH, sizeof(Guint));
   memset(grayImg, 0, gridW * gridH * sizeof(Guint));
   atx[0] = templ <= 1 ? 3 : 2;  aty[0] = -1;
   atx[1] = -3;                  aty[1] = -1;
@@ -2335,6 +2408,9 @@ void JBIG2Stream::readHalftoneRegionSeg(Guint segNum, GBool imm,
   }
 
   gfree(grayImg);
+  if (skipBitmap) {
+    delete skipBitmap;
+  }
 
   // combine the region bitmap into the page bitmap
   if (imm) {
@@ -2451,8 +2527,8 @@ JBIG2Bitmap *JBIG2Stream::readGenericBitmap(GBool mmr, int w, int h,
   if (mmr) {
 
     mmrDecoder->reset();
-    refLine = (int *)gmalloc((w + 2) * sizeof(int));
-    codingLine = (int *)gmalloc((w + 2) * sizeof(int));
+    refLine = (int *)gmallocn(w + 2, sizeof(int));
+    codingLine = (int *)gmallocn(w + 2, sizeof(int));
     codingLine[0] = codingLine[1] = w;
 
     for (y = 0; y < h; ++y) {
@@ -3111,14 +3187,14 @@ void JBIG2Stream::readCodeTableSeg(Guint segNum, Guint length) {
   huffDecoder->reset();
   huffTabSize = 8;
   huffTab = (JBIG2HuffmanTable *)
-                gmalloc(huffTabSize * sizeof(JBIG2HuffmanTable));
+                gmallocn(huffTabSize, sizeof(JBIG2HuffmanTable));
   i = 0;
   val = lowVal;
   while (val < highVal) {
     if (i == huffTabSize) {
       huffTabSize *= 2;
       huffTab = (JBIG2HuffmanTable *)
-	            grealloc(huffTab, huffTabSize * sizeof(JBIG2HuffmanTable));
+	            greallocn(huffTab, huffTabSize, sizeof(JBIG2HuffmanTable));
     }
     huffTab[i].val = val;
     huffTab[i].prefixLen = huffDecoder->readBits(prefixBits);
@@ -3129,7 +3205,7 @@ void JBIG2Stream::readCodeTableSeg(Guint segNum, Guint length) {
   if (i + oob + 3 > huffTabSize) {
     huffTabSize = i + oob + 3;
     huffTab = (JBIG2HuffmanTable *)
-                  grealloc(huffTab, huffTabSize * sizeof(JBIG2HuffmanTable));
+                  greallocn(huffTab, huffTabSize, sizeof(JBIG2HuffmanTable));
   }
   huffTab[i].val = lowVal - 1;
   huffTab[i].prefixLen = huffDecoder->readBits(prefixBits);
@@ -3265,7 +3341,7 @@ void JBIG2Stream::resetIntStats(int symCodeLen) {
   iardwStats->reset();
   iardhStats->reset();
   iariStats->reset();
-  if (iaidStats->getContextSize() == symCodeLen + 1) {
+  if (iaidStats->getContextSize() == 1 << (symCodeLen + 1)) {
     iaidStats->reset();
   } else {
     delete iaidStats;

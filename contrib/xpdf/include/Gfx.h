@@ -25,8 +25,8 @@ namespace xpdf
 {
   class Parser;
 }
-
 class Dict;
+class Function;
 class OutputDev;
 class GfxFontDict;
 class GfxFont;
@@ -37,13 +37,16 @@ class GfxShading;
 class GfxFunctionShading;
 class GfxAxialShading;
 class GfxRadialShading;
+class GfxGouraudTriangleShading;
+class GfxPatchMeshShading;
+struct GfxPatch;
 class GfxState;
 struct GfxColor;
+class GfxColorSpace;
 class Gfx;
 class PDFRectangle;
+class AnnotBorderStyle;
 
-//------------------------------------------------------------------------
-// Gfx
 //------------------------------------------------------------------------
 
 enum GfxClipType {
@@ -64,7 +67,7 @@ enum TchkType {
   tchkNone			// used to avoid empty initializer lists
 };
 
-#define maxArgs 8
+#define maxArgs 33
 
 struct Operator {
   char name[4];
@@ -72,6 +75,8 @@ struct Operator {
   TchkType tchk[maxArgs];
   void (Gfx::*func)(Object args[], int numArgs);
 };
+
+//------------------------------------------------------------------------
 
 class GfxResources {
 public:
@@ -100,19 +105,23 @@ private:
   GfxResources *next;
 };
 
+//------------------------------------------------------------------------
+// Gfx
+//------------------------------------------------------------------------
+
 class Gfx {
 public:
 
   // Constructor for regular output.
   Gfx(XRef *xrefA, OutputDev *outA, int pageNum, Dict *resDict,
-      double hDPI, double vDPI, PDFRectangle *box, GBool crop,
+      double hDPI, double vDPI, PDFRectangle *box,
       PDFRectangle *cropBox, int rotate,
       GBool (*abortCheckCbkA)(void *data) = NULL,
       void *abortCheckCbkDataA = NULL);
 
   // Constructor for a sub-page object.
   Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict,
-      PDFRectangle *box, GBool crop, PDFRectangle *cropBox,
+      PDFRectangle *box, PDFRectangle *cropBox,
       GBool (*abortCheckCbkA)(void *data) = NULL,
       void *abortCheckCbkDataA = NULL);
 
@@ -121,16 +130,19 @@ public:
   // Interpret a stream or array of streams.
   void display(Object *obj, GBool topLevel = gTrue);
 
-  // Display an annotation, given its appearance (a Form XObject) and
-  // bounding box (in default user space).
-  void doAnnot(Object *str, double xMin, double yMin,
-	       double xMax, double yMax);
+  // Display an annotation, given its appearance (a Form XObject),
+  // border style, and bounding box (in default user space).
+  void drawAnnot(Object *str, AnnotBorderStyle *borderStyle,
+		 double xMin, double yMin, double xMax, double yMax);
 
   // Save graphics state.
   void saveState();
 
   // Restore graphics state.
   void restoreState();
+
+  // Get the current graphics state object.
+  GfxState *getState() { return state; }
 
 private:
 
@@ -174,6 +186,10 @@ private:
   void opSetMiterLimit(Object args[], int numArgs);
   void opSetLineWidth(Object args[], int numArgs);
   void opSetExtGState(Object args[], int numArgs);
+  void doSoftMask(Object *str, GBool alpha,
+		  GfxColorSpace *blendingColorSpace,
+		  GBool isolated, GBool knockout,
+		  Function *transferFunc, GfxColor *backdropColor);
   void opSetRenderingIntent(Object args[], int numArgs);
 
   // color operators
@@ -210,8 +226,11 @@ private:
   void opEOFillStroke(Object args[], int numArgs);
   void opCloseEOFillStroke(Object args[], int numArgs);
   void doPatternFill(GBool eoFill);
-  void doTilingPatternFill(GfxTilingPattern *tPat, GBool eoFill);
-  void doShadingPatternFill(GfxShadingPattern *sPat, GBool eoFill);
+  void doPatternStroke();
+  void doTilingPatternFill(GfxTilingPattern *tPat,
+			   GBool stroke, GBool eoFill);
+  void doShadingPatternFill(GfxShadingPattern *sPat,
+			    GBool stroke, GBool eoFill);
   void opShFill(Object args[], int numArgs);
   void doFunctionShFill(GfxFunctionShading *shading);
   void doFunctionShFill1(GfxFunctionShading *shading,
@@ -220,6 +239,13 @@ private:
 			 GfxColor *colors, int depth);
   void doAxialShFill(GfxAxialShading *shading);
   void doRadialShFill(GfxRadialShading *shading);
+  void doGouraudTriangleShFill(GfxGouraudTriangleShading *shading);
+  void gouraudFillTriangle(double x0, double y0, GfxColor *color0,
+			   double x1, double y1, GfxColor *color1,
+			   double x2, double y2, GfxColor *color2,
+			   int nComps, int depth);
+  void doPatchMeshShFill(GfxPatchMeshShading *shading);
+  void fillPatch(GfxPatch *patch, int nComps, int depth);
   void doEndPath();
 
   // path clipping operators
@@ -256,7 +282,12 @@ private:
   void opXObject(Object args[], int numArgs);
   void doImage(Object *ref, Stream *str, GBool inlineImg);
   void doForm(Object *str);
-  void doForm1(Object *str, Dict *resDict, double *matrix, double *bbox);
+  void doForm1(Object *str, Dict *resDict, double *matrix, double *bbox,
+	       GBool transpGroup = gFalse, GBool softMask = gFalse,
+	       GfxColorSpace *blendingColorSpace = NULL,
+	       GBool isolated = gFalse, GBool knockout = gFalse,
+	       GBool alpha = gFalse, Function *transferFunc = NULL,
+	       GfxColor *backdropColor = NULL);
 
   // in-line image operators
   void opBeginImage(Object args[], int numArgs);

@@ -16,17 +16,16 @@
 #include "Object.h"
 #include "Array.h"
 #include "Dict.h"
+#include "Decrypt.h"
 #include "Parser.h"
 #include "XRef.h"
 #include "Error.h"
-#ifndef NO_DECRYPTION
-#include "Decrypt.h"
-#endif
 
-xpdf::Parser::Parser(XRef *xrefA, Lexer *lexerA) {
+xpdf::Parser::Parser(XRef *xrefA, Lexer *lexerA, GBool allowStreamsA) {
   xref = xrefA;
   lexer = lexerA;
   inlineImg = 0;
+  allowStreams = allowStreamsA;
   lexer->getObj(&buf1);
   lexer->getObj(&buf2);
 }
@@ -37,23 +36,16 @@ xpdf::Parser::~Parser() {
   delete lexer;
 }
 
-#ifndef NO_DECRYPTION
-Object *xpdf::Parser::getObj(Object *obj,
-		       Guchar *fileKey, int keyLength,
+Object *xpdf::Parser::getObj(Object *obj, Guchar *fileKey,
+		       CryptAlgorithm encAlgorithm, int keyLength,
 		       int objNum, int objGen) {
-#else
-Object *xpdf::Parser::getObj(Object *obj) {
-#endif
   char *key;
   Stream *str;
   Object obj2;
   int num;
-#ifndef NO_DECRYPTION
-  Decrypt *decrypt;
-  GString *s;
-  char *p;
-  int i;
-#endif
+  DecryptStream *decrypt;
+  GString *s, *s2;
+  int c;
 
   // refill buffer after inline image data
   if (inlineImg == 2) {
@@ -69,11 +61,8 @@ Object *xpdf::Parser::getObj(Object *obj) {
     shift();
     obj->initArray(xref);
     while (!buf1.isCmd("]") && !buf1.isEOF())
-#ifndef NO_DECRYPTION
-      obj->arrayAdd(getObj(&obj2, fileKey, keyLength, objNum, objGen));
-#else
-      obj->arrayAdd(getObj(&obj2));
-#endif
+      obj->arrayAdd(getObj(&obj2, fileKey, encAlgorithm, keyLength,
+			   objNum, objGen));
     if (buf1.isEOF())
       error(getPos(), "End of file inside array");
     shift();
@@ -93,24 +82,18 @@ Object *xpdf::Parser::getObj(Object *obj) {
 	  gfree(key);
 	  break;
 	}
-#ifndef NO_DECRYPTION
-	obj->dictAdd(key, getObj(&obj2, fileKey, keyLength, objNum, objGen));
-#else
-	obj->dictAdd(key, getObj(&obj2));
-#endif
+	obj->dictAdd(key, getObj(&obj2, fileKey, encAlgorithm, keyLength,
+				 objNum, objGen));
       }
     }
     if (buf1.isEOF())
       error(getPos(), "End of file inside dictionary");
-    if (buf2.isCmd("stream")) {
-      if ((str = makeStream(obj))) {
+    // stream objects are not allowed inside content streams or
+    // object streams
+    if (allowStreams && buf2.isCmd("stream")) {
+      if ((str = makeStream(obj, fileKey, encAlgorithm, keyLength,
+			    objNum, objGen))) {
 	obj->initStream(str);
-#ifndef NO_DECRYPTION
-	if (fileKey) {
-	  str->getBaseStream()->doDecryption(fileKey, keyLength,
-					     objNum, objGen);
-	}
-#endif
       } else {
 	obj->free();
 	obj->initError();
@@ -131,20 +114,22 @@ Object *xpdf::Parser::getObj(Object *obj) {
       obj->initInt(num);
     }
 
-#ifndef NO_DECRYPTION
   // string
   } else if (buf1.isString() && fileKey) {
-    buf1.copy(obj);
-    s = obj->getString();
-    decrypt = new Decrypt(fileKey, keyLength, objNum, objGen);
-    for (i = 0, p = obj->getString()->getCString();
-	 i < s->getLength();
-	 ++i, ++p) {
-      *p = decrypt->decryptByte(*p);
+    s = buf1.getString();
+    s2 = new GString();
+    obj2.initNull();
+    decrypt = new DecryptStream(new MemStream(s->getCString(), 0,
+					      s->getLength(), &obj2),
+				fileKey, encAlgorithm, keyLength,
+				objNum, objGen);
+    decrypt->reset();
+    while ((c = decrypt->getChar()) != EOF) {
+      s2->append((char)c);
     }
     delete decrypt;
+    obj->initString(s2);
     shift();
-#endif
 
   // simple object
   } else {
@@ -155,8 +140,11 @@ Object *xpdf::Parser::getObj(Object *obj) {
   return obj;
 }
 
-Stream *xpdf::Parser::makeStream(Object *dict) {
+Stream *xpdf::Parser::makeStream(Object *dict, Guchar *fileKey,
+			   CryptAlgorithm encAlgorithm, int keyLength,
+			   int objNum, int objGen) {
   Object obj;
+  BaseStream *baseStr;
   Stream *str;
   Guint pos, endPos, length;
 
@@ -185,13 +173,7 @@ Stream *xpdf::Parser::makeStream(Object *dict) {
   if (!lexer->getStream()) {
     return NULL;
   }
-
-  // make base stream
-  str = lexer->getStream()->getBaseStream()->makeSubStream(pos, gTrue,
-							   length, dict);
-
-  // get filters
-  str = str->addFilters(dict);
+  baseStr = lexer->getStream()->getBaseStream();
 
   // skip over stream data
   lexer->setPos(pos + length);
@@ -203,8 +185,22 @@ Stream *xpdf::Parser::makeStream(Object *dict) {
     shift();
   } else {
     error(getPos(), "Missing 'endstream'");
-    str->ignoreLength();
+    // kludge for broken PDF files: just add 5k to the length, and
+    // hope its enough
+    length += 5000;
   }
+
+  // make base stream
+  str = baseStr->makeSubStream(pos, gTrue, length, dict);
+
+  // handle decryption
+  if (fileKey) {
+    str = new DecryptStream(str, fileKey, encAlgorithm, keyLength,
+			    objNum, objGen);
+  }
+
+  // get filters
+  str = str->addFilters(dict);
 
   return str;
 }
@@ -229,7 +225,3 @@ void xpdf::Parser::shift() {
   else
     lexer->getObj(&buf2);
 }
-
-Stream* xpdf::Parser::getStream() { return lexer->getStream(); }
-int xpdf::Parser::getPos() { return lexer->getPos(); }
-

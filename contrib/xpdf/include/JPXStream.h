@@ -19,6 +19,7 @@
 #include "Object.h"
 #include "Stream.h"
 
+class JArithmeticDecoder;
 class JArithmeticDecoderStats;
 
 //------------------------------------------------------------------------
@@ -44,18 +45,22 @@ enum JPXColorSpaceType {
   jpxCSYPbPr1250 = 24
 };
 
+struct JPXColorSpecCIELab {
+  Guint rl, ol, ra, oa, rb, ob, il;
+};
+
+struct JPXColorSpecEnumerated {
+  JPXColorSpaceType type;	// color space type
+  union {
+    JPXColorSpecCIELab cieLab;
+  };
+};
+
 struct JPXColorSpec {
   Guint meth;			// method
   int prec;			// precedence
   union {
-    struct {
-      JPXColorSpaceType type;	// color space type
-      union {
-	struct {
-	  Guint rl, ol, ra, oa, rb, ob, il;
-	} cieLab;
-      };
-    } enumerated;
+    JPXColorSpecEnumerated enumerated;
   };
 };
 
@@ -135,6 +140,8 @@ struct JPXCodeBlock {
 
   //----- coefficient data
   JPXCoeff *coeffs;		// the coefficients
+  JArithmeticDecoder		// arithmetic decoder
+    *arithDecoder;
   JArithmeticDecoderStats	// arithmetic decoder stats
     *stats;
 };
@@ -271,14 +278,18 @@ public:
   virtual ~JPXStream();
   virtual StreamKind getKind() { return strJPX; }
   virtual void reset();
+  virtual void close();
   virtual int getChar();
   virtual int lookChar();
   virtual GString *getPSFilter(int psLevel, char *indent);
   virtual GBool isBinary(GBool last = gTrue);
+  virtual void getImageParams(int *bitsPerComponent,
+			      StreamColorSpaceMode *csMode);
 
 private:
 
   void fillReadBuf();
+  void getImageParams2(int *bitsPerComponent, StreamColorSpaceMode *csMode);
   GBool readBoxes();
   GBool readColorSpecBox(Guint dataLen);
   GBool readCodestream(Guint len);
@@ -308,7 +319,8 @@ private:
   GBool readULong(Guint *x);
   GBool readNBytes(int nBytes, GBool signd, int *x);
   GBool readBits(int nBits, Guint *x);
-  void clearBitBuf();
+  void startBitBuf(Guint byteCountA);
+  Guint finishBitBuf();
 
   Guint nComps;			// number of components
   Guint *bpc;			// bits per component, for each component
@@ -329,8 +341,7 @@ private:
   int bitBufLen;		// number of bits in bitBuf
   GBool bitBufSkip;		// true if next bit should be skipped
 				//   (for bit stuffing)
-  Guint byteCount;		// number of bytes read since last call
-				//   to clearBitBuf
+  Guint byteCount;		// number of available bytes left
 
   Guint curX, curY, curComp;	// current position for lookChar/getChar
   Guint readBuf;		// read buffer

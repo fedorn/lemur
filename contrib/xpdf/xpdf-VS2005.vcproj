@@ -252,11 +252,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\gmem.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\gmempp.cc"
+				RelativePath=".\src\gmem.cc"
 				>
 			</File>
 			<File
@@ -321,6 +317,10 @@
 			</File>
 			<File
 				RelativePath=".\src\PSTokenizer.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\SecurityHandler.cc"
 				>
 			</File>
 			<File
@@ -558,6 +558,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\PreScanOutputDev.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\PSOutputDev.h"
 				>
 			</File>
@@ -567,6 +571,10 @@
 			</File>
 			<File
 				RelativePath=".\include\Stream-CCITT.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\SecurityHandler.h"
 				>
 			</File>
 			<File
