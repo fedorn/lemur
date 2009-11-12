@@ -69,6 +69,31 @@ static const char* trec_conflations[] = { "hl", NULL, NULL, "headline", "head", 
 static const char* trec_index_tags[] = { "hl", "head", "headline", "title", "ttl", "dd", "date_time", "date", 0 };
 static const char* html_exclude_tags[] = { "script", 0};
 
+struct extension_conflations {
+  const char **alternates;
+};
+
+// form is canonical extension alternate1 alternate2... NULL
+static const char* _html[] = {"html", "htm", 0};
+static const char* _txt[] =  {"txt", "text", 0};
+static const char* _doc[] =  {"doc", "docx", 0};
+
+static extension_conflations extensions[] = {
+  _html, _txt, _doc, {0}
+};
+
+static std::string _canonicalExtension (const std::string &name) {
+  std::string retval = name;
+  for (int i = 0; extensions[i].alternates; i++) {
+    for (int j = 0; extensions[i].alternates[j]; j++) {
+      if( !strcmp( name.c_str(), extensions[i].alternates[j] ) ) {
+        return extensions[i].alternates[0];
+      }
+    }
+    return name;
+  }
+}
+  
 static file_class_environment_spec environments[] = {
   {
     "html",               // name
@@ -364,9 +389,11 @@ indri::parse::FileClassEnvironment* build_file_class_environment( const indri::p
 }
 
 indri::parse::FileClassEnvironmentFactory::Specification* indri::parse::FileClassEnvironmentFactory::getFileClassSpec( const std::string& name ) {
+  std::string canonicalName = _canonicalExtension(name);
+  
   // look for a user-specified environment:
   std::map<std::string, indri::parse::FileClassEnvironmentFactory::Specification*>::iterator iter;
-  iter = _userTable.find( name );
+  iter = _userTable.find( canonicalName );
 
   if( iter != _userTable.end() ) {
     // copy and return;
@@ -377,7 +404,7 @@ indri::parse::FileClassEnvironmentFactory::Specification* indri::parse::FileClas
   // look for a default environment
   const file_class_environment_spec* spec = 0;
   for( unsigned int i=0; environments[i].name; i++ ) {
-    if( !strcmp( name.c_str(), environments[i].name ) ) {
+    if( !strcmp( canonicalName.c_str(), environments[i].name ) ) {
       spec = &environments[i];
       break;
     }
@@ -417,9 +444,11 @@ indri::parse::FileClassEnvironmentFactory::Specification* indri::parse::FileClas
 }
 
 indri::parse::FileClassEnvironment* indri::parse::FileClassEnvironmentFactory::get( const std::string& name ) {
+  std::string canonicalName = _canonicalExtension(name);
+  
   // look for a user-specified environment:
   std::map<std::string, indri::parse::FileClassEnvironmentFactory::Specification*>::iterator iter;
-  iter = _userTable.find( name );
+  iter = _userTable.find( canonicalName );
 
   if( iter != _userTable.end() ) {
     return build_file_class_environment( iter->second );
@@ -429,7 +458,7 @@ indri::parse::FileClassEnvironment* indri::parse::FileClassEnvironmentFactory::g
   const file_class_environment_spec* spec = 0;
 
   for( unsigned int i=0; environments[i].name; i++ ) {
-    if( !strcmp( name.c_str(), environments[i].name ) ) {
+    if( !strcmp( canonicalName.c_str(), environments[i].name ) ) {
       spec = &environments[i];
       break;
     }
