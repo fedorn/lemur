@@ -90,8 +90,8 @@ static std::string _canonicalExtension (const std::string &name) {
         return extensions[i].alternates[0];
       }
     }
-    return name;
   }
+  return name;
 }
   
 static file_class_environment_spec environments[] = {
