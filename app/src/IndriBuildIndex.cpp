@@ -265,6 +265,61 @@ is reached for a wildcard term, an exception will be thrown. If this parameter
 is not specified, a default of 100 will be used.
 </dd>
 </dl>
+<H4>Baseline (non-LM) retrieval</H4>
+<dl>
+<dt>baseline</dt>
+<dd>Specifies the baseline (non-language modeling) retrieval method to
+apply. This enables running baseline experiments on collections too large
+for the Lemur RetMethod API. When running a baseline experiment, the queries
+may not contain any indri query language operators, they must contain only
+terms.
+
+<p>Format of the parameter value:<br>
+
+<tt>   (tfidf|okapi) [ "," key ":" value ]* </tt>
+<p>
+Here's an example rule in command line format:<br>
+
+   <tt>-baseline=tfidf,k1:1.0,b:0.3</tt>
+<p> and in parameter file format:<br>
+<tt>
+&lt;baseline&gt;tfidf,k1:1.0,b:0.3&lt;/baseline&gt;
+</tt>
+
+<p>Methods:
+<dl>
+
+<dt>   tfidf</dt>
+
+<dd> Performs retrieval via tf.idf scoring as implemented in 
+lemur::retrieval::TFIDFRetMethod using BM25TF term weighting. 
+Pseudo-relevance feedback may be performed via the parameters below.
+<p>
+<p>Parameters (optional):
+<dl>
+<dt>   k1</dt><dd>k1 parameter for term  weight (default 1.2)</dd>
+<dt>   b</dt><dd>b parameter for term weight (default 0.75)</dd>
+</dd>
+</dl>
+</dd>
+
+<dt>   okapi</dt>
+
+<dd> Performs retrieval via Okapi scoring as implemented in 
+lemur::retrieval::OkapiRetMethod. Pseudo-relevance feedback may 
+<bold>not</bold> be performed with this baseline method.
+<p>
+<p>Parameters (optional):
+<dl>
+<dt>   k1</dt><dd>k1 parameter for term  weight (default 1.2)</dd>
+<dt>   b</dt><dd>b parameter for term weight (default 0.75)</dd>
+<dt>   k3</dt><dd>k3 parameter for query term  weight (default 7) </dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
 <H4>Formatting Parameters</H4>
 <dl>
 <dt>queryOffset</dt>
