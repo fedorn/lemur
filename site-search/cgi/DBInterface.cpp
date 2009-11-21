@@ -563,13 +563,18 @@ void DBInterface::search(int datasourceID, string &query, long listLength, long 
     // get the environment and add our index
     indriEnvironment=new indri::api::QueryEnvironment();
     // if we have a queryserver host - use that instead...
-    std::string getQueryHost=CGIConfiguration::getInstance().getQueryHost(pathToIndex);
-    if (getQueryHost=="") {
+    //std::cout << "Path: " << pathToIndex << std::endl;
+    //std::cout << "Query Host: " << CGIConfiguration::getInstance().getQueryHost(pathToIndex) << std::endl;
+    vector<string> thisQueryHostVec=CGIConfiguration::getInstance().getQueryHostVec(pathToIndex);
+    if (thisQueryHostVec.size()==0) {
       indriEnvironment->addIndex(pathToIndex.c_str());
     } else {
-      indriEnvironment->addServer(getQueryHost);
+      for (vector<string>::iterator vIter=thisQueryHostVec.begin(); vIter!=thisQueryHostVec.end(); vIter++) {
+        indriEnvironment->addServer(*vIter);
+      }
     }
   } // end if (indriTestIndexCast)
+
 
   Stopper* stopper = NULL;
   Stemmer* stemmer = getDbStemmer(db);
@@ -577,7 +582,7 @@ void DBInterface::search(int datasourceID, string &query, long listLength, long 
   const lemur::parse::BasicCollectionProps* props = dynamic_cast<const lemur::parse::BasicCollectionProps*> (db->collectionProps());
 
   // create the results vector
-  IndexedRealVector results(db->docCount());
+  IndexedRealVector results(50000);
 
   if (props) {
     const lemur::parse::Property* p = NULL;

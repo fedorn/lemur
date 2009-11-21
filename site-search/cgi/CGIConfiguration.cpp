@@ -1,5 +1,7 @@
 #include "CGIConfiguration.h"
 
+#include <sstream>
+
 using namespace indri::xml;
 
 CGIConfiguration *CGIConfiguration::_instance=0;
@@ -97,9 +99,14 @@ bool CGIConfiguration::readConfigFile(char *filePath) {
           newIndex->path=indexPathNode->getValue();
           if (descriptionNode) newIndex->name=descriptionNode->getValue();
           if (queryHostNode) { 
-            newIndex->queryHost=queryHostNode->getValue();
+            // newIndex->queryHost=queryHostNode->getValue();
+            std::stringstream ss(std::string(queryHostNode->getValue()));
+            std::string item;
+            while(std::getline(ss, item, ';')) {
+              newIndex->queryHostVec.push_back(item);
+            }
           } else {
-            newIndex->queryHost="";
+            // newIndex->queryHost="";
           }
           indices.push_back(newIndex);
         }
@@ -129,7 +136,7 @@ string CGIConfiguration::getRootPath(int whichPath) {
   if ((whichPath > -1) && (whichPath < currentRootPathSize)) {
     return rootPaths[whichPath];
   }
-  return "";
+  return string("");
 }
 
 string CGIConfiguration::getRootAddPath() {
@@ -144,23 +151,26 @@ string CGIConfiguration::getIndexPath(int whichIndex) {
   if ((whichIndex > -1) && (whichIndex < currentIndicesSize)) {
     return indices[whichIndex]->path;
   }
-  return "";
+  return string("");
 }
 
-string CGIConfiguration::getQueryHost(string indexPath) {
+vector<string> CGIConfiguration::getQueryHostVec(const string &indexPath) {
+  vector<string> retVec;
+
   for (int i=0; i < currentIndicesSize; i++) {
     if (indices[i]->path==indexPath) {
-      return indices[i]->queryHost;
+      return indices[i]->queryHostVec;
     }
   }
-  return "";
+
+  return retVec;
 }
 
 string CGIConfiguration::getIndexDescription(int whichIndex) {
   if ((whichIndex > -1) && (whichIndex < currentIndicesSize)) {
     return indices[whichIndex]->name;
   }
-  return "";
+  return string("");
 }
 
 void CGIConfiguration::putKVItem(string _key, string _value) {

@@ -73,6 +73,8 @@ protected:
   /** dictionary hash for any values we may want to temporarily store **/
   DictionaryHash  _kvPairs;
 
+  vector<string> _queryHostVector;
+
   /** support page rank as a prior **/
   bool supportPageRank;
 
@@ -175,7 +177,8 @@ public:
    */
   string getIndexPath(int whichIndex);
 
-  string getQueryHost(string indexPath);
+  // string getQueryHost(const string &indexPath);
+  vector<string> getQueryHostVec(const string &indexPath);
 
   /**
    * Retrieves a description tag for an index

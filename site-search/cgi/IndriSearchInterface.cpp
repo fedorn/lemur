@@ -102,8 +102,11 @@ string IndriSearchInterface::stripHtmlTags(string inputString) {
   string::size_type lastPos=0;
 
   while ((oPos!=string::npos) && (cPos!=string::npos)) {
-    retString.append(inputString.substr(lastPos, oPos-lastPos));
-    retString.append(" ");
+    int len=oPos-lastPos;
+    if (len > 0) {
+      retString.append(inputString.substr(lastPos, oPos-lastPos));
+      retString.append(" ");
+    }
     lastPos=cPos+1;
     oPos=inputString.find("<", cPos);
     cPos=inputString.find(">", oPos);
@@ -121,9 +124,12 @@ std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api:
                                                       string docext) {
 
   std::vector<lemur::api::DOCID_T> docIDVec;
-  int thisDocID=db->document(docext);
-  docIDVec.push_back(thisDocID);
-  std::vector< indri::api::ParsedDocument*> dVec=queryEnvironment->documents(docIDVec);
+  // int thisDocID=db->document(docext);
+  // docIDVec.push_back(thisDocID);
+  std::vector<indri::api::ScoredExtentResult> resVec;
+  resVec.push_back(result);
+  // std::vector< indri::api::ParsedDocument*> dVec=queryEnvironment->documents(docIDVec);
+  std::vector< indri::api::ParsedDocument*> dVec=queryEnvironment->documents(resVec);
   if (dVec.size()==0) return "...";
   indri::utility::greedy_vector<indri::parse::TermExtent> termPositions=dVec[0]->positions;
 
@@ -227,12 +233,18 @@ std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api:
     for (int j=0; j < thisSegment.internalPositions.size(); j++) {
       int beginMatch=thisSegment.internalPositions[j].begin;
       int endMatch=thisSegment.internalPositions[j].end;
+      int tPos=termPositions[beginMatch].begin-currentByte;
+      int ePos=termPositions[endMatch-1].end-termPositions[beginMatch].begin;
 
-      outString << stripHtmlTags(fullDocText.substr(currentByte, termPositions[beginMatch].begin-currentByte)) << "<strong>";
-      outString << stripHtmlTags(fullDocText.substr(termPositions[beginMatch].begin, termPositions[endMatch-1].end-termPositions[beginMatch].begin)) << "</strong>";
+      if ((tPos > 0) && (ePos > tPos)) {
+        outString << stripHtmlTags(fullDocText.substr(currentByte, termPositions[beginMatch].begin-currentByte)) << "<strong>";
+        outString << stripHtmlTags(fullDocText.substr(termPositions[beginMatch].begin, termPositions[endMatch-1].end-termPositions[beginMatch].begin)) << "</strong>";
+      }
       currentByte=termPositions[endMatch-1].end;
     }
-    outString << stripHtmlTags(fullDocText.substr(currentByte, endByte-currentByte));
+    if ((currentByte < fullDocText.length()) && ((endByte-currentByte) > 0)) {
+      outString << stripHtmlTags(fullDocText.substr(currentByte, endByte-currentByte));
+    }
 
     if (end < (result.end-1)) {
       outString << "<strong>...</strong> ";
@@ -943,14 +955,20 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
       docIDVec.clear(); // just to make sure...
       docIDVec.push_back(thisResult.document);
 
+      // get the URL for this result
+      std::vector< std::string > urlStrings=queryEnvironment->documentMetadata(docIDVec, "url");
+      if (urlStrings.size() > 0) {
+        thisURL=(*(urlStrings.begin()));
+      } else {
+        thisURL=docext;
+      }
       // get a title field (if any)
       std::vector< std::string > titleStrings=queryEnvironment->documentMetadata(docIDVec, "title");
       if (titleStrings.size() > 0) {
         thisTitle=(*(titleStrings.begin()));
+      } else {
+        thisTitle=thisURL;
       }
-
-      thisURL=docext;
-
       // should we strip the root path?
       if ((CGIConfiguration::getInstance().getStripRootPathFlag()) && (thisURL.find(dataRoot)==0)) {
         // remove the data root from the docext path...
@@ -960,6 +978,8 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults, int i
       // depending on if we have a title and/or URL, decide how we want to display it
       if ((thisTitle.length() > 0) && (thisURL.length() > 0)) {
         output->writeSearchResult(thisURL, docext, thisTitle, buf, thisResult.score, indexID, thisResult.document);
+      } else if (thisURL.length() > 0) {
+        output->writeSearchResult(thisURL, docext, thisURL, buf, thisResult.score, indexID, thisResult.document);
       } else if (thisTitle.length() > 0) {
         output->writeSearchResult("", docext, thisTitle, buf, thisResult.score, indexID, thisResult.document);
       } else {

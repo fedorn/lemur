@@ -511,6 +511,7 @@ bool CGIOutput::writeSearchResult(string resultURL, string origURL, string resul
   SingleResultItem thisItem(resultItemTemplate);
 
   thisItem.setVariable("URL", resultURL);
+  thisItem.setVariable("origURL", origURL);
   thisItem.setVariable("title", resultTitle);
   thisItem.setVariable("summary", resultSummary);
   stringstream sScore;
@@ -548,10 +549,6 @@ bool CGIOutput::writeSearchResult(string resultURL, string origURL, string resul
       tCopy.erase(0, dRootString.length());
       thisItem.setVariable("title", tCopy);
     }
-
-  } else {
-    thisItem.setVariable("URL", "");
-    thisItem.setVariable("origURL", origURL);
   }
 
   cout << "<li>" << thisItem.toString() << "</li>\n";

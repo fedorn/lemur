@@ -1,6 +1,9 @@
 #ifndef _LEMUR_SEARCH_CGI_CONSTANTS_H
 #define _LEMUR_SEARCH_CGI_CONSTANTS_H
 
+#include <vector>
+#include <string>
+
 /**
  * Structure to hold our index items
  */
@@ -10,7 +13,7 @@ typedef struct {
   /** the description of the index */
   string name;
   /** the query host (if there is one) */
-  string queryHost;
+  std::vector<std::string> queryHostVec;
 } db_t;
 
 /** 

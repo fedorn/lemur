@@ -388,7 +388,12 @@ int main (int argc, char **argv) {
 
   // right off the bat - get the request method and our pathf
 #ifndef OFFLINEDEBUGGING
-  string cgi_request_method(getenv("REQUEST_METHOD"));
+  string cgi_request_method;
+  if (getenv("REQUEST_METHOD")==NULL) {
+    cgi_request_method="GET";
+  } else {
+    cgi_request_method=getenv("REQUEST_METHOD");
+  }
 #else
   string cgi_request_method("GET");
 #endif
