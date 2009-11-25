@@ -163,7 +163,7 @@ void lemur::parse::ArabicParser::doParse() {
     case CONTRACTION:
       if (state == TEXT) {
 	// strip suffix and convert to lowercase
-	char * c;
+	char * c, *tmpc;
 	int len = 0, diff;      
 	for (c = Arabictext; *c != '\''; c++, len++)
 	  *(c) = tolower(*c);	
@@ -173,6 +173,8 @@ void lemur::parse::ArabicParser::doParse() {
 	if (textHandler != NULL) textHandler->foundWord(Arabictext);
 	arabicpos += diff;
 	c++;
+	for (tmpc = c; *tmpc != '\0'; tmpc++)
+	  *(tmpc) = tolower(*tmpc);	
 	if (textHandler != NULL) textHandler->foundWord(c);
       }
       break;

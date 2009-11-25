@@ -159,7 +159,7 @@ void lemur::parse::ReutersParser::doParse() {
     case CONTRACTION:
       if (state == TEXT) {
 	// strip suffix and convert to lowercase
-	char * c;
+	char * c, *tmpc;
 	int len = 0, diff;
 	for (c = reuterstext; *c != '\''; c++, len++)
 	  *(c) = tolower(*c);	
@@ -169,6 +169,8 @@ void lemur::parse::ReutersParser::doParse() {
 	if (textHandler != NULL) textHandler->foundWord(reuterstext);
 	reuterspos += diff;
 	c++;
+	for (tmpc = c; *tmpc != '\0'; tmpc++)
+	  *(tmpc) = tolower(*tmpc);	
 	if (textHandler != NULL) textHandler->foundWord(c);
       }
       break;

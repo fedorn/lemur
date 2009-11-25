@@ -280,7 +280,7 @@ void lemur::parse::WebParser::doParse() {
     case CONTRACTION:
       if (state == DOC) {
         // strip the suffx, put the word in lowercase, pass it on
-	char * c;
+	char * c, *tmpc;
 	int len = 0, diff;
 	for (c = webtext; *c != '\''; c++, len++)
 	  *(c) = tolower(*c);	
@@ -290,6 +290,8 @@ void lemur::parse::WebParser::doParse() {
 	if (textHandler != NULL) textHandler->foundWord(webtext);
 	webloc += diff;
 	c++;
+	for (tmpc = c; *tmpc != '\0'; tmpc++)
+	  *(tmpc) = tolower(*tmpc);	
 	if (textHandler != NULL) textHandler->foundWord(c);
       }
       break;
