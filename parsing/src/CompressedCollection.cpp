@@ -362,6 +362,9 @@ void indri::collection::CompressedCollection::create( const std::string& fileNam
   _output = new indri::file::SequentialWriteBuffer( _storage, 1024*1024 );
 
   indri::api::Parameters manifest;
+
+  manifest.set( "storeDocs", _storeDocs );
+  
   indri::api::Parameters forwardParameters = manifest.append( "forward" );
 
   for( size_t i=0; i<forwardIndexedFields.size(); i++ ) {
@@ -418,6 +421,7 @@ void indri::collection::CompressedCollection::open( const std::string& fileName 
   _lookup.open( lookupName );
   _output = new indri::file::SequentialWriteBuffer( _storage, 1024*1024 );
 
+  _storeDocs = manifest.get( "storeDocs", true );
   if( manifest.exists("forward.field") ) {
     indri::api::Parameters forward = manifest["forward.field"];
 
@@ -434,7 +438,7 @@ void indri::collection::CompressedCollection::open( const std::string& fileName 
       _forwardLookups.insert( key, metalookup );
     }
   }
-
+  
   indri::api::Parameters reverse = manifest["reverse"];
 
   if( manifest.exists("reverse.field") ) {
