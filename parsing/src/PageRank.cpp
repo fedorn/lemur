@@ -540,7 +540,7 @@ void indri::parse::PageRank::indexPageRank( const std::string& outputFile,
           // avoid creating NaNs/inf
           pr += prTable[link]/(outlinksTable[link] ? outlinksTable[link] : 1.0);
         }
-        prTable[docid] = (1.0 - _c) + _c * pr;
+        prTable[docid] = ((1.0 - _c)/(double)_colLen) + _c * pr;
         delete linkdocs;
       }
     }
