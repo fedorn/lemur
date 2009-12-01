@@ -37,7 +37,7 @@ in the parameter file and as
 <dt>index</dt>
 <dd>index to use to get the collection size and internal document ids.
 Default is none. When none the corpus is scanned to count the number 
-of documents and the string document ids are used.</d>
+of documents and the string document ids are used.</dd>
 <dt>docs</dt>
 <dd>Number of documents to process per iteration. Default 1000. This
 parameter is ignored if an index parameter is provided, all docs

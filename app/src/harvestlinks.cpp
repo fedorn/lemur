@@ -56,7 +56,7 @@ This will allow you to perform retrieval tasks on the anchor text.
   corpus files you're trying to index
 </li>
 <li>
-  <b>class: (<i>optionl</i>)</b> The file class of the corpus. One of trecweb (the default) or warc.
+  <b>class: (<i>optional</i>)</b> The file class of the corpus. One of trecweb (the default) or warc.
 </li>
 <li>
   <b>output: (<i>required</i>)</b> The path to a directory where the link
@@ -77,20 +77,20 @@ This will allow you to perform retrieval tasks on the anchor text.
   than 8 max.)
 </li>
 <li>
-  <b>delete</b>: set to 0 to not delete any existing directories
-  in the output directory (default 1: do delete)
+  <b>delete</b>: set to false to not delete any existing directories
+  in the output directory (default true: do delete)
 </li>
 <li>
-  <b>harvest</b>: perform the harvesting step (default 1, set to 0 to skip)
+  <b>harvest</b>: perform the harvesting step (default true, set to false to skip)
 </li>
 <li>
-  <b>sort</b>: perform the sorting/merge step (default 1, set to 0 to skip)
+  <b>sort</b>: perform the sorting/merge step (default true, set to false to skip)
 </li>
 <li>
-  <b>clean</b>: perform cleaning of temporary files after sort (default 1, set to 0 to skip)
+  <b>clean</b>: perform cleaning of temporary files after sort (default true, set to false to skip)
 </li>
 <li>
-  <b>combine</b>: perfom final combination of links (default 1, set to 0 to skip)
+  <b>combine</b>: perfom final combination of links (default true, set to false to skip)
 </li>
 
 </ul>
