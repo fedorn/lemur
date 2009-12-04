@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include\win32&quot;;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Program Files\Java\jdk1.6.0_17\include&quot;;&quot;C:\Program Files\Java\jdk1.6.0_17\include\win32&quot;;..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include\win32&quot;;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LEMUR_JNI_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -100,86 +100,6 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
-			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="3"
-				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include\win32&quot;;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LEMUR_JNI_EXPORTS"
-				RuntimeLibrary="2"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="1"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib"
-				OutputFile="$(OutDir)/lemur_jni.dll"
-				LinkIncremental="1"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/lemur_jni.lib"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
@@ -206,7 +126,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include\win32&quot;;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include&quot;"
+				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;&quot;C:\Program Files\Java\jdk1.6.0_17\include&quot;;&quot;C:\Program Files\Java\jdk1.6.0_17\include\win32&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LEMUR_JNI_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -261,6 +181,86 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="Release"
+			IntermediateDirectory="Release"
+			ConfigurationType="2"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="&quot;C:\Program Files\Java\jdk1.6.0_17\include&quot;;&quot;C:\Program Files\Java\jdk1.6.0_17\include\win32&quot;;..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include\win32&quot;;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LEMUR_JNI_EXPORTS"
+				RuntimeLibrary="2"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="1"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="wsock32.lib"
+				OutputFile="$(OutDir)/lemur_jni.dll"
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				ImportLibrary="$(OutDir)/lemur_jni.lib"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
@@ -288,7 +288,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include\win32&quot;;&quot;C:\Program Files (x86)\Java\jdk1.6.0_13\include&quot;"
+				AdditionalIncludeDirectories="..\..\utility\include;..\..\retrieval\include;..\..\parsing\include;..\..\langmod\include;..\..\index\include;&quot;C:\Program Files\Java\jdk1.6.0_17\include&quot;;&quot;C:\Program Files\Java\jdk1.6.0_17\include\win32&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LEMUR_JNI_EXPORTS"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
