@@ -246,9 +246,11 @@ void indri::parse::WordDocumentExtractor::open( const std::string& filename ) {
 
   _unparsedDocument.metadata.clear();
 
+  _docnostring.assign(_documentPath.c_str() );
+  cleanDocno();
+  pair.value = _docnostring.c_str();
+  pair.valueLength = _docnostring.length()+1;
   pair.key = "docno";
-  pair.value = _documentPath.c_str();
-  pair.valueLength = _documentPath.length()+1;
   _unparsedDocument.metadata.push_back( pair );
 
   pair.key = "path";

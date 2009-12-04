@@ -206,9 +206,11 @@ indri::parse::UnparsedDocument* indri::parse::MboxDocumentIterator::nextDocument
   // copy subject into docno
   for( size_t i=0; i<_document.metadata.size(); i++ ) {
     if( !strcmp( "subject", _document.metadata[i].key ) ) {
+      _docnostring.assign((char *)_document.metadata[i].value );
+      cleanDocno();
+      pair.value = _docnostring.c_str();
+      pair.valueLength = _docnostring.length()+1;
       pair.key = "docno";
-      pair.value = _document.metadata[i].value;
-      pair.valueLength = _document.metadata[i].valueLength;
       _document.metadata.push_back( pair );
       break;
     }

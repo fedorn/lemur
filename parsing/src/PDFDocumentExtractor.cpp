@@ -201,9 +201,11 @@ indri::parse::UnparsedDocument* indri::parse::PDFDocumentExtractor::nextDocument
   pair.valueLength = _documentPath.length()+1;
   _unparsedDocument.metadata.push_back( pair );
 
+  _docnostring.assign(_documentPath.c_str() );
+  cleanDocno();
+  pair.value = _docnostring.c_str();
+  pair.valueLength = _docnostring.length()+1;
   pair.key = "docno";
-  pair.value = docnoPoint;
-  pair.valueLength = _documentPath.length()+1;
   _unparsedDocument.metadata.push_back( pair );
 
   _documentPath = "";

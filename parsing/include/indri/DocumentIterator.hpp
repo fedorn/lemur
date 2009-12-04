@@ -22,12 +22,15 @@
 #include "indri/ObjectHandler.hpp"
 #include "indri/UnparsedDocument.hpp"
 #include <string>
+#include <ctype.h>
 namespace indri
 {
   namespace parse
   {
     
     class DocumentIterator {
+    protected:
+      std::string _docnostring;
     public:
       virtual ~DocumentIterator() {};
 
@@ -35,6 +38,15 @@ namespace indri
 
       virtual void open( const std::string& filename ) = 0;
       virtual void close() = 0;
+      // replace spaces with '_' in docno element value.
+      void cleanDocno() {
+        char *docno = (char *)_docnostring.c_str();
+        while ( *docno ) {
+          if ( isspace(*docno) )
+            *docno = '_';
+          docno++;
+        }
+      }
     };
   }
 }
