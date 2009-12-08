@@ -67,7 +67,7 @@ static const char* trecalt_index_tags[] = { "text", 0 };
 static const char* trec_metadata_tags[] = { "docno", "title", 0 };
 static const char* trec_conflations[] = { "hl", NULL, NULL, "headline", "head", NULL, NULL, "headline", "ttl", NULL, NULL, "title", "dd", NULL, NULL, "date", "date_time", NULL, NULL, "date", 0, 0, 0, 0 };
 static const char* trec_index_tags[] = { "hl", "head", "headline", "title", "ttl", "dd", "date_time", "date", 0 };
-static const char* html_exclude_tags[] = { "script", 0};
+static const char* html_exclude_tags[] = { "script", "style", 0};
 
 struct extension_conflations {
   const char **alternates;
