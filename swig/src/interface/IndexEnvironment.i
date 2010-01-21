@@ -244,6 +244,37 @@ public";
 #endif
 
       void setNumericField( const std::string& fieldName, bool isNumeric, const std::string & parserName="" ) throw (lemur::api::Exception);
+
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+       Set the ordinal property of a field. If child, parent, or
+       ancestor field queries are slow, you may want to be certain to index
+       the specified fields explicitly as an ordinal. This speeds
+       things up at the cost of a minimal amount of disk space.
+       @param fieldName the field.
+       @param isOrdinal true if the field is an ordinal field, false if not.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
+      void setOrdinalField( const std::string& fieldName, bool isOrdinal ) throw (lemur::api::Exception);
+
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+       Set the parental property of a field. If child, parent, or
+       ancestor field queries are slow, you may want to be certain to index
+       the specified fields explicitly as an ordinal. This speeds
+       things up at the cost of a minimal amount of disk space.
+       @param fieldName the field.
+       @param isParental true if the field is a parental field, false if not.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
+      void setParentalField( const std::string& fieldName, bool isParental ) throw (lemur::api::Exception);
+
 #ifdef SWIGJAVA
       %javamethodmodifiers  "
 /**
@@ -391,9 +422,30 @@ public";
 */
 public";
 #endif
-
-
       int addString( const std::string& fileName, const std::string& fileClass, const std::vector<indri::parse::MetadataPair>& metadata ) throw (lemur::api::Exception);
+
+#ifdef SWIGJAVA
+      %javamethodmodifiers  "
+/**
+       Adds a string to the index and repository.  The documentString is assumed to contain the kind of
+       text that would be found in a file of type fileClass.
+       @param documentString the document string to add.
+       @param fileClass the file class, signaling which parser to use while processing the document string.
+       @param metadata a map of metadata String name to String value.
+       @param tags offset annotations to be indexed as field data. The
+       begin and end values of each TagExtent specify <b>byte</b> (not
+       character or token) offsets within the document string. These
+       byte offsets are converted to token offsets after document
+       string parsing.
+       @throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public";
+#endif
+#ifdef SWIGJAVA
+// only for UIMA indexing for now
+int addString( const std::string& documentString, const std::string&
+fileClass, const std::vector<indri::parse::MetadataPair>& metadata, const std::vector<indri::parse::TagExtent *> &tags ) throw (lemur::api::Exception);
+#endif
 #ifdef SWIGJAVA
       %javamethodmodifiers  "
 /**
@@ -402,12 +454,6 @@ public";
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
 public";
-#endif
-
-#ifdef SWIGJAVA
-// only for UIMA indexing for now
-int addString( const std::string& documentString, const std::string&
-fileClass, const std::vector<indri::parse::MetadataPair>& metadata, const std::vector<indri::parse::TagExtent *> &tags ) throw (lemur::api::Exception);
 #endif
 
       int addParsedDocument( indri::api::ParsedDocument* document ) throw (lemur::api::Exception);

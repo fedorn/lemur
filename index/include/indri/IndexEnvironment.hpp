@@ -258,6 +258,16 @@ namespace indri
                      const std::string& fileClass, 
                      const std::vector<indri::parse::MetadataPair>& metadata );
 
+      /// Adds a string to the index and repository.  The documentString is assumed to contain the kind of
+      /// text that would be found in a file of type fileClass.
+      /// @param documentString the document to add
+      /// @param fileClass the file class to add (eg trecweb).
+      /// @param metadata the metadata pairs associated with the string.
+      /// @param tags offset annotations to be indexed as field
+      /// data. The begin and end values of each TagExtent should
+      /// specify byte (not character or token) offsets within the
+      /// document string. These byte offsets are converted to token
+      /// offsets after document string parsing.
       lemur::api::DOCID_T addString( const std::string& documentString, 
                      const std::string& fileClass, 
                      const std::vector<indri::parse::MetadataPair>& metadata, 

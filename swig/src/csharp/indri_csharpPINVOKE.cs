@@ -1748,6 +1748,12 @@ class indri_csharpPINVOKE {
   [DllImport("lemur_csharp", EntryPoint="CSharp_IndexEnvironment_setNumericField__SWIG_1")]
   public static extern void IndexEnvironment_setNumericField__SWIG_1(HandleRef jarg1, string jarg2, bool jarg3);
 
+  [DllImport("lemur_csharp", EntryPoint="CSharp_IndexEnvironment_setOrdinalField")]
+  public static extern void IndexEnvironment_setOrdinalField(HandleRef jarg1, string jarg2, bool jarg3);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_IndexEnvironment_setParentalField")]
+  public static extern void IndexEnvironment_setParentalField(HandleRef jarg1, string jarg2, bool jarg3);
+
   [DllImport("lemur_csharp", EntryPoint="CSharp_IndexEnvironment_setMetadataIndexedFields")]
   public static extern void IndexEnvironment_setMetadataIndexedFields(HandleRef jarg1, HandleRef jarg2, HandleRef jarg3);
 

@@ -10361,6 +10361,54 @@ SWIGEXPORT void SWIGSTDCALL CSharp_IndexEnvironment_setNumericField__SWIG_1(void
 }
 
 
+SWIGEXPORT void SWIGSTDCALL CSharp_IndexEnvironment_setOrdinalField(void * jarg1, char * jarg2, unsigned int jarg3) {
+  indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  bool arg3 ;
+  
+  arg1 = (indri::api::IndexEnvironment *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  arg3 = jarg3 ? true : false; 
+  try {
+    (arg1)->setOrdinalField((std::string const &)*arg2,arg3);
+  }
+  catch(lemur::api::Exception &_e) {
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, ("C++ #lemur::api::Exception exception: " + (&_e)->what()).c_str());
+    return ; 
+  }
+  
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_IndexEnvironment_setParentalField(void * jarg1, char * jarg2, unsigned int jarg3) {
+  indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  bool arg3 ;
+  
+  arg1 = (indri::api::IndexEnvironment *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  arg3 = jarg3 ? true : false; 
+  try {
+    (arg1)->setParentalField((std::string const &)*arg2,arg3);
+  }
+  catch(lemur::api::Exception &_e) {
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, ("C++ #lemur::api::Exception exception: " + (&_e)->what()).c_str());
+    return ; 
+  }
+  
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_IndexEnvironment_setMetadataIndexedFields(void * jarg1, void * jarg2, void * jarg3) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::vector< std::string > *arg2 = 0 ;

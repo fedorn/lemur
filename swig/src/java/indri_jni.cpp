@@ -4344,6 +4344,94 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setNu
 }
 
 
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setOrdinalField(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3) {
+  indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  bool arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(indri::api::IndexEnvironment **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return ;
+  }
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return ;
+  std::string arg2_str(arg2_pstr);
+  arg2 = &arg2_str;
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  arg3 = jarg3 ? true : false; 
+  {
+    try {
+      try {
+        (arg1)->setOrdinalField((std::string const &)*arg2,arg3);
+      }
+      catch(lemur::api::Exception &_e) {
+        {
+          jclass excep = jenv->FindClass("java/lang/Exception");
+          if (excep)
+          jenv->ThrowNew(excep, (&_e)->what().c_str());
+          return ;
+        }
+      }
+      
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return ;
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setParentalField(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3) {
+  indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
+  std::string *arg2 = 0 ;
+  bool arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(indri::api::IndexEnvironment **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return ;
+  }
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return ;
+  std::string arg2_str(arg2_pstr);
+  arg2 = &arg2_str;
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  arg3 = jarg3 ? true : false; 
+  {
+    try {
+      try {
+        (arg1)->setParentalField((std::string const &)*arg2,arg3);
+      }
+      catch(lemur::api::Exception &_e) {
+        {
+          jclass excep = jenv->FindClass("java/lang/Exception");
+          if (excep)
+          jenv->ThrowNew(excep, (&_e)->what().c_str());
+          return ;
+        }
+      }
+      
+    } catch( lemur::api::Exception& e ) {
+      {
+        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
+      };
+      // control does not leave method when thrown. (fixed in 1.3.25
+      // return ;
+    }
+  }
+}
+
+
 SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setMetadataIndexedFields(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2, jobjectArray jarg3) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::vector< std::string > *arg2 = 0 ;

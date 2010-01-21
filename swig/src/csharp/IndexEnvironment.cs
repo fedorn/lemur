@@ -99,6 +99,16 @@ public class IndexEnvironment : IDisposable {
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
+  public void setOrdinalField(string fieldName, bool isOrdinal) {
+    indri_csharpPINVOKE.IndexEnvironment_setOrdinalField(swigCPtr, fieldName, isOrdinal);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public void setParentalField(string fieldName, bool isParental) {
+    indri_csharpPINVOKE.IndexEnvironment_setParentalField(swigCPtr, fieldName, isParental);
+    if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
+  }
+
   public void setMetadataIndexedFields(StringVector forward, StringVector backward) {
     indri_csharpPINVOKE.IndexEnvironment_setMetadataIndexedFields(swigCPtr, StringVector.getCPtr(forward), StringVector.getCPtr(backward));
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();

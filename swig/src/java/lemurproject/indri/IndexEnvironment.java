@@ -169,6 +169,34 @@ public void setNumericField(String fieldName, boolean isNumeric) throws java.lan
 
   
 /**
+       Set the ordinal property of a field. If child, parent, or
+       ancestor field queries are slow, you may want to be certain to index
+       the specified fields explicitly as an ordinal. This speeds
+       things up at the cost of a minimal amount of disk space.
+       @param fieldName the field.
+       @param isOrdinal true if the field is an ordinal field, false if not.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void setOrdinalField(String fieldName, boolean isOrdinal) throws java.lang.Exception {
+    indriJNI.IndexEnvironment_setOrdinalField(swigCPtr, this, fieldName, isOrdinal);
+  }
+
+  
+/**
+       Set the parental property of a field. If child, parent, or
+       ancestor field queries are slow, you may want to be certain to index
+       the specified fields explicitly as an ordinal. This speeds
+       things up at the cost of a minimal amount of disk space.
+       @param fieldName the field.
+       @param isParental true if the field is a parental field, false if not.
+@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+*/
+public void setParentalField(String fieldName, boolean isParental) throws java.lang.Exception {
+    indriJNI.IndexEnvironment_setParentalField(swigCPtr, this, fieldName, isParental);
+  }
+
+  
+/**
        Set names of metadata fields to be indexed for fast retrieval.
        The forward fields are indexed in a B-Tree mapping (documentID, metadataValue).
        If a field is not forward indexed, the documentMetadata calls will still work, but they
@@ -328,9 +356,17 @@ public int addString(String fileName, String fileClass, Map metadata) throws jav
 
   
 /**
-       add an already parsed document to the index and repository
-       @param document the document to add
-@throws Exception if a lemur::api::Exception was thrown by the JNI library.
+       Adds a string to the index and repository.  The documentString is assumed to contain the kind of
+       text that would be found in a file of type fileClass.
+       @param documentString the document string to add.
+       @param fileClass the file class, signaling which parser to use while processing the document string.
+       @param metadata a map of metadata String name to String value.
+       @param tags offset annotations to be indexed as field data. The
+       begin and end values of each TagExtent specify <b>byte</b> (not
+       character or token) offsets within the document string. These
+       byte offsets are converted to token offsets after document
+       string parsing.
+       @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
 public int addString(String documentString, String fileClass, Map metadata, TagExtent[] tags) throws java.lang.Exception {
     return indriJNI.IndexEnvironment_addString__SWIG_1(swigCPtr, this, documentString, fileClass, metadata, tags);

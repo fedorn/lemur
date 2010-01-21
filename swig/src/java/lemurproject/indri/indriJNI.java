@@ -75,6 +75,8 @@ class indriJNI {
   public final static native void IndexEnvironment_setIndexedFields(long jarg1, IndexEnvironment jarg1_, String[] jarg2) throws java.lang.Exception;
   public final static native void IndexEnvironment_setNumericField__SWIG_0(long jarg1, IndexEnvironment jarg1_, String jarg2, boolean jarg3, String jarg4) throws java.lang.Exception;
   public final static native void IndexEnvironment_setNumericField__SWIG_1(long jarg1, IndexEnvironment jarg1_, String jarg2, boolean jarg3) throws java.lang.Exception;
+  public final static native void IndexEnvironment_setOrdinalField(long jarg1, IndexEnvironment jarg1_, String jarg2, boolean jarg3) throws java.lang.Exception;
+  public final static native void IndexEnvironment_setParentalField(long jarg1, IndexEnvironment jarg1_, String jarg2, boolean jarg3) throws java.lang.Exception;
   public final static native void IndexEnvironment_setMetadataIndexedFields(long jarg1, IndexEnvironment jarg1_, String[] jarg2, String[] jarg3) throws java.lang.Exception;
   public final static native void IndexEnvironment_setStopwords(long jarg1, IndexEnvironment jarg1_, String[] jarg2) throws java.lang.Exception;
   public final static native void IndexEnvironment_setStemmer(long jarg1, IndexEnvironment jarg1_, String jarg2) throws java.lang.Exception;
