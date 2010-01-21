@@ -1301,7 +1301,6 @@ Optional Features:
   --enable-php            Enable php shared library generation
   --enable-csharp         Enable csharp shared library generation
   --enable-java           Enable java shared library generation
-  --enable-indri-soap     Enable indri soap server
   --enable-distrib        Enable distributed retrieval package
   --enable-summarization  Enable summarization package
   --enable-assert         Enable assert statements in code
@@ -6749,14 +6748,6 @@ fi
 
 
 APPDIRS=app
-# Check whether --enable-indri-soap was given.
-if test "${enable_indri_soap+set}" = set; then
-  enableval=$enable_indri_soap;
-fi
-
-if test "$enable_indri_soap" = "yes" ; then
-  APPDIRS="$APPDIRS indri-soap"
-fi
 
 MODULES="retrieval langmod index parsing utility contrib/antlr contrib/xpdf"
 

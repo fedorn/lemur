@@ -293,11 +293,6 @@ AC_SUBST(WITH_CLUSTER)
 dnl AC_SUBST(HOST_OS)
 
 APPDIRS=app
-AC_ARG_ENABLE(indri-soap,
-	    AS_HELP_STRING(--enable-indri-soap,Enable indri soap server))
-if test "$enable_indri_soap" = "yes" ; then
-  APPDIRS="$APPDIRS indri-soap"
-fi
 
 dnl Base lemur modules
 MODULES="retrieval langmod index parsing utility contrib/antlr contrib/xpdf"

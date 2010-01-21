@@ -23,8 +23,6 @@
 		  swig generated php wrappers. Default is disabled.
 		- <tt>--enable-csharp</tt> compiles and installs the
 		  swig generated C# wrappers. Default is disabled.
-		- <tt>--enable-indri-soap</tt> compiles and installs the
-		  indri SOAP server. Default is disabled.
 		- <tt>--with-javahome=&lt;path&gt;</tt> Path to JAVAHOME for
 		  compiling the swig generated shared library. 
 		- <tt>--with-php-config=&lt;path&gt;</tt> Path to php-config
