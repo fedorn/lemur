@@ -38,10 +38,10 @@ public:
 		 int objNum = 0, int objGen = 0);
 
   // Get stream.
-  Stream *getStream() { return lexer->getStream(); }
+  Stream *getStream();
 
   // Get current position in file.
-  int getPos() { return lexer->getPos(); }
+  int getPos();
 
 private:
 

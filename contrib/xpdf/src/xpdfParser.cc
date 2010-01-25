@@ -35,6 +35,11 @@ xpdf::Parser::~Parser() {
   buf2.free();
   delete lexer;
 }
+  // Get stream.
+Stream *xpdf::Parser::getStream() { return lexer->getStream(); }
+
+  // Get current position in file.
+int xpdf::Parser::getPos() { return lexer->getPos(); }
 
 Object *xpdf::Parser::getObj(Object *obj, Guchar *fileKey,
 		       CryptAlgorithm encAlgorithm, int keyLength,
