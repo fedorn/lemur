@@ -297,6 +297,8 @@ indri::parse::UnparsedDocument* indri::parse::WARCDocumentIterator::nextDocument
   dochdrMetadata.key = _dochdr;
   dochdrMetadata.value = _metaBuffer.front() + _metaBuffer.position();
   // put in the uri
+  // add back the newline that was stripped.
+  uri += '\n';
   memcpy( _metaBuffer.write(uri.size()), uri.c_str(), 
           uri.size() * sizeof(char));
   dochdrMetadata.valueLength = uri.size();
