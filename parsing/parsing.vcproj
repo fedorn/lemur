@@ -178,6 +178,9 @@
 				RelativePath=".\src\NormalizationTransformation.cpp">
 			</File>
 			<File
+				RelativePath=".\src\OfficeHelper.cpp">
+			</File>
+			<File
 				RelativePath=".\src\OffsetAnnotationAnnotator.cpp">
 			</File>
 			<File
@@ -388,6 +391,9 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\ObjectHandler.hpp">
+			</File>
+			<File
+				RelativePath=".\include\indri\OfficeHelper.hpp">
 			</File>
 			<File
 				RelativePath=".\include\indri\OffsetAnnotationAnnotator.hpp">
