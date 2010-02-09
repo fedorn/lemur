@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 
 //
@@ -26,9 +26,8 @@
 #include <windows.h>
 #endif
 
-#include "indri/WordDocumentExtractor.hpp"
-
 #ifdef WIN32
+#include "indri/WordDocumentExtractor.hpp"
 
 
 // using this wde_internal structure for windows types
@@ -49,7 +48,7 @@ indri::parse::WordDocumentExtractor::WordDocumentExtractor() {
   _internal = new wde_internal;
 
   v_internal->_documentsDispatch = 0;
-  v_internal->_wordDispatch = 0;
+  v_internal->_wordUnknown = 0;
   v_internal->_wordDispatch = 0;
 
   initialize();
@@ -65,10 +64,11 @@ void indri::parse::WordDocumentExtractor::uninitialize() {
     // close application too?
     if( v_internal->_documentsDispatch )
       v_internal->_documentsDispatch->Release();
-    if( v_internal->_wordUnknown )
-      v_internal->_wordUnknown->Release();
-    if( v_internal->_wordDispatch )
-      v_internal->_wordDispatch->Release();
+    //  if( v_internal->_wordDispatch )
+    //  v_internal->_wordDispatch->Release();
+    //if( v_internal->_wordUnknown )
+    //      v_internal->_wordUnknown->Release();
+
     delete v_internal;
   }
 }
@@ -81,10 +81,10 @@ void indri::parse::WordDocumentExtractor::initialize() {
   CLSIDFromProgID( L"Word.Application", &wordClsid );  
 
   hr = ::CoCreateInstance( wordClsid,
-                            NULL,
-                            CLSCTX_LOCAL_SERVER,
-                            IID_IUnknown,
-                            (void**) &v_internal->_wordUnknown );
+                           NULL,
+                           CLSCTX_LOCAL_SERVER,
+                           IID_IUnknown,
+                           (void**) &v_internal->_wordUnknown );
 
   if( FAILED(hr) ) {
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Couldn't get Unknown interface pointer to Word application." );
@@ -102,47 +102,53 @@ void indri::parse::WordDocumentExtractor::initialize() {
   DISPID documentsDispatchID;
 
   hr = v_internal->_wordDispatch->GetIDsOfNames( IID_NULL,
-                                      &documentsPropertyName,
-                                      1,
-                                      LOCALE_SYSTEM_DEFAULT,
-                                      &documentsDispatchID );
+                                                 &documentsPropertyName,
+                                                 1,
+                                                 LOCALE_SYSTEM_DEFAULT,
+                                                 &documentsDispatchID );
 
   DISPPARAMS parameters = { NULL, NULL, 0, 0 };
   VARIANT result;
 
   hr = v_internal->_wordDispatch->Invoke( documentsDispatchID,
-                              IID_NULL,
-                              LOCALE_SYSTEM_DEFAULT,
-                              DISPATCH_PROPERTYGET,
-                              &parameters,
-                              &result,
-                              NULL,
-                              NULL );
+                                          IID_NULL,
+                                          LOCALE_SYSTEM_DEFAULT,
+                                          DISPATCH_PROPERTYGET,
+                                          &parameters,
+                                          &result,
+                                          NULL,
+                                          NULL );
                                       
   v_internal->_documentsDispatch = result.pdispVal;
 
   LPOLESTR closeMethodName = L"Close";
 
   hr = v_internal->_documentsDispatch->GetIDsOfNames( IID_NULL,
-                                          &closeMethodName,
-                                          1,
-                                          LOCALE_SYSTEM_DEFAULT,
-                                          &v_internal->_closeDispatchID );
+                                                      &closeMethodName,
+                                                      1,
+                                                      LOCALE_SYSTEM_DEFAULT,
+                                                      &v_internal->_closeDispatchID );
   LPOLESTR openMethodName = L"Open";
 
   hr = v_internal->_documentsDispatch->GetIDsOfNames( IID_NULL,
-                                          &openMethodName,
-                                          1,
-                                          LOCALE_SYSTEM_DEFAULT,
-                                          &v_internal->_openDispatchID );
+                                                      &openMethodName,
+                                                      1,
+                                                      LOCALE_SYSTEM_DEFAULT,
+                                                      &v_internal->_openDispatchID );
 }
 
 void indri::parse::WordDocumentExtractor::open( const std::string& filename ) {
   // open the document
+  initialize();
   HRESULT hr;
   VARIANT result;
   DISPPARAMS parameters;
   VARIANT fileNameParameter;
+  int location = filename.find_last_of("\\/");
+  if(filename[location+1]=='~'){
+    //skip temp-Word files
+    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Skipping temp Word Files starting with ~, they cause trouble parsing. " + filename + "." );
+  }
 
   _documentPath = filename;
 
@@ -158,19 +164,23 @@ void indri::parse::WordDocumentExtractor::open( const std::string& filename ) {
   parameters.rgvarg = &fileNameParameter; 
 
   hr = v_internal->_documentsDispatch->Invoke( v_internal->_openDispatchID,
-                                    IID_NULL,
-                                    LOCALE_SYSTEM_DEFAULT,
-                                    DISPATCH_METHOD,
-                                    &parameters,
-                                    &result,
-                                    NULL,
-                                    NULL );
+                                               IID_NULL,
+                                               LOCALE_SYSTEM_DEFAULT,
+                                               DISPATCH_METHOD,
+                                               &parameters,
+                                               &result,
+                                               NULL,
+                                               NULL );
   
   if( FAILED(hr) ) {
+    _officeHelper.AutoWrap(DISPATCH_METHOD, NULL,v_internal->_wordDispatch, L"Quit", 0);
+    v_internal->_wordDispatch->Release();
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Couldn't open file " + filename + "." );
   }
 
   IDispatch* documentDispatch = result.pdispVal;
+
+
 
   // get content dispatch ID
   DISPID contentDispatchID;
@@ -182,19 +192,26 @@ void indri::parse::WordDocumentExtractor::open( const std::string& filename ) {
                                         LOCALE_SYSTEM_DEFAULT,
                                         &contentDispatchID );
 
+  if( FAILED(hr) ) {
+    closeWord(documentDispatch,true);
+    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Couldn't get ID of \"Content\" for file " + filename + "." );
+  }
+
+
   // fetch the content property
   DISPPARAMS noParameters = { NULL, NULL, 0, 0 };
 
   hr = documentDispatch->Invoke( contentDispatchID,
-                                  IID_NULL,
-                                  LOCALE_SYSTEM_DEFAULT,
-                                  DISPATCH_PROPERTYGET,
-                                  &noParameters,
-                                  &result,
-                                  NULL,
-                                  NULL );
+                                 IID_NULL,
+                                 LOCALE_SYSTEM_DEFAULT,
+                                 DISPATCH_PROPERTYGET,
+                                 &noParameters,
+                                 &result,
+                                 NULL,
+                                 NULL );
 
   if( FAILED(hr) ) {
+    closeWord(documentDispatch,true);
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Couldn't get content for file " + filename + "." );
   }
 
@@ -205,12 +222,13 @@ void indri::parse::WordDocumentExtractor::open( const std::string& filename ) {
   LPOLESTR textPropertyName = L"Text";
 
   hr = contentDispatch->GetIDsOfNames( IID_NULL,
-                                        &textPropertyName,
-                                        1,
-                                        LOCALE_SYSTEM_DEFAULT,
-                                        &textDispatchID );
+                                       &textPropertyName,
+                                       1,
+                                       LOCALE_SYSTEM_DEFAULT,
+                                       &textDispatchID );
 
   if( FAILED(hr) ) {
+    closeWord(documentDispatch,true);
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Couldn't get text for file " + filename + "." );
   }
 
@@ -225,6 +243,7 @@ void indri::parse::WordDocumentExtractor::open( const std::string& filename ) {
                                 NULL );
 
   if( FAILED(hr) ) {
+    closeWord(documentDispatch,true);
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Couldn't get text for file " + filename + "." );
   }
 
@@ -236,21 +255,32 @@ void indri::parse::WordDocumentExtractor::open( const std::string& filename ) {
   UINT convertedLength = 3*textLength;
   _documentTextBuffer.clear();
 
+  _unparsedDocument.metadata.clear();
+  _officeHelper.SetOfficeMetaData(documentDispatch,&_unparsedDocument);
+  _officeHelper.writeHeaderToBuffer(_documentTextBuffer);
+
+
+  
+
+  //add to buffer
+ 
+  
+  //wordHeader
+
+
   // convert the document text into a multibyte representation
   int trueLength = ::WideCharToMultiByte( CP_UTF8, 0, textResult, -1,
-                                         _documentTextBuffer.write( convertedLength ), convertedLength,
-                                         NULL, NULL );
+                                          _documentTextBuffer.write( convertedLength ), convertedLength,
+                                          NULL, NULL );
   _documentTextBuffer.unwrite( convertedLength-trueLength );
 
   indri::parse::MetadataPair pair;
 
-  _unparsedDocument.metadata.clear();
 
-  _docnostring.assign(_documentPath.c_str() );
-  cleanDocno();
-  pair.value = _docnostring.c_str();
-  pair.valueLength = _docnostring.length()+1;
+
   pair.key = "docno";
+  pair.value = _documentPath.c_str();
+  pair.valueLength = _documentPath.length()+1;
   _unparsedDocument.metadata.push_back( pair );
 
   pair.key = "path";
@@ -263,6 +293,9 @@ void indri::parse::WordDocumentExtractor::open( const std::string& filename ) {
   pair.valueLength = 7;
   _unparsedDocument.metadata.push_back( pair );
 
+
+
+
   _unparsedDocument.text = _documentTextBuffer.front();
   _unparsedDocument.textLength = _documentTextBuffer.position();
   _unparsedDocument.content = _documentTextBuffer.front();
@@ -274,17 +307,22 @@ void indri::parse::WordDocumentExtractor::open( const std::string& filename ) {
 
   contentDispatch->Release();
   
-  // close the document
-  hr = documentDispatch->Invoke( v_internal->_closeDispatchID,
-                                  IID_NULL,
-                                  LOCALE_SYSTEM_DEFAULT,
-                                  DISPATCH_METHOD,
-                                  &noParameters,
-                                  &result,
-                                  NULL,
-                                  NULL );
+  closeWord(documentDispatch,true);
+
   documentDispatch->Release();
+  v_internal->_wordDispatch->Release();
+  v_internal->_wordUnknown->Release();
   _documentWaiting = true;
+}
+
+void indri::parse::WordDocumentExtractor::closeWord(IDispatch* documentDispatch, bool quit){
+  // Close the document without saving changes
+  VARIANT x;
+  x.vt = VT_BOOL;
+  x.boolVal = false;
+  _officeHelper.AutoWrap(DISPATCH_METHOD, NULL, documentDispatch, L"Close", 1, x);
+  if(quit)
+    _officeHelper.AutoWrap(DISPATCH_METHOD, NULL,v_internal->_wordDispatch, L"Quit", 0);
 }
 
 indri::parse::UnparsedDocument* indri::parse::WordDocumentExtractor::nextDocument() {
@@ -301,5 +339,3 @@ void indri::parse::WordDocumentExtractor::close() {
 }
 
 #endif // WIN32
-
-

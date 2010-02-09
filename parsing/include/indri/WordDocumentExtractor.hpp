@@ -21,34 +21,39 @@
 #ifndef INDRI_WORDDOCUMENTEXTRACTOR_HPP
 #define INDRI_WORDDOCUMENTEXTRACTOR_HPP
 
+#ifdef WIN32
+
 #include "lemur-compat.hpp"
 #include "indri/Buffer.hpp"
 #include "indri/UnparsedDocument.hpp"
 #include "Exception.hpp"
 #include <string>
 #include "indri/DocumentIterator.hpp"
+#include "indri/OfficeHelper.hpp"
 
-#ifdef WIN32
 namespace indri
 {
   namespace parse
   {
     
     class WordDocumentExtractor : public DocumentIterator {
+    private:
       void* _internal;
-
       indri::utility::Buffer _documentTextBuffer;
       UnparsedDocument _unparsedDocument;
+
       std::string _documentPath;
+
+      OfficeHelper _officeHelper;
+
       bool _documentWaiting;
 
       void initialize();
       void uninitialize();
-  
+      void closeWord(IDispatch* documentDispatch, bool quit);
     public:
       WordDocumentExtractor();
       ~WordDocumentExtractor();
-
       void open( const std::string& filename );
       UnparsedDocument* nextDocument( );
       void quit();

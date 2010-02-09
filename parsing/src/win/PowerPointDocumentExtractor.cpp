@@ -7,7 +7,7 @@
  * http://www.lemurproject.org/license.html
  *
  *==========================================================================
-*/
+ */
 
 //
 // PowerPointDocumentExtractor
@@ -35,151 +35,6 @@
 //        text = shape.TextFrame.TextRange.Text;
 //
 
-//
-// copy_bstr_to_buffer
-//
-
-void copy_bstr_to_buffer( indri::utility::Buffer& docBuffer, BSTR bstr ) {
-  UINT textLength = ((UINT*)bstr)[-1];
-  
-  if( !textLength )
-    return;
-
-  // get rid of any trailing nulls
-  if( docBuffer.position() > 0 ) {
-    docBuffer.unwrite(1);
-    *docBuffer.write(1) = ' ';
-  }
- 
-  // multibyte could potentially have 3 bytes for every 1 double-byte char
-  UINT convertedLength = 3*(textLength+1);
-
-  // convert the document text into a multibyte representation
-  int trueLength = ::WideCharToMultiByte( CP_UTF8, 0, bstr, -1,
-                                         docBuffer.write( convertedLength ), convertedLength,
-                                         NULL, NULL );
-
-  docBuffer.unwrite( convertedLength-trueLength );
-}
-
-//
-// com_get_dispatch_id
-//
-
-DISPID com_get_dispatch_id( IDispatch* dispatch, LPOLESTR name ) {
-  DISPID dispatchID;
-  HRESULT hr;
-
-  hr = dispatch->GetIDsOfNames( IID_NULL,
-                                &name,
-                                1,
-                                LOCALE_SYSTEM_DEFAULT,
-                                &dispatchID );
-  
-  if( FAILED(hr) ) {
-    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Failed to get the ID of method." );
-  }
-
-  return dispatchID;
-}
-
-//
-// com_property_get
-//
-
-void com_property_get( VARIANT* result, IDispatch* dispatch, LPOLESTR name ) {
-  DISPID dispatchID = com_get_dispatch_id( dispatch, name );
-  DISPPARAMS nullParameters = { NULL, NULL, 0, 0 };
-
-  HRESULT hr;
-  hr = dispatch->Invoke( dispatchID,
-                         IID_NULL,
-                         LOCALE_SYSTEM_DEFAULT,
-                         DISPATCH_PROPERTYGET,
-                         &nullParameters,
-                         result,
-                         NULL,
-                         NULL );
-
-  if( FAILED(hr) ) {
-    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Failed to get the property." );
-  }
-}
-
-//
-// com_method_execute
-//
-
-void com_method_execute( VARIANT* result, IDispatch* dispatch, LPOLESTR name, DISPPARAMS* parameters ) {
-  HRESULT hr;
-  DISPID dispatchID = com_get_dispatch_id( dispatch, name );
-  EXCEPINFO exceptionInfo;
-
-  hr = dispatch->Invoke( dispatchID,
-                         IID_NULL,
-                         LOCALE_SYSTEM_DEFAULT,
-                         DISPATCH_METHOD,
-                         parameters,
-                         result,
-                         &exceptionInfo,
-                         NULL );
-
-  if( FAILED(hr) ) {
-    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Failed to execute method." );
-  }
-}
-
-//
-// com_method_execute
-//
-
-void com_method_execute( VARIANT* result, IDispatch* dispatch, LPOLESTR name, VARIANT* parameter = 0 ) {
-  DISPPARAMS oneParameter;
-
-  oneParameter.cArgs = 1;
-  oneParameter.cNamedArgs = 0;
-  oneParameter.rgdispidNamedArgs = NULL;
-  oneParameter.rgvarg = parameter;
-
-  DISPPARAMS noParameters = { 0, 0, NULL, NULL };
-
-  DISPPARAMS* parameters;
-
-  if( parameter )
-    parameters = &oneParameter;
-  else
-    parameters = &noParameters;
-
-  com_method_execute( result, dispatch, name, parameters );
-}
-
-void com_property_put( VARIANT* result, IDispatch* dispatch, LPOLESTR name, VARIANT* parameter ) {
-  HRESULT hr;
-  DISPID dispatchID = com_get_dispatch_id( dispatch, name );
-  EXCEPINFO exceptionInfo;
-  unsigned int badArgument;
-
-  DISPPARAMS parameters;
-  DISPID putID = DISPID_PROPERTYPUT;
-
-  parameters.cArgs = 1;
-  parameters.cNamedArgs = 1;
-  parameters.rgdispidNamedArgs = &putID;
-  parameters.rgvarg = parameter;
-
-  hr = dispatch->Invoke( dispatchID,
-                         IID_NULL,
-                         LOCALE_SYSTEM_DEFAULT,
-                         DISPATCH_PROPERTYPUT,
-                         &parameters,
-                         NULL,
-                         &exceptionInfo,
-                         &badArgument );
-
-  if( FAILED(hr) ) {
-    LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Failed to put property." );
-  }
-}
 
 indri::parse::PowerPointDocumentExtractor::PowerPointDocumentExtractor() {
   ::CoInitialize( NULL );
@@ -207,12 +62,14 @@ indri::parse::PowerPointDocumentExtractor::PowerPointDocumentExtractor() {
     LEMUR_THROW( LEMUR_RUNTIME_ERROR, "Couldn't get Dispatch interface pointer to PowerPoint application." );
   }
 
+  // Make PowerPoint invisible
+  // By default PowerPoint is invisible, till you make it visible:
   VARIANT param;
   param.vt = VT_INT;
   param.intVal = -1;
-  com_property_put( &result, _powerPointDispatch, L"Visible", &param );
+  _officeHelper.com_property_put( &result, _powerPointDispatch, L"Visible", &param );
 
-  com_property_get( &result, _powerPointDispatch, L"Presentations" );                                          
+  _officeHelper.com_property_get( &result, _powerPointDispatch, L"Presentations" );                                          
   _presentationsDispatch = result.pdispVal;
 
   _documentWaiting = false;
@@ -230,6 +87,8 @@ void indri::parse::PowerPointDocumentExtractor::open( const std::string& filenam
 
   _documentPath = filename;
   _documentBuffer.clear();
+
+
   *_documentBuffer.write(1) = 0;
 
   // copy the path into a form powerpoint will understand
@@ -257,18 +116,22 @@ void indri::parse::PowerPointDocumentExtractor::open( const std::string& filenam
   arguments[0].vt = VT_I4;
   arguments[0].lVal = -1; // withwindow
 
-  com_method_execute( &result, _presentationsDispatch, L"Open", &parameters );
+  _officeHelper.com_method_execute( &result, _presentationsDispatch, L"Open", &parameters );
   IDispatch* documentDispatch = result.pdispVal;
+
+  _unparsedDocument.metadata.clear();
+  _officeHelper.SetOfficeMetaData(documentDispatch,&_unparsedDocument);
+  _officeHelper.writeHeaderToBuffer(_documentBuffer);
 
   // get rid of the filename parameter
   ::SysFreeString( arguments[3].bstrVal );
 
   // get the Slides dispatch
-  com_property_get( &result, documentDispatch, L"Slides" );
+  _officeHelper.com_property_get( &result, documentDispatch, L"Slides" );
   IDispatch* slidesDispatch = result.pdispVal;
 
   // get the count of slides
-  com_property_get( &result, slidesDispatch, L"Count" );
+  _officeHelper.com_property_get( &result, slidesDispatch, L"Count" );
   long slidesCount = result.lVal;
   VARIANT index;
   memset( &index, 0, sizeof index );
@@ -278,26 +141,26 @@ void indri::parse::PowerPointDocumentExtractor::open( const std::string& filenam
     index.lVal = i;
 
     // fetch the i^th slide
-    com_method_execute( &result, slidesDispatch, L"Item", &index );
+    _officeHelper.com_method_execute( &result, slidesDispatch, L"Item", &index );
     IDispatch* slideDispatch = result.pdispVal;
 
     // fetch the shapes
-    com_property_get( &result, slideDispatch, L"Shapes" );
+    _officeHelper.com_property_get( &result, slideDispatch, L"Shapes" );
     IDispatch* shapesDispatch = result.pdispVal;
 
     // fetch shapes count
-    com_property_get( &result, shapesDispatch, L"Count" );
+    _officeHelper.com_property_get( &result, shapesDispatch, L"Count" );
     long shapesCount = result.lVal;
 
     for( int j=1; j<=shapesCount; j++ ) {
       index.lVal = j;
 
       // fetch the j^th shape
-      com_method_execute( &result, shapesDispatch, L"Item", &index );
+      _officeHelper.com_method_execute( &result, shapesDispatch, L"Item", &index );
       IDispatch* shapeDispatch = result.pdispVal;
 
       // fetch the textframe
-      com_property_get( &result, shapeDispatch, L"TextFrame" );
+      _officeHelper.com_property_get( &result, shapeDispatch, L"TextFrame" );
       IDispatch* textFrameDispatch = result.pdispVal;
 
       // fetch the textrange
@@ -305,15 +168,15 @@ void indri::parse::PowerPointDocumentExtractor::open( const std::string& filenam
       BSTR textResult = 0;
 
       try {
-        com_property_get( &result, textFrameDispatch, L"TextRange" );
+        _officeHelper.com_property_get( &result, textFrameDispatch, L"TextRange" );
         IDispatch* textRangeDispatch = result.pdispVal;
 
         // fetch the text itself
-        com_property_get( &result, textRangeDispatch, L"Text" );
+        _officeHelper.com_property_get( &result, textRangeDispatch, L"Text" );
         BSTR textResult = result.bstrVal;
 
-        copy_bstr_to_buffer( _documentBuffer, textResult );
-	  } catch( lemur::api::Exception& e ) {
+        _officeHelper.copy_bstr_to_buffer( _documentBuffer, textResult );
+      } catch( lemur::api::Exception& e ) {
         if( textResult )
           ::SysFreeString( textResult );
         if( textRangeDispatch )
@@ -336,13 +199,11 @@ void indri::parse::PowerPointDocumentExtractor::open( const std::string& filenam
   // add metadata to identify this file
   indri::parse::MetadataPair pair;
 
-  _unparsedDocument.metadata.clear();
 
-  _docnostring.assign(_documentPath.c_str() );
-  cleanDocno();
-  pair.value = _docnostring.c_str();
-  pair.valueLength = _docnostring.length()+1;
+
   pair.key = "docno";
+  pair.value = _documentPath.c_str();
+  pair.valueLength = _documentPath.length()+1;
   _unparsedDocument.metadata.push_back( pair );
 
   pair.key = "path";
@@ -355,13 +216,15 @@ void indri::parse::PowerPointDocumentExtractor::open( const std::string& filenam
   pair.valueLength = 6;
   _unparsedDocument.metadata.push_back( pair );
 
+
+
   _unparsedDocument.text = _documentBuffer.front();
   _unparsedDocument.textLength = _documentBuffer.position();
   _unparsedDocument.content = _documentBuffer.front();
   _unparsedDocument.contentLength = _documentBuffer.position() - 1;
 
   // close the document
-  com_method_execute( &result, documentDispatch, L"Close" );
+  _officeHelper.com_method_execute( &result, documentDispatch, L"Close" );
   documentDispatch->Release();
   _documentWaiting = true;
 }

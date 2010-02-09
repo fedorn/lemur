@@ -57,16 +57,23 @@ struct file_class_environment_spec {
 
 static const char* pdf_index_tags[] = { "title", "author", 0 };
 static const char* pdf_metadata_tags[] = { "title", "author", 0 };
-static const char* html_index_tags[] = { "title", "h1", "h2", "h3", "h4", 0 };
-static const char* html_metadata_tags[] = { "title", 0 };
+static const char* html_index_tags[] = { "title", "author", "h1", "h2", "h3", "h4", 0 };
+static const char* html_metadata_tags[] = { "title", "author", 0 };
 //static const char* html_conflations[] = { "h1", NULL, NULL, "heading", "h2", NULL, NULL, "heading", "h3", NULL, NULL, "heading", "h4", NULL, NULL, "heading", "bloghpno", NULL, NULL, "docno", 0, 0, 0, 0 };
+/*
+TODO:
+A Meta Author tag declares the author of the HTML or XML document of a website. An example of a Meta Author tag is as follows:
+<META NAME="Author" CONTENT="George Costanza, gcostanza@vandalayindustries.com">
+"meta","name","author","author",  //make the parser understand META and grab the CONTENT implicitly
+or make  html_attribute_conflations[]={"meta","name","author","content","author",0} this has maybe big impact on the interfaces
+*/
 static const char* html_conflations[] = { "h1", NULL, NULL, "heading", "h2", NULL, NULL, "heading", "h3", NULL, NULL, "heading", "h4", NULL, NULL, "heading", 0, 0, 0, 0 };
 static const char* trec_include_tags[] = { "text", "hl", "head", "headline", "title", "ttl", "dd", "date", "date_time", "lp", "leadpara", 0 };
 static const char* trecalt_include_tags[] = { "text", 0 };
 static const char* trecalt_index_tags[] = { "text", 0 };
-static const char* trec_metadata_tags[] = { "docno", "title", 0 };
+static const char* trec_metadata_tags[] = { "docno", "title", "author", 0 };
 static const char* trec_conflations[] = { "hl", NULL, NULL, "headline", "head", NULL, NULL, "headline", "ttl", NULL, NULL, "title", "dd", NULL, NULL, "date", "date_time", NULL, NULL, "date", 0, 0, 0, 0 };
-static const char* trec_index_tags[] = { "hl", "head", "headline", "title", "ttl", "dd", "date_time", "date", 0 };
+static const char* trec_index_tags[] = { "author", "hl", "head", "headline", "title", "ttl", "dd", "date_time", "date", 0 };
 static const char* html_exclude_tags[] = { "script", "style", 0};
 
 struct extension_conflations {
@@ -77,9 +84,10 @@ struct extension_conflations {
 static const char* _html[] = {"html", "htm", 0};
 static const char* _txt[] =  {"txt", "text", 0};
 static const char* _doc[] =  {"doc", "docx", 0};
+static const char* _ppt[] =  {"ppt", "pptx", 0};
 
 static extension_conflations extensions[] = {
-  _html, _txt, _doc, {0}
+  _html, _txt, _doc, _ppt, {0}
 };
 
 static std::string _canonicalExtension (const std::string &name) {
@@ -227,7 +235,7 @@ static file_class_environment_spec environments[] = {
 #ifdef WIN32
   {
     "doc",                // name
-    "text",               // parser
+    "html",               // parser
     "word",               // tokenizer
     "doc",                // iterator
     NULL,                 // startDocTag
@@ -242,7 +250,7 @@ static file_class_environment_spec environments[] = {
 
   {
     "ppt",                // name
-    "text",               // parser
+    "html",               // parser
     "word",               // tokenizer
     "ppt",                // iterator
     NULL,                 // startDocTag

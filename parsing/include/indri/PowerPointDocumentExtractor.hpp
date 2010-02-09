@@ -28,6 +28,8 @@
 #include <unknwn.h>
 #include <oaidl.h>
 #include "indri/DocumentIterator.hpp"
+#include "indri/OfficeHelper.hpp"
+
 namespace indri
 {
   namespace parse
@@ -43,6 +45,7 @@ namespace indri
       std::string _documentPath;
       indri::utility::Buffer _documentBuffer;
       bool _documentWaiting;
+      OfficeHelper _officeHelper;
 
     public:
       PowerPointDocumentExtractor();
@@ -57,4 +60,3 @@ namespace indri
 
 #endif // WIN32
 #endif // INDRI_POWERPOINTDOCUMENTEXTRACTOR_HPP
-
