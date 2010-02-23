@@ -119,7 +119,7 @@ bool indri::parse::WARCRecord::readHeader() {
   std::string key, value;
   bool result;
   bool empty = false;
-  
+  _buffer.clear();
   do {
     result = _readLine( beginLine, lineLength );
     if (! result) break;
@@ -154,7 +154,6 @@ bool indri::parse::WARCRecord::readHeader() {
 }
 
 bool indri::parse::WARCRecord::readContent() {
-  // read they bytes
   _buffer.clear();
   content = (char *)_buffer.front();
   int numRead;
@@ -164,16 +163,6 @@ bool indri::parse::WARCRecord::readContent() {
   }
   // terminate the string
   *_buffer.write(1) = 0;
-#if 0
-  // consume two empty lines?
-  // works correctly with heritrix WARC files, fails with
-  // ClueWeb09 nutch-generated files.
-  size_t length;
-  char *beginLine;
-  // test that each line is just a newline (CRLF or LF);
-  bool read = _readLine(beginLine, length);
-  read = _readLine(beginLine, length);
-#endif
   return true;
 }
 
