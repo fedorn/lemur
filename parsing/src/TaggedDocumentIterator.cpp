@@ -207,17 +207,17 @@ indri::parse::UnparsedDocument* indri::parse::TaggedDocumentIterator::nextDocume
   int startDocument = (int)_buffer.position() - 1;
   
   while(true) {
+    int lineEnd = 0;
     result = _readLine( beginLine, lineLength );
-    
     if( !result ) {
       LEMUR_THROW( LEMUR_IO_ERROR, "Malformed document: " + _fileName );
     }
-
+    if (beginLine[lineLength - 2] == '\r') lineEnd = 2; else lineEnd = 1;
     if( (int)lineLength >= _endDocTagLength &&
-        !strncmp( beginLine+lineLength-_endDocTagLength, _endDocTag, _endDocTagLength - 1 ) ) {
+        !strncmp( beginLine+lineLength-_endDocTagLength-lineEnd, _endDocTag, _endDocTagLength ) ) {
       //      beginLine[lineLength-_endDocTagLength] = 0;
       _document.content = _buffer.front() + startDocument;
-      _document.contentLength = _buffer.position() - startDocument - _endDocTagLength - 1;
+      _document.contentLength = _buffer.position() - startDocument - (_endDocTagLength + lineEnd + 1);
       // don't prune the DOC/metadata tags.
       beginLine[lineLength] = 0;
       _document.text = _buffer.front();

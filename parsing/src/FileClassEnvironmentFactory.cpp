@@ -165,7 +165,7 @@ static file_class_environment_spec environments[] = {
     "word",               // tokenizer
     "tagged",             // iterator
     "<DOC>",              // startDocTag
-    "</DOC>\n",             // endDocTag
+    "</DOC>",             // endDocTag
     "</DOCHDR>",          // endMetadataTag
     NULL,                 // includeTags
     html_exclude_tags,    // excludeTags
@@ -180,7 +180,7 @@ static file_class_environment_spec environments[] = {
     "word",               // tokenizer
     "tagged",             // iterator
     "<DOC>",              // startDocTag
-    "</DOC>\n",             // endDocTag
+    "</DOC>",             // endDocTag
     NULL,                 // endMetadataTag
     trec_include_tags,    // includeTags
     NULL,                 // excludeTags
@@ -194,7 +194,7 @@ static file_class_environment_spec environments[] = {
     "char",               // tokenizer
     "tagged",             // iterator
     "<DOC>",              // startDocTag
-    "</DOC>\n",             // endDocTag
+    "</DOC>",             // endDocTag
     NULL,                 // endMetadataTag
     trec_include_tags,    // includeTags
     NULL,                 // excludeTags
@@ -208,7 +208,7 @@ static file_class_environment_spec environments[] = {
     "word",               // tokenizer
     "tagged",             // iterator
     "<DOC>",              // startDocTag
-    "</DOC>\n",             // endDocTag
+    "</DOC>",             // endDocTag
     NULL,                 // endMetadataTag
     trecalt_include_tags,    // includeTags
     NULL,                 // excludeTags
