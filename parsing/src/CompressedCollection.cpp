@@ -845,7 +845,7 @@ std::vector<lemur::api::DOCID_T> indri::collection::CompressedCollection::retrie
   std::vector<lemur::api::DOCID_T> results;
 
   // if we have a lookup, find the associated documentIDs for this value
-  if( metalookup && value.size() > 0) {
+  if( metalookup && value.size() > 0 && value.size() < lemur::file::Keyfile::MAX_KEY_LENGTH ) {
     int actual = 0;
     int dataSize = (*metalookup)->getSize( value.c_str() );
 
