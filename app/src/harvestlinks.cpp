@@ -205,7 +205,7 @@ static void harvest_anchor_text_file( const std::string& path,
     iterator = new indri::parse::TaggedDocumentIterator();
     ((indri::parse::TaggedDocumentIterator *)iterator)->setTags(
                                                               "<DOC>",       // startDocTag
-                                                              "</DOC>\n",    // endDocTag
+                                                              "</DOC>",    // endDocTag
                                                               "</DOCHDR>"    // endMetadataTag
                                                               );
   } else if (fileClass == "warc") {
