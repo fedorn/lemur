@@ -89,7 +89,13 @@ lemur::api::COUNT_T lemur::index::LemurIndriIndex::docCount() const {
 }
 
 lemur::api::COUNT_T lemur::index::LemurIndriIndex::termCountUnique() const { 
-  return _repository->indexes()->back()->uniqueTermCount(); 
+  indri::collection::Repository::index_state indexes = _repository->indexes();
+  lemur::api::COUNT_T total = 0;
+  for( int i=0; i<indexes->size(); i++ ) {
+    indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
+    total += (*indexes)[i]->uniqueTermCount( );
+  }
+  return total;
 }
 
 lemur::api::COUNT_T lemur::index::LemurIndriIndex::termCount(lemur::api::TERMID_T termID) const { 
