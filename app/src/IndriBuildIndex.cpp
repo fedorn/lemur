@@ -760,10 +760,11 @@ static std::vector<std::string> findConflations(indri::parse::FileClassEnvironme
 /*! Add a string to a vector if not already present.
  * @return true if the string was added.
  */
-static bool addNew(std::vector<std::string>& vec, string &name, 
+static bool addNew(std::vector<std::string>& orig, 
+                   std::vector<std::string>& vec, string &name, 
                    std::string &specName, const char *msg) {
   bool retval = false;
-  if( std::find( vec.begin(), vec.end(), name ) == vec.end() ) {
+  if( std::find( orig.begin(), orig.end(), name ) == orig.end() ) {
     std::cerr << "Adding " << name << " to " << specName << msg << std::endl;
     vec.push_back(name);
     retval = true;
@@ -785,32 +786,34 @@ static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification
   // eg headline for head, hl, or headline tags.
   std::vector<std::string> conflations;
   std::vector<std::string>::iterator i1;
-
+  std::vector<std::string> origIndex = spec->index;
+  std::vector<std::string> origInclude = spec->include;
+  
   for (i1 = fields.begin(); i1 != fields.end(); i1++) {
     // find any conflated names
     conflations = findConflations(spec, *i1);
     for (size_t j = 0; j < conflations.size(); j++) {
       // only add the field for indexing if it doesn't already exist
-      if (addNew(spec->index, conflations[j], 
+      if (addNew(origIndex, spec->index, conflations[j], 
                  spec->name, " as an indexed field")) {
         // added a field, make sure it is indexable
         // only add include tags if there are some already.
         // if it is empty, *all* tags are included.
         if( !spec->include.empty() ) {
-          addNew(spec->include, conflations[j], spec->name,
+          addNew(origInclude, spec->include, conflations[j], spec->name,
                  " as an included tag");
         }
         retval = true;
       }
     }
   }
-  
+
   // add fields that should be marked metadata for retrieval
   for (i1 = metadata.begin(); i1 != metadata.end(); i1++) {
     // find any conflated names
     conflations = findConflations(spec, *i1);
     for (size_t j = 0; j < conflations.size(); j++)
-      retval |= addNew(spec->metadata, conflations[j], spec->name,
+      retval |= addNew(spec->metadata, spec->metadata, conflations[j], spec->name,
                        " as a metadata field");
   }
   // add fields that should have a metadata forward lookup table.
@@ -818,7 +821,7 @@ static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification
     // find any conflated names
     conflations = findConflations(spec, *i1);
     for (size_t j = 0; j < conflations.size(); j++) 
-      retval |= addNew(spec->metadata, conflations[j], spec->name,
+      retval |= addNew(spec->metadata, spec->metadata, conflations[j], spec->name,
                        " as a forward indexed metadata field");
   }
   // add fields that should have a metadata reverse lookup table.
@@ -826,8 +829,8 @@ static bool augmentSpec(indri::parse::FileClassEnvironmentFactory::Specification
     // find any conflated names
     conflations = findConflations(spec, *i1);
     for (size_t j = 0; j < conflations.size(); j++) 
-      retval |= addNew(spec->metadata, conflations[j], spec->name,
-                       " as a forward indexed metadata field");
+      retval |= addNew(spec->metadata, spec->metadata, conflations[j], spec->name,
+                       " as a backward indexed metadata field");
   }
 
   return retval;
