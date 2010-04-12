@@ -876,6 +876,11 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::_runQu
   PRINT_TIMER( "Parsing complete" );
 
   if (_baseline) {
+    // make sure it doesn't have any field restrictions
+    if ( q.find(".") != std::string::npos) {
+      LEMUR_THROW( LEMUR_PARSE_ERROR, "Can't run baseline on this query: " + q + "\nindri query language field restrictions are not allowed." );
+    }
+    
     // Replace with a PlusNode
     indri::lang::UnweightedCombinationNode* rootScorer = dynamic_cast<indri::lang::UnweightedCombinationNode*>(rootNode);
     indri::lang::RawScorerNode* rawScorer = dynamic_cast<indri::lang::RawScorerNode*>(rootNode);
