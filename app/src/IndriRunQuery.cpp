@@ -582,7 +582,7 @@ public:
 
     // run the query
     try {
-      if (_parameters.exists("baseline") && (query->text.find("#") != std::string::npos) || (query->text.find(".") != std::string::npos) ) {
+      if (_parameters.exists("baseline") && ((query->text.find("#") != std::string::npos) || (query->text.find(".") != std::string::npos)) ) {
         LEMUR_THROW( LEMUR_PARSE_ERROR, "Can't run baseline on this query: " + query->text + "\nindri query language operators are not allowed." );
       }
       _runQuery( output, query->text, query->qType );
