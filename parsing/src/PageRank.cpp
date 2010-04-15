@@ -45,7 +45,7 @@ void indri::parse::PageRank::_computeColLen() {
     indri::parse::TaggedDocumentIterator iterator;
     iterator.open( filePath );
     iterator.setTags( "<DOC>",             // startDocTag
-                      "</DOC>\n",          // endDocTag
+                      "</DOC>",          // endDocTag
                       "</DOCHDR>" );       // endMetadataTag
     indri::parse::UnparsedDocument* unparsed;
     while( (unparsed = iterator.nextDocument()) != 0 )
