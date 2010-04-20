@@ -104,7 +104,8 @@ COMMA:     ',';
 SLASH:     '/';
 B_SLASH:   '\\';
 
-protected DASH:      '-';
+DASH:      '-';
+SPACE_DASH: " -";
 COLON:     ':';
 
 protected TAB:       '\t';
@@ -115,8 +116,8 @@ protected SPACE:     ' ';
 protected HIGH_CHAR:         '\u0080'..'\u00ff';
 protected DIGIT:             ('0'..'9');
 protected ASCII_LETTER:      ('a'..'z' | 'A'..'Z');
-protected SAFE_LETTER:       ('a'..'z' | 'A'..'Z' | '-' | '_');
-protected SAFE_CHAR:         ('a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_');
+protected SAFE_LETTER:       ('a'..'z' | 'A'..'Z' | '_');
+protected SAFE_CHAR:         ('a'..'z' | 'A'..'Z' | '0'..'9' | '_');
 protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/' | '=');
 
 //
@@ -128,14 +129,12 @@ protected BASESIXFOUR_CHAR:  ('a'..'z' | 'A'..'Z' | '0'..'9' | '+' | '/' | '=');
 
 protected TEXT_TERM:        ( HIGH_CHAR | SAFE_CHAR )+;
 protected NUMBER:           ( '0'..'9' )+;
-protected NEGATIVE_NUMBER:  DASH ( '0'..'9' )+;
-protected FLOAT:            (DASH)? ( '0'..'9' )+ DOT ( '0'..'9' )+;
+protected FLOAT:            ( '0'..'9' )+ DOT ( '0'..'9' )+;
 
-TERM:     ( (DIGIT)+ (SAFE_LETTER | HIGH_CHAR) ) => TEXT_TERM |
-          ( FLOAT ) => FLOAT { $setType(FLOAT); } |
-          ( NUMBER ) => NUMBER { $setType(NUMBER); } |
-          ( NEGATIVE_NUMBER ) => NEGATIVE_NUMBER { $setType(NEGATIVE_NUMBER); } |
-          TEXT_TERM;
+TERM:   ( (DIGIT)+ (SAFE_LETTER | HIGH_CHAR) ) => TEXT_TERM |
+        ( FLOAT ) => FLOAT { $setType(FLOAT); } |
+        ( NUMBER ) => NUMBER { $setType(NUMBER); } |
+        TEXT_TERM;
 
 protected ENCODED_QUOTED_TERM:    "#base64quote"! O_PAREN! (TAB! | SPACE!)* (BASESIXFOUR_CHAR)+ (TAB! | SPACE!)* C_PAREN!;
 protected ENCODED_TERM:           "#base64"! O_PAREN! (TAB! | SPACE!)* (BASESIXFOUR_CHAR)+ (TAB! | SPACE!)* C_PAREN!;
@@ -487,17 +486,18 @@ scoreifNode[ indri::lang::RawExtentNode * ou ] returns [ indri::lang::FilReqNode
     fq = new FilReqNode( filter, required );
     _nodes.push_back(fq);
   }; 
- 
+
 anyField returns [ indri::lang::Field* f ]
   {
+  std::string fName;
     f = 0;
   } :
-  (ANY COLON) => ANY COLON t:TERM {
-    f = new Field(t->getText());
+  (ANY COLON) => ANY COLON fName=fieldNameString  {
+    f = new Field(fName);
     _nodes.push_back(f);
   } |
-  (ANY O_PAREN) => ANY O_PAREN tt:TERM C_PAREN {
-    f = new Field(tt->getText());
+  (ANY O_PAREN) => ANY O_PAREN fName=fieldNameString C_PAREN {
+    f = new Field(fName);
     _nodes.push_back(f);
   };
 
@@ -545,6 +545,11 @@ unqualifiedTerm returns [ indri::lang::RawExtentNode* re ] {
   | ( GREATER ) => re=greaterNode
   | ( BETWEEN ) => re=betweenNode
   | ( EQUALS ) => re=equalsNode
+  | ( TERM SPACE_DASH ) => re=rawText
+  | ( TERM DASH ) => re=hyphenTerm
+  | ( NUMBER DASH ) => re=hyphenTerm
+  | ( SPACE_DASH ) => re=rawText
+  | ( DASH ) => re=rawText
   | ( WCARD ) => re=wildcardOpNode
   | ( TERM STAR ) => t=rawText STAR {
       // wildcard support as an unqualified term
@@ -578,6 +583,59 @@ unqualifiedTerm returns [ indri::lang::RawExtentNode* re ] {
   }
   | re = rawText;
 
+hyphenTerm returns [ indri::lang::ODNode* od ] {
+    od = new indri::lang::ODNode;
+    od->setWindowSize(1);
+    _nodes.push_back(od);
+    indri::lang::IndexTerm* t = 0;
+  } : id:TERM {     
+            t = new indri::lang::IndexTerm(id->getText());
+            _nodes.push_back(t);
+            od->addChild(t); }
+    ( options { greedy=true; }: DASH t=hyphenate { 
+            od->addChild(t); }
+    )+ |
+      n:NUMBER {     
+            t = new indri::lang::IndexTerm(n->getText());
+            _nodes.push_back(t);
+            od->addChild(t); }
+    ( options { greedy=true; }: DASH t=hyphenate { 
+            od->addChild(t); }
+    )+
+    ;
+
+hyphenate returns [indri::lang::IndexTerm * t] {
+    t = 0;
+  } :
+   id:TERM {
+   t = new indri::lang::IndexTerm(id->getText());
+   _nodes.push_back(t);
+  } |
+  n:NUMBER {
+    t = new indri::lang::IndexTerm(n->getText());
+    _nodes.push_back(t);
+  };
+
+fieldNameString returns [std::string field] {
+    std::string second;
+} : (TERM DASH) => first:TERM {
+            field = first->getText();
+        } (options { greedy = true; } : DASH second=fstring {
+            field += "-";
+            field += second;
+            } )+ |
+        fname:TERM {
+            field = fname->getText();
+        } ;
+
+fstring returns [ std::string f] :
+  id:TERM {
+    f = id->getText();
+  } |
+  n:NUMBER {
+    f = n->getText();
+  };
+
 wildcardOpNode returns [ indri::lang::WildcardTerm* s ] {
     // wildcard operator "#wildcard( term )"
     indri::lang::IndexTerm* t = 0;
@@ -591,6 +649,7 @@ wildcardOpNode returns [ indri::lang::WildcardTerm* s ] {
           
 extentRestriction [ indri::lang::ScoredExtentNode* sn, indri::lang::RawExtentNode * ou ] returns [ indri::lang::ScoredExtentNode* er ] {
     indri::lang::Field* f = 0;
+    std::string fName;
     er = 0;
     indri::lang::ExtentInside * po = 0;
   } :
@@ -608,9 +667,9 @@ extentRestriction [ indri::lang::ScoredExtentNode* sn, indri::lang::RawExtentNod
     
     er = new indri::lang::FixedPassage(sn, windowSize, increment);
   } |
-  ( O_SQUARE TERM ) =>  O_SQUARE field:TERM C_SQUARE
+  ( O_SQUARE TERM ) =>  O_SQUARE fName=fieldNameString C_SQUARE
   {
-    f = new indri::lang::Field(field->getText());
+    f = new indri::lang::Field(fName);
     _nodes.push_back(f);
     er = new indri::lang::ExtentRestriction(sn, f);
     _nodes.push_back(er);
@@ -632,12 +691,13 @@ path returns [ indri::lang::ExtentInside* r ] {
     indri::lang::Field * f = 0;
     indri::lang::ExtentInside * po = 0;
     indri::lang::ExtentInside * lastPo = 0;
+    std::string fieldRestricted;
 } :
-  (options{greedy=true;} : po=pathOperator fieldRestricted:TERM {
+  (options{greedy=true;} : po=pathOperator fieldRestricted=fieldNameString {
       if ( r == 0 ) {  // set the root
         r = po;
       }      
-      f = new indri::lang::Field(fieldRestricted->getText());
+      f = new indri::lang::Field(fieldRestricted);
       _nodes.push_back(f);      
       po->setInner(f);  // set the leaf's inner
       if ( lastPo != 0 ) {  // add this operator into the chain
@@ -711,19 +771,20 @@ synonym_list_alt returns [ indri::lang::ExtentOr* s ] {
 
 field_list returns [ indri::lang::ExtentAnd* fields ]
   { 
+    std::string first, additional;
     fields = new ExtentAnd;
     _nodes.push_back( fields );
   } :
   // first field
-  first:TERM {
-    Field* firstField = new indri::lang::Field( first->getText() );
+  first=fieldNameString {
+    Field* firstField = new indri::lang::Field( first );
     _nodes.push_back( firstField );
     fields->addChild( firstField );
   }
   // additional fields
   ( options { greedy=true; } :
-      COMMA additional:TERM {
-        Field* additionalField = new Field(additional->getText());
+      COMMA additional=fieldNameString {
+        Field* additionalField = new Field(additional);
         _nodes.push_back( additionalField );
         fields->addChild( additionalField );
       }
@@ -734,11 +795,12 @@ context_list [ indri::lang::RawExtentNode * ou ] returns [ ExtentOr* contexts ] 
     _nodes.push_back( contexts );
     indri::lang::ExtentInside * p = 0;
     indri::lang::ExtentInside * pAdditional = 0;
+    std::string first, additional;
   } :
   O_PAREN
   // first field
-  (first:TERM {
-    Field* firstField = new indri::lang::Field( first->getText() );
+  (first=fieldNameString {
+    Field* firstField = new indri::lang::Field( first );
     _nodes.push_back( firstField );
     contexts->addChild( firstField );
   }
@@ -749,8 +811,8 @@ context_list [ indri::lang::RawExtentNode * ou ] returns [ ExtentOr* contexts ] 
   }))
   // additional fields
   ( options { greedy=true; } :
-      COMMA ( additional:TERM {
-        Field* additionalField = new Field(additional->getText());
+      COMMA ( additional=fieldNameString {
+        Field* additionalField = new Field(additional);
         _nodes.push_back( additionalField );
         contexts->addChild( additionalField );
       } |
@@ -763,10 +825,12 @@ context_list [ indri::lang::RawExtentNode * ou ] returns [ ExtentOr* contexts ] 
 
 
 
-field_restriction returns [ indri::lang::Field* extent ] :
+field_restriction returns [ indri::lang::Field* extent ] {
+    std::string fieldName;
+  } :
   O_SQUARE
-  fieldName:TERM {
-    extent = new Field( fieldName->getText() );
+  fieldName=fieldNameString {
+    extent = new Field( fieldName );
     _nodes.push_back( extent );
   }
   C_SQUARE;
@@ -840,20 +904,14 @@ date returns [ UINT64 d ] :
   ( NUMBER SLASH ) => d=slashDate |
   ( TERM NUMBER ) => d=spaceDate |
   ( NUMBER TERM ) => d=spaceDate |
-  d=dashDate;
+  ( NUMBER DASH ) => d=dashDate 
+  ;
   
 dashDate returns [ UINT64 d ] {
     d = 0;
   } :
-  dmy:TERM {
-    const std::string& text = dmy->getText();
-    int firstDash = text.find('-');
-    int secondDash = text.find('-', firstDash+1);
-    std::string day = text.substr( 0, firstDash ); 
-    std::string month = text.substr( firstDash+1, secondDash-firstDash-1 );
-    std::string year = text.substr( secondDash+1 );
-
-    d = indri::parse::DateParse::convertDate( year, month, day ); 
+  day:NUMBER DASH month:TERM DASH year:NUMBER {
+    d = indri::parse::DateParse::convertDate( year->getText(), month->getText(), day->getText() );             
   };
   
 slashDate returns [ UINT64 d ] {
@@ -885,12 +943,24 @@ rawText returns [ indri::lang::IndexTerm* t ] {
     t = new indri::lang::IndexTerm(n->getText());
     _nodes.push_back(t);
   } |
-  nn:NEGATIVE_NUMBER {
-    t = new indri::lang::IndexTerm(nn->getText());
+  SPACE_DASH nn:NUMBER {
+    t = new indri::lang::IndexTerm(std::string("-") + nn->getText());
+    _nodes.push_back(t);
+  } |
+  DASH nnn:NUMBER {
+    t = new indri::lang::IndexTerm(std::string("-") + nnn->getText());
     _nodes.push_back(t);
   } |
   f:FLOAT {
     t = new indri::lang::IndexTerm(f->getText());
+    _nodes.push_back(t);
+  } |
+  DASH ff:FLOAT {
+    t = new indri::lang::IndexTerm(std::string("-") + ff->getText());
+    _nodes.push_back(t);
+  } |
+  SPACE_DASH fff:FLOAT {
+    t = new indri::lang::IndexTerm(std::string("-") + fff->getText());
     _nodes.push_back(t);
   } |
   DBL_QUOTE t=rawText DBL_QUOTE {
@@ -921,6 +991,18 @@ floating returns [ double d ] {
   } |
   n:NUMBER {
     d = atof(n->getText().c_str());
+  } |
+  DASH ff:FLOAT {
+    d = - atof(ff->getText().c_str());
+  } |
+  DASH nn:NUMBER {
+    d = - atof(nn->getText().c_str());
+  } |
+  SPACE_DASH fff:FLOAT {
+    d = - atof(fff->getText().c_str());
+  } |
+  SPACE_DASH nnn:NUMBER {
+    d = - atof(nnn->getText().c_str());
   };
 
 number returns [ INT64 v ] {
@@ -929,17 +1011,21 @@ number returns [ INT64 v ] {
   n:NUMBER {
     v = string_to_i64(n->getText());
   } |
-  nn:NEGATIVE_NUMBER {
-    v = string_to_i64(nn->getText());
+  DASH nn:NUMBER {
+    v = - string_to_i64(nn->getText());
+  } |
+  SPACE_DASH nnn:NUMBER {
+    v = - string_to_i64(nnn->getText());
   };
 
 greaterNode returns [ indri::lang::FieldGreaterNode* gn ] {
     gn = 0;
     Field* compareField = 0;
     INT64 low = 0;
+    std::string field;
   } :
-  GREATER O_PAREN field:TERM low=number C_PAREN {
-    compareField = new Field(field->getText());
+  GREATER O_PAREN field=fieldNameString low=number C_PAREN {
+    compareField = new Field(field);
     gn = new FieldGreaterNode( compareField, low );
     _nodes.push_back( compareField );
     _nodes.push_back( gn );
@@ -949,9 +1035,10 @@ lessNode returns [ indri::lang::FieldLessNode* ln ] {
     ln = 0;
     Field* compareField = 0;
     INT64 high = 0;
+    std::string field;
   } :
-  LESS O_PAREN field:TERM high=number C_PAREN {
-    compareField = new Field(field->getText());
+  LESS O_PAREN field=fieldNameString high=number C_PAREN {
+    compareField = new Field(field);
     ln = new FieldLessNode( compareField, high );
     _nodes.push_back( compareField );
     _nodes.push_back( ln );
@@ -962,9 +1049,10 @@ betweenNode returns [ indri::lang::FieldBetweenNode* bn ] {
     Field* compareField = 0;
     INT64 low = 0;
     INT64 high = 0;
+    std::string field;
   } :
-  BETWEEN O_PAREN field:TERM low=number high=number C_PAREN {
-    compareField = new Field(field->getText());
+  BETWEEN O_PAREN field=fieldNameString low=number high=number C_PAREN {
+    compareField = new Field(field);
     bn = new FieldBetweenNode( compareField, low, high );
     _nodes.push_back( compareField );
     _nodes.push_back( bn );
@@ -974,9 +1062,10 @@ equalsNode returns [ indri::lang::FieldEqualsNode* en ] {
     en = 0;
     Field* compareField = 0;
     INT64 eq = 0;
+    std::string field;
   } :
-  EQUALS O_PAREN field:TERM eq=number C_PAREN {
-    compareField = new Field(field->getText());
+  EQUALS O_PAREN field=fieldNameString eq=number C_PAREN {
+    compareField = new Field(field);
     en = new FieldEqualsNode( compareField, eq );
     _nodes.push_back( compareField );
     _nodes.push_back( en );

@@ -10,7 +10,7 @@
 
 #line 12 "QueryParser.hpp"
 #include <antlr/config.hpp>
-/* $ANTLR 2.7.3 (20060307-1): "indrilang.g" -> "QueryParser.hpp"$ */
+/* $ANTLR 2.7.7 (2006-11-01): "indrilang.g" -> "QueryParser.hpp"$ */
 #include <antlr/TokenStream.hpp>
 #include <antlr/TokenBuffer.hpp>
 #include "QueryLexerTokenTypes.hpp"
@@ -20,7 +20,7 @@ ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
 class CUSTOM_API QueryParser : public ANTLR_USE_NAMESPACE(antlr)LLkParser, public QueryLexerTokenTypes
 {
-#line 159 "indrilang.g"
+#line 158 "indrilang.g"
 
 private:
   // storage for allocated nodes
@@ -142,6 +142,7 @@ public:
 	public:  indri::lang::UWNode*  uwNode();
 	public:  indri::lang::BAndNode*  bandNode();
 	public:  indri::lang::Field*  anyField();
+	public: std::string  fieldNameString();
 	public:  indri::lang::ExtentAnd*  field_list();
 	public:  indri::lang::FieldLessNode*  dateBefore();
 	public:  indri::lang::FieldGreaterNode*  dateAfter();
@@ -154,8 +155,11 @@ public:
 	public:  indri::lang::FieldGreaterNode*  greaterNode();
 	public:  indri::lang::FieldBetweenNode*  betweenNode();
 	public:  indri::lang::FieldEqualsNode*  equalsNode();
-	public:  indri::lang::WildcardTerm*  wildcardOpNode();
 	public:  indri::lang::IndexTerm*  rawText();
+	public:  indri::lang::ODNode*  hyphenTerm();
+	public:  indri::lang::WildcardTerm*  wildcardOpNode();
+	public: indri::lang::IndexTerm *  hyphenate();
+	public:  std::string  fstring();
 	public:  indri::lang::ExtentInside*  path();
 	public:  indri::lang::ExtentInside*  pathOperator();
 	public:  indri::lang::Field*  field_restriction();
@@ -175,10 +179,10 @@ protected:
 private:
 	static const char* tokenNames[];
 #ifndef NO_STATIC_CONSTS
-	static const int NUM_TOKENS = 68;
+	static const int NUM_TOKENS = 69;
 #else
 	enum {
-		NUM_TOKENS = 68
+		NUM_TOKENS = 69
 	};
 #endif
 	
@@ -198,6 +202,10 @@ private:
 	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_6;
 	static const unsigned long _tokenSet_7_data_[];
 	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_7;
+	static const unsigned long _tokenSet_8_data_[];
+	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_8;
+	static const unsigned long _tokenSet_9_data_[];
+	static const ANTLR_USE_NAMESPACE(antlr)BitSet _tokenSet_9;
 };
 
 ANTLR_END_NAMESPACE

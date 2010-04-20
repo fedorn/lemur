@@ -3,7 +3,7 @@
 
 ANTLR_BEGIN_NAMESPACE(indri)
 ANTLR_BEGIN_NAMESPACE(lang)
-/* $ANTLR 2.7.3 (20060307-1): "indrilang.g" -> "QueryLexerTokenTypes.hpp"$ */
+/* $ANTLR 2.7.7 (2006-11-01): "indrilang.g" -> "QueryLexerTokenTypes.hpp"$ */
 
 #ifndef CUSTOM_API
 # define CUSTOM_API
@@ -61,23 +61,24 @@ struct CUSTOM_API QueryLexerTokenTypes {
 		SLASH = 48,
 		B_SLASH = 49,
 		DASH = 50,
-		COLON = 51,
-		TAB = 52,
-		CR = 53,
-		LF = 54,
-		SPACE = 55,
-		HIGH_CHAR = 56,
-		DIGIT = 57,
-		ASCII_LETTER = 58,
-		SAFE_LETTER = 59,
-		SAFE_CHAR = 60,
-		BASESIXFOUR_CHAR = 61,
-		TEXT_TERM = 62,
-		TERM = 63,
-		ENCODED_QUOTED_TERM = 64,
-		ENCODED_TERM = 65,
-		OPERATOR = 66,
-		JUNK = 67,
+		SPACE_DASH = 51,
+		COLON = 52,
+		TAB = 53,
+		CR = 54,
+		LF = 55,
+		SPACE = 56,
+		HIGH_CHAR = 57,
+		DIGIT = 58,
+		ASCII_LETTER = 59,
+		SAFE_LETTER = 60,
+		SAFE_CHAR = 61,
+		BASESIXFOUR_CHAR = 62,
+		TEXT_TERM = 63,
+		TERM = 64,
+		ENCODED_QUOTED_TERM = 65,
+		ENCODED_TERM = 66,
+		OPERATOR = 67,
+		JUNK = 68,
 		NULL_TREE_LOOKAHEAD = 3
 	};
 #ifdef __cplusplus

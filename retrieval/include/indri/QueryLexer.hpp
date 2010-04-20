@@ -10,7 +10,7 @@
 
 #line 12 "QueryLexer.hpp"
 #include <antlr/config.hpp>
-/* $ANTLR 2.7.3 (20060307-1): "indrilang.g" -> "QueryLexer.hpp"$ */
+/* $ANTLR 2.7.7 (2006-11-01): "indrilang.g" -> "QueryLexer.hpp"$ */
 #include <antlr/CommonToken.hpp>
 #include <antlr/InputBuffer.hpp>
 #include <antlr/BitSet.hpp>
@@ -61,7 +61,8 @@ public:
 	public: void mCOMMA(bool _createToken);
 	public: void mSLASH(bool _createToken);
 	public: void mB_SLASH(bool _createToken);
-	protected: void mDASH(bool _createToken);
+	public: void mDASH(bool _createToken);
+	public: void mSPACE_DASH(bool _createToken);
 	public: void mCOLON(bool _createToken);
 	protected: void mTAB(bool _createToken);
 	protected: void mCR(bool _createToken);
@@ -75,7 +76,6 @@ public:
 	protected: void mBASESIXFOUR_CHAR(bool _createToken);
 	protected: void mTEXT_TERM(bool _createToken);
 	protected: void mNUMBER(bool _createToken);
-	protected: void mNEGATIVE_NUMBER(bool _createToken);
 	protected: void mFLOAT(bool _createToken);
 	public: void mTERM(bool _createToken);
 	protected: void mENCODED_QUOTED_TERM(bool _createToken);
