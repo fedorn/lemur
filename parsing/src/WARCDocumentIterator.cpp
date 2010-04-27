@@ -155,6 +155,7 @@ bool indri::parse::WARCRecord::readHeader() {
 
 bool indri::parse::WARCRecord::readContent() {
   _buffer.clear();
+  _buffer.grow(contentLength+1);
   content = (char *)_buffer.front();
   int numRead;
   numRead = gzread(_gzin, _buffer.write(contentLength), contentLength);
