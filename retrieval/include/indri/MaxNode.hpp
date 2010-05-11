@@ -114,7 +114,7 @@ namespace indri
   
           if (childResults.size() > 0) {
             for( unsigned int j=0; j<childResults.size(); j++ ) {
-              if ( maxResult.score < childResults[j].score ) {
+              if ( maxScore < childResults[j].score ) {
                 maxResult=childResults[j];
                 maxI = i;
               }
