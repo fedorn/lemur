@@ -109,7 +109,11 @@ namespace indri
       }
 
       int write( const void* buffer, size_t length ) {
-        return ::send( _socket, (const char*) buffer, int(length), 0 );
+//        return ::send( _socket, (const char*) buffer, int(length), 0 );
+        if (_socket == -1) return 0;
+        int result = ::send( _socket, (const char*) buffer, int(length), MSG_NOSIGNAL );
+        if (result < 0) close();
+        return result;
       }
 
       int read( void* buffer, size_t length ) {
