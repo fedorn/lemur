@@ -107,14 +107,14 @@ namespace indri
         int maxBegin = -1;
         int maxEnd = -1;
 
-        indri::api::ScoredExtentResult maxResult((double)-1.0, -1);
+        indri::api::ScoredExtentResult maxResult((double)maxScore, -1);
 
         for( unsigned int i=0; i<_children.size(); i++ ) {
           const indri::utility::greedy_vector<indri::api::ScoredExtentResult>& childResults = _children[i]->score( documentID, extent, extent.end);
   
           if (childResults.size() > 0) {
             for( unsigned int j=0; j<childResults.size(); j++ ) {
-              if ( maxScore < childResults[j].score ) {
+              if ( maxResult.score < childResults[j].score ) {
                 maxResult=childResults[j];
                 maxI = i;
               }
