@@ -19,6 +19,10 @@
 #ifndef INDRI_NETWORKSTREAM_HPP
 #define INDRI_NETWORKSTREAM_HPP
 
+#if defined(__APPLE__) || defined(WIN32)
+#define MSG_NOSIGNAL 0
+#endif
+
 #include "lemur-platform.h"
 #include "lemur-compat.hpp"
 #include "indri/indri-platform.h"
@@ -93,6 +97,10 @@ namespace indri
         lemur_compat::initializeNetwork();
 
         _socket = ::socket( AF_INET, SOCK_STREAM, 0 );
+#ifdef __APPLE__
+        int set = 1;
+        setsockopt(_socket, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
+#endif
         struct sockaddr_in sa = _getSockaddr( name, port );
         int result = ::connect( _socket, (const sockaddr*) &sa, sizeof sa );
 
