@@ -810,6 +810,7 @@ std::vector<indri::api::ScoredExtentResult> indri::api::QueryEnvironment::expres
   
   std::vector<ScoredExtentResult>& occurrencesList = statisticsResults[ listAccumulator->nodeName() ][ "occurrences" ];
   delete parser;
+  delete listAccumulator;
   return occurrencesList;
 }
 
@@ -846,7 +847,7 @@ double indri::api::QueryEnvironment::expressionCount( const std::string& express
   
   std::vector<ScoredExtentResult>& occurrencesList = statisticsResults[ contextCounter->nodeName() ][ "occurrences" ];
   delete parser;
-  
+  delete contextCounter;
   return occurrencesList[0].score;
 }
 
