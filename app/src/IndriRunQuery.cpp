@@ -24,14 +24,6 @@
 <H3>QueryEnvironment Parameters</H3>
 <H4>Retrieval Parameters</H4>
 <dl>
-<dt>memory</dt>
-<dd> an integer value specifying the number of bytes to use for the
-query retrieval process. The value can include a scaling factor by
-adding a suffix. Valid values are (case insensitive) K = 1000, M =
-1000000, G = 1000000000. So 100M would be equivalent to 100000000. The
-value should contain only decimal digits and the optional
-suffix. Specified as &lt;memory&gt;100M&lt;/memory&gt; in the parameter
-file and as <tt>-memory=100M</tt> on the command line. </dd>
 <dt>index</dt>
 <dd> path to an Indri Repository. Specified as
 &lt;index&gt;/path/to/repository&lt;/index&gt; in the parameter file and
@@ -490,7 +482,6 @@ public:
   }
 
   UINT64 initialize() {
-    _environment.setMemory( _parameters.get("memory", 100*1024*1024) );
     _environment.setSingleBackgroundModel( _parameters.get("singleBackgroundModel", false) );
 
     std::vector<std::string> stopwords;
