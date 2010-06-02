@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([Lemur],[4.11],[project@lemurproject.org])
+AC_INIT([Lemur],[4.12],[project@lemurproject.org])
 CFLAGS=${CFLAGS:-"-g -O3"}
 CXXFLAGS=${CXXFLAGS:-"-g -O3"}
 AC_CONFIG_SRCDIR(app/src/RetEval.cpp)
