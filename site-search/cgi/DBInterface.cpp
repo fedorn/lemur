@@ -1,4 +1,5 @@
 #include "DBInterface.h"
+#include "indri/CompressedCollection.hpp"
 
 using namespace lemur::api;
 
@@ -276,120 +277,121 @@ void DBInterface::listIndexFields() {
 }
 
 
-std::string DBInterface::getSummaryString(const lemur::api::DocumentManager* dm, lemur::api::Index *db, 
-                                          lemur::parse::StringQuery* q, int resultID, string docext) {
-    //
-    // Build excerpt from MatchInfo matches ------------------------------------------
-    //
+std::string DBInterface::getSummaryString(const lemur::api::DocumentManager* dm, lemur::api::Index *db, lemur::parse::StringQuery* q, int resultID, string docext) {
+  //
+  // Build excerpt from MatchInfo matches --
+  //
 
-    std::string retSummary="";
+  std::string retSummary="";
 
-    string doc="";
-    char *tmpDoc=dm->getDoc(docext);
-    if (tmpDoc) {
-      doc.append(tmpDoc);
+  string doc="";
+  char *tmpDoc=dm->getDoc(docext);
+  if (tmpDoc) {
+    doc.append(tmpDoc);
+  }
+
+  MatchInfo* mi = MatchInfo::getMatches(*db, *q, resultID);
+
+  int matchcount = mi->count();
+  //int docmatches[matchcount*2];
+  int *docmatches = new int[matchcount*2]; //studio .NET doesn't like
+
+  // mi->startIteration();
+  for (int m=0; m < matchcount; m++) {
+    TMatch tm = mi->at(m);
+    //TMatch tm = mi->nextMatch();
+    docmatches[m*2] = tm.start;
+    docmatches[m*2+1] = tm.end;
+  } // end for (int m=0; m < matchcount; m++)
+
+  if (matchcount > 0) {
+    // Display first three matches with passage30 for each, try to break on whitespace
+    int start, end;  // bounds of passage
+    int first, last; // occurrences of whitespace
+    int finalpassage = matchcount;
+
+    if (finalpassage > 3) {
+      finalpassage = 3;
     }
 
-    MatchInfo* mi = MatchInfo::getMatches(*db, *q, resultID);
+    bool badTextOffset=false;
 
-    int matchcount = mi->count();
-    //int docmatches[matchcount*2];
-    int *docmatches = new int[matchcount*2]; //studio .NET doesn't like
+    for (int m=0; (!badTextOffset) && (m < finalpassage); m++) {
+      start = docmatches[m*2] - 30;
+      end = docmatches[m*2+1] + 30;
 
-    // mi->startIteration();
-    for (int m=0; m < matchcount; m++) {
-      TMatch tm = mi->at(m);
-      //TMatch tm = mi->nextMatch();
-      docmatches[m*2] = tm.start;
-      docmatches[m*2+1] = tm.end;
-    } // end for (int m=0; m < matchcount; m++)
-
-    if (matchcount > 0) {
-      // Display first three matches with passage30 for each, try to break on whitespace
-      int start, end;  // bounds of passage
-      int first, last; // occurrences of whitespace
-      int finalpassage = matchcount;
-
-      if (finalpassage > 3) {
-        finalpassage = 3;
+      if (start < 0) {
+	start = 0;
       }
 
-      bool badTextOffset=false;
+      if (end >= doc.length()) {
+	end = doc.length() - 1;
+      }
 
-      for (int m=0; (!badTextOffset) && (m < finalpassage); m++) {
-        start = docmatches[m*2] - 30;
-        end = docmatches[m*2+1] + 30;
+      first = start;
+      last = end;
 
-        if (start < 0) {
-          start = 0;
-        }
+      for (int w = (docmatches[m*2] + start) / 2; w > start; w--) {
+	if (w >= doc.length()) {
+	  badTextOffset=true;
+	} else {
+	  if (doc.at(w) == ' ') first = w;
+	}
+      }
 
-        if (end >= doc.length()) {
-          end = doc.length() - 1;
-        }
+      for (int w = (docmatches[m*2+1] + end) / 2; w < end; w++) {
+	if (w >= doc.length()) {
+	  badTextOffset=true;
+	} else {
+	  if (doc.at(w) == ' ') last = w;
+	}
+      }
 
-        first = start;
-        last = end;
-
-        for (int w = (docmatches[m*2] + start) / 2; w > start; w--) {
-          if (w >= doc.length()) {
-            badTextOffset=true;
-          } else {
-            if (doc.at(w) == ' ') first = w;
-          }
-        }
-
-        for (int w = (docmatches[m*2+1] + end) / 2; w < end; w++) {
-          if (w >= doc.length()) {
-            badTextOffset=true;
-          } else {
-            if (doc.at(w) == ' ') last = w;
-          }
-        }
-
-        if (!badTextOffset) {
-          docmatches[m*2] = first;
-          docmatches[m*2+1] = last;
-        }
-      } // end for (int m=0; m < finalpassage; m++)
-
-      retSummary.append("...");
-      if ((!badTextOffset) && (finalpassage > 1)) {
-        //
-        // Combine overlapping passages
-        //
-        for (int m=1; m < finalpassage; m++) {
-          if (docmatches[m*2-1] >= docmatches[m*2]) {
-            docmatches[m*2] = docmatches[m*2-2];
-          } else {
-            // no overlap so display previous passage
-            string passage = doc.substr(docmatches[m*2-2],docmatches[m*2-1]+1 - docmatches[m*2-2]);
-            retSummary.append(passage + "...");
-          }
-        } // end for (int m=1; m < finalpassage; m++)
-      } // end if (finalpassage > 1)
-      // Display last passage (max third)
       if (!badTextOffset) {
-        std::string passage = doc.substr(docmatches[finalpassage*2-2],docmatches[finalpassage*2-1]+1 - docmatches[finalpassage*2-2]);
-        retSummary.append(passage + "...");
+	docmatches[m*2] = first;
+	docmatches[m*2+1] = last;
       }
-    } // end if (matchcount > 0)
+    } // end for (int m=0; m < finalpassage; m++)
 
-    int pos = 0;
-    while ((pos = retSummary.find('<',pos)) != string::npos) {
-      retSummary.replace(pos, 1, "&lt;", 4);
+    retSummary.append("...");
+    if ((!badTextOffset) && (finalpassage > 1)) {
+      //
+      // Combine overlapping passages
+      //
+      for (int m=1; m < finalpassage; m++) {
+	if (docmatches[m*2-1] >= docmatches[m*2]) {
+	  docmatches[m*2] = docmatches[m*2-2];
+	} else {
+	  // no overlap so display previous passage
+	  string passage = doc.substr(docmatches[m*2-2],
+				      docmatches[m*2-1]+1 - docmatches[m*2-2]);
+	  retSummary.append(passage + "...");
+	}
+      } // end for (int m=1; m < finalpassage; m++)
+    } // end if (finalpassage > 1)
+      // Display last passage (max third)
+    if (!badTextOffset) {
+      std::string passage = doc.substr(docmatches[finalpassage*2-2],
+				       docmatches[finalpassage*2-1]+1 - docmatches[finalpassage*2-2]);
+      retSummary.append(passage + "...");
     }
+  } // end if (matchcount > 0)
 
-    pos = 0;
-    while ((pos = retSummary.find('>',pos)) != string::npos) {
-      retSummary.replace(pos, 1, "&gt;", 4);
-    }
+  int pos = 0;
+  while ((pos = retSummary.find('<',pos)) != string::npos) {
+    retSummary.replace(pos, 1, "&lt;", 4);
+  }
 
-    // clean up
-    delete[](docmatches);
+  pos = 0;
+  while ((pos = retSummary.find('>',pos)) != string::npos) {
+    retSummary.replace(pos, 1, "&gt;", 4);
+  }
 
-    // Done with matches from MatchInfo ------------------------------------------
-    return retSummary;
+  // clean up
+  delete[](docmatches);
+
+  // Done with matches from MatchInfo -----------
+  return retSummary;
 }
 
 lemur::api::IndexedRealVector DBInterface::removeDuplicateResults(lemur::api::IndexedRealVector results, lemur::api::Index *db) {
@@ -531,13 +533,19 @@ void DBInterface::displaySearchResults(lemur::api::Index *db, int datasourceID, 
       }
 
       if (ptitle) {
-        output->writeSearchResult(docext, docext, ptitle, buf, (*results)[i].val, datasourceID, (*results)[i].ind);
+        output->writeSearchResult(docext, docext, ptitle, buf, 
+				  (*results)[i].val, datasourceID, 
+				  (*results)[i].ind);
         delete[]ptitle;
       } else {
-        output->writeSearchResult(docext, docext, docext, buf, (*results)[i].val, datasourceID, (*results)[i].ind);
+        output->writeSearchResult(docext, docext, docext, buf, 
+				  (*results)[i].val, datasourceID, 
+				  (*results)[i].ind);
       } // end if (ptitle)
     } else {
-      output->writeSearchResult(docext, docext, docext, buf, (*results)[i].val, datasourceID, (*results)[i].ind);
+      output->writeSearchResult(docext, docext, docext, buf, 
+				(*results)[i].val, datasourceID, 
+				(*results)[i].ind);
     } // end [else] if (elem)
   } // for (int i=rankStart;(i<listLength+rankStart) && (i<results.size());i++)
 
@@ -545,10 +553,12 @@ void DBInterface::displaySearchResults(lemur::api::Index *db, int datasourceID, 
   output->displayResultsPageEnding();
 }
 
-void DBInterface::search(int datasourceID, string &query, long listLength, long rankStart, QUERY_INTERFACE_TYPE queryType) {
+void DBInterface::search(int datasourceID, string &query, long listLength,
+			 long rankStart, QUERY_INTERFACE_TYPE queryType) {
   lemur::api::Index *db=openIndex();
   if (!db) {
-    output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
+    output->writeErrorMessage("Cannot open index.", 
+			      "Error opening index: " + pathToIndex);
     return;
   }
 
@@ -680,13 +690,15 @@ void DBInterface::search(int datasourceID, string &query, long listLength, long 
 void DBInterface::getParsedDoc(long docID) {
   Index *db=openIndex();
   if (!db) {
-    output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
+    output->writeErrorMessage("Cannot open index.", 
+			      "Error opening index: " + pathToIndex);
     return;
   }
 
   TermInfoList* termlist = db->termInfoListSeq(docID);
   if (!termlist) {
-    output->writeErrorMessage("Cannot find parsed document.", "Cannot find parsed document termlist.");
+    output->writeErrorMessage("Cannot find parsed document.", 
+			      "Cannot find parsed document termlist.");
     delete db;
     return;
   }
@@ -714,7 +726,8 @@ void DBInterface::getParsedDoc(long docID) {
 void DBInterface::getDocIID(long docID) {
   Index *db=openIndex();
   if (!db) {
-    output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
+    output->writeErrorMessage("Cannot open index.", 
+			      "Error opening index: " + pathToIndex);
     return;
   }
 
@@ -741,17 +754,49 @@ void DBInterface::getDocIID(long docID) {
 }
 
 void DBInterface::getDocXID(string *docID) {
-  Index *db=openIndex();
-  if (!db) {
-    output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
+  if (!docID) {
+    output->writeErrorMessage("DocID is NULL.", "DocID is NULL.");
     return;
   }
 
-  const DocumentManager* dm = NULL;
-  if (docID) {
+  Index *db=openIndex();
+  if (!db) {
+    output->writeErrorMessage("Cannot open index.", 
+			      "Error opening index: " + pathToIndex);
+    return;
+  }
+
+  indri::api::QueryEnvironment *indriEnvironment=NULL;
+  lemur::index::LemurIndriIndex *indriTestIndexCast=dynamic_cast<lemur::index::LemurIndriIndex*>((lemur::api::Index*)db);
+  if (indriTestIndexCast) {
+    // get the environment and add our index
+    indriEnvironment=new indri::api::QueryEnvironment();
+    vector<string> thisQueryHostVec=CGIConfiguration::getInstance().getQueryHostVec(pathToIndex);
+    if (thisQueryHostVec.size()==0) {
+      indriEnvironment->addIndex(pathToIndex.c_str());
+    } else {
+      for (vector<string>::iterator vIter=thisQueryHostVec.begin(); vIter!=thisQueryHostVec.end(); vIter++) {
+        indriEnvironment->addServer(*vIter);
+      }
+    }
+    std::vector<std::string> idList;
+    idList.push_back(docID->c_str());
+    std::vector<lemur::api::DOCID_T> docIDs = 
+      indriEnvironment->documentIDsFromMetadata("docno", idList);
+    std::vector<indri::api::ParsedDocument*> documents = 
+      indriEnvironment->documents(docIDs);
+
+    // Just take the first one (there should be only one)
+    indri::api::ParsedDocument* document = documents[0];
+    if (document) {
+      output->displayDataPage(documents[0]->text, "Document by External ID");
+      delete db;
+      return;
+    }
+  } else {
     int internalDocID=db->document(docID->c_str());
     if (internalDocID) {
-      dm=db->docManager(internalDocID);
+      const DocumentManager* dm=db->docManager(internalDocID);
       if (dm) {
         string s(dm->getDoc(docID->c_str()));
     	output->displayDataPage(s, "Document by External ID");
@@ -761,7 +806,8 @@ void DBInterface::getDocXID(string *docID) {
     }
   }
 
-  output->writeErrorMessage("Error retrieving document.", "Cannot retrieve document.");
+  output->writeErrorMessage("Error retrieving document.", 
+			    "Cannot retrieve document.");
 
   delete db;
 }
@@ -769,7 +815,8 @@ void DBInterface::getDocXID(string *docID) {
 void DBInterface::getTermCorpusStats(string *term) {
   Index *db=openIndex();
   if (!db) {
-    output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
+    output->writeErrorMessage("Cannot open index.", 
+			      "Error opening index: " + pathToIndex);
     return;
   }
 
@@ -817,7 +864,8 @@ void DBInterface::getTermCorpusStats(string *term) {
 void DBInterface::getTermInvList (string *term) {
   Index *db=openIndex();
   if (!db) {
-    output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
+    output->writeErrorMessage("Cannot open index.", 
+			      "Error opening index: " + pathToIndex);
     return;
   }
 
@@ -953,7 +1001,7 @@ void DBInterface::getWordStem(string *term) {
 
 void DBInterface::getTermInvListField(string *term) {
   // first - get the field position (if any)
-	string::size_type dotPos=term->find(".", 0);
+  string::size_type dotPos=term->find(".", 0);
 
   Index *db=openIndex();
   if (!db) {
@@ -966,162 +1014,148 @@ void DBInterface::getTermInvListField(string *term) {
   try {
     _repository.openRead(pathToIndex);
   } catch (...) {
-		// not an indri repository?
-		// if we don't have a dot position, 
-		// try the normal method...
-		if (dotPos==string::npos) {
-			// no field? use the normal method
-			getTermInvList(term);
-			return;
-		}
+    // not an indri repository?
+    // if we don't have a dot position, 
+    // try the normal method...
+    if (dotPos==string::npos) {
+      // no field? use the normal method
+      getTermInvList(term);
+      return;
+    }
     output->writeErrorMessage("Cannot open repository.","Can't open indri repository: " + pathToIndex);
     delete db;
     return;
   }
 
-	// our output stream string
+  // our output stream string
   stringstream statsString;
 
-	string theTerm="";
-	string theField="";
+  string theTerm="";
+  string theField="";
 
   // got it - separate the two...
-	if (dotPos==string::npos) {
-		// no field? use the mainbody field (only if it exists!)
-		theTerm=term->c_str();
+  if (dotPos==string::npos) {
+    // no field? use the mainbody field (only if it exists!)
+    theTerm=term->c_str();
 
-		const std::vector< indri::collection::Repository::Field > repFields=_repository.fields();
-		std::vector< indri::collection::Repository::Field >::const_iterator fIter=repFields.begin();
-		for (; (fIter!=repFields.end() && theField.length()==0); fIter++) {
-			if ((*fIter).name=="mainbody") {
-				theField="mainbody";
-			}
-		}
+    const std::vector< indri::collection::Repository::Field > repFields=_repository.fields();
+    std::vector< indri::collection::Repository::Field >::const_iterator fIter=repFields.begin();
+    for (; (fIter!=repFields.end() && theField.length()==0); fIter++) {
+      if ((*fIter).name=="mainbody") {
+	theField="mainbody";
+      }
+    }
 
-		if (theField.length()==0) {
-			// not found? use the old method...
-			getTermInvList(term);
-			return;
-		}
+    if (theField.length()==0) {
+      // not found? use the old method...
+      getTermInvList(term);
+      return;
+    }
     
-	} else {
-		theTerm=term->substr(0, dotPos);
-		theField=term->substr(dotPos+1);
-	}
+  } else {
+    theTerm=term->substr(0, dotPos);
+    theField=term->substr(dotPos+1);
+  }
 
-	// get the stemmed term (if any)
-	string stemmedTerm=getStemmedTerm(theTerm, db);
+  // get the stemmed term (if any)
+  string stemmedTerm=getStemmedTerm(theTerm, db);
 
-	// get the internal term ID
-	int termid = db->term(theTerm.c_str());
+  // get the internal term ID
+  int termid = db->term(theTerm.c_str());
 
-	// get inverted list
-	lemur::index::InvDocList *dlist = 0L;
-	if (termid) {
-		dlist=(lemur::index::InvDocList*) db->docInfoList (termid);
-	}
+  // get inverted list
+  lemur::index::InvDocList *dlist = 0L;
+  if (termid) {
+    dlist=(lemur::index::InvDocList*) db->docInfoList (termid);
+  }
 
   if (!dlist) {
-		// no inverted list? Just output the headers...
-		if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
-			statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
-		}
-		// term count and doc frequency of 0.
-		statsString << setw(9) << 0 << "  " << setw(9) << 0 << "\n";
-	} else {
-		// got the list - print headers
-		if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
-			statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
-		}
-		statsString << setw(9) << db->termCount (termid)   << "  " << setw(9) << dlist->docFreq() << "\n\n";
+    // no inverted list? Just output the headers...
+    if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
+      statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
+    }
+    // term count and doc frequency of 0.
+    statsString << setw(9) << 0 << "  " << setw(9) << 0 << "\n";
+  } else {
+    // got the list - print headers
+    if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
+      statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
+    }
+    statsString << setw(9) << db->termCount (termid)   << "  " << setw(9) << dlist->docFreq() << "\n\n";
 
-		if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
-			/*
-			statsString << setw(9) << "docid"  << "  "
-									<< setw(9) << "doclen" << "  "
-									<< setw(9) << "tf (doc)" << "  "
-									<< setw(9) << "# " << theField  << "  "
-									<< setw(9) << theField << "_freq"  << "  "
-									<< setw(9) << "tf (" << theField << ")"  << "\n";
-			*/
+    if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
+      statsString << setw(9) << "docid"  << "  "
+		  << setw(9) << "# " << theField  << "  "
+		  << setw(9) << theField << "_freq"  << "  "
+		  << setw(9) << "tf (" << theField << ")"  << "\n";
+    } // if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM)
 
-			statsString << setw(9) << "docid"  << "  "
-									<< setw(9) << "# " << theField  << "  "
-									<< setw(9) << theField << "_freq"  << "  "
-									<< setw(9) << "tf (" << theField << ")"  << "\n";
-		} // if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM)
-
-		// iterate through the inv. list
-		dlist->startIteration();
-		while (dlist->hasMore()) {
+    // iterate through the inv. list
+    dlist->startIteration();
+    while (dlist->hasMore()) {
 			
-			// get the next entry...
-			DocInfo* info = dlist->nextEntry();
-			if (info) {
-				int fieldCount=0;    // total number of fields
-				int fieldFreq=0;     // number of fields where term occurs
-				int fieldTFCount=0;  // total term frequency within the fields
+      // get the next entry...
+      DocInfo* info = dlist->nextEntry();
+      if (info) {
+	int fieldCount=0;    // total number of fields
+	int fieldFreq=0;     // number of fields where term occurs
+	int fieldTFCount=0;  // total term frequency within the fields
 
-				// we unfortunately need to do this for every document - 
-				// we don't know if the document is in a different index within
-				// the repository...
-				indri::collection::Repository::index_state indexes = _repository.indexes();
+	// we unfortunately need to do this for every document - 
+	// we don't know if the document is in a different index within
+	// the repository...
+	indri::collection::Repository::index_state indexes = _repository.indexes();
 
-				// ensure we get the correct internal index
-				indri::index::Index* index = _indexWithDocument( indexes, info->docID());
-				if (index) {
-					// get the correct internal field ID
-					int fieldID=index->field(theField);
+	// ensure we get the correct internal index
+	indri::index::Index* index = _indexWithDocument(indexes,info->docID());
+	if (index) {
+	  // get the correct internal field ID
+	  int fieldID=index->field(theField);
 
-					// get a vector of the field tags
-					indri::utility::greedy_vector<indri::index::FieldExtent> *aTagVec=getFieldTags(index, info->docID(), fieldID);
-					if (aTagVec) {
-						// get the count (size)
-						fieldCount=aTagVec->size();
-						// get the actual # of fields (total)
-						fieldFreq=getFieldCountOfTerm(index, info->docID(), termid, aTagVec);
-						// get the tf per field...
-						fieldTFCount=getTFFieldTagCount(index, info->docID(), termid, aTagVec);
-						delete aTagVec;
-					} // end if (aTagVec)
-				} // end if (index)
+	  // get a vector of the field tags
+	  indri::utility::greedy_vector<indri::index::FieldExtent> *aTagVec=getFieldTags(index, info->docID(), fieldID);
+	  if (aTagVec) {
+	    // get the count (size)
+	    fieldCount=aTagVec->size();
+	    // get the actual # of fields (total)
+	    fieldFreq=getFieldCountOfTerm(index, info->docID(), termid,
+					  aTagVec);
+	    // get the tf per field...
+	    fieldTFCount=getTFFieldTagCount(index, info->docID(), termid,
+					    aTagVec);
+	    delete aTagVec;
+	  } // end if (aTagVec)
+	} // end if (index)
 
-				if (fieldFreq > 0) {
-					/*
-					statsString << setw(9) << info->docID() << "  "
-											<< setw(9) << db->docLength(info->docID()) << "  "
-											<< setw(9) << info->termCount() << "  "
-											<< setw(9) << fieldCount << "  "
-											<< setw(9) << fieldFreq << "  "
-											<< setw(9) << fieldTFCount << "\n";
-					*/
-					statsString << setw(9) << info->docID() << "  "
-											<< setw(9) << fieldCount << "  "
-											<< setw(9) << fieldFreq << "  "
-											<< setw(9) << fieldTFCount << "\n";
-				} // end if (fieldFreq > 0)
-			} // end if (info)
-		} // end while (dlist->hasMore())
+	if (fieldFreq > 0) {
+	  statsString << setw(9) << info->docID() << "  "
+		      << setw(9) << fieldCount << "  "
+		      << setw(9) << fieldFreq << "  "
+		      << setw(9) << fieldTFCount << "\n";
+	} // end if (fieldFreq > 0)
+      } // end if (info)
+    } // end while (dlist->hasMore())
 
 
-		// we're done here - cleanup.
-		delete dlist;
-	} // end if (!dlist)
+    // we're done here - cleanup.
+    delete dlist;
+  } // end if (!dlist)
 
   output->displayDataPage(statsString.str(), "Inverted list for " + (*term));
 
-	_repository.close();
-	delete db;
+  _repository.close();
+  delete db;
 } // end function: void getTermInvListField(string*)
 
 
 void DBInterface::getTermInvPosListField(string *term) {
   // first - get the field (if any)
-	string::size_type dotPos=term->find(".", 0);
+  string::size_type dotPos=term->find(".", 0);
 
   Index *db=openIndex();
   if (!db) {
-    output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
+    output->writeErrorMessage("Cannot open index.", 
+			      "Error opening index: " + pathToIndex);
     return;
   }
 
@@ -1130,230 +1164,216 @@ void DBInterface::getTermInvPosListField(string *term) {
   try {
     _repository.openRead(pathToIndex);
   } catch (...) {
-		// not an indri repository?
-		// if we don't have a dot position, 
-		// try the normal method...
-		if (dotPos==string::npos) {
-			// no field? use the normal method
-			getTermInvList(term);
-			return;
-		}
+    // not an indri repository?
+    // if we don't have a dot position, 
+    // try the normal method...
+    if (dotPos==string::npos) {
+      // no field? use the normal method
+      getTermInvList(term);
+      return;
+    }
 
-    output->writeErrorMessage("Cannot open repository.","Can't open indri repository: " + pathToIndex);
+    output->writeErrorMessage("Cannot open repository.",
+			      "Can't open indri repository: " + pathToIndex);
     delete db;
     return;
   }
 
-	// our output stream string
+  // our output stream string
   stringstream statsString;
 
-	string theTerm="";
-	string theField="";
+  string theTerm="";
+  string theField="";
 
   // got it - separate the two...
-	if (dotPos==string::npos) {
-		// no field? use the mainbody field (only if it exists!)
-		theTerm=term->c_str();
+  if (dotPos==string::npos) {
+    // no field? use the mainbody field (only if it exists!)
+    theTerm=term->c_str();
 
-		const std::vector< indri::collection::Repository::Field > repFields=_repository.fields();
-		std::vector< indri::collection::Repository::Field >::const_iterator fIter=repFields.begin();
-		for (; (fIter!=repFields.end() && theField.length()==0); fIter++) {
-			if ((*fIter).name=="mainbody") {
-				theField="mainbody";
-			}
-		}
+    const std::vector< indri::collection::Repository::Field > repFields=_repository.fields();
+    std::vector< indri::collection::Repository::Field >::const_iterator fIter=repFields.begin();
+    for (; (fIter!=repFields.end() && theField.length()==0); fIter++) {
+      if ((*fIter).name=="mainbody") {
+	theField="mainbody";
+      }
+    }
 
-		if (theField.length()==0) {
-			// not found? use the old method...
-			getTermInvList(term);
-			return;
-		}
+    if (theField.length()==0) {
+      // not found? use the old method...
+      getTermInvList(term);
+      return;
+    }
     
-	} else {
-		theTerm=term->substr(0, dotPos);
-		theField=term->substr(dotPos+1);
-	}
+  } else {
+    theTerm=term->substr(0, dotPos);
+    theField=term->substr(dotPos+1);
+  }
 
-	// get the stemmed term (if any)
-	string stemmedTerm=getStemmedTerm(theTerm, db);
+  // get the stemmed term (if any)
+  string stemmedTerm=getStemmedTerm(theTerm, db);
 
-	// get the internal term ID
-	int termid = db->term(theTerm.c_str());
+  // get the internal term ID
+  int termid = db->term(theTerm.c_str());
 
-	// get inverted list
-	lemur::index::InvDocList *dlist = 0L;
-	if (termid) {
-		dlist=(lemur::index::InvDocList*) db->docInfoList (termid);
-	}
+  // get inverted list
+  lemur::index::InvDocList *dlist = 0L;
+  if (termid) {
+    dlist=(lemur::index::InvDocList*) db->docInfoList (termid);
+  }
 
   if (!dlist) {
-		// no inverted list? Just output the headers...
-		if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
-			statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
-		}
-		// term count and doc frequency of 0.
-		statsString << setw(9) << 0 << "  " << setw(9) << 0 << "\n";
-	} else {
-		// got the list - print headers
-		if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
-			statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
-		}
-		statsString << setw(9) << db->termCount (termid)   << "  " << setw(9) << dlist->docFreq() << "\n\n";
+    // no inverted list? Just output the headers...
+    if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
+      statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
+    }
+    // term count and doc frequency of 0.
+    statsString << setw(9) << 0 << "  " << setw(9) << 0 << "\n";
+  } else {
+    // got the list - print headers
+    if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
+      statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
+    }
+    statsString << setw(9) << db->termCount (termid) << "  " << setw(9) 
+		<< dlist->docFreq() << "\n\n";
 
-		if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
-			/*
-			statsString << setw(9) << "docid"  << "  "
-									<< setw(9) << "doclen" << "  "
-									<< setw(9) << "tf (doc)" << "  "
-									<< setw(9) << "# " << theField  << "  "
-									<< setw(9) << theField << "_freq"  << "  "
-									<< setw(9) << "tf (" << theField << ")"  << "  "
+    if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
+      statsString << setw(9) << "docid"  << "  "
+		  << setw(9) << "# " << theField  << "  "
+		  << setw(9) << theField << "_freq"  << "  "
+		  << setw(9) << "tf (" << theField << ")"  << "  "
                   << setw(9) << theField << "_n_tf..."     << "  "
                   << setw(9) << theField << "_n_loc_x..."  << "\n";
-			*/
-			statsString << setw(9) << "docid"  << "  "
-									<< setw(9) << "# " << theField  << "  "
-									<< setw(9) << theField << "_freq"  << "  "
-									<< setw(9) << "tf (" << theField << ")"  << "  "
-                  << setw(9) << theField << "_n_tf..."     << "  "
-                  << setw(9) << theField << "_n_loc_x..."  << "\n";
-		} // if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM)
+    } // if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM)
 
-		// iterate through the inv. list
-		dlist->startIteration();
-		while (dlist->hasMore()) {
+    // iterate through the inv. list
+    dlist->startIteration();
+    while (dlist->hasMore()) {
 			
-			// get the next entry...
-			DocInfo* info = dlist->nextEntry();
-			if (info) {
-				int fieldCount=0;    // total number of fields
-				int fieldFreq=0;     // number of fields where term occurs
-				int fieldTFCount=0;  // total term frequency within the fields
-        int *fieldTFCounts=NULL;		//array to hold individual field counts
-        int *fieldTFLocations=NULL;	//array to hold individual field positions
+      // get the next entry...
+      DocInfo* info = dlist->nextEntry();
+      if (info) {
+	int fieldCount=0;    // total number of fields
+	int fieldFreq=0;     // number of fields where term occurs
+	int fieldTFCount=0;  // total term frequency within the fields
+        int *fieldTFCounts=NULL; //array to hold individual field counts
+        int *fieldTFLocations=NULL; //array to hold individual field positions
 
 
-				// we unfortunately need to do this for every document - 
-				// we don't know if the document is in a different index within
-				// the repository...
-				indri::collection::Repository::index_state indexes = _repository.indexes();
+	// we unfortunately need to do this for every document - 
+	// we don't know if the document is in a different index within
+	// the repository...
+	indri::collection::Repository::index_state indexes = _repository.indexes();
 
-				// ensure we get the correct internal index
-				indri::index::Index* index = _indexWithDocument( indexes, info->docID());
-				if (index) {
-					// get the correct internal field ID
-					int fieldID=index->field(theField);
+	// ensure we get the correct internal index
+	indri::index::Index* index = _indexWithDocument(indexes,info->docID());
+	if (index) {
+	  // get the correct internal field ID
+	  int fieldID=index->field(theField);
 
-					// get a vector of the field tags
-					indri::utility::greedy_vector<indri::index::FieldExtent> *aTagVec=getFieldTags(index, info->docID(), fieldID);
-					if (aTagVec) {
-						// get the count (size)
-						fieldCount=aTagVec->size();
-						// get the actual # of fields (total)
-						fieldFreq=getFieldCountOfTerm(index, info->docID(), termid, aTagVec);
-						// get the tf per field...
-						fieldTFCount=getTFFieldTagCount(index, info->docID(), termid, aTagVec);
+	  // get a vector of the field tags
+	  indri::utility::greedy_vector<indri::index::FieldExtent> *aTagVec=getFieldTags(index, info->docID(), fieldID);
+	  if (aTagVec) {
+	    // get the count (size)
+	    fieldCount=aTagVec->size();
+	    // get the actual # of fields (total)
+	    fieldFreq=getFieldCountOfTerm(index, info->docID(), termid,
+					  aTagVec);
+	    // get the tf per field...
+	    fieldTFCount=getTFFieldTagCount(index, info->docID(), termid,
+					    aTagVec);
 
-						//--- new code
+	    //--- new code
 
-						// generate the inlink_n_tf and inlink_n_loc_x arrays...
-						if ((fieldTFCount > 0) && (fieldFreq > 0)) {
-							fieldTFCounts=new int[fieldFreq];
-							fieldTFLocations=new int[fieldTFCount];
+	    // generate the inlink_n_tf and inlink_n_loc_x arrays...
+	    if ((fieldTFCount > 0) && (fieldFreq > 0)) {
+	      fieldTFCounts=new int[fieldFreq];
+	      fieldTFLocations=new int[fieldTFCount];
 
-							int currentLinkPos=0;
-							int currentLocPos=0;
+	      int currentLinkPos=0;
+	      int currentLocPos=0;
 
-							indri::index::TermList *tList=(indri::index::TermList*)index->termList(info->docID());
-							if (!tList) {
-								delete fieldTFCounts; fieldTFCounts=NULL;
-								delete fieldTFLocations; fieldTFLocations=NULL;
-							} else {
-								indri::utility::greedy_vector<int> termVec=tList->terms();
-								indri::utility::greedy_vector<indri::index::FieldExtent>::iterator fIter=aTagVec->begin();
-								while (fIter!=aTagVec->end()) {
-									// cerr << "field iter...";
-									long fieldStart=(*fIter).begin;
-									bool thisOneHasTerm=false;
-									int  thisFieldTFCount=0;
+	      indri::index::TermList *tList=(indri::index::TermList*)index->termList(info->docID());
+	      if (!tList) {
+		delete fieldTFCounts; fieldTFCounts=NULL;
+		delete fieldTFLocations; fieldTFLocations=NULL;
+	      } else {
+		indri::utility::greedy_vector<int> termVec=tList->terms();
+		indri::utility::greedy_vector<indri::index::FieldExtent>::iterator fIter=aTagVec->begin();
+		while (fIter!=aTagVec->end()) {
+		  // cerr << "field iter...";
+		  long fieldStart=(*fIter).begin;
+		  bool thisOneHasTerm=false;
+		  int  thisFieldTFCount=0;
 
-									for (long i=fieldStart; i < (*fIter).end; i++) {
-										if (termVec[i]==termid) {
-											if (!thisOneHasTerm) {
-												thisOneHasTerm=true;
-											} // end if (!thisOneHasTerm)
-											thisFieldTFCount++;
-											fieldTFLocations[currentLocPos++]=(i-fieldStart);
-										} // end if (termVec[i]==termid)
-									} // end for (long i=anchorFieldStart; i < (*fIter).end; i++)
+		  for (long i=fieldStart; i < (*fIter).end; i++) {
+		    if (termVec[i]==termid) {
+		      if (!thisOneHasTerm) {
+			thisOneHasTerm=true;
+		      } // end if (!thisOneHasTerm)
+		      thisFieldTFCount++;
+		      fieldTFLocations[currentLocPos++]=(i-fieldStart);
+		    } // end if (termVec[i]==termid)
+		  } // end for (long i=anchorFieldStart; i < (*fIter).end; i++)
 
-									if (thisOneHasTerm) {
-										fieldTFCounts[currentLinkPos++]=thisFieldTFCount;
-									} // end if (thisOneHasTerm)
+		  if (thisOneHasTerm) {
+		    fieldTFCounts[currentLinkPos++]=thisFieldTFCount;
+		  } // end if (thisOneHasTerm)
 
-									fIter++;
-								} // end while (fIter!=anchorFields->end())
-							} // if (!tList)
-						} // if ((anchorTFCount > 0) && (anchorFreq > 0))
+		  fIter++;
+		} // end while (fIter!=anchorFields->end())
+	      } // if (!tList)
+	    } // if ((anchorTFCount > 0) && (anchorFreq > 0))
 
-						//--- end new code
+	    //--- end new code
 
-						delete aTagVec;
-					} // end if (aTagVec)
-				} // end if (index)
+	    delete aTagVec;
+	  } // end if (aTagVec)
+	} // end if (index)
 
-				if (fieldFreq > 0) {
+	if (fieldFreq > 0) {
 
-					int tf=(info->termCount() - fieldFreq);
-					const LOC_T *pos=info->positions();
+	  int tf=(info->termCount() - fieldFreq);
+	  const LOC_T *pos=info->positions();
 
+	  statsString << setw(9) << info->docID()  << "  " << setw(9);
 
+	  for (int i=0; i<tf; i++) {
+	    statsString << pos[i] << "  ";
+	  }
 
-					/*
-					statsString << setw(9) << info->docID()  << "  "
-											<< setw(9) << db->docLength(info->docID()) << "  "
-											<< setw(9) << tf << "  "
-											<< setw(9);
-					*/
+	  statsString << setw(9) << fieldCount << "  " << setw(9) 
+		      << fieldFreq << "  " << setw(9) << fieldTFCount 
+		      << "  " << setw(9);
 
-					statsString << setw(9) << info->docID()  << "  "
-											<< setw(9);
+	  if (fieldTFCounts && fieldTFLocations) {
+	    int currentTFPos=0;
+	    for (int i=0; i < fieldFreq; i++) {
+	      int currentTF=fieldTFCounts[i];
+	      statsString << currentTF << "  ";
+	      for (int j=0; j < currentTF; j++) {
+		statsString << fieldTFLocations[currentTFPos++] << "  ";
+	      } // end for (int j=0; j < currentTF; j++)
+	    } // end for (int i=0; i < fieldFreq; i++)
+	  } // end if (fieldTFCounts && fieldTFLocations)
+	  statsString << "\n";
+	} // end if (fieldFreq > 0)
 
-					for (int i=0; i<tf; i++) {
-						statsString << pos[i] << "  ";
-					}
+	if (fieldTFCounts) delete fieldTFCounts;
+	if (fieldTFLocations) delete fieldTFLocations;
 
-					statsString << setw(9) << fieldCount << "  " << setw(9) << fieldFreq << "  " << setw(9) << fieldTFCount << "  " << setw(9);
+	fieldTFCounts=NULL;
+	fieldTFLocations=NULL;
 
-					if (fieldTFCounts && fieldTFLocations) {
-						int currentTFPos=0;
-						for (int i=0; i < fieldFreq; i++) {
-							int currentTF=fieldTFCounts[i];
-							statsString << currentTF << "  ";
-							for (int j=0; j < currentTF; j++) {
-								statsString << fieldTFLocations[currentTFPos++] << "  ";
-							} // end for (int j=0; j < currentTF; j++)
-						} // end for (int i=0; i < fieldFreq; i++)
-					} // end if (fieldTFCounts && fieldTFLocations)
-					statsString << "\n";
-				} // end if (fieldFreq > 0)
+      } // end if (info)
+    } // end while (dlist->hasMore())
 
-				if (fieldTFCounts) delete fieldTFCounts;
-				if (fieldTFLocations) delete fieldTFLocations;
-
-				fieldTFCounts=NULL;
-				fieldTFLocations=NULL;
-
-			} // end if (info)
-		} // end while (dlist->hasMore())
-
-		// we're done here - cleanup.
-		delete dlist;
-	} // end if (!dlist)
+    // we're done here - cleanup.
+    delete dlist;
+  } // end if (!dlist)
 
   output->displayDataPage(statsString.str(), "Inverted list for " + (*term));
 
-	_repository.close();
-	delete db;
+  _repository.close();
+  delete db;
 } // end function void getTermInvPosListField(string*)
 

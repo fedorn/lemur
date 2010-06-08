@@ -21,6 +21,7 @@ using std::string;
 #include "indri/QueryEnvironment.hpp"
 #include "indri/QueryAnnotation.hpp"
 #include "indri/ScoredExtentResult.hpp"
+#include "indri/SnippetBuilder.hpp"
 
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
@@ -81,7 +82,10 @@ private:
 
   std::vector<IndriSearchInterface::indriTermMatches> getMatches(int docID, std::map<std::string, std::vector<indri::api::ScoredExtentResult> > *annotations, std::vector<string> *rawNodes);
 
-  std::vector<indri::api::ScoredExtentResult> indriRemoveDuplicateResults(std::vector<indri::api::ScoredExtentResult> results, lemur::api::Index *db);
+  // NAM - Can't use lemur index here - won't work with indri daemons
+  // need to use indri query environment instead
+  //std::vector<indri::api::ScoredExtentResult> indriRemoveDuplicateResults(std::vector<indri::api::ScoredExtentResult> results, lemur::api::Index *db);
+  std::vector<indri::api::ScoredExtentResult> indriRemoveDuplicateResults(std::vector<indri::api::ScoredExtentResult> results, indri::api::QueryEnvironment *indriEnvironment);
 
   void displayIndriSearchResults(lemur::api::Index *db, int datasourceID, lemur::parse::StringQuery* q, indri::api::QueryEnvironment *indriEnvironment,
                             std::vector<indri::api::ScoredExtentResult> *results, std::vector<string> *nodes,

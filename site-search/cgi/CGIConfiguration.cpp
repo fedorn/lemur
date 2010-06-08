@@ -73,6 +73,11 @@ bool CGIConfiguration::readConfigFile(char *filePath) {
     rootAddPath=rootAddPathNode->getValue();
   }
 
+  const XMLNode *queryTimeoutValue=rootNode->getChild("querytimeout");
+  if (queryTimeoutValue) {
+    queryTimeout=string_to_int(queryTimeoutValue->getValue());
+  }
+
   _useQueryLog=false;
   const XMLNode *useQueryLogNode=rootNode->getChild("querylog");
   if (useQueryLogNode) {
@@ -141,6 +146,10 @@ string CGIConfiguration::getRootPath(int whichPath) {
 
 string CGIConfiguration::getRootAddPath() {
   return rootAddPath;
+}
+
+int CGIConfiguration::getQueryTimeout() {
+  return queryTimeout;
 }
 
 int CGIConfiguration::getNumIndices() {

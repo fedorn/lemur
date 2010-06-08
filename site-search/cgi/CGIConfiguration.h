@@ -54,6 +54,9 @@ protected:
   /** current number of indexes */
   int             currentIndicesSize;
 
+  /** how long to wait for query response */
+  int queryTimeout;
+
   bool  _useQueryLog;
 
   string queryLogPath;
@@ -142,6 +145,12 @@ public:
    */
   int    getNumRootPaths();
 
+  /**
+   * Returns the query timeout (how long to wait for query processing)
+   *
+   * @return the query timeout
+   */
+  int getQueryTimeout();
 
   bool getSupportPageRankPrior() {
     return supportPageRank;

@@ -14,10 +14,13 @@ using std::map;
 #include "CGIOutput.h"
 #include "DictionaryHash.h"
 #include "DBInterface.h"
+#include "indri/Thread.hpp"
+
+#define DEFAULT_TIMEOUT 300
 
 // these are for offline debugging...
-// #define OFFLINEDEBUGGING
-// #define OFFLINEDEBUGGING_QUERY "q=cows"
+//#define OFFLINEDEBUGGING
+//#define OFFLINEDEBUGGING_QUERY "x=false&q=%23combine[inlink](obama)"
 
 // our query parameters
 
@@ -222,112 +225,114 @@ void processRequest(CGIOutput *output) {
       continue;
     }
 
-		if (thisKey.length()==1) {
-			// backwards compatibility for single-letter functions
-	    thisKey=keyFirstCharToWholeKey(thisKey[0]);
-		}
+    if (thisKey.length()==1) {
+      // backwards compatibility for single-letter functions
+      thisKey=keyFirstCharToWholeKey(thisKey[0]);
+    }
 
-		/* I know, bad programming style follows... */
+    /* I know, bad programming style follows... */
 
-		if (thisKey=="termstats") {
+    if (thisKey=="termstats") {
       db.getTermCorpusStats(&thisVal);
       hasOutput=true;
-		} else if (thisKey=="datasource") {
+    } else if (thisKey=="datasource") {
       if (thisVal.length() > 0) {
         if (thisVal[0]=='?') {
           // display datasource list and exit...
           output->displayIndexListingPage();
-		      hasOutput=true;
-				} else {
-					datasourceToUse=atoi(thisVal.c_str());
-					if (datasourceToUse >= CGIConfiguration::getInstance().getNumIndices()) {
-						// error out - unknown datasource...
-						stringstream tmpDSource;
-						tmpDSource << "Unknown datasource value: d=" << datasourceToUse;
-						output->writeErrorMessage("Unknown datasource.", tmpDSource.str());
-						return;
-					} // end if (datasourceToUse >= CGIConfiguration::getInstance().getNumIndices())
+	  hasOutput=true;
+	} else {
+	  datasourceToUse=atoi(thisVal.c_str());
+	  if (datasourceToUse >= CGIConfiguration::getInstance().getNumIndices()) {
+	    // error out - unknown datasource...
+	    stringstream tmpDSource;
+	    tmpDSource << "Unknown datasource value: d=" << datasourceToUse;
+	    output->writeErrorMessage("Unknown datasource.", tmpDSource.str());
+	    return;
+	  } // end if (datasourceToUse >= CGIConfiguration::getInstance().getNumIndices())
 
-					db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(datasourceToUse));
-				} // end if (thisVal[0]=='?')
+	  db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(datasourceToUse));
+	} // end if (thisVal[0]=='?')
       } // end if (thisVal.length() > 0)
-		} else if (thisKey=="listdatasources") {
+    } else if (thisKey=="listdatasources") {
       output->displayIndexListingPage();
       hasOutput=true;
-		} else if (thisKey=="datasourcestats") {
+    } else if (thisKey=="datasourcestats") {
       // get database statistics
       if (thisVal.length() > 0) {
         if (thisVal[0]=='?') {
           // display datasource list and exit...
           output->displayIndexListingPage();
-					hasOutput=true;
-				} else {
-					int whichDatasource=atoi(thisVal.c_str());
+	  hasOutput=true;
+	} else {
+	  int whichDatasource=atoi(thisVal.c_str());
 
-					if (whichDatasource >= CGIConfiguration::getInstance().getNumIndices()) {
-						// error out - unknown datasource...
-						stringstream tmpDSource;
-						tmpDSource << "Unknown datasource value: D=" << whichDatasource;
-						output->writeErrorMessage("Unknown datasource.", tmpDSource.str());
-						return;
-					}
+	  if (whichDatasource >= CGIConfiguration::getInstance().getNumIndices()) {
+	    // error out - unknown datasource...
+	    stringstream tmpDSource;
+	    tmpDSource << "Unknown datasource value: D=" << whichDatasource;
+	    output->writeErrorMessage("Unknown datasource.", tmpDSource.str());
+	    return;
+	  }
 
-					db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(whichDatasource));
-					db.displayIndexStatistics(whichDatasource);
-					db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(datasourceToUse));
-					hasOutput=true;
-				} //end if (thisVal[0]=='?')
+	  db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(whichDatasource));
+	  db.displayIndexStatistics(whichDatasource);
+	  db.setIndexPath(CGIConfiguration::getInstance().getIndexPath(datasourceToUse));
+	  hasOutput=true;
+	} //end if (thisVal[0]=='?')
       } // end if (thisVal.length() > 0)
-		} else if (thisKey=="getdocext") {
+    } else if (thisKey=="getdocext") {
       db.getDocXID(&thisVal);
       hasOutput=true;
-		} else if (thisKey=="listfields") {
+    } else if (thisKey=="listfields") {
       db.listIndexFields();
       hasOutput=true;
-		} else if (thisKey=="setoutput") {
-			if (thisVal=="d" || thisVal=="debug") {
+    } else if (thisKey=="setoutput") {
+      if (thisVal=="d" || thisVal=="debug") {
         output->setOutputMode(CGI_OUTPUT_DIAGNOSTIC);
-			} else if (thisVal=="p" || thisVal=="program") {
+      } else if (thisVal=="p" || thisVal=="program") {
         output->setOutputMode(CGI_OUTPUT_PROGRAM);
-			} else if (thisVal=="i" || thisVal=="interactive") {
-				output->setOutputMode(CGI_OUTPUT_INTERACTIVE);
-			}
-		} else if (thisKey=="help") {
+      } else if (thisVal=="i" || thisVal=="interactive") {
+	output->setOutputMode(CGI_OUTPUT_INTERACTIVE);
+      }
+    } else if (thisKey=="help") {
       printOutHelp(output);
       hasOutput=true;
-		} else if (thisKey=="getdoc") {
+    } else if (thisKey=="getdoc") {
       long internalID=atol(thisVal.c_str());
       db.getDocIID(internalID);
       hasOutput=true;
-		} else if (thisKey=="getparseddoc") {
-			long internalID=atol(thisVal.c_str());
-			db.getParsedDoc(internalID);
-			hasOutput=true;
-		} else if (thisKey=="getterm") {
+    } else if (thisKey=="getparseddoc") {
+      long internalID=atol(thisVal.c_str());
+      db.getParsedDoc(internalID);
+      hasOutput=true;
+    } else if (thisKey=="getterm") {
       db.getWordStem(&thisVal);
       hasOutput=true;
-		} else if (thisKey=="maxresults") {
+    } else if (thisKey=="maxresults") {
       // set max # of documents to retrieve per page
       maxDocsToRetrievePerPage=atoi(thisVal.c_str());
       if (maxDocsToRetrievePerPage < 1) {
         maxDocsToRetrievePerPage=DEFAULT_RESULTS_PER_PAGE;
       }
-		} else if (thisKey=="query") {
+    } else if (thisKey=="query") {
       if (thisVal=="") {
         output->displayDefaultSearchPage();      
       } else {
-        db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, startRank, currentQueryType);
+        db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, 
+		  startRank, currentQueryType);
       }  
       hasOutput=true;
-		} else if (thisKey=="querydebug") {
+    } else if (thisKey=="querydebug") {
       CGIConfiguration::getInstance().putKVItem("displayquerydebug", "true");
       if (thisVal=="") {
         output->displayDefaultSearchPage();      
       } else {
-        db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, startRank, currentQueryType);
+        db.search(datasourceToUse, thisVal, maxDocsToRetrievePerPage, 
+		  startRank, currentQueryType);
       }  
       hasOutput=true;
-		} else if (thisKey=="start") {
+    } else if (thisKey=="start") {
       startRank=atoi(thisVal.c_str());
       if (startRank < 0) {
         startRank=0;
@@ -338,7 +343,7 @@ void processRequest(CGIOutput *output) {
           startRank=DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE-1;
         }
       }
-		} else if (thisKey=="querytype") {
+    } else if (thisKey=="querytype") {
       // set query type...
       if (thisVal.compare("indri")==0) {
         currentQueryType=DBInterface::QUERY_INTERFACE_INDRI;
@@ -347,16 +352,15 @@ void processRequest(CGIOutput *output) {
       } else {
         // ignore it...
       }
-		} else if (thisKey=="invlist") {
-			db.getTermInvListField(&thisVal);
+    } else if (thisKey=="invlist") {
+      db.getTermInvListField(&thisVal);
       hasOutput=true;
-		} else if (thisKey=="invposlist") {
-  		db.getTermInvPosListField(&thisVal);
+    } else if (thisKey=="invposlist") {
+      db.getTermInvPosListField(&thisVal);
       hasOutput=true;
-		} else if (thisKey=="queryexpansion") {
+    } else if (thisKey=="queryexpansion") {
       CGIConfiguration::getInstance().putKVItem("expandindriquery", thisVal);
-		}
-
+    }
     vIter++;
   } // end while (vIter!=queryParameters.end())
   if (!hasOutput) {
@@ -371,7 +375,8 @@ char* getFileFromPath(const char *filePath) {
 
   char *fPtr=(char*)(filePath+strlen(filePath)-1);
   //accounts for *nix, Windows/MS-DOS, & Macintosh path names
-  while ((fPtr!=filePath) && ((*fPtr)!='/') && ((*fPtr)!='\\') && ((*fPtr)!=':')) {
+  while ((fPtr!=filePath) && ((*fPtr)!='/') 
+	 && ((*fPtr)!='\\') && ((*fPtr)!=':')) {
     fPtr--;
   }
   if (fPtr!=filePath) {
@@ -381,6 +386,24 @@ char* getFileFromPath(const char *filePath) {
       return fPtr+1;
     else
       return fPtr;
+  }
+}
+
+// timeout is in seconds
+struct timer_thread_info {
+  CGIOutput *output;
+  int timeout;
+  indri::thread::Thread *thread;
+};
+
+void timer_thread(void *c) {
+  timer_thread_info *info = (timer_thread_info *)c;
+
+  sleep(info->timeout);
+
+  if (!info->output->headersSent()) {
+    info->output->writeErrorMessage("Query Timeout", "The query you have entered is taking too long to process. Please restate the query.\n\n");
+    exit(0);
   }
 }
 
@@ -414,6 +437,13 @@ int main (int argc, char **argv) {
   if (!getCGIParams(&output, cgi_request_method)) {
     output.writeErrorMessage("Unsuppored Request Method.", "Error:  Unsupported request method. Please notify Web site administrator.");
   } else {
+    timer_thread_info *info = new timer_thread_info;
+    info->output = &output;
+    info->timeout = CGIConfiguration::getInstance().getQueryTimeout();
+    if (info->timeout <= 0) info->timeout = DEFAULT_TIMEOUT;
+    indri::thread::Thread *thread = new indri::thread::Thread(timer_thread,
+							      info);
+    info->thread = thread;
     processRequest(&output);
   }
 

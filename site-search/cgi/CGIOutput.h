@@ -248,6 +248,8 @@ public:
    */
   bool writeSearchResult(string resultURL, string origURL, string resultTitle, string resultSummary, double resultScore, int datasource=0, int resultID=0);
 
+  bool headersSent() { return haveHeadersBeenSent; }
+
 }; // end class CGIOutput
 
 #endif //_CGIOUTPUT_H
