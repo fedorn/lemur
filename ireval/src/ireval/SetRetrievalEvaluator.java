@@ -97,11 +97,13 @@ public class SetRetrievalEvaluator {
     public double geometricMeanAveragePrecision() {
         double productAveragePrecision = 1.0;
         if (_evaluators.size() == 0) return 0;
-        
+
         for( RetrievalEvaluator evaluator : _evaluators ) {
-            productAveragePrecision *= evaluator.averagePrecision();
+            double p = evaluator.averagePrecision();
+            // don't let a 0 value into the product.
+            if (p > 0.0)
+                productAveragePrecision *= p;
         }
-        
         return Math.pow( productAveragePrecision, 1.0 / _evaluators.size() );
     }
     
