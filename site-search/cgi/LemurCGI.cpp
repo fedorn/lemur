@@ -398,9 +398,11 @@ struct timer_thread_info {
 
 void timer_thread(void *c) {
   timer_thread_info *info = (timer_thread_info *)c;
-
+#ifdef WIN32
+    Sleep(info->timeout);
+#else
   sleep(info->timeout);
-
+#endif
   if (!info->output->headersSent()) {
     info->output->writeErrorMessage("Query Timeout", "The query you have entered is taking too long to process. Please restate the query.\n\n");
     exit(0);
