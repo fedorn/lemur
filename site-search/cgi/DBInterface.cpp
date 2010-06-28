@@ -224,15 +224,38 @@ void DBInterface::displayIndexStatistics(int indexID) {
     return;
   }
 
-  // get doc count
-  long docCount=db->docCount();
-  // get average document length
-  double avgDocLen=db->docLengthAvg();
-  // get unique terms
-  long numUniqueTerms=db->termCountUnique();
-  // get total terms
-  long numTotalTerms=db->termCount();
+  UINT64 docCount=0;
+  long double avgDocLen=0;
+  UINT64 numUniqueTerms=0;
+  UINT64 numTotalTerms=0;
 
+  // Is this an indri index or a lemur one?
+  lemur::index::LemurIndriIndex *indriTestIndexCast=dynamic_cast<lemur::index::LemurIndriIndex*>((lemur::api::Index*)db);
+  if (indriTestIndexCast) {
+
+    indri::api::QueryEnvironment *indriEnvironment=new indri::api::QueryEnvironment();
+    vector<string> thisQueryHostVec=CGIConfiguration::getInstance().getQueryHostVec(pathToIndex);
+    if (thisQueryHostVec.size()==0) {
+      indriEnvironment->addIndex(pathToIndex.c_str());
+    } else {
+      for (vector<string>::iterator vIter=thisQueryHostVec.begin(); vIter!=thisQueryHostVec.end(); vIter++) {
+        indriEnvironment->addServer(*vIter);
+      }
+    }
+    docCount = indriEnvironment->documentCount();
+    numTotalTerms = indriEnvironment->termCount();
+
+    avgDocLen = (long double)numTotalTerms / (long double)docCount;
+  } else { // lemur index
+    // get doc count
+    docCount=db->docCount();
+    // get average document length
+    avgDocLen=db->docLengthAvg();
+    // get unique terms
+    numUniqueTerms=db->termCountUnique();
+    // get total terms
+    numTotalTerms=db->termCount();
+  }
 
   stringstream statsString;
   statsString << "Corpus Size: " << docCount << " document";
@@ -240,9 +263,13 @@ void DBInterface::displayIndexStatistics(int indexID) {
     statsString << "s";
   }
   statsString << "\n";
-  statsString << "Corpus Length (in words): " << numTotalTerms << "\n"
-    << "Unique Terms: " << numUniqueTerms << "\n"
-    << "Average Document Length: " << avgDocLen << " words\n";
+  statsString << "Corpus Length (in words): " << numTotalTerms << "\n";
+  if (numUniqueTerms > 0) {
+    statsString << "Unique Terms: " << numUniqueTerms << "\n";
+  } else {
+    statsString << "Unique Terms: " << numUniqueTerms << " (not available for distributed indexes)\n";
+  }
+  statsString << "Average Document Length: " << avgDocLen << " words\n";
 
   stringstream iTitle;
   iTitle << "Index Statistics for Index ID " << indexID;
