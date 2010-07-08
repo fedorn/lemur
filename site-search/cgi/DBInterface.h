@@ -14,11 +14,8 @@ using std::string;
 #include "InQueryOpParser.hpp"
 #include "Stopper.hpp"
 #include "StringQuery.hpp"
-#include "ElemDocMgr.hpp"
-#include "MatchInfo.hpp"
 #include "TextHandlerManager.hpp"
 #include "Param.hpp"
-#include "LemurIndriIndex.hpp"
 #include "indri/QueryEnvironment.hpp"
 #include "indri/QueryAnnotation.hpp"
 #include "IndriSearchInterface.h"
@@ -87,7 +84,7 @@ private:
    * Creates a summary string for the result
    *
    */
-  std::string getSummaryString(const lemur::api::DocumentManager* dm, lemur::api::Index *db, lemur::parse::StringQuery* q, int resultID, string docext);
+  //  std::string getSummaryString(const lemur::api::DocumentManager* dm, lemur::api::Index *db, lemur::parse::StringQuery* q, int resultID, string docext);
 
   /**
    * Retrieves the original HTTP link of the document for trecweb data

@@ -62,17 +62,6 @@ public";
 #ifdef SWIGJAVA
       %javamethodmodifiers  "
 /**
-@return the document manager to get at the source
-       of the document with this document id
-@throws Exception if a lemur::api::Exception was thrown by the JNI library.
-*/
-public";
-#endif
-
-      const lemur::api::DocumentManager* docManager(DOCID_T docID) const throw (lemur::api::Exception) ;
-#ifdef SWIGJAVA
-      %javamethodmodifiers  "
-/**
        Total count (i.e., number) of documents in collection
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */

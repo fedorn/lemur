@@ -98,4 +98,4 @@ CFLAGS = @DEFS@ @CFLAGS@ @SHARED@
 CXXFLAGS    = @DEFS@ @CXXFLAGS@ @SHARED@
 CPPLDFLAGS  = @LDFLAGS@ @LIBS@
 
-ALLBIN = BuildDocMgr BuildIndex BuildPropIndex EstimateDirPrior GenL2Norm GenerateQueryModel GenerateSmoothSupport ParseInQueryOp ParseQuery ParseToFile QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval TwoStageRetEval RetQueryClarity XlingRetEval PDictManager  dumpDoc dumpTerm IndriBuildIndex IndriDaemon IndriRunQuery dumpindex makeprior harvestlinks pagerank ModifyFields
+ALLBIN =  GenerateQueryModel GenerateSmoothSupport ParseInQueryOp ParseQuery ParseToFile QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval IndriBuildIndex IndriDaemon IndriRunQuery dumpindex makeprior harvestlinks pagerank ModifyFields

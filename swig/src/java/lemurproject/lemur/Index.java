@@ -81,17 +81,6 @@ public String document(int docID) throws java.lang.Exception {
 
   
 /**
-@return the document manager to get at the source
-       of the document with this document id
-@throws Exception if a lemur::api::Exception was thrown by the JNI library.
-*/
-public DocumentManager docManager(int docID) throws java.lang.Exception {
-    long cPtr = lemurJNI.Index_docManager(swigCPtr, this, docID);
-    return (cPtr == 0) ? null : new DocumentManager(cPtr, false);
-  }
-
-  
-/**
        Total count (i.e., number) of documents in collection
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */

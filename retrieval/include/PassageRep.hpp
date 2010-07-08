@@ -13,7 +13,6 @@
 #define _PASSAGEREP_HPP
 
 #include <vector>
-#include "MatchInfo.hpp"
 
 namespace lemur 
 {
@@ -194,6 +193,7 @@ namespace lemur
       /// the document. This list is used for efficiency, as it is shorter
       /// than the whole TermInfoList for the document.
       /// @return the frequency of a term within the current passage.
+#if 0
       int passageTF(lemur::api::TERMID_T tid, lemur::api::MatchInfo *matches) const {
         int tf = 0;
         int pos = 0;
@@ -212,6 +212,7 @@ namespace lemur
         }
         return tf;
       }
+#endif
       /// start of the current passage
       int getStart () const {return start;}
       /// end + 1 of the current passage

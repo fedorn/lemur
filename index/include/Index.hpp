@@ -16,10 +16,10 @@
 #define _INDEX_HPP
 // C. Zhai 02/08/2001
 
+#include "InvFPTypes.hpp"
 #include "TermInfoList.hpp"
 #include "FieldInfoList.hpp"
 #include "DocInfoList.hpp"
-#include "DocumentManager.hpp"
 #include "CollectionProps.hpp"
 #include "lemur-platform.h"
 #include "lemur-compat.hpp"
@@ -98,7 +98,7 @@ namespace lemur
       /// A String identifier for the document manager to get at the source
       /// of the document with this document id
       //  virtual const char* docManager(int docID) { return NULL;}
-      virtual const DocumentManager* docManager(DOCID_T docID) const {return NULL;}
+      //deprecated//      virtual const DocumentManager* docManager(DOCID_T docID) const {return NULL;}
 
       /// Convert a field name to a field ID (for those index types that support fields)
       virtual const int field(std::string fieldName) const { return 0; }

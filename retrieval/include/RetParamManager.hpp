@@ -21,7 +21,6 @@
 #include "CORIRetMethod.hpp"
 #include "CosSimRetMethod.hpp"
 #include "InQueryRetMethod.hpp"
-#include "IndriRetMethod.hpp"
 
 /// General retrieval-related parameters
 namespace RetrievalParameter {
@@ -70,7 +69,6 @@ namespace RetrievalParameter {
     if (retModel == "4") retModel = "cori_cs";
     if (retModel == "5") retModel = "cos";
     if (retModel == "6") retModel = "inq_struct";
-    if (retModel == "7") retModel = "indri";
 
     string tmp = getLower("cacheDocReps", "true");
     cacheDocReps = (tmp == "true" || tmp == "1");
@@ -294,34 +292,5 @@ namespace InQueryParameter {
   }
 }
 
-/// Parameters used in the Indri query language
-namespace IndriParameter {
-  /// @name Indri query language parameters
-  /// Parameters object passed into the IndriRetMethod
-  static indri::api::Parameters params;
-  /// For query time stopping.
-  static string stopwords;
-  /// get parameters.
-  static void get()
-  {
-    RetrievalParameter::get();
-    // stopwords
-    stopwords = lemur::api::ParamGetString("stopwords", "");
-
-    // RM expansion parameters
-    int fbTerms = lemur::api::ParamGetInt("feedbackTermCount", 10);
-    double fbOrigWt = lemur::api::ParamGetDouble("fbOrigWt", 0.5);
-    double fbMu = lemur::api::ParamGetDouble("fbMu", 0);
-    params.set( "fbDocs" , RetrievalParameter::fbDocCount);
-    params.set( "fbTerms" , fbTerms );
-    params.set( "fbOrigWt", fbOrigWt);
-    params.set( "fbMu", fbMu );
-    // set retrieval rules -- NB limit to one.
-    string rule = lemur::api::ParamGetString("rule", "method:dirichlet,mu:2500");
-    params.set("rule", rule);
-    // results count
-    params.set( "count", RetrievalParameter::resultCount );
-  }
-}
 
 #endif

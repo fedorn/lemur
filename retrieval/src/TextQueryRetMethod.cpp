@@ -138,6 +138,7 @@ double lemur::api::TextQueryRetMethod::scoreDocVector(const TextQueryRep &qRep, 
 double lemur::api::TextQueryRetMethod::scoreDocPassages(const TermQuery &qry, DOCID_T docID, 
                                                         lemur::retrieval::PassageScoreVector &scores, 
                                                         int psgSize, int overlap) {
+#if 0
   double score = 0, maxScore = -DBL_MAX;
   MatchInfo *matches = MatchInfo::getMatches(ind, qry, docID);
   TextQueryRep *qRep = (TextQueryRep *) computeQueryRep(qry);
@@ -185,4 +186,7 @@ double lemur::api::TextQueryRetMethod::scoreDocPassages(const TermQuery &qry, DO
   delete(myRep);
   delete(qRep);
   return maxScore;
+#endif
+  return 0;
+  
 }

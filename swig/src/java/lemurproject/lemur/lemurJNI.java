@@ -33,15 +33,11 @@ class lemurJNI {
   public final static native boolean DocInfoList_hasMore(long jarg1, DocInfoList jarg1_);
   public final static native long DocInfoList_nextEntry(long jarg1, DocInfoList jarg1_);
   public final static native void delete_DocInfoList(long jarg1);
-  public final static native String DocumentManager_getDoc(long jarg1, DocumentManager jarg1_, String jarg2);
-  public final static native String DocumentManager_docElement(long jarg1, DocumentManager jarg1_, String jarg2, String jarg3);
-  public final static native void delete_DocumentManager(long jarg1);
   public final static native boolean Index_open(long jarg1, Index jarg1_, String jarg2) throws java.lang.Exception;
   public final static native int Index_term__SWIG_0(long jarg1, Index jarg1_, String jarg2) throws java.lang.Exception;
   public final static native String Index_term__SWIG_1(long jarg1, Index jarg1_, int jarg2) throws java.lang.Exception;
   public final static native int Index_document__SWIG_0(long jarg1, Index jarg1_, String jarg2) throws java.lang.Exception;
   public final static native String Index_document__SWIG_1(long jarg1, Index jarg1_, int jarg2) throws java.lang.Exception;
-  public final static native long Index_docManager(long jarg1, Index jarg1_, int jarg2) throws java.lang.Exception;
   public final static native int Index_docCount__SWIG_0(long jarg1, Index jarg1_) throws java.lang.Exception;
   public final static native int Index_termCountUnique(long jarg1, Index jarg1_) throws java.lang.Exception;
   public final static native int Index_termCount__SWIG_0(long jarg1, Index jarg1_, int jarg2) throws java.lang.Exception;
@@ -69,7 +65,6 @@ class lemurJNI {
   public final static native void delete_RetrievalMethod(long jarg1);
   public final static native void delete_TextQueryRetMethod(long jarg1);
   public final static native void delete_StructQueryRetMethod(long jarg1);
-  public final static native void delete_IndriRetMethod(long jarg1);
   public final static native RetrievalMethod RetMethodManager_createModel__SWIG_0(long jarg1, Index jarg1_, long jarg2, ScoreAccumulator jarg2_, String jarg3) throws java.lang.Exception;
   public final static native RetrievalMethod RetMethodManager_createModel__SWIG_1(long jarg1, Index jarg1_, long jarg2, ScoreAccumulator jarg2_) throws java.lang.Exception;
   public final static native IndexedReal[] RetMethodManager_runTextQuery__SWIG_0(String jarg1, long jarg2, TextQueryRetMethod jarg2_, String jarg3, String jarg4, String jarg5, String jarg6) throws java.lang.Exception;
@@ -82,16 +77,13 @@ class lemurJNI {
   public final static native IndexedReal[] RetMethodManager_runStructQuery__SWIG_2(String jarg1, long jarg2, StructQueryRetMethod jarg2_, String jarg3, String jarg4) throws java.lang.Exception;
   public final static native IndexedReal[] RetMethodManager_runStructQuery__SWIG_3(String jarg1, long jarg2, StructQueryRetMethod jarg2_, String jarg3) throws java.lang.Exception;
   public final static native IndexedReal[] RetMethodManager_runStructQuery__SWIG_4(String jarg1, long jarg2, StructQueryRetMethod jarg2_) throws java.lang.Exception;
-  public final static native IndexedReal[] RetMethodManager_runIndriQuery(String jarg1, long jarg2, IndriRetMethod jarg2_) throws java.lang.Exception;
   public final static native long new_ArrayAccumulator(int jarg1);
   public final static native void delete_ArrayAccumulator(long jarg1);
-  public final static native TMatch[] MatchInfo_getMatches(long jarg1, Index jarg1_, long jarg2, Query jarg2_, int jarg3) throws java.lang.Exception;
   public final static native void ParamSet(String jarg1, String jarg2) throws java.lang.Exception;
   public final static native void ParamClear() throws java.lang.Exception;
   public final static native int ParamPushFile(String jarg1) throws java.lang.Exception;
   public final static native String ParamPopFile() throws java.lang.Exception;
   public final static native long SWIGTextQueryRetMethodUpcast(long jarg1);
   public final static native long SWIGStructQueryRetMethodUpcast(long jarg1);
-  public final static native long SWIGIndriRetMethodUpcast(long jarg1);
   public final static native long SWIGArrayAccumulatorUpcast(long jarg1);
 }

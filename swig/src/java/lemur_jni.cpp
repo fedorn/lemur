@@ -229,8 +229,6 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include "RetMethodManager.hpp"
 #include "StructQueryRetMethod.hpp"
 #include "TextQueryRetMethod.hpp"
-#include "MatchInfo.hpp"
-#include "ElemDocMgr.hpp"
   
 
 #include <string>
@@ -308,13 +306,6 @@ SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
   }
 
   
-SWIGINTERN char *lemur_api_DocumentManager_docElement(lemur::api::DocumentManager *self,std::string const &docid,std::string const &elt){
-            lemur::parse::ElemDocMgr *dm = dynamic_cast<lemur::parse::ElemDocMgr *>(self);
-            if (dm)
-              return dm->getElement(docid.c_str(), elt.c_str());
-            else
-              return NULL;
-          }
 SWIGINTERN void lemur_api_Index_setProps(lemur::api::Index *self){
             const lemur::parse::BasicCollectionProps* props = dynamic_cast<const lemur::parse::BasicCollectionProps*> (self->collectionProps());
             if (props) {
@@ -359,42 +350,6 @@ SWIGINTERN lemur::api::Query *lemur_api_Query_makeQuery__SWIG_0(std::string quer
           }
           return qryterms;
         }
-SWIGINTERN lemur::api::IndexedRealVector *lemur_api_RetMethodManager_runIndriQuery(std::string const &query,lemur::retrieval::IndriRetMethod *model){
-          lemur::api::IndexedRealVector *tmp = new lemur::api::IndexedRealVector();
-          model->scoreCollection(query, *tmp);
-          return tmp;
-        }
-
-  jobjectArray java_build_matchinfo( JNIEnv* jenv, const lemur::api::MatchInfo* input ) {
-    jclass clazz = jenv->FindClass("lemurproject/lemur/TMatch");
-    jmethodID constructor = jenv->GetMethodID(clazz, "<init>", "()V" );
-    jobjectArray result;
-
-    result = jenv->NewObjectArray(input->size(), clazz, NULL);
-    if (!result) {
-      return 0;
-    }
-
-    jfieldID idField = jenv->GetFieldID(clazz, "tid", "I" );
-    jfieldID startField = jenv->GetFieldID(clazz, "start", "I" );
-    jfieldID endField = jenv->GetFieldID(clazz, "end", "I" );
-    jfieldID positionField = jenv->GetFieldID(clazz, "position", "I" );
-
-    for( jsize i=0; i<input->size(); i++ ) {
-      // make a new scored extent result object
-      jobject ser = jenv->NewObject(clazz, constructor);
-
-      // fill in the fields
-      jenv->SetIntField(ser, idField, (*input)[i].tid );
-      jenv->SetIntField(ser, startField, (*input)[i].start );
-      jenv->SetIntField(ser, endField, (*input)[i].end );
-      jenv->SetIntField(ser, positionField, (*input)[i].position );
-
-      jenv->SetObjectArrayElement(result, i, ser);
-    }
-    return result;
-  }
-  
 
 #ifdef __cplusplus
 extern "C" {
@@ -873,106 +828,6 @@ SWIGEXPORT void JNICALL Java_lemurproject_lemur_lemurJNI_delete_1DocInfoList(JNI
 }
 
 
-SWIGEXPORT jstring JNICALL Java_lemurproject_lemur_lemurJNI_DocumentManager_1getDoc(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  jstring jresult = 0 ;
-  lemur::api::DocumentManager *arg1 = (lemur::api::DocumentManager *) 0 ;
-  std::string *arg2 = 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(lemur::api::DocumentManager **)&jarg1; 
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
-    return 0;
-  }
-  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
-  if (!arg2_pstr) return 0;
-  std::string arg2_str(arg2_pstr);
-  arg2 = &arg2_str;
-  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  {
-    try {
-      result = (char *)((lemur::api::DocumentManager const *)arg1)->getDoc((std::string const &)*arg2);
-    } catch( lemur::api::Exception& e ) {
-      {
-        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
-      };
-      // control does not leave method when thrown. (fixed in 1.3.25
-      // return 0;
-    }
-  }
-  if(result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_lemurproject_lemur_lemurJNI_DocumentManager_1docElement(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
-  jstring jresult = 0 ;
-  lemur::api::DocumentManager *arg1 = (lemur::api::DocumentManager *) 0 ;
-  std::string *arg2 = 0 ;
-  std::string *arg3 = 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(lemur::api::DocumentManager **)&jarg1; 
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
-    return 0;
-  }
-  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
-  if (!arg2_pstr) return 0;
-  std::string arg2_str(arg2_pstr);
-  arg2 = &arg2_str;
-  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  if(!jarg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
-    return 0;
-  }
-  const char *arg3_pstr = (const char *)jenv->GetStringUTFChars(jarg3, 0); 
-  if (!arg3_pstr) return 0;
-  std::string arg3_str(arg3_pstr);
-  arg3 = &arg3_str;
-  jenv->ReleaseStringUTFChars(jarg3, arg3_pstr); 
-  {
-    try {
-      result = (char *)lemur_api_DocumentManager_docElement(arg1,(std::string const &)*arg2,(std::string const &)*arg3);
-    } catch( lemur::api::Exception& e ) {
-      {
-        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
-      };
-      // control does not leave method when thrown. (fixed in 1.3.25
-      // return 0;
-    }
-  }
-  if(result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_lemurproject_lemur_lemurJNI_delete_1DocumentManager(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  lemur::api::DocumentManager *arg1 = (lemur::api::DocumentManager *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(lemur::api::DocumentManager **)&jarg1; 
-  {
-    try {
-      delete arg1;
-    } catch( lemur::api::Exception& e ) {
-      {
-        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
-      };
-      // control does not leave method when thrown. (fixed in 1.3.25
-      // return ;
-    }
-  }
-}
-
-
 SWIGEXPORT jboolean JNICALL Java_lemurproject_lemur_lemurJNI_Index_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jboolean jresult = 0 ;
   lemur::api::Index *arg1 = (lemur::api::Index *) 0 ;
@@ -1183,44 +1038,6 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_lemur_lemurJNI_Index_1document_1_1S
     }
   }
   jresult = jenv->NewStringUTF((&result)->c_str()); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_lemurproject_lemur_lemurJNI_Index_1docManager(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
-  lemur::api::Index *arg1 = (lemur::api::Index *) 0 ;
-  lemur::api::DOCID_T arg2 ;
-  lemur::api::DocumentManager *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(lemur::api::Index **)&jarg1; 
-  arg2 = (lemur::api::DOCID_T)jarg2; 
-  {
-    try {
-      try {
-        result = (lemur::api::DocumentManager *)((lemur::api::Index const *)arg1)->docManager(arg2);
-      }
-      catch(lemur::api::Exception &_e) {
-        {
-          jclass excep = jenv->FindClass("java/lang/Exception");
-          if (excep)
-          jenv->ThrowNew(excep, (&_e)->what().c_str());
-          return 0;
-        }
-      }
-      
-    } catch( lemur::api::Exception& e ) {
-      {
-        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
-      };
-      // control does not leave method when thrown. (fixed in 1.3.25
-      // return 0;
-    }
-  }
-  *(lemur::api::DocumentManager **)&jresult = result; 
   return jresult;
 }
 
@@ -2231,26 +2048,6 @@ SWIGEXPORT void JNICALL Java_lemurproject_lemur_lemurJNI_delete_1StructQueryRetM
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_lemur_lemurJNI_delete_1IndriRetMethod(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  lemur::retrieval::IndriRetMethod *arg1 = (lemur::retrieval::IndriRetMethod *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(lemur::retrieval::IndriRetMethod **)&jarg1; 
-  {
-    try {
-      delete arg1;
-    } catch( lemur::api::Exception& e ) {
-      {
-        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return ; 
-      };
-      // control does not leave method when thrown. (fixed in 1.3.25
-      // return ;
-    }
-  }
-}
-
-
 SWIGEXPORT jobject JNICALL Java_lemurproject_lemur_lemurJNI_RetMethodManager_1createModel_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jstring jarg3) {
   jobject jresult = 0 ;
   lemur::api::Index *arg1 = (lemur::api::Index *) 0 ;
@@ -2297,7 +2094,6 @@ SWIGEXPORT jobject JNICALL Java_lemurproject_lemur_lemurJNI_RetMethodManager_1cr
   {
     lemur::api::TextQueryRetMethod *t = dynamic_cast<lemur::api::TextQueryRetMethod*>(result);
     lemur::api::StructQueryRetMethod *s = dynamic_cast<lemur::api::StructQueryRetMethod*>(result);
-    lemur::retrieval::IndriRetMethod *ind = dynamic_cast<lemur::retrieval::IndriRetMethod*>(result);
     if (t) {
       jclass clazz = jenv->FindClass("lemurproject/lemur/TextQueryRetMethod");
       if (clazz) {
@@ -2315,16 +2111,6 @@ SWIGEXPORT jobject JNICALL Java_lemurproject_lemur_lemurJNI_RetMethodManager_1cr
         if (mid) {
           jlong cptr = 0;
           *(lemur::api::StructQueryRetMethod **)&cptr = s;
-          jresult = jenv->NewObject(clazz, mid, cptr, true);
-        }
-      }
-    }  else if (ind) {
-      jclass clazz = jenv->FindClass("lemurproject/lemur/IndriRetMethod");
-      if (clazz) {
-        jmethodID mid = jenv->GetMethodID(clazz, "<init>", "(JZ)V");
-        if (mid) {
-          jlong cptr = 0;
-          *(lemur::retrieval::IndriRetMethod **)&cptr = ind;
           jresult = jenv->NewObject(clazz, mid, cptr, true);
         }
       }
@@ -2373,7 +2159,6 @@ SWIGEXPORT jobject JNICALL Java_lemurproject_lemur_lemurJNI_RetMethodManager_1cr
   {
     lemur::api::TextQueryRetMethod *t = dynamic_cast<lemur::api::TextQueryRetMethod*>(result);
     lemur::api::StructQueryRetMethod *s = dynamic_cast<lemur::api::StructQueryRetMethod*>(result);
-    lemur::retrieval::IndriRetMethod *ind = dynamic_cast<lemur::retrieval::IndriRetMethod*>(result);
     if (t) {
       jclass clazz = jenv->FindClass("lemurproject/lemur/TextQueryRetMethod");
       if (clazz) {
@@ -2391,16 +2176,6 @@ SWIGEXPORT jobject JNICALL Java_lemurproject_lemur_lemurJNI_RetMethodManager_1cr
         if (mid) {
           jlong cptr = 0;
           *(lemur::api::StructQueryRetMethod **)&cptr = s;
-          jresult = jenv->NewObject(clazz, mid, cptr, true);
-        }
-      }
-    }  else if (ind) {
-      jclass clazz = jenv->FindClass("lemurproject/lemur/IndriRetMethod");
-      if (clazz) {
-        jmethodID mid = jenv->GetMethodID(clazz, "<init>", "(JZ)V");
-        if (mid) {
-          jlong cptr = 0;
-          *(lemur::retrieval::IndriRetMethod **)&cptr = ind;
           jresult = jenv->NewObject(clazz, mid, cptr, true);
         }
       }
@@ -3102,55 +2877,6 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_lemur_lemurJNI_RetMethodManage
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_lemur_lemurJNI_RetMethodManager_1runIndriQuery(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jobject jarg2_) {
-  jobjectArray jresult = 0 ;
-  std::string *arg1 = 0 ;
-  lemur::retrieval::IndriRetMethod *arg2 = (lemur::retrieval::IndriRetMethod *) 0 ;
-  lemur::api::IndexedRealVector *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg2_;
-  if(!jarg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
-    return 0;
-  }
-  const char *arg1_pstr = (const char *)jenv->GetStringUTFChars(jarg1, 0); 
-  if (!arg1_pstr) return 0;
-  std::string arg1_str(arg1_pstr);
-  arg1 = &arg1_str;
-  jenv->ReleaseStringUTFChars(jarg1, arg1_pstr); 
-  arg2 = *(lemur::retrieval::IndriRetMethod **)&jarg2; 
-  {
-    try {
-      try {
-        result = (lemur::api::IndexedRealVector *)lemur_api_RetMethodManager_runIndriQuery((std::string const &)*arg1,arg2);
-      }
-      catch(lemur::api::Exception &_e) {
-        {
-          jclass excep = jenv->FindClass("java/lang/Exception");
-          if (excep)
-          jenv->ThrowNew(excep, (&_e)->what().c_str());
-          return 0;
-        }
-      }
-      
-    } catch( lemur::api::Exception& e ) {
-      {
-        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
-      };
-      // control does not leave method when thrown. (fixed in 1.3.25
-      // return 0;
-    }
-  }
-  {
-    jresult = java_build_indexedrealvector( jenv, *(result) );
-    delete(result);
-  }
-  return jresult;
-}
-
-
 SWIGEXPORT jlong JNICALL Java_lemurproject_lemur_lemurJNI_new_1ArrayAccumulator(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   int arg1 ;
@@ -3192,59 +2918,6 @@ SWIGEXPORT void JNICALL Java_lemurproject_lemur_lemurJNI_delete_1ArrayAccumulato
       // return ;
     }
   }
-}
-
-
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_lemur_lemurJNI_MatchInfo_1getMatches(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3) {
-  jobjectArray jresult = 0 ;
-  lemur::api::Index *arg1 = 0 ;
-  lemur::api::Query *arg2 = 0 ;
-  lemur::api::DOCID_T arg3 ;
-  lemur::api::TMatch *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(lemur::api::Index **)&jarg1;
-  if(!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "lemur::api::Index const & reference is null");
-    return 0;
-  } 
-  arg2 = *(lemur::api::Query **)&jarg2;
-  if(!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "lemur::api::Query const & reference is null");
-    return 0;
-  } 
-  arg3 = (lemur::api::DOCID_T)jarg3; 
-  {
-    try {
-      try {
-        result = (lemur::api::TMatch *)lemur::api::MatchInfo::getMatches((lemur::api::Index const &)*arg1,(lemur::api::Query const &)*arg2,arg3);
-      }
-      catch(lemur::api::Exception &_e) {
-        {
-          jclass excep = jenv->FindClass("java/lang/Exception");
-          if (excep)
-          jenv->ThrowNew(excep, (&_e)->what().c_str());
-          return 0;
-        }
-      }
-      
-    } catch( lemur::api::Exception& e ) {
-      {
-        SWIG_JavaException(jenv, SWIG_RuntimeError, e.what().c_str()); return 0; 
-      };
-      // control does not leave method when thrown. (fixed in 1.3.25
-      // return 0;
-    }
-  }
-  {
-    jresult = java_build_matchinfo( jenv, (const lemur::api::MatchInfo*)result );
-    // clean up
-    delete(result);
-  }
-  return jresult;
 }
 
 
@@ -3414,14 +3087,6 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_lemur_lemurJNI_SWIGStructQueryRetMeth
     (void)jenv;
     (void)jcls;
     *(lemur::api::RetrievalMethod **)&baseptr = *(lemur::api::StructQueryRetMethod **)&jarg1;
-    return baseptr;
-}
-
-SWIGEXPORT jlong JNICALL Java_lemurproject_lemur_lemurJNI_SWIGIndriRetMethodUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(lemur::api::RetrievalMethod **)&baseptr = *(lemur::retrieval::IndriRetMethod **)&jarg1;
     return baseptr;
 }
 

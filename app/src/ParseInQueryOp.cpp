@@ -161,7 +161,6 @@ contain a semicolon, as that will prematurely terminate the query.
 #include "TextHandlerManager.hpp"
 #include "WriterInQueryHandler.hpp"
 #include "InQueryOpParser.hpp"
-#include "InqArabicParser.hpp"
 #include "indri/Path.hpp"
 #include "Param.hpp"
 #include "Exception.hpp"
@@ -229,10 +228,7 @@ int AppMain(int argc, char * argv[]) {
 
   // Create the appropriate parser.
   Parser * parser;
-  if (LocalParameter::docFormat == "arabic")
-    parser = new lemur::parse::InqArabicParser();
-  else
-    parser = new lemur::parse::InQueryOpParser();
+  parser = new lemur::parse::InQueryOpParser();
 
   if (!LocalParameter::acronyms.empty()) {
     parser->setAcroList(LocalParameter::acronyms);

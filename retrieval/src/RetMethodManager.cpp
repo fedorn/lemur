@@ -64,17 +64,9 @@ lemur::api::RetrievalMethod* lemur::api::RetMethodManager::createModel (const In
                                                    InQueryParameter::fbCoeff,
                                                    InQueryParameter::cacheIDF);
     break;
-  case INDRI:
-    IndriParameter::get();
-    model = new lemur::retrieval::IndriRetMethod(*ind);
-    lemur::retrieval::IndriRetMethod * indri = dynamic_cast<lemur::retrieval::IndriRetMethod *>(model);
-    // set up the parameters
-    indri->setParams(&IndriParameter::params);
-    // then add the stopwords.
-    indri->setStopwords(IndriParameter::stopwords);
-  }  
-  return model;
+  } 
 }
+
 
 lemur::api::RetrievalMethod* lemur::api::RetMethodManager::createModel (const Index* ind, 
                                                                         ScoreAccumulator* accum, 
@@ -135,12 +127,6 @@ lemur::api::IndexedRealVector* lemur::api::RetMethodManager::runQuery(const stri
     results = runTextQuery(query, textmethod, stopfile, stemtype, datadir, func);
   } else if (StructQueryRetMethod* structmethod = dynamic_cast<StructQueryRetMethod*>(model)) {
     results = runStructQuery(query, structmethod, stopfile, stemtype, datadir, func);
-  } else if (lemur::retrieval::IndriRetMethod* indrimethod = dynamic_cast<lemur::retrieval::IndriRetMethod*>(model)) {
-    results = new IndexedRealVector();
-    // add the stopwords.
-    indrimethod->setStopwords(stopfile);
-    indrimethod->scoreCollection(query, *results);
-    results->Sort();
   } else {
     delete(model);
     LEMUR_THROW(LEMUR_GENERIC_ERROR, "could not handle retrieval model");

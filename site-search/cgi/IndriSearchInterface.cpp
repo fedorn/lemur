@@ -114,7 +114,7 @@ string IndriSearchInterface::stripHtmlTags(string inputString) {
 }
 
 #define INDRI_SNIPPET_MAX_WINDOWSIZE 50
-
+#if 0
 std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api::DocumentManager* dm, lemur::api::Index *db, lemur::parse::StringQuery* q, indri::api::ScoredExtentResult &result, std::vector<std::string> *nodes, std::map< std::string, std::vector<indri::api::ScoredExtentResult> > *annotations, string docext) {
 
   std::vector<lemur::api::DOCID_T> docIDVec;
@@ -248,6 +248,7 @@ std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api:
 
   return outString.str();
 }
+#endif
 
 void IndriSearchInterface::findAndReplace(std::string &source, const std::string &find, const std::string &replace) {
   size_t f;
@@ -490,6 +491,7 @@ std::vector<indri::api::ScoredExtentResult> IndriSearchInterface::indriRemoveDup
 }
 
 void IndriSearchInterface::displayIndriSearchResults(lemur::api::Index *db, int datasourceID, lemur::parse::StringQuery* q, indri::api::QueryEnvironment *indriEnvironment, std::vector<indri::api::ScoredExtentResult> *results, std::vector<string> *nodes, std::map< std::string, std::vector<indri::api::ScoredExtentResult> > *annotations, int listLength, int rankStart) {
+#if 0
   // start the page...
   output->setMaxResultsPerPage(listLength);
 
@@ -579,6 +581,8 @@ void IndriSearchInterface::displayIndriSearchResults(lemur::api::Index *db, int 
   }
 
   output->displayResultsPageEnding();
+#endif
+
 }
 
 int IndriSearchInterface::findOccurrence(char *input, char *chrSet) {
@@ -827,7 +831,7 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults,
     }
     output->displayResultsPageEnding();
   } else {
-
+#if 0
     // get annotations for only those nodes we will be displaying...
     // create a docID vector...
     // std::vector<lemur::api::DOCID_T> displayNodes;
@@ -948,7 +952,7 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults,
     }
 
     output->displayResultsPageEnding();
-
+#endif
   } // end [else] if (results.size() == 0)
 
   delete(q);

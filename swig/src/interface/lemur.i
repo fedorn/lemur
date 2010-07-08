@@ -11,8 +11,6 @@
 #include "RetMethodManager.hpp"
 #include "StructQueryRetMethod.hpp"
 #include "TextQueryRetMethod.hpp"
-#include "MatchInfo.hpp"
-#include "ElemDocMgr.hpp"
   %}
 
 // swig library typemaps
@@ -36,11 +34,9 @@
 %include "TermInfoList.i"
 %include "DocInfoList.i"
 %include "IndexedRealVector.i"
-%include "DocumentManager.i"
 %include "Index.i"
 %include "RetMethod.i"
 %include "ScoreAccumulator.i"
-%include "MatchInfo.i"
 //%include "Parameters.i"
 namespace lemur {
   namespace api {

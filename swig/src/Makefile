@@ -119,14 +119,12 @@ csharp-lib: $(OUTDIRCSHARP) $(CSHARPLIB) $(CSHARP_DLL)
 
 $(SOLIB): $(LIBDEPS)
 
-$(SOLIB): $(OBJ)/java/lemur_jni.o $(OBJ)/java/indri_jni.o  $(OBJ)/java/JBuildIndex.o
-	$(CXX) $(JAVA_SHARED)  $(OBJ)/java/lemur_jni.o $(OBJ)/java/indri_jni.o  $(OBJ)/java/JBuildIndex.o -o $@ $(LDFLAGS)
+$(SOLIB): $(OBJ)/java/lemur_jni.o $(OBJ)/java/indri_jni.o
+	$(CXX) $(JAVA_SHARED)  $(OBJ)/java/lemur_jni.o $(OBJ)/java/indri_jni.o  -o $@ $(LDFLAGS)
 
 $(OBJ)/java/lemur_jni.o: java/lemur_jni.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(JAVAINC)
 
-$(OBJ)/java/JBuildIndex.o: java/JBuildIndex.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $< $(JAVAINC)
 
 java/lemur_jni.cpp: $(INTERFACES)
 ifneq ("$(SWIG)", "")

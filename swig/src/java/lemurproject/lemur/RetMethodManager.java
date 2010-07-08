@@ -29,18 +29,6 @@ public class RetMethodManager {
     swigCPtr = 0;
   }
 
-        /**
-           Run a string query with a given retrieval method instance.
-           @param searchQuery the query to run
-           @param m The retrieval method to use.
-           @return array of IndexedReal results
-           @throws Exception if a lemur::api::Exception was thrown by the JNI library.
-        */
-
-public static IndexedReal[] runQuery(String searchQuery, IndriRetMethod m) throws Exception
-  {
-    return RetMethodManager.runIndriQuery(searchQuery, m);
-  }
 /**
    Run a string query with a given retrieval method instance.
    @param searchQuery the query to run
@@ -193,17 +181,6 @@ public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod mo
 */
 public static IndexedReal[] runStructQuery(String query, StructQueryRetMethod model) throws java.lang.Exception {
   return lemurJNI.RetMethodManager_runStructQuery__SWIG_4(query, StructQueryRetMethod.getCPtr(model), model);
-}
-
-  
-/**
-      Automatically generate query models from the given query and run through
-      given retrieval model. Stopword file and stemmer are optional
-      query terms delimited by space
-@throws Exception if a lemur::api::Exception was thrown by the JNI library.
-*/
-public static IndexedReal[] runIndriQuery(String query, IndriRetMethod model) throws java.lang.Exception {
-  return lemurJNI.RetMethodManager_runIndriQuery(query, IndriRetMethod.getCPtr(model), model);
 }
 
 }

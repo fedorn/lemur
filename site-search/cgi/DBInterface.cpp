@@ -146,9 +146,6 @@ lemur::api::Stemmer* DBInterface::getDbStemmer(const lemur::api::Index* ind) {
 
 std::string DBInterface::getStemmedTerm(std::string term, const lemur::api::Index* ind) {
 
-  // if we can dynamic cast it, it must be an indri index!
-  lemur::index::LemurIndriIndex *indriTestIndexCast=dynamic_cast<lemur::index::LemurIndriIndex*>((lemur::api::Index*)ind);
-  if (indriTestIndexCast) {
     // get the repository
     indri::collection::Repository _repository;
     try {
@@ -162,24 +159,6 @@ std::string DBInterface::getStemmedTerm(std::string term, const lemur::api::Inde
     _repository.close();
 
     return retWord;
-  } else { 
-    // standard stemmer...
-
-    // get stemmer
-    Stemmer* stemmer = getDbStemmer(ind);
-  
-    // get the word and stem it (if there's a stemmer...)
-    char *word;
-    if (stemmer) {
-      word=stemmer->stemWord((char*)term.c_str());
-      delete stemmer;
-    } else {
-      word=(char*)(term.c_str());
-    }
-
-    std::string retWord(word);
-    return retWord;
-  }
 }
 
 lemur::api::Index *DBInterface::openIndex() {
@@ -230,9 +209,6 @@ void DBInterface::displayIndexStatistics(int indexID) {
   UINT64 numTotalTerms=0;
 
   // Is this an indri index or a lemur one?
-  lemur::index::LemurIndriIndex *indriTestIndexCast=dynamic_cast<lemur::index::LemurIndriIndex*>((lemur::api::Index*)db);
-  if (indriTestIndexCast) {
-
     indri::api::QueryEnvironment *indriEnvironment=new indri::api::QueryEnvironment();
     vector<string> thisQueryHostVec=CGIConfiguration::getInstance().getQueryHostVec(pathToIndex);
     if (thisQueryHostVec.size()==0) {
@@ -246,16 +222,6 @@ void DBInterface::displayIndexStatistics(int indexID) {
     numTotalTerms = indriEnvironment->termCount();
 
     avgDocLen = (long double)numTotalTerms / (long double)docCount;
-  } else { // lemur index
-    // get doc count
-    docCount=db->docCount();
-    // get average document length
-    avgDocLen=db->docLengthAvg();
-    // get unique terms
-    numUniqueTerms=db->termCountUnique();
-    // get total terms
-    numTotalTerms=db->termCount();
-  }
 
   stringstream statsString;
   statsString << "Corpus Size: " << docCount << " document";
@@ -303,7 +269,7 @@ void DBInterface::listIndexFields() {
   _repository.close();
 }
 
-
+#if 0
 std::string DBInterface::getSummaryString(const lemur::api::DocumentManager* dm, lemur::api::Index *db, lemur::parse::StringQuery* q, int resultID, string docext) {
   //
   // Build excerpt from MatchInfo matches --
@@ -420,6 +386,7 @@ std::string DBInterface::getSummaryString(const lemur::api::DocumentManager* dm,
   // Done with matches from MatchInfo -----------
   return retSummary;
 }
+#endif
 
 lemur::api::IndexedRealVector DBInterface::removeDuplicateResults(lemur::api::IndexedRealVector results, lemur::api::Index *db) {
   // simple duplicate detection and removal...
@@ -498,6 +465,7 @@ lemur::api::IndexedRealVector DBInterface::removeDuplicateResults(lemur::api::In
 void DBInterface::displaySearchResults(lemur::api::Index *db, int datasourceID, lemur::parse::StringQuery* q,
                                        indri::api::QueryEnvironment *indriEnvironment, lemur::api::IndexedRealVector *results, 
                                        int listLength, int rankStart) { 
+#if 0
   
   // start the page...
 
@@ -578,6 +546,7 @@ void DBInterface::displaySearchResults(lemur::api::Index *db, int datasourceID, 
 
   output->outputString("</ol>\n");
   output->displayResultsPageEnding();
+#endif
 }
 
 void DBInterface::search(int datasourceID, string &query, long listLength,
@@ -595,8 +564,6 @@ void DBInterface::search(int datasourceID, string &query, long listLength,
   indri::api::QueryEnvironment *indriEnvironment=NULL;
 
   // if we can dynamic cast it, it must be an indri index!
-  lemur::index::LemurIndriIndex *indriTestIndexCast=dynamic_cast<lemur::index::LemurIndriIndex*>(db);
-  if (indriTestIndexCast) {
     // get the environment and add our index
     indriEnvironment=new indri::api::QueryEnvironment();
     // if we have a queryserver host - use that instead...
@@ -609,7 +576,6 @@ void DBInterface::search(int datasourceID, string &query, long listLength,
       for (vector<string>::iterator vIter=thisQueryHostVec.begin(); vIter!=thisQueryHostVec.end(); vIter++) {
         indriEnvironment->addServer(*vIter);
       }
-    }
   } // end if (indriTestIndexCast)
 
 
@@ -751,6 +717,7 @@ void DBInterface::getParsedDoc(long docID) {
 }
 
 void DBInterface::getDocIID(long docID) {
+#if 0
   Index *db=openIndex();
   if (!db) {
     output->writeErrorMessage("Cannot open index.", 
@@ -778,6 +745,7 @@ void DBInterface::getDocIID(long docID) {
   }
 
   delete db;
+#endif
 }
 
 void DBInterface::getDocXID(string *docID) {
@@ -794,8 +762,6 @@ void DBInterface::getDocXID(string *docID) {
   }
 
   indri::api::QueryEnvironment *indriEnvironment=NULL;
-  lemur::index::LemurIndriIndex *indriTestIndexCast=dynamic_cast<lemur::index::LemurIndriIndex*>((lemur::api::Index*)db);
-  if (indriTestIndexCast) {
     // get the environment and add our index
     indriEnvironment=new indri::api::QueryEnvironment();
     vector<string> thisQueryHostVec=CGIConfiguration::getInstance().getQueryHostVec(pathToIndex);
@@ -820,18 +786,6 @@ void DBInterface::getDocXID(string *docID) {
       delete db;
       return;
     }
-  } else {
-    int internalDocID=db->document(docID->c_str());
-    if (internalDocID) {
-      const DocumentManager* dm=db->docManager(internalDocID);
-      if (dm) {
-        string s(dm->getDoc(docID->c_str()));
-    	output->displayDataPage(s, "Document by External ID");
-        delete db;
-        return;
-      }
-    }
-  }
 
   output->writeErrorMessage("Error retrieving document.", 
 			    "Cannot retrieve document.");

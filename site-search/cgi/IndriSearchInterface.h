@@ -13,11 +13,8 @@ using std::string;
 #include "InQueryOpParser.hpp"
 #include "Stopper.hpp"
 #include "StringQuery.hpp"
-#include "ElemDocMgr.hpp"
-#include "MatchInfo.hpp"
 #include "TextHandlerManager.hpp"
 #include "Param.hpp"
-#include "LemurIndriIndex.hpp"
 #include "indri/QueryEnvironment.hpp"
 #include "indri/QueryAnnotation.hpp"
 #include "indri/ScoredExtentResult.hpp"
@@ -91,12 +88,12 @@ private:
                             std::vector<indri::api::ScoredExtentResult> *results, std::vector<string> *nodes,
                             std::map< std::string, std::vector<indri::api::ScoredExtentResult> > *annotations,
                             int listLength, int rankStart);
-
-  std::string getScoredExtentSummaryString(const lemur::api::DocumentManager* dm, lemur::api::Index *db, lemur::parse::StringQuery* q,
+#if 0
+    std::string getScoredExtentSummaryString(const lemur::api::DocumentManager* dm, lemur::api::Index *db, lemur::parse::StringQuery* q,
                                            indri::api::ScoredExtentResult &result, std::vector<string> *nodes,
                                            std::map< std::string, std::vector<indri::api::ScoredExtentResult> > *annotations,
                                            string docext);
-
+#endif
   std::vector<std::string> getRawScoringNodes(const indri::api::QueryAnnotationNode *node);
 
   /**
