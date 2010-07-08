@@ -8,83 +8,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "langmod", "langmod\langmod-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "retrieval", "retrieval\retrieval-VS2008.vcproj", "{8FE7FACA-8F60-41BA-8ED5-EFFD8E1B779E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cluster", "cluster\cluster-VS2008.vcproj", "{AF7E9B9B-427E-49FA-8843-B10455B1D182}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "summarization", "summarization\summarization-VS2008.vcproj", "{071C9F65-1F19-46C3-B230-D37616DFF17D}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "distrib", "distrib\distrib-VS2008.vcproj", "{40BED97C-0AF7-4F90-B5FD-21836C9BC47B}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicSummApp", "app\BasicSummApp-VS2008.vcproj", "{DEFCE8E5-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BuildDocMgr", "app\BuildDocMgr-VS2008.vcproj", "{DEF8F140-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BuildIndex", "app\BuildIndex-VS2008.vcproj", "{DEF93F62-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BuildPropIndex", "app\BuildPropIndex-VS2008.vcproj", "{DEF96670-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClusterApp", "app\ClusterApp-VS2008.vcproj", "{DEFFA804-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CollSelIndex", "app\CollSelIndex-VS2008.vcproj", "{DEFC9AC7-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DistRetEval", "app\DistRetEval-VS2008.vcproj", "{DEFCC1D3-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dumpDoc", "app\dumpDoc-VS2008.vcproj", "{DEFC2595-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dumpTerm", "app\dumpTerm-VS2008.vcproj", "{DEFC4CA1-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EstimateDirPrior", "app\EstimateDirPrior-VS2008.vcproj", "{DEF96674-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenerateQueryModel", "app\GenerateQueryModel-VS2008.vcproj", "{DEF9B491-F1DE-11D8-9669-0800200C9A66}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenerateSmoothSupport", "app\GenerateSmoothSupport-VS2008.vcproj", "{DEF9DBA1-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenL2Norm", "app\GenL2Norm-VS2008.vcproj", "{DEF98D82-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MMRSummApp", "app\MMRSummApp-VS2008.vcproj", "{DEFFA800-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OfflineCluster", "app\OfflineCluster-VS2008.vcproj", "{DEFFA808-F1DE-11D8-9669-0800200C9A66}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
 	EndProjectSection
@@ -100,21 +29,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParseQuery", "app\ParseQuer
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParseToFile", "app\ParseToFile-VS2008.vcproj", "{DEFA50D4-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PDictManager", "app\PDictManager-VS2008.vcproj", "{DEFC2591-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PLSA", "app\PLSA-VS2008.vcproj", "{DEFFCF13-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QryBasedSample", "app\QryBasedSample-VS2008.vcproj", "{DEFCE8E1-F1DE-11D8-9669-0800200C9A66}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
 	EndProjectSection
@@ -139,22 +53,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RetEval", "app\RetEval-VS20
 		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RetQueryClarity", "app\RetQueryClarity-VS2008.vcproj", "{DEFBFE80-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StructQueryEval", "app\StructQueryEval-VS2008.vcproj", "{DEFBD770-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwoStageRetEval", "app\TwoStageRetEval-VS2008.vcproj", "{DEFBD774-F1DE-11D8-9669-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XlingRetEval", "app\XlingRetEval-VS2008.vcproj", "{DEFBFE84-F1DE-11D8-9669-0800200C9A66}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
 	EndProjectSection
