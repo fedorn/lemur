@@ -54,15 +54,12 @@ distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
 
 LEMURLIB = lib$(PACKAGE).a
-WITH_DISTRIB = @WITH_DISTRIB@
-WITH_SUMMARIZATION = @WITH_SUMMARIZATION@
-WITH_CLUSTER = @WITH_CLUSTER@
 WITH_SWIG = @WITH_SWIG@
 WITH_JAVA = @WITH_JAVA@
 WITH_PHP = @WITH_PHP@
 WITH_CSHARP = @WITH_CSHARP@
 
-ALLMODULES=cluster summarization distrib retrieval langmod index parsing utility
+ALLMODULES=retrieval langmod index parsing utility
 CONTMODULES=$(ALLMODULES) contrib/antlr contrib/xpdf
 # C++ source files
 CPPSRC1 = $(notdir $(wildcard ../src/*.cpp))
@@ -102,15 +99,3 @@ CXXFLAGS    = @DEFS@ @CXXFLAGS@ @SHARED@
 CPPLDFLAGS  = @LDFLAGS@ @LIBS@
 
 ALLBIN = BuildDocMgr BuildIndex BuildPropIndex EstimateDirPrior GenL2Norm GenerateQueryModel GenerateSmoothSupport ParseInQueryOp ParseQuery ParseToFile QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval TwoStageRetEval RetQueryClarity XlingRetEval PDictManager  dumpDoc dumpTerm IndriBuildIndex IndriDaemon IndriRunQuery dumpindex makeprior harvestlinks pagerank ModifyFields
-
-ifneq ($(WITH_DISTRIB),0)
-ALLBIN += CollSelIndex DistRetEval QryBasedSample
-endif
-
-ifneq ($(WITH_SUMMARIZATION),0)
-ALLBIN += BasicSummApp MMRSummApp
-endif
-
-ifneq ($(WITH_CLUSTER),0)
-ALLBIN += Cluster OfflineCluster PLSA
-endif
