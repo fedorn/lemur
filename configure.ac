@@ -287,9 +287,6 @@ AC_SUBST(CSHARP_SO)
 dnl Finish up and output.
 AC_SUBST(APPDIRS)
 AC_SUBST(MODULES)
-AC_SUBST(WITH_SUMMARIZATION)
-AC_SUBST(WITH_DISTRIB)
-AC_SUBST(WITH_CLUSTER)
 dnl AC_SUBST(HOST_OS)
 
 APPDIRS=app
@@ -297,47 +294,12 @@ APPDIRS=app
 dnl Base lemur modules
 MODULES="retrieval langmod index parsing utility contrib/antlr contrib/xpdf"
 
-AC_ARG_ENABLE(distrib,
-	    AS_HELP_STRING(--enable-distrib,Enable distributed retrieval package))
-if test "$enable_distrib" = "yes" ; then
-  MODULES="distrib $MODULES"
-  WITH_DISTRIB=1
-dnl  AC_DEFINE(WITH_DISTRIB, 1, [Enable distributed retrieval package])
-else
-  WITH_DISTRIB=0
-dnl   AC_DEFINE(WITH_DISTRIB, 0, [Enable distributed retrieval package])
-fi
-
-AC_ARG_ENABLE(summarization,
-	    AS_HELP_STRING(--enable-summarization,Enable summarization package))
-
-if test "$enable_summarization" = "yes" ; then
-  MODULES="summarization $MODULES"
-  WITH_SUMMARIZATION=1
-dnl   AC_DEFINE(WITH_SUMMARIZATION, 1, [Enable summarization package])
-else
-  WITH_SUMMARIZATION=0
-dnl  AC_DEFINE(WITH_SUMMARIZATION, 0, [Enable summarization package])
-fi
-
 AC_ARG_ENABLE(assert,
 	    AS_HELP_STRING(--enable-assert,Enable assert statements in code),
 			   [if test "${enable_assert}" = "no" ; then
 			    AC_DEFINE(NDEBUG, 1, [Turn off assert statements])
 			   fi],
 			   AC_DEFINE(NDEBUG, 1, [Turn off assert statements]))
-
-AC_ARG_ENABLE(cluster,
-	    AS_HELP_STRING(--enable-cluster,Enable cluster package))
-
-if test "$enable_cluster" = "yes" ; then
-  MODULES="cluster $MODULES"
-  WITH_CLUSTER=1
-dnl  AC_DEFINE(WITH_CLUSTER, 1, [Enable cluster package])
-else
-  WITH_CLUSTER=0
-dnl  AC_DEFINE(WITH_CLUSTER, 0, [Enable cluster package])
-fi
 
 dnl site search parameters
 SITESEED="unknownhost"
