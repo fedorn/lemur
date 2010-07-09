@@ -623,11 +623,6 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults,
 					 int rankStart) {
   if (!output) return;
 
-  // ensure we have an index and a query environment
-  if (!index) {
-    output->writeErrorMessage("No index?", "No index set on call to IndriSearchInterface::performSearch()");
-    return;
-  }
   if (!queryEnvironment) {
     output->writeErrorMessage("No Query Environment?", "No Query Environment set on call to IndriSearchInterface::performSearch()");
     return;
