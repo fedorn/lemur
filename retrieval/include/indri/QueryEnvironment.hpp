@@ -264,7 +264,13 @@ namespace indri
       /// @param attributeValue values that the metadata attribute should match
       /// @return a vector of ParsedDocuments that match the given metadata criteria
       std::vector<lemur::api::DOCID_T> documentIDsFromMetadata( const std::string& attributeName, const std::vector<std::string>& attributeValue );
-
+      /// \brief Return the stem of the term
+      /// @param term the term to stem
+      /// @return the stem of the term
+      std::string stemTerm(const std::string &term);
+      /// \brief Return total number of unique terms.
+      /// @return total number of unique terms in the aggregated collection
+      INT64 termCountUnique();
       /// \brief Return total number of terms.
       /// @return total number of terms in the aggregated collection
       INT64 termCount();

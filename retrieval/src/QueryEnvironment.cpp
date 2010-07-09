@@ -1198,9 +1198,26 @@ indri::api::QueryAnnotation* indri::api::QueryEnvironment::runAnnotatedQuery( co
   return annotation;
 }
 
+std::string indri::api::QueryEnvironment::stemTerm(const std::string &term) {
+  //TODO: add the API call to the local query servers, etc.
+  return term;
+}
+
 //
 // Term counts
 //
+
+INT64 indri::api::QueryEnvironment::termCountUnique() {
+  // note that we should probably send these requests asynchronously
+  INT64 totalTermCount = 0;
+
+  for( size_t i=0; i<_servers.size(); i++ ) {
+    //TODO: ADD to local server API
+    //    totalTermCount += _servers[i]->termCount();
+  }
+
+  return totalTermCount;
+}
 
 INT64 indri::api::QueryEnvironment::termCount() {
   // note that we should probably send these requests asynchronously
