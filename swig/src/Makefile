@@ -21,45 +21,27 @@ LIBNAMESFULL=$(patsubst %,lib%.a, $(LIBNAMES))
 LIBDEPS=$(join $(LIBDIRS), $(LIBNAMESFULL))
 
 LDFLAGS = $(LIBPATH) $(LIBS) $(CPPLDFLAGS)
-SRC=interface/lemur.i
 INDRI_SRC=interface/indri.i
 
 OBJ=../obj
-OUTDIR=$(OBJ)/java/lemurproject/lemur
-OUTDIRUI=$(OUTDIR)/ui
-JSRC=java/lemurproject/lemur
-JSRCUI=$(JSRC)/ui
 INDRI_JSRC=java/lemurproject/indri
 INDRI_JSRCUI=$(INDRI_JSRC)/ui
 INDRI_OUTDIR=$(OBJ)/java/lemurproject/indri
 INDRI_OUTDIRUI=$(INDRI_OUTDIR)/ui
-JAVASRC = $(notdir $(wildcard $(JSRC)/*.java))
-JAVASRCUI = $(notdir $(wildcard $(JSRCUI)/*.java))
 INDRI_JAVASRC = $(notdir $(wildcard $(INDRI_JSRC)/*.java))
 INDRI_JAVASRCUI = $(notdir $(wildcard $(INDRI_JSRCUI)/*.java))
-ALLSRC= $(wildcard $(JSRC)/*.java) $(wildcard $(JSRCUI)/*.java) $(wildcard $(INDRI_JSRC)/*.java) $(wildcard $(INDRI_JSRCUI)/*.java)
-
-OUTDIRPROP=$(OUTDIR)/ui/properties
-PROPS = $(patsubst %,$(OUTDIRPROP)/%, $(notdir $(wildcard $(JSRCUI)/properties/*)))
-PROPS += $(patsubst %,$(OUTDIRPROP)/docs/%, $(notdir $(wildcard $(JSRCUI)/properties/docs/*)))
-PROPS += $(patsubst %,$(OUTDIRPROP)/docs/images/%, $(notdir $(wildcard $(JSRCUI)/properties/docs/images/*)))
-
+ALLSRC= $(wildcard $(INDRI_JSRC)/*.java) $(wildcard $(INDRI_JSRCUI)/*.java)
 INDRI_OUTDIRPROP=$(INDRI_OUTDIR)/ui/properties
 INDRI_PROPS = $(patsubst %,$(INDRI_OUTDIRPROP)/%, $(notdir $(wildcard $(INDRI_JSRCUI)/properties/*)))
 
-LEMUR_MFST=java/manifest.lemur
-LEMUR_MFSTRET=java/manifest.LemurRet
-LEMUR_MFSTIND=java/manifest.LemurIndex
 INDRI_MFST=java/manifest.indri
 MFSTRET=java/manifest.RetUI
 MFSTIND=java/manifest.IndexUI
 
-JARFILES=$(OBJ)/java/indri.jar $(OBJ)/java/RetUI.jar $(OBJ)/java/IndexUI.jar $(OBJ)/java/lemur.jar $(OBJ)/java/LemurRet.jar $(OBJ)/java/LemurIndex.jar
+JARFILES=$(OBJ)/java/indri.jar $(OBJ)/java/RetUI.jar $(OBJ)/java/IndexUI.jar
 
 INTERFACES = $(wildcard interface/*.i)
 
-CSHARPSRC=interface/lemur.i
-CSHARP_CPP=csharp/lemur_csharp.cpp
 INDRI_CSHARPSRC=interface/indri.i
 INDRI_CSHARP_CPP=csharp/indri_csharp.cpp
 
@@ -71,11 +53,9 @@ OUTDIRPHP=$(OBJ)/php
 PHPLIB=$(OUTDIRPHP)/libindri_php$(PHP_SO)
 PHPLIBPHP=php/libindri_php.php
 
-JAVADIRS = $(OUTDIR) $(INDRI_OUTDIR) $(OUTDIRUI) $(INDRI_OUTDIRUI) $(OUTDIRPROP)/docs/images $(INDRI_OUTDIRPROP) $(OBJ)/java/docs
-
+JAVADIRS = $(INDRI_OUTDIR) $(INDRI_OUTDIRUI)  $(INDRI_OUTDIRPROP) $(OBJ)/java/docs
 DIRS=
-
-JAVAOBJ = $(patsubst %,$(OUTDIR)/%, $(JAVASRC:.java=.class)) $(patsubst %,$(INDRI_OUTDIR)/%, $(INDRI_JAVASRC:.java=.class)) $(patsubst %,$(OUTDIRUI)/%, $(JAVASRCUI:.java=.class)) $(patsubst %,$(INDRI_OUTDIRUI)/%, $(INDRI_JAVASRCUI:.java=.class))
+JAVAOBJ = $(patsubst %,$(INDRI_OUTDIR)/%, $(INDRI_JAVASRC:.java=.class)) $(patsubst %,$(INDRI_OUTDIRUI)/%, $(INDRI_JAVASRCUI:.java=.class))
 
 SOLIB=$(OBJ)/java/lib$(PACKAGE)$(JAVA_SO)
 
@@ -84,10 +64,9 @@ OUTDIRCSHARP=$(OBJ)/csharp
 #naming issues on windows
 CSHARPLIB=$(OUTDIRCSHARP)/liblemur_csharp$(CSHARP_SO)
 CSHARP_DLL=$(OUTDIRCSHARP)/LemurCsharp.dll
-PCK=lemurproject.lemur
 INDRI_PCK=lemurproject.indri
 
-DOC_PCK=$(PCK) $(INDRI_PCK) $(PCK).ui $(INDRI_PCK).ui
+DOC_PCK=$(INDRI_PCK) $(INDRI_PCK).ui
 DOCARGS=-private -author -version
 
 DOC=$(JAVADOC) -classpath java  $(DOCARGS)
@@ -119,17 +98,8 @@ csharp-lib: $(OUTDIRCSHARP) $(CSHARPLIB) $(CSHARP_DLL)
 
 $(SOLIB): $(LIBDEPS)
 
-$(SOLIB): $(OBJ)/java/lemur_jni.o $(OBJ)/java/indri_jni.o
-	$(CXX) $(JAVA_SHARED)  $(OBJ)/java/lemur_jni.o $(OBJ)/java/indri_jni.o  -o $@ $(LDFLAGS)
-
-$(OBJ)/java/lemur_jni.o: java/lemur_jni.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $< $(JAVAINC)
-
-
-java/lemur_jni.cpp: $(INTERFACES)
-ifneq ("$(SWIG)", "")
-	$(SWIG) -c++ -java -package $(PCK) -o $@ -outdir $(JSRC) $(SRC) 
-endif
+$(SOLIB): $(OBJ)/java/indri_jni.o
+	$(CXX) $(JAVA_SHARED)  $(OBJ)/java/indri_jni.o  -o $@ $(LDFLAGS)
 
 $(OBJ)/java/indri_jni.o: java/indri_jni.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(JAVAINC)
@@ -138,14 +108,6 @@ java/indri_jni.cpp: $(INTERFACES)
 ifneq ("$(SWIG)", "")
 	$(SWIG) -c++ -java -package $(INDRI_PCK) -o $@ -outdir $(INDRI_JSRC) $(INDRI_SRC) 
 endif
-
-$(CSHARP_CPP): $(INTERFACES)
-ifneq ("$(SWIG)", "")
-	$(SWIG) -c++ -csharp -namespace Lemur -o $@ -outdir csharp $(CSHARPSRC)
-endif
-
-$(OUTDIRCSHARP)/lemur_csharp.o: $(CSHARP_CPP)
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(INDRI_CSHARP_CPP): $(INTERFACES)
 ifneq ("$(SWIG)", "")
@@ -158,8 +120,8 @@ $(OUTDIRCSHARP)/indri_csharp.o: $(INDRI_CSHARP_CPP)
 #needs csharp_shared
 $(CSHARPLIB): $(LIBDEPS)
 
-$(CSHARPLIB): $(OUTDIRCSHARP)/lemur_csharp.o  $(OUTDIRCSHARP)/indri_csharp.o
-	$(CXX) -g $(CSHARP_SHARED) $(OUTDIRCSHARP)/lemur_csharp.o  $(OUTDIRCSHARP)/indri_csharp.o -o $@ $(LDFLAGS)
+$(CSHARPLIB): $(OUTDIRCSHARP)/indri_csharp.o
+	$(CXX) -g $(CSHARP_SHARED) $(OUTDIRCSHARP)/indri_csharp.o -o $@ $(LDFLAGS)
 
 $(CSHARP_DLL): $(CSHARP_CPP)
 	$(MCS) -target:library -out:$@ csharp/*.cs
@@ -167,39 +129,14 @@ $(CSHARP_DLL): $(CSHARP_CPP)
 $(DIRS):
 	$(INSTALL_DIR) $@
 
-$(OUTDIR)/%.class:$(JSRC)/%.java
-	$(JAVAC) -classpath java -d $(OBJ)/java $<
-
 $(INDRI_OUTDIR)/%.class:$(INDRI_JSRC)/%.java
 	$(JAVAC) -classpath java -d $(OBJ)/java $<
-
-$(OUTDIRPROP)/%:$(JSRCUI)/properties/%
-	if test -f $< ; then $(INSTALL_DATA) $< $@ ; fi
-
-$(OUTDIRPROP)/docs/%:$(JSRCUI)/properties/docs/%
-	if test -f $< ; then $(INSTALL_DATA) $< $@ ; fi
-
-$(OUTDIRPROP)/docs/images/%:$(JSRCUI)/properties/docs/images/%
-	if test -f $< ; then $(INSTALL_DATA) $< $@ ; fi
 
 $(INDRI_OUTDIRPROP)/%:$(INDRI_JSRCUI)/properties/%
 	if test -f $< ; then $(INSTALL_DATA) $< $@ ; fi
 
-
 $(DOCDEP): $(ALLSRC)
 	$(DOC) -d $(OBJ)/java/docs -doctitle "Lemur JNI" -windowtitle "Lemur JNI" $(DOC_PCK)
-
-$(OBJ)/java/lemur.jar: $(JAVAOBJ) $(LEMUR_MFST) $(DOCDEP)
-	rm -f $@
-	cd $(OBJ)/java; $(JAR) cmf ../../src/$(LEMUR_MFST) lemur.jar lemurproject docs
-
-$(OBJ)/java/LemurRet.jar: $(JAVAOBJ) $(LEMUR_MFSTRET) $(DOCDEP)
-	rm -f $@
-	cd $(OBJ)/java; $(JAR) cmf ../../src/$(LEMUR_MFSTRET) LemurRet.jar lemurproject docs
-
-$(OBJ)/java/LemurIndex.jar: $(JAVAOBJ) $(LEMUR_MFSTIND) $(DOCDEP)
-	rm -f $@
-	cd $(OBJ)/java; $(JAR) cmf ../../src/$(LEMUR_MFSTIND) LemurIndex.jar lemurproject docs
 
 $(OBJ)/java/indri.jar: $(JAVAOBJ) $(INDRI_MFST) $(DOCDEP)
 	rm -f $@
