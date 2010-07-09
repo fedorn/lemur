@@ -59,7 +59,7 @@ WITH_JAVA = @WITH_JAVA@
 WITH_PHP = @WITH_PHP@
 WITH_CSHARP = @WITH_CSHARP@
 
-ALLMODULES=retrieval langmod index parsing utility
+ALLMODULES=retrieval index parsing utility
 CONTMODULES=$(ALLMODULES) contrib/antlr contrib/xpdf
 # C++ source files
 CPPSRC1 = $(notdir $(wildcard ../src/*.cpp))
@@ -98,4 +98,4 @@ CFLAGS = @DEFS@ @CFLAGS@ @SHARED@
 CXXFLAGS    = @DEFS@ @CXXFLAGS@ @SHARED@
 CPPLDFLAGS  = @LDFLAGS@ @LIBS@
 
-ALLBIN =  GenerateQueryModel GenerateSmoothSupport ParseInQueryOp ParseQuery ParseToFile QueryClarity QueryModelEval RelFBEval RetEval StructQueryEval IndriBuildIndex IndriDaemon IndriRunQuery dumpindex makeprior harvestlinks pagerank ModifyFields
+ALLBIN =  IndriBuildIndex IndriDaemon IndriRunQuery dumpindex makeprior harvestlinks pagerank ModifyFields

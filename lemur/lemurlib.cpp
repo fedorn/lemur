@@ -19,8 +19,4 @@
 #pragma comment (lib, "parsing.lib")
 #pragma comment (lib, "index.lib")
 #pragma comment (lib, "retrieval.lib") 
-#pragma comment (lib, "langmod.lib")
-#pragma comment (lib, "cluster.lib")
-#pragma comment (lib, "summarization.lib")
-#pragma comment (lib, "distrib.lib")
 #endif
