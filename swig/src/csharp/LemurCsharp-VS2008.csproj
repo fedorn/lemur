@@ -105,9 +105,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArrayAccumulator.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -126,15 +123,6 @@
     <Compile Include="ConfMap.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DocInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DocInfoList.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DocumentManager.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="DocumentVector.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -147,25 +135,10 @@
     <Compile Include="FieldVector.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Index.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IndexedReal.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IndexedRealVector.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="IndexEnvironment.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IndexManager.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="IndexStatus.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IndriRetMethod.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="indri_csharp.cs">
@@ -175,18 +148,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IntVector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IRVector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="lemur_csharp.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="lemur_csharpPINVOKE.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MatchInfo.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MetadataPair.cs">
@@ -213,9 +174,6 @@
     <Compile Include="PonteExpander.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Query.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="QueryAnnotation.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -231,19 +189,7 @@
     <Compile Include="QueryExpander.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="QueryRep.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="RetMethodManager.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="RetrievalMethod.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="RMExpander.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ScoreAccumulator.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ScoredExtentResult.cs">
@@ -258,9 +204,6 @@
     <Compile Include="StringVector.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="StructQueryRetMethod.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="TagExtent.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -271,24 +214,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TermExtentVector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TermInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TermInfoList.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TextQueryRetMethod.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TMatch.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TMatchVector.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="WeightedIDSet.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

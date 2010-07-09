@@ -85,9 +85,9 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			Name="Debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -106,14 +106,16 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
-				FavorSizeOrSpeed="1"
+				Optimization="0"
 				AdditionalIncludeDirectories="include;../parsing/include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				RuntimeLibrary="2"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="1"
@@ -149,9 +151,9 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			Name="Release|Win32"
+			OutputDirectory="Release"
+			IntermediateDirectory="Release"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -170,16 +172,14 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="include;../parsing/include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="1"
@@ -289,19 +289,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\BasicCollectionProps.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\BasicDocStream.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\BulkTree.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ByteHash.cpp"
 				>
 			</File>
 			<File
@@ -310,10 +298,6 @@
 			</File>
 			<File
 				RelativePath=".\src\DirectoryIterator.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\File.cpp"
 				>
 			</File>
 			<File
@@ -357,43 +341,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\LinkedPropertyList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\main.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\MemCache.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Param.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\Parameters.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\Path.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\PDict.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Property.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\QueryDocument.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ReadBuffer.cpp"
 				>
 			</File>
 			<File
@@ -413,27 +365,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\String.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\TermCache.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\Thread.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\UtilityThread.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\WordSet.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\WriteBuffer.cpp"
 				>
 			</File>
 			<File
@@ -459,27 +395,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\BasicCollectionProps.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\BasicDocStream.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\Buffer.hpp"
 				>
 			</File>
 			<File
 				RelativePath=".\include\indri\BulkTree.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\ByteHash.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\CollectionProps.hpp"
 				>
 			</File>
 			<File
@@ -495,14 +415,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Counter.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\CSet.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\DateParse.hpp"
 				>
 			</File>
@@ -515,31 +427,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\DocOffsetParser.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\DocStream.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Document.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\DocumentProps.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Exception.hpp"
 				>
 			</File>
 			<File
 				RelativePath=".\include\indri\Extent.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\File.hpp"
 				>
 			</File>
 			<File
@@ -579,7 +471,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\lemur\integer_types.h"
+				RelativePath=".\include\integer_types.h"
 				>
 			</File>
 			<File
@@ -587,11 +479,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\ISet.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\lemur\key_consts.h"
+				RelativePath=".\include\key_consts.h"
 				>
 			</File>
 			<File
@@ -631,27 +519,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\LinkedPropertyList.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\Lockable.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\main.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Match.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\MemCache.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\minmax.hpp"
 				>
 			</File>
 			<File
@@ -671,10 +543,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Param.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\Parameters.hpp"
 				>
 			</File>
@@ -683,31 +551,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\PDict.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Property.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\PropertyList.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\PSet.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\QueryDocument.hpp"
 				>
 			</File>
 			<File
 				RelativePath=".\include\indri\RawTextParser.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\ReadBuffer.hpp"
 				>
 			</File>
 			<File
@@ -767,19 +615,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\String.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\TagExtent.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Term.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\TermCache.hpp"
 				>
 			</File>
 			<File
@@ -788,18 +624,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\UtilityThread.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\WeightedIDSet.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\WordSet.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\WriteBuffer.hpp"
 				>
 			</File>
 			<File
@@ -825,10 +649,6 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
-		<File
-			RelativePath=".\ReadMe.txt"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

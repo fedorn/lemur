@@ -354,14 +354,6 @@
 				RelativePath="..\src\java\indri_jni.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\src\java\JBuildIndex.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\java\lemur_jni.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

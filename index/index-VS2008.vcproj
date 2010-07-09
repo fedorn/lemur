@@ -85,9 +85,9 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			Name="Debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -106,14 +106,16 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
-				FavorSizeOrSpeed="1"
+				Optimization="0"
 				AdditionalIncludeDirectories="..\contrib\zlib\include;include;..\utility\include;..\parsing\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				RuntimeLibrary="2"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="1"
@@ -149,9 +151,9 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			Name="Release|Win32"
+			OutputDirectory="Release"
+			IntermediateDirectory="Release"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -170,16 +172,14 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="..\contrib\zlib\include;include;..\utility\include;..\parsing\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="1"
@@ -353,51 +353,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\IndexManager.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\IndexWriter.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\IndriFieldInfoList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\IndriTermInfoList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\IndriTextHandler.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\InvDocList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\InvFPDocList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\InvFPTermList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\KeyfileDocListSegmentReader.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\KeyfileIncIndex.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\KeyfileTextHandler.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\LemurIndriIndex.cpp"
 				>
 			</File>
 			<File
@@ -414,14 +370,6 @@
 			</File>
 			<File
 				RelativePath=".\src\PriorListIterator.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\PropIndexTH.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\QueryTextHandler.cpp"
 				>
 			</File>
 			<File
@@ -443,87 +391,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\include\DocInfoList.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\FieldInfoList.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Index.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\IndexManager.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\IndriFieldInfoList.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\IndriTextHandler.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\InvDocInfo.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\InvDocList.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\InvFPDocInfo.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\InvFPDocList.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\InvFPTerm.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\InvFPTermList.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\InvFPTypes.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\KeyfileDocListSegmentReader.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\KeyfileIncIndex.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\KeyfileTextHandler.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\LemurIndriIndex.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\PropIndexTH.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\PushIndex.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\QueryTextHandler.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\TermInfoList.hpp"
 				>
 			</File>
 			<Filter
@@ -717,10 +585,6 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
-		<File
-			RelativePath=".\ReadMe.txt"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

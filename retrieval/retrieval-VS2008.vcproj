@@ -85,9 +85,9 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			Name="Debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -106,14 +106,16 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
-				FavorSizeOrSpeed="1"
+				Optimization="0"
 				AdditionalIncludeDirectories="include;..\utility\include;..\index\include;..\langmod\include;..\contrib\antlr\include;..\parsing\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				RuntimeLibrary="2"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="1"
@@ -149,9 +151,9 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			Name="Release|Win32"
+			OutputDirectory="Release"
+			IntermediateDirectory="Release"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -170,16 +172,14 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="include;..\utility\include;..\index\include;..\langmod\include;..\contrib\antlr\include;..\parsing\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="1"
@@ -317,14 +317,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\CORIRetMethod.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\CosSimRetMethod.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\DocListIteratorNode.cpp"
 				>
 			</File>
@@ -405,27 +397,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\FreqVector.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\IndexedReal.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\IndriRetMethod.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\InferenceNetwork.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\InferenceNetworkBuilder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\InQueryRetMethod.cpp"
 				>
 			</File>
 			<File
@@ -442,10 +418,6 @@
 			</File>
 			<File
 				RelativePath=".\src\LocalQueryServer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\MatchInfo.cpp"
 				>
 			</File>
 			<File
@@ -489,10 +461,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\OkapiRetMethod.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\OrderedWindowNode.cpp"
 				>
 			</File>
@@ -521,10 +489,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\ProxInfo.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\QueryAnnotation.cpp"
 				>
 			</File>
@@ -541,10 +505,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\QueryNode.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\QueryParser.cpp"
 				>
 			</File>
@@ -557,23 +517,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\ResultFile.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\RetMethodManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\RetrievalMethod.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\RMExpander.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ScoreAccumulator.cpp"
 				>
 			</File>
 			<File
@@ -581,23 +525,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\SimpleKLRetMethod.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\SnippetBuilder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\StringQuery.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\StructQueryRep.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\StructQueryRetMethod.cpp"
 				>
 			</File>
 			<File
@@ -609,19 +537,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\TextQueryRep.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\TextQueryRetMethod.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\TFIDFExpander.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\TFIDFRetMethod.cpp"
 				>
 			</File>
 			<File
@@ -658,10 +574,6 @@
 			</File>
 			<File
 				RelativePath=".\src\WPlusNode.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\XLingRetMethod.cpp"
 				>
 			</File>
 		</Filter>
@@ -719,14 +631,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\CORIRetMethod.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\CosSimRetMethod.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\DagCopier.hpp"
 				>
 			</File>
@@ -736,10 +640,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\DocListIteratorNode.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\DocumentRep.hpp"
 				>
 			</File>
 			<File
@@ -839,18 +739,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\FreqVector.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\IndexedReal.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\IndriRetMethod.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\InferenceNetwork.hpp"
 				>
 			</File>
@@ -860,10 +748,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\InferenceNetworkNode.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\InQueryRetMethod.hpp"
 				>
 			</File>
 			<File
@@ -892,10 +776,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\LocalQueryServer.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\MatchInfo.hpp"
 				>
 			</File>
 			<File
@@ -947,10 +827,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\OkapiRetMethod.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\OrderedWindowNode.hpp"
 				>
 			</File>
@@ -960,10 +836,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\Packer.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\PassageRep.hpp"
 				>
 			</File>
 			<File
@@ -980,10 +852,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\PriorNode.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\ProxInfo.hpp"
 				>
 			</File>
 			<File
@@ -1004,10 +872,6 @@
 			</File>
 			<File
 				RelativePath=".\include\indri\QueryLexerTokenTypes.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\QueryNode.hpp"
 				>
 			</File>
 			<File
@@ -1047,27 +911,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\ResultFile.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\RetMethodManager.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\RetParamManager.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\RetrievalMethod.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\RMExpander.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\ScoreAccumulator.hpp"
 				>
 			</File>
 			<File
@@ -1079,23 +923,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\ScoreFunction.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\ShrinkageBeliefNode.hpp"
 				>
 			</File>
 			<File
 				RelativePath=".\include\indri\SimpleCopier.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\SimpleKLDocModel.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\SimpleKLRetMethod.hpp"
 				>
 			</File>
 			<File
@@ -1107,19 +939,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\StringQuery.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\StructQryDocRep.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\StructQueryRep.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\StructQueryRetMethod.hpp"
+				RelativePath=".\include\indri\SnippetBuilder.hpp"
 				>
 			</File>
 			<File
@@ -1131,10 +951,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\TermQuery.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\TermScoreFunction.hpp"
 				>
 			</File>
@@ -1143,23 +959,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\TextQuery.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\TextQueryRep.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\TextQueryRetMethod.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\include\indri\TFIDFExpander.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\TFIDFRetMethod.hpp"
 				>
 			</File>
 			<File
@@ -1210,14 +1010,6 @@
 				RelativePath=".\include\indri\WPlusNode.hpp"
 				>
 			</File>
-			<File
-				RelativePath=".\include\XLingDocModel.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\XLingRetMethod.hpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -1233,10 +1025,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\ReadMe.txt"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
