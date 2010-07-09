@@ -5,16 +5,6 @@
 using std::string;
 
 #include "CGIOutput.h"
-#include "Index.hpp"
-#include "IndexManager.hpp"
-#include "Stemmer.hpp"
-#include "IndexManager.hpp"
-#include "InQueryRetMethod.hpp"
-#include "InQueryOpParser.hpp"
-#include "Stopper.hpp"
-#include "StringQuery.hpp"
-#include "TextHandlerManager.hpp"
-#include "Param.hpp"
 #include "indri/QueryEnvironment.hpp"
 #include "indri/QueryAnnotation.hpp"
 #include "indri/ScoredExtentResult.hpp"
@@ -57,7 +47,6 @@ private:
   };
 
   CGIOutput *output;
-  lemur::api::Index *index;
   indri::api::QueryEnvironment *queryEnvironment;
   string dataRoot;
 
@@ -79,21 +68,12 @@ private:
 
   std::vector<IndriSearchInterface::indriTermMatches> getMatches(int docID, std::map<std::string, std::vector<indri::api::ScoredExtentResult> > *annotations, std::vector<string> *rawNodes);
 
-  // NAM - Can't use lemur index here - won't work with indri daemons
-  // need to use indri query environment instead
-  //std::vector<indri::api::ScoredExtentResult> indriRemoveDuplicateResults(std::vector<indri::api::ScoredExtentResult> results, lemur::api::Index *db);
   std::vector<indri::api::ScoredExtentResult> indriRemoveDuplicateResults(std::vector<indri::api::ScoredExtentResult> results, indri::api::QueryEnvironment *indriEnvironment);
 
-  void displayIndriSearchResults(lemur::api::Index *db, int datasourceID, lemur::parse::StringQuery* q, indri::api::QueryEnvironment *indriEnvironment,
-                            std::vector<indri::api::ScoredExtentResult> *results, std::vector<string> *nodes,
-                            std::map< std::string, std::vector<indri::api::ScoredExtentResult> > *annotations,
-                            int listLength, int rankStart);
-#if 0
-    std::string getScoredExtentSummaryString(const lemur::api::DocumentManager* dm, lemur::api::Index *db, lemur::parse::StringQuery* q,
-                                           indri::api::ScoredExtentResult &result, std::vector<string> *nodes,
+  std::string getScoredExtentSummaryString(indri::api::ScoredExtentResult &result, std::vector<string> *nodes,
                                            std::map< std::string, std::vector<indri::api::ScoredExtentResult> > *annotations,
                                            string docext);
-#endif
+
   std::vector<std::string> getRawScoringNodes(const indri::api::QueryAnnotationNode *node);
 
   /**
@@ -104,9 +84,8 @@ private:
   string indriDefaultQueryExpansion(string &origQuery, bool usePagerank=false);
 
 public:
-  IndriSearchInterface(CGIOutput *_output, lemur::api::Index *_index, indri::api::QueryEnvironment *_queryEnvironment, string _dataRoot);
+  IndriSearchInterface(CGIOutput *_output, indri::api::QueryEnvironment *_queryEnvironment, string _dataRoot);
   ~IndriSearchInterface();
-
   void performSearch(string &query, int maxNumResults, int indexID, int listLength, int rankStart);
 
 

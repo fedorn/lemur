@@ -1,5 +1,6 @@
 #include "DBInterface.h"
 #include "indri/CompressedCollection.hpp"
+#include "lemur-compat.hpp"
 
 using namespace lemur::api;
 
@@ -13,6 +14,7 @@ DBInterface::DBInterface(CGIOutput *outputInterface) {
 }
 
 DBInterface::~DBInterface() {
+  delete _env;
 }
 
 
@@ -123,55 +125,29 @@ int DBInterface::getTFAnchorTagCount(indri::index::Index *index, long docid, lon
 }
 */
 
-lemur::api::Stemmer* DBInterface::getDbStemmer(const lemur::api::Index* ind) {
-  Stemmer* stemmer = NULL;
-  
-  // get our collection properties
-  const lemur::parse::BasicCollectionProps* props = dynamic_cast<const lemur::parse::BasicCollectionProps*> (ind->collectionProps());
-  if (props) {
-    string stype = "";
-    const lemur::parse::Property* p = NULL;
-    
-    // get the stemmer propery...
-    p = props->getProperty(Stemmer::category);
-    if (p) {
-      stype = (char*)p->getValue();
-    }
-
-    // create the stemmer...
-    stemmer = TextHandlerManager::createStemmer(stype);
-  }
-  return stemmer;
+std::string DBInterface::getStemmedTerm(std::string term) {
+  // get the QueryEnvironment
+  openIndex();
+  std::string retWord;
+  retWord = _env->stemTerm(term);
+  return retWord;
 }
 
-std::string DBInterface::getStemmedTerm(std::string term, const lemur::api::Index* ind) {
-
-    // get the repository
-    indri::collection::Repository _repository;
-    try {
-      _repository.openRead(pathToIndex);
-    } catch (...) {
-      return term;
-    }
-
-    std::string retWord;
-    retWord=_repository.processTerm(term);
-    _repository.close();
-
-    return retWord;
-}
-
-lemur::api::Index *DBInterface::openIndex() {
-  Index* db;
-
+void DBInterface::openIndex() {
+  if (_env != NULL) return;
   try {
-    db = IndexManager::openIndex(pathToIndex);
+    _env = new indri::api::QueryEnvironment();
+    vector<string> thisQueryHostVec=CGIConfiguration::getInstance().getQueryHostVec(pathToIndex);
+    if (thisQueryHostVec.size()==0) {
+      _env->addIndex(pathToIndex.c_str());
+    } else {
+      for (vector<string>::iterator vIter=thisQueryHostVec.begin(); vIter!=thisQueryHostVec.end(); vIter++) {
+        _env->addServer(*vIter);
+      }
+    }
+  } catch (...) {
+    _env = NULL;
   }
-  catch (...) {
-    db = NULL;
-  }
-
-  return db;
 }
 
 /** public functions **/
@@ -197,8 +173,8 @@ string DBInterface::getIndexPath() {
 }
 
 void DBInterface::displayIndexStatistics(int indexID) {
-  Index *db=openIndex();
-  if (!db) {
+  openIndex();
+  if (!_env) {
     output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
     return;
   }
@@ -208,21 +184,10 @@ void DBInterface::displayIndexStatistics(int indexID) {
   UINT64 numUniqueTerms=0;
   UINT64 numTotalTerms=0;
 
-  // Is this an indri index or a lemur one?
-    indri::api::QueryEnvironment *indriEnvironment=new indri::api::QueryEnvironment();
-    vector<string> thisQueryHostVec=CGIConfiguration::getInstance().getQueryHostVec(pathToIndex);
-    if (thisQueryHostVec.size()==0) {
-      indriEnvironment->addIndex(pathToIndex.c_str());
-    } else {
-      for (vector<string>::iterator vIter=thisQueryHostVec.begin(); vIter!=thisQueryHostVec.end(); vIter++) {
-        indriEnvironment->addServer(*vIter);
-      }
-    }
-    docCount = indriEnvironment->documentCount();
-    numTotalTerms = indriEnvironment->termCount();
-
-    avgDocLen = (long double)numTotalTerms / (long double)docCount;
-
+  docCount = _env->documentCount();
+  numTotalTerms = _env->termCount();
+  numUniqueTerms = _env->termCountUnique();
+  avgDocLen = (long double)numTotalTerms / (long double)docCount;
   stringstream statsString;
   statsString << "Corpus Size: " << docCount << " document";
   if (docCount!=1) {
@@ -230,43 +195,27 @@ void DBInterface::displayIndexStatistics(int indexID) {
   }
   statsString << "\n";
   statsString << "Corpus Length (in words): " << numTotalTerms << "\n";
-  if (numUniqueTerms > 0) {
-    statsString << "Unique Terms: " << numUniqueTerms << "\n";
-  } else {
-    statsString << "Unique Terms: " << numUniqueTerms << " (not available for distributed indexes)\n";
-  }
+  statsString << "Unique Terms: " << numUniqueTerms << "\n";
   statsString << "Average Document Length: " << avgDocLen << " words\n";
-
   stringstream iTitle;
   iTitle << "Index Statistics for Index ID " << indexID;
-
   output->displayDataPage(statsString.str(), iTitle.str());
-
-  delete db;
 }
 
 void DBInterface::listIndexFields() {
-  // ensure this is only used with Indri indexes...
-  indri::collection::Repository _repository;
-  try {
-    _repository.openRead(pathToIndex);
-  } catch (...) {
+  openIndex();
+  if (_env == NULL) {
     output->writeErrorMessage("Cannot open repository.","Can't open indri repository: " + pathToIndex);
     return;
   }
-
   stringstream fieldsString;
-
-  std::vector< indri::collection::Repository::Field> fields=_repository.fields();
-
-  std::vector< indri::collection::Repository::Field>::iterator fIter=fields.begin();
+  std::vector<std::string> fields = _env->fieldList();
+  std::vector<std::string>::iterator fIter=fields.begin();
   while (fIter!=fields.end()) {
-    fieldsString << (*fIter).name << "\n";
+    fieldsString << (*fIter) << "\n";
     fIter++;
   }
-
   output->displayDataPage(fieldsString.str(), "Index Fields Available:");
-  _repository.close();
 }
 
 #if 0
@@ -388,84 +337,17 @@ std::string DBInterface::getSummaryString(const lemur::api::DocumentManager* dm,
 }
 #endif
 
-lemur::api::IndexedRealVector DBInterface::removeDuplicateResults(lemur::api::IndexedRealVector results, lemur::api::Index *db) {
-  // simple duplicate detection and removal...
-  // based on Don Metzler's work - in theory, if two results have
-  // the _exact_ same score, they should be duplicates....
-  //
-  // also - remove any documents where the ~ and %7E are interchangable!
-
-  lemur::api::IndexedRealVector retVector;
-
-  lemur::api::IndexedRealVector::iterator vIter=results.begin();
-
-  std::string lastDocNo="";
-  string::size_type lastDocTildePos=string::npos;
-
-  // some riduculous seed value...
-  double currentScore=9999999999.999999;
-  while (vIter!=results.end()) {
-    if ((*vIter).val!=currentScore) {
-      std::string thisDocIDString=db->document((*vIter).ind);
-      string::size_type thisDocTildePos=thisDocIDString.find("~");
-      bool isOK=true;
-      
-      if (thisDocTildePos==string::npos) {
-         thisDocTildePos=thisDocIDString.find("%7E");
-      }
-     
-      if (thisDocTildePos!=string::npos) {
-        if (lastDocTildePos==thisDocTildePos) {
-          // so far - it looks the same...
-          // check out the string in the beginning...
-          string beginLastString=lastDocNo.substr(0, lastDocTildePos); 
-          string beginThisString=thisDocIDString.substr(0, thisDocTildePos);
-          if (beginLastString==beginThisString) {
-            // OK - so far, so good - check out the ending of the string...
-            string endLastString="";
-            string endThisString="";
-            if (lastDocNo[lastDocTildePos]=='~') {
-              endLastString=lastDocNo.substr(lastDocTildePos+1);
-            } else {
-              endLastString=lastDocNo.substr(lastDocTildePos+3);      
-            }
-            if (thisDocIDString[thisDocTildePos]=='~') {
-              endThisString=thisDocIDString.substr(thisDocTildePos+1);
-            } else {
-              endThisString=thisDocIDString.substr(thisDocTildePos+3);      
-            }
-            if (endLastString==endThisString) {
-              // not OK - it's the same...
-              isOK=false;
-            }
-          }
-        } 
-      }
-
-      if (isOK) {          
-        retVector.push_back((*vIter));
-        currentScore=(*vIter).val;
-      }
-
-      lastDocTildePos=thisDocTildePos;
-      lastDocNo=thisDocIDString;
-    }
-    vIter++;
-  }
-
-  return retVector;
-}
-
 /**
  * @param datasourceID the index of the database used for this search
  * @param results pointer to the vector of results
  * @param listLength the max. number of results to show on this page
  * @param rankStart the starting number of the first result of the page
  */
-void DBInterface::displaySearchResults(lemur::api::Index *db, int datasourceID, lemur::parse::StringQuery* q,
+#if 0
+void DBInterface::displaySearchResults(int datasourceID, 
                                        indri::api::QueryEnvironment *indriEnvironment, lemur::api::IndexedRealVector *results, 
                                        int listLength, int rankStart) { 
-#if 0
+
   
   // start the page...
 
@@ -480,11 +362,11 @@ void DBInterface::displaySearchResults(lemur::api::Index *db, int datasourceID, 
 
   int maxResultsToGet=results->size();
   if (DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE!=0) {
-    maxResultsToGet=MIN(results->size(), DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE);
+    maxResultsToGet=min(results->size(), DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE);
   }
 
   output->setResultStatistics(  datasourceID, rankStart,
-                                MIN(rankStart+listLength, maxResultsToGet),
+                                min(rankStart+listLength, maxResultsToGet),
                                 maxResultsToGet
                               );
 
@@ -546,148 +428,42 @@ void DBInterface::displaySearchResults(lemur::api::Index *db, int datasourceID, 
 
   output->outputString("</ol>\n");
   output->displayResultsPageEnding();
-#endif
-}
 
+}
+#endif
 void DBInterface::search(int datasourceID, string &query, long listLength,
 			 long rankStart, QUERY_INTERFACE_TYPE queryType) {
-  lemur::api::Index *db=openIndex();
-  if (!db) {
+  openIndex();
+  if (!_env) {
     output->writeErrorMessage("Cannot open index.", 
 			      "Error opening index: " + pathToIndex);
     return;
-  }
-
-  //
-  // are we using an indri database?
-  //
-  indri::api::QueryEnvironment *indriEnvironment=NULL;
-
-  // if we can dynamic cast it, it must be an indri index!
-    // get the environment and add our index
-    indriEnvironment=new indri::api::QueryEnvironment();
-    // if we have a queryserver host - use that instead...
-    //std::cout << "Path: " << pathToIndex << std::endl;
-    //std::cout << "Query Host: " << CGIConfiguration::getInstance().getQueryHost(pathToIndex) << std::endl;
-    vector<string> thisQueryHostVec=CGIConfiguration::getInstance().getQueryHostVec(pathToIndex);
-    if (thisQueryHostVec.size()==0) {
-      indriEnvironment->addIndex(pathToIndex.c_str());
-    } else {
-      for (vector<string>::iterator vIter=thisQueryHostVec.begin(); vIter!=thisQueryHostVec.end(); vIter++) {
-        indriEnvironment->addServer(*vIter);
-      }
-  } // end if (indriTestIndexCast)
-
-
-  Stopper* stopper = NULL;
-  Stemmer* stemmer = getDbStemmer(db);
-
-  const lemur::parse::BasicCollectionProps* props = dynamic_cast<const lemur::parse::BasicCollectionProps*> (db->collectionProps());
-
-  // create the results vector
-  IndexedRealVector results(50000);
-
-  if (props) {
-    const lemur::parse::Property* p = NULL;
-    p = props->getProperty("stopwords");
-    if (p) {
-      stopper = TextHandlerManager::createStopper((char*)p->getValue());
-    }
-  } // end if (props)
-
-  // quick check - if we are requesting an indri query type
-  // but don't have an indri index - revert to inquery!
-  if ((queryType==QUERY_INTERFACE_INDRI) && (!indriEnvironment)) {
-    queryType=QUERY_INTERFACE_INQUERY;
   }
 
   if (queryType==QUERY_INTERFACE_INDRI) {
     int maxToRet=DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE;
     if (maxToRet==0) maxToRet=DEFAULT_MAX_INDRI_RESULTS;
 
-    IndriSearchInterface *indSearch=new IndriSearchInterface(output, db, indriEnvironment, dataRoot);
+    IndriSearchInterface *indSearch=new IndriSearchInterface(output, _env, dataRoot);
     indSearch->performSearch(query, maxToRet, datasourceID, listLength, rankStart);
 
     delete indSearch;
-   } else if (queryType==QUERY_INTERFACE_INQUERY) {
-    // process InQuery query
-
-    // create retrieval model using default values
-    lemur::retrieval::InQueryRetMethod *model = new lemur::retrieval::InQueryRetMethod(*db, 0.4, 50, 0.5, false);
-
-
-    int qlen = query.length();
-    char* qChar = new char[qlen+5];
-    sprintf(qChar, "#q1=%s\0", query.c_str());
-    lemur::parse::InQueryOpParser opparser;
-    lemur::parse::StringQuery* q = new lemur::parse::StringQuery();
-    TextHandler* th = &opparser;
-
-    if (stopper) {
-      th->setTextHandler(stopper);
-      th = stopper;
-    } // end if (stopper)
-
-    if (stemmer) {
-      th->setTextHandler(stemmer);
-      th=stemmer;
-    } // end if (stemmer)
-
-    th->setTextHandler(q);
-    opparser.parseBuffer(qChar, qlen+5);
-    QueryRep *qr = model->computeQueryRep(*q);
-    model->scoreCollection(*qr, results);
-    results.Sort();
-
-    //delete(stopper);
-    delete[]qChar;
-
-    // reset out results page to initialize it...
-    output->resetResultsPage();
-    output->setResultQuery(query);
-
-    results=removeDuplicateResults(results, db);
-
-    // Display results
-    //
-    if (results.size() == 0) {
-      output->setResultStatistics(0, 0, 0, 0);
-      output->displayResultsPageBeginning();
-      output->outputString("No results.");
-      output->displayResultsPageEnding();
-    } else {
-      displaySearchResults(db, datasourceID, q, indriEnvironment, &results, listLength, rankStart);
-    } // end [else] if (results.size() == 0)
-
-    delete(model);
-    delete(qr);
-    delete(q);
   } else {
     // unknown query type!
     output->writeErrorMessage("Unknown query type", "Unknown query type.");
-    if (indriEnvironment) {
-      delete indriEnvironment;
-    }
-
-    delete (db);
     return;
   }
-    
-  if (indriEnvironment) {
-    delete indriEnvironment;
-  }
-
-  delete (db);
 }
 
 void DBInterface::getParsedDoc(long docID) {
-  Index *db=openIndex();
-  if (!db) {
+  openIndex();
+  if (!_env) {
     output->writeErrorMessage("Cannot open index.", 
 			      "Error opening index: " + pathToIndex);
     return;
   }
-
+  //FIXME:
+#if 0
   TermInfoList* termlist = db->termInfoListSeq(docID);
   if (!termlist) {
     output->writeErrorMessage("Cannot find parsed document.", 
@@ -714,38 +490,30 @@ void DBInterface::getParsedDoc(long docID) {
 
   // close and release the index...
   delete db;
+#endif
 }
 
 void DBInterface::getDocIID(long docID) {
-#if 0
-  Index *db=openIndex();
-  if (!db) {
+  openIndex();
+  if (!_env) {
     output->writeErrorMessage("Cannot open index.", 
 			      "Error opening index: " + pathToIndex);
     return;
   }
 
-  const DocumentManager* dm = NULL;
-  string idstr;
-  stringstream docidStrStr;
-  docidStrStr << docID;
-
-  if (! (dm = db->docManager (docID))) {
-    output->writeErrorMessage("No document manager found.", "Could got retrieve document manager for document: " + docidStrStr.str());
-    delete db;
+  std::vector<lemur::api::DOCID_T> docIDs;
+  docIDs.push_back(docID);
+  std::vector<indri::api::ParsedDocument*> documents = 
+    _env->documents(docIDs);
+  // Just take the first one (there should be only one)
+  indri::api::ParsedDocument* document = documents[0];
+  if (document) {
+    output->displayDataPage(documents[0]->text, "Document by Internal ID");
     return;
   }
-
-  idstr = db->document (docID);
-
-  if (idstr == "[OOV]") {
-    output->writeErrorMessage("Document not found.", "Document not found. Document: " + docidStrStr.str());
-  } else {
-    output->displayDataPage(dm->getDoc(idstr), "Document by Internal ID");
-  }
-
-  delete db;
-#endif
+  stringstream docidStrStr;
+  docidStrStr << docID;
+  output->writeErrorMessage("Document not found.", "Document not found. Document: " + docidStrStr.str());
 }
 
 void DBInterface::getDocXID(string *docID) {
@@ -754,124 +522,55 @@ void DBInterface::getDocXID(string *docID) {
     return;
   }
 
-  Index *db=openIndex();
-  if (!db) {
+  openIndex();
+  if (!_env) {
     output->writeErrorMessage("Cannot open index.", 
 			      "Error opening index: " + pathToIndex);
     return;
   }
+  std::vector<std::string> idList;
+  idList.push_back(docID->c_str());
+  std::vector<lemur::api::DOCID_T> docIDs = 
+    _env->documentIDsFromMetadata("docno", idList);
+  std::vector<indri::api::ParsedDocument*> documents = 
+    _env->documents(docIDs);
 
-  indri::api::QueryEnvironment *indriEnvironment=NULL;
-    // get the environment and add our index
-    indriEnvironment=new indri::api::QueryEnvironment();
-    vector<string> thisQueryHostVec=CGIConfiguration::getInstance().getQueryHostVec(pathToIndex);
-    if (thisQueryHostVec.size()==0) {
-      indriEnvironment->addIndex(pathToIndex.c_str());
-    } else {
-      for (vector<string>::iterator vIter=thisQueryHostVec.begin(); vIter!=thisQueryHostVec.end(); vIter++) {
-        indriEnvironment->addServer(*vIter);
-      }
-    }
-    std::vector<std::string> idList;
-    idList.push_back(docID->c_str());
-    std::vector<lemur::api::DOCID_T> docIDs = 
-      indriEnvironment->documentIDsFromMetadata("docno", idList);
-    std::vector<indri::api::ParsedDocument*> documents = 
-      indriEnvironment->documents(docIDs);
-
-    // Just take the first one (there should be only one)
-    indri::api::ParsedDocument* document = documents[0];
-    if (document) {
-      output->displayDataPage(documents[0]->text, "Document by External ID");
-      delete db;
-      return;
-    }
-
+  // Just take the first one (there should be only one)
+  indri::api::ParsedDocument* document = documents[0];
+  if (document) {
+    output->displayDataPage(document->text, "Document by External ID");
+    return;
+  }
   output->writeErrorMessage("Error retrieving document.", 
 			    "Cannot retrieve document.");
-
-  delete db;
 }
 
 void DBInterface::getTermCorpusStats(string *term) {
-  Index *db=openIndex();
-  if (!db) {
+  openIndex();
+  if (!_env) {
     output->writeErrorMessage("Cannot open index.", 
 			      "Error opening index: " + pathToIndex);
     return;
   }
-
-  lemur::index::InvDocList* dlist=0L;
-
-  // get stemmer
-  Stemmer* stemmer = getDbStemmer(db);
-
-  // get the word and stem it (if there's a stemmer...)
-  char *word;
-  if (stemmer) {
-    word=stemmer->stemWord((char*)term->c_str());
-    delete stemmer;
-  } else {
-    word=(char*)(term->c_str());
-  }
-
-  int termid = db->term (word);
-
- 
-  // get inverted list
-  if (termid) {
-    dlist = (lemur::index::InvDocList*) db->docInfoList (termid);
-  }
-
   stringstream statsString;
-  if (!dlist) {
-    if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
-      statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
-    }
-    statsString << setw(9) << 0 << "  " << setw(9) << 0 << "\n";
-  } else {
-    if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
-      statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
-    }
-    statsString << setw(9) << db->termCount (termid)   << "  " << setw(9) << dlist->docFreq() << "\n";
-    delete dlist;
+  if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
+    statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
   }
-
+  statsString << setw(9) << _env->termCount (*term)   << "  " << setw(9) << _env->documentCount(*term) << "\n";
+  
   output->displayDataPage(statsString.str(), "Corpus Statistics");
-
-  delete db;
 }
 
 void DBInterface::getTermInvList (string *term) {
-  Index *db=openIndex();
-  if (!db) {
+  openIndex();
+  if (!_env) {
     output->writeErrorMessage("Cannot open index.", 
 			      "Error opening index: " + pathToIndex);
     return;
   }
-
-  // get stemmer
-  Stemmer* stemmer = getDbStemmer(db);
-
-  // get the word and stem it (if there's a stemmer...)
-  char *word;
-  if (stemmer) {
-    word=stemmer->stemWord((char*)term->c_str());
-    delete stemmer;
-  } else {
-    word=(char*)(term->c_str());
-  }
-
-  int termid = db->term (word);
-
-  // get inverted list
-  lemur::index::InvDocList *dlist = 0L;
-
-  if (termid) {
-    dlist=(lemur::index::InvDocList*) db->docInfoList (termid);
-  }
-
   stringstream statsString;
+  //FIXME
+#if 0
   if (!dlist) {
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
@@ -898,35 +597,17 @@ void DBInterface::getTermInvList (string *term) {
   output->displayDataPage(statsString.str(), "Inverted list for " + (*term));
 
   delete db;
+#endif
 }
 
 void DBInterface::getTermInvPosList (string *term) {
-  Index *db=openIndex();
-  if (!db) {
+  openIndex();
+  if (!_env) {
     output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
     return;
   }
-
-  // get stemmer
-  Stemmer* stemmer = getDbStemmer(db);
-
-  // get the word and stem it (if there's a stemmer...)
-  char *word;
-  if (stemmer) {
-    word=stemmer->stemWord((char*)term->c_str());
-    delete stemmer;
-  } else {
-    word=(char*)(term->c_str());
-  }
-
-  int termid = db->term (word);
-
-  // get inverted list
-  lemur::index::InvFPDocList *dlist = 0L;
-  if (termid) {
-    dlist=(lemur::index::InvFPDocList*) db->docInfoList (termid);
-  }
-
+  // FIXME:
+#if 0
   stringstream statsString;
   if (!dlist) {
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
@@ -958,56 +639,37 @@ void DBInterface::getTermInvPosList (string *term) {
   output->displayDataPage(statsString.str(), "Inverted list for " + (*term));
 
   delete db;
+#endif
 }
 
 void DBInterface::getWordStem(string *term) {
-  Index *db=openIndex();
-  if (!db) {
+  openIndex();
+  if (!_env) {
     output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
     return;
   }
-
-  std::string stemmedWord=getStemmedTerm(*term, db);
-
-  TERMID_T id = db->term(stemmedWord.c_str());
-
-  if (id == 0) {
+  std::string stemmedWord=getStemmedTerm(*term);
+  INT64 count = _env->stemCount(stemmedWord);
+  // OOV have tf==0.
+  if (count == 0) {
     output->displayDataPage("[OOV]\n", "Word stem for " + (*term));
   } else {
     output->displayDataPage(stemmedWord, "Word stem for " + (*term));
   }
-
-  delete db;
 }
+
 
 void DBInterface::getTermInvListField(string *term) {
   // first - get the field position (if any)
   string::size_type dotPos=term->find(".", 0);
 
-  Index *db=openIndex();
-  if (!db) {
+  openIndex();
+  if (!_env) {
     output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
     return;
   }
-
-  // ensure this is only used with Indri indexes...
-  indri::collection::Repository _repository;
-  try {
-    _repository.openRead(pathToIndex);
-  } catch (...) {
-    // not an indri repository?
-    // if we don't have a dot position, 
-    // try the normal method...
-    if (dotPos==string::npos) {
-      // no field? use the normal method
-      getTermInvList(term);
-      return;
-    }
-    output->writeErrorMessage("Cannot open repository.","Can't open indri repository: " + pathToIndex);
-    delete db;
-    return;
-  }
-
+  //FIXME:
+#if 0
   // our output stream string
   stringstream statsString;
 
@@ -1126,6 +788,7 @@ void DBInterface::getTermInvListField(string *term) {
 
   _repository.close();
   delete db;
+#endif
 } // end function: void getTermInvListField(string*)
 
 
@@ -1133,33 +796,14 @@ void DBInterface::getTermInvPosListField(string *term) {
   // first - get the field (if any)
   string::size_type dotPos=term->find(".", 0);
 
-  Index *db=openIndex();
-  if (!db) {
+  openIndex();
+  if (!_env) {
     output->writeErrorMessage("Cannot open index.", 
 			      "Error opening index: " + pathToIndex);
     return;
   }
-
-  // ensure this is only used with Indri indexes...
-  indri::collection::Repository _repository;
-  try {
-    _repository.openRead(pathToIndex);
-  } catch (...) {
-    // not an indri repository?
-    // if we don't have a dot position, 
-    // try the normal method...
-    if (dotPos==string::npos) {
-      // no field? use the normal method
-      getTermInvList(term);
-      return;
-    }
-
-    output->writeErrorMessage("Cannot open repository.",
-			      "Can't open indri repository: " + pathToIndex);
-    delete db;
-    return;
-  }
-
+  // FIXME:
+#if 0
   // our output stream string
   stringstream statsString;
 
@@ -1356,5 +1000,6 @@ void DBInterface::getTermInvPosListField(string *term) {
 
   _repository.close();
   delete db;
+#endif
 } // end function void getTermInvPosListField(string*)
 

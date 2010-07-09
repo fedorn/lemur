@@ -5,22 +5,9 @@
 using std::string;
 
 #include "CGIOutput.h"
-#include "Index.hpp"
-#include "BasicCollectionProps.hpp"
-#include "IndexManager.hpp"
-#include "Stemmer.hpp"
-#include "IndexManager.hpp"
-#include "InQueryRetMethod.hpp"
-#include "InQueryOpParser.hpp"
-#include "Stopper.hpp"
-#include "StringQuery.hpp"
-#include "TextHandlerManager.hpp"
-#include "Param.hpp"
 #include "indri/QueryEnvironment.hpp"
 #include "indri/QueryAnnotation.hpp"
 #include "IndriSearchInterface.h"
-
-#define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
 /**
  * A class that represents a single result item for the results
@@ -40,34 +27,19 @@ private:
 	/** the output object */
   CGIOutput *output;
 
-	/**
-	 * retrieves a stemmer object for the specified index
-	 * @param ind the index to get the stemmer for
-	 * @return the stemmer (or NULL if none could be found)
-	 */
-  lemur::api::Stemmer* getDbStemmer(const lemur::api::Index* ind);
-
+  indri::api::QueryEnvironment * _env;
 	/**
 	 * retrieves a stemmed term from an index
 	 * @param term the term to get the stemmed version of
 	 * @param ind the opened index
 	 * @return the stemmed word (if it exists)
 	 */
-  std::string getStemmedTerm(std::string term, const lemur::api::Index* ind);
+  std::string getStemmedTerm(std::string term);
   
 	/**
-	 * Generalized function to open the index specified by pathToIndex
-	 * @return the opened index (or NULL on error)
+	 * Open the QueryEnvironment _env specified by pathToIndex
 	 */
-  lemur::api::Index *openIndex();
-
-	/**
-	 * Attempts to remove duplicate results from a result set
-	 * @param results the original results set
-	 * @param db the opened index
-	 * @return the results set with duplicates removed
-	 */
-  lemur::api::IndexedRealVector removeDuplicateResults(lemur::api::IndexedRealVector results, lemur::api::Index *db);
+  void openIndex();
 
   /**
 	 * displays the search results
@@ -76,10 +48,11 @@ private:
    * @param listLength the max. number of results to show on this page
    * @param rankStart the starting number of the first result of the page
    */
-  void displaySearchResults(lemur::api::Index *db, int datasourceID, lemur::parse::StringQuery* q, indri::api::QueryEnvironment *indriEnvironment,
+#if 0
+  void displaySearchResults(int datasourceID, indri::api::QueryEnvironment *indriEnvironment,
                             lemur::api::IndexedRealVector *results, int listLength, int rankStart);
 
-
+#endif
   /**
    * Creates a summary string for the result
    *

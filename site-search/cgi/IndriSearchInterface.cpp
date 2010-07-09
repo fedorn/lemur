@@ -2,10 +2,9 @@
 #include <time.h>
 #include <cctype>
 #include <algorithm>
-
-IndriSearchInterface::IndriSearchInterface(CGIOutput *_output, lemur::api::Index *_index, indri::api::QueryEnvironment *_queryEnvironment, string _dataRoot) {
+#include <cmath>
+IndriSearchInterface::IndriSearchInterface(CGIOutput *_output, indri::api::QueryEnvironment *_queryEnvironment, string _dataRoot) {
   output=_output;
-  index=_index;
   queryEnvironment=_queryEnvironment;
   dataRoot=_dataRoot;
 }
@@ -114,8 +113,8 @@ string IndriSearchInterface::stripHtmlTags(string inputString) {
 }
 
 #define INDRI_SNIPPET_MAX_WINDOWSIZE 50
-#if 0
-std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api::DocumentManager* dm, lemur::api::Index *db, lemur::parse::StringQuery* q, indri::api::ScoredExtentResult &result, std::vector<std::string> *nodes, std::map< std::string, std::vector<indri::api::ScoredExtentResult> > *annotations, string docext) {
+
+std::string IndriSearchInterface::getScoredExtentSummaryString(indri::api::ScoredExtentResult &result, std::vector<std::string> *nodes, std::map< std::string, std::vector<indri::api::ScoredExtentResult> > *annotations, string docext) {
 
   std::vector<lemur::api::DOCID_T> docIDVec;
   // int thisDocID=db->document(docext);
@@ -127,11 +126,7 @@ std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api:
   if (dVec.size()==0) return "...";
   indri::utility::greedy_vector<indri::parse::TermExtent> termPositions=dVec[0]->positions;
 
-  string fullDocText="";
-  char *fullDocTextChr=dm->getDoc(docext);
-  if (fullDocTextChr) {
-    fullDocText.append(fullDocTextChr);
-  }
+  string fullDocText = dVec[0]->text;
 
   // get snippet
   std::vector<IndriSearchInterface::indriTermMatches> matches=getMatches(result.document, annotations, nodes);
@@ -248,7 +243,7 @@ std::string IndriSearchInterface::getScoredExtentSummaryString(const lemur::api:
 
   return outString.str();
 }
-#endif
+
 
 void IndriSearchInterface::findAndReplace(std::string &source, const std::string &find, const std::string &replace) {
   size_t f;
@@ -261,7 +256,7 @@ std::string IndriSearchInterface::getASCIIFromPercentEncoding(std::string inputS
   if (inputSequence.length() < 3) { return inputSequence; }
   if (inputSequence[0]!='%') { return inputSequence; }
 
-  char retChar;
+  unsigned char retChar;
   char firstNibble=inputSequence[1];
   char secondNibble=inputSequence[2];
 
@@ -490,101 +485,6 @@ std::vector<indri::api::ScoredExtentResult> IndriSearchInterface::indriRemoveDup
   return retVector;
 }
 
-void IndriSearchInterface::displayIndriSearchResults(lemur::api::Index *db, int datasourceID, lemur::parse::StringQuery* q, indri::api::QueryEnvironment *indriEnvironment, std::vector<indri::api::ScoredExtentResult> *results, std::vector<string> *nodes, std::map< std::string, std::vector<indri::api::ScoredExtentResult> > *annotations, int listLength, int rankStart) {
-#if 0
-  // start the page...
-  output->setMaxResultsPerPage(listLength);
-
-  //
-  //  If someone tries to go past the end of the list, don't.
-  //
-  if (rankStart >= results->size()) {
-    rankStart = results->size() - 1;
-  }
-
-  int maxResultsToGet=results->size();
-  if (DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE!=0) {
-    maxResultsToGet=MIN(results->size(), DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE);
-  }
-
-  output->setResultStatistics(datasourceID, rankStart,
-                              MIN(rankStart+listLength, maxResultsToGet),
-                              maxResultsToGet);
-
-  output->displayResultsPageBeginning();
-
-  stringstream htmlListStart;
-  htmlListStart << "<ol type=1 start=\"" << (rankStart + 1) << "\">\n";
-  output->outputString(htmlListStart.str());
-
-
-  for (int i=rankStart;(i<listLength+rankStart) && (i<maxResultsToGet);i++) {
-    indri::api::ScoredExtentResult thisResult=(*results)[i];
-    //
-    // get DocMgr
-    //
-    const lemur::api::DocumentManager* dm = index->docManager(thisResult.document);
-
-    //
-    // fetch possible title
-    //
-    string docext = index->document(thisResult.document);
-
-    //
-    // Get the summary item (if any)
-    //
-    string buf = getScoredExtentSummaryString(dm, index, q, thisResult, 
-					      nodes, annotations, docext);
-
-    //
-    // if we're using an Indri index - check for metadata fields...
-    //
-    std::string thisTitle="";
-    std::string thisURL="";
-
-    std::vector< lemur::api::DOCID_T > docIDVec;
-    docIDVec.clear(); // just to make sure...
-    docIDVec.push_back(thisResult.document);
-
-    // get a title field (if any)
-    std::vector< std::string > titleStrings=queryEnvironment->documentMetadata(docIDVec, "title");
-    if (titleStrings.size() > 0) {
-      thisTitle=(*(titleStrings.begin()));
-    }
-
-    thisURL=docext;
-
-    // should we strip the root path?
-    if ((CGIConfiguration::getInstance().getStripRootPathFlag()) && (thisURL.find(dataRoot)==0)) {
-      // remove the data root from the docext path...
-      thisURL.erase(0,dataRoot.length());
-    }
-
-    // depending on if we have a title and/or URL, decide how we want to display it
-    if ((thisTitle.length() > 0) && (thisURL.length() > 0)) {
-      output->writeSearchResult(thisURL, docext, thisTitle, buf, 
-				thisResult.score, datasourceID,
-				thisResult.document);
-    } else if (thisTitle.length() > 0) {
-      output->writeSearchResult("", docext, thisTitle, buf, thisResult.score, 
-				datasourceID, thisResult.document);
-    } else {
-      output->writeSearchResult("", docext, thisURL, buf, thisResult.score, 
-				datasourceID, thisResult.document);
-    }
-  } // for (int i=rankStart;(i<listLength+rankStart) && (i<results.size());i++)
-
-  output->outputString("</ol>\n");
-
-  if (CGIConfiguration::getInstance().getKVItem("displayquerydebug")=="true") {
-    output->outputString("<hr />Reformulated Query: " + CGIConfiguration::getInstance().getKVItem("reformulatedQuery") + "<hr />");
-  }
-
-  output->displayResultsPageEnding();
-#endif
-
-}
-
 int IndriSearchInterface::findOccurrence(char *input, char *chrSet) {
   if ((!input) || (!chrSet)) return -1;
   char *tmp=input;
@@ -810,13 +710,12 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults,
   // get our raw scoring nodes from the annotation tree...
   //std::vector<std::string> rawScoringNodeNames=getRawScoringNodes(qaResults->getQueryTree());
 
-  lemur::parse::StringQuery* q = new lemur::parse::StringQuery(query.c_str());
   // reset out results page to initialize it...
   output->resetResultsPage();
   output->setResultQuery(origQueryCopy);
 
   if (oQueryLog) {
-    fprintf(oQueryLog, "(%d results)\n", finalResults.size());
+    fprintf(oQueryLog, "(%ld results)\n", finalResults.size());
     fclose(oQueryLog);
   }
 
@@ -831,7 +730,7 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults,
     }
     output->displayResultsPageEnding();
   } else {
-#if 0
+
     // get annotations for only those nodes we will be displaying...
     // create a docID vector...
     // std::vector<lemur::api::DOCID_T> displayNodes;
@@ -879,8 +778,6 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults,
       // get DocMgr
       //
 
-      const lemur::api::DocumentManager* dm = index->docManager(thisResult.document);
-
       std::vector< lemur::api::DOCID_T > docIDVec;
       docIDVec.clear(); // just to make sure...
       docIDVec.push_back(thisResult.document);
@@ -895,7 +792,7 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults,
       //
       // Get the summary item (if any)
       //
-      //string buf = getScoredExtentSummaryString(dm, index, q, thisResult, &rawScoringNodeNames, &annotations, docext);
+      //string buf = getScoredExtentSummaryString( index, q, thisResult, &rawScoringNodeNames, &annotations, docext);
       indri::api::SnippetBuilder builder(true);
       string buf = builder.build(thisResult.document,parsedDocs[i],qaResults);
 
@@ -952,12 +849,8 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults,
     }
 
     output->displayResultsPageEnding();
-#endif
-  } // end [else] if (results.size() == 0)
 
-  delete(q);
+  } // end [else] if (results.size() == 0)
 
   finalResults.clear();
 }
-
-

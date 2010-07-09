@@ -1,6 +1,6 @@
 LEMURDIR = ../..
 include $(LEMURDIR)/MakeDefns
-LIBNAMES= retrieval langmod index parsing utility
+LIBNAMES= retrieval index parsing utility
 CONTMODULES=$(LIBNAMES)  contrib/antlr contrib/xpdf
 INCPATH = $(patsubst %, -I$(LEMURDIR)/%/include, $(CONTMODULES))
 
