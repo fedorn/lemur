@@ -6740,7 +6740,7 @@ fi
 
 APPDIRS=app
 
-MODULES="retrieval langmod index parsing utility contrib/antlr contrib/xpdf"
+MODULES="retrieval index parsing utility contrib/antlr contrib/xpdf"
 
 # Check whether --enable-assert was given.
 if test "${enable_assert+set}" = set; then
