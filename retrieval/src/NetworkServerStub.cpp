@@ -297,6 +297,10 @@ void indri::net::NetworkServerStub::_handleTermCount( indri::xml::XMLNode* reque
   INT64 termCount = _server->termCount();
   _sendNumericResponse( "term-count", termCount );
 }
+void indri::net::NetworkServerStub::_handleTermCountUnique( indri::xml::XMLNode* request ) {
+  INT64 termCount = _server->termCountUnique();
+  _sendNumericResponse( "term-count-unique", termCount );
+}
 
 void indri::net::NetworkServerStub::_handleStemCountText( indri::xml::XMLNode* request ) {
   INT64 termCount = _server->stemCount( request->getValue().c_str() );
@@ -319,6 +323,14 @@ void indri::net::NetworkServerStub::_handleTermName( indri::xml::XMLNode* reques
 void indri::net::NetworkServerStub::_handleTermID( indri::xml::XMLNode* request ) {
   lemur::api::TERMID_T termID = _server->termID( request->getValue().c_str() );
   _sendNumericResponse( "term-id", termID );
+}
+
+void indri::net::NetworkServerStub::_handleStemTerm( indri::xml::XMLNode* request ) {
+  std::string name = _server->stemTerm( request->getValue()  );
+  indri::xml::XMLNode* response = new indri::xml::XMLNode( "term-stem", name );
+  _stream->reply( response );
+  _stream->replyDone();
+  delete response;
 }
 
 void indri::net::NetworkServerStub::_handleTermFieldCount( indri::xml::XMLNode* request ) {
@@ -447,8 +459,12 @@ void indri::net::NetworkServerStub::request( indri::xml::XMLNode* input ) {
       _handleTermID( input );
     } else if( type == "term-name" ) {
       _handleTermName( input );
+    } else if( type == "term-stem" ) {
+      _handleStemTerm( input );
     } else if( type == "term-count" ) {
       _handleTermCount( input );
+    } else if( type == "term-count-unique" ) {
+      _handleTermCountUnique( input );
     } else if( type == "term-count-text" ) {
       _handleTermCountText( input );
     } else if( type == "stem-count-text" ) {

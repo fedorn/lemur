@@ -1199,7 +1199,13 @@ indri::api::QueryAnnotation* indri::api::QueryEnvironment::runAnnotatedQuery( co
 }
 
 std::string indri::api::QueryEnvironment::stemTerm(const std::string &term) {
-  //TODO: add the API call to the local query servers, etc.
+  std::string stem;
+  // return the first stem that differs from the input term
+  // as servers may have different stemmers.
+  for( size_t i=0; i<_servers.size(); i++ ) {
+    stem = _servers[i]->stemTerm(term);
+    if (stem != term) return stem;
+  }
   return term;
 }
 
@@ -1212,8 +1218,7 @@ INT64 indri::api::QueryEnvironment::termCountUnique() {
   INT64 totalTermCount = 0;
 
   for( size_t i=0; i<_servers.size(); i++ ) {
-    //TODO: ADD to local server API
-    //    totalTermCount += _servers[i]->termCount();
+    totalTermCount += _servers[i]->termCountUnique();
   }
 
   return totalTermCount;

@@ -69,10 +69,12 @@ namespace indri
       // terms
       INT64 termCount();
       INT64 termCount( const std::string& term );
+      INT64 termCountUnique( );
       INT64 stemCount( const std::string& stem );
       std::string termName( lemur::api::TERMID_T term );
       lemur::api::TERMID_T termID( const std::string& term );
-  
+      std::string stemTerm(const std::string &term);
+      
       // fields
       std::vector<std::string> fieldList();
       INT64 termFieldCount( const std::string& term, const std::string& field );

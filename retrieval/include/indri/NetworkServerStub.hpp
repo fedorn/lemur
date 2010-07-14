@@ -50,11 +50,13 @@ namespace indri
       void _handleQuery( indri::xml::XMLNode* input );
 
       void _handleTermCount( indri::xml::XMLNode* request );
+      void _handleTermCountUnique( indri::xml::XMLNode* request );
       void _handleStemCountText( indri::xml::XMLNode* request );
       void _handleTermCountText( indri::xml::XMLNode* request );
 
       void _handleTermName( indri::xml::XMLNode* request );
       void _handleTermID( indri::xml::XMLNode* request );
+      void _handleStemTerm( indri::xml::XMLNode* request );
 
       void _handleTermFieldCount( indri::xml::XMLNode* request );
       void _handleStemFieldCount( indri::xml::XMLNode* request );

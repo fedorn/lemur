@@ -549,6 +549,11 @@ INT64 indri::server::NetworkServerProxy::termCount( const std::string& term ) {
   return _numericRequest( request );
 }
 
+INT64 indri::server::NetworkServerProxy::termCountUnique( ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "term-count-unique" );
+  return _numericRequest( request );
+}
+
 INT64 indri::server::NetworkServerProxy::stemCount( const std::string& term ) {
   indri::xml::XMLNode* request = new indri::xml::XMLNode( "stem-count-text", term );
   return _numericRequest( request );
@@ -556,6 +561,11 @@ INT64 indri::server::NetworkServerProxy::stemCount( const std::string& term ) {
 
 std::string indri::server::NetworkServerProxy::termName( lemur::api::TERMID_T term ) {
   indri::xml::XMLNode* request = new indri::xml::XMLNode( "term-name", i64_to_string(term) );
+  return _stringRequest( request );
+}
+
+std::string indri::server::NetworkServerProxy::stemTerm( const std::string & term ) {
+  indri::xml::XMLNode* request = new indri::xml::XMLNode( "term-stem", term );
   return _stringRequest( request );
 }
 

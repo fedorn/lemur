@@ -241,6 +241,18 @@ INT64 indri::server::LocalQueryServer::termCount() {
   return total;
 }
 
+INT64 indri::server::LocalQueryServer::termCountUnique() {
+  indri::collection::Repository::index_state indexes = _repository.indexes();
+  INT64 total = 0;
+
+  for( size_t i=0; i<indexes->size(); i++ ) {
+    indri::thread::ScopedLock lock( (*indexes)[i]->statisticsLock() );
+    total += (*indexes)[i]->uniqueTermCount();
+  }
+
+  return total;
+}
+
 INT64 indri::server::LocalQueryServer::termCount( const std::string& term ) {
   std::string stem = _repository.processTerm( term );
   // stopwords return a string of length 0, causing Keyfile to throw.
@@ -303,6 +315,11 @@ lemur::api::TERMID_T indri::server::LocalQueryServer::termID( const std::string&
   } else {
     return 0;
   }
+}
+
+std::string indri::server::LocalQueryServer::stemTerm( const std::string& term ) {
+  std::string stem  = _repository.processTerm(term);
+  return stem;
 }
 
 std::vector<std::string> indri::server::LocalQueryServer::fieldList() {

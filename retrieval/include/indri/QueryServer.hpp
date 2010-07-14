@@ -73,11 +73,13 @@ namespace indri
       // terms
       virtual INT64 termCount() = 0;
       virtual INT64 termCount( const std::string& term ) = 0;
+      virtual INT64 termCountUnique( ) = 0;
       virtual INT64 stemCount( const std::string& stem ) = 0;
 
       virtual std::string termName( lemur::api::TERMID_T term ) = 0;
       virtual lemur::api::TERMID_T  termID( const std::string& term ) = 0;
-  
+      virtual std::string stemTerm(const std::string &term) = 0;
+      
       // fields
       virtual std::vector<std::string> fieldList() = 0;
       virtual INT64 termFieldCount( const std::string& term, const std::string& field ) = 0;
