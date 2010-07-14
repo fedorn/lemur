@@ -1,5 +1,4 @@
 #include "DBInterface.h"
-#include "indri/CompressedCollection.hpp"
 #include "lemur-compat.hpp"
 
 using namespace lemur::api;
@@ -362,11 +361,11 @@ void DBInterface::displaySearchResults(int datasourceID,
 
   int maxResultsToGet=results->size();
   if (DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE!=0) {
-    maxResultsToGet=min(results->size(), DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE);
+    maxResultsToGet=lemur_compat::min(results->size(), DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE);
   }
 
   output->setResultStatistics(  datasourceID, rankStart,
-                                min(rankStart+listLength, maxResultsToGet),
+                                lemur_compat::min(rankStart+listLength, maxResultsToGet),
                                 maxResultsToGet
                               );
 
@@ -462,35 +461,25 @@ void DBInterface::getParsedDoc(long docID) {
 			      "Error opening index: " + pathToIndex);
     return;
   }
-  //FIXME:
-#if 0
-  TermInfoList* termlist = db->termInfoListSeq(docID);
-  if (!termlist) {
+  std::vector<lemur::api::DOCID_T> ids;
+  ids.push_back(docID);
+  std::vector<indri::api::DocumentVector*> docs = _env->documentVectors(ids);
+  if (docs.size() == 0) {
     output->writeErrorMessage("Cannot find parsed document.", 
 			      "Cannot find parsed document termlist.");
-    delete db;
     return;
   }
-
-  TermInfoList::iterator it;
+  indri::api::DocumentVector *v = docs[0];
   std::string doc = "";
-
-  termlist->startIteration();
-  while (termlist->hasMore()) {
-    TermInfo *thisEntry=termlist->nextEntry();
-    if (thisEntry) {
-      doc+=db->term(thisEntry->termID()) + " ";
-    }
+  for( size_t i=0; i < v->positions().size(); i++ ) {
+    int position = v->positions()[i];
+    const std::string& stem = v->stems()[position];
+    if (stem == "[OOV]") continue;
+    doc += stem + " ";
   }
-
   // just print out the whole string
   output->displayDataPage(doc, "Parsed Document", false);
-
-  delete termlist;
-
-  // close and release the index...
-  delete db;
-#endif
+  delete(v);
 }
 
 void DBInterface::getDocIID(long docID) {
@@ -561,6 +550,39 @@ void DBInterface::getTermCorpusStats(string *term) {
   output->displayDataPage(statsString.str(), "Corpus Statistics");
 }
 
+class InvItem 
+{
+public:
+  lemur::api::DOCID_T docID;
+  int tf;
+  std::vector<indri::api::ScoredExtentResult> positions;
+  InvItem() : docID(0), tf(0) {
+  }
+  static std::vector<InvItem> makeInvList(std::vector<indri::api::ScoredExtentResult> items, INT64 &docCount) {
+    std::vector<InvItem> res;
+    docCount = 0;
+    InvItem newItem;
+
+    // transform into InvItems, count docs, tf, copy positions
+    for (size_t i = 0; i < items.size(); i++) {
+      indri::api::ScoredExtentResult &item = items[i];
+      if (item.document != newItem.docID) {
+        // starting a new document
+        if (newItem.docID != 0) res.push_back(newItem);
+        docCount++;
+        newItem.docID = item.document;
+        newItem.tf = 0;
+        newItem.positions.clear();
+      }
+      newItem.tf++;
+      newItem.positions.push_back(item);
+    }
+    if (newItem.docID != 0) res.push_back(newItem);
+    return res;
+  }
+};
+
+  
 void DBInterface::getTermInvList (string *term) {
   openIndex();
   if (!_env) {
@@ -569,9 +591,11 @@ void DBInterface::getTermInvList (string *term) {
     return;
   }
   stringstream statsString;
-  //FIXME
-#if 0
-  if (!dlist) {
+  std::vector<indri::api::ScoredExtentResult> result = _env->expressionList( *term );
+  INT64 docCount = 0;
+  std::vector<InvItem> list = InvItem::makeInvList(result, docCount);
+
+  if (list.size() == 0) {
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
     }
@@ -580,24 +604,17 @@ void DBInterface::getTermInvList (string *term) {
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
     }
-    statsString << setw(9) << db->termCount (termid)   << "  " << setw(9) << dlist->docFreq() << "\n\n";
+    statsString << setw(9) << _env->termCount (*term)   << "  " << setw(9) << docCount << "\n\n";
 
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "docid"  << "  " << setw(9) << "doclen" << "  " << setw(9) << "tf"     << "\n";
     }
-
-    dlist->startIteration();
-    while (dlist->hasMore()) {
-      DocInfo* info = dlist->nextEntry();
-      statsString << setw(9) << info->docID()  << "  " << setw(9) << db->docLength(info->docID()) << "  " << setw(9) << info->termCount() << "\n";
+    for (int i = 0; i < list.size(); i++) {
+      InvItem &item = list[i];
+      statsString << setw(9) << item.docID  << "  " << setw(9) << _env->documentLength(item.docID) << "  " << setw(9) << item.tf << "\n";
     }
-
-    delete dlist;
   }
   output->displayDataPage(statsString.str(), "Inverted list for " + (*term));
-
-  delete db;
-#endif
 }
 
 void DBInterface::getTermInvPosList (string *term) {
@@ -606,10 +623,12 @@ void DBInterface::getTermInvPosList (string *term) {
     output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
     return;
   }
-  // FIXME:
-#if 0
   stringstream statsString;
-  if (!dlist) {
+  std::vector<indri::api::ScoredExtentResult> result = _env->expressionList( *term );
+  INT64 docCount = 0;
+  std::vector<InvItem> list = InvItem::makeInvList(result, docCount);
+
+  if (list.size() == 0) {
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
     }
@@ -618,28 +637,21 @@ void DBInterface::getTermInvPosList (string *term) {
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
     }
-    statsString << setw(9) << db->termCount (termid)   << "  " << setw(9) << dlist->docFreq() << "\n\n";
+    statsString << setw(9) << _env->termCount (*term)   << "  " << setw(9) << docCount << "\n\n";
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "docid"  << "  " << setw(9) << "doclen" << "  " << setw(9) << "tf"     << "  " << setw(9) << "positions"     << "\n";
     }
 
-    dlist->startIteration();
-    while (dlist->hasMore()) {
-      DocInfo* info = dlist->nextEntry();
-      int tf=info->termCount();
-      const LOC_T *pos=info->positions();
-      statsString << setw(9) << info->docID()  << "  " << setw(9) << db->docLength(info->docID()) << "  " << setw(9) << tf << "  " << setw(9);
-      for (int i=0; i<tf; i++) {
-        statsString << pos[i] << "  ";
+    for (int i = 0; i < list.size(); i++) {
+      InvItem &item = list[i];
+      statsString << setw(9) << item.docID  << "  " << setw(9) << _env->documentLength(item.docID) << "  " << setw(9) << item.tf << "  " << setw(9);
+      for (int j=0; j < item.tf; j++) {
+        statsString << item.positions[j].begin << "  ";
       }
       statsString << "\n";
     }
-    delete dlist;
   }
   output->displayDataPage(statsString.str(), "Inverted list for " + (*term));
-
-  delete db;
-#endif
 }
 
 void DBInterface::getWordStem(string *term) {
@@ -668,23 +680,22 @@ void DBInterface::getTermInvListField(string *term) {
     output->writeErrorMessage("Cannot open index.", "Error opening index: " + pathToIndex);
     return;
   }
-  //FIXME:
-#if 0
   // our output stream string
   stringstream statsString;
 
-  string theTerm="";
+  std::vector<indri::api::ScoredExtentResult> result = _env->expressionList( *term );
+  INT64 docCount = 0;
+  std::vector<InvItem> list = InvItem::makeInvList(result, docCount);
+  std::vector<lemur::api::DOCID_T> ids;
   string theField="";
 
   // got it - separate the two...
   if (dotPos==string::npos) {
     // no field? use the mainbody field (only if it exists!)
-    theTerm=term->c_str();
-
-    const std::vector< indri::collection::Repository::Field > repFields=_repository.fields();
-    std::vector< indri::collection::Repository::Field >::const_iterator fIter=repFields.begin();
-    for (; (fIter!=repFields.end() && theField.length()==0); fIter++) {
-      if ((*fIter).name=="mainbody") {
+    std::vector<std::string> fieldNames = _env->fieldList();
+    std::vector< std::string >::const_iterator fIter=fieldNames.begin();
+    for (; (fIter!=fieldNames.end() && theField.length()==0); fIter++) {
+      if ((*fIter)=="mainbody") {
 	theField="mainbody";
       }
     }
@@ -694,25 +705,10 @@ void DBInterface::getTermInvListField(string *term) {
       getTermInvList(term);
       return;
     }
-    
   } else {
-    theTerm=term->substr(0, dotPos);
     theField=term->substr(dotPos+1);
   }
-
-  // get the stemmed term (if any)
-  string stemmedTerm=getStemmedTerm(theTerm, db);
-
-  // get the internal term ID
-  int termid = db->term(theTerm.c_str());
-
-  // get inverted list
-  lemur::index::InvDocList *dlist = 0L;
-  if (termid) {
-    dlist=(lemur::index::InvDocList*) db->docInfoList (termid);
-  }
-
-  if (!dlist) {
+  if (list.size() == 0) {
     // no inverted list? Just output the headers...
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
@@ -720,11 +716,12 @@ void DBInterface::getTermInvListField(string *term) {
     // term count and doc frequency of 0.
     statsString << setw(9) << 0 << "  " << setw(9) << 0 << "\n";
   } else {
+
     // got the list - print headers
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
     }
-    statsString << setw(9) << db->termCount (termid)   << "  " << setw(9) << dlist->docFreq() << "\n\n";
+    statsString << setw(9) << _env->termCount (*term)   << "  " << setw(9) << docCount << "\n\n";
 
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "docid"  << "  "
@@ -734,61 +731,47 @@ void DBInterface::getTermInvListField(string *term) {
     } // if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM)
 
     // iterate through the inv. list
-    dlist->startIteration();
-    while (dlist->hasMore()) {
-			
-      // get the next entry...
-      DocInfo* info = dlist->nextEntry();
-      if (info) {
-	int fieldCount=0;    // total number of fields
-	int fieldFreq=0;     // number of fields where term occurs
-	int fieldTFCount=0;  // total term frequency within the fields
+    // iterate over the elements
+    // fetch the DocumentVector
+    // count the field frequency.
+    for (int i = 0; i < list.size(); i++) {
+      InvItem &item = list[i];
+      ids.clear();
+      ids.push_back(item.docID);
+      std::vector<indri::api::DocumentVector*> docs = _env->documentVectors(ids);
+      indri::api::DocumentVector *v = docs[0];
+      std::vector<indri::api::DocumentVector::Field> fields;
+      int fieldCount = 0;    // total number of fields
+      int fieldFreq = 0;     // number of fields where term occurs
+      int fieldTFCount = 0;  // total term frequency within the fields
 
-	// we unfortunately need to do this for every document - 
-	// we don't know if the document is in a different index within
-	// the repository...
-	indri::collection::Repository::index_state indexes = _repository.indexes();
-
-	// ensure we get the correct internal index
-	indri::index::Index* index = _indexWithDocument(indexes,info->docID());
-	if (index) {
-	  // get the correct internal field ID
-	  int fieldID=index->field(theField);
-
-	  // get a vector of the field tags
-	  indri::utility::greedy_vector<indri::index::FieldExtent> *aTagVec=getFieldTags(index, info->docID(), fieldID);
-	  if (aTagVec) {
-	    // get the count (size)
-	    fieldCount=aTagVec->size();
-	    // get the actual # of fields (total)
-	    fieldFreq=getFieldCountOfTerm(index, info->docID(), termid,
-					  aTagVec);
-	    // get the tf per field...
-	    fieldTFCount=getTFFieldTagCount(index, info->docID(), termid,
-					    aTagVec);
-	    delete aTagVec;
-	  } // end if (aTagVec)
-	} // end if (index)
-
-	if (fieldFreq > 0) {
-	  statsString << setw(9) << info->docID() << "  "
-		      << setw(9) << fieldCount << "  "
-		      << setw(9) << fieldFreq << "  "
-		      << setw(9) << fieldTFCount << "\n";
-	} // end if (fieldFreq > 0)
-      } // end if (info)
-    } // end while (dlist->hasMore())
-
-
-    // we're done here - cleanup.
-    delete dlist;
-  } // end if (!dlist)
+      for (size_t j = 0; j < v->fields().size(); j++)
+        if (v->fields()[j].name == theField) fields.push_back(v->fields()[j]);
+      fieldCount = fields.size();
+      size_t last_j = 0;
+      for (size_t field_idx = 0; field_idx < fieldCount; field_idx++) {
+        for (size_t j = last_j; j < item.positions.size() ; j++) {
+          if ( item.positions[j].begin >= fields[field_idx].begin &&
+               item.positions[j].end <= fields[field_idx].end ) {
+            fieldFreq++;
+            last_j = j;
+            break;
+          }
+        }
+      }
+      
+      fieldTFCount = item.positions.size();
+      
+      if (fieldFreq > 0) {
+        statsString << setw(9) << item.docID << "  "
+                    << setw(9) << fieldCount << "  "
+                    << setw(9) << fieldFreq << "  "
+                    << setw(9) << fieldTFCount << "\n";
+      } // end if (fieldFreq > 0)
+    } // end if (info)
+  }
 
   output->displayDataPage(statsString.str(), "Inverted list for " + (*term));
-
-  _repository.close();
-  delete db;
-#endif
 } // end function: void getTermInvListField(string*)
 
 
@@ -802,23 +785,21 @@ void DBInterface::getTermInvPosListField(string *term) {
 			      "Error opening index: " + pathToIndex);
     return;
   }
-  // FIXME:
-#if 0
   // our output stream string
   stringstream statsString;
-
-  string theTerm="";
+  std::vector<indri::api::ScoredExtentResult> result = _env->expressionList( *term );
+  INT64 docCount = 0;
+  std::vector<InvItem> list = InvItem::makeInvList(result, docCount);
+  std::vector<lemur::api::DOCID_T> ids;
   string theField="";
 
   // got it - separate the two...
   if (dotPos==string::npos) {
     // no field? use the mainbody field (only if it exists!)
-    theTerm=term->c_str();
-
-    const std::vector< indri::collection::Repository::Field > repFields=_repository.fields();
-    std::vector< indri::collection::Repository::Field >::const_iterator fIter=repFields.begin();
-    for (; (fIter!=repFields.end() && theField.length()==0); fIter++) {
-      if ((*fIter).name=="mainbody") {
+    std::vector<std::string> fieldNames = _env->fieldList();
+    std::vector< std::string >::const_iterator fIter=fieldNames.begin();
+    for (; (fIter!=fieldNames.end() && theField.length()==0); fIter++) {
+      if ((*fIter)=="mainbody") {
 	theField="mainbody";
       }
     }
@@ -830,23 +811,10 @@ void DBInterface::getTermInvPosListField(string *term) {
     }
     
   } else {
-    theTerm=term->substr(0, dotPos);
     theField=term->substr(dotPos+1);
   }
 
-  // get the stemmed term (if any)
-  string stemmedTerm=getStemmedTerm(theTerm, db);
-
-  // get the internal term ID
-  int termid = db->term(theTerm.c_str());
-
-  // get inverted list
-  lemur::index::InvDocList *dlist = 0L;
-  if (termid) {
-    dlist=(lemur::index::InvDocList*) db->docInfoList (termid);
-  }
-
-  if (!dlist) {
+  if (list.size() == 0) {
     // no inverted list? Just output the headers...
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
@@ -858,8 +826,8 @@ void DBInterface::getTermInvPosListField(string *term) {
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "ctf" << "  " << setw(9) << "df" << "\n";
     }
-    statsString << setw(9) << db->termCount (termid) << "  " << setw(9) 
-		<< dlist->docFreq() << "\n\n";
+    statsString << setw(9) << _env->termCount (*term) << "  " << setw(9) 
+		<< docCount << "\n\n";
 
     if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM) {
       statsString << setw(9) << "docid"  << "  "
@@ -871,100 +839,67 @@ void DBInterface::getTermInvPosListField(string *term) {
     } // if (output->getOutputMode()!=CGI_OUTPUT_PROGRAM)
 
     // iterate through the inv. list
-    dlist->startIteration();
-    while (dlist->hasMore()) {
-			
-      // get the next entry...
-      DocInfo* info = dlist->nextEntry();
-      if (info) {
-	int fieldCount=0;    // total number of fields
-	int fieldFreq=0;     // number of fields where term occurs
-	int fieldTFCount=0;  // total term frequency within the fields
-        int *fieldTFCounts=NULL; //array to hold individual field counts
-        int *fieldTFLocations=NULL; //array to hold individual field positions
+    // iterate over the elements
+    // fetch the DocumentVector
+    // count the field frequency.
+    for (int i = 0; i < list.size(); i++) {
+      InvItem &item = list[i];
+      ids.clear();
+      ids.push_back(item.docID);
+      std::vector<indri::api::DocumentVector*> docs = _env->documentVectors(ids);
+      indri::api::DocumentVector *v = docs[0];
+      std::vector<indri::api::DocumentVector::Field> fields;
+      int fieldCount = 0;    // total number of fields
+      int fieldFreq = 0;     // number of fields where term occurs
+      int fieldTFCount = 0;  // total term frequency within the fields
 
+      for (size_t j = 0; j < v->fields().size(); j++)
+        if (v->fields()[j].name == theField) fields.push_back(v->fields()[j]);
+      fieldCount = fields.size();
+      size_t last_j = 0;
+      for (size_t field_idx = 0; field_idx < fieldCount; field_idx++) {
+        for (size_t j = last_j; j < item.positions.size() ; j++) {
+          if ( item.positions[j].begin >= fields[field_idx].begin &&
+               item.positions[j].end <= fields[field_idx].end ) {
+            fieldFreq++;
+            last_j = j;
+            break;
+          }
+        }
+      }
+      
+      fieldTFCount = item.positions.size();
+      
+      int *fieldTFCounts=NULL; //array to hold individual field counts
+      int *fieldTFLocations=NULL; //array to hold individual field positions
 
-	// we unfortunately need to do this for every document - 
-	// we don't know if the document is in a different index within
-	// the repository...
-	indri::collection::Repository::index_state indexes = _repository.indexes();
-
-	// ensure we get the correct internal index
-	indri::index::Index* index = _indexWithDocument(indexes,info->docID());
-	if (index) {
-	  // get the correct internal field ID
-	  int fieldID=index->field(theField);
-
-	  // get a vector of the field tags
-	  indri::utility::greedy_vector<indri::index::FieldExtent> *aTagVec=getFieldTags(index, info->docID(), fieldID);
-	  if (aTagVec) {
-	    // get the count (size)
-	    fieldCount=aTagVec->size();
-	    // get the actual # of fields (total)
-	    fieldFreq=getFieldCountOfTerm(index, info->docID(), termid,
-					  aTagVec);
-	    // get the tf per field...
-	    fieldTFCount=getTFFieldTagCount(index, info->docID(), termid,
-					    aTagVec);
-
-	    //--- new code
-
-	    // generate the inlink_n_tf and inlink_n_loc_x arrays...
-	    if ((fieldTFCount > 0) && (fieldFreq > 0)) {
-	      fieldTFCounts=new int[fieldFreq];
-	      fieldTFLocations=new int[fieldTFCount];
-
-	      int currentLinkPos=0;
-	      int currentLocPos=0;
-
-	      indri::index::TermList *tList=(indri::index::TermList*)index->termList(info->docID());
-	      if (!tList) {
-		delete fieldTFCounts; fieldTFCounts=NULL;
-		delete fieldTFLocations; fieldTFLocations=NULL;
-	      } else {
-		indri::utility::greedy_vector<int> termVec=tList->terms();
-		indri::utility::greedy_vector<indri::index::FieldExtent>::iterator fIter=aTagVec->begin();
-		while (fIter!=aTagVec->end()) {
-		  // cerr << "field iter...";
-		  long fieldStart=(*fIter).begin;
-		  bool thisOneHasTerm=false;
-		  int  thisFieldTFCount=0;
-
-		  for (long i=fieldStart; i < (*fIter).end; i++) {
-		    if (termVec[i]==termid) {
-		      if (!thisOneHasTerm) {
-			thisOneHasTerm=true;
-		      } // end if (!thisOneHasTerm)
-		      thisFieldTFCount++;
-		      fieldTFLocations[currentLocPos++]=(i-fieldStart);
-		    } // end if (termVec[i]==termid)
-		  } // end for (long i=anchorFieldStart; i < (*fIter).end; i++)
-
-		  if (thisOneHasTerm) {
-		    fieldTFCounts[currentLinkPos++]=thisFieldTFCount;
-		  } // end if (thisOneHasTerm)
-
-		  fIter++;
-		} // end while (fIter!=anchorFields->end())
-	      } // if (!tList)
-	    } // if ((anchorTFCount > 0) && (anchorFreq > 0))
-
-	    //--- end new code
-
-	    delete aTagVec;
-	  } // end if (aTagVec)
-	} // end if (index)
+      // generate the inlink_n_tf and inlink_n_loc_x arrays...
+      if ((fieldTFCount > 0) && (fieldFreq > 0)) {
+        fieldTFCounts=new int[fieldFreq];
+        fieldTFLocations=new int[fieldTFCount];
+        
+        int currentLinkPos=0;
+        int currentLocPos=0;
+        
+        for (size_t field_idx = 0; field_idx < fieldCount; field_idx++) {
+          int  thisFieldTFCount = 0;
+          for (size_t j = last_j; j < item.positions.size() ; j++) {
+            if ( item.positions[j].begin >= fields[field_idx].begin &&
+                 item.positions[j].end <= fields[field_idx].end ) {
+              thisFieldTFCount++;
+              fieldTFLocations[currentLocPos++] = item.positions[j].begin;
+            }
+          }
+          if (thisFieldTFCount > 0) {
+            fieldTFCounts[currentLinkPos++]=thisFieldTFCount;
+          }
+        }
 
 	if (fieldFreq > 0) {
-
-	  int tf=(info->termCount() - fieldFreq);
-	  const LOC_T *pos=info->positions();
-
-	  statsString << setw(9) << info->docID()  << "  " << setw(9);
-
-	  for (int i=0; i<tf; i++) {
-	    statsString << pos[i] << "  ";
-	  }
+	  statsString << setw(9) << item.docID  << "  " << setw(9);
+          for (int j=0; j < item.tf; j++) {
+            statsString << item.positions[j].begin << "  ";
+          }
 
 	  statsString << setw(9) << fieldCount << "  " << setw(9) 
 		      << fieldFreq << "  " << setw(9) << fieldTFCount 
@@ -988,18 +923,9 @@ void DBInterface::getTermInvPosListField(string *term) {
 
 	fieldTFCounts=NULL;
 	fieldTFLocations=NULL;
-
-      } // end if (info)
-    } // end while (dlist->hasMore())
-
-    // we're done here - cleanup.
-    delete dlist;
-  } // end if (!dlist)
+      }
+    }
+  }
 
   output->displayDataPage(statsString.str(), "Inverted list for " + (*term));
-
-  _repository.close();
-  delete db;
-#endif
 } // end function void getTermInvPosListField(string*)
-

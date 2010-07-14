@@ -1,4 +1,6 @@
 #include "IndriSearchInterface.h"
+#include "lemur-compat.hpp"
+
 #include <time.h>
 #include <cctype>
 #include <algorithm>
@@ -678,7 +680,7 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults,
   
   // run the query...
   try {
-    int totalNumResults=MIN(maxNumResults, (rankStart+1000));
+    int totalNumResults=lemur_compat::min(maxNumResults, (rankStart+1000));
     qaResults=queryEnvironment->runAnnotatedQuery(reformulatedQuery, 
 						  totalNumResults);
   } catch (...) {
@@ -746,12 +748,12 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults,
 
     int maxResultsToGet=finalResults.size();
     if (DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE!=0) {
-      maxResultsToGet=MIN(finalResults.size(), 
-			  DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE);
+      maxResultsToGet=lemur_compat::min((int)finalResults.size(), 
+                                        DEFAULT_MAX_DOCUMENTS_TO_RETRIEVE);
     }
 
     output->setResultStatistics(indexID, rankStart,
-                                MIN(rankStart+listLength, maxResultsToGet),
+                                lemur_compat::min(rankStart+listLength, maxResultsToGet),
                                 maxResultsToGet);
 
     output->displayResultsPageBeginning();
@@ -762,7 +764,7 @@ void IndriSearchInterface::performSearch(string &query, int maxNumResults,
 
     std::vector<indri::api::ScoredExtentResult> resultSubset;
     resultSubset.assign(finalResults.begin()+rankStart, 
-			finalResults.begin()+MIN(rankStart+listLength, 
+			finalResults.begin()+lemur_compat::min(rankStart+listLength, 
 						 maxResultsToGet));
 
     std::vector<indri::api::ParsedDocument*> parsedDocs = queryEnvironment->documents(resultSubset);
