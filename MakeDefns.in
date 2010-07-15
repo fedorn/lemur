@@ -98,4 +98,4 @@ CFLAGS = @DEFS@ @CFLAGS@ @SHARED@
 CXXFLAGS    = @DEFS@ @CXXFLAGS@ @SHARED@
 CPPLDFLAGS  = @LDFLAGS@ @LIBS@
 
-ALLBIN =  IndriBuildIndex IndriDaemon IndriRunQuery dumpindex makeprior harvestlinks pagerank ModifyFields
+ALLBIN =  IndriBuildIndex IndriDaemon IndriRunQuery dumpindex makeprior harvestlinks pagerank ModifyFields clarity
