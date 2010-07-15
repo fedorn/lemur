@@ -39,30 +39,29 @@ static bool copy_parameters_to_string_vector( std::vector<std::string>& vec, ind
   return true;
 }
 
-static void open_indexes( indri::api::QueryEnvironment& environment, indri::api::Parameters& param ) {
+static void open_indexes( indri::api::QueryEnvironment& environment, 
+                          indri::api::Parameters& param ) {
   if( param.exists( "index" ) ) {
     indri::api::Parameters indexes = param["index"];
-
     for( unsigned int i=0; i < indexes.size(); i++ ) {
       environment.addIndex( std::string(indexes[i]) );
     }
   }
-
   if( param.exists( "server" ) ) {
     indri::api::Parameters servers = param["server"];
-
     for( unsigned int i=0; i < servers.size(); i++ ) {
       environment.addServer( std::string(servers[i]) );
     }
   }
-
   std::vector<std::string> smoothingRules;
   if( copy_parameters_to_string_vector( smoothingRules, param, "rule" ) )
     environment.setScoringRules( smoothingRules );
 }
 
 // how to just compute the clarity score without printing out the terms.
-static double clarity( const std::string& query, indri::api::QueryEnvironment & env, const std::vector<indri::query::RelevanceModel::Gram*>& grams, int numTerms ) {
+static double clarity( const std::string& query, 
+                       indri::api::QueryEnvironment & env, 
+                       const std::vector<indri::query::RelevanceModel::Gram*>& grams, int numTerms ) {
 
   int count = 0;
   double sum=0, ln_Pr=0;
@@ -81,7 +80,9 @@ static double clarity( const std::string& query, indri::api::QueryEnvironment & 
   return (ln_Pr/(sum ? sum : 1.0)/log(2.0));
 }
 
-static void printClarity( const std::string& query, indri::api::QueryEnvironment & env, const std::vector<indri::query::RelevanceModel::Gram*>& grams, int numTerms ) {
+static void printClarity( const std::string& query, 
+                          indri::api::QueryEnvironment & env, 
+                          const std::vector<indri::query::RelevanceModel::Gram*>& grams, int numTerms ) {
 
   int count = 0;
   double sum=0, ln_Pr=0;
@@ -97,9 +98,11 @@ static void printClarity( const std::string& query, indri::api::QueryEnvironment
     sum += pwq;    
     ln_Pr += (pwq)*log(pwq/pw);
   }
-  std::cout << "# query: " << query <<  " = " << count << " " << (ln_Pr/(sum ? sum : 1.0)/log(2.0)) << std::endl;
+  std::cout << "# query: " << query <<  " = " << count << " " 
+            << (ln_Pr/(sum ? sum : 1.0)/log(2.0)) << std::endl;
   for( size_t j=0; j< numTerms && j < grams.size(); j++ ) {
     std::string t = grams[j]->terms[0];
+    double pw = ((double)env.stemCount(t)/(double)env.termCount());
     std::cout << t << " "
               << (grams[j]->weight*log(grams[j]->weight/
     // the relevance model uses stemmed terms, so use stemCount
@@ -109,15 +112,17 @@ static void printClarity( const std::string& query, indri::api::QueryEnvironment
 }
 
 static void usage( indri::api::Parameters param ) {
-  if( !param.exists( "query" ) || !( param.exists( "index" ) || param.exists( "server" ) )) {
+  if( !param.exists( "query" ) || 
+      !( param.exists( "index" ) || param.exists( "server" ) )) {
    std::cerr << "clarity usage: " << std::endl
-             << "   clarity -query=myquery -index=myindex -documents=10 -terms=5" << std::endl
-             << "OR clarity -query=myquery -server=myserver -documents=10 -terms=5" << std::endl
+             << "   clarity -query=myquery -index=myindex -documents=10 -terms=5 -smoothing=\"method:jm,lambda,0.5\"" << std::endl
+             << "OR clarity -query=myquery -server=myserver -documents=10 -terms=5 -smoothing=\"method:jm,lambda,0.5\"" << std::endl
              << "     myquery: a valid Indri query (be sure to use quotes around it if there are spaces in it)" << std::endl
              << "     myindex: a valid Indri index" << std::endl
              << "     myserver: a valid IndriDaemon instance" << std::endl
              << "     documents: the number of documents to use to build the relevance model. Default is 5" << std::endl
-             << "     terms: the number of terms to use to build the relevance model. Default is 10" << std::endl;
+             << "     terms: the number of terms to use to build the relevance model. Default is 10" 
+             << "     smoothing: the smoothing rule to apply. Default is linear smoothing with lambda=0.5" << std::endl;
    exit(-1);
   }
 }
@@ -132,7 +137,7 @@ int main( int argc, char** argv ) {
     open_indexes( environment, param );
               
     indri::api::Parameters parameterQueries = param[ "query" ];
-    std::string rmSmoothing = "";
+    std::string rmSmoothing = param.get("smoothing", "method:jm,lambda,0.5");
     int documents = (int) param.get( "documents", 5 );
     int terms = (int) param.get( "terms", 10 );
     int maxGrams = 1; 
