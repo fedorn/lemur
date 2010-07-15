@@ -179,7 +179,7 @@ void indri::query::RelevanceModel::_scoreGrams() {
       // we're smoothing with them; otherwise we don't care.
 
       if( gram->terms.size() == 1 ) {
-        gramCount = (double)_environment.termCount( gram->terms[0] );
+        gramCount = (double)_environment.stemCount( gram->terms[0] );
       } else {
         // notice that we're running a query here;
         // this is likely to be slow. (be warned)
@@ -227,8 +227,9 @@ void indri::query::RelevanceModel::_scoreGrams() {
         termScore = occurrences / double(contextLength);
       }
       //RMExpander weights this by 1/fbDocs
-      //      gramScore += documentScore * termScore;
-      gramScore += (1.0/_documents) * documentScore * termScore;
+      // Unclear as to why.
+      gramScore += documentScore * termScore;
+      //gramScore += (1.0/_documents) * documentScore * termScore;
     }
 
     gram->weight = gramScore;
