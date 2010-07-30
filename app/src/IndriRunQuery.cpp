@@ -281,10 +281,10 @@ struct query_t {
     }
   };
 
-  query_t( int _index, std::string _number, const std::string& _text, const std::string &queryType ) :
+  query_t( int _index, std::string _number, const std::string& _text, const std::string &queryType,  std::vector<std::string> workSet,   std::vector<std::string> FBDocs) :
     index( _index ),
     number( _number ),
-    text( _text ), qType(queryType)
+    text( _text ), qType(queryType), workingSet(workSet), relFBDocs(FBDocs)
   {
   }
 
@@ -299,6 +299,10 @@ struct query_t {
   int index;
   std::string text;
   std::string qType;
+  // working set to restrict retrieval
+  std::vector<std::string> workingSet;
+  // Rel fb docs
+  std::vector<std::string> relFBDocs;
 };
 
 class QueryThread : public indri::thread::UtilityThread {
@@ -328,21 +332,49 @@ private:
 
   // Runs the query, expanding it if necessary.  Will print output as well if verbose is on.
   void _runQuery( std::stringstream& output, const std::string& query,
-                  const std::string &queryType ) {
+                  const std::string &queryType, const std::vector<std::string> &workingSet, std::vector<std::string> relFBDocs ) {
     try {
       if( _printQuery ) output << "# query: " << query << std::endl;
+      std::vector<lemur::api::DOCID_T> docids;;
+      if (workingSet.size() > 0) 
+        docids = _environment.documentIDsFromMetadata("docno", workingSet);
 
-      if( _printSnippets ) {
-        _annotation = _environment.runAnnotatedQuery( query, _initialRequested );
-        _results = _annotation->getResults();
-      } else {
-        _results = _environment.runQuery( query, _initialRequested, queryType );
+      if (relFBDocs.size() == 0) {
+          if( _printSnippets ) {
+            if (workingSet.size() > 0) 
+              _annotation = _environment.runAnnotatedQuery( query, docids, _initialRequested, queryType ); 
+            else
+              _annotation = _environment.runAnnotatedQuery( query, _initialRequested );
+            _results = _annotation->getResults();
+          } else {
+            if (workingSet.size() > 0)
+              _results = _environment.runQuery( query, docids, _initialRequested, queryType );
+            else
+              _results = _environment.runQuery( query, _initialRequested, queryType );
+          }
       }
-
+      
       if( _expander ) {
-        std::string expandedQuery = _expander->expand( query, _results );
+        std::vector<indri::api::ScoredExtentResult> fbDocs;
+        if (relFBDocs.size() > 0) {
+          docids = _environment.documentIDsFromMetadata("docno", relFBDocs);
+          for (size_t i = 0; i < docids.size(); i++) {
+            indri::api::ScoredExtentResult r(0.0, docids[i]);
+            fbDocs.push_back(r);
+          }
+        }
+        std::string expandedQuery;
+        if (relFBDocs.size() != 0)
+          expandedQuery = _expander->expand( query, fbDocs );
+        else
+          expandedQuery = _expander->expand( query, _results );
         if( _printQuery ) output << "# expanded: " << expandedQuery << std::endl;
-        _results = _environment.runQuery( expandedQuery, _requested, queryType );
+        if (workingSet.size() > 0) {
+          docids = _environment.documentIDsFromMetadata("docno", workingSet);
+          _results = _environment.runQuery( expandedQuery, docids, _requested, queryType );
+        } else {
+          _results = _environment.runQuery( expandedQuery, _requested, queryType );
+        }
       }
     }
     catch( lemur::api::Exception& e )
@@ -541,8 +573,7 @@ public:
 
     if (_parameters.exists("maxWildcardTerms")) {
       _environment.setMaxWildcardTerms((int)_parameters.get("maxWildcardTerms"));
-    }
-
+    }    
     return 0;
   }
 
@@ -576,7 +607,7 @@ public:
       if (_parameters.exists("baseline") && ((query->text.find("#") != std::string::npos) || (query->text.find(".") != std::string::npos)) ) {
         LEMUR_THROW( LEMUR_PARSE_ERROR, "Can't run baseline on this query: " + query->text + "\nindri query language operators are not allowed." );
       }
-      _runQuery( output, query->text, query->qType );
+      _runQuery( output, query->text, query->qType, query->workingSet, query->relFBDocs );
     } catch( lemur::api::Exception& e ) {
       output << "# EXCEPTION in query " << query->number << ": " << e.what() << std::endl;
     }
@@ -605,18 +636,29 @@ void push_queue( std::queue< query_t* >& q, indri::api::Parameters& queries,
     std::string queryType = "indri";
     if( queries[i].exists( "type" ) )
       queryType = (std::string) queries[i]["type"];
-
-    if( queries[i].exists( "number" ) ) {
+    if (queries[i].exists("text"))
       queryText = (std::string) queries[i]["text"];
+    if( queries[i].exists( "number" ) ) {
       queryNumber = (std::string) queries[i]["number"];
     } else {
-      queryText = (std::string) queries[i];
       int thisQuery=queryOffset + int(i);
       std::stringstream s;
       s << thisQuery;
       queryNumber = s.str();
     }
-    q.push( new query_t( i, queryNumber, queryText, queryType ) );
+    if (queryText.size() == 0)
+      queryText = (std::string) queries[i];
+
+    // working set and RELFB docs go here.
+    // working set to restrict retrieval
+    std::vector<std::string> workingSet;
+    // Rel fb docs
+    std::vector<std::string> relFBDocs;
+    copy_parameters_to_string_vector( workingSet, queries[i], "workingSetDocno" );
+    copy_parameters_to_string_vector( relFBDocs, queries[i], "feedbackDocno" );
+
+    q.push( new query_t( i, queryNumber, queryText, queryType, workingSet, relFBDocs ) );
+
   }
 }
 
