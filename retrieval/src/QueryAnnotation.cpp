@@ -77,21 +77,25 @@ void delete_query_node( indri::api::QueryAnnotationNode* node, std::set<indri::a
   
   for( size_t i=0; i<node->children.size(); i++ ) {
     indri::api::QueryAnnotationNode* child = node->children[i];
-    if( deleted.find(child) != deleted.end() )
+    if( deleted.find(child) == deleted.end() )
       delete_query_node(node->children[i], deleted);
   }
 }
 
 
 indri::api::QueryAnnotation::QueryAnnotation() :
-  _queryTree(0)
-{
+  _queryTree(0) {
 }
 
 indri::api::QueryAnnotation::~QueryAnnotation() {
   std::set<indri::api::QueryAnnotationNode*> deleted;
   delete_query_node(_queryTree, deleted);
+  std::set<indri::api::QueryAnnotationNode*>::iterator item;
+  for(item = deleted.begin(); item != deleted.end(); item++) {
+    delete *item;
+  }
 }
+
 
 indri::api::QueryAnnotation::QueryAnnotation( indri::lang::Node* queryRoot, indri::infnet::EvaluatorNode::MResults& annotations, std::vector<indri::api::ScoredExtentResult>& results ) {
   indri::lang::QueryNodeBuilder builder;
