@@ -79,6 +79,22 @@ namespace indri
         _disqualifiers.push(fixedPassage);
       }
 
+      void before( indri::lang::FieldGreaterNode* fieldGreater ) {
+        _disqualifiers.push(fieldGreater);
+      }
+
+      void before( indri::lang::FieldLessNode* fieldLess ) {
+        _disqualifiers.push(fieldLess);
+      }
+      
+      void before( indri::lang::FieldEqualsNode* fieldEquals ) {
+        _disqualifiers.push(fieldEquals);
+      }
+
+      void before( indri::lang::FieldBetweenNode* fieldBetween ) {
+        _disqualifiers.push(fieldBetween);
+      }
+
       void before( indri::lang::ContextCounterNode* context ) {
         if( context->getContext() != NULL ) {
           _disqualifiedTree = true;
