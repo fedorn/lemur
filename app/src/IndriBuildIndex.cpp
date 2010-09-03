@@ -54,6 +54,7 @@ parameter file and as <tt>-corpus.class=trecweb</tt> on the command
 line. The known classes are: 
 <ul>
 <li>html -- web page data.
+<li>xml -- xml marked up data.
 <li>trecweb -- TREC web format, eg terabyte track.
 <li>trectext -- TREC format, eg TREC-3 onward.
 <li>trecalt -- TREC format, eg TREC-3 onward, with only the TEXT field included.
@@ -411,6 +412,7 @@ parameter file and as <tt>-corpus.class=trecweb</tt> on the command
 line. The known classes are: 
 <ul>
 <li>html -- web page data.
+<li>xml -- xml marked up data.
 <li>trecweb -- TREC web format, eg terabyte track.
 <li>trectext -- TREC format, eg TREC-3 onward.
 <li>trecalt -- TREC format, eg TREC-3 onward, with only the TEXT field included.
