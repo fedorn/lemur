@@ -18,7 +18,7 @@
 //
 
 void indri::api::SnippetBuilder::_getRawNodes( std::vector<std::string>& nodeNames, const indri::api::QueryAnnotationNode* node ) {
-  if( node->type == "IndexTerm" || node->type == "OrderedWindowNode" ) {
+  if( node->type == "RawScorerNode" ) {
     nodeNames.push_back( node->name );
   } else {
     for( size_t i=0; i<node->children.size(); i++ ) {
