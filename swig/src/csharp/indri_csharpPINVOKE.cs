@@ -1047,29 +1047,17 @@ class indri_csharpPINVOKE {
   [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_getContent")]
   public static extern string ParsedDocument_getContent(HandleRef jarg1);
 
-  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_terms_set")]
-  public static extern void ParsedDocument_terms_set(HandleRef jarg1, HandleRef jarg2);
-
-  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_terms_get")]
-  public static extern IntPtr ParsedDocument_terms_get(HandleRef jarg1);
-
-  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_tags_set")]
-  public static extern void ParsedDocument_tags_set(HandleRef jarg1, HandleRef jarg2);
-
-  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_tags_get")]
-  public static extern IntPtr ParsedDocument_tags_get(HandleRef jarg1);
-
-  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_positions_set")]
-  public static extern void ParsedDocument_positions_set(HandleRef jarg1, HandleRef jarg2);
-
-  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_positions_get")]
-  public static extern IntPtr ParsedDocument_positions_get(HandleRef jarg1);
-
   [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_metadata_set")]
   public static extern void ParsedDocument_metadata_set(HandleRef jarg1, HandleRef jarg2);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_metadata_get")]
   public static extern IntPtr ParsedDocument_metadata_get(HandleRef jarg1);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_terms_set")]
+  public static extern void ParsedDocument_terms_set(HandleRef jarg1, HandleRef jarg2);
+
+  [DllImport("lemur_csharp", EntryPoint="CSharp_ParsedDocument_terms_get")]
+  public static extern IntPtr ParsedDocument_terms_get(HandleRef jarg1);
 
   [DllImport("lemur_csharp", EntryPoint="CSharp_new_ParsedDocument")]
   public static extern IntPtr new_ParsedDocument();

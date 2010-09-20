@@ -86,39 +86,6 @@ public class ParsedDocument : IDisposable {
     return ret;
   }
 
-  public Char_pVector terms {
-    set {
-      indri_csharpPINVOKE.ParsedDocument_terms_set(swigCPtr, Char_pVector.getCPtr(value));
-    } 
-    get {
-      IntPtr cPtr = indri_csharpPINVOKE.ParsedDocument_terms_get(swigCPtr);
-      Char_pVector ret = (cPtr == IntPtr.Zero) ? null : new Char_pVector(cPtr, false);
-      return ret;
-    } 
-  }
-
-  public TagExtentVector tags {
-    set {
-      indri_csharpPINVOKE.ParsedDocument_tags_set(swigCPtr, TagExtentVector.getCPtr(value));
-    } 
-    get {
-      IntPtr cPtr = indri_csharpPINVOKE.ParsedDocument_tags_get(swigCPtr);
-      TagExtentVector ret = (cPtr == IntPtr.Zero) ? null : new TagExtentVector(cPtr, false);
-      return ret;
-    } 
-  }
-
-  public TermExtentVector positions {
-    set {
-      indri_csharpPINVOKE.ParsedDocument_positions_set(swigCPtr, TermExtentVector.getCPtr(value));
-    } 
-    get {
-      IntPtr cPtr = indri_csharpPINVOKE.ParsedDocument_positions_get(swigCPtr);
-      TermExtentVector ret = (cPtr == IntPtr.Zero) ? null : new TermExtentVector(cPtr, false);
-      return ret;
-    } 
-  }
-
   public MetadataPairVector metadata {
     set {
       indri_csharpPINVOKE.ParsedDocument_metadata_set(swigCPtr, MetadataPairVector.getCPtr(value));
@@ -126,6 +93,17 @@ public class ParsedDocument : IDisposable {
     get {
       IntPtr cPtr = indri_csharpPINVOKE.ParsedDocument_metadata_get(swigCPtr);
       MetadataPairVector ret = (cPtr == IntPtr.Zero) ? null : new MetadataPairVector(cPtr, false);
+      return ret;
+    } 
+  }
+
+  public Char_pVector terms {
+    set {
+      indri_csharpPINVOKE.ParsedDocument_terms_set(swigCPtr, Char_pVector.getCPtr(value));
+    } 
+    get {
+      IntPtr cPtr = indri_csharpPINVOKE.ParsedDocument_terms_get(swigCPtr);
+      Char_pVector ret = (cPtr == IntPtr.Zero) ? null : new Char_pVector(cPtr, false);
       return ret;
     } 
   }

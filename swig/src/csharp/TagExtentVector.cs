@@ -190,8 +190,8 @@ public class TagExtentVector : IDisposable, System.Collections.IEnumerable {
     indri_csharpPINVOKE.TagExtentVector_Clear(swigCPtr);
   }
 
-  public void Add(SWIGTYPE_p_p_indri__parse__TagExtent value) {
-    indri_csharpPINVOKE.TagExtentVector_Add(swigCPtr, SWIGTYPE_p_p_indri__parse__TagExtent.getCPtr(value));
+  public void Add(TagExtent value) {
+    indri_csharpPINVOKE.TagExtentVector_Add(swigCPtr, TagExtent.getCPtr(value));
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -217,20 +217,19 @@ public class TagExtentVector : IDisposable, System.Collections.IEnumerable {
   }
 
   private TagExtent getitemcopy(int index) {
-    IntPtr cPtr = indri_csharpPINVOKE.TagExtentVector_getitemcopy(swigCPtr, index);
-    TagExtent ret = (cPtr == IntPtr.Zero) ? null : new TagExtent(cPtr, false);
+    TagExtent ret = new TagExtent(indri_csharpPINVOKE.TagExtentVector_getitemcopy(swigCPtr, index), true);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  private SWIGTYPE_p_p_indri__parse__TagExtent getitem(int index) {
-    SWIGTYPE_p_p_indri__parse__TagExtent ret = new SWIGTYPE_p_p_indri__parse__TagExtent(indri_csharpPINVOKE.TagExtentVector_getitem(swigCPtr, index), false);
+  private TagExtent getitem(int index) {
+    TagExtent ret = new TagExtent(indri_csharpPINVOKE.TagExtentVector_getitem(swigCPtr, index), false);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  private void setitem(int index, SWIGTYPE_p_p_indri__parse__TagExtent value) {
-    indri_csharpPINVOKE.TagExtentVector_setitem(swigCPtr, index, SWIGTYPE_p_p_indri__parse__TagExtent.getCPtr(value));
+  private void setitem(int index, TagExtent value) {
+    indri_csharpPINVOKE.TagExtentVector_setitem(swigCPtr, index, TagExtent.getCPtr(value));
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -246,8 +245,8 @@ public class TagExtentVector : IDisposable, System.Collections.IEnumerable {
     return ret;
   }
 
-  public void Insert(int index, SWIGTYPE_p_p_indri__parse__TagExtent value) {
-    indri_csharpPINVOKE.TagExtentVector_Insert(swigCPtr, index, SWIGTYPE_p_p_indri__parse__TagExtent.getCPtr(value));
+  public void Insert(int index, TagExtent value) {
+    indri_csharpPINVOKE.TagExtentVector_Insert(swigCPtr, index, TagExtent.getCPtr(value));
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -266,8 +265,8 @@ public class TagExtentVector : IDisposable, System.Collections.IEnumerable {
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static TagExtentVector Repeat(SWIGTYPE_p_p_indri__parse__TagExtent value, int count) {
-    IntPtr cPtr = indri_csharpPINVOKE.TagExtentVector_Repeat(SWIGTYPE_p_p_indri__parse__TagExtent.getCPtr(value), count);
+  public static TagExtentVector Repeat(TagExtent value, int count) {
+    IntPtr cPtr = indri_csharpPINVOKE.TagExtentVector_Repeat(TagExtent.getCPtr(value), count);
     TagExtentVector ret = (cPtr == IntPtr.Zero) ? null : new TagExtentVector(cPtr, true);
     if (indri_csharpPINVOKE.SWIGPendingException.Pending) throw indri_csharpPINVOKE.SWIGPendingException.Retrieve();
     return ret;

@@ -322,8 +322,8 @@ SWIG_GREEDY_VECTOR_SPECIALIZE_MINIMUM(TermExtent, indri::parse::TermExtent)
 SWIG_GREEDY_VECTOR_SPECIALIZE_MINIMUM(MetadataPair, indri::parse::MetadataPair)
   %template(MetadataPairVector) indri::utility::greedy_vector<indri::parse::MetadataPair> ;
 
-SWIG_GREEDY_VECTOR_SPECIALIZE_MINIMUM(TagExtent, indri::parse::TagExtent *)
-  %template(TagExtentVector) indri::utility::greedy_vector<indri::parse::TagExtent *> ;
+SWIG_GREEDY_VECTOR_SPECIALIZE_MINIMUM(TagExtent, indri::parse::TagExtent)
+  %template(TagExtentVector) indri::utility::greedy_vector<indri::parse::TagExtent> ;
 
 // needs more typemaps.
 %typemap(ctype) char *& "char *"
@@ -388,10 +388,12 @@ namespace indri {
       size_t contentLength;
 
       std::string getContent();
-      indri::utility::greedy_vector<char *> terms;
-      indri::utility::greedy_vector<indri::parse::TagExtent *> tags;
-      indri::utility::greedy_vector<indri::parse::TermExtent> positions;
       indri::utility::greedy_vector<indri::parse::MetadataPair> metadata;
+      indri::utility::greedy_vector<char *> terms;
+    private:
+      indri::utility::greedy_vector<indri::parse::TagExtent> tags;
+      indri::utility::greedy_vector<indri::parse::TermExtent> positions;
+
     };
 
   }
