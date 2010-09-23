@@ -358,14 +358,6 @@ as <tt>-fbOrigWeight=number</tt> on the command line.</dd>
 
 <H3>IndriDaemon Parameters</H3>
 <dl>
-<dt>memory</dt>
-<dd> an integer value specifying the number of bytes to use for the
-query retrieval process. The value can include a scaling factor by
-adding a suffix. Valid values are (case insensitive) K = 1000, M =
-1000000, G = 1000000000. So 100M would be equivalent to 100000000. The
-value should contain only decimal digits and the optional
-suffix. Specified as &lt;memory&gt;100M&lt;/memory&gt; in the parameter
-file and as <tt>-memory=100M</tt> on the command line. </dd> 
 <dt>index</dt>
 <dd> path to the Indri Repository to act as server for. Specified as
 &lt;index&gt;/path/to/repository&lt;/index&gt; in the parameter file and
