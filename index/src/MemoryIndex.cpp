@@ -163,10 +163,10 @@ lemur::api::TERMID_T indri::index::MemoryIndex::term( const std::string& term ) 
 //
 
 std::string indri::index::MemoryIndex::term( lemur::api::TERMID_T termID ) {
-  if( termID <= 0 || termID >= (int)_idToTerm.size() )
+  if( termID <= 0 || termID > (int)_idToTerm.size() )
     return std::string();
 
-  term_entry* entry = _idToTerm[ termID ];
+  term_entry* entry = _idToTerm[ termID - 1 ];
   return entry->term;
 }
 
@@ -489,10 +489,10 @@ indri::index::MemoryIndex::term_entry* indri::index::MemoryIndex::_lookupTerm( c
   if( entry )
     return *entry;
 
+
   // this is a term we haven't seen before
   _corpusStatistics.uniqueTerms++;
   lemur::api::TERMID_T termID = _corpusStatistics.uniqueTerms;
-  
   // create a term data structure
   TermData* termData = termdata_construct( _allocator.allocate( termdata_size( _fieldData.size() ) ),
                                            _fieldData.size() );
@@ -661,7 +661,7 @@ indri::index::DocListIterator* indri::index::MemoryIndex::docListIterator( lemur
   if( termID == 0 )
     return 0;
   
-  term_entry* entry = _idToTerm[termID];
+  term_entry* entry = _idToTerm[termID - 1];
   return new DocListMemoryBuilderIterator( entry->list, entry->termData );
 }
 
@@ -728,7 +728,6 @@ const indri::index::TermList* indri::index::MemoryIndex::termList( lemur::api::D
 
   assert( documentBuffer );
   TermList* list = new TermList();
-
   list->read( documentBuffer->front() + documentOffset, data.byteLength );
   return list;
 }
