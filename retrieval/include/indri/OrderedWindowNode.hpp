@@ -49,6 +49,7 @@ namespace indri
       struct extents_pointer {
         indri::utility::greedy_vector<indri::index::Extent>::const_iterator iter;
         indri::utility::greedy_vector<indri::index::Extent>::const_iterator end;
+        indri::utility::greedy_vector<indri::index::Extent>::const_iterator start;
       };
       int _windowSize;
       std::vector<ListIteratorNode*> _children;
@@ -56,6 +57,8 @@ namespace indri
       std::vector<extents_pointer> _pointers;
       std::string _name;
 
+      bool findNextPossibleOccurrence(int i, bool& fail);
+      
     public:
       OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children );
       OrderedWindowNode( const std::string& name, const std::vector<ListIteratorNode*>& children, int windowSize );
