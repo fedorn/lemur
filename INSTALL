@@ -6,12 +6,6 @@
       -# go to top level lemur directory.
       -# run <tt>configure</tt> to generate MakeDefns, Makefile, 
          and Makefile.app. <tt>configure</tt> accepts following arguments:
-		- <tt>--enable-distrib</tt> compiles and installs 
-		  the distributed retrieval components. Default is disabled.
-		- <tt>--enable-summarization</tt> compiles and installs the
-		  summarization components. Default is disabled.
-		- <tt>--enable-cluster</tt> compiles and installs the
-		  document clustering components. Default is disabled.
 		- <tt>--enable-assert</tt> Enable assert statements in
                   the code. Default is disabled.
 		- <tt>--prefix=&lt;install-directory&gt;</tt> Specifies the 
@@ -62,9 +56,7 @@ javadoc generated documentation.
 <p>For linux and solaris, if configured with --enable-java,
 the shared library will be installed in
 &lt;install-directory&gt;/lib/liblemur_jni.so and the java class files will be
-installed in &lt;install-directory&gt;/share/lemur/lemur.jar and
-&lt;install-directory&gt;/share/lemur/indri.jar, for the Lemur and Indri
-APIS. You will need to 
+installed in &lt;install-directory&gt;/share/lemur/indri.jar. You will need to 
 add &lt;install-directory&gt;/lib to your LD_LIBRARY_PATH and add
 the appropriate jar file(s) to your CLASSPATH to use the
 JNI interface.
@@ -73,25 +65,25 @@ JNI interface.
 the shared library will be installed in
 &lt;install-directory&gt;/lib/liblemur_jni.jnilib and the java class
 files will be installed in
-&lt;install-directory&gt;/share/lemur/lemur.jar and
-&lt;install-directory&gt;/share/lemur/indri.jar, for the Lemur and Indri
-APIS. You will need to add &lt;install-directory&gt;/lib to your
+&lt;install-directory&gt;/share/lemur/indri.jar. 
+You will need to add &lt;install-directory&gt;/lib to your
 java.library.path on the java command line, using -Djava.library.path=&lt;install-directory&gt;/lib and add 
 the appropriate jar file(s) to your CLASSPATH to use the
 JNI interface.
 
-<p> Four additional jar files are installed. RetUI.jar provides a basic
+<p> Two additional jar files are installed. RetUI.jar provides a basic
 document retrieval GUI for interactive queries, using the Indri
 API. IndexUI.jar provides a 
 basic collection indexing GUI for building an indri
-repository. LemurRet.jar provides a basic document retrieval GUI for
-interactive queries using the Lemur API. LemurIndex.jar provides a basic
-collection indexing GUI for building Lemur indexes. All are
+repository. Each  are
 installed in &lt;install-directory&gt;/share/lemur and can be run with 
 <br>
 <pre>
 java -jar &lt;jarfilename&gt;
 </pre>
+
+<p> Note that only portions of the Indri API are wrapped for
+use with Java.
 
 <p>If configured with --enable-php,
 the shared library will be installed in
@@ -104,7 +96,8 @@ use with PHP.
 the shared library will be installed in
 &lt;install-directory&gt;/lib/liblemur_csharp.so. The C# wrapper classes
 assembly will be installed  in &lt;install-directory&gt;/lib/LemurCsharp.dll
-This assembly should be referenced by your C# program.
+This assembly should be referenced by your C# program. Note that only
+portions of the Indri API are wrapped for use with C#.
 
   \section program  Programming with the lemur toolkit
 
