@@ -63,9 +63,9 @@ indri::parse::TokenizedDocument* indri::parse::TextTokenizer::tokenize( indri::p
 
   _termBuffer.clear();
   if ( _tokenize_entire_words)
-    _termBuffer.grow( document->textLength );
+    _termBuffer.grow( document->textLength * 4);
   else
-    _termBuffer.grow( document->textLength * 2 ); // extra null per char.
+    _termBuffer.grow( document->textLength * 8 ); // extra null per char.
 
   _document.terms.clear();
   _document.tags.clear();
@@ -301,14 +301,14 @@ void indri::parse::TextTokenizer::processTag() {
 
             bool quoted = true;
 
-            if ( *c == '"' || *c == '\'' ) { c++; offset++; }
+            if ( *c == '"' || *c =='\'' ) { c++; offset++; }
             else quoted = false;
 
             // Attribute value starts here.
 
             i = 0;
             if ( quoted ) 
-              while ( c[i] != '"' && c[i] != '>' && c[i] != '\'') i++;
+              while ( c[i] != '"' && c[i] != '>' && c[i] !='\'') i++;
             else
 #ifndef WIN32
               while ( ! isspace( c[i] ) && c[i] != '>' ) i++;
