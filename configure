@@ -6512,7 +6512,7 @@ echo "${ECHO_T}not found disabling swig java wrappers" >&6; }
    else
       { echo "$as_me:$LINENO: checking for java include file jni_md.h" >&5
 echo $ECHO_N "checking for java include file jni_md.h... $ECHO_C" >&6; }
-      JAVAMDDIR=`find $JAVAINCDIR -follow -name jni_md.h -print`
+      JAVAMDDIR=`find $JAVAINCDIR -follow -name jni_md.h -print | head -1`
       if test "$JAVAMDDIR" = "" ; then
 	 { echo "$as_me:$LINENO: result: not found" >&5
 echo "${ECHO_T}not found" >&6; }

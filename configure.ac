@@ -198,7 +198,7 @@ dnl only disable if no java includes or no javac
    else
 dnl now look for <arch>/jni_md.h
       AC_MSG_CHECKING(for java include file jni_md.h)
-      JAVAMDDIR=`find $JAVAINCDIR -follow -name jni_md.h -print`
+      JAVAMDDIR=`find $JAVAINCDIR -follow -name jni_md.h -print | head -1`
       if test "$JAVAMDDIR" = "" ; then
 	 AC_MSG_RESULT(not found)
 	 WITH_JAVA=0
