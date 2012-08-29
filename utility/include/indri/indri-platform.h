@@ -27,10 +27,6 @@
 
 #include "lemur-platform.h"
 
-#ifdef __APPLE__
-#include <tcpd.h>
-#endif /* __APPLE__ */
-
 #define INDRID_PORT ( 16743 )
 #define INDRI_DISTRIBUTION "Indri development release 5.0"
 
