@@ -87,7 +87,7 @@ namespace lemur
       }
   
       int operator[](const ObjType& u) const {    // get idx of u, -1 if not there
-        int hashval = computeHash(u);    
+        int hashval = this->computeHash(u);
         typename PSet<ObjType>::SET_NODE *p = this->hashTable[hashval];
         while(p!=0 && !(p->u==u)) p=p->next;
         return ((p==0)? -1: p->idx);
@@ -101,12 +101,12 @@ namespace lemur
         memset(newHashTable, 0, this->hashTableSize*sizeof(typename PSet<ObjType>::SET_NODE *));
         for (int i=0; i<this->currentSize; i++) {
           typename PSet<ObjType>::SET_NODE *sn = index[i];
-          const int hashval = computeHash(sn->u);
-          typename PSet<ObjType>::SET_NODE *snNew = createNode(sn->u);
+          const int hashval = this->computeHash(sn->u);
+          typename PSet<ObjType>::SET_NODE *snNew = this->createNode(sn->u);
           snNew->idx = i;
           snNew->next = newHashTable[hashval];
           newHashTable[hashval] = snNew;
-          deleteNode(sn);
+          this->deleteNode(sn);
           newIndex[i] = snNew;
         }
         delete [] index;

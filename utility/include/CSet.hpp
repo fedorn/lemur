@@ -60,7 +60,7 @@ namespace lemur
         sn = PSet<ObjType>::internalAdd(u);
         if (sn==0) {
           // already in set, but need to increment count anyway
-          int idx = operator[](u);
+          int idx = this->operator[](u);
           countOfIndex[idx] += count;
           return -1;
         }
