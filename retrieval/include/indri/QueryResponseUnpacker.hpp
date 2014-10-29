@@ -94,7 +94,7 @@ namespace indri
           aligned.end = ntohl(aligned.end);
           aligned.document = ntohl(aligned.document);
           aligned.score = lemur_compat::ntohd(aligned.score);
-          aligned.number = lemur_compat::ntohll(aligned.number);
+          aligned.number = ntohll(aligned.number);
           aligned.ordinal = ntohl(aligned.ordinal);
           aligned.parentOrdinal = ntohl(aligned.parentOrdinal);
 

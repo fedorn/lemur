@@ -94,8 +94,8 @@ OBJ = $(CPPOBJ) $(COBJ)
 
 # C compiler and compiling options
 # C++ compiler and compiling/linking options
-CFLAGS = @DEFS@ @CFLAGS@ @SHARED@
-CXXFLAGS    = @DEFS@ @CXXFLAGS@ @SHARED@
+CFLAGS = @DEFS@ @CPPFLAGS@ @CFLAGS@ @SHARED@
+CXXFLAGS    = @DEFS@ @CPPFLAGS@ @CXXFLAGS@ @SHARED@
 CPPLDFLAGS  = @LDFLAGS@ @LIBS@
 
 ALLBIN =  IndriBuildIndex IndriDaemon IndriRunQuery dumpindex makeprior harvestlinks pagerank ModifyFields clarity

@@ -45,6 +45,19 @@ case $host in
      CSHARP_SHARED="-shared"
      CSHARP_SO=".so"
      ;;
+   *-*-darwin1@<:@3-9@:>@*)
+     SHARED=
+
+# have to fix this for php/java bits.
+     PHP_SHARED=" -stdlib=libstdc++ -bundle  -undefined suppress -flat_namespace"
+     PHP_SO=".so"
+     JAVA_SHARED=" -stdlib=libstdc++ -dynamiclib -framework JavaVM"
+     JAVA_SO=".jnilib"
+     CSHARP_SHARED=" -stdlib=libstdc++ -bundle  -undefined suppress -flat_namespace"
+     CSHARP_SO=".so"
+     CPPFLAGS+=" -stdlib=libstdc++"
+     LDFLAGS+=" -stdlib=libstdc++"
+     ;;
    *-*-darwin*)
      SHARED=
      PHP_SHARED="-bundle  -undefined suppress -flat_namespace"

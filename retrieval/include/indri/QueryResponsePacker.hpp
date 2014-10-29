@@ -65,7 +65,7 @@ namespace indri
                 byteSwapped.end = htonl(unswapped.end);
                 byteSwapped.document = htonl(unswapped.document );
                 byteSwapped.score = lemur_compat::htond(unswapped.score);
-                byteSwapped.number = lemur_compat::htonll(unswapped.number);
+                byteSwapped.number = htonll(unswapped.number);
                 byteSwapped.ordinal = htonl(unswapped.ordinal);
                 byteSwapped.parentOrdinal = htonl(unswapped.parentOrdinal);
 
