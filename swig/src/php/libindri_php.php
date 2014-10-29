@@ -44,6 +44,10 @@ class TermExtent {
 		return array_key_exists($var, $this->_pData);
 	}
 
+	function __isset($var) {
+		return function_exists('TermExtent_'.$var.'_set');
+	}
+
 	function __get($var) {
 		$func = 'TermExtent_'.$var.'_get';
 		if (function_exists($func)) {

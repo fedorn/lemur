@@ -305,7 +305,7 @@ dnl AC_SUBST(HOST_OS)
 APPDIRS=app
 
 dnl Base lemur modules
-MODULES="retrieval index parsing utility contrib/antlr contrib/xpdf"
+MODULES="retrieval langmod index parsing utility contrib/antlr contrib/xpdf"
 
 AC_ARG_ENABLE(assert,
 	    AS_HELP_STRING(--enable-assert,Enable assert statements in code),

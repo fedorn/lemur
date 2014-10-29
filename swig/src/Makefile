@@ -4,7 +4,7 @@ include $(LEMURDIR)/MakeDefns
 PACKAGE = lemur_jni
 VERSION = 1.0
 
-LIBNAMES= retrieval index parsing utility
+LIBNAMES= retrieval langmod index parsing utility
 CONTMODULES=$(LIBNAMES)  contrib/antlr contrib/xpdf
 
 INCPATH = $(patsubst %, -I$(LEMURDIR)/%/include, $(CONTMODULES))

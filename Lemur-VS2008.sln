@@ -4,7 +4,59 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utility", "utility\utility-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "index", "index\index-VS2008.vcproj", "{EAA59E50-097D-4820-93EB-935B7C2FA46E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "langmod", "langmod\langmod-VS2008.vcproj", "{CBFA9666-9D4D-48F8-B8E3-4C98E8301E9D}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "retrieval", "retrieval\retrieval-VS2008.vcproj", "{8FE7FACA-8F60-41BA-8ED5-EFFD8E1B779E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenerateQueryModel", "app\GenerateQueryModel-VS2008.vcproj", "{DEF9B491-F1DE-11D8-9669-0800200C9A66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenerateSmoothSupport", "app\GenerateSmoothSupport-VS2008.vcproj", "{DEF9DBA1-F1DE-11D8-9669-0800200C9A66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParseInQueryOp", "app\ParseInQueryOp-VS2008.vcproj", "{DEFA29C2-F1DE-11D8-9669-0800200C9A66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParseQuery", "app\ParseQuery-VS2008.vcproj", "{DEFA50D0-F1DE-11D8-9669-0800200C9A66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParseToFile", "app\ParseToFile-VS2008.vcproj", "{DEFA50D4-F1DE-11D8-9669-0800200C9A66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QueryClarity", "app\QueryClarity-VS2008.vcproj", "{DEFB6241-F1DE-11D8-9669-0800200C9A66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QueryModelEval", "app\QueryModelEval-VS2008.vcproj", "{DEFB8951-F1DE-11D8-9669-0800200C9A66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RelFBEval", "app\RelFBEval-VS2008.vcproj", "{DEFB8955-F1DE-11D8-9669-0800200C9A66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RetEval", "app\RetEval-VS2008.vcproj", "{DEFBB063-F1DE-11D8-9669-0800200C9A66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StructQueryEval", "app\StructQueryEval-VS2008.vcproj", "{DEFBD770-F1DE-11D8-9669-0800200C9A66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5969DC42-6F94-43A7-A3F2-E493AF7DCDC2} = {5969DC42-6F94-43A7-A3F2-E493AF7DCDC2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "antlr", "contrib\antlr\antlr-VS2008.vcproj", "{BCB55C31-0117-427B-B4AF-20E3F7EC0AA7}"
 EndProject
